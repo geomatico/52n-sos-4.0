@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 10.07.2012 15:18:27 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="org.n52.sos.ds.hibernate.entities.SweType" table="swe_type">
+        <id name="sweTypeId" type="long">
+            <column name="swe_type_id" />
+            <generator class="increment" />
+        </id>
+        <property name="sweType" type="string">
+            <column name="swe_type" not-null="true" unique="true" />
+        </property>
+        <set name="qualities" table="quality" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="swe_type_id" not-null="true" />
+            </key>
+            <one-to-many class="org.n52.sos.ds.hibernate.entities.Quality" />
+        </set>
+    </class>
+</hibernate-mapping>

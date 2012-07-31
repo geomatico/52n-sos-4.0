@@ -1,0 +1,2 @@
+org.n52.sos.encode.SoapEncoder
+org.n52.sos.encode.WsaEncoder

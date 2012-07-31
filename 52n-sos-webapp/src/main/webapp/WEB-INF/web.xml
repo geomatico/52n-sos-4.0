@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+	<display-name>${project.parent.name}, SVN: ${buildNumber} @ ${timestamp}</display-name>
+	<description>This is an OGC SOS.</description>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+	<context-param>
+		<!--defines the directory in which the log files will be stored. -->
+		<param-name>logDir</param-name>
+		<!-- a relative path is not allowed, if a relative path would be supported the log dir has to be in the WEB-INF dir-->
+		<param-value>${conf.sos.logdir}</param-value>
+	</context-param>
+	<!-- servlet SosAdmin -->
+	<servlet>
+		<servlet-name>Admin</servlet-name>
+		<servlet-class>org.n52.sos.service.admin.SosAdminService</servlet-class>
+		<init-param>
+			<param-name>configFile</param-name>
+			<param-value>/WEB-INF/conf/sos.config</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<!-- servlet SOS -->
+	<servlet>
+		<servlet-name>SOS</servlet-name>
+		<servlet-class>org.n52.sos.service.SosService</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	<!-- mapping of endpoints -->
+	<servlet-mapping>
+		<servlet-name>Admin</servlet-name>
+		<url-pattern>/admin</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>SOS</servlet-name>
+		<url-pattern>/sos/kvp</url-pattern>
+	</servlet-mapping>
+		<servlet-mapping>
+		<servlet-name>SOS</servlet-name>
+		<url-pattern>/sos/soap</url-pattern>
+	</servlet-mapping>
+</web-app>

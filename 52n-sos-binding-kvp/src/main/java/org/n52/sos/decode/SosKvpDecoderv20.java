@@ -1,0 +1,836 @@
+package org.n52.sos.decode;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.joda.time.DateTime;
+import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
+import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
+import org.n52.sos.ogc.filter.SpatialFilter;
+import org.n52.sos.ogc.filter.TemporalFilter;
+import org.n52.sos.ogc.gml.time.TimeInstant;
+import org.n52.sos.ogc.gml.time.TimePeriod;
+import org.n52.sos.ogc.ows.OWSConstants;
+import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
+import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
+import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.request.SosDescribeSensorRequest;
+import org.n52.sos.request.SosGetCapabilitiesRequest;
+import org.n52.sos.request.SosGetFeatureOfInterestRequest;
+import org.n52.sos.request.SosGetObservationRequest;
+import org.n52.sos.request.SosGetResultRequest;
+import org.n52.sos.request.SosGetResultTemplateRequest;
+import org.n52.sos.service.Configurator;
+import org.n52.sos.util.DateTimeHelper;
+import org.n52.sos.util.JTSHelper;
+import org.n52.sos.util.KvpHelper;
+import org.n52.sos.util.SosHelper;
+import org.n52.sos.util.Util4Exceptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vividsolutions.jts.geom.Geometry;
+
+public class SosKvpDecoderv20 implements IDecoder<AbstractServiceRequest, Map<String, String>> {
+
+    /**
+     * logger, used for logging while initializing the constants from config
+     * file
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(SosKvpDecoderv20.class);
+
+    private List<DecoderKeyType> decoderKeyTypes;
+
+    public SosKvpDecoderv20() {
+        decoderKeyTypes = new ArrayList<DecoderKeyType>();
+        DecoderKeyType serviceVersionDKT = new DecoderKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION);
+        serviceVersionDKT.setUrlPattern("/sos/kvp");
+        decoderKeyTypes.add(serviceVersionDKT);
+        DecoderKeyType serviceDKT = new DecoderKeyType(SosConstants.SOS, null);
+        serviceDKT.setUrlPattern("/sos/kvp");
+        decoderKeyTypes.add(serviceDKT);
+        StringBuilder builder = new StringBuilder();
+        for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
+            builder.append(decoderKeyType.toString());
+            builder.append(", ");
+        }
+        builder.delete(builder.lastIndexOf(", "), builder.length());
+        LOGGER.info("Decoder for the following namespaces initialized successfully: " + builder.toString() + "!");
+    }
+
+    @Override
+    public List<DecoderKeyType> getDecoderKeyTypes() {
+        return decoderKeyTypes;
+    }
+
+    @Override
+    public AbstractServiceRequest decode(Map<String, String> element) throws OwsExceptionReport {
+        AbstractServiceRequest sosRequest = null;
+        String requestParameterValue = null;
+
+        for (String key : element.keySet()) {
+            if (key.equalsIgnoreCase(RequestParams.request.name())) {
+                requestParameterValue = KvpHelper.checkParameterSingleValue(element.get(key), key);
+                break;
+            }
+        }
+        if (requestParameterValue != null) {
+            if (requestParameterValue.equalsIgnoreCase(SosConstants.Operations.GetCapabilities.name())) {
+                sosRequest = parseGetCapabilitiesRequest(element);
+            } else if (requestParameterValue.equalsIgnoreCase(SosConstants.Operations.DescribeSensor.name())) {
+                sosRequest = parseDescribeSensorRequest(element);
+            } else if (requestParameterValue.equalsIgnoreCase(SosConstants.Operations.GetObservation.name())) {
+                sosRequest = parseGetObservationRequest(element);
+            } else if (requestParameterValue.equalsIgnoreCase(SosConstants.Operations.GetFeatureOfInterest.name())) {
+                sosRequest = parseGetFeatureOfInterestRequest(element);
+                // } else if
+                // (paramValue.equalsIgnoreCase(SosConstants.Operations.GetResult.name()))
+                // {
+                // sosRequest =
+                // parseGetResultTemplateRequest(parameterValueMap);
+                // } else if
+                // (paramValue.equalsIgnoreCase(Sos2Constants.Operations.GetResultTemplate.name()))
+                // {
+                // sosRequest = parseGetResultRequest(parameterValueMap);
+            } else {
+                throw Util4Exceptions.createOperationNotSupportedException(RequestParams.request.name());
+            }
+
+        }
+        return sosRequest;
+    }
+
+    /**
+     * parses the String representing the getCapabilities request and creates a
+     * SosGetCapabilities request
+     * 
+     * @param element
+     *            String with getCapabilities parameters
+     * @return Returns SosGetCapabilitiesRequest representing the request
+     * @throws OwsExceptionReport
+     *             If parsing the String failed
+     */
+    private SosGetCapabilitiesRequest parseGetCapabilitiesRequest(Map<String, String> element)
+            throws OwsExceptionReport {
+
+        SosGetCapabilitiesRequest request = new SosGetCapabilitiesRequest();
+        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+
+        for (String parameterName : element.keySet()) {
+            String parameterValues = element.get(parameterName);
+            try {
+                // service (mandatory SOS 1.0.0, SOS 2.0 default)
+                if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.service.name())) {
+                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                }
+                // request (mandatory)
+                else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.request.name())) {
+                    KvpHelper.checkParameterSingleValue(parameterValues, parameterName);
+                }
+                // acceptVersions (optional)
+                else if (parameterName.equalsIgnoreCase(SosConstants.GetCapabilitiesParams.AcceptVersions.name())) {
+                    if (!parameterValues.isEmpty()) {
+                        request.setAcceptVersions(parameterValues.split(","));
+                    } else {
+                        OwsExceptionReport owse = new OwsExceptionReport();
+                        owse.addCodedException(OwsExceptionCode.InvalidParameterValue,
+                                SosConstants.GetObservationParams.offering.name(), "The value of parameter "
+                                        + parameterName + " (" + parameterValues + ") is invalid.");
+                        throw owse;
+                    }
+                }
+                // acceptFormats (optional)
+                else if (parameterName.equalsIgnoreCase(SosConstants.GetCapabilitiesParams.AcceptFormats.name())) {
+                    request.setAcceptFormats(KvpHelper.checkParameterMultipleValues(parameterValues, parameterName));
+                }
+                // updateSequence (optional)
+                else if (parameterName.equalsIgnoreCase(SosConstants.GetCapabilitiesParams.updateSequence.name())) {
+                    request.setUpdateSequence(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+
+                }
+                // sections (optional)
+                else if (parameterName.equalsIgnoreCase(SosConstants.GetCapabilitiesParams.Sections.name())) {
+                    request.setSections(KvpHelper.checkParameterMultipleValues(parameterValues, parameterName));
+                } else {
+                    String exceptionText =
+                            "The parameter '" + parameterName + "' is invalid for the GetCapabilities request!";
+                    LOGGER.debug(exceptionText);
+                    throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+                }
+            } catch (OwsExceptionReport owse) {
+                exceptions.add(owse);
+            }
+        }
+        Util4Exceptions.mergeExceptions(exceptions);
+
+        return request;
+
+    }
+
+    /**
+     * parses the HttpServletRequest representing the describeSensor request and
+     * creates a SosDescribeSensor request
+     * 
+     * @param request
+     *            HttpServletRequest, which contains the request parameters
+     * @return SosDescribeSensorRequest
+     * @throws OwsExceptionReport
+     *             if parsing of request fails
+     */
+    private SosDescribeSensorRequest parseDescribeSensorRequest(Map<String, String> element) throws OwsExceptionReport {
+
+        SosDescribeSensorRequest request = new SosDescribeSensorRequest();
+        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+
+        boolean foundProcedure = false;
+        boolean foundProcedureDescriptionFormat = false;
+        boolean foundService = false;
+        boolean foundVersion = false;
+
+        for (String parameterName : element.keySet()) {
+            String parameterValues = element.get(parameterName);
+            try {
+                // service (mandatory)
+                if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.service.name())) {
+                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    foundService = true;
+                }
+                // version (mandatory)
+                else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.version.name())) {
+                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    foundVersion = true;
+                }
+                // request (mandatory)
+                else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.request.name())) {
+                    KvpHelper.checkParameterSingleValue(parameterValues, parameterName);
+                }
+                // procedure
+                else if (parameterName.equalsIgnoreCase(SosConstants.DescribeSensorParams.procedure.name())) {
+                    request.setProcedures(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    foundProcedure = true;
+                }
+                // procedureDescriptionFormat
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.DescribeSensorParams.procedureDescriptionFormat
+                        .name())) {
+                    request.setOutputFormat(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    foundProcedureDescriptionFormat = true;
+                }
+                // valid time (optional)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.DescribeSensorParams.validTime.name())) {
+                    request.setTime(parseValidTime(parameterValues, parameterName));
+                    foundProcedureDescriptionFormat = true;
+                } else {
+                    String exceptionText =
+                            "The parameter '" + parameterName + "' is invalid for the DescribeSensor request!";
+                    LOGGER.debug(exceptionText);
+                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
+                }
+            } catch (OwsExceptionReport owse) {
+                exceptions.add(owse);
+            }
+        }
+
+        if (!foundProcedure) {
+            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+            owse.addCodedException(OwsExceptionCode.MissingParameterValue,
+                    SosConstants.DescribeSensorParams.procedure.name(),
+                    "Your request was invalid! The parameter PROCEDURE must be contained in your request!");
+            exceptions.add(owse);
+        }
+
+        if (!foundProcedureDescriptionFormat) {
+            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+            owse.addCodedException(OwsExceptionCode.MissingParameterValue,
+                    Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name(),
+                    "Your request was invalid! The parameter "
+                            + Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name()
+                            + " must be contained in your request!");
+            exceptions.add(owse);
+        }
+
+        if (!foundService) {
+            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+            owse.addCodedException(OwsExceptionCode.MissingParameterValue, OWSConstants.RequestParams.service.name(),
+                    "Your request was invalid! The mandatory parameter " + OWSConstants.RequestParams.service.name()
+                            + " must be contained in your request!");
+            exceptions.add(owse);
+        }
+
+        if (!foundVersion) {
+            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+            owse.addCodedException(OwsExceptionCode.MissingParameterValue, OWSConstants.RequestParams.version.name(),
+                    "Your request was invalid! The mandatory parameter " + OWSConstants.RequestParams.version.name()
+                            + " must be contained in your request!");
+            exceptions.add(owse);
+        }
+
+        Util4Exceptions.mergeExceptions(exceptions);
+
+        return request;
+    }
+
+    /**
+     * parses the HttpServletRequest representing the getObservation request and
+     * creates a SosGetObservation request
+     * 
+     * @param request
+     *            HttpServletRequest, which contains the request parameters
+     * @return SosGetObservationRequest
+     * @throws OwsExceptionReport
+     *             if parsing of request fails
+     */
+    private SosGetObservationRequest parseGetObservationRequest(Map<String, String> element) throws OwsExceptionReport {
+
+        SosGetObservationRequest request = new SosGetObservationRequest();
+        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+        boolean foundService = false;
+        boolean foundVersion = false;
+
+        for (String parameterName : element.keySet()) {
+            String parameterValues = element.get(parameterName);
+            try {
+                // service (mandatory)
+                if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.service.name())) {
+                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    foundService = true;
+                }
+
+                // version (mandatory)
+                else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.version.name())) {
+                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    foundVersion = true;
+                }
+                // request (mandatory)
+                else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.request.name())) {
+                    KvpHelper.checkParameterSingleValue(parameterValues, parameterName);
+                }
+
+                // offering (optional)
+                else if (parameterName.equalsIgnoreCase(SosConstants.GetObservationParams.offering.name())) {
+                    request.setOfferings(KvpHelper.checkParameterMultipleValues(parameterValues, parameterName));
+                }
+
+                // observedProperty (optional)
+                else if (parameterName.equalsIgnoreCase(SosConstants.GetObservationParams.observedProperty.name())) {
+                    request.setObservedProperties(KvpHelper.checkParameterMultipleValues(parameterValues,
+                            parameterName));
+                }
+
+                // procedure (optional)
+                else if (parameterName.equalsIgnoreCase(SosConstants.GetObservationParams.procedure.name())) {
+                    request.setProcedures(KvpHelper.checkParameterMultipleValues(parameterValues, parameterName));
+                }
+
+                // featureOfInterest (optional)
+                else if (parameterName.equalsIgnoreCase(SosConstants.GetObservationParams.featureOfInterest.name())) {
+                    request.setFeatureIdentifiers(KvpHelper.checkParameterMultipleValues(parameterValues,
+                            parameterName));
+                }
+
+                // eventTime (optional)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.temporalFilter.name())) {
+                    request.setEventTimes(parseTemporalFilter(
+                            KvpHelper.checkParameterMultipleValues(parameterValues, parameterName), parameterName));
+                }
+
+                // spatialFilter (optional)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.spatialFilter.name())) {
+                    request.setSpatialFilter(parseSpatialFilter(
+                            KvpHelper.checkParameterMultipleValues(parameterValues, parameterName), parameterName));
+                }
+
+                // responseFormat (optional)
+                else if (parameterName.equalsIgnoreCase(SosConstants.GetObservationParams.responseFormat.name())) {
+                    request.setResponseFormat(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                }
+                // namespaces (conditional)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.namespaces.name())) {
+                    request.setNamespaces(parseNamespaces(parameterValues));
+                } else {
+                    String exceptionText =
+                            "The parameter '" + parameterName + "' is invalid for the GetObservation request!";
+                    LOGGER.debug(exceptionText);
+                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
+                }
+
+            } catch (OwsExceptionReport owse) {
+                exceptions.add(owse);
+            }
+        }
+
+        if (!foundService) {
+            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+            owse.addCodedException(OwsExceptionCode.MissingParameterValue, OWSConstants.RequestParams.service.name(),
+                    "Your request was invalid! The mandatory parameter " + OWSConstants.RequestParams.service.name()
+                            + " must be contained in your request!");
+            exceptions.add(owse);
+        }
+
+        if (!foundVersion) {
+            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+            owse.addCodedException(OwsExceptionCode.MissingParameterValue, OWSConstants.RequestParams.version.name(),
+                    "Your request was invalid! The mandatory parameter " + OWSConstants.RequestParams.version.name()
+                            + " must be contained in your request!");
+            exceptions.add(owse);
+        }
+
+        Util4Exceptions.mergeExceptions(exceptions);
+
+        return request;
+    }
+
+    /**
+     * parses the HttpServletRequest representing the getFeatureOfInterest
+     * request and creates a SosFeatureOfInterest request
+     * 
+     * @param request
+     *            HttpServletRequest, which contains the request parameters
+     * @return SosGetFeatureOfInterestRequest
+     * @throws OwsExceptionReport
+     *             if parsing of request fails
+     */
+    private SosGetFeatureOfInterestRequest parseGetFeatureOfInterestRequest(Map<String, String> element)
+            throws OwsExceptionReport {
+
+        SosGetFeatureOfInterestRequest request = new SosGetFeatureOfInterestRequest();
+        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+
+        boolean foundService = false;
+        boolean foundVersion = false;
+
+        for (String parameterName : element.keySet()) {
+            String parameterValues = element.get(parameterName);
+            try {
+                // service (mandatory)
+                if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.service.name())) {
+                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    foundService = true;
+                }
+
+                // version (mandatory)
+                else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.version.name())) {
+                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    foundVersion = true;
+                }
+                // request (mandatory)
+                else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.request.name())) {
+                    KvpHelper.checkParameterSingleValue(parameterValues, parameterName);
+                }
+                // observedProperty (optional)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetFeatureOfInterestParams.observedProperty
+                        .name())) {
+                    request.setObservedProperties(KvpHelper.checkParameterMultipleValues(parameterValues,
+                            parameterName));
+                }
+
+                // procedure (optional)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetFeatureOfInterestParams.procedure.name())) {
+                    request.setProcedures(KvpHelper.checkParameterMultipleValues(parameterValues, parameterName));
+                }
+
+                // featureOfInterest (optional)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetFeatureOfInterestParams.featureOfInterest
+                        .name())) {
+                    request.setFeatureIdentifiers(KvpHelper.checkParameterMultipleValues(parameterValues,
+                            parameterName));
+                }
+
+                // spatialFilter (optional)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetFeatureOfInterestParams.spatialFilter.name())) {
+                    List<SpatialFilter> spatialFilters = new ArrayList<SpatialFilter>();
+                    spatialFilters.add(parseSpatialFilter(
+                            KvpHelper.checkParameterMultipleValues(parameterValues, parameterName), parameterName));
+                    request.setSpatialFilters(spatialFilters);
+                }
+                // namespaces (conditional)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.namespaces.name())) {
+                    request.setNamespaces(parseNamespaces(parameterValues));
+                } else {
+                    String exceptionText =
+                            "The parameter '" + parameterName + "' is invalid for the GetFeatureOfInterest request!";
+                    LOGGER.debug(exceptionText);
+                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
+                }
+            } catch (OwsExceptionReport owse) {
+                exceptions.add(owse);
+            }
+
+        }
+
+        if (!foundService) {
+            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+            owse.addCodedException(OwsExceptionCode.MissingParameterValue, OWSConstants.RequestParams.service.name(),
+                    "Your request was invalid! The mandatory parameter " + OWSConstants.RequestParams.service.name()
+                            + " must be contained in your request!");
+            exceptions.add(owse);
+        }
+
+        if (!foundVersion) {
+            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+            owse.addCodedException(OwsExceptionCode.MissingParameterValue, OWSConstants.RequestParams.version.name(),
+                    "Your request was invalid! The mandatory parameter " + OWSConstants.RequestParams.version.name()
+                            + " must be contained in your request!");
+            exceptions.add(owse);
+        }
+
+        Util4Exceptions.mergeExceptions(exceptions);
+
+        return request;
+    }
+
+    private SosGetResultTemplateRequest parseGetResultTemplateRequest(Map<String, String> element)
+            throws OwsExceptionReport {
+        SosGetResultTemplateRequest request = new SosGetResultTemplateRequest();
+        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+
+        boolean foundService = false;
+        boolean foundVersion = false;
+        boolean foundOffering = false;
+        boolean foundObservedProperty = false;
+
+        for (String parameterName : element.keySet()) {
+            String parameterValues = element.get(parameterName);
+            try {
+                // service (mandatory)
+                if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.service.name())) {
+                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    foundService = true;
+                }
+
+                // version (mandatory)
+                else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.version.name())) {
+                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    foundVersion = true;
+                }
+                // request (mandatory)
+                else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.request.name())) {
+                    KvpHelper.checkParameterSingleValue(parameterValues, parameterName);
+                }
+
+                // offering (mandatory)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetResultTemplateParams.offering.name())) {
+                    request.setOffering(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                }
+
+                // observedProperty (mandatory)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetResultTemplateParams.observedProperty.name())) {
+                    request.setObservedProperty(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                } else {
+                    String exceptionText =
+                            "The parameter '" + parameterName + "' is invalid for the GetResultTemplate request!";
+                    LOGGER.debug(exceptionText);
+                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
+                }
+            } catch (OwsExceptionReport owse) {
+                exceptions.add(owse);
+            }
+        }
+
+        if (!foundService) {
+            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+            owse.addCodedException(OwsExceptionCode.MissingParameterValue, OWSConstants.RequestParams.service.name(),
+                    "Your request was invalid! The mandatory parameter " + OWSConstants.RequestParams.service.name()
+                            + " must be contained in your request!");
+            exceptions.add(owse);
+        }
+
+        if (!foundVersion) {
+            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+            owse.addCodedException(OwsExceptionCode.MissingParameterValue, OWSConstants.RequestParams.version.name(),
+                    "Your request was invalid! The mandatory parameter " + OWSConstants.RequestParams.version.name()
+                            + " must be contained in your request!");
+            exceptions.add(owse);
+        }
+
+        if (!foundOffering) {
+            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+            owse.addCodedException(OwsExceptionCode.MissingParameterValue,
+                    Sos2Constants.GetResultTemplateParams.offering.name(),
+                    "Your request was invalid! The mandatory parameter "
+                            + Sos2Constants.GetResultTemplateParams.offering.name()
+                            + " must be contained in your request!");
+            exceptions.add(owse);
+        }
+
+        if (!foundObservedProperty) {
+            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+            owse.addCodedException(OwsExceptionCode.MissingParameterValue,
+                    Sos2Constants.GetResultTemplateParams.observedProperty.name(),
+                    "Your request was invalid! The mandatory parameter "
+                            + Sos2Constants.GetResultTemplateParams.observedProperty.name()
+                            + " must be contained in your request!");
+            exceptions.add(owse);
+        }
+        Util4Exceptions.mergeExceptions(exceptions);
+
+        return request;
+    }
+
+    private SosGetResultRequest parseGetResultRequest(Map<String, String> element) throws OwsExceptionReport {
+        SosGetResultRequest request = new SosGetResultRequest();
+        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+
+        boolean foundService = false;
+        boolean foundVersion = false;
+        boolean foundOffering = false;
+        boolean foundObservedProperty = false;
+
+        for (String parameterName : element.keySet()) {
+            String parameterValues = element.get(parameterName);
+            try {
+                // service (mandatory)
+                if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.service.name())) {
+                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    foundService = true;
+                }
+                // version (mandatory)
+                else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.version.name())) {
+                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    foundVersion = true;
+                }
+                // request (mandatory)
+                else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.request.name())) {
+                    KvpHelper.checkParameterSingleValue(parameterValues, parameterName);
+                }
+                // offering (mandatory)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetResultTemplateParams.offering.name())) {
+                    request.setOffering(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                }
+
+                // observedProperty (mandatory)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetResultTemplateParams.observedProperty.name())) {
+                    request.setObservedProperty(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                }
+                // featureOfInterest (optional)
+                else if (parameterName.equalsIgnoreCase(SosConstants.GetObservationParams.featureOfInterest.name())) {
+                    request.setFeatureIdentifiers(KvpHelper.checkParameterMultipleValues(parameterValues,
+                            parameterName));
+                }
+
+                // eventTime (optional)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.temporalFilter.name())) {
+                    request.setEventTimes(parseTemporalFilter(
+                            KvpHelper.checkParameterMultipleValues(parameterValues, parameterName), parameterName));
+                }
+
+                // spatialFilter (optional)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.spatialFilter.name())) {
+                    request.setSpatialFilter(parseSpatialFilter(
+                            KvpHelper.checkParameterMultipleValues(parameterValues, parameterName), parameterName));
+                }
+                // xmlWrapper (default = false) (optional)
+                // namespaces (conditional)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.namespaces.name())) {
+                    request.setNamespaces(parseNamespaces(parameterValues));
+                } else {
+                    String exceptionText =
+                            "The parameter '" + parameterName + "' is invalid for the GetResult request!";
+                    LOGGER.debug(exceptionText);
+                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
+                }
+            } catch (OwsExceptionReport owse) {
+                exceptions.add(owse);
+            }
+        }
+
+        if (!foundService) {
+            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+            owse.addCodedException(OwsExceptionCode.MissingParameterValue, OWSConstants.RequestParams.service.name(),
+                    "Your request was invalid! The mandatory parameter " + OWSConstants.RequestParams.service.name()
+                            + " must be contained in your request!");
+            exceptions.add(owse);
+        }
+
+        if (!foundVersion) {
+            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+            owse.addCodedException(OwsExceptionCode.MissingParameterValue, OWSConstants.RequestParams.version.name(),
+                    "Your request was invalid! The mandatory parameter " + OWSConstants.RequestParams.version.name()
+                            + " must be contained in your request!");
+            exceptions.add(owse);
+        }
+
+        if (!foundOffering) {
+            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+            owse.addCodedException(
+                    OwsExceptionCode.MissingParameterValue,
+                    Sos2Constants.GetResultParams.offering.name(),
+                    "Your request was invalid! The mandatory parameter "
+                            + Sos2Constants.GetResultParams.offering.name() + " must be contained in your request!");
+            exceptions.add(owse);
+        }
+
+        if (!foundObservedProperty) {
+            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+            owse.addCodedException(OwsExceptionCode.MissingParameterValue,
+                    Sos2Constants.GetResultParams.observedProperty.name(),
+                    "Your request was invalid! The mandatory parameter "
+                            + Sos2Constants.GetResultParams.observedProperty.name()
+                            + " must be contained in your request!");
+            exceptions.add(owse);
+        }
+        Util4Exceptions.mergeExceptions(exceptions);
+        return request;
+    }
+
+    private List<TemporalFilter> parseValidTime(String parameterValue, String parameterName) throws OwsExceptionReport {
+        List<TemporalFilter> filterList = new ArrayList<TemporalFilter>();
+        filterList.add(createTemporalFilterFromValue(parameterValue, null));
+        return filterList;
+    }
+
+    private SpatialFilter parseSpatialFilter(List<String> parameterValues, String parameterName)
+            throws OwsExceptionReport {
+        if (!parameterValues.isEmpty()) {
+            SpatialFilter spatialFilter = new SpatialFilter();
+
+            boolean hasSrid = false;
+
+            if (parameterValues.get(0).contains(":")) {
+                spatialFilter.setValueReference(parameterValues.get(0));
+            }
+
+            int srid = 4326;
+            if (parameterValues.get(parameterValues.size() - 1).startsWith(
+                    Configurator.getInstance().getSrsNamePrefixSosV2())) {
+                hasSrid = true;
+                srid =
+                        SosHelper.parseSrsName(parameterValues.get(parameterValues.size() - 1), Configurator
+                                .getInstance().getSrsNamePrefixSosV2());
+            } else if (parameterValues.get(parameterValues.size() - 1).startsWith(
+                    Configurator.getInstance().getSrsNamePrefix())) {
+                hasSrid = true;
+                srid =
+                        SosHelper.parseSrsName(parameterValues.get(parameterValues.size() - 1), Configurator
+                                .getInstance().getSrsNamePrefix());
+            }
+
+            List<String> coordinates;
+            if (hasSrid) {
+                coordinates = parameterValues.subList(1, parameterValues.size() - 1);
+            } else {
+                coordinates = parameterValues.subList(1, parameterValues.size());
+            }
+
+            if (coordinates.size() != 4) {
+                throw Util4Exceptions.createInvalidParameterValueException(parameterName,
+                        "The parameter value is not valid!");
+            }
+            String lowerCorner;
+            String upperCorner;
+
+            if (Configurator.getInstance().switchCoordinatesForEPSG(srid)) {
+                lowerCorner = coordinates.get(1) + " " + coordinates.get(0);
+                upperCorner = coordinates.get(3) + " " + coordinates.get(2);
+            } else {
+                lowerCorner = coordinates.get(0) + " " + coordinates.get(1);
+                upperCorner = coordinates.get(2) + " " + coordinates.get(3);
+            }
+            Geometry geom =
+                    JTSHelper.createGeometryFromWKT(JTSHelper.createWKTPolygonFromEnvelope(lowerCorner, upperCorner));
+            geom.setSRID(srid);
+            spatialFilter.setGeometry(geom);
+            spatialFilter.setOperator(SpatialOperator.BBOX);
+            return spatialFilter;
+        }
+        return null;
+    }
+
+    private List<TemporalFilter> parseTemporalFilter(List<String> parameterValues, String parameterName)
+            throws OwsExceptionReport {
+        List<TemporalFilter> filterList = new ArrayList<TemporalFilter>();
+        if (parameterValues.size() != 2) {
+            throw Util4Exceptions.createInvalidParameterValueException(parameterName,
+                    "The parameter value is not valid!");
+        }
+        filterList.add(createTemporalFilterFromValue(parameterValues.get(1), parameterValues.get(0)));
+        return filterList;
+    }
+
+    private Map<String, String> parseNamespaces(String parameterValues) {
+        Map<String, String> namespaces = new HashMap<String, String>();
+        List<String> array = Arrays.asList(parameterValues.replaceAll("\\),", "").replaceAll("\\)", "").split("xmlns\\("));
+        for (String string : array) {
+            if (string != null && !string.isEmpty()) {
+                String[] s = string.split(",");
+                namespaces.put(s[0], s[1]);
+            }
+        }
+        return namespaces;
+    }
+
+    private TemporalFilter createTemporalFilterFromValue(String value, String valueReference)
+            throws OwsExceptionReport {
+        TemporalFilter temporalFilter = new TemporalFilter();
+        temporalFilter.setValueReference(valueReference);
+        try {
+            String[] times = value.split("/");
+
+            if (times.length == 1) {
+                DateTime instant = DateTimeHelper.parseIsoString2DateTime(times[0]);
+                TimeInstant ti = new TimeInstant();
+                ti.setValue(instant);
+                String valueSplit = null;
+                if (times[0].contains("Z")) {
+                    valueSplit = times[0].substring(0, times[0].indexOf("Z"));
+                } else if (times[0].contains("+")) {
+                    valueSplit = times[0].substring(0, times[0].indexOf("+"));
+                }
+                if (valueSplit != null) {
+                    ti.setRequestedTimeLength(valueSplit.length());
+                } else {
+                    ti.setRequestedTimeLength(times[0].length());
+                }
+                temporalFilter.setOperator(TimeOperator.TM_Equals);
+                temporalFilter.setTime(ti);
+            } else if (times.length == 2) {
+                DateTime start = DateTimeHelper.parseIsoString2DateTime(times[0]);
+                // check if end time is a full ISO 8106 string
+                String valueSplit = null;
+                if (times[1].contains("Z")) {
+                    valueSplit = times[1].substring(0, times[1].indexOf("Z"));
+                } else if (times[1].contains("+")) {
+                    valueSplit = times[1].substring(0, times[1].indexOf("+"));
+                }
+                DateTime end = null;
+                if (valueSplit != null) {
+                    end = DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
+                            DateTimeHelper.parseIsoString2DateTime(times[1]), valueSplit.length());
+                } else {
+                    end = DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
+                            DateTimeHelper.parseIsoString2DateTime(times[1]), times[1].length());
+                }
+                TimePeriod tp = new TimePeriod();
+                tp.setStart(start);
+                tp.setEnd(end);
+                temporalFilter.setOperator(TimeOperator.TM_During);
+                temporalFilter.setTime(tp);
+
+            } else {
+                OwsExceptionReport owse = new OwsExceptionReport();
+                owse.addCodedException(OwsExceptionCode.InvalidParameterValue,
+                        Sos2Constants.GetObservationParams.temporalFilter.name(), "The value of parameter "
+                                + Sos2Constants.GetObservationParams.temporalFilter.name() + " is invalid.");
+                throw owse;
+            }
+            return temporalFilter;
+        } catch (Exception e) {
+            if (e instanceof OwsExceptionReport) {
+                throw (OwsExceptionReport) e;
+            } else {
+                OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+                LOGGER.error("Error while parse time String to DateTime!", e);
+                owse.addCodedException(null, null, "Error while parse time String to DateTime!");
+                throw owse;
+            }
+
+        }
+    }
+
+}

@@ -1,0 +1,239 @@
+RELEASE NOTES
+
+ The Sensor Observation Service aggregates readings from live sensors as well as sensor archives. The service provides an
+ interface to get the pure data (encoded in Observation&Measurement), information about the sensor itself (encoded in a 
+ SensorML instance document), and information about the sensor mounting platform (SensorML as well).
+ 
+ For detailed information concerning the installation procedure the reader is referred to the installation guide (how2install) 
+ in the doc directory.
+ 
+Changes since last release
+=========================
+
+--- New features ---
+ 
+ * Result filtering for getFirst/latest queries
+ * Spatial filtering for a spatial value
+
+--- Changes ---
+
+ * remove mobileSOS extension (mobileSOS now a branch)
+ * remove Tomcat deploy properties from pom.xml file (how to deploy is now described here https://wiki.52north.org/bin/view/Sensornet/SosEclipseJavaProject)
+ * create Javadoc with 'mvn site' to default output directory
+ * new internal representation of observations (between de-/encoder and DAOs)
+ * better mapping of constants to the constant classes (SosConstants, Sos1Sonstants, Sos2Constants)
+ * now RequestListener throw OwsExceptionReports instead of returning ExceptionReports -> easier version setting in ExceptionReport
+
+--- Fixed bugs ---
+
+For more detailed information about the bugs look at https://52north.org/bugzilla/
+
+ * Bug 569 - Switch logging to slf4j
+ * Bug 675 - Add fallback revision number to buildnumber-maven-plugin
+ * Bug 690 - Add configuration property for default version, if two, versions are supported
+ 	* The correct bug was that the SOS does not throw InvalidParameter exception if GetCapabilities request contains 'version' parameter.
+
+Release 52N-SOS-3.2.0
+=========================
+
+--- New features ---
+
+ * GenericObservation extended for numeric(Measurement), text(CategoryObservation) and spatial(GeometryObservation) values.
+ * new installation/deploy configuration (use build.properties to set properties, not in pom).
+ * abstract CapabilitiesCacheContoller (to use other than default CapabilitiesCacheContoller).
+ * no Listener casting in RequestOperator (to use other than default Listener).
+ * dynamic build of capabilities responses.
+ * HTTP-Get for GetFeatureOfInterest.
+ * if foiEncodingInObservation = false, HTTP-Get-URL for FeatureOfInterest is set.
+ * get first observation query alike get latest observation query (example: GetObs_getFirstObs.xml)
+ * FeaturesOfInterest can be inserted into SOS during a RegisterSensor request.
+ * GenericObservation: duplicate values can be skipped, before an exceptions was thrown when duplicate values are contained.
+ * Possible to insert SensorML, names and descriptions with containing apostrophe.
+ * show full OperationsMetadata, with all values or only the parameter names. (Property, default=true)
+ * show or FOIs in contents (Property, default=true)
+ * some SWE Common data types added (boolean, countType, categoryType, isoTime)
+ * Insert DomainFeature as SampledFeature in FeatureOfInterest
+ * MultiPolygon support for FOIs (encoded as gml:CompositeSurface)
+ * Cross-Domain-Resource-Sharing (http://www.w3.org/TR/cors) to enable fetching of Observations in JavaScript from different origins
+ 
+--- Changes ---
+
+ * correct EPSG prefix: urn:ogc:def:crs:EPSG:: (property, code and examples)
+ * only logging in SOS log file and not SOS log and default Tomcat log files.
+ * In some cases URIs are used instead of URNs.
+ * ObservationCollection-ID and GenericObservation-ID contains prefix + time of build in ms.
+ * Now Measurement, CategoryObservation and SpatialObservation have the same ID-prefix = o_ .
+ * Make build process Maven3 ready: Some build properties moved from build.properties to main pom.xml.
+ * Positions for polygons and lineStrings in responses are represented as gml:posList.
+
+--- Fixed bugs ---
+
+For more detailed information about the bugs look at https://52north.org/bugzilla/
+
+  ID Summary
+ * Bug 168 - Example sensors are not registered in database (Note in the installation guide)
+ * Bug 171 - Lacking parameter in capabilities document
+ * Bug 291 - Not all Capabilities set via POM.XML
+ * Bug 347 - RegisterSensor fails because of URN-Error
+ * Bug 363 - Confusing Parameter Names within pom.xml 
+ * Bug 384 - SAXParseException not forwarded to user
+ * Bug 399 - Build Error when platform character encoding is UTF-8 
+ * Bug 413 - Unescaped apostrophe in sensor description enables SQL Injections
+ * Bug 415 - Capabilities document does not list GET DCPs for DescribeSensor and GetObservation
+ * Bug 418 - InsertObservation - FOI is inserted into all Offerings containing requested phenomenon.
+ * Bug 425 - TM_Before and TM_After do not work with TimeInstant
+ * Bug 431 - GetObservation using GetLatest-hack with observedProperty, eventTime, featureOfInterest and offering parameter returns observations for all featureOfInterest
+ * Bug 440 - GetLatest observation do not consider requested features of interest
+ * Bug 441 - Escaping of SensorML
+ * Bug 442 - Exception when DescribeSensor request contains mobileEnabled="true"
+ * Bug 448 - Empty GetObservation is invalid to schemata
+ * Bug 455 - NPE when RegisterSensor with more identifiers than the uniqueID
+ * Bug 484 - Wrong (or rather: incomplete) mime type in GetObservation response
+
+--- Limitations ---
+
+
+Release 52N-SOS-3.1.1
+=========================
+
+--- New features ---
+
+* SOAP-Binding supported
+* Coordinate switching
+* Spatial Observation supported
+* TestClient 2.0, drop down menu for requests, code highligting
+
+--- Changes ---
+
+* How2Install: Installation section for PostgreSQL and PostGIS are deleted
+
+--- Fixed bugs ---
+
+For more detailed information about the bugs look at https://52north.org/bugzilla/
+
+  ID Summary
+* 79 result filter of GetObservation Operation does not work
+* 91 Namespace in ExceptionReportDocument has to be corrected
+* 135 Combination of eventtimes in request causes database error
+* 155 SRS is not changed in Capabilities and GetObservation response, if coordinates have been transformed
+* 156 PropertyName in time filter of GetObservation has to be changed
+* 165 DomainFetaure is not inserted in InsertObservation operation of mobile extension
+* 167 Undeployment does not proceed successfully (postgis.jar not deleted)
+* 169 Temporal filter could not be parsed in GetObservation request, if namespace of OGC namespace is other than 'ogc'
+* 194 SOS crash if database server is not reachable
+* 195 non mandatory element "axisID" required in RegisterSensor document
+* 196 Erroneous handling of z-value in SensorMLDecoder.parsePointPosition()
+* 197 Schema bean compilation lacks a substitution, resulting in casting error and validation error
+* 198 two parsePointPosition()-Method expect different values - inconsistent!
+* 212 not helping null pointer if a request listener is missing in the config.properties file
+* 215 GMLDecoder has errorenous Timezone handling
+* 216 SensorMLEncoder creates invalid documents, createPosition()
+* 218 DescribeSensor for current time and mobileEnabled="true" results in exception
+* 219 DescribeSensor: Java Heap Space Error if SensorML is too big
+* 223 GetObservation -> ObservationCollection: BoundingBox has wrong x,y-order and no srs defined
+* 230 GetCapabilities Property "updateSequence" is not updated
+* 231 nullCheck for Measurement Observation will never work
+* 232 State implementation version in capabilities
+* 233 ResultFilter Bugs
+* 239 GetObservation - mandatory param offering is not queried
+* 247 getCapabilities on an 'empty' offering (or SOS) causes exception
+* 258 GetCapabilities accepts only capitalized parameter names => not spec conform
+* 268 Time parse Exception when requesting GetObservationById re
+* 281 CapabilitiesCache not refreshed after InsertObservation requests
+* 286 BoundingBox of EmptyOfferings is broken 
+* 335 Feature-Response with FeatureCollection only when more than one Feature returned.
+* 336 resultModel Parameter namespace causes GetObservation request to return exception report
+* 337 GetCapabilities crashes, if emtpy offering is contained in database
+* 349 Coordinates are not switched for EPSG::4326 during InsertObsertion with new FOI
+* 368 Namespace declaration of resultModel in capabilities is buggy
+* 372 Slow SOS after some GetObservations.
+* 375 Error in Date/Time parsing 
+
+  
+--- Limitations ---
+
+
+
+Release 52N-SOS-3.1.0
+=========================
+
+--- New features ---
+
+* GET Binding for GetObservation and DescribeSensor operation
+* automatic capabilities cache update
+
+--- Changes ---
+
+* project converted to Maven
+  
+--- Limitations ---
+
+ 
+Release 52N-SOS-3.0.0
+=========================
+
+--- New features ---
+
+--- Changes ---
+
+* SOS completely adapted to SOS schemata version 1.0.0
+  
+--- Limitations ---
+
+
+
+Release 52N-SOSv2-01-00
+=========================
+
+--- New features ---
+
+* new framework - the so called DBFeeder framework - for updating the underlying data base.
+
+
+--- Changes ---
+
+* The provided implementation of the DAOObjects is now based on the PostgreSQL 8.1 data base. It is possible to use the 
+  PostgreSQL 8.0 version, too. Read the installation guide for detailed configuration issues.
+
+* In the former release an Tomcat exception occured if the O&M document for the issued request was to large. In this version 
+  the available Memory is survyed and in the case the response exceeds the available Memory an OGC Service Exception is returned.
+  
+  
+--- Limitations ---
+
+
+
+Release 52N-SOSv2-00-00
+=========================
+
+--- New features ---
+
+* new framework for the pluggable implementation of service operations.
+
+
+--- Changes ---
+
+* General redesign of the SOS framework, due to the updated specification. The release implements the core profile of the 
+  Sensor Observation Service specified in the OGC document "Sensor Observation Service" by Arthur Na & Mark Priest, 
+  OGC-# 05-088r1. The core profile comprises of the following operations:
+  - GetCapabilities
+  - DescribeSensor
+  - GetObservation
+ 
+* The provided implementation of the DAOObjects is now based on the PostgreSQL 8.0 data base and replaces the non spatial 
+  MySQL data base on which the former release was based.
+  
+--- Limitations ---
+
+* The current implementation of the DAOObjects does not work with the PostgreSQL 8.1 data base system.
+	
+
+
+Release 52N-SOS-spec_0.9_rel_1.0
+=================
+
+- Initial release, implementing the operations defined in the OGC Interoperability Program Report "Sensor Collection Service" 
+  by Tom McCarty, OGC-# 03-023r1. In addition the release encompasses an enhancement of the SCS that provides the ability to 
+  define threshold values and to receive the observations if the threshold value is crossed. This patter is called the Active 
+  SCS (ASCS).
+

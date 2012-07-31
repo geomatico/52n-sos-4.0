@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 10.07.2012 15:18:27 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="org.n52.sos.ds.hibernate.entities.ValueType" table="value_type">
+        <id name="valueTypeId" type="long">
+            <column name="value_type_id" />
+            <generator class="increment" />
+        </id>
+        <property name="valueType" type="string">
+            <column name="value_type" not-null="true" unique="true" />
+        </property>
+        <set name="observableProperties" table="observable_property" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="value_type_id" not-null="true" />
+            </key>
+            <one-to-many class="org.n52.sos.ds.hibernate.entities.ObservableProperty" />
+        </set>
+    </class>
+</hibernate-mapping>

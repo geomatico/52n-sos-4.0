@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ows:ServiceProvider xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" >
+	<ows:ProviderName>${conf.sos.capabilities.provider.name}</ows:ProviderName>
+	<ows:ProviderSite xlink:href="${conf.sos.capabilities.provider.site}" />
+	<ows:ServiceContact>
+		<ows:IndividualName>${conf.sos.capabilities.provider.individual.name}</ows:IndividualName>
+		<ows:PositionName>${conf.sos.capabilities.provider.position.name}</ows:PositionName>
+		<ows:ContactInfo>
+			<ows:Phone>
+				<ows:Voice>${conf.sos.capabilities.provider.phone}</ows:Voice>
+			</ows:Phone>
+			<ows:Address>
+				<ows:DeliveryPoint>${conf.sos.capabilities.provider.address}</ows:DeliveryPoint>
+				<ows:City>${conf.sos.capabilities.provider.city}</ows:City>
+				<ows:AdministrativeArea>${conf.sos.capabilities.provider.state}</ows:AdministrativeArea>
+				<ows:PostalCode>${conf.sos.capabilities.provider.zip}</ows:PostalCode>
+				<ows:Country>${conf.sos.capabilities.provider.country}</ows:Country>
+				<ows:ElectronicMailAddress>${conf.sos.capabilities.provider.email}</ows:ElectronicMailAddress>
+			</ows:Address>
+		</ows:ContactInfo>
+		<ows:Role />
+	</ows:ServiceContact>
+</ows:ServiceProvider>

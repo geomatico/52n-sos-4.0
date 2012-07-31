@@ -1,0 +1,7 @@
+org.n52.sos.encode.FesEncoderv20
+org.n52.sos.encode.GmlEncoderv321
+org.n52.sos.encode.OmEncoderv20
+org.n52.sos.encode.SamplingEncoderv20
+org.n52.sos.encode.SosEncoderv20
+org.n52.sos.encode.SweCommonEncoderv20
+org.n52.sos.encode.SwesEncoderv20

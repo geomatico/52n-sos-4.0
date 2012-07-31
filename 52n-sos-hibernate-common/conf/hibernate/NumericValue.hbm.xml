@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 10.07.2012 15:18:27 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="org.n52.sos.ds.hibernate.entities.NumericValue" table="numeric_value">
+        <id name="numericValueId" type="long">
+            <column name="numeric_value_id" />
+            <generator class="increment" />
+        </id>
+        <property name="value" type="double">
+            <column name="value" precision="131089" scale="0" not-null="true" unique="true" />
+        </property>
+        <set name="observations" table="observation_has_numeric_value" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="numeric_value_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.Observation">
+                <column name="observation_id" not-null="true" />
+            </many-to-many>
+        </set>
+    </class>
+</hibernate-mapping>

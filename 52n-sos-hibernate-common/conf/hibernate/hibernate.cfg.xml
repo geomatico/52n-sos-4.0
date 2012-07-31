@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+		"http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.url">${conf.sos.ds.connectionstring}</property>
+        <property name="hibernate.connection.username">${conf.sos.ds.user}</property>
+        <property name="hibernate.connection.password">${conf.sos.ds.password}</property>
+        <!-- <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property> -->
+        <property name="hibernate.dialect">org.hibernate.spatial.dialect.postgis.PostgisDialect52N</property>
+        <property name="hibernate.connection.provider_class">org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider</property>
+        <property name="hibernate.transaction.factory_class">org.hibernate.engine.transaction.internal.jdbc.JdbcTransactionFactory</property>
+        <property name="hibernate.current_session_context_class">thread</property>
+        <property name="hibernate.cache.provider_class">org.hibernate.cache.NoCacheProvider</property>
+        <property name="hibernate.c3p0.min_size">10</property>
+        <property name="hibernate.c3p0.max_size">30</property>
+        <property name="hibernate.c3p0.idle_test_period">1</property>
+        <property name="hibernate.c3p0.acquire_increment">1</property>
+        <property name="hibernate.c3p0.timeout">0</property>
+        <property name="hibernate.c3p0.max_statements">0</property>
+        <property name="hibernate.connection.autoReconnect">true</property>
+        <property name="hibernate.connection.autoReconnectForPools">true</property>
+        <property name="hibernate.connection.testOnBorrow">true</property>
+        <!-- <property name="hibernate.connection.oracle.jdbc.V8Compatible">true</property> -->
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">true</property>
+        
+        <!-- Hibernate mapping files -->
+        <mapping resource="CategoryValue.hbm.xml"/>
+        <mapping resource="CompositePhenomenon.hbm.xml"/>
+        <mapping resource="CountValue.hbm.xml"/>
+        <mapping resource="FeatureOfInterest.hbm.xml"/>
+        <mapping resource="FeatureOfInterestType.hbm.xml"/>
+        <mapping resource="GeographyColumns.hbm.xml"/>
+        <mapping resource="GeometryColumns.hbm.xml"/>
+        <mapping resource="GeometryValue.hbm.xml"/>
+        <mapping resource="NumericValue.hbm.xml"/>
+        <mapping resource="ObservableProperty.hbm.xml"/>
+        <mapping resource="Observation.hbm.xml"/>
+        <mapping resource="ObservationConstellation.hbm.xml"/>
+        <mapping resource="ObservationTemplate.hbm.xml"/>
+        <mapping resource="ObservationType.hbm.xml"/>
+        <mapping resource="Offering.hbm.xml"/>
+        <mapping resource="Procedure.hbm.xml"/>
+        <mapping resource="ProcedureDescriptionFormat.hbm.xml"/>
+        <mapping resource="Quality.hbm.xml"/>
+        <mapping resource="RelatedFeature.hbm.xml"/>
+        <mapping resource="RelatedFeatureRole.hbm.xml"/>
+        <mapping resource="Request.hbm.xml"/>
+        <mapping resource="ResultStructureType.hbm.xml"/>
+        <mapping resource="ResultTemplate.hbm.xml"/>
+        <mapping resource="ResultType.hbm.xml"/>
+        <mapping resource="SpatialFilteringProfile.hbm.xml"/>
+        <mapping resource="SpatialRefSys.hbm.xml"/>
+        <mapping resource="SweType.hbm.xml"/>
+        <mapping resource="TextValue.hbm.xml"/>
+        <mapping resource="Unit.hbm.xml"/>
+        <mapping resource="ValidProcedureTime.hbm.xml"/>
+        <mapping resource="ValueType.hbm.xml"/>
+    </session-factory>
+</hibernate-configuration>
