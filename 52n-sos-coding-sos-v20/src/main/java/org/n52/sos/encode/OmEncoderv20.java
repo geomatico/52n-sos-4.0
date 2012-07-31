@@ -68,6 +68,7 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
+import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -667,7 +668,7 @@ public class OmEncoderv20 implements IEncoder<XmlObject, Object> {
             throws OwsExceptionReport {
         String urlPattern =
                 SosHelper.getUrlPatternForHttpGetMethod(Configurator.getInstance().getBindingOperators().values(),
-                        SosConstants.Operations.GetFeatureOfInterest.name(), Sos2Constants.SERVICEVERSION);
+                        SosConstants.Operations.GetFeatureOfInterest.name(), new DecoderKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION));
         FeaturePropertyType xbFoiType = xbObs.addNewFeatureOfInterest();
         if (!Configurator.getInstance().isFoiEncodedInObservation()) {
             if (urlPattern != null) {

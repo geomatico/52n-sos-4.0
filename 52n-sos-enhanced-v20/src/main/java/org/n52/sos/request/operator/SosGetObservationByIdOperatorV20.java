@@ -71,10 +71,6 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
 
     /** Name of the operation the listener implements */
     private static final String OPERATION_NAME = SosConstants.Operations.GetObservationById.name();
-    
-    private static final String VERSION = Sos2Constants.SERVICEVERSION;
-
-    private static final String SERVICE = SosConstants.SOS;
 
     private RequestOperatorKeyType requestOperatorKeyType;
 
@@ -84,9 +80,10 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
      */
     public SosGetObservationByIdOperatorV20() {
         requestOperatorKeyType =
-                new RequestOperatorKeyType(new ServiceOperatorKeyType(SERVICE, VERSION), OPERATION_NAME);
+                new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION),
+                        OPERATION_NAME);
         this.dao = (IGetObservationByIdDAO) Configurator.getInstance().getOperationDAOs().get(OPERATION_NAME);
-        LOGGER.info("GetObservationByIdListenerSOSv20 initialized successfully!");
+        LOGGER.info("SosGetObservationByIdOperatorV20 initialized successfully!");
     }
 
     @Override
@@ -112,12 +109,12 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
                 exceptions.add(owse);
             }
             Util4Exceptions.mergeExceptions(exceptions);
-            
+
             SosObservationCollection obsCollection = this.dao.getObservationById(sosRequest);
             String version = sosRequest.getVersion();
             String contentType = SosConstants.CONTENT_TYPE_XML;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//            XmlOptions xmlOptions;
+            // XmlOptions xmlOptions;
 
             try {
                 if (obsCollection.getResponseFormat() == null) {
@@ -131,7 +128,8 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
                 if (obsCollection.getResponseFormat().equals(OMConstants.CONTENT_TYPE_OM)
                         || obsCollection.getResponseFormat().equals(OMConstants.RESPONSE_FORMAT_OM)) {
                     namespace.append(obsCollection.getResponseFormat());
-//                    xmlOptions = SosXmlOptionsUtility.getInstance().getXmlOptions();
+                    // xmlOptions =
+                    // SosXmlOptionsUtility.getInstance().getXmlOptions();
                     contentType = OMConstants.CONTENT_TYPE_OM;
                 }
                 // O&M 2.0 non SOS 1.0
@@ -139,14 +137,16 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
                         && (obsCollection.getResponseFormat().equals(OMConstants.CONTENT_TYPE_OM_2) || obsCollection
                                 .getResponseFormat().equals(OMConstants.RESPONSE_FORMAT_OM_2))) {
                     namespace.append(obsCollection.getResponseFormat());
-//                    xmlOptions = SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200();
+                    // xmlOptions =
+                    // SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200();
                     contentType = OMConstants.CONTENT_TYPE_OM_2;
                 }
                 // O&M 2.0 for SOS 2.0
                 else if (request.getVersion().equals(Sos2Constants.SERVICEVERSION)
                         && obsCollection.getResponseFormat().equals(OMConstants.RESPONSE_FORMAT_OM_2)) {
                     namespace.append(Sos2Constants.NS_SOS_20);
-//                    xmlOptions = SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200();
+                    // xmlOptions =
+                    // SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200();
                 } else {
                     String exceptionText = "Received version in request is not supported!";
                     LOGGER.debug(exceptionText);
@@ -160,11 +160,10 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
                     additionalValues.put(HelperValues.OPERATION, Operations.GetObservation.name());
                     Object encodedObject = encoder.encode(obsCollection, additionalValues);
                     if (encodedObject instanceof XmlObject) {
-                        ((XmlObject)encodedObject).save(baos,
-                                XmlOptionsHelper.getInstance().getXmlOptions());
+                        ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
                         return new SosResponse(baos, contentType, false, version, true);
                     } else if (encodedObject instanceof IServiceResponse) {
-                        return (IServiceResponse)encodedObject;
+                        return (IServiceResponse) encodedObject;
                     } else {
                         String exceptionText = "The encoder response is not supported!";
                         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
@@ -180,7 +179,8 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
             }
 
         } else {
-            String exceptionText = "Received request in GetObservationByIdListener() is not a SosGetObservationByIdRequest!";
+            String exceptionText =
+                    "Received request is not a SosGetObservationByIdRequest!";
             LOGGER.error(exceptionText);
             throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
         }
@@ -195,7 +195,8 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
     }
 
     @Override
-    public OWSOperation getOperationMetadata(String service, String version, Object connection) throws OwsExceptionReport {
+    public OWSOperation getOperationMetadata(String service, String version, Object connection)
+            throws OwsExceptionReport {
         return dao.getOperationsMetadata(service, version, connection);
     }
 

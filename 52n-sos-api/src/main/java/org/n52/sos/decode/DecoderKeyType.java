@@ -8,8 +8,6 @@ public class DecoderKeyType implements Comparable<DecoderKeyType> {
 
     private String version;
 
-    private String urlPattern;
-    
     public DecoderKeyType(String namespace) {
         this.namespace = namespace;
     }
@@ -19,8 +17,12 @@ public class DecoderKeyType implements Comparable<DecoderKeyType> {
         this.version = version;
     }
 
-    public void setUrlPattern(String urlPattern) {
-        this.urlPattern = urlPattern;
+    public String getService() {
+        return service;
+    }
+
+    public String getVersion() {
+        return version;
     }
 
     @Override
@@ -28,7 +30,7 @@ public class DecoderKeyType implements Comparable<DecoderKeyType> {
         if (o instanceof DecoderKeyType) {
             DecoderKeyType toCheck = (DecoderKeyType) o;
             if (checkParameter(service, toCheck.service) && checkParameter(version, toCheck.version)
-                    && checkParameter(namespace, toCheck.namespace) && checkParameter(urlPattern, toCheck.urlPattern)) {
+                    && checkParameter(namespace, toCheck.namespace)) {
                 return 0;
             }
             return 1;
@@ -46,7 +48,7 @@ public class DecoderKeyType implements Comparable<DecoderKeyType> {
         if (paramObject instanceof DecoderKeyType) {
             DecoderKeyType toCheck = (DecoderKeyType) paramObject;
             return (checkParameter(service, toCheck.service) && checkParameter(version, toCheck.version) && checkParameter(
-                    namespace, toCheck.namespace) && checkParameter(urlPattern, toCheck.urlPattern));
+                    namespace, toCheck.namespace));
         }
         return false;
     }
@@ -68,9 +70,6 @@ public class DecoderKeyType implements Comparable<DecoderKeyType> {
         if (namespace != null) {
             hash += 31 * hash + namespace.hashCode();
         }
-        if (urlPattern != null) {
-            hash += 31 * hash + urlPattern.hashCode();
-        }
         return hash;
     }
     
@@ -87,8 +86,7 @@ public class DecoderKeyType implements Comparable<DecoderKeyType> {
         string.append("DecoderKey(");
         string.append(service + ",");
         string.append(version + ",");
-        string.append(namespace + ",");
-        string.append(urlPattern);
+        string.append(namespace);
         string.append(")");
         return string.toString();
     }

@@ -218,7 +218,7 @@ public final class Configurator {
      */
     private IConnectionProvider connectionProvider;
 
-    private Map<DecoderKeyType, IDecoder> decoder;
+    private Map<DecoderKeyType, List<IDecoder>> decoder;
 
     /**
      * default EPSG code of stored geometries
@@ -1014,7 +1014,7 @@ public final class Configurator {
     }
 
     private void initalizeDecoder() throws OwsExceptionReport {
-        decoder = new HashMap<DecoderKeyType, IDecoder>();
+        decoder = new HashMap<DecoderKeyType, List<IDecoder>>();
         serviceLoaderDecoder = ServiceLoader.load(IDecoder.class);
         setDecoder();
         LOGGER.info("\n******\n Decoder(s) initialized successfully!\n******\n");
@@ -1102,7 +1102,13 @@ public final class Configurator {
             try {
                 IDecoder aDecoder = (IDecoder) iter.next();
                 for (DecoderKeyType decoderKeyType : (List<DecoderKeyType>) aDecoder.getDecoderKeyTypes()) {
-                    decoder.put(decoderKeyType, aDecoder);
+                    if (decoder.containsKey(decoderKeyType)) {
+                        decoder.get(decoderKeyType).add(aDecoder);
+                    } else {
+                        List<IDecoder> decoderList = new ArrayList<IDecoder>();
+                        decoderList.add(aDecoder);
+                        decoder.put(decoderKeyType, decoderList);
+                    }
                 }
             } catch (ServiceConfigurationError sce) {
                 LOGGER.warn("An IDecoder implementation could not be loaded!", sce);
@@ -1663,7 +1669,7 @@ public final class Configurator {
      * @return the decoder
      * @throws OwsExceptionReport
      */
-    public IDecoder getDecoder(String namespace) throws OwsExceptionReport {
+    public List<IDecoder> getDecoder(String namespace) throws OwsExceptionReport {
         return getDecoder(new DecoderKeyType(namespace));
     }
 
@@ -1671,7 +1677,7 @@ public final class Configurator {
      * @return the decoder
      * @throws OwsExceptionReport
      */
-    public IDecoder getDecoder(String service, String version) throws OwsExceptionReport {
+    public List<IDecoder> getDecoder(String service, String version) throws OwsExceptionReport {
         return getDecoder(new DecoderKeyType(service, version));
     }
     
@@ -1679,7 +1685,7 @@ public final class Configurator {
      * @return the decoder
      * @throws OwsExceptionReport
      */
-    public IDecoder getDecoder(DecoderKeyType decoderKeyType) throws OwsExceptionReport {
+    public List<IDecoder> getDecoder(DecoderKeyType decoderKeyType) throws OwsExceptionReport {
         return decoder.get(decoderKeyType);
     }
 

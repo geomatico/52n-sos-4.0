@@ -42,6 +42,7 @@ import org.apache.xmlbeans.XmlObject;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
+import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IGetCapabilitiesDAO;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
@@ -636,7 +637,13 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         // set operation name
         opsMeta.setOperationName(SosConstants.Operations.GetCapabilities.name());
         // set DCP
-        opsMeta.setDcp(SosHelper.getDCP(SosConstants.Operations.GetCapabilities.name(), service, version, Configurator
+        DecoderKeyType dkt = null;
+        if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
+        } else {
+            dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
+        }
+        opsMeta.setDcp(SosHelper.getDCP(SosConstants.Operations.GetCapabilities.name(), dkt, Configurator
                 .getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set param updateSequence
         List<String> updateSequenceValues = new ArrayList<String>();
@@ -861,7 +868,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         } else {
             String urlPattern =
                     SosHelper.getUrlPatternForHttpGetMethod(Configurator.getInstance().getBindingOperators().values(),
-                            SosConstants.Operations.GetFeatureOfInterest.name(), version);
+                            SosConstants.Operations.GetFeatureOfInterest.name(), new DecoderKeyType(SosConstants.SOS, version));
             return SosHelper.createFoiGetUrl(identifier, version, Configurator.getInstance().getServiceURL(),
                     urlPattern);
         }

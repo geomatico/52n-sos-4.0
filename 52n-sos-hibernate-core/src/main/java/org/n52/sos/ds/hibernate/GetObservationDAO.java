@@ -44,6 +44,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projection;
 import org.joda.time.DateTime;
+import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IGetObservationDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
@@ -177,9 +178,15 @@ public class GetObservationDAO implements IGetObservationDAO {
 
         OWSOperation opsMeta = new OWSOperation();
         // set operation name
-        opsMeta.setOperationName(SosConstants.Operations.GetObservation.name());
+        opsMeta.setOperationName(OPERATION_NAME);
         // set DCP
-        opsMeta.setDcp(SosHelper.getDCP(SosConstants.Operations.GetObservation.name(), service, version, Configurator
+        DecoderKeyType dkt = null;
+        if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
+        } else {
+            dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
+        }
+        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt, Configurator
                 .getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set param srsName
         List<String> srsNameValues = new ArrayList<String>(1);

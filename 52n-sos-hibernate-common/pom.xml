@@ -55,11 +55,11 @@
 						</goals>
 						<configuration>
 							<outputDirectory>
-								${project.parent.basedir}/52n-sos-webapp/src/main/webapp/WEB-INF/conf
+								${project.parent.basedir}/52n-sos-webapp/src/main/resources
 							</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${project.basedir}/conf</directory>
+									<directory>${project.basedir}/conf/hibernate</directory>
 								</resource>
 							</resources>
 							<overwrite>true</overwrite>

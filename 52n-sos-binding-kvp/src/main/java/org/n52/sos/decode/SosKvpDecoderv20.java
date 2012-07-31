@@ -20,6 +20,7 @@ import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.SosDescribeSensorRequest;
 import org.n52.sos.request.SosGetCapabilitiesRequest;
@@ -38,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class SosKvpDecoderv20 implements IDecoder<AbstractServiceRequest, Map<String, String>> {
+public class SosKvpDecoderv20 implements IKvpDecoder {
 
     /**
      * logger, used for logging while initializing the constants from config
@@ -51,11 +52,13 @@ public class SosKvpDecoderv20 implements IDecoder<AbstractServiceRequest, Map<St
     public SosKvpDecoderv20() {
         decoderKeyTypes = new ArrayList<DecoderKeyType>();
         DecoderKeyType serviceVersionDKT = new DecoderKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION);
-        serviceVersionDKT.setUrlPattern("/sos/kvp");
         decoderKeyTypes.add(serviceVersionDKT);
         DecoderKeyType serviceDKT = new DecoderKeyType(SosConstants.SOS, null);
-        serviceDKT.setUrlPattern("/sos/kvp");
         decoderKeyTypes.add(serviceDKT);
+        DecoderKeyType namespaceSosDKT = new DecoderKeyType(Sos2Constants.NS_SOS_20);
+        decoderKeyTypes.add(namespaceSosDKT);
+        DecoderKeyType namespaceSwesDKT = new DecoderKeyType(SWEConstants.NS_SWES_20);
+        decoderKeyTypes.add(namespaceSwesDKT);
         StringBuilder builder = new StringBuilder();
         for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
             builder.append(decoderKeyType.toString());
@@ -83,13 +86,13 @@ public class SosKvpDecoderv20 implements IDecoder<AbstractServiceRequest, Map<St
         }
         if (requestParameterValue != null) {
             if (requestParameterValue.equalsIgnoreCase(SosConstants.Operations.GetCapabilities.name())) {
-                sosRequest = parseGetCapabilitiesRequest(element);
+                sosRequest = parseGetCapabilities(element);
             } else if (requestParameterValue.equalsIgnoreCase(SosConstants.Operations.DescribeSensor.name())) {
-                sosRequest = parseDescribeSensorRequest(element);
+                sosRequest = parseDescribeSensor(element);
             } else if (requestParameterValue.equalsIgnoreCase(SosConstants.Operations.GetObservation.name())) {
-                sosRequest = parseGetObservationRequest(element);
+                sosRequest = parseGetObservation(element);
             } else if (requestParameterValue.equalsIgnoreCase(SosConstants.Operations.GetFeatureOfInterest.name())) {
-                sosRequest = parseGetFeatureOfInterestRequest(element);
+                sosRequest = parseGetFeatureOfInterest(element);
                 // } else if
                 // (paramValue.equalsIgnoreCase(SosConstants.Operations.GetResult.name()))
                 // {
@@ -117,7 +120,7 @@ public class SosKvpDecoderv20 implements IDecoder<AbstractServiceRequest, Map<St
      * @throws OwsExceptionReport
      *             If parsing the String failed
      */
-    private SosGetCapabilitiesRequest parseGetCapabilitiesRequest(Map<String, String> element)
+    private SosGetCapabilitiesRequest parseGetCapabilities(Map<String, String> element)
             throws OwsExceptionReport {
 
         SosGetCapabilitiesRequest request = new SosGetCapabilitiesRequest();
@@ -184,7 +187,7 @@ public class SosKvpDecoderv20 implements IDecoder<AbstractServiceRequest, Map<St
      * @throws OwsExceptionReport
      *             if parsing of request fails
      */
-    private SosDescribeSensorRequest parseDescribeSensorRequest(Map<String, String> element) throws OwsExceptionReport {
+    private SosDescribeSensorRequest parseDescribeSensor(Map<String, String> element) throws OwsExceptionReport {
 
         SosDescribeSensorRequest request = new SosDescribeSensorRequest();
         List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
@@ -286,7 +289,7 @@ public class SosKvpDecoderv20 implements IDecoder<AbstractServiceRequest, Map<St
      * @throws OwsExceptionReport
      *             if parsing of request fails
      */
-    private SosGetObservationRequest parseGetObservationRequest(Map<String, String> element) throws OwsExceptionReport {
+    private SosGetObservationRequest parseGetObservation(Map<String, String> element) throws OwsExceptionReport {
 
         SosGetObservationRequest request = new SosGetObservationRequest();
         List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
@@ -396,7 +399,7 @@ public class SosKvpDecoderv20 implements IDecoder<AbstractServiceRequest, Map<St
      * @throws OwsExceptionReport
      *             if parsing of request fails
      */
-    private SosGetFeatureOfInterestRequest parseGetFeatureOfInterestRequest(Map<String, String> element)
+    private SosGetFeatureOfInterestRequest parseGetFeatureOfInterest(Map<String, String> element)
             throws OwsExceptionReport {
 
         SosGetFeatureOfInterestRequest request = new SosGetFeatureOfInterestRequest();
@@ -485,7 +488,7 @@ public class SosKvpDecoderv20 implements IDecoder<AbstractServiceRequest, Map<St
         return request;
     }
 
-    private SosGetResultTemplateRequest parseGetResultTemplateRequest(Map<String, String> element)
+    private SosGetResultTemplateRequest parseGetResultTemplate(Map<String, String> element)
             throws OwsExceptionReport {
         SosGetResultTemplateRequest request = new SosGetResultTemplateRequest();
         List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
@@ -573,7 +576,7 @@ public class SosKvpDecoderv20 implements IDecoder<AbstractServiceRequest, Map<St
         return request;
     }
 
-    private SosGetResultRequest parseGetResultRequest(Map<String, String> element) throws OwsExceptionReport {
+    private SosGetResultRequest parseGetResult(Map<String, String> element) throws OwsExceptionReport {
         SosGetResultRequest request = new SosGetResultRequest();
         List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
 

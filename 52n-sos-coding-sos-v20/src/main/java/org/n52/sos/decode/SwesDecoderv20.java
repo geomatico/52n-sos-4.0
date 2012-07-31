@@ -3,20 +3,25 @@ package org.n52.sos.decode;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.opengis.swes.x20.DeleteSensorDocument;
 import net.opengis.swes.x20.DescribeSensorDocument;
 import net.opengis.swes.x20.DescribeSensorType;
+import net.opengis.swes.x20.InsertSensorDocument;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.request.SosDeleteSensorRequest;
 import org.n52.sos.request.SosDescribeSensorRequest;
+import org.n52.sos.request.SosInsertSensorRequest;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SwesDecoderv20 implements IDecoder<AbstractServiceRequest, XmlObject> {
+public class SwesDecoderv20 implements IXmlRequestDecoder {
 
     /**
      * logger, used for logging while initializing the constants from config
@@ -28,14 +33,8 @@ public class SwesDecoderv20 implements IDecoder<AbstractServiceRequest, XmlObjec
 
     public SwesDecoderv20() {
         decoderKeyTypes = new ArrayList<DecoderKeyType>();
-        DecoderKeyType dkt = new DecoderKeyType(SWEConstants.NS_SWES_20);
-        decoderKeyTypes.add(dkt);
-        DecoderKeyType dktSoapPattern = new DecoderKeyType(SWEConstants.NS_SWES_20);
-        dktSoapPattern.setUrlPattern("/sos/soap");
-        decoderKeyTypes.add(dktSoapPattern);
-        DecoderKeyType dktXmlPattern = new DecoderKeyType(SWEConstants.NS_SWES_20);
-        dktXmlPattern.setUrlPattern("/sos/xml");
-        decoderKeyTypes.add(dktXmlPattern);
+        DecoderKeyType namespaceDKT = new DecoderKeyType(SWEConstants.NS_SWES_20);
+        decoderKeyTypes.add(namespaceDKT);
         StringBuilder builder = new StringBuilder();
         for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
             builder.append(decoderKeyType.toString());
@@ -57,7 +56,7 @@ public class SwesDecoderv20 implements IDecoder<AbstractServiceRequest, XmlObjec
         
         if (xmlObject instanceof DescribeSensorDocument) {
             DescribeSensorDocument obsDoc = (DescribeSensorDocument) xmlObject;
-            response = parseDescribeSensorRequest(obsDoc);
+            response = parseDescribeSensor(obsDoc);
         }
         return response;
     }
@@ -72,7 +71,7 @@ public class SwesDecoderv20 implements IDecoder<AbstractServiceRequest, XmlObjec
      * @throws OwsExceptionReport
      *             if validation of the request failed
      */
-    private AbstractServiceRequest parseDescribeSensorRequest(DescribeSensorDocument xbDescSenDoc)
+    private AbstractServiceRequest parseDescribeSensor(DescribeSensorDocument xbDescSenDoc)
             throws OwsExceptionReport {
         // validate document
         XmlHelper.validateDocument(xbDescSenDoc);
@@ -89,6 +88,24 @@ public class SwesDecoderv20 implements IDecoder<AbstractServiceRequest, XmlObjec
             descSensorRequest.setOutputFormat(SosConstants.PARAMETER_NOT_SET);
         }
         return descSensorRequest;
+    }
+    
+    private AbstractServiceRequest parseInsertSensor(InsertSensorDocument xbInsertSensorDoc) throws OwsExceptionReport {
+        // validate document
+        XmlHelper.validateDocument(xbInsertSensorDoc);
+        
+        SosInsertSensorRequest insertSensorRequest = new SosInsertSensorRequest();
+        
+        return insertSensorRequest;
+    }
+    
+    private AbstractServiceRequest parseDeleteSensor(DeleteSensorDocument xbDeleteSensor) throws OwsExceptionReport {
+     // validate document
+        XmlHelper.validateDocument(xbDeleteSensor);
+        
+        SosDeleteSensorRequest deleteSensorRequest = new SosDeleteSensorRequest();
+        
+        return deleteSensorRequest;
     }
 
 }

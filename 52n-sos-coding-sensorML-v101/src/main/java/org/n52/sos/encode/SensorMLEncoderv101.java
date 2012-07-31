@@ -41,6 +41,7 @@ import net.opengis.swe.x101.VectorType.Coordinate;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.SosSensorML;
@@ -660,7 +661,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
                             SWEConstants.QN_SIMPLEDATARECORD_SWE_101, SimpleDataRecordType.type);
             String urlPattern =
                     SosHelper.getUrlPatternForHttpGetMethod(Configurator.getInstance().getBindingOperators().values(),
-                            SosConstants.Operations.DescribeSensor.name(), Sos2Constants.SERVICEVERSION);
+                            SosConstants.Operations.DescribeSensor.name(), new DecoderKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION));
             for (String parentProcedureId : parentProcedureIds) {
                 MetaDataPropertyType xb_metaData = xb_sdr.addNewMetaDataProperty();
                 xb_metaData.setTitle(parentProcedureId);
@@ -705,7 +706,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
 
             String urlPattern =
                     SosHelper.getUrlPatternForHttpGetMethod(Configurator.getInstance().getBindingOperators().values(),
-                            SosConstants.Operations.DescribeSensor.name(), Sos2Constants.SERVICEVERSION);
+                            SosConstants.Operations.DescribeSensor.name(), new DecoderKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION));
             for (String childProcedureId : childProcedureIds) {
                 childCount++;
                 Component xb_component = xb_componentList.addNewComponent();

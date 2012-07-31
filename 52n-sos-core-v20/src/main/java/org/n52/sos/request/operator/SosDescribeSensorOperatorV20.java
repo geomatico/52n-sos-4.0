@@ -72,10 +72,6 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
 
     /** Name of the operation the listener implements */
     private static final String OPERATION_NAME = SosConstants.Operations.DescribeSensor.name();
-    
-    private static final String VERSION = Sos2Constants.SERVICEVERSION;
-
-    private static final String SERVICE = SosConstants.SOS;
 
     private RequestOperatorKeyType requestOperatorKeyType;
 
@@ -88,9 +84,10 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
      */
     public SosDescribeSensorOperatorV20() {
         requestOperatorKeyType =
-                new RequestOperatorKeyType(new ServiceOperatorKeyType(SERVICE, VERSION), OPERATION_NAME);
+                new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION),
+                        OPERATION_NAME);
         this.dao = (IDescribeSensorDAO) Configurator.getInstance().getOperationDAOs().get(OPERATION_NAME);
-        LOGGER.info("DescribeSensorListenerSOSv20 initialized successfully!");
+        LOGGER.info("SosDescribeSensorOperatorV20 initialized successfully!");
     }
 
     /*
@@ -119,7 +116,8 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
                 exceptions.add(owse);
             }
             try {
-                SosHelper.checkProcedureOutputFormat(outputFormat, Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name());
+                SosHelper.checkProcedureOutputFormat(outputFormat,
+                        Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name());
             } catch (OwsExceptionReport owse) {
                 exceptions.add(owse);
             }
@@ -153,18 +151,20 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
             String contentType = SosConstants.CONTENT_TYPE_XML;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             contentType = SensorMLConstants.SENSORML_CONTENT_TYPE;
-//            XmlOptions xmlOptions;
+            // XmlOptions xmlOptions;
 
             try {
                 String namespace;
                 // check SOS version for response encoding
                 if (outputFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
                     namespace = outputFormat;
-//                    xmlOptions = SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200();
+                    // xmlOptions =
+                    // SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200();
 
                 } else if (outputFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
                     namespace = SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL;
-//                    xmlOptions = SosXmlOptionsUtility.getInstance().getXmlOptions();
+                    // xmlOptions =
+                    // SosXmlOptionsUtility.getInstance().getXmlOptions();
                 } else {
                     String exceptionText = "Received version in request is not supported!";
                     LOGGER.debug(exceptionText);
@@ -178,11 +178,10 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
                     additionalValues.put(HelperValues.OPERATION, Operations.DescribeSensor.name());
                     Object encodedObject = encoder.encode(smlDesc, additionalValues);
                     if (encodedObject instanceof XmlObject) {
-                        ((XmlObject)encodedObject).save(baos,
-                                XmlOptionsHelper.getInstance().getXmlOptions());
+                        ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
                         return new SosResponse(baos, contentType, false, version, true);
                     } else if (encodedObject instanceof IServiceResponse) {
-                        return (IServiceResponse)encodedObject;
+                        return (IServiceResponse) encodedObject;
                     } else {
                         String exceptionText = "The encoder response is not supported!";
                         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
@@ -206,7 +205,7 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
                 throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
             }
         } else {
-            String exceptionText = "Received request in DescribeSensorListener is not a SosDescribeSensorRequest!";
+            String exceptionText = "Received request is not a SosDescribeSensorRequest!";
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
         }
@@ -233,7 +232,8 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
      * .String, java.lang.Object)
      */
     @Override
-    public OWSOperation getOperationMetadata(String service, String version, Object connection) throws OwsExceptionReport {
+    public OWSOperation getOperationMetadata(String service, String version, Object connection)
+            throws OwsExceptionReport {
         return dao.getOperationsMetadata(service, version, connection);
     }
 

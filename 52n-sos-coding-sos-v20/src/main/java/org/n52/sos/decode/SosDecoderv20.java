@@ -40,6 +40,7 @@ import net.opengis.sos.x20.GetObservationByIdDocument;
 import net.opengis.sos.x20.GetObservationByIdType;
 import net.opengis.sos.x20.GetObservationDocument;
 import net.opengis.sos.x20.GetObservationType;
+import net.opengis.sos.x20.InsertObservationDocument;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.filter.SpatialFilter;
@@ -47,19 +48,19 @@ import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.SosGetCapabilitiesRequest;
 import org.n52.sos.request.SosGetFeatureOfInterestRequest;
 import org.n52.sos.request.SosGetObservationByIdRequest;
 import org.n52.sos.request.SosGetObservationRequest;
+import org.n52.sos.request.SosInsertObservationRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosDecoderv20 implements IDecoder<AbstractServiceRequest, XmlObject> {
+public class SosDecoderv20 implements IXmlRequestDecoder {
 
     /**
      * logger, used for logging while initializing the constants from config
@@ -71,16 +72,8 @@ public class SosDecoderv20 implements IDecoder<AbstractServiceRequest, XmlObject
 
     public SosDecoderv20() {
         decoderKeyTypes = new ArrayList<DecoderKeyType>();
-        DecoderKeyType serviceVersionDKT = new DecoderKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION);
-        decoderKeyTypes.add(serviceVersionDKT);
         DecoderKeyType namespaceDKT = new DecoderKeyType(Sos2Constants.NS_SOS_20);
         decoderKeyTypes.add(namespaceDKT);
-        DecoderKeyType serviceVersionPatternDKT = new DecoderKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION);
-        serviceVersionPatternDKT.setUrlPattern("/sos/soap");
-        decoderKeyTypes.add(serviceVersionPatternDKT);
-        DecoderKeyType namespacePatternDKT = new DecoderKeyType(Sos2Constants.NS_SOS_20);
-        namespacePatternDKT.setUrlPattern("/sos/soap");
-        decoderKeyTypes.add(namespacePatternDKT);
         StringBuilder builder = new StringBuilder();
         for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
             builder.append(decoderKeyType.toString());
@@ -103,26 +96,31 @@ public class SosDecoderv20 implements IDecoder<AbstractServiceRequest, XmlObject
         // getCapabilities request
         if (xmlObject instanceof GetCapabilitiesDocument) {
             GetCapabilitiesDocument getCapsDoc = (GetCapabilitiesDocument) xmlObject;
-            response = parseGetCapabilitiesRequest(getCapsDoc);
+            response = parseGetCapabilities(getCapsDoc);
         }
 
         // getObservation request
         else if (xmlObject instanceof GetObservationDocument) {
             GetObservationDocument getObsDoc = (GetObservationDocument) xmlObject;
-            response = parseGetObservationRequest(getObsDoc);
+            response = parseGetObservation(getObsDoc);
         }
 
         // getFeatureOfInterest request
         else if (xmlObject instanceof GetFeatureOfInterestDocument) {
             GetFeatureOfInterestDocument getFoiDoc = (GetFeatureOfInterestDocument) xmlObject;
-            response = parseGetFeatureOfInterestRequest(getFoiDoc);
+            response = parseGetFeatureOfInterest(getFoiDoc);
         }
 
         else if (xmlObject instanceof GetObservationByIdDocument) {
             GetObservationByIdDocument getObsByIdDoc = (GetObservationByIdDocument) xmlObject;
             response = parseGetObservationById(getObsByIdDoc);
         }
-
+        
+        else if (xmlObject instanceof InsertObservationDocument) {
+            InsertObservationDocument insertObservationDoc = (InsertObservationDocument) xmlObject;
+            response = parseInsertObservation(insertObservationDoc);
+        }
+        
         else {
             String exceptionText = "The request is not supported by this server!";
             LOGGER.debug(exceptionText);
@@ -141,7 +139,7 @@ public class SosDecoderv20 implements IDecoder<AbstractServiceRequest, XmlObject
      * @throws OwsExceptionReport
      *             If parsing the XmlBean failed
      */
-    private AbstractServiceRequest parseGetCapabilitiesRequest(GetCapabilitiesDocument getCapsDoc)
+    private AbstractServiceRequest parseGetCapabilities(GetCapabilitiesDocument getCapsDoc)
             throws OwsExceptionReport {
         SosGetCapabilitiesRequest request = new SosGetCapabilitiesRequest();
 
@@ -181,7 +179,7 @@ public class SosDecoderv20 implements IDecoder<AbstractServiceRequest, XmlObject
      * @throws OwsExceptionReport
      *             If parsing the XmlBean failed
      */
-    private AbstractServiceRequest parseGetObservationRequest(GetObservationDocument getObsDoc)
+    private AbstractServiceRequest parseGetObservation(GetObservationDocument getObsDoc)
             throws OwsExceptionReport {
         // validate document
         XmlHelper.validateDocument(getObsDoc);
@@ -219,7 +217,7 @@ public class SosDecoderv20 implements IDecoder<AbstractServiceRequest, XmlObject
      * @throws OwsExceptionReport
      *             if validation of the request failed
      */
-    private AbstractServiceRequest parseGetFeatureOfInterestRequest(GetFeatureOfInterestDocument getFoiDoc)
+    private AbstractServiceRequest parseGetFeatureOfInterest(GetFeatureOfInterestDocument getFoiDoc)
             throws OwsExceptionReport {
         // validate document
         XmlHelper.validateDocument(getFoiDoc);
@@ -247,6 +245,14 @@ public class SosDecoderv20 implements IDecoder<AbstractServiceRequest, XmlObject
         getObsByIdRequest.setObservationIdentifier(Arrays.asList(getObsByIdType.getObservationArray()));
         return getObsByIdRequest;
     }
+    
+    private AbstractServiceRequest parseInsertObservation(InsertObservationDocument insertObservationDoc) throws OwsExceptionReport {
+     // validate document
+        XmlHelper.validateDocument(insertObservationDoc);
+        SosInsertObservationRequest insertObservationRequest = new SosInsertObservationRequest();
+        return insertObservationRequest;
+        
+    }
 
     /**
      * Parses the spatial filter of a GetObservation request.
@@ -262,10 +268,16 @@ public class SosDecoderv20 implements IDecoder<AbstractServiceRequest, XmlObject
     private SpatialFilter parseSpatialFilter4GetObs(net.opengis.sos.x20.GetObservationType.SpatialFilter xbFilter)
             throws OwsExceptionReport {
         if (xbFilter != null && xbFilter.getSpatialOps() != null) {
-            IDecoder decoder =
+            List<IDecoder> decoderList =
                     Configurator.getInstance().getDecoder(xbFilter.getSpatialOps().getDomNode().getNamespaceURI());
-            Object filter = decoder.decode(xbFilter.getSpatialOps());
-            if (filter instanceof SpatialFilter) {
+            Object filter = null;
+            for (IDecoder decoder : decoderList) {
+                filter = decoder.decode(xbFilter.getSpatialOps());
+                if (filter != null) {
+                    break;
+                }
+            }
+            if (filter != null && filter instanceof SpatialFilter) {
                 return (SpatialFilter) filter;
             }
         }
@@ -287,10 +299,16 @@ public class SosDecoderv20 implements IDecoder<AbstractServiceRequest, XmlObject
             net.opengis.sos.x20.GetFeatureOfInterestType.SpatialFilter[] xbFilters) throws OwsExceptionReport {
         List<SpatialFilter> spatialFilters = new ArrayList<SpatialFilter>(xbFilters.length);
         for (net.opengis.sos.x20.GetFeatureOfInterestType.SpatialFilter xbFilter : xbFilters) {
-            IDecoder decoder =
+            List<IDecoder> decoderList =
                     Configurator.getInstance().getDecoder(xbFilter.getSpatialOps().getDomNode().getNamespaceURI());
-            Object filter = decoder.decode(xbFilter.getSpatialOps());
-            if (filter instanceof SpatialFilter) {
+            Object filter = null;
+            for (IDecoder decoder : decoderList) {
+                filter = decoder.decode(xbFilter.getSpatialOps());
+                if (filter != null) {
+                    break;
+                }
+            }
+            if (filter != null && filter instanceof SpatialFilter) {
                 spatialFilters.add((SpatialFilter) filter);
             }
         }
@@ -312,11 +330,14 @@ public class SosDecoderv20 implements IDecoder<AbstractServiceRequest, XmlObject
             net.opengis.sos.x20.GetObservationType.TemporalFilter[] temporalFilters) throws OwsExceptionReport {
         List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>();
         for (net.opengis.sos.x20.GetObservationType.TemporalFilter temporalFilter : temporalFilters) {
-            IDecoder decoder =
+            List<IDecoder> decoderList =
                     Configurator.getInstance().getDecoder(
                             temporalFilter.getTemporalOps().getDomNode().getNamespaceURI());
-            Object filter = decoder.decode(temporalFilter.getTemporalOps());
-            if (filter instanceof TemporalFilter) {
+            Object filter = null;
+            for (IDecoder decoder : decoderList) {
+                filter = decoder.decode(temporalFilter.getTemporalOps());
+            }
+            if (filter != null && filter instanceof TemporalFilter) {
                 sosTemporalFilters.add((TemporalFilter) filter);
             }
         }

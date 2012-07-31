@@ -311,9 +311,17 @@ public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
         }
         for (String headerElementsNamespace : headerElementsMap.keySet()) {
             try {
-                IDecoder decoder = Configurator.getInstance().getDecoder(headerElementsNamespace);
-                SoapHeader headerElement = (SoapHeader) decoder.decode(headerElementsMap.get(headerElementsNamespace));
-                soapHeaders.put(headerElementsNamespace, (SoapHeader) headerElement);
+                List<IDecoder> decoderList = Configurator.getInstance().getDecoder(headerElementsNamespace);
+                SoapHeader headerElement = null;
+                for (IDecoder decoder : decoderList) {
+                    headerElement = (SoapHeader) decoder.decode(headerElementsMap.get(headerElementsNamespace));
+                    if (headerElement != null) {
+                        break;
+                    }
+                }
+                if (headerElement != null && headerElement instanceof SoapHeader) {
+                    soapHeaders.put(headerElementsNamespace, (SoapHeader) headerElement);
+                }
             } catch (OwsExceptionReport owse) {
                 LOGGER.debug("Requested SOAPHeader element is not supported", owse);
             }

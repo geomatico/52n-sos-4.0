@@ -57,10 +57,7 @@ import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.SosExceptionCode;
-import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
-import org.n52.sos.request.operator.IRequestOperator;
-import org.n52.sos.service.operator.IServiceOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,11 +79,6 @@ public class SosHelper {
      * Prefix for decoder methods
      */
     private static final String HTTP_DECODER_METHODE_PREFIX = "parse";
-
-    /**
-     * Postfix for decoder methods
-     */
-    private static final String HTTP_DECODER_METHODE_POSTFIX = "Request";
 
     private static final String generatedFoiPrefix = "generated_";
 
@@ -390,7 +382,7 @@ public class SosHelper {
      */
     public static boolean checkMethodeImplementation4DCP(Method[] methods, String operation) {
         boolean implemented = false;
-        String formattedOperation = HTTP_DECODER_METHODE_PREFIX + operation + HTTP_DECODER_METHODE_POSTFIX;
+        String formattedOperation = HTTP_DECODER_METHODE_PREFIX + operation;
         for (Method method : methods) {
             if (method.getName().equals(formattedOperation)) {
                 return true;
@@ -413,18 +405,18 @@ public class SosHelper {
      * @return Map with DCPs for the SOS operation
      * @throws OwsExceptionReport
      */
-    public static Map<String, List<String>> getDCP(String operation, String service, String version,
+    public static Map<String, List<String>> getDCP(String operation, DecoderKeyType decoderKey,
             Collection<IBinding> bindings, String serviceURL) throws OwsExceptionReport {
         List<String> httpGetUrls = new ArrayList<String>();
         List<String> httpPostUrls = new ArrayList<String>();
         try {
             for (IBinding binding : bindings) {
                 // HTTP-Get
-                if (binding.checkOperationHttpGetSupported(operation, service, version)) {
+                if (binding.checkOperationHttpGetSupported(operation, decoderKey)) {
                     httpGetUrls.add(serviceURL + binding.getUrlPattern() + "?");
                 }
                 // HTTP-Post
-                if (binding.checkOperationHttpPostSupported(operation, service, version)) {
+                if (binding.checkOperationHttpPostSupported(operation, decoderKey)) {
                     httpPostUrls.add(serviceURL + binding.getUrlPattern());
                 }
 
@@ -442,36 +434,35 @@ public class SosHelper {
         return dcp;
     }
 
-    private static String getKvpNamespaceForVersionAndOperation(String operation, String version) {
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
+    private static String getKvpNamespaceForVersionAndOperation(String operation, DecoderKeyType decoderKey) {
+        if (decoderKey.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
             return Sos1Constants.NS_SOS;
-        } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
+        } else if (decoderKey.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
             return Sos2Constants.NS_SOS_20;
         }
         return "";
     }
-
-    private static String getPostNamespaceForVersionAndOperation(String operation, String version) {
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            return Sos1Constants.NS_SOS;
-        } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
-            if (operation.equals(SosConstants.Operations.DescribeSensor.name())
-                    || operation.equals(Sos2Constants.Operations.InsertSensor.name())
-                    || operation.equals(Sos2Constants.Operations.DeleteSensor.name())) {
-                return SWEConstants.NS_SWES_20;
-            } else {
-                return Sos2Constants.NS_SOS_20;
-            }
-        }
-        return "";
-    }
+//
+//    private static String getPostNamespaceForVersionAndOperation(String operation, String version) {
+//        if (version.equals(Sos1Constants.SERVICEVERSION)) {
+//            return Sos1Constants.NS_SOS;
+//        } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
+//            if (operation.equals(SosConstants.Operations.DescribeSensor.name())
+//                    || operation.equals(Sos2Constants.Operations.InsertSensor.name())
+//                    || operation.equals(Sos2Constants.Operations.DeleteSensor.name())) {
+//                return SWEConstants.NS_SWES_20;
+//            } else {
+//                return Sos2Constants.NS_SOS_20;
+//            }
+//        }
+//        return "";
+//    }
 
     public static String getUrlPatternForHttpGetMethod(Collection<IBinding> bindings,
-            String operationName, String version) throws OwsExceptionReport {
+            String operationName, DecoderKeyType decoderKey) throws OwsExceptionReport {
         try {
             for (IBinding binding : bindings) {
-                if (binding.checkOperationHttpGetSupported(operationName, version,
-                        getKvpNamespaceForVersionAndOperation(operationName, version))) {
+                if (binding.checkOperationHttpGetSupported(operationName, new DecoderKeyType(getKvpNamespaceForVersionAndOperation(operationName, decoderKey)))) {
                     return binding.getUrlPattern();
                 }
             }

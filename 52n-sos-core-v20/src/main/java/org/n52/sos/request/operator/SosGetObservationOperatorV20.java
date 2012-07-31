@@ -42,11 +42,9 @@ import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosObservationCollection;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
-import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
@@ -79,7 +77,7 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
 
     /** Name of the operation the listener implements */
     private static final String OPERATION_NAME = SosConstants.Operations.GetObservation.name();
-    
+
     private static final String VERSION = Sos2Constants.SERVICEVERSION;
 
     private static final String SERVICE = SosConstants.SOS;
@@ -94,7 +92,7 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
         requestOperatorKeyType =
                 new RequestOperatorKeyType(new ServiceOperatorKeyType(SERVICE, VERSION), OPERATION_NAME);
         this.dao = (IGetObservationDAO) Configurator.getInstance().getOperationDAOs().get(OPERATION_NAME);
-        LOGGER.info("GetObservationListenerSOSv20 initialized successfully!");
+        LOGGER.info("SosGetObservationOperatorV20 initialized successfully!");
     }
 
     /*
@@ -196,23 +194,23 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
                     Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
                     additionalValues.put(HelperValues.VERSION, version);
                     additionalValues.put(HelperValues.OPERATION, Operations.GetObservation.name());
-                        Object encodedObject = encoder.encode(obsCollection, additionalValues);
-                        if (encodedObject instanceof XmlObject) {
-                            ((XmlObject)encodedObject).save(baos,
-                                    XmlOptionsHelper.getInstance().getXmlOptions());
-                            return new SosResponse(baos, contentType, false, version, true);
-                        } else if (encodedObject instanceof IServiceResponse) {
-                            return (IServiceResponse)encodedObject;
-                        } else {
-                            String exceptionText = "The encoder response is not supported!";
-                            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-                        }
+                    Object encodedObject = encoder.encode(obsCollection, additionalValues);
+                    if (encodedObject instanceof XmlObject) {
+                        ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
+                        return new SosResponse(baos, contentType, false, version, true);
+                    } else if (encodedObject instanceof IServiceResponse) {
+                        return (IServiceResponse) encodedObject;
+                    } else {
+                        String exceptionText = "The encoder response is not supported!";
+                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                    }
                 } else {
                     String exceptionText =
                             "The value '" + obsCollection.getResponseFormat()
                                     + "' of the outputFormat parameter is incorrect and has to be '"
                                     + SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL + "' for the requested sensor!";
-                    throw Util4Exceptions.createInvalidParameterValueException(SosConstants.GetObservationParams.responseFormat.name(), exceptionText);
+                    throw Util4Exceptions.createInvalidParameterValueException(
+                            SosConstants.GetObservationParams.responseFormat.name(), exceptionText);
                 }
             } catch (IOException ioe) {
                 String exceptionText = "Error occurs while saving response to output stream!";
@@ -221,7 +219,7 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
             }
 
         } else {
-            String exceptionText = "Received request in GetObservationListener() is not a SosGetObservationRequest!";
+            String exceptionText = "Received request is not a SosGetObservationRequest!";
             LOGGER.error(exceptionText);
             throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
         }
@@ -248,7 +246,8 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
      * .String, java.lang.Object)
      */
     @Override
-    public OWSOperation getOperationMetadata(String service, String version, Object connection) throws OwsExceptionReport {
+    public OWSOperation getOperationMetadata(String service, String version, Object connection)
+            throws OwsExceptionReport {
         return dao.getOperationsMetadata(service, version, connection);
     }
 

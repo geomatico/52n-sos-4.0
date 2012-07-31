@@ -39,6 +39,7 @@ import java.util.Set;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projection;
+import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IGetFeatureOfInterestDAO;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
@@ -49,6 +50,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.SosGetFeatureOfInterestRequest;
 import org.n52.sos.service.Configurator;
@@ -99,9 +101,15 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
 
         OWSOperation opsMeta = new OWSOperation();
         // set operation name
-        opsMeta.setOperationName(SosConstants.Operations.GetFeatureOfInterest.name());
+        opsMeta.setOperationName(OPERATION_NAME);
         // set DCP
-        opsMeta.setDcp(SosHelper.getDCP(SosConstants.Operations.GetFeatureOfInterest.name(), service, version,
+        DecoderKeyType dkt = null;
+        if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
+        } else {
+            dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
+        }
+        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt,
                 Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance()
                         .getServiceURL()));
         // set param procedure

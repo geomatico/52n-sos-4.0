@@ -68,6 +68,10 @@ public class SosInsertSensorRequest extends AbstractServiceRequest {
 	 * Sensor description
 	 */
 	private String sensorDescription;
+	
+	public SosInsertSensorRequest() {
+	    
+	}
 
 	/**
 	 * constructor

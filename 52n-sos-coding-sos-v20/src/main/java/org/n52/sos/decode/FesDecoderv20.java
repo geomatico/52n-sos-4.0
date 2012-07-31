@@ -92,10 +92,16 @@ public class FesDecoderv20 implements IDecoder<Object, XmlObject> {
                 }
                 XmlCursor geometryCursor = xbSpatialOpsType.newCursor();
                 if (geometryCursor.toChild(GMLConstants.QN_ENVELOPE_32)) {
-                    IDecoder decoder =
+                    List<IDecoder> decoderList =
                             Configurator.getInstance().getDecoder(geometryCursor.getDomNode().getNamespaceURI());
-                    Object sosGeometry = decoder.decode(XmlObject.Factory.parse(geometryCursor.getDomNode()));
-                    if (sosGeometry instanceof Geometry) {
+                    Object sosGeometry = null;
+                    for (IDecoder decoder : decoderList) {
+                        sosGeometry = decoder.decode(XmlObject.Factory.parse(geometryCursor.getDomNode()));
+                        if (sosGeometry != null) {
+                            break;
+                        }
+                    }
+                    if (sosGeometry != null && sosGeometry instanceof Geometry) {
                         spatialFilter.setGeometry((Geometry) sosGeometry);
                     }
 
@@ -142,9 +148,16 @@ public class FesDecoderv20 implements IDecoder<Object, XmlObject> {
                 for (int i = 0; i < nodes.getLength(); i++) {
                     if (nodes.item(i).getNamespaceURI() != null
                             && !nodes.item(i).getLocalName().equals(FilterConstants.EN_VALUE_REFERENCE)) {
-                        IDecoder decoder = Configurator.getInstance().getDecoder(nodes.item(i).getNamespaceURI());
-                        Object timeObject = decoder.decode(XmlObject.Factory.parse(nodes.item(i)));
-                        if (timeObject instanceof ITime) {
+                        List<IDecoder> decoderList =
+                                Configurator.getInstance().getDecoder(nodes.item(i).getNamespaceURI());
+                        Object timeObject = null;
+                        for (IDecoder decoder : decoderList) {
+                            timeObject = decoder.decode(XmlObject.Factory.parse(nodes.item(i).getNamespaceURI()));
+                            if (timeObject != null) {
+                                break;
+                            }
+                        }
+                        if (timeObject != null && timeObject instanceof ITime) {
                             TimeOperator operator;
                             ITime time = (ITime) timeObject;
                             String localName = xbTemporalOpsType.getDomNode().getLocalName();

@@ -28,12 +28,14 @@
 
 package org.n52.sos.binding;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.IDecoder;
+import org.n52.sos.decode.IKvpDecoder;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -86,16 +88,13 @@ public class KvpBinding implements IBinding {
                 throw owse;
             }
             Map<String, String> parameterValueMap = KvpHelper.getKvpParameterValueMap(req);
-            DecoderKeyType dkt = new DecoderKeyType(getServiceParameterValue(parameterValueMap),
-                            getParameterValue(OWSConstants.RequestParams.version.name(), parameterValueMap));
-            dkt.setUrlPattern(urlPattern);
-            IDecoder<AbstractServiceRequest, Map<String, String>> decoder =
-                    Configurator.getInstance().getDecoder(dkt);
+            IDecoder<AbstractServiceRequest, Map<String, String>> decoder = getDecoder(new DecoderKeyType(getServiceParameterValue(parameterValueMap),
+                            getParameterValue(OWSConstants.RequestParams.version.name(), parameterValueMap)));
             if (decoder != null) {
                 request = decoder.decode(parameterValueMap);
             } else {
                 String exceptionText =
-                        "No decoder implementation is available for the key '" + dkt.toString() + "'!";
+                        "No decoder implementation is available for KvpBinding!";
                 LOGGER.debug(exceptionText);
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
             }
@@ -181,11 +180,9 @@ public class KvpBinding implements IBinding {
      * .String, java.lang.String)
      */
     @Override
-    public boolean checkOperationHttpGetSupported(String operationName, String service, String version)
+    public boolean checkOperationHttpGetSupported(String operationName, DecoderKeyType decoderKey)
             throws OwsExceptionReport {
-        DecoderKeyType dkt = new DecoderKeyType(service, version);
-        dkt.setUrlPattern(urlPattern);
-        IDecoder decoder = Configurator.getInstance().getDecoder(dkt);
+        IDecoder decoder = getDecoder(decoderKey);
         if (decoder != null) {
             return SosHelper.checkMethodeImplementation4DCP(decoder.getClass().getDeclaredMethods(), operationName);
         }
@@ -200,9 +197,19 @@ public class KvpBinding implements IBinding {
      * lang.String, java.lang.String)
      */
     @Override
-    public boolean checkOperationHttpPostSupported(String operationName,  String service, String version)
+    public boolean checkOperationHttpPostSupported(String operationName, DecoderKeyType decoderKey)
             throws OwsExceptionReport {
         return false;
+    }
+    
+    private IKvpDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
+        List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
+        for (IDecoder iDecoder : decoder) {
+            if (iDecoder instanceof IKvpDecoder) {
+                return (IKvpDecoder)iDecoder;
+            }
+        }
+        return null;
     }
 
 }

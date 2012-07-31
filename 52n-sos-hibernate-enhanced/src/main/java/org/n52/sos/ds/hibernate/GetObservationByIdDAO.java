@@ -37,6 +37,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projection;
+import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IGetObservationByIdDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
@@ -97,9 +98,15 @@ public class GetObservationByIdDAO implements IGetObservationByIdDAO {
         }
         OWSOperation opsMeta = new OWSOperation();
         // set operation name
-        opsMeta.setOperationName(SosConstants.Operations.GetObservationById.name());
+        opsMeta.setOperationName(OPERATION_NAME);
         // set DCP
-        opsMeta.setDcp(SosHelper.getDCP(SosConstants.Operations.GetObservationById.name(), service, version, Configurator
+        DecoderKeyType dkt = null;
+        if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
+        } else {
+            dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
+        }
+        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt, Configurator
                 .getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set identifier
         opsMeta.addParameterValue(Sos2Constants.GetObservationByIdParams.observation.name(),

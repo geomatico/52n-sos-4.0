@@ -13,7 +13,7 @@
 	<description>52North Sensor Observation Service Enhanced Profile Hibernate DAOs module</description>
 	<url>http://maven.apache.org</url>
 	<dependencies>
-	<dependency>
+		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-api</artifactId>
 			<version>${project.version}</version>

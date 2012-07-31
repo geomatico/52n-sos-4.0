@@ -28,6 +28,8 @@
 
 package org.n52.sos.binding;
 
+import java.util.List;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.soap.SOAPConstants;
@@ -35,6 +37,7 @@ import javax.xml.soap.SOAPConstants;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.IDecoder;
+import org.n52.sos.decode.IXmlRequestDecoder;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -87,8 +90,7 @@ public class SoapBinding implements IBinding {
             SoapHelper.checkSoapHeader(request);
             XmlObject doc = XmlHelper.parseXmlSosRequest(request);
             String reqNamespaceURI = XmlHelper.getNamespace(doc);
-            DecoderKeyType dkt = new DecoderKeyType(reqNamespaceURI);
-            IDecoder decoder = Configurator.getInstance().getDecoder(dkt);
+            IDecoder decoder = getDecoder(new DecoderKeyType(reqNamespaceURI));
             // decode SOAP message
             Object abstractRequest = decoder.decode(doc);
             if (abstractRequest instanceof SoapRequest) {
@@ -100,7 +102,7 @@ public class SoapBinding implements IBinding {
                 soapResponse.setHeader(soapRequest.getSoapHeader());
                 if (soapRequest.getSoapFault() == null) {
                     XmlObject xmlObject = soapRequest.getSoapBodyContent();
-                    IDecoder bodyDecoder = Configurator.getInstance().getDecoder(XmlHelper.getNamespace(xmlObject));
+                    IXmlRequestDecoder bodyDecoder = getIXmlRequestDecoder(new DecoderKeyType(XmlHelper.getNamespace(xmlObject)));
                     // Decode SOAPBody content
                     Object aBodyRequest = bodyDecoder.decode(xmlObject);
                     if (aBodyRequest instanceof AbstractServiceRequest) {
@@ -180,20 +182,36 @@ public class SoapBinding implements IBinding {
     }
 
     @Override
-    public boolean checkOperationHttpGetSupported(String operationName, String service, String version)
+    public boolean checkOperationHttpGetSupported(String operationName, DecoderKeyType decoderKey)
             throws OwsExceptionReport {
         return false;
     }
 
     @Override
-    public boolean checkOperationHttpPostSupported(String operationName, String service, String version)
+    public boolean checkOperationHttpPostSupported(String operationName, DecoderKeyType decoderKey)
             throws OwsExceptionReport {
-        DecoderKeyType dkt = new DecoderKeyType(service, version);
-        dkt.setUrlPattern(urlPattern);
-        IDecoder decoder = Configurator.getInstance().getDecoder(dkt);
+        IXmlRequestDecoder decoder = getIXmlRequestDecoder(decoderKey);
         if (decoder != null) {
             return SosHelper.checkMethodeImplementation4DCP(decoder.getClass().getDeclaredMethods(), operationName);
         }
         return false;
+    }
+    
+    private IDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
+        List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
+        for (IDecoder iDecoder : decoder) {
+            return iDecoder;
+        }
+        return null;
+    }
+    
+    private IXmlRequestDecoder getIXmlRequestDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
+        List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
+        for (IDecoder iDecoder : decoder) {
+            if (iDecoder instanceof IXmlRequestDecoder) {
+                return (IXmlRequestDecoder)iDecoder;
+            }
+        }
+        return null;
     }
 }

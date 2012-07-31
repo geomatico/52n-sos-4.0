@@ -28,6 +28,8 @@
 
 package org.n52.sos.request.operator;
 
+import java.util.List;
+
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.AbstractServiceRequest;

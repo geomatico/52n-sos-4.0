@@ -55,6 +55,10 @@ public class SosInsertObservationRequest extends AbstractServiceRequest {
 	 */
 	private SosObservationCollection observations;
 
+	public SosInsertObservationRequest() {
+	    
+	}
+	
 	/**
 	 * constructor
 	 * 

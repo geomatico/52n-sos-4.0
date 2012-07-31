@@ -67,9 +67,9 @@ public interface IBinding {
      */
     public String getUrlPattern();
 
-    boolean checkOperationHttpGetSupported(String operationName, String service, String version)
+    boolean checkOperationHttpGetSupported(String operationName, DecoderKeyType decoderKey)
             throws OwsExceptionReport;
 
-    boolean checkOperationHttpPostSupported(String operationName, String service, String version) throws OwsExceptionReport;
+    boolean checkOperationHttpPostSupported(String operationName, DecoderKeyType decoderKey) throws OwsExceptionReport;
 
 }

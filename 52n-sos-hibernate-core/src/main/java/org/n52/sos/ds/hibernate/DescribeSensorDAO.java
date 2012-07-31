@@ -38,6 +38,7 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IDescribeSensorDAO;
 import org.n52.sos.ds.hibernate.entities.Procedure;
@@ -50,6 +51,7 @@ import org.n52.sos.ogc.sensorML.SosSensorML;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SensorMLType;
 import org.n52.sos.ogc.swe.SWEConstants.SosSensorDescription;
 import org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName;
@@ -220,9 +222,15 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
     public OWSOperation getOperationsMetadata(String service, String version, Object connection) throws OwsExceptionReport {
         OWSOperation opsMeta = new OWSOperation();
         // set operation name
-        opsMeta.setOperationName(SosConstants.Operations.DescribeSensor.name());
+        opsMeta.setOperationName(OPERATION_NAME);
         // set param DCP
-        opsMeta.setDcp(SosHelper.getDCP(SosConstants.Operations.DescribeSensor.name(), service, version, Configurator
+        DecoderKeyType dkt = null;
+        if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
+        } else {
+            dkt = new DecoderKeyType(SWEConstants.NS_SWES_20);
+        }
+        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt, Configurator
                 .getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set param procedure
         opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), Configurator.getInstance()

@@ -43,10 +43,6 @@ public class SosGetFeatureOfInterestOperatorV20 implements IRequestOperator {
 
     /** Name of the operation the listener implements */
     private static final String OPERATION_NAME = SosConstants.Operations.GetFeatureOfInterest.name();
-    
-    private static final String VERSION = Sos2Constants.SERVICEVERSION;
-
-    private static final String SERVICE = SosConstants.SOS;
 
     private RequestOperatorKeyType requestOperatorKeyType;
 
@@ -56,9 +52,10 @@ public class SosGetFeatureOfInterestOperatorV20 implements IRequestOperator {
      */
     public SosGetFeatureOfInterestOperatorV20() {
         requestOperatorKeyType =
-                new RequestOperatorKeyType(new ServiceOperatorKeyType(SERVICE, VERSION), OPERATION_NAME);
+                new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION),
+                        OPERATION_NAME);
         this.dao = (IGetFeatureOfInterestDAO) Configurator.getInstance().getOperationDAOs().get(OPERATION_NAME);
-        LOGGER.info("GetFeatureOfInterestListenerSOSv20 initialized successfully!");
+        LOGGER.info("SosGetFeatureOfInterestOperatorV20 initialized successfully!");
     }
 
     @Override
@@ -131,11 +128,10 @@ public class SosGetFeatureOfInterestOperatorV20 implements IRequestOperator {
                     additionalValues.put(HelperValues.OPERATION, Operations.GetFeatureOfInterest.name());
                     Object encodedObject = encoder.encode(featureCollection, additionalValues);
                     if (encodedObject instanceof XmlObject) {
-                        ((XmlObject)encodedObject).save(baos,
-                                XmlOptionsHelper.getInstance().getXmlOptions());
+                        ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
                         return new SosResponse(baos, contentType, false, version, true);
                     } else if (encodedObject instanceof IServiceResponse) {
-                        return (IServiceResponse)encodedObject;
+                        return (IServiceResponse) encodedObject;
                     } else {
                         String exceptionText = "The encoder response is not supported!";
                         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
@@ -151,7 +147,7 @@ public class SosGetFeatureOfInterestOperatorV20 implements IRequestOperator {
             }
 
         } else {
-            String exceptionText = "Received request in GetObservationListener() is not a SosGetObservationRequest!";
+            String exceptionText = "Received request is not a SosGetObservationRequest!";
             LOGGER.error(exceptionText);
             throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
         }
@@ -171,7 +167,8 @@ public class SosGetFeatureOfInterestOperatorV20 implements IRequestOperator {
     }
 
     @Override
-    public OWSOperation getOperationMetadata(String service, String version, Object connection) throws OwsExceptionReport {
+    public OWSOperation getOperationMetadata(String service, String version, Object connection)
+            throws OwsExceptionReport {
         return dao.getOperationsMetadata(service, version, connection);
     }
 
