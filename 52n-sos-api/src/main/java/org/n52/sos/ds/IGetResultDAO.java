@@ -28,7 +28,9 @@
 
 package org.n52.sos.ds;
 
-import org.n52.sos.ogc.om.SosObservationCollection;
+import java.util.List;
+
+import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.AbstractServiceRequest;
 
@@ -50,7 +52,7 @@ public interface IGetResultDAO extends IOperationDAO {
 	 * @throws OwsExceptionReport
 	 *             If an error occurs.
 	 */
-	public SosObservationCollection getResult(AbstractServiceRequest request)
+	public List<SosObservation> getResult(AbstractServiceRequest request)
 			throws OwsExceptionReport;
 
 }

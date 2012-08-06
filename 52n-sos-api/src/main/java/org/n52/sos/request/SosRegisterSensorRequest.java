@@ -32,10 +32,7 @@ import java.util.Collection;
 
 import org.n52.sos.ogc.om.AbstractSosPhenomenon;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.sensorML.SensorSystem;
 import org.n52.sos.ogc.sos.Sos1Constants;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.operator.RequestOperatorKeyType;
 
 /**
  * SOS RegisterSensor request
@@ -52,7 +49,7 @@ public class SosRegisterSensorRequest extends AbstractServiceRequest {
 	/**
 	 * SOS Sensor system
 	 */
-	private SensorSystem system;
+//	private SensorSystem system;
 
 	/**
 	 * observableProperties collection
@@ -81,11 +78,11 @@ public class SosRegisterSensorRequest extends AbstractServiceRequest {
 	 * @param featuresOfInterest
 	 *            featuresOfInterst
 	 */
-	public SosRegisterSensorRequest(SensorSystem system,
+	public SosRegisterSensorRequest(
 			Collection<AbstractSosPhenomenon> observableProperties,
 			String sensorDescription,
 			Collection<SosAbstractFeature> featuresOfInterest) {
-		this.system = system;
+//		this.system = system;
 		this.observableProperties = observableProperties;
 		this.sensorDescription = sensorDescription;
 		this.featuresOfInterest = featuresOfInterest;
@@ -130,24 +127,24 @@ public class SosRegisterSensorRequest extends AbstractServiceRequest {
 		this.sensorDescription = sensorDescription;
 	}
 
-	/**
-	 * Get SOS sensor system
-	 * 
-	 * @return SOS sensor system
-	 */
-	public SensorSystem getSystem() {
-		return system;
-	}
-
-	/**
-	 * Set SOS sensor system
-	 * 
-	 * @param system
-	 *            SOS sensor system
-	 */
-	public void setSystem(SensorSystem system) {
-		this.system = system;
-	}
+//	/**
+//	 * Get SOS sensor system
+//	 * 
+//	 * @return SOS sensor system
+//	 */
+//	public SensorSystem getSystem() {
+//		return system;
+//	}
+//
+//	/**
+//	 * Set SOS sensor system
+//	 * 
+//	 * @param system
+//	 *            SOS sensor system
+//	 */
+//	public void setSystem(SensorSystem system) {
+//		this.system = system;
+//	}
 
 	/**
 	 * Get featuresOfInterst

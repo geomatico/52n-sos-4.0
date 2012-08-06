@@ -31,6 +31,8 @@ package org.n52.sos.ds;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
 import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.request.GetCapabilitiesRequest;
+import org.n52.sos.response.GetCapabilitiesResponse;
 
 /**
  * interface for getting capabilities for a passed GetCapabilities request from
@@ -47,7 +49,7 @@ public interface IGetCapabilitiesDAO extends IOperationDAO {
 	 * @throws OwsExceptionReport
 	 *             If an error occurs.
 	 */
-	public SosCapabilities getCapabilities(AbstractServiceRequest request)
+	public GetCapabilitiesResponse getCapabilities(GetCapabilitiesRequest request)
 			throws OwsExceptionReport;
 
 }

@@ -35,8 +35,7 @@ import net.opengis.ows.x11.ExceptionReportDocument;
 
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.response.IServiceResponse;
-import org.n52.sos.response.SosResponse;
+import org.n52.sos.response.ServiceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +57,7 @@ public class SosRequestToResponseHelper {
      *            Exception thrown by the SOS
      * @return Exception report document response
      */
-    public static IServiceResponse createExceptionResponse(OwsExceptionReport exceptionReport) {
+    public static ServiceResponse createExceptionResponse(OwsExceptionReport exceptionReport) {
         ExceptionReportDocument erd = exceptionReport.getDocument();
         N52XmlHelper.setSchemaLocationToDocument(erd, N52XmlHelper.getSchemaLocationForOWS110());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -67,6 +66,6 @@ public class SosRequestToResponseHelper {
         } catch (IOException ioe) {
             LOGGER.debug("Error while creating Exception response!", ioe);
         }
-        return new SosResponse(baos, SosConstants.CONTENT_TYPE_XML, false, exceptionReport.getVersion(), true);
+        return new ServiceResponse(baos, SosConstants.CONTENT_TYPE_XML, false, true);
     }
 }

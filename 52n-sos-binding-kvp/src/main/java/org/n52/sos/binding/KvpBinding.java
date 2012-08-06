@@ -43,7 +43,7 @@ import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.response.IServiceResponse;
+import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.IServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
@@ -77,8 +77,8 @@ public class KvpBinding implements IBinding {
      * HttpServletRequest)
      */
     @Override
-    public IServiceResponse doGetOperation(HttpServletRequest req) {
-        IServiceResponse response = null;
+    public ServiceResponse doGetOperation(HttpServletRequest req) {
+        ServiceResponse response = null;
         AbstractServiceRequest request = null;
         try {
             if (req.getParameterMap() == null || (req.getParameterMap() != null && req.getParameterMap().isEmpty())) {
@@ -138,7 +138,7 @@ public class KvpBinding implements IBinding {
      * HttpServletRequest)
      */
     @Override
-    public IServiceResponse doPostOperation(HttpServletRequest request) {
+    public ServiceResponse doPostOperation(HttpServletRequest request) {
         String exceptionText = "This SOS URL only supports KVP requests!";
         LOGGER.info(exceptionText);
         return SosRequestToResponseHelper.createExceptionResponse(Util4Exceptions.createNoApplicableCodeException(

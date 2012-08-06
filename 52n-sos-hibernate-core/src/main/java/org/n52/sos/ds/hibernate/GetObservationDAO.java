@@ -51,7 +51,6 @@ import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateResultUtilities;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.om.SosObservationCollection;
 import org.n52.sos.ogc.ows.OWSConstants.MinMax;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -59,8 +58,8 @@ import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.GetObservationParams;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.SosGetObservationRequest;
+import org.n52.sos.request.GetObservationRequest;
+import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.SosHelper;
@@ -265,9 +264,9 @@ public class GetObservationDAO implements IGetObservationDAO {
      * AbstractSosRequest)
      */
     @Override
-    public SosObservationCollection getObservation(AbstractServiceRequest request) throws OwsExceptionReport {
-        if (request instanceof SosGetObservationRequest) {
-            SosGetObservationRequest sosRequest = (SosGetObservationRequest) request;
+    public GetObservationResponse getObservation(GetObservationRequest request) throws OwsExceptionReport {
+        if (request instanceof GetObservationRequest) {
+            GetObservationRequest sosRequest = (GetObservationRequest) request;
             // setting a global "now" for this request
             now = new DateTime();
             Session session = null;
@@ -285,68 +284,13 @@ public class GetObservationDAO implements IGetObservationDAO {
                     }
                     List<Observation> observations = queryObservation(sosRequest, session);
 
-                    return HibernateResultUtilities.createSosObservationCollectionFromObservations(
-                            OMConstants.RESPONSE_FORMAT_OM_2, observations, sosRequest.getVersion(), session);
-
-                    // List<ResultSet> resultSetList = new
-                    // ArrayList<ResultSet>();
-                    // // if timeInstant contains "latest", return the last
-                    // // observation
-                    // // for each phen/proc/foi/df
-                    // if (sosRequest.getEventTime() != null
-                    // && !sosRequest.getEventTime().isEmpty()) {
-                    // for (TemporalFilter tf : sosRequest.getEventTime()) {
-                    // if (tf.getTime().getIndeterminateValue() != null) {
-                    // if (tf.getTime().getIndeterminateValue()
-                    // .equals(FirstLatest.latest.name())) {
-                    // resultSetList.add(queryLatestObservations(
-                    // sosRequest, tf, session,
-                    // hasSpatialPhen));
-                    // } else if (tf
-                    // .getTime()
-                    // .getIndeterminateValue()
-                    // .equalsIgnoreCase(
-                    // FirstLatest.getFirst.name())) {
-                    // resultSetList
-                    // .add(queryGetFirstObservations(
-                    // sosRequest, tf, session,
-                    // hasSpatialPhen));
-                    // } else {
-                    // resultSetList
-                    // .add(queryObservation(sosRequest,
-                    // session, hasSpatialPhen));
-                    // }
-                    // } else {
-                    // resultSetList.add(queryObservation(sosRequest,
-                    // session, hasSpatialPhen));
-                    // }
-                    // }
-                    // } else {
-                    // resultSetList.add(queryObservation(sosRequest, session,
-                    // hasSpatialPhen));
-                    // }
-                    //
-                    // checkMaxGetObsResultsList(resultSetList);
-                    //
-                    // for (ResultSet resultSet : resultSetList) {
-                    //
-                    // // if resultModel parameter is set in the request,
-                    // // check,
-                    // // whether it is correct and then return request
-                    // // observations
-                    // QName resultModel = request.getResultModel();
-                    // // check ResponseMode
-                    // if (request.getResponseMode() != null
-                    // && !request.getResponseMode().equalsIgnoreCase(
-                    // SosConstants.PARAMETER_NOT_SET)) {
-                    // // check for resultTemplate responseMode
-                    // if (request.getResponseMode() ==
-                    // SosConstants.RESPONSE_RESULT_TEMPLATE) {
-                    // response.addColllection(getResultTemplate(
-                    // resultSet, request, null));
-                    // }
-                    // }
-                    // }
+                    GetObservationResponse response = new GetObservationResponse();
+                    response.setService(request.getService());
+                    response.setVersion(request.getVersion());
+                    response.setResponseFormat(request.getResponseFormat());
+                    response.setObservationCollection(HibernateResultUtilities.createSosObservationFromObservations(
+                          observations, sosRequest.getVersion(), session));
+                    return response;
                 }
             } catch (HibernateException he) {
                 String exceptionText = "Error while querying data observation data!";
@@ -374,7 +318,7 @@ public class GetObservationDAO implements IGetObservationDAO {
      * @throws OwsExceptionReport
      *             If an error occurs.
      */
-    protected List<Observation> queryObservation(SosGetObservationRequest request, Session session)
+    protected List<Observation> queryObservation(GetObservationRequest request, Session session)
             throws OwsExceptionReport {
         Map<String, String> aliases = new HashMap<String, String>();
         List<Criterion> criterions = new ArrayList<Criterion>();

@@ -43,16 +43,14 @@ import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IGetFeatureOfInterestDAO;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.SosFeatureCollection;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.swe.SWEConstants;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.SosGetFeatureOfInterestRequest;
+import org.n52.sos.request.GetFeatureOfInterestRequest;
+import org.n52.sos.response.GetFeatureOfInterestResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -161,9 +159,9 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
     }
 
     @Override
-    public SosAbstractFeature getFeatureOfInterest(AbstractServiceRequest request) throws OwsExceptionReport {
-        if (request instanceof SosGetFeatureOfInterestRequest) {
-            SosGetFeatureOfInterestRequest sosRequest = (SosGetFeatureOfInterestRequest) request;
+    public GetFeatureOfInterestResponse getFeatureOfInterest(GetFeatureOfInterestRequest request) throws OwsExceptionReport {
+        if (request instanceof GetFeatureOfInterestRequest) {
+            GetFeatureOfInterestRequest sosRequest = (GetFeatureOfInterestRequest) request;
             Session session = null;
             session = (Session) connectionProvider.getConnection();
             if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION)
@@ -188,7 +186,11 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
                                 .getFeatureQueryHandler()
                                 .getFeatures(new ArrayList<String>(foiIDs), sosRequest.getSpatialFilters(), session,
                                         sosRequest.getVersion()));
-                return featureCollection;
+                GetFeatureOfInterestResponse response = new GetFeatureOfInterestResponse();
+                response.setService(request.getService());
+                response.setVersion(request.getVersion());
+                response.setAbstractFeature(featureCollection);
+                return response;
             }
         } else {
             String exceptionText = "The SOS request is not a SosGetObservationRequest!";
@@ -197,7 +199,7 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
         }
     }
 
-    private List<String> queryFeatureIdentifiersForParameter(SosGetFeatureOfInterestRequest sosRequest, Session session)
+    private List<String> queryFeatureIdentifiersForParameter(GetFeatureOfInterestRequest sosRequest, Session session)
             throws OwsExceptionReport {
         Map<String, String> aliases = new HashMap<String, String>();
         List<Criterion> criterions = new ArrayList<Criterion>();

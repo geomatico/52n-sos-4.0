@@ -32,12 +32,13 @@ import org.hibernate.Session;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IInsertObservationDAO;
-import org.n52.sos.ogc.om.SosObservationCollection;
+import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -95,7 +96,7 @@ public class InsertObservationDAO implements IInsertObservationDAO {
     }
 
     @Override
-    public int insertObservation(SosObservationCollection observation) throws OwsExceptionReport {
+    public int insertObservation(InsertObservationRequest request) throws OwsExceptionReport {
         // TODO Auto-generated method stub
         return 0;
     }

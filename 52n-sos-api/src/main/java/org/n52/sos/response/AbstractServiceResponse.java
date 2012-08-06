@@ -32,7 +32,7 @@ package org.n52.sos.response;
  * abstract super class for all service request classes
  * 
  */
-public abstract class AbstractServiceResponse implements IServiceResponse {
+public abstract class AbstractServiceResponse {
 
     /** service parameter */
     private String service;

@@ -28,7 +28,7 @@
 
 package org.n52.sos.ds;
 
-import org.n52.sos.response.IServiceResponse;
+import org.n52.sos.response.ServiceResponse;
 
 /**
  * interface for the DescribeObservationTypeDAOs, offers method to get the
@@ -41,6 +41,6 @@ public interface IDescribeObservationTypeDAO extends IOperationDAO {
     /**
      * @return Returns the DescirbeObservationType response
      */
-    public IServiceResponse getObservationTypeDescription();
+    public ServiceResponse getObservationTypeDescription();
 
 }

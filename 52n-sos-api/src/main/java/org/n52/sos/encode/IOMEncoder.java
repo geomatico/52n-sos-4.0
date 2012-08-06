@@ -29,9 +29,10 @@
 package org.n52.sos.encode;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ogc.om.SosObservationCollection;
+import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 /**
@@ -52,7 +53,7 @@ public interface IOMEncoder {
      * @return observation collection
      * @throws OwsExceptionReport
      */
-    public XmlObject createObservationCollection(SosObservationCollection sosObsCol) throws OwsExceptionReport;
+    public XmlObject createObservationCollection(List<SosObservation> sosObsCol) throws OwsExceptionReport;
 
     /**
      * method creates a compositePhenomenon element

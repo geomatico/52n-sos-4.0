@@ -66,7 +66,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.SosGetObservationRequest;
+import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
@@ -129,8 +129,8 @@ public class ITRequestEncoder {
      */
     public GetObservationDocument createGetObservationRequest(AbstractServiceRequest request)
             throws OwsExceptionReport {
-        if (request instanceof SosGetObservationRequest) {
-            SosGetObservationRequest req = (SosGetObservationRequest) request;
+        if (request instanceof GetObservationRequest) {
+            GetObservationRequest req = (GetObservationRequest) request;
 
             GetObservationDocument xb_getObsDoc = GetObservationDocument.Factory.newInstance();
             GetObservation xb_getObs = xb_getObsDoc.addNewGetObservation();

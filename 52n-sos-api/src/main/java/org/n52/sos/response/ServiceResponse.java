@@ -33,19 +33,21 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.GZIPOutputStream;
 
+import javax.xml.transform.TransformerException;
+
 import org.n52.sos.ogc.sos.SosConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of the ISosResponse interface.
+ * 
  * 
  */
-public class SosResponse extends AbstractServiceResponse {
+public class ServiceResponse {
 
     /** the logger, used to log exceptions and additonaly information */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SosResponse.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceResponse.class);
+    
     /** output stream of document */
     private ByteArrayOutputStream byteArrayOutputStream;
 
@@ -54,11 +56,6 @@ public class SosResponse extends AbstractServiceResponse {
     /** indicator for compression usage */
     private boolean applyZipCompression;
 
-    /**
-     * SOS version
-     */
-    private String version;
-    
     private boolean xmlResponse;
 
     /**
@@ -73,22 +70,18 @@ public class SosResponse extends AbstractServiceResponse {
      * @param version
      *            SOS version
      */
-    public SosResponse(ByteArrayOutputStream byteArrayOutputStream, String contentType, boolean applyZipCompression,
-            String version, boolean isXmlResponse) {
+    public ServiceResponse(ByteArrayOutputStream byteArrayOutputStream, String contentType, boolean applyZipCompression,
+            boolean isXmlResponse) {
         super();
         this.byteArrayOutputStream = byteArrayOutputStream;
         this.contentType = contentType;
         this.applyZipCompression = applyZipCompression;
-        this.version = version;
         this.xmlResponse = isXmlResponse;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.resp.ISosResponse#getContentType()
+    
+    /**
+     * @return Returns the content type of this response
      */
-    @Override
     public String getContentType() {
         if (applyZipCompression) {
             return SosConstants.CONTENT_TYPE_ZIP;
@@ -96,24 +89,24 @@ public class SosResponse extends AbstractServiceResponse {
         return contentType;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.resp.ISosResponse#getContentLength()
+    /**
+     * @return Returns the the length of the content in bytes
+     * @throws IOException
+     *             if getting the content length failed
+     * @throws TransformerException
+     *             if getting the content length failed
      */
-    @Override
     public int getContentLength() throws IOException {
         return byteArrayOutputStream.size();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.sos.resp.ISosResponse#getWriteTooutputStream(java.io.OutputStream
-     * )
+    /**
+     * @return Returns the response as byte[]
+     * @throws IOException
+     *             if getting the response as byte[] failed
+     * @throws TransformerException
+     *             if getting the response as byte[] failed
      */
-    @Override
     public void writeToOutputStream(OutputStream outputStream) throws IOException {
         GZIPOutputStream gzip = null;
         try {
@@ -144,37 +137,18 @@ public class SosResponse extends AbstractServiceResponse {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.resp.ISosResponse#getApplyGzipCompression()
+    /**
+     * @return Returns true if the response should compressed using gzip,
+     *         otherwise false
      */
-    @Override
     public boolean getApplyGzipCompression() {
         return applyZipCompression;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.resp.ISosResponse#getVersion()
-     */
-    @Override
-    public String getVersion() {
-        return version;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.resp.ISosResponse#getByteArray()
-     */
-    @Override
     public byte[] getByteArray() {
         return byteArrayOutputStream.toByteArray();
     }
 
-    @Override
     public boolean isXmlResponse() {
         return xmlResponse;
     }

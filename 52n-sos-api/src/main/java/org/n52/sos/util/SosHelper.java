@@ -44,8 +44,6 @@ import java.util.Stack;
 
 import org.n52.sos.binding.IBinding;
 import org.n52.sos.decode.DecoderKeyType;
-import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSConstants.MinMax;
@@ -590,37 +588,6 @@ public class SosHelper {
     }
 
     /**
-     * Merge SosObservations with the same procedure id.
-     * 
-     * @param observationMembers
-     *            SosObservations list
-     * @return merged SosObservations as list
-     */
-    public static Collection<SosObservation> mergeObservationsForGenericObservation(
-            Collection<SosObservation> observationMembers) {
-        Collection<SosObservation> combinedObsCol = new ArrayList<SosObservation>();
-        for (SosObservation sosObservation : observationMembers) {
-            if (combinedObsCol.isEmpty()) {
-                combinedObsCol.add(sosObservation);
-            } else {
-                boolean combined = false;
-                for (SosObservation combinedSosObs : combinedObsCol) {
-                    if (combinedSosObs.getObservationConstellation().equalsExcludingObsProp(
-                            sosObservation.getObservationConstellation())) {
-                        combinedSosObs.mergeWithObservation(sosObservation);
-                        combined = true;
-                        break;
-                    }
-                }
-                if (!combined) {
-                    combinedObsCol.add(sosObservation);
-                }
-            }
-        }
-        return combinedObsCol;
-    }
-
-    /**
      * help method to check the result format parameter. If the application/zip
      * result format is set, true is returned. If not and the value is text/xml;
      * subtype="OM" false is returned. If neither zip nor OM is set, a
@@ -684,37 +651,17 @@ public class SosHelper {
     }
 
     /**
-     * help method to check the result format parameter. If the application/zip
-     * result format is set, true is returned. If not and the value is text/xml;
-     * subtype="OM" false is returned. If neither zip nor OM is set, a
-     * ServiceException with InvalidParameterValue as its code is thrown.
+     * help method to check the result format parameter for application/zip.
      * 
-     * @param resultFormat
-     *            String containing the value of the result format parameter
-     * @return boolean true if application/zip is the resultFormat value, false
-     *         if its value is text/xml;subtype="OM"
-     * @throws OwsExceptionReport
-     *             if the parameter value is incorrect
+     * @param responseFormat
+     *            String containing the value of the responseFormat parameter
+     * @return boolean true if application/zip
      */
-    public static boolean checkResponseFormat(String resultFormat) throws OwsExceptionReport {
-        boolean isZipCompr = false;
-        if (resultFormat.equalsIgnoreCase(OMConstants.CONTENT_TYPE_OM)) {
-            return isZipCompr;
-        } else if (resultFormat.equalsIgnoreCase(SosConstants.CONTENT_TYPE_ZIP)) {
-            isZipCompr = true;
-            return isZipCompr;
-        } else {
-            String exceptionText =
-                    "The value of the parameter '" + SosConstants.GetObservationParams.responseFormat.toString() + "'"
-                            + "must be '" + OMConstants.CONTENT_TYPE_OM + " or " + SosConstants.CONTENT_TYPE_ZIP
-                            + "'. Delivered value was: " + resultFormat;
-            LOGGER.error(exceptionText);
-            OwsExceptionReport se = new OwsExceptionReport();
-            se.addCodedException(OwsExceptionCode.InvalidParameterValue,
-                    SosConstants.GetObservationParams.responseFormat.toString(), exceptionText);
-
-            throw se;
+    public static boolean checkResponseFormatForZipCompression(String responseFormat) throws OwsExceptionReport {
+         if (responseFormat.equalsIgnoreCase(SosConstants.CONTENT_TYPE_ZIP)) {
+            return true;
         }
+         return false;
     }
 
     /**

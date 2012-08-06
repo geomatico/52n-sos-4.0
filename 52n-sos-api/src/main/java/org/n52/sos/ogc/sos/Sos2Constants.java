@@ -69,7 +69,7 @@ public final class Sos2Constants {
 
     /** the names of the SOS 2.0 operations that are not supported by all versions */
     public enum Operations {
-        InsertSensor, DeleteSensor, InsertResult, InsertResultTemplate, GetResultTemplate;
+        InsertSensor, DeleteSensor, InsertResult, InsertResultTemplate, GetResultTemplate, UpdateSensor;
         
         public static boolean contains(String s) {
             boolean contained = false;
@@ -78,6 +78,7 @@ public final class Sos2Constants {
                             || (s.equals(Operations.InsertSensor.name()))
                             || (s.equals(Operations.DeleteSensor.name()))
                             || (s.equals(Operations.InsertResult.name()))
+                            || (s.equals(Operations.UpdateSensor.name()))
                             || (s.equals(Operations.InsertResultTemplate.name()))
                             || (s.equals(Operations.GetResultTemplate.name()));
             return contained;
@@ -214,6 +215,54 @@ public final class Sos2Constants {
     
     public enum GetResultParams {
         offering, observedProperty;
+    }
+    
+    /** enum with parameter names for registerSensor request */
+    public enum InsertSensorParams {
+        service, version, procedureDescriptionFormat, procedureDescription, observableProperty, metadata;
+
+        /**
+         * method checks whether the string parameter is contained in this
+         * enumeration
+         * 
+         * @param s
+         *            the name which should be checked
+         * @return true if the name is contained in the enumeration
+         */
+        public static boolean contains(String s) {
+            boolean contained = false;
+            contained =
+                    (s.equals(InsertSensorParams.service.name())) || (s.equals(InsertSensorParams.version.name()))
+                            || (s.equals(InsertSensorParams.procedureDescriptionFormat.name()))
+                            || (s.equals(InsertSensorParams.procedureDescription.name()))
+                            || (s.equals(InsertSensorParams.observableProperty.name()))
+                            || (s.equals(InsertSensorParams.metadata.name()));
+            return contained;
+        }
+    }
+
+    /** enum with parameter names for registerSensor request */
+    public enum UpdateSensorDescriptionParams {
+        service, version, procedure, procedureDescriptionFormat, description;
+
+        /**
+         * method checks whether the string parameter is contained in this
+         * enumeration
+         * 
+         * @param s
+         *            the name which should be checked
+         * @return true if the name is contained in the enumeration
+         */
+        public static boolean contains(String s) {
+            boolean contained = false;
+            contained =
+                    (s.equals(UpdateSensorDescriptionParams.service.name()))
+                            || (s.equals(UpdateSensorDescriptionParams.version.name()))
+                            || (s.equals(UpdateSensorDescriptionParams.procedure.name()))
+                            || (s.equals(UpdateSensorDescriptionParams.procedureDescriptionFormat.name()))
+                            || (s.equals(UpdateSensorDescriptionParams.description.name()));
+            return contained;
+        }
     }
 
     /**

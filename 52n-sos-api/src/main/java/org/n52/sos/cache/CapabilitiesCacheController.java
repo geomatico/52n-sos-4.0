@@ -59,7 +59,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * CapabilitiesCache instance
      */
     private CapabilitiesCache capabilitiesCache;
-    
+
     /**
      * ICacheFeederDAO instance
      */
@@ -108,7 +108,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
                 getUpdateFree().await();
             }
             setUpdateIsFree(false);
-            
+
             this.cacheFeederDAO.initalizeCache(capabilitiesCache);
 
         } catch (InterruptedException ie) {
@@ -152,10 +152,10 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
                 getUpdateFree().await();
             }
             setUpdateIsFree(false);
-//            queryFois();
-//            queryFoiProcedures();
-//            queryOffFois();
-//            queryOffRelatedFeatures();
+            // queryFois();
+            // queryFoiProcedures();
+            // queryOffFois();
+            // queryOffRelatedFeatures();
 
         } catch (InterruptedException e) {
             LOGGER.error("Problem while threadsafe capabilities cache update", e);
@@ -192,10 +192,10 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
                 getUpdateFree().await();
             }
             setUpdateIsFree(false);
-//            queryPhenProcs();
-//            queryProcPhens();
-//            queryProcedures();
-//            queryOffProcedures();
+            // queryPhenProcs();
+            // queryProcPhens();
+            // queryProcedures();
+            // queryOffProcedures();
 
         } catch (InterruptedException e) {
             LOGGER.error("Problem while threadsafe capabilities cache update", e);
@@ -216,8 +216,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      *            db and whose relationships have to be maintained in cache
      * @throws OwsExceptionReport
      */
-    public void updateMetadata4newObservation(SosObservation observation)
-            throws OwsExceptionReport {
+    public void updateMetadata4newObservation(SosObservation observation) throws OwsExceptionReport {
 
         boolean timeNotElapsed = true;
         try {
@@ -237,15 +236,15 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
             }
             setUpdateIsFree(false);
 
-//            queryOffResultModels();
-//            queryOffFois();
-//            queryFois();
-//            queryFoiProcedures();
-//            queryPhens4CompPhens();
-//            queryOffCompPhens();
-//            queryTimes4Offerings();
-//            querySRIDs();
-//            queryOffRelatedFeatures();
+            // queryOffResultModels();
+            // queryOffFois();
+            // queryFois();
+            // queryFoiProcedures();
+            // queryPhens4CompPhens();
+            // queryOffCompPhens();
+            // queryTimes4Offerings();
+            // querySRIDs();
+            // queryOffRelatedFeatures();
 
         } catch (InterruptedException e) {
             LOGGER.error("Problem while threadsafe capabilities cache update", e);
@@ -357,82 +356,102 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         }
         return new ArrayList<String>();
     }
-    
-    /**
-     * Returns collection containing parent procedures for the passed procedure, optionally navigating
-     * the full hierarchy and including itself
-     * 
-     * @param procId the procedure id to find parents for
-     * @param fullHierarchy whether or not to navigate the full procedure hierarchy 
-     * @param includeSelf whether or not to include the passed procedure id in the result
-     * 
-     * @return Collection<String> containing the passed procedure id's parents (and optionally itself)
-     */
-    public Collection<String> getParentProcedures( String procId, boolean fullHierarchy, boolean includeSelf ){
-        return this.capabilitiesCache.getParentProcs( procId, fullHierarchy, includeSelf );        
-    }
 
     /**
-     * Returns collection containing parent procedures for the passed procedures, optionally navigating
-     * the full hierarchy and including themselves
+     * Returns collection containing parent procedures for the passed procedure,
+     * optionally navigating the full hierarchy and including itself
      * 
-     * @param procIds collection of the procedure ids to find parents for
-     * @param fullHierarchy whether or not to navigate the full procedure hierarchy 
-     * @param includeSelves whether or not to include the passed procedure ids in the result
+     * @param procId
+     *            the procedure id to find parents for
+     * @param fullHierarchy
+     *            whether or not to navigate the full procedure hierarchy
+     * @param includeSelf
+     *            whether or not to include the passed procedure id in the
+     *            result
      * 
-     * @return Collection<String> containing the passed procedure id's parents (and optionally themselves)
+     * @return Collection<String> containing the passed procedure id's parents
+     *         (and optionally itself)
      */
-    public Collection<String> getParentProcedures( Collection<String> procIds, boolean fullHierarchy,
-            boolean includeSelves ){
-        return this.capabilitiesCache.getParentProcs( procIds, fullHierarchy, includeSelves );
+    public Collection<String> getParentProcedures(String procId, boolean fullHierarchy, boolean includeSelf) {
+        return this.capabilitiesCache.getParentProcs(procId, fullHierarchy, includeSelf);
     }
 
     /**
-     * Returns collection containing child procedures for the passed procedure, optionally navigating
-     * the full hierarchy and including itself
+     * Returns collection containing parent procedures for the passed
+     * procedures, optionally navigating the full hierarchy and including
+     * themselves
      * 
-     * @param procId procedure id to find children for
-     * @param fullHierarchy whether or not to navigate the full procedure hierarchy 
-     * @param includeSelf whether or not to include the passed procedure id in the result
+     * @param procIds
+     *            collection of the procedure ids to find parents for
+     * @param fullHierarchy
+     *            whether or not to navigate the full procedure hierarchy
+     * @param includeSelves
+     *            whether or not to include the passed procedure ids in the
+     *            result
      * 
-     * @return Collection<String> containing the passed procedure id's children (and optionally itself)
+     * @return Collection<String> containing the passed procedure id's parents
+     *         (and optionally themselves)
      */
-    public Collection<String> getChildProcedures( String procId, boolean fullHierarchy, boolean includeSelf ){
-        return this.capabilitiesCache.getChildProcs( procId, fullHierarchy, includeSelf );        
+    public Collection<String> getParentProcedures(Collection<String> procIds, boolean fullHierarchy,
+            boolean includeSelves) {
+        return this.capabilitiesCache.getParentProcs(procIds, fullHierarchy, includeSelves);
     }
 
     /**
-     * Returns collection containing child procedures for the passed procedures, optionally navigating
-     * the full hierarchy and including themselves
+     * Returns collection containing child procedures for the passed procedure,
+     * optionally navigating the full hierarchy and including itself
      * 
-     * @param procIds collection of procedure ids to find children for
-     * @param fullHierarchy whether or not to navigate the full procedure hierarchy 
-     * @param includeSelves whether or not to include the passed procedure ids in the result
+     * @param procId
+     *            procedure id to find children for
+     * @param fullHierarchy
+     *            whether or not to navigate the full procedure hierarchy
+     * @param includeSelf
+     *            whether or not to include the passed procedure id in the
+     *            result
      * 
-     * @return Collection<String> containing the passed procedure id's children (and optionally itself)
+     * @return Collection<String> containing the passed procedure id's children
+     *         (and optionally itself)
      */
-    public Collection<String> getChildProcedures( Collection<String> procIds, boolean fullHierarchy,
-            boolean includeSelves ){
-        return this.capabilitiesCache.getChildProcs( procIds, fullHierarchy, includeSelves );
-    }
-    
-    
-    public Collection<String> getParentFeatures( String featureID, boolean fullHierarchy, boolean includeSelf ){
-        return this.capabilitiesCache.getParentProcs( featureID, fullHierarchy, includeSelf );        
+    public Collection<String> getChildProcedures(String procId, boolean fullHierarchy, boolean includeSelf) {
+        return this.capabilitiesCache.getChildProcs(procId, fullHierarchy, includeSelf);
     }
 
-    public Collection<String> getParentFeatures( Collection<String> featureIDs, boolean fullHierarchy,
-            boolean includeSelves ){
-        return this.capabilitiesCache.getParentProcs( featureIDs, fullHierarchy, includeSelves );
+    /**
+     * Returns collection containing child procedures for the passed procedures,
+     * optionally navigating the full hierarchy and including themselves
+     * 
+     * @param procIds
+     *            collection of procedure ids to find children for
+     * @param fullHierarchy
+     *            whether or not to navigate the full procedure hierarchy
+     * @param includeSelves
+     *            whether or not to include the passed procedure ids in the
+     *            result
+     * 
+     * @return Collection<String> containing the passed procedure id's children
+     *         (and optionally itself)
+     */
+    public Collection<String> getChildProcedures(Collection<String> procIds, boolean fullHierarchy,
+            boolean includeSelves) {
+        return this.capabilitiesCache.getChildProcs(procIds, fullHierarchy, includeSelves);
     }
 
-    public Collection<String> getChildFeatures( String featureIDs, boolean fullHierarchy, boolean includeSelf ){
-        return this.capabilitiesCache.getChildProcs( featureIDs, fullHierarchy, includeSelf );        
+    public Collection<String> getParentFeatures(String featureID, boolean fullHierarchy, boolean includeSelf) {
+        return this.capabilitiesCache.getParentProcs(featureID, fullHierarchy, includeSelf);
     }
 
-    public Collection<String> getChildFeatures( Collection<String> featureIDs, boolean fullHierarchy,
-            boolean includeSelves ){
-        return this.capabilitiesCache.getChildProcs( featureIDs, fullHierarchy, includeSelves );
+    public Collection<String> getParentFeatures(Collection<String> featureIDs, boolean fullHierarchy,
+            boolean includeSelves) {
+        return this.capabilitiesCache.getParentProcs(featureIDs, fullHierarchy, includeSelves);
+    }
+
+    public Collection<String> getChildFeatures(String featureIDs, boolean fullHierarchy, boolean includeSelf) {
+        return this.capabilitiesCache.getChildProcs(featureIDs, fullHierarchy, includeSelf);
+    }
+
+    public Collection<String> getChildFeatures(Collection<String> featureIDs, boolean fullHierarchy,
+            boolean includeSelves) {
+        return this.capabilitiesCache.getChildProcs(featureIDs, fullHierarchy, includeSelves);
     }
 
     /**
@@ -443,10 +462,10 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @return String[] containing the result models for the requested offering
      */
     public Collection<String> getResultModels4Offering(String offering) {
-        if (!this.capabilitiesCache.getOffResultModels().containsKey(offering)) {
+        if (!this.capabilitiesCache.getKOfferingVObservationTypes().containsKey(offering)) {
             return new ArrayList<String>();
         }
-        return this.capabilitiesCache.getOffResultModels().get(offering);
+        return this.capabilitiesCache.getKOfferingVObservationTypes().get(offering);
     }
 
     /**
@@ -655,204 +674,275 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         return new HashMap<String, Collection<String>>();
     }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getObservablePropertiesForOffering(java.lang.String)
-	 */
-	@Override
-	public Collection<String> getObservablePropertiesForOffering(String offering) {
-		if (this.capabilitiesCache.getPhenomenons4Offering(offering) != null) {
-			return new ArrayList<String>(this.capabilitiesCache.getPhenomenons4Offering(offering));
-		}
-		return new ArrayList<String>();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.cache.ACapabilitiesCacheController#
+     * getObservablePropertiesForOffering(java.lang.String)
+     */
+    @Override
+    public Collection<String> getObservablePropertiesForOffering(String offering) {
+        if (this.capabilitiesCache.getPhenomenons4Offering(offering) != null) {
+            return new ArrayList<String>(this.capabilitiesCache.getPhenomenons4Offering(offering));
+        }
+        return new ArrayList<String>();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getObservableProperties()
-	 */
-	@Override
-	public Collection<String> getObservableProperties() {
-		if (this.capabilitiesCache.getAllPhenomenons() != null) {
-			return new ArrayList<String>(this.capabilitiesCache.getAllPhenomenons());
-		}
-		return new ArrayList<String>();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.n52.sos.cache.ACapabilitiesCacheController#getObservableProperties()
+     */
+    @Override
+    public Collection<String> getObservableProperties() {
+        if (this.capabilitiesCache.getAllPhenomenons() != null) {
+            return new ArrayList<String>(this.capabilitiesCache.getAllPhenomenons());
+        }
+        return new ArrayList<String>();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getKOfferingsVObservableProperties()
-	 */
-	@Override
-	public Map<String, Collection<String>> getKOfferingsVObservableProperties() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.cache.ACapabilitiesCacheController#
+     * getKOfferingsVObservableProperties()
+     */
+    @Override
+    public Map<String, Collection<String>> getKOfferingsVObservableProperties() {
         if (this.capabilitiesCache.getOffCompPhens() != null) {
             return new HashMap<String, Collection<String>>(this.capabilitiesCache.getOffCompPhens());
         }
         return new HashMap<String, Collection<String>>();
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getProcedures4FeatureOfInterest(java.lang.String)
-	 */
-	@Override
-	public Collection<String> getProcedures4FeatureOfInterest(String foiID) {
-		if (this.capabilitiesCache.getProc4FOI(foiID) != null) {
-			return new ArrayList<String>(this.capabilitiesCache.getProc4FOI(foiID));
-		}
-		return new ArrayList<String>();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.cache.ACapabilitiesCacheController#
+     * getProcedures4FeatureOfInterest(java.lang.String)
+     */
+    @Override
+    public Collection<String> getProcedures4FeatureOfInterest(String foiID) {
+        if (this.capabilitiesCache.getProc4FOI(foiID) != null) {
+            return new ArrayList<String>(this.capabilitiesCache.getProc4FOI(foiID));
+        }
+        return new ArrayList<String>();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getUnit4ObservableProperty(java.lang.String)
-	 */
-	@Override
-	public String getUnit4ObservableProperty(String observedProperty) {
-		return this.capabilitiesCache.getUnit4ObsProp(observedProperty);
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.n52.sos.cache.ACapabilitiesCacheController#getUnit4ObservableProperty
+     * (java.lang.String)
+     */
+    @Override
+    public String getUnit4ObservableProperty(String observedProperty) {
+        return this.capabilitiesCache.getUnit4ObsProp(observedProperty);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getFeatureOfInterest()
-	 */
-	@Override
-	public Collection<String> getFeatureOfInterest() {
-		if (this.capabilitiesCache.getFeatureOfInterest() != null) {
-			return new ArrayList<String>(this.capabilitiesCache.getFeatureOfInterest());
-		}
-		return new ArrayList<String>();
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getAllFeature()
-	 */
-	@Override
-	public Collection<String> getAllFeature() {
-		if (this.capabilitiesCache.getAllFeature() != null) {
-			return new ArrayList<String>(this.capabilitiesCache.getAllFeature());
-		}
-		return new ArrayList<String>();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.n52.sos.cache.ACapabilitiesCacheController#getFeatureOfInterest()
+     */
+    @Override
+    public Collection<String> getFeatureOfInterest() {
+        if (this.capabilitiesCache.getFeatureOfInterest() != null) {
+            return new ArrayList<String>(this.capabilitiesCache.getFeatureOfInterest());
+        }
+        return new ArrayList<String>();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getObservableProperties4CompositePhenomenons()
-	 */
-	@Override
-	public Map<String, Collection<String>> getObservableProperties4CompositePhenomenons() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.cache.ACapabilitiesCacheController#getAllFeature()
+     */
+    @Override
+    public Collection<String> getAllFeature() {
+        if (this.capabilitiesCache.getAllFeature() != null) {
+            return new ArrayList<String>(this.capabilitiesCache.getAllFeature());
+        }
+        return new ArrayList<String>();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.cache.ACapabilitiesCacheController#
+     * getObservableProperties4CompositePhenomenons()
+     */
+    @Override
+    public Map<String, Collection<String>> getObservableProperties4CompositePhenomenons() {
         if (this.capabilitiesCache.getPhens4CompPhens() != null) {
             return new HashMap<String, Collection<String>>(this.capabilitiesCache.getPhens4CompPhens());
         }
         return new HashMap<String, Collection<String>>();
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getKOfferingVCompositePhenomenons()
-	 */
-	@Override
-	public Map<String, Collection<String>> getKOfferingVCompositePhenomenons() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.cache.ACapabilitiesCacheController#
+     * getKOfferingVCompositePhenomenons()
+     */
+    @Override
+    public Map<String, Collection<String>> getKOfferingVCompositePhenomenons() {
         if (this.capabilitiesCache.getOffCompPhens() != null) {
             return new HashMap<String, Collection<String>>(this.capabilitiesCache.getOffCompPhens());
         }
         return new HashMap<String, Collection<String>>();
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getKObservablePropertyVProcedures()
-	 */
-	@Override
-	public Map<String, Collection<String>> getKObservablePropertyVProcedures() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.cache.ACapabilitiesCacheController#
+     * getKObservablePropertyVProcedures()
+     */
+    @Override
+    public Map<String, Collection<String>> getKObservablePropertyVProcedures() {
         if (this.capabilitiesCache.getPhenProcs() != null) {
             return new HashMap<String, Collection<String>>(this.capabilitiesCache.getPhenProcs());
         }
         return new HashMap<String, Collection<String>>();
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getKProcedureVObservableProperties()
-	 */
-	@Override
-	public Map<String, Collection<String>> getKProcedureVObservableProperties() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.cache.ACapabilitiesCacheController#
+     * getKProcedureVObservableProperties()
+     */
+    @Override
+    public Map<String, Collection<String>> getKProcedureVObservableProperties() {
         if (this.capabilitiesCache.getProcPhens() != null) {
             return new HashMap<String, Collection<String>>(this.capabilitiesCache.getProcPhens());
         }
         return new HashMap<String, Collection<String>>();
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getValueType4ObservableProperty(java.lang.String)
-	 */
-	@Override
-	public ValueTypes getValueType4ObservableProperty(String phenomenonID) {
-		return this.capabilitiesCache.getValueType4Phenomenon(phenomenonID);
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.cache.ACapabilitiesCacheController#
+     * getValueType4ObservableProperty(java.lang.String)
+     */
+    @Override
+    public ValueTypes getValueType4ObservableProperty(String phenomenonID) {
+        return this.capabilitiesCache.getValueType4Phenomenon(phenomenonID);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getKOfferingVFeatures()
-	 */
-	@Override
-	public Map<String, Collection<String>> getKOfferingVFeatures() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.n52.sos.cache.ACapabilitiesCacheController#getKOfferingVFeatures()
+     */
+    @Override
+    public Map<String, Collection<String>> getKOfferingVFeatures() {
         if (this.capabilitiesCache.getOffFeatures() != null) {
             return new HashMap<String, Collection<String>>(this.capabilitiesCache.getOffFeatures());
         }
         return new HashMap<String, Collection<String>>();
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getOfferings4ObservableProperty(java.lang.String)
-	 */
-	@Override
-	public Collection<String> getOfferings4ObservableProperty(String phenID) {
-		if (this.capabilitiesCache.getOfferings4Phenomenon(phenID) != null) {
-			return new ArrayList<String>(this.capabilitiesCache.getOfferings4Phenomenon(phenID));
-		}
-		return new ArrayList<String>();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.cache.ACapabilitiesCacheController#
+     * getOfferings4ObservableProperty(java.lang.String)
+     */
+    @Override
+    public Collection<String> getOfferings4ObservableProperty(String phenID) {
+        if (this.capabilitiesCache.getOfferings4Phenomenon(phenID) != null) {
+            return new ArrayList<String>(this.capabilitiesCache.getOfferings4Phenomenon(phenID));
+        }
+        return new ArrayList<String>();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getKObservablePropertyVValueType()
-	 */
-	@Override
-	public Map<String, ValueTypes> getKObservablePropertyVValueType() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.cache.ACapabilitiesCacheController#
+     * getKObservablePropertyVValueType()
+     */
+    @Override
+    public Map<String, ValueTypes> getKObservablePropertyVValueType() {
         if (this.capabilitiesCache.getValueTypes4ObsProps() != null) {
             return new HashMap<String, ValueTypes>(this.capabilitiesCache.getValueTypes4ObsProps());
         }
         return new HashMap<String, ValueTypes>();
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getKOfferingVProcedures()
-	 */
-	@Override
-	public Map<String, Collection<String>> getKOfferingVProcedures() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.n52.sos.cache.ACapabilitiesCacheController#getKOfferingVProcedures()
+     */
+    @Override
+    public Map<String, Collection<String>> getKOfferingVProcedures() {
         if (this.capabilitiesCache.getOffProcedures() != null) {
             return new HashMap<String, Collection<String>>(this.capabilitiesCache.getOffProcedures());
         }
         return new HashMap<String, Collection<String>>();
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getKOfferingVRelatedFeatures()
-	 */
-	@Override
-	public Map<String, Collection<String>> getKOfferingVRelatedFeatures() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.n52.sos.cache.ACapabilitiesCacheController#getKOfferingVRelatedFeatures
+     * ()
+     */
+    @Override
+    public Map<String, Collection<String>> getKOfferingVRelatedFeatures() {
         if (this.capabilitiesCache.getKOfferingVRelatedFeatures() != null) {
             return new HashMap<String, Collection<String>>(this.capabilitiesCache.getKOfferingVRelatedFeatures());
         }
         return new HashMap<String, Collection<String>>();
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.ACapabilitiesCacheController#getKCompositePhenomenonVObservableProperty()
-	 */
-	@Override
-	public Map<String, Collection<String>> getKCompositePhenomenonVObservableProperty() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.cache.ACapabilitiesCacheController#
+     * getKCompositePhenomenonVObservableProperty()
+     */
+    @Override
+    public Map<String, Collection<String>> getKCompositePhenomenonVObservableProperty() {
         if (this.capabilitiesCache.getPhens4CompPhens() != null) {
             return new HashMap<String, Collection<String>>(this.capabilitiesCache.getPhens4CompPhens());
         }
         return new HashMap<String, Collection<String>>();
-	}
+    }
 
-	@Override
-	public Map<String, Collection<String>> getKRelatedFeaturesVRole() {
+    @Override
+    public Map<String, Collection<String>> getKRelatedFeaturesVRole() {
         if (this.capabilitiesCache.getKRelatedFeatureVRole() != null) {
             return new HashMap<String, Collection<String>>(this.capabilitiesCache.getKRelatedFeatureVRole());
         }
         return new HashMap<String, Collection<String>>();
-	}
+    }
+
+    @Override
+    public Map<String, Collection<String>> getKOfferingVObservationTypes() {
+        if (this.capabilitiesCache.getKOfferingVObservationTypes() != null) {
+            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getKOfferingVObservationTypes());
+        }
+        return new HashMap<String, Collection<String>>();
+    }
+
+    @Override
+    public Collection<String> getObservationTypes4Offering(String offering) {
+        if (this.capabilitiesCache.getKOfferingVObservationTypes() != null) {
+            return new ArrayList<String>(this.capabilitiesCache.getKOfferingVObservationTypes().get(offering));
+        }
+        return new ArrayList<String>();
+    }
 
 }

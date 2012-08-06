@@ -39,7 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.n52.sos.binding.IBinding;
-import org.n52.sos.response.IServiceResponse;
+import org.n52.sos.response.ServiceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +95,7 @@ public class SosService extends HttpServlet {
 
         this.setCorsHeaders(resp);
 
-        IServiceResponse sosResp = getBindingOperatorForServletPath(req.getServletPath()).doPostOperation(req);
+        ServiceResponse sosResp = getBindingOperatorForServletPath(req.getServletPath()).doPostOperation(req);
         doResponse(resp, sosResp);
     }
 
@@ -117,7 +117,7 @@ public class SosService extends HttpServlet {
 
         this.setCorsHeaders(resp);
 
-        IServiceResponse sosResp = getBindingOperatorForServletPath(req.getServletPath()).doGetOperation(req);
+        ServiceResponse sosResp = getBindingOperatorForServletPath(req.getServletPath()).doGetOperation(req);
         doResponse(resp, sosResp);
     }
 
@@ -148,7 +148,7 @@ public class SosService extends HttpServlet {
      * @throws ServletException 
      * 
      */
-    private void doResponse(HttpServletResponse resp, IServiceResponse sosResponse) throws ServletException {
+    private void doResponse(HttpServletResponse resp, ServiceResponse sosResponse) throws ServletException {
         OutputStream out = null;
         GZIPOutputStream gzip = null;
         try {

@@ -458,4 +458,8 @@ public abstract class ACapabilitiesCacheController extends TimerTask {
 	 * @return Map<String, Collection<String>> roles for relatedFeatures
 	 */
 	public abstract Map<String, Collection<String>> getKRelatedFeaturesVRole();
+	
+	public abstract Map<String, Collection<String>> getKOfferingVObservationTypes();
+	
+	public abstract Collection<String> getObservationTypes4Offering(String offering);
 }

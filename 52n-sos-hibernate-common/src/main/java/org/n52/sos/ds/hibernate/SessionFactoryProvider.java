@@ -28,8 +28,6 @@
 
 package org.n52.sos.ds.hibernate;
 
-import java.io.File;
-
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -41,7 +39,6 @@ import org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider;
 import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -28,9 +28,10 @@
 
 package org.n52.sos.ds;
 
-import org.n52.sos.ogc.om.SosObservationCollection;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.request.GetObservationRequest;
+import org.n52.sos.response.GetObservationResponse;
 
 /**
  * interface for getting observations for a passed getObservation request from
@@ -52,7 +53,7 @@ public interface IGetObservationDAO extends IOperationDAO {
 	 * @throws OwsExceptionReport
 	 *             if query of the database or creating the O&M document failed
 	 */
-	public SosObservationCollection getObservation(
-	        AbstractServiceRequest request) throws OwsExceptionReport;
+	public GetObservationResponse getObservation(
+	        GetObservationRequest request) throws OwsExceptionReport;
 
 }

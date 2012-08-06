@@ -28,8 +28,6 @@
 
 package org.n52.sos.ogc.om.features;
 
-import org.n52.sos.ogc.AbstractServiceResponseObject;
-
 
 /**
  * Abstract class for encoding the feature of interest. Necessary because
@@ -38,7 +36,7 @@ import org.n52.sos.ogc.AbstractServiceResponseObject;
  * schema.
  * 
  */
-public abstract class SosAbstractFeature extends AbstractServiceResponseObject {
+public abstract class SosAbstractFeature {
 
     /** identifier */
     private String identifier;

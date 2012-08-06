@@ -26,31 +26,38 @@
  Modified: <DATE OF LAST MODIFICATION (optional line)>
  ***************************************************************/
 
-package org.n52.sos.request;
+package org.n52.sos.ogc.gml;
 
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.operator.RequestOperatorKeyType;
+public class SosGmlMetaDataProperty {
+    
+    private String title;
+    
+    private String role;
+    
+    private String href;
 
-/**
- * SOS DeleteSensor request
- */
-public class SosDeleteSensorRequest extends AbstractServiceRequest {
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	/**
-	 * DeleteSensor operation name
-	 */
-	private final String operationName = Sos2Constants.Operations.DeleteSensor
-			.name();
+    public void setRole(String role) {
+        this.role = role;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
-	 */
-	@Override
-	public String getOperationName() {
-		return operationName;
-	}
+    public void setHref(String href) {
+        this.href = href;
+    }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public String getHref() {
+        return href;
+    }
+    
 }

@@ -44,7 +44,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.response.IServiceResponse;
+import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.IServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
@@ -69,7 +69,7 @@ public class SoapBinding implements IBinding {
     }
 
     @Override
-    public IServiceResponse doGetOperation(HttpServletRequest req) {
+    public ServiceResponse doGetOperation(HttpServletRequest req) {
         OwsExceptionReport owse =
                 Util4Exceptions.createNoApplicableCodeException(null, "The requested operations is not supported!");
         if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
@@ -81,7 +81,7 @@ public class SoapBinding implements IBinding {
     }
 
     @Override
-    public IServiceResponse doPostOperation(HttpServletRequest request) throws ServletException {
+    public ServiceResponse doPostOperation(HttpServletRequest request) throws ServletException {
         String version = null;
         String soapVersion = null;
         String soapNamespace = null;
@@ -111,7 +111,7 @@ public class SoapBinding implements IBinding {
                             IServiceOperator serviceOperator =
                                     Configurator.getInstance().getServiceOperator(serviceVersionIdentifier);
                             if (serviceOperator != null) {
-                                IServiceResponse bodyResponse = serviceOperator.receiveRequest(bodyRequest);
+                                ServiceResponse bodyResponse = serviceOperator.receiveRequest(bodyRequest);
                                 if (!bodyResponse.isXmlResponse()) {
                                     return bodyResponse;
                                 }
@@ -129,7 +129,7 @@ public class SoapBinding implements IBinding {
                 // Encode SOAP response
                 IEncoder encoder = Configurator.getInstance().getEncoder(soapResponse.getSoapNamespace());
                 if (encoder != null) {
-                    return (IServiceResponse) encoder.encode(soapResponse);
+                    return (ServiceResponse) encoder.encode(soapResponse);
                 } else {
                     OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
                     throw owse;
@@ -163,7 +163,7 @@ public class SoapBinding implements IBinding {
             try {
                 IEncoder encoder = Configurator.getInstance().getEncoder(soapResponse.getSoapNamespace());
                 if (encoder != null) {
-                    return (IServiceResponse) encoder.encode(soapResponse);
+                    return (ServiceResponse) encoder.encode(soapResponse);
                 } else {
                     throw Util4Exceptions.createNoApplicableCodeException(null,
                             "Error while encoding exception with SOAP envelope!");

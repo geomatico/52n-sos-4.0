@@ -44,16 +44,14 @@ import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateResultUtilities;
-import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.om.SosObservationCollection;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.GetObservationParams;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.SosGetObservationByIdRequest;
+import org.n52.sos.request.GetObservationByIdRequest;
+import org.n52.sos.response.GetObservationByIdResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -115,9 +113,9 @@ public class GetObservationByIdDAO implements IGetObservationByIdDAO {
     }
 
     @Override
-    public SosObservationCollection getObservationById(AbstractServiceRequest request) throws OwsExceptionReport {
-        if (request instanceof SosGetObservationByIdRequest) {
-            SosGetObservationByIdRequest sosRequest = (SosGetObservationByIdRequest) request;
+    public GetObservationByIdResponse getObservationById(GetObservationByIdRequest request) throws OwsExceptionReport {
+        if (request instanceof GetObservationByIdRequest) {
+            GetObservationByIdRequest sosRequest = (GetObservationByIdRequest) request;
             Session session = null;
             try {
                 session = (Session) connectionProvider.getConnection();
@@ -126,14 +124,13 @@ public class GetObservationByIdDAO implements IGetObservationByIdDAO {
                             .name());
                 } else {
                     List<Observation> observations = queryObservation(sosRequest, session);
-                    String responseFormat;
-                    if (sosRequest.getResponseFormat() != null && !sosRequest.getResponseFormat().isEmpty()) {
-                        responseFormat = sosRequest.getResponseFormat();
-                    } else {
-                        responseFormat = OMConstants.RESPONSE_FORMAT_OM_2;
-                    }
-                    return HibernateResultUtilities.createSosObservationCollectionFromObservations(
-                            responseFormat, observations, sosRequest.getVersion(), session);
+                    GetObservationByIdResponse response = new GetObservationByIdResponse();
+                    response.setService(request.getService());
+                    response.setVersion(request.getVersion());
+                    response.setResponseFormat(sosRequest.getResponseFormat());
+                    response.setObservationCollection(HibernateResultUtilities.createSosObservationFromObservations(
+                            observations, sosRequest.getVersion(), session));
+                    return response;
                 }
             } catch (HibernateException he) {
                 String exceptionText = "Error while querying observation data!";
@@ -149,7 +146,7 @@ public class GetObservationByIdDAO implements IGetObservationByIdDAO {
         }
     }
 
-    private List<Observation> queryObservation(SosGetObservationByIdRequest request, Session session) {
+    private List<Observation> queryObservation(GetObservationByIdRequest request, Session session) {
         Map<String, String> aliases = new HashMap<String, String>();
         List<Criterion> criterions = new ArrayList<Criterion>();
         List<Projection> projections = new ArrayList<Projection>();

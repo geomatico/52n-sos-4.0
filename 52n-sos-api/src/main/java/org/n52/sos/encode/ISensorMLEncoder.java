@@ -33,7 +33,7 @@ import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sensorML.SosSensorML;
+import org.n52.sos.ogc.sensorML.SensorML;
 
 /**
  * class offers operations for encoding of SensorML documents/elements
@@ -51,8 +51,8 @@ public interface ISensorMLEncoder {
      * @return Returns XMLBeans representation of sml:System
      * @throws OwsExceptionReport
      */
-    public XmlObject createSensor(SosSensorML sensorDesc, Collection<String> parentProcedureIds,
-    		Map<String,SosSensorML> childProcedures)
+    public XmlObject createSensor(SensorML sensorDesc, Collection<String> parentProcedureIds,
+    		Map<String,SensorML> childProcedures)
             throws OwsExceptionReport;
 
 }

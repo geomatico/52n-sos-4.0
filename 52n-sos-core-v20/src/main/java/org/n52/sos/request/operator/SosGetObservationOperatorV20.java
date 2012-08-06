@@ -32,27 +32,22 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IGetObservationDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.om.SosObservationCollection;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.sos.SosConstants.HelperValues;
-import org.n52.sos.ogc.sos.SosConstants.Operations;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.SosGetObservationRequest;
-import org.n52.sos.response.IServiceResponse;
-import org.n52.sos.response.SosResponse;
+import org.n52.sos.request.GetObservationRequest;
+import org.n52.sos.response.GetObservationResponse;
+import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.OwsHelper;
@@ -103,10 +98,10 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
      * .AbstractSosRequest)
      */
     @Override
-    public synchronized IServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
-        if (request instanceof SosGetObservationRequest) {
+    public synchronized ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
+        if (request instanceof GetObservationRequest) {
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
-            SosGetObservationRequest sosRequest = (SosGetObservationRequest) request;
+            GetObservationRequest sosRequest = (GetObservationRequest) request;
             // check parameters with variable content
             try {
                 SosHelper.checkServiceParameter(sosRequest.getService());
@@ -142,17 +137,20 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
             } catch (OwsExceptionReport owse) {
                 exceptions.add(owse);
             }
-            boolean zipCompression = false;
-            try {
-                zipCompression =
-                        SosHelper.checkResponseFormat(sosRequest.getResponseFormat(), sosRequest.getVersion());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
             Util4Exceptions.mergeExceptions(exceptions);
+            
+            boolean zipCompression = false;
+            if (sosRequest.getResponseFormat() == null || (sosRequest.getResponseFormat() != null && sosRequest.getResponseFormat().isEmpty())) {
+                sosRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
+            } else {
+                zipCompression = SosHelper.checkResponseFormatForZipCompression(sosRequest.getResponseFormat());
+                if (zipCompression) {
+                    sosRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2); 
+                }
+            }
 
-            SosObservationCollection obsCollection = this.dao.getObservation(sosRequest);
-            String version = sosRequest.getVersion();
+            GetObservationResponse response = this.dao.getObservation(sosRequest);
+            String responseFormat = response.getResponseFormat();
             String contentType = SosConstants.CONTENT_TYPE_XML;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             // XmlOptions xmlOptions;
@@ -161,25 +159,24 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
                 // check SOS version for response encoding
                 StringBuilder namespace = new StringBuilder();
                 // O&M 1.0.0
-                if (obsCollection.getResponseFormat().equals(OMConstants.CONTENT_TYPE_OM)
-                        || obsCollection.getResponseFormat().equals(OMConstants.RESPONSE_FORMAT_OM)) {
-                    namespace.append(obsCollection.getResponseFormat());
+                if (responseFormat.equals(OMConstants.CONTENT_TYPE_OM)
+                        || responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM)) {
+                    namespace.append(responseFormat);
                     // xmlOptions =
                     // SosXmlOptionsUtility.getInstance().getXmlOptions();
                     contentType = OMConstants.CONTENT_TYPE_OM;
                 }
                 // O&M 2.0 non SOS 2.0
                 else if (!request.getVersion().equals(Sos2Constants.SERVICEVERSION)
-                        && (obsCollection.getResponseFormat().equals(OMConstants.CONTENT_TYPE_OM_2) || obsCollection
-                                .getResponseFormat().equals(OMConstants.RESPONSE_FORMAT_OM_2))) {
-                    namespace.append(obsCollection.getResponseFormat());
+                        && (responseFormat.equals(OMConstants.CONTENT_TYPE_OM_2) || responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2))) {
+                    namespace.append(responseFormat);
                     // xmlOptions =
                     // SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200();
                     contentType = OMConstants.CONTENT_TYPE_OM_2;
                 }
                 // O&M 2.0 for SOS 2.0
                 else if (request.getVersion().equals(Sos2Constants.SERVICEVERSION)
-                        && obsCollection.getResponseFormat().equals(OMConstants.RESPONSE_FORMAT_OM_2)) {
+                        && responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2)) {
                     namespace.append(Sos2Constants.NS_SOS_20);
                     // xmlOptions =
                     // SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200();
@@ -191,22 +188,19 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
                 }
                 IEncoder encoder = Configurator.getInstance().getEncoder(namespace.toString());
                 if (encoder != null) {
-                    Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
-                    additionalValues.put(HelperValues.VERSION, version);
-                    additionalValues.put(HelperValues.OPERATION, Operations.GetObservation.name());
-                    Object encodedObject = encoder.encode(obsCollection, additionalValues);
+                    Object encodedObject = encoder.encode(response);
                     if (encodedObject instanceof XmlObject) {
                         ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
-                        return new SosResponse(baos, contentType, false, version, true);
-                    } else if (encodedObject instanceof IServiceResponse) {
-                        return (IServiceResponse) encodedObject;
+                        return new ServiceResponse(baos, contentType, zipCompression, true);
+                    } else if (encodedObject instanceof ServiceResponse) {
+                        return (ServiceResponse) encodedObject;
                     } else {
                         String exceptionText = "The encoder response is not supported!";
                         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
                     }
                 } else {
                     String exceptionText =
-                            "The value '" + obsCollection.getResponseFormat()
+                            "The value '" + responseFormat
                                     + "' of the outputFormat parameter is incorrect and has to be '"
                                     + SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL + "' for the requested sensor!";
                     throw Util4Exceptions.createInvalidParameterValueException(

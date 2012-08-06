@@ -30,7 +30,7 @@ package org.n52.sos.soap;
 
 import java.util.Map;
 
-import org.n52.sos.response.IServiceResponse;
+import org.n52.sos.response.ServiceResponse;
 
 public class SoapResponse {
     
@@ -42,7 +42,7 @@ public class SoapResponse {
    
     private SoapFault soapFault;
     
-    private IServiceResponse bodyContent;
+    private ServiceResponse bodyContent;
     
     private Map<String, SoapHeader> header;
 
@@ -85,7 +85,7 @@ public class SoapResponse {
         return soapFault;
     }
 
-    public IServiceResponse getSoapBodyContent() {
+    public ServiceResponse getSoapBodyContent() {
         return bodyContent;
     }
 
@@ -96,7 +96,7 @@ public class SoapResponse {
     public String getSoapAction() {
         return soapAction;
     }
-    public void setSoapBodyContent(IServiceResponse bodyContent) {
+    public void setSoapBodyContent(ServiceResponse bodyContent) {
         this.bodyContent = bodyContent;
     }
 

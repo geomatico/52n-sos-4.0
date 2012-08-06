@@ -54,6 +54,8 @@ public class XmlOptionsHelper {
      * instance
      */
     private static XmlOptionsHelper instance = null;
+    
+    private Map<String, String> prefixMap = getPrefixMap();
 
     /**
      * XML options
@@ -69,34 +71,38 @@ public class XmlOptionsHelper {
     private void initialize(String characterEncoding) {
         if (xmlOptions == null) {
             xmlOptions = new XmlOptions();
-            Map<String, String> lPrefixMap = new Hashtable<String, String>();
-            lPrefixMap.put(SensorMLConstants.NS_SML, SensorMLConstants.NS_SML_PREFIX);
-            lPrefixMap.put(SWEConstants.NS_SWE, SWEConstants.NS_SWE_PREFIX);
-            lPrefixMap.put(GMLConstants.NS_GML, GMLConstants.NS_GML_PREFIX);
-            lPrefixMap.put(OGCConstants.NS_OGC, OGCConstants.NS_OGC_PREFIX);
-            lPrefixMap.put(OMConstants.NS_OM, OMConstants.NS_OM_PREFIX);
-            lPrefixMap.put(OWSConstants.NS_OWS, OWSConstants.NS_OWS_PREFIX);
-            lPrefixMap.put(SFConstants.NS_SA, SFConstants.NS_SA_PREFIX);
-            lPrefixMap.put(Sos1Constants.NS_SOS, SosConstants.NS_SOS_PREFIX);
-            lPrefixMap.put(W3CConstants.NS_XLINK, W3CConstants.NS_XLINK_PREFIX);
-            lPrefixMap.put(W3CConstants.NS_XSI, W3CConstants.NS_XSI_PREFIX);
-            lPrefixMap.put(SWEConstants.NS_SWE_20, SWEConstants.NS_SWE_PREFIX);
-            lPrefixMap.put(SWEConstants.NS_SWES_20, SWEConstants.NS_SWES_PREFIX);
-            lPrefixMap.put(GMLConstants.NS_GML_32, GMLConstants.NS_GML_PREFIX);
-            lPrefixMap.put(OMConstants.NS_OM_2, OMConstants.NS_OM_PREFIX);
-            lPrefixMap.put(SFConstants.NS_SF, SFConstants.NS_SF_PREFIX);
-            lPrefixMap.put(SFConstants.NS_SAMS, SFConstants.NS_SAMS_PREFIX);
-            lPrefixMap.put(FilterConstants.NS_FES_2, FilterConstants.NS_FES_2_PREFIX);
-            lPrefixMap.put(Sos2Constants.NS_SOS_20, SosConstants.NS_SOS_PREFIX);
-            xmlOptions.setSaveSuggestedPrefixes(lPrefixMap);
-            xmlOptions.setSaveImplicitNamespaces(lPrefixMap);
+            xmlOptions.setSaveSuggestedPrefixes(prefixMap);
+            xmlOptions.setSaveImplicitNamespaces(prefixMap);
             xmlOptions.setSaveAggressiveNamespaces();
             xmlOptions.setSavePrettyPrint();
             xmlOptions.setSaveNamespacesFirst();
             xmlOptions.setCharacterEncoding(characterEncoding);
         }
     }
-
+    
+    private Map<String, String> getPrefixMap() {
+        Map<String, String> lPrefixMap = new Hashtable<String, String>();
+        lPrefixMap.put(SensorMLConstants.NS_SML, SensorMLConstants.NS_SML_PREFIX);
+        lPrefixMap.put(SWEConstants.NS_SWE, SWEConstants.NS_SWE_PREFIX);
+        lPrefixMap.put(GMLConstants.NS_GML, GMLConstants.NS_GML_PREFIX);
+        lPrefixMap.put(OGCConstants.NS_OGC, OGCConstants.NS_OGC_PREFIX);
+        lPrefixMap.put(OMConstants.NS_OM, OMConstants.NS_OM_PREFIX);
+        lPrefixMap.put(OWSConstants.NS_OWS, OWSConstants.NS_OWS_PREFIX);
+        lPrefixMap.put(SFConstants.NS_SA, SFConstants.NS_SA_PREFIX);
+        lPrefixMap.put(Sos1Constants.NS_SOS, SosConstants.NS_SOS_PREFIX);
+        lPrefixMap.put(W3CConstants.NS_XLINK, W3CConstants.NS_XLINK_PREFIX);
+        lPrefixMap.put(W3CConstants.NS_XSI, W3CConstants.NS_XSI_PREFIX);
+        lPrefixMap.put(SWEConstants.NS_SWE_20, SWEConstants.NS_SWE_PREFIX);
+        lPrefixMap.put(SWEConstants.NS_SWES_20, SWEConstants.NS_SWES_PREFIX);
+        lPrefixMap.put(GMLConstants.NS_GML_32, GMLConstants.NS_GML_PREFIX);
+        lPrefixMap.put(OMConstants.NS_OM_2, OMConstants.NS_OM_PREFIX);
+        lPrefixMap.put(SFConstants.NS_SF, SFConstants.NS_SF_PREFIX);
+        lPrefixMap.put(SFConstants.NS_SAMS, SFConstants.NS_SAMS_PREFIX);
+        lPrefixMap.put(FilterConstants.NS_FES_2, FilterConstants.NS_FES_2_PREFIX);
+        lPrefixMap.put(Sos2Constants.NS_SOS_20, SosConstants.NS_SOS_PREFIX);
+        return lPrefixMap;
+    }
+    
     /**
      * Get the XML options for SOS 1.0.0
      * 

@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.response.IServiceResponse;
+import org.n52.sos.response.ServiceResponse;
 
 /**
  * Interface for binding implementations
@@ -48,7 +48,7 @@ public interface IBinding {
      *            HTTP-Post request
      * @return SOS response
      */
-    public IServiceResponse doGetOperation(HttpServletRequest request);
+    public ServiceResponse doGetOperation(HttpServletRequest request);
 
     /**
      * HTTP-Post request handling method
@@ -58,7 +58,7 @@ public interface IBinding {
      * @return SOS response
      * @throws ServletException 
      */
-    public IServiceResponse doPostOperation(HttpServletRequest request) throws ServletException;
+    public ServiceResponse doPostOperation(HttpServletRequest request) throws ServletException;
 
     /**
      * Get URL pattern for the operator

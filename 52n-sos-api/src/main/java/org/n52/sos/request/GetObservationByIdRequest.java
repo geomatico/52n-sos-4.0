@@ -40,7 +40,7 @@ import org.n52.sos.request.operator.RequestOperatorKeyType;
  * SOS GetObservationById request
  * 
  */
-public class SosGetObservationByIdRequest extends AbstractServiceRequest {
+public class GetObservationByIdRequest extends AbstractServiceRequest {
 
     /**
      * GetObservationById operation name

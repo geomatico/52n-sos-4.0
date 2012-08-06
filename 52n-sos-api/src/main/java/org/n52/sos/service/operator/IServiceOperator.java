@@ -30,7 +30,7 @@ package org.n52.sos.service.operator;
 
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.response.IServiceResponse;
+import org.n52.sos.response.ServiceResponse;
 
 /**
  * interface for the request listeners
@@ -48,7 +48,7 @@ public interface IServiceOperator {
      * 
      * @return Returns the response of the request (e.g. CapabilitiesResponse
      */
-    public IServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
+    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
 
     public ServiceOperatorKeyType getServiceOperatorKeyType();
     

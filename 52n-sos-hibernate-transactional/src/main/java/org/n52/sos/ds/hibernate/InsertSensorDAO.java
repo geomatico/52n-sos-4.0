@@ -37,7 +37,8 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.swe.SWEConstants;
-import org.n52.sos.request.SosInsertSensorRequest;
+import org.n52.sos.request.InsertSensorRequest;
+import org.n52.sos.response.InsertSensorResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -102,9 +103,12 @@ public class InsertSensorDAO implements IInsertSensorDAO {
     }
 
     @Override
-    public String insertSensor(SosInsertSensorRequest insertSensorRequest) {
+    public InsertSensorResponse insertSensor(InsertSensorRequest request) {
         // TODO Auto-generated method stub
-        return null;
+        InsertSensorResponse response = new InsertSensorResponse();
+        response.setService(request.getService());
+        response.setVersion(request.getVersion());
+        return response;
     }
 
 }

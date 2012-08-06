@@ -41,7 +41,7 @@ import org.n52.sos.request.operator.RequestOperatorKeyType;
  * Sos GetFeatureOfInterst request
  * 
  */
-public class SosGetFeatureOfInterestRequest extends AbstractServiceRequest {
+public class GetFeatureOfInterestRequest extends AbstractServiceRequest {
 
 	/**
 	 * GetFeatureOfInterest operation name

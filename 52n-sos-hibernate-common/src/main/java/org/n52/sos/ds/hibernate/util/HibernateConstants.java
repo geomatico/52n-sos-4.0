@@ -76,4 +76,6 @@ public class HibernateConstants {
     
     public static final String PARAMETER_OBSERVATIONS = "observations";
 
+    public static final String PARAMETER_OBSERVATION_TYPE = "observationType";
+
 }

@@ -21,13 +21,9 @@
 
 package org.hibernate.spatial.dialect.postgis;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-
 import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 import org.hibernate.spatial.dialect.AbstractJTSGeometryValueExtractor;
 import org.hibernate.spatial.jts.mgeom.MCoordinate;
@@ -41,6 +37,9 @@ import org.postgis.PGgeometry;
 import org.postgis.Point;
 import org.postgis.Polygon;
 import org.postgresql.util.PGobject;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 
 public class PGGeometryValueExtractor52N extends AbstractJTSGeometryValueExtractor {
     

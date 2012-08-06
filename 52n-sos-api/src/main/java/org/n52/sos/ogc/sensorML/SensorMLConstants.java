@@ -51,6 +51,13 @@ public class SensorMLConstants {
 	
 	public static final String EN_SYSTEM = "System";
 	
+	public static final String EN_PROCESS_MODEL = "ProcessModel";
+	
+	public static final String EN_ABSTRACT_PROCESS = "AbstractProcess";
+	
 	public static final QName SYSTEM_QNAME = new QName( NS_SML, EN_SYSTEM, NS_SML_PREFIX );
 
+	public static final QName PROCESS_MODEL_QNAME = new QName( NS_SML, EN_PROCESS_MODEL, NS_SML_PREFIX );
+	
+	public static final QName ABSTRACT_PROCESS_QNAME = new QName( NS_SML, EN_ABSTRACT_PROCESS, NS_SML_PREFIX );
 }

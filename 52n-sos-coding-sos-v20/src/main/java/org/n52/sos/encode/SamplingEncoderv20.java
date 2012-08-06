@@ -10,9 +10,6 @@ import javax.xml.namespace.QName;
 import net.opengis.gml.x32.AbstractGeometryType;
 import net.opengis.gml.x32.CodeWithAuthorityType;
 import net.opengis.gml.x32.FeaturePropertyType;
-import net.opengis.gml.x32.LineStringType;
-import net.opengis.gml.x32.PointType;
-import net.opengis.gml.x32.PolygonType;
 import net.opengis.sampling.x20.SFSamplingFeatureCollectionDocument;
 import net.opengis.sampling.x20.SFSamplingFeatureCollectionType;
 import net.opengis.sampling.x20.SFSamplingFeaturePropertyType;
@@ -36,6 +33,7 @@ import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
@@ -123,32 +121,17 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, Object> {
 
             // set position
             ShapeType xbShape = xbSampFeature.addNewShape();
-            AbstractGeometryType abstractGeometryType;
-            if (sampFeat.getGeometry() instanceof Point) {
-                abstractGeometryType =
-                        (PointType) xbShape.addNewAbstractGeometry().substitute(
-                                new QName(GMLConstants.NS_GML_32, GMLConstants.EN_POINT, GMLConstants.NS_GML),
-                                PointType.type);
-            } else if (sampFeat.getGeometry() instanceof LineString) {
-                abstractGeometryType =
-                        (LineStringType) xbShape.addNewAbstractGeometry().substitute(
-                                new QName(GMLConstants.NS_GML_32, GMLConstants.EN_LINE_STRING, GMLConstants.NS_GML),
-                                LineStringType.type);
-            } else if (sampFeat.getGeometry() instanceof Polygon) {
-                abstractGeometryType =
-                        (PolygonType) xbShape.addNewAbstractGeometry().substitute(
-                                new QName(GMLConstants.NS_GML_32, GMLConstants.EN_POLYGON, GMLConstants.NS_GML),
-                                PolygonType.type);
-            } else {
-                abstractGeometryType = xbShape.addNewAbstractGeometry();
-            }
-
             IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
             if (encoder != null) {
                 Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
                 additionalValues.put(HelperValues.GMLID, gmlID);
                 XmlObject xmlObject = (XmlObject) encoder.encode(sampFeat.getGeometry(), additionalValues);
-                abstractGeometryType.set(xmlObject);
+                if (xmlObject instanceof AbstractGeometryType) {
+                    XmlObject substitution = xbShape.addNewAbstractGeometry().substitute(getQnameForGeometry(sampFeat.getGeometry()), xmlObject.schemaType());
+                    substitution.set((AbstractGeometryType)xmlObject);
+                } else {
+                    // TODO: Exception
+                }
             } else {
                 String exceptionText = "Error while encoding geometry for feature, needed encoder is missing!";
                 LOGGER.debug(exceptionText);
@@ -156,6 +139,17 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, Object> {
             }
         }
         return xbSampFeatDoc;
+    }
+
+    private QName getQnameForGeometry(Geometry geom) {
+        if (geom instanceof Point) {
+            return new QName(GMLConstants.NS_GML_32, GMLConstants.EN_POINT, GMLConstants.NS_GML);
+        } else if (geom instanceof LineString) {
+            return new QName(GMLConstants.NS_GML_32, GMLConstants.EN_LINE_STRING, GMLConstants.NS_GML);
+        } else if (geom instanceof Polygon) {
+            return new QName(GMLConstants.NS_GML_32, GMLConstants.EN_POLYGON, GMLConstants.NS_GML);
+        }
+        return new QName(GMLConstants.NS_GML_32, GMLConstants.EN_ABSTRACT_GEOMETRY, GMLConstants.NS_GML);
     }
 
     private XmlObject createFeatureCollection(Map<SosAbstractFeature, String> foiGmlIds, boolean forObservation)

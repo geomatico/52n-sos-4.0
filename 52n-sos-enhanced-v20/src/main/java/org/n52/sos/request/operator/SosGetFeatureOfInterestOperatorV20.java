@@ -21,9 +21,9 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.sos.SosConstants.Operations;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.SosGetFeatureOfInterestRequest;
-import org.n52.sos.response.IServiceResponse;
-import org.n52.sos.response.SosResponse;
+import org.n52.sos.request.GetFeatureOfInterestRequest;
+import org.n52.sos.response.GetFeatureOfInterestResponse;
+import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.OwsHelper;
@@ -59,10 +59,10 @@ public class SosGetFeatureOfInterestOperatorV20 implements IRequestOperator {
     }
 
     @Override
-    public IServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
-        if (request instanceof SosGetFeatureOfInterestRequest) {
+    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
+        if (request instanceof GetFeatureOfInterestRequest) {
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
-            SosGetFeatureOfInterestRequest sosRequest = (SosGetFeatureOfInterestRequest) request;
+            GetFeatureOfInterestRequest sosRequest = (GetFeatureOfInterestRequest) request;
             // check parameters with variable content
             try {
                 SosHelper.checkServiceParameter(sosRequest.getService());
@@ -98,8 +98,7 @@ public class SosGetFeatureOfInterestOperatorV20 implements IRequestOperator {
             }
             Util4Exceptions.mergeExceptions(exceptions);
 
-            SosAbstractFeature featureCollection = this.dao.getFeatureOfInterest(sosRequest);
-            String version = sosRequest.getVersion();
+            GetFeatureOfInterestResponse response = this.dao.getFeatureOfInterest(sosRequest);
             String contentType = SosConstants.CONTENT_TYPE_XML;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             // XmlOptions xmlOptions;
@@ -123,15 +122,12 @@ public class SosGetFeatureOfInterestOperatorV20 implements IRequestOperator {
                 }
                 IEncoder encoder = Configurator.getInstance().getEncoder(namespace.toString());
                 if (encoder != null) {
-                    Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
-                    additionalValues.put(HelperValues.VERSION, version);
-                    additionalValues.put(HelperValues.OPERATION, Operations.GetFeatureOfInterest.name());
-                    Object encodedObject = encoder.encode(featureCollection, additionalValues);
+                    Object encodedObject = encoder.encode(response);
                     if (encodedObject instanceof XmlObject) {
                         ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
-                        return new SosResponse(baos, contentType, false, version, true);
-                    } else if (encodedObject instanceof IServiceResponse) {
-                        return (IServiceResponse) encodedObject;
+                        return new ServiceResponse(baos, contentType, false, true);
+                    } else if (encodedObject instanceof ServiceResponse) {
+                        return (ServiceResponse) encodedObject;
                     } else {
                         String exceptionText = "The encoder response is not supported!";
                         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);

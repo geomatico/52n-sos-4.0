@@ -31,28 +31,19 @@ package org.n52.sos.request.operator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ds.IDeleteSensorDAO;
 import org.n52.sos.ds.IInsertObservationDAO;
 import org.n52.sos.encode.IEncoder;
-import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
-import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.sos.SosConstants.HelperValues;
-import org.n52.sos.ogc.sos.SosConstants.Operations;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.SosDeleteSensorRequest;
-import org.n52.sos.request.SosInsertObservationRequest;
-import org.n52.sos.response.IServiceResponse;
-import org.n52.sos.response.SosResponse;
+import org.n52.sos.request.InsertObservationRequest;
+import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.Util4Exceptions;
@@ -80,16 +71,16 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
     }
 
     @Override
-    public IServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
+    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
         String version = "";
-        if (request instanceof SosInsertObservationRequest) {
+        if (request instanceof InsertObservationRequest) {
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
-            SosInsertObservationRequest insertObservationRequest = (SosInsertObservationRequest) request;
+            InsertObservationRequest insertObservationRequest = (InsertObservationRequest) request;
             version = insertObservationRequest.getVersion();
             
             Util4Exceptions.mergeExceptions(exceptions);
             
-            int id = this.dao.insertObservation(insertObservationRequest.getObservation());
+            int id = this.dao.insertObservation(insertObservationRequest);
             String contentType = SosConstants.CONTENT_TYPE_XML;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try {
@@ -100,9 +91,9 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
                     Object encodedObject = encoder.encode(null);
                     if (encodedObject instanceof XmlObject) {
                         ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
-                        return new SosResponse(baos, contentType, false, version, true);
-                    } else if (encodedObject instanceof IServiceResponse) {
-                        return (IServiceResponse) encodedObject;
+                        return new ServiceResponse(baos, contentType, false, true);
+                    } else if (encodedObject instanceof ServiceResponse) {
+                        return (ServiceResponse) encodedObject;
                     } else {
                         String exceptionText = "The encoder response is not supported!";
                         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);

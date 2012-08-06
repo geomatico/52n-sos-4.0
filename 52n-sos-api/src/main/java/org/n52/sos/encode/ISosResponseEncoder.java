@@ -28,12 +28,13 @@ Modified: <DATE OF LAST MODIFICATION (optional line)>
 package org.n52.sos.encode;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ogc.om.SosObservationCollection;
+import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sensorML.SosSensorML;
+import org.n52.sos.ogc.sensorML.SensorML;
 
 /**
  * Interface for a response encoder 
@@ -67,8 +68,8 @@ public interface ISosResponseEncoder {
      * @return XMLBeans representation of GetResultResponse
      * @throws OwsExceptionReport
      */
-    public XmlObject createResultRespDoc(SosObservationCollection sosObs) throws OwsExceptionReport;
+    public XmlObject createResultRespDoc(List<SosObservation> sosObs) throws OwsExceptionReport;
     
-    public XmlObject createDescribeSensorResponse(SosSensorML sensorDesc, Collection<String> parentProcedureIds, Map<String,SosSensorML> childProcedureIds) throws OwsExceptionReport;
+    public XmlObject createDescribeSensorResponse(SensorML sensorDesc, Collection<String> parentProcedureIds, Map<String,SensorML> childProcedureIds) throws OwsExceptionReport;
 
 }

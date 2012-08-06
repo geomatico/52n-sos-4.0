@@ -14,6 +14,7 @@ import net.opengis.gml.x32.DirectPositionType;
 import net.opengis.gml.x32.EnvelopeType;
 import net.opengis.gml.x32.FeaturePropertyType;
 import net.opengis.gml.x32.TimePeriodType;
+import net.opengis.om.x20.OMObservationType;
 import net.opengis.ows.x11.OperationsMetadataDocument.OperationsMetadata;
 import net.opengis.ows.x11.ServiceIdentificationDocument.ServiceIdentification;
 import net.opengis.ows.x11.ServiceProviderDocument.ServiceProvider;
@@ -33,9 +34,8 @@ import net.opengis.swes.x20.FeatureRelationshipType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ogc.AbstractServiceResponseObject;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.om.SosObservationCollection;
+import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.SosFeatureCollection;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
@@ -46,6 +46,11 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.sos.SosOfferingsForContents;
+import org.n52.sos.response.AbstractServiceResponse;
+import org.n52.sos.response.GetCapabilitiesResponse;
+import org.n52.sos.response.GetFeatureOfInterestResponse;
+import org.n52.sos.response.GetObservationByIdResponse;
+import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.N52XmlHelper;
@@ -59,7 +64,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceResponseObject> {
+public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceResponse> {
 
     /**
      * logger, used for logging while initializing the constants from config
@@ -87,39 +92,28 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
     }
 
     @Override
-    public XmlObject encode(AbstractServiceResponseObject response) throws OwsExceptionReport {
+    public XmlObject encode(AbstractServiceResponse response) throws OwsExceptionReport {
         Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
         additionalValues.put(HelperValues.VERSION, Sos2Constants.SERVICEVERSION);
         return encode(response, additionalValues);
     }
 
     @Override
-    public XmlObject encode(AbstractServiceResponseObject response, Map<HelperValues, String> additionalValues)
+    public XmlObject encode(AbstractServiceResponse response, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
-        String operationName = additionalValues.get(HelperValues.OPERATION);
-        if (operationName.equals(SosConstants.Operations.GetCapabilities.name())) {
-            if (response instanceof SosCapabilities) {
-                return createCapabilitiesDocument((SosCapabilities) response);
-            }
-            String exceptionText = "Error while encoding GetCapabilities response!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        } else if (operationName.equals(SosConstants.Operations.GetObservation.name())) {
-            SosObservationCollection sosObsColl = (SosObservationCollection) response;
-            if (OMHelper.checkOMResponseFormat(sosObsColl.getResponseFormat())) {
-                return createObservationResponseDocuement((SosObservationCollection) response);
-            }
-            return null;
-        } else if (operationName.equals(SosConstants.Operations.GetFeatureOfInterest.name())) {
-            return createGetFeatureOfInterestResponse((SosAbstractFeature) response);
-        } else if (operationName.equals(SosConstants.Operations.GetObservationById.name())) {
+        if (response instanceof GetCapabilitiesResponse) {
+            return createCapabilitiesDocument((GetCapabilitiesResponse) response);
+        } else if (response instanceof GetObservationResponse) {
+            return createObservationResponseDocument((GetObservationResponse) response);
+        } else if (response instanceof GetFeatureOfInterestResponse) {
+            return createGetFeatureOfInterestResponse((GetFeatureOfInterestResponse) response);
+        } else if (response instanceof GetObservationByIdResponse) {
             return createGetObservationByIdResponse();
-        } else {
-            return null;
         }
+        return null;
     }
 
-    private XmlObject createCapabilitiesDocument(SosCapabilities sosCapabilities) throws OwsExceptionReport {
+    private XmlObject createCapabilitiesDocument(GetCapabilitiesResponse response) throws OwsExceptionReport {
         // CapabilitiesDocument xbCapsDoc =
         // CapabilitiesDocument.Factory
         // .newInstance(SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200());
@@ -128,7 +122,9 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
         CapabilitiesType xbCaps = xbCapsDoc.addNewCapabilities();
 
         // set version.
-        xbCaps.setVersion(sosCapabilities.getVersion());
+        xbCaps.setVersion(response.getVersion());
+
+        SosCapabilities sosCapabilities = response.getCapabilities();
 
         IEncoder owsEncoder = Configurator.getInstance().getEncoder(OWSConstants.NS_OWS);
         if (owsEncoder == null) {
@@ -152,7 +148,8 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
         if (sosCapabilities.getFilterCapabilities() != null) {
             IEncoder filterEncoder =
                     Configurator.getInstance().getEncoder(
-                            XmlHelper.getNamespace(FilterCapabilitiesDocument.Factory.newInstance().addNewFilterCapabilities()));
+                            XmlHelper.getNamespace(FilterCapabilitiesDocument.Factory.newInstance()
+                                    .addNewFilterCapabilities()));
             if (filterEncoder == null) {
                 String exceptionText = "Error while encoding GetCapabilities response, missing encoder!";
                 LOGGER.debug(exceptionText);
@@ -162,7 +159,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
                     (FilterCapabilities) filterEncoder.encode(sosCapabilities.getFilterCapabilities()));
         }
         if (sosCapabilities.getContents() != null) {
-            setContents(xbCaps.addNewContents(), sosCapabilities.getContents(), sosCapabilities.getVersion());
+            setContents(xbCaps.addNewContents(), sosCapabilities.getContents(), response.getVersion());
         }
         // TODO extensions section
         // if (EXTENSIONS != null) {
@@ -174,19 +171,39 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
         return xbCapsDoc;
     }
 
-    private XmlObject createObservationResponseDocuement(SosObservationCollection sosObsCol) throws OwsExceptionReport {
+    private XmlObject createObservationResponseDocument(GetObservationResponse response) throws OwsExceptionReport {
         // GetObservationResponseDocument xbGetObsRespDoc =
         // GetObservationResponseDocument.Factory.newInstance(SosXmlOptionsUtility.getInstance()
         // .getXmlOptions4Sos2Swe200());
         GetObservationResponseDocument xbGetObsRespDoc =
                 GetObservationResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        IEncoder encoder = Configurator.getInstance().getEncoder(sosObsCol.getResponseFormat());
+        GetObservationResponseType xbGetObsResp = xbGetObsRespDoc.addNewGetObservationResponse();
+        List<SosObservation> observationCollection = response.getObservationCollection();
+        IEncoder encoder = Configurator.getInstance().getEncoder(response.getResponseFormat());
         if (encoder == null) {
             String exceptionText = "Error while encoding GetObservation response, missing encoder!";
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
-        xbGetObsRespDoc.setGetObservationResponse((GetObservationResponseType) encoder.encode(sosObsCol));
+        HashMap<String, String> gmlID4sfIdentifier = new HashMap<String, String>();
+        int sfIdCounter = 1;
+        for (SosObservation sosObservation : observationCollection) {
+            Map<HelperValues, String> foiHelper = new HashMap<SosConstants.HelperValues, String>();
+            String gmlId = null;
+            if (gmlID4sfIdentifier.containsKey(sosObservation.getObservationConstellation().getFeatureOfInterest().getIdentifier())) {
+                gmlId = gmlID4sfIdentifier.get(sosObservation.getObservationConstellation().getFeatureOfInterest().getIdentifier());
+                foiHelper.put(HelperValues.EXIST_FOI_IN_DOC, Boolean.toString(true));
+            } else {
+                gmlId = "sf_" + sfIdCounter;
+                gmlID4sfIdentifier.put(sosObservation.getObservationConstellation().getFeatureOfInterest().getIdentifier(), gmlId);
+                foiHelper.put(HelperValues.EXIST_FOI_IN_DOC, Boolean.toString(false));
+            }
+            foiHelper.put(HelperValues.GMLID, gmlId);
+           
+            xbGetObsResp.addNewObservationData()
+                    .setOMObservation((OMObservationType) encoder.encode(sosObservation, foiHelper));
+        }
+        XmlHelper.makeGmlIdsUnique(xbGetObsRespDoc.getDomNode());
         List<String> schemaLocations = new ArrayList<String>();
         schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS200());
         schemaLocations.add(N52XmlHelper.getSchemaLocationForOM200());
@@ -196,7 +213,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
         return xbGetObsRespDoc;
     }
 
-    private XmlObject createGetFeatureOfInterestResponse(SosAbstractFeature sosAbstractFeature)
+    private XmlObject createGetFeatureOfInterestResponse(GetFeatureOfInterestResponse response)
             throws OwsExceptionReport {
         int sfIdCounter = 1;
         HashMap<String, String> gmlID4sfIdentifier = new HashMap<String, String>();
@@ -208,6 +225,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
                 GetFeatureOfInterestResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance()
                         .getXmlOptions());
         GetFeatureOfInterestResponseType xbGetFoiResponse = xbGetFoiResponseDoc.addNewGetFeatureOfInterestResponse();
+        SosAbstractFeature sosAbstractFeature = response.getAbstractFeature();
         if (sosAbstractFeature instanceof SosFeatureCollection) {
             Map<String, SosAbstractFeature> sosFeatColMap = ((SosFeatureCollection) sosAbstractFeature).getMembers();
             for (String sosFeatID : sosFeatColMap.keySet()) {

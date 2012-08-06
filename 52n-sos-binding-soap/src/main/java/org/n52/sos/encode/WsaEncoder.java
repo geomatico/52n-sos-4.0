@@ -13,7 +13,7 @@ import javax.xml.soap.SOAPHeader;
 import org.apache.log4j.Logger;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
-import org.n52.sos.response.IServiceResponse;
+import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.soap.SoapHeader;
 import org.n52.sos.soap.SoapResponse;
 import org.n52.sos.wsa.WsaConstants;

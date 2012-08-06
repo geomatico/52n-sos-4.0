@@ -28,8 +28,10 @@
 
 package org.n52.sos.ogc.sensorML.elements;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.n52.sos.ogc.gml.SosGmlMetaDataProperty;
 import org.n52.sos.ogc.swe.SWEConstants.SweAggregateType;
 import org.n52.sos.ogc.swe.SosSweField;
 
@@ -38,10 +40,14 @@ import org.n52.sos.ogc.swe.SosSweField;
  * 
  */
 public class SosSMLCapabilities {
+    
+    private String name;
 
     private SweAggregateType capabilitiesType;
 
     private List<SosSweField> fields;
+    
+    private List<SosGmlMetaDataProperty> metaDataProperties;
 
     /**
      * default constructor
@@ -58,10 +64,19 @@ public class SosSMLCapabilities {
      * @param fields
      *            Fields
      */
-    public SosSMLCapabilities(SweAggregateType capabilitiesType, List<SosSweField> fields) {
+    public SosSMLCapabilities(String name, SweAggregateType capabilitiesType, List<SosSweField> fields) {
         super();
+        this.setName(name);
         this.capabilitiesType = capabilitiesType;
         this.fields = fields;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -94,4 +109,19 @@ public class SosSMLCapabilities {
         this.fields = fields;
     }
 
+    public List<SosGmlMetaDataProperty> getMetaDataProperties() {
+        return metaDataProperties;
+    }
+
+    public void setMetaDataProperties(List<SosGmlMetaDataProperty> metaDataProperties) {
+        this.metaDataProperties = metaDataProperties;
+    }
+    
+    public void addMetaDataProperties(SosGmlMetaDataProperty metaDataProperty) {
+        if (metaDataProperties == null) {
+            metaDataProperties = new ArrayList<SosGmlMetaDataProperty>();
+        }
+        metaDataProperties.add(metaDataProperty);
+    }
+    
 }

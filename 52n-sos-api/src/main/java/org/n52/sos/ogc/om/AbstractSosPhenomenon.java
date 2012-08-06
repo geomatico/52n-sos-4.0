@@ -32,88 +32,103 @@ import java.util.Collection;
 
 /**
  * Abstract class for phenomena
- *
+ * 
  */
 public class AbstractSosPhenomenon {
 
-	
-	/** phenomenon identifier */
-	private String identifier;
-	
-	/** phenomenon description */
-	private String description;
+    /** phenomenon identifier */
+    private String identifier;
+
+    /** phenomenon description */
+    private String description;
 
     /** Offerings the phenomenon should be added to */
     private Collection<SosOffering> offerings;
-	
-	/**
-	 * constructor
-	 * @param identifier Phenomenon identifier
-	 */
-	public AbstractSosPhenomenon(String identifier) {
-		super();
-		this.identifier = identifier;
-	}
 
-	/**
-	 * constructor
-	 * @param identifier Phenomenon identifier
-	 * @param description Phenomenon description
-	 */
-	public AbstractSosPhenomenon(String identifier, String description) {
-		super();
-		this.identifier = identifier;
-		this.description = description;
-	}
-	
-	/**
-	 * constructor
-	 * @param identifier Phenomenon identifier
-	 * @param description Phenomenon description
-	 * @param offerings Offerings added to
-	 */
-	public AbstractSosPhenomenon(String identifier, String description, Collection<SosOffering> offerings) {
-		super();
-		this.identifier = identifier;
-		this.description = description;
-		this.offerings = offerings;
-	}
+    /**
+     * constructor
+     * 
+     * @param identifier
+     *            Phenomenon identifier
+     */
+    public AbstractSosPhenomenon(String identifier) {
+        super();
+        this.identifier = identifier;
+    }
 
-	/**
-	 * Get phenomenon identifier
-	 * @return the identifier
-	 */
-	public String getIdentifier() {
-		return identifier;
-	}
+    /**
+     * constructor
+     * 
+     * @param identifier
+     *            Phenomenon identifier
+     * @param description
+     *            Phenomenon description
+     */
+    public AbstractSosPhenomenon(String identifier, String description) {
+        super();
+        this.identifier = identifier;
+        this.description = description;
+    }
 
-	/**
-	 * Set phenomenon identifier
-	 * @param identifier the identifier to set
-	 */
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
-	}
+    /**
+     * constructor
+     * 
+     * @param identifier
+     *            Phenomenon identifier
+     * @param description
+     *            Phenomenon description
+     * @param offerings
+     *            Offerings added to
+     */
+    public AbstractSosPhenomenon(String identifier, String description, Collection<SosOffering> offerings) {
+        super();
+        this.identifier = identifier;
+        this.description = description;
+        this.offerings = offerings;
+    }
 
-	/**
-	 * Get phenomenon description
-	 * @return the description
-	 */
-	public String getDescription() {
-		return description;
-	}
+    /**
+     * Get phenomenon identifier
+     * 
+     * @return the identifier
+     */
+    public String getIdentifier() {
+        return identifier;
+    }
 
-	/**
-	 * Set phenomenon description
-	 * @param description the description to set
-	 */
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	
+    /**
+     * Set phenomenon identifier
+     * 
+     * @param identifier
+     *            the identifier to set
+     */
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+    /**
+     * Get phenomenon description
+     * 
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Set phenomenon description
+     * 
+     * @param description
+     *            the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     /**
      * Get offerings add to
-     * @return Offerings add to 
+     * 
+     * @return Offerings add to
      */
     public Collection<SosOffering> getOfferings() {
         return offerings;
@@ -121,31 +136,37 @@ public class AbstractSosPhenomenon {
 
     /**
      * Set offerings add to
-     * @param offerings offerings add to
+     * 
+     * @param offerings
+     *            offerings add to
      */
     public void setOfferings(Collection<SosOffering> offerings) {
         this.offerings = offerings;
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object paramObject) {
-    	if (paramObject instanceof AbstractSosPhenomenon) {
-    		AbstractSosPhenomenon phen = (AbstractSosPhenomenon) paramObject;
-			return identifier.equals(phen.getIdentifier());
-		}
-		return false;
+        if (paramObject instanceof AbstractSosPhenomenon) {
+            AbstractSosPhenomenon phen = (AbstractSosPhenomenon) paramObject;
+            return identifier.equals(phen.getIdentifier());
+        }
+        return false;
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
-		int hash = 7;
-		hash = 31 * hash + identifier.hashCode();
-		return hash;
+        int hash = 7;
+        hash = 31 * hash + identifier.hashCode();
+        return hash;
     }
 }

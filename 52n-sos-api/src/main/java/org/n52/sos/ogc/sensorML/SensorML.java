@@ -29,53 +29,46 @@
 package org.n52.sos.ogc.sensorML;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
+
+
 
 /**
- * class represents a history of a procedure (sensor)
- * 
+ * SOS internal representation of a sensor description
  */
-public class ProcedureHistory {
+public class SensorML extends AbstractSensorML{
 
-    /** collection containing the history of procedure */
-    private Collection<ProcedureHistoryEvent> history;
+    private String version;
 
-    /**
-     * constructor
-     * 
-     * @param eventCollection
-     *            conatins events of this procedure history
-     */
-    public ProcedureHistory(Collection<ProcedureHistoryEvent> eventCollection) {
-        this.history = eventCollection;
-    }
+    private List<AbstractProcess> members;
 
     /**
-     * constructor for single procedure history event
-     * 
-     * @param event
+     * default constructor
      */
-    public ProcedureHistory(ProcedureHistoryEvent event) {
-        this.history = new ArrayList<ProcedureHistoryEvent>(1);
-        this.history.add(event);
+    public SensorML() {
     }
 
-    /**
-     * Returns the the history events
-     * 
-     * @return the history
-     */
-    public Collection<ProcedureHistoryEvent> getHistory() {
-        return history;
+    public String getVersion() {
+        return version;
     }
 
-    /**
-     * sets the history events
-     * 
-     * @param history
-     *            the history to set
-     */
-    public void setHistory(Collection<ProcedureHistoryEvent> history) {
-        this.history = history;
+    public void setVersion(String version) {
+        this.version = version;
     }
+
+    public List<AbstractProcess> getMembers() {
+        return members;
+    }
+
+    public void setMembers(List<AbstractProcess> members) {
+        this.members = members;
+    }
+
+    public void addMember(AbstractProcess member) {
+        if (members == null) {
+            members = new ArrayList<AbstractProcess>();
+        }
+        members.add(member);
+    }
+
 }

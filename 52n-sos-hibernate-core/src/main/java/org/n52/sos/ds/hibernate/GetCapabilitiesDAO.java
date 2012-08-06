@@ -66,10 +66,10 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.ogc.sos.SosOfferingsForContents;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.SosGetCapabilitiesRequest;
+import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.request.operator.IRequestOperator;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
+import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -131,33 +131,32 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
      * .AbstractSosRequest)
      */
     @Override
-    public SosCapabilities getCapabilities(AbstractServiceRequest request) throws OwsExceptionReport {
+    public GetCapabilitiesResponse getCapabilities(GetCapabilitiesRequest request) throws OwsExceptionReport {
         Session session = null;
         try {
-            SosGetCapabilitiesRequest sosRequest = (SosGetCapabilitiesRequest) request;
+            GetCapabilitiesRequest sosRequest = (GetCapabilitiesRequest) request;
             session = (Session) connectionProvider.getConnection();
-
-            SosCapabilities sosCapabilities = new SosCapabilities();
-            sosCapabilities.setService(SosConstants.SOS);
+            GetCapabilitiesResponse response = new GetCapabilitiesResponse();
+            response.setService(SosConstants.SOS);
             if (request.getVersion() == null) {
                 if (sosRequest.getAcceptVersions() != null) {
                     String[] acceptedVersion = sosRequest.getAcceptVersions();
                     for (int i = 0; i < acceptedVersion.length; i++) {
                         if (Configurator.getInstance().isVersionSupported(acceptedVersion[i])) {
-                            sosCapabilities.setVersion(acceptedVersion[i]);
+                            response.setVersion(acceptedVersion[i]);
                             break;
                         }
                     }
                 } else {
                     for (String supportedVersion : Configurator.getInstance().getSupportedVersions()) {
-                        sosCapabilities.setVersion(supportedVersion);
+                        response.setVersion(supportedVersion);
                         break;
                     }
                 }
             } else {
-                sosCapabilities.setVersion(request.getVersion());
+                response.setVersion(request.getVersion());
             }
-            if (sosCapabilities.getVersion() == null) {
+            if (response.getVersion() == null) {
                 String exceptionText =
                         "The requested '" + SosConstants.GetCapabilitiesParams.AcceptVersions.name()
                                 + "' values are not supported by this service!";
@@ -216,13 +215,14 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
             }
 
             // response with all sections should be created
+            SosCapabilities sosCapabilities = new SosCapabilities();
             if (all) {
-                sosCapabilities.setServiceIdentification(getServiceIdentification(sosCapabilities.getVersion()));
+                sosCapabilities.setServiceIdentification(getServiceIdentification(response.getVersion()));
                 sosCapabilities.setServiceProvider(getServiceProvicer());
-                sosCapabilities.setFilterCapabilities(getFilterCapabilities(sosCapabilities));
-                sosCapabilities.setOperationsMetadata(getOperationsMetadata(sosCapabilities, session));
-                if (sosCapabilities.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
-                    sosCapabilities.setContents(getContentsForSosV2(sosCapabilities, session));
+                sosCapabilities.setFilterCapabilities(getFilterCapabilities(response.getVersion()));
+                sosCapabilities.setOperationsMetadata(getOperationsMetadata(response.getService(), response.getVersion(), session));
+                if (response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
+                    sosCapabilities.setContents(getContentsForSosV2(response.getVersion(), session));
                     sosCapabilities.setExensions(getExtensions());
                 } else {
 
@@ -230,29 +230,30 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                 }
             }
             if (serviceIdentificationSection) {
-                sosCapabilities.setServiceIdentification(getServiceIdentification(sosCapabilities.getVersion()));
+                sosCapabilities.setServiceIdentification(getServiceIdentification(response.getVersion()));
             }
             if (serviceProviderSection) {
                 sosCapabilities.setServiceProvider(getServiceProvicer());
             }
             if (operationsMetadataSection) {
-                sosCapabilities.setOperationsMetadata(getOperationsMetadata(sosCapabilities, session));
+                sosCapabilities.setOperationsMetadata(getOperationsMetadata(response.getService(), response.getVersion(), session));
             }
             if (filter_CapabilitiesSection) {
-                sosCapabilities.setFilterCapabilities(getFilterCapabilities(sosCapabilities));
+                sosCapabilities.setFilterCapabilities(getFilterCapabilities(response.getVersion()));
             }
             if (contentsSection) {
-                if (sosCapabilities.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
-                    sosCapabilities.setContents(getContentsForSosV2(sosCapabilities, session));
+                if (response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
+                    sosCapabilities.setContents(getContentsForSosV2(response.getVersion(), session));
                 } else {
                     sosCapabilities.setContents(getContents(sosCapabilities, session));
                 }
             }
-            if (sosCapabilities.getVersion().equals(Sos2Constants.SERVICEVERSION)
+            if (response.getVersion().equals(Sos2Constants.SERVICEVERSION)
                     && sosRequest.getExtensionArray() != null && sosRequest.getExtensionArray().size() != 0) {
                 sosCapabilities.setExensions(getExtensions());
             }
-            return sosCapabilities;
+            response.setCapabilities(sosCapabilities);
+            return response;
         } catch (HibernateException he) {
             String exceptionText = "Error while querying data for Capabilities document!";
             LOGGER.error(exceptionText, he);
@@ -323,21 +324,21 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    private OWSOperationsMetadata getOperationsMetadata(SosCapabilities sosCapabilities, Session session)
+    private OWSOperationsMetadata getOperationsMetadata(String service, String version, Session session)
             throws OwsExceptionReport {
         OWSOperationsMetadata operationsMetadata = new OWSOperationsMetadata();
         List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>();
 
         Map<RequestOperatorKeyType, IRequestOperator> requestOperators =
                 Configurator.getInstance().getRequestOperator();
-        opsMetadata.add(getOpsGetCapabilities(sosCapabilities, sosCapabilities.getService(),
-                sosCapabilities.getVersion()));
+        opsMetadata.add(getOpsGetCapabilities(service,
+                version));
         for (RequestOperatorKeyType requestOperatorKeyType : requestOperators.keySet()) {
             if (!requestOperatorKeyType.getOperationName().equals(OPERATION_NAME)
                     && requestOperatorKeyType.getServiceOperatorKeyType().getVersion()
-                            .equals(sosCapabilities.getVersion())) {
+                            .equals(version)) {
                 opsMetadata.add(requestOperators.get(requestOperatorKeyType).getOperationMetadata(
-                        sosCapabilities.getService(), sosCapabilities.getVersion(), session));
+                        service, version, session));
             }
         }
         operationsMetadata.setOperations(opsMetadata);
@@ -354,15 +355,15 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
      *            SOS internal capabilities
      * @return FilterCapabilities
      */
-    private FilterCapabilities getFilterCapabilities(SosCapabilities sosCapabilities) {
+    private FilterCapabilities getFilterCapabilities(String version) {
         FilterCapabilities filterCapabilities = new FilterCapabilities();
 
         // !!! Modify methods addicted to your implementation !!!
-        if (sosCapabilities.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
+        if (version.equals(Sos1Constants.SERVICEVERSION)) {
             getScalarFilterCapabilities(filterCapabilities);
         }
-        getSpatialFilterCapabilities(filterCapabilities, sosCapabilities.getVersion());
-        getTemporalFilterCapabilities(filterCapabilities, sosCapabilities.getVersion());
+        getSpatialFilterCapabilities(filterCapabilities, version);
+        getTemporalFilterCapabilities(filterCapabilities, version);
 
         return filterCapabilities;
     }
@@ -475,7 +476,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    private List<SosOfferingsForContents> getContentsForSosV2(SosCapabilities sosCapabilities, Session session)
+    private List<SosOfferingsForContents> getContentsForSosV2(String version, Session session)
             throws OwsExceptionReport {
         List<SosOfferingsForContents> sosOfferings = new ArrayList<SosOfferingsForContents>();
 
@@ -565,7 +566,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                                     .getKRelatedFeaturesVRole().get(relatedFeature));
                         } else {
                             String relatedFeatureID =
-                                    getRelatedFeatureID(relatedFeature, session, sosCapabilities.getVersion());
+                                    getRelatedFeatureID(relatedFeature, session, version);
                             if (relatedFeatureID != null) {
                                 relatedFeatures.put(relatedFeatureID, Configurator.getInstance()
                                         .getCapsCacheController().getKRelatedFeaturesVRole().get(relatedFeature));
@@ -588,20 +589,11 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                 sosOffering.setRelatedFeatures(relatedFeatures);
 
                 // insert observation type and observation result type
-                List<String> observationTypes = new ArrayList<String>(1);
-                Map<String, Collection<String>> observationResultTypes = new HashMap<String, Collection<String>>(1);
-                observationTypes.add(OMConstants.OBS_TYPE_OBSERVATION);
-                List<String> resultTypes = new ArrayList<String>(1);
-                resultTypes.add(OMConstants.OBS_RESULT_TYPE_OBSERVATION);
-                observationResultTypes.put(OMConstants.OBS_TYPE_OBSERVATION, resultTypes);
-                sosOffering.setObservationTypes(observationTypes);
-                sosOffering.setObservationResultTypes(observationResultTypes);
+                sosOffering.setObservationTypes(Configurator.getInstance().getCapsCacheController()
+                        .getObservationTypes4Offering(offering));
 
                 // set response format
                 sosOffering.setResponseFormats(Arrays.asList(Sos2Constants.getResponseFormats()));
-
-                // set response Mode
-                sosOffering.setResponseModes(Arrays.asList(SosConstants.getResponseModes()));
 
                 sosOfferings.add(sosOffering);
             }
@@ -631,7 +623,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
      * @return OperationsMetadata for GetCapabilities
      * @throws OwsExceptionReport
      */
-    private OWSOperation getOpsGetCapabilities(SosCapabilities sosCapabilities, String service, String version)
+    private OWSOperation getOpsGetCapabilities(String service, String version)
             throws OwsExceptionReport {
         OWSOperation opsMeta = new OWSOperation();
         // set operation name
@@ -657,9 +649,9 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         sectionsValues.add(SosConstants.CapabilitiesSections.ServiceIdentification.name());
         sectionsValues.add(SosConstants.CapabilitiesSections.ServiceProvider.name());
         sectionsValues.add(SosConstants.CapabilitiesSections.OperationsMetadata.name());
-        if (sosCapabilities.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
+        if (version.equals(Sos1Constants.SERVICEVERSION)) {
             sectionsValues.add(Sos1Constants.CapabilitiesSections.Filter_Capabilities.name());
-        } else if (sosCapabilities.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
+        } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
             sectionsValues.add(Sos2Constants.CapabilitiesSections.FilterCapabilities.name());
         }
         sectionsValues.add(SosConstants.CapabilitiesSections.Contents.name());

@@ -31,27 +31,22 @@ package org.n52.sos.request.operator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IGetObservationByIdDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.om.SosObservationCollection;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.sos.SosConstants.HelperValues;
-import org.n52.sos.ogc.sos.SosConstants.Operations;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.SosGetObservationByIdRequest;
-import org.n52.sos.response.IServiceResponse;
-import org.n52.sos.response.SosResponse;
+import org.n52.sos.request.GetObservationByIdRequest;
+import org.n52.sos.response.GetObservationByIdResponse;
+import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.OwsHelper;
@@ -92,10 +87,10 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
     }
 
     @Override
-    public IServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
-        if (request instanceof SosGetObservationByIdRequest) {
+    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
+        if (request instanceof GetObservationByIdRequest) {
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
-            SosGetObservationByIdRequest sosRequest = (SosGetObservationByIdRequest) request;
+            GetObservationByIdRequest sosRequest = (GetObservationByIdRequest) request;
             // check parameters with variable content
             try {
                 SosHelper.checkServiceParameter(sosRequest.getService());
@@ -109,15 +104,25 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
                 exceptions.add(owse);
             }
             Util4Exceptions.mergeExceptions(exceptions);
+            
+            boolean zipCompression = false;
+            if (sosRequest.getResponseFormat() == null || (sosRequest.getResponseFormat() != null && sosRequest.getResponseFormat().isEmpty())) {
+                sosRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
+            } else {
+                zipCompression = SosHelper.checkResponseFormatForZipCompression(sosRequest.getResponseFormat());
+                if (zipCompression) {
+                    sosRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2); 
+                }
+            }
 
-            SosObservationCollection obsCollection = this.dao.getObservationById(sosRequest);
-            String version = sosRequest.getVersion();
+            GetObservationByIdResponse response = this.dao.getObservationById(sosRequest);
+            String responseFormat = response.getResponseFormat();
             String contentType = SosConstants.CONTENT_TYPE_XML;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             // XmlOptions xmlOptions;
 
             try {
-                if (obsCollection.getResponseFormat() == null) {
+                if (responseFormat == null) {
                     String exceptionText = "Missing responseFormat definition in GetObservationById response!";
                     LOGGER.error(exceptionText);
                     throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
@@ -125,25 +130,24 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
                 // check SOS version for response encoding
                 StringBuilder namespace = new StringBuilder();
                 // O&M 1.0.0
-                if (obsCollection.getResponseFormat().equals(OMConstants.CONTENT_TYPE_OM)
-                        || obsCollection.getResponseFormat().equals(OMConstants.RESPONSE_FORMAT_OM)) {
-                    namespace.append(obsCollection.getResponseFormat());
+                if (responseFormat.equals(OMConstants.CONTENT_TYPE_OM)
+                        || responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM)) {
+                    namespace.append(responseFormat);
                     // xmlOptions =
                     // SosXmlOptionsUtility.getInstance().getXmlOptions();
                     contentType = OMConstants.CONTENT_TYPE_OM;
                 }
                 // O&M 2.0 non SOS 1.0
                 else if (!request.getVersion().equals(Sos2Constants.SERVICEVERSION)
-                        && (obsCollection.getResponseFormat().equals(OMConstants.CONTENT_TYPE_OM_2) || obsCollection
-                                .getResponseFormat().equals(OMConstants.RESPONSE_FORMAT_OM_2))) {
-                    namespace.append(obsCollection.getResponseFormat());
+                        && (responseFormat.equals(OMConstants.CONTENT_TYPE_OM_2) || responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2))) {
+                    namespace.append(responseFormat);
                     // xmlOptions =
                     // SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200();
                     contentType = OMConstants.CONTENT_TYPE_OM_2;
                 }
                 // O&M 2.0 for SOS 2.0
                 else if (request.getVersion().equals(Sos2Constants.SERVICEVERSION)
-                        && obsCollection.getResponseFormat().equals(OMConstants.RESPONSE_FORMAT_OM_2)) {
+                        && responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2)) {
                     namespace.append(Sos2Constants.NS_SOS_20);
                     // xmlOptions =
                     // SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200();
@@ -155,15 +159,12 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
                 }
                 IEncoder encoder = Configurator.getInstance().getEncoder(namespace.toString());
                 if (encoder != null) {
-                    Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
-                    additionalValues.put(HelperValues.VERSION, version);
-                    additionalValues.put(HelperValues.OPERATION, Operations.GetObservation.name());
-                    Object encodedObject = encoder.encode(obsCollection, additionalValues);
+                    Object encodedObject = encoder.encode(response);
                     if (encodedObject instanceof XmlObject) {
                         ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
-                        return new SosResponse(baos, contentType, false, version, true);
-                    } else if (encodedObject instanceof IServiceResponse) {
-                        return (IServiceResponse) encodedObject;
+                        return new ServiceResponse(baos, contentType, false, true);
+                    } else if (encodedObject instanceof ServiceResponse) {
+                        return (ServiceResponse) encodedObject;
                     } else {
                         String exceptionText = "The encoder response is not supported!";
                         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);

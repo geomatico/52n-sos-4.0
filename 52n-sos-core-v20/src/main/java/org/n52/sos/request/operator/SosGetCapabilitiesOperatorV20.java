@@ -2,9 +2,7 @@ package org.n52.sos.request.operator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IGetCapabilitiesDAO;
@@ -12,15 +10,12 @@ import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.ows.SosCapabilities;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.sos.SosConstants.HelperValues;
-import org.n52.sos.ogc.sos.SosConstants.Operations;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.SosGetCapabilitiesRequest;
-import org.n52.sos.response.IServiceResponse;
-import org.n52.sos.response.SosResponse;
+import org.n52.sos.request.GetCapabilitiesRequest;
+import org.n52.sos.response.GetCapabilitiesResponse;
+import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.Util4Exceptions;
@@ -72,10 +67,10 @@ public class SosGetCapabilitiesOperatorV20 implements IRequestOperator {
      * .AbstractSosRequest)
      */
     @Override
-    public synchronized IServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
-        SosGetCapabilitiesRequest sosRequest;
-        if (request instanceof SosGetCapabilitiesRequest) {
-            sosRequest = (SosGetCapabilitiesRequest) request;
+    public synchronized ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
+        GetCapabilitiesRequest sosRequest;
+        if (request instanceof GetCapabilitiesRequest) {
+            sosRequest = (GetCapabilitiesRequest) request;
             /*
              * getting parameter acceptFormats (optional) boolean zipCompr shows
              * whether the response format should be zip (true) or xml (false)
@@ -86,23 +81,19 @@ public class SosGetCapabilitiesOperatorV20 implements IRequestOperator {
                 zipCompr = checkAcceptFormats(acceptFormats);
             }
 
-            SosCapabilities sosCaps = this.dao.getCapabilities(sosRequest);
-            String version = sosCaps.getVersion();
+            GetCapabilitiesResponse sosCapsResponse = this.dao.getCapabilities(sosRequest);
             String contentType = SosConstants.CONTENT_TYPE_XML;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             // XmlOptions xmlOptions;
             try {
                 IEncoder encoder = Configurator.getInstance().getEncoder(Sos2Constants.NS_SOS_20);
                 if (encoder != null) {
-                    Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
-                    additionalValues.put(HelperValues.VERSION, version);
-                    additionalValues.put(HelperValues.OPERATION, Operations.GetCapabilities.name());
-                    Object encodedObject = encoder.encode(sosCaps, additionalValues);
+                    Object encodedObject = encoder.encode(sosCapsResponse);
                     if (encodedObject instanceof XmlObject) {
                         ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
-                        return new SosResponse(baos, contentType, false, version, true);
-                    } else if (encodedObject instanceof IServiceResponse) {
-                        return (IServiceResponse) encodedObject;
+                        return new ServiceResponse(baos, contentType, false, true);
+                    } else if (encodedObject instanceof ServiceResponse) {
+                        return (ServiceResponse) encodedObject;
                     } else {
                         String exceptionText = "The encoder response is not supported!";
                         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);

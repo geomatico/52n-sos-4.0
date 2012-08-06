@@ -28,8 +28,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.sos.SosSoapConstants;
-import org.n52.sos.response.IServiceResponse;
-import org.n52.sos.response.SosResponse;
+import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.soap.SoapFault;
 import org.n52.sos.soap.SoapHeader;
@@ -43,7 +42,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-public class SoapEncoder implements IEncoder<IServiceResponse, SoapResponse> {
+public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
 
     /** the logger, used to log exceptions and additonaly information */
     private static Logger LOGGER = Logger.getLogger(SoapEncoder.class);
@@ -73,12 +72,12 @@ public class SoapEncoder implements IEncoder<IServiceResponse, SoapResponse> {
     }
 
     @Override
-    public IServiceResponse encode(SoapResponse response) throws OwsExceptionReport {
+    public ServiceResponse encode(SoapResponse response) throws OwsExceptionReport {
         return encode(response, null);
     }
 
     @Override
-    public IServiceResponse encode(SoapResponse response, Map<HelperValues, String> additionalValues)
+    public ServiceResponse encode(SoapResponse response, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
         SoapResponse soapResponse = (SoapResponse) response;
         String soapVersion = soapResponse.getSoapVersion();
@@ -127,8 +126,8 @@ public class SoapEncoder implements IEncoder<IServiceResponse, SoapResponse> {
             }
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             soapResponseMessage.writeTo(baos);
-            return new SosResponse(baos, SosConstants.CONTENT_TYPE_XML, soapResponse.getSoapBodyContent()
-                    .getApplyGzipCompression(), null, true);
+            return new ServiceResponse(baos, SosConstants.CONTENT_TYPE_XML, soapResponse.getSoapBodyContent()
+                    .getApplyGzipCompression(), true);
         } catch (SOAPException soape) {
             String exceptionText = "Error while encoding SOAPMessage!";
             LOGGER.debug(exceptionText, soape);
@@ -150,7 +149,7 @@ public class SoapEncoder implements IEncoder<IServiceResponse, SoapResponse> {
      * @throws SOAPException
      *             if an error occurs.
      */
-    private String createSOAPBody(SOAPMessage soapResponseMessage, IServiceResponse sosResponse, String actionURI)
+    private String createSOAPBody(SOAPMessage soapResponseMessage, ServiceResponse sosResponse, String actionURI)
             throws SOAPException {
         try {
             if (sosResponse != null) {

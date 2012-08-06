@@ -30,93 +30,86 @@ package org.n52.sos.request;
 
 import java.util.List;
 
-import org.n52.sos.ogc.filter.TemporalFilter;
+import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.operator.RequestOperatorKeyType;
 
 /**
- * SOS DescribeSensor request
+ * SOS InsertObservation request
  * 
  */
-public class SosDescribeSensorRequest extends AbstractServiceRequest {
+public class InsertObservationRequest extends AbstractServiceRequest {
 
 	/**
-	 * DescribeSensor operation name
+	 * InsertObservation operation name
 	 */
-	private final String operationName = SosConstants.Operations.DescribeSensor
+	private final String operationName = SosConstants.Operations.InsertObservation
 			.name();
 
 	/**
-	 * Procedure identifier
+	 * Assigned sensor id
 	 */
-	private String procedure;
+	private String assignedSensorId;
 
 	/**
-	 * Output format
+	 * SOS observation collection with observations to insert
 	 */
-	private String outputFormat;
+	private List<SosObservation> observations;
 
+	public InsertObservationRequest() {
+	    
+	}
+	
 	/**
-	 * Temporal filters
-	 */
-	protected List<TemporalFilter> times;
-
-	/**
-	 * Get output format
+	 * constructor
 	 * 
-	 * @return output format
+	 * @param assignedSensorId
+	 *            assigned sensor id
+	 * @param observations
+	 *            Observations to insert
 	 */
-	public String getOutputFormat() {
-		return outputFormat;
+	public InsertObservationRequest(String assignedSensorId,
+	        List<SosObservation> observations) {
+		this.assignedSensorId = assignedSensorId;
+		this.observations = observations;
 	}
 
 	/**
-	 * Set output format
+	 * Get assigned sensor id
 	 * 
-	 * @param outputFormat
-	 *            output format
+	 * @return assigned sensor id
 	 */
-	public void setOutputFormat(String outputFormat) {
-		this.outputFormat = outputFormat;
+	public String getAssignedSensorId() {
+		return assignedSensorId;
 	}
 
 	/**
-	 * Get Procedure identifier
+	 * Set assigned sensor id
 	 * 
-	 * @return Procedure identifier
+	 * @param assignedSensorId
+	 *            assigned sensor id
 	 */
-	public String getProcedure() {
-		return procedure;
+	public void setAssignedSensorId(String assignedSensorId) {
+		this.assignedSensorId = assignedSensorId;
 	}
 
 	/**
-	 * Set Procedure identifier
+	 * Get observations to insert
 	 * 
-	 * @param procedure
-	 *            Procedure identifier
+	 * @return observations to insert
 	 */
-	public void setProcedures(String procedure) {
-		this.procedure = procedure;
+	public List<SosObservation> getObservation() {
+		return observations;
 	}
 
 	/**
-	 * Get temporal filters
+	 * Set observations to insert
 	 * 
-	 * @return temporal filters
+	 * @param observation
+	 *            observations to insert
 	 */
-	public List<TemporalFilter> getTime() {
-		return times;
-	}
-
-	/**
-	 * Set temporal filters
-	 * 
-	 * @param time
-	 *            temporal filters
-	 */
-	public void setTime(List<TemporalFilter> time) {
-		this.times = time;
+	public void setObservation(List<SosObservation> observation) {
+		this.observations = observation;
 	}
 
 	/*

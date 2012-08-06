@@ -31,10 +31,7 @@ package org.n52.sos.request.operator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IDescribeSensorDAO;
@@ -43,16 +40,14 @@ import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
-import org.n52.sos.ogc.sensorML.SosSensorML;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.sos.SosConstants.HelperValues;
-import org.n52.sos.ogc.sos.SosConstants.Operations;
+import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.SosDescribeSensorRequest;
-import org.n52.sos.response.IServiceResponse;
-import org.n52.sos.response.SosResponse;
+import org.n52.sos.request.DescribeSensorRequest;
+import org.n52.sos.response.DescribeSensorResponse;
+import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.SosHelper;
@@ -98,14 +93,14 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
      * .AbstractSosRequest)
      */
     @Override
-    public synchronized IServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
+    public synchronized ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
 
         boolean applyZIPcomp = false;
         String version = "";
 
-        if (request instanceof SosDescribeSensorRequest) {
+        if (request instanceof DescribeSensorRequest) {
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
-            SosDescribeSensorRequest descSensRequest = (SosDescribeSensorRequest) request;
+            DescribeSensorRequest descSensRequest = (DescribeSensorRequest) request;
             version = descSensRequest.getVersion();
             String procedureID = descSensRequest.getProcedure();
             String outputFormat = descSensRequest.getOutputFormat();
@@ -127,44 +122,22 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
                 applyZIPcomp = true;
             }
 
-            SosSensorML smlDesc = this.dao.getSensorMLDescription(descSensRequest);
-            Collection<String> parentProcedureIds =
-                    Configurator.getInstance().getCapsCacheController()
-                            .getParentProcedures(descSensRequest.getProcedure(), false, false);
-            Collection<String> childProcedureIds =
-                    Configurator.getInstance().getCapsCacheController()
-                            .getChildProcedures(descSensRequest.getProcedure(), false, false);
-            Map<String, SosSensorML> childProcedures = new HashMap<String, SosSensorML>(childProcedureIds.size());
-            if (childProcedureIds != null && childProcedureIds.size() > 0) {
-                for (String childProcedureId : childProcedureIds) {
-                    SosDescribeSensorRequest childRequest = new SosDescribeSensorRequest();
-                    childRequest.setProcedures(childProcedureId);
-                    childRequest.setOutputFormat(descSensRequest.getOutputFormat());
-                    childRequest.setService(descSensRequest.getService());
-                    childRequest.setVersion(descSensRequest.getVersion());
-                    childRequest.setTime(descSensRequest.getTime());
-                    childProcedures.put(childProcedureId, this.dao.getSensorMLDescription(childRequest));
-                }
-            }
-            smlDesc.setParentProcedureIDs(parentProcedureIds);
-            smlDesc.setChildProcedures(childProcedures);
+            DescribeSensorResponse response = this.dao.getSensorDescription(descSensRequest);
             String contentType = SosConstants.CONTENT_TYPE_XML;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            contentType = SensorMLConstants.SENSORML_CONTENT_TYPE;
-            // XmlOptions xmlOptions;
+            
 
             try {
                 String namespace;
                 // check SOS version for response encoding
-                if (outputFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
-                    namespace = outputFormat;
-                    // xmlOptions =
-                    // SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200();
-
-                } else if (outputFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
+                if (response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
+                    namespace = SWEConstants.NS_SWES_20;
+                } else if (response.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
                     namespace = SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL;
-                    // xmlOptions =
-                    // SosXmlOptionsUtility.getInstance().getXmlOptions();
+                    if (outputFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE) || outputFormat
+                                .equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
+                        contentType = SensorMLConstants.SENSORML_CONTENT_TYPE;
+                    }
                 } else {
                     String exceptionText = "Received version in request is not supported!";
                     LOGGER.debug(exceptionText);
@@ -173,15 +146,12 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
                 }
                 IEncoder encoder = Configurator.getInstance().getEncoder(namespace);
                 if (encoder != null) {
-                    Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
-                    additionalValues.put(HelperValues.VERSION, version);
-                    additionalValues.put(HelperValues.OPERATION, Operations.DescribeSensor.name());
-                    Object encodedObject = encoder.encode(smlDesc, additionalValues);
+                    Object encodedObject = encoder.encode(response);
                     if (encodedObject instanceof XmlObject) {
                         ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
-                        return new SosResponse(baos, contentType, false, version, true);
-                    } else if (encodedObject instanceof IServiceResponse) {
-                        return (IServiceResponse) encodedObject;
+                        return new ServiceResponse(baos, contentType, false, true);
+                    } else if (encodedObject instanceof ServiceResponse) {
+                        return (ServiceResponse) encodedObject;
                     } else {
                         String exceptionText = "The encoder response is not supported!";
                         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);

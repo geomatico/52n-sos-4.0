@@ -46,7 +46,7 @@ import org.n52.sos.request.operator.RequestOperatorKeyType;
  * SOS GetObservation request
  * 
  */
-public class SosGetObservationRequest extends AbstractServiceRequest {
+public class GetObservationRequest extends AbstractServiceRequest {
 
 	/**
 	 * GetObservation operation name
@@ -119,7 +119,7 @@ public class SosGetObservationRequest extends AbstractServiceRequest {
 	/**
 	 * constructor
 	 */
-	public SosGetObservationRequest() {
+	public GetObservationRequest() {
 		String notSet = SosConstants.PARAMETER_NOT_SET;
 		srid = -1;
 		/*
@@ -392,8 +392,8 @@ public class SosGetObservationRequest extends AbstractServiceRequest {
 	 *            defined observableProperties
 	 * @return SOS GetObservation request copy
 	 */
-	public SosGetObservationRequest copyOf(List<String> obsProps) {
-		SosGetObservationRequest res = new SosGetObservationRequest();
+	public GetObservationRequest copyOf(List<String> obsProps) {
+		GetObservationRequest res = new GetObservationRequest();
 		res.setEventTimes(this.eventTimes);
 		res.setObservedProperties(obsProps);
 		res.setOfferings(this.offerings);

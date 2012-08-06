@@ -41,7 +41,7 @@ import org.n52.sos.service.operator.ServiceOperatorKeyType;
  * SOS GetCapabilities request
  * 
  */
-public class SosGetCapabilitiesRequest extends AbstractServiceRequest {
+public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * GetCapabilities operation name
@@ -76,7 +76,7 @@ public class SosGetCapabilitiesRequest extends AbstractServiceRequest {
     /**
      * constructor
      */
-    public SosGetCapabilitiesRequest() {
+    public GetCapabilitiesRequest() {
         String notSet = SosConstants.PARAMETER_NOT_SET;
         setService(SosConstants.SOS);
         updateSequence = notSet;

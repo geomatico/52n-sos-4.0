@@ -50,425 +50,424 @@ import org.n52.sos.util.SosHelper;
  */
 public class CapabilitiesCache extends ACapabilitiesCache {
 
-	/**
-	 * contains the supported ids of SRS, which are supported by this SOS
-	 * instance
-	 */
-	private Collection<Integer> srids;
+    /**
+     * contains the supported ids of SRS, which are supported by this SOS
+     * instance
+     */
+    private Collection<Integer> srids;
 
-	/** contains the procedure IDs offered in the database */
-	private List<String> procedures;
+    /** contains the procedure IDs offered in the database */
+    private List<String> procedures;
 
-	/** contains the feature IDs offered in the database */
-	private Collection<String> allFeatures;
-	
-	/** contains the procedure IDs offered in the database */
-	private Collection<String> featuresOfInterest;
+    /** contains the feature IDs offered in the database */
+    private Collection<String> allFeatures;
 
-	/** contains the observation IDs offered in the database */
-	private Collection<String> obsIds;
+    /** contains the procedure IDs offered in the database */
+    private Collection<String> featuresOfInterest;
 
-	/** hash map containing the phenomenons for each offering */
-	private Map<String, Collection<String>> offPhenomenons;
+    /** contains the observation IDs offered in the database */
+    private Collection<String> obsIds;
 
-	/** hash map containing the name for each offering */
-	private Map<String, String> offName;
+    /** hash map containing the phenomenons for each offering */
+    private Map<String, Collection<String>> offPhenomenons;
 
-	/** hash map containing the name for each offering */
-	private Map<String, Collection<String>> offResultModels;
+    /** hash map containing the name for each offering */
+    private Map<String, String> offName;
 
-	/** hash map containing the procedures for each offering */
-	private Map<String, Collection<String>> offProcedures;
+    /** hash map containing the name for each offering */
+    private Map<String, Collection<String>> offferingObservationTypes;
 
-	/** hash map containing the features of interest for each offering */
-	private Map<String, Collection<String>> offFeatures;
+    /** hash map containing the procedures for each offering */
+    private Map<String, Collection<String>> offProcedures;
 
-	/** hash map containing the procedures for each feature of interest */
-	private Map<String, Collection<String>> foiProcedures;
+    /** hash map containing the features of interest for each offering */
+    private Map<String, Collection<String>> offFeatures;
 
-	/** hash map containing the units of the values for each observedProperties */
-	private Map<String, ValueTypes> obsPropsValueTypes;
+    /** hash map containing the procedures for each feature of interest */
+    private Map<String, Collection<String>> foiProcedures;
 
-	/**
-	 * hash map containing the phenomenon components of each compositePhenomenon
-	 */
-	private Map<String, Collection<String>> phens4CompPhens;
+    /** hash map containing the units of the values for each observedProperties */
+    private Map<String, ValueTypes> obsPropsValueTypes;
 
-	/**
-	 * hash map containing the offering IDs as keys and the corresponding
-	 * composite phenomena ids as values
-	 */
-	private Map<String, Collection<String>> offCompPhens;
-	
+    /**
+     * hash map containing the phenomenon components of each compositePhenomenon
+     */
+    private Map<String, Collection<String>> phens4CompPhens;
+
+    /**
+     * hash map containing the offering IDs as keys and the corresponding
+     * composite phenomena ids as values
+     */
+    private Map<String, Collection<String>> offCompPhens;
+
     /** hash map containing parent procedures for each procedure */
     private Map<String, Collection<String>> parentProcs;
 
     /** hash map containing child procedures for each procedure */
     private Map<String, Collection<String>> childProcs;
 
-	/** hash map containing the corresponding phenomena for each procedure */
-	private Map<String, Collection<String>> procPhens;
+    /** hash map containing the corresponding phenomena for each procedure */
+    private Map<String, Collection<String>> procPhens;
 
-	/** hash map containing the offerings(values) for each procedure (key) */
-	private Map<String, Collection<String>> procOffs;
-	
-	private Map<String, Collection<String>> parentFeatures;
-	 
+    /** hash map containing the offerings(values) for each procedure (key) */
+    private Map<String, Collection<String>> procOffs;
+
+    private Map<String, Collection<String>> parentFeatures;
+
     private Map<String, Collection<String>> childFeatures;
 
-	/**
-	 * hash map containing the phenomenon IDs as keys and the corresponding
-	 * procedure ids as values
-	 */
-	private Map<String, Collection<String>> phenProcs;
+    /**
+     * hash map containing the phenomenon IDs as keys and the corresponding
+     * procedure ids as values
+     */
+    private Map<String, Collection<String>> phenProcs;
 
-	/** map contains the offerings for each phenomenon */
-	private Map<String, Collection<String>> phenOffs;
+    /** map contains the offerings for each phenomenon */
+    private Map<String, Collection<String>> phenOffs;
 
-	private Map<String, String[]> times4Offerings;
+    private Map<String, String[]> times4Offerings;
 
-	/** contains the unit (value) for each phenomenon (key) */
-	private Map<String, String> unit4Phen;
+    /** contains the unit (value) for each phenomenon (key) */
+    private Map<String, String> unit4Phen;
 
-	/** EPSG code of coordinates contained in the database */
-	private int srid;
+    /** EPSG code of coordinates contained in the database */
+    private int srid;
 
-	/** hash map containing the related features for each offering */
-	private Map<String, Collection<String>> offRelatedFeatures;
-	
-	/** hash map containing the roles for each  related feature */
-	private Map<String, Collection<String>> kRelatedFeatureVRole;
+    /** hash map containing the related features for each offering */
+    private Map<String, Collection<String>> offRelatedFeatures;
 
-	/**
-	 * constructor
-	 * 
-	 * @throws OwsExceptionReport
-	 */
-	public CapabilitiesCache() {
-		super();
-	}
+    /** hash map containing the roles for each related feature */
+    private Map<String, Collection<String>> kRelatedFeatureVRole;
 
-	/**
-	 * returns
-	 * 
-	 * @return
-	 */
-	protected Map<String, ValueTypes> getValueTypes4ObsProps() {
-		return this.obsPropsValueTypes;
-	}
+    /**
+     * constructor
+     * 
+     * @throws OwsExceptionReport
+     */
+    public CapabilitiesCache() {
+        super();
+    }
 
-	/**
-	 * Returns the observedProperties (phenomenons) for the requested offering
-	 * 
-	 * @param offering
-	 *            the offering for which observedProperties should be returned
-	 * @return Returns String[] containing the phenomenons of the requested
-	 *         offering
-	 */
-	protected Collection<String> getPhenomenons4Offering(String offering) {
-		return this.offPhenomenons.get(offering);
-	}
+    /**
+     * returns
+     * 
+     * @return
+     */
+    protected Map<String, ValueTypes> getValueTypes4ObsProps() {
+        return this.obsPropsValueTypes;
+    }
 
-	/**
-	 * methods returns all phenomena (single or components of composite
-	 * phenomena) which belong to the requested offering; necessary for database
-	 * queries
-	 * 
-	 * @param offering
-	 *            the id of the offering for which all phenomena should be
-	 *            returned
-	 * @return List<String> containing all phenomena which belong to the
-	 *         offering
-	 */
-	protected Collection<String> getAllPhenomenons4Offering(String offering) {
-		List<String> result = new ArrayList<String>();
+    /**
+     * Returns the observedProperties (phenomenons) for the requested offering
+     * 
+     * @param offering
+     *            the offering for which observedProperties should be returned
+     * @return Returns String[] containing the phenomenons of the requested
+     *         offering
+     */
+    protected Collection<String> getPhenomenons4Offering(String offering) {
+        return this.offPhenomenons.get(offering);
+    }
 
-		// single phenomena
-		if (this.offPhenomenons.containsKey(offering)) {
+    /**
+     * methods returns all phenomena (single or components of composite
+     * phenomena) which belong to the requested offering; necessary for database
+     * queries
+     * 
+     * @param offering
+     *            the id of the offering for which all phenomena should be
+     *            returned
+     * @return List<String> containing all phenomena which belong to the
+     *         offering
+     */
+    protected Collection<String> getAllPhenomenons4Offering(String offering) {
+        List<String> result = new ArrayList<String>();
 
-			result.addAll(this.offPhenomenons.get(offering));
+        // single phenomena
+        if (this.offPhenomenons.containsKey(offering)) {
 
-			// components of composite phenomena
-			if (this.offCompPhens.containsKey(offering)) {
-				Collection<String> compPhens = this.offCompPhens.get(offering);
-				for (String cp : compPhens) {
-					if (this.phens4CompPhens.containsKey(cp)) {
-						result.addAll(this.phens4CompPhens.get(cp));
-					}
-				}
+            result.addAll(this.offPhenomenons.get(offering));
 
-			}
-		}
+            // components of composite phenomena
+            if (this.offCompPhens.containsKey(offering)) {
+                Collection<String> compPhens = this.offCompPhens.get(offering);
+                for (String cp : compPhens) {
+                    if (this.phens4CompPhens.containsKey(cp)) {
+                        result.addAll(this.phens4CompPhens.get(cp));
+                    }
+                }
 
-		// only components of composite phenomena
-		else {
-			if (this.offCompPhens.containsKey(offering)) {
-				Collection<String> compPhens = this.offCompPhens.get(offering);
-				for (String cp : compPhens) {
-					if (this.phens4CompPhens.containsKey(cp)) {
-						result.addAll(this.phens4CompPhens.get(cp));
-					}
-				}
+            }
+        }
 
-			}
-		}
-		return result;
-	}
+        // only components of composite phenomena
+        else {
+            if (this.offCompPhens.containsKey(offering)) {
+                Collection<String> compPhens = this.offCompPhens.get(offering);
+                for (String cp : compPhens) {
+                    if (this.phens4CompPhens.containsKey(cp)) {
+                        result.addAll(this.phens4CompPhens.get(cp));
+                    }
+                }
 
-	/**
-	 * Returns the phenomenons of all offerings
-	 * 
-	 * @return List<String> containing the phenomenons of all offerings
-	 */
-	protected Collection<String> getAllPhenomenons() {
-		List<String> phenomenons = new ArrayList<String>();
-		for (String s : this.offName.keySet()) {
+            }
+        }
+        return result;
+    }
 
-			// get single phenomena
-			if (this.offPhenomenons.containsKey(s)) {
-				Collection<String> phen = this.offPhenomenons.get(s);
-				for (String p : phen) {
-					if (!phenomenons.contains(p)) {
-						phenomenons.add(p);
-					}
-				}
-			}
+    /**
+     * Returns the phenomenons of all offerings
+     * 
+     * @return List<String> containing the phenomenons of all offerings
+     */
+    protected Collection<String> getAllPhenomenons() {
+        List<String> phenomenons = new ArrayList<String>();
+        for (String s : this.offName.keySet()) {
 
-			// // get composite phenomena
-			// if (this.offCompPhens.containsKey(s)) {
-			// Collection<String> phen = this.offCompPhens.get(s);
-			// for (String p : phen) {
-			//
-			// // add id of the composite phenomenon to the result
-			// if (!phenomenons.contains(p)) {
-			// phenomenons.add(p);
-			// }
-			//
-			// // add components of composite phenomenon to the result
-			// if (phens4CompPhens.containsKey(p)) {
-			//
-			// Collection<String> components = phens4CompPhens.get(p);
-			// for (String phenComp : components) {
-			// if (!phenomenons.contains(phenComp)) {
-			// phenomenons.add(phenComp);
-			// }
-			// }
-			//
-			// }
-			// }
-			// }
-		}
-		return phenomenons;
-	}
+            // get single phenomena
+            if (this.offPhenomenons.containsKey(s)) {
+                Collection<String> phen = this.offPhenomenons.get(s);
+                for (String p : phen) {
+                    if (!phenomenons.contains(p)) {
+                        phenomenons.add(p);
+                    }
+                }
+            }
 
-	/**
-	 * returns the offerings of this SOS
-	 * 
-	 * @return List<String> containing the offerings of this SOS
-	 */
-	protected Collection<String> getOfferings() {
-		if (this.offName != null) {
-			return this.offName.keySet();
-		}
-		return new ArrayList<String>();
-	}
+            // // get composite phenomena
+            // if (this.offCompPhens.containsKey(s)) {
+            // Collection<String> phen = this.offCompPhens.get(s);
+            // for (String p : phen) {
+            //
+            // // add id of the composite phenomenon to the result
+            // if (!phenomenons.contains(p)) {
+            // phenomenons.add(p);
+            // }
+            //
+            // // add components of composite phenomenon to the result
+            // if (phens4CompPhens.containsKey(p)) {
+            //
+            // Collection<String> components = phens4CompPhens.get(p);
+            // for (String phenComp : components) {
+            // if (!phenomenons.contains(phenComp)) {
+            // phenomenons.add(phenComp);
+            // }
+            // }
+            //
+            // }
+            // }
+            // }
+        }
+        return phenomenons;
+    }
 
-	/**
-	 * returns the observation ids of this SOS
-	 * 
-	 * @return List<String> containing the observation ids of this SOS
-	 */
-	protected Collection<String> getObservationIds() {
-		return this.obsIds;
-	}
+    /**
+     * returns the offerings of this SOS
+     * 
+     * @return List<String> containing the offerings of this SOS
+     */
+    protected Collection<String> getOfferings() {
+        if (this.offName != null) {
+            return this.offName.keySet();
+        }
+        return new ArrayList<String>();
+    }
 
-	/**
-	 * returns the observation ids of this SOS
-	 * 
-	 * @return List<String> containing the observation ids of this SOS
-	 */
-	protected Collection<String> getObsIds() {
-		return obsIds;
-	}
+    /**
+     * returns the observation ids of this SOS
+     * 
+     * @return List<String> containing the observation ids of this SOS
+     */
+    protected Collection<String> getObservationIds() {
+        return this.obsIds;
+    }
 
-	/**
-	 * returns relationships between offerings and phenomena
-	 * 
-	 * @return
-	 */
-	protected Map<String, Collection<String>> getOffPhenomenons() {
-		return offPhenomenons;
-	}
+    /**
+     * returns the observation ids of this SOS
+     * 
+     * @return List<String> containing the observation ids of this SOS
+     */
+    protected Collection<String> getObsIds() {
+        return obsIds;
+    }
 
-	/**
-	 * returns relationships between names and offerings
-	 * 
-	 * @return
-	 */
-	protected Map<String, String> getOffName() {
-		return offName;
-	}
+    /**
+     * returns relationships between offerings and phenomena
+     * 
+     * @return
+     */
+    protected Map<String, Collection<String>> getOffPhenomenons() {
+        return offPhenomenons;
+    }
 
-	/**
-	 * returns relationships between offerings and result models
-	 * 
-	 * @return
-	 */
-	protected Map<String, Collection<String>> getOffResultModels() {
-		return offResultModels;
-	}
+    /**
+     * returns relationships between names and offerings
+     * 
+     * @return
+     */
+    protected Map<String, String> getOffName() {
+        return offName;
+    }
 
-	/**
-	 * returns relationships between offerings and procedures
-	 * 
-	 * @return
-	 */
-	protected Map<String, Collection<String>> getOffProcedures() {
-		return offProcedures;
-	}
+    /**
+     * returns relationships between offerings and result models
+     * 
+     * @return
+     */
+    protected Map<String, Collection<String>> getKOfferingVObservationTypes() {
+        return offferingObservationTypes;
+    }
 
-	/**
-	 * returns the units for phenomena
-	 * 
-	 * @return the units related to phenomenon
-	 */
-	protected Map<String, String> getUnit4Phen() {
-		return unit4Phen;
-	}
+    /**
+     * returns relationships between offerings and procedures
+     * 
+     * @return
+     */
+    protected Map<String, Collection<String>> getOffProcedures() {
+        return offProcedures;
+    }
 
-	/**
-	 * returns the value types for phenomena
-	 * 
-	 * @return value types related to phenomena
-	 */
-	protected Map<String, ValueTypes> getObsPropsValueTypes() {
-		return obsPropsValueTypes;
-	}
+    /**
+     * returns the units for phenomena
+     * 
+     * @return the units related to phenomenon
+     */
+    protected Map<String, String> getUnit4Phen() {
+        return unit4Phen;
+    }
 
-	/**
-	 * returns the observedProperties for each offering
-	 * 
-	 * @return Map<String, String[]> containing the offerings with its
-	 *         observedProperties
-	 */
-	protected Map<String, Collection<String>> getObsPhenomenons() {
-		return offPhenomenons;
-	}
+    /**
+     * returns the value types for phenomena
+     * 
+     * @return value types related to phenomena
+     */
+    protected Map<String, ValueTypes> getObsPropsValueTypes() {
+        return obsPropsValueTypes;
+    }
 
-	/**
-	 * returns the name of the requested offering
-	 * 
-	 * @param offering
-	 *            the offering for which the name should be returned
-	 * @return String containing the name of the offering
-	 */
-	protected String getOfferingName(String offering) {
-		return this.offName.get(offering);
-	}
+    /**
+     * returns the observedProperties for each offering
+     * 
+     * @return Map<String, String[]> containing the offerings with its
+     *         observedProperties
+     */
+    protected Map<String, Collection<String>> getObsPhenomenons() {
+        return offPhenomenons;
+    }
 
-	/**
-	 * 
-	 * 
-	 * @return Returns ListString containing all procedures which are used by
-	 *         the Offerings offered in this SOS
-	 */
-	protected List<String> getProcedures() {
-		return procedures;
-	}
+    /**
+     * returns the name of the requested offering
+     * 
+     * @param offering
+     *            the offering for which the name should be returned
+     * @return String containing the name of the offering
+     */
+    protected String getOfferingName(String offering) {
+        return this.offName.get(offering);
+    }
 
-	/**
-	 * return the result models for the requested offering
-	 * 
-	 * @param offering
-	 *            the offering for which the result models should be returned
-	 * @return String[] containing the result models for the requested offering
-	 */
-	protected Collection<String> getResultModels4Offering(String offering) {
-		return this.offResultModels.get(offering);
-	}
+    /**
+     * 
+     * 
+     * @return Returns ListString containing all procedures which are used by
+     *         the Offerings offered in this SOS
+     */
+    protected List<String> getProcedures() {
+        return procedures;
+    }
 
-	/**
-	 * returns the procedures for the requested offering
-	 * 
-	 * @param offering
-	 *            the offering for which the procedures should be returned
-	 * @return String[] containing the procedures for the requested offering
-	 */
-	protected Collection<String> getProcedures4Offering(String offering) {
-		return this.offProcedures.get(offering);
-	}
+    /**
+     * return the result models for the requested offering
+     * 
+     * @param offering
+     *            the offering for which the result models should be returned
+     * @return String[] containing the result models for the requested offering
+     */
+    protected Collection<String> getObservationTypes4Offering(String offering) {
+        return this.offferingObservationTypes.get(offering);
+    }
 
-	/**
-	 * returns the procedureID for the feature of interest (station)
-	 * 
-	 * @param foiID
-	 *            the foiID for which the procedureID should returned
-	 * @return String representing the procedureID
-	 */
-	protected Collection<String> getProc4FOI(String foiID) {
-		return this.foiProcedures.get(foiID);
-	}
+    /**
+     * returns the procedures for the requested offering
+     * 
+     * @param offering
+     *            the offering for which the procedures should be returned
+     * @return String[] containing the procedures for the requested offering
+     */
+    protected Collection<String> getProcedures4Offering(String offering) {
+        return this.offProcedures.get(offering);
+    }
 
-	/**
-	 * returns the foiProcedures
-	 * 
-	 * @return Map<String, List<String>> foiProcedures
-	 */
-	protected Map<String, Collection<String>> getFoiProcedures() {
-		return foiProcedures;
-	}
+    /**
+     * returns the procedureID for the feature of interest (station)
+     * 
+     * @param foiID
+     *            the foiID for which the procedureID should returned
+     * @return String representing the procedureID
+     */
+    protected Collection<String> getProc4FOI(String foiID) {
+        return this.foiProcedures.get(foiID);
+    }
 
-	/**
-	 * return the unit of the values for the observedProperty
-	 * 
-	 * @param observedProperty
-	 *            String observedProperty for which the type of the values
-	 *            should be returned
-	 * @return String representing the valueType of the values for the
-	 *         observedProperty
-	 */
-	protected String getUnit4ObsProp(String observedProperty) {
-		return this.unit4Phen.get(observedProperty);
-	}
+    /**
+     * returns the foiProcedures
+     * 
+     * @return Map<String, List<String>> foiProcedures
+     */
+    protected Map<String, Collection<String>> getFoiProcedures() {
+        return foiProcedures;
+    }
 
-	/**
-	 * @return Returns all features
-	 */
-	protected Collection<String> getAllFeature() {
-		return allFeatures;
-	}
+    /**
+     * return the unit of the values for the observedProperty
+     * 
+     * @param observedProperty
+     *            String observedProperty for which the type of the values
+     *            should be returned
+     * @return String representing the valueType of the values for the
+     *         observedProperty
+     */
+    protected String getUnit4ObsProp(String observedProperty) {
+        return this.unit4Phen.get(observedProperty);
+    }
 
-	/**
-	 * @return Returns only FOIs which are sampling features
-	 */
-	protected Collection<String> getFeatureOfInterest() {
-		return featuresOfInterest;
-	}
-	
+    /**
+     * @return Returns all features
+     */
+    protected Collection<String> getAllFeature() {
+        return allFeatures;
+    }
 
-	/**
-	 * @return Returns the phens4CompPhens.
-	 */
-	protected Map<String, Collection<String>> getPhens4CompPhens() {
-		return phens4CompPhens;
-	}
+    /**
+     * @return Returns only FOIs which are sampling features
+     */
+    protected Collection<String> getFeatureOfInterest() {
+        return featuresOfInterest;
+    }
 
-	/**
-	 * @return Returns the offCompPhens.
-	 */
-	protected Map<String, Collection<String>> getOffCompPhens() {
-		return offCompPhens;
-	}
+    /**
+     * @return Returns the phens4CompPhens.
+     */
+    protected Map<String, Collection<String>> getPhens4CompPhens() {
+        return phens4CompPhens;
+    }
 
-	/**
-	 * @return Returns the phenProcs.
-	 */
-	protected Map<String, Collection<String>> getPhenProcs() {
-		return phenProcs;
-	}
-	
-	/**
-     * returns parent procedure map 
+    /**
+     * @return Returns the offCompPhens.
+     */
+    protected Map<String, Collection<String>> getOffCompPhens() {
+        return offCompPhens;
+    }
+
+    /**
+     * @return Returns the phenProcs.
+     */
+    protected Map<String, Collection<String>> getPhenProcs() {
+        return phenProcs;
+    }
+
+    /**
+     * returns parent procedure map
      * 
      * @return Returns the parentProcs.
      */
@@ -485,9 +484,9 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     protected void setParentProcs(Map<String, Collection<String>> parentProcs) {
         this.parentProcs = parentProcs;
     }
-    
+
     /**
-     * returns child procedure map 
+     * returns child procedure map
      * 
      * @return Returns the childProcs.
      */
@@ -506,34 +505,35 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     }
 
     /**
-     * sets the parent procedure map, then inverts it and sets child procedure map
+     * sets the parent procedure map, then inverts it and sets child procedure
+     * map
      * 
      * @param parentProcs
      *            The parentProcs map to set.
      */
     public void setProcedureHierarchies(Map<String, Collection<String>> parentProcs) {
         this.parentProcs = parentProcs;
-        this.childProcs = SosHelper.invertHierarchy( parentProcs );
+        this.childProcs = SosHelper.invertHierarchy(parentProcs);
     }
 
-	/**
-	 * sets the observation ids
-	 * 
-	 * @param obsIds
-	 */
-	public void setObsIds(Collection<String> obsIds) {
-		this.obsIds = obsIds;
-	}
+    /**
+     * sets the observation ids
+     * 
+     * @param obsIds
+     */
+    public void setObsIds(Collection<String> obsIds) {
+        this.obsIds = obsIds;
+    }
 
-	/**
-	 * sets the SRIDs
-	 * 
-	 * @param srids
-	 */
-	public void setSrids(Collection<Integer> srids) {
-		this.srids = srids;
-	}
-	
+    /**
+     * sets the SRIDs
+     * 
+     * @param srids
+     */
+    public void setSrids(Collection<Integer> srids) {
+        this.srids = srids;
+    }
+
     protected Map<String, Collection<String>> getParentFeatures() {
         return parentFeatures;
     }
@@ -541,7 +541,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     protected void setParentFeatures(Map<String, Collection<String>> parentFeatures) {
         this.parentFeatures = parentFeatures;
     }
-    
+
     protected Map<String, Collection<String>> getChildFeatures() {
         return childProcs;
     }
@@ -552,472 +552,480 @@ public class CapabilitiesCache extends ACapabilitiesCache {
 
     public void setFeatureHierarchies(Map<String, Collection<String>> parentFeatures) {
         this.parentFeatures = parentFeatures;
-        this.childFeatures = SosHelper.invertHierarchy( parentFeatures );
+        this.childFeatures = SosHelper.invertHierarchy(parentFeatures);
     }
 
-	/**
-	 * sets relationships between offerings and FOIs
-	 * 
-	 * @param offFeatures
-	 */
-	public void setKOffrtingVFeatures(
-			Map<String, Collection<String>> offFeatures) {
-		this.offFeatures = offFeatures;
-	}
+    /**
+     * sets relationships between offerings and FOIs
+     * 
+     * @param offFeatures
+     */
+    public void setKOffrtingVFeatures(Map<String, Collection<String>> offFeatures) {
+        this.offFeatures = offFeatures;
+    }
 
-	/**
-	 * sets relationships between offerings and phenomena
-	 * 
-	 * @param offPhenomenons
-	 */
-	public void setKOfferingVObservableProperties(
-			Map<String, Collection<String>> offPhenomenons) {
-		this.offPhenomenons = offPhenomenons;
-	}
+    /**
+     * sets relationships between offerings and phenomena
+     * 
+     * @param offPhenomenons
+     */
+    public void setKOfferingVObservableProperties(Map<String, Collection<String>> offPhenomenons) {
+        this.offPhenomenons = offPhenomenons;
+    }
 
-	/**
-	 * sets relationships between names and offerings
-	 * 
-	 * @param offName
-	 */
-	public void setKOfferingVName(Map<String, String> offName) {
-		this.offName = offName;
-	}
+    /**
+     * sets relationships between names and offerings
+     * 
+     * @param offName
+     */
+    public void setKOfferingVName(Map<String, String> offName) {
+        this.offName = offName;
+    }
 
-	/**
-	 * set procedures with SensorML
-	 * 
-	 * @param procedures
-	 */
-	public void setProcedures(List<String> procedures) {
-		this.procedures = procedures;
-	}
+    /**
+     * set procedures with SensorML
+     * 
+     * @param procedures
+     */
+    public void setProcedures(List<String> procedures) {
+        this.procedures = procedures;
+    }
 
-	/**
-	 * sets relationships between offerings and result models
-	 * 
-	 * @param offResultModels
-	 */
-	public void setKOfferingVObservationTypes(
-			Map<String, Collection<String>> offResultModels) {
-		this.offResultModels = offResultModels;
-	}
+    /**
+     * sets relationships between offerings and result models
+     * 
+     * @param offResultModels
+     */
+    public void setKOfferingVObservationTypes(Map<String, Collection<String>> offferingObservationTypes) {
+        this.offferingObservationTypes = offferingObservationTypes;
+    }
 
-	/**
-	 * sets relationships between offerings and procedures
-	 * 
-	 * @param offProcedures
-	 */
-	public void setKOfferingVProcedures(
-			Map<String, Collection<String>> offProcedures) {
-		this.offProcedures = offProcedures;
-	}
+    /**
+     * sets relationships between offerings and procedures
+     * 
+     * @param offProcedures
+     */
+    public void setKOfferingVProcedures(Map<String, Collection<String>> offProcedures) {
+        this.offProcedures = offProcedures;
+    }
 
-	/**
-	 * sets relationships between procedures and offerings
-	 * 
-	 * @param procOffs
-	 */
-	public void setKProcedureVOfferings(Map<String, Collection<String>> procOffs) {
-		this.procOffs = procOffs;
-	}
+    /**
+     * sets relationships between procedures and offerings
+     * 
+     * @param procOffs
+     */
+    public void setKProcedureVOfferings(Map<String, Collection<String>> procOffs) {
+        this.procOffs = procOffs;
+    }
 
-	/**
-	 * sets FOIs
-	 * 
-	 * @param fois
-	 */
-	public void setFeaturesOfInterest(Collection<String> featuresOfInterest) {
-		this.featuresOfInterest = featuresOfInterest;
-	}
-	
-	/**
-	 * sets FOIs
-	 * 
-	 * @param fois
-	 */
-	public void setAllFeatures(Collection<String> allFeatures) {
-		this.allFeatures = allFeatures;
-	}
+    /**
+     * sets FOIs
+     * 
+     * @param fois
+     */
+    public void setFeaturesOfInterest(Collection<String> featuresOfInterest) {
+        this.featuresOfInterest = featuresOfInterest;
+    }
 
-	/**
-	 * sets the feature of interest procedure relations
-	 * 
-	 * @param foiProcedures
-	 */
-	public void setKFeatureOfInterestVProcedures(
-			Map<String, Collection<String>> foiProcedures) {
-		this.foiProcedures = foiProcedures;
-	}
+    /**
+     * sets FOIs
+     * 
+     * @param fois
+     */
+    public void setAllFeatures(Collection<String> allFeatures) {
+        this.allFeatures = allFeatures;
+    }
 
-	/**
-	 * sets relationships between phenomena and composite phenomena
-	 * 
-	 * @param phens4CompPhens
-	 */
-	public void setKCompositePhenomenonVObservableProperties(
-			Map<String, Collection<String>> phens4CompPhens) {
-		this.phens4CompPhens = phens4CompPhens;
-	}
+    /**
+     * sets the feature of interest procedure relations
+     * 
+     * @param foiProcedures
+     */
+    public void setKFeatureOfInterestVProcedures(Map<String, Collection<String>> foiProcedures) {
+        this.foiProcedures = foiProcedures;
+    }
 
-	/**
-	 * sets relationships between offerings and composite phenomena
-	 * 
-	 * @param offCompPhens
-	 */
-	public void setKOfferingVCompositePhenomenon(
-			Map<String, Collection<String>> offCompPhens) {
-		this.offCompPhens = offCompPhens;
-	}
+    /**
+     * sets relationships between phenomena and composite phenomena
+     * 
+     * @param phens4CompPhens
+     */
+    public void setKCompositePhenomenonVObservableProperties(Map<String, Collection<String>> phens4CompPhens) {
+        this.phens4CompPhens = phens4CompPhens;
+    }
 
-	/**
-	 * sets the unit phenomenon relations
-	 * 
-	 * @param unit4Phen
-	 */
-	public void setUnit4ObservableProperty(Map<String, String> unit4Phen) {
-		this.unit4Phen = unit4Phen;
-	}
+    /**
+     * sets relationships between offerings and composite phenomena
+     * 
+     * @param offCompPhens
+     */
+    public void setKOfferingVCompositePhenomenon(Map<String, Collection<String>> offCompPhens) {
+        this.offCompPhens = offCompPhens;
+    }
 
-	/**
-	 * sets relationships between phenomena and offerings
-	 * 
-	 * @param phenOffs
-	 */
-	public void setKObservablePropertyVOfferings(
-			Map<String, Collection<String>> phenOffs) {
-		this.phenOffs = phenOffs;
-	}
+    /**
+     * sets the unit phenomenon relations
+     * 
+     * @param unit4Phen
+     */
+    public void setUnit4ObservableProperty(Map<String, String> unit4Phen) {
+        this.unit4Phen = unit4Phen;
+    }
 
-	/**
-	 * sets phenomenon procedure relations
-	 * 
-	 * @param phenProcs
-	 *            The phenProcs to set.
-	 */
-	public void setKObservablePropertyKProcedures(
-			Map<String, Collection<String>> phenProcs) {
-		this.phenProcs = phenProcs;
-	}
+    /**
+     * sets relationships between phenomena and offerings
+     * 
+     * @param phenOffs
+     */
+    public void setKObservablePropertyVOfferings(Map<String, Collection<String>> phenOffs) {
+        this.phenOffs = phenOffs;
+    }
 
-	/**
-	 * returns the procedure phenomenon relations
-	 * 
-	 * @return Returns the procPhens.
-	 */
-	protected Map<String, Collection<String>> getProcPhens() {
-		return procPhens;
-	}
+    /**
+     * sets phenomenon procedure relations
+     * 
+     * @param phenProcs
+     *            The phenProcs to set.
+     */
+    public void setKObservablePropertyKProcedures(Map<String, Collection<String>> phenProcs) {
+        this.phenProcs = phenProcs;
+    }
 
-	/**
-	 * sets the procedure phenomenon relations
-	 * 
-	 * @param procPhens
-	 *            The procPhens to set.
-	 */
-	public void setProcPhens(Map<String, Collection<String>> procPhens) {
-		this.procPhens = procPhens;
-	}
+    /**
+     * returns the procedure phenomenon relations
+     * 
+     * @return Returns the procPhens.
+     */
+    protected Map<String, Collection<String>> getProcPhens() {
+        return procPhens;
+    }
 
-	/**
-	 * returns the value type for the passed phenomenon
-	 * 
-	 * @param phenomenonID
-	 *            id of the phenomenon for which the value type should be
-	 *            returned
-	 * @return Returns the value type for the passed phenomenon
-	 */
-	protected ValueTypes getValueType4Phenomenon(String phenomenonID) {
-		return obsPropsValueTypes.get(phenomenonID);
-	}
+    /**
+     * sets the procedure phenomenon relations
+     * 
+     * @param procPhens
+     *            The procPhens to set.
+     */
+    public void setProcPhens(Map<String, Collection<String>> procPhens) {
+        this.procPhens = procPhens;
+    }
 
-	/**
-	 * sets the phenomenon value type relations
-	 * 
-	 * @param obsPropsValueTypes
-	 */
-	public void setObsPropsValueTypes(Map<String, ValueTypes> obsPropsValueTypes) {
-		this.obsPropsValueTypes = obsPropsValueTypes;
-	}
+    /**
+     * returns the value type for the passed phenomenon
+     * 
+     * @param phenomenonID
+     *            id of the phenomenon for which the value type should be
+     *            returned
+     * @return Returns the value type for the passed phenomenon
+     */
+    protected ValueTypes getValueType4Phenomenon(String phenomenonID) {
+        return obsPropsValueTypes.get(phenomenonID);
+    }
 
-	/**
-	 * returns the time offering relations
-	 * 
-	 * @return the times4Offerings
-	 */
-	protected Map<String, String[]> getTimes4Offerings() {
-		return times4Offerings;
-	}
+    /**
+     * sets the phenomenon value type relations
+     * 
+     * @param obsPropsValueTypes
+     */
+    public void setObsPropsValueTypes(Map<String, ValueTypes> obsPropsValueTypes) {
+        this.obsPropsValueTypes = obsPropsValueTypes;
+    }
 
-	/**
-	 * sets the time offering relations
-	 * 
-	 * @param times4Offerings
-	 *            the times4Offerings to set
-	 */
-	public void setTimes4Offerings(Map<String, String[]> times4Offerings) {
-		this.times4Offerings = times4Offerings;
-	}
+    /**
+     * returns the time offering relations
+     * 
+     * @return the times4Offerings
+     */
+    protected Map<String, String[]> getTimes4Offerings() {
+        return times4Offerings;
+    }
 
-	/**
-	 * returns the SRID
-	 * 
-	 * @return Returns Srid of coordinates stored in SOS database
-	 */
-	protected int getSrid() {
-		return srid;
-	}
+    /**
+     * sets the time offering relations
+     * 
+     * @param times4Offerings
+     *            the times4Offerings to set
+     */
+    public void setTimes4Offerings(Map<String, String[]> times4Offerings) {
+        this.times4Offerings = times4Offerings;
+    }
 
-	/**
-	 * 
-	 * @return Returns Map containing offeringIDs as keys and list of
-	 *         corresponding features as values
-	 */
-	protected Map<String, Collection<String>> getOffFeatures() {
-		return offFeatures;
-	}
+    /**
+     * returns the SRID
+     * 
+     * @return Returns Srid of coordinates stored in SOS database
+     */
+    protected int getSrid() {
+        return srid;
+    }
 
-	/**
-	 * returns the offerings for the passed procedure id
-	 * 
-	 * @param procID
-	 *            id of procedure, for which related offerings should be
-	 *            returned
-	 * @return Returns offerings, for which passed procedure produces data
-	 */
-	protected List<String> getOfferings4Procedure(String procID) {
-		List<String> result = new ArrayList<String>();
-		if (this.procOffs.containsKey(procID)) {
-			result.addAll(this.procOffs.get(procID));
-		}
-		return result;
-	}
+    /**
+     * 
+     * @return Returns Map containing offeringIDs as keys and list of
+     *         corresponding features as values
+     */
+    protected Map<String, Collection<String>> getOffFeatures() {
+        return offFeatures;
+    }
 
-	/**
-	 * returns the offerings for the passed phenomenon
-	 * 
-	 * @param phenID
-	 *            id of procedure, for which related offerings should be
-	 *            returned
-	 * @return Returns offerings, to which passed phenomenon belongs to
-	 */
-	protected List<String> getOfferings4Phenomenon(String phenID) {
-		List<String> result = new ArrayList<String>();
-		if (this.phenOffs.containsKey(phenID)) {
-			result.addAll(this.phenOffs.get(phenID));
-		}
-		return result;
-	}
+    /**
+     * returns the offerings for the passed procedure id
+     * 
+     * @param procID
+     *            id of procedure, for which related offerings should be
+     *            returned
+     * @return Returns offerings, for which passed procedure produces data
+     */
+    protected List<String> getOfferings4Procedure(String procID) {
+        List<String> result = new ArrayList<String>();
+        if (this.procOffs.containsKey(procID)) {
+            result.addAll(this.procOffs.get(procID));
+        }
+        return result;
+    }
 
-	/**
-	 * Returns srids, which are supported by this SOS
-	 * 
-	 * @return Returns srids, which are supported by this SOS
-	 */
-	protected Collection<Integer> getSrids() {
-		return this.srids;
-	}
+    /**
+     * returns the offerings for the passed phenomenon
+     * 
+     * @param phenID
+     *            id of procedure, for which related offerings should be
+     *            returned
+     * @return Returns offerings, to which passed phenomenon belongs to
+     */
+    protected List<String> getOfferings4Phenomenon(String phenID) {
+        List<String> result = new ArrayList<String>();
+        if (this.phenOffs.containsKey(phenID)) {
+            result.addAll(this.phenOffs.get(phenID));
+        }
+        return result;
+    }
 
-	/**
-	 * methods for adding relationships in Cache for recently received new
-	 * observation
-	 * 
-	 * @param observation
-	 *            recently received observation which has been inserted into SOS
-	 *            db and whose relationships have to be maintained in cache
-	 */
-	protected void refreshMetadata4newObservation(SosObservation observation) {
+    /**
+     * Returns srids, which are supported by this SOS
+     * 
+     * @return Returns srids, which are supported by this SOS
+     */
+    protected Collection<Integer> getSrids() {
+        return this.srids;
+    }
 
-		// create local variables for better readable code
-		String procID = observation.getObservationConstellation()
-				.getProcedure();
-		ArrayList<String> procs = new ArrayList<String>(1);
-		procs.add(procID);
+    /**
+     * methods for adding relationships in Cache for recently received new
+     * observation
+     * 
+     * @param observation
+     *            recently received observation which has been inserted into SOS
+     *            db and whose relationships have to be maintained in cache
+     */
+    protected void refreshMetadata4newObservation(SosObservation observation) {
 
-		String foiID = observation.getObservationConstellation()
-				.getFeatureOfInterest();
-		ArrayList<String> features = new ArrayList<String>(1);
-		features.add(foiID);
+        // create local variables for better readable code
+        String procID = observation.getObservationConstellation().getProcedure();
+        ArrayList<String> procs = new ArrayList<String>(1);
+        procs.add(procID);
 
-		// if foi id is NOT contained add foi
-		if (!this.getAllFeature().contains(foiID)) {
-			this.allFeatures.add(foiID);
-			this.featuresOfInterest.add(foiID);
-		}
+        String foiID = observation.getObservationConstellation().getFeatureOfInterest().getIdentifier();
+        ArrayList<String> features = new ArrayList<String>(1);
+        features.add(foiID);
 
-		// get offerings for phenomenon of observation
-		List<String> offs = this.getOfferings4Phenomenon(observation
-				.getObservationConstellation().getObservableProperty()
-				.getIdentifier());
+        // if foi id is NOT contained add foi
+        if (!this.getAllFeature().contains(foiID)) {
+            this.allFeatures.add(foiID);
+            this.featuresOfInterest.add(foiID);
+        }
 
-		// insert foi_off relationsship for each offering
-		for (String offering_id : offs) {
+        // get offerings for phenomenon of observation
+        List<String> offs =
+                this.getOfferings4Phenomenon(observation.getObservationConstellation().getObservableProperty()
+                        .getIdentifier());
 
-			// check whether offering foi relationship is already contained in
-			// DB
-			if (!this.getOffFeatures().containsKey(offering_id)) {
+        // insert foi_off relationsship for each offering
+        for (String offering_id : offs) {
 
-				// Case 1: offering is NOT contained in foi_off -> insert
-				// relationsship
-				this.getOffFeatures().put(offering_id, features);
-			} else if (!this.getOffFeatures().get(offering_id).contains(foiID)) {
+            // check whether offering foi relationship is already contained in
+            // DB
+            if (!this.getOffFeatures().containsKey(offering_id)) {
 
-				// Case 2: offering is already stored in foi_off -> insert
-				// relationsship if
-				// offering NOT contains foi id
-				this.getOffFeatures().get(offering_id).add(foiID);
-			}
+                // Case 1: offering is NOT contained in foi_off -> insert
+                // relationsship
+                this.getOffFeatures().put(offering_id, features);
+            } else if (!this.getOffFeatures().get(offering_id).contains(foiID)) {
 
-		}
+                // Case 2: offering is already stored in foi_off -> insert
+                // relationsship if
+                // offering NOT contains foi id
+                this.getOffFeatures().get(offering_id).add(foiID);
+            }
 
-		// insert proc_foi relationsship
-		if (this.foiProcedures.get(foiID) != null) {
-			this.foiProcedures.get(foiID).add(procID);
-		} else {
-			this.foiProcedures.put(foiID, procs);
-		}
-	}
+        }
 
-	/**
-	 * method to set the related features for a offering
-	 * 
-	 * @param offRelatedFeatures
-	 *            the relatedFeatures to set
-	 */
-	public void setKOfferingVRelatedFeatures(
-			Map<String, Collection<String>> offRelatedFeatures) {
-		this.offRelatedFeatures = offRelatedFeatures;
-	}
+        // insert proc_foi relationsship
+        if (this.foiProcedures.get(foiID) != null) {
+            this.foiProcedures.get(foiID).add(procID);
+        } else {
+            this.foiProcedures.put(foiID, procs);
+        }
+    }
 
-	/**
-	 * method to get the related features for offerings
-	 * 
-	 * @return the relatedFeatures Map with related features for offerings
-	 */
-	protected Map<String, Collection<String>> getKOfferingVRelatedFeatures() {
-		return offRelatedFeatures;
-	}
-	
+    /**
+     * method to set the related features for a offering
+     * 
+     * @param offRelatedFeatures
+     *            the relatedFeatures to set
+     */
+    public void setKOfferingVRelatedFeatures(Map<String, Collection<String>> offRelatedFeatures) {
+        this.offRelatedFeatures = offRelatedFeatures;
+    }
+
+    /**
+     * method to get the related features for offerings
+     * 
+     * @return the relatedFeatures Map with related features for offerings
+     */
+    protected Map<String, Collection<String>> getKOfferingVRelatedFeatures() {
+        return offRelatedFeatures;
+    }
+
     protected Map<String, Collection<String>> getKRelatedFeatureVRole() {
-		return kRelatedFeatureVRole;
-	}
-    
-	/**
-	 * method to set the related features for a offering
-	 * 
-	 * @param offRelatedFeatures
-	 *            the relatedFeatures to set
-	 */
-	public void setKRelatedFeaturesVRole(
-			Map<String, Collection<String>> kRelatedFeatureVRole) {
-		this.kRelatedFeatureVRole = kRelatedFeatureVRole;
-	}
-
-	/**
-     * Returns collection containing parent procedures for the passed procedure, optionally navigating
-     * the full hierarchy and including itself
-     * 
-     * @param procId the procedure id to find parents for
-     * @param fullHierarchy whether or not to navigate the full procedure hierarchy 
-     * @param includeSelf whether or not to include the passed procedure id in the result
-     * 
-     * @return Collection<String> containing the passed procedure id's parents (and optionally itself)
-     */
-    public Collection<String> getParentProcs( String procId, boolean fullHierarchy, boolean includeSelf ){
-        return SosHelper.getHierarchy( parentProcs, procId, fullHierarchy, includeSelf );
+        return kRelatedFeatureVRole;
     }
 
     /**
-     * Returns collection containing parent procedures for the passed procedures, optionally navigating
-     * the full hierarchy and including themselves
+     * method to set the related features for a offering
      * 
-     * @param procIds collection of the procedure ids to find parents for
-     * @param fullHierarchy whether or not to navigate the full procedure hierarchy 
-     * @param includeSelves whether or not to include the passed procedure ids in the result
-     * 
-     * @return Collection<String> containing the passed procedure id's parents (and optionally themselves)
+     * @param offRelatedFeatures
+     *            the relatedFeatures to set
      */
-    public Collection<String> getParentProcs( Collection<String> procIds, boolean fullHierarchy,
-            boolean includeSelves ){
+    public void setKRelatedFeaturesVRole(Map<String, Collection<String>> kRelatedFeatureVRole) {
+        this.kRelatedFeatureVRole = kRelatedFeatureVRole;
+    }
+
+    /**
+     * Returns collection containing parent procedures for the passed procedure,
+     * optionally navigating the full hierarchy and including itself
+     * 
+     * @param procId
+     *            the procedure id to find parents for
+     * @param fullHierarchy
+     *            whether or not to navigate the full procedure hierarchy
+     * @param includeSelf
+     *            whether or not to include the passed procedure id in the
+     *            result
+     * 
+     * @return Collection<String> containing the passed procedure id's parents
+     *         (and optionally itself)
+     */
+    public Collection<String> getParentProcs(String procId, boolean fullHierarchy, boolean includeSelf) {
+        return SosHelper.getHierarchy(parentProcs, procId, fullHierarchy, includeSelf);
+    }
+
+    /**
+     * Returns collection containing parent procedures for the passed
+     * procedures, optionally navigating the full hierarchy and including
+     * themselves
+     * 
+     * @param procIds
+     *            collection of the procedure ids to find parents for
+     * @param fullHierarchy
+     *            whether or not to navigate the full procedure hierarchy
+     * @param includeSelves
+     *            whether or not to include the passed procedure ids in the
+     *            result
+     * 
+     * @return Collection<String> containing the passed procedure id's parents
+     *         (and optionally themselves)
+     */
+    public Collection<String> getParentProcs(Collection<String> procIds, boolean fullHierarchy, boolean includeSelves) {
         Collection<String> collectionParentProcs = new HashSet<String>();
-        
-        for( String procId : procIds ){
-            collectionParentProcs.addAll( SosHelper.getHierarchy( parentProcs, procId, fullHierarchy, includeSelves ) );
+
+        for (String procId : procIds) {
+            collectionParentProcs.addAll(SosHelper.getHierarchy(parentProcs, procId, fullHierarchy, includeSelves));
         }
-        
-        List<String> cppList = new ArrayList<String>( collectionParentProcs );
-        Collections.sort( cppList );
+
+        List<String> cppList = new ArrayList<String>(collectionParentProcs);
+        Collections.sort(cppList);
         return cppList;
-    }
-    
-    /**
-     * Returns collection containing child procedures for the passed procedure, optionally navigating
-     * the full hierarchy and including itself
-     * 
-     * @param procId procedure id to find children for
-     * @param fullHierarchy whether or not to navigate the full procedure hierarchy 
-     * @param includeSelf whether or not to include the passed procedure id in the result
-     * 
-     * @return Collection<String> containing the passed procedure id's children (and optionally itself)
-     */
-    public Collection<String> getChildProcs( String procId, boolean fullHierarchy, boolean includeSelf ){
-        return SosHelper.getHierarchy( childProcs, procId, fullHierarchy, includeSelf );        
     }
 
     /**
-     * Returns collection containing child procedures for the passed procedures, optionally navigating
-     * the full hierarchy and including themselves
+     * Returns collection containing child procedures for the passed procedure,
+     * optionally navigating the full hierarchy and including itself
      * 
-     * @param procIds collection of procedure ids to find children for
-     * @param fullHierarchy whether or not to navigate the full procedure hierarchy 
-     * @param includeSelves whether or not to include the passed procedure ids in the result
+     * @param procId
+     *            procedure id to find children for
+     * @param fullHierarchy
+     *            whether or not to navigate the full procedure hierarchy
+     * @param includeSelf
+     *            whether or not to include the passed procedure id in the
+     *            result
      * 
-     * @return Collection<String> containing the passed procedure id's children (and optionally itself)
+     * @return Collection<String> containing the passed procedure id's children
+     *         (and optionally itself)
      */
-    public Collection<String> getChildProcs( Collection<String> procIds, boolean fullHierarchy,
-            boolean includeSelves ){
+    public Collection<String> getChildProcs(String procId, boolean fullHierarchy, boolean includeSelf) {
+        return SosHelper.getHierarchy(childProcs, procId, fullHierarchy, includeSelf);
+    }
+
+    /**
+     * Returns collection containing child procedures for the passed procedures,
+     * optionally navigating the full hierarchy and including themselves
+     * 
+     * @param procIds
+     *            collection of procedure ids to find children for
+     * @param fullHierarchy
+     *            whether or not to navigate the full procedure hierarchy
+     * @param includeSelves
+     *            whether or not to include the passed procedure ids in the
+     *            result
+     * 
+     * @return Collection<String> containing the passed procedure id's children
+     *         (and optionally itself)
+     */
+    public Collection<String> getChildProcs(Collection<String> procIds, boolean fullHierarchy, boolean includeSelves) {
         Collection<String> collectionChildProcs = new HashSet<String>();
-        
-        for( String procId : procIds ){
-            collectionChildProcs.addAll( SosHelper.getHierarchy( childProcs, procId, fullHierarchy, includeSelves ) );
+
+        for (String procId : procIds) {
+            collectionChildProcs.addAll(SosHelper.getHierarchy(childProcs, procId, fullHierarchy, includeSelves));
         }
-        
-        List<String> ccpList = new ArrayList<String>( collectionChildProcs );
-        Collections.sort( ccpList );
-        return ccpList;        
-    }
-    
-    public Collection<String> getParentFeatures( String featureID, boolean fullHierarchy, boolean includeSelf ){
-        return SosHelper.getHierarchy( parentFeatures, featureID, fullHierarchy, includeSelf );
+
+        List<String> ccpList = new ArrayList<String>(collectionChildProcs);
+        Collections.sort(ccpList);
+        return ccpList;
     }
 
-    public Collection<String> getParentFeatures( Collection<String> featureIDs, boolean fullHierarchy,
-            boolean includeSelves ){
+    public Collection<String> getParentFeatures(String featureID, boolean fullHierarchy, boolean includeSelf) {
+        return SosHelper.getHierarchy(parentFeatures, featureID, fullHierarchy, includeSelf);
+    }
+
+    public Collection<String> getParentFeatures(Collection<String> featureIDs, boolean fullHierarchy,
+            boolean includeSelves) {
         Collection<String> collectionParentFeatures = new HashSet<String>();
-        
-        for( String featureID : featureIDs ){
-            collectionParentFeatures.addAll( SosHelper.getHierarchy( parentFeatures, featureID, fullHierarchy, includeSelves ) );
+
+        for (String featureID : featureIDs) {
+            collectionParentFeatures.addAll(SosHelper.getHierarchy(parentFeatures, featureID, fullHierarchy,
+                    includeSelves));
         }
-        
-        List<String> cppList = new ArrayList<String>( collectionParentFeatures );
-        Collections.sort( cppList );
+
+        List<String> cppList = new ArrayList<String>(collectionParentFeatures);
+        Collections.sort(cppList);
         return cppList;
     }
-    
-    public Collection<String> getChildFeatures( String featureID, boolean fullHierarchy, boolean includeSelf ){
-        return SosHelper.getHierarchy( childFeatures, featureID, fullHierarchy, includeSelf );        
+
+    public Collection<String> getChildFeatures(String featureID, boolean fullHierarchy, boolean includeSelf) {
+        return SosHelper.getHierarchy(childFeatures, featureID, fullHierarchy, includeSelf);
     }
 
-    public Collection<String> getChildPFeatures( Collection<String> featureIDs, boolean fullHierarchy,
-            boolean includeSelves ){
+    public Collection<String> getChildPFeatures(Collection<String> featureIDs, boolean fullHierarchy,
+            boolean includeSelves) {
         Collection<String> collectionChildFeatures = new HashSet<String>();
-        
-        for( String featureID : featureIDs ){
-            collectionChildFeatures.addAll( SosHelper.getHierarchy( childProcs, featureID, fullHierarchy, includeSelves ) );
+
+        for (String featureID : featureIDs) {
+            collectionChildFeatures
+                    .addAll(SosHelper.getHierarchy(childProcs, featureID, fullHierarchy, includeSelves));
         }
-        
-        List<String> ccpList = new ArrayList<String>( collectionChildFeatures );
-        Collections.sort( ccpList );
-        return ccpList;        
+
+        List<String> ccpList = new ArrayList<String>(collectionChildFeatures);
+        Collections.sort(ccpList);
+        return ccpList;
     }
 }

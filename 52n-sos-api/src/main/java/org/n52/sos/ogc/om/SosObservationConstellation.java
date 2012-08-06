@@ -28,6 +28,8 @@
 
 package org.n52.sos.ogc.om;
 
+import org.n52.sos.ogc.om.features.SosAbstractFeature;
+
 /**
  * @author c_hollmann
  * 
@@ -44,7 +46,7 @@ public class SosObservationConstellation {
 	private String offering;
 
 	/** Identifier of the featureOfInterest to which this observation belongs */
-	private String featureOfInterest;
+	private SosAbstractFeature featureOfInterest;
 
 	/** type of the observation */
 	private String observationType;
@@ -72,7 +74,7 @@ public class SosObservationConstellation {
 	 */
 	public SosObservationConstellation(String procedure,
 			AbstractSosPhenomenon observableProperty, String offering,
-			String featureOfInterest, String observationType) {
+			SosAbstractFeature featureOfInterest, String observationType) {
 		super();
 		this.procedure = procedure;
 		this.observableProperty = observableProperty;
@@ -143,7 +145,7 @@ public class SosObservationConstellation {
 	 * 
 	 * @return the featureOfInterest
 	 */
-	public String getFeatureOfInterest() {
+	public SosAbstractFeature getFeatureOfInterest() {
 		return featureOfInterest;
 	}
 
@@ -153,7 +155,7 @@ public class SosObservationConstellation {
 	 * @param featureOfInterest
 	 *            the featureOfInterest to set
 	 */
-	public void setFeatureOfInterest(String featureOfInterest) {
+	public void setFeatureOfInterest(SosAbstractFeature featureOfInterest) {
 		this.featureOfInterest = featureOfInterest;
 	}
 

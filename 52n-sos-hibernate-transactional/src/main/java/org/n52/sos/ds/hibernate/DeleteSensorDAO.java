@@ -34,10 +34,10 @@ import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IDeleteSensorDAO;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.swe.SWEConstants;
-import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.request.DeleteSensorRequest;
+import org.n52.sos.response.DeleteSensorResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -91,9 +91,12 @@ public class DeleteSensorDAO implements IDeleteSensorDAO {
     }
 
     @Override
-    public int deleteSensor(AbstractServiceRequest request) {
+    public DeleteSensorResponse deleteSensor(DeleteSensorRequest request) {
         // TODO Auto-generated method stub
-        return 0;
+        DeleteSensorResponse response = new DeleteSensorResponse();
+        response.setService(request.getService());
+        response.setVersion(request.getVersion());
+        return response;
     }
 
 }

@@ -28,38 +28,84 @@
 
 package org.n52.sos.ogc.sensorML.elements;
 
+import org.n52.sos.ogc.sensorML.AbstractSensorML;
+
 /**
  * SOS internal representation of SensorML component
  * 
  */
 public class SosSMLComponent {
 
-    private String identifier;
+    private String name;
 
+    private String title;
+
+    private String href;
+
+    private String role;
+
+    private AbstractSensorML process;
+
+    public SosSMLComponent() {
+        
+    }
+    
     /**
      * constructor
      * 
      * @param identifier
      *            Component identifier
      */
-    public SosSMLComponent(String identifier) {
+    public SosSMLComponent(String name) {
         super();
-        this.identifier = identifier;
+        this.name = name;
     }
 
     /**
      * @return the identifier
      */
-    public String getIdentifier() {
-        return identifier;
+    public String getName() {
+        return name;
     }
 
     /**
      * @param identifier
      *            The identifier
      */
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setHref(String href) {
+        this.href = href;
+    }
+
+    public void setProcess(AbstractSensorML process) {
+        this.process = process;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getHref() {
+        return href;
+    }
+
+    public AbstractSensorML getProcess() {
+        return process;
     }
 
 }

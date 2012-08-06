@@ -2,7 +2,6 @@ package org.n52.sos.ds.hibernate.entities;
 
 // Generated 10.07.2012 15:18:23 by Hibernate Tools 3.4.0.CR1
 
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 

@@ -26,47 +26,38 @@
  Modified: <DATE OF LAST MODIFICATION (optional line)>
  ***************************************************************/
 
-package org.n52.sos.ogc.sensorML;
+package org.n52.sos.request;
 
+import org.n52.sos.ogc.sos.Sos2Constants;
 
-/**
- * represents a timestamp in a procedure history
- *
- * 
- */
-public class ProcedureHistoryEvent {
-
-    /** identifier of sensor */
-    private String procedure;
-
-    /**
-     * constructor
-     * 
-     * @param procedure
-     *            identifier of sensor
-     */
-    public ProcedureHistoryEvent(String procedure) {
-        this.procedure = procedure;
+public class DeleteSensorRequest extends AbstractServiceRequest {
+    
+    private final String operationName = Sos2Constants.Operations.DeleteSensor
+            .name();
+    
+    private String procedureID;
+    
+    public DeleteSensorRequest (String procedureID) {
+        this.setProcedureID(procedureID);
     }
 
     /**
-     * Returns identifier of sensor of this history event
-     * 
-     * @return Returns the identifier
-     * 
+     * @param procedureID the procedureID to set
      */
-    public String getProcedure() {
-        return procedure;
+    public void setProcedureID(String procedureID) {
+        this.procedureID = procedureID;
     }
 
     /**
-     * sets identifier of sensor of this history event
-     * 
-     * @param procedure
-     *            the identifier to set
+     * @return the procedureID
      */
-	public void setProcedure(String procedure) {
-        this.procedure = procedure;
+    public String getProcedureID() {
+        return procedureID;
+    }
+
+    @Override
+    public String getOperationName() {
+        return operationName;
     }
 
 }

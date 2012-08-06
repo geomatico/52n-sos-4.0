@@ -22,10 +22,10 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.SosDescribeSensorRequest;
-import org.n52.sos.request.SosGetCapabilitiesRequest;
-import org.n52.sos.request.SosGetFeatureOfInterestRequest;
-import org.n52.sos.request.SosGetObservationRequest;
+import org.n52.sos.request.DescribeSensorRequest;
+import org.n52.sos.request.GetCapabilitiesRequest;
+import org.n52.sos.request.GetFeatureOfInterestRequest;
+import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.request.SosGetResultRequest;
 import org.n52.sos.request.SosGetResultTemplateRequest;
 import org.n52.sos.service.Configurator;
@@ -120,10 +120,10 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
      * @throws OwsExceptionReport
      *             If parsing the String failed
      */
-    private SosGetCapabilitiesRequest parseGetCapabilities(Map<String, String> element)
+    private GetCapabilitiesRequest parseGetCapabilities(Map<String, String> element)
             throws OwsExceptionReport {
 
-        SosGetCapabilitiesRequest request = new SosGetCapabilitiesRequest();
+        GetCapabilitiesRequest request = new GetCapabilitiesRequest();
         List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
 
         for (String parameterName : element.keySet()) {
@@ -187,9 +187,9 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
      * @throws OwsExceptionReport
      *             if parsing of request fails
      */
-    private SosDescribeSensorRequest parseDescribeSensor(Map<String, String> element) throws OwsExceptionReport {
+    private DescribeSensorRequest parseDescribeSensor(Map<String, String> element) throws OwsExceptionReport {
 
-        SosDescribeSensorRequest request = new SosDescribeSensorRequest();
+        DescribeSensorRequest request = new DescribeSensorRequest();
         List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
 
         boolean foundProcedure = false;
@@ -289,9 +289,9 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
      * @throws OwsExceptionReport
      *             if parsing of request fails
      */
-    private SosGetObservationRequest parseGetObservation(Map<String, String> element) throws OwsExceptionReport {
+    private GetObservationRequest parseGetObservation(Map<String, String> element) throws OwsExceptionReport {
 
-        SosGetObservationRequest request = new SosGetObservationRequest();
+        GetObservationRequest request = new GetObservationRequest();
         List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
         boolean foundService = false;
         boolean foundVersion = false;
@@ -399,10 +399,10 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
      * @throws OwsExceptionReport
      *             if parsing of request fails
      */
-    private SosGetFeatureOfInterestRequest parseGetFeatureOfInterest(Map<String, String> element)
+    private GetFeatureOfInterestRequest parseGetFeatureOfInterest(Map<String, String> element)
             throws OwsExceptionReport {
 
-        SosGetFeatureOfInterestRequest request = new SosGetFeatureOfInterestRequest();
+        GetFeatureOfInterestRequest request = new GetFeatureOfInterestRequest();
         List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
 
         boolean foundService = false;

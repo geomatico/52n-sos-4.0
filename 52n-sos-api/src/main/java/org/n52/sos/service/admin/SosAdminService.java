@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.response.IServiceResponse;
+import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.admin.operator.IAdminServiceOperator;
 import org.slf4j.Logger;
@@ -138,7 +138,7 @@ public class SosAdminService extends HttpServlet {
 					req.getRequestURL().toString());
 		}
 
-		IServiceResponse sosResp = sosAdminOperator.doPostOperation(req);
+		ServiceResponse sosResp = sosAdminOperator.doPostOperation(req);
 		doResponse(resp, sosResp);
 	}
 
@@ -170,7 +170,7 @@ public class SosAdminService extends HttpServlet {
 		// ///////////////////////////////////////////////
 		// forward GET-request to RequestOperator
 
-		IServiceResponse sosResp = sosAdminOperator.doGetOperation(req);
+		ServiceResponse sosResp = sosAdminOperator.doGetOperation(req);
 		doResponse(resp, sosResp);
 	}
 
@@ -186,7 +186,7 @@ public class SosAdminService extends HttpServlet {
 	 *            outputStream of resp param
 	 * 
 	 */
-	public void doResponse(HttpServletResponse resp, IServiceResponse sosResponse) {
+	public void doResponse(HttpServletResponse resp, ServiceResponse sosResponse) {
 		OutputStream out = null;
 		GZIPOutputStream gzip = null;
 		try {

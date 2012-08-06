@@ -30,7 +30,6 @@ package org.n52.sos.ogc.ows;
 
 import java.util.Collection;
 
-import org.n52.sos.ogc.AbstractServiceResponseObject;
 import org.n52.sos.ogc.filter.FilterCapabilities;
 import org.n52.sos.ogc.sos.SosOfferingsForContents;
 
@@ -38,7 +37,7 @@ import org.n52.sos.ogc.sos.SosOfferingsForContents;
  * Class which represents the Capabilities.
  * 
  */
-public class SosCapabilities extends AbstractServiceResponseObject {
+public class SosCapabilities {
 
     /**
      * Service identification, loaded from file.

@@ -33,7 +33,7 @@ import java.util.List;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.response.IServiceResponse;
+import org.n52.sos.response.ServiceResponse;
 
 /**
  * Interface for SOS request operator implementations
@@ -61,7 +61,7 @@ public interface IRequestOperator {
     // public IServiceResponse doPostOperation(HttpServletRequest request)
     // throws ServletException;
 
-    public IServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
+    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
 
     public boolean hasImplementedDAO();
 

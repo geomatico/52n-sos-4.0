@@ -30,7 +30,7 @@ package org.n52.sos.service.admin.operator;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.n52.sos.response.IServiceResponse;
+import org.n52.sos.response.ServiceResponse;
 
 /**
  * Abstract operator class for the administration interface
@@ -50,7 +50,7 @@ public abstract class IAdminServiceOperator {
 	 *            HTTP-Get request
 	 * @return SOS response
 	 */
-	public abstract IServiceResponse doGetOperation(HttpServletRequest request);
+	public abstract ServiceResponse doGetOperation(HttpServletRequest request);
 
 	/**
 	 * HTTP-Post request handling method
@@ -59,7 +59,7 @@ public abstract class IAdminServiceOperator {
 	 *            HTTP-Post request
 	 * @return SOS response
 	 */
-	public abstract IServiceResponse doPostOperation(HttpServletRequest request);
+	public abstract ServiceResponse doPostOperation(HttpServletRequest request);
 
 	/**
 	 * Get URL pattern for the administration interface

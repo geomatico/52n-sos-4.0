@@ -40,7 +40,7 @@ import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.response.IServiceResponse;
+import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.operator.IServiceOperator;
 import org.n52.sos.util.SosRequestToResponseHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -74,9 +74,9 @@ public class AdminServiceOperator extends IAdminServiceOperator {
      * .HttpServletRequest)
      */
     @Override
-    public IServiceResponse doGetOperation(HttpServletRequest req) {
+    public ServiceResponse doGetOperation(HttpServletRequest req) {
 
-        IServiceResponse response = null;
+        ServiceResponse response = null;
         AbstractServiceRequest request = null;
         try {
             Map<String, String> kvp = new HashMap<String, String>();
@@ -122,7 +122,7 @@ public class AdminServiceOperator extends IAdminServiceOperator {
      * .HttpServletRequest)
      */
     @Override
-    public IServiceResponse doPostOperation(HttpServletRequest req) {
+    public ServiceResponse doPostOperation(HttpServletRequest req) {
         String exceptionText = "The SOS administration backend does not support HTTP-Post requests!";
         LOGGER.error(exceptionText);
         OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
