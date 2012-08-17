@@ -226,6 +226,9 @@
 			<id>Apache</id>
 			<name>Apache repository</name>
 			<url>http://repo1.maven.org/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>n52-releases</id>
@@ -253,11 +256,18 @@
 			<id>Refractions</id>
 			<name>Refractions repository</name>
 			<url>http://lists.refractions.net/m2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>Hibernate Spatial repo</id>
 			<url>http://www.hibernatespatial.org/repository</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
+
 	</repositories>
 
 	<profiles>

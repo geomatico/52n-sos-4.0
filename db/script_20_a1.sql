@@ -9,19 +9,20 @@ DROP TABLE IF EXISTS observation_type CASCADE;
 DROP TABLE IF EXISTS swe_type CASCADE;
 DROP TABLE IF EXISTS composite_phenomenon CASCADE;
 DROP TABLE IF EXISTS feature_of_interest_type CASCADE;
-DROP TABLE IF EXISTS value_type CASCADE;
 DROP TABLE IF EXISTS geometry_value CASCADE;
 DROP TABLE IF EXISTS text_value CASCADE;
 DROP TABLE IF EXISTS category_value CASCADE;
 DROP TABLE IF EXISTS unit CASCADE;
 DROP TABLE IF EXISTS numeric_value CASCADE;
 DROP TABLE IF EXISTS count_value CASCADE;
+DROP TABLE IF EXISTS boolean_value CASCADE;
 DROP TABLE IF EXISTS request CASCADE;
 DROP TABLE IF EXISTS procedure CASCADE;
 DROP TABLE IF EXISTS feature_relation CASCADE;
 DROP TABLE IF EXISTS feature_of_interest CASCADE;
 DROP TABLE IF EXISTS observable_property CASCADE;
 DROP TABLE IF EXISTS procedure_has_observation_type CASCADE;
+DROP TABLE IF EXISTS offering_has_allowed_observation_type CASCADE;
 DROP TABLE IF EXISTS quality CASCADE;
 DROP TABLE IF EXISTS offering_has_related_feature CASCADE;
 DROP TABLE IF EXISTS procedure_has_feature_of_interest_type CASCADE;
@@ -37,6 +38,7 @@ DROP TABLE IF EXISTS observation_has_category_value CASCADE;
 DROP TABLE IF EXISTS result_template CASCADE;
 DROP TABLE IF EXISTS observation_has_numeric_value CASCADE;
 DROP TABLE IF EXISTS observation_has_count_value CASCADE;
+DROP TABLE IF EXISTS observation_has_boolean_value CASCADE;
 DROP TABLE IF EXISTS observation_has_quality CASCADE;
 DROP TABLE IF EXISTS observation_has_spatial_filtering_profile CASCADE;
 DROP TABLE IF EXISTS observation_has_geometry_value CASCADE;
@@ -90,8 +92,8 @@ CREATE TABLE procedure_description_format (
 
 CREATE TABLE related_feature (
   related_feature_id bigserial NOT NULL,
-  identifier TEXT NULL,
-  UNIQUE (identifier),
+  feature_of_interest_id INTEGER NULL,
+  UNIQUE (feature_of_interest_id),
   PRIMARY KEY(related_feature_id)
 );
 
@@ -122,13 +124,6 @@ CREATE TABLE feature_of_interest_type (
   feature_of_interest_type TEXT NOT NULL,
   UNIQUE (feature_of_interest_type),
   PRIMARY KEY(feature_of_interest_type_id)
-);
-
-CREATE TABLE value_type (
-  value_type_id bigserial NOT NULL,
-  value_type TEXT NOT NULL,
-  UNIQUE (value_type),
-  PRIMARY KEY(value_type_id)
 );
 
 CREATE TABLE geometry_value (
@@ -168,9 +163,16 @@ CREATE TABLE numeric_value (
 
 CREATE TABLE count_value (
   count_value_id bigserial NOT NULL,
-  value bigint NOT NULL,
+  value integer NOT NULL,
   UNIQUE (value),
   PRIMARY KEY(count_value_id)
+);
+
+CREATE TABLE boolean_value (
+  boolean_value_id bigserial NOT NULL,
+  value boolean NOT NULL,
+  UNIQUE (value),
+  PRIMARY KEY(boolean_value_id)
 );
 
 CREATE TABLE request (
@@ -201,6 +203,7 @@ CREATE TABLE feature_of_interest (
   feature_of_interest_id bigserial NOT NULL,
   feature_of_interest_type_id INTEGER NOT NULL,
   identifier TEXT NULL,
+  name Text NULL,
   geom GEOMETRY NULL,
   description_xml TEXT NULL,
   url TEXT NULL,
@@ -221,8 +224,6 @@ CREATE TABLE observable_property (
   observable_property_id bigserial NOT NULL,
   identifier TEXT NOT NULL,
   description TEXT NULL,
-  unit_id INTEGER NOT NULL,
-  value_type_id INTEGER NOT NULL,
   UNIQUE (identifier),
   PRIMARY KEY(observable_property_id)
 );
@@ -231,6 +232,12 @@ CREATE TABLE procedure_has_observation_type (
   procedure_id INTEGER NOT NULL,
   observation_type_id INTEGER NOT NULL,
   PRIMARY KEY(procedure_id, observation_type_id)
+);
+
+CREATE TABLE offering_has_allowed_observation_type (
+  offering_id INTEGER NOT NULL,
+  observation_type_id INTEGER NOT NULL,
+  PRIMARY KEY(offering_id, observation_type_id)
 );
 
 CREATE TABLE quality (
@@ -282,9 +289,9 @@ CREATE TABLE related_feature_has_related_feature_role (
 
 CREATE TABLE observation_constellation (
   observation_constellation_id bigserial NOT NULL,
-  observation_type_id INTEGER NOT NULL,
+  observation_type_id INTEGER NULL,
   procedure_id INTEGER NOT NULL,
-  result_type_id INTEGER NOT NULL,
+  result_type_id INTEGER NULL,
   offering_id INTEGER NOT NULL,
   observable_property_id INTEGER NOT NULL,
   UNIQUE (observation_type_id,procedure_id,result_type_id,offering_id,observable_property_id),
@@ -318,6 +325,7 @@ CREATE TABLE observation (
   result_time TIMESTAMP NULL,
   valid_time_start TIMESTAMP NULL,
   valid_time_end TIMESTAMP NULL,
+  unit_id INTEGER NULL,
   anti_subsetting INTEGER NULL,
   UNIQUE (feature_of_interest_id,observation_constellation_id,phenomenon_time_start),
   PRIMARY KEY(observation_id)
@@ -359,6 +367,12 @@ CREATE TABLE observation_has_count_value (
   PRIMARY KEY(observation_id, count_value_id)
 );
 
+CREATE TABLE observation_has_boolean_value (
+  observation_id INTEGER NOT NULL,
+  boolean_value_id INTEGER NOT NULL,
+  PRIMARY KEY(observation_id, boolean_value_id)
+);
+
 CREATE TABLE observation_has_quality (
   observation_id INTEGER NOT NULL,
   quality_id INTEGER NOT NULL,
@@ -384,8 +398,9 @@ CREATE INDEX procedure_FKIndex1 ON procedure(procedure_description_format_id);
 CREATE INDEX feature_of_interest_FKIndex1 ON feature_of_interest(feature_of_interest_type_id);
 CREATE INDEX sensor_system_FKIndex1 ON sensor_system(parent_sensor_id);
 CREATE INDEX sensor_system_FKIndex2 ON sensor_system(child_sensor_id);
-CREATE INDEX observable_property_FKIndex1 ON observable_property(unit_id);
-CREATE INDEX observable_property_FKIndex2 ON observable_property(value_type_id);
+CREATE INDEX observable_property_FKIndex1 ON observation(unit_id);
+CREATE INDEX offering_has_allowed_observation_type_FKIndex1 ON offering_has_allowed_observation_type(offering_id);
+CREATE INDEX offering_has_allowed_observation_type_FKIndex2 ON offering_has_allowed_observation_type(observation_type_id);
 CREATE INDEX procedure_has_observation_type_FKIndex1 ON procedure_has_observation_type(procedure_id);
 CREATE INDEX procedure_has_observation_type_FKIndex2 ON procedure_has_observation_type(observation_type_id);
 CREATE INDEX quality_FKIndex1 ON quality(swe_type_id);
@@ -425,6 +440,8 @@ CREATE INDEX observation_has_numeric_value_FKIndex1 ON observation_has_numeric_v
 CREATE INDEX observation_has_numeric_value_FKIndex2 ON observation_has_numeric_value(numeric_value_id);
 CREATE INDEX observation_has_count_value_FKIndex1 ON observation_has_count_value(observation_id);
 CREATE INDEX observation_has_count_value_FKIndex2 ON observation_has_count_value(count_value_id);
+CREATE INDEX observation_has_boolean_value_FKIndex1 ON observation_has_boolean_value(observation_id);
+CREATE INDEX observation_has_boolean_value_FKIndex2 ON observation_has_boolean_value(boolean_value_id);
 CREATE INDEX observation_has_quality_FKIndex1 ON observation_has_quality(observation_id);
 CREATE INDEX observation_has_quality_FKIndex2 ON observation_has_quality(quality_id);
 CREATE INDEX observation_has_spatial_filtering_profile_FKIndex1 ON observation_has_spatial_filtering_profile(observation_id);
@@ -439,8 +456,9 @@ ALTER TABLE procedure ADD FOREIGN KEY (procedure_description_format_id) REFERENC
 ALTER TABLE sensor_system ADD FOREIGN KEY (parent_sensor_id) REFERENCES procedure(procedure_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE sensor_system ADD FOREIGN KEY (child_sensor_id) REFERENCES procedure(procedure_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE feature_of_interest ADD FOREIGN KEY (feature_of_interest_type_id) REFERENCES feature_of_interest_type(feature_of_interest_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE observable_property ADD FOREIGN KEY (unit_id) REFERENCES unit(unit_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE observable_property ADD FOREIGN KEY (value_type_id) REFERENCES value_type(value_Type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE observation ADD FOREIGN KEY (unit_id) REFERENCES unit(unit_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE offering_has_allowed_observation_type ADD FOREIGN KEY (offering_id) REFERENCES offering(offering_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE offering_has_allowed_observation_type ADD FOREIGN KEY (observation_type_id) REFERENCES observation_type(observation_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE procedure_has_observation_type ADD FOREIGN KEY (procedure_id) REFERENCES procedure(procedure_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE procedure_has_observation_type ADD FOREIGN KEY (observation_type_id) REFERENCES observation_type(observation_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE quality ADD FOREIGN KEY (swe_type_id) REFERENCES swe_type(swe_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -476,6 +494,8 @@ ALTER TABLE observation_has_numeric_value ADD FOREIGN KEY (observation_id) REFER
 ALTER TABLE observation_has_numeric_value ADD FOREIGN KEY (numeric_value_id) REFERENCES numeric_value(numeric_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_count_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_count_value ADD FOREIGN KEY (count_value_id) REFERENCES count_value(count_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE observation_has_boolean_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE observation_has_boolean_value ADD FOREIGN KEY (boolean_value_id) REFERENCES boolean_value(boolean_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_category_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_category_value ADD FOREIGN KEY (category_value_id) REFERENCES category_value(category_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_quality ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
