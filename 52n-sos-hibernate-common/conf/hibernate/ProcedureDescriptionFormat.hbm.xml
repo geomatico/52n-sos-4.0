@@ -6,12 +6,14 @@
     <class name="org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat" table="procedure_description_format">
         <id name="procedureDescriptionFormatId" type="long">
             <column name="procedure_description_format_id" />
-            <generator class="increment" />
+            <generator class="sequence">
+            	<param name="sequence">procedure_description_format_procedure_description_format_i_seq</param>
+            </generator>
         </id>
         <property name="procedureDescriptionFormat" type="string">
             <column name="procedure_description_format" not-null="true" />
         </property>
-        <set name="procedures" table="procedure" inverse="true" lazy="true" fetch="select">
+        <set name="procedures" table="procedure" inverse="true" lazy="true" fetch="join">
             <key>
                 <column name="procedure_description_format_id" not-null="true" />
             </key>

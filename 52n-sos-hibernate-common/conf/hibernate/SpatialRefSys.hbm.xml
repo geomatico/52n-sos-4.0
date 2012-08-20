@@ -6,7 +6,7 @@
     <class name="org.n52.sos.ds.hibernate.entities.SpatialRefSys" table="spatial_ref_sys">
         <id name="srid" type="int">
             <column name="srid" />
-            <generator class="increment" />
+            <generator class="sequence" />
         </id>
         <property name="authName" type="string">
             <column name="auth_name" length="256" />

@@ -6,9 +6,11 @@
     <class name="org.n52.sos.ds.hibernate.entities.Request" table="request">
         <id name="requestId" type="long">
             <column name="request_id" />
-            <generator class="increment" />
+            <generator class="sequence">
+            	<param name="sequence">request_request_id_seq</param>
+            </generator>
         </id>
-        <many-to-one name="offering" class="org.n52.sos.ds.hibernate.entities.Offering" fetch="select">
+        <many-to-one name="offering" class="org.n52.sos.ds.hibernate.entities.Offering" fetch="join">
             <column name="offering_id" not-null="true" />
         </many-to-one>
         <property name="request" type="string">
@@ -20,7 +22,7 @@
         <property name="endLease" type="timestamp">
             <column name="end_lease" length="29" not-null="true" />
         </property>
-        <set name="observableProperties" table="request_has_observable_property" inverse="false" lazy="true" fetch="select">
+        <set name="observableProperties" table="request_has_observable_property" inverse="false" lazy="true" fetch="join">
             <key>
                 <column name="request_id" not-null="true" />
             </key>
@@ -28,13 +30,13 @@
                 <column name="observable_property_id" not-null="true" />
             </many-to-many>
         </set>
-        <set name="observationTemplates" table="observation_template" inverse="true" lazy="true" fetch="select">
+        <set name="observationTemplates" table="observation_template" inverse="true" lazy="true" fetch="join">
             <key>
                 <column name="request_id" not-null="true" />
             </key>
             <one-to-many class="org.n52.sos.ds.hibernate.entities.ObservationTemplate" />
         </set>
-        <set name="compositePhenomenons" table="request_has_composite_phenomenon" inverse="false" lazy="true" fetch="select">
+        <set name="compositePhenomenons" table="request_has_composite_phenomenon" inverse="false" lazy="true" fetch="join">
             <key>
                 <column name="request_id" not-null="true" />
             </key>

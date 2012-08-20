@@ -6,7 +6,9 @@
     <class name="org.n52.sos.ds.hibernate.entities.CompositePhenomenon" table="composite_phenomenon">
         <id name="compositePhenomenonId" type="long">
             <column name="composite_phenomenon_id" />
-            <generator class="increment" />
+            <generator class="sequence">
+            	<param name="sequence">composite_phenomenon_composite_phenomenon_id_seq</param>
+            </generator>
         </id>
         <property name="identifier" type="string">
             <column name="identifier" not-null="true" unique="true" />
@@ -14,7 +16,7 @@
         <property name="description" type="string">
             <column name="description" />
         </property>
-        <set name="requests" table="request_has_composite_phenomenon" inverse="true" lazy="true" fetch="select">
+        <set name="requests" table="request_has_composite_phenomenon" inverse="true" lazy="true" fetch="join">
             <key>
                 <column name="composite_phenomenon_id" not-null="true" />
             </key>
@@ -22,7 +24,7 @@
                 <column name="request_id" not-null="true" />
             </many-to-many>
         </set>
-        <set name="observableProperties" table="composite_phenomenon_has_observable_property" inverse="false" lazy="true" fetch="select">
+        <set name="observableProperties" table="composite_phenomenon_has_observable_property" inverse="false" lazy="true" fetch="join">
             <key>
                 <column name="composite_phenomenon_id" not-null="true" />
             </key>

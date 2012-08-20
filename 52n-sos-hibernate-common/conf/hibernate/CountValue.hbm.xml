@@ -6,12 +6,14 @@
     <class name="org.n52.sos.ds.hibernate.entities.CountValue" table="count_value">
         <id name="countValueId" type="long">
             <column name="count_value_id" />
-            <generator class="increment" />
+            <generator class="sequence">
+            	<param name="sequence">count_value_count_value_id_seq</param>
+            </generator>
         </id>
-        <property name="value" type="long">
+        <property name="value" type="int">
             <column name="value" not-null="true" unique="true" />
         </property>
-        <set name="observations" table="observation_has_count_value" inverse="true" lazy="true" fetch="select">
+        <set name="observations" table="observation_has_count_value" inverse="true" lazy="true" fetch="join">
             <key>
                 <column name="count_value_id" not-null="true" />
             </key>

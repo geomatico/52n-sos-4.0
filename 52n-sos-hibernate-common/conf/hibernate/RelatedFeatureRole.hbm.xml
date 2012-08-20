@@ -6,12 +6,14 @@
     <class name="org.n52.sos.ds.hibernate.entities.RelatedFeatureRole" table="related_feature_role">
         <id name="relatedFeatureRoleId" type="long">
             <column name="related_feature_role_id" />
-            <generator class="increment" />
+            <generator class="sequence">
+            	<param name="sequence">related_feature_role_related_feature_role_id_seq</param>
+            </generator>
         </id>
         <property name="relatedFeatureRole" type="string">
             <column name="related_feature_role" not-null="true" unique="true" />
         </property>
-        <set name="relatedFeatures" table="related_feature_has_related_feature_role" inverse="true" lazy="true" fetch="select">
+        <set name="relatedFeatures" table="related_feature_has_related_feature_role" inverse="true" lazy="true" fetch="join">
             <key>
                 <column name="related_feature_role_id" not-null="true" />
             </key>

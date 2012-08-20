@@ -3,19 +3,19 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <!-- Generated 10.07.2012 15:18:27 by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
-    <class name="org.n52.sos.ds.hibernate.entities.NumericValue" table="numeric_value">
-        <id name="numericValueId" type="long">
-            <column name="numeric_value_id" />
+    <class name="org.n52.sos.ds.hibernate.entities.BooleanValue" table="boolean_value">
+        <id name="booleanValueId" type="long">
+            <column name="boolean_value_id" />
             <generator class="sequence">
-            	<param name="sequence">numeric_value_numeric_value_id_seq</param>
+            	<param name="sequence">boolean_value_boolean_value_id_seq</param>
             </generator>
         </id>
-        <property name="value" type="double">
-            <column name="value" precision="131089" scale="0" not-null="true" unique="true" />
+        <property name="value" type="boolean">
+            <column name="value" not-null="true" unique="true" />
         </property>
-        <set name="observations" table="observation_has_numeric_value" inverse="true" lazy="true" fetch="join">
+        <set name="observations" table="observation_has_boolean_value" inverse="true" lazy="true" fetch="join">
             <key>
-                <column name="numeric_value_id" not-null="true" />
+                <column name="boolean_value_id" not-null="true" />
             </key>
             <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.Observation">
                 <column name="observation_id" not-null="true" />

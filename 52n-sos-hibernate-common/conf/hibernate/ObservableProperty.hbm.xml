@@ -6,21 +6,17 @@
     <class name="org.n52.sos.ds.hibernate.entities.ObservableProperty" table="observable_property">
         <id name="observablePropertyId" type="long">
             <column name="observable_property_id" />
-            <generator class="increment" />
+            <generator class="sequence">
+            	<param name="sequence">observable_property_observable_property_id_seq</param>
+            </generator>
         </id>
-        <many-to-one name="valueType" class="org.n52.sos.ds.hibernate.entities.ValueType" fetch="select">
-            <column name="value_type_id" not-null="true" />
-        </many-to-one>
-        <many-to-one name="unit" class="org.n52.sos.ds.hibernate.entities.Unit" fetch="select">
-            <column name="unit_id" not-null="true" />
-        </many-to-one>
         <property name="identifier" type="string">
             <column name="identifier" not-null="true" unique="true" />
         </property>
         <property name="description" type="string">
             <column name="description" />
         </property>
-        <set name="requests" table="request_has_observable_property" inverse="true" lazy="true" fetch="select">
+        <set name="requests" table="request_has_observable_property" inverse="true" lazy="true" fetch="join">
             <key>
                 <column name="observable_property_id" not-null="true" />
             </key>
@@ -28,7 +24,7 @@
                 <column name="request_id" not-null="true" />
             </many-to-many>
         </set>
-        <set name="compositePhenomenons" table="composite_phenomenon_has_observable_property" inverse="true" lazy="true" fetch="select">
+        <set name="compositePhenomenons" table="composite_phenomenon_has_observable_property" inverse="true" lazy="true" fetch="join">
             <key>
                 <column name="observable_property_id" not-null="true" />
             </key>
@@ -36,7 +32,7 @@
                 <column name="composite_phenomenon_id" not-null="true" />
             </many-to-many>
         </set>
-        <set name="observationConstellations" table="observation_constellation" inverse="true" lazy="true" fetch="select">
+        <set name="observationConstellations" table="observation_constellation" inverse="true" lazy="true" fetch="join">
             <key>
                 <column name="observable_property_id" not-null="true" />
             </key>

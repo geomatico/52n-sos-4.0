@@ -28,6 +28,7 @@
         <property name="hibernate.format_sql">true</property>
         
         <!-- Hibernate mapping files -->
+        <mapping resource="BooleanValue.hbm.xml"/>
         <mapping resource="CategoryValue.hbm.xml"/>
         <mapping resource="CompositePhenomenon.hbm.xml"/>
         <mapping resource="CountValue.hbm.xml"/>
@@ -58,6 +59,5 @@
         <mapping resource="TextValue.hbm.xml"/>
         <mapping resource="Unit.hbm.xml"/>
         <mapping resource="ValidProcedureTime.hbm.xml"/>
-        <mapping resource="ValueType.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>

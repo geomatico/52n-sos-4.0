@@ -6,12 +6,14 @@
     <class name="org.n52.sos.ds.hibernate.entities.Quality" table="quality">
         <id name="qualityId" type="long">
             <column name="quality_id" />
-            <generator class="increment" />
+            <generator class="sequence">
+            	<param name="sequence">quality_quality_id_seq</param>
+            </generator>
         </id>
-        <many-to-one name="sweType" class="org.n52.sos.ds.hibernate.entities.SweType" fetch="select">
+        <many-to-one name="sweType" class="org.n52.sos.ds.hibernate.entities.SweType" fetch="join">
             <column name="swe_type_id" not-null="true" />
         </many-to-one>
-        <many-to-one name="unit" class="org.n52.sos.ds.hibernate.entities.Unit" fetch="select">
+        <many-to-one name="unit" class="org.n52.sos.ds.hibernate.entities.Unit" fetch="join">
             <column name="unit_id" not-null="true" />
         </many-to-one>
         <property name="name" type="string">
@@ -20,7 +22,7 @@
         <property name="value" type="string">
             <column name="value" not-null="true" />
         </property>
-        <set name="observations" table="observation_has_quality" inverse="true" lazy="true" fetch="select">
+        <set name="observations" table="observation_has_quality" inverse="true" lazy="true" fetch="join">
             <key>
                 <column name="quality_id" not-null="true" />
             </key>

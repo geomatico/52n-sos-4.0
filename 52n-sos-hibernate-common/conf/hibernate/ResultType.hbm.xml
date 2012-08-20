@@ -6,12 +6,14 @@
     <class name="org.n52.sos.ds.hibernate.entities.ResultType" table="result_type">
         <id name="resultTypeId" type="long">
             <column name="result_type_id" />
-            <generator class="increment" />
+            <generator class="sequence">
+            	<param name="sequence">result_type_result_type_id_seq</param>
+            </generator>
         </id>
         <property name="resultType" type="string">
             <column name="result_type" not-null="true" unique="true" />
         </property>
-        <set name="observationConstellations" table="observation_constellation" inverse="true" lazy="true" fetch="select">
+        <set name="observationConstellations" table="observation_constellation" inverse="true" lazy="true" fetch="join">
             <key>
                 <column name="result_type_id" not-null="true" />
             </key>

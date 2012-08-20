@@ -6,7 +6,9 @@
     <class name="org.n52.sos.ds.hibernate.entities.SpatialFilteringProfile" table="spatial_filtering_profile">
         <id name="spatialFilteringProfileId" type="long">
             <column name="spatial_filtering_profile_id" />
-            <generator class="increment" />
+            <generator class="sequence">
+            	<param name="sequence">spatial_filtering_profile_spatial_filtering_profile_id_seq</param>
+            </generator>
         </id>
         <property name="identifier" type="string">
             <column name="identifier" not-null="true" unique="true" />
@@ -14,7 +16,7 @@
         <property name="geom" type="org.hibernate.spatial.GeometryType">
             <column name="geom" not-null="true" />
         </property>
-        <set name="observations" table="observation_has_spatial_filtering_profile" inverse="true" lazy="true" fetch="select">
+        <set name="observations" table="observation_has_spatial_filtering_profile" inverse="true" lazy="true" fetch="join">
             <key>
                 <column name="spatial_filtering_profile_id" not-null="true" />
             </key>
