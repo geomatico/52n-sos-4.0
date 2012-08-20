@@ -51,6 +51,7 @@ import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
+import org.n52.sos.ds.hibernate.entities.ObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
@@ -108,9 +109,69 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             setRelatedFeatures(cache, session);
             setCompositePhenomenonValues(cache, session);
             setSridValues(cache, session);
-            session.close();
+            setObservationTypes(cache, session);
         } catch (HibernateException he) {
             String exceptionText = "Error while initializing CapabilitiesCache!";
+            LOGGER.debug(exceptionText, he);
+            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+        } finally {
+            connectionProvider.returnConnection(session);
+        }
+    }
+
+    @Override
+    public void updateAfterSensorInsertion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport {
+        CapabilitiesCache cache = (CapabilitiesCache) capabilitiesCache;
+        Session session = null;
+        try {
+            // TODO: check which setter are necessary
+            session = (Session) connectionProvider.getConnection();
+            setOfferingValues(cache, session);
+            setProcedureValues(cache, session);
+            setObservablePropertyValues(cache, session);
+            setFeatureOfInterestValues(cache, session);
+            setRelatedFeatures(cache, session);
+            setCompositePhenomenonValues(cache, session);
+            session.close();
+        } catch (HibernateException he) {
+            String exceptionText = "Error while updateing CapabilitiesCache after sensor insertion!";
+            LOGGER.debug(exceptionText, he);
+            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+        } finally {
+            connectionProvider.returnConnection(session);
+        }
+    }
+
+    @Override
+    public void updateAfterObservationInsertion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport {
+        CapabilitiesCache cache = (CapabilitiesCache) capabilitiesCache;
+        Session session = null;
+        try {
+            // TODO: check which setter are necessary
+            session = (Session) connectionProvider.getConnection();
+            setFeatureOfInterestValues(cache, session);
+            session.close();
+        } catch (HibernateException he) {
+            String exceptionText = "Error while updateing CapabilitiesCache after observation insertion!";
+            LOGGER.debug(exceptionText, he);
+            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+        } finally {
+            connectionProvider.returnConnection(session);
+        }
+    }
+
+    @Override
+    public void updateAfterSensorDeletion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport {
+        CapabilitiesCache cache = (CapabilitiesCache) capabilitiesCache;
+        Session session = null;
+        try {
+            // TODO: check which setter are necessary
+            session = (Session) connectionProvider.getConnection();
+            setOfferingValues(cache, session);
+            setProcedureValues(cache, session);
+            session.close();
+        } catch (HibernateException he) {
+            String exceptionText = "Error while updateing CapabilitiesCache after sensor deletion!";
             LOGGER.debug(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
@@ -132,17 +193,22 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         Map<String, Collection<String>> kOfferingVObservableProperties = new HashMap<String, Collection<String>>();
         Map<String, Collection<String>> kOfferingVRelatedFeatures = new HashMap<String, Collection<String>>();
         Map<String, Collection<String>> kOfferingVObservationTypes = new HashMap<String, Collection<String>>();
+        Map<String, Collection<String>> allowedkOfferingVObservationTypes = new HashMap<String, Collection<String>>();
         List<Offering> hOfferings = session.createCriteria(Offering.class).list();
         for (Offering offering : hOfferings) {
-            kOfferingVName.put(offering.getIdentifier(), offering.getName());
-            kOfferingVProcedures.put(offering.getIdentifier(),
-                    getProceduresFromObservationConstellation(offering.getObservationConstellations()));
-            kOfferingVObservableProperties.put(offering.getIdentifier(),
-                    getObservablePropertiesFromObservationConstellation(offering.getObservationConstellations()));
-            kOfferingVRelatedFeatures.put(offering.getIdentifier(),
-                    getRelatedFeatureIDsFromOffering(offering.getRelatedFeatures()));
-            kOfferingVObservationTypes.put(offering.getIdentifier(),
-                    getObservationTypesFromObservationConstellation(offering.getObservationConstellations()));
+            if (!checkOfferingForDeletedProcedure(offering.getObservationConstellations())) {
+                kOfferingVName.put(offering.getIdentifier(), offering.getName());
+                kOfferingVProcedures.put(offering.getIdentifier(),
+                        getProceduresFromObservationConstellation(offering.getObservationConstellations()));
+                kOfferingVObservableProperties.put(offering.getIdentifier(),
+                        getObservablePropertiesFromObservationConstellation(offering.getObservationConstellations()));
+                kOfferingVRelatedFeatures.put(offering.getIdentifier(),
+                        getRelatedFeatureIDsFromOffering(offering.getRelatedFeatures()));
+                kOfferingVObservationTypes.put(offering.getIdentifier(),
+                        getObservationTypesFromObservationConstellation(offering.getObservationConstellations()));
+                allowedkOfferingVObservationTypes.put(offering.getIdentifier(),
+                        getObservationTypesFromObservationType(offering.getObservationTypes()));
+            }
         }
         cache.setKOfferingVName(kOfferingVName);
         cache.setKOfferingVObservableProperties(kOfferingVObservableProperties);
@@ -150,7 +216,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         cache.setKOfferingVRelatedFeatures(kOfferingVRelatedFeatures);
         cache.setKOfferingVObservationTypes(kOfferingVObservationTypes);
         cache.setKOffrtingVFeatures(getFeaturesFromObservationForOfferings(kOfferingVName.keySet(), session));
-
+        cache.setAllowedKOfferingVObservationType(allowedkOfferingVObservationTypes);
     }
 
     /**
@@ -168,13 +234,15 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         Map<String, Collection<String>> parentProcs = new HashMap<String, Collection<String>>();
         List<Procedure> hProcedures = session.createCriteria(Procedure.class).list();
         for (Procedure procedure : hProcedures) {
-            procedures.add(procedure.getIdentifier());
-            kProcedureVOffering.put(procedure.getIdentifier(),
-                    getOfferingsFromObservationCollection(procedure.getObservationConstellations()));
-            kProcedureVObservableProperties.put(procedure.getIdentifier(),
-                    getObservablePropertiesFromObservationConstellation(procedure.getObservationConstellations()));
-            parentProcs.put(procedure.getIdentifier(),
-                    getProcedureIDsFromProcedures(procedure.getProceduresForChildSensorId()));
+            if (!procedure.isDeleted()) {
+                procedures.add(procedure.getIdentifier());
+                kProcedureVOffering.put(procedure.getIdentifier(),
+                        getOfferingsFromObservationCollection(procedure.getObservationConstellations()));
+                kProcedureVObservableProperties.put(procedure.getIdentifier(),
+                        getObservablePropertiesFromObservationConstellation(procedure.getObservationConstellations()));
+                parentProcs.put(procedure.getIdentifier(),
+                        getProcedureIDsFromProcedures(procedure.getProceduresForChildSensorId()));
+            }
         }
         cache.setProcedures(procedures);
         cache.setKProcedureVOfferings(kProcedureVOffering);
@@ -195,7 +263,6 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         Map<String, Collection<String>> kObservablePropertyVOffering = new HashMap<String, Collection<String>>();
         Map<String, Collection<String>> kObservablePropertyVProcedures = new HashMap<String, Collection<String>>();
         Map<String, ValueTypes> kObservablePropertyVValutType = new HashMap<String, ValueTypes>();
-        Map<String, String> kObservablePropertyVUnit = new HashMap<String, String>();
         List<ObservableProperty> hObservableProperties = session.createCriteria(ObservableProperty.class).list();
         for (ObservableProperty observableProperty : hObservableProperties) {
             observableProperties.add(observableProperty.getIdentifier());
@@ -203,14 +270,9 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
                     getOfferingsFromObservationCollection(observableProperty.getObservationConstellations()));
             kObservablePropertyVProcedures.put(observableProperty.getIdentifier(),
                     getProceduresFromObservationConstellation(observableProperty.getObservationConstellations()));
-            kObservablePropertyVValutType.put(observableProperty.getIdentifier(),
-                    SosConstants.getValueTypeForString(observableProperty.getValueType().getValueType()));
-            kObservablePropertyVUnit.put(observableProperty.getIdentifier(), observableProperty.getUnit().getUnit());
         }
         cache.setKObservablePropertyVOfferings(kObservablePropertyVOffering);
         cache.setKObservablePropertyKProcedures(kObservablePropertyVProcedures);
-        cache.setObsPropsValueTypes(kObservablePropertyVValutType);
-        cache.setUnit4ObservableProperty(kObservablePropertyVUnit);
     }
 
     /**
@@ -247,7 +309,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
                     .getRelatedFeatureRoles()) {
                 roles.add(relatedFeatureRole.getRelatedFeatureRole());
             }
-            relatedFeatureList.put(relatedFeature.getIdentifier(), roles);
+            relatedFeatureList.put(relatedFeature.getFeatureOfInterest().getIdentifier(), roles);
         }
         cache.setKRelatedFeaturesVRole(relatedFeatureList);
     }
@@ -288,6 +350,17 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             srids.add(spatialRefSys.getSrid());
         }
         cache.setSrids(srids);
+    }
+
+    private void setObservationTypes(CapabilitiesCache cache, Session session) {
+        cache.setObservationTypes(HibernateCriteriaQueryUtilities.getObservationTypes(session));
+    }
+
+    private boolean checkOfferingForDeletedProcedure(Set<ObservationConstellation> observationConstellations) {
+        for (ObservationConstellation observationConstellation : observationConstellations) {
+            return observationConstellation.getProcedure().isDeleted();
+        }
+        return true;
     }
 
     /**
@@ -391,9 +464,19 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             Set<ObservationConstellation> observationConstellations) {
         Set<String> observationTypes = new HashSet<String>();
         for (ObservationConstellation observationConstellation : observationConstellations) {
-            observationTypes.add(observationConstellation.getObservationType().getObservationType());
+            if (observationConstellation.getObservationType() != null) {
+                observationTypes.add(observationConstellation.getObservationType().getObservationType());
+            }
         }
         return new ArrayList<String>(observationTypes);
+    }
+
+    private Collection<String> getObservationTypesFromObservationType(Set observationTypes) {
+        Set<String> obsTypes = new HashSet<String>();
+        for (ObservationType obsType : (Set<ObservationType>) observationTypes) {
+            obsTypes.add(obsType.getObservationType());
+        }
+        return new ArrayList<String>(obsTypes);
     }
 
     /**
@@ -406,7 +489,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
     private Collection<String> getRelatedFeatureIDsFromOffering(Set<RelatedFeature> relatedFeatures) {
         List<String> relatedFeatureList = new ArrayList<String>();
         for (RelatedFeature relatedFeature : relatedFeatures) {
-            relatedFeatureList.add(relatedFeature.getIdentifier());
+            relatedFeatureList.add(relatedFeature.getFeatureOfInterest().getIdentifier());
         }
         return relatedFeatureList;
     }

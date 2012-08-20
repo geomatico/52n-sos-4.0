@@ -52,7 +52,6 @@ public interface ISensorMLEncoder {
      * @throws OwsExceptionReport
      */
     public XmlObject createSensor(SensorML sensorDesc, Collection<String> parentProcedureIds,
-    		Map<String,SensorML> childProcedures)
-            throws OwsExceptionReport;
+            Map<String, SensorML> childProcedures) throws OwsExceptionReport;
 
 }

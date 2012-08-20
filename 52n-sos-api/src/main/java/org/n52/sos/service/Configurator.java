@@ -31,8 +31,6 @@ package org.n52.sos.service;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,13 +51,12 @@ import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.IDecoder;
 import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ds.IConnectionProvider;
+import org.n52.sos.ds.IDataSourceInitializator;
 import org.n52.sos.ds.IFeatureQueryHandler;
 import org.n52.sos.ds.IOperationDAO;
 import org.n52.sos.encode.EncoderKeyType;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.ISosRequestEncoder;
-import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Range;
 import org.n52.sos.request.operator.IRequestOperator;
@@ -81,9 +78,6 @@ public final class Configurator {
 
     /** logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(Configurator.class);
-
-    /** propertyname of CAPABILITIESCACHECONTROLLER property */
-    private static final String CAPABILITIESCACHECONTROLLER = "CAPABILITIESCACHECONTROLLER";
 
     /** propertyname of CAPABILITIESCACHECONTROLLER property */
     private static final String CAPABILITIESCACHEUPDATEINTERVAL = "CAPABILITIESCACHEUPDATEINTERVAL";
@@ -187,7 +181,7 @@ public final class Configurator {
     private String basepath;
 
     /** Capabilities Cache Controller */
-    private ACapabilitiesCacheController capsCacheController;
+    private ACapabilitiesCacheController capabilitiesCacheController;
 
     /**
      * property indicates whether SOS encodes the complete child procedure
@@ -217,6 +211,8 @@ public final class Configurator {
      * Implementation of IConnectionProvider
      */
     private IConnectionProvider connectionProvider;
+    
+    private IDataSourceInitializator dataSourceInitializator;
 
     private Map<DecoderKeyType, List<IDecoder>> decoder;
 
@@ -294,8 +290,13 @@ public final class Configurator {
     /** ServiceLoader for ICacheFeederDAO */
     private ServiceLoader<ICacheFeederDAO> serviceLoaderCacheFeederDAO;
 
+    /** ServiceLoader for ACapabilitiesCacheController */
+    private ServiceLoader<ACapabilitiesCacheController> serviceLoaderCapabilitiesCacheController;
+
     /** ServiceLoader for ISosRequestOperator */
     private ServiceLoader<IBinding> serviceLoaderBindingOperator;
+    
+    private ServiceLoader<IDataSourceInitializator> serviceLoaderDataSourceInitializator;
 
     private ServiceLoader<IDecoder> serviceLoaderDecoder;
 
@@ -464,46 +465,35 @@ public final class Configurator {
         // default lease is 6 hours.
         String leaseString = props.getProperty(LEASE, "600");
         if (leaseString == null || leaseString.equals("")) {
-            OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-                    "No lease is defined in the config file! Please set the lease property on an integer value!");
-            LOGGER.error("No lease is defined in the config file! Please set the lease property on an integer value!",
-                    se);
-            throw se;
+            String exceptionText = "No lease is defined in the config file! Please set the lease property on an integer value!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
 
         // creating common SOS properties object from inputStream
         // default lease is 6 hours.
         String defaultEPSGstring = props.getProperty(DEFAULT_EPSG, "4326");
         if (defaultEPSGstring == null || defaultEPSGstring.equals("")) {
-            OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-                    "No default EPSG code is defined in the config file! Please set the default EPSG code property on an integer value!");
-            LOGGER.error(
-                    "No default EPSG code is defined in the config file! Please set the default EPSG code property on an integer value!",
-                    se);
-            throw se;
+            String exceptionText = "No default EPSG code is defined in the config file! Please set the default EPSG code property on an integer value!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
 
         this.defaultEPSG = Integer.valueOf(defaultEPSGstring).intValue();
 
         String characterEnodingString = props.getProperty(CHARACTER_ENCODING);
         if (characterEnodingString == null || (characterEnodingString != null && characterEnodingString.isEmpty())) {
-            OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-                    "No characterEnoding is defined in the config file!!");
-            LOGGER.error("No characterEnoding is defined in the config file!!");
-            throw se;
+            String exceptionText = "No characterEnoding is defined in the config file!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
         this.characterEncoding = characterEnodingString;
 
         String srsNamePrefixString = props.getProperty(SRS_NAME_PREFIX);
         if (srsNamePrefixString == null) {
-            OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-                    "No prefix for the spation reference system is defined in the config file!!");
-            LOGGER.error("No SRS prefix is defined in the config file!!");
-            throw se;
+            String exceptionText = "No SOS 1.0.0 prefix for the spation reference system is defined in the config file!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         } else if (!srsNamePrefixString.endsWith(":") && srsNamePrefixString.length() != 0) {
             srsNamePrefixString += ":";
         }
@@ -511,11 +501,9 @@ public final class Configurator {
 
         String srsNamePrefixStringSosV2 = props.getProperty(SRS_NAME_PREFIX_SOS_V2);
         if (srsNamePrefixStringSosV2 == null) {
-            OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-                    "No prefix for the spation reference system is defined in the config file!!");
-            LOGGER.error("No SRS prefix is defined in the config file!!");
-            throw se;
+            String exceptionText = "No SOS 2.0 prefix for the spation reference system is defined in the config file!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         } else if (!srsNamePrefixStringSosV2.endsWith("/") && srsNamePrefixStringSosV2.length() != 0) {
             srsNamePrefixStringSosV2 += "/";
         }
@@ -525,13 +513,12 @@ public final class Configurator {
         if (supportsQualityString == null
                 || (!supportsQualityString.equalsIgnoreCase("true") && !supportsQualityString
                         .equalsIgnoreCase("false"))) {
-            OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-                    "No supportsQuality is defined in the config file or the value :" + supportsQualityString
-                            + " is wrong!");
-            LOGGER.error("No supportsQuality is defined in the config file or the value '" + supportsQualityString
-                    + "' is wrong!", se);
-            throw se;
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("No supportsQuality is defined in the config file or the value : ");
+            exceptionText.append(supportsQualityString);
+                    exceptionText.append(" is wrong!");
+            LOGGER.error(exceptionText.toString());
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
         }
         this.supportsQuality = Boolean.parseBoolean(supportsQualityString);
 
@@ -540,25 +527,21 @@ public final class Configurator {
         if (skipDuplicateObservationsString == null
                 || (!skipDuplicateObservationsString.equalsIgnoreCase("true") && !skipDuplicateObservationsString
                         .equalsIgnoreCase("false"))) {
-            OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-                    "No 'skipDuplicateObservations' is defined in the config file or the value '"
-                            + skipDuplicateObservationsString + "' is wrong!");
-            LOGGER.error("No 'skipDuplicateObservations' is defined in the config file or the value :"
-                    + skipDuplicateObservationsString + " is wrong!", se);
-            throw se;
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("No skipDuplicateObservations is defined in the config file or the value : ");
+            exceptionText.append(skipDuplicateObservationsString);
+                    exceptionText.append(" is wrong!");
+            LOGGER.error(exceptionText.toString());
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
         }
         this.skipDuplicateObservations = Boolean.parseBoolean(skipDuplicateObservationsString);
 
         String switchCoordinatesForEPSGString = props.getProperty(SWITCHCOORDINATESFOREPSG);
         if (switchCoordinatesForEPSGString == null) {
-            OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            String excMsg =
-                    "No switchCoordinatesForEPSG is defined in the config file or the value '" + supportsQualityString
-                            + "' is wrong!";
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null, excMsg);
-            LOGGER.error(excMsg, se);
-            throw se;
+            String exceptionText = "No switchCoordinatesForEPSG is defined in the config file or the value '" + supportsQualityString
+                    + "' is wrong!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
         for (String switchCoordinatesForEPSGEntry : switchCoordinatesForEPSGString.split(";")) {
             String[] splittedSwitchCoordinatesForEPSGEntry = switchCoordinatesForEPSGEntry.split("-");
@@ -573,12 +556,11 @@ public final class Configurator {
                                 Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[1]));
                 switchCoordinatesForEPSG.add(r);
             } else {
-                OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-                String excMsg =
-                        "Invalid format of entry in 'switchCoordinatesForEPSG': " + switchCoordinatesForEPSGEntry;
-                se.addCodedException(OwsExceptionCode.NoApplicableCode, null, excMsg);
-                LOGGER.error(excMsg, se);
-                throw se;
+                StringBuilder exceptionText = new StringBuilder();
+                exceptionText.append("Invalid format of entry in 'switchCoordinatesForEPSG': ");
+                exceptionText.append(switchCoordinatesForEPSGEntry);
+                LOGGER.error(exceptionText.toString());
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
             }
         }
 
@@ -587,13 +569,10 @@ public final class Configurator {
         if (foiEncodedInObservationString == null
                 || (!foiEncodedInObservationString.equalsIgnoreCase("true") && !foiEncodedInObservationString
                         .equalsIgnoreCase("false"))) {
-            OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-                    "No 'foiEncodedInObservation' is defined in the config file or the value '"
-                            + supportsQualityString + "' is wrong!");
-            LOGGER.error("No 'foiEncodedInObservation' is defined in the config file or the value :"
-                    + foiEncodedInObservationString + " is wrong!", se);
-            throw se;
+            String exceptionText =  "No 'foiEncodedInObservation' is defined in the config file or the value '"
+                    + supportsQualityString + "' is wrong!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
         this.foiEncodedInObservation = Boolean.parseBoolean(foiEncodedInObservationString);
 
@@ -602,13 +581,10 @@ public final class Configurator {
         if (foiListedInOfferingsString == null
                 || (!foiListedInOfferingsString.equalsIgnoreCase("true") && !foiListedInOfferingsString
                         .equalsIgnoreCase("false"))) {
-            OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-                    "No 'foiListedInOfferings' is defined in the config file or the value '"
-                            + foiListedInOfferingsString + "' is wrong!");
-            LOGGER.error("No 'foiListedInOfferings' is defined in the config file or the value :"
-                    + foiListedInOfferingsString + " is wrong!", se);
-            throw se;
+            String exceptionText = "No 'foiListedInOfferings' is defined in the config file or the value '"
+                    + foiListedInOfferingsString + "' is wrong!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
         this.foiListedInOfferings = Boolean.parseBoolean(foiListedInOfferingsString);
 
@@ -623,13 +599,10 @@ public final class Configurator {
         if (showFullOperationsMetadataString == null
                 || (!showFullOperationsMetadataString.equalsIgnoreCase("true") && !showFullOperationsMetadataString
                         .equalsIgnoreCase("false"))) {
-            OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-                    "No 'showFullOperationsMetadata' is defined in the config file or the value '"
-                            + showFullOperationsMetadataString + "' is wrong!");
-            LOGGER.error("No 'showFullOperationsMetadata' is defined in the config file or the value :"
-                    + showFullOperationsMetadataString + " is wrong!", se);
-            throw se;
+            String exceptionText = "No 'showFullOperationsMetadata' is defined in the config file or the value '"
+                    + showFullOperationsMetadataString + "' is wrong!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
         this.showFullOperationsMetadata = Boolean.parseBoolean(showFullOperationsMetadataString);
 
@@ -639,13 +612,10 @@ public final class Configurator {
         if (showFullOperationsMetadata4ObservationsString == null
                 || (!showFullOperationsMetadata4ObservationsString.equalsIgnoreCase("true") && !showFullOperationsMetadata4ObservationsString
                         .equalsIgnoreCase("false"))) {
-            OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-                    "No 'showFullOperationsMetadata' is defined in the config file or the value '"
-                            + showFullOperationsMetadata4ObservationsString + "' is wrong!");
-            LOGGER.error("No 'showFullOperationsMetadata' is defined in the config file or the value :"
-                    + showFullOperationsMetadata4ObservationsString + " is wrong!", se);
-            throw se;
+            String exceptionText = "No 'showFullOperationsMetadata4Observations' is defined in the config file or the value '"
+                    + showFullOperationsMetadata4ObservationsString + "' is wrong!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
         this.showFullOperationsMetadata4Observations =
                 Boolean.parseBoolean(showFullOperationsMetadata4ObservationsString);
@@ -655,13 +625,10 @@ public final class Configurator {
         if (supportDynamicLocationString == null
                 || (!supportDynamicLocationString.equalsIgnoreCase("true") && !supportDynamicLocationString
                         .equalsIgnoreCase("false"))) {
-            OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-                    "No 'supportDynamicLocation' is defined in the config file or the value '"
-                            + supportDynamicLocationString + "' is wrong!");
-            LOGGER.error("No 'supportDynamicLocation' is defined in the config file or the value :"
-                    + supportDynamicLocationString + " is wrong!", se);
-            throw se;
+            String exceptionText =  "No 'supportDynamicLocation' is defined in the config file or the value '"
+                    + supportDynamicLocationString + "' is wrong!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
         this.supportDynamicLocation = Boolean.parseBoolean(supportDynamicLocationString);
 
@@ -670,24 +637,17 @@ public final class Configurator {
         if (dynamicFoiLocationString == null
                 || (!dynamicFoiLocationString.equalsIgnoreCase("true") && !dynamicFoiLocationString
                         .equalsIgnoreCase("false"))) {
-            OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-                    "No 'dynamicFoiLocation' is defined in the config file or the value '" + dynamicFoiLocationString
-                            + "' is wrong!");
-            LOGGER.error("No 'dynamicFoiLocation' is defined in the config file or the value :"
-                    + dynamicFoiLocationString + " is wrong!", se);
-            throw se;
+            String exceptionText = "No 'dynamicFoiLocation' is defined in the config file or the value '" + dynamicFoiLocationString
+                    + "' is wrong!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
         if (this.supportDynamicLocation == false && dynamicFoiLocationString != null
                 && dynamicFoiLocationString.equalsIgnoreCase("true")) {
-            OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-                    "Support for dynamic location is set to false in the config file! To set dynamic foi location set '"
-                            + supportDynamicLocation + "' to true!");
-            LOGGER.error(
-                    "Support for dynamic location is set to false in the config file! To set dynamic foi location set '"
-                            + supportDynamicLocation + "' to true!", se);
-            throw se;
+            String exceptionText = "Support for dynamic location is set to false in the config file! To set dynamic foi location set '"
+                    + supportDynamicLocation + "' to true!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
         this.setFoiLocationDynamically = Boolean.parseBoolean(dynamicFoiLocationString);
 
@@ -695,11 +655,9 @@ public final class Configurator {
         String spatialObsProp4DynymicLocationString = props.getProperty(SPATIAL_OBSERVABLE_PROPERTY);
         if (this.supportDynamicLocation == true
                 && (spatialObsProp4DynymicLocationString == null || spatialObsProp4DynymicLocationString.isEmpty())) {
-            OwsExceptionReport se = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-                    "Dynamic location support is set to true but no observable property is defined!!");
-            LOGGER.error("Dynamic location support is set to true but no observable property is defined!!");
-            throw se;
+            String exceptionText =  "Dynamic location support is set to true but no observable property is defined!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
         this.spatialObsProp4DynymicLocation = spatialObsProp4DynymicLocationString;
 
@@ -767,6 +725,8 @@ public final class Configurator {
 
         setServiceURL(props.getProperty(SOS_URL));
 
+        updateIntervall = Long.parseLong(props.getProperty(CAPABILITIESCACHEUPDATEINTERVAL));
+
         // //////////////////////////////////////////////////////////////
         // initializing DAOFactory Implementation
         // if not set, throw exception
@@ -780,13 +740,10 @@ public final class Configurator {
         initalizeDecoder();
         initalizeEncoder();
         initializeRequestOperators();
-
-        // initialize CapabilitiesCache
-        initializeCapabilitiesCacheController(props);
-
         initializeBindingOperator();
         initializeAdminRequestOperator();
-
+        initializeDataSource();
+        initializeCapabilitiesCacheController();
     }
 
     /**
@@ -836,91 +793,6 @@ public final class Configurator {
     }
 
     /**
-     * intializes the CapabilitiesCache
-     * 
-     * @throws OwsExceptionReport
-     *             if initializing the CapabilitiesCache failed
-     */
-    @SuppressWarnings("unchecked")
-    private void initializeCapabilitiesCacheController(Properties props) throws OwsExceptionReport {
-
-        // TODO SOSX: entsprechend dem SOSX Flag den CapCacheController
-        // initialisieren
-        // Umschreiben des CapCache -> muss mehrfach instanzierbar sein
-        // CacheController hat Liste mit SOSID und zugehoerigem CapCache
-        // Wenn SOSX -> factory.getCapCacheDAO, sonst factory.getConfigDAO
-        // rename to intializeCapabilitiesController
-
-        String className = props.getProperty(CAPABILITIESCACHECONTROLLER);
-        updateIntervall = Long.parseLong(props.getProperty(CAPABILITIESCACHEUPDATEINTERVAL));
-
-        try {
-
-            if (className == null) {
-                LOGGER.error("No CapabilitiesCacheController Implementation is set in the configFile!");
-                OwsExceptionReport se = new OwsExceptionReport();
-                se.addCodedException(OwsExceptionCode.NoApplicableCode,
-                        "SosConfigurator.initializeCapabilitiesCacheController()",
-                        "No CapabilitiesCacheController Implementation is set in the configFile!");
-                throw se;
-            }
-
-            // get Class of the OMEncoder Implementation
-            Class controllerClass = Class.forName(className);
-
-            // get Constructor of this class with matching parameter types
-            Constructor<ACapabilitiesCacheController> constructor = controllerClass.getConstructor();
-
-            this.capsCacheController = constructor.newInstance();
-
-            LOGGER.info("\n******\n" + className + " loaded successfully!\n******\n");
-
-            // start timertask only if intervall is greater than zero, else
-            // don't start
-            if (updateIntervall > 0) {
-                timer = new Timer();
-                timer.scheduleAtFixedRate(this.capsCacheController, getUpdateIntervallInMillis(),
-                        getUpdateIntervallInMillis());
-                LOGGER.info("\n******\n CapabilitiesCacheController timertask started successfully!\n******\n");
-            } else {
-                LOGGER.info("\n******\n CapabilitiesCacheController timertask not started!\n******\n");
-            }
-            try {
-                this.capsCacheController.update(false);
-            } catch (OwsExceptionReport owse) {
-                LOGGER.error("Fatal error: Couldn't initialize capabilities cache!");
-                throw owse;
-            }
-
-        } catch (ClassNotFoundException cnfe) {
-            LOGGER.error("Error while loading CapabilitiesCacheController, required class could not be loaded: "
-                    + cnfe.toString());
-            throw new OwsExceptionReport(cnfe.getMessage(), cnfe.getCause());
-        } catch (SecurityException se) {
-            LOGGER.error("Error while loading CapabilitiesCacheController: " + se.toString());
-            throw new OwsExceptionReport(se.getMessage(), se.getCause());
-        } catch (NoSuchMethodException nsme) {
-            LOGGER.error("Error while loading CapabilitiesCacheController, no required constructor available: "
-                    + nsme.toString());
-            throw new OwsExceptionReport(nsme.getMessage(), nsme.getCause());
-        } catch (IllegalArgumentException iae) {
-            LOGGER.error("Error while loading CapabilitiesCacheController, parameters for the constructor are illegal: "
-                    + iae.toString());
-            throw new OwsExceptionReport(iae.getMessage(), iae.getCause());
-        } catch (InstantiationException ie) {
-            LOGGER.error("The instantiation of a CapabilitiesCacheController failed: " + ie.toString());
-            throw new OwsExceptionReport(ie.getMessage(), ie.getCause());
-        } catch (IllegalAccessException iace) {
-            LOGGER.error("The instantiation of an CapabilitiesCacheController failed: " + iace.toString());
-            throw new OwsExceptionReport(iace.getMessage(), iace.getCause());
-        } catch (InvocationTargetException ite) {
-            LOGGER.error("the instantiation of an CapabilitiesCacheController failed: " + ite.toString()
-                    + ite.getLocalizedMessage() + ite.getCause());
-            throw new OwsExceptionReport(ite.getMessage(), ite.getCause());
-        }
-    }
-
-    /**
      * reads the requestListeners from the configFile and returns a
      * RequestOperator containing the requestListeners
      * 
@@ -939,9 +811,7 @@ public final class Configurator {
         if (this.adminRequestOperator == null) {
             String exceptionText = "No IAdminServiceOperator implementation is loaded!";
             LOGGER.error(exceptionText);
-            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText);
-            throw owse;
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
         LOGGER.info("\n******\n IAdminServiceOperator loaded successfully!\n******\n");
     }
@@ -971,9 +841,7 @@ public final class Configurator {
         if (this.bindingOperators.isEmpty()) {
             String exceptionText = "No IBinding implementation could is loaded!";
             LOGGER.error(exceptionText);
-            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText);
-            throw owse;
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
         LOGGER.info("\n******\n Binding(s) loaded successfully!\n******\n");
     }
@@ -987,7 +855,43 @@ public final class Configurator {
     private void initalizeCacheFeederDAO() throws OwsExceptionReport {
         serviceLoaderCacheFeederDAO = ServiceLoader.load(ICacheFeederDAO.class);
         setCacheFeederDAO();
-        LOGGER.info("\n******\n CacheFeederDAO initialized successfully!\n******\n");
+        LOGGER.info("\n******\n CacheFeederDAO loaded successfully!\n******\n");
+    }
+
+    /**
+     * intializes the CapabilitiesCache
+     * 
+     * @throws OwsExceptionReport
+     *             if initializing the CapabilitiesCache failed
+     */
+    private void initializeCapabilitiesCacheController() throws OwsExceptionReport {
+        serviceLoaderCapabilitiesCacheController = ServiceLoader.load(ACapabilitiesCacheController.class);
+        Iterator<ACapabilitiesCacheController> iter = serviceLoaderCapabilitiesCacheController.iterator();
+        try {
+            this.capabilitiesCacheController = iter.hasNext() ? iter.next() : null;
+        } catch (ServiceConfigurationError sce) {
+            LOGGER.warn("An ACapabilitiesCacheController implementation could not be loaded!", sce);
+        }
+        if (this.capabilitiesCacheController == null) {
+            String exceptionText = "No ACapabilitiesCacheController implementation is loaded!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        }
+        LOGGER.info("\n******\n ACapabilitiesCacheController loaded successfully!\n******\n");
+        if (updateIntervall > 0) {
+            timer = new Timer();
+            timer.scheduleAtFixedRate(this.capabilitiesCacheController, getUpdateIntervallInMillis(),
+                    getUpdateIntervallInMillis());
+            LOGGER.info("\n******\n ACapabilitiesCacheController timertask started successfully!\n******\n");
+        } else {
+            LOGGER.info("\n******\n ACapabilitiesCacheController timertask not started!\n******\n");
+        }
+        try {
+            this.capabilitiesCacheController.update(false);
+        } catch (OwsExceptionReport owse) {
+            LOGGER.error("Fatal error: Couldn't initialize capabilities cache!");
+            throw owse;
+        }
     }
 
     /**
@@ -1006,25 +910,40 @@ public final class Configurator {
         if (this.connectionProvider == null) {
             String exceptionText = "No IConnectionProvider implementation is loaded!";
             LOGGER.error(exceptionText);
-            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText);
-            throw owse;
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
         LOGGER.info("\n******\n ConnectionProvider loaded successfully!\n******\n");
+    }
+
+    private void initializeDataSource() throws OwsExceptionReport {
+        serviceLoaderDataSourceInitializator = ServiceLoader.load(IDataSourceInitializator.class);
+        Iterator<IDataSourceInitializator> iter = serviceLoaderDataSourceInitializator.iterator();
+        try {
+            this.dataSourceInitializator = iter.hasNext() ? iter.next() : null;
+        } catch (ServiceConfigurationError sce) {
+            LOGGER.warn("An IDataSourceInitializator implementation could not be loaded!", sce);
+        }
+        if (this.dataSourceInitializator == null) {
+            String exceptionText = "No IDataSourceInitializator implementation is loaded!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        }
+        LOGGER.info("\n******\n IDataSourceInitializator loaded successfully!\n******\n");
+        this.dataSourceInitializator.initializeDataSource();
     }
 
     private void initalizeDecoder() throws OwsExceptionReport {
         decoder = new HashMap<DecoderKeyType, List<IDecoder>>();
         serviceLoaderDecoder = ServiceLoader.load(IDecoder.class);
         setDecoder();
-        LOGGER.info("\n******\n Decoder(s) initialized successfully!\n******\n");
+        LOGGER.info("\n******\n Decoder(s) loaded successfully!\n******\n");
     }
 
     private void initalizeEncoder() throws OwsExceptionReport {
         encoder = new HashMap<EncoderKeyType, IEncoder>();
         serviceLoaderEncoder = ServiceLoader.load(IEncoder.class);
         setEncoder();
-        LOGGER.info("\n******\n Encoder(s) initialized successfully!\n******\n");
+        LOGGER.info("\n******\n Encoder(s) loaded successfully!\n******\n");
     }
 
     /**
@@ -1036,7 +955,7 @@ public final class Configurator {
     private void initalizeFeatureQueryHandler() throws OwsExceptionReport {
         serviceLoaderFeatureQueryHandler = ServiceLoader.load(IFeatureQueryHandler.class);
         setFeatureQueryHandler();
-        LOGGER.info("\n******\n FeatureQueryHandler initialized successfully!\n******\n");
+        LOGGER.info("\n******\n FeatureQueryHandler loaded successfully!\n******\n");
     }
 
     /**
@@ -1049,7 +968,7 @@ public final class Configurator {
         operationDAOs = new HashMap<String, IOperationDAO>();
         serviceLoaderOperationDAOs = ServiceLoader.load(IOperationDAO.class);
         setOperationDAOs();
-        LOGGER.info("\n******\n OperationDAO(s) initialized successfully!\n******\n");
+        LOGGER.info("\n******\n OperationDAO(s) loaded successfully!\n******\n");
     }
 
     /**
@@ -1062,14 +981,14 @@ public final class Configurator {
         serviceOperators = new HashMap<ServiceOperatorKeyType, IServiceOperator>();
         serviceLoaderServiceOperators = ServiceLoader.load(IServiceOperator.class);
         setServiceOperatorMap();
-        LOGGER.info("\n******\n ServiceOperator(s) initialized successfully!\n******\n");
+        LOGGER.info("\n******\n ServiceOperator(s) loaded successfully!\n******\n");
     }
 
     private void initializeRequestOperators() throws OwsExceptionReport {
         requestOperators = new HashMap<RequestOperatorKeyType, IRequestOperator>();
         serviceLoaderRequestOperators = ServiceLoader.load(IRequestOperator.class);
         setRequestOperatorMap();
-        LOGGER.info("\n******\n RequestOperator(s) initialized successfully!\n******\n");
+        LOGGER.info("\n******\n RequestOperator(s) loaded successfully!\n******\n");
     }
 
     /**
@@ -1089,9 +1008,7 @@ public final class Configurator {
         if (this.cacheFeederDAO == null) {
             String exceptionText = "No ICacheFeederDAO implementations is loaded!";
             LOGGER.error(exceptionText);
-            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText);
-            throw owse;
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
     }
 
@@ -1118,9 +1035,7 @@ public final class Configurator {
         if (this.decoder.isEmpty()) {
             String exceptionText = "No IDecoder implementations is loaded!";
             LOGGER.error(exceptionText);
-            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText);
-            throw owse;
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
     }
 
@@ -1139,9 +1054,7 @@ public final class Configurator {
         if (this.encoder.isEmpty()) {
             String exceptionText = "No IEncoder implementations is loaded!";
             LOGGER.error(exceptionText);
-            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText);
-            throw owse;
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
     }
 
@@ -1162,9 +1075,7 @@ public final class Configurator {
         if (this.featureQueryHandler == null) {
             String exceptionText = "No IFeatureQueryHandler implementations is loaded!";
             LOGGER.error(exceptionText);
-            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText);
-            throw owse;
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
     }
 
@@ -1188,9 +1099,7 @@ public final class Configurator {
         if (this.operationDAOs.isEmpty()) {
             String exceptionText = "No IOperationDAO implementations is loaded!";
             LOGGER.error(exceptionText);
-            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText);
-            throw owse;
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
     }
 
@@ -1207,9 +1116,7 @@ public final class Configurator {
         if (this.encoder.isEmpty()) {
             String exceptionText = "No IRequestOperator implementation is loaded!";
             LOGGER.error(exceptionText);
-            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText);
-            throw owse;
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
 
     }
@@ -1235,9 +1142,7 @@ public final class Configurator {
         if (this.serviceOperators.isEmpty()) {
             String exceptionText = "No IServiceOperator implementations is loaded!";
             LOGGER.error(exceptionText);
-            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText);
-            throw owse;
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
     }
 
@@ -1518,8 +1423,8 @@ public final class Configurator {
     /**
      * @return the current capabilitiesCacheController
      */
-    public ACapabilitiesCacheController getCapsCacheController() {
-        return capsCacheController;
+    public ACapabilitiesCacheController getCapabilitiesCacheController() {
+        return capabilitiesCacheController;
     }
 
     /**
@@ -1680,7 +1585,7 @@ public final class Configurator {
     public List<IDecoder> getDecoder(String service, String version) throws OwsExceptionReport {
         return getDecoder(new DecoderKeyType(service, version));
     }
-    
+
     /**
      * @return the decoder
      * @throws OwsExceptionReport
@@ -1695,12 +1600,15 @@ public final class Configurator {
      */
     public IEncoder getEncoder(String namespace) throws OwsExceptionReport {
         return encoder.get(new EncoderKeyType(namespace));
-//        if (iEncoder == null) {
-//            String exceptionText = "No encoder implementation is available for the namespace '" + namespace + "'!";
-//            LOGGER.debug(exceptionText);
-//            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-//        }
-//        return iEncoder;
+        // if (iEncoder == null) {
+        // String exceptionText =
+        // "No encoder implementation is available for the namespace '" +
+        // namespace + "'!";
+        // LOGGER.debug(exceptionText);
+        // throw Util4Exceptions.createNoApplicableCodeException(null,
+        // exceptionText);
+        // }
+        // return iEncoder;
     }
 
     public IBinding getBindingOperator(String urlPattern) {
@@ -1710,12 +1618,20 @@ public final class Configurator {
     public IRequestOperator getRequestOperator(ServiceOperatorKeyType serviceOperatorKeyType, String operationName) {
         return requestOperators.get(new RequestOperatorKeyType(serviceOperatorKeyType, operationName));
     }
-    
+
     public Map<RequestOperatorKeyType, IRequestOperator> getRequestOperator() {
         return requestOperators;
     }
 
     public Map<String, IBinding> getBindingOperators() {
         return bindingOperators;
+    }
+
+    public Map<DecoderKeyType, List<IDecoder>> getDecoderMap() {
+        return decoder;
+    }
+
+    public Map<EncoderKeyType, IEncoder> getEncoderMap() {
+       return encoder;
     }
 }

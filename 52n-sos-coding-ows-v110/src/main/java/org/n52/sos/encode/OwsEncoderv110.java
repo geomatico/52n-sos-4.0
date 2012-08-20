@@ -2,12 +2,18 @@ package org.n52.sos.encode;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.opengis.ows.x11.AllowedValuesDocument.AllowedValues;
 import net.opengis.ows.x11.DCPDocument.DCP;
 import net.opengis.ows.x11.DomainType;
+import net.opengis.ows.x11.ExceptionReportDocument;
+import net.opengis.ows.x11.ExceptionReportDocument.ExceptionReport;
+import net.opengis.ows.x11.ExceptionType;
 import net.opengis.ows.x11.HTTPDocument.HTTP;
 import net.opengis.ows.x11.KeywordsType;
 import net.opengis.ows.x11.OperationDocument.Operation;
@@ -20,14 +26,18 @@ import net.opengis.ows.x11.ServiceProviderDocument.ServiceProvider;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.ows.OWSConstants;
+import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSConstants.MinMax;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSOperationsMetadata;
+import org.n52.sos.ogc.ows.OwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.ows.SosServiceProvider;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -62,20 +72,20 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
 
     @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
+        return encode(element, null);
+    }
+
+    @Override
+    public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         if (element instanceof SosServiceIdentification) {
             return encodeServiceIdentification((SosServiceIdentification) element);
         } else if (element instanceof SosServiceProvider) {
             return encodeServiceProvider((SosServiceProvider) element);
         } else if (element instanceof OWSOperationsMetadata) {
             return encodeOperationsMetadata((OWSOperationsMetadata) element);
+        } else if (element instanceof OwsExceptionReport) {
+            return encodeOwsExceptionReport((OwsExceptionReport) element);
         }
-        return null;
-    }
-
-    @Override
-    public XmlObject encode(Object response, Map<HelperValues, String> additionalValues)
-            throws OwsExceptionReport {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -89,7 +99,8 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
      * @throws OwsExceptionReport
      *             if the file is invalid.
      */
-    private XmlObject encodeServiceIdentification(SosServiceIdentification sosServiceIdentification) throws OwsExceptionReport {
+    private XmlObject encodeServiceIdentification(SosServiceIdentification sosServiceIdentification)
+            throws OwsExceptionReport {
         if (sosServiceIdentification.getServiceIdentification() != null) {
             ServiceIdentification serviceIdent;
             if (sosServiceIdentification.getServiceIdentification() instanceof ServiceIdentificationDocument) {
@@ -124,7 +135,7 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
                 }
             }
 
-           return serviceIdent;
+            return serviceIdent;
         } else {
             String exceptionText =
                     "The service identification file is not a ServiceIdentificationDocument, ServiceIdentification or invalid! Check the file in the Tomcat webapps: /SOS_webapp/WEB-INF/conf/capabilities/.";
@@ -143,8 +154,7 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
      * @throws OwsExceptionReport
      *             if the file is invalid.
      */
-    private XmlObject encodeServiceProvider(SosServiceProvider sosServiceProvider)
-            throws OwsExceptionReport {
+    private XmlObject encodeServiceProvider(SosServiceProvider sosServiceProvider) throws OwsExceptionReport {
         if (sosServiceProvider.getServiceProvider() != null) {
             if (sosServiceProvider.getServiceProvider() instanceof ServiceProviderDocument) {
                 return ((ServiceProviderDocument) sosServiceProvider.getServiceProvider()).getServiceProvider();
@@ -175,7 +185,8 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
      */
     private OperationsMetadata encodeOperationsMetadata(OWSOperationsMetadata operationsMetadata)
             throws OwsExceptionReport {
-        OperationsMetadata xbMeta = OperationsMetadata.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        OperationsMetadata xbMeta =
+                OperationsMetadata.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         for (OWSOperation operationMetadata : operationsMetadata.getOperations()) {
             Operation operation = xbMeta.addNewOperation();
             // name
@@ -183,9 +194,11 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
             // dcp
             encodeDCP(operation.addNewDCP(), operationMetadata.getDcp());
             // parameter
-            for (String parameterName : operationMetadata.getParameterValues().keySet()) {
-                setParamList(operation.addNewParameter(), parameterName,
-                        operationMetadata.getParameterValues().get(parameterName));
+            if (operationMetadata.getParameterValues() != null) {
+                for (String parameterName : operationMetadata.getParameterValues().keySet()) {
+                    setParamList(operation.addNewParameter(), parameterName, operationMetadata.getParameterValues()
+                            .get(parameterName));
+                }
             }
             if (operationMetadata.getParameterMinMaxMap() != null
                     && !operationMetadata.getParameterMinMaxMap().isEmpty()) {
@@ -200,6 +213,58 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
             setParamList(xbMeta.addNewParameter(), name, operationsMetadata.getCommonValues().get(name));
         }
         return xbMeta;
+    }
+
+    private ExceptionReportDocument encodeOwsExceptionReport(OwsExceptionReport owsExceptionReport) {
+        ExceptionReportDocument erd =
+                ExceptionReportDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        ExceptionReport er = erd.addNewExceptionReport();
+        // er.setLanguage("en");
+        er.setVersion(owsExceptionReport.getVersion());
+        if (owsExceptionReport.getExceptions() != null) {
+            List<ExceptionType> exceptionTypes = new ArrayList<ExceptionType>();
+            for (OwsException owsException : owsExceptionReport.getExceptions()) {
+                ExceptionType exceptionType =
+                        ExceptionType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                exceptionType.setExceptionCode(owsException.getCode().toString());
+                if (owsException.getLocator() != null) {
+                    exceptionType.setLocator(owsException.getLocator());
+                }
+                StringBuilder exceptionText = new StringBuilder();
+                if (owsException.getMessages() != null) {
+                    for (String message : owsException.getMessages()) {
+                        exceptionText.append(message);
+                        exceptionText.append("\n");
+                    }
+                }
+                if (owsException.getException() != null) {
+                    Exception exception = owsException.getException();
+                    String name = exception.getClass().getName();
+                    String message = exception.getMessage();
+                    StackTraceElement[] stackTraces = exception.getStackTrace();
+
+                    exceptionText.append("[EXC] internal service exception");
+                    if (owsExceptionReport.getExcLevel().compareTo(ExceptionLevel.PlainExceptions) == 0) {
+                        exceptionText.append(". Message: ");
+                        exceptionText.append(message);
+                    } else if (owsExceptionReport.getExcLevel().compareTo(ExceptionLevel.DetailedExceptions) == 0) {
+                        exceptionText.append(": " + name + "\n");
+                        exceptionText.append("[EXC] message: " + message + "\n");
+                        for (StackTraceElement stackTraceElement : stackTraces) {
+                            exceptionText.append("[EXC]" + stackTraceElement.toString() + "\n");
+                        }
+                    } else {
+                        LOGGER.warn("addCodedException: unknown ExceptionLevel " + "("
+                                + owsExceptionReport.getExcLevel().toString() + ")occurred.");
+                    }
+                }
+                exceptionType.addExceptionText(exceptionText.toString());
+                exceptionTypes.add(exceptionType);
+            }
+            er.setExceptionArray(exceptionTypes.toArray(new ExceptionType[0]));
+        }
+        N52XmlHelper.setSchemaLocationToDocument(erd, N52XmlHelper.getSchemaLocationForOWS110());
+        return erd;
     }
 
     /**
@@ -268,6 +333,16 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
         } else {
             domainType.addNewNoValues();
         }
+    }
+
+    @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return new HashMap<SupportedTypeKey, Set<String>>(0);
+    }
+
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
     }
 
 }

@@ -65,7 +65,7 @@ public class SosGetResultRequest extends AbstractServiceRequest {
      * Temporal filters list
      */
     private List<TemporalFilter> eventTimes;
-    
+
     /**
      * FOI identifiers list
      */
@@ -75,7 +75,7 @@ public class SosGetResultRequest extends AbstractServiceRequest {
      * Spatial filters list
      */
     private SpatialFilter spatialFilter;
-    
+
     private Map<String, String> namespaces;
 
     /**
@@ -172,14 +172,14 @@ public class SosGetResultRequest extends AbstractServiceRequest {
     public void setOffering(String offering) {
         this.offering = offering;
     }
-    
+
     /**
      * Get FOI identifiers
      * 
      * @return FOI identifiers
      */
     public List<String> getFeatureIdentifiers() {
-            return featureIdentifiers;
+        return featureIdentifiers;
     }
 
     /**
@@ -189,16 +189,16 @@ public class SosGetResultRequest extends AbstractServiceRequest {
      *            FOI identifiers
      */
     public void setFeatureIdentifiers(List<String> featureIdentifiers) {
-            this.featureIdentifiers = featureIdentifiers;
+        this.featureIdentifiers = featureIdentifiers;
     }
-    
+
     /**
      * Get spatial filter
      * 
      * @return spatial filter
      */
     public SpatialFilter getSpatialFilter() {
-            return spatialFilter;
+        return spatialFilter;
     }
 
     /**
@@ -208,7 +208,7 @@ public class SosGetResultRequest extends AbstractServiceRequest {
      *            spatial filter
      */
     public void setSpatialFilter(SpatialFilter resultSpatialFilter) {
-            this.spatialFilter = resultSpatialFilter;
+        this.spatialFilter = resultSpatialFilter;
     }
 
     /*
@@ -224,7 +224,7 @@ public class SosGetResultRequest extends AbstractServiceRequest {
     public void setNamespaces(Map<String, String> namespaces) {
         this.namespaces = namespaces;
     }
-    
+
     public Map<String, String> getNamespaces() {
         return namespaces;
     }

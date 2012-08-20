@@ -32,8 +32,6 @@ import java.util.List;
 
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.operator.RequestOperatorKeyType;
 
 /**
  * SOS DescribeSensor request
@@ -41,91 +39,90 @@ import org.n52.sos.request.operator.RequestOperatorKeyType;
  */
 public class DescribeSensorRequest extends AbstractServiceRequest {
 
-	/**
-	 * DescribeSensor operation name
-	 */
-	private final String operationName = SosConstants.Operations.DescribeSensor
-			.name();
+    /**
+     * DescribeSensor operation name
+     */
+    private final String operationName = SosConstants.Operations.DescribeSensor.name();
 
-	/**
-	 * Procedure identifier
-	 */
-	private String procedure;
+    /**
+     * Procedure identifier
+     */
+    private String procedure;
 
-	/**
-	 * Output format
-	 */
-	private String outputFormat;
+    /**
+     * Output format
+     */
+    private String outputFormat;
 
-	/**
-	 * Temporal filters
-	 */
-	protected List<TemporalFilter> times;
+    /**
+     * Temporal filters
+     */
+    protected List<TemporalFilter> times;
 
-	/**
-	 * Get output format
-	 * 
-	 * @return output format
-	 */
-	public String getOutputFormat() {
-		return outputFormat;
-	}
+    /**
+     * Get output format
+     * 
+     * @return output format
+     */
+    public String getOutputFormat() {
+        return outputFormat;
+    }
 
-	/**
-	 * Set output format
-	 * 
-	 * @param outputFormat
-	 *            output format
-	 */
-	public void setOutputFormat(String outputFormat) {
-		this.outputFormat = outputFormat;
-	}
+    /**
+     * Set output format
+     * 
+     * @param outputFormat
+     *            output format
+     */
+    public void setOutputFormat(String outputFormat) {
+        this.outputFormat = outputFormat;
+    }
 
-	/**
-	 * Get Procedure identifier
-	 * 
-	 * @return Procedure identifier
-	 */
-	public String getProcedure() {
-		return procedure;
-	}
+    /**
+     * Get Procedure identifier
+     * 
+     * @return Procedure identifier
+     */
+    public String getProcedure() {
+        return procedure;
+    }
 
-	/**
-	 * Set Procedure identifier
-	 * 
-	 * @param procedure
-	 *            Procedure identifier
-	 */
-	public void setProcedures(String procedure) {
-		this.procedure = procedure;
-	}
+    /**
+     * Set Procedure identifier
+     * 
+     * @param procedure
+     *            Procedure identifier
+     */
+    public void setProcedures(String procedure) {
+        this.procedure = procedure;
+    }
 
-	/**
-	 * Get temporal filters
-	 * 
-	 * @return temporal filters
-	 */
-	public List<TemporalFilter> getTime() {
-		return times;
-	}
+    /**
+     * Get temporal filters
+     * 
+     * @return temporal filters
+     */
+    public List<TemporalFilter> getTime() {
+        return times;
+    }
 
-	/**
-	 * Set temporal filters
-	 * 
-	 * @param time
-	 *            temporal filters
-	 */
-	public void setTime(List<TemporalFilter> time) {
-		this.times = time;
-	}
+    /**
+     * Set temporal filters
+     * 
+     * @param time
+     *            temporal filters
+     */
+    public void setTime(List<TemporalFilter> time) {
+        this.times = time;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
-	 */
-	@Override
-	public String getOperationName() {
-		return operationName;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
+     */
+    @Override
+    public String getOperationName() {
+        return operationName;
+    }
 }

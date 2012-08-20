@@ -42,9 +42,6 @@ public class AbstractSosPhenomenon {
     /** phenomenon description */
     private String description;
 
-    /** Offerings the phenomenon should be added to */
-    private Collection<SosOffering> offerings;
-
     /**
      * constructor
      * 
@@ -68,23 +65,6 @@ public class AbstractSosPhenomenon {
         super();
         this.identifier = identifier;
         this.description = description;
-    }
-
-    /**
-     * constructor
-     * 
-     * @param identifier
-     *            Phenomenon identifier
-     * @param description
-     *            Phenomenon description
-     * @param offerings
-     *            Offerings added to
-     */
-    public AbstractSosPhenomenon(String identifier, String description, Collection<SosOffering> offerings) {
-        super();
-        this.identifier = identifier;
-        this.description = description;
-        this.offerings = offerings;
     }
 
     /**
@@ -123,25 +103,6 @@ public class AbstractSosPhenomenon {
      */
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    /**
-     * Get offerings add to
-     * 
-     * @return Offerings add to
-     */
-    public Collection<SosOffering> getOfferings() {
-        return offerings;
-    }
-
-    /**
-     * Set offerings add to
-     * 
-     * @param offerings
-     *            offerings add to
-     */
-    public void setOfferings(Collection<SosOffering> offerings) {
-        this.offerings = offerings;
     }
 
     /*

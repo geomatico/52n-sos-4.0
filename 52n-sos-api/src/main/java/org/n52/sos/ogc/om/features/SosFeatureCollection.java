@@ -52,6 +52,7 @@ public class SosFeatureCollection extends SosAbstractFeature {
 
     /**
      * Get features
+     * 
      * @return the members
      */
     public Map<String, SosAbstractFeature> getMembers() {
@@ -60,6 +61,7 @@ public class SosFeatureCollection extends SosAbstractFeature {
 
     /**
      * Set features
+     * 
      * @param members
      *            the members to set
      */

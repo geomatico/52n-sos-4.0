@@ -34,18 +34,18 @@ package org.n52.sos.ogc.gml.time;
  */
 public interface ITime extends Comparable<ITime> {
 
-	/**
-	 * Get indeterminate value
-	 * 
-	 * @return Returns the indeterminateValue.
-	 */
-	public String getIndeterminateValue();
+    /**
+     * Get indeterminate value
+     * 
+     * @return Returns the indeterminateValue.
+     */
+    public String getIndeterminateValue();
 
-	/**
-	 * Set indeterminate value
-	 * 
-	 * @param indeterminateValue
-	 *            The indeterminateValue to set.
-	 */
-	public void setIndeterminateValue(String indeterminateValue);
+    /**
+     * Set indeterminate value
+     * 
+     * @param indeterminateValue
+     *            The indeterminateValue to set.
+     */
+    public void setIndeterminateValue(String indeterminateValue);
 }

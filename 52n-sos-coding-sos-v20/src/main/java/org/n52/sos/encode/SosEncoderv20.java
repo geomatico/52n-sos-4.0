@@ -3,8 +3,10 @@ package org.n52.sos.encode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -24,8 +26,13 @@ import net.opengis.sos.x20.CapabilitiesType.Contents;
 import net.opengis.sos.x20.ContentsType;
 import net.opengis.sos.x20.GetFeatureOfInterestResponseDocument;
 import net.opengis.sos.x20.GetFeatureOfInterestResponseType;
+import net.opengis.sos.x20.GetObservationByIdResponseDocument;
+import net.opengis.sos.x20.GetObservationByIdResponseType;
 import net.opengis.sos.x20.GetObservationResponseDocument;
 import net.opengis.sos.x20.GetObservationResponseType;
+import net.opengis.sos.x20.InsertObservationResponseDocument;
+import net.opengis.sos.x20.InsertionCapabilitiesDocument;
+import net.opengis.sos.x20.InsertionCapabilitiesType;
 import net.opengis.sos.x20.ObservationOfferingType;
 import net.opengis.sos.x20.ObservationOfferingType.PhenomenonTime;
 import net.opengis.swes.x20.AbstractContentsType.Offering;
@@ -34,24 +41,29 @@ import net.opengis.swes.x20.FeatureRelationshipType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.SosFeatureCollection;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
+import org.n52.sos.ogc.sos.SosInsertionCapabilities;
 import org.n52.sos.ogc.sos.SosOfferingsForContents;
 import org.n52.sos.response.AbstractServiceResponse;
 import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.response.GetFeatureOfInterestResponse;
 import org.n52.sos.response.GetObservationByIdResponse;
 import org.n52.sos.response.GetObservationResponse;
+import org.n52.sos.response.InsertObservationResponse;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.OMHelper;
@@ -92,6 +104,16 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
     }
 
     @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return new HashMap<SupportedTypeKey, Set<String>>(0);
+    }
+    
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
+    }
+
+    @Override
     public XmlObject encode(AbstractServiceResponse response) throws OwsExceptionReport {
         Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
         additionalValues.put(HelperValues.VERSION, Sos2Constants.SERVICEVERSION);
@@ -108,17 +130,17 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
         } else if (response instanceof GetFeatureOfInterestResponse) {
             return createGetFeatureOfInterestResponse((GetFeatureOfInterestResponse) response);
         } else if (response instanceof GetObservationByIdResponse) {
-            return createGetObservationByIdResponse();
+            return createGetObservationByIdResponse((GetObservationByIdResponse) response);
+        } else if (response instanceof InsertObservationResponse) {
+            return createInsertObservationResponse((InsertObservationResponse) response);
         }
         return null;
     }
-
+    
     private XmlObject createCapabilitiesDocument(GetCapabilitiesResponse response) throws OwsExceptionReport {
-        // CapabilitiesDocument xbCapsDoc =
-        // CapabilitiesDocument.Factory
-        // .newInstance(SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200());
         CapabilitiesDocument xbCapsDoc =
                 CapabilitiesDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        // cursor for getting prefixes
         CapabilitiesType xbCaps = xbCapsDoc.addNewCapabilities();
 
         // set version.
@@ -141,7 +163,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
             xbCaps.setServiceProvider((ServiceProvider) owsEncoder.encode(sosCapabilities.getServiceProvider()));
 
         }
-        if (sosCapabilities.getOperationsMetadata() != null) {
+        if (sosCapabilities.getOperationsMetadata() != null && sosCapabilities.getOperationsMetadata().getOperations() != null && sosCapabilities.getOperationsMetadata().getOperations().isEmpty()) {
             xbCaps.setOperationsMetadata((OperationsMetadata) owsEncoder.encode(sosCapabilities
                     .getOperationsMetadata()));
         }
@@ -152,19 +174,22 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
                                     .addNewFilterCapabilities()));
             if (filterEncoder == null) {
                 String exceptionText = "Error while encoding GetCapabilities response, missing encoder!";
-                LOGGER.debug(exceptionText);
+                LOGGER.error(exceptionText);
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
             }
             xbCaps.addNewFilterCapabilities().setFilterCapabilities(
                     (FilterCapabilities) filterEncoder.encode(sosCapabilities.getFilterCapabilities()));
         }
-        if (sosCapabilities.getContents() != null) {
+        if (sosCapabilities.getContents() != null && !sosCapabilities.getContents().isEmpty()) {
             setContents(xbCaps.addNewContents(), sosCapabilities.getContents(), response.getVersion());
         }
-        // TODO extensions section
-        // if (EXTENSIONS != null) {
-        // setExensions(xbCaps.addNewExtension());
-        // }
+
+        if (sosCapabilities.getExtensions() != null && !sosCapabilities.getExtensions().isEmpty()) {
+            for (IExtension extension : sosCapabilities.getExtensions()) {
+                setExensions(xbCaps.addNewExtension(), extension);
+            }
+
+        }
 
         N52XmlHelper.setSchemaLocationToDocument(xbCapsDoc, N52XmlHelper.getSchemaLocationForSOS200());
 
@@ -190,19 +215,24 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
         for (SosObservation sosObservation : observationCollection) {
             Map<HelperValues, String> foiHelper = new HashMap<SosConstants.HelperValues, String>();
             String gmlId = null;
-            if (gmlID4sfIdentifier.containsKey(sosObservation.getObservationConstellation().getFeatureOfInterest().getIdentifier())) {
-                gmlId = gmlID4sfIdentifier.get(sosObservation.getObservationConstellation().getFeatureOfInterest().getIdentifier());
+            if (gmlID4sfIdentifier.containsKey(sosObservation.getObservationConstellation().getFeatureOfInterest()
+                    .getIdentifier())) {
+                gmlId =
+                        gmlID4sfIdentifier.get(sosObservation.getObservationConstellation().getFeatureOfInterest()
+                                .getIdentifier());
                 foiHelper.put(HelperValues.EXIST_FOI_IN_DOC, Boolean.toString(true));
             } else {
                 gmlId = "sf_" + sfIdCounter;
-                gmlID4sfIdentifier.put(sosObservation.getObservationConstellation().getFeatureOfInterest().getIdentifier(), gmlId);
+                gmlID4sfIdentifier.put(sosObservation.getObservationConstellation().getFeatureOfInterest()
+                        .getIdentifier(), gmlId);
                 foiHelper.put(HelperValues.EXIST_FOI_IN_DOC, Boolean.toString(false));
             }
             foiHelper.put(HelperValues.GMLID, gmlId);
-           
-            xbGetObsResp.addNewObservationData()
-                    .setOMObservation((OMObservationType) encoder.encode(sosObservation, foiHelper));
+
+            xbGetObsResp.addNewObservationData().setOMObservation(
+                    (OMObservationType) encoder.encode(sosObservation, foiHelper));
         }
+        // set schema location
         XmlHelper.makeGmlIdsUnique(xbGetObsRespDoc.getDomNode());
         List<String> schemaLocations = new ArrayList<String>();
         schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS200());
@@ -218,9 +248,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
         int sfIdCounter = 1;
         HashMap<String, String> gmlID4sfIdentifier = new HashMap<String, String>();
 
-        // GetFeatureOfInterestResponseDocument xbGetFoiResponseDoc =
-        // GetFeatureOfInterestResponseDocument.Factory.newInstance(SosXmlOptionsUtility.getInstance()
-        // .getXmlOptions4Sos2Swe200());
+       // FIXME: gml:id not valid, always the same
         GetFeatureOfInterestResponseDocument xbGetFoiResponseDoc =
                 GetFeatureOfInterestResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance()
                         .getXmlOptions());
@@ -254,10 +282,8 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
                                 LOGGER.debug(exceptionText, xmle);
                                 throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
                             }
-
-                        } else if (sampFeat.getUrl() != null) {
-                            xbFeatMember.setHref(sampFeat.getUrl());
-                        } else {
+                        } else if (sampFeat.getFeatureType() != null && 
+                                !sampFeat.getFeatureType().equalsIgnoreCase(OGCConstants.UNKNOWN)) {
                             IEncoder encoder =
                                     Configurator.getInstance().getEncoder(
                                             OMHelper.getNamespaceForFeatureType(sampFeat.getFeatureType()));
@@ -270,6 +296,12 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
                             Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
                             additionalValues.put(HelperValues.GMLID, gmlId);
                             xbFeatMember.set((XmlObject) encoder.encode(sampFeat, additionalValues));
+                            gmlID4sfIdentifier.put(identifier, gmlId);
+                        } else if (sampFeat.getUrl() != null) {
+                            xbFeatMember.setHref(identifier);
+                            gmlID4sfIdentifier.put(identifier, gmlId);
+                        } else {
+                            xbFeatMember.setHref(sampFeat.getIdentifier());
                             gmlID4sfIdentifier.put(identifier, gmlId);
                         }
 
@@ -301,9 +333,60 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
         return xbGetFoiResponseDoc;
     }
 
-    private XmlObject createGetObservationByIdResponse() {
-        // TODO Auto-generated method stub
-        return null;
+    private XmlObject createGetObservationByIdResponse(GetObservationByIdResponse response) throws OwsExceptionReport {
+        GetObservationByIdResponseDocument xbGetObsByIdRespDoc =
+                GetObservationByIdResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        GetObservationByIdResponseType xbGetObsByIdResp = xbGetObsByIdRespDoc.addNewGetObservationByIdResponse();
+        List<SosObservation> observationCollection = response.getObservationCollection();
+        IEncoder encoder = Configurator.getInstance().getEncoder(response.getResponseFormat());
+        if (encoder == null) {
+            String exceptionText = "Error while encoding GetObservationById response, missing encoder!";
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        }
+        HashMap<String, String> gmlID4sfIdentifier = new HashMap<String, String>();
+        int sfIdCounter = 1;
+        for (SosObservation sosObservation : observationCollection) {
+            Map<HelperValues, String> foiHelper = new HashMap<SosConstants.HelperValues, String>();
+            String gmlId = null;
+            if (gmlID4sfIdentifier.containsKey(sosObservation.getObservationConstellation().getFeatureOfInterest()
+                    .getIdentifier())) {
+                gmlId =
+                        gmlID4sfIdentifier.get(sosObservation.getObservationConstellation().getFeatureOfInterest()
+                                .getIdentifier());
+                foiHelper.put(HelperValues.EXIST_FOI_IN_DOC, Boolean.toString(true));
+            } else {
+                gmlId = "sf_" + sfIdCounter;
+                gmlID4sfIdentifier.put(sosObservation.getObservationConstellation().getFeatureOfInterest()
+                        .getIdentifier(), gmlId);
+                foiHelper.put(HelperValues.EXIST_FOI_IN_DOC, Boolean.toString(false));
+            }
+            foiHelper.put(HelperValues.GMLID, gmlId);
+
+            xbGetObsByIdResp.addNewObservation().setOMObservation(
+                    (OMObservationType) encoder.encode(sosObservation, foiHelper));
+        }
+        XmlHelper.makeGmlIdsUnique(xbGetObsByIdResp.getDomNode());
+        // set schema location
+        List<String> schemaLocations = new ArrayList<String>();
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS200());
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForOM200());
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSF200());
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSAMS200());
+        N52XmlHelper.setSchemaLocationsToDocument(xbGetObsByIdResp, schemaLocations);
+        xbGetObsByIdResp.addNewObservation().addNewOMObservation();
+        return xbGetObsByIdRespDoc;
+    }
+
+    private XmlObject createInsertObservationResponse(InsertObservationResponse response) {
+        InsertObservationResponseDocument xbInsObsRespDoc =
+                InsertObservationResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        xbInsObsRespDoc.addNewInsertObservationResponse();
+        // set schema location
+        List<String> schemaLocations = new ArrayList<String>();
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS200());
+        N52XmlHelper.setSchemaLocationsToDocument(xbInsObsRespDoc, schemaLocations);
+        return xbInsObsRespDoc;
     }
 
     /**
@@ -322,9 +405,6 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
             throws OwsExceptionReport {
         ContentsType xbContType = xbContents.addNewContents();
         for (SosOfferingsForContents offering : offerings) {
-            // ObservationOfferingType xbObsOff =
-            // ObservationOfferingType.Factory.newInstance(SosXmlOptionsUtility.getInstance()
-            // .getXmlOptions4Sos2Swe200());
             ObservationOfferingType xbObsOff =
                     ObservationOfferingType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             xbObsOff.setIdentifier(offering.getOffering());
@@ -334,10 +414,8 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
             // TODO: procedureDescriptionFormat [0..*]
             // set phenomenons [0..*]
             for (String phenomenon : offering.getObservableProperties()) {
-                xbObsOff.addNewObservableProperty().setStringValue(phenomenon);
+                xbObsOff.addObservableProperty(phenomenon);
             }
-
-            // set featureOfInterestType [0..1]
 
             // set relatedFeatures [0..*]
             if (offering.getRelatedFeatures() != null) {
@@ -348,10 +426,14 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
             }
 
             // set observed area [0..1]
-            if (offering.getBoundeBy() != null && offering.getSrid() != -1) {
-                xbObsOff.addNewObservedArea()
-                        .setEnvelope(getBBOX4Offering(offering.getBoundeBy(), offering.getSrid()));
+            if (offering.getObservedArea() != null) {
+                if (offering.getObservedArea().getEnvelope() != null && offering.getObservedArea().getSrid() != -1) {
+                    xbObsOff.addNewObservedArea().setEnvelope(
+                            getBBOX4Offering(offering.getObservedArea().getEnvelope(), offering.getObservedArea()
+                                    .getSrid()));
+                }
             }
+
             // set up phenomenon time [0..1]
             if (offering.getTime() instanceof TimePeriod) {
                 TimePeriod tp = (TimePeriod) offering.getTime();
@@ -363,53 +445,42 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
                             DateTimeHelper.formatDateTime2ResponseString(tp.getStart()));
                     xbTime.addNewEndPosition().setStringValue(
                             DateTimeHelper.formatDateTime2ResponseString(tp.getEnd()));
+                    xbObsOff.getPhenomenonTime().substitute(
+                            new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_PHENOMENON_TIME,
+                                    SosConstants.NS_SOS_PREFIX), xbObsOff.getPhenomenonTime().schemaType());
                 }
-            }
-
-            // set responseFormat [0..*]
-            for (String responseFormat : offering.getResponseFormats()) {
-                xbObsOff.addNewResponseFormat().setStringValue(responseFormat);
-            }
-            // set observationType [0..*]
-            for (String obsType : offering.getObservationTypes()) {
-                xbObsOff.addNewObservationType().setStringValue(obsType);
             }
 
             // set resultTime [0..1]
 
+            // set responseFormat [0..*]
+            if (offering.getResponseFormats() != null) {
+                for (String responseFormat : offering.getResponseFormats()) {
+                    xbObsOff.addResponseFormat(responseFormat);
+                }
+            }
+
+            // set observationType [0..*]
+            if (offering.getObservationTypes() != null) {
+                for (String obsType : offering.getObservationTypes()) {
+                    xbObsOff.addObservationType(obsType);
+                }
+            }
+
+            // set featureOfInterestType [0..1]
+            if (offering.getFeatureOfInterestTypes() != null) {
+                for (String featureOfInterestType : offering.getFeatureOfInterestTypes()) {
+                    xbObsOff.addFeatureOfInterestType(featureOfInterestType);
+                }
+            }
+
             xbContType.addNewOffering().setAbstractOffering(xbObsOff);
         }
-
         // FIXME: change swes:AbstractOffering to sos:ObservationOffering and
         // the namespace prefix ns to sos due to
         // XMLBeans problems with substitution
         // (http://www.mail-archive.com/dev%40xmlbeans.apache.org/msg00962.html).
-        for (Offering offering : xbContents.getContents().getOfferingArray()) {
-            XmlCursor cursor = offering.getAbstractOffering().newCursor();
-            cursor.setName(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_OBSERVATION_OFFERING,
-                    SosConstants.NS_SOS_PREFIX));
-            cursor.removeAttribute(new QName(W3CConstants.NS_XSI, "type"));
-            // cursor.insertAttributeWithValue(new QName(W3CConstants.NS_XSI,
-            // "type"), "sos:ObservationOfferingType");
-            cursor.toChild(new QName(Sos2Constants.NS_SOS_20, "observedArea"));
-            cursor.setName(new QName(Sos2Constants.NS_SOS_20, "observedArea", SosConstants.NS_SOS_PREFIX));
-            cursor.toParent();
-            cursor.toChild(new QName(Sos2Constants.NS_SOS_20, "phenomenonTime"));
-            cursor.setName(new QName(Sos2Constants.NS_SOS_20, "phenomenonTime", SosConstants.NS_SOS_PREFIX));
-            cursor.toParent();
-            cursor.toChild(new QName(Sos2Constants.NS_SOS_20, "responseFormat"));
-            cursor.setName(new QName(Sos2Constants.NS_SOS_20, "responseFormat", SosConstants.NS_SOS_PREFIX));
-            while (cursor.toNextSibling(new QName(Sos2Constants.NS_SOS_20, "responseFormat"))) {
-                cursor.setName(new QName(Sos2Constants.NS_SOS_20, "responseFormat", SosConstants.NS_SOS_PREFIX));
-            }
-            cursor.toParent();
-            cursor.toChild(new QName(Sos2Constants.NS_SOS_20, "observationType"));
-            cursor.setName(new QName(Sos2Constants.NS_SOS_20, "observationType", SosConstants.NS_SOS_PREFIX));
-            while (cursor.toNextSibling(new QName(Sos2Constants.NS_SOS_20, "observationType"))) {
-                cursor.setName(new QName(Sos2Constants.NS_SOS_20, "observationType", SosConstants.NS_SOS_PREFIX));
-            }
-            cursor.dispose();
-        }
+        renameContentsElementNames(xbContents);
     }
 
     /**
@@ -430,6 +501,45 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
                 featureRelationchip.setRole(role);
             }
         }
+    }
+
+    private void setExensions(XmlObject addNewExtension, IExtension extension) {
+        if (extension instanceof SosInsertionCapabilities) {
+            addNewExtension.set(createInsertionCapabilities((SosInsertionCapabilities) extension));
+        } else {
+            // TODO: not supported
+        }
+    }
+
+    private XmlObject createInsertionCapabilities(SosInsertionCapabilities sosInsertionCapabilities) {
+        InsertionCapabilitiesDocument insertionCapabilitiesDoc = InsertionCapabilitiesDocument.Factory.newInstance();
+//        InsertionCapabilitiesType insertionCapabilities =
+//                InsertionCapabilitiesType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        InsertionCapabilitiesType insertionCapabilities = insertionCapabilitiesDoc.addNewInsertionCapabilities();
+        for (String featureOfInterestType : sosInsertionCapabilities.getFeatureOfInterestTypes()) {
+            if (!featureOfInterestType.equals(SosConstants.NOT_DEFINED)) {
+                insertionCapabilities.addFeatureOfInterestType(featureOfInterestType);
+            }
+        }
+        for (String observationType : sosInsertionCapabilities.getObservationTypes()) {
+            if (!observationType.equals(SosConstants.NOT_DEFINED)) {
+                insertionCapabilities.addObservationType(observationType);
+            }
+        }
+        for (String procedureDescriptionFormat : sosInsertionCapabilities.getProcedureDescriptionFormats()) {
+            if (!procedureDescriptionFormat.equals(SosConstants.NOT_DEFINED)) {
+                insertionCapabilities.addProcedureDescriptionFormat(procedureDescriptionFormat);
+            }
+        }
+        if (sosInsertionCapabilities.getSupportedEncodings() != null) {
+            for (String supportedEncoding : sosInsertionCapabilities.getSupportedEncodings()) {
+                if (!supportedEncoding.equals(SosConstants.NOT_DEFINED)) {
+                    insertionCapabilities.addSupportedEncoding(supportedEncoding);
+                }
+            }
+        }
+//        return insertionCapabilities;
+        return insertionCapabilitiesDoc;
     }
 
     /**
@@ -496,6 +606,43 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
         // toNormalize = toNormalize.replaceAll("Ü", "UE");
         // toNormalize = toNormalize.replaceAll("ß", "ss");
         return toNormalize.replaceAll("[\\\\,/,:,\\*,?,\",<,>,;,#,%,=,@]", "_");
+    }
+
+    private void renameContentsElementNames(Contents xbContents) {
+        for (Offering offering : xbContents.getContents().getOfferingArray()) {
+            XmlCursor cursor = offering.getAbstractOffering().newCursor();
+            cursor.setName(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_OBSERVATION_OFFERING,
+                    SosConstants.NS_SOS_PREFIX));
+            cursor.removeAttribute(new QName(W3CConstants.NS_XSI, "type"));
+            if (cursor.toChild(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_OBSERVED_AREA))) {
+                cursor.setName(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_OBSERVED_AREA,
+                        SosConstants.NS_SOS_PREFIX));
+                cursor.toParent();
+            }
+            if (cursor.toChild(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_PHENOMENON_TIME))) {
+                cursor.setName(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_PHENOMENON_TIME,
+                        SosConstants.NS_SOS_PREFIX));
+                cursor.toParent();
+            }
+            if (cursor.toChild(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_RESPONSE_FORMAT))) {
+                cursor.setName(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_RESPONSE_FORMAT,
+                        SosConstants.NS_SOS_PREFIX));
+                while (cursor.toNextSibling(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_RESPONSE_FORMAT))) {
+                    cursor.setName(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_RESPONSE_FORMAT,
+                            SosConstants.NS_SOS_PREFIX));
+                }
+                cursor.toParent();
+            }
+            if (cursor.toChild(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_OBSERVATION_TYPE))) {
+                cursor.setName(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_OBSERVATION_TYPE,
+                        SosConstants.NS_SOS_PREFIX));
+                while (cursor.toNextSibling(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_OBSERVATION_TYPE))) {
+                    cursor.setName(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_OBSERVATION_TYPE,
+                            SosConstants.NS_SOS_PREFIX));
+                }
+            }
+            cursor.dispose();
+        }
     }
 
 }

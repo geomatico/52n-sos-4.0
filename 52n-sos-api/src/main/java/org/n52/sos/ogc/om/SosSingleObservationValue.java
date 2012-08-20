@@ -1,23 +1,31 @@
 package org.n52.sos.ogc.om;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.om.quality.SosQuality;
+import org.n52.sos.ogc.om.values.BooleanValue;
+import org.n52.sos.ogc.om.values.IValue;
 
-public class SosSingleObservationValue implements IObservationValue<Object> {
-    
+public class SosSingleObservationValue implements IObservationValue {
+
     private ITime phenomenonTime;
-    
-    private Object value;
-    
+
+    private IValue value;
+
     private List<SosQuality> qualityList;
 
-    public SosSingleObservationValue(ITime phenomenonTime, Object value, List<SosQuality> qualityList) {
-       this.phenomenonTime = phenomenonTime;
-       this.value = value;
-       this.qualityList = qualityList;
+    public SosSingleObservationValue() {
+    }
+
+    public SosSingleObservationValue(IValue value) {
+        this.value = value;
+    }
+
+    public SosSingleObservationValue(ITime phenomenonTime, IValue value, List<SosQuality> qualityList) {
+        this.phenomenonTime = phenomenonTime;
+        this.value = value;
+        this.qualityList = qualityList;
     }
 
     @Override
@@ -25,20 +33,24 @@ public class SosSingleObservationValue implements IObservationValue<Object> {
         return phenomenonTime;
     }
 
-    public Object getValue() {
+    public IValue getValue() {
         return value;
     }
 
     @Override
-    public void setValues(Object value) {
+    public void setValue(IValue value) {
         this.value = value;
     }
-    
+
     public void setQualityList(List<SosQuality> qualityList) {
         this.qualityList = qualityList;
     }
 
     public List<SosQuality> getQualityList() {
         return qualityList;
+    }
+
+    public void setPhenomenonTime(ITime phenomenonTime) {
+        this.phenomenonTime = phenomenonTime;
     }
 }

@@ -33,7 +33,7 @@ public class ServiceOperatorKeyType implements Comparable<ServiceOperatorKeyType
     private String service;
 
     private String version;
-    
+
     public ServiceOperatorKeyType() {
         super();
     }
@@ -66,12 +66,12 @@ public class ServiceOperatorKeyType implements Comparable<ServiceOperatorKeyType
             ServiceOperatorKeyType toCheck = (ServiceOperatorKeyType) o;
             if (service.equals(toCheck.service) && version.equals(toCheck.version)) {
                 return 0;
-            } 
+            }
             return 1;
         }
         return -1;
     }
-    
+
     /*
      * (non-Javadoc)
      * 

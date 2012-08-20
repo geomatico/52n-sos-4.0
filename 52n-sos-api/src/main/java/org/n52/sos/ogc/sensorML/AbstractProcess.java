@@ -5,15 +5,15 @@ import java.util.List;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 
 public class AbstractProcess extends AbstractSensorML {
-    
+
     private List<String> descriptions;
-    
+
     private List<String> names;
-    
+
     private List<SosSMLIo> inputs;
-    
+
     private List<SosSMLIo> outputs;
-    
+
     private List<String> parameters;
 
     public List<String> getDescriptions() {

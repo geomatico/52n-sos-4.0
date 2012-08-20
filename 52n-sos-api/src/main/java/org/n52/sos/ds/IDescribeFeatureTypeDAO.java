@@ -39,13 +39,12 @@ import org.n52.sos.request.AbstractServiceRequest;
  */
 public interface IDescribeFeatureTypeDAO extends IOperationDAO {
 
-	/**
-	 * Get the feature type description
-	 * 
-	 * @return Returns the DescribeFeatureOfInterest response
-	 * @throws OwsExceptionReport
-	 *             If an error occurs
-	 */
-	public XmlObject getFeatureOfInterestDescription(AbstractServiceRequest request)
-			throws OwsExceptionReport;
+    /**
+     * Get the feature type description
+     * 
+     * @return Returns the DescribeFeatureOfInterest response
+     * @throws OwsExceptionReport
+     *             If an error occurs
+     */
+    public XmlObject getFeatureOfInterestDescription(AbstractServiceRequest request) throws OwsExceptionReport;
 }

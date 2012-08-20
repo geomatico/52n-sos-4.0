@@ -33,17 +33,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
 import net.opengis.gml.x32.AbstractTimeObjectType;
-import net.opengis.gml.x32.BooleanValueDocument;
 import net.opengis.gml.x32.FeaturePropertyType;
-import net.opengis.gml.x32.IntegerValueDocument;
 import net.opengis.gml.x32.MeasureType;
-import net.opengis.gml.x32.StringValueDocument;
 import net.opengis.om.x20.OMObservationType;
 import net.opengis.om.x20.TimeObjectPropertyType;
 import net.opengis.swe.x20.BooleanType;
@@ -58,16 +57,17 @@ import net.opengis.swe.x20.DataRecordType;
 import net.opengis.swe.x20.DataRecordType.Field;
 import net.opengis.swe.x20.EncodedValuesPropertyType;
 import net.opengis.swe.x20.QuantityType;
-import net.opengis.swe.x20.Reference;
 import net.opengis.swe.x20.TextEncodingType;
 import net.opengis.swe.x20.TextType;
 import net.opengis.swe.x20.TimeType;
 import net.opengis.swe.x20.UnitReference;
 
+import org.apache.xmlbeans.XmlBoolean;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlInteger;
 import org.apache.xmlbeans.XmlObject;
-import org.joda.time.DateTime;
+import org.apache.xmlbeans.XmlString;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
@@ -81,13 +81,21 @@ import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.values.BooleanValue;
+import org.n52.sos.ogc.om.values.CategoryValue;
+import org.n52.sos.ogc.om.values.CountValue;
+import org.n52.sos.ogc.om.values.GeometryValue;
+import org.n52.sos.ogc.om.values.IValue;
+import org.n52.sos.ogc.om.values.QuantityValue;
+import org.n52.sos.ogc.om.values.SweDataArrayValue;
+import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
-import org.n52.sos.ogc.sos.SosConstants.ValueTypes;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.SosHelper;
@@ -100,7 +108,7 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
 
-public class OmEncoderv20 implements IEncoder<XmlObject, Object> {
+public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
 
     /**
      * logger, used for logging while initializing the constants from config
@@ -109,6 +117,8 @@ public class OmEncoderv20 implements IEncoder<XmlObject, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(OmEncoderv20.class);
 
     private List<EncoderKeyType> encoderKeyTypes;
+
+    private Set<String> supportedObservationTypes;
 
     public OmEncoderv20() {
         encoderKeyTypes = new ArrayList<EncoderKeyType>();
@@ -119,12 +129,40 @@ public class OmEncoderv20 implements IEncoder<XmlObject, Object> {
             builder.append(", ");
         }
         builder.delete(builder.lastIndexOf(", "), builder.length());
+
+        supportedObservationTypes = new HashSet<String>(0);
+        supportedObservationTypes.add(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION);
+        supportedObservationTypes.add(OMConstants.OBS_TYPE_COUNT_OBSERVATION);
+//        supportedObservationTypes.add(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION);
+        supportedObservationTypes.add(OMConstants.OBS_TYPE_MEASUREMENT);
+        supportedObservationTypes.add(OMConstants.OBS_TYPE_TEXT_OBSERVATION);
+        supportedObservationTypes.add(OMConstants.OBS_TYPE_TRUTH_OBSERVATION);
+
         LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
     }
 
     @Override
     public List<EncoderKeyType> getEncoderKeyType() {
         return encoderKeyTypes;
+    }
+
+    @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        Map<SupportedTypeKey, Set<String>> map = new HashMap<SupportedTypeKey, Set<String>>();
+        map.put(SupportedTypeKey.ObservationType, supportedObservationTypes);
+        return map;
+    }
+    
+    @Override
+    public Set<String> getConformanceClasses() {
+        Set<String> conformanceClasses = new HashSet<String>(0);
+        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/measurement");
+        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/categoryObservation");
+        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/countObservation");
+        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/truthObservation");
+        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/geometryObservation");
+        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/textObservation");
+        return conformanceClasses;
     }
 
     @Override
@@ -138,6 +176,11 @@ public class OmEncoderv20 implements IEncoder<XmlObject, Object> {
             return createObservation((SosObservation) element, additionalValues);
         }
         return null;
+    }
+
+    @Override
+    public boolean isSingleValueEncoding() {
+        return true;
     }
 
     private XmlObject createObservation(SosObservation sosObservation, Map<HelperValues, String> additionalValues)
@@ -154,7 +197,7 @@ public class OmEncoderv20 implements IEncoder<XmlObject, Object> {
         if (sosObservation.getIdentifier() != null) {
             xbObs.addNewIdentifier().setStringValue(sosObservation.getIdentifier());
         }
-            
+
         String observationType = sosObservation.getObservationConstellation().getObservationType();
         xbObs.addNewType().setHref(observationType);
         // set phenomenonTime
@@ -185,83 +228,8 @@ public class OmEncoderv20 implements IEncoder<XmlObject, Object> {
                 existFoiInDoc);
 
         // set result
-        if (sosObservation.getValue() instanceof SosSingleObservationValue) {
-            SosSingleObservationValue observationValue = (SosSingleObservationValue) sosObservation.getValue();
-            if (observationType.equals(OMConstants.OBS_TYPE_MEASUREMENT)
-                    || observationType.equals(OMConstants.RESULT_MODEL_MEASUREMENT)) {
-                MeasureType xbMeasureType = MeasureType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-                if (((SosObservableProperty) sosObservation.getObservationConstellation().getObservableProperty())
-                        .getUnit() != null) {
-                    xbMeasureType.setUom(((SosObservableProperty) sosObservation.getObservationConstellation()
-                            .getObservableProperty()).getUnit());
-                } else {
-                    xbMeasureType.setUom("");
-                }
+        addResultToObservation(xbObs.addNewResult(), sosObservation, phenComponents, observationID);
 
-                if (observationValue.getValue() instanceof Double
-                        && !((Double) observationValue.getValue()).equals(Double.NaN)) {
-                    xbMeasureType.setDoubleValue((Double) observationValue.getValue());
-                } else {
-                    xbMeasureType.setNil();
-                }
-                xbObs.addNewResult().set(xbMeasureType);
-            } else if (observationType.equals(OMConstants.OBS_TYPE_COUNT_OBSERVATION)
-                    || observationType.equals(OMConstants.RESULT_MODEL_COUNT_OBSERVATION)) {
-                IntegerValueDocument xbInteger = IntegerValueDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-                if (observationValue.getValue() instanceof Long) {
-                    xbInteger.setIntegerValue(new BigInteger(Long.toString((Long)observationValue.getValue())));
-                } else {
-                    xbInteger.setNil();
-                }
-                xbObs.addNewResult().set(xbInteger);
-            } else if (observationType.equals(OMConstants.OBS_TYPE_TEXT_OBSERVATION)
-                    || observationType.equals(OMConstants.RESULT_MODEL_TEXT_OBSERVATION)) {
-                StringValueDocument xbString = StringValueDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-                if (observationValue.getValue() instanceof String) {
-                    xbString.setStringValue1((String)observationValue.getValue());
-                } else {
-                    xbString.setNil();
-                }
-                xbObs.addNewResult().set(xbString);
-            } else if (observationType.equals(OMConstants.OBS_TYPE_TRUTH_OBSERVATION)
-                    || observationType.equals(OMConstants.RESULT_MODEL_TRUTH_OBSERVATION)) {
-                BooleanValueDocument xbBoolean = BooleanValueDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-                if (observationValue.getValue() instanceof Boolean) {
-                    xbBoolean.setBooleanValue1((Boolean)observationValue.getValue());
-                } else {
-                    xbBoolean.setNil();
-                }
-                xbObs.addNewResult().set(xbBoolean);
-            } else if (observationType.equals(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION)
-                    || observationType.equals(OMConstants.RESULT_MODEL_CATEGORY_OBSERVATION)) {
-                Reference xbRef = Reference.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-                xbRef.setHref((String) observationValue.getValue());
-                xbObs.addNewResult().set(xbRef);
-            } else if (observationType.equals(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION)
-                    || observationType.equals(OMConstants.RESULT_MODEL_GEOMETRY_OBSERVATION)) {
-                IEncoder geomEncoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
-                if (geomEncoder != null) {
-                    Map<HelperValues, String> additionalValue = new HashMap<HelperValues, String>();
-                    additionalValue.put(HelperValues.GMLID, SosConstants.OBS_ID_PREFIX + observationID);
-                    XmlObject xmlObject =
-                            (XmlObject) geomEncoder.encode((Geometry) sosObservation.getValue(), additionalValue);
-                    xbObs.addNewResult().set(xmlObject);
-                } else {
-                    String exceptionText = "Error while encoding geometry value, needed encoder is missing!";
-                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-                }
-            }
-        } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
-            if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)
-                    || observationType.equals(OMConstants.RESULT_MODEL_OBSERVATION)) {
-                XmlObject xbRresult = xbObs.addNewResult();
-                DataArrayDocument xb_dataArrayDoc = createDataArrayResult(phenComponents, sosObservation);
-                xbRresult.set(xb_dataArrayDoc);
-                XmlCursor cursor = xbRresult.newCursor();
-                cursor.setAttributeText(new QName(W3CConstants.NS_XSI, "type"), "swe:DataArrayPropertyType");
-                cursor.dispose();
-            }
-        }
         return xbObs;
 
         // ----------------------------------------------
@@ -544,127 +512,128 @@ public class OmEncoderv20 implements IEncoder<XmlObject, Object> {
      */
     private DataArrayDocument createDataArrayResult(List<SosObservableProperty> phenComponents,
             SosObservation sosObservation) throws OwsExceptionReport {
+        SosMultiObservationValues sosObservationValue = (SosMultiObservationValues) sosObservation.getValue();
+        if (sosObservationValue.getValue() instanceof SweDataArrayValue) {
+            // TODO: move this to SweCommonEncoderv20
+            DataArrayDocument xbDataArrayDoc =
+                    DataArrayDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+            DataArrayType xbDataArray = xbDataArrayDoc.addNewDataArray1();
 
-        // create DataArray
-        // DataArrayDocument xbDataArrayDoc =
-        // DataArrayDocument.Factory.newInstance(SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200());
-        DataArrayDocument xbDataArrayDoc =
-                DataArrayDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        DataArrayType xbDataArray = xbDataArrayDoc.addNewDataArray1();
+            // set element count
+            CountPropertyType xb_elementCount = xbDataArray.addNewElementCount();
+            // TODOD: CHECK SIZE
 
-        // set element count
-        CountPropertyType xb_elementCount = xbDataArray.addNewElementCount();
-        // TODOD: CHECK SIZE
+            // element count
 
-        // element count
-        xb_elementCount.addNewCount().setValue(
-                BigInteger.valueOf(((SosMultiObservationValues) sosObservation.getValue()).getValue().size()));
+            Map<ITime, Map<String, IValue>> valueMap = ((SweDataArrayValue) sosObservationValue.getValue()).getValue();
 
-        // create data definition
-        ElementType xb_elementType = xbDataArray.addNewElementType();
+            xb_elementCount.addNewCount().setValue(new BigInteger(Integer.toString(valueMap.size())));
 
-        DataRecordDocument xbDataRecordDoc = DataRecordDocument.Factory.newInstance();
-        DataRecordType xb_dataRecord = xbDataRecordDoc.addNewDataRecord();
+            // create data definition
+            ElementType xb_elementType = xbDataArray.addNewElementType();
 
-        // add time component
-        Field xbField = xb_dataRecord.addNewField();
-        xbField.setName(OMConstants.PHENOMENON_TIME_NAME);
-        TimeType xbTimeComponent =
-                (TimeType) xbField.addNewAbstractDataComponent().substitute(SWEConstants.QN_TIME_SWE_200,
-                        TimeType.type);
-        xbTimeComponent.setDefinition(OMConstants.PHENOMENON_TIME);
-        xbTimeComponent.addNewUom().setHref(OMConstants.PHEN_UOM_ISO8601);
+            DataRecordDocument xbDataRecordDoc = DataRecordDocument.Factory.newInstance();
+            DataRecordType xb_dataRecord = xbDataRecordDoc.addNewDataRecord();
 
-        // add phenomenon components
-        Map<String, ValueTypes> valueTypes4phens =
-                Configurator.getInstance().getCapsCacheController().getKObservablePropertyVValueType();
-        for (SosObservableProperty phenComponent : phenComponents) {
+            // add time component
+            Field xbField = xb_dataRecord.addNewField();
+            xbField.setName(OMConstants.PHENOMENON_TIME_NAME);
+            TimeType xbTimeComponent =
+                    (TimeType) xbField.addNewAbstractDataComponent().substitute(SWEConstants.QN_TIME_SWE_200,
+                            TimeType.type);
+            xbTimeComponent.setDefinition(OMConstants.PHENOMENON_TIME);
+            xbTimeComponent.addNewUom().setHref(OMConstants.PHEN_UOM_ISO8601);
 
-            ValueTypes valueType = valueTypes4phens.get(phenComponent.getIdentifier());
-            Field xb_field = xb_dataRecord.addNewField();
-            if (valueType != null) {
-                switch (valueType) {
-                case booleanType: {
-                    BooleanType xbBool =
-                            (BooleanType) xb_field.addNewAbstractDataComponent().substitute(
-                                    SWEConstants.QN_BOOLEAN_SWE_200, BooleanType.type);
-                    xbBool.setDefinition(phenComponent.getIdentifier());
-                    break;
-                }
-                case countType: {
-                    CountType xbCount =
-                            (CountType) xb_field.addNewAbstractDataComponent().substitute(
-                                    SWEConstants.QN_COUNT_SWE_200, CountType.type);
-                    xbCount.setDefinition(phenComponent.getIdentifier());
-                    break;
-                }
-                case numericType: {
-                    QuantityType xbQuantity =
-                            (QuantityType) xb_field.addNewAbstractDataComponent().substitute(
-                                    SWEConstants.QN_QUANTITY_SWE_200, QuantityType.type);
-                    xbQuantity.setDefinition(phenComponent.getIdentifier());
-                    UnitReference xb_uom = xbQuantity.addNewUom();
-                    xb_uom.setCode(phenComponent.getUnit());
-                    break;
-                }
-                case isoTimeType: {
-                    TimeType xbTime =
-                            (TimeType) xb_field.addNewAbstractDataComponent().substitute(SWEConstants.QN_TIME_SWE_200,
-                                    TimeType.type);
-                    xbTime.setDefinition(phenComponent.getIdentifier());
-                    xbTime.addNewUom().setHref(OMConstants.PHEN_UOM_ISO8601);
-                    break;
-                }
-                case textType: {
-                    TextType xbText =
-                            (TextType) xb_field.addNewAbstractDataComponent().substitute(SWEConstants.QN_TEXT_SWE_200,
-                                    TextType.type);
-                    xbText.setDefinition(phenComponent.getIdentifier());
-                    break;
-                }
-                case categoryType: {
-                    CategoryType xbCategory =
-                            (CategoryType) xb_field.addNewAbstractDataComponent().substitute(
-                                    SWEConstants.QN_CATEGORY_SWE_200, CategoryType.type);
-                    xbCategory.setDefinition(phenComponent.getIdentifier());
-                    break;
-                }
-                default:
-                    TextType xbText =
-                            (TextType) xb_field.addNewAbstractDataComponent().substitute(SWEConstants.QN_TEXT_SWE_200,
-                                    TextType.type);
-                    xbText.setDefinition(phenComponent.getIdentifier());
-                    break;
-                }
-                String[] uriParts = phenComponent.getIdentifier().split("/|:");
-                xb_field.setName(uriParts[uriParts.length - 1]);
-            } else {
-                xb_field.setName(phenComponent.getIdentifier().replace(SosConstants.PHENOMENON_PREFIX, ""));
-                TextType xbText =
-                        (TextType) xb_field.addNewAbstractDataComponent().substitute(SWEConstants.QN_TEXT_SWE_200,
-                                TextType.type);
-                xbText.setDefinition(phenComponent.getIdentifier());
+            // add phenomenon components
+            for (SosObservableProperty observableProperty : phenComponents) {
+                Field field = xb_dataRecord.addNewField();
+                addDataComponentToField(field, observableProperty, valueMap.values());
             }
 
+            // set components to SimpleDataRecord
+            xb_elementType.set(xbDataRecordDoc);
+            xb_elementType.setName("Components");
+
+            // add encoding element
+            TextEncodingType xb_textBlock =
+                    (TextEncodingType) xbDataArray.addNewEncoding().addNewAbstractEncoding()
+                            .substitute(SWEConstants.QN_TEXT_ENCODING_SWE_200, TextEncodingType.type);
+
+            xb_textBlock.setDecimalSeparator(Configurator.getInstance().getDecimalSeparator());
+            xb_textBlock.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
+            xb_textBlock.setBlockSeparator(Configurator.getInstance().getTupleSeperator());
+
+            EncodedValuesPropertyType xb_values = xbDataArray.addNewValues();
+            xb_values.newCursor().setTextValue(createResultString(phenComponents, sosObservation, valueMap));
+            return xbDataArrayDoc;
+        }
+        return null;
+    }
+
+    private void addDataComponentToField(Field field, SosObservableProperty observableProperty,
+            Collection<Map<String, IValue>> values) {
+        IValue value = getValueForObservableProperty(values, observableProperty.getIdentifier());
+        if (value != null) {
+            if (value instanceof BooleanValue) {
+                BooleanType xbBool =
+                        (BooleanType) field.addNewAbstractDataComponent().substitute(SWEConstants.QN_BOOLEAN_SWE_200,
+                                BooleanType.type);
+                xbBool.setDefinition(observableProperty.getIdentifier());
+            } else if (value instanceof CountValue) {
+                CountType xbCount =
+                        (CountType) field.addNewAbstractDataComponent().substitute(SWEConstants.QN_COUNT_SWE_200,
+                                CountType.type);
+                xbCount.setDefinition(observableProperty.getIdentifier());
+            } else if (value instanceof QuantityValue) {
+                QuantityType xbQuantity =
+                        (QuantityType) field.addNewAbstractDataComponent().substitute(
+                                SWEConstants.QN_QUANTITY_SWE_200, QuantityType.type);
+                xbQuantity.setDefinition(observableProperty.getIdentifier());
+                UnitReference xb_uom = xbQuantity.addNewUom();
+                xb_uom.setCode(observableProperty.getUnit());
+            }
+            // else if (value instanceof t) {
+            // TimeType xbTime =
+            // (TimeType) field.addNewAbstractDataComponent().substitute(
+            // SWEConstants.QN_TIME_SWE_200, TimeType.type);
+            // xbTime.setDefinition(observableProperty.getIdentifier());
+            // xbTime.addNewUom().setHref(OMConstants.PHEN_UOM_ISO8601);
+            // }
+            else if (value instanceof TextValue) {
+                TextType xbText =
+                        (TextType) field.addNewAbstractDataComponent().substitute(SWEConstants.QN_TEXT_SWE_200,
+                                TextType.type);
+                xbText.setDefinition(observableProperty.getIdentifier());
+            } else if (value instanceof CategoryValue) {
+                CategoryType xbCategory =
+                        (CategoryType) field.addNewAbstractDataComponent().substitute(
+                                SWEConstants.QN_CATEGORY_SWE_200, CategoryType.type);
+                xbCategory.setDefinition(observableProperty.getIdentifier());
+            } else {
+                TextType xbText =
+                        (TextType) field.addNewAbstractDataComponent().substitute(SWEConstants.QN_TEXT_SWE_200,
+                                TextType.type);
+                xbText.setDefinition(observableProperty.getIdentifier());
+            }
+            String[] uriParts = observableProperty.getIdentifier().split("/|:");
+            field.setName(uriParts[uriParts.length - 1]);
+        } else {
+            field.setName(observableProperty.getIdentifier().replace(SosConstants.PHENOMENON_PREFIX, ""));
+            TextType xbText =
+                    (TextType) field.addNewAbstractDataComponent().substitute(SWEConstants.QN_TEXT_SWE_200,
+                            TextType.type);
+            xbText.setDefinition(observableProperty.getIdentifier());
         }
 
-        // set components to SimpleDataRecord
-        xb_elementType.set(xbDataRecordDoc);
-        xb_elementType.setName("Components");
+    }
 
-        // add encoding element
-        TextEncodingType xb_textBlock =
-                (TextEncodingType) xbDataArray.addNewEncoding().addNewAbstractEncoding()
-                        .substitute(SWEConstants.QN_TEXT_ENCODING_SWE_200, TextEncodingType.type);
-
-        xb_textBlock.setDecimalSeparator(Configurator.getInstance().getDecimalSeparator());
-        xb_textBlock.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
-        xb_textBlock.setBlockSeparator(Configurator.getInstance().getTupleSeperator());
-
-        EncodedValuesPropertyType xb_values = xbDataArray.addNewValues();
-        xb_values.newCursor().setTextValue(createResultString(phenComponents, sosObservation));
-
-        return xbDataArrayDoc;
+    private IValue getValueForObservableProperty(Collection<Map<String, IValue>> values, String identifier) {
+        for (Map<String, IValue> map : values) {
+            if (map.containsKey(identifier) && map.get(identifier) != null) {
+                return map.get(identifier);
+            }
+        }
+        return null;
     }
 
     /**
@@ -673,15 +642,16 @@ public class OmEncoderv20 implements IEncoder<XmlObject, Object> {
      * 
      * @param phenComponents
      *            the phenomenon components of the values of the value matrix
-     * @param values
+     * @param valueMap
+     * @param valueMap
      *            HashMap containing the time as key, and an ArrayList with
      *            pairs of phenomena and values at the key time as values
      * @return String representing the value matrix of the result element
      * @throws OwsExceptionReport
      * @throws ServiceException
      */
-    private String createResultString(List<SosObservableProperty> phenComponents, SosObservation sosObservation)
-            throws OwsExceptionReport {
+    private String createResultString(List<SosObservableProperty> phenComponents, SosObservation sosObservation,
+            Map<ITime, Map<String, IValue>> valueMap) throws OwsExceptionReport {
 
         // save the position for values of each phenomenon in a hash map with
         // the phen id as key
@@ -717,24 +687,22 @@ public class OmEncoderv20 implements IEncoder<XmlObject, Object> {
         String tokenSeperator = sosObservation.getTokenSeparator();
         String tupleSeperator = sosObservation.getTupleSeparator();
 
-        Map<ITime, Map<String, String>> values = ((SosMultiObservationValues) sosObservation.getValue()).getValue();
-
         // value matrix which should be built
         StringBuffer valueMatrix = new StringBuffer();
-        List<ITime> times = new ArrayList<ITime>(values.keySet());
+        List<ITime> times = new ArrayList<ITime>(valueMap.keySet());
         Collections.sort(times);
         for (ITime time : times) {
             String timeString = getTimeString(time);
             valueMatrix.append(timeString);
             valueMatrix.append(tokenSeperator);
-            Map<String, String> map = values.get(time);
+            Map<String, IValue> map = valueMap.get(time);
             for (SosObservableProperty obsProp : phenComponents) {
                 if (map.containsKey(obsProp.getIdentifier())) {
-                    String value = map.get(obsProp.getIdentifier());
-                    if (value == null || (value != null && value.isEmpty())) {
+                    IValue value = map.get(obsProp.getIdentifier());
+                    if (value == null) {
                         valueMatrix.append(noDataValue);
                     } else {
-                        valueMatrix.append(value);
+                        valueMatrix.append(getStringValue(value, noDataValue));
                     }
                 } else {
                     valueMatrix.append(noDataValue);
@@ -774,66 +742,574 @@ public class OmEncoderv20 implements IEncoder<XmlObject, Object> {
     /**
      * Get value as text.
      * 
+     * @param noDataValue
+     * 
      * @param obsPropID
      *            observableProperty
      * @param object
      *            value
      * @return value as text.
      */
-    private String getStringValue(String obsPropID, Object object) {
+    private String getStringValue(IValue value, String noDataValue) {
         WKTWriter wktWriter = new WKTWriter();
-        Map<String, ValueTypes> valueTypes4phens =
-                Configurator.getInstance().getCapsCacheController().getKObservablePropertyVValueType();
-        ValueTypes valueType = valueTypes4phens.get(obsPropID);
-        switch (valueType) {
-        case booleanType:
-            return ((Boolean) object).toString();
-        case countType:
-            return ((Integer) object).toString();
-        case numericType:
-            return ((Double) object).toString();
-        case isoTimeType:
-            try {
-                return DateTimeHelper.formatDateTime2ResponseString((DateTime) object);
-            } catch (OwsExceptionReport owse) {
-                LOGGER.info("Value could not be parsed to ISO time stamp!");
-                return null;
+        if (value instanceof BooleanValue) {
+            BooleanValue booleanValue = (BooleanValue) value;
+            if (booleanValue.getValue() == null) {
+                return noDataValue;
+            } else {
+                return Boolean.toString(booleanValue.getValue().booleanValue());
             }
-        case textType:
-            return ((String) object);
-        case categoryType:
-            return ((String) object);
-        case spatialType:
-            Geometry geom = ((Geometry) object);
-            return wktWriter.write(geom) + "#" + geom.getSRID();
-        case notDefined:
-            if (object instanceof Double) {
-                return ((Double) object).toString();
-            } else if (object instanceof Boolean) {
-                return ((Boolean) object).toString();
-            } else if (object instanceof Integer) {
-                return ((Integer) object).toString();
-            } else if (object instanceof DateTime) {
-                try {
-                    return DateTimeHelper.formatDateTime2ResponseString((DateTime) object);
-                } catch (OwsExceptionReport owse) {
-                    LOGGER.info("Value could not be parsed to ISO time stamp!");
-                    return null;
-                }
-            } else if (object instanceof String) {
-                return ((String) object);
-            } else if (object instanceof Geometry) {
-                Geometry geom2 = ((Geometry) object);
-                return wktWriter.write(geom2) + "#" + geom2.getSRID();
+        } else if (value instanceof CountValue) {
+            CountValue countValue = (CountValue) value;
+            if (countValue.getValue() == null
+                    || (countValue.getValue() != null && countValue.getValue() == Integer.MIN_VALUE)) {
+                return noDataValue;
+            } else {
+                return Integer.toString(countValue.getValue().intValue());
             }
-        default:
-            return null;
+        } else if (value instanceof QuantityValue) {
+            QuantityValue quantityValue = (QuantityValue) value;
+            if (quantityValue.getValue() == null
+                    || (quantityValue.getValue() != null && quantityValue.getValue().equals(Double.NaN))) {
+                return noDataValue;
+            } else {
+                return Double.toString(quantityValue.getValue().doubleValue());
+            }
+        }
+        // else if (value instanceof t) {
+        // TimeType xbTime =
+        // (TimeType) field.addNewAbstractDataComponent().substitute(
+        // SWEConstants.QN_TIME_SWE_200, TimeType.type);
+        // xbTime.setDefinition(observableProperty.getIdentifier());
+        // xbTime.addNewUom().setHref(OMConstants.PHEN_UOM_ISO8601);
+        // }
+        else if (value instanceof TextValue) {
+            TextValue textValue = (TextValue) value;
+            if (textValue.getValue() == null || (textValue.getValue() != null && !textValue.getValue().isEmpty())) {
+                return noDataValue;
+            } else {
+                return textValue.getValue().toString();
+            }
+        } else if (value instanceof CategoryValue) {
+            CategoryValue categoryValue = (CategoryValue) value;
+            if (categoryValue.getValue() == null
+                    || (categoryValue.getValue() != null && !categoryValue.getValue().isEmpty())) {
+                return noDataValue;
+            } else {
+                return categoryValue.getValue().toString();
+            }
+        } else {
+            if (value.getValue() == null) {
+                return noDataValue;
+            } else {
+                return value.getValue().toString();
+            }
         }
     }
 
     private XmlObject createCompositePhenomenon(String compPhenId, Collection<String> phenComponents) {
         // Currently not used for SOS 2.0 and OM 2.0 encoding.
         return null;
+    }
+
+    // /**
+    // * Creates XML representation of OM 2.0 observation type from SOS
+    // * observation.
+    // *
+    // * @param xbObs
+    // * OM 2.0 observation
+    // * @param phenID
+    // * @param object
+    // * @param observationType
+    // * @param map
+    // * @param absObs
+    // * SOS observation
+    // * @throws OwsExceptionReport
+    // * if an error occurs during creation.
+    // */
+    // private void createObservation(OMObservationType xbObs, SosObservation
+    // sosObs,
+    // Map<String, SosAbstractFeature> features, String phenID,
+    // SosObservationValue sosObsValue,
+    // String observationType) throws OwsExceptionReport {
+    //
+    // xbObs.setId("o_" + Long.toString(System.currentTimeMillis()));
+    // String observationID = "";
+    // if (sosObsValue.getObservationID() != null) {
+    // observationID = sosObsValue.getObservationID();
+    // xbObs.addNewIdentifier().setStringValue(observationID);
+    // } else {
+    // observationID = Long.toString(System.currentTimeMillis());
+    // }
+    // xbObs.addNewType().setHref(observationType);
+    //
+    // // set eventTime
+    // String phenTimeId = OMConstants.PHENOMENON_TIME_NAME + "_" +
+    // observationID;
+    // addPhenomenonTime(xbObs.addNewPhenomenonTime(), phenTimeId,
+    // sosObs.getPhenomenonTime());
+    // // AbstractTimeObjectType xbAbsTimeObject =
+    // // xbObs.addNewPhenomenonTime().addNewAbstractTimeObject();
+    // // IEncoder encoder =
+    // //
+    // Configurator.getInstance().getEncoder(xbAbsTimeObject.getDomNode().getNamespaceURI());
+    // // if (encoder != null) {
+    // // Map<HelperValues, String> additionalValues = new
+    // // HashMap<HelperValues, String>();
+    // // additionalValues.put(HelperValues.GMLID, phenTimeId);
+    // // XmlObject xmlObject = (XmlObject)
+    // // encoder.encode(sosObsValue.getPhenomenonTime(), additionalValues);
+    // // xbAbsTimeObject.set(xmlObject);
+    // // if (sosObsValue.getPhenomenonTime() instanceof TimeInstant) {
+    // // xbAbsTimeObject.substitute(new QName(GMLConstants.NS_GML_32,
+    // // GMLConstants.EN_TIME_INSTANT,
+    // // GMLConstants.NS_GML), xmlObject.schemaType());
+    // // } else if (sosObsValue.getPhenomenonTime() instanceof TimePeriod) {
+    // // xbAbsTimeObject.substitute(new QName(GMLConstants.NS_GML_32,
+    // // GMLConstants.EN_TIME_PERIOD,
+    // // GMLConstants.NS_GML), xmlObject.schemaType());
+    // // }
+    // // } else {
+    // // String exceptionText =
+    // // "Error while encoding phenomenon time, needed encoder is missing!";
+    // // throw Util4Exceptions.createNoApplicableCodeException(null,
+    // // exceptionText);
+    // // }
+    // xbObs.addNewResultTime().setHref("#" + phenTimeId);
+    //
+    // // set procedure
+    // xbObs.addNewProcedure().setHref(sosObs.getObservationConstellation().getProcedure());
+    //
+    // // set observedProperty (phenomenon)
+    // xbObs.addNewObservedProperty().setHref(phenID);
+    //
+    // // set feature
+    // encodeFeatureOfInterest(xbObs,
+    // sosObs.getObservationConstellation().getFeatureOfInterest(),
+    // features.get(sosObs.getObservationConstellation().getFeatureOfInterest()));
+    //
+    // // // Currently not used for SOS 2.0 and OM 2.0 encoding.
+    // // // // add quality, if set
+    // // if (meas.getQuality() != null) {
+    // // DQElementPropertyType xbQuality = xbObs.addNewResultQuality();
+    // // xbQuality.set(createQualityProperty(sosObs.getQuality()));
+    // // }
+    //
+    // // set result
+    // if (observationType.equals(OMConstants.OBS_TYPE_MEASUREMENT)
+    // || observationType.equals(OMConstants.RESULT_MODEL_MEASUREMENT)) {
+    // MeasureType xbMeasureType = MeasureType.Factory.newInstance();
+    // if (((SosObservableProperty)
+    // sosObs.getObservationConstellation().getObservableProperty()).getUnit()
+    // != null) {
+    // xbMeasureType.setUom(((SosObservableProperty)
+    // sosObs.getObservationConstellation()
+    // .getObservableProperty()).getUnit());
+    // } else {
+    // xbMeasureType.setUom("");
+    // }
+    //
+    // if (!((Double) sosObsValue.getValue()).equals(Double.NaN)) {
+    // xbMeasureType.setDoubleValue((Double) sosObsValue.getValue());
+    // }
+    //
+    // else {
+    // xbMeasureType.setNil();
+    // }
+    // xbObs.addNewResult().set(xbMeasureType);
+    // } else if
+    // (observationType.equals(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION)
+    // || observationType.equals(OMConstants.RESULT_MODEL_CATEGORY_OBSERVATION))
+    // {
+    // Reference xbRef = Reference.Factory.newInstance();
+    // xbRef.setHref((String) sosObsValue.getValue());
+    // xbObs.addNewResult().set(xbRef);
+    // } else if
+    // (observationType.equals(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION)
+    // || observationType.equals(OMConstants.RESULT_MODEL_GEOMETRY_OBSERVATION))
+    // {
+    // IEncoder geomEncoder =
+    // Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
+    // if (geomEncoder != null) {
+    // Map<HelperValues, String> additionalValues = new HashMap<HelperValues,
+    // String>();
+    // additionalValues.put(HelperValues.GMLID, SosConstants.OBS_ID_PREFIX +
+    // observationID);
+    // XmlObject xmlObject =
+    // (XmlObject) geomEncoder.encode((Geometry) sosObsValue.getValue(),
+    // additionalValues);
+    // xbObs.addNewResult().set(xmlObject);
+    // } else {
+    // String exceptionText =
+    // "Error while encoding geometry value, needed encoder is missing!";
+    // throw Util4Exceptions.createNoApplicableCodeException(null,
+    // exceptionText);
+    // }
+    // }
+    //
+    // }
+    //
+    // private void createGenericObservation(OMObservationType xbObs,
+    // SosObservation sosObs,
+    // Map<String, SosAbstractFeature> features) throws OwsExceptionReport {
+    // xbObs.setId("o_" + Long.toString(System.currentTimeMillis()));
+    // String observationID = SosConstants.OBS_ID_PREFIX + new
+    // DateTime().getMillis();
+    // xbObs.addNewType().setHref(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
+    //
+    // // set eventTime
+    // String phenTimeId = OMConstants.PHENOMENON_TIME_NAME + "_" +
+    // observationID;
+    // addPhenomenonTime(xbObs.addNewPhenomenonTime(), phenTimeId,
+    // sosObs.getPhenomenonTime());
+    //
+    // xbObs.addNewResultTime().setHref("#" + phenTimeId);
+    //
+    // // set procedure
+    // xbObs.addNewProcedure().setHref(sosObs.getObservationConstellation().getProcedure());
+    //
+    // // phenomena of the common observation
+    // List<SosObservableProperty> phenComponents = null;
+    // if (sosObs.getObservationConstellation().getObservableProperty()
+    // instanceof SosObservableProperty) {
+    // xbObs.addNewObservedProperty().setHref(
+    // sosObs.getObservationConstellation().getObservableProperty().getIdentifier());
+    // phenComponents = new ArrayList<SosObservableProperty>();
+    // phenComponents.add((SosObservableProperty)
+    // sosObs.getObservationConstellation().getObservableProperty());
+    // } else if (sosObs.getObservationConstellation().getObservableProperty()
+    // instanceof SosCompositePhenomenon) {
+    // SosCompositePhenomenon compPhen =
+    // (SosCompositePhenomenon)
+    // sosObs.getObservationConstellation().getObservableProperty();
+    // xbObs.addNewObservedProperty().setHref(compPhen.getIdentifier());
+    // phenComponents = compPhen.getPhenomenonComponents();
+    // }
+    //
+    // // set feature
+    // encodeFeatureOfInterest(xbObs,
+    // sosObs.getObservationConstellation().getFeatureOfInterest(),
+    // features.get(sosObs.getObservationConstellation().getFeatureOfInterest()));
+    //
+    // // set result
+    // // add resultDefinition
+    // XmlObject xbRresult = xbObs.addNewResult();
+    // DataArrayDocument xb_dataArrayDoc = createDataArrayResult(phenComponents,
+    // sosObs);
+    // xbRresult.set(xb_dataArrayDoc);
+    // XmlCursor cursor = xbRresult.newCursor();
+    // cursor.setAttributeText(new QName(W3CConstants.NS_XSI, "type"),
+    // "swe:DataArrayPropertyType");
+    // cursor.dispose();
+    // }
+
+    // /**
+    // * Creates XML representation of OM 2.0 observation type from SOS
+    // * observation.
+    // *
+    // * @param xbObs
+    // * OM 2.0 observation
+    // * @param phenID
+    // * @param object
+    // * @param observationType
+    // * @param map
+    // * @param absObs
+    // * SOS observation
+    // * @throws OwsExceptionReport
+    // * if an error occurs during creation.
+    // */
+    // private void createObservation(OMObservationType xbObs, SosObservation
+    // sosObs,
+    // Map<String, SosAbstractFeature> features, String phenID,
+    // SosObservationValue sosObsValue,
+    // String observationType) throws OwsExceptionReport {
+    //
+    // xbObs.setId("o_" + Long.toString(System.currentTimeMillis()));
+    // String observationID = "";
+    // if (sosObsValue.getObservationID() != null) {
+    // observationID = sosObsValue.getObservationID();
+    // xbObs.addNewIdentifier().setStringValue(observationID);
+    // } else {
+    // observationID = Long.toString(System.currentTimeMillis());
+    // }
+    // xbObs.addNewType().setHref(observationType);
+    //
+    // // set eventTime
+    // String phenTimeId = OMConstants.PHENOMENON_TIME_NAME + "_" +
+    // observationID;
+    // addPhenomenonTime(xbObs.addNewPhenomenonTime(), phenTimeId,
+    // sosObs.getPhenomenonTime());
+    // // AbstractTimeObjectType xbAbsTimeObject =
+    // // xbObs.addNewPhenomenonTime().addNewAbstractTimeObject();
+    // // IEncoder encoder =
+    // //
+    // Configurator.getInstance().getEncoder(xbAbsTimeObject.getDomNode().getNamespaceURI());
+    // // if (encoder != null) {
+    // // Map<HelperValues, String> additionalValues = new
+    // // HashMap<HelperValues, String>();
+    // // additionalValues.put(HelperValues.GMLID, phenTimeId);
+    // // XmlObject xmlObject = (XmlObject)
+    // // encoder.encode(sosObsValue.getPhenomenonTime(), additionalValues);
+    // // xbAbsTimeObject.set(xmlObject);
+    // // if (sosObsValue.getPhenomenonTime() instanceof TimeInstant) {
+    // // xbAbsTimeObject.substitute(new QName(GMLConstants.NS_GML_32,
+    // // GMLConstants.EN_TIME_INSTANT,
+    // // GMLConstants.NS_GML), xmlObject.schemaType());
+    // // } else if (sosObsValue.getPhenomenonTime() instanceof TimePeriod) {
+    // // xbAbsTimeObject.substitute(new QName(GMLConstants.NS_GML_32,
+    // // GMLConstants.EN_TIME_PERIOD,
+    // // GMLConstants.NS_GML), xmlObject.schemaType());
+    // // }
+    // // } else {
+    // // String exceptionText =
+    // // "Error while encoding phenomenon time, needed encoder is missing!";
+    // // throw Util4Exceptions.createNoApplicableCodeException(null,
+    // // exceptionText);
+    // // }
+    // xbObs.addNewResultTime().setHref("#" + phenTimeId);
+    //
+    // // set procedure
+    // xbObs.addNewProcedure().setHref(sosObs.getObservationConstellation().getProcedure());
+    //
+    // // set observedProperty (phenomenon)
+    // xbObs.addNewObservedProperty().setHref(phenID);
+    //
+    // // set feature
+    // encodeFeatureOfInterest(xbObs,
+    // sosObs.getObservationConstellation().getFeatureOfInterest(),
+    // features.get(sosObs.getObservationConstellation().getFeatureOfInterest()));
+    //
+    // // // Currently not used for SOS 2.0 and OM 2.0 encoding.
+    // // // // add quality, if set
+    // // if (meas.getQuality() != null) {
+    // // DQElementPropertyType xbQuality = xbObs.addNewResultQuality();
+    // // xbQuality.set(createQualityProperty(sosObs.getQuality()));
+    // // }
+    //
+    // // set result
+    // if (observationType.equals(OMConstants.OBS_TYPE_MEASUREMENT)
+    // || observationType.equals(OMConstants.RESULT_MODEL_MEASUREMENT)) {
+    // MeasureType xbMeasureType = MeasureType.Factory.newInstance();
+    // if (((SosObservableProperty)
+    // sosObs.getObservationConstellation().getObservableProperty()).getUnit()
+    // != null) {
+    // xbMeasureType.setUom(((SosObservableProperty)
+    // sosObs.getObservationConstellation()
+    // .getObservableProperty()).getUnit());
+    // } else {
+    // xbMeasureType.setUom("");
+    // }
+    //
+    // if (!((Double) sosObsValue.getValue()).equals(Double.NaN)) {
+    // xbMeasureType.setDoubleValue((Double) sosObsValue.getValue());
+    // }
+    //
+    // else {
+    // xbMeasureType.setNil();
+    // }
+    // xbObs.addNewResult().set(xbMeasureType);
+    // } else if
+    // (observationType.equals(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION)
+    // || observationType.equals(OMConstants.RESULT_MODEL_CATEGORY_OBSERVATION))
+    // {
+    // Reference xbRef = Reference.Factory.newInstance();
+    // xbRef.setHref((String) sosObsValue.getValue());
+    // xbObs.addNewResult().set(xbRef);
+    // } else if
+    // (observationType.equals(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION)
+    // || observationType.equals(OMConstants.RESULT_MODEL_GEOMETRY_OBSERVATION))
+    // {
+    // IEncoder geomEncoder =
+    // Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
+    // if (geomEncoder != null) {
+    // Map<HelperValues, String> additionalValues = new HashMap<HelperValues,
+    // String>();
+    // additionalValues.put(HelperValues.GMLID, SosConstants.OBS_ID_PREFIX +
+    // observationID);
+    // XmlObject xmlObject =
+    // (XmlObject) geomEncoder.encode((Geometry) sosObsValue.getValue(),
+    // additionalValues);
+    // xbObs.addNewResult().set(xmlObject);
+    // } else {
+    // String exceptionText =
+    // "Error while encoding geometry value, needed encoder is missing!";
+    // throw Util4Exceptions.createNoApplicableCodeException(null,
+    // exceptionText);
+    // }
+    // }
+    //
+    // }
+    //
+    // private void createGenericObservation(OMObservationType xbObs,
+    // SosObservation sosObs,
+    // Map<String, SosAbstractFeature> features) throws OwsExceptionReport {
+    // xbObs.setId("o_" + Long.toString(System.currentTimeMillis()));
+    // String observationID = SosConstants.OBS_ID_PREFIX + new
+    // DateTime().getMillis();
+    // xbObs.addNewType().setHref(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
+    //
+    // // set eventTime
+    // String phenTimeId = OMConstants.PHENOMENON_TIME_NAME + "_" +
+    // observationID;
+    // addPhenomenonTime(xbObs.addNewPhenomenonTime(), phenTimeId,
+    // sosObs.getPhenomenonTime());
+    //
+    // xbObs.addNewResultTime().setHref("#" + phenTimeId);
+    //
+    // // set procedure
+    // xbObs.addNewProcedure().setHref(sosObs.getObservationConstellation().getProcedure());
+    //
+    // // phenomena of the common observation
+    // List<SosObservableProperty> phenComponents = null;
+    // if (sosObs.getObservationConstellation().getObservableProperty()
+    // instanceof SosObservableProperty) {
+    // xbObs.addNewObservedProperty().setHref(
+    // sosObs.getObservationConstellation().getObservableProperty().getIdentifier());
+    // phenComponents = new ArrayList<SosObservableProperty>();
+    // phenComponents.add((SosObservableProperty)
+    // sosObs.getObservationConstellation().getObservableProperty());
+    // } else if (sosObs.getObservationConstellation().getObservableProperty()
+    // instanceof SosCompositePhenomenon) {
+    // SosCompositePhenomenon compPhen =
+    // (SosCompositePhenomenon)
+    // sosObs.getObservationConstellation().getObservableProperty();
+    // xbObs.addNewObservedProperty().setHref(compPhen.getIdentifier());
+    // phenComponents = compPhen.getPhenomenonComponents();
+    // }
+    //
+    // // set feature
+    // encodeFeatureOfInterest(xbObs,
+    // sosObs.getObservationConstellation().getFeatureOfInterest(),
+    // features.get(sosObs.getObservationConstellation().getFeatureOfInterest()));
+    //
+    // // set result
+    // // add resultDefinition
+    // XmlObject xbRresult = xbObs.addNewResult();
+    // DataArrayDocument xb_dataArrayDoc = createDataArrayResult(phenComponents,
+    // sosObs);
+    // xbRresult.set(xb_dataArrayDoc);
+    // XmlCursor cursor = xbRresult.newCursor();
+    // cursor.setAttributeText(new QName(W3CConstants.NS_XSI, "type"),
+    // "swe:DataArrayPropertyType");
+    // cursor.dispose();
+    // }
+
+    private void addResultToObservation(XmlObject addNewResult, SosObservation sosObservation,
+            List<SosObservableProperty> phenComponents, String observationID) throws OwsExceptionReport {
+        String observationType = sosObservation.getObservationConstellation().getObservationType();
+        if (sosObservation.getValue() instanceof SosSingleObservationValue) {
+            addSingleObservationToResultSet(addNewResult, (SosSingleObservationValue) sosObservation.getValue(),
+                    observationID, sosObservation.getObservationConstellation().getObservationType());
+        } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
+            addMultiObservationValueToResult(addNewResult, sosObservation, phenComponents);
+        }
+
+    }
+
+    private void addSingleObservationToResultSet(XmlObject addNewResult, SosSingleObservationValue observationValue,
+            String observationID, String observationType) throws OwsExceptionReport {
+        if ((observationType.equals(OMConstants.OBS_TYPE_MEASUREMENT) || observationType
+                .equals(OMConstants.RESULT_MODEL_MEASUREMENT)) && observationValue.getValue() instanceof QuantityValue) {
+            QuantityValue quantityValue = (QuantityValue) observationValue.getValue();
+            MeasureType xbMeasureType =
+                    MeasureType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+            if (quantityValue.getUnit() != null) {
+                xbMeasureType.setUom(quantityValue.getUnit());
+            } else {
+                xbMeasureType.setUom("");
+            }
+            if (!quantityValue.getValue().equals(Double.NaN)) {
+                xbMeasureType.setDoubleValue(quantityValue.getValue());
+            } else {
+                xbMeasureType.setNil();
+            }
+            addNewResult.set(xbMeasureType);
+        } else if ((observationType.equals(OMConstants.OBS_TYPE_COUNT_OBSERVATION) || observationType
+                .equals(OMConstants.RESULT_MODEL_COUNT_OBSERVATION))
+                && observationValue.getValue() instanceof CountValue) {
+            CountValue countValue = (CountValue) observationValue.getValue();
+            XmlInteger xbInteger = XmlInteger.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+            if (countValue.getValue() != null && countValue.getValue() != Integer.MIN_VALUE) {
+                xbInteger.setBigIntegerValue(new BigInteger(countValue.getValue().toString()));
+            } else {
+                xbInteger.setNil();
+            }
+            addNewResult.set(xbInteger);
+        } else if ((observationType.equals(OMConstants.OBS_TYPE_TEXT_OBSERVATION) || observationType
+                .equals(OMConstants.RESULT_MODEL_TEXT_OBSERVATION))
+                && observationValue.getValue() instanceof TextValue) {
+            TextValue textValue = (TextValue) observationValue.getValue();
+            XmlString xbString = XmlString.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+            if (textValue.getValue() != null && !textValue.getValue().isEmpty()) {
+                xbString.setStringValue(textValue.getValue());
+            } else {
+                xbString.setNil();
+            }
+            addNewResult.set(xbString);
+        } else if ((observationType.equals(OMConstants.OBS_TYPE_TRUTH_OBSERVATION) || observationType
+                .equals(OMConstants.RESULT_MODEL_TRUTH_OBSERVATION))
+                && observationValue.getValue() instanceof BooleanValue) {
+            BooleanValue booleanValue = (BooleanValue) observationValue.getValue();
+            XmlBoolean xbBoolean = XmlBoolean.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+            if (booleanValue.getValue() != null) {
+                xbBoolean.setBooleanValue(booleanValue.getValue());
+            } else {
+                xbBoolean.setNil();
+            }
+            addNewResult.set(xbBoolean);
+        } else if ((observationType.equals(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION) || observationType
+                .equals(OMConstants.RESULT_MODEL_CATEGORY_OBSERVATION))
+                && observationValue.getValue() instanceof CategoryValue) {
+            CategoryValue categoryValue = (CategoryValue) observationValue.getValue();
+            if (categoryValue.getValue() != null && !categoryValue.getValue().isEmpty()) {
+                IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
+                if (encoder != null) {
+                    Map<HelperValues, String> additionalValue = new HashMap<HelperValues, String>();
+                    additionalValue.put(HelperValues.GMLID, SosConstants.OBS_ID_PREFIX + observationID);
+                    XmlObject xmlObject = (XmlObject) encoder.encode(categoryValue, additionalValue);
+                    addNewResult.set(xmlObject);
+                } else {
+                    String exceptionText = "Error while encoding category value, needed encoder is missing!";
+                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                }
+            } else {
+                addNewResult.setNil();
+            }
+        } else if ((observationType.equals(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION) || observationType
+                .equals(OMConstants.RESULT_MODEL_GEOMETRY_OBSERVATION))
+                && observationValue.getValue() instanceof GeometryValue) {
+
+            GeometryValue geometryValue = (GeometryValue) observationValue.getValue();
+            if (geometryValue.getValue() != null) {
+                IEncoder geomEncoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
+                if (geomEncoder != null) {
+                    Map<HelperValues, String> additionalValue = new HashMap<HelperValues, String>();
+                    additionalValue.put(HelperValues.GMLID, SosConstants.OBS_ID_PREFIX + observationID);
+                    XmlObject xmlObject =
+                            (XmlObject) geomEncoder.encode((Geometry) geometryValue.getValue(), additionalValue);
+                    addNewResult.set(xmlObject);
+                } else {
+                    String exceptionText = "Error while encoding geometry value, needed encoder is missing!";
+                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                }
+            } else {
+                addNewResult.setNil();
+            }
+        }
+    }
+
+    private void addMultiObservationValueToResult(XmlObject addNewResult, SosObservation sosObservation,
+            List<SosObservableProperty> phenComponents) throws OwsExceptionReport {
+        String observationType = sosObservation.getObservationConstellation().getObservationType();
+        if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)
+                || observationType.equals(OMConstants.RESULT_MODEL_OBSERVATION)) {
+            XmlObject xbRresult = addNewResult;
+            DataArrayDocument xb_dataArrayDoc = createDataArrayResult(phenComponents, sosObservation);
+            xbRresult.set(xb_dataArrayDoc);
+            XmlCursor cursor = xbRresult.newCursor();
+            cursor.setAttributeText(new QName(W3CConstants.NS_XSI, "type"), "swe:DataArrayPropertyType");
+            cursor.dispose();
+        }
     }
 
     /**
@@ -868,9 +1344,9 @@ public class OmEncoderv20 implements IEncoder<XmlObject, Object> {
                         try {
                             xbFoiType.set(XmlObject.Factory.parse(sampFeat.getXmlDescription()));
                         } catch (XmlException xmle) {
-                            OwsExceptionReport owse = new OwsExceptionReport(xmle);
-                            LOGGER.error("ERROR encoder", owse);
-                            throw owse;
+                           String exceptionText = "Error while encoding featureOfInterest in OMObservation!";
+                            LOGGER.error(exceptionText, xmle);
+                            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
                         }
 
                     } else if (sampFeat.getUrl() != null) {
@@ -903,4 +1379,196 @@ public class OmEncoderv20 implements IEncoder<XmlObject, Object> {
             }
         }
     }
+
+    // /**
+    // * Creates XML representation of OM 2.0 observation type from SOS
+    // * observation.
+    // *
+    // * @param xbObs
+    // * OM 2.0 observation
+    // * @param phenID
+    // * @param object
+    // * @param observationType
+    // * @param map
+    // * @param absObs
+    // * SOS observation
+    // * @throws OwsExceptionReport
+    // * if an error occurs during creation.
+    // */
+    // private void createObservation(OMObservationType xbObs, SosObservation
+    // sosObs,
+    // Map<String, SosAbstractFeature> features, String phenID,
+    // SosObservationValue sosObsValue,
+    // String observationType) throws OwsExceptionReport {
+    //
+    // xbObs.setId("o_" + Long.toString(System.currentTimeMillis()));
+    // String observationID = "";
+    // if (sosObsValue.getObservationID() != null) {
+    // observationID = sosObsValue.getObservationID();
+    // xbObs.addNewIdentifier().setStringValue(observationID);
+    // } else {
+    // observationID = Long.toString(System.currentTimeMillis());
+    // }
+    // xbObs.addNewType().setHref(observationType);
+    //
+    // // set eventTime
+    // String phenTimeId = OMConstants.PHENOMENON_TIME_NAME + "_" +
+    // observationID;
+    // addPhenomenonTime(xbObs.addNewPhenomenonTime(), phenTimeId,
+    // sosObs.getPhenomenonTime());
+    // // AbstractTimeObjectType xbAbsTimeObject =
+    // // xbObs.addNewPhenomenonTime().addNewAbstractTimeObject();
+    // // IEncoder encoder =
+    // //
+    // Configurator.getInstance().getEncoder(xbAbsTimeObject.getDomNode().getNamespaceURI());
+    // // if (encoder != null) {
+    // // Map<HelperValues, String> additionalValues = new
+    // // HashMap<HelperValues, String>();
+    // // additionalValues.put(HelperValues.GMLID, phenTimeId);
+    // // XmlObject xmlObject = (XmlObject)
+    // // encoder.encode(sosObsValue.getPhenomenonTime(), additionalValues);
+    // // xbAbsTimeObject.set(xmlObject);
+    // // if (sosObsValue.getPhenomenonTime() instanceof TimeInstant) {
+    // // xbAbsTimeObject.substitute(new QName(GMLConstants.NS_GML_32,
+    // // GMLConstants.EN_TIME_INSTANT,
+    // // GMLConstants.NS_GML), xmlObject.schemaType());
+    // // } else if (sosObsValue.getPhenomenonTime() instanceof TimePeriod) {
+    // // xbAbsTimeObject.substitute(new QName(GMLConstants.NS_GML_32,
+    // // GMLConstants.EN_TIME_PERIOD,
+    // // GMLConstants.NS_GML), xmlObject.schemaType());
+    // // }
+    // // } else {
+    // // String exceptionText =
+    // // "Error while encoding phenomenon time, needed encoder is missing!";
+    // // throw Util4Exceptions.createNoApplicableCodeException(null,
+    // // exceptionText);
+    // // }
+    // xbObs.addNewResultTime().setHref("#" + phenTimeId);
+    //
+    // // set procedure
+    // xbObs.addNewProcedure().setHref(sosObs.getObservationConstellation().getProcedure());
+    //
+    // // set observedProperty (phenomenon)
+    // xbObs.addNewObservedProperty().setHref(phenID);
+    //
+    // // set feature
+    // encodeFeatureOfInterest(xbObs,
+    // sosObs.getObservationConstellation().getFeatureOfInterest(),
+    // features.get(sosObs.getObservationConstellation().getFeatureOfInterest()));
+    //
+    // // // Currently not used for SOS 2.0 and OM 2.0 encoding.
+    // // // // add quality, if set
+    // // if (meas.getQuality() != null) {
+    // // DQElementPropertyType xbQuality = xbObs.addNewResultQuality();
+    // // xbQuality.set(createQualityProperty(sosObs.getQuality()));
+    // // }
+    //
+    // // set result
+    // if (observationType.equals(OMConstants.OBS_TYPE_MEASUREMENT)
+    // || observationType.equals(OMConstants.RESULT_MODEL_MEASUREMENT)) {
+    // MeasureType xbMeasureType = MeasureType.Factory.newInstance();
+    // if (((SosObservableProperty)
+    // sosObs.getObservationConstellation().getObservableProperty()).getUnit()
+    // != null) {
+    // xbMeasureType.setUom(((SosObservableProperty)
+    // sosObs.getObservationConstellation()
+    // .getObservableProperty()).getUnit());
+    // } else {
+    // xbMeasureType.setUom("");
+    // }
+    //
+    // if (!((Double) sosObsValue.getValue()).equals(Double.NaN)) {
+    // xbMeasureType.setDoubleValue((Double) sosObsValue.getValue());
+    // }
+    //
+    // else {
+    // xbMeasureType.setNil();
+    // }
+    // xbObs.addNewResult().set(xbMeasureType);
+    // } else if
+    // (observationType.equals(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION)
+    // || observationType.equals(OMConstants.RESULT_MODEL_CATEGORY_OBSERVATION))
+    // {
+    // Reference xbRef = Reference.Factory.newInstance();
+    // xbRef.setHref((String) sosObsValue.getValue());
+    // xbObs.addNewResult().set(xbRef);
+    // } else if
+    // (observationType.equals(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION)
+    // || observationType.equals(OMConstants.RESULT_MODEL_GEOMETRY_OBSERVATION))
+    // {
+    // IEncoder geomEncoder =
+    // Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
+    // if (geomEncoder != null) {
+    // Map<HelperValues, String> additionalValues = new HashMap<HelperValues,
+    // String>();
+    // additionalValues.put(HelperValues.GMLID, SosConstants.OBS_ID_PREFIX +
+    // observationID);
+    // XmlObject xmlObject =
+    // (XmlObject) geomEncoder.encode((Geometry) sosObsValue.getValue(),
+    // additionalValues);
+    // xbObs.addNewResult().set(xmlObject);
+    // } else {
+    // String exceptionText =
+    // "Error while encoding geometry value, needed encoder is missing!";
+    // throw Util4Exceptions.createNoApplicableCodeException(null,
+    // exceptionText);
+    // }
+    // }
+    //
+    // }
+    //
+    // private void createGenericObservation(OMObservationType xbObs,
+    // SosObservation sosObs,
+    // Map<String, SosAbstractFeature> features) throws OwsExceptionReport {
+    // xbObs.setId("o_" + Long.toString(System.currentTimeMillis()));
+    // String observationID = SosConstants.OBS_ID_PREFIX + new
+    // DateTime().getMillis();
+    // xbObs.addNewType().setHref(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
+    //
+    // // set eventTime
+    // String phenTimeId = OMConstants.PHENOMENON_TIME_NAME + "_" +
+    // observationID;
+    // addPhenomenonTime(xbObs.addNewPhenomenonTime(), phenTimeId,
+    // sosObs.getPhenomenonTime());
+    //
+    // xbObs.addNewResultTime().setHref("#" + phenTimeId);
+    //
+    // // set procedure
+    // xbObs.addNewProcedure().setHref(sosObs.getObservationConstellation().getProcedure());
+    //
+    // // phenomena of the common observation
+    // List<SosObservableProperty> phenComponents = null;
+    // if (sosObs.getObservationConstellation().getObservableProperty()
+    // instanceof SosObservableProperty) {
+    // xbObs.addNewObservedProperty().setHref(
+    // sosObs.getObservationConstellation().getObservableProperty().getIdentifier());
+    // phenComponents = new ArrayList<SosObservableProperty>();
+    // phenComponents.add((SosObservableProperty)
+    // sosObs.getObservationConstellation().getObservableProperty());
+    // } else if (sosObs.getObservationConstellation().getObservableProperty()
+    // instanceof SosCompositePhenomenon) {
+    // SosCompositePhenomenon compPhen =
+    // (SosCompositePhenomenon)
+    // sosObs.getObservationConstellation().getObservableProperty();
+    // xbObs.addNewObservedProperty().setHref(compPhen.getIdentifier());
+    // phenComponents = compPhen.getPhenomenonComponents();
+    // }
+    //
+    // // set feature
+    // encodeFeatureOfInterest(xbObs,
+    // sosObs.getObservationConstellation().getFeatureOfInterest(),
+    // features.get(sosObs.getObservationConstellation().getFeatureOfInterest()));
+    //
+    // // set result
+    // // add resultDefinition
+    // XmlObject xbRresult = xbObs.addNewResult();
+    // DataArrayDocument xb_dataArrayDoc = createDataArrayResult(phenComponents,
+    // sosObs);
+    // xbRresult.set(xb_dataArrayDoc);
+    // XmlCursor cursor = xbRresult.newCursor();
+    // cursor.setAttributeText(new QName(W3CConstants.NS_XSI, "type"),
+    // "swe:DataArrayPropertyType");
+    // cursor.dispose();
+    // }
+
 }

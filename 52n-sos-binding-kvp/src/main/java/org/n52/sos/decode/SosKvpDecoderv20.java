@@ -3,8 +3,10 @@ package org.n52.sos.decode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.joda.time.DateTime;
 import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
@@ -29,6 +31,7 @@ import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.request.SosGetResultRequest;
 import org.n52.sos.request.SosGetResultTemplateRequest;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.KvpHelper;
@@ -110,6 +113,11 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
         return sosRequest;
     }
 
+    @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return new HashMap<SupportedTypeKey, Set<String>>(0);
+    }
+
     /**
      * parses the String representing the getCapabilities request and creates a
      * SosGetCapabilities request
@@ -120,8 +128,7 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
      * @throws OwsExceptionReport
      *             If parsing the String failed
      */
-    private GetCapabilitiesRequest parseGetCapabilities(Map<String, String> element)
-            throws OwsExceptionReport {
+    private GetCapabilitiesRequest parseGetCapabilities(Map<String, String> element) throws OwsExceptionReport {
 
         GetCapabilitiesRequest request = new GetCapabilitiesRequest();
         List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
@@ -488,8 +495,7 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
         return request;
     }
 
-    private SosGetResultTemplateRequest parseGetResultTemplate(Map<String, String> element)
-            throws OwsExceptionReport {
+    private SosGetResultTemplateRequest parseGetResultTemplate(Map<String, String> element) throws OwsExceptionReport {
         SosGetResultTemplateRequest request = new SosGetResultTemplateRequest();
         List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
 
@@ -758,7 +764,8 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
 
     private Map<String, String> parseNamespaces(String parameterValues) {
         Map<String, String> namespaces = new HashMap<String, String>();
-        List<String> array = Arrays.asList(parameterValues.replaceAll("\\),", "").replaceAll("\\)", "").split("xmlns\\("));
+        List<String> array =
+                Arrays.asList(parameterValues.replaceAll("\\),", "").replaceAll("\\)", "").split("xmlns\\("));
         for (String string : array) {
             if (string != null && !string.isEmpty()) {
                 String[] s = string.split(",");
@@ -803,11 +810,13 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
                 }
                 DateTime end = null;
                 if (valueSplit != null) {
-                    end = DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
-                            DateTimeHelper.parseIsoString2DateTime(times[1]), valueSplit.length());
+                    end =
+                            DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
+                                    DateTimeHelper.parseIsoString2DateTime(times[1]), valueSplit.length());
                 } else {
-                    end = DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
-                            DateTimeHelper.parseIsoString2DateTime(times[1]), times[1].length());
+                    end =
+                            DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
+                                    DateTimeHelper.parseIsoString2DateTime(times[1]), times[1].length());
                 }
                 TimePeriod tp = new TimePeriod();
                 tp.setStart(start);
@@ -834,6 +843,11 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
             }
 
         }
+    }
+
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
     }
 
 }

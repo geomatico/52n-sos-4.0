@@ -30,25 +30,29 @@ package org.n52.sos.soap;
 
 import java.util.Map;
 
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.response.ServiceResponse;
 
 public class SoapResponse {
-    
+
     private String soapNamespace;
-    
+
     private String soapVersion;
-    
+
     private String soapAction;
-   
+
     private SoapFault soapFault;
-    
+
     private ServiceResponse bodyContent;
-    
+
     private Map<String, SoapHeader> header;
+    
+    private OwsExceptionReport exception;
 
     public SoapResponse() {
         // TODO Auto-generated constructor stub
     }
+
     /**
      * @return the soapNamespace
      */
@@ -57,7 +61,8 @@ public class SoapResponse {
     }
 
     /**
-     * @param soapNamespace the soapNamespace to set
+     * @param soapNamespace
+     *            the soapNamespace to set
      */
     public void setSoapNamespace(String soapNamespace) {
         this.soapNamespace = soapNamespace;
@@ -71,7 +76,8 @@ public class SoapResponse {
     }
 
     /**
-     * @param soapVersion the soapVersion to set
+     * @param soapVersion
+     *            the soapVersion to set
      */
     public void setSoapVersion(String soapVersion) {
         this.soapVersion = soapVersion;
@@ -96,6 +102,7 @@ public class SoapResponse {
     public String getSoapAction() {
         return soapAction;
     }
+
     public void setSoapBodyContent(ServiceResponse bodyContent) {
         this.bodyContent = bodyContent;
     }
@@ -103,8 +110,17 @@ public class SoapResponse {
     public void setHeader(Map<String, SoapHeader> map) {
         this.header = map;
     }
+
     public Map<String, SoapHeader> getHeader() {
         return header;
+    }
+
+    public void setException(OwsExceptionReport owse) {
+        this.exception = owse;
+    }
+    
+    public OwsExceptionReport getException() {
+        return exception;
     }
 
 }

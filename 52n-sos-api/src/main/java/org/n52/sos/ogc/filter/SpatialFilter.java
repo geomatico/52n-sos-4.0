@@ -38,116 +38,115 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class SpatialFilter {
 
-	/**
-	 * Spatial filter operator
-	 */
-	private SpatialOperator operator;
+    /**
+     * Spatial filter operator
+     */
+    private SpatialOperator operator;
 
-	/**
-	 * Filter geometry
-	 */
-	private Geometry geometry;
+    /**
+     * Filter geometry
+     */
+    private Geometry geometry;
 
-	/**
-	 * Filter valueReference
-	 */
-	private String valueReference;
+    /**
+     * Filter valueReference
+     */
+    private String valueReference;
 
-	/**
-	 * constructor
-	 * 
-	 * @param operatorp
-	 *            Spatial operator
-	 * @param geomWKTp
-	 *            Filter geometry
-	 * @param valueReferencep
-	 *            Filter valueReference
-	 */
-	public SpatialFilter(SpatialOperator operatorp, Geometry geomWKTp,
-			String valueReferencep) {
-		this.operator = operatorp;
-		this.geometry = geomWKTp;
-		this.valueReference = valueReferencep;
-	}
+    /**
+     * constructor
+     * 
+     * @param operatorp
+     *            Spatial operator
+     * @param geomWKTp
+     *            Filter geometry
+     * @param valueReferencep
+     *            Filter valueReference
+     */
+    public SpatialFilter(SpatialOperator operatorp, Geometry geomWKTp, String valueReferencep) {
+        this.operator = operatorp;
+        this.geometry = geomWKTp;
+        this.valueReference = valueReferencep;
+    }
 
-	/**
-	 * default constructor
-	 */
-	public SpatialFilter() {
-	}
+    /**
+     * default constructor
+     */
+    public SpatialFilter() {
+    }
 
-	/**
-	 * Get spatial filter operator
-	 * 
-	 * @return spatial filter operator
-	 */
-	public SpatialOperator getOperator() {
-		return operator;
-	}
+    /**
+     * Get spatial filter operator
+     * 
+     * @return spatial filter operator
+     */
+    public SpatialOperator getOperator() {
+        return operator;
+    }
 
-	/**
-	 * Set spatial filter operator
-	 * 
-	 * @param operator
-	 *            spatial filter operator
-	 */
-	public void setOperator(SpatialOperator operator) {
-		this.operator = operator;
-	}
+    /**
+     * Set spatial filter operator
+     * 
+     * @param operator
+     *            spatial filter operator
+     */
+    public void setOperator(SpatialOperator operator) {
+        this.operator = operator;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		return "Spatial filter: " + operator + " " + geometry;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        return "Spatial filter: " + operator + " " + geometry;
+    }
 
-	/**
-	 * Get SRID
-	 * 
-	 * @return SRID
-	 */
-	public int getSrid() {
-		return geometry.getSRID();
-	}
+    /**
+     * Get SRID
+     * 
+     * @return SRID
+     */
+    public int getSrid() {
+        return geometry.getSRID();
+    }
 
-	/**
-	 * Get filter geometry
-	 * 
-	 * @return filter geometry
-	 */
-	public Geometry getGeometry() {
-		return geometry;
-	}
+    /**
+     * Get filter geometry
+     * 
+     * @return filter geometry
+     */
+    public Geometry getGeometry() {
+        return geometry;
+    }
 
-	/**
-	 * Set filter geometry
-	 * 
-	 * @param geometry
-	 *            filter geometry
-	 */
-	public void setGeometry(Geometry geometry) {
-		this.geometry = geometry;
-	}
+    /**
+     * Set filter geometry
+     * 
+     * @param geometry
+     *            filter geometry
+     */
+    public void setGeometry(Geometry geometry) {
+        this.geometry = geometry;
+    }
 
-	/**
-	 * Get valueReference
-	 * 
-	 * @return valueReference
-	 */
-	public String getValueReference() {
-		return valueReference;
-	}
+    /**
+     * Get valueReference
+     * 
+     * @return valueReference
+     */
+    public String getValueReference() {
+        return valueReference;
+    }
 
-	/**
-	 * Set valueReference
-	 * 
-	 * @param valueReference
-	 *            valueReference
-	 */
-	public void setValueReference(String valueReference) {
-		this.valueReference = valueReference;
-	}
+    /**
+     * Set valueReference
+     * 
+     * @param valueReference
+     *            valueReference
+     */
+    public void setValueReference(String valueReference) {
+        this.valueReference = valueReference;
+    }
 }

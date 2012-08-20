@@ -37,42 +37,41 @@ import java.util.List;
  */
 public class SosCompositePhenomenon extends AbstractSosPhenomenon {
 
-	/** the components of the composite phenomenon */
-	private List<SosObservableProperty> phenomenonComponents;
+    /** the components of the composite phenomenon */
+    private List<SosObservableProperty> phenomenonComponents;
 
-	/**
-	 * standard constructor
-	 * 
-	 * @param compPhenId
-	 *            id of the composite phenomenon
-	 * @param compPhenDesc
-	 *            description of the composite phenomenon
-	 * @param phenomenonComponents
-	 *            components of the composite phenomenon
-	 */
-	public SosCompositePhenomenon(String compPhenId, String compPhenDesc,
-			List<SosObservableProperty> phenomenonComponents) {
-		super(compPhenId, compPhenDesc);
-		this.phenomenonComponents = phenomenonComponents;
-	}
+    /**
+     * standard constructor
+     * 
+     * @param compPhenId
+     *            id of the composite phenomenon
+     * @param compPhenDesc
+     *            description of the composite phenomenon
+     * @param phenomenonComponents
+     *            components of the composite phenomenon
+     */
+    public SosCompositePhenomenon(String compPhenId, String compPhenDesc,
+            List<SosObservableProperty> phenomenonComponents) {
+        super(compPhenId, compPhenDesc);
+        this.phenomenonComponents = phenomenonComponents;
+    }
 
-	/**
-	 * Get observableProperties
-	 * 
-	 * @return Returns the phenomenonComponents.
-	 */
-	public List<SosObservableProperty> getPhenomenonComponents() {
-		return phenomenonComponents;
-	}
+    /**
+     * Get observableProperties
+     * 
+     * @return Returns the phenomenonComponents.
+     */
+    public List<SosObservableProperty> getPhenomenonComponents() {
+        return phenomenonComponents;
+    }
 
-	/**
-	 * Set observableProperties
-	 * 
-	 * @param phenomenonComponents
-	 *            The phenomenonComponents to set.
-	 */
-	public void setPhenomenonComponents(
-			ArrayList<SosObservableProperty> phenomenonComponents) {
-		this.phenomenonComponents = phenomenonComponents;
-	}
+    /**
+     * Set observableProperties
+     * 
+     * @param phenomenonComponents
+     *            The phenomenonComponents to set.
+     */
+    public void setPhenomenonComponents(ArrayList<SosObservableProperty> phenomenonComponents) {
+        this.phenomenonComponents = phenomenonComponents;
+    }
 }

@@ -46,7 +46,7 @@ public class OWSOperation {
      * Name of the operation which metadata are represented.
      */
     private String operationName;
-    
+
     /**
      * Supported DCPs
      */
@@ -56,7 +56,7 @@ public class OWSOperation {
      * Map with names and allowed values for the parameter.
      */
     private Map<String, Collection<String>> parameterValues;
-    
+
     /**
      * Map for min/max values, e. g. observation ids
      */
@@ -64,6 +64,7 @@ public class OWSOperation {
 
     /**
      * Get operation name
+     * 
      * @return operation name
      */
     public String getOperationName() {
@@ -72,6 +73,7 @@ public class OWSOperation {
 
     /**
      * Set operation name
+     * 
      * @param operationName
      */
     public void setOperationName(String operationName) {
@@ -80,6 +82,7 @@ public class OWSOperation {
 
     /**
      * Get DCP for operation
+     * 
      * @return DCP map
      */
     public Map<String, List<String>> getDcp() {
@@ -88,7 +91,9 @@ public class OWSOperation {
 
     /**
      * Set DCP for operation
-     * @param dcp DCP map
+     * 
+     * @param dcp
+     *            DCP map
      */
     public void setDcp(Map<String, List<String>> dcp) {
         if (this.dcp == null) {
@@ -100,8 +105,11 @@ public class OWSOperation {
 
     /**
      * Add DCP for operation
-     * @param operation Operation name
-     * @param value DCP values
+     * 
+     * @param operation
+     *            Operation name
+     * @param value
+     *            DCP values
      */
     public void addDcp(String operation, List<String> values) {
         if (dcp == null) {
@@ -112,6 +120,7 @@ public class OWSOperation {
 
     /**
      * Get parameter and value map
+     * 
      * @return Parameter value map
      */
     public Map<String, Collection<String>> getParameterValues() {
@@ -120,7 +129,9 @@ public class OWSOperation {
 
     /**
      * Set parameter and value map
-     * @param parameterValues Parameter value map
+     * 
+     * @param parameterValues
+     *            Parameter value map
      */
     public void setParameterValues(Map<String, Collection<String>> parameterValues) {
         if (this.parameterValues == null) {
@@ -133,8 +144,11 @@ public class OWSOperation {
 
     /**
      * Add values for parameter
-     * @param parameterName parameter name
-     * @param allowedValues values to add
+     * 
+     * @param parameterName
+     *            parameter name
+     * @param allowedValues
+     *            values to add
      */
     public void addParameterValue(String parameterName, Collection<String> allowedValues) {
         if (parameterValues == null) {
@@ -142,9 +156,10 @@ public class OWSOperation {
         }
         parameterValues.put(parameterName, allowedValues);
     }
-    
+
     /**
      * Get min/max values map
+     * 
      * @return min/max value map
      */
     public Map<String, Map<MinMax, String>> getParameterMinMaxMap() {
@@ -153,11 +168,13 @@ public class OWSOperation {
 
     /**
      * Set min/max value map
-     * @param minMaxMap min/max value map
+     * 
+     * @param minMaxMap
+     *            min/max value map
      */
     public void addParameterMinMaxMapValue(String parameter, Map<MinMax, String> minMaxMap) {
         if (parameterminMaxMap == null) {
-            parameterminMaxMap = new HashMap<String, Map<MinMax,String>>();
+            parameterminMaxMap = new HashMap<String, Map<MinMax, String>>();
         }
         if (parameterminMaxMap.containsKey(parameter)) {
             parameterminMaxMap.get(parameter).putAll(minMaxMap);

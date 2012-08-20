@@ -80,6 +80,14 @@ public class OWSConstants {
 
     public static final String SOAP_REASON_UNKNOWN = "A server exception was encountered.";
 
+    public static final String EN_EXCEPTION = "Exception";
+
+    public static final String EN_EXCEPTION_CODE = "exceptionCode";
+
+    public static final String EN_LOCATOR = "locator";
+
+    public static final String EN_EXCEPTION_TEXT = "ExceptionText";
+
     /**
      * Enumeration for related feature role
      * 

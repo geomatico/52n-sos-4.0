@@ -54,7 +54,7 @@ public class XmlOptionsHelper {
      * instance
      */
     private static XmlOptionsHelper instance = null;
-    
+
     private Map<String, String> prefixMap = getPrefixMap();
 
     /**
@@ -76,10 +76,12 @@ public class XmlOptionsHelper {
             xmlOptions.setSaveAggressiveNamespaces();
             xmlOptions.setSavePrettyPrint();
             xmlOptions.setSaveNamespacesFirst();
+//            xmlOptions.setLoadAdditionalNamespaces(prefixMap);
+//            xmlOptions.setLoadSubstituteNamespaces(prefixMap);
             xmlOptions.setCharacterEncoding(characterEncoding);
         }
     }
-    
+
     private Map<String, String> getPrefixMap() {
         Map<String, String> lPrefixMap = new Hashtable<String, String>();
         lPrefixMap.put(SensorMLConstants.NS_SML, SensorMLConstants.NS_SML_PREFIX);
@@ -92,6 +94,7 @@ public class XmlOptionsHelper {
         lPrefixMap.put(Sos1Constants.NS_SOS, SosConstants.NS_SOS_PREFIX);
         lPrefixMap.put(W3CConstants.NS_XLINK, W3CConstants.NS_XLINK_PREFIX);
         lPrefixMap.put(W3CConstants.NS_XSI, W3CConstants.NS_XSI_PREFIX);
+        lPrefixMap.put(W3CConstants.NS_XS, W3CConstants.NS_XS_PREFIX);
         lPrefixMap.put(SWEConstants.NS_SWE_20, SWEConstants.NS_SWE_PREFIX);
         lPrefixMap.put(SWEConstants.NS_SWES_20, SWEConstants.NS_SWES_PREFIX);
         lPrefixMap.put(GMLConstants.NS_GML_32, GMLConstants.NS_GML_PREFIX);
@@ -102,7 +105,7 @@ public class XmlOptionsHelper {
         lPrefixMap.put(Sos2Constants.NS_SOS_20, SosConstants.NS_SOS_PREFIX);
         return lPrefixMap;
     }
-    
+
     /**
      * Get the XML options for SOS 1.0.0
      * 
@@ -111,7 +114,6 @@ public class XmlOptionsHelper {
     public XmlOptions getXmlOptions() {
         return xmlOptions;
     }
-
 
     /**
      * Cleanup, set XML options to null

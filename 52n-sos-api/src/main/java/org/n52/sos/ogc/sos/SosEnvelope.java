@@ -36,66 +36,66 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class SosEnvelope {
 
-	/**
-	 * JTS envelope object
-	 */
-	private Envelope envelope;
+    /**
+     * JTS envelope object
+     */
+    private Envelope envelope;
 
-	/**
-	 * SRID
-	 */
-	private int srid;
+    /**
+     * SRID
+     */
+    private int srid;
 
-	/**
-	 * constructor
-	 * 
-	 * @param envelope
-	 *            JTS envelope
-	 * @param srid
-	 *            SRID
-	 */
-	public SosEnvelope(Envelope envelope, int srid) {
-		super();
-		this.envelope = envelope;
-		this.srid = srid;
-	}
+    /**
+     * constructor
+     * 
+     * @param envelope
+     *            JTS envelope
+     * @param srid
+     *            SRID
+     */
+    public SosEnvelope(Envelope envelope, int srid) {
+        super();
+        this.envelope = envelope;
+        this.srid = srid;
+    }
 
-	/**
-	 * Get envelope
-	 * 
-	 * @return the envelope
-	 */
-	public Envelope getEnvelope() {
-		return envelope;
-	}
+    /**
+     * Get envelope
+     * 
+     * @return the envelope
+     */
+    public Envelope getEnvelope() {
+        return envelope;
+    }
 
-	/**
-	 * Set envelope
-	 * 
-	 * @param envelope
-	 *            the envelope to set
-	 */
-	public void setEnvelope(Envelope envelope) {
-		this.envelope = envelope;
-	}
+    /**
+     * Set envelope
+     * 
+     * @param envelope
+     *            the envelope to set
+     */
+    public void setEnvelope(Envelope envelope) {
+        this.envelope = envelope;
+    }
 
-	/**
-	 * Get SRID
-	 * 
-	 * @return the srid
-	 */
-	public int getSrid() {
-		return srid;
-	}
+    /**
+     * Get SRID
+     * 
+     * @return the srid
+     */
+    public int getSrid() {
+        return srid;
+    }
 
-	/**
-	 * Set SRID
-	 * 
-	 * @param srid
-	 *            the srid to set
-	 */
-	public void setSrid(int srid) {
-		this.srid = srid;
-	}
+    /**
+     * Set SRID
+     * 
+     * @param srid
+     *            the srid to set
+     */
+    public void setSrid(int srid) {
+        this.srid = srid;
+    }
 
 }

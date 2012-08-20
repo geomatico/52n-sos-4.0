@@ -74,7 +74,9 @@ public class XmlHelper {
     private static List<LaxValidationCase> laxValidationCases;
     static {
         laxValidationCases = new ArrayList<LaxValidationCase>();
-        laxValidationCases.add(new GMLAbstractFeatureLaxCase());
+        laxValidationCases.add(new GML311AbstractFeatureLaxCase());
+        laxValidationCases.add(new GML321AbstractFeatureLaxCase());
+        laxValidationCases.add(new GML321AbstractTimeLaxCase());
     }
 
     /**
@@ -93,13 +95,15 @@ public class XmlHelper {
                 doc = XmlObject.Factory.parse(request.getInputStream());
             } else {
                 doc =
-                        XmlObject.Factory.parse(SosHelper.parseHttpPostBodyWithParameter(
-                                request.getParameterNames(), request.getParameterMap()));
+                        XmlObject.Factory.parse(SosHelper.parseHttpPostBodyWithParameter(request.getParameterNames(),
+                                request.getParameterMap()));
             }
         } catch (XmlException xmle) {
-            throw Util4Exceptions.createNoApplicableCodeException(xmle, "An xml error occured when parsing the request! Message: " + xmle.getMessage());
+            throw Util4Exceptions.createNoApplicableCodeException(xmle,
+                    "An xml error occured when parsing the request! Message: " + xmle.getMessage());
         } catch (IOException ioe) {
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, "Error while reading request! Message: " + ioe.getMessage());
+            throw Util4Exceptions.createNoApplicableCodeException(ioe,
+                    "Error while reading request! Message: " + ioe.getMessage());
         }
 
         return doc;
@@ -133,7 +137,6 @@ public class XmlHelper {
      *             if the Document is not valid
      */
     public static void validateDocument(XmlObject xb_doc) throws OwsExceptionReport {
-
         // Create an XmlOptions instance and set the error listener.
         ArrayList<XmlError> validationErrors = new ArrayList<XmlError>();
         XmlOptions validationOptions = new XmlOptions();
@@ -155,12 +158,17 @@ public class XmlHelper {
             List<XmlError> errors = new ArrayList<XmlError>();
             while (iter.hasNext()) {
                 XmlError error = iter.next();
+                boolean shouldPass = false;
                 for (LaxValidationCase lvc : laxValidationCases) {
                     if (lvc.shouldPass((XmlValidationError) error)) {
-                        shouldPassErrors.add(error);
-                    } else {
-                        errors.add(error);
+                        shouldPass = true;
+                        break;
                     }
+                }
+                if (shouldPass) {
+                    shouldPassErrors.add(error);
+                } else {
+                    errors.add(error);
                 }
             }
             for (XmlError error : errors) {
@@ -261,8 +269,8 @@ public class XmlHelper {
                     } else {
                         // create service exception
                         OwsExceptionReport se = new OwsExceptionReport();
-                        se.addCodedException(SwesExceptionCode.InvalidRequest, message, "[XmlBeans validation error:] "
-                                + message);
+                        se.addCodedException(SwesExceptionCode.InvalidRequest, message,
+                                "[XmlBeans validation error:] " + message);
                         LOGGER.error("The request is invalid!", se);
                         throw se;
                     }
@@ -291,13 +299,41 @@ public class XmlHelper {
      * Allow substitutions of gml:AbstractFeature. This lax validation lets pass
      * every child, hence it checks not _if_ this is a valid substitution.
      */
-    private static class GMLAbstractFeatureLaxCase implements LaxValidationCase {
+    private static class GML311AbstractFeatureLaxCase implements LaxValidationCase {
 
         private static final Object FEATURE_QN = new QName("http://www.opengis.net/gml", "_Feature");
 
         @Override
         public boolean shouldPass(XmlValidationError xve) {
             if (xve.getExpectedQNames() != null && xve.getExpectedQNames().contains(FEATURE_QN)) {
+                return true;
+            }
+            return false;
+        }
+
+    }
+
+    private static class GML321AbstractFeatureLaxCase implements LaxValidationCase {
+
+        private static final Object FEATURE_QN = new QName("http://www.opengis.net/gml/3.2", "AbstractFeature");
+
+        @Override
+        public boolean shouldPass(XmlValidationError xve) {
+            if (xve.getExpectedQNames() != null && xve.getExpectedQNames().contains(FEATURE_QN)) {
+                return true;
+            }
+            return false;
+        }
+
+    }
+
+    private static class GML321AbstractTimeLaxCase implements LaxValidationCase {
+
+        private static final Object TIME_QN = new QName("http://www.opengis.net/gml/3.2", "AbstractTimeObject");
+
+        @Override
+        public boolean shouldPass(XmlValidationError xve) {
+            if (xve.getExpectedQNames() != null && xve.getExpectedQNames().contains(TIME_QN)) {
                 return true;
             }
             return false;
@@ -320,9 +356,11 @@ public class XmlHelper {
             is = FileIOHelper.loadInputStreamFromFile(file);
             return XmlObject.Factory.parse(is);
         } catch (XmlException xmle) {
-            throw Util4Exceptions.createNoApplicableCodeException(xmle, "Error while parsing file " + file.getName() + "!");
+            throw Util4Exceptions.createNoApplicableCodeException(xmle, "Error while parsing file " + file.getName()
+                    + "!");
         } catch (IOException ioe) {
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, "Error while parsing file " + file.getName() + "!");
+            throw Util4Exceptions.createNoApplicableCodeException(ioe, "Error while parsing file " + file.getName()
+                    + "!");
         } finally {
             if (is != null) {
                 try {

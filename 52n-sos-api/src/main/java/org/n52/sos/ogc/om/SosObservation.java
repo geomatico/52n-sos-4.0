@@ -30,13 +30,14 @@ package org.n52.sos.ogc.om;
 
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
+import org.n52.sos.ogc.gml.time.TimePeriod;
 
 /**
  * Class represents a SOS observation
  * 
  */
-public class SosObservation {
-
+public class SosObservation implements Cloneable {
+    
     /**
      * ID of this observation; in the standard 52n SOS PostgreSQL database, this
      * is implemented through a sequence type.
@@ -52,7 +53,7 @@ public class SosObservation {
     private TimeInstant resultTime;
 
     /** valid time of the observation */
-    private ITime validTime;
+    private TimePeriod validTime;
 
     /**
      * constellation of procedure, obervedProperty, offering and observationType
@@ -104,14 +105,14 @@ public class SosObservation {
     public void setObservationConstellation(SosObservationConstellation observationConstellation) {
         this.observationConstellation = observationConstellation;
     }
-    
+
     /**
      * Get observation ID
      * 
      * @return the observationID
      */
     public String getObservationID() {
-            return observationID;
+        return observationID;
     }
 
     /**
@@ -121,7 +122,7 @@ public class SosObservation {
      *            the observationID to set
      */
     public void setObservationID(String observationID) {
-            this.observationID = observationID;
+        this.observationID = observationID;
     }
 
     /**
@@ -130,7 +131,7 @@ public class SosObservation {
      * @return the identifier
      */
     public String getIdentifier() {
-            return identifier;
+        return identifier;
     }
 
     /**
@@ -140,7 +141,7 @@ public class SosObservation {
      *            the identifier to set
      */
     public void setIdentifier(String identifier) {
-            this.identifier = identifier;
+        this.identifier = identifier;
     }
 
     /**
@@ -149,7 +150,7 @@ public class SosObservation {
      * @return the phenomenonTime
      */
     public ITime getPhenomenonTime() {
-            return value.getPhenomenonTime();
+        return value.getPhenomenonTime();
     }
 
     /**
@@ -158,7 +159,7 @@ public class SosObservation {
      * @return the resultTime
      */
     public TimeInstant getResultTime() {
-            return resultTime;
+        return resultTime;
     }
 
     /**
@@ -168,7 +169,7 @@ public class SosObservation {
      *            the resultTime to set
      */
     public void setResultTime(TimeInstant resultTime) {
-            this.resultTime = resultTime;
+        this.resultTime = resultTime;
     }
 
     /**
@@ -176,8 +177,8 @@ public class SosObservation {
      * 
      * @return the validTime
      */
-    public ITime getValidTime() {
-            return validTime;
+    public TimePeriod getValidTime() {
+        return validTime;
     }
 
     /**
@@ -186,8 +187,8 @@ public class SosObservation {
      * @param validTime
      *            the validTime to set
      */
-    public void setValidTime(ITime validTime) {
-            this.validTime = validTime;
+    public void setValidTime(TimePeriod validTime) {
+        this.validTime = validTime;
     }
 
     /**
@@ -196,7 +197,7 @@ public class SosObservation {
      * @return the resultType
      */
     public String getResultType() {
-            return resultType;
+        return resultType;
     }
 
     /**
@@ -206,9 +207,8 @@ public class SosObservation {
      *            the resultType to set
      */
     public void setResultType(String resultType) {
-            this.resultType = resultType;
+        this.resultType = resultType;
     }
-
 
     /**
      * Get token separator
@@ -284,5 +284,9 @@ public class SosObservation {
      */
     public void setValue(IObservationValue value) {
         this.value = value;
+    }
+
+    public SosObservation clone() throws CloneNotSupportedException{
+            return (SosObservation)super.clone();
     }
 }

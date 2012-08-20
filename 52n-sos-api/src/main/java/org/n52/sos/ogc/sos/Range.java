@@ -43,8 +43,10 @@ public class Range {
     /**
      * constructor
      * 
-     * @param start Start value
-     * @param end End value
+     * @param start
+     *            Start value
+     * @param end
+     *            End value
      */
     public Range(int start, int end) {
         this.from = start;

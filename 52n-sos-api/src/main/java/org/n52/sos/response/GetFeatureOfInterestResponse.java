@@ -3,7 +3,7 @@ package org.n52.sos.response;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 
 public class GetFeatureOfInterestResponse extends AbstractServiceResponse {
-    
+
     private SosAbstractFeature abstractFeature;
 
     public SosAbstractFeature getAbstractFeature() {
@@ -11,7 +11,7 @@ public class GetFeatureOfInterestResponse extends AbstractServiceResponse {
     }
 
     public void setAbstractFeature(SosAbstractFeature abstractFeature) {
-       this.abstractFeature = abstractFeature;
+        this.abstractFeature = abstractFeature;
     }
 
 }

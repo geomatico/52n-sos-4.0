@@ -28,6 +28,7 @@
 
 package org.n52.sos.service.admin;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,10 +41,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.admin.operator.IAdminServiceOperator;
+import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,189 +59,223 @@ import org.slf4j.LoggerFactory;
  */
 public class SosAdminService extends HttpServlet {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/** the logger */
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(SosAdminService.class);
+    /** the logger */
+    private static final Logger LOGGER = LoggerFactory.getLogger(SosAdminService.class);
 
-	/** The init parameter of the configFile */
-	private static final String INIT_PARAM_CONFIG_FILE = "configFile";
+    /** The init parameter of the configFile */
+    private static final String INIT_PARAM_CONFIG_FILE = "configFile";
 
-	/**
-	 * The request operator for the adminstration backend
-	 */
-	private IAdminServiceOperator sosAdminOperator;
+    /**
+     * The request operator for the adminstration backend
+     */
+    private IAdminServiceOperator sosAdminOperator;
 
-	/**
-	 * initializes the Servlet
-	 */
-	public void init() throws ServletException {
+    /**
+     * initializes the Servlet
+     */
+    public void init() throws ServletException {
 
-		// get ServletContext
-		ServletContext context = getServletContext();
-		String basepath = context.getRealPath("/");
+        // get ServletContext
+        ServletContext context = getServletContext();
+        String basepath = context.getRealPath("/");
 
-		// get configFile as InputStream
-		InputStream configStream = context
-				.getResourceAsStream(getInitParameter(INIT_PARAM_CONFIG_FILE));
+        // get configFile as InputStream
+        InputStream configStream = context.getResourceAsStream(getInitParameter(INIT_PARAM_CONFIG_FILE));
 
-		if (configStream == null) {
-			throw new UnavailableException("could not open the config file");
-		}
-		// initialize configurator
-		try {
-			Configurator.getInstance(configStream, basepath);
-			configStream.close();
-		} catch (OwsExceptionReport se) {
-			throw new UnavailableException(se.getMessage());
-		} catch (IOException ioe) {
-			throw new UnavailableException(ioe.getMessage());
-		} finally {
-			try {
-				configStream.close();
-			} catch (IOException ioe) {
-				LOGGER.error("cannot close input streams!", ioe);
-			}
+        if (configStream == null) {
+            throw new UnavailableException("could not open the config file");
+        }
+        // initialize configurator
+        try {
+            Configurator.getInstance(configStream, basepath);
+            configStream.close();
+        } catch (OwsExceptionReport owse) {
+            throw new UnavailableException(owse.getMessage());
+        } catch (IOException ioe) {
+            throw new UnavailableException(ioe.getMessage());
+        } finally {
+            try {
+                configStream.close();
+            } catch (IOException ioe) {
+                LOGGER.error("cannot close input streams!", ioe);
+            }
 
-		}
-		sosAdminOperator = Configurator.getInstance().getAdminRequestOperator();
-	}
+        }
+        sosAdminOperator = Configurator.getInstance().getAdminRequestOperator();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.servlet.GenericServlet#destroy()
-	 */
-	@Override
-	public void destroy() {
-		Configurator.getInstance().cleanup();
-		super.destroy();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.servlet.GenericServlet#destroy()
+     */
+    @Override
+    public void destroy() {
+        Configurator.getInstance().cleanup();
+        super.destroy();
+    }
 
-	/**
-	 * handles all POST requests, the request will be passed to the
-	 * requestOperator
-	 * 
-	 * @param req
-	 *            the incomming request
-	 * 
-	 * @param resp
-	 *            the response for the incoming request
-	 */
-	public void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException {
+    /**
+     * handles all POST requests, the request will be passed to the
+     * requestOperator
+     * 
+     * @param req
+     *            the incomming request
+     * 
+     * @param resp
+     *            the response for the incoming request
+     */
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
 
-		LOGGER.debug("\n**********\n(POST) Connected from: "
-				+ req.getRemoteAddr() + " " + req.getRemoteHost());
+        LOGGER.debug("\n**********\n(POST) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
 
-		this.setCorsHeaders(resp);
+        this.setCorsHeaders(resp);
 
-		// Set service URL in configurator
-		if (Configurator.getInstance().getServiceURL() == null) {
-			Configurator.getInstance().setServiceURL(
-					req.getRequestURL().toString());
-		}
+        // Set service URL in configurator
+        if (Configurator.getInstance().getServiceURL() == null) {
+            Configurator.getInstance().setServiceURL(req.getRequestURL().toString());
+        }
 
-		ServiceResponse sosResp = sosAdminOperator.doPostOperation(req);
-		doResponse(resp, sosResp);
-	}
+        ServiceResponse sosResp = null;
+        try {
+            sosResp = sosAdminOperator.doPostOperation(req);
+        } catch (OwsExceptionReport owse) {
+            sosResp = handleOwsExceptionReport(owse);
+        }
+        doResponse(resp, sosResp);
+    }
 
-	/**
-	 * handles all GET requests, the request will be passed to the
-	 * RequestOperator
-	 * 
-	 * @param req
-	 *            the incoming request
-	 * 
-	 * @param resp
-	 *            the response for the incomming request
-	 * 
-	 */
-	public void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException {
+    /**
+     * handles all GET requests, the request will be passed to the
+     * RequestOperator
+     * 
+     * @param req
+     *            the incoming request
+     * 
+     * @param resp
+     *            the response for the incomming request
+     * 
+     */
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
 
-		LOGGER.debug("\n**********\n(GET) Connected from: "
-				+ req.getRemoteAddr() + " " + req.getRemoteHost());
-		LOGGER.trace("Query String: " + req.getQueryString());
+        LOGGER.debug("\n**********\n(GET) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
+        LOGGER.trace("Query String: " + req.getQueryString());
 
-		this.setCorsHeaders(resp);
+        this.setCorsHeaders(resp);
 
-		// Set service URL in configurator
-		if (Configurator.getInstance().getServiceURL() == null) {
-			Configurator.getInstance().setServiceURL(
-					req.getRequestURL().toString());
-		}
-		// ///////////////////////////////////////////////
-		// forward GET-request to RequestOperator
+        // Set service URL in configurator
+        if (Configurator.getInstance().getServiceURL() == null) {
+            Configurator.getInstance().setServiceURL(req.getRequestURL().toString());
+        }
+        // ///////////////////////////////////////////////
+        // forward GET-request to RequestOperator
 
-		ServiceResponse sosResp = sosAdminOperator.doGetOperation(req);
-		doResponse(resp, sosResp);
-	}
+        ServiceResponse sosResp = null;
+        try {
+            sosResp = sosAdminOperator.doGetOperation(req);
+        } catch (OwsExceptionReport owse) {
+            sosResp = handleOwsExceptionReport(owse);
+        }
+        doResponse(resp, sosResp);
+    }
+    
+    private ServiceResponse handleOwsExceptionReport(OwsExceptionReport owsExceptionReport) throws ServletException {
+        try {
+            IEncoder encoder = Configurator.getInstance().getEncoder(owsExceptionReport.getNamespace());
+            if (encoder != null) {
+                Object encodedObject = encoder.encode(owsExceptionReport);
+                if (encodedObject instanceof XmlObject) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
+                    return new ServiceResponse(baos, SosConstants.CONTENT_TYPE_XML, false, true);
+                } else if (encodedObject instanceof ServiceResponse) {
+                    return (ServiceResponse) encodedObject;
+                } else {
+                    String exceptionText = "Error while handle exception message response!";
+                    LOGGER.debug(exceptionText);
+                    throw new ServletException(exceptionText);
+                }
+            } else {
+                String exceptionText = "Error while handle exception message response!";
+                LOGGER.debug(exceptionText);
+                throw new ServletException(exceptionText);
+            }
+        } catch (OwsExceptionReport owse) {
+            String exceptionText = "Error while handle exception message response!";
+            LOGGER.debug(exceptionText, owse);
+            throw new ServletException(exceptionText);
+        } catch (IOException ioe) {
+            String exceptionText = "Error while handle exception message response!";
+            LOGGER.debug(exceptionText, ioe);
+            throw new ServletException(exceptionText);
+        }
+        
+    }
 
-	/**
-	 * writes the content of the SosResponse to the outputStream of the
-	 * HttpServletResponse
-	 * 
-	 * @param resp
-	 *            the HttpServletResponse to which the content will be written
-	 * 
-	 * @param sosResponse
-	 *            the SosResponse, whose content will be written to the
-	 *            outputStream of resp param
-	 * 
-	 */
-	public void doResponse(HttpServletResponse resp, ServiceResponse sosResponse) {
-		OutputStream out = null;
-		GZIPOutputStream gzip = null;
-		try {
-			String contentType = sosResponse.getContentType();
-			int contentLength = sosResponse.getContentLength();
-			resp.setContentLength(contentLength);
-			out = resp.getOutputStream();
-			resp.setContentType(contentType);
-			sosResponse.writeToOutputStream(out);
-			out.flush();
-		} catch (IOException ioe) {
-			LOGGER.error("doResponse", ioe);
-		} finally {
-			try {
-				if (gzip != null) {
-					gzip.close();
-				}
-				if (out != null) {
-					out.close();
-				}
-			} catch (IOException ioe) {
-				LOGGER.error("doSoapResponse, close streams", ioe);
-			}
-		}
-	}
+    /**
+     * writes the content of the SosResponse to the outputStream of the
+     * HttpServletResponse
+     * 
+     * @param resp
+     *            the HttpServletResponse to which the content will be written
+     * 
+     * @param sosResponse
+     *            the SosResponse, whose content will be written to the
+     *            outputStream of resp param
+     * 
+     */
+    public void doResponse(HttpServletResponse resp, ServiceResponse sosResponse) {
+        OutputStream out = null;
+        GZIPOutputStream gzip = null;
+        try {
+            String contentType = sosResponse.getContentType();
+            int contentLength = sosResponse.getContentLength();
+            resp.setContentLength(contentLength);
+            out = resp.getOutputStream();
+            resp.setContentType(contentType);
+            sosResponse.writeToOutputStream(out);
+            out.flush();
+        } catch (IOException ioe) {
+            LOGGER.error("doResponse", ioe);
+        } finally {
+            try {
+                if (gzip != null) {
+                    gzip.close();
+                }
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException ioe) {
+                LOGGER.error("doSoapResponse, close streams", ioe);
+            }
+        }
+    }
 
-	/**
-	 * Handles OPTIONS request to enable Cross-Origin Resource Sharing.
-	 * 
-	 * @param req
-	 *            the incoming request
-	 * 
-	 * @param resp
-	 *            the response for the incoming request
-	 */
-	public void doOptions(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		super.doOptions(req, resp);
-		this.setCorsHeaders(resp);
-	}
+    /**
+     * Handles OPTIONS request to enable Cross-Origin Resource Sharing.
+     * 
+     * @param req
+     *            the incoming request
+     * 
+     * @param resp
+     *            the response for the incoming request
+     */
+    public void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doOptions(req, resp);
+        this.setCorsHeaders(resp);
+    }
 
-	/**
-	 * Set Headers according to CORS to enable Cross-Domain JavaScript access.
-	 * 
-	 * @see <a href="http://www.w3.org/TR/cors/">http://www.w3.org/TR/cors/</a>
-	 */
-	private void setCorsHeaders(HttpServletResponse resp) {
-		resp.addHeader("Access-Control-Allow-Origin", "*");
-		resp.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-		resp.addHeader("Access-Control-Allow-Headers", "Content-Type");
-	}
+    /**
+     * Set Headers according to CORS to enable Cross-Domain JavaScript access.
+     * 
+     * @see <a href="http://www.w3.org/TR/cors/">http://www.w3.org/TR/cors/</a>
+     */
+    private void setCorsHeaders(HttpServletResponse resp) {
+        resp.addHeader("Access-Control-Allow-Origin", "*");
+        resp.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+        resp.addHeader("Access-Control-Allow-Headers", "Content-Type");
+    }
 
 }

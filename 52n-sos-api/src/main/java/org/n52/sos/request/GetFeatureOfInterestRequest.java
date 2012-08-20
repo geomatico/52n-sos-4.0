@@ -34,8 +34,6 @@ import java.util.Map;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.operator.RequestOperatorKeyType;
 
 /**
  * Sos GetFeatureOfInterst request
@@ -43,150 +41,149 @@ import org.n52.sos.request.operator.RequestOperatorKeyType;
  */
 public class GetFeatureOfInterestRequest extends AbstractServiceRequest {
 
-	/**
-	 * GetFeatureOfInterest operation name
-	 */
-	private final String operationName = SosConstants.Operations.GetFeatureOfInterest
-			.name();
+    /**
+     * GetFeatureOfInterest operation name
+     */
+    private final String operationName = SosConstants.Operations.GetFeatureOfInterest.name();
 
-	/**
-	 * FOI identifiers list
-	 */
-	private List<String> featureIdentifiers;
+    /**
+     * FOI identifiers list
+     */
+    private List<String> featureIdentifiers;
 
-	/**
-	 * FOI observedProperties list
-	 */
-	private List<String> observedProperties;
+    /**
+     * FOI observedProperties list
+     */
+    private List<String> observedProperties;
 
-	/**
-	 * FOI procedures list
-	 */
-	private List<String> procedures;
+    /**
+     * FOI procedures list
+     */
+    private List<String> procedures;
 
-	/**
-	 * FOI spatial filters list
-	 */
-	private List<SpatialFilter> spatialFilters;
+    /**
+     * FOI spatial filters list
+     */
+    private List<SpatialFilter> spatialFilters;
 
-	/**
-	 * FOI temporal filters list
-	 */
-	private List<TemporalFilter> eventTimes;
-	
-	private Map<String, String> namespaces;
+    /**
+     * FOI temporal filters list
+     */
+    private List<TemporalFilter> eventTimes;
 
-	/**
-	 * Get temporal filters
-	 * 
-	 * @return temporal filters
-	 */
-	public List<TemporalFilter> getEventTimes() {
-		return eventTimes;
-	}
+    private Map<String, String> namespaces;
 
-	/**
-	 * Set temporal filters
-	 * 
-	 * @param eventTime
-	 *            temporal filters
-	 */
-	public void setEventTimes(List<TemporalFilter> eventTime) {
-		this.eventTimes = eventTime;
-	}
+    /**
+     * Get temporal filters
+     * 
+     * @return temporal filters
+     */
+    public List<TemporalFilter> getEventTimes() {
+        return eventTimes;
+    }
 
-	/**
-	 * Get FOI identifiers
-	 * 
-	 * @return FOI identifiers
-	 */
-	public List<String> getFeatureIdentifiers() {
-		return featureIdentifiers;
-	}
+    /**
+     * Set temporal filters
+     * 
+     * @param eventTime
+     *            temporal filters
+     */
+    public void setEventTimes(List<TemporalFilter> eventTime) {
+        this.eventTimes = eventTime;
+    }
 
-	/**
-	 * Set FOI identifiers
-	 * 
-	 * @param featureIDs
-	 *            FOI identifiers
-	 */
-	public void setFeatureIdentifiers(List<String> featureIDs) {
-		this.featureIdentifiers = featureIDs;
-	}
+    /**
+     * Get FOI identifiers
+     * 
+     * @return FOI identifiers
+     */
+    public List<String> getFeatureIdentifiers() {
+        return featureIdentifiers;
+    }
 
-	/**
-	 * Get FOI observedProperties
-	 * 
-	 * @return FOI observedProperties
-	 */
-	public List<String> getObservedProperties() {
-		return observedProperties;
-	}
+    /**
+     * Set FOI identifiers
+     * 
+     * @param featureIDs
+     *            FOI identifiers
+     */
+    public void setFeatureIdentifiers(List<String> featureIDs) {
+        this.featureIdentifiers = featureIDs;
+    }
 
-	/**
-	 * Set FOI observedProperties
-	 * 
-	 * @param observedProperties
-	 *            FOI observedProperties
-	 */
-	public void setObservedProperties(List<String> observedProperties) {
-		this.observedProperties = observedProperties;
-	}
+    /**
+     * Get FOI observedProperties
+     * 
+     * @return FOI observedProperties
+     */
+    public List<String> getObservedProperties() {
+        return observedProperties;
+    }
 
-	/**
-	 * Get FOI procedures
-	 * 
-	 * @return FOI procedures
-	 */
-	public List<String> getProcedures() {
-		return procedures;
-	}
+    /**
+     * Set FOI observedProperties
+     * 
+     * @param observedProperties
+     *            FOI observedProperties
+     */
+    public void setObservedProperties(List<String> observedProperties) {
+        this.observedProperties = observedProperties;
+    }
 
-	/**
-	 * Set FOI procedures
-	 * 
-	 * @param procedures
-	 *            FOI procedures
-	 */
-	public void setProcedures(List<String> procedures) {
-		this.procedures = procedures;
-	}
+    /**
+     * Get FOI procedures
+     * 
+     * @return FOI procedures
+     */
+    public List<String> getProcedures() {
+        return procedures;
+    }
 
-	/**
-	 * Get spatial filters
-	 * 
-	 * @return spatial filters
-	 */
-	public List<SpatialFilter> getSpatialFilters() {
-		return spatialFilters;
-	}
+    /**
+     * Set FOI procedures
+     * 
+     * @param procedures
+     *            FOI procedures
+     */
+    public void setProcedures(List<String> procedures) {
+        this.procedures = procedures;
+    }
 
-	/**
-	 * Set spatial filters
-	 * 
-	 * @param spatialFilters
-	 *            spatial filters
-	 */
-	public void setSpatialFilters(List<SpatialFilter> spatialFilters) {
-		this.spatialFilters = spatialFilters;
-	}
+    /**
+     * Get spatial filters
+     * 
+     * @return spatial filters
+     */
+    public List<SpatialFilter> getSpatialFilters() {
+        return spatialFilters;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
-	 */
-	@Override
-	public String getOperationName() {
-		return operationName;
-	}
+    /**
+     * Set spatial filters
+     * 
+     * @param spatialFilters
+     *            spatial filters
+     */
+    public void setSpatialFilters(List<SpatialFilter> spatialFilters) {
+        this.spatialFilters = spatialFilters;
+    }
 
-	    public void setNamespaces(Map<String, String> namespaces) {
-	        this.namespaces = namespaces;
-	    }
-	    
-	    public Map<String, String> getNamespaces() {
-	        return namespaces;
-	    }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
+     */
+    @Override
+    public String getOperationName() {
+        return operationName;
+    }
+
+    public void setNamespaces(Map<String, String> namespaces) {
+        this.namespaces = namespaces;
+    }
+
+    public Map<String, String> getNamespaces() {
+        return namespaces;
+    }
 
 }

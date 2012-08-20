@@ -34,21 +34,19 @@ import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OWSConstants;
 
 /**
- * SosConstants holds all important and often used constants 
- * (e.g. name of the getCapabilities operation) that are
- * specific to SOS 2.0
+ * SosConstants holds all important and often used constants (e.g. name of the
+ * getCapabilities operation) that are specific to SOS 2.0
  * 
  * 
  */
 public final class Sos2Constants {
-	
-	public static final String NS_SOS_20 = "http://www.opengis.net/sos/2.0";
-	
-	public static final String SCHEMA_LOCATION_SOS = "http://schemas.opengis.net/sos/2.0/sos.xsd";
-	
+
+    public static final String NS_SOS_20 = "http://www.opengis.net/sos/2.0";
+
+    public static final String SCHEMA_LOCATION_SOS = "http://schemas.opengis.net/sos/2.0/sos.xsd";
+
     /** Constant for the content types of the response formats */
-    private static String[] RESPONSE_FORMATS = { OMConstants.RESPONSE_FORMAT_OM_2,
-        SosConstants.CONTENT_TYPE_ZIP };
+    private static String[] RESPONSE_FORMATS = { OMConstants.RESPONSE_FORMAT_OM_2, SosConstants.CONTENT_TYPE_ZIP };
 
     /** Constant for actual implementing version */
     public static final String SERVICEVERSION = "2.0.0";
@@ -58,36 +56,50 @@ public final class Sos2Constants {
      * SensorML 1.0.1
      */
     public static final String EN_OBSERVATION_OFFERING = "ObservationOffering";
-    
+
     public static final String EN_ABSTRACT_OFFERING = "AbstractOffering";
-    
-    public static final QName QN_OBSERVATION_OFFERING  = new QName(NS_SOS_20, EN_OBSERVATION_OFFERING, SosConstants.NS_SOS_PREFIX);
-    
+
+    public static final QName QN_OBSERVATION_OFFERING = new QName(NS_SOS_20, EN_OBSERVATION_OFFERING,
+            SosConstants.NS_SOS_PREFIX);
+
+    public static final String EN_OBSERVED_AREA = "observedArea";
+
+    public static final String EN_PHENOMENON_TIME = "phenomenonTime";
+
+    public static final String EN_RESPONSE_FORMAT = "responseFormat";
+
+    public static final String EN_OBSERVATION_TYPE = "observationType";
+
     /** private constructor, to enforce use of instance instead of instantiation */
     private Sos2Constants() {
     }
 
-    /** the names of the SOS 2.0 operations that are not supported by all versions */
+    /**
+     * the names of the SOS 2.0 operations that are not supported by all
+     * versions
+     */
     public enum Operations {
-        InsertSensor, DeleteSensor, InsertResult, InsertResultTemplate, GetResultTemplate, UpdateSensor;
-        
+        InsertSensor, DeleteSensor, InsertResult, InsertResultTemplate, GetResultTemplate, UpdateSensorDescription;
+
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
-                    (SosConstants.Operations.contains(s))                    
-                            || (s.equals(Operations.InsertSensor.name()))
+                    (SosConstants.Operations.contains(s)) || (s.equals(Operations.InsertSensor.name()))
                             || (s.equals(Operations.DeleteSensor.name()))
                             || (s.equals(Operations.InsertResult.name()))
-                            || (s.equals(Operations.UpdateSensor.name()))
+                            || (s.equals(Operations.UpdateSensorDescription.name()))
                             || (s.equals(Operations.InsertResultTemplate.name()))
                             || (s.equals(Operations.GetResultTemplate.name()));
             return contained;
         }
     }
 
-    /** enum with names of SOS 2.0 Capabilities sections not supported by all versions */
+    /**
+     * enum with names of SOS 2.0 Capabilities sections not supported by all
+     * versions
+     */
     public enum CapabilitiesSections {
-        FilterCapabilities;
+        FilterCapabilities, InsertionCapabilities;
 
         /**
          * method checks whether the string parameter is contained in this
@@ -106,7 +118,6 @@ public final class Sos2Constants {
         }
     }
 
-
     /** enum with parameter names for getObservation request */
     public enum GetObservationParams {
         temporalFilter, spatialFilter, namespaces;
@@ -122,16 +133,19 @@ public final class Sos2Constants {
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
-                    (SosConstants.GetObservationParams.contains(s))            
+                    (SosConstants.GetObservationParams.contains(s))
                             || (s.equals(GetObservationParams.temporalFilter.name()))
                             || (s.equals(GetObservationParams.spatialFilter.name()));
             return contained;
         }
     }
 
-    /** enum with parameter names for SOS 2.0 insertObservation request not supported by all versions */
+    /**
+     * enum with parameter names for SOS 2.0 insertObservation request not
+     * supported by all versions
+     */
     public enum InsertObservationParams {
-        offering, observation;
+        offering, observation, observationType;
 
         /**
          * method checks whether the string parameter is contained in this
@@ -144,14 +158,16 @@ public final class Sos2Constants {
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
-                    (OWSConstants.RequestParams.contains(s))            
-                            || (s.equals(InsertObservationParams.offering.name()))
+                    (OWSConstants.RequestParams.contains(s)) || (s.equals(InsertObservationParams.offering.name()))
                             || (s.equals(InsertObservationParams.observation.name()));
             return contained;
         }
     }
 
-    /** enum with parameter names for SOS 2.0 getObservation request not supported by all versions  */
+    /**
+     * enum with parameter names for SOS 2.0 getObservation request not
+     * supported by all versions
+     */
     public enum DescribeSensorParams {
         procedureDescriptionFormat, validTime;
 
@@ -166,14 +182,17 @@ public final class Sos2Constants {
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
-                    (SosConstants.DescribeSensorParams.contains(s))            
+                    (SosConstants.DescribeSensorParams.contains(s))
                             || (s.equals(DescribeSensorParams.procedureDescriptionFormat.name()))
                             || (s.equals(DescribeSensorParams.validTime.name()));
             return contained;
         }
     }
-    
-    /** enum with parameter names for SOS 2.0 getFeatureOfInterest request not supported by all versions */
+
+    /**
+     * enum with parameter names for SOS 2.0 getFeatureOfInterest request not
+     * supported by all versions
+     */
     public enum GetFeatureOfInterestParams {
         featureOfInterest, observedProperty, procedure, spatialFilter;
 
@@ -196,10 +215,10 @@ public final class Sos2Constants {
             return contained;
         }
     }
-    
+
     public enum GetObservationByIdParams {
         observation;
-        
+
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
@@ -208,18 +227,18 @@ public final class Sos2Constants {
             return contained;
         }
     }
-    
+
     public enum GetResultTemplateParams {
         offering, observedProperty;
     }
-    
+
     public enum GetResultParams {
         offering, observedProperty;
     }
-    
+
     /** enum with parameter names for registerSensor request */
     public enum InsertSensorParams {
-        service, version, procedureDescriptionFormat, procedureDescription, observableProperty, metadata;
+        service, version, procedureDescriptionFormat, procedureDescription, observableProperty, metadata, featureOfInterestType, observationType;
 
         /**
          * method checks whether the string parameter is contained in this
@@ -236,7 +255,22 @@ public final class Sos2Constants {
                             || (s.equals(InsertSensorParams.procedureDescriptionFormat.name()))
                             || (s.equals(InsertSensorParams.procedureDescription.name()))
                             || (s.equals(InsertSensorParams.observableProperty.name()))
-                            || (s.equals(InsertSensorParams.metadata.name()));
+                            || (s.equals(InsertSensorParams.metadata.name()))
+                            || (s.equals(InsertSensorParams.featureOfInterestType.name()))
+                            || (s.equals(InsertSensorParams.observationType.name()));
+            return contained;
+        }
+    }
+
+    public enum DeleteSensorParams {
+        service, version, procedure;
+
+        public static boolean contains(String s) {
+            boolean contained = false;
+            contained =
+                    (s.equals(DeleteSensorParams.service.name())) || (s.equals(DeleteSensorParams.version.name()))
+                            || (s.equals(DeleteSensorParams.procedure.name()))
+                            || (s.equals(UpdateSensorDescriptionParams.procedureDescriptionFormat.name()));
             return contained;
         }
     }

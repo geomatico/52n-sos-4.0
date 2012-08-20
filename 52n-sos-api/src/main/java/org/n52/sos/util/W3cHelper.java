@@ -24,7 +24,7 @@ visit the Free Software Foundation web page, http://www.fsf.org.
 Author: <LIST OF AUTHORS/EDITORS>
 Created: <CREATION DATE>
 Modified: <DATE OF LAST MODIFICATION (optional line)>
-***************************************************************/
+ ***************************************************************/
 
 package org.n52.sos.util;
 
@@ -86,7 +86,7 @@ public class W3cHelper {
         }
         return xmlString;
     }
-    
+
     /**
      * Get text content from element by namespace.
      * 

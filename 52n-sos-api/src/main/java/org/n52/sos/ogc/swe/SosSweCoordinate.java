@@ -41,7 +41,7 @@ public class SosSweCoordinate {
      * Coordinate name
      */
     private SweCoordinateName name;
-    
+
     /**
      * Coordinate value
      */

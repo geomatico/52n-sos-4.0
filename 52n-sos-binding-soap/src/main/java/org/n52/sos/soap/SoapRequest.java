@@ -33,19 +33,19 @@ import java.util.Map;
 import org.apache.xmlbeans.XmlObject;
 
 public class SoapRequest {
-    
+
     private String soapNamespace;
-    
+
     private String soapVersion;
-    
+
     private SoapFault soapFault;
-    
+
     private XmlObject soapBodyContent;
 
     private String soapAction;
-    
+
     private Map<String, SoapHeader> soapHeader;
-    
+
     public SoapRequest(String soapNamespace, String soapVersion) {
         this.soapNamespace = soapNamespace;
         this.soapVersion = soapVersion;
@@ -59,7 +59,8 @@ public class SoapRequest {
     }
 
     /**
-     * @param soapNamespace the soapNamespace to set
+     * @param soapNamespace
+     *            the soapNamespace to set
      */
     public void setSoapNamespace(String soapNamespace) {
         this.soapNamespace = soapNamespace;
@@ -73,7 +74,8 @@ public class SoapRequest {
     }
 
     /**
-     * @param soapVersion the soapVersion to set
+     * @param soapVersion
+     *            the soapVersion to set
      */
     public void setSoapVersion(String soapVersion) {
         this.soapVersion = soapVersion;
@@ -81,7 +83,7 @@ public class SoapRequest {
 
     public void setSoapFault(SoapFault fault) {
         this.soapFault = fault;
-        
+
     }
 
     public SoapFault getSoapFault() {
@@ -93,17 +95,17 @@ public class SoapRequest {
     }
 
     public void setSoapBodyContent(XmlObject soapBodyContent) {
-       this.soapBodyContent = soapBodyContent;
-        
+        this.soapBodyContent = soapBodyContent;
+
     }
 
     public void setAction(String soapAction) {
-       this.soapAction = soapAction;
-        
+        this.soapAction = soapAction;
+
     }
 
     public void setSoapHeader(Map<String, SoapHeader> soapHeader) {
-       this.soapHeader = soapHeader;
+        this.soapHeader = soapHeader;
     }
 
     /**

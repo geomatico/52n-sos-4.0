@@ -8,7 +8,7 @@
 			xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:schemaLocation="http://www.opengis.net/sos/2.0
 http://schemas.opengis.net/sos/2.0.0/sos.xsd">
-		<sos:observation>3330510996719302867</sos:observation>
+			<sos:observation>6279294833397072427</sos:observation>
 		</sos:GetObservationById>
 	</env:Body>
 </env:Envelope>

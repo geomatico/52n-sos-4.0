@@ -28,8 +28,9 @@
 
 package org.n52.sos.ds;
 
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.cache.ACapabilitiesCache;
+import org.n52.sos.cache.CapabilitiesCache;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 /**
  * Interface for implementations of cache feeder DAOs. Used to feed the
@@ -38,15 +39,20 @@ import org.n52.sos.cache.ACapabilitiesCache;
  */
 public interface ICacheFeederDAO {
 
-	/**
-	 * Method to start the feeding of the CapabilitiesCache
-	 * 
-	 * @param capabilitiesCache
-	 *            CapabilitiesCache instance
-	 * @throws OwsExceptionReport
-	 *             If an error occurs during feeding
-	 */
-	public void initalizeCache(ACapabilitiesCache capabilitiesCache)
-			throws OwsExceptionReport;
+    /**
+     * Method to start the feeding of the CapabilitiesCache
+     * 
+     * @param capabilitiesCache
+     *            CapabilitiesCache instance
+     * @throws OwsExceptionReport
+     *             If an error occurs during feeding
+     */
+    public void initalizeCache(ACapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
 
+    public void updateAfterSensorInsertion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
+
+    public void updateAfterObservationInsertion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
+
+    public void updateAfterSensorDeletion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
+    
 }

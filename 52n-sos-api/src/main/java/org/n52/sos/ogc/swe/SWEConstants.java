@@ -37,70 +37,65 @@ import org.n52.sos.exception.IExceptionCode;
  * 
  */
 public class SWEConstants {
-	
-	// namespaces and schema locations
-	public static final String NS_SWE = "http://www.opengis.net/swe/1.0.1";
 
-	public static final String NS_SWE_20 = "http://www.opengis.net/swe/2.0";
+    // namespaces and schema locations
+    public static final String NS_SWE = "http://www.opengis.net/swe/1.0.1";
 
-	public static final String NS_SWE_PREFIX = "swe";
+    public static final String NS_SWE_20 = "http://www.opengis.net/swe/2.0";
 
-	public static final String NS_SWES_20 = "http://www.opengis.net/swes/2.0";
+    public static final String NS_SWE_PREFIX = "swe";
 
-	public static final String NS_SWES_PREFIX = "swes";
-	
-	public static final String SCHEMA_LOCATION_SWE = "http://schemas.opengis.net/sweCommon/1.0.1/swe.xsd";
-	
-	public static final String SCHEMA_LOCATION_SWE_200 = "http://schemas.opengis.net/sweCommon/2.0/swe.xsd";
-	
-	// element names
+    public static final String NS_SWES_20 = "http://www.opengis.net/swes/2.0";
+
+    public static final String NS_SWES_PREFIX = "swes";
+
+    public static final String SCHEMA_LOCATION_SWE = "http://schemas.opengis.net/sweCommon/1.0.1/swe.xsd";
+
+    public static final String SCHEMA_LOCATION_SWE_200 = "http://schemas.opengis.net/sweCommon/2.0/swe.xsd";
+    
+    public static final String SCHEMA_LOCATION_SWES_200 = "http://schemas.opengis.net/swes/2.0/swes.xsd";
+
+    // element names
 
     public static String EN_SIMPLEDATARECORD = "SimpleDataRecord";
-    
+
     public static String EN_BOOLEAN = "Boolean";
-    
+
     public static String EN_CATEGORY = "Category";
-    
+
     public static String EN_COUNT = "Count";
-    
+
     public static String EN_QUANTITY = "Quantity";
-    
+
     public static String EN_TEXT = "Text";
-    
+
     public static String EN_TIME = "Time";
-    
+
     public static String EN_TEXT_ENCODING = "TextEncoding";
-    
+
     // QNames for elements
-    
-    public static final QName QN_SIMPLEDATARECORD_SWE_101 = new QName(NS_SWE, EN_SIMPLEDATARECORD,
-            NS_SWE_PREFIX);
-    
-    public static final QName QN_BOOLEAN_SWE_200 = new QName(NS_SWE_20, EN_BOOLEAN,
-            NS_SWE_PREFIX);
-    
-    public static final QName QN_CATEGORY_SWE_200 = new QName(NS_SWE_20, EN_CATEGORY,
-            NS_SWE_PREFIX);
-    
-    public static final QName QN_COUNT_SWE_200 = new QName(NS_SWE_20, EN_COUNT,
-            NS_SWE_PREFIX);
-    
-    public static final QName QN_QUANTITY_SWE_200 = new QName(NS_SWE_20, EN_QUANTITY,
-            NS_SWE_PREFIX);
-    
-    public static final QName QN_TEXT_SWE_200 = new QName(NS_SWE_20, EN_TEXT,
-            NS_SWE_PREFIX);
-    
-    public static final QName QN_TIME_SWE_200 = new QName(NS_SWE_20, EN_TIME,
-            NS_SWE_PREFIX);
-    
-    public static final QName QN_TEXT_ENCODING_SWE_200 = new QName(NS_SWE_20, EN_TEXT_ENCODING,
-            NS_SWE_PREFIX);
-    
-    public static final String SOAP_REASON_INVALID_REQUEST = "The request did not conform to its XML Schema definition.";
-    
+
+    public static final QName QN_SIMPLEDATARECORD_SWE_101 = new QName(NS_SWE, EN_SIMPLEDATARECORD, NS_SWE_PREFIX);
+
+    public static final QName QN_BOOLEAN_SWE_200 = new QName(NS_SWE_20, EN_BOOLEAN, NS_SWE_PREFIX);
+
+    public static final QName QN_CATEGORY_SWE_200 = new QName(NS_SWE_20, EN_CATEGORY, NS_SWE_PREFIX);
+
+    public static final QName QN_COUNT_SWE_200 = new QName(NS_SWE_20, EN_COUNT, NS_SWE_PREFIX);
+
+    public static final QName QN_QUANTITY_SWE_200 = new QName(NS_SWE_20, EN_QUANTITY, NS_SWE_PREFIX);
+
+    public static final QName QN_TEXT_SWE_200 = new QName(NS_SWE_20, EN_TEXT, NS_SWE_PREFIX);
+
+    public static final QName QN_TIME_SWE_200 = new QName(NS_SWE_20, EN_TIME, NS_SWE_PREFIX);
+
+    public static final QName QN_TEXT_ENCODING_SWE_200 = new QName(NS_SWE_20, EN_TEXT_ENCODING, NS_SWE_PREFIX);
+
+    public static final String SOAP_REASON_INVALID_REQUEST =
+            "The request did not conform to its XML Schema definition.";
+
     public static final String SOAP_REASON_REQUEST_EXTENSION_NOT_SUPPORTED = "";
-    
+
     /**
      * Enum for SensorML types
      */
@@ -135,7 +130,7 @@ public class SWEConstants {
     public static enum SosSensorDescription {
         XmlStringDescription, SosDescription
     }
-    
+
     public enum SwesExceptionCode implements IExceptionCode {
         InvalidRequest, RequestExtensionNotSupported
     }

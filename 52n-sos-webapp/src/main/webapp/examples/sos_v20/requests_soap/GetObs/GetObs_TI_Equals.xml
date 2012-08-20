@@ -12,7 +12,7 @@ http://schemas.opengis.net/sos/2.0.0/sos.xsd">
 				<fes:TEquals>
 					<fes:ValueReference>phenomenonTime</fes:ValueReference>
 					<gml:TimeInstant gml:id="ti_1">
-						<gml:timePosition>2008-04-01T17:45:00+02:00</gml:timePosition>
+						<gml:timePosition>2012-07-16T12:43:01.78+02:00</gml:timePosition>
 					</gml:TimeInstant>
 				</fes:TEquals>
 			</sos:temporalFilter>

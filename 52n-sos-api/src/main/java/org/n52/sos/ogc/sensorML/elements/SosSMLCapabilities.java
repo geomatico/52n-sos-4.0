@@ -40,13 +40,13 @@ import org.n52.sos.ogc.swe.SosSweField;
  * 
  */
 public class SosSMLCapabilities {
-    
+
     private String name;
 
     private SweAggregateType capabilitiesType;
 
     private List<SosSweField> fields;
-    
+
     private List<SosGmlMetaDataProperty> metaDataProperties;
 
     /**
@@ -116,12 +116,12 @@ public class SosSMLCapabilities {
     public void setMetaDataProperties(List<SosGmlMetaDataProperty> metaDataProperties) {
         this.metaDataProperties = metaDataProperties;
     }
-    
+
     public void addMetaDataProperties(SosGmlMetaDataProperty metaDataProperty) {
         if (metaDataProperties == null) {
             metaDataProperties = new ArrayList<SosGmlMetaDataProperty>();
         }
         metaDataProperties.add(metaDataProperty);
     }
-    
+
 }

@@ -31,7 +31,9 @@ package org.n52.sos.request.operator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IDescribeSensorDAO;
@@ -39,6 +41,7 @@ import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -96,36 +99,17 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
     public synchronized ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
 
         boolean applyZIPcomp = false;
-        String version = "";
 
         if (request instanceof DescribeSensorRequest) {
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
-            DescribeSensorRequest descSensRequest = (DescribeSensorRequest) request;
-            version = descSensRequest.getVersion();
-            String procedureID = descSensRequest.getProcedure();
-            String outputFormat = descSensRequest.getOutputFormat();
-            try {
-                SosHelper.checkProcedureID(procedureID, Configurator.getInstance().getCapsCacheController()
-                        .getProcedures(), SosConstants.DescribeSensorParams.procedure.name());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
-            try {
-                SosHelper.checkProcedureOutputFormat(outputFormat,
-                        Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
-            Util4Exceptions.mergeExceptions(exceptions);
-
-            if (outputFormat.equals(SosConstants.CONTENT_TYPE_ZIP)) {
+            DescribeSensorRequest sosRequest = (DescribeSensorRequest) request;
+            checkRequestedParameters(sosRequest);
+            if (sosRequest.getOutputFormat().equals(SosConstants.CONTENT_TYPE_ZIP)) {
                 applyZIPcomp = true;
             }
 
-            DescribeSensorResponse response = this.dao.getSensorDescription(descSensRequest);
+            DescribeSensorResponse response = this.dao.getSensorDescription(sosRequest);
             String contentType = SosConstants.CONTENT_TYPE_XML;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            
 
             try {
                 String namespace;
@@ -134,8 +118,8 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
                     namespace = SWEConstants.NS_SWES_20;
                 } else if (response.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
                     namespace = SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL;
-                    if (outputFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE) || outputFormat
-                                .equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
+                    if (sosRequest.getOutputFormat().equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)
+                            || sosRequest.getOutputFormat().equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
                         contentType = SensorMLConstants.SENSORML_CONTENT_TYPE;
                     }
                 } else {
@@ -158,16 +142,18 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
                     }
                 } else {
                     String parameterName = null;
-                    if (version.equals(Sos1Constants.SERVICEVERSION)) {
+                    if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
                         parameterName = Sos1Constants.DescribeSensorParams.outputFormat.name();
-                    } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
+                    } else if (sosRequest.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
                         parameterName = Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name();
                     }
-                    String exceptionText =
-                            "The value '" + outputFormat
-                                    + "' of the outputFormat parameter is incorrect and has to be '"
-                                    + SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL + "' for the requested sensor!";
-                    throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+                    StringBuilder exceptionText = new StringBuilder();
+                    exceptionText.append("The value '");
+                    exceptionText.append(sosRequest.getOutputFormat());
+                    exceptionText.append("' of the outputFormat parameter is incorrect and has to be '");
+                    exceptionText.append(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
+                    exceptionText.append("' for the requested sensor!");
+                    throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText.toString());
                 }
             } catch (IOException ioe) {
                 String exceptionText = "Error occurs while saving response to output stream!";
@@ -206,10 +192,41 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
             throws OwsExceptionReport {
         return dao.getOperationsMetadata(service, version, connection);
     }
+    
+    @Override
+    public IExtension getExtension(Object connection) throws OwsExceptionReport {
+        return dao.getExtension(connection);
+    }
 
     @Override
     public RequestOperatorKeyType getRequestOperatorKeyType() {
         return requestOperatorKeyType;
+    }
+    
+    @Override
+    public Set<String> getConformanceClasses() {
+        Set<String> conformanceClasses = new HashSet<String>(0);
+        if (hasImplementedDAO()) {
+            conformanceClasses.add("http://www.opengis.net/spec/SOS/2.0/conf/core");
+        }
+        return conformanceClasses;
+    }
+
+    private void checkRequestedParameters(DescribeSensorRequest sosRequest) throws OwsExceptionReport {
+        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+        try {
+            SosHelper.checkProcedureID(sosRequest.getProcedure(), Configurator.getInstance().getCapabilitiesCacheController()
+                    .getProcedures(), SosConstants.DescribeSensorParams.procedure.name());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            SosHelper.checkProcedureOutputFormat(sosRequest.getOutputFormat(),
+                    Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        Util4Exceptions.mergeExceptions(exceptions);
     }
 
 }

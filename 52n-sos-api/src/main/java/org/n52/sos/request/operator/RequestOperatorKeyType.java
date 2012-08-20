@@ -31,11 +31,11 @@ package org.n52.sos.request.operator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 
 public class RequestOperatorKeyType implements Comparable<RequestOperatorKeyType> {
-    
+
     private ServiceOperatorKeyType serviceOperatorKeyType;
-    
+
     private String operationName;
-    
+
     public RequestOperatorKeyType() {
         super();
     }
@@ -66,14 +66,15 @@ public class RequestOperatorKeyType implements Comparable<RequestOperatorKeyType
     public int compareTo(RequestOperatorKeyType o) {
         if (o instanceof RequestOperatorKeyType) {
             RequestOperatorKeyType toCheck = (RequestOperatorKeyType) o;
-            if (serviceOperatorKeyType.equals(toCheck.serviceOperatorKeyType) && operationName.equals(toCheck.operationName)) {
+            if (serviceOperatorKeyType.equals(toCheck.serviceOperatorKeyType)
+                    && operationName.equals(toCheck.operationName)) {
                 return 0;
-            } 
+            }
             return 1;
         }
         return -1;
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -83,7 +84,8 @@ public class RequestOperatorKeyType implements Comparable<RequestOperatorKeyType
     public boolean equals(Object paramObject) {
         if (serviceOperatorKeyType != null && operationName != null && paramObject instanceof RequestOperatorKeyType) {
             RequestOperatorKeyType toCheck = (RequestOperatorKeyType) paramObject;
-            return (serviceOperatorKeyType.equals(toCheck.serviceOperatorKeyType) && operationName.equals(toCheck.operationName));
+            return (serviceOperatorKeyType.equals(toCheck.serviceOperatorKeyType) && operationName
+                    .equals(toCheck.operationName));
         }
         return false;
     }
@@ -100,7 +102,5 @@ public class RequestOperatorKeyType implements Comparable<RequestOperatorKeyType
         hash += 31 * hash + operationName.hashCode();
         return hash;
     }
-    
-    
 
 }

@@ -75,7 +75,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     private Map<String, String> offName;
 
     /** hash map containing the name for each offering */
-    private Map<String, Collection<String>> offferingObservationTypes;
+    private Map<String, Collection<String>> kOffferingVObservationTypes;
 
     /** hash map containing the procedures for each offering */
     private Map<String, Collection<String>> offProcedures;
@@ -85,9 +85,6 @@ public class CapabilitiesCache extends ACapabilitiesCache {
 
     /** hash map containing the procedures for each feature of interest */
     private Map<String, Collection<String>> foiProcedures;
-
-    /** hash map containing the units of the values for each observedProperties */
-    private Map<String, ValueTypes> obsPropsValueTypes;
 
     /**
      * hash map containing the phenomenon components of each compositePhenomenon
@@ -139,6 +136,10 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     /** hash map containing the roles for each related feature */
     private Map<String, Collection<String>> kRelatedFeatureVRole;
 
+    private Map<String, Collection<String>> allowedKOfferingVObservationType;
+
+    private Collection<String> observationTypes;
+
     /**
      * constructor
      * 
@@ -146,15 +147,6 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      */
     public CapabilitiesCache() {
         super();
-    }
-
-    /**
-     * returns
-     * 
-     * @return
-     */
-    protected Map<String, ValueTypes> getValueTypes4ObsProps() {
-        return this.obsPropsValueTypes;
     }
 
     /**
@@ -315,7 +307,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @return
      */
     protected Map<String, Collection<String>> getKOfferingVObservationTypes() {
-        return offferingObservationTypes;
+        return kOffferingVObservationTypes;
     }
 
     /**
@@ -334,15 +326,6 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      */
     protected Map<String, String> getUnit4Phen() {
         return unit4Phen;
-    }
-
-    /**
-     * returns the value types for phenomena
-     * 
-     * @return value types related to phenomena
-     */
-    protected Map<String, ValueTypes> getObsPropsValueTypes() {
-        return obsPropsValueTypes;
     }
 
     /**
@@ -374,17 +357,6 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      */
     protected List<String> getProcedures() {
         return procedures;
-    }
-
-    /**
-     * return the result models for the requested offering
-     * 
-     * @param offering
-     *            the offering for which the result models should be returned
-     * @return String[] containing the result models for the requested offering
-     */
-    protected Collection<String> getObservationTypes4Offering(String offering) {
-        return this.offferingObservationTypes.get(offering);
     }
 
     /**
@@ -597,7 +569,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @param offResultModels
      */
     public void setKOfferingVObservationTypes(Map<String, Collection<String>> offferingObservationTypes) {
-        this.offferingObservationTypes = offferingObservationTypes;
+        this.kOffferingVObservationTypes = offferingObservationTypes;
     }
 
     /**
@@ -708,27 +680,6 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      */
     public void setProcPhens(Map<String, Collection<String>> procPhens) {
         this.procPhens = procPhens;
-    }
-
-    /**
-     * returns the value type for the passed phenomenon
-     * 
-     * @param phenomenonID
-     *            id of the phenomenon for which the value type should be
-     *            returned
-     * @return Returns the value type for the passed phenomenon
-     */
-    protected ValueTypes getValueType4Phenomenon(String phenomenonID) {
-        return obsPropsValueTypes.get(phenomenonID);
-    }
-
-    /**
-     * sets the phenomenon value type relations
-     * 
-     * @param obsPropsValueTypes
-     */
-    public void setObsPropsValueTypes(Map<String, ValueTypes> obsPropsValueTypes) {
-        this.obsPropsValueTypes = obsPropsValueTypes;
     }
 
     /**
@@ -915,7 +866,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @return Collection<String> containing the passed procedure id's parents
      *         (and optionally itself)
      */
-    public Collection<String> getParentProcs(String procId, boolean fullHierarchy, boolean includeSelf) {
+    protected Collection<String> getParentProcs(String procId, boolean fullHierarchy, boolean includeSelf) {
         return SosHelper.getHierarchy(parentProcs, procId, fullHierarchy, includeSelf);
     }
 
@@ -935,7 +886,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @return Collection<String> containing the passed procedure id's parents
      *         (and optionally themselves)
      */
-    public Collection<String> getParentProcs(Collection<String> procIds, boolean fullHierarchy, boolean includeSelves) {
+    protected Collection<String> getParentProcs(Collection<String> procIds, boolean fullHierarchy, boolean includeSelves) {
         Collection<String> collectionParentProcs = new HashSet<String>();
 
         for (String procId : procIds) {
@@ -962,7 +913,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @return Collection<String> containing the passed procedure id's children
      *         (and optionally itself)
      */
-    public Collection<String> getChildProcs(String procId, boolean fullHierarchy, boolean includeSelf) {
+    protected Collection<String> getChildProcs(String procId, boolean fullHierarchy, boolean includeSelf) {
         return SosHelper.getHierarchy(childProcs, procId, fullHierarchy, includeSelf);
     }
 
@@ -981,7 +932,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @return Collection<String> containing the passed procedure id's children
      *         (and optionally itself)
      */
-    public Collection<String> getChildProcs(Collection<String> procIds, boolean fullHierarchy, boolean includeSelves) {
+    protected Collection<String> getChildProcs(Collection<String> procIds, boolean fullHierarchy, boolean includeSelves) {
         Collection<String> collectionChildProcs = new HashSet<String>();
 
         for (String procId : procIds) {
@@ -993,11 +944,11 @@ public class CapabilitiesCache extends ACapabilitiesCache {
         return ccpList;
     }
 
-    public Collection<String> getParentFeatures(String featureID, boolean fullHierarchy, boolean includeSelf) {
+    protected Collection<String> getParentFeatures(String featureID, boolean fullHierarchy, boolean includeSelf) {
         return SosHelper.getHierarchy(parentFeatures, featureID, fullHierarchy, includeSelf);
     }
 
-    public Collection<String> getParentFeatures(Collection<String> featureIDs, boolean fullHierarchy,
+    protected Collection<String> getParentFeatures(Collection<String> featureIDs, boolean fullHierarchy,
             boolean includeSelves) {
         Collection<String> collectionParentFeatures = new HashSet<String>();
 
@@ -1011,11 +962,11 @@ public class CapabilitiesCache extends ACapabilitiesCache {
         return cppList;
     }
 
-    public Collection<String> getChildFeatures(String featureID, boolean fullHierarchy, boolean includeSelf) {
+    protected Collection<String> getChildFeatures(String featureID, boolean fullHierarchy, boolean includeSelf) {
         return SosHelper.getHierarchy(childFeatures, featureID, fullHierarchy, includeSelf);
     }
 
-    public Collection<String> getChildPFeatures(Collection<String> featureIDs, boolean fullHierarchy,
+    protected Collection<String> getChildPFeatures(Collection<String> featureIDs, boolean fullHierarchy,
             boolean includeSelves) {
         Collection<String> collectionChildFeatures = new HashSet<String>();
 
@@ -1027,5 +978,21 @@ public class CapabilitiesCache extends ACapabilitiesCache {
         List<String> ccpList = new ArrayList<String>(collectionChildFeatures);
         Collections.sort(ccpList);
         return ccpList;
+    }
+
+    protected Map<String, Collection<String>> getAllowedKOfferingVObservationType() {
+        return allowedKOfferingVObservationType;
+    }
+    
+    public void setAllowedKOfferingVObservationType(Map<String, Collection<String>> allowedKOfferingVObservationType) {
+        this.allowedKOfferingVObservationType = allowedKOfferingVObservationType;
+    }
+
+    public void setObservationTypes(Collection<String> observationTypes) {
+        this.observationTypes = observationTypes;
+    }
+
+    public Collection<String> getObservationTypes() {
+        return observationTypes;
     }
 }

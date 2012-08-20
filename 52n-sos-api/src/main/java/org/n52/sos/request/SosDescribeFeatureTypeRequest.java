@@ -29,52 +29,49 @@
 package org.n52.sos.request;
 
 import org.n52.sos.ogc.sos.Sos1Constants;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.operator.RequestOperatorKeyType;
 
 /**
  * SOS DescribeFeatureType request
  */
 public class SosDescribeFeatureTypeRequest extends AbstractServiceRequest {
 
-	/**
-	 * DescribeFeatureType operation name
-	 */
-	private final String operationName = Sos1Constants.Operations.DescribeFeatureType
-			.name();
+    /**
+     * DescribeFeatureType operation name
+     */
+    private final String operationName = Sos1Constants.Operations.DescribeFeatureType.name();
 
-	/**
-	 * FeatureOfInterest identifier
-	 */
-	private String featureIdentifier;
+    /**
+     * FeatureOfInterest identifier
+     */
+    private String featureIdentifier;
 
-	/**
-	 * Get FOI identifier
-	 * 
-	 * @return FOI identifier
-	 */
-	public String getFeatureIdentifier() {
-		return featureIdentifier;
-	}
+    /**
+     * Get FOI identifier
+     * 
+     * @return FOI identifier
+     */
+    public String getFeatureIdentifier() {
+        return featureIdentifier;
+    }
 
-	/**
-	 * Set the FOI identifier
-	 * 
-	 * @param featureIdentifier
-	 *            FOI identifier
-	 */
-	public void setFeatureIdentifier(String featureIdentifier) {
-		this.featureIdentifier = featureIdentifier;
-	}
+    /**
+     * Set the FOI identifier
+     * 
+     * @param featureIdentifier
+     *            FOI identifier
+     */
+    public void setFeatureIdentifier(String featureIdentifier) {
+        this.featureIdentifier = featureIdentifier;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
-	 */
-	@Override
-	public String getOperationName() {
-		return operationName;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
+     */
+    @Override
+    public String getOperationName() {
+        return operationName;
+    }
 
 }

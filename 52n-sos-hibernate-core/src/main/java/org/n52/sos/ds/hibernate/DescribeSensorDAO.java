@@ -53,6 +53,7 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ogc.gml.SosGmlMetaDataProperty;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sensorML.AbstractMultiProcess;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
@@ -104,55 +105,6 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * org.n52.sos.ds.IDescribeSensorDAO#getSensorMLDescription(org.n52.sos.
-     * request.AbstractSosRequest)
-     */
-    @Override
-    public DescribeSensorResponse getSensorDescription(DescribeSensorRequest request) throws OwsExceptionReport {
-        // sensorDocument which should be returned
-        Session session = null;
-        try {
-            DescribeSensorRequest sosRequest = (DescribeSensorRequest) request;
-            session = (Session) connectionProvider.getConnection();
-            SensorML result = queryProcedure(sosRequest.getProcedure(), sosRequest.getOutputFormat(), session);
-            AbstractMultiProcess member = new AbstractMultiProcess();
-            // fois
-            List<String> procedures = new ArrayList<String>(1);
-            procedures.add(request.getProcedure());
-            SosSMLCapabilities featureCapabilities =
-                    getFeatureOfInterestIDsForProcedure(procedures, request.getVersion(), session);
-            if (featureCapabilities != null) {
-                member.addCapabilities(featureCapabilities);
-            }
-            // parent procs
-            SosSMLCapabilities parentProcCapabilities =
-                    getParentProcedures(sosRequest.getProcedure(), request.getVersion());
-            if (parentProcCapabilities != null) {
-                member.addCapabilities(parentProcCapabilities);
-            }
-            // child procs
-            member.addComponents(getChildProcedures(sosRequest.getProcedure(), sosRequest.getOutputFormat(),
-                    request.getVersion(), session));
-            result.addMember(member);
-            DescribeSensorResponse response = new DescribeSensorResponse();
-            response.setService(request.getService());
-            response.setVersion(request.getVersion());
-            response.setOutputFormat(request.getOutputFormat());
-            response.setSensorDescription(result);
-            return response;
-        } catch (HibernateException he) {
-            String exceptionText = "Error while querying data for DescribeSensor document!";
-            LOGGER.error(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
-        } finally {
-            connectionProvider.returnConnection(session);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see org.n52.sos.ds.ISosOperationDAO#getOperationName()
      */
     @Override
@@ -184,23 +136,78 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
                 Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set param procedure
         opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), Configurator.getInstance()
-                .getCapsCacheController().getProcedures());
+                .getCapabilitiesCacheController().getProcedures());
         // set param output format
         List<String> outputFormatValues = new ArrayList<String>(1);
+        String parameterName = null;
+     // FIXME: getTypes from Decoder
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             outputFormatValues.add(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE);
-        }
-        if (version.equals(Sos2Constants.SERVICEVERSION)) {
+            parameterName = Sos1Constants.DescribeSensorParams.outputFormat.name();
+        } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
             outputFormatValues.add(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
+           parameterName = Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name();
         }
-        opsMeta.addParameterValue(Sos1Constants.DescribeSensorParams.outputFormat.name(), outputFormatValues);
+        if (parameterName != null) { 
+            opsMeta.addParameterValue(parameterName, outputFormatValues);
+        }
+        
         return opsMeta;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.n52.sos.ds.IDescribeSensorDAO#getSensorMLDescription(org.n52.sos.
+     * request.AbstractSosRequest)
+     */
+    @Override
+    public DescribeSensorResponse getSensorDescription(DescribeSensorRequest request) throws OwsExceptionReport {
+        // sensorDocument which should be returned
+        Session session = null;
+        try {
+            session = (Session) connectionProvider.getConnection();
+            SensorML result = queryProcedure(request.getProcedure(), request.getOutputFormat(), session);
+            AbstractMultiProcess member = new AbstractMultiProcess();
+            // fois
+            List<String> procedures = new ArrayList<String>(1);
+            procedures.add(request.getProcedure());
+            SosSMLCapabilities featureCapabilities =
+                    getFeatureOfInterestIDsForProcedure(procedures, request.getVersion(), session);
+            if (featureCapabilities != null) {
+                member.addCapabilities(featureCapabilities);
+            }
+            // parent procs
+            SosSMLCapabilities parentProcCapabilities =
+                    getParentProcedures(request.getProcedure(), request.getVersion());
+            if (parentProcCapabilities != null) {
+                member.addCapabilities(parentProcCapabilities);
+            }
+            // child procs
+            member.addComponents(getChildProcedures(request.getProcedure(), request.getOutputFormat(),
+                    request.getVersion(), session));
+            result.addMember(member);
+            DescribeSensorResponse response = new DescribeSensorResponse();
+            response.setService(request.getService());
+            response.setVersion(request.getVersion());
+            response.setOutputFormat(request.getOutputFormat());
+            response.setSensorDescription(result);
+            return response;
+        } catch (HibernateException he) {
+            String exceptionText = "Error while querying data for DescribeSensor document!";
+            LOGGER.error(exceptionText, he);
+            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+        } finally {
+            connectionProvider.returnConnection(session);
+        }
     }
 
     private SensorML queryProcedure(String procID, String outputFormat, Session session) throws OwsExceptionReport {
         String filename = null;
         String smlFile = null;
         String descriptionFormat = null;
+        // TODO: check and query for validTime parameter 
         Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(procID, session);
         Set<ValidProcedureTime> validProcedureTimes = procedure.getValidProcedureTimes();
         for (ValidProcedureTime validProcedureTime : validProcedureTimes) {
@@ -295,8 +302,9 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
         criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), proceedures));
         // FIXME: checks for generated IDs and remove them for SOS 2.0
-        Collection<String> foiIDs = SosHelper.getFeatureIDs(HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(aliases, criterions, projections,
-                session), version);
+        Collection<String> foiIDs =
+                SosHelper.getFeatureIDs(HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(aliases,
+                        criterions, projections, session), version);
         if (foiIDs != null && !foiIDs.isEmpty()) {
             SosSMLCapabilities capabilities = new SosSMLCapabilities();
             capabilities.setName("featureOfInterest");
@@ -325,7 +333,7 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
      */
     private SosSMLCapabilities getParentProcedures(String procID, String version) throws OwsExceptionReport {
         Collection<String> parentProcedureIds =
-                Configurator.getInstance().getCapsCacheController().getParentProcedures(procID, false, false);
+                Configurator.getInstance().getCapabilitiesCacheController().getParentProcedures(procID, false, false);
         if (parentProcedureIds != null && !parentProcedureIds.isEmpty()) {
             SosSMLCapabilities capabilities = new SosSMLCapabilities();
             capabilities.setName(SosConstants.SYS_CAP_PARENT_PROCEDURES_NAME);
@@ -365,7 +373,7 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
             Session session) throws OwsExceptionReport {
         List<SosSMLComponent> smlComponsents = new ArrayList<SosSMLComponent>();
         Collection<String> childProcedureIds =
-                Configurator.getInstance().getCapsCacheController().getChildProcedures(procID, false, false);
+                Configurator.getInstance().getCapabilitiesCacheController().getChildProcedures(procID, false, false);
         int childCount = 0;
         if (childProcedureIds != null && !childProcedureIds.isEmpty()) {
             String urlPattern =
@@ -392,6 +400,12 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
             }
         }
         return smlComponsents;
+    }
+
+    @Override
+    public IExtension getExtension(Object connection) throws OwsExceptionReport {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

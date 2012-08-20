@@ -1,8 +1,11 @@
 package org.n52.sos.encode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.opengis.swe.x101.QuantityDocument.Quantity;
 import net.opengis.swe.x101.TextDocument.Text;
@@ -15,6 +18,7 @@ import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +55,7 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
 
     @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
-       return encode(element, null);
+        return encode(element, null);
     }
 
     @Override
@@ -64,6 +68,11 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
             return addValuesToCoordinate((SosSweCoordinate) element);
         }
         return null;
+    }
+    
+    @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return new HashMap<SupportedTypeKey, Set<String>>(0);
     }
 
     /**
@@ -126,6 +135,11 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
         xbCoordinate.setName(coordinate.getName().name());
         xbCoordinate.setQuantity(addValuesToSimpleTypeQuantity((SosSweQuantity) coordinate.getValue()));
         return xbCoordinate;
+    }
+
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
     }
 
 }

@@ -47,7 +47,7 @@ public class ServiceResponse {
 
     /** the logger, used to log exceptions and additonaly information */
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceResponse.class);
-    
+
     /** output stream of document */
     private ByteArrayOutputStream byteArrayOutputStream;
 
@@ -70,15 +70,15 @@ public class ServiceResponse {
      * @param version
      *            SOS version
      */
-    public ServiceResponse(ByteArrayOutputStream byteArrayOutputStream, String contentType, boolean applyZipCompression,
-            boolean isXmlResponse) {
+    public ServiceResponse(ByteArrayOutputStream byteArrayOutputStream, String contentType,
+            boolean applyZipCompression, boolean isXmlResponse) {
         super();
         this.byteArrayOutputStream = byteArrayOutputStream;
         this.contentType = contentType;
         this.applyZipCompression = applyZipCompression;
         this.xmlResponse = isXmlResponse;
     }
-    
+
     /**
      * @return Returns the content type of this response
      */

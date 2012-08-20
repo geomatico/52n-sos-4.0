@@ -31,10 +31,12 @@ package org.n52.sos.decode;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPConstants;
@@ -43,23 +45,23 @@ import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
 import javax.xml.soap.SOAPMessage;
 
-import net.opengis.ows.x11.ExceptionType;
-
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.ogc.ows.OwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.soap.SoapFault;
 import org.n52.sos.soap.SoapHeader;
 import org.n52.sos.soap.SoapHelper;
 import org.n52.sos.soap.SoapRequest;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3cHelper;
+import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsa.WsaConstants;
 import org.n52.sos.wsa.WsaHeader;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * class encapsulates decoding methods for SOAP elements.
@@ -137,8 +139,8 @@ public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
                 }
                 fault.setLocale(Locale.ENGLISH);
                 StringBuilder faultString = new StringBuilder();
-                for (ExceptionType exceptionType : owse.getDocument().getExceptionReport().getExceptionArray()) {
-                    for (String exceptionText : exceptionType.getExceptionTextArray()) {
+                for (OwsException owsException : owse.getExceptions()) {
+                    for (String exceptionText : owsException.getMessages()) {
                         faultString.append(exceptionText + "\n");
                     }
                     faultString.append("\n");
@@ -187,15 +189,11 @@ public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
                     soapRequest.setSoapHeader(getSoapHeader(soapMessageRequest.getSOAPHeader()));
                 }
                 soapRequest.setAction(checkSoapAction(soapAction, soapRequest.getSoapHeader()));
-                soapRequest.setSoapBodyContent(XmlObject.Factory.parse(getSOAPBodyContent(soapMessageRequest)));
+                soapRequest.setSoapBodyContent(getSOAPBodyContent(soapMessageRequest));
             } catch (SOAPException soape) {
-                String exceptionText = "Error while parsing SOAPMessage header!";
+                String exceptionText = "Error while parsing SOAPMessage!";
                 LOGGER.debug(exceptionText, soape);
                 throw Util4Exceptions.createNoApplicableCodeException(soape, exceptionText);
-            } catch (XmlException xmle) {
-                String exceptionText = "Error while parsing SOAPMessage body content!";
-                LOGGER.debug(exceptionText, xmle);
-                throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
             }
         } catch (OwsExceptionReport owse) {
             throw owse;
@@ -255,15 +253,11 @@ public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
                     soapRequest.setSoapHeader(getSoapHeader(soapMessageRequest.getSOAPHeader()));
                 }
                 soapRequest.setAction(checkSoapAction(soapAction, soapRequest.getSoapHeader()));
-                soapRequest.setSoapBodyContent(XmlObject.Factory.parse(getSOAPBodyContent(soapMessageRequest)));
+                soapRequest.setSoapBodyContent(getSOAPBodyContent(soapMessageRequest));
             } catch (SOAPException soape) {
-                String exceptionText = "Error while parsing SOAPMessage header!";
+                String exceptionText = "Error while parsing SOAPMessage!";
                 LOGGER.debug(exceptionText, soape);
                 throw Util4Exceptions.createNoApplicableCodeException(soape, exceptionText);
-            } catch (XmlException xmle) {
-                String exceptionText = "Error while parsing SOAPMessage body content!";
-                LOGGER.debug(exceptionText, xmle);
-                throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
             }
         } catch (OwsExceptionReport owse) {
             throw owse;
@@ -280,18 +274,21 @@ public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
      * @throws OwsExceptionReport
      *             if an error occurs.
      */
-    private String getSOAPBodyContent(SOAPMessage soapMessageRequest) throws OwsExceptionReport {
+    private XmlObject getSOAPBodyContent(SOAPMessage soapMessageRequest) throws OwsExceptionReport {
         try {
-            Document bodyRequestDoc;
-            bodyRequestDoc = soapMessageRequest.getSOAPBody().extractContentAsDocument();
-            Element rootRequestDoc = bodyRequestDoc.getDocumentElement();
-            return W3cHelper.nodeToXmlString(rootRequestDoc);
+            Document bodyRequestDoc = soapMessageRequest.getSOAPBody().extractContentAsDocument();
+//            Element rootRequestDoc = bodyRequestDoc.getDocumentElement();
+//            return W3cHelper.nodeToXmlString(rootRequestDoc);
+            return XmlObject.Factory.parse(W3cHelper.nodeToXmlString(bodyRequestDoc.getDocumentElement()), XmlOptionsHelper.getInstance().getXmlOptions());
+//            return XmlObject.Factory.parse(bodyRequestDoc.getFirstChild(), XmlOptionsHelper.getInstance().getXmlOptions());
         } catch (SOAPException soape) {
             String exceptionText = "Error while parsing SOAPMessage body content!";
             LOGGER.debug(exceptionText, soape);
             throw Util4Exceptions.createNoApplicableCodeException(soape, exceptionText);
-        } catch (OwsExceptionReport owse) {
-            throw owse;
+        } catch (XmlException xmle) {
+            String exceptionText = "Error while parsing SOAPMessage body content!";
+            LOGGER.debug(exceptionText, xmle);
+            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
         }
     }
 
@@ -332,11 +329,21 @@ public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
     private String checkSoapAction(String soapAction, Map<String, SoapHeader> soapHeader) {
         if ((soapAction != null && !soapAction.isEmpty())) {
             return soapAction;
-        } else if (soapHeader != null && soapHeader.containsKey(WsaConstants.NS_WSA)){
-                WsaHeader wsaHeaderRequest = (WsaHeader)soapHeader.get(WsaConstants.NS_WSA);
-                return wsaHeaderRequest.getActionValue();
+        } else if (soapHeader != null && soapHeader.containsKey(WsaConstants.NS_WSA)) {
+            WsaHeader wsaHeaderRequest = (WsaHeader) soapHeader.get(WsaConstants.NS_WSA);
+            return wsaHeaderRequest.getActionValue();
         }
         return null;
+    }
+
+    @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return new HashMap<SupportedTypeKey, Set<String>>(0);
+    }
+
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
     }
 
 }

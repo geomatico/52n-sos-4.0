@@ -33,20 +33,19 @@ import java.util.Locale;
 import javax.xml.namespace.QName;
 
 public class SoapFault {
-    
+
     private QName faultCode;
-    
+
     private QName faultSubcode;
-    
+
     private String faultReason;
-    
+
     private Locale locale;
-    
+
     private String detailText;
-    
 
     public void setFaultCode(QName faultCode) {
-       this.faultCode = faultCode;
+        this.faultCode = faultCode;
     }
 
     public void setFaultReason(String faultReason) {
@@ -54,7 +53,7 @@ public class SoapFault {
     }
 
     public void setLocale(Locale locale) {
-       this.locale = locale;
+        this.locale = locale;
     }
 
     public void setDetailText(String detailText) {
@@ -87,7 +86,5 @@ public class SoapFault {
     public QName getFaultSubcode() {
         return faultSubcode;
     }
-    
-    
 
 }

@@ -28,7 +28,6 @@
 
 package org.n52.sos.ogc.om;
 
-import java.util.Collection;
 
 /**
  * class represents a phenomenon of an observation
@@ -36,132 +35,79 @@ import java.util.Collection;
  */
 public class SosObservableProperty extends AbstractSosPhenomenon {
 
-	/** unit of the values of the phenomenons observations */
-	private String unit;
+    /** unit of the values of the phenomenons observations */
+    private String unit;
 
-	/** O&M application schema link of the phenomenon */
-	private String applicationSchemaLink;
+    /** valueType in the database of the phenomenons observation values */
+    private String valueType;
 
-	/** valueType in the database of the phenomenons observation values */
-	private String valueType;
+    /**
+     * constructor
+     * 
+     * @param identifier
+     *            observableProperty identifier
+     */
+    public SosObservableProperty(String identifier) {
+        super(identifier);
+    }
 
-	/**
-	 * constructor
-	 * 
-	 * @param identifier
-	 *            observableProperty identifier
-	 */
-	public SosObservableProperty(String identifier) {
-		super(identifier);
-	}
+    /**
+     * constructor
+     * 
+     * @param identifier
+     *            id of the observableProperty
+     * @param description
+     *            description of the observableProperty
+     * @param unit
+     *            unit of the observation values according to this
+     *            observableProperty
+     * @param valueType
+     *            database valType of the observation values according to this
+     *            observableProperty
+     */
+    public SosObservableProperty(String identifier, String description, String unit,
+            String valueType) {
+        super(identifier, description);
+        this.unit = unit;
+        this.valueType = valueType;
+    }
 
-	/**
-	 * constructor
-	 * 
-	 * @param identifier
-	 *            id of the observableProperty
-	 * @param description
-	 *            description of the observableProperty
-	 * @param unit
-	 *            unit of the observation values according to this
-	 *            observableProperty
-	 * @param applicationSchemaLink
-	 *            OM application schema link of this observableProperty
-	 * @param valueType
-	 *            database valType of the observation values according to this
-	 *            observableProperty
-	 * @param offerings
-	 *            Collection of Offerings the observableProperty should be added
-	 *            to
-	 */
-	public SosObservableProperty(String identifier, String description,
-			String unit, String applicationSchemaLink, String valueType,
-			Collection<SosOffering> offerings) {
-		super(identifier, description, offerings);
-		this.unit = unit;
-		this.applicationSchemaLink = applicationSchemaLink;
-		this.valueType = valueType;
-	}
+    /**
+     * Get unit of measurement
+     * 
+     * @return Returns the unit.
+     */
+    public String getUnit() {
+        return unit;
+    }
 
-	/**
-	 * constructor
-	 * 
-	 * @param identifier
-	 *            id of the observableProperty
-	 * @param description
-	 *            description of the observableProperty
-	 * @param unit
-	 *            unit of the observation values according to this
-	 *            observableProperty
-	 * @param applicationSchemaLink
-	 *            OM application schema link of this observableProperty
-	 * @param valueType
-	 *            database valType of the observation values according to this
-	 *            observableProperty
-	 */
-	public SosObservableProperty(String identifier, String description,
-			String unit, String applicationSchemaLink, String valueType) {
-		super(identifier, description);
-		this.unit = unit;
-		this.applicationSchemaLink = applicationSchemaLink;
-		this.valueType = valueType;
-	}
+    /**
+     * Set unit of measurement
+     * 
+     * @param unit
+     *            The unit to set.
+     */
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
 
-	/**
-	 * Get application schema link
-	 * 
-	 * @return Returns the applicationSchemaLink.
-	 */
-	public String getApplicationSchemaLink() {
-		return applicationSchemaLink;
-	}
+    /**
+     * Get value type
+     * 
+     * @return Returns the valueType.
+     */
+    public String getValueType() {
+        return valueType;
+    }
 
-	/**
-	 * Set application schema link
-	 * 
-	 * @param applicationSchemaLink
-	 *            The applicationSchemaLink to set.
-	 */
-	public void setApplicationSchemaLink(String applicationSchemaLink) {
-		this.applicationSchemaLink = applicationSchemaLink;
-	}
-
-	/**
-	 * Get unit of measurement
-	 * 
-	 * @return Returns the unit.
-	 */
-	public String getUnit() {
-		return unit;
-	}
-
-	/**
-	 * Set unit of measurement
-	 * 
-	 * @param unit
-	 *            The unit to set.
-	 */
-	public void setUnit(String unit) {
-		this.unit = unit;
-	}
-
-	/**
-	 * Get value type
-	 * 
-	 * @return Returns the valueType.
-	 */
-	public String getValueType() {
-		return valueType;
-	}
-
-	/**
-	 * Set value type
-	 * 
-	 * @param valueType
-	 *            The valueType to set.
-	 */
-	public void setValueType(String valueType) {
-		this.valueType = valueType;
-	}
+    /**
+     * Set value type
+     * 
+     * @param valueType
+     *            The valueType to set.
+     */
+    public void setValueType(String valueType) {
+        this.valueType = valueType;
+    }
 
 }

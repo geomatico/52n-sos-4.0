@@ -33,8 +33,6 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.operator.RequestOperatorKeyType;
 
 /**
  * SOS GetObservationById request

@@ -47,11 +47,6 @@ public class SosMetadata {
     private List<String> observationTypes;
 
     /**
-     * list of valid result types
-     */
-    private List<String> resultTypes;
-
-    /**
      * constructor
      */
     public SosMetadata() {
@@ -87,20 +82,4 @@ public class SosMetadata {
     public void setObservationTypes(List<String> observationTypes) {
         this.observationTypes = observationTypes;
     }
-
-    /**
-     * @return the resultTypes
-     */
-    public List<String> getResultTypes() {
-        return resultTypes;
-    }
-
-    /**
-     * @param resultTypes
-     *            the resultTypes to set
-     */
-    public void setResultTypes(List<String> resultTypes) {
-        this.resultTypes = resultTypes;
-    }
-
 }

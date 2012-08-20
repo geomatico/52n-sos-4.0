@@ -36,11 +36,10 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-import org.n52.sos.ogc.sos.SosConstants.ValueTypes;
+import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,6 +123,100 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         return true;
 
         // queryObservationIds();
+    }
+
+    @Override
+    public void updateAfterSensorInsertion() throws OwsExceptionReport {
+        boolean timeNotElapsed = true;
+        try {
+            // thread safe updating of the cache map
+            timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
+
+            // has waiting for lock got a time out?
+            if (!timeNotElapsed) {
+                LOGGER.warn("\n******\nupdateFois() not successful "
+                        + "because of time out while waiting for update lock." + "\nWaited "
+                        + SosConstants.UPDATE_TIMEOUT + " milliseconds.\n******\n");
+                return;
+            }
+            while (!isUpdateIsFree()) {
+
+                getUpdateFree().await();
+            }
+            setUpdateIsFree(false);
+            this.cacheFeederDAO.updateAfterSensorInsertion(capabilitiesCache);
+
+        } catch (InterruptedException e) {
+            LOGGER.error("Problem while threadsafe capabilities cache update", e);
+        } finally {
+            if (timeNotElapsed) {
+                getUpdateLock().unlock();
+                setUpdateIsFree(true);
+            }
+        }
+    }
+
+    @Override
+    public void updateAfterObservationInsertion() throws OwsExceptionReport {
+        boolean timeNotElapsed = true;
+        try {
+            // thread safe updating of the cache map
+            timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
+
+            // has waiting for lock got a time out?
+            if (!timeNotElapsed) {
+                LOGGER.warn("\n******\nupdateFois() not successful "
+                        + "because of time out while waiting for update lock." + "\nWaited "
+                        + SosConstants.UPDATE_TIMEOUT + " milliseconds.\n******\n");
+                return;
+            }
+            while (!isUpdateIsFree()) {
+
+                getUpdateFree().await();
+            }
+            setUpdateIsFree(false);
+            this.cacheFeederDAO.updateAfterObservationInsertion(capabilitiesCache);
+
+        } catch (InterruptedException e) {
+            LOGGER.error("Problem while threadsafe capabilities cache update", e);
+        } finally {
+            if (timeNotElapsed) {
+                getUpdateLock().unlock();
+                setUpdateIsFree(true);
+            }
+        }
+    }
+
+    @Override
+    public void updateAfterSensorDeletion() throws OwsExceptionReport {
+        boolean timeNotElapsed = true;
+        try {
+            // thread safe updating of the cache map
+            timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
+
+            // has waiting for lock got a time out?
+            if (!timeNotElapsed) {
+                LOGGER.warn("\n******\nupdateFois() not successful "
+                        + "because of time out while waiting for update lock." + "\nWaited "
+                        + SosConstants.UPDATE_TIMEOUT + " milliseconds.\n******\n");
+                return;
+            }
+            while (!isUpdateIsFree()) {
+
+                getUpdateFree().await();
+            }
+            setUpdateIsFree(false);
+            this.cacheFeederDAO.updateAfterSensorDeletion(capabilitiesCache);
+
+        } catch (InterruptedException e) {
+            LOGGER.error("Problem while threadsafe capabilities cache update", e);
+        } finally {
+            if (timeNotElapsed) {
+                getUpdateLock().unlock();
+                setUpdateIsFree(true);
+            }
+        }
+        
     }
 
     /**
@@ -558,18 +651,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     }
 
     /**
-     * returns the value type for the passed phenomenon
-     * 
-     * @param phenomenonID
-     *            id of the phenomenon for which the value type should be
-     *            returned
-     * @return Returns the value type for the passed phenomenon
-     */
-    public ValueTypes getValueType4Phenomenon(String phenomenonID) {
-        return this.capabilitiesCache.getObsPropsValueTypes().get(phenomenonID);
-    }
-
-    /**
      * returns the the times for offerings
      * 
      * @return Map<String, String[]> the times for offerings
@@ -636,18 +717,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
             return new ArrayList<Integer>(this.capabilitiesCache.getSrids());
         }
         return new ArrayList<Integer>();
-    }
-
-    /**
-     * returns valuetypes for obsProps
-     * 
-     * @return HashMap<String, ValueTypes> valuetypes for obsProps
-     */
-    public Map<String, ValueTypes> getValueTypes4ObsProps() {
-        if (this.capabilitiesCache.getValueTypes4ObsProps() != null) {
-            return new HashMap<String, ValueTypes>(this.capabilitiesCache.getValueTypes4ObsProps());
-        }
-        return new HashMap<String, ValueTypes>();
     }
 
     /**
@@ -828,17 +897,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     /*
      * (non-Javadoc)
      * 
-     * @see org.n52.sos.cache.ACapabilitiesCacheController#
-     * getValueType4ObservableProperty(java.lang.String)
-     */
-    @Override
-    public ValueTypes getValueType4ObservableProperty(String phenomenonID) {
-        return this.capabilitiesCache.getValueType4Phenomenon(phenomenonID);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see
      * org.n52.sos.cache.ACapabilitiesCacheController#getKOfferingVFeatures()
      */
@@ -862,20 +920,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
             return new ArrayList<String>(this.capabilitiesCache.getOfferings4Phenomenon(phenID));
         }
         return new ArrayList<String>();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.cache.ACapabilitiesCacheController#
-     * getKObservablePropertyVValueType()
-     */
-    @Override
-    public Map<String, ValueTypes> getKObservablePropertyVValueType() {
-        if (this.capabilitiesCache.getValueTypes4ObsProps() != null) {
-            return new HashMap<String, ValueTypes>(this.capabilitiesCache.getValueTypes4ObsProps());
-        }
-        return new HashMap<String, ValueTypes>();
     }
 
     /*
@@ -941,6 +985,30 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     public Collection<String> getObservationTypes4Offering(String offering) {
         if (this.capabilitiesCache.getKOfferingVObservationTypes() != null) {
             return new ArrayList<String>(this.capabilitiesCache.getKOfferingVObservationTypes().get(offering));
+        }
+        return new ArrayList<String>();
+    }
+
+    @Override
+    public Collection<String> getObservationTypes() {
+        if (this.capabilitiesCache.getObservationTypes() != null) {
+            return new ArrayList<String>(this.capabilitiesCache.getObservationTypes());
+        }
+        return new ArrayList<String>();
+    }
+
+    @Override
+    public Map<String, Collection<String>> getAllowedKOfferingVObservationTypes() {
+        if (this.capabilitiesCache.getAllowedKOfferingVObservationType() != null) {
+            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getAllowedKOfferingVObservationType());
+        }
+        return new HashMap<String, Collection<String>>();
+    }
+
+    @Override
+    public Collection<String> getAllowedObservationTypes4Offering(String offering) {
+        if (this.capabilitiesCache.getAllowedKOfferingVObservationType() != null) {
+            return new ArrayList<String>(this.capabilitiesCache.getAllowedKOfferingVObservationType().get(offering));
         }
         return new ArrayList<String>();
     }

@@ -2,23 +2,19 @@ package org.n52.sos.encode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPConstants;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPHeader;
 
 import org.apache.log4j.Logger;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
-import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.soap.SoapHeader;
-import org.n52.sos.soap.SoapResponse;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.wsa.WsaConstants;
 import org.n52.sos.wsa.WsaHeader;
-import org.w3c.dom.DOMException;
 
 public class WsaEncoder implements IEncoder<Map<QName, String>, WsaHeader> {
 
@@ -67,6 +63,16 @@ public class WsaEncoder implements IEncoder<Map<QName, String>, WsaHeader> {
             wsaHeaderValues.put(WsaConstants.getQNameAction(), response.getActionValue());
         }
         return wsaHeaderValues;
+    }
+    
+    @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return new HashMap<SupportedTypeKey, Set<String>>(0);
+    }
+
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
     }
 
 }

@@ -29,8 +29,6 @@
 package org.n52.sos.request;
 
 import org.n52.sos.ogc.sos.Sos1Constants;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.operator.RequestOperatorKeyType;
 
 /**
  * SOS GetFeatureOfInterestTime request
@@ -38,43 +36,42 @@ import org.n52.sos.request.operator.RequestOperatorKeyType;
  */
 public class SosGetFeatureOfInterestTimeRequest extends AbstractServiceRequest {
 
-	/**
-	 * GetFeatureOfInterestTime operation name
-	 */
-	private final String operationName = Sos1Constants.Operations.GetFeatureOfInterestTime
-			.name();
+    /**
+     * GetFeatureOfInterestTime operation name
+     */
+    private final String operationName = Sos1Constants.Operations.GetFeatureOfInterestTime.name();
 
-	/**
-	 * FOI identifier
-	 */
-	protected String featureIdentifier;
+    /**
+     * FOI identifier
+     */
+    protected String featureIdentifier;
 
-	/**
-	 * Get FOI identifier
-	 * 
-	 * @return FOI identifier
-	 */
-	public String getFeatureIdentifier() {
-		return featureIdentifier;
-	}
+    /**
+     * Get FOI identifier
+     * 
+     * @return FOI identifier
+     */
+    public String getFeatureIdentifier() {
+        return featureIdentifier;
+    }
 
-	/**
-	 * Set FOI identifier
-	 * 
-	 * @param featureIdentifier
-	 *            FOI identifier
-	 */
-	public void setFeatureIdentifier(String featureIdentifier) {
-		this.featureIdentifier = featureIdentifier;
-	}
+    /**
+     * Set FOI identifier
+     * 
+     * @param featureIdentifier
+     *            FOI identifier
+     */
+    public void setFeatureIdentifier(String featureIdentifier) {
+        this.featureIdentifier = featureIdentifier;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
-	 */
-	@Override
-	public String getOperationName() {
-		return operationName;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
+     */
+    @Override
+    public String getOperationName() {
+        return operationName;
+    }
 }

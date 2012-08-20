@@ -38,15 +38,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * SosConstants holds all important and often used constants of this SOS (e.g.
- * name of the getCapabilities operation) that are global between all
- * supported versions
+ * name of the getCapabilities operation) that are global between all supported
+ * versions
  * 
  */
 public final class SosConstants {
-    
+
     /** logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosConstants.class);
-    
+
     public static final String NS_SOS_PREFIX = "sos";
 
     /** Constant for the content type of the response */
@@ -57,20 +57,24 @@ public final class SosConstants {
 
     /** Constant for the content types of the accept formats */
     private static String[] ACCEPT_FORMATS = { CONTENT_TYPE_XML, CONTENT_TYPE_ZIP };
-    
-    /** name of System capabilities containing parent procedures for RegisterSensor and DescribeSensor */
-    public static final String SYS_CAP_PARENT_PROCEDURES_NAME = "parentProcedures";  
-    
+
+    /**
+     * name of System capabilities containing parent procedures for
+     * RegisterSensor and DescribeSensor
+     */
+    public static final String SYS_CAP_PARENT_PROCEDURES_NAME = "parentProcedures";
+
     /**
      * hexadecimal values
      */
-    public static final char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-    
+    public static final char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
+            'E', 'F' };
+
     /**
      * Message digest for generating single identifier
      */
     public static MessageDigest MESSAGE_DIGEST;
-    
+
     /**
      * Instantiation of the message digest
      */
@@ -103,8 +107,8 @@ public final class SosConstants {
     public static final String PARAMETER_NOT_SET = "NOT_SET";
 
     /**
-     * String representing parameter value, if parameter is any in an
-     * operation request
+     * String representing parameter value, if parameter is any in an operation
+     * request
      */
     public static final String PARAMETER_ANY = "ANY";
 
@@ -113,6 +117,8 @@ public final class SosConstants {
      * operation request
      */
     public static final String PARAMETER_NO_VALUES = "NoValues";
+
+    public static final String NOT_DEFINED = "NOT_DEFINED";
 
     /**
      * request timeout in ms for split requests to SOS instances
@@ -182,31 +188,34 @@ public final class SosConstants {
     public static final String SEPARATOR_4_REL_FEAT = "_._";
 
     public static final String SEPARATOR_4_OFFERINGS = "_._";
-    
+
     public static final String PROPERTY_NAME_LOCATION = "urn:ogc:data:location";
-    
+
     public static final String PROPERTY_NAME_SAMPLING_GEOMETRY = "urn:ogc:data:samplingGeometry";
-    
+
     public static final String PROPERTY_NAME_SPATIAL_VALUE = "urn:ogc:data:spatialValue";
-    
-    public static final String SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT = "The requested result set exceeds the response size limit of this service and thus cannot be delivered.";
-    
-    public static final String SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION = "Observations for the requested combination of observedProperty and offering do not use SWE Common encoded results.";
+
+    public static final String SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT =
+            "The requested result set exceeds the response size limit of this service and thus cannot be delivered.";
+
+    public static final String SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION =
+            "Observations for the requested combination of observedProperty and offering do not use SWE Common encoded results.";
 
     /** private constructor, to enforce use of instance instead of instantiation */
     private SosConstants() {
     }
-    
-    /** the names of the operations supported by all versions of the SOS specification */
+
+    /**
+     * the names of the operations supported by all versions of the SOS
+     * specification
+     */
     public enum Operations {
-        GetCapabilities, GetObservation, GetObservationById, DescribeSensor, InsertObservation,
-        GetResult, GetFeatureOfInterest;
-        
+        GetCapabilities, GetObservation, GetObservationById, DescribeSensor, InsertObservation, GetResult, GetFeatureOfInterest;
+
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
-                    (s.equals(Operations.GetCapabilities.name()))
-                            || (s.equals(Operations.GetObservation.name()))
+                    (s.equals(Operations.GetCapabilities.name())) || (s.equals(Operations.GetObservation.name()))
                             || (s.equals(Operations.GetObservationById.name()))
                             || (s.equals(Operations.DescribeSensor.name()))
                             || (s.equals(Operations.InsertObservation.name()))
@@ -214,8 +223,8 @@ public final class SosConstants {
                             || (s.equals(Operations.GetFeatureOfInterest.name()));
             return contained;
         }
-    }    
-    
+    }
+
     /** enum with names of Capabilities sections supported by all versions */
     public enum CapabilitiesSections {
         ServiceIdentification, ServiceProvider, OperationsMetadata, Contents, All;
@@ -231,7 +240,7 @@ public final class SosConstants {
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
-                    (OWSConstants.RequestParams.contains(s))                    
+                    (OWSConstants.RequestParams.contains(s))
                             || (s.equals(CapabilitiesSections.ServiceIdentification.name()))
                             || (s.equals(CapabilitiesSections.ServiceProvider.name()))
                             || (s.equals(CapabilitiesSections.OperationsMetadata.name()))
@@ -256,8 +265,7 @@ public final class SosConstants {
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
-                    (OWSConstants.RequestParams.contains(s))               
-                            || (s.equals(GetCapabilitiesParams.Sections.name()))
+                    (OWSConstants.RequestParams.contains(s)) || (s.equals(GetCapabilitiesParams.Sections.name()))
                             || (s.equals(GetCapabilitiesParams.AcceptVersions.name()))
                             || (s.equals(GetCapabilitiesParams.updateSequence.name()))
                             || (s.equals(GetCapabilitiesParams.AcceptFormats.name()))
@@ -266,11 +274,13 @@ public final class SosConstants {
             return contained;
         }
     }
-    
-    /** enum with parameter names for getObservation request supported by all versions */
+
+    /**
+     * enum with parameter names for getObservation request supported by all
+     * versions
+     */
     public enum GetObservationParams {
-        srsName, resultType, startPosition, maxRecords, offering, procedure,
-        observedProperty, featureOfInterest, result, responseFormat, resultModel, responseMode, SortBy, BBOX;
+        srsName, resultType, startPosition, maxRecords, offering, procedure, observedProperty, featureOfInterest, result, responseFormat, resultModel, responseMode, SortBy, BBOX;
 
         /**
          * method checks whether the string parameter is contained in this
@@ -283,8 +293,7 @@ public final class SosConstants {
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
-                    (OWSConstants.RequestParams.contains(s))
-                            || (s.equals(GetObservationParams.srsName.name()))
+                    (OWSConstants.RequestParams.contains(s)) || (s.equals(GetObservationParams.srsName.name()))
                             || (s.equals(GetObservationParams.resultType.name()))
                             || (s.equals(GetObservationParams.startPosition.name()))
                             || (s.equals(GetObservationParams.maxRecords.name()))
@@ -298,9 +307,12 @@ public final class SosConstants {
                             || (s.equals(GetObservationParams.responseMode.name()));
             return contained;
         }
-    }        
-    
-    /** enum with parameter names for getObservation request supported by all versions */
+    }
+
+    /**
+     * enum with parameter names for getObservation request supported by all
+     * versions
+     */
     public enum DescribeSensorParams {
         procedure;
 
@@ -314,21 +326,17 @@ public final class SosConstants {
          */
         public static boolean contains(String s) {
             boolean contained = false;
-            contained = 
-                    (OWSConstants.RequestParams.contains(s))                    
-                            || s.equals(DescribeSensorParams.procedure.name());
+            contained = (OWSConstants.RequestParams.contains(s)) || s.equals(DescribeSensorParams.procedure.name());
             return contained;
         }
-    }    
-    
+    }
+
     /**
      * 
      * Enumeration with values for value type
      */
     public enum ValueTypes {
-        textType, numericType, booleanType, countType, categoryType, isoTimeType, spatialType, commonType,
-        externalReferenceType, referenceValueTextType, referenceValueNumericType,
-        referenceValueExternalReferenceType, uncertaintyType, notDefined;
+        textType, numericType, booleanType, countType, categoryType, isoTimeType, spatialType, commonType, externalReferenceType, referenceValueTextType, referenceValueNumericType, referenceValueExternalReferenceType, uncertaintyType, notDefined;
 
         /**
          * method checks whether the string parameter is contained in this
@@ -341,51 +349,54 @@ public final class SosConstants {
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
-                    (s.equals(ValueTypes.textType.name())) || (s.equals(ValueTypes.numericType.name()))
-                            || (s.equals(ValueTypes.booleanType.name())) || (s.equals(ValueTypes.countType.name()))
-                            || (s.equals(ValueTypes.categoryType.name())) || (s.equals(ValueTypes.isoTimeType.name()))
+                    (s.equals(ValueTypes.textType.name()))
+                            || (s.equals(ValueTypes.numericType.name()))
+                            || (s.equals(ValueTypes.booleanType.name()))
+                            || (s.equals(ValueTypes.countType.name()))
+                            || (s.equals(ValueTypes.categoryType.name()))
+                            || (s.equals(ValueTypes.isoTimeType.name()))
                             || (s.equals(ValueTypes.spatialType.name()))
                             || (s.equals(ValueTypes.externalReferenceType.name()))
                             || (s.equals(ValueTypes.referenceValueTextType.name()))
                             || (s.equals(ValueTypes.referenceValueNumericType.name()))
-                            || (s.equals(ValueTypes.referenceValueExternalReferenceType.name())
-                            || (s.equals(ValueTypes.uncertaintyType.name())) );
+                            || (s.equals(ValueTypes.referenceValueExternalReferenceType.name()) || (s
+                                    .equals(ValueTypes.uncertaintyType.name())));
             return contained;
         }
     }
-    
+
     /**
      * @param valueType
      * @return
      */
     public static ValueTypes getValueTypeForString(String valueType) {
-    	if (valueType.equals(ValueTypes.textType.name())) {
-    		return ValueTypes.textType;
-    	} else if (valueType.equals(ValueTypes.numericType.name())) {
-    		return ValueTypes.numericType; 
-    	} else if (valueType.equals(ValueTypes.booleanType.name())) {
-    		return ValueTypes.booleanType; 
-    	} else if (valueType.equals(ValueTypes.countType.name())) {
-    		return ValueTypes.countType; 
-    	} else if (valueType.equals(ValueTypes.categoryType.name())) {
-    		return ValueTypes.categoryType; 
-    	} else if (valueType.equals(ValueTypes.isoTimeType.name())) {
-    		return ValueTypes.isoTimeType; 
-    	} else if (valueType.equals(ValueTypes.spatialType.name())) {
-    		return ValueTypes.spatialType; 
-    	} else if (valueType.equals(ValueTypes.externalReferenceType.name())) {
-    		return ValueTypes.externalReferenceType; 
-    	} else if (valueType.equals(ValueTypes.referenceValueTextType.name())) {
-    		return ValueTypes.referenceValueTextType; 
-    	} else if (valueType.equals(ValueTypes.referenceValueNumericType.name())) {
-    		return ValueTypes.referenceValueNumericType; 
-    	} else if (valueType.equals(ValueTypes.referenceValueExternalReferenceType.name())) {
-    		return ValueTypes.referenceValueExternalReferenceType; 
-    	} else if (valueType.equals(ValueTypes.uncertaintyType.name())) {
-    		return ValueTypes.uncertaintyType;
-    	} else {
-    		return ValueTypes.notDefined;
-    	}
+        if (valueType.equals(ValueTypes.textType.name())) {
+            return ValueTypes.textType;
+        } else if (valueType.equals(ValueTypes.numericType.name())) {
+            return ValueTypes.numericType;
+        } else if (valueType.equals(ValueTypes.booleanType.name())) {
+            return ValueTypes.booleanType;
+        } else if (valueType.equals(ValueTypes.countType.name())) {
+            return ValueTypes.countType;
+        } else if (valueType.equals(ValueTypes.categoryType.name())) {
+            return ValueTypes.categoryType;
+        } else if (valueType.equals(ValueTypes.isoTimeType.name())) {
+            return ValueTypes.isoTimeType;
+        } else if (valueType.equals(ValueTypes.spatialType.name())) {
+            return ValueTypes.spatialType;
+        } else if (valueType.equals(ValueTypes.externalReferenceType.name())) {
+            return ValueTypes.externalReferenceType;
+        } else if (valueType.equals(ValueTypes.referenceValueTextType.name())) {
+            return ValueTypes.referenceValueTextType;
+        } else if (valueType.equals(ValueTypes.referenceValueNumericType.name())) {
+            return ValueTypes.referenceValueNumericType;
+        } else if (valueType.equals(ValueTypes.referenceValueExternalReferenceType.name())) {
+            return ValueTypes.referenceValueExternalReferenceType;
+        } else if (valueType.equals(ValueTypes.uncertaintyType.name())) {
+            return ValueTypes.uncertaintyType;
+        } else {
+            return ValueTypes.notDefined;
+        }
     }
 
     /**
@@ -413,7 +424,7 @@ public final class SosConstants {
     public enum FirstLatest {
         getFirst, latest
     }
-    
+
     /**
      * Returns the accepted formats.
      * 
@@ -431,11 +442,11 @@ public final class SosConstants {
     public static String[] getResponseModes() {
         return RESPONSE_MODES;
     }
-    
+
     public enum HelperValues {
         GMLID, EXIST_FOI_IN_DOC, VERSION
     }
-    
+
     public enum SosExceptionCode implements IExceptionCode {
         ResponseExceedsSizeLimit, InvalidPropertyOfferingCombination
     }

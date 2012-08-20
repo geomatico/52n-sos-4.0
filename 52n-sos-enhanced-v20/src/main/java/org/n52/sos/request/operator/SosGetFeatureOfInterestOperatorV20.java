@@ -3,23 +3,21 @@ package org.n52.sos.request.operator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IGetFeatureOfInterestDAO;
 import org.n52.sos.encode.IEncoder;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.sos.SosConstants.HelperValues;
-import org.n52.sos.ogc.sos.SosConstants.Operations;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetFeatureOfInterestRequest;
 import org.n52.sos.response.GetFeatureOfInterestResponse;
@@ -61,42 +59,8 @@ public class SosGetFeatureOfInterestOperatorV20 implements IRequestOperator {
     @Override
     public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
         if (request instanceof GetFeatureOfInterestRequest) {
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
             GetFeatureOfInterestRequest sosRequest = (GetFeatureOfInterestRequest) request;
-            // check parameters with variable content
-            try {
-                SosHelper.checkServiceParameter(sosRequest.getService());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
-            try {
-                OwsHelper.checkSingleVersionParameter(sosRequest.getVersion(), Configurator.getInstance()
-                        .getSupportedVersions());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
-            try {
-                SosHelper.checkObservedProperties(sosRequest.getObservedProperties(), Configurator.getInstance()
-                        .getCapsCacheController().getObservableProperties(),
-                        Sos2Constants.GetFeatureOfInterestParams.observedProperty.name());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
-            try {
-                SosHelper.checkProcedureIDs(sosRequest.getProcedures(), Configurator.getInstance()
-                        .getCapsCacheController().getProcedures(),
-                        Sos2Constants.GetFeatureOfInterestParams.procedure.name());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
-            try {
-                SosHelper.checkFeatureOfInterest(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
-                        .getCapsCacheController().getFeatureOfInterest(),
-                        Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
-            Util4Exceptions.mergeExceptions(exceptions);
+            checkRequestedParameter(sosRequest);
 
             GetFeatureOfInterestResponse response = this.dao.getFeatureOfInterest(sosRequest);
             String contentType = SosConstants.CONTENT_TYPE_XML;
@@ -166,6 +130,57 @@ public class SosGetFeatureOfInterestOperatorV20 implements IRequestOperator {
     public OWSOperation getOperationMetadata(String service, String version, Object connection)
             throws OwsExceptionReport {
         return dao.getOperationsMetadata(service, version, connection);
+    }
+    
+    @Override
+    public IExtension getExtension(Object connection) throws OwsExceptionReport {
+        return dao.getExtension(connection);
+    }
+    
+    @Override
+    public Set<String> getConformanceClasses() {
+        Set<String> conformanceClasses = new HashSet<String>(0);
+        if (hasImplementedDAO()) {
+            conformanceClasses.add("http://www.opengis.net/spec/SOS/2.0/conf/foiRetrieval");
+        }
+        return conformanceClasses;
+    }
+
+    private void checkRequestedParameter(GetFeatureOfInterestRequest sosRequest) throws OwsExceptionReport {
+        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+        try {
+            SosHelper.checkServiceParameter(sosRequest.getService());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion(), Configurator.getInstance()
+                    .getSupportedVersions());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            SosHelper.checkObservedProperties(sosRequest.getObservedProperties(), Configurator.getInstance()
+                    .getCapabilitiesCacheController().getObservableProperties(),
+                    Sos2Constants.GetFeatureOfInterestParams.observedProperty.name());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            SosHelper.checkProcedureIDs(sosRequest.getProcedures(), Configurator.getInstance()
+                    .getCapabilitiesCacheController().getProcedures(),
+                    Sos2Constants.GetFeatureOfInterestParams.procedure.name());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            SosHelper.checkFeatureOfInterest(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
+                    .getCapabilitiesCacheController().getFeatureOfInterest(),
+                    Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        Util4Exceptions.mergeExceptions(exceptions);
     }
 
 }

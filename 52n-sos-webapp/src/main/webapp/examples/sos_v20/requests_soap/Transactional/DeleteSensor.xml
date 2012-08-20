@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2003/05/soap-envelope http://www.w3.org/2003/05/soap-envelope/soap-envelope.xsd
+http://www.opengis.net/swes/2.0 http://schemas.opengis.net/swes/2.0/swes.xsd" xmlns:swes="http://www.opengis.net/swes/2.0">
+	<env:Body>
+		<swes:DeleteSensor service="SOS" version="2.0.0">
+			<swes:procedure>http://www.my_namespace.org/sensors/100</swes:procedure>
+		</swes:DeleteSensor>
+	</env:Body>
+</env:Envelope>

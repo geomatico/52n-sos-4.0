@@ -29,8 +29,6 @@
 package org.n52.sos.request;
 
 import org.n52.sos.ogc.sos.Sos1Constants;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.operator.RequestOperatorKeyType;
 
 /**
  * SOS DescribeObservationType request
@@ -38,19 +36,18 @@ import org.n52.sos.request.operator.RequestOperatorKeyType;
  */
 public class SosDescribeObservationTypeRequest extends AbstractServiceRequest {
 
-	/**
-	 * DescribeObservtionType operation name
-	 */
-	private final String operationName = Sos1Constants.Operations.DescribeObservtionType
-			.name();
+    /**
+     * DescribeObservtionType operation name
+     */
+    private final String operationName = Sos1Constants.Operations.DescribeObservtionType.name();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
-	 */
-	@Override
-	public String getOperationName() {
-		return operationName;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
+     */
+    @Override
+    public String getOperationName() {
+        return operationName;
+    }
 }

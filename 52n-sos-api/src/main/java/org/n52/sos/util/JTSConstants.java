@@ -33,10 +33,10 @@ package org.n52.sos.util;
  */
 public class JTSConstants {
 
-	public static final String WKT_POINT = "POINT";
+    public static final String WKT_POINT = "POINT";
 
-	public static final String WKT_LINESTRING = "LINESTRING";
+    public static final String WKT_LINESTRING = "LINESTRING";
 
-	public static final String WKT_POLYGON = "POLYGON";
+    public static final String WKT_POLYGON = "POLYGON";
 
 }

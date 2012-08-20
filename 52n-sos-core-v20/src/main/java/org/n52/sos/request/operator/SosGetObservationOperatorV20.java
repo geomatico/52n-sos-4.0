@@ -32,15 +32,19 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IGetObservationDAO;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.IObservationEncoder;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -100,61 +104,22 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
     @Override
     public synchronized ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
         if (request instanceof GetObservationRequest) {
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+           
             GetObservationRequest sosRequest = (GetObservationRequest) request;
-            // check parameters with variable content
-            try {
-                SosHelper.checkServiceParameter(sosRequest.getService());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
-            try {
-                OwsHelper.checkSingleVersionParameter(sosRequest.getVersion(), Configurator.getInstance()
-                        .getSupportedVersions());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
-            try {
-                checkOfferingId(sosRequest.getOfferings());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
-            try {
-                checkObservedProperties(sosRequest.getObservedProperties());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
-            try {
-                SosHelper.checkProcedureIDs(sosRequest.getProcedures(), Configurator.getInstance()
-                        .getCapsCacheController().getProcedures(), SosConstants.GetObservationParams.procedure.name());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
-            try {
-                SosHelper.checkFeatureOfInterest(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
-                        .getCapsCacheController().getFeatureOfInterest(),
-                        SosConstants.GetObservationParams.featureOfInterest.name());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
-            Util4Exceptions.mergeExceptions(exceptions);
-            
+            checkRequestedParameters(sosRequest);
             boolean zipCompression = false;
-            if (sosRequest.getResponseFormat() == null || (sosRequest.getResponseFormat() != null && sosRequest.getResponseFormat().isEmpty())) {
+            if (sosRequest.getResponseFormat() == null
+                    || (sosRequest.getResponseFormat() != null && sosRequest.getResponseFormat().isEmpty())) {
                 sosRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
             } else {
                 zipCompression = SosHelper.checkResponseFormatForZipCompression(sosRequest.getResponseFormat());
                 if (zipCompression) {
-                    sosRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2); 
+                    sosRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
                 }
             }
 
-            GetObservationResponse response = this.dao.getObservation(sosRequest);
-            String responseFormat = response.getResponseFormat();
             String contentType = SosConstants.CONTENT_TYPE_XML;
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            // XmlOptions xmlOptions;
-
+            String responseFormat = sosRequest.getResponseFormat();
             try {
                 // check SOS version for response encoding
                 StringBuilder namespace = new StringBuilder();
@@ -162,24 +127,19 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
                 if (responseFormat.equals(OMConstants.CONTENT_TYPE_OM)
                         || responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM)) {
                     namespace.append(responseFormat);
-                    // xmlOptions =
-                    // SosXmlOptionsUtility.getInstance().getXmlOptions();
                     contentType = OMConstants.CONTENT_TYPE_OM;
                 }
                 // O&M 2.0 non SOS 2.0
                 else if (!request.getVersion().equals(Sos2Constants.SERVICEVERSION)
-                        && (responseFormat.equals(OMConstants.CONTENT_TYPE_OM_2) || responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2))) {
+                        && (responseFormat.equals(OMConstants.CONTENT_TYPE_OM_2) || responseFormat
+                                .equals(OMConstants.RESPONSE_FORMAT_OM_2))) {
                     namespace.append(responseFormat);
-                    // xmlOptions =
-                    // SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200();
                     contentType = OMConstants.CONTENT_TYPE_OM_2;
                 }
                 // O&M 2.0 for SOS 2.0
                 else if (request.getVersion().equals(Sos2Constants.SERVICEVERSION)
                         && responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2)) {
                     namespace.append(Sos2Constants.NS_SOS_20);
-                    // xmlOptions =
-                    // SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200();
                 } else {
                     String exceptionText = "Received version in request is not supported!";
                     LOGGER.debug(exceptionText);
@@ -188,6 +148,11 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
                 }
                 IEncoder encoder = Configurator.getInstance().getEncoder(namespace.toString());
                 if (encoder != null) {
+                    if (encoder instanceof IObservationEncoder) {
+                        sosRequest.setSingleEncodedValues(((IObservationEncoder)encoder).isSingleValueEncoding());
+                    }
+                    GetObservationResponse response = this.dao.getObservation(sosRequest);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     Object encodedObject = encoder.encode(response);
                     if (encodedObject instanceof XmlObject) {
                         ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
@@ -232,6 +197,11 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
         return false;
     }
 
+    @Override
+    public RequestOperatorKeyType getRequestOperatorKeyType() {
+        return requestOperatorKeyType;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -243,6 +213,59 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
     public OWSOperation getOperationMetadata(String service, String version, Object connection)
             throws OwsExceptionReport {
         return dao.getOperationsMetadata(service, version, connection);
+    }
+    
+    @Override
+    public IExtension getExtension(Object connection) throws OwsExceptionReport {
+        return dao.getExtension(connection);
+    }
+    
+    @Override
+    public Set<String> getConformanceClasses() {
+        Set<String> conformanceClasses = new HashSet<String>(0);
+        if (hasImplementedDAO()) {
+            conformanceClasses.add("http://www.opengis.net/spec/SOS/2.0/conf/core");
+        }
+        return conformanceClasses;
+    }
+
+    private void checkRequestedParameters(GetObservationRequest sosRequest) throws OwsExceptionReport {
+        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+        try {
+            SosHelper.checkServiceParameter(sosRequest.getService());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion(), Configurator.getInstance()
+                    .getSupportedVersions());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            checkOfferingId(sosRequest.getOfferings());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            checkObservedProperties(sosRequest.getObservedProperties());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            SosHelper.checkProcedureIDs(sosRequest.getProcedures(), Configurator.getInstance()
+                    .getCapabilitiesCacheController().getProcedures(), SosConstants.GetObservationParams.procedure.name());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            SosHelper.checkFeatureOfInterest(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
+                    .getCapabilitiesCacheController().getFeatureOfInterest(),
+                    SosConstants.GetObservationParams.featureOfInterest.name());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        Util4Exceptions.mergeExceptions(exceptions);
     }
 
     /**
@@ -258,11 +281,11 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
      *             if the parameter does not containing any matching
      *             observedProperty for the requested offering
      */
-    protected void checkObservedProperties(List<String> observedProperties) throws OwsExceptionReport {
+    private void checkObservedProperties(List<String> observedProperties) throws OwsExceptionReport {
         if (observedProperties != null) {
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
             Collection<String> validObservedProperties =
-                    Configurator.getInstance().getCapsCacheController().getObservableProperties();
+                    Configurator.getInstance().getCapabilitiesCacheController().getObservableProperties();
             for (String obsProp : observedProperties) {
                 if (!validObservedProperties.contains(obsProp)) {
                     String exceptionText =
@@ -287,15 +310,15 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
      * @throws OwsExceptionReport
      *             if the passed offeringId is not supported
      */
-    protected void checkOfferingId(List<String> offeringIds) throws OwsExceptionReport {
+    private void checkOfferingId(List<String> offeringIds) throws OwsExceptionReport {
         if (offeringIds != null) {
-            Collection<String> offerings = Configurator.getInstance().getCapsCacheController().getOfferings();
+            Collection<String> offerings = Configurator.getInstance().getCapabilitiesCacheController().getOfferings();
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
             for (String offeringId : offeringIds) {
                 if (offeringId.contains(SosConstants.SEPARATOR_4_OFFERINGS)) {
                     String[] offArray = offeringId.split(SosConstants.SEPARATOR_4_OFFERINGS);
                     if (!offerings.contains(offArray[0])
-                            || !Configurator.getInstance().getCapsCacheController()
+                            || !Configurator.getInstance().getCapabilitiesCacheController()
                                     .getProcedures4Offering(offArray[0]).contains(offArray[1])) {
                         String exceptionText =
                                 "The value (" + offeringId + ") of the parameter '"
@@ -318,10 +341,5 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
             }
             Util4Exceptions.mergeExceptions(exceptions);
         }
-    }
-
-    @Override
-    public RequestOperatorKeyType getRequestOperatorKeyType() {
-        return requestOperatorKeyType;
     }
 }

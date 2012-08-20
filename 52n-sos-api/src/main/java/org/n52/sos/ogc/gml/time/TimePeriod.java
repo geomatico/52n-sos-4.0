@@ -40,276 +40,276 @@ import org.joda.time.format.ISOPeriodFormat;
  */
 public class TimePeriod implements ITime {
 
-	/** start Date of timePeriod */
-	private DateTime start;
+    /** start Date of timePeriod */
+    private DateTime start;
 
-	/** indeterminate position of startPosition */
-	private String startIndet;
+    /** indeterminate position of startPosition */
+    private String startIndet;
 
-	/** end Date of timePeriod */
-	private DateTime end;
+    /** end Date of timePeriod */
+    private DateTime end;
 
-	/** indeterminate position of endPosition */
-	private String endIndet;
+    /** indeterminate position of endPosition */
+    private String endIndet;
 
-	/** duration value */
-	private Period duration = null; // ISO8601 format
+    /** duration value */
+    private Period duration = null; // ISO8601 format
 
-	/** intervall value */
-	private String intervall = null; // ISO8601 format
+    /** intervall value */
+    private String intervall = null; // ISO8601 format
 
-	/** indeterminate position of timeInstant */
-	private String indeterminateValue;
+    /** indeterminate position of timeInstant */
+    private String indeterminateValue;
 
-	/**
-	 * standard constructor
-	 * 
-	 * @param start
-	 *            timeString of startposition in ISO8601 format
-	 * @param startIndet
-	 *            indeterminate time position of start
-	 * @param end
-	 *            timeString of endposition in ISO8601 format
-	 * @param endIndet
-	 *            indeterminate time value of end position
-	 * @param duration
-	 *            duration in ISO8601 format
-	 * @throws ParseException
-	 *             if parsing the time strings of start or end into
-	 *             java.util.Date failed
-	 */
-	public TimePeriod(DateTime start, String startIndet, DateTime end,
-			String endIndet, String duration) throws ParseException {
-		this.start = start;
-		this.startIndet = startIndet;
-		this.end = end;
-		this.endIndet = endIndet;
-		this.duration = ISOPeriodFormat.standard().parsePeriod(duration);
-	}
+    /**
+     * standard constructor
+     * 
+     * @param start
+     *            timeString of startposition in ISO8601 format
+     * @param startIndet
+     *            indeterminate time position of start
+     * @param end
+     *            timeString of endposition in ISO8601 format
+     * @param endIndet
+     *            indeterminate time value of end position
+     * @param duration
+     *            duration in ISO8601 format
+     * @throws ParseException
+     *             if parsing the time strings of start or end into
+     *             java.util.Date failed
+     */
+    public TimePeriod(DateTime start, String startIndet, DateTime end, String endIndet, String duration)
+            throws ParseException {
+        this.start = start;
+        this.startIndet = startIndet;
+        this.end = end;
+        this.endIndet = endIndet;
+        this.duration = ISOPeriodFormat.standard().parsePeriod(duration);
+    }
 
-	/**
-	 * constructor with start and end date as parameters
-	 * 
-	 * @param start
-	 *            start date of the time period
-	 * @param end
-	 *            end date of the timeperiod
-	 */
-	public TimePeriod(DateTime start, DateTime end) {
-		this.start = start;
-		this.end = end;
-	}
+    /**
+     * constructor with start and end date as parameters
+     * 
+     * @param start
+     *            start date of the time period
+     * @param end
+     *            end date of the timeperiod
+     */
+    public TimePeriod(DateTime start, DateTime end) {
+        this.start = start;
+        this.end = end;
+    }
 
-	/**
-	 * default constructor
-	 * 
-	 */
-	public TimePeriod() {
-	}
+    /**
+     * default constructor
+     * 
+     */
+    public TimePeriod() {
+    }
 
-	/**
-	 * Get duration
-	 * 
-	 * @return Returns the duration.
-	 */
-	public Period getDuration() {
-		return duration;
-	}
+    /**
+     * Get duration
+     * 
+     * @return Returns the duration.
+     */
+    public Period getDuration() {
+        return duration;
+    }
 
-	/**
-	 * Set duration
-	 * 
-	 * @param duration
-	 *            The duration to set.
-	 */
-	public void setDuration(Period duration) {
-		this.duration = duration;
-	}
+    /**
+     * Set duration
+     * 
+     * @param duration
+     *            The duration to set.
+     */
+    public void setDuration(Period duration) {
+        this.duration = duration;
+    }
 
-	/**
-	 * Get start time
-	 * 
-	 * @return Returns the start.
-	 */
-	public DateTime getStart() {
-		return start;
-	}
+    /**
+     * Get start time
+     * 
+     * @return Returns the start.
+     */
+    public DateTime getStart() {
+        return start;
+    }
 
-	/**
-	 * Set start time
-	 * 
-	 * @param start
-	 *            The start to set.
-	 */
-	public void setStart(DateTime start) {
-		this.start = start;
-	}
+    /**
+     * Set start time
+     * 
+     * @param start
+     *            The start to set.
+     */
+    public void setStart(DateTime start) {
+        this.start = start;
+    }
 
-	/**
-	 * Get end time
-	 * 
-	 * @return Returns the end.
-	 */
-	public DateTime getEnd() {
-		return end;
-	}
+    /**
+     * Get end time
+     * 
+     * @return Returns the end.
+     */
+    public DateTime getEnd() {
+        return end;
+    }
 
-	/**
-	 * Set end time
-	 * 
-	 * @param end
-	 *            The end to set.
-	 */
-	public void setEnd(DateTime end) {
-		this.end = end;
-	}
+    /**
+     * Set end time
+     * 
+     * @param end
+     *            The end to set.
+     */
+    public void setEnd(DateTime end) {
+        this.end = end;
+    }
 
-	/**
-	 * Get start indet time
-	 * 
-	 * @return Returns the startIndet.
-	 */
-	public String getStartIndet() {
-		return startIndet;
-	}
+    /**
+     * Get start indet time
+     * 
+     * @return Returns the startIndet.
+     */
+    public String getStartIndet() {
+        return startIndet;
+    }
 
-	/**
-	 * Set start indet time
-	 * 
-	 * @param startIndet
-	 *            The startIndet to set.
-	 */
-	public void setStartIndet(String startIndet) {
-		this.startIndet = startIndet;
-	}
+    /**
+     * Set start indet time
+     * 
+     * @param startIndet
+     *            The startIndet to set.
+     */
+    public void setStartIndet(String startIndet) {
+        this.startIndet = startIndet;
+    }
 
-	/**
-	 * Get end indet time
-	 * 
-	 * @return Returns the endIndet.
-	 */
-	public String getEndIndet() {
-		return endIndet;
-	}
+    /**
+     * Get end indet time
+     * 
+     * @return Returns the endIndet.
+     */
+    public String getEndIndet() {
+        return endIndet;
+    }
 
-	/**
-	 * Set end indet time
-	 * 
-	 * @param endIndet
-	 *            The endIndet to set.
-	 */
-	public void setEndIndet(String endIndet) {
-		this.endIndet = endIndet;
-	}
+    /**
+     * Set end indet time
+     * 
+     * @param endIndet
+     *            The endIndet to set.
+     */
+    public void setEndIndet(String endIndet) {
+        this.endIndet = endIndet;
+    }
 
-	/**
-	 * Get intervall
-	 * 
-	 * @return
-	 */
-	public String getIntervall() {
-		return this.intervall;
-	}
+    /**
+     * Get intervall
+     * 
+     * @return
+     */
+    public String getIntervall() {
+        return this.intervall;
+    }
 
-	/**
-	 * Set intervall
-	 * 
-	 * @param intervall
-	 */
-	public void setIntervall(String intervall) {
-		this.intervall = intervall;
-	}
+    /**
+     * Set intervall
+     * 
+     * @param intervall
+     */
+    public void setIntervall(String intervall) {
+        this.intervall = intervall;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.ogc.gml.time.ISosTime#getIndeterminateValue()
-	 */
-	@Override
-	public String getIndeterminateValue() {
-		return indeterminateValue;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.ogc.gml.time.ISosTime#getIndeterminateValue()
+     */
+    @Override
+    public String getIndeterminateValue() {
+        return indeterminateValue;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.n52.ogc.gml.time.ISosTime#setIndeterminateValue(java.lang.String)
-	 */
-	@Override
-	public void setIndeterminateValue(String indeterminateValue) {
-		this.indeterminateValue = indeterminateValue;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.n52.ogc.gml.time.ISosTime#setIndeterminateValue(java.lang.String)
+     */
+    @Override
+    public void setIndeterminateValue(String indeterminateValue) {
+        this.indeterminateValue = indeterminateValue;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		String result = "Time period: ";
-		if (start != null) {
-			result += start.toString() + ", ";
-		}
-		result += startIndet + ", ";
-		if (end != null) {
-			result += end.toString() + ", ";
-		}
-		result += endIndet;
-		return result;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        String result = "Time period: ";
+        if (start != null) {
+            result += start.toString() + ", ";
+        }
+        result += startIndet + ", ";
+        if (end != null) {
+            result += end.toString() + ", ";
+        }
+        result += endIndet;
+        return result;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	@Override
-	public int compareTo(ITime o) {
-		if (o instanceof TimeInstant) {
-			TimeInstant ti = (TimeInstant) o;
-			if (end.isBefore(ti.getValue())) {
-				return -1;
-			} else if (start.isAfter(ti.getValue())) {
-				return 1;
-			}
-		} else if (o instanceof TimePeriod) {
-			// TODO: CHECK if TimerPeriod for PhenTime is supported
-			TimePeriod tp = (TimePeriod) o;
-			if (start.isBefore(tp.getStart())) {
-				return -1;
-			} else if (end.isAfter(tp.getEnd())) {
-				return 1;
-			}
-		}
-		return 0;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    @Override
+    public int compareTo(ITime o) {
+        if (o instanceof TimeInstant) {
+            TimeInstant ti = (TimeInstant) o;
+            if (end.isBefore(ti.getValue())) {
+                return -1;
+            } else if (start.isAfter(ti.getValue())) {
+                return 1;
+            }
+        } else if (o instanceof TimePeriod) {
+            // TODO: CHECK if TimerPeriod for PhenTime is supported
+            TimePeriod tp = (TimePeriod) o;
+            if (start.isBefore(tp.getStart())) {
+                return -1;
+            } else if (end.isAfter(tp.getEnd())) {
+                return 1;
+            }
+        }
+        return 0;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object paramObject) {
-		if (start != null && end != null && paramObject instanceof TimePeriod) {
-			TimePeriod tp = (TimePeriod) paramObject;
-			return (start.isEqual(tp.start) && end.isEqual(tp.end));
-		}
-		return false;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object paramObject) {
+        if (start != null && end != null && paramObject instanceof TimePeriod) {
+            TimePeriod tp = (TimePeriod) paramObject;
+            return (start.isEqual(tp.start) && end.isEqual(tp.end));
+        }
+        return false;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		int hash = 7;
-		hash = 31 * hash + start.hashCode();
-		hash = 31 * hash + end.hashCode();
-		return hash;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 31 * hash + start.hashCode();
+        hash = 31 * hash + end.hashCode();
+        return hash;
+    }
 }

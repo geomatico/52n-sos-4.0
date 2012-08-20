@@ -35,14 +35,14 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.Sos1Constants;
+import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.IServiceOperator;
-import org.n52.sos.util.SosRequestToResponseHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,44 +74,40 @@ public class AdminServiceOperator extends IAdminServiceOperator {
      * .HttpServletRequest)
      */
     @Override
-    public ServiceResponse doGetOperation(HttpServletRequest req) {
+    public ServiceResponse doGetOperation(HttpServletRequest req) throws OwsExceptionReport {
 
         ServiceResponse response = null;
         AbstractServiceRequest request = null;
-        try {
-            Map<String, String> kvp = new HashMap<String, String>();
-            Iterator<?> parameterNames = req.getParameterMap().keySet().iterator();
-            while (parameterNames.hasNext()) {
-                // all key names to lower case
-                String parameterName = (String) parameterNames.next();
-                String parameterValue = (String) req.getParameterMap().get(parameterName);
-                kvp.put(parameterName, parameterValue);
-            }
-            if (kvp.isEmpty()) {
-                OwsExceptionReport owse =  Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.service.name());
-                owse.addServiceException(Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.request.name()));
-                throw owse;
-            } else if (!kvp.isEmpty() && !kvp.containsKey(SosConstants.GetCapabilitiesParams.request.name())) {
-                throw Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.request.name());
-            } else if (!kvp.isEmpty() && !kvp.containsKey(SosConstants.GetCapabilitiesParams.service.name())) {
-                throw Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.service.name());
-            }
-            IServiceOperator requestOperator = null;
-
-            // receive request
-            OwsExceptionReport se = new OwsExceptionReport();
-            se.addCodedException(
-                    OwsExceptionCode.OperationNotSupported,
-                    null,
-                    "Please add the missing Listener into the pom.xml (new deploy) or into the sos.config (reload webapp), you find in your webapp/WEB-INF/conf.");
-            LOGGER.error("Listener is unknown!", se);
-            throw se;
-        } catch (OwsExceptionReport owse) {
-            LOGGER.debug("Error while performin GetOperation!", owse);
-            response = SosRequestToResponseHelper.createExceptionResponse(owse);
+        Map<String, String> kvp = new HashMap<String, String>();
+        Iterator<?> parameterNames = req.getParameterMap().keySet().iterator();
+        while (parameterNames.hasNext()) {
+            // all key names to lower case
+            String parameterName = (String) parameterNames.next();
+            String parameterValue = (String) req.getParameterMap().get(parameterName);
+            kvp.put(parameterName, parameterValue);
         }
-
-        return response;
+        if (kvp.isEmpty()) {
+            OwsExceptionReport owse =
+                    Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.service.name());
+            owse.addOwsExceptionReport(Util4Exceptions
+                    .createMissingParameterValueException(OWSConstants.RequestParams.request.name()));
+            throw owse;
+        } else if (!kvp.isEmpty() && !kvp.containsKey(SosConstants.GetCapabilitiesParams.request.name())) {
+            throw Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.request.name());
+        } else if (!kvp.isEmpty() && !kvp.containsKey(SosConstants.GetCapabilitiesParams.service.name())) {
+            throw Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.service.name());
+        }
+        IServiceOperator requestOperator = null;
+        if (requestOperator != null) {
+            return response;
+        }
+        OwsExceptionReport owse = Util4Exceptions.createOperationNotSupportedException("AdmininstratorOperation");
+        if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
+            owse.setVersion(Sos2Constants.SERVICEVERSION);
+        } else {
+            owse.setVersion(Sos1Constants.SERVICEVERSION);
+        }
+        throw owse;
     }
 
     /*
@@ -122,37 +118,41 @@ public class AdminServiceOperator extends IAdminServiceOperator {
      * .HttpServletRequest)
      */
     @Override
-    public ServiceResponse doPostOperation(HttpServletRequest req) {
+    public ServiceResponse doPostOperation(HttpServletRequest req) throws OwsExceptionReport {
         String exceptionText = "The SOS administration backend does not support HTTP-Post requests!";
-        LOGGER.error(exceptionText);
-        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-        owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText);
-        return SosRequestToResponseHelper.createExceptionResponse(owse);
+        OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
+            owse.setVersion(Sos2Constants.SERVICEVERSION);
+        } else {
+            owse.setVersion(Sos1Constants.SERVICEVERSION);
+        }
+        throw owse;
     }
 
-//    @Override
-//    public boolean checkOperationHttpGetSupported(String operationName, String version, String namespace)
-//            throws Exception {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean checkOperationHttpPostSupported(String operationName, String version, String namespace)
-//            throws Exception {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean hasImplementedDAO() {
-//        // TODO Auto-generated method stub
-//        return false;
-//    }
-//
-//    @Override
-//    public String getOperationName() {
-//        // TODO Auto-generated method stub
-//        return null;
-//    }
-
+    // @Override
+    // public boolean checkOperationHttpGetSupported(String operationName,
+    // String version, String namespace)
+    // throws Exception {
+    // return true;
+    // }
+    //
+    // @Override
+    // public boolean checkOperationHttpPostSupported(String operationName,
+    // String version, String namespace)
+    // throws Exception {
+    // return false;
+    // }
+    //
+    // @Override
+    // public boolean hasImplementedDAO() {
+    // // TODO Auto-generated method stub
+    // return false;
+    // }
+    //
+    // @Override
+    // public String getOperationName() {
+    // // TODO Auto-generated method stub
+    // return null;
+    // }
 
 }

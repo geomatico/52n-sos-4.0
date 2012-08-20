@@ -29,9 +29,7 @@
 package org.n52.sos.ds;
 
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetObservationByIdRequest;
-import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationByIdResponse;
 
 /**
@@ -41,17 +39,16 @@ import org.n52.sos.response.GetObservationByIdResponse;
  */
 public interface IGetObservationByIdDAO extends IOperationDAO {
 
-	/**
-	 * fetches the requested observation(s) from the datasource
-	 * 
-	 * @param request
-	 *            getObservationById request, which should be returned
-	 *            observations for
-	 * @return Returns observation collection (also if single observations are
-	 *         returned)
-	 * @throws OwsExceptionReport
-	 *             if getting observation(s) from data source failed
-	 */
-	public GetObservationByIdResponse getObservationById(
-	        GetObservationByIdRequest request) throws OwsExceptionReport;
+    /**
+     * fetches the requested observation(s) from the datasource
+     * 
+     * @param request
+     *            getObservationById request, which should be returned
+     *            observations for
+     * @return Returns observation collection (also if single observations are
+     *         returned)
+     * @throws OwsExceptionReport
+     *             if getting observation(s) from data source failed
+     */
+    public GetObservationByIdResponse getObservationById(GetObservationByIdRequest request) throws OwsExceptionReport;
 }

@@ -2,7 +2,9 @@ package org.n52.sos.request.operator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IGetCapabilitiesDAO;
@@ -10,6 +12,7 @@ import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
@@ -81,14 +84,14 @@ public class SosGetCapabilitiesOperatorV20 implements IRequestOperator {
                 zipCompr = checkAcceptFormats(acceptFormats);
             }
 
-            GetCapabilitiesResponse sosCapsResponse = this.dao.getCapabilities(sosRequest);
+            GetCapabilitiesResponse response = this.dao.getCapabilities(sosRequest);
             String contentType = SosConstants.CONTENT_TYPE_XML;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             // XmlOptions xmlOptions;
             try {
                 IEncoder encoder = Configurator.getInstance().getEncoder(Sos2Constants.NS_SOS_20);
                 if (encoder != null) {
-                    Object encodedObject = encoder.encode(sosCapsResponse);
+                    Object encodedObject = encoder.encode(response);
                     if (encodedObject instanceof XmlObject) {
                         ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
                         return new ServiceResponse(baos, contentType, false, true);
@@ -139,8 +142,22 @@ public class SosGetCapabilitiesOperatorV20 implements IRequestOperator {
      * .String, java.lang.Object)
      */
     @Override
-    public OWSOperation getOperationMetadata(String service, String version, Object connection) {
-        return null;
+    public OWSOperation getOperationMetadata(String service, String version, Object connection) throws OwsExceptionReport {
+        return dao.getOperationsMetadata(service, version, connection);
+    }
+    
+    @Override
+    public IExtension getExtension(Object connection) throws OwsExceptionReport {
+        return dao.getExtension(connection);
+    }
+    
+    @Override
+    public Set<String> getConformanceClasses() {
+        Set<String> conformanceClasses = new HashSet<String>(0);
+        if (hasImplementedDAO()) {
+            conformanceClasses.add("http://www.opengis.net/spec/SOS/2.0/conf/core");
+        }
+        return conformanceClasses;
     }
 
     private boolean checkAcceptFormats(List<String> formats) throws OwsExceptionReport {

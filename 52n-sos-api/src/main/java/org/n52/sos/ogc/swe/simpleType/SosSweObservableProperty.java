@@ -36,132 +36,132 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
  */
 public class SosSweObservableProperty implements ISosSweSimpleType {
 
-	/**
-	 * SWE simple type type
-	 */
-	private SweSimpleType simpleType = SweSimpleType.ObservableProperty;
+    /**
+     * SWE simple type type
+     */
+    private SweSimpleType simpleType = SweSimpleType.ObservableProperty;
 
-	/**
-	 * definition
-	 */
-	private String definition;
+    /**
+     * definition
+     */
+    private String definition;
 
-	/**
-	 * description
-	 */
-	private String description;
+    /**
+     * description
+     */
+    private String description;
 
-	/**
-	 * quality information
-	 */
-	private SosSweQuality quality;
+    /**
+     * quality information
+     */
+    private SosSweQuality quality;
 
-	/**
-	 * value
-	 */
-	private String value;
+    /**
+     * value
+     */
+    private String value;
 
-	/**
-	 * constructor
-	 */
-	public SosSweObservableProperty() {
-	}
+    /**
+     * constructor
+     */
+    public SosSweObservableProperty() {
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getSimpleType()
-	 */
-	@Override
-	public SweSimpleType getSimpleType() {
-		return simpleType;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getSimpleType()
+     */
+    @Override
+    public SweSimpleType getSimpleType() {
+        return simpleType;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getQuality()
-	 */
-	@Override
-	public SosSweQuality getQuality() {
-		return quality;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getQuality()
+     */
+    @Override
+    public SosSweQuality getQuality() {
+        return quality;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.n52.ogc.swe.simpleType.ISosSweSimpleType#setQuality(org.n52.ogc.swe
-	 * .simpleType.SosSweQuality)
-	 */
-	@Override
-	public void setQuality(SosSweQuality quality) {
-		this.quality = quality;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.n52.ogc.swe.simpleType.ISosSweSimpleType#setQuality(org.n52.ogc.swe
+     * .simpleType.SosSweQuality)
+     */
+    @Override
+    public void setQuality(SosSweQuality quality) {
+        this.quality = quality;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getDefinition()
-	 */
-	@Override
-	public String getDefinition() {
-		return definition;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getDefinition()
+     */
+    @Override
+    public String getDefinition() {
+        return definition;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.n52.ogc.swe.simpleType.ISosSweSimpleType#setDefinition(java.lang.
-	 * String)
-	 */
-	@Override
-	public void setDefinition(String definition) {
-		this.definition = definition;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.n52.ogc.swe.simpleType.ISosSweSimpleType#setDefinition(java.lang.
+     * String)
+     */
+    @Override
+    public void setDefinition(String definition) {
+        this.definition = definition;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getDescription()
-	 */
-	@Override
-	public String getDescription() {
-		return description;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getDescription()
+     */
+    @Override
+    public String getDescription() {
+        return description;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.n52.ogc.swe.simpleType.ISosSweSimpleType#setDescription(java.lang
-	 * .String)
-	 */
-	@Override
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.n52.ogc.swe.simpleType.ISosSweSimpleType#setDescription(java.lang
+     * .String)
+     */
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getValue()
-	 */
-	@Override
-	public String getValue() {
-		return value;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getValue()
+     */
+    @Override
+    public String getValue() {
+        return value;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.n52.ogc.swe.simpleType.ISosSweSimpleType#setValue(java.lang.String)
-	 */
-	@Override
-	public void setValue(String value) {
-		this.value = value;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.n52.ogc.swe.simpleType.ISosSweSimpleType#setValue(java.lang.String)
+     */
+    @Override
+    public void setValue(String value) {
+        this.value = value;
+    }
 
 }

@@ -29,23 +29,27 @@
 package org.n52.sos.util;
 
 /**
- * Constants class for W3C 
- *
+ * Constants class for W3C
+ * 
  */
 public class W3CConstants {
-	
-	// namespaces and schema locations
-	
-	public static final String NS_XLINK = "http://www.w3.org/1999/xlink";
 
-	public static final String NS_XLINK_PREFIX = "xlink";
+    // namespaces and schema locations
 
-	public static final String NS_XSI = "http://www.w3.org/2001/XMLSchema-instance";
+    public static final String NS_XLINK = "http://www.w3.org/1999/xlink";
 
-	public static final String NS_XSI_PREFIX = "xsi";
-	
-	public static final String SCHEMA_LOCATION_XLINK = "http://www.w3.org/1999/xlink.xsd";
-	
-	public static final String AN_SCHEMA_LOCATION = "schemaLocation";
+    public static final String NS_XLINK_PREFIX = "xlink";
+
+    public static final String NS_XSI = "http://www.w3.org/2001/XMLSchema-instance";
+
+    public static final String NS_XSI_PREFIX = "xsi";
+
+    public static final String SCHEMA_LOCATION_XLINK = "http://www.w3.org/1999/xlink.xsd";
+
+    public static final String AN_SCHEMA_LOCATION = "schemaLocation";
+
+    public static final String NS_XS = "http://www.w3.org/2001/XMLSchema";
+
+    public static final String NS_XS_PREFIX = "xs";
 
 }

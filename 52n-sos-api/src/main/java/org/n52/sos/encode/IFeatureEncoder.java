@@ -59,7 +59,7 @@ public interface IFeatureEncoder {
      * @param absFeature
      *            SOS feature
      * @return XML representation of a SpatialSamplingFeature
-     * @throws OwsExceptionReport 
+     * @throws OwsExceptionReport
      */
     public XmlObject createFeature(SosAbstractFeature absFeature, String gmlID) throws OwsExceptionReport;
 
@@ -70,8 +70,9 @@ public interface IFeatureEncoder {
      * @param foiGmlIds
      *            SOS features
      * @return XML representation of a SamplingFeaturecollection
-     * @throws OwsExceptionReport 
+     * @throws OwsExceptionReport
      */
-    public XmlObject createFeatureCollection(Map<SosAbstractFeature, String> foiGmlIds, boolean forObservation) throws OwsExceptionReport;
-    
+    public XmlObject createFeatureCollection(Map<SosAbstractFeature, String> foiGmlIds, boolean forObservation)
+            throws OwsExceptionReport;
+
 }

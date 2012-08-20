@@ -40,140 +40,135 @@ import org.n52.sos.ogc.sos.Sos1Constants;
  */
 public class SosRegisterSensorRequest extends AbstractServiceRequest {
 
-	/**
-	 * RegisterSensor operation name
-	 */
-	private final String operationName = Sos1Constants.Operations.RegisterSensor
-			.name();
+    /**
+     * RegisterSensor operation name
+     */
+    private final String operationName = Sos1Constants.Operations.RegisterSensor.name();
 
-	/**
-	 * SOS Sensor system
-	 */
-//	private SensorSystem system;
+    /**
+     * SOS Sensor system
+     */
+    // private SensorSystem system;
 
-	/**
-	 * observableProperties collection
-	 */
-	private Collection<AbstractSosPhenomenon> observableProperties;
+    /**
+     * observableProperties collection
+     */
+    private Collection<AbstractSosPhenomenon> observableProperties;
 
-	/**
-	 * featureOfInterest collection
-	 */
-	private Collection<SosAbstractFeature> featuresOfInterest;
+    /**
+     * featureOfInterest collection
+     */
+    private Collection<SosAbstractFeature> featuresOfInterest;
 
-	/**
-	 * Sensor description
-	 */
-	private String sensorDescription;
+    /**
+     * Sensor description
+     */
+    private String sensorDescription;
 
-	/**
-	 * constructor
-	 * 
-	 * @param system
-	 *            SOS sensor system
-	 * @param sosComponents
-	 *            observableProperties
-	 * @param sensorDescription
-	 *            Sensor description
-	 * @param featuresOfInterest
-	 *            featuresOfInterst
-	 */
-	public SosRegisterSensorRequest(
-			Collection<AbstractSosPhenomenon> observableProperties,
-			String sensorDescription,
-			Collection<SosAbstractFeature> featuresOfInterest) {
-//		this.system = system;
-		this.observableProperties = observableProperties;
-		this.sensorDescription = sensorDescription;
-		this.featuresOfInterest = featuresOfInterest;
-	}
+    /**
+     * constructor
+     * 
+     * @param system
+     *            SOS sensor system
+     * @param sosComponents
+     *            observableProperties
+     * @param sensorDescription
+     *            Sensor description
+     * @param featuresOfInterest
+     *            featuresOfInterst
+     */
+    public SosRegisterSensorRequest(Collection<AbstractSosPhenomenon> observableProperties, String sensorDescription,
+            Collection<SosAbstractFeature> featuresOfInterest) {
+        // this.system = system;
+        this.observableProperties = observableProperties;
+        this.sensorDescription = sensorDescription;
+        this.featuresOfInterest = featuresOfInterest;
+    }
 
-	/**
-	 * Get observableProperties
-	 * 
-	 * @return observableProperties
-	 */
-	public Collection<AbstractSosPhenomenon> getObservableProperties() {
-		return observableProperties;
-	}
+    /**
+     * Get observableProperties
+     * 
+     * @return observableProperties
+     */
+    public Collection<AbstractSosPhenomenon> getObservableProperties() {
+        return observableProperties;
+    }
 
-	/**
-	 * Set observableProperties
-	 * 
-	 * @param observableProperties
-	 *            observableProperties
-	 */
-	public void setObservableProperties(
-			Collection<AbstractSosPhenomenon> observableProperties) {
-		this.observableProperties = observableProperties;
-	}
+    /**
+     * Set observableProperties
+     * 
+     * @param observableProperties
+     *            observableProperties
+     */
+    public void setObservableProperties(Collection<AbstractSosPhenomenon> observableProperties) {
+        this.observableProperties = observableProperties;
+    }
 
-	/**
-	 * Get sensor description
-	 * 
-	 * @return sensor description
-	 */
-	public String getSensorDescription() {
-		return sensorDescription;
-	}
+    /**
+     * Get sensor description
+     * 
+     * @return sensor description
+     */
+    public String getSensorDescription() {
+        return sensorDescription;
+    }
 
-	/**
-	 * Set sensor description
-	 * 
-	 * @param sensorDescription
-	 *            sensor description
-	 */
-	public void setSensorDescription(String sensorDescription) {
-		this.sensorDescription = sensorDescription;
-	}
+    /**
+     * Set sensor description
+     * 
+     * @param sensorDescription
+     *            sensor description
+     */
+    public void setSensorDescription(String sensorDescription) {
+        this.sensorDescription = sensorDescription;
+    }
 
-//	/**
-//	 * Get SOS sensor system
-//	 * 
-//	 * @return SOS sensor system
-//	 */
-//	public SensorSystem getSystem() {
-//		return system;
-//	}
-//
-//	/**
-//	 * Set SOS sensor system
-//	 * 
-//	 * @param system
-//	 *            SOS sensor system
-//	 */
-//	public void setSystem(SensorSystem system) {
-//		this.system = system;
-//	}
+    // /**
+    // * Get SOS sensor system
+    // *
+    // * @return SOS sensor system
+    // */
+    // public SensorSystem getSystem() {
+    // return system;
+    // }
+    //
+    // /**
+    // * Set SOS sensor system
+    // *
+    // * @param system
+    // * SOS sensor system
+    // */
+    // public void setSystem(SensorSystem system) {
+    // this.system = system;
+    // }
 
-	/**
-	 * Get featuresOfInterst
-	 * 
-	 * @return featuresOfInterst
-	 */
-	public Collection<SosAbstractFeature> getFeaturesOfInterest() {
-		return featuresOfInterest;
-	}
+    /**
+     * Get featuresOfInterst
+     * 
+     * @return featuresOfInterst
+     */
+    public Collection<SosAbstractFeature> getFeaturesOfInterest() {
+        return featuresOfInterest;
+    }
 
-	/**
-	 * Set featuresOfInterst
-	 * 
-	 * @param featuresOfInterest
-	 *            featuresOfInterst
-	 */
-	public void setFeaturesOfInterest(
-			Collection<SosAbstractFeature> featuresOfInterest) {
-		this.featuresOfInterest = featuresOfInterest;
-	}
+    /**
+     * Set featuresOfInterst
+     * 
+     * @param featuresOfInterest
+     *            featuresOfInterst
+     */
+    public void setFeaturesOfInterest(Collection<SosAbstractFeature> featuresOfInterest) {
+        this.featuresOfInterest = featuresOfInterest;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
-	 */
-	@Override
-	public String getOperationName() {
-		return operationName;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
+     */
+    @Override
+    public String getOperationName() {
+        return operationName;
+    }
 
 }

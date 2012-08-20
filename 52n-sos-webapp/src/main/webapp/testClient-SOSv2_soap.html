@@ -35,12 +35,7 @@
 				//load files for SOS 2.0 requests
 				requests[index++]=datafolder_sos2+"GetCapabilities.xml";
 				requests[index++]=datafolder_sos2+"DescribeSensor.xml";
-				// requests[index++]=datafolder_sos2+"GetFoi/GetFeatureOfInterest_allParams.xml";
-				// requests[index++]=datafolder_sos2+"GetFoi/GetFeatureOfInterest_bbox.xml";
-				// requests[index++]=datafolder_sos2+"GetFoi/GetFeatureOfInterest_foiId.xml";
-				// requests[index++]=datafolder_sos2+"GetFoi/GetFeatureOfInterest_obsProp.xml";
-				// requests[index++]=datafolder_sos2+"GetFoi/GetFeatureOfInterest_proc.xml";
-				// requests[index++]=datafolder_sos2+"GetFoi/GetFeatureOfInterest.xml";
+				// GetObservation
 				requests[index++]=datafolder_sos2+"GetObs/GetObs.xml";
 				requests[index++]=datafolder_sos2+"GetObs/GetObs_allParams.xml";
 				requests[index++]=datafolder_sos2+"GetObs/GetObs_FoiIds.xml";
@@ -50,7 +45,26 @@
 				requests[index++]=datafolder_sos2+"GetObs/GetObs_SP_Foi.xml";
 				requests[index++]=datafolder_sos2+"GetObs/GetObs_TP_During.xml";
 				requests[index++]=datafolder_sos2+"GetObs/GetObs_TI_Equals.xml";
-				// requests[index++]=datafolder_sos2+"GetObservationById.xml";
+				// GetFeatureOfInterest
+				requests[index++]=datafolder_sos2+"GetFoi/GetFeatureOfInterest_allParams.xml";
+				requests[index++]=datafolder_sos2+"GetFoi/GetFeatureOfInterest_bbox.xml";
+				requests[index++]=datafolder_sos2+"GetFoi/GetFeatureOfInterest_foiId.xml";
+				requests[index++]=datafolder_sos2+"GetFoi/GetFeatureOfInterest_obsProp.xml";
+				requests[index++]=datafolder_sos2+"GetFoi/GetFeatureOfInterest_proc.xml";
+				requests[index++]=datafolder_sos2+"GetFoi/GetFeatureOfInterest.xml";
+				// GetObservationById
+				requests[index++]=datafolder_sos2+"GetObservationById.xml";
+				requests[index++]=datafolder_sos2+"GetObservationByIds.xml";
+				// Transactional
+				requests[index++]=datafolder_sos2+"Transactional/InsertSensor.xml";
+				requests[index++]=datafolder_sos2+"Transactional/InsertObservation_Measurement.xml";
+				requests[index++]=datafolder_sos2+"Transactional/InsertObservation_Category.xml";
+				requests[index++]=datafolder_sos2+"Transactional/InsertObservation_Count.xml";
+				requests[index++]=datafolder_sos2+"Transactional/InsertObservation_Text.xml";
+				requests[index++]=datafolder_sos2+"Transactional/InsertObservation_Truth.xml";
+				requests[index++]=datafolder_sos2+"Transactional/UpdateSensor.xml";
+				requests[index++]=datafolder_sos2+"Transactional/DeleteSensor.xml";
+				
 				
 				//fill the select element
 				var selRequest = document.getElementById("selRequest");

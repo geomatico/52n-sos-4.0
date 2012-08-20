@@ -36,25 +36,25 @@ package org.n52.sos.ds;
  */
 public interface IConnectionProvider {
 
-	/**
-	 * Get a data source connection
-	 * 
-	 * @return Connection to the data source
-	 */
-	public Object getConnection();
+    /**
+     * Get a data source connection
+     * 
+     * @return Connection to the data source
+     */
+    public Object getConnection();
 
-	/**
-	 * Return the connection to the provider
-	 * 
-	 * @param connection
-	 *            Connection
-	 */
-	public void returnConnection(Object connection);
+    /**
+     * Return the connection to the provider
+     * 
+     * @param connection
+     *            Connection
+     */
+    public void returnConnection(Object connection);
 
-	/**
-	 * Cleanup the connection provider when stopping the server, e.g. close all
-	 * connection.
-	 */
-	public void cleanup();
+    /**
+     * Cleanup the connection provider when stopping the server, e.g. close all
+     * connection.
+     */
+    public void cleanup();
 
 }

@@ -6,13 +6,13 @@ import java.util.List;
 import org.apache.xmlbeans.XmlObject;
 
 public class SosServiceIdentification {
-    
+
     private XmlObject serviceIdentification;
-    
+
     private Collection<String> versions;
-    
+
     private List<String> profiles;
-    
+
     private List<String> keywords;
 
     public XmlObject getServiceIdentification() {

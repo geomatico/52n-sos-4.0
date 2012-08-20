@@ -29,8 +29,6 @@
 package org.n52.sos.request;
 
 import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.operator.RequestOperatorKeyType;
 
 /**
  * SOS InsertResultTemplate request
@@ -38,20 +36,19 @@ import org.n52.sos.request.operator.RequestOperatorKeyType;
  */
 public class SosInsertResultTemplateRequest extends AbstractServiceRequest {
 
-	/**
-	 * InsertResultTemplate operation name
-	 */
-	private final String operationName = Sos2Constants.Operations.InsertResultTemplate
-			.name();
+    /**
+     * InsertResultTemplate operation name
+     */
+    private final String operationName = Sos2Constants.Operations.InsertResultTemplate.name();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
-	 */
-	@Override
-	public String getOperationName() {
-		return operationName;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
+     */
+    @Override
+    public String getOperationName() {
+        return operationName;
+    }
 
 }

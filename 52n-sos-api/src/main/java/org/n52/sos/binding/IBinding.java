@@ -34,21 +34,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.IConformanceClass;
 
 /**
  * Interface for binding implementations
  * 
  */
-public interface IBinding {
-    
-    /**
-     * HTTP-Post request handling method
-     * 
-     * @param request
-     *            HTTP-Post request
-     * @return SOS response
-     */
-    public ServiceResponse doGetOperation(HttpServletRequest request);
+public interface IBinding extends IConformanceClass {
 
     /**
      * HTTP-Post request handling method
@@ -56,9 +48,19 @@ public interface IBinding {
      * @param request
      *            HTTP-Post request
      * @return SOS response
-     * @throws ServletException 
+     * @throws OwsExceptionReport 
      */
-    public ServiceResponse doPostOperation(HttpServletRequest request) throws ServletException;
+    public ServiceResponse doGetOperation(HttpServletRequest request) throws OwsExceptionReport;
+
+    /**
+     * HTTP-Post request handling method
+     * 
+     * @param request
+     *            HTTP-Post request
+     * @return SOS response
+     * @throws ServletException
+     */
+    public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport;
 
     /**
      * Get URL pattern for the operator
@@ -67,8 +69,7 @@ public interface IBinding {
      */
     public String getUrlPattern();
 
-    boolean checkOperationHttpGetSupported(String operationName, DecoderKeyType decoderKey)
-            throws OwsExceptionReport;
+    boolean checkOperationHttpGetSupported(String operationName, DecoderKeyType decoderKey) throws OwsExceptionReport;
 
     boolean checkOperationHttpPostSupported(String operationName, DecoderKeyType decoderKey) throws OwsExceptionReport;
 

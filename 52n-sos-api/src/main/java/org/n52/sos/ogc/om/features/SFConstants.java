@@ -34,49 +34,54 @@ package org.n52.sos.ogc.om.features;
  */
 public class SFConstants {
 
-	// namespaces and schema lcations
-	public static final String NS_SA = "http://www.opengis.net/sampling/1.0";
+    // namespaces and schema lcations
+    public static final String NS_SA = "http://www.opengis.net/sampling/1.0";
 
-	public static final String NS_SA_PREFIX = "sa";
+    public static final String NS_SA_PREFIX = "sa";
 
-	public static final String NS_SF = "http://www.opengis.net/sampling/2.0";
+    public static final String NS_SF = "http://www.opengis.net/sampling/2.0";
 
-	public static final String NS_SF_PREFIX = "sf";
+    public static final String NS_SF_PREFIX = "sf";
 
-	public static final String NS_SAMS = "http://www.opengis.net/samplingSpatial/2.0";
+    public static final String NS_SAMS = "http://www.opengis.net/samplingSpatial/2.0";
 
-	public static final String NS_SAMS_PREFIX = "sams";
+    public static final String NS_SAMS_PREFIX = "sams";
 
-	public static final String SCHEMA_LOCATION_SA = "http://schemas.opengis.net/sampling/1.0.0/sampling.xsd";
+    public static final String SCHEMA_LOCATION_SA = "http://schemas.opengis.net/sampling/1.0.0/sampling.xsd";
 
-	public static final String SCHEMA_LOCATION_SF = "http://schemas.opengis.net/sampling/2.0/samplingFeature.xsd";
+    public static final String SCHEMA_LOCATION_SF = "http://schemas.opengis.net/sampling/2.0/samplingFeature.xsd";
 
-	public static final String SCHEMA_LOCATION_SAMS = "http://schemas.opengis.net/samplingSpatial/2.0/spatialSamplingFeature.xsd";
-	
-	
-	// feature types
-	public static final String SAMPLING_FEAT_TYPE_SF_SAMPLING_FEATURE = "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingFeature";
-	
-	public static final String SAMPLING_FEAT_TYPE_SF_SPATIAL_SAMPLING_FEATURE = "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SpatialSamplingFeature";
-	
-	public static final String SAMPLING_FEAT_TYPE_SF_SAMPLING_POINT = "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint";
-	
-	public static final String SAMPLING_FEAT_TYPE_SF_SAMPLING_CURVE = "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingCurve";
-	
-	public static final String SAMPLING_FEAT_TYPE_SF_SAMPLING_SURFACE = "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingSurface";
-	
-	public static final String SAMPLING_FEAT_TYPE_SF_SAMPLING_SOLID = "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingSolid";
-	
-	public static final String SAMPLING_FEAT_TYPE_SF_SAMPLING_SPECIMEN = "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingSpecimen";
+    public static final String SCHEMA_LOCATION_SAMS =
+            "http://schemas.opengis.net/samplingSpatial/2.0/spatialSamplingFeature.xsd";
+    
+    // feature types
+    public static final String SAMPLING_FEAT_TYPE_SF_SAMPLING_FEATURE =
+            "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingFeature";
 
-	// element names
-	public static final String EN_SAMPLINGPOINT = "SamplingPoint";
+    public static final String SAMPLING_FEAT_TYPE_SF_SPATIAL_SAMPLING_FEATURE =
+            "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SpatialSamplingFeature";
 
-	public static final String EN_SAMPLINGSURFACE = "SamplingSurface";
+    public static final String SAMPLING_FEAT_TYPE_SF_SAMPLING_POINT =
+            "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint";
 
-	public static final String FT_SAMPLINGPOINT = NS_SA_PREFIX + ":"
-			+ EN_SAMPLINGPOINT;
+    public static final String SAMPLING_FEAT_TYPE_SF_SAMPLING_CURVE =
+            "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingCurve";
 
-	public static final String FT_SAMPLINGSURFACE = NS_SA_PREFIX + ":"
-			+ EN_SAMPLINGSURFACE;
+    public static final String SAMPLING_FEAT_TYPE_SF_SAMPLING_SURFACE =
+            "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingSurface";
+
+    public static final String SAMPLING_FEAT_TYPE_SF_SAMPLING_SOLID =
+            "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingSolid";
+
+    public static final String SAMPLING_FEAT_TYPE_SF_SAMPLING_SPECIMEN =
+            "http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingSpecimen";
+
+    // element names
+    public static final String EN_SAMPLINGPOINT = "SamplingPoint";
+
+    public static final String EN_SAMPLINGSURFACE = "SamplingSurface";
+
+    public static final String FT_SAMPLINGPOINT = NS_SA_PREFIX + ":" + EN_SAMPLINGPOINT;
+
+    public static final String FT_SAMPLINGSURFACE = NS_SA_PREFIX + ":" + EN_SAMPLINGSURFACE;
 }

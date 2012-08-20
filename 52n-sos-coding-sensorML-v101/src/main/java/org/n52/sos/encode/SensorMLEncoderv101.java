@@ -1,8 +1,11 @@
 package org.n52.sos.encode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -68,6 +71,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweObservableProperty;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -79,6 +83,8 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SensorMLEncoderv101.class);
 
     private List<EncoderKeyType> encoderKeyTypes;
+    
+    private Set<String> supportedProcedureDescriptionFormats;
 
     public SensorMLEncoderv101() {
         encoderKeyTypes = new ArrayList<EncoderKeyType>();
@@ -89,6 +95,10 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
             builder.append(", ");
         }
         builder.delete(builder.lastIndexOf(", "), builder.length());
+        
+        supportedProcedureDescriptionFormats = new HashSet<String>(0); 
+        supportedProcedureDescriptionFormats.add(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
+        
         LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
     }
 
@@ -108,6 +118,14 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
             return createSensorDescription((AbstractSensorML) response);
         }
         return null;
+    }
+    
+    
+    @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        Map<SupportedTypeKey, Set<String>> map = new HashMap<SupportedTypeKey, Set<String>>();
+        map.put(SupportedTypeKey.ProcedureDescriptionFormat, supportedProcedureDescriptionFormats);
+        return map;
     }
 
     /**
@@ -178,8 +196,11 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
     }
 
     private XmlObject createSensorMLDescription(SensorML sensorDesc) {
-        // TODO Auto-generated method stub
-        return null;
+        SensorMLDocument sensorMLDoc = SensorMLDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        net.opengis.sensorML.x101.SensorMLDocument.SensorML sensorML = sensorMLDoc.addNewSensorML();
+        sensorML.setVersion(SensorMLConstants.VERSION_V101);
+        // TODO: set all other elements
+        return sensorMLDoc;
     }
 
     private XmlObject createProcessDescription(AbstractProcess sensorDesc) throws OwsExceptionReport {
@@ -336,6 +357,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
 
     /**
      * Creates the capabilities section of the SensorML description.
+     * @param oldCcapabilities 
      * 
      * @param xbCapabilities
      *            Xml capabilities object
@@ -477,6 +499,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
      *            Xml components object
      * @param sosComponents
      *            SOS SWE representation.
+     * @param components 
      * @throws OwsExceptionReport
      */
     private Components createComponents(List<SosSMLComponent> sosComponents) throws OwsExceptionReport {
@@ -720,4 +743,10 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
         }
         return SensorMLConstants.ABSTRACT_PROCESS_QNAME;
     }
+
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
+    }
+
 }

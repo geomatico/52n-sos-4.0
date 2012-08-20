@@ -37,8 +37,8 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorML;
 
 /**
- * Interface for a response encoder 
- *
+ * Interface for a response encoder
+ * 
  */
 public interface ISosResponseEncoder {
 
@@ -69,7 +69,8 @@ public interface ISosResponseEncoder {
      * @throws OwsExceptionReport
      */
     public XmlObject createResultRespDoc(List<SosObservation> sosObs) throws OwsExceptionReport;
-    
-    public XmlObject createDescribeSensorResponse(SensorML sensorDesc, Collection<String> parentProcedureIds, Map<String,SensorML> childProcedureIds) throws OwsExceptionReport;
+
+    public XmlObject createDescribeSensorResponse(SensorML sensorDesc, Collection<String> parentProcedureIds,
+            Map<String, SensorML> childProcedureIds) throws OwsExceptionReport;
 
 }

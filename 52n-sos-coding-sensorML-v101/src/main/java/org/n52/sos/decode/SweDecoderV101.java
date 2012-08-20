@@ -29,23 +29,30 @@
 package org.n52.sos.decode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.opengis.swe.x101.AnyScalarPropertyType;
 import net.opengis.swe.x101.CountDocument.Count;
+import net.opengis.swe.x101.CountRangeDocument.CountRange;
 import net.opengis.swe.x101.DataArrayDocument;
 import net.opengis.swe.x101.DataComponentPropertyType;
 import net.opengis.swe.x101.ObservablePropertyDocument.ObservableProperty;
 import net.opengis.swe.x101.PositionType;
 import net.opengis.swe.x101.QuantityDocument.Quantity;
+import net.opengis.swe.x101.QuantityRangeDocument.QuantityRange;
 import net.opengis.swe.x101.TextDocument.Text;
+import net.opengis.swe.x101.TimeDocument.Time;
+import net.opengis.swe.x101.TimeRangeDocument.TimeRange;
 import net.opengis.swe.x101.VectorType.Coordinate;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
+import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
 import org.n52.sos.ogc.swe.SosSweDataArray;
@@ -54,6 +61,8 @@ import org.n52.sos.ogc.swe.simpleType.ISosSweSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuality;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +78,7 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
 
     public SweDecoderV101() {
         decoderKeyTypes = new ArrayList<DecoderKeyType>();
-        decoderKeyTypes.add(new DecoderKeyType(SensorMLConstants.NS_SML));
+        decoderKeyTypes.add(new DecoderKeyType(SWEConstants.NS_SWE));
         StringBuilder builder = new StringBuilder();
         for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
             builder.append(decoderKeyType.toString());
@@ -104,20 +113,27 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
             return parseCoordinates((Coordinate[]) element);
         } else if (element instanceof AnyScalarPropertyType[]) {
             return parseSimpleDataRecordFieldArray((AnyScalarPropertyType[]) element);
+        } else {
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("The requested element");
+            if (element instanceof XmlObject) {
+                exceptionText.append(" '");
+                exceptionText.append(((XmlObject) element).getDomNode().getLocalName());
+                exceptionText.append("' ");
+            }
+            exceptionText.append("is not supported by this server!");
+            LOGGER.debug(exceptionText.toString());
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
         }
-        return null;
+    }
+
+    @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return new HashMap<SupportedTypeKey, Set<String>>(0);
     }
 
     private SosSweDataArray parseSweDataArray(DataArrayDocument xbDataArray) throws OwsExceptionReport {
-        if (xbDataArray instanceof DataArrayDocument) {
-
-        } else {
-            OwsExceptionReport se = new OwsExceptionReport();
-            se.addCodedException(OwsExceptionCode.InvalidParameterValue, "Observation-Result",
-                    "Error when parsing the SweDataArray: It is not of type DataArrayDocument");
-            LOGGER.error("Error when parsing the SweDataArray: It is not of type DataArrayDocument");
-            throw se;
-        }
+        // TODO parse DataArray;
         return null;
     }
 
@@ -126,62 +142,59 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         List<SosSweField> sosFields = new ArrayList<SosSweField>();
         for (DataComponentPropertyType xbField : fieldArray) {
             if (xbField.isSetBoolean()) {
-                OwsExceptionReport se = new OwsExceptionReport();
-                se.addCodedException(OwsExceptionCode.InvalidParameterValue, "Observation-Result",
-                        "Error when parsing the DataRecordFieldArray: It must not be of type Boolean");
-                LOGGER.error("Error when parsing the DataRecordFieldArray: It must not be of type Boolean");
-                throw se;
-            }
-            if (xbField.isSetBoolean()) {
-                OwsExceptionReport se = new OwsExceptionReport();
-                se.addCodedException(OwsExceptionCode.InvalidParameterValue, "Observation-Result",
-                        "Error when parsing the DataRecordFieldArray: It must not be of type Boolean");
-                LOGGER.error("Error when parsing the DataRecordFieldArray: It must not be of type Boolean");
-                throw se;
-            }
-            if (xbField.isSetCategory()) {
-                OwsExceptionReport se = new OwsExceptionReport();
-                se.addCodedException(OwsExceptionCode.InvalidParameterValue, "Observation-Result",
-                        "Error when parsing the DataRecordFieldArray: It must not be of type Category");
-                LOGGER.error("Error when parsing the DataRecordFieldArray: It must not be of type Category");
-                throw se;
-            }
-            if (xbField.isSetCount()) {
-                OwsExceptionReport se = new OwsExceptionReport();
-                se.addCodedException(OwsExceptionCode.InvalidParameterValue, "Observation-Result",
-                        "Error when parsing the DataRecordFieldArray: It must not be of type Count");
-                LOGGER.error("Error when parsing the DataRecordFieldArray: It must not be of type Count");
-                throw se;
-            }
-            if (xbField.isSetCountRange()) {
-                OwsExceptionReport se = new OwsExceptionReport();
-                se.addCodedException(OwsExceptionCode.InvalidParameterValue, "Observation-Result",
-                        "Error when parsing the DataRecordFieldArray: It must not be of type CountRange");
-                LOGGER.error("Error when parsing the DataRecordFieldArray: It must not be of type Count Range");
-                throw se;
-            }
-            if (xbField.isSetQuantity()) {
+                sosFields.add(new SosSweField(xbField.getName(), parseBoolean(xbField.getBoolean())));
+            } else if (xbField.isSetCategory()) {
+                sosFields.add(new SosSweField(xbField.getName(), parseCategory(xbField.getCategory())));
+            } else if (xbField.isSetCount()) {
+                sosFields.add(new SosSweField(xbField.getName(), parseCount(xbField.getCount())));
+            } else if (xbField.isSetCountRange()) {
+                sosFields.add(new SosSweField(xbField.getName(), parseCountRange(xbField.getCountRange())));
+            } else if (xbField.isSetQuantity()) {
                 sosFields.add(new SosSweField(xbField.getName(), parseQuantity(xbField.getQuantity())));
-            }
-            if (xbField.isSetQuantityRange()) {
-                OwsExceptionReport se = new OwsExceptionReport();
-                se.addCodedException(OwsExceptionCode.InvalidParameterValue, "Observation-Result",
-                        "Error when parsing the DataRecordFieldArray: It must not be of type Quantity Range");
-                LOGGER.error("Error when parsing the DataRecordFieldArray: It must not be of type Quantity Range");
-                throw se;
-            }
-            if (xbField.isSetText()) {
+            } else if (xbField.isSetQuantityRange()) {
+                sosFields.add(new SosSweField(xbField.getName(), parseQuantityRange(xbField.getQuantityRange())));
+            } else if (xbField.isSetText()) {
                 sosFields.add(new SosSweField(xbField.getName(), parseText(xbField.getText())));
-            }
-            if (xbField.isSetTime()) {
-                OwsExceptionReport se = new OwsExceptionReport();
-                se.addCodedException(OwsExceptionCode.InvalidParameterValue, "Observation-Result",
-                        "Error when parsing the DataRecordFieldArray: It must not be of type Time");
-                LOGGER.error("Error when parsing the DataRecordFieldArray: It must not be of type Time");
-                throw se;
+            } else if (xbField.isSetTime()) {
+                sosFields.add(new SosSweField(xbField.getName(), parseTime(xbField.getTime())));
+            } else if (xbField.isSetTimeRange()) {
+                sosFields.add(new SosSweField(xbField.getName(), parseTimeRange(xbField.getTimeRange())));
             }
         }
         return sosFields;
+    }
+
+    private ISosSweSimpleType parseBoolean(XmlObject xbBoolean) throws OwsExceptionReport {
+        String exceptionText = "The Boolean is not supported";
+        LOGGER.debug(exceptionText);
+        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+    }
+
+    private ISosSweSimpleType parseCategory(XmlObject xbCategory) throws OwsExceptionReport {
+        String exceptionText = "The Category is not supported";
+        LOGGER.debug(exceptionText);
+        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+    }
+
+    private ISosSweSimpleType parseCount(XmlObject xbCount) throws OwsExceptionReport {
+        String exceptionText = "The Count is not supported";
+        LOGGER.debug(exceptionText);
+        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+    }
+
+    private ISosSweSimpleType parseCountRange(CountRange countRange) throws OwsExceptionReport {
+        String exceptionText = "The CountRange is not supported";
+        LOGGER.debug(exceptionText);
+        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+    }
+
+    private ISosSweSimpleType parseObservableProperty(ObservableProperty observableProperty) {
+        ObservableProperty xbObsProp = (ObservableProperty) observableProperty;
+        SosSweText sosObservableProperty = new SosSweText();
+        if (xbObsProp.isSetDefinition()) {
+            sosObservableProperty.setDefinition(xbObsProp.getDefinition());
+        }
+        return sosObservableProperty;
     }
 
     private ISosSweSimpleType parseQuantity(Quantity xbQuantity) {
@@ -207,6 +220,12 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return sosQuantity;
     }
 
+    private ISosSweSimpleType parseQuantityRange(QuantityRange quantityRange) throws OwsExceptionReport {
+        String exceptionText = "The QuantityRange is not supported";
+        LOGGER.debug(exceptionText);
+        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+    }
+
     private ISosSweSimpleType parseText(Text xbText) {
         SosSweText sosText = new SosSweText();
         if (xbText.isSetDefinition()) {
@@ -221,17 +240,20 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return sosText;
     }
 
-    private SosSweQuality parseQuality(XmlObject[] qualityArray) {
-        return new SosSweQuality();
+    private ISosSweSimpleType parseTime(Time time) throws OwsExceptionReport {
+        String exceptionText = "The Time is not supported";
+        LOGGER.debug(exceptionText);
+        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private ISosSweSimpleType parseObservableProperty(ObservableProperty observableProperty) {
-        ObservableProperty xbObsProp = (ObservableProperty) observableProperty;
-        SosSweText sosObservableProperty = new SosSweText();
-        if (xbObsProp.isSetDefinition()) {
-            sosObservableProperty.setDefinition(xbObsProp.getDefinition());
-        }
-        return sosObservableProperty;
+    private ISosSweSimpleType parseTimeRange(TimeRange timeRange) throws OwsExceptionReport {
+        String exceptionText = "The TimeRange is not supported";
+        LOGGER.debug(exceptionText);
+        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+    }
+
+    private SosSweQuality parseQuality(XmlObject[] qualityArray) {
+        return new SosSweQuality();
     }
 
     private SosSMLPosition parsePosition(PositionType position) throws OwsExceptionReport {
@@ -254,11 +276,9 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
                 sosCoordinates.add(new SosSweCoordinate(checkCoordinateName(xbCoordinate.getName()),
                         parseQuantity(xbCoordinate.getQuantity())));
             } else {
-                OwsExceptionReport se = new OwsExceptionReport();
-                se.addCodedException(OwsExceptionCode.InvalidParameterValue, "SensorML - Position",
-                        "Error when parsing the DataRecordFieldArray of coordinates: It must not be of type Quantity");
-                LOGGER.error("Error when parsing the DataRecordFieldArray of coordinates: It must not be of type Quantity");
-                throw se;
+                String exceptionText = "Error when parsing the Coordinates of Position: It must be of type Quantity!";
+                LOGGER.debug(exceptionText);
+                throw Util4Exceptions.createInvalidParameterValueException("Position", exceptionText);
             }
         }
         return null;
@@ -272,11 +292,9 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         } else if (name.equals(SweCoordinateName.altitude.name())) {
             return SweCoordinateName.altitude;
         } else {
-            OwsExceptionReport se = new OwsExceptionReport();
-            se.addCodedException(OwsExceptionCode.InvalidParameterValue, "SensorML - Position",
-                    "The coordinate name is neighter 'easting' nor 'northing' nor 'altitude'");
-            LOGGER.error("The coordinate name is neighter 'easting' nor 'northing' nor 'altitude'");
-            throw se;
+            String exceptionText = "The coordinate name is neighter 'easting' nor 'northing' nor 'altitude'!";
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createInvalidParameterValueException("Position", exceptionText);
         }
     }
 
@@ -285,52 +303,25 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         List<SosSweField> sosFields = new ArrayList<SosSweField>();
         for (AnyScalarPropertyType xbField : (AnyScalarPropertyType[]) fieldArray) {
             if (xbField.isSetBoolean()) {
-                OwsExceptionReport se = new OwsExceptionReport();
-                se.addCodedException(OwsExceptionCode.InvalidParameterValue, "Observation-Result",
-                        "Error when parsing the DataRecordFieldArray: It must not be of type Boolean");
-                LOGGER.error("Error when parsing the DataRecordFieldArray: It must not be of type Boolean");
-                throw se;
-            }
-            if (xbField.isSetBoolean()) {
-                OwsExceptionReport se = new OwsExceptionReport();
-                se.addCodedException(OwsExceptionCode.InvalidParameterValue, "Observation-Result",
-                        "Error when parsing the DataRecordFieldArray: It must not be of type Boolean");
-                LOGGER.error("Error when parsing the DataRecordFieldArray: It must not be of type Boolean");
-                throw se;
-            }
-            if (xbField.isSetCategory()) {
-                OwsExceptionReport se = new OwsExceptionReport();
-                se.addCodedException(OwsExceptionCode.InvalidParameterValue, "Observation-Result",
-                        "Error when parsing the DataRecordFieldArray: It must not be of type Category");
-                LOGGER.error("Error when parsing the DataRecordFieldArray: It must not be of type Category");
-                throw se;
-            }
-            if (xbField.isSetCount()) {
-                OwsExceptionReport se = new OwsExceptionReport();
-                se.addCodedException(OwsExceptionCode.InvalidParameterValue, "Observation-Result",
-                        "Error when parsing the DataRecordFieldArray: It must not be of type Count");
-                LOGGER.error("Error when parsing the DataRecordFieldArray: It must not be of type Count");
-                throw se;
-            }
-            if (xbField.isSetQuantity()) {
+                sosFields.add(new SosSweField(xbField.getName(), parseBoolean(xbField.getBoolean())));
+            } else if (xbField.isSetCategory()) {
+                sosFields.add(new SosSweField(xbField.getName(), parseCategory(xbField.getCategory())));
+            } else if (xbField.isSetCount()) {
+                sosFields.add(new SosSweField(xbField.getName(), parseCount(xbField.getCount())));
+            } else if (xbField.isSetQuantity()) {
                 sosFields.add(new SosSweField(xbField.getName(), parseQuantity(xbField.getQuantity())));
-            }
-            if (xbField.isSetText()) {
+            } else if (xbField.isSetText()) {
                 sosFields.add(new SosSweField(xbField.getName(), parseText(xbField.getText())));
-            }
-            if (xbField.isSetTime()) {
-                OwsExceptionReport se = new OwsExceptionReport();
-                se.addCodedException(OwsExceptionCode.InvalidParameterValue, "Observation-Result",
-                        "Error when parsing the DataRecordFieldArray: It must not be of type Time");
-                LOGGER.error("Error when parsing the DataRecordFieldArray: It must not be of type Time");
-                throw se;
+            } else if (xbField.isSetTime()) {
+                sosFields.add(new SosSweField(xbField.getName(), parseTime(xbField.getTime())));
             }
         }
         return sosFields;
     }
 
-    private ISosSweSimpleType parseCount(XmlObject xbCount) {
-        return null;
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
     }
 
 }

@@ -86,9 +86,12 @@ public interface IGMLEncoder {
 
     /**
      * Creates a XML representation of a TimePeriod.
-     * @param timePeriod SOS time period
+     * 
+     * @param timePeriod
+     *            SOS time period
      * @return XML representation
-     * @throws OwsExceptionReport if an error occurs
+     * @throws OwsExceptionReport
+     *             if an error occurs
      */
     public XmlObject createTimePeriodDocument(TimePeriod timePeriod) throws OwsExceptionReport;
 

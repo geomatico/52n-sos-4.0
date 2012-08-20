@@ -30,6 +30,7 @@ package org.n52.sos.ds;
 
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.IExtension;
 
 /**
  * Interface for all SOS operation DAOs
@@ -37,25 +38,27 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
  */
 public interface IOperationDAO {
 
-	/**
-	 * Get the SOS operation name this DAO supports
-	 * 
-	 * @return The supported SOS operation name
-	 */
-	public abstract String getOperationName();
+    /**
+     * Get the SOS operation name this DAO supports
+     * 
+     * @return The supported SOS operation name
+     */
+    public String getOperationName();
 
-	/**
-	 * Get the OperationsMetadata of the supported SOS operation for the
-	 * capabilities
-	 * 
-	 * @param version
-	 *            SOS version
-	 * @param connection
-	 *            Data source connection
-	 * @return OperationsMetadata for the operation
-	 * @throws OwsExceptionReport
-	 *             If an error occurs.
-	 */
-	public abstract OWSOperation getOperationsMetadata(String service, String version,
-			Object connection) throws OwsExceptionReport;
+    /**
+     * Get the OperationsMetadata of the supported SOS operation for the
+     * capabilities
+     * 
+     * @param version
+     *            SOS version
+     * @param connection
+     *            Data source connection
+     * @return OperationsMetadata for the operation
+     * @throws OwsExceptionReport
+     *             If an error occurs.
+     */
+    public OWSOperation getOperationsMetadata(String service, String version, Object connection)
+            throws OwsExceptionReport;
+    
+    public IExtension getExtension(Object connection) throws OwsExceptionReport;
 }

@@ -28,9 +28,6 @@
 
 package org.n52.sos.request;
 
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.operator.RequestOperatorKeyType;
-
 /**
  * Parsed SOS request, used for GetResult requests
  */

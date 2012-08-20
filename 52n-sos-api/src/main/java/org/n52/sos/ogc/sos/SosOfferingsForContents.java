@@ -53,15 +53,17 @@ public class SosOfferingsForContents {
      */
     private String offeringName;
 
-    /**
-     * Envelope of the offering
-     */
-    private Envelope boundeBy;
-
-    /**
-     * SRS id of the offerng
-     */
-    private int srid;
+    private SosEnvelope observedArea;
+    
+//    /**
+//     * Envelope of the offering
+//     */
+//    private Envelope boundeBy;
+//
+//    /**
+//     * SRS id of the offerng
+//     */
+//    private int srid;
 
     /**
      * All observableProperties contained in the offering
@@ -107,6 +109,8 @@ public class SosOfferingsForContents {
      * All observation types contained in the offering
      */
     private Collection<String> observationTypes;
+    
+    private Collection<String> featureOfInterestTypes;
 
     /**
      * All observation result types contained in the offering
@@ -151,33 +155,33 @@ public class SosOfferingsForContents {
         this.offeringName = offeringName;
     }
 
-    /**
-     * @return
-     */
-    public Envelope getBoundeBy() {
-        return boundeBy;
-    }
-
-    /**
-     * @param boundeBy
-     */
-    public void setBoundeBy(Envelope boundeBy) {
-        this.boundeBy = boundeBy;
-    }
-
-    /**
-     * @return
-     */
-    public int getSrid() {
-        return srid;
-    }
-
-    /**
-     * @param srid
-     */
-    public void setSrid(int srid) {
-        this.srid = srid;
-    }
+//    /**
+//     * @return
+//     */
+//    public Envelope getBoundeBy() {
+//        return boundeBy;
+//    }
+//
+//    /**
+//     * @param boundeBy
+//     */
+//    public void setBoundeBy(Envelope boundeBy) {
+//        this.boundeBy = boundeBy;
+//    }
+//
+//    /**
+//     * @return
+//     */
+//    public int getSrid() {
+//        return srid;
+//    }
+//
+//    /**
+//     * @param srid
+//     */
+//    public void setSrid(int srid) {
+//        this.srid = srid;
+//    }
 
     /**
      * @return
@@ -349,4 +353,19 @@ public class SosOfferingsForContents {
         this.responseModes = responseModes;
     }
 
+    public SosEnvelope getObservedArea() {
+        return observedArea;
+    }
+
+    public void setObservedArea(SosEnvelope observedArea) {
+        this.observedArea = observedArea;
+    }
+
+    public Collection<String> getFeatureOfInterestTypes() {
+        return featureOfInterestTypes;
+    }
+
+    public void setFeatureOfInterestTypes(Collection<String> featureOfInterestTypes) {
+        this.featureOfInterestTypes = featureOfInterestTypes;
+    }
 }

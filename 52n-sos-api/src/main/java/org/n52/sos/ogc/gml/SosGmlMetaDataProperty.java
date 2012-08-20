@@ -29,11 +29,11 @@
 package org.n52.sos.ogc.gml;
 
 public class SosGmlMetaDataProperty {
-    
+
     private String title;
-    
+
     private String role;
-    
+
     private String href;
 
     public void setTitle(String title) {
@@ -59,5 +59,5 @@ public class SosGmlMetaDataProperty {
     public String getHref() {
         return href;
     }
-    
+
 }

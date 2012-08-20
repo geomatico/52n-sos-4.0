@@ -35,14 +35,14 @@ import org.n52.sos.service.operator.ServiceOperatorKeyType;
  * 
  */
 public abstract class AbstractServiceRequest {
-    
+
     protected ServiceOperatorKeyType[] serviceOperatorKeyTypes;
-    
+
     /** service parameter */
     private String service;
 
     private String version;
-    
+
     /**
      * @return the service
      */
@@ -77,8 +77,8 @@ public abstract class AbstractServiceRequest {
      * @return the operationName
      */
     public abstract String getOperationName();
-    
-    public ServiceOperatorKeyType[] getServiceOperatorKeyType()  {
+
+    public ServiceOperatorKeyType[] getServiceOperatorKeyType() {
         if (serviceOperatorKeyTypes == null) {
             serviceOperatorKeyTypes = new ServiceOperatorKeyType[1];
             serviceOperatorKeyTypes[0] = new ServiceOperatorKeyType(service, version);

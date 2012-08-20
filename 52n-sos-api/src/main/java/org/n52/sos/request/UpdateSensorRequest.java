@@ -29,32 +29,29 @@
 package org.n52.sos.request;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import org.n52.sos.ogc.om.AbstractSosPhenomenon;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosProcedureDescription;
 
 /**
  * class represents a updateSensor request
  * 
  */
 public class UpdateSensorRequest extends AbstractServiceRequest {
+
+    private final String operationName = Sos2Constants.Operations.UpdateSensorDescription.name();
+
+    private String procedureIdentifier;
     
-    private final String operationName = Sos2Constants.Operations.UpdateSensor
-            .name();
-
-    private String procedureID;
-
-    /** SensorML system, which should be updated */
-    private SensorML system;
+    private String procedureDescriptionFormat;
 
     /** String representing xml sensor description */
-    private String sensorDescription;
+    private String procedureXmlDescription;
 
     /** SOS SensorML description */
-    private List<SensorML> sosSensorML;
+    private List<SosProcedureDescription> procedureDescriptions;
 
     /**
      * default constructor
@@ -64,100 +61,54 @@ public class UpdateSensorRequest extends AbstractServiceRequest {
     }
 
     /**
-     * constructor
-     * 
-     * @param systemp
-     *            sensor system, which should be updated
-     * @param sosComponents
-     *            offering ID, for which the sensor, which should be updated,
-     *            offers values for
-     * @param sensorDescriptionp
-     *            offering ID, for which the sensor, which should be updated,
-     *            offers values for
+     * @return the procedureIdentifier
      */
-    public UpdateSensorRequest(String procedureID, Collection<AbstractSosPhenomenon> sosComponents,
-            String sensorDescriptionp) {
-        this.procedureID = procedureID;
-        this.sensorDescription = sensorDescriptionp;
+    public String getProcedureIdentifier() {
+        return procedureIdentifier;
     }
 
     /**
-     * @return the procedureID
+     * @param procedureIdentifier
+     *            the procedureIdentifier to set
      */
-    public String getProcedureID() {
-        return procedureID;
+    public void setProcedureIdentifier(String procedureIdentifier) {
+        this.procedureIdentifier = procedureIdentifier;
     }
 
-    /**
-     * @param procedureID
-     *            the procedureID to set
-     */
-    public void setProcedureID(String procedureID) {
-        this.procedureID = procedureID;
+
+    public String getProcedureDescriptionFormat() {
+        return procedureDescriptionFormat;
     }
 
-    /**
-     * @return the sensorDescription
-     */
-    public String getSensorDescription() {
-        return sensorDescription;
+    public void setProcedureDescriptionFormat(String procedureDescriptionFormat) {
+        this.procedureDescriptionFormat = procedureDescriptionFormat;
     }
 
-    /**
-     * @param sensorDescription
-     *            the sensorDescription to set
-     */
-    public void setSensorDescription(String sensorDescription) {
-        this.sensorDescription = sensorDescription;
+    public String getProcedureXmlDescription() {
+        return procedureXmlDescription;
     }
 
-//    /**
-//     * @return the system
-//     */
-//    public SensorSystem getSystem() {
-//        return system;
-//    }
-//
-//    /**
-//     * @param system
-//     *            the system to set
-//     */
-//    public void setSystem(SensorSystem system) {
-//        this.system = system;
-//    }
-
-    /**
-     * Get the sensor description contained in request.
-     * 
-     * @return the sosSensorML
-     */
-    public List<SensorML> getSosSensorML() {
-        return sosSensorML;
+    public void setProcedureXmlDescription(String procedureXmlDescription) {
+        this.procedureXmlDescription = procedureXmlDescription;
     }
 
-    /**
-     * Set the sensor description contained in request.
-     * 
-     * @param sosSensorML
-     *            the sosSensorML to set
-     */
-    public void setSosSensorML(List<SensorML> sosSensorML) {
-        this.sosSensorML.addAll(sosSensorML);
+    public List<SosProcedureDescription> getProcedureDescriptions() {
+        return procedureDescriptions;
     }
 
-    /**
-     * @param sosSensorML
-     */
-    public void addSosSensorML(SensorML sosSensorML) {
-        if (this.sosSensorML == null) {
-            this.sosSensorML = new ArrayList<SensorML>();
-        }
-        this.sosSensorML.add(sosSensorML);
+    public void setProcedureDescriptions(List<SosProcedureDescription> procedureDescriptions) {
+        this.procedureDescriptions = procedureDescriptions;
+    }
+
+    public void addProcedureDescriptionString(SosProcedureDescription procedureDescription) {
+       if (procedureDescriptions == null) {
+           procedureDescriptions = new ArrayList<SosProcedureDescription>();
+       }
+       procedureDescriptions.add(procedureDescription);
     }
 
     @Override
     public String getOperationName() {
         return operationName;
     }
-
 }

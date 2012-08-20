@@ -2,8 +2,10 @@ package org.n52.sos.encode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -19,6 +21,7 @@ import net.opengis.samplingSpatial.x20.ShapeType;
 
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
+import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
@@ -27,6 +30,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -38,7 +42,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class SamplingEncoderv20 implements IEncoder<XmlObject, Object> {
+public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeature> {
 
     /**
      * logger, used for logging while initializing the constants from config
@@ -47,6 +51,8 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SamplingEncoderv20.class);
 
     private List<EncoderKeyType> encoderKeyTypes;
+    
+    private Set<String> supportedFeatureTypes;
 
     public SamplingEncoderv20() {
         encoderKeyTypes = new ArrayList<EncoderKeyType>();
@@ -58,6 +64,13 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, Object> {
             builder.append(", ");
         }
         builder.delete(builder.lastIndexOf(", "), builder.length());
+
+        supportedFeatureTypes = new HashSet<String>(0);
+        supportedFeatureTypes.add(OGCConstants.UNKNOWN);
+        supportedFeatureTypes.add(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_POINT);
+        supportedFeatureTypes.add(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_CURVE);
+        supportedFeatureTypes.add(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_SURFACE);
+        
         LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
     }
 
@@ -67,19 +80,35 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, Object> {
     }
 
     @Override
-    public XmlObject encode(Object response) throws OwsExceptionReport {
-        // TODO Auto-generated method stub
-        return null;
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        Map<SupportedTypeKey, Set<String>> map = new HashMap<SupportedTypeKey, Set<String>>();
+        map.put(SupportedTypeKey.FeatureType, supportedFeatureTypes);
+        return map;
+    }
+    
+    @Override
+    public Set<String> getConformanceClasses() {
+        Set<String> conformanceClasses = new HashSet<String>(0);
+        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/spatialSampling");
+        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/samplingPoint");
+        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/samplingCurve");
+        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/samplingSurface");
+        return conformanceClasses;
     }
 
     @Override
-    public XmlObject encode(Object response, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+    public XmlObject encode(SosAbstractFeature response) throws OwsExceptionReport {
+        return encode(response, null);
+    }
+
+    @Override
+    public XmlObject encode(SosAbstractFeature response, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         if (response instanceof SosAbstractFeature) {
             return createFeature((SosAbstractFeature) response, additionalValues.get(HelperValues.GMLID));
         }
         return null;
     }
-
+    
     private XmlObject createFeature(SosAbstractFeature absFeature, String gmlID) throws OwsExceptionReport {
         // SFSpatialSamplingFeatureDocument xbSampFeatDoc =
         // SFSpatialSamplingFeatureDocument.Factory
@@ -127,8 +156,10 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, Object> {
                 additionalValues.put(HelperValues.GMLID, gmlID);
                 XmlObject xmlObject = (XmlObject) encoder.encode(sampFeat.getGeometry(), additionalValues);
                 if (xmlObject instanceof AbstractGeometryType) {
-                    XmlObject substitution = xbShape.addNewAbstractGeometry().substitute(getQnameForGeometry(sampFeat.getGeometry()), xmlObject.schemaType());
-                    substitution.set((AbstractGeometryType)xmlObject);
+                    XmlObject substitution =
+                            xbShape.addNewAbstractGeometry().substitute(getQnameForGeometry(sampFeat.getGeometry()),
+                                    xmlObject.schemaType());
+                    substitution.set((AbstractGeometryType) xmlObject);
                 } else {
                     // TODO: Exception
                 }

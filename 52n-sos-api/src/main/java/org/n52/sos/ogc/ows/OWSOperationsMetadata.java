@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class OWSOperationsMetadata {
-    
+
     private Collection<OWSOperation> operations;
-    
+
     private Map<String, Set<String>> commonValues;
 
     public Collection<OWSOperation> getOperations() {
@@ -28,14 +28,14 @@ public class OWSOperationsMetadata {
     public void setCommonValues(Map<String, Set<String>> commonValues) {
         this.commonValues = commonValues;
     }
-    
+
     public void addOperation(OWSOperation operation) {
-        if(operations == null) {
+        if (operations == null) {
             operations = new ArrayList<OWSOperation>();
         }
         operations.add(operation);
     }
-    
+
     public void addCommonValues(String name, Set<String> values) {
         if (commonValues == null) {
             commonValues = new HashMap<String, Set<String>>();
@@ -45,9 +45,9 @@ public class OWSOperationsMetadata {
         } else {
             commonValues.put(name, values);
         }
-        
+
     }
-    
+
     public void addCommonValue(String name, String value) {
         if (commonValues == null) {
             commonValues = new HashMap<String, Set<String>>();
@@ -59,7 +59,7 @@ public class OWSOperationsMetadata {
             values.add(value);
             commonValues.put(name, values);
         }
-        
+
     }
 
 }

@@ -38,7 +38,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.SosConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +51,7 @@ public class KvpHelper {
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(KvpHelper.class);
-    
+
     public static Map<String, String> getKvpParameterValueMap(HttpServletRequest req) {
         Map<String, String> kvp = new HashMap<String, String>();
         Enumeration<?> parameterNames = req.getParameterNames();
@@ -63,32 +62,29 @@ public class KvpHelper {
         }
         return kvp;
     }
-    
-    public static String checkParameterSingleValue(String parameterValue, String parameterName) throws OwsExceptionReport {
-        if (!parameterValue.isEmpty()
-                && parameterValue.split(",").length == 1) {
+
+    public static String checkParameterSingleValue(String parameterValue, String parameterName)
+            throws OwsExceptionReport {
+        if (!parameterValue.isEmpty() && parameterValue.split(",").length == 1) {
             return parameterValue;
         } else {
             OwsExceptionReport owse = new OwsExceptionReport();
-            owse.addCodedException(OwsExceptionCode.InvalidParameterValue,
-                    parameterName,
-                    "The value of parameter " + parameterName + " ("
-                            + parameterValue + ") is invalid.");
+            owse.addCodedException(OwsExceptionCode.InvalidParameterValue, parameterName, "The value of parameter "
+                    + parameterName + " (" + parameterValue + ") is invalid.");
             throw owse;
         }
     }
-    
-    public static List<String> checkParameterMultipleValues(String parameterValues, String parameterName) throws OwsExceptionReport {
+
+    public static List<String> checkParameterMultipleValues(String parameterValues, String parameterName)
+            throws OwsExceptionReport {
         if (!parameterValues.isEmpty()) {
             return Arrays.asList(parameterValues.split(","));
         } else {
             OwsExceptionReport owse = new OwsExceptionReport();
-            owse.addCodedException(OwsExceptionCode.InvalidParameterValue,
-                    parameterName,
-                    "The value of parameter " + parameterName + " ("
-                            + parameterValues + ") is invalid.");
+            owse.addCodedException(OwsExceptionCode.InvalidParameterValue, parameterName, "The value of parameter "
+                    + parameterName + " (" + parameterValues + ") is invalid.");
             throw owse;
         }
     }
-      
+
 }

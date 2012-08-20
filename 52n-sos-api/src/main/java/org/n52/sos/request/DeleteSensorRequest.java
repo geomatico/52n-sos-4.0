@@ -31,28 +31,28 @@ package org.n52.sos.request;
 import org.n52.sos.ogc.sos.Sos2Constants;
 
 public class DeleteSensorRequest extends AbstractServiceRequest {
-    
-    private final String operationName = Sos2Constants.Operations.DeleteSensor
-            .name();
-    
-    private String procedureID;
-    
-    public DeleteSensorRequest (String procedureID) {
-        this.setProcedureID(procedureID);
+
+    private final String operationName = Sos2Constants.Operations.DeleteSensor.name();
+
+    private String procedureIdentifier;
+
+    public DeleteSensorRequest() {
+        // TODO Auto-generated constructor stub
     }
 
     /**
-     * @param procedureID the procedureID to set
+     * @param procedureIdentifier
+     *            the procedureIdentifier to set
      */
-    public void setProcedureID(String procedureID) {
-        this.procedureID = procedureID;
+    public void setProcedureIdentifier(String procedureIdentifier) {
+        this.procedureIdentifier = procedureIdentifier;
     }
 
     /**
-     * @return the procedureID
+     * @return the procedureIdentifier
      */
-    public String getProcedureID() {
-        return procedureID;
+    public String getProcedureIdentifier() {
+        return procedureIdentifier;
     }
 
     @Override

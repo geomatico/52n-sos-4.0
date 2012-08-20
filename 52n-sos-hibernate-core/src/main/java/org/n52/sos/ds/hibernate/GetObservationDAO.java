@@ -48,12 +48,14 @@ import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IGetObservationDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
+import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateResultUtilities;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OWSConstants.MinMax;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -165,7 +167,8 @@ public class GetObservationDAO implements IGetObservationDAO {
      * java.lang.Object)
      */
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Object connection) throws OwsExceptionReport {
+    public OWSOperation getOperationsMetadata(String service, String version, Object connection)
+            throws OwsExceptionReport {
         Session session = null;
         if (connection instanceof Session) {
             session = (Session) connection;
@@ -185,15 +188,15 @@ public class GetObservationDAO implements IGetObservationDAO {
         } else {
             dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
         }
-        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt, Configurator
-                .getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
+        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt,
+                Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set param srsName
         List<String> srsNameValues = new ArrayList<String>(1);
         srsNameValues.add(SosConstants.PARAMETER_ANY);
         opsMeta.addParameterValue(SosConstants.GetObservationParams.srsName.name(), srsNameValues);
         // set param offering
         opsMeta.addParameterValue(SosConstants.GetObservationParams.offering.name(), Configurator.getInstance()
-                .getCapsCacheController().getOfferings());
+                .getCapabilitiesCacheController().getOfferings());
         // set param eventTime
         String parameterName;
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
@@ -204,11 +207,11 @@ public class GetObservationDAO implements IGetObservationDAO {
         opsMeta.addParameterMinMaxMapValue(parameterName, getEventTime(session));
         // set param procedure
         opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), Configurator.getInstance()
-                .getCapsCacheController().getProcedures());
+                .getCapabilitiesCacheController().getProcedures());
         // set param observedProperty
         if (Configurator.getInstance().isShowFullOperationsMetadata4Observations()) {
             opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(), Configurator
-                    .getInstance().getCapsCacheController().getObservableProperties());
+                    .getInstance().getCapabilitiesCacheController().getObservableProperties());
         } else {
             List<String> phenomenonValues = new ArrayList<String>(1);
             phenomenonValues.add(SosConstants.PARAMETER_ANY);
@@ -216,8 +219,8 @@ public class GetObservationDAO implements IGetObservationDAO {
         }
         // set param foi
         Collection<String> featureIDs =
-                SosHelper.getFeatureIDs(Configurator.getInstance().getCapsCacheController()
-                        .getFeatureOfInterest(), version);
+                SosHelper.getFeatureIDs(Configurator.getInstance().getCapabilitiesCacheController().getFeatureOfInterest(),
+                        version);
         if (Configurator.getInstance().isShowFullOperationsMetadata4Observations()) {
             opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(), featureIDs);
         } else {
@@ -289,7 +292,7 @@ public class GetObservationDAO implements IGetObservationDAO {
                     response.setVersion(request.getVersion());
                     response.setResponseFormat(request.getResponseFormat());
                     response.setObservationCollection(HibernateResultUtilities.createSosObservationFromObservations(
-                          observations, sosRequest.getVersion(), session));
+                            observations, sosRequest.getVersion(), sosRequest.isSingleEncodedValues(), session));
                     return response;
                 }
             } catch (HibernateException he) {
@@ -378,6 +381,7 @@ public class GetObservationDAO implements IGetObservationDAO {
             String foiAlias = HibernateCriteriaQueryUtilities.addFeatureOfInterestAliasToMap(aliases, null);
             criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                     HibernateCriteriaQueryUtilities.getIdentifierParameter(foiAlias), new ArrayList<String>(foiIDs)));
+  
         }
         // ...
         List<Observation> observations =
@@ -729,6 +733,12 @@ public class GetObservationDAO implements IGetObservationDAO {
             opsMeta.addParameterValue(SosConstants.GetObservationParams.responseFormat.name(),
                     Arrays.asList(Sos2Constants.getResponseFormats()));
         }
+    }
+
+    @Override
+    public IExtension getExtension(Object connection) throws OwsExceptionReport {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

@@ -43,127 +43,124 @@ import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
  */
 public class FilterCapabilities {
 
-	/**
-	 * Spatial operands list
-	 */
-	private List<QName> spatialOperands;
+    /**
+     * Spatial operands list
+     */
+    private List<QName> spatialOperands;
 
-	/**
-	 * Spatial operators map
-	 */
-	private Map<SpatialOperator, List<QName>> spatialOperators;
+    /**
+     * Spatial operators map
+     */
+    private Map<SpatialOperator, List<QName>> spatialOperators;
 
-	/**
-	 * Temporal operands list
-	 */
-	private List<QName> temporalOperands;
+    /**
+     * Temporal operands list
+     */
+    private List<QName> temporalOperands;
 
-	/**
-	 * Temporal operators map
-	 */
-	private Map<TimeOperator, List<QName>> tempporalOperators;
+    /**
+     * Temporal operators map
+     */
+    private Map<TimeOperator, List<QName>> tempporalOperators;
 
-	/**
-	 * Comparison operators list
-	 */
-	private List<ComparisonOperator> comparisonOperators;
+    /**
+     * Comparison operators list
+     */
+    private List<ComparisonOperator> comparisonOperators;
 
-	/**
-	 * Get spatial operands
-	 * 
-	 * @return spatial operands
-	 */
-	public List<QName> getSpatialOperands() {
-		return spatialOperands;
-	}
+    /**
+     * Get spatial operands
+     * 
+     * @return spatial operands
+     */
+    public List<QName> getSpatialOperands() {
+        return spatialOperands;
+    }
 
-	/**
-	 * Set spatial operands
-	 * 
-	 * @param spatialOperands
-	 *            spatial operands
-	 */
-	public void setSpatialOperands(List<QName> spatialOperands) {
-		this.spatialOperands = spatialOperands;
-	}
+    /**
+     * Set spatial operands
+     * 
+     * @param spatialOperands
+     *            spatial operands
+     */
+    public void setSpatialOperands(List<QName> spatialOperands) {
+        this.spatialOperands = spatialOperands;
+    }
 
-	/**
-	 * Get spatial operators
-	 * 
-	 * @return spatial operators
-	 */
-	public Map<SpatialOperator, List<QName>> getSpatialOperators() {
-		return spatialOperators;
-	}
+    /**
+     * Get spatial operators
+     * 
+     * @return spatial operators
+     */
+    public Map<SpatialOperator, List<QName>> getSpatialOperators() {
+        return spatialOperators;
+    }
 
-	/**
-	 * Set spatial operators
-	 * 
-	 * @param spatialOperators
-	 *            spatial operators
-	 */
-	public void setSpatialOperators(
-			Map<SpatialOperator, List<QName>> spatialOperators) {
-		this.spatialOperators = spatialOperators;
-	}
+    /**
+     * Set spatial operators
+     * 
+     * @param spatialOperators
+     *            spatial operators
+     */
+    public void setSpatialOperators(Map<SpatialOperator, List<QName>> spatialOperators) {
+        this.spatialOperators = spatialOperators;
+    }
 
-	/**
-	 * Get temporal operands
-	 * 
-	 * @return temporal operands
-	 */
-	public List<QName> getTemporalOperands() {
-		return temporalOperands;
-	}
+    /**
+     * Get temporal operands
+     * 
+     * @return temporal operands
+     */
+    public List<QName> getTemporalOperands() {
+        return temporalOperands;
+    }
 
-	/**
-	 * Set temporal operands
-	 * 
-	 * @param temporalOperands
-	 *            temporal operands
-	 */
-	public void setTemporalOperands(List<QName> temporalOperands) {
-		this.temporalOperands = temporalOperands;
-	}
+    /**
+     * Set temporal operands
+     * 
+     * @param temporalOperands
+     *            temporal operands
+     */
+    public void setTemporalOperands(List<QName> temporalOperands) {
+        this.temporalOperands = temporalOperands;
+    }
 
-	/**
-	 * Get temporal operators
-	 * 
-	 * @return temporal operators
-	 */
-	public Map<TimeOperator, List<QName>> getTempporalOperators() {
-		return tempporalOperators;
-	}
+    /**
+     * Get temporal operators
+     * 
+     * @return temporal operators
+     */
+    public Map<TimeOperator, List<QName>> getTempporalOperators() {
+        return tempporalOperators;
+    }
 
-	/**
-	 * Set temporal operators
-	 * 
-	 * @param tempporalOperators
-	 *            temporal operators
-	 */
-	public void setTempporalOperators(
-			Map<TimeOperator, List<QName>> tempporalOperators) {
-		this.tempporalOperators = tempporalOperators;
-	}
+    /**
+     * Set temporal operators
+     * 
+     * @param tempporalOperators
+     *            temporal operators
+     */
+    public void setTempporalOperators(Map<TimeOperator, List<QName>> tempporalOperators) {
+        this.tempporalOperators = tempporalOperators;
+    }
 
-	/**
-	 * Get comparison operators
-	 * 
-	 * @return comparison operators
-	 */
-	public List<ComparisonOperator> getComparisonOperators() {
-		return comparisonOperators;
-	}
+    /**
+     * Get comparison operators
+     * 
+     * @return comparison operators
+     */
+    public List<ComparisonOperator> getComparisonOperators() {
+        return comparisonOperators;
+    }
 
-	/**
-	 * Set comparison operators
-	 * 
-	 * @param comparisonOperators
-	 *            comparison operators
-	 */
-	public void setComparisonOperators(
-			List<ComparisonOperator> comparisonOperators) {
-		this.comparisonOperators = comparisonOperators;
-	}
+    /**
+     * Set comparison operators
+     * 
+     * @param comparisonOperators
+     *            comparison operators
+     */
+    public void setComparisonOperators(List<ComparisonOperator> comparisonOperators) {
+        this.comparisonOperators = comparisonOperators;
+    }
 
 }

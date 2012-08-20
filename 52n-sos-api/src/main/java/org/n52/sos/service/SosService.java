@@ -28,6 +28,7 @@
 
 package org.n52.sos.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.GZIPOutputStream;
@@ -38,8 +39,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.binding.IBinding;
+import org.n52.sos.encode.IEncoder;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,8 +101,12 @@ public class SosService extends HttpServlet {
         LOGGER.debug("\n**********\n(POST) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
 
         this.setCorsHeaders(resp);
-
-        ServiceResponse sosResp = getBindingOperatorForServletPath(req.getServletPath()).doPostOperation(req);
+        ServiceResponse sosResp = null;
+        try {
+            sosResp = getBindingOperatorForServletPath(req.getServletPath()).doPostOperation(req);
+        } catch (OwsExceptionReport owse) {
+            sosResp = handleOwsExceptionReport(owse);
+        }
         doResponse(resp, sosResp);
     }
 
@@ -117,7 +128,12 @@ public class SosService extends HttpServlet {
 
         this.setCorsHeaders(resp);
 
-        ServiceResponse sosResp = getBindingOperatorForServletPath(req.getServletPath()).doGetOperation(req);
+        ServiceResponse sosResp = null;
+        try {
+            sosResp = getBindingOperatorForServletPath(req.getServletPath()).doGetOperation(req);
+        } catch (OwsExceptionReport owse) {
+            sosResp = handleOwsExceptionReport(owse);
+        }
         doResponse(resp, sosResp);
     }
 
@@ -134,6 +150,39 @@ public class SosService extends HttpServlet {
         super.doOptions(req, resp);
         this.setCorsHeaders(resp);
     }
+    
+    private ServiceResponse handleOwsExceptionReport(OwsExceptionReport owsExceptionReport) throws ServletException {
+        try {
+            IEncoder encoder = Configurator.getInstance().getEncoder(owsExceptionReport.getNamespace());
+            if (encoder != null) {
+                Object encodedObject = encoder.encode(owsExceptionReport);
+                if (encodedObject instanceof XmlObject) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
+                    return new ServiceResponse(baos, SosConstants.CONTENT_TYPE_XML, false, true);
+                } else if (encodedObject instanceof ServiceResponse) {
+                    return (ServiceResponse) encodedObject;
+                } else {
+                    String exceptionText = "Error while handle exception message response!";
+                    LOGGER.debug(exceptionText);
+                    throw new ServletException(exceptionText);
+                }
+            } else {
+                String exceptionText = "Error while handle exception message response!";
+                LOGGER.debug(exceptionText);
+                throw new ServletException(exceptionText);
+            }
+        } catch (OwsExceptionReport owse) {
+            String exceptionText = "Error while handle exception message response!";
+            LOGGER.debug(exceptionText, owse);
+            throw new ServletException(exceptionText);
+        } catch (IOException ioe) {
+            String exceptionText = "Error while handle exception message response!";
+            LOGGER.debug(exceptionText, ioe);
+            throw new ServletException(exceptionText);
+        }
+        
+    }
 
     /**
      * writes the content of the SosResponse to the outputStream of the
@@ -145,7 +194,7 @@ public class SosService extends HttpServlet {
      * @param sosResponse
      *            the SosResponse, whose content will be written to the
      *            outputStream of resp param
-     * @throws ServletException 
+     * @throws ServletException
      * 
      */
     private void doResponse(HttpServletResponse resp, ServiceResponse sosResponse) throws ServletException {
@@ -196,13 +245,15 @@ public class SosService extends HttpServlet {
      * @return SOS request operator
      * @throws UnavailableException
      *             If the URL pattern is not supported by this SOS.
+     * @throws OwsExceptionReport 
      */
-    private IBinding getBindingOperatorForServletPath(String urlPattern) throws UnavailableException {
+    private IBinding getBindingOperatorForServletPath(String urlPattern) throws OwsExceptionReport {
         IBinding bindingOperator = Configurator.getInstance().getBindingOperator(urlPattern);
         if (bindingOperator == null) {
-            String exceptionText = "The requested servlet path with pattern '" + urlPattern + "' is not supported by this SOS!";
+            String exceptionText =
+                    "The requested servlet path with pattern '" + urlPattern + "' is not supported by this SOS!";
             LOGGER.debug(exceptionText);
-            throw new UnavailableException(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
         return bindingOperator;
     }

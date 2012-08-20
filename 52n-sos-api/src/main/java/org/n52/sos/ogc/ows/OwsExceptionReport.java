@@ -31,16 +31,10 @@ package org.n52.sos.ogc.ows;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
-import net.opengis.ows.x11.ExceptionReportDocument;
-import net.opengis.ows.x11.ExceptionReportDocument.ExceptionReport;
-import net.opengis.ows.x11.ExceptionType;
-
 import org.apache.log4j.Logger;
-import org.apache.xmlbeans.XmlCursor;
-import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.exception.IExceptionCode;
+import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
+import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 
 /**
  * Implementation of the ows service exception. The exception codes are defined
@@ -49,244 +43,166 @@ import org.n52.sos.exception.IExceptionCode;
  */
 public class OwsExceptionReport extends Exception {
 
-	private static final long serialVersionUID = 9069373009339881302L;
+    private static final long serialVersionUID = 9069373009339881302L;
 
-	/** logger */
-	private static final Logger LOGGER = Logger
-			.getLogger(OwsExceptionReport.class.getName());
+    /** logger */
+    private static final Logger LOGGER = Logger.getLogger(OwsExceptionReport.class.getName());
 
-	/** Exception types */
-	private List<ExceptionType> excs = new ArrayList<ExceptionType>();
+    /** Exception types */
+    private List<OwsException> owsExceptions = new ArrayList<OwsException>();
 
-	/** exception level */
-	private ExceptionLevel excLevel = null;
+    /** exception level */
+    private ExceptionLevel excLevel = null;
+    
+    private final String namespace = OWSConstants.NS_OWS;
 
-	/**
-	 * SOS version
-	 */
-	private String version;
+    /**
+     * SOS version
+     */
+    private String version;
 
-	/**
-	 * standard constructor without parameters, sets the ExceptionLevel on
-	 * PlainExceptions
-	 * 
-	 */
-	public OwsExceptionReport() {
-		this.excLevel = ExceptionLevel.DetailedExceptions;
-	}
+    /**
+     * standard constructor without parameters, sets the ExceptionLevel on
+     * PlainExceptions
+     * 
+     */
+    public OwsExceptionReport() {
+        this.excLevel = ExceptionLevel.DetailedExceptions;
+    }
 
-	/**
-	 * constructor with message and cause as parameters
-	 * 
-	 * @param message
-	 *            String containing the message of this exception
-	 * @param cause
-	 *            Throwable cause of this exception
-	 */
-	public OwsExceptionReport(String message, Throwable cause) {
-		super(message, cause);
-		this.excLevel = ExceptionLevel.DetailedExceptions;
-	}
+//    /**
+//     * constructor with message and cause as parameters
+//     * 
+//     * @param message
+//     *            String containing the message of this exception
+//     * @param cause
+//     *            Throwable cause of this exception
+//     */
+//    public OwsExceptionReport(String message, Throwable cause) {
+//        super(message, cause);
+//        
+//        this.excLevel = ExceptionLevel.DetailedExceptions;
+//    }
+//
+//    /**
+//     * constructor with cause as parameter
+//     * 
+//     * @param cause
+//     *            Throwable cause of this exception
+//     */
+//    public OwsExceptionReport(Throwable cause) {
+//        super(cause);
+//        this.excLevel = ExceptionLevel.DetailedExceptions;
+//    }
 
-	/**
-	 * constructor with cause as parameter
-	 * 
-	 * @param cause
-	 *            Throwable cause of this exception
-	 */
-	public OwsExceptionReport(Throwable cause) {
-		super(cause);
-		this.excLevel = ExceptionLevel.DetailedExceptions;
-	}
+    /**
+     * constructor with exceptionLevel as parameter
+     * 
+     * @param excLevelIn
+     */
+    public OwsExceptionReport(ExceptionLevel excLevelIn) {
+        this.excLevel = excLevelIn;
+    }
 
-	/**
-	 * constructor with exceptionLevel as parameter
-	 * 
-	 * @param excLevelIn
-	 */
-	public OwsExceptionReport(ExceptionLevel excLevelIn) {
-		this.excLevel = excLevelIn;
-	}
+    /**
+     * adds a coded Exception with ExceptionCode,locator and a single String
+     * message to this exception
+     * 
+     * @param code
+     *            Exception code of the exception to add
+     * @param locator
+     *            String locator of the exception to add
+     * @param message
+     *            String message of the exception to add
+     */
+    public void addCodedException(IExceptionCode code, String locator, String message) {
+        String[] messages = { message };
+        owsExceptions.add(new OwsException(code, locator, messages));
+    }
 
-	/**
-	 * 
-	 * @return Returns the ExceptionTypes of this exception
-	 */
-	public List<ExceptionType> getExceptions() {
-		return excs;
-	}
+    /**
+     * adds a coded exception to this exception with code, locator and messages
+     * as parameters
+     * 
+     * @param code
+     *            ExceptionCode of the added exception
+     * @param locator
+     *            String locator of this exception
+     * @param messages
+     *            String[] messages of this exception
+     */
+    public void addCodedException(IExceptionCode code, String locator, String[] messages) {
+        owsExceptions.add(new OwsException(code, locator, messages));
+    }
 
-	/**
-	 * adds a coded exception to this exception with code, locator and messages
-	 * as parameters
-	 * 
-	 * @param code
-	 *            ExceptionCode of the added exception
-	 * @param locator
-	 *            String locator of this exception
-	 * @param messages
-	 *            String[] messages of this exception
-	 */
-	public void addCodedException(IExceptionCode code, String locator,
-			String[] messages) {
-		ExceptionType et = ExceptionType.Factory.newInstance();
-		et.setExceptionCode(code.toString());
-		if (locator != null) {
-			et.setLocator(locator);
-		}
-		for (int i = 0; i < messages.length; i++) {
-			String string = messages[i];
-			et.addExceptionText(string);
-		}
-		excs.add(et);
-	}
+    /**
+     * adds a coded Exception to this service exception with code, locator and
+     * the exception itself as parameters
+     * 
+     * @param code
+     *            ExceptionCode of the added exception
+     * @param locator
+     *            String locator of the added exception
+     * @param e
+     *            Exception which should be added
+     */
+    public void addCodedException(IExceptionCode code, String locator, String[] messages, Exception exception) {
+        owsExceptions.add(new OwsException(code, locator, messages, exception));
+    }
 
-	/**
-	 * adds a ServiceException to this exception
-	 * 
-	 * @param seIn
-	 *            ServiceException which should be added
-	 */
-	public void addServiceException(OwsExceptionReport seIn) {
-		this.excs.addAll(seIn.getExceptions());
-	}
+    public void addCodedException(IExceptionCode code, String locator, String message,
+            Exception exception) {
+        String[] messages = { message };
+        owsExceptions.add(new OwsException(code, locator, messages, exception));
+    }
 
-	/**
-	 * checks whether the ExceptionCode parameter is contain in this exception
-	 * 
-	 * @param ec
-	 *            ExceptionCode which should be checked
-	 * @return Returns boolean true if ExceptionCode is contained, otherwise
-	 *         false
-	 */
-	public boolean containsCode(IExceptionCode ec) {
-		for (ExceptionType et : excs) {
-			if (et.getExceptionCode().equalsIgnoreCase(ec.toString())) {
-				return true;
-			}
-		}
-		return false;
-	}
+    /**
+     * adds a ServiceException to this exception
+     * 
+     * @param seIn
+     *            ServiceException which should be added
+     */
+    public void addOwsExceptionReport(OwsExceptionReport owsExceptionReport) {
+        this.owsExceptions.addAll(owsExceptionReport.getExceptions());
+    }
 
-	/**
-	 * adds a coded Exception to this service exception with code, locator and
-	 * the exception itself as parameters
-	 * 
-	 * @param code
-	 *            ExceptionCode of the added exception
-	 * @param locator
-	 *            String locator of the added exception
-	 * @param e
-	 *            Exception which should be added
-	 */
-	public void addCodedException(IExceptionCode code, String locator,
-			Exception e) {
+    /**
+     * 
+     * @return Returns the ExceptionTypes of this exception
+     */
+    public List<OwsException> getExceptions() {
+        return owsExceptions;
+    }
 
-		ExceptionType et = ExceptionType.Factory.newInstance();
-		et.setExceptionCode(code.toString());
-		if (locator != null) {
-			et.setLocator(locator);
-		}
+    public ExceptionLevel getExcLevel() {
+        return excLevel;
+    }
 
-		String name = e.getClass().getName();
-		String message = e.getMessage();
-		StackTraceElement[] stackTraces = e.getStackTrace();
+    public void setExcLevel(ExceptionLevel excLevel) {
+        this.excLevel = excLevel;
+    }
 
-		StringBuffer sb = new StringBuffer();
-		sb.append("[EXC] internal service exception");
-		if (excLevel.compareTo(ExceptionLevel.PlainExceptions) == 0) {
-			sb.append(". Message: ");
-			sb.append(message);
-		} else if (excLevel.compareTo(ExceptionLevel.DetailedExceptions) == 0) {
-			sb.append(": " + name + "\n");
-			sb.append("[EXC] message: " + message + "\n");
-			for (int i = 0; i < stackTraces.length; i++) {
-				StackTraceElement element = stackTraces[i];
-				sb.append("[EXC]" + element.toString() + "\n");
-			}
-		} else {
-			LOGGER.warn("addCodedException: unknown ExceptionLevel " + "("
-					+ excLevel.toString() + ")occurred.");
-		}
-		et.addExceptionText(sb.toString());
-		// TODO i guess there is a better way to format an exception
+    /**
+     * Set SOS version
+     * 
+     * @param version
+     *            the version to set
+     */
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
-		excs.add(et);
-	}
+    /**
+     * Get SOS version
+     * 
+     * @return SOS version
+     */
+    public String getVersion() {
+        return this.version;
+    }
 
-	/**
-	 * 
-	 * @return Returns the ExceptionReportDocument XmlBean created from this
-	 *         service exception
-	 */
-	public ExceptionReportDocument getDocument() {
-
-		ExceptionReportDocument erd = ExceptionReportDocument.Factory
-				.newInstance();
-		ExceptionReport er = ExceptionReport.Factory.newInstance();
-		// er.setLanguage("en");
-		er.setVersion(version);
-		er.setExceptionArray(excs.toArray(new ExceptionType[excs.size()]));
-		erd.setExceptionReport(er);
-		XmlCursor c = erd.newCursor(); // Cursor on the documentc.toStartDoc();
-		c.toFirstChild();
-		c.setAttributeText(
-				new QName("http://www.w3.org/2001/XMLSchema-instance",
-						"schemaLocation"),
-				"http://www.opengeospatial.net/ows http://mars.uni-muenster.de/swerep/trunk/ows/1.0.30/owsExceptionReport.xsd");
-		c.dispose();
-		return erd;
-	}
-
-	/**
-	 * checks whether this service exception contains another exception
-	 * 
-	 * @return Returns true if this service exception contains another exception
-	 */
-	public boolean containsExceptions() {
-		return excs.size() > 0;
-	}
-
-	/**
-	 * adds a coded Exception with ExceptionCode,locator and a single String
-	 * message to this exception
-	 * 
-	 * @param code
-	 *            Exception code of the exception to add
-	 * @param locator
-	 *            String locator of the exception to add
-	 * @param message
-	 *            String message of the exception to add
-	 */
-	public void addCodedException(IExceptionCode code, String locator,
-			String message) {
-
-		ExceptionType et = ExceptionType.Factory.newInstance();
-		et.setExceptionCode(code.toString());
-		if (locator != null) {
-			et.setLocator(locator);
-		}
-		et.addExceptionText(message);
-		excs.add(et);
-	}
-
-	/**
-	 * Set SOS version
-	 * 
-	 * @param version
-	 *            the version to set
-	 */
-	public void setVersion(String version) {
-		this.version = version;
-	}
-
-	/**
-	 * Get SOS version
-	 * 
-	 * @return SOS version
-	 */
-	public String getVersion() {
-		return this.version;
-	}
+    public String getNamespace() {
+        return namespace;
+    }
 
 }

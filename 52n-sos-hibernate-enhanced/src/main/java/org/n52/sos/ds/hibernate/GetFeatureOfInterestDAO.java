@@ -46,6 +46,7 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ogc.om.features.SosFeatureCollection;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -87,7 +88,8 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
     }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Object connection) throws OwsExceptionReport {
+    public OWSOperation getOperationsMetadata(String service, String version, Object connection)
+            throws OwsExceptionReport {
         Session session = null;
         if (connection instanceof Session) {
             session = (Session) connection;
@@ -108,12 +110,11 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
             dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
         }
         opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt,
-                Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance()
-                        .getServiceURL()));
+                Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set param procedure
         if (Configurator.getInstance().isShowFullOperationsMetadata4Observations()) {
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), Configurator
-                    .getInstance().getCapsCacheController().getProcedures());
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), Configurator.getInstance()
+                    .getCapabilitiesCacheController().getProcedures());
         } else {
             List<String> phenomenonValues = new ArrayList<String>(1);
             phenomenonValues.add(SosConstants.PARAMETER_ANY);
@@ -122,7 +123,7 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
         // set param observedProperty
         if (Configurator.getInstance().isShowFullOperationsMetadata4Observations()) {
             opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(), Configurator
-                    .getInstance().getCapsCacheController().getObservableProperties());
+                    .getInstance().getCapabilitiesCacheController().getObservableProperties());
         } else {
             List<String> phenomenonValues = new ArrayList<String>(1);
             phenomenonValues.add(SosConstants.PARAMETER_ANY);
@@ -130,12 +131,10 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
         }
         // set param foi
         Collection<String> featureIDs =
-                SosHelper.getFeatureIDs(Configurator.getInstance().getCapsCacheController()
-                        .getFeatureOfInterest(), version);
+                SosHelper.getFeatureIDs(Configurator.getInstance().getCapabilitiesCacheController().getFeatureOfInterest(),
+                        version);
         if (Configurator.getInstance().isShowFullOperationsMetadata4Observations()) {
-            opsMeta.addParameterValue(
-                    SosConstants.GetObservationParams.featureOfInterest.name(),
-                    featureIDs);
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(), featureIDs);
         } else {
             List<String> foiValues = new ArrayList<String>(1);
             foiValues.add(SosConstants.PARAMETER_ANY);
@@ -159,7 +158,8 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
     }
 
     @Override
-    public GetFeatureOfInterestResponse getFeatureOfInterest(GetFeatureOfInterestRequest request) throws OwsExceptionReport {
+    public GetFeatureOfInterestResponse getFeatureOfInterest(GetFeatureOfInterestRequest request)
+            throws OwsExceptionReport {
         if (request instanceof GetFeatureOfInterestRequest) {
             GetFeatureOfInterestRequest sosRequest = (GetFeatureOfInterestRequest) request;
             Session session = null;
@@ -171,7 +171,7 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
                         Util4Exceptions
                                 .createMissingParameterValueException(Sos1Constants.GetFeatureOfInterestParams.featureOfInterestID
                                         .name());
-                owse.addServiceException(Util4Exceptions
+                owse.addOwsExceptionReport(Util4Exceptions
                         .createMissingParameterValueException(Sos1Constants.GetFeatureOfInterestParams.location.name()));
                 throw owse;
             } else {
@@ -205,7 +205,8 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
         List<Criterion> criterions = new ArrayList<Criterion>();
         List<Projection> projections = new ArrayList<Projection>();
         String obsAlias = HibernateCriteriaQueryUtilities.addObservationAliasToMap(aliases, null);
-        String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, obsAlias);
+        String obsConstAlias =
+                HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, obsAlias);
         // observableProperties
         if (sosRequest.getObservedProperties() != null && !sosRequest.getObservedProperties().isEmpty()) {
             String obsPropAlias =
@@ -225,10 +226,17 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
             criterions.add(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(sosRequest.getEventTimes()));
         }
         if (!criterions.isEmpty()) {
-            return HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(aliases, criterions, projections, session);
+            return HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(aliases, criterions, projections,
+                    session);
         }
-        
+
         return new ArrayList<String>();
+    }
+
+    @Override
+    public IExtension getExtension(Object connection) throws OwsExceptionReport {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

@@ -31,56 +31,64 @@ package org.n52.sos.request.operator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.cache.ACapabilitiesCacheController;
+import org.n52.sos.cache.CapabilitiesCacheController;
 import org.n52.sos.ds.IInsertObservationDAO;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.InsertObservationRequest;
+import org.n52.sos.response.InsertObservationResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.util.OwsHelper;
+import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SosInsertObservationOperatorV20 implements IRequestOperator {
-    
+
     /** the data access object for the DescribeSensor operation */
     private IInsertObservationDAO dao;
 
     /** Name of the operation the listener implements */
     private static final String OPERATION_NAME = SosConstants.Operations.InsertObservation.name();
-    
+
     private RequestOperatorKeyType requestOperatorKeyType;
 
     /** logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosInsertObservationOperatorV20.class);
-    
+
     public SosInsertObservationOperatorV20() {
-        requestOperatorKeyType = new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION), OPERATION_NAME);
+        requestOperatorKeyType =
+                new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION),
+                        OPERATION_NAME);
         this.dao = (IInsertObservationDAO) Configurator.getInstance().getOperationDAOs().get(OPERATION_NAME);
         LOGGER.info("SosInsertObservationOperatorV20 initialized successfully!");
     }
 
     @Override
     public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
-        String version = "";
         if (request instanceof InsertObservationRequest) {
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
-            InsertObservationRequest insertObservationRequest = (InsertObservationRequest) request;
-            version = insertObservationRequest.getVersion();
-            
-            Util4Exceptions.mergeExceptions(exceptions);
-            
-            int id = this.dao.insertObservation(insertObservationRequest);
+            InsertObservationRequest sosRequest = (InsertObservationRequest) request;
+            checkRequestedParameter(sosRequest);
+            InsertObservationResponse response = this.dao.insertObservation(sosRequest);
+            Configurator.getInstance().getCapabilitiesCacheController().updateAfterObservationInsertion();
             String contentType = SosConstants.CONTENT_TYPE_XML;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try {
@@ -88,7 +96,7 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
                 IEncoder encoder = Configurator.getInstance().getEncoder(namespace);
                 if (encoder != null) {
                     // TODO valid response object
-                    Object encodedObject = encoder.encode(null);
+                    Object encodedObject = encoder.encode(response);
                     if (encodedObject instanceof XmlObject) {
                         ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
                         return new ServiceResponse(baos, contentType, false, true);
@@ -100,8 +108,7 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
                     }
                 } else {
                     String exceptionText =
-                            "The value '" + null
-                                    + "' of the outputFormat parameter is incorrect and has to be '"
+                            "The value '" + null + "' of the outputFormat parameter is incorrect and has to be '"
                                     + SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL + "' for the requested sensor!";
                     throw Util4Exceptions.createInvalidParameterValueException("", exceptionText);
                 }
@@ -134,6 +141,126 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
     public OWSOperation getOperationMetadata(String service, String version, Object connection)
             throws OwsExceptionReport {
         return dao.getOperationsMetadata(service, version, connection);
+    }
+
+    private void checkRequestedParameter(InsertObservationRequest request) throws OwsExceptionReport {
+        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+        try {
+            SosHelper.checkServiceParameter(request.getService());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        addOfferingToObservationConstallation(request);
+        try {
+            OwsHelper.checkSingleVersionParameter(request.getVersion(), Configurator.getInstance()
+                    .getSupportedVersions());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        // offering [1..*]
+        try {
+            checkOfferings(request.getOfferings());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        // observation [1..*]
+        try {
+            checkObservations(request.getObservation());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        Util4Exceptions.mergeExceptions(exceptions);
+
+    }
+
+    private void checkOfferings(List<String> offerings) throws OwsExceptionReport {
+        if (offerings == null || (offerings != null && offerings.isEmpty())) {
+            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertObservationParams.offering
+                    .name());
+        } else {
+            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            for (String offering : offerings) {
+                if (!Configurator.getInstance().getCapabilitiesCacheController().getOfferings().contains(offering)) {
+                    StringBuilder exceptionText = new StringBuilder();
+                    exceptionText.append("The requested offering (");
+                    exceptionText.append(offering);
+                    exceptionText.append(") is not provided by this server!");
+                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(
+                            Sos2Constants.InsertObservationParams.offering.name(), exceptionText.toString()));
+                }
+            }
+            Util4Exceptions.mergeExceptions(exceptions);
+        }
+    }
+
+    private void addOfferingToObservationConstallation(InsertObservationRequest request) throws OwsExceptionReport {
+        List<SosObservation> updatededObservations = new ArrayList<SosObservation>();
+        try {
+            for (String offering : request.getOfferings()) {
+                for (SosObservation observation : request.getObservation()) {
+                    SosObservation updatedObservation = observation.clone();
+                    updatedObservation.getObservationConstellation().setOffering(offering);
+                    updatededObservations.add(updatedObservation);
+                }
+            }
+        } catch (CloneNotSupportedException cnse) {
+            String exceptionText = "Error while adding offering(s) to observation(s)!";
+            LOGGER.error(exceptionText, cnse);
+            throw Util4Exceptions.createNoApplicableCodeException(cnse, exceptionText);
+        }
+
+        request.setObservation(updatededObservations);
+    }
+
+    private void checkObservations(List<SosObservation> observations) throws OwsExceptionReport {
+        ACapabilitiesCacheController capsController = Configurator.getInstance().getCapabilitiesCacheController();
+        if (observations == null || (observations != null && observations.isEmpty())) {
+            throw Util4Exceptions
+                    .createMissingParameterValueException(Sos2Constants.InsertObservationParams.observation.name());
+        } else {
+            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            for (SosObservation observation : observations) {
+                SosObservationConstellation obsConstallation = observation.getObservationConstellation();
+                // Requirement 67
+                if (!capsController.getObservationTypes().contains(obsConstallation.getObservationType())) {
+                    StringBuilder exceptionText = new StringBuilder();
+                    exceptionText.append("The requested observationType (");
+                    exceptionText.append(observation.getObservationConstellation().getObservationType());
+                    exceptionText.append(") is not supported by this server!");
+                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(
+                            Sos2Constants.InsertObservationParams.observationType.name(), exceptionText.toString()));
+                } else {
+                    if (!capsController.getAllowedObservationTypes4Offering(obsConstallation.getOffering())
+                            .contains(obsConstallation.getObservationType())) {
+                        StringBuilder exceptionText = new StringBuilder();
+                        exceptionText.append("The requested observationType (");
+                        exceptionText.append(obsConstallation.getObservationType());
+                        exceptionText.append(") is not allowed for the requested offering (");
+                        exceptionText.append(obsConstallation.getOffering());
+                        exceptionText.append(")!");
+                        exceptions
+                                .add(Util4Exceptions.createInvalidParameterValueException(
+                                        Sos2Constants.InsertObservationParams.observationType.name(),
+                                        exceptionText.toString()));
+                    }
+                }
+            }
+            Util4Exceptions.mergeExceptions(exceptions);
+        }
+    }
+
+    @Override
+    public IExtension getExtension(Object connection) throws OwsExceptionReport {
+        return dao.getExtension(connection);
+    }
+
+    @Override
+    public Set<String> getConformanceClasses() {
+        Set<String> conformanceClasses = new HashSet<String>(0);
+        if (hasImplementedDAO()) {
+            conformanceClasses.add("http://www.opengis.net/spec/SOS/2.0/conf/obsInsertion");
+        }
+        return conformanceClasses;
     }
 
 }

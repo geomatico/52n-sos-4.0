@@ -28,11 +28,7 @@
 
 package org.n52.sos.request;
 
-import java.util.List;
-
 import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.operator.RequestOperatorKeyType;
 
 /**
  * SOS GetResultTemplate request
@@ -40,87 +36,86 @@ import org.n52.sos.request.operator.RequestOperatorKeyType;
  */
 public class SosGetResultTemplateRequest extends AbstractServiceRequest {
 
-	/**
-	 * GetResultTemplate operation name
-	 */
-	private final String operationName = Sos2Constants.Operations.GetResultTemplate
-			.name();
-	
-	       /**
-         * ObservedProperties list
-         */
-        private String observedProperty;
-        
-        /**
-         * Offerings list
-         */
-        private String offering;
+    /**
+     * GetResultTemplate operation name
+     */
+    private final String operationName = Sos2Constants.Operations.GetResultTemplate.name();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
-	 */
-	@Override
-	public String getOperationName() {
-		return operationName;
-	}
+    /**
+     * ObservedProperties list
+     */
+    private String observedProperty;
 
-        /**
-         * Get observableProperties
-         * 
-         * @return observableProperties
-         */
-        public String getObservedProperty() {
-                return observedProperty;
-        }
+    /**
+     * Offerings list
+     */
+    private String offering;
 
-        /**
-         * Set observableProperties
-         * 
-         * @param observableProperties
-         *            observableProperties
-         */
-        public void setObservedProperty(String observedProperty) {
-                this.observedProperty = observedProperty;
-                // CapabilitiesCacheController cache =
-                // (CapabilitiesCacheController)SosConfigurator.getInstance().getCapsCacheController();
-                // TODO: FIXME
-                //
-                // List<String> phens = new ArrayList<String>();
-                // Map<String, Collection<String>> compPhens =
-                // SosConfigurator.getInstance().getCapsCacheController().getPhens4CompPhens();
-                //
-                // // find phens for comp phens
-                // for (String phen : observedProperty) {
-                // if (compPhens.keySet().contains(phen)) {
-                // phens.addAll(compPhens.get(phen));
-                // } else {
-                // phens.add(phen);
-                // }
-                // }
-                //
-                // this.observedProperty = (String[]) phens.toArray(new
-                // String[phens.size()]);
-        }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
+     */
+    @Override
+    public String getOperationName() {
+        return operationName;
+    }
 
-        /**
-         * Get offerings
-         * 
-         * @return offerings
-         */
-        public String getOffering() {
-                return offering;
-        }
+    /**
+     * Get observableProperties
+     * 
+     * @return observableProperties
+     */
+    public String getObservedProperty() {
+        return observedProperty;
+    }
 
-        /**
-         * Set offerings
-         * 
-         * @param offerings
-         *            offerings
-         */
-        public void setOffering(String offering) {
-                this.offering = offering;
-        }
+    /**
+     * Set observableProperties
+     * 
+     * @param observableProperties
+     *            observableProperties
+     */
+    public void setObservedProperty(String observedProperty) {
+        this.observedProperty = observedProperty;
+        // CapabilitiesCacheController cache =
+        // (CapabilitiesCacheController)SosConfigurator.getInstance().getCapsCacheController();
+        // TODO: FIXME
+        //
+        // List<String> phens = new ArrayList<String>();
+        // Map<String, Collection<String>> compPhens =
+        // SosConfigurator.getInstance().getCapsCacheController().getPhens4CompPhens();
+        //
+        // // find phens for comp phens
+        // for (String phen : observedProperty) {
+        // if (compPhens.keySet().contains(phen)) {
+        // phens.addAll(compPhens.get(phen));
+        // } else {
+        // phens.add(phen);
+        // }
+        // }
+        //
+        // this.observedProperty = (String[]) phens.toArray(new
+        // String[phens.size()]);
+    }
+
+    /**
+     * Get offerings
+     * 
+     * @return offerings
+     */
+    public String getOffering() {
+        return offering;
+    }
+
+    /**
+     * Set offerings
+     * 
+     * @param offerings
+     *            offerings
+     */
+    public void setOffering(String offering) {
+        this.offering = offering;
+    }
 
 }

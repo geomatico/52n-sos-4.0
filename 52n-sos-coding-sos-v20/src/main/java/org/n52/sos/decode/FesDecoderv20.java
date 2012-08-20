@@ -1,7 +1,11 @@
 package org.n52.sos.decode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.opengis.fes.x20.BBOXType;
 import net.opengis.fes.x20.BinaryTemporalOpType;
@@ -24,6 +28,7 @@ import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +64,16 @@ public class FesDecoderv20 implements IDecoder<Object, XmlObject> {
     }
 
     @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return new HashMap<SupportedTypeKey, Set<String>>(0);
+    }
+    
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
+    }
+
+    @Override
     public Object decode(XmlObject xmlObject) throws OwsExceptionReport {
         if (xmlObject instanceof SpatialOpsType) {
             return parseSpatialFilterType((SpatialOpsType) xmlObject);
@@ -67,7 +82,7 @@ public class FesDecoderv20 implements IDecoder<Object, XmlObject> {
         }
         return null;
     }
-
+    
     /**
      * Parses the spatial filter of a request.
      * 

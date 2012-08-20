@@ -30,21 +30,16 @@ package org.n52.sos.soap;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.MimeHeaders;
-import javax.xml.soap.SOAPConstants;
-import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 
-import org.n52.sos.ogc.om.OMConstants;
+import org.n52.sos.exception.IExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -54,12 +49,8 @@ import org.n52.sos.ogc.sos.SosSoapConstants;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
 import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.W3CConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -145,30 +136,30 @@ public class SoapHelper {
      *            Exception code
      * @return SOAP action URI
      */
-    public static String getExceptionActionURI(String exceptionCode) {
-        if (exceptionCode.equals(OwsExceptionCode.InvalidParameterValue.name())) {
+    public static String getExceptionActionURI(IExceptionCode exceptionCode) {
+        if (exceptionCode.equals(OwsExceptionCode.InvalidParameterValue)) {
             return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode.equals(SwesExceptionCode.InvalidRequest.name())) {
+        } else if (exceptionCode.equals(SwesExceptionCode.InvalidRequest)) {
             return SosSoapConstants.RESP_ACTION_SWES;
-        } else if (exceptionCode.equals(OwsExceptionCode.InvalidUpdateSequence.name())) {
+        } else if (exceptionCode.equals(OwsExceptionCode.InvalidUpdateSequence)) {
             return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode.equals(OwsExceptionCode.MissingParameterValue.name())) {
+        } else if (exceptionCode.equals(OwsExceptionCode.MissingParameterValue)) {
             return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode.equals(OwsExceptionCode.NoApplicableCode.name())) {
+        } else if (exceptionCode.equals(OwsExceptionCode.NoApplicableCode)) {
             return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode.equals(OwsExceptionCode.NoDataAvailable.name())) {
+        } else if (exceptionCode.equals(OwsExceptionCode.NoDataAvailable)) {
             return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode.equals(OwsExceptionCode.OperationNotSupported.name())) {
+        } else if (exceptionCode.equals(OwsExceptionCode.OperationNotSupported)) {
             return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode.equals(OwsExceptionCode.OptionNotSupported.name())) {
+        } else if (exceptionCode.equals(OwsExceptionCode.OptionNotSupported)) {
             return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode.equals(SwesExceptionCode.RequestExtensionNotSupported.name())) {
+        } else if (exceptionCode.equals(SwesExceptionCode.RequestExtensionNotSupported)) {
             return SosSoapConstants.RESP_ACTION_SWES;
-        } else if (exceptionCode.equals(OwsExceptionCode.VersionNegotiationFailed.name())) {
+        } else if (exceptionCode.equals(OwsExceptionCode.VersionNegotiationFailed)) {
             return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode.equals(SosExceptionCode.InvalidPropertyOfferingCombination.name())) {
+        } else if (exceptionCode.equals(SosExceptionCode.InvalidPropertyOfferingCombination)) {
             return SosSoapConstants.RESP_ACTION_SOS;
-        } else if (exceptionCode.equals(SosExceptionCode.ResponseExceedsSizeLimit.name())) {
+        } else if (exceptionCode.equals(SosExceptionCode.ResponseExceedsSizeLimit)) {
             return SosSoapConstants.RESP_ACTION_SOS;
         } else {
             return SosSoapConstants.RESP_ACTION_OWS;
@@ -182,47 +173,48 @@ public class SoapHelper {
      *            OWS exception code to get reason for.
      * @return Text for SOAP fault reason
      */
-    public static String getSoapFaultReasonText(String exceptionCode) {
-        if (exceptionCode.equals(OwsExceptionCode.InvalidParameterValue.name())) {
+    public static String getSoapFaultReasonText(IExceptionCode exceptionCode) {
+        if (exceptionCode.equals(OwsExceptionCode.InvalidParameterValue)) {
             return OWSConstants.SOAP_REASON_INVALID_PARAMETER_VALUE;
-        } else if (exceptionCode.equals(SwesExceptionCode.InvalidRequest.name())) {
+        } else if (exceptionCode.equals(SwesExceptionCode.InvalidRequest)) {
             return SWEConstants.SOAP_REASON_INVALID_REQUEST;
-        } else if (exceptionCode.equals(OwsExceptionCode.InvalidUpdateSequence.name())) {
+        } else if (exceptionCode.equals(OwsExceptionCode.InvalidUpdateSequence)) {
             return OWSConstants.SOAP_REASON_INVALID_UPDATE_SEQUENCES;
-        } else if (exceptionCode.equals(OwsExceptionCode.MissingParameterValue.name())) {
+        } else if (exceptionCode.equals(OwsExceptionCode.MissingParameterValue)) {
             return OWSConstants.SOAP_REASON_MISSING_PARAMETER_VALUE;
-        } else if (exceptionCode.equals(OwsExceptionCode.NoApplicableCode.name())) {
+        } else if (exceptionCode.equals(OwsExceptionCode.NoApplicableCode)) {
             return OWSConstants.SOAP_REASON_NO_APPLICABLE_CODE;
-        } else if (exceptionCode.equals(OwsExceptionCode.NoDataAvailable.name())) {
+        } else if (exceptionCode.equals(OwsExceptionCode.NoDataAvailable)) {
             return OWSConstants.SOAP_REASON_NO_DATA_AVAILABLE;
-        } else if (exceptionCode.equals(OwsExceptionCode.OperationNotSupported.name())) {
+        } else if (exceptionCode.equals(OwsExceptionCode.OperationNotSupported)) {
             return OWSConstants.SOAP_REASON_OPERATION_NOT_SUPPORTED;
-        } else if (exceptionCode.equals(OwsExceptionCode.OptionNotSupported.name())) {
+        } else if (exceptionCode.equals(OwsExceptionCode.OptionNotSupported)) {
             return OWSConstants.SOAP_REASON_OPTION_NOT_SUPPORTED;
-        } else if (exceptionCode.equals(SwesExceptionCode.RequestExtensionNotSupported.name())) {
+        } else if (exceptionCode.equals(SwesExceptionCode.RequestExtensionNotSupported)) {
             return OWSConstants.SOAP_REASON_REQUEST_EXTENSION_NOT_SUPPORTED;
-        } else if (exceptionCode.equals(OwsExceptionCode.VersionNegotiationFailed.name())) {
+        } else if (exceptionCode.equals(OwsExceptionCode.VersionNegotiationFailed)) {
             return OWSConstants.SOAP_REASON_VERSION_NEGOTIATION_FAILED;
-        } else if (exceptionCode.equals(SosExceptionCode.InvalidPropertyOfferingCombination.name())) {
+        } else if (exceptionCode.equals(SosExceptionCode.InvalidPropertyOfferingCombination)) {
             return OWSConstants.SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION;
-        } else if (exceptionCode.equals(SosExceptionCode.ResponseExceedsSizeLimit.name())) {
+        } else if (exceptionCode.equals(SosExceptionCode.ResponseExceedsSizeLimit)) {
             return OWSConstants.SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT;
         } else {
             return OWSConstants.SOAP_REASON_UNKNOWN;
         }
     }
 
-    public static String checkActionURIWithBodyContent(String soapAction, String operationName) throws OwsExceptionReport {
+    public static String checkActionURIWithBodyContent(String soapAction, String operationName)
+            throws OwsExceptionReport {
         if (soapAction != null && !soapAction.isEmpty()) {
-            if (operationName.equals(Operations.GetCapabilities.name()) 
+            if (operationName.equals(Operations.GetCapabilities.name())
                     && soapAction.equals(SosSoapConstants.REQ_ACTION_GETCAPABILITIES)) {
                 LOGGER.debug("ActionURI and SOAPBody content are valid!");
-                return SosSoapConstants.RESP_ACTION_GETCAPABILITIES; 
-            } else if (operationName.equals(Operations.DescribeSensor.name()) 
+                return SosSoapConstants.RESP_ACTION_GETCAPABILITIES;
+            } else if (operationName.equals(Operations.DescribeSensor.name())
                     && soapAction.equals(SosSoapConstants.REQ_ACTION_DESCRIBESENSOR)) {
                 LOGGER.debug("ActionURI and SOAPBody content are valid!");
                 return SosSoapConstants.RESP_ACTION_DESCRIBESENSOR;
-            } else if (operationName.equals(Operations.GetObservation.name()) 
+            } else if (operationName.equals(Operations.GetObservation.name())
                     && soapAction.equals(SosSoapConstants.REQ_ACTION_GETOBSERVATION)) {
                 LOGGER.debug("ActionURI and SOAPBody content are valid!");
                 return SosSoapConstants.RESP_ACTION_GETOBSERVATION;
@@ -233,7 +225,7 @@ public class SoapHelper {
         }
         return null;
     }
-    
+
     // private ISOAPDecoder soapDecoder;
     //
     // private DocumentBuilderFactory docBuildFactory;

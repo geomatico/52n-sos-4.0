@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class OwsHelper {
-    
+
     /**
      * logger
      */
@@ -27,10 +27,10 @@ public class OwsHelper {
      * @return Modified string.
      */
     public static String refactorOpsName(String name) {
-            return name.substring(0, 1).toUpperCase() + name.substring(1);
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
 
     }
-    
+
     /**
      * method checks whether this SOS supports the requested versions
      * 
@@ -40,7 +40,8 @@ public class OwsHelper {
      * @throws OwsExceptionReport
      *             if this SOS does not support the requested versions
      */
-    public static List<String> checkAcceptedVersionsParameter(List<String> versions, Set<String> supportedVersions) throws OwsExceptionReport {
+    public static List<String> checkAcceptedVersionsParameter(List<String> versions, Set<String> supportedVersions)
+            throws OwsExceptionReport {
 
         List<String> validVersions = new ArrayList<String>();
         if (versions != null) {
@@ -63,8 +64,9 @@ public class OwsHelper {
             return validVersions;
         } else {
             OwsExceptionReport owse =
-                    Util4Exceptions.createMissingParameterValueException(SosConstants.GetCapabilitiesParams.AcceptVersions
-                            .name());
+                    Util4Exceptions
+                            .createMissingParameterValueException(SosConstants.GetCapabilitiesParams.AcceptVersions
+                                    .name());
             LOGGER.error("checkAcceptedVersionsParameters", owse);
             throw owse;
         }
@@ -78,11 +80,11 @@ public class OwsHelper {
      * @throws OwsExceptionReport
      *             if this SOS does not support the requested versions
      */
-    public static void checkSingleVersionParameter(String version, Set<String> supportedVersions) throws OwsExceptionReport {
+    public static void checkSingleVersionParameter(String version, Set<String> supportedVersions)
+            throws OwsExceptionReport {
 
         // if version is incorrect, throw exception
-        if (version == null
-                || !supportedVersions.contains(version)) {
+        if (version == null || !supportedVersions.contains(version)) {
 
             StringBuilder exceptionText = new StringBuilder();
             exceptionText.append("The parameter '");
@@ -96,8 +98,8 @@ public class OwsHelper {
             exceptionText.append("'!");
             LOGGER.error("The accepted versions parameter is incorrect.");
             OwsExceptionReport owse = new OwsExceptionReport();
-            owse.addCodedException(OwsExceptionCode.InvalidParameterValue,
-                    OWSConstants.RequestParams.version.name(), exceptionText.toString());
+            owse.addCodedException(OwsExceptionCode.InvalidParameterValue, OWSConstants.RequestParams.version.name(),
+                    exceptionText.toString());
 
             throw owse;
         }
@@ -113,18 +115,20 @@ public class OwsHelper {
      *             if the versions list is empty or no matching version is
      *             contained
      */
-    public static void checkAcceptedVersionsParameter(String versionsString, Set<String> supportedVersions) throws OwsExceptionReport {
+    public static void checkAcceptedVersionsParameter(String versionsString, Set<String> supportedVersions)
+            throws OwsExceptionReport {
         // check acceptVersions
         if (versionsString != null && !versionsString.equals("")) {
             String[] versionsArray = versionsString.split(",");
             checkAcceptedVersionsParameter(Arrays.asList(versionsArray), supportedVersions);
         } else {
             OwsExceptionReport se =
-                    Util4Exceptions.createMissingParameterValueException(SosConstants.GetCapabilitiesParams.AcceptVersions
-                            .name());
+                    Util4Exceptions
+                            .createMissingParameterValueException(SosConstants.GetCapabilitiesParams.AcceptVersions
+                                    .name());
             LOGGER.error("checkAcceptedVersionsParameter", se);
             throw se;
         }
     }
-    
+
 }

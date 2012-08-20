@@ -41,18 +41,17 @@ import org.n52.sos.request.AbstractServiceRequest;
  */
 public interface IGetResultDAO extends IOperationDAO {
 
-	/**
-	 * method queries data for the getResult response and generates an
-	 * ISosResponse which represents the result response or an ExceptionReport
-	 * if an exception occurred
-	 * 
-	 * @param request
-	 *            GetResult request for the getResult operation
-	 * @return Returns GetResult response
-	 * @throws OwsExceptionReport
-	 *             If an error occurs.
-	 */
-	public List<SosObservation> getResult(AbstractServiceRequest request)
-			throws OwsExceptionReport;
+    /**
+     * method queries data for the getResult response and generates an
+     * ISosResponse which represents the result response or an ExceptionReport
+     * if an exception occurred
+     * 
+     * @param request
+     *            GetResult request for the getResult operation
+     * @return Returns GetResult response
+     * @throws OwsExceptionReport
+     *             If an error occurs.
+     */
+    public List<SosObservation> getResult(AbstractServiceRequest request) throws OwsExceptionReport;
 
 }

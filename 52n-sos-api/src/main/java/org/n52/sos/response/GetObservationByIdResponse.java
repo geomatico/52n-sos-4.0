@@ -9,7 +9,7 @@ public class GetObservationByIdResponse extends AbstractServiceResponse {
     private String responseFormat;
 
     private List<SosObservation> observationCollection;
-    
+
     public String getResponseFormat() {
         return responseFormat;
     }
@@ -23,7 +23,7 @@ public class GetObservationByIdResponse extends AbstractServiceResponse {
     }
 
     public void setObservationCollection(List<SosObservation> observationCollection) {
-       this.observationCollection = observationCollection;
+        this.observationCollection = observationCollection;
     }
 
 }

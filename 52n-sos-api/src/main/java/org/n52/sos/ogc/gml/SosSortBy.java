@@ -59,7 +59,7 @@ public class SosSortBy {
     }
 
     /**
-     *  default constructor
+     * default constructor
      */
     public SosSortBy() {
     }

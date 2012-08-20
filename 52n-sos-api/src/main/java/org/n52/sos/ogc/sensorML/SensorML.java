@@ -31,12 +31,10 @@ package org.n52.sos.ogc.sensorML;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 /**
  * SOS internal representation of a sensor description
  */
-public class SensorML extends AbstractSensorML{
+public class SensorML extends AbstractSensorML {
 
     private String version;
 
@@ -69,6 +67,18 @@ public class SensorML extends AbstractSensorML{
             members = new ArrayList<AbstractProcess>();
         }
         members.add(member);
+    }
+    
+    public boolean isWrapper() {
+        return (getKeywords() == null || (getKeywords() != null && getKeywords().isEmpty()))
+                && (getIdentifications() == null || (getIdentifications() != null && getIdentifications().isEmpty()))
+                && (getClassifications() == null || (getClassifications() != null && getClassifications().isEmpty()))
+                && (getCapabilities() == null || (getCapabilities() != null && getCapabilities().isEmpty()))
+                && (getCharacteristics() == null || (getCharacteristics() != null && getCharacteristics().isEmpty()))
+                && (getValidTime() == null) && (getContact() == null || (getContact() != null && getContact().isEmpty()))
+                && (getDocumentation() == null || (getDocumentation() != null && getDocumentation().isEmpty()))
+                && (getHistory() == null || (getHistory() != null && getHistory().isEmpty()))
+                && (members != null && !members.isEmpty());
     }
 
 }

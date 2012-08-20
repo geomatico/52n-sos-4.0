@@ -34,6 +34,7 @@ import java.util.Map;
 
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -44,64 +45,62 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public interface IFeatureQueryHandler {
 
-	/**
-	 * Query feature data from data source for an identifier
-	 * 
-	 * @param featureID
-	 *            FOI identifier
-	 * @param connection
-	 *            Data source connection
-	 * @param version
-	 *            SOS version
-	 * @return SOS representation of the FOI
-	 * @throws OwsExceptionReport
-	 */
-	public SosAbstractFeature getFeatureByID(String featureID,
-			Object connection, String version) throws OwsExceptionReport;
+    /**
+     * Query feature data from data source for an identifier
+     * 
+     * @param featureID
+     *            FOI identifier
+     * @param connection
+     *            Data source connection
+     * @param version
+     *            SOS version
+     * @return SOS representation of the FOI
+     * @throws OwsExceptionReport
+     */
+    public SosAbstractFeature getFeatureByID(String featureID, Object connection, String version)
+            throws OwsExceptionReport;
 
-	/**
-	 * Query feature identifier from data source for a spatial filter
-	 * 
-	 * @param filter
-	 *            Spatial filter
-	 * @param connection
-	 *            Data source connection
-	 * @return List of FOI identifieres
-	 * @throws OwsExceptionReport
-	 */
-	Collection<String> getFeatureIDs(SpatialFilter filter, Object connection)
-			throws OwsExceptionReport;
+    /**
+     * Query feature identifier from data source for a spatial filter
+     * 
+     * @param filter
+     *            Spatial filter
+     * @param connection
+     *            Data source connection
+     * @return List of FOI identifieres
+     * @throws OwsExceptionReport
+     */
+    Collection<String> getFeatureIDs(SpatialFilter filter, Object connection) throws OwsExceptionReport;
 
-	/**
-	 * Get feature data for identifiers and/or for a spatial filter
-	 * 
-	 * @param foiIDs
-	 *            FOI identifiers
-	 * @param list
-	 *            Spatial filter
-	 * @param connection
-	 *            Data source connection
-	 * @param version
-	 *            SOS version
-	 * @return Map of identifier and SOS FOI representation
-	 * @throws OwsExceptionReport
-	 */
-	public Map<String, SosAbstractFeature> getFeatures(List<String> foiIDs,
-			List<SpatialFilter> list, Object connection, String version)
-			throws OwsExceptionReport;
+    /**
+     * Get feature data for identifiers and/or for a spatial filter
+     * 
+     * @param foiIDs
+     *            FOI identifiers
+     * @param list
+     *            Spatial filter
+     * @param connection
+     *            Data source connection
+     * @param version
+     *            SOS version
+     * @return Map of identifier and SOS FOI representation
+     * @throws OwsExceptionReport
+     */
+    public Map<String, SosAbstractFeature> getFeatures(List<String> foiIDs, List<SpatialFilter> list,
+            Object connection, String version) throws OwsExceptionReport;
 
-	/**
-	 * Query the envelope for feature ids
-	 * 
-	 * @param featureIDs
-	 *            FOI identifiers
-	 * @param connection
-	 *            Data source connection
-	 * @return Envelope of requested FOI identifiers
-	 * @throws OwsExceptionReport
-	 */
-	public Envelope getEnvelopeforFeatureIDs(List<String> featureIDs,
-			Object connection) throws OwsExceptionReport;
-
+    /**
+     * Query the envelope for feature ids
+     * 
+     * @param featureIDs
+     *            FOI identifiers
+     * @param connection
+     *            Data source connection
+     * @return Envelope of requested FOI identifiers
+     * @throws OwsExceptionReport
+     */
+    public Envelope getEnvelopeforFeatureIDs(List<String> featureIDs, Object connection) throws OwsExceptionReport;
+    
+    public String insertFeature(SosSamplingFeature samplingFeature, Object connection) throws OwsExceptionReport;
 
 }

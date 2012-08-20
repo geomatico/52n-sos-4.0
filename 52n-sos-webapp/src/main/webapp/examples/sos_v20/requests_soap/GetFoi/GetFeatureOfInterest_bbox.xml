@@ -18,7 +18,6 @@ http://schemas.opengis.net/sos/2.0.0/sos.xsd">
 					</gml:Envelope>
 				</fes:BBOX>
 			</sos:spatialFilter>
-
 		</sos:GetFeatureOfInterest>
 	</env:Body>
 </env:Envelope>

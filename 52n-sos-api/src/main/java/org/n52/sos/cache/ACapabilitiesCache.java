@@ -30,7 +30,7 @@ package org.n52.sos.cache;
 
 /**
  * Abstract class for the capabilities cache implementations
- *
+ * 
  */
 public abstract class ACapabilitiesCache {
 

@@ -32,23 +32,20 @@ import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OWSConstants;
 
 /**
- * SosConstants holds all important and often used constants
- * (e.g. name of the getCapabilities operation) that are 
- * specific to SOS 1.0
-
+ * SosConstants holds all important and often used constants (e.g. name of the
+ * getCapabilities operation) that are specific to SOS 1.0
+ * 
  * 
  */
 public final class Sos1Constants {
-	
-	public static final String NS_SOS = "http://www.opengis.net/sos/1.0";
-	
-	/** Constant for the schema repository of the SOS */
-	public static final String SCHEMA_LOCATION_SOS = "http://schemas.opengis.net/sos/1.0.0/sosAll.xsd";
-	
-	
+
+    public static final String NS_SOS = "http://www.opengis.net/sos/1.0";
+
+    /** Constant for the schema repository of the SOS */
+    public static final String SCHEMA_LOCATION_SOS = "http://schemas.opengis.net/sos/1.0.0/sosAll.xsd";
+
     /** Constant for the content types of the response formats */
-    private static String[] RESPONSE_FORMATS = { OMConstants.CONTENT_TYPE_OM,
-        SosConstants.CONTENT_TYPE_ZIP };    
+    private static String[] RESPONSE_FORMATS = { OMConstants.CONTENT_TYPE_OM, SosConstants.CONTENT_TYPE_ZIP };
 
     /** Constant for actual implementing version */
     public static final String SERVICEVERSION = "1.0.0";
@@ -57,16 +54,17 @@ public final class Sos1Constants {
     private Sos1Constants() {
     }
 
-    /** the names of the SOS 1.0 operations that are not supported by all versions */
+    /**
+     * the names of the SOS 1.0 operations that are not supported by all
+     * versions
+     */
     public enum Operations {
-        GetFeatureOfInterestTime, DescribeFeatureType, DescribeObservtionType, DescribeResultModel,
-        RegisterSensor;
-        
+        GetFeatureOfInterestTime, DescribeFeatureType, DescribeObservtionType, DescribeResultModel, RegisterSensor;
+
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
-                    (SosConstants.Operations.contains(s))                    
-                            || (s.equals(Operations.GetFeatureOfInterestTime.name()))
+                    (SosConstants.Operations.contains(s)) || (s.equals(Operations.GetFeatureOfInterestTime.name()))
                             || (s.equals(Operations.DescribeFeatureType.name()))
                             || (s.equals(Operations.DescribeObservtionType.name()))
                             || (s.equals(Operations.DescribeResultModel.name()))
@@ -75,7 +73,10 @@ public final class Sos1Constants {
         }
     }
 
-    /** enum with names of SOS 1.0 Capabilities sections not supported by all versions */
+    /**
+     * enum with names of SOS 1.0 Capabilities sections not supported by all
+     * versions
+     */
     public enum CapabilitiesSections {
         Filter_Capabilities;
 
@@ -96,7 +97,10 @@ public final class Sos1Constants {
         }
     }
 
-    /** enum with parameter names for SOS 1.0 getObservation request not supported by all versions */
+    /**
+     * enum with parameter names for SOS 1.0 getObservation request not
+     * supported by all versions
+     */
     public enum GetObservationParams {
         eventTime;
 
@@ -117,7 +121,10 @@ public final class Sos1Constants {
         }
     }
 
-    /** enum with parameter names for SOS 1.0 insertObservation request not supported by all versions */
+    /**
+     * enum with parameter names for SOS 1.0 insertObservation request not
+     * supported by all versions
+     */
     public enum InsertObservationParams {
         AssignedSensorId, Observation;
 
@@ -132,14 +139,17 @@ public final class Sos1Constants {
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
-                    (OWSConstants.RequestParams.contains(s))                                        
+                    (OWSConstants.RequestParams.contains(s))
                             || (s.equals(InsertObservationParams.AssignedSensorId.name()))
                             || (s.equals(InsertObservationParams.Observation.name()));
             return contained;
         }
     }
 
-    /** enum with parameter names for SOS 1.0 getObservation request not supported by all versions */
+    /**
+     * enum with parameter names for SOS 1.0 getObservation request not
+     * supported by all versions
+     */
     public enum DescribeSensorParams {
         outputFormat, time;
 
@@ -154,14 +164,17 @@ public final class Sos1Constants {
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
-                    (SosConstants.DescribeSensorParams.contains(s))                    
+                    (SosConstants.DescribeSensorParams.contains(s))
                             || (s.equals(DescribeSensorParams.outputFormat.name()))
                             || (s.equals(DescribeSensorParams.time.name()));
             return contained;
         }
     }
 
-    /** enum with parameter names for SOS 1.0 getFeatureOfInterest request not supported by all versions */
+    /**
+     * enum with parameter names for SOS 1.0 getFeatureOfInterest request not
+     * supported by all versions
+     */
     public enum GetFeatureOfInterestParams {
         featureOfInterestID, location;
 
@@ -176,13 +189,13 @@ public final class Sos1Constants {
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
-                    (OWSConstants.RequestParams.contains(s))                    
+                    (OWSConstants.RequestParams.contains(s))
                             || (s.equals(GetFeatureOfInterestParams.featureOfInterestID.name()))
                             || (s.equals(GetFeatureOfInterestParams.location.name()));
             return contained;
         }
     }
-    
+
     /** enum with parameter names for getFeatureOfInterestTime request */
     public enum GetFeatureOfInterestTimeParams {
         featureOfInterestID, location, observedProperty, procedure;
@@ -198,7 +211,7 @@ public final class Sos1Constants {
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
-                    (OWSConstants.RequestParams.contains(s))                    
+                    (OWSConstants.RequestParams.contains(s))
                             || (s.equals(GetFeatureOfInterestTimeParams.featureOfInterestID.name()))
                             || (s.equals(GetFeatureOfInterestTimeParams.location.name()))
                             || (s.equals(GetFeatureOfInterestTimeParams.observedProperty.name()))
@@ -222,17 +235,20 @@ public final class Sos1Constants {
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
-                    (OWSConstants.RequestParams.contains(s))                    
+                    (OWSConstants.RequestParams.contains(s))
                             || (s.equals(RegisterSensorParams.SensorDescription.name()))
                             || (s.equals(RegisterSensorParams.ObservationTemplate.name()));
             return contained;
         }
     }
-    
-    /** enum with parameter names for SOS 1.0 getObservationById request not supported by all versions */
+
+    /**
+     * enum with parameter names for SOS 1.0 getObservationById request not
+     * supported by all versions
+     */
     public enum GetObservationByIdParams {
         srsName, ObservationId, responseFormat, resultModel, responseMode, SortBy;
-        
+
         /**
          * method checks whether the string parameter is contained in this
          * enumeration
@@ -244,8 +260,7 @@ public final class Sos1Constants {
         public static boolean contains(String s) {
             boolean contained = false;
             contained =
-                    (OWSConstants.RequestParams.contains(s))                    
-                            || (s.equals(GetObservationByIdParams.srsName.name()))
+                    (OWSConstants.RequestParams.contains(s)) || (s.equals(GetObservationByIdParams.srsName.name()))
                             || (s.equals(GetObservationByIdParams.ObservationId.name()))
                             || (s.equals(GetObservationByIdParams.responseFormat.name()))
                             || (s.equals(GetObservationByIdParams.resultModel.name()))
@@ -253,7 +268,7 @@ public final class Sos1Constants {
                             || (s.equals(GetObservationByIdParams.SortBy.name()));
             return contained;
         }
-    }    
+    }
 
     /**
      * Returns the supported response formats.

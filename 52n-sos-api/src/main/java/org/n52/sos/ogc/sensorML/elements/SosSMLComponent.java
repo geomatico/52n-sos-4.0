@@ -47,9 +47,9 @@ public class SosSMLComponent {
     private AbstractSensorML process;
 
     public SosSMLComponent() {
-        
+
     }
-    
+
     /**
      * constructor
      * 

@@ -39,17 +39,16 @@ import org.n52.sos.request.AbstractServiceRequest;
  */
 public interface IGetFeatureOfInterestTimeDAO extends IOperationDAO {
 
-	/**
-	 * Get the times period of observations for a specific FOI contained in data
-	 * source.
-	 * 
-	 * @param request
-	 *            GetFeatureOfInterestTime request
-	 * @return Returns the GetFeatureOfInterestTime response
-	 * @throws OwsExceptionReport
-	 *             If an error occurs.
-	 */
-	public TimePeriod getFeatureOfInterestTime(AbstractServiceRequest request)
-			throws OwsExceptionReport;
+    /**
+     * Get the times period of observations for a specific FOI contained in data
+     * source.
+     * 
+     * @param request
+     *            GetFeatureOfInterestTime request
+     * @return Returns the GetFeatureOfInterestTime response
+     * @throws OwsExceptionReport
+     *             If an error occurs.
+     */
+    public TimePeriod getFeatureOfInterestTime(AbstractServiceRequest request) throws OwsExceptionReport;
 
 }

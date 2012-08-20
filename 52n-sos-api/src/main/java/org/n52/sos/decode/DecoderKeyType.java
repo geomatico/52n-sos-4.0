@@ -72,14 +72,15 @@ public class DecoderKeyType implements Comparable<DecoderKeyType> {
         }
         return hash;
     }
-    
+
     private boolean checkParameter(String localParameter, String parameterToCheck) {
-        if ((localParameter == null && parameterToCheck == null) || (localParameter != null && parameterToCheck != null && localParameter.equals(parameterToCheck))) {
+        if ((localParameter == null && parameterToCheck == null)
+                || (localParameter != null && parameterToCheck != null && localParameter.equals(parameterToCheck))) {
             return true;
         }
         return false;
     }
-    
+
     @Override
     public String toString() {
         StringBuilder string = new StringBuilder();

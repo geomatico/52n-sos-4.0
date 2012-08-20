@@ -28,9 +28,10 @@
 
 package org.n52.sos.binding;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.soap.SOAPConstants;
 
@@ -48,11 +49,10 @@ import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.IServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.soap.SoapHelper;
 import org.n52.sos.soap.SoapRequest;
 import org.n52.sos.soap.SoapResponse;
-import org.n52.sos.soap.SoapHelper;
 import org.n52.sos.util.SosHelper;
-import org.n52.sos.util.SosRequestToResponseHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
@@ -69,19 +69,19 @@ public class SoapBinding implements IBinding {
     }
 
     @Override
-    public ServiceResponse doGetOperation(HttpServletRequest req) {
-        OwsExceptionReport owse =
-                Util4Exceptions.createNoApplicableCodeException(null, "The requested operations is not supported!");
+    public ServiceResponse doGetOperation(HttpServletRequest req) throws OwsExceptionReport {
+        String exceptionText = "The requested service URL only supports HTTP-Post SOAP requests!";
+        OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
             owse.setVersion(Sos2Constants.SERVICEVERSION);
         } else {
             owse.setVersion(Sos1Constants.SERVICEVERSION);
         }
-        return SosRequestToResponseHelper.createExceptionResponse(owse);
+        throw owse;
     }
 
     @Override
-    public ServiceResponse doPostOperation(HttpServletRequest request) throws ServletException {
+    public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport {
         String version = null;
         String soapVersion = null;
         String soapNamespace = null;
@@ -102,7 +102,8 @@ public class SoapBinding implements IBinding {
                 soapResponse.setHeader(soapRequest.getSoapHeader());
                 if (soapRequest.getSoapFault() == null) {
                     XmlObject xmlObject = soapRequest.getSoapBodyContent();
-                    IXmlRequestDecoder bodyDecoder = getIXmlRequestDecoder(new DecoderKeyType(XmlHelper.getNamespace(xmlObject)));
+                    IXmlRequestDecoder bodyDecoder =
+                            getIXmlRequestDecoder(new DecoderKeyType(XmlHelper.getNamespace(xmlObject)));
                     // Decode SOAPBody content
                     Object aBodyRequest = bodyDecoder.decode(xmlObject);
                     if (aBodyRequest instanceof AbstractServiceRequest) {
@@ -131,14 +132,17 @@ public class SoapBinding implements IBinding {
                 if (encoder != null) {
                     return (ServiceResponse) encoder.encode(soapResponse);
                 } else {
+                    // FIXME: valid exception
                     OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
                     throw owse;
                 }
             } else {
+                // FIXME: valid exception
                 OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
                 throw owse;
             }
         } catch (OwsExceptionReport owse) {
+            // FIXME: valid debug text
             LOGGER.debug("", owse);
             if (version != null) {
                 owse.setVersion(version);
@@ -149,7 +153,7 @@ public class SoapBinding implements IBinding {
                     owse.setVersion(Sos2Constants.SERVICEVERSION);
                 }
             }
-            soapResponse.setSoapBodyContent(SosRequestToResponseHelper.createExceptionResponse(owse));
+            soapResponse.setException(owse);
             if (soapVersion == null || (soapVersion != null && !soapVersion.isEmpty())) {
                 soapResponse.setSoapVersion(SOAPConstants.SOAP_1_2_PROTOCOL);
             } else {
@@ -160,19 +164,13 @@ public class SoapBinding implements IBinding {
             } else {
                 soapResponse.setSoapNamespace(soapNamespace);
             }
-            try {
-                IEncoder encoder = Configurator.getInstance().getEncoder(soapResponse.getSoapNamespace());
-                if (encoder != null) {
-                    return (ServiceResponse) encoder.encode(soapResponse);
-                } else {
-                    throw Util4Exceptions.createNoApplicableCodeException(null,
-                            "Error while encoding exception with SOAP envelope!");
-                }
-            } catch (OwsExceptionReport exc) {
-                LOGGER.debug("ERROR while encoding OWSException to SOAP message", exc);
-                throw new ServletException("ERROR", exc);
+            IEncoder encoder = Configurator.getInstance().getEncoder(soapResponse.getSoapNamespace());
+            if (encoder != null) {
+                return (ServiceResponse) encoder.encode(soapResponse);
+            } else {
+                throw Util4Exceptions.createNoApplicableCodeException(null,
+                        "Error while encoding exception with SOAP envelope!");
             }
-
         }
     }
 
@@ -196,7 +194,7 @@ public class SoapBinding implements IBinding {
         }
         return false;
     }
-    
+
     private IDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
         List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
         for (IDecoder iDecoder : decoder) {
@@ -204,14 +202,21 @@ public class SoapBinding implements IBinding {
         }
         return null;
     }
-    
+
     private IXmlRequestDecoder getIXmlRequestDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
         List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
         for (IDecoder iDecoder : decoder) {
             if (iDecoder instanceof IXmlRequestDecoder) {
-                return (IXmlRequestDecoder)iDecoder;
+                return (IXmlRequestDecoder) iDecoder;
             }
         }
         return null;
+    }
+
+    @Override
+    public Set<String> getConformanceClasses() {
+        Set<String> conformanceClasses = new HashSet<String>(0);
+        conformanceClasses.add("http://www.opengis.net/spec/SOS/2.0/conf/soap");
+        return conformanceClasses;
     }
 }

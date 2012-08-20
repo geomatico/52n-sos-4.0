@@ -1,3 +1,4 @@
+
 /***************************************************************
  Copyright (C) 2012
  by 52 North Initiative for Geospatial Open Source Software GmbH
@@ -30,7 +31,11 @@ package org.n52.sos.decode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.opengis.sos.x20.GetCapabilitiesDocument;
 import net.opengis.sos.x20.GetCapabilitiesType;
@@ -41,11 +46,16 @@ import net.opengis.sos.x20.GetObservationByIdType;
 import net.opengis.sos.x20.GetObservationDocument;
 import net.opengis.sos.x20.GetObservationType;
 import net.opengis.sos.x20.InsertObservationDocument;
+import net.opengis.sos.x20.InsertObservationType;
+import net.opengis.sos.x20.InsertObservationType.Observation;
 
+import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
+import org.apache.xmlbeans.XmlOptions;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.om.OMConstants;
+import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.request.AbstractServiceRequest;
@@ -55,7 +65,9 @@ import org.n52.sos.request.GetObservationByIdRequest;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.W3CConstants;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +101,16 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
     }
 
     @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return new HashMap<SupportedTypeKey, Set<String>>(0);
+    }
+    
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
+    }
+
+    @Override
     public AbstractServiceRequest decode(XmlObject xmlObject) throws OwsExceptionReport {
         AbstractServiceRequest response = null;
         LOGGER.debug("REQUESTTYPE:" + xmlObject.getClass());
@@ -115,7 +137,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
             GetObservationByIdDocument getObsByIdDoc = (GetObservationByIdDocument) xmlObject;
             response = parseGetObservationById(getObsByIdDoc);
         }
-        
+
         else if (xmlObject instanceof InsertObservationDocument) {
             InsertObservationDocument insertObservationDoc = (InsertObservationDocument) xmlObject;
             response = parseInsertObservation(insertObservationDoc);
@@ -128,7 +150,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
         }
         return response;
     }
-
+    
     /**
      * parses the XmlBean representing the getCapabilities request and creates a
      * SosGetCapabilities request
@@ -139,8 +161,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
      * @throws OwsExceptionReport
      *             If parsing the XmlBean failed
      */
-    private AbstractServiceRequest parseGetCapabilities(GetCapabilitiesDocument getCapsDoc)
-            throws OwsExceptionReport {
+    private AbstractServiceRequest parseGetCapabilities(GetCapabilitiesDocument getCapsDoc) throws OwsExceptionReport {
         GetCapabilitiesRequest request = new GetCapabilitiesRequest();
 
         // validate document
@@ -179,8 +200,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
      * @throws OwsExceptionReport
      *             If parsing the XmlBean failed
      */
-    private AbstractServiceRequest parseGetObservation(GetObservationDocument getObsDoc)
-            throws OwsExceptionReport {
+    private AbstractServiceRequest parseGetObservation(GetObservationDocument getObsDoc) throws OwsExceptionReport {
         // validate document
         XmlHelper.validateDocument(getObsDoc);
 
@@ -245,13 +265,54 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
         getObsByIdRequest.setObservationIdentifier(Arrays.asList(getObsByIdType.getObservationArray()));
         return getObsByIdRequest;
     }
-    
-    private AbstractServiceRequest parseInsertObservation(InsertObservationDocument insertObservationDoc) throws OwsExceptionReport {
-     // validate document
+
+    private AbstractServiceRequest parseInsertObservation(InsertObservationDocument insertObservationDoc)
+            throws OwsExceptionReport {
+        // set namespace for default XML type (e.g. xs:string, xs:integer, xs:boolean, ...)
+        // Fix for problem with XmlBeans: namespace is not set in child elements when defined in root of request (SOAP)
+        XmlCursor cursor = insertObservationDoc.newCursor();
+        if (cursor.toFirstChild()) {
+            if (cursor.namespaceForPrefix(W3CConstants.NS_XS_PREFIX) == null) {
+                cursor.prefixForNamespace(W3CConstants.NS_XS);
+            }
+        }
+        cursor.dispose();
+        // validate document
         XmlHelper.validateDocument(insertObservationDoc);
         InsertObservationRequest insertObservationRequest = new InsertObservationRequest();
-        return insertObservationRequest;
+        InsertObservationType insertObservationType = insertObservationDoc.getInsertObservation();
+        insertObservationRequest.setService(insertObservationType.getService());
+        insertObservationRequest.setVersion(insertObservationType.getVersion());
+        if (insertObservationDoc.getInsertObservation().getOfferingArray() != null) {
+            insertObservationRequest.setOfferings(Arrays.asList(insertObservationType.getOfferingArray()));
+        }
         
+        if (insertObservationType.getObservationArray() != null) {
+            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            for (Observation observation : insertObservationType.getObservationArray()) {
+                List<IDecoder> decoderList = Configurator.getInstance().getDecoder(new DecoderKeyType(XmlHelper.getNamespace(observation.getOMObservation())));
+                if (decoderList != null) {
+                    for (IDecoder decoder : decoderList) {
+                        Object decodedObject = decoder.decode(observation.getOMObservation());
+                        if (decodedObject != null && decodedObject instanceof SosObservation) {
+                            insertObservationRequest.addObservation((SosObservation)decodedObject);
+                            break;
+                        }
+                    }
+                } else {
+                    StringBuilder exceptionText = new StringBuilder();
+                    exceptionText.append("The requested observation type (");
+                    exceptionText.append(observation.getOMObservation().getDomNode().getNodeName());
+                    exceptionText.append(") is not supported by this server!");
+                    LOGGER.debug(exceptionText.toString());
+                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(Sos2Constants.InsertObservationParams.observation.name(), exceptionText.toString()));
+                }
+            }
+            Util4Exceptions.mergeExceptions(exceptions);
+            // TODO: add offering to observationConstellation (duplicate obs if more than one offering)
+        }
+        return insertObservationRequest;
+
     }
 
     /**
@@ -343,5 +404,5 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
         }
         return sosTemporalFilters.toArray(new TemporalFilter[0]);
     }
-
+    
 }

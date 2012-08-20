@@ -1,10 +1,28 @@
 package org.n52.sos.decode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import net.opengis.gml.x32.AbstractRingPropertyType;
+import net.opengis.gml.x32.AbstractRingType;
+import net.opengis.gml.x32.AbstractSurfaceType;
+import net.opengis.gml.x32.CompositeSurfaceType;
+import net.opengis.gml.x32.CoordinatesType;
+import net.opengis.gml.x32.DirectPositionListType;
+import net.opengis.gml.x32.DirectPositionType;
 import net.opengis.gml.x32.EnvelopeDocument;
 import net.opengis.gml.x32.EnvelopeType;
+import net.opengis.gml.x32.LineStringType;
+import net.opengis.gml.x32.LinearRingType;
+import net.opengis.gml.x32.MeasureType;
+import net.opengis.gml.x32.PointType;
+import net.opengis.gml.x32.PolygonType;
+import net.opengis.gml.x32.ReferenceType;
+import net.opengis.gml.x32.SurfacePropertyType;
 import net.opengis.gml.x32.TimeInstantDocument;
 import net.opengis.gml.x32.TimeInstantType;
 import net.opengis.gml.x32.TimePeriodDocument;
@@ -16,8 +34,12 @@ import org.joda.time.DateTime;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
+import org.n52.sos.ogc.om.SosSingleObservationValue;
+import org.n52.sos.ogc.om.values.CategoryValue;
+import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.SosHelper;
@@ -26,6 +48,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
 
@@ -36,10 +60,17 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GmlDecoderv321.class);
 
     private List<DecoderKeyType> decoderKeyTypes;
+    
+    private static final String CS = ",";
+
+    private static final String DECIMAL = ".";
+
+    private static final String TS = " ";
 
     public GmlDecoderv321() {
         decoderKeyTypes = new ArrayList<DecoderKeyType>();
         decoderKeyTypes.add(new DecoderKeyType(GMLConstants.NS_GML_32));
+        decoderKeyTypes.add(new DecoderKeyType(MeasureType.type.toString()));
         StringBuilder builder = new StringBuilder();
         for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
             builder.append(decoderKeyType.toString());
@@ -55,6 +86,16 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
     }
 
     @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return new HashMap<SupportedTypeKey, Set<String>>(0);
+    }
+
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
+    }
+    
+    @Override
     public Object decode(XmlObject xmlObject) throws OwsExceptionReport {
         if (xmlObject instanceof EnvelopeDocument) {
             return getGeometry4BBOX((EnvelopeDocument) xmlObject);
@@ -66,10 +107,22 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
             return parseTimeInstant(((TimeInstantDocument) xmlObject).getTimeInstant());
         } else if (xmlObject instanceof TimePeriodDocument) {
             return parseTimePeriod(((TimePeriodDocument) xmlObject).getTimePeriod());
+        } else if (xmlObject instanceof ReferenceType) {
+            return parseReferenceType((ReferenceType)xmlObject);
+        } else if (xmlObject instanceof MeasureType) {
+            return parseMeasureType((MeasureType)xmlObject);
+        } else if (xmlObject instanceof PointType) {
+            return parsePointType((PointType)xmlObject);
+        } else if (xmlObject instanceof LineStringType) {
+            return parseLineStringType((LineStringType)xmlObject);
+        } else if (xmlObject instanceof PolygonType) {
+            return parsePolygonType((PolygonType)xmlObject);
+        } else if (xmlObject instanceof CompositeSurfaceType) {
+            return parseCompositeSurfaceType((CompositeSurfaceType)xmlObject);
         }
         return null;
     }
-
+    
     /**
      * parses the BBOX element of the featureOfInterest element contained in the
      * GetObservation request and returns a String representing the BOX in
@@ -85,8 +138,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
     private Geometry getGeometry4BBOX(EnvelopeDocument envelopeDocument) throws OwsExceptionReport {
         EnvelopeType envelopeType = envelopeDocument.getEnvelope();
         int srid =
-                SosHelper.parseSrsName(envelopeType.getSrsName(), Configurator.getInstance()
-                        .getSrsNamePrefixSosV2());
+                SosHelper.parseSrsName(envelopeType.getSrsName(), Configurator.getInstance().getSrsNamePrefixSosV2());
         String lowerCorner = envelopeType.getLowerCorner().getStringValue();
         String upperCorner = envelopeType.getUpperCorner().getStringValue();
         if (Configurator.getInstance().switchCoordinatesForEPSG(srid)) {
@@ -94,8 +146,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
             upperCorner = switchCoordinatesInString(upperCorner);
         }
         Geometry geom =
-                JTSHelper
-                        .createGeometryFromWKT(JTSHelper.createWKTPolygonFromEnvelope(lowerCorner, upperCorner));
+                JTSHelper.createGeometryFromWKT(JTSHelper.createWKTPolygonFromEnvelope(lowerCorner, upperCorner));
         geom.setSRID(srid);
         return geom;
     }
@@ -229,209 +280,316 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         return new TimePeriod(begin, end);
     }
 
-    // /**
-    // * Parses a XML time object to a SOS representation.
-    // *
-    // * @param xbTemporalOpsType
-    // * XML time object
-    // * @return SOS time object representation.
-    // * @throws OwsExceptionReport
-    // */
-    // private ISosTime parseTime(TemporalOpsType xbTemporalOpsType) throws
-    // OwsExceptionReport {
-    // ISosTime sosTime = null;
-    // XmlCursor timeCursor = xbTemporalOpsType.newCursor();
-    // try {
-    // if (timeCursor.toChild(GMLConstants.QN_TIME_INSTANT_32)) {
-    // sosTime = parseTimeInstantNode(timeCursor.getDomNode());
-    // } else if (timeCursor.toChild(GMLConstants.QN_TIME_PERIOD_32)) {
-    // sosTime = parseTimePeriodNode(timeCursor.getDomNode());
-    // } else {
-    // OwsExceptionReport se = new OwsExceptionReport();
-    // se.addCodedException(OwsExceptionReport.ExceptionCode.InvalidParameterValue,
-    // "Time",
-    // "The requested time type is not supported by this SOS!");
-    // LOGGER.error("The requested time type is not supported by this SOS!");
-    // throw se;
-    // }
-    // } catch (XmlException xmle) {
-    // OwsExceptionReport se = new OwsExceptionReport();
-    // se.addCodedException(OwsExceptionReport.ExceptionCode.InvalidParameterValue,
-    // "Time",
-    // "Error while parsing time: " + xmle.getMessage());
-    // LOGGER.error(se.getMessage() + xmle.getMessage());
-    // throw se;
-    // }
-    // timeCursor.dispose();
-    // return sosTime;
-    // }
-    //
-    // /**
-    // * help method, which creates an TimeInstant object from the DOM-node of
-    // the
-    // * TimeInstantType. This constructor is necessary cause XMLBeans does not
-    // * full support substitution groups. So one has to do a workaround with
-    // * XmlCursor and the DomNodes of the elements.
-    // *
-    // * @param timeInstant
-    // * DOM Node of timeInstant element
-    // * @return Returns a TimeInstant created from the DOM-Node
-    // * @throws OwsExceptionReport
-    // * if no timePosition element is cotained in the timeInstant
-    // * element
-    // * @throws XmlException
-    // * if parsing the DomNode to an XMLBeans XmlObject failed
-    // */
-    // private TimeInstant parseTimeInstantNode(Node timeInstant) throws
-    // OwsExceptionReport, XmlException {
-    //
-    // TimeInstant ti = new TimeInstant();
-    //
-    // TimeInstantDocument xbTimeInstantDocument =
-    // TimeInstantDocument.Factory.parse(timeInstant);
-    // TimeInstantType xbTimeInstant = xbTimeInstantDocument.getTimeInstant();
-    //
-    // if (xbTimeInstant.getTimePosition() != null) {
-    // try {
-    // String positionString = xbTimeInstant.getTimePosition().getStringValue();
-    // if (positionString != null && !positionString.equals("")) {
-    // if (positionString.equals(SosConstants.FirstLatest.latest.name())
-    // || positionString.equals(SosConstants.FirstLatest.getFirst.name())) {
-    // ti.setIndeterminateValue(positionString);
-    // ti.setRequestedTimeLength(positionString.length());
-    // } else {
-    // ti.setValue(SosDateTimeUtilities.parseIsoString2DateTime(positionString));
-    // ti.setRequestedTimeLength(positionString.length());
-    // }
-    // }
-    //
-    // // if intdeterminateTime attribute is set, set string value
-    // if (xbTimeInstant.getTimePosition().getIndeterminatePosition() != null) {
-    // ti.setIndeterminateValue(xbTimeInstant.getTimePosition().getIndeterminatePosition().toString());
-    // }
-    // if (!(ti.getIndeterminateValue() != null &&
-    // !ti.getIndeterminateValue().isEmpty())
-    // && ti.getValue() == null) {
-    // OwsExceptionReport se = new
-    // OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-    // se.addCodedException(ExceptionCode.MissingParameterValue,
-    // "gml:timePosition",
-    // "No IndeterminateValue attribute and gml:timePosition value ist null or empty!");
-    // throw se;
-    // }
-    // } catch (Exception e) {
-    // OwsExceptionReport se = new
-    // OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-    // LOGGER.error("Error while parse time String to DateTime!", e);
-    // se.addCodedException(null, null,
-    // "Error while parse time String to DateTime!");
-    // throw se;
-    // }
-    // } else {
-    // OwsExceptionReport se = new
-    // OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-    // se.addCodedException(ExceptionCode.MissingParameterValue,
-    // "gml:timePosition",
-    // "No timePosition element is contained in the gml:timeInstant element");
-    // throw se;
-    // }
-    // return ti;
-    // }
-    //
-    // /**
-    // * parse methode, which creates an TimePeriod object from the DOM-node of
-    // * the TimePeriodType. This constructor is necessary cause XMLBeans does
-    // not
-    // * fully support substitution groups. So one has to do a workaround with
-    // * XmlCursor and the DomNodes of the elements.
-    // *
-    // *
-    // * @param timePeriod
-    // * the DomNode of the timePeriod element
-    // * @return Returns a TimePeriod created from the DOM-Node
-    // * @throws XmlException
-    // * if the Node could not be parsed into a XmlBean
-    // * @throws OwsExceptionReport
-    // * if required elements of the timePeriod are missed
-    // */
-    // private TimePeriod parseTimePeriodNode(Node timePeriod) throws
-    // XmlException, OwsExceptionReport {
-    //
-    // TimePeriod tp = new TimePeriod();
-    //
-    // TimePeriodDocument xbTimePeriodDocument =
-    // TimePeriodDocument.Factory.parse(timePeriod);
-    // TimePeriodType xbTimePeriod = xbTimePeriodDocument.getTimePeriod();
-    //
-    // if (xbTimePeriod.getBegin() != null) {
-    // // TODO:
-    //
-    // } else if (xbTimePeriod.getBeginPosition() != null) {
-    // String startString = xbTimePeriod.getBeginPosition().getStringValue();
-    // if (startString.equals("")) {
-    // tp.setStart(null);
-    // } else {
-    // try {
-    // tp.setStart(SosDateTimeUtilities.parseIsoString2DateTime(startString));
-    // } catch (Exception e) {
-    // OwsExceptionReport se = new
-    // OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-    // LOGGER.error("Error while parse time String to DateTime!", e);
-    // se.addCodedException(null, null,
-    // "Error while parse time String to DateTime!");
-    // throw se;
-    // }
-    // }
-    // } else {
-    // OwsExceptionReport se = new OwsExceptionReport();
-    // se.addCodedException(OwsExceptionReport.ExceptionCode.InvalidParameterValue,
-    // GetObservationParams.eventTime.toString(),
-    // "The start time is missed in the timePeriod element of time parameter!");
-    // throw se;
-    // }
-    //
-    // if (xbTimePeriod.getEnd() != null) {
-    // // TODO:
-    // } else if (xbTimePeriod.getEndPosition() != null) {
-    // String endString = xbTimePeriod.getEndPosition().getStringValue();
-    // if (endString.equals("")) {
-    // tp.setEnd(null);
-    // } else {
-    // try {
-    // tp.setEnd(SosDateTimeUtilities.setDateTime2EndOfDay4RequestedEndPosition(
-    // SosDateTimeUtilities.parseIsoString2DateTime(endString),
-    // endString.length()));
-    // } catch (Exception e) {
-    // OwsExceptionReport se = new
-    // OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-    // LOGGER.error("Error while parse time String to DateTime!", e);
-    // se.addCodedException(null, null,
-    // "Error while parse time String to DateTime!");
-    // throw se;
-    // }
-    // }
-    //
-    // if (xbTimePeriod.getEndPosition().getIndeterminatePosition() != null) {
-    // tp.setEndIndet(xbTimePeriod.getEndPosition().getIndeterminatePosition().toString());
-    // }
-    //
-    // }
-    //
-    // // else no endPosition -> throw exception!!
-    // else {
-    // OwsExceptionReport se = new OwsExceptionReport();
-    // se.addCodedException(OwsExceptionReport.ExceptionCode.InvalidParameterValue,
-    // GetObservationParams.eventTime.toString(),
-    // "The end time is missed in the timePeriod element of time parameter!");
-    // throw se;
-    // }
-    //
-    // if (xbTimePeriod.getDuration() != null) {
-    // // TODO: JODA TIME
-    // tp.setDuration(SosDateTimeUtilities.parseDuration(xbTimePeriod.getDuration().toString()));
-    // }
-    //
-    // return tp;
-    // }
+    private SosSingleObservationValue parseReferenceType(ReferenceType referenceType) {
+        if (referenceType.getHref() != null && !referenceType.getHref().isEmpty()) {
+            return new SosSingleObservationValue(new CategoryValue(referenceType.getHref()));
+        } else if (referenceType.getTitle() != null && !referenceType.getTitle().isEmpty()) {
+            return new SosSingleObservationValue(new CategoryValue(referenceType.getTitle()));
+        }
+        return new SosSingleObservationValue();
+    }
+
+    private SosSingleObservationValue parseMeasureType(MeasureType measureType) {
+        QuantityValue quantityValue = new QuantityValue(measureType.getDoubleValue());
+        quantityValue.setUnit(measureType.getUom());
+        return new SosSingleObservationValue(quantityValue);
+    }
+
+    private Object parsePointType(PointType xbPointType) throws OwsExceptionReport {
+        Geometry geom = null;
+        String geomWKT = null;
+        int srid = -1;
+        if (xbPointType.getSrsName() != null) {
+            srid = SosHelper.parseSrsName(xbPointType.getSrsName(), Configurator.getInstance().getSrsNamePrefixSosV2());
+        }
+
+        if (xbPointType.getPos() != null) {
+            DirectPositionType xbPos = xbPointType.getPos();
+            if (srid == -1 && xbPos.getSrsName() != null) {
+                srid = SosHelper.parseSrsName(xbPos.getSrsName(), Configurator.getInstance().getSrsNamePrefixSosV2());
+            }
+            String directPosition = getString4Pos(xbPos);
+            geomWKT = "POINT(" + directPosition + ")";
+        } else if (xbPointType.getCoordinates() != null) {
+            CoordinatesType xbCoords = xbPointType.getCoordinates();
+            String directPosition = getString4Coordinates(xbCoords);
+            geomWKT = "POINT" + directPosition;
+        } else {
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("For geometry type 'gml:Point' only element ");
+            exceptionText.append("'gml:pos' and 'gml:coordinates' are allowed ");
+            exceptionText.append("in the feature of interest parameter!");
+            LOGGER.debug(exceptionText.toString());
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+        }
+
+        checkSrid(srid);
+        if (srid == -1) {
+            StringBuilder exceptionText = new StringBuilder("No SrsName ist specified for geometry!");
+            LOGGER.debug(exceptionText.toString());
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+        }
+        geom = JTSHelper.createGeometryFromWKT(geomWKT);
+        geom.setSRID(srid);
+
+        return geom;
+    }
+
+    private Object parseLineStringType(LineStringType xbLineStringType) throws OwsExceptionReport {
+        Geometry geom = null;
+        String geomWKT = null;
+        int srid = -1;
+        if (xbLineStringType.getSrsName() != null) {
+            srid = SosHelper.parseSrsName(xbLineStringType.getSrsName(), Configurator.getInstance().getSrsNamePrefixSosV2());
+        }
+
+        DirectPositionType[] xbPositions = xbLineStringType.getPosArray();
+
+        StringBuffer positions = new StringBuffer();
+        if (xbPositions != null && xbPositions.length > 0) {
+            if (srid == -1 && xbPositions[0].getSrsName() != null && !(xbPositions[0].getSrsName().equals(""))) {
+                srid = SosHelper.parseSrsName(xbPositions[0].getSrsName(), Configurator.getInstance().getSrsNamePrefixSosV2());
+            }
+            positions.append(getString4PosArray(xbLineStringType.getPosArray()));
+        }
+        geomWKT = "LINESTRING" + positions.toString() + "";
+
+        checkSrid(srid);
+
+        geom = JTSHelper.createGeometryFromWKT(geomWKT);
+        geom.setSRID(srid);
+
+        return geom;
+    }
+
+    private Object parsePolygonType(PolygonType xbPolygonType) throws OwsExceptionReport {
+        Geometry geom = null;
+        int srid = -1;
+        if (xbPolygonType.getSrsName() != null) {
+            srid = SosHelper.parseSrsName(xbPolygonType.getSrsName(), Configurator.getInstance().getSrsNamePrefixSosV2());
+        }
+        String exteriorCoordString = null;
+        StringBuilder geomWKT = new StringBuilder();
+        StringBuilder interiorCoordString = new StringBuilder();
+
+        AbstractRingPropertyType xbExterior = xbPolygonType.getExterior();
+
+        if (xbExterior != null) {
+            AbstractRingType xbExteriorRing = xbExterior.getAbstractRing();
+            if (xbExteriorRing instanceof LinearRingType) {
+                LinearRingType xbLinearRing = (LinearRingType) xbExteriorRing;
+                exteriorCoordString = getCoordString4LinearRing(xbLinearRing);
+            } else {
+                StringBuilder exceptionText = new StringBuilder();
+                exceptionText.append("The Polygon must contain the following elements ");
+                exceptionText.append("<gml:exterior><gml:LinearRing><gml:posList>!");
+                LOGGER.debug(exceptionText.toString());
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            }
+        }
+
+        AbstractRingPropertyType[] xbInterior = xbPolygonType.getInteriorArray();
+        AbstractRingPropertyType xbInteriorRing;
+        if (xbInterior != null && xbInterior.length != 0) {
+            for (int i = 0; i < xbInterior.length; i++) {
+                xbInteriorRing = xbInterior[i];
+                if (xbInteriorRing instanceof LinearRingType) {
+                    interiorCoordString.append(", " + getCoordString4LinearRing((LinearRingType) xbInteriorRing));
+                }
+            }
+        }
+
+        geomWKT.append("POLYGON(");
+        geomWKT.append(exteriorCoordString);
+        if (interiorCoordString != null) {
+            geomWKT.append(interiorCoordString);
+        }
+        geomWKT.append(")");
+
+        checkSrid(srid);
+        geom = JTSHelper.createGeometryFromWKT(geomWKT.toString());
+        geom.setSRID(srid);
+
+        return geom;
+    }
+
+
+
+    private Geometry parseCompositeSurfaceType(CompositeSurfaceType xbCompositeSurface) throws OwsExceptionReport {
+        SurfacePropertyType[] xbCurfaceProperties = xbCompositeSurface.getSurfaceMemberArray();
+        int srid = -1;
+        ArrayList<Polygon> polygons = new ArrayList<Polygon>(xbCurfaceProperties.length);
+        if (xbCompositeSurface.getSrsName() != null) {
+            srid = SosHelper.parseSrsName(xbCompositeSurface.getSrsName(), Configurator.getInstance().getSrsNamePrefixSosV2());
+        }
+        for (SurfacePropertyType xbSurfaceProperty : xbCurfaceProperties) {
+            AbstractSurfaceType xbAbstractSurface = xbSurfaceProperty.getAbstractSurface();
+            if (srid == -1 && xbAbstractSurface.getSrsName() != null) {
+                srid = SosHelper.parseSrsName(xbAbstractSurface.getSrsName(), Configurator.getInstance().getSrsNamePrefixSosV2());
+            }
+            if (xbAbstractSurface instanceof PolygonType) {
+                polygons.add((Polygon) parsePolygonType((PolygonType) xbAbstractSurface));
+            } else {
+                StringBuilder exceptionText = new StringBuilder();
+                exceptionText.append("The FeatureType ");
+                exceptionText.append(xbAbstractSurface);
+                exceptionText.append(" is not supportted! Only PolygonType");
+                LOGGER.debug(exceptionText.toString());
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            }
+        }
+        if (polygons.isEmpty()) {
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("The FeatureType: ");
+            exceptionText.append(xbCompositeSurface);
+            exceptionText.append(" does not contain any member!");
+            LOGGER.debug(exceptionText.toString());
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+        }
+        checkSrid(srid);
+        GeometryFactory factory = new GeometryFactory();
+        Geometry geom = factory.createMultiPolygon(polygons.toArray(new Polygon[polygons.size()]));
+        geom.setSRID(srid);
+        return geom;
+    }
+    
+    /**
+     * method parses the passed linearRing(generated thru XmlBEans) and returns
+     * a string containing the coordinate values of the passed ring
+     * 
+     * @param xbLinearRing
+     *            linearRing(generated thru XmlBEans)
+     * @return Returns a string containing the coordinate values of the passed
+     *         ring
+     * @throws OwsExceptionReport
+     *             if parsing the linear Ring failed
+     */
+    private String getCoordString4LinearRing(LinearRingType xbLinearRing) throws OwsExceptionReport {
+
+        String result = "";
+        DirectPositionListType xbPosList = xbLinearRing.getPosList();
+        CoordinatesType xbCoordinates = xbLinearRing.getCoordinates();
+        DirectPositionType[] xbPosArray = xbLinearRing.getPosArray();
+        if (xbPosList != null && !(xbPosList.getStringValue().equals(""))) {
+            result = getString4PosList(xbPosList);
+        } else if (xbCoordinates != null && !(xbCoordinates.getStringValue().equals(""))) {
+            result = getString4Coordinates(xbCoordinates);
+        } else if (xbPosArray != null && xbPosArray.length > 0) {
+            result = getString4PosArray(xbPosArray);
+        } else {
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("The Polygon must contain the following elements ");
+            exceptionText.append("<gml:exterior><gml:LinearRing><gml:posList>, ");
+            exceptionText.append("<gml:exterior><gml:LinearRing><gml:coordinates> ");
+            exceptionText.append("or <gml:exterior><gml:LinearRing><gml:pos>{<gml:pos>}!");
+            LOGGER.debug(exceptionText.toString());
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+        }
+
+        return result;
+    }// end getCoordStrig4LinearRing
+
+    /**
+     * parses XmlBeans DirectPosition to a String with coordinates for WKT.
+     * 
+     * @param xbPos
+     *            XmlBeans generated DirectPosition.
+     * @return Returns String with coordinates for WKT.
+     */
+    private String getString4Pos(DirectPositionType xbPos) {
+        StringBuffer coordinateString = new StringBuffer();
+
+        coordinateString.append(xbPos.getStringValue());
+
+        return coordinateString.toString();
+    }
+
+    /**
+     * parses XmlBeans DirectPosition[] to a String with coordinates for WKT.
+     * 
+     * @param xbPosArray
+     *            XmlBeans generated DirectPosition[].
+     * @return Returns String with coordinates for WKT.
+     */
+    private String getString4PosArray(DirectPositionType[] xbPosArray) {
+        StringBuffer coordinateString = new StringBuffer();
+        coordinateString.append("(");
+        for (DirectPositionType directPositionType : xbPosArray) {
+            coordinateString.append(directPositionType.getStringValue());
+            coordinateString.append(", ");
+        }
+        coordinateString.append(xbPosArray[0].getStringValue());
+        coordinateString.append(")");
+
+        return coordinateString.toString();
+    }
+
+    /**
+     * parses XmlBeans DirectPositionList to a String with coordinates for WKT.
+     * 
+     * @param xbPosList
+     *            XmlBeans generated DirectPositionList.
+     * @return Returns String with coordinates for WKT.
+     * @throws OwsExceptionReport
+     */
+    private String getString4PosList(DirectPositionListType xbPosList) throws OwsExceptionReport {
+        StringBuffer coordinateString = new StringBuffer("(");
+        List<?> values = xbPosList.getListValue();
+        if ((values.size() % 2) != 0) {
+            String exceptionText = "The Polygons posList must contain pairs of coordinates!";
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        } else {
+            for (int i = 0; i < values.size(); i++) {
+                coordinateString.append(values.get(i));
+                if ((i % 2) != 0) {
+                    coordinateString.append(", ");
+                } else {
+                    coordinateString.append(" ");
+                }
+            }
+        }
+        int length = coordinateString.length();
+        coordinateString.delete(length - 2, length);
+        coordinateString.append(")");
+
+        return coordinateString.toString();
+    }
+
+    /**
+     * parses XmlBeans Coordinates to a String with coordinates for WKT.
+     * Replaces cs, decimal and ts if different from default.
+     * 
+     * @param xbCoordinates
+     *            XmlBeans generated Coordinates.
+     * @return Returns String with coordinates for WKT.
+     */
+    private String getString4Coordinates(CoordinatesType xbCoordinates) {
+        String coordinateString = "";
+
+        coordinateString = "(" + xbCoordinates.getStringValue() + ")";
+
+        // replace cs, decimal and ts if different from default.
+        if (!xbCoordinates.getCs().equals(CS)) {
+            coordinateString = coordinateString.replace(xbCoordinates.getCs(), CS);
+        }
+        if (!xbCoordinates.getDecimal().equals(DECIMAL)) {
+            coordinateString = coordinateString.replace(xbCoordinates.getDecimal(), DECIMAL);
+        }
+        if (!xbCoordinates.getTs().equals(TS)) {
+            coordinateString = coordinateString.replace(xbCoordinates.getTs(), TS);
+        }
+
+        return coordinateString;
+    }
+
+    private void checkSrid(int srid) throws OwsExceptionReport {
+        if (srid == 0 || srid == -1) {
+            StringBuilder exceptionText = new StringBuilder("No SrsName ist specified for geometry!");
+            LOGGER.debug(exceptionText.toString());
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+        }
+    }
+
 
 }

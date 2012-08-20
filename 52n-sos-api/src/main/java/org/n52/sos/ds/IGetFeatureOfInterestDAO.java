@@ -28,10 +28,7 @@
 
 package org.n52.sos.ds;
 
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.SosFeatureCollection;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetFeatureOfInterestRequest;
 import org.n52.sos.response.GetFeatureOfInterestResponse;
 
@@ -42,16 +39,16 @@ import org.n52.sos.response.GetFeatureOfInterestResponse;
  */
 public interface IGetFeatureOfInterestDAO extends IOperationDAO {
 
-	/**
-	 * Get the featureOfInterest from data source.
-	 * 
-	 * @param request
-	 *            GetFeatureOfInterest request
-	 * @return Returns the GetFeatureOfInterest response
-	 * @throws OwsExceptionReport
-	 *             If an error occurs.
-	 */
-	public GetFeatureOfInterestResponse getFeatureOfInterest(GetFeatureOfInterestRequest request)
-			throws OwsExceptionReport;
+    /**
+     * Get the featureOfInterest from data source.
+     * 
+     * @param request
+     *            GetFeatureOfInterest request
+     * @return Returns the GetFeatureOfInterest response
+     * @throws OwsExceptionReport
+     *             If an error occurs.
+     */
+    public GetFeatureOfInterestResponse getFeatureOfInterest(GetFeatureOfInterestRequest request)
+            throws OwsExceptionReport;
 
 }

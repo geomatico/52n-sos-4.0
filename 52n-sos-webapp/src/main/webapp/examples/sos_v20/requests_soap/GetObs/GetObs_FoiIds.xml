@@ -8,8 +8,8 @@
 			xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:schemaLocation="http://www.opengis.net/sos/2.0
 http://schemas.opengis.net/sos/2.0.0/sos.xsd">
-			<sos:featureOfInterest>foi_1001</sos:featureOfInterest>
-			<sos:featureOfInterest>foi_2001</sos:featureOfInterest>
+			<sos:featureOfInterest>foi_46</sos:featureOfInterest>
+			<sos:featureOfInterest>foi_43</sos:featureOfInterest>
 		</sos:GetObservation>
 	</env:Body>
 </env:Envelope>

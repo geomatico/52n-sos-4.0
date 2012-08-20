@@ -29,8 +29,6 @@
 package org.n52.sos.ds;
 
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sensorML.SensorML;
-import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.response.DescribeSensorResponse;
 
@@ -41,14 +39,13 @@ import org.n52.sos.response.DescribeSensorResponse;
  */
 public interface IDescribeSensorDAO extends IOperationDAO {
 
-	/**
-	 * Get the procedure description for a procedure
-	 * 
-	 * @return Returns the DescribeSensor response
-	 * @throws OwsExceptionReport
-	 *             If an error occurs
-	 */
-	public DescribeSensorResponse getSensorDescription(DescribeSensorRequest request)
-			throws OwsExceptionReport;
+    /**
+     * Get the procedure description for a procedure
+     * 
+     * @return Returns the DescribeSensor response
+     * @throws OwsExceptionReport
+     *             If an error occurs
+     */
+    public DescribeSensorResponse getSensorDescription(DescribeSensorRequest request) throws OwsExceptionReport;
 
 }

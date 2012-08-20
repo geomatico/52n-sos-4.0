@@ -31,7 +31,9 @@ package org.n52.sos.request.operator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IGetObservationByIdDAO;
@@ -41,6 +43,7 @@ import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
@@ -89,29 +92,16 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
     @Override
     public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
         if (request instanceof GetObservationByIdRequest) {
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
             GetObservationByIdRequest sosRequest = (GetObservationByIdRequest) request;
-            // check parameters with variable content
-            try {
-                SosHelper.checkServiceParameter(sosRequest.getService());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
-            try {
-                OwsHelper.checkSingleVersionParameter(sosRequest.getVersion(), Configurator.getInstance()
-                        .getSupportedVersions());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
-            Util4Exceptions.mergeExceptions(exceptions);
-            
+            checkRequestedParameter(sosRequest);
             boolean zipCompression = false;
-            if (sosRequest.getResponseFormat() == null || (sosRequest.getResponseFormat() != null && sosRequest.getResponseFormat().isEmpty())) {
+            if (sosRequest.getResponseFormat() == null
+                    || (sosRequest.getResponseFormat() != null && sosRequest.getResponseFormat().isEmpty())) {
                 sosRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
             } else {
                 zipCompression = SosHelper.checkResponseFormatForZipCompression(sosRequest.getResponseFormat());
                 if (zipCompression) {
-                    sosRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2); 
+                    sosRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
                 }
             }
 
@@ -139,7 +129,8 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
                 }
                 // O&M 2.0 non SOS 1.0
                 else if (!request.getVersion().equals(Sos2Constants.SERVICEVERSION)
-                        && (responseFormat.equals(OMConstants.CONTENT_TYPE_OM_2) || responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2))) {
+                        && (responseFormat.equals(OMConstants.CONTENT_TYPE_OM_2) || responseFormat
+                                .equals(OMConstants.RESPONSE_FORMAT_OM_2))) {
                     namespace.append(responseFormat);
                     // xmlOptions =
                     // SosXmlOptionsUtility.getInstance().getXmlOptions4Sos2Swe200();
@@ -180,8 +171,7 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
             }
 
         } else {
-            String exceptionText =
-                    "Received request is not a SosGetObservationByIdRequest!";
+            String exceptionText = "Received request is not a SosGetObservationByIdRequest!";
             LOGGER.error(exceptionText);
             throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
         }
@@ -199,6 +189,37 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
     public OWSOperation getOperationMetadata(String service, String version, Object connection)
             throws OwsExceptionReport {
         return dao.getOperationsMetadata(service, version, connection);
+    }
+    
+    @Override
+    public IExtension getExtension(Object connection) throws OwsExceptionReport {
+        return dao.getExtension(connection);
+    }
+   
+    @Override
+    public Set<String> getConformanceClasses() {
+        Set<String> conformanceClasses = new HashSet<String>(0);
+        if (hasImplementedDAO()) {
+            conformanceClasses.add("http://www.opengis.net/spec/SOS/2.0/conf/obsByIdRetrieval");
+        }
+        return conformanceClasses;
+    }
+
+    private void checkRequestedParameter(GetObservationByIdRequest sosRequest) throws OwsExceptionReport {
+        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+        // check parameters with variable content
+        try {
+            SosHelper.checkServiceParameter(sosRequest.getService());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion(), Configurator.getInstance()
+                    .getSupportedVersions());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        Util4Exceptions.mergeExceptions(exceptions);
     }
 
 }

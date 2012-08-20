@@ -28,6 +28,7 @@
 
 package org.n52.sos.ogc.om.features.samplingFeatures;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
@@ -40,7 +41,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  */
 public class SosSamplingFeature extends SosAbstractFeature {
-
+    
     private List<String> name;
 
     private String description;
@@ -57,7 +58,7 @@ public class SosSamplingFeature extends SosAbstractFeature {
 
     private List<SosAbstractFeature> sampledFeatures;
 
-    private boolean sampling;
+    private boolean sampling = false;
 
     /**
      * constructor
@@ -65,8 +66,12 @@ public class SosSamplingFeature extends SosAbstractFeature {
      * @param identifier
      *            identifier of sampling feature
      */
-    public SosSamplingFeature(String identifier) {
-        super(identifier);
+    public SosSamplingFeature(String featureIdentifier) {
+        super(featureIdentifier);
+    }
+
+    public SosSamplingFeature(String featureIdentifier, String gmlId) {
+       super(featureIdentifier, gmlId);
     }
 
     public List<String> getName() {
@@ -75,6 +80,13 @@ public class SosSamplingFeature extends SosAbstractFeature {
 
     public void setName(List<String> name) {
         this.name = name;
+    }
+    
+    public void addName(String name) {
+        if (this.name == null) {
+            this.name = new ArrayList<String>();
+        }
+        this.name.add(name);
     }
 
     public String getDescription() {

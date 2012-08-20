@@ -46,6 +46,7 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateResultUtilities;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -85,7 +86,8 @@ public class GetObservationByIdDAO implements IGetObservationByIdDAO {
     }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Object connection) throws OwsExceptionReport {
+    public OWSOperation getOperationsMetadata(String service, String version, Object connection)
+            throws OwsExceptionReport {
         Session session = null;
         if (connection instanceof Session) {
             session = (Session) connection;
@@ -104,8 +106,8 @@ public class GetObservationByIdDAO implements IGetObservationByIdDAO {
         } else {
             dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
         }
-        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt, Configurator
-                .getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
+        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt,
+                Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set identifier
         opsMeta.addParameterValue(Sos2Constants.GetObservationByIdParams.observation.name(),
                 HibernateCriteriaQueryUtilities.getObservationIdentifiers(session));
@@ -129,7 +131,7 @@ public class GetObservationByIdDAO implements IGetObservationByIdDAO {
                     response.setVersion(request.getVersion());
                     response.setResponseFormat(sosRequest.getResponseFormat());
                     response.setObservationCollection(HibernateResultUtilities.createSosObservationFromObservations(
-                            observations, sosRequest.getVersion(), session));
+                            observations, sosRequest.getVersion(), true, session));
                     return response;
                 }
             } catch (HibernateException he) {
@@ -155,6 +157,12 @@ public class GetObservationByIdDAO implements IGetObservationByIdDAO {
         List<Observation> observations =
                 HibernateCriteriaQueryUtilities.getObservations(aliases, criterions, projections, session);
         return observations;
+    }
+
+    @Override
+    public IExtension getExtension(Object connection) throws OwsExceptionReport {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

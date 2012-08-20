@@ -58,7 +58,8 @@ public class Util4Exceptions {
      *         MissingParameterValue and corresponding message
      * 
      */
-    public static OwsExceptionReport createMissingParameterValueException(String parameterName) throws OwsExceptionReport {
+    public static OwsExceptionReport createMissingParameterValueException(String parameterName)
+            throws OwsExceptionReport {
         OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
         owse.addCodedException(OwsExceptionCode.MissingParameterValue, parameterName,
                 "The mandatory parameter value '" + parameterName + "' is missing in the request!");
@@ -67,41 +68,32 @@ public class Util4Exceptions {
 
     /**
      * creates a ServiceException for GetObservation requests that are too large
-     *
-     * @param responseSize Number of observations matching request
+     * 
+     * @param responseSize
+     *            Number of observations matching request
      * @return Returns ServiceException with ExceptionCode =
      *         ResponseExceedsSizeLimit and corresponding message
-     *
+     * 
      */
-    public static OwsExceptionReport createResponseExceedsSizeLimitException( int responseSize,
-            int responseLimit ) throws OwsExceptionReport {
+    public static OwsExceptionReport createResponseExceedsSizeLimitException(int responseSize, int responseLimit)
+            throws OwsExceptionReport {
         OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-        owse.addCodedException(
-                SosExceptionCode.ResponseExceedsSizeLimit,
-                null,
-                "The request matched " + responseSize + " observations, which exceeds this " +
-                        " server's limit of " + responseLimit);
+        owse.addCodedException(SosExceptionCode.ResponseExceedsSizeLimit, null, "The request matched " + responseSize
+                + " observations, which exceeds this " + " server's limit of " + responseLimit);
         return owse;
     }
 
     public static OwsExceptionReport createOperationNotSupportedException(String operationName) {
         OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-        owse.addCodedException(OwsExceptionCode.OperationNotSupported, operationName,
-                "The requested operation '" + operationName + "' is not supported by this service!");
+        owse.addCodedException(OwsExceptionCode.OperationNotSupported, operationName, "The requested operation '"
+                + operationName + "' is not supported by this service!");
         return owse;
     }
 
     public static OwsExceptionReport createNoApplicableCodeException(Exception exception, String message) {
-        OwsExceptionReport owse = getOwsExceptionReport(exception);
-        owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, message);
+        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions); 
+        owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, message, exception);
         return owse;
-    }
-    
-    private static OwsExceptionReport getOwsExceptionReport(Exception exception) {
-        if (exception != null) {
-            return new OwsExceptionReport(exception);
-        }
-        return new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
     }
 
     public static OwsExceptionReport createInvalidParameterValueException(String parameterName, String message) {
@@ -109,13 +101,13 @@ public class Util4Exceptions {
         owse.addCodedException(OwsExceptionCode.InvalidParameterValue, parameterName, message);
         return owse;
     }
-    
+
     public static OwsExceptionReport createVersionNegotiationFailedException(String message) {
         OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
         owse.addCodedException(OwsExceptionCode.VersionNegotiationFailed, null, message);
         return owse;
     }
-    
+
     public static void mergeExceptions(List<OwsExceptionReport> exceptions) throws OwsExceptionReport {
         if (!exceptions.isEmpty()) {
             OwsExceptionReport owse = null;
@@ -123,12 +115,11 @@ public class Util4Exceptions {
                 if (owse == null) {
                     owse = owsExceptionReport;
                 } else {
-                    owse.addServiceException(owsExceptionReport);
+                    owse.addOwsExceptionReport(owsExceptionReport);
                 }
-
             }
             throw owse;
         }
     }
-    
+
 }

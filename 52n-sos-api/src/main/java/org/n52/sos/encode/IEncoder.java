@@ -30,30 +30,35 @@ package org.n52.sos.encode;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
+import org.n52.sos.service.IConformanceClass;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 
-public interface IEncoder<S, T> {
+public interface IEncoder<S, T> extends IConformanceClass {
 
-	/**
-	 * @return
-	 */
-	public List<EncoderKeyType> getEncoderKeyType();
-	
-	/**
-	 * @param element1
-	 * @return
-	 * @throws OwsExceptionReport
-	 */
-	public S encode(T element1) throws OwsExceptionReport;
-        
-        /**
-         * @param element
-         * @param additionalValues
-         * @return
-         * @throws OwsExceptionReport
-         */
-        public S encode(T element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport;
-        
+    /**
+     * @return
+     */
+    public List<EncoderKeyType> getEncoderKeyType();
+
+    /**
+     * @param element1
+     * @return
+     * @throws OwsExceptionReport
+     */
+    public S encode(T element1) throws OwsExceptionReport;
+
+    /**
+     * @param element
+     * @param additionalValues
+     * @return
+     * @throws OwsExceptionReport
+     */
+    public S encode(T element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport;
+    
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
+    
 }

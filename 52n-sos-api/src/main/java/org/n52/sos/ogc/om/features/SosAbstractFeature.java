@@ -28,7 +28,6 @@
 
 package org.n52.sos.ogc.om.features;
 
-
 /**
  * Abstract class for encoding the feature of interest. Necessary because
  * different feature types should be supported. The SOS database or another
@@ -40,6 +39,8 @@ public abstract class SosAbstractFeature {
 
     /** identifier */
     private String identifier;
+    
+    private String gmlId;
 
     /**
      * constructor
@@ -49,6 +50,11 @@ public abstract class SosAbstractFeature {
      */
     public SosAbstractFeature(String featureIdentifier) {
         this.identifier = featureIdentifier;
+    }
+    
+    public SosAbstractFeature(String featureIdentifier, String gmlId) {
+        this.identifier = featureIdentifier;
+        this.gmlId = gmlId;
     }
 
     /*
@@ -60,7 +66,7 @@ public abstract class SosAbstractFeature {
     public boolean equals(Object o) {
         if (o instanceof SosAbstractFeature) {
             SosAbstractFeature feature = (SosAbstractFeature) o;
-            if (feature.getIdentifier().equals(this.getIdentifier())) {
+            if (feature.getIdentifier().equals(this.getIdentifier()) && feature.getGmlId().equals(this.getGmlId())) {
                 return true;
             }
         }
@@ -77,6 +83,7 @@ public abstract class SosAbstractFeature {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((identifier == null) ? 0 : identifier.hashCode());
+        result = prime * result + ((gmlId == null) ? 0 : gmlId.hashCode());
         return result;
     }
 
@@ -97,6 +104,14 @@ public abstract class SosAbstractFeature {
      */
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    public String getGmlId() {
+        return gmlId;
+    }
+
+    public void setGmlId(String gmlId) {
+        this.gmlId = gmlId;
     }
 
 }

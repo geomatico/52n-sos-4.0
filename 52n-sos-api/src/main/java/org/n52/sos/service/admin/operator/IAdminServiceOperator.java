@@ -30,6 +30,7 @@ package org.n52.sos.service.admin.operator;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.response.ServiceResponse;
 
 /**
@@ -38,36 +39,37 @@ import org.n52.sos.response.ServiceResponse;
  */
 public abstract class IAdminServiceOperator {
 
-	/**
-	 * URL pattern for the administration interface
-	 */
-	private static final String urlPattern = "/admin";
+    /**
+     * URL pattern for the administration interface
+     */
+    private static final String urlPattern = "/admin";
 
-	/**
-	 * HTTP-Get request handling method
-	 * 
-	 * @param request
-	 *            HTTP-Get request
-	 * @return SOS response
-	 */
-	public abstract ServiceResponse doGetOperation(HttpServletRequest request);
+    /**
+     * HTTP-Get request handling method
+     * 
+     * @param request
+     *            HTTP-Get request
+     * @return SOS response
+     * @throws OwsExceptionReport 
+     */
+    public abstract ServiceResponse doGetOperation(HttpServletRequest request) throws OwsExceptionReport;
 
-	/**
-	 * HTTP-Post request handling method
-	 * 
-	 * @param request
-	 *            HTTP-Post request
-	 * @return SOS response
-	 */
-	public abstract ServiceResponse doPostOperation(HttpServletRequest request);
+    /**
+     * HTTP-Post request handling method
+     * 
+     * @param request
+     *            HTTP-Post request
+     * @return SOS response
+     */
+    public abstract ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport;
 
-	/**
-	 * Get URL pattern for the administration interface
-	 * 
-	 * @return URL pattern
-	 */
-	public String getUrlPattern() {
-		return urlPattern;
-	}
+    /**
+     * Get URL pattern for the administration interface
+     * 
+     * @return URL pattern
+     */
+    public String getUrlPattern() {
+        return urlPattern;
+    }
 
 }

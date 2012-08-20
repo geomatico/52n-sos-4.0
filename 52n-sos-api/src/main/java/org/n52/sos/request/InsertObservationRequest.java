@@ -28,11 +28,11 @@
 
 package org.n52.sos.request;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.request.AbstractServiceRequest;
 
 /**
  * SOS InsertObservation request
@@ -40,85 +40,87 @@ import org.n52.sos.request.AbstractServiceRequest;
  */
 public class InsertObservationRequest extends AbstractServiceRequest {
 
-	/**
-	 * InsertObservation operation name
-	 */
-	private final String operationName = SosConstants.Operations.InsertObservation
-			.name();
+    /**
+     * InsertObservation operation name
+     */
+    private final String operationName = SosConstants.Operations.InsertObservation.name();
 
-	/**
-	 * Assigned sensor id
-	 */
-	private String assignedSensorId;
+    /**
+     * Assigned sensor id
+     */
+    private String assignedSensorId;
+    
+    private List<String> offerings;
 
-	/**
-	 * SOS observation collection with observations to insert
-	 */
-	private List<SosObservation> observations;
+    /**
+     * SOS observation collection with observations to insert
+     */
+    private List<SosObservation> observations;
 
-	public InsertObservationRequest() {
-	    
-	}
-	
-	/**
-	 * constructor
-	 * 
-	 * @param assignedSensorId
-	 *            assigned sensor id
-	 * @param observations
-	 *            Observations to insert
-	 */
-	public InsertObservationRequest(String assignedSensorId,
-	        List<SosObservation> observations) {
-		this.assignedSensorId = assignedSensorId;
-		this.observations = observations;
-	}
+    public InsertObservationRequest() {
 
-	/**
-	 * Get assigned sensor id
-	 * 
-	 * @return assigned sensor id
-	 */
-	public String getAssignedSensorId() {
-		return assignedSensorId;
-	}
+    }
 
-	/**
-	 * Set assigned sensor id
-	 * 
-	 * @param assignedSensorId
-	 *            assigned sensor id
-	 */
-	public void setAssignedSensorId(String assignedSensorId) {
-		this.assignedSensorId = assignedSensorId;
-	}
+    /**
+     * Get assigned sensor id
+     * 
+     * @return assigned sensor id
+     */
+    public String getAssignedSensorId() {
+        return assignedSensorId;
+    }
 
-	/**
-	 * Get observations to insert
-	 * 
-	 * @return observations to insert
-	 */
-	public List<SosObservation> getObservation() {
-		return observations;
-	}
+    /**
+     * Set assigned sensor id
+     * 
+     * @param assignedSensorId
+     *            assigned sensor id
+     */
+    public void setAssignedSensorId(String assignedSensorId) {
+        this.assignedSensorId = assignedSensorId;
+    }
 
-	/**
-	 * Set observations to insert
-	 * 
-	 * @param observation
-	 *            observations to insert
-	 */
-	public void setObservation(List<SosObservation> observation) {
-		this.observations = observation;
-	}
+    /**
+     * Get observations to insert
+     * 
+     * @return observations to insert
+     */
+    public List<SosObservation> getObservation() {
+        return observations;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
-	 */
-	@Override
-	public String getOperationName() {
-		return operationName;
-	}
+    /**
+     * Set observations to insert
+     * 
+     * @param observation
+     *            observations to insert
+     */
+    public void setObservation(List<SosObservation> observation) {
+        this.observations = observation;
+    }
+
+    public void addObservation(SosObservation observation) {
+       if (observations == null) {
+           observations = new ArrayList<SosObservation>();
+       }
+        observations.add(observation);
+    }
+
+    public void setOfferings(List<String> offerings) {
+        this.offerings = offerings;
+    }
+
+    public List<String> getOfferings() {
+        return offerings;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
+     */
+    @Override
+    public String getOperationName() {
+        return operationName;
+    }
 }

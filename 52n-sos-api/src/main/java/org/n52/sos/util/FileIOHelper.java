@@ -43,36 +43,32 @@ import org.slf4j.LoggerFactory;
  */
 public class FileIOHelper {
 
-	/**
-	 * logger
-	 */
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(FileIOHelper.class);
+    /**
+     * logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileIOHelper.class);
 
-	/**
-	 * Loads a file and returns an InputStream
-	 * 
-	 * @param file
-	 *            File to load
-	 * @return InputStream of the file
-	 * @throws OwsExceptionReport
-	 *             If and error occurs;
-	 */
-	public static InputStream loadInputStreamFromFile(File file)
-			throws OwsExceptionReport {
-		InputStream is = null;
-		try {
-			is = new FileInputStream(file);
-			return is;
-		} catch (FileNotFoundException fnfe) {
-			OwsExceptionReport se = new OwsExceptionReport(fnfe);
-			String exceptionText = "Error while loading file " + file.getName()
-					+ "!";
-			LOGGER.error(exceptionText, fnfe);
-			se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-					exceptionText);
-			throw se;
-		}
-	}
+    /**
+     * Loads a file and returns an InputStream
+     * 
+     * @param file
+     *            File to load
+     * @return InputStream of the file
+     * @throws OwsExceptionReport
+     *             If and error occurs;
+     */
+    public static InputStream loadInputStreamFromFile(File file) throws OwsExceptionReport {
+        InputStream is = null;
+        try {
+            is = new FileInputStream(file);
+            return is;
+        } catch (FileNotFoundException fnfe) {
+            String exceptionText = "Error while loading file " + file.getName() + "!";
+            LOGGER.error(exceptionText, fnfe);
+            OwsExceptionReport se = new OwsExceptionReport();
+            se.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText, fnfe);
+            throw se;
+        }
+    }
 
 }

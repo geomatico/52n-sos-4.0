@@ -37,123 +37,121 @@ import org.n52.sos.ogc.gml.time.ITime;
  */
 public class TemporalFilter {
 
-	/**
-	 * Temporal filter operator
-	 */
-	private TimeOperator operator;
+    /**
+     * Temporal filter operator
+     */
+    private TimeOperator operator;
 
-	/**
-	 * Temporal filter time value
-	 */
-	private ITime time;
+    /**
+     * Temporal filter time value
+     */
+    private ITime time;
 
-	/**
-	 * Value reference
-	 */
-	private String valueReference;
+    /**
+     * Value reference
+     */
+    private String valueReference;
 
-	public TemporalFilter() {
+    public TemporalFilter() {
         // TODO Auto-generated constructor stub
     }
 
     /**
-	 * constructor
-	 * 
-	 * @param operatorp
-	 *            Temporal filter operator
-	 * @param timep
-	 *            Filter time
-	 * @param valueReferencep
-	 *            value reference
-	 */
-	public TemporalFilter(TimeOperator operatorp, ITime timep,
-			String valueReferencep) {
-		this.operator = operatorp;
-		this.time = timep;
-		this.valueReference = valueReferencep;
-	}
+     * constructor
+     * 
+     * @param operatorp
+     *            Temporal filter operator
+     * @param timep
+     *            Filter time
+     * @param valueReferencep
+     *            value reference
+     */
+    public TemporalFilter(TimeOperator operatorp, ITime timep, String valueReferencep) {
+        this.operator = operatorp;
+        this.time = timep;
+        this.valueReference = valueReferencep;
+    }
 
-	/**
-	 * constructor
-	 * 
-	 * @param operatorNamep
-	 *            Temporal filter operator name
-	 * @param timep
-	 *            Filter time
-	 * @param valueReferencep
-	 *            value reference
-	 */
-	public TemporalFilter(String operatorNamep, ITime timep,
-			String valueReferencep) {
-		this.operator = TimeOperator.valueOf(operatorNamep);
-		this.time = timep;
-		this.valueReference = valueReferencep;
-	}
+    /**
+     * constructor
+     * 
+     * @param operatorNamep
+     *            Temporal filter operator name
+     * @param timep
+     *            Filter time
+     * @param valueReferencep
+     *            value reference
+     */
+    public TemporalFilter(String operatorNamep, ITime timep, String valueReferencep) {
+        this.operator = TimeOperator.valueOf(operatorNamep);
+        this.time = timep;
+        this.valueReference = valueReferencep;
+    }
 
-	/**
-	 * Get temporal filter operator
-	 * 
-	 * @return temporal filter operator
-	 */
-	public TimeOperator getOperator() {
-		return operator;
-	}
+    /**
+     * Get temporal filter operator
+     * 
+     * @return temporal filter operator
+     */
+    public TimeOperator getOperator() {
+        return operator;
+    }
 
-	/**
-	 * Set temporal filter operator
-	 * 
-	 * @param operator
-	 *            temporal filter operator
-	 */
-	public void setOperator(TimeOperator operator) {
-		this.operator = operator;
-	}
+    /**
+     * Set temporal filter operator
+     * 
+     * @param operator
+     *            temporal filter operator
+     */
+    public void setOperator(TimeOperator operator) {
+        this.operator = operator;
+    }
 
-	/**
-	 * Get filter time
-	 * 
-	 * @return filter time
-	 */
-	public ITime getTime() {
-		return time;
-	}
+    /**
+     * Get filter time
+     * 
+     * @return filter time
+     */
+    public ITime getTime() {
+        return time;
+    }
 
-	/**
-	 * Set filter time
-	 * 
-	 * @param time
-	 *            filter time
-	 */
-	public void setTime(ITime time) {
-		this.time = time;
-	}
+    /**
+     * Set filter time
+     * 
+     * @param time
+     *            filter time
+     */
+    public void setTime(ITime time) {
+        this.time = time;
+    }
 
-	/**
-	 * Get value reference
-	 * 
-	 * @return value reference
-	 */
-	public String getValueReference() {
-		return valueReference;
-	}
+    /**
+     * Get value reference
+     * 
+     * @return value reference
+     */
+    public String getValueReference() {
+        return valueReference;
+    }
 
-	/**
-	 * Set value reference
-	 * 
-	 * @param valueReference
-	 *            value reference
-	 */
-	public void setValueReference(String valueReference) {
-		this.valueReference = valueReference;
-	}
+    /**
+     * Set value reference
+     * 
+     * @param valueReference
+     *            value reference
+     */
+    public void setValueReference(String valueReference) {
+        this.valueReference = valueReference;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		return "Temporal filter: " + operator + time.toString();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        return "Temporal filter: " + operator + time.toString();
+    }
 
 }

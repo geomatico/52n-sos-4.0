@@ -2,8 +2,10 @@ package org.n52.sos.encode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.opengis.gml.x32.AbstractRingPropertyType;
 import net.opengis.gml.x32.AbstractRingType;
@@ -13,9 +15,11 @@ import net.opengis.gml.x32.LineStringType;
 import net.opengis.gml.x32.LinearRingType;
 import net.opengis.gml.x32.PointType;
 import net.opengis.gml.x32.PolygonType;
+import net.opengis.gml.x32.ReferenceType;
 import net.opengis.gml.x32.TimeInstantType;
 import net.opengis.gml.x32.TimePeriodType;
 import net.opengis.gml.x32.TimePositionType;
+import net.opengis.swe.x20.Reference;
 
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
@@ -24,9 +28,11 @@ import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
+import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -67,6 +73,16 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
     }
 
     @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return new HashMap<SupportedTypeKey, Set<String>>(0);
+    }
+    
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
+    }
+    
+    @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
         return encode(element, new HashMap<HelperValues, String>());
     }
@@ -79,9 +95,12 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
         if (element instanceof Geometry) {
             return createPosition((Geometry) element, additionalValues.get(HelperValues.GMLID));
         }
+        if (element instanceof CategoryValue) {
+            return createReferenceType((CategoryValue)element);
+        }
         return null;
     }
-
+    
     private XmlObject createTime(ITime time, String id) throws OwsExceptionReport {
         if (time != null) {
             if (time instanceof TimeInstant) {
@@ -303,6 +322,20 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
                 }
             }
         }
+    }
+    
+    private XmlObject createReferenceType(CategoryValue categoryValue) {
+        ReferenceType  xbRef = ReferenceType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        if (categoryValue.getValue() != null && !categoryValue.getValue().isEmpty()) {
+            if (categoryValue.getValue().startsWith("http://")) {
+                xbRef.setHref(categoryValue.getValue());
+            } else {
+                xbRef.setTitle(categoryValue.getValue()); 
+            }
+        } else {
+            xbRef.setNil();
+        }
+       return xbRef;
     }
 
 }

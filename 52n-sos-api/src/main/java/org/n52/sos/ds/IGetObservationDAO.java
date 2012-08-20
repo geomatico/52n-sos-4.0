@@ -29,7 +29,6 @@
 package org.n52.sos.ds;
 
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
 
@@ -40,20 +39,19 @@ import org.n52.sos.response.GetObservationResponse;
  */
 public interface IGetObservationDAO extends IOperationDAO {
 
-	/**
-	 * process the GetObservation query
-	 * 
-	 * @param request
-	 *            GetObservation object which represents the getObservation
-	 *            request
-	 * 
-	 * @return ObservationDocument representing the requested values in an OGC
-	 *         conform O&M observation document
-	 * 
-	 * @throws OwsExceptionReport
-	 *             if query of the database or creating the O&M document failed
-	 */
-	public GetObservationResponse getObservation(
-	        GetObservationRequest request) throws OwsExceptionReport;
+    /**
+     * process the GetObservation query
+     * 
+     * @param request
+     *            GetObservation object which represents the getObservation
+     *            request
+     * 
+     * @return ObservationDocument representing the requested values in an OGC
+     *         conform O&M observation document
+     * 
+     * @throws OwsExceptionReport
+     *             if query of the database or creating the O&M document failed
+     */
+    public GetObservationResponse getObservation(GetObservationRequest request) throws OwsExceptionReport;
 
 }

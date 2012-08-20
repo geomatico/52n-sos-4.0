@@ -28,8 +28,10 @@
 
 package org.n52.sos.binding;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -49,7 +51,6 @@ import org.n52.sos.service.operator.IServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.KvpHelper;
 import org.n52.sos.util.SosHelper;
-import org.n52.sos.util.SosRequestToResponseHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +78,7 @@ public class KvpBinding implements IBinding {
      * HttpServletRequest)
      */
     @Override
-    public ServiceResponse doGetOperation(HttpServletRequest req) {
+    public ServiceResponse doGetOperation(HttpServletRequest req) throws OwsExceptionReport {
         ServiceResponse response = null;
         AbstractServiceRequest request = null;
         try {
@@ -88,17 +89,17 @@ public class KvpBinding implements IBinding {
                 throw owse;
             }
             Map<String, String> parameterValueMap = KvpHelper.getKvpParameterValueMap(req);
-            IDecoder<AbstractServiceRequest, Map<String, String>> decoder = getDecoder(new DecoderKeyType(getServiceParameterValue(parameterValueMap),
-                            getParameterValue(OWSConstants.RequestParams.version.name(), parameterValueMap)));
+            IDecoder<AbstractServiceRequest, Map<String, String>> decoder =
+                    getDecoder(new DecoderKeyType(getServiceParameterValue(parameterValueMap), getParameterValue(
+                            OWSConstants.RequestParams.version.name(), parameterValueMap)));
             if (decoder != null) {
                 request = decoder.decode(parameterValueMap);
             } else {
-                String exceptionText =
-                        "No decoder implementation is available for KvpBinding!";
+                String exceptionText = "No decoder implementation is available for KvpBinding!";
                 LOGGER.debug(exceptionText);
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
             }
-            
+
             for (ServiceOperatorKeyType serviceVersionIdentifier : request.getServiceOperatorKeyType()) {
                 IServiceOperator serviceOperator =
                         Configurator.getInstance().getServiceOperator(serviceVersionIdentifier);
@@ -126,7 +127,7 @@ public class KvpBinding implements IBinding {
                     owse.setVersion(Sos1Constants.SERVICEVERSION);
                 }
             }
-            response = SosRequestToResponseHelper.createExceptionResponse(owse);
+            throw owse;
         }
         return response;
     }
@@ -138,11 +139,16 @@ public class KvpBinding implements IBinding {
      * HttpServletRequest)
      */
     @Override
-    public ServiceResponse doPostOperation(HttpServletRequest request) {
-        String exceptionText = "This SOS URL only supports KVP requests!";
-        LOGGER.info(exceptionText);
-        return SosRequestToResponseHelper.createExceptionResponse(Util4Exceptions.createNoApplicableCodeException(
-                null, exceptionText));
+    public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport {
+        String exceptionText = "The requested service URL only supports HTTP-Get KVP requests!";
+        OwsExceptionReport owse =
+                Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
+            owse.setVersion(Sos2Constants.SERVICEVERSION);
+        } else {
+            owse.setVersion(Sos1Constants.SERVICEVERSION);
+        }
+        throw owse;
     }
 
     /*
@@ -201,15 +207,22 @@ public class KvpBinding implements IBinding {
             throws OwsExceptionReport {
         return false;
     }
-    
+
     private IKvpDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
         List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
         for (IDecoder iDecoder : decoder) {
             if (iDecoder instanceof IKvpDecoder) {
-                return (IKvpDecoder)iDecoder;
+                return (IKvpDecoder) iDecoder;
             }
         }
         return null;
+    }
+
+    @Override
+    public Set<String> getConformanceClasses() {
+        Set<String> conformanceClasses = new HashSet<String>(0);
+        conformanceClasses.add("http://www.opengis.net/spec/SOS/2.0/conf/kvp-core");
+        return conformanceClasses;
     }
 
 }

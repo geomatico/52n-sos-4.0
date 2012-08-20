@@ -30,13 +30,15 @@ package org.n52.sos.ogc;
 
 /**
  * Constants for OGC
- *
+ * 
  */
 public class OGCConstants {
 
-	public static final String NS_OGC = "http://www.opengis.net/ogc";
+    public static final String NS_OGC = "http://www.opengis.net/ogc";
 
-	public static final String NS_OGC_PREFIX = "ogc";
-	
-	public static final String SCHEMA_LOCATION_OGC = "http://schemas.opengis.net/sos/1.0.0/ogc4sos.xsd";
+    public static final String NS_OGC_PREFIX = "ogc";
+
+    public static final String SCHEMA_LOCATION_OGC = "http://schemas.opengis.net/sos/1.0.0/ogc4sos.xsd";
+
+    public static final String UNKNOWN = "http://www.opengis.net/def/nil/OGC/0/unknown";
 }

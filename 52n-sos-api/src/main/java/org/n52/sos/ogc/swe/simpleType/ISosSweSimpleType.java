@@ -38,71 +38,71 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
  */
 public interface ISosSweSimpleType {
 
-	/**
-	 * Get type of simpleType
-	 * 
-	 * @return Type of simpleType
-	 */
-	public SweSimpleType getSimpleType();
+    /**
+     * Get type of simpleType
+     * 
+     * @return Type of simpleType
+     */
+    public SweSimpleType getSimpleType();
 
-	/**
-	 * Get quality information
-	 * 
-	 * @return Quality information
-	 */
-	public SosSweQuality getQuality();
+    /**
+     * Get quality information
+     * 
+     * @return Quality information
+     */
+    public SosSweQuality getQuality();
 
-	/**
-	 * Set quality information
-	 * 
-	 * @param quality
-	 *            quality information to set
-	 */
-	public void setQuality(SosSweQuality quality);
+    /**
+     * Set quality information
+     * 
+     * @param quality
+     *            quality information to set
+     */
+    public void setQuality(SosSweQuality quality);
 
-	/**
-	 * Get definition
-	 * 
-	 * @return definition
-	 */
-	public String getDefinition();
+    /**
+     * Get definition
+     * 
+     * @return definition
+     */
+    public String getDefinition();
 
-	/**
-	 * Set definition
-	 * 
-	 * @param definition
-	 *            definition to set
-	 */
-	public void setDefinition(String definition);
+    /**
+     * Set definition
+     * 
+     * @param definition
+     *            definition to set
+     */
+    public void setDefinition(String definition);
 
-	/**
-	 * Get description
-	 * 
-	 * @return description
-	 */
-	public String getDescription();
+    /**
+     * Get description
+     * 
+     * @return description
+     */
+    public String getDescription();
 
-	/**
-	 * Set description
-	 * 
-	 * @param description
-	 *            description to set
-	 */
-	public void setDescription(String description);
+    /**
+     * Set description
+     * 
+     * @param description
+     *            description to set
+     */
+    public void setDescription(String description);
 
-	/**
-	 * Get value
-	 * 
-	 * @return value
-	 */
-	public String getValue();
+    /**
+     * Get value
+     * 
+     * @return value
+     */
+    public String getValue();
 
-	/**
-	 * Set value
-	 * 
-	 * @param value
-	 *            value to set
-	 */
-	public void setValue(String value);
+    /**
+     * Set value
+     * 
+     * @param value
+     *            value to set
+     */
+    public void setValue(String value);
 
 }

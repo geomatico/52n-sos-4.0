@@ -39,8 +39,6 @@ import org.n52.sos.ogc.filter.ComparisonFilter;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.operator.RequestOperatorKeyType;
 
 /**
  * SOS GetObservation request
@@ -48,385 +46,395 @@ import org.n52.sos.request.operator.RequestOperatorKeyType;
  */
 public class GetObservationRequest extends AbstractServiceRequest {
 
-	/**
-	 * GetObservation operation name
-	 */
-	private final String operationName = SosConstants.Operations.GetObservation
-			.name();
+    /**
+     * GetObservation operation name
+     */
+    private final String operationName = SosConstants.Operations.GetObservation.name();
 
-	/**
-	 * Request as String
-	 */
-	private String requestString;
+    /**
+     * Request as String
+     */
+    private String requestString;
 
-	/**
-	 * SRID
-	 */
-	private int srid;
+    /**
+     * SRID
+     */
+    private int srid;
 
-	/**
-	 * Offerings list
-	 */
-	private List<String> offerings;
+    /**
+     * Offerings list
+     */
+    private List<String> offerings;
 
-	/**
-	 * Temporal filters list
-	 */
-	private List<TemporalFilter> eventTimes;
+    /**
+     * Temporal filters list
+     */
+    private List<TemporalFilter> eventTimes;
 
-	/**
-	 * Procedures list
-	 */
-	private List<String> procedures;
+    /**
+     * Procedures list
+     */
+    private List<String> procedures;
 
-	/**
-	 * ObservedProperties list
-	 */
-	private List<String> observedProperties;
+    /**
+     * ObservedProperties list
+     */
+    private List<String> observedProperties;
 
-	/**
-	 * FOI identifiers list
-	 */
-	private List<String> featureIdentifiers;
+    /**
+     * FOI identifiers list
+     */
+    private List<String> featureIdentifiers;
 
-	/**
-	 * Spatial filters list
-	 */
-	private SpatialFilter spatialFilter;
+    /**
+     * Spatial filters list
+     */
+    private SpatialFilter spatialFilter;
 
-	/**
-	 * Result filters list
-	 */
-	private ComparisonFilter result;
+    /**
+     * Result filters list
+     */
+    private ComparisonFilter result;
 
-	/**
-	 * Response format
-	 */
-	private String responseFormat;
+    /**
+     * Response format
+     */
+    private String responseFormat;
 
-	/**
-	 * Result model
-	 */
-	private QName resultModel;
-	
-	private Map<String, String> namespaces;
+    /**
+     * Result model
+     */
+    private QName resultModel;
 
-	/**
-	 * Response mode
-	 */
-	private String responseMode;
+    private Map<String, String> namespaces;
 
-	/**
-	 * constructor
-	 */
-	public GetObservationRequest() {
-		String notSet = SosConstants.PARAMETER_NOT_SET;
-		srid = -1;
-		/*
-		 * resultType = null; startPosition = Integer.MIN_VALUE; maxRecords =
-		 * Integer.MIN_VALUE;
-		 */
-		offerings = new ArrayList<String>(1);
-		eventTimes = new ArrayList<TemporalFilter>(1);
-		procedures = new ArrayList<String>(1);
-		observedProperties = new ArrayList<String>(1);
-		featureIdentifiers = new ArrayList<String>(1);
-		spatialFilter = null;
-		result = null;
-		resultModel = null;
-		responseMode = notSet;
-		namespaces = new HashMap<String, String>(1);
-	}
+    /**
+     * Response mode
+     */
+    private String responseMode;
+    
+    private boolean singleEncodedValues;
 
-	/**
-	 * Get temporal filters
-	 * 
-	 * @return temporal filters
-	 */
-	public List<TemporalFilter> getEventTimes() {
-		return eventTimes;
-	}
+    /**
+     * constructor
+     */
+    public GetObservationRequest() {
+        String notSet = SosConstants.PARAMETER_NOT_SET;
+        srid = -1;
+        /*
+         * resultType = null; startPosition = Integer.MIN_VALUE; maxRecords =
+         * Integer.MIN_VALUE;
+         */
+        offerings = new ArrayList<String>(1);
+        eventTimes = new ArrayList<TemporalFilter>(1);
+        procedures = new ArrayList<String>(1);
+        observedProperties = new ArrayList<String>(1);
+        featureIdentifiers = new ArrayList<String>(1);
+        spatialFilter = null;
+        result = null;
+        resultModel = null;
+        responseMode = notSet;
+        namespaces = new HashMap<String, String>(1);
+        singleEncodedValues = true;
+    }
 
-	/**
-	 * Set temporal filters
-	 * 
-	 * @param eventTime
-	 *            temporal filters
-	 */
-	public void setEventTimes(List<TemporalFilter> eventTimes) {
-		this.eventTimes = eventTimes;
-	}
+    /**
+     * Get temporal filters
+     * 
+     * @return temporal filters
+     */
+    public List<TemporalFilter> getEventTimes() {
+        return eventTimes;
+    }
 
-	/**
-	 * Get FOI identifiers
-	 * 
-	 * @return FOI identifiers
-	 */
-	public List<String> getFeatureIdentifiers() {
-		return featureIdentifiers;
-	}
+    /**
+     * Set temporal filters
+     * 
+     * @param eventTime
+     *            temporal filters
+     */
+    public void setEventTimes(List<TemporalFilter> eventTimes) {
+        this.eventTimes = eventTimes;
+    }
 
-	/**
-	 * Set FOI identifiers
-	 * 
-	 * @param featureIdentifiers
-	 *            FOI identifiers
-	 */
-	public void setFeatureIdentifiers(List<String> featureIdentifiers) {
-		this.featureIdentifiers = featureIdentifiers;
-	}
+    /**
+     * Get FOI identifiers
+     * 
+     * @return FOI identifiers
+     */
+    public List<String> getFeatureIdentifiers() {
+        return featureIdentifiers;
+    }
 
-	/**
-	 * Get observableProperties
-	 * 
-	 * @return observableProperties
-	 */
-	public List<String> getObservedProperties() {
-		return observedProperties;
-	}
+    /**
+     * Set FOI identifiers
+     * 
+     * @param featureIdentifiers
+     *            FOI identifiers
+     */
+    public void setFeatureIdentifiers(List<String> featureIdentifiers) {
+        this.featureIdentifiers = featureIdentifiers;
+    }
 
-	/**
-	 * Set observableProperties
-	 * 
-	 * @param observableProperties
-	 *            observableProperties
-	 */
-	public void setObservedProperties(List<String> observedProperties) {
-		this.observedProperties = observedProperties;
-		// CapabilitiesCacheController cache =
-		// (CapabilitiesCacheController)SosConfigurator.getInstance().getCapsCacheController();
-		// TODO: FIXME
-		//
-		// List<String> phens = new ArrayList<String>();
-		// Map<String, Collection<String>> compPhens =
-		// SosConfigurator.getInstance().getCapsCacheController().getPhens4CompPhens();
-		//
-		// // find phens for comp phens
-		// for (String phen : observedProperty) {
-		// if (compPhens.keySet().contains(phen)) {
-		// phens.addAll(compPhens.get(phen));
-		// } else {
-		// phens.add(phen);
-		// }
-		// }
-		//
-		// this.observedProperty = (String[]) phens.toArray(new
-		// String[phens.size()]);
-	}
+    /**
+     * Get observableProperties
+     * 
+     * @return observableProperties
+     */
+    public List<String> getObservedProperties() {
+        return observedProperties;
+    }
 
-	/**
-	 * Get offerings
-	 * 
-	 * @return offerings
-	 */
-	public List<String> getOfferings() {
-		return offerings;
-	}
+    /**
+     * Set observableProperties
+     * 
+     * @param observableProperties
+     *            observableProperties
+     */
+    public void setObservedProperties(List<String> observedProperties) {
+        this.observedProperties = observedProperties;
+        // CapabilitiesCacheController cache =
+        // (CapabilitiesCacheController)SosConfigurator.getInstance().getCapsCacheController();
+        // TODO: FIXME
+        //
+        // List<String> phens = new ArrayList<String>();
+        // Map<String, Collection<String>> compPhens =
+        // SosConfigurator.getInstance().getCapsCacheController().getPhens4CompPhens();
+        //
+        // // find phens for comp phens
+        // for (String phen : observedProperty) {
+        // if (compPhens.keySet().contains(phen)) {
+        // phens.addAll(compPhens.get(phen));
+        // } else {
+        // phens.add(phen);
+        // }
+        // }
+        //
+        // this.observedProperty = (String[]) phens.toArray(new
+        // String[phens.size()]);
+    }
 
-	/**
-	 * Set offerings
-	 * 
-	 * @param offerings
-	 *            offerings
-	 */
-	public void setOfferings(List<String> offerings) {
-		this.offerings = offerings;
-	}
+    /**
+     * Get offerings
+     * 
+     * @return offerings
+     */
+    public List<String> getOfferings() {
+        return offerings;
+    }
 
-	/**
-	 * Get procedures
-	 * 
-	 * @return procedures
-	 */
-	public List<String> getProcedures() {
-		return procedures;
-	}
+    /**
+     * Set offerings
+     * 
+     * @param offerings
+     *            offerings
+     */
+    public void setOfferings(List<String> offerings) {
+        this.offerings = offerings;
+    }
 
-	/**
-	 * Set procedures
-	 * 
-	 * @param procedures
-	 *            procedures
-	 */
-	public void setProcedures(List<String> procedures) {
-		this.procedures = procedures;
-	}
+    /**
+     * Get procedures
+     * 
+     * @return procedures
+     */
+    public List<String> getProcedures() {
+        return procedures;
+    }
 
-	/**
-	 * Get response format
-	 * 
-	 * @return response format
-	 */
-	public String getResponseFormat() {
-		return responseFormat;
-	}
+    /**
+     * Set procedures
+     * 
+     * @param procedures
+     *            procedures
+     */
+    public void setProcedures(List<String> procedures) {
+        this.procedures = procedures;
+    }
 
-	/**
-	 * Set response format
-	 * 
-	 * @param responseFormat
-	 *            response format
-	 */
-	public void setResponseFormat(String responseFormat) {
-		this.responseFormat = responseFormat;
-	}
+    /**
+     * Get response format
+     * 
+     * @return response format
+     */
+    public String getResponseFormat() {
+        return responseFormat;
+    }
 
-	/**
-	 * Get response mode
-	 * 
-	 * @return response mode
-	 */
-	public String getResponseMode() {
-		return responseMode;
-	}
+    /**
+     * Set response format
+     * 
+     * @param responseFormat
+     *            response format
+     */
+    public void setResponseFormat(String responseFormat) {
+        this.responseFormat = responseFormat;
+    }
 
-	/**
-	 * Set response mode
-	 * 
-	 * @param responseMode
-	 *            response mode
-	 */
-	public void setResponseMode(String responseMode) {
-		this.responseMode = responseMode;
-	}
+    /**
+     * Get response mode
+     * 
+     * @return response mode
+     */
+    public String getResponseMode() {
+        return responseMode;
+    }
 
-	/**
-	 * Get result filters
-	 * 
-	 * @return result filters
-	 */
-	public ComparisonFilter getResult() {
-		return result;
-	}
+    /**
+     * Set response mode
+     * 
+     * @param responseMode
+     *            response mode
+     */
+    public void setResponseMode(String responseMode) {
+        this.responseMode = responseMode;
+    }
 
-	/**
-	 * Set result filters
-	 * 
-	 * @param result
-	 *            result filters
-	 */
-	public void setResult(ComparisonFilter result) {
-		this.result = result;
-	}
+    /**
+     * Get result filters
+     * 
+     * @return result filters
+     */
+    public ComparisonFilter getResult() {
+        return result;
+    }
 
-	/**
-	 * Get result model
-	 * 
-	 * @return result model
-	 */
-	public QName getResultModel() {
-		return resultModel;
-	}
+    /**
+     * Set result filters
+     * 
+     * @param result
+     *            result filters
+     */
+    public void setResult(ComparisonFilter result) {
+        this.result = result;
+    }
 
-	/**
-	 * Set result model
-	 * 
-	 * @param resultModel
-	 *            result model
-	 */
-	public void setResultModel(QName resultModel) {
-		this.resultModel = resultModel;
-	}
+    /**
+     * Get result model
+     * 
+     * @return result model
+     */
+    public QName getResultModel() {
+        return resultModel;
+    }
 
-	/**
-	 * Get SRID
-	 * 
-	 * @return SRID
-	 */
-	public int getSrid() {
-		return srid;
-	}
+    /**
+     * Set result model
+     * 
+     * @param resultModel
+     *            result model
+     */
+    public void setResultModel(QName resultModel) {
+        this.resultModel = resultModel;
+    }
 
-	/**
-	 * Set SRID
-	 * 
-	 * @param srid
-	 *            SRID
-	 */
-	public void setSrid(int srid) {
-		this.srid = srid;
-	}
+    /**
+     * Get SRID
+     * 
+     * @return SRID
+     */
+    public int getSrid() {
+        return srid;
+    }
 
-	/**
-	 * Get request as String
-	 * 
-	 * @return request as String
-	 */
-	public String getRequestString() {
-		return requestString;
-	}
+    /**
+     * Set SRID
+     * 
+     * @param srid
+     *            SRID
+     */
+    public void setSrid(int srid) {
+        this.srid = srid;
+    }
 
-	/**
-	 * Set request as String
-	 * 
-	 * @param requestString
-	 *            request as String
-	 */
-	public void setRequestString(String requestString) {
-		this.requestString = requestString;
-	}
+    /**
+     * Get request as String
+     * 
+     * @return request as String
+     */
+    public String getRequestString() {
+        return requestString;
+    }
 
-	/**
-	 * Get spatial filter
-	 * 
-	 * @return spatial filter
-	 */
-	public SpatialFilter getSpatialFilter() {
-		return spatialFilter;
-	}
+    /**
+     * Set request as String
+     * 
+     * @param requestString
+     *            request as String
+     */
+    public void setRequestString(String requestString) {
+        this.requestString = requestString;
+    }
 
-	/**
-	 * Set spatial filter
-	 * 
-	 * @param resultSpatialFilter
-	 *            spatial filter
-	 */
-	public void setSpatialFilter(SpatialFilter resultSpatialFilter) {
-		this.spatialFilter = resultSpatialFilter;
-	}
+    /**
+     * Get spatial filter
+     * 
+     * @return spatial filter
+     */
+    public SpatialFilter getSpatialFilter() {
+        return spatialFilter;
+    }
 
-	/**
-	 * Create a copy of this request with defined observableProperties
-	 * 
-	 * @param obsProps
-	 *            defined observableProperties
-	 * @return SOS GetObservation request copy
-	 */
-	public GetObservationRequest copyOf(List<String> obsProps) {
-		GetObservationRequest res = new GetObservationRequest();
-		res.setEventTimes(this.eventTimes);
-		res.setObservedProperties(obsProps);
-		res.setOfferings(this.offerings);
-		res.setProcedures(this.procedures);
-		res.setResponseFormat(this.responseFormat);
-		res.setResponseMode(this.responseMode);
-		res.setSpatialFilter(this.spatialFilter);
-		res.setResult(this.result);
-		res.setResultModel(this.resultModel);
-		res.setFeatureIdentifiers(this.featureIdentifiers);
-		res.setService(this.getService());
-		res.setSrid(this.srid);
-		res.setRequestString(this.requestString);
-		return res;
+    /**
+     * Set spatial filter
+     * 
+     * @param resultSpatialFilter
+     *            spatial filter
+     */
+    public void setSpatialFilter(SpatialFilter resultSpatialFilter) {
+        this.spatialFilter = resultSpatialFilter;
+    }
 
-	}
+    /**
+     * Create a copy of this request with defined observableProperties
+     * 
+     * @param obsProps
+     *            defined observableProperties
+     * @return SOS GetObservation request copy
+     */
+    public GetObservationRequest copyOf(List<String> obsProps) {
+        GetObservationRequest res = new GetObservationRequest();
+        res.setEventTimes(this.eventTimes);
+        res.setObservedProperties(obsProps);
+        res.setOfferings(this.offerings);
+        res.setProcedures(this.procedures);
+        res.setResponseFormat(this.responseFormat);
+        res.setResponseMode(this.responseMode);
+        res.setSpatialFilter(this.spatialFilter);
+        res.setResult(this.result);
+        res.setResultModel(this.resultModel);
+        res.setFeatureIdentifiers(this.featureIdentifiers);
+        res.setService(this.getService());
+        res.setSrid(this.srid);
+        res.setRequestString(this.requestString);
+        return res;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
-	 */
-	@Override
-	public String getOperationName() {
-		return operationName;
-	}
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
+     */
+    @Override
+    public String getOperationName() {
+        return operationName;
+    }
 
     public void setNamespaces(Map<String, String> namespaces) {
         this.namespaces = namespaces;
     }
-    
+
     public Map<String, String> getNamespaces() {
         return namespaces;
+    }
+
+    public boolean isSingleEncodedValues() {
+        return singleEncodedValues;
+    }
+
+    public void setSingleEncodedValues(boolean singleEncodedValues) {
+        this.singleEncodedValues = singleEncodedValues;
     }
 
 }

@@ -34,61 +34,61 @@ package org.n52.sos.ogc.om;
  */
 public class SosOffering {
 
-	/** identifier of this offering */
-	private String offeringIdentifier;
+    /** identifier of this offering */
+    private String offeringIdentifier;
 
-	/** name of this offering */
-	private String offeringName;
+    /** name of this offering */
+    private String offeringName;
 
-	/**
-	 * constructor
-	 * 
-	 * @param offeringIdentifier
-	 *            offering identifier
-	 * @param offeringName
-	 *            offering name
-	 */
-	public SosOffering(String offeringIdentifier, String offeringName) {
-		this.offeringIdentifier = offeringIdentifier;
-		this.offeringName = offeringName;
-	}
+    /**
+     * constructor
+     * 
+     * @param offeringIdentifier
+     *            offering identifier
+     * @param offeringName
+     *            offering name
+     */
+    public SosOffering(String offeringIdentifier, String offeringName) {
+        this.offeringIdentifier = offeringIdentifier;
+        this.offeringName = offeringName;
+    }
 
-	/**
-	 * Get offering identifier
-	 * 
-	 * @return Returns the offeringIdentifier.
-	 */
-	public String getOfferingIdentifier() {
-		return offeringIdentifier;
-	}
+    /**
+     * Get offering identifier
+     * 
+     * @return Returns the offeringIdentifier.
+     */
+    public String getOfferingIdentifier() {
+        return offeringIdentifier;
+    }
 
-	/**
-	 * Set offering identifier
-	 * 
-	 * @param offeringIdentifier
-	 *            The offeringIdentifier to set.
-	 */
-	public void setOfferingIdentifier(String offeringIdentifier) {
-		this.offeringIdentifier = offeringIdentifier;
-	}
+    /**
+     * Set offering identifier
+     * 
+     * @param offeringIdentifier
+     *            The offeringIdentifier to set.
+     */
+    public void setOfferingIdentifier(String offeringIdentifier) {
+        this.offeringIdentifier = offeringIdentifier;
+    }
 
-	/**
-	 * Get offering name
-	 * 
-	 * @return Returns the offeringName.
-	 */
-	public String getOfferingName() {
-		return offeringName;
-	}
+    /**
+     * Get offering name
+     * 
+     * @return Returns the offeringName.
+     */
+    public String getOfferingName() {
+        return offeringName;
+    }
 
-	/**
-	 * Set offering name
-	 * 
-	 * @param offeringName
-	 *            The offeringName to set.
-	 */
-	public void setOfferingName(String offeringName) {
-		this.offeringName = offeringName;
-	}
+    /**
+     * Set offering name
+     * 
+     * @param offeringName
+     *            The offeringName to set.
+     */
+    public void setOfferingName(String offeringName) {
+        this.offeringName = offeringName;
+    }
 
 }

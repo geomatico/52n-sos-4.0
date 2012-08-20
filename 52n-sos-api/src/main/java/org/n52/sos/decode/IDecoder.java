@@ -29,13 +29,19 @@
 package org.n52.sos.decode;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.service.IConformanceClass;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 
-public interface IDecoder<S, T> {
+public interface IDecoder<S, T> extends IConformanceClass {
 
     public List<DecoderKeyType> getDecoderKeyTypes();
-    
+
     public S decode(T element) throws OwsExceptionReport;
     
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
+
 }

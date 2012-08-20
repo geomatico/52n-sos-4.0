@@ -10,21 +10,21 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.util.Util4Exceptions;
 
 public class SosServiceOperatorV20 implements IServiceOperator {
-    
+
     private ServiceOperatorKeyType serviceOperatorKeyType;
-    
+
     public SosServiceOperatorV20() {
         serviceOperatorKeyType = new ServiceOperatorKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION);
     }
-    
 
     @Override
     public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
         ServiceResponse response = null;
-            IRequestOperator requestOperator = Configurator.getInstance().getRequestOperator(serviceOperatorKeyType, request.getOperationName());
-            if (requestOperator != null) {
-                response = requestOperator.receiveRequest(request);
-            }
+        IRequestOperator requestOperator =
+                Configurator.getInstance().getRequestOperator(serviceOperatorKeyType, request.getOperationName());
+        if (requestOperator != null) {
+            response = requestOperator.receiveRequest(request);
+        }
         if (response != null) {
             return response;
         }

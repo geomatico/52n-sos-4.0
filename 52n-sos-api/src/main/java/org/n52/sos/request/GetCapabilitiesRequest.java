@@ -33,7 +33,6 @@ import java.util.List;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 

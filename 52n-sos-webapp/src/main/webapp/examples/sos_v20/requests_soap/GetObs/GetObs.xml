@@ -8,7 +8,6 @@
 			xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:schemaLocation="http://www.opengis.net/sos/2.0
 http://schemas.opengis.net/sos/2.0.0/sos.xsd">
-
 		</sos:GetObservation>
 	</env:Body>
 </env:Envelope>

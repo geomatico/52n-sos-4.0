@@ -28,18 +28,18 @@
 
 package org.n52.sos.request.operator;
 
-import java.util.List;
-
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.IConformanceClass;
 
 /**
  * Interface for SOS request operator implementations
  * 
  */
-public interface IRequestOperator {
+public interface IRequestOperator extends IConformanceClass {
 
     // /**
     // * HTTP-Post request handling method
@@ -67,5 +67,8 @@ public interface IRequestOperator {
 
     public RequestOperatorKeyType getRequestOperatorKeyType();
 
-    public OWSOperation getOperationMetadata(String service, String version, Object connection) throws OwsExceptionReport;
+    public OWSOperation getOperationMetadata(String service, String version, Object connection)
+            throws OwsExceptionReport;
+    
+    public IExtension getExtension(Object connection) throws OwsExceptionReport;
 }

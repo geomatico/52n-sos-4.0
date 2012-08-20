@@ -28,12 +28,16 @@
 
 package org.n52.sos.ds.hibernate;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IDeleteSensorDAO;
+import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.DeleteSensorRequest;
@@ -60,6 +64,13 @@ public class DeleteSensorDAO implements IDeleteSensorDAO {
      * Instance of the IConnectionProvider
      */
     private IConnectionProvider connectionProvider;
+    
+    /**
+     * constructor
+     */
+    public DeleteSensorDAO() {
+        this.connectionProvider = Configurator.getInstance().getConnectionProvider();
+    }
 
     @Override
     public String getOperationName() {
@@ -81,22 +92,46 @@ public class DeleteSensorDAO implements IDeleteSensorDAO {
         OWSOperation opsMeta = new OWSOperation();
         // set operation name
         opsMeta.setOperationName(OPERATION_NAME);
-        
-        DecoderKeyType dkt =  new DecoderKeyType(SWEConstants.NS_SWES_20);
-        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt, Configurator
-                .getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
-        
-        
+        // set DCP
+        DecoderKeyType dkt = new DecoderKeyType(SWEConstants.NS_SWES_20);
+        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt,
+                Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
+        // set param procedure
+        opsMeta.addParameterValue(Sos2Constants.DeleteSensorParams.procedure.name(), Configurator.getInstance()
+                .getCapabilitiesCacheController().getProcedures());
         return opsMeta;
     }
 
     @Override
-    public DeleteSensorResponse deleteSensor(DeleteSensorRequest request) {
-        // TODO Auto-generated method stub
+    public synchronized DeleteSensorResponse deleteSensor(DeleteSensorRequest request) throws OwsExceptionReport {
         DeleteSensorResponse response = new DeleteSensorResponse();
         response.setService(request.getService());
         response.setVersion(request.getVersion());
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = (Session) connectionProvider.getConnection();
+            transaction = session.beginTransaction();
+            HibernateCriteriaTransactionalUtilities.setDeleteSensorFlag(request.getProcedureIdentifier(), true, session);
+            transaction.commit();
+            response.setDeletedProcedure(request.getProcedureIdentifier());
+        } catch (HibernateException he) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            String exceptionText = "Error while updateing deleted sensor flag data!";
+            LOGGER.error(exceptionText, he);
+            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+        } finally {
+            connectionProvider.returnConnection(session);
+        }
         return response;
+    }
+
+    @Override
+    public IExtension getExtension(Object connection) throws OwsExceptionReport {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

@@ -38,14 +38,13 @@ import org.n52.sos.request.AbstractServiceRequest;
  */
 public interface ISosRequestEncoder {
 
-	/**
-	 * creates GetObservationDocument from SosGetObservationRequest
-	 * 
-	 * @param getObsRequest
-	 *            SosGetObservationRequest to be encoded to XML bean
-	 * @return Returns XMLBeans representation of SosGetObservationRequest
-	 * @throws OwsExceptionReport
-	 */
-	public XmlObject createGetObservationRequest(
-	        AbstractServiceRequest getObsRequest) throws OwsExceptionReport;
+    /**
+     * creates GetObservationDocument from SosGetObservationRequest
+     * 
+     * @param getObsRequest
+     *            SosGetObservationRequest to be encoded to XML bean
+     * @return Returns XMLBeans representation of SosGetObservationRequest
+     * @throws OwsExceptionReport
+     */
+    public XmlObject createGetObservationRequest(AbstractServiceRequest getObsRequest) throws OwsExceptionReport;
 }

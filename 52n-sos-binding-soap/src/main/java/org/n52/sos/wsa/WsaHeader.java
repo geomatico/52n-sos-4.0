@@ -30,17 +30,16 @@ package org.n52.sos.wsa;
 
 import org.n52.sos.soap.SoapHeader;
 
-
 public class WsaHeader extends SoapHeader {
-    
+
     private String toValue;
-    
+
     private String actionValue;
-    
+
     private String replyToAddress;
-    
+
     private String messageID;
-    
+
     /**
      * @return the toValue
      */
@@ -49,7 +48,8 @@ public class WsaHeader extends SoapHeader {
     }
 
     /**
-     * @param toValue the toValue to set
+     * @param toValue
+     *            the toValue to set
      */
     public void setToValue(String toValue) {
         this.toValue = toValue;
@@ -63,7 +63,8 @@ public class WsaHeader extends SoapHeader {
     }
 
     /**
-     * @param actionValue the actionValue to set
+     * @param actionValue
+     *            the actionValue to set
      */
     public void setActionValue(String actionValue) {
         this.actionValue = actionValue;
@@ -77,7 +78,8 @@ public class WsaHeader extends SoapHeader {
     }
 
     /**
-     * @param replyToAddress the replyToAddress to set
+     * @param replyToAddress
+     *            the replyToAddress to set
      */
     public void setReplyToAddress(String replyToAddress) {
         this.replyToAddress = replyToAddress;
@@ -91,12 +93,11 @@ public class WsaHeader extends SoapHeader {
     }
 
     /**
-     * @param messageID the messageID to set
+     * @param messageID
+     *            the messageID to set
      */
     public void setMessageID(String messageID) {
         this.messageID = messageID;
     }
-    
-    
 
 }

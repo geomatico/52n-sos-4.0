@@ -32,32 +32,34 @@ import javax.xml.namespace.QName;
 
 /**
  * Constants class for SensorML
- *
+ * 
  */
 public class SensorMLConstants {
-	
-	// namespaces and schema locations
-	public static final String NS_SML = "http://www.opengis.net/sensorML/1.0.1";
 
-	public static final String NS_SML_PREFIX = "sml";
-	
-	public static final String SCHEMA_LOCATION_SML = "http://schemas.opengis.net/sensorML/1.0.1/sensorML.xsd";
-	
-	public static final String SENSORML_OUTPUT_FORMAT_MIME_TYPE = "text/xml;subtype=\"sensorML/1.0.1\"";
-	
-	public static final String SENSORML_OUTPUT_FORMAT_URL = NS_SML;
-	    
-	public static final String SENSORML_CONTENT_TYPE = "text/xml;subtype=\"sensorML/1.0.1\"";
-	
-	public static final String EN_SYSTEM = "System";
-	
-	public static final String EN_PROCESS_MODEL = "ProcessModel";
-	
-	public static final String EN_ABSTRACT_PROCESS = "AbstractProcess";
-	
-	public static final QName SYSTEM_QNAME = new QName( NS_SML, EN_SYSTEM, NS_SML_PREFIX );
+    // namespaces and schema locations
+    public static final String NS_SML = "http://www.opengis.net/sensorML/1.0.1";
 
-	public static final QName PROCESS_MODEL_QNAME = new QName( NS_SML, EN_PROCESS_MODEL, NS_SML_PREFIX );
-	
-	public static final QName ABSTRACT_PROCESS_QNAME = new QName( NS_SML, EN_ABSTRACT_PROCESS, NS_SML_PREFIX );
+    public static final String NS_SML_PREFIX = "sml";
+
+    public static final String SCHEMA_LOCATION_SML = "http://schemas.opengis.net/sensorML/1.0.1/sensorML.xsd";
+
+    public static final String SENSORML_OUTPUT_FORMAT_MIME_TYPE = "text/xml;subtype=\"sensorML/1.0.1\"";
+
+    public static final String SENSORML_OUTPUT_FORMAT_URL = NS_SML;
+
+    public static final String SENSORML_CONTENT_TYPE = "text/xml;subtype=\"sensorML/1.0.1\"";
+
+    public static final String EN_SYSTEM = "System";
+
+    public static final String EN_PROCESS_MODEL = "ProcessModel";
+
+    public static final String EN_ABSTRACT_PROCESS = "AbstractProcess";
+
+    public static final QName SYSTEM_QNAME = new QName(NS_SML, EN_SYSTEM, NS_SML_PREFIX);
+
+    public static final QName PROCESS_MODEL_QNAME = new QName(NS_SML, EN_PROCESS_MODEL, NS_SML_PREFIX);
+
+    public static final QName ABSTRACT_PROCESS_QNAME = new QName(NS_SML, EN_ABSTRACT_PROCESS, NS_SML_PREFIX);
+
+    public static final String VERSION_V101 = "1.0.1";
 }

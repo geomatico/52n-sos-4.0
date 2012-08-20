@@ -42,8 +42,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.joda.time.DateTime;
 import org.n52.sos.binding.IBinding;
 import org.n52.sos.decode.DecoderKeyType;
+import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSConstants.MinMax;
@@ -51,11 +53,15 @@ import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
+import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.SosExceptionCode;
 import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
+import org.n52.sos.ogc.swe.simpleType.ISosSweSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
+import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -235,10 +241,10 @@ public class SosHelper {
                 String exceptionText =
                         "Error while parsing srsName parameter! Parameter has to match pattern '" + srsNamePrefix
                                 + "' with appended EPSGcode number";
-                LOGGER.error(exceptionText);
-                OwsExceptionReport owse = new OwsExceptionReport(nfe);
+                LOGGER.error(exceptionText, nfe);
+                OwsExceptionReport owse = new OwsExceptionReport();
                 owse.addCodedException(OwsExceptionCode.NoApplicableCode,
-                        SosConstants.GetObservationParams.srsName.name(), exceptionText);
+                        SosConstants.GetObservationParams.srsName.name(), exceptionText, nfe);
                 throw owse;
             }
         }
@@ -327,6 +333,7 @@ public class SosHelper {
                 throw owse;
             }
         }
+        // FIXME: valid exception
         OwsExceptionReport se = new OwsExceptionReport();
         throw se;
     }
@@ -423,7 +430,9 @@ public class SosHelper {
             if (e instanceof OwsExceptionReport) {
                 throw (OwsExceptionReport) e;
             }
-            OwsExceptionReport owse = new OwsExceptionReport(e);
+            // FIXME valid exception
+            OwsExceptionReport owse = new OwsExceptionReport();
+//            owse.addCodedException(invalidparametervalue, locator, message, e);
             throw owse;
         }
         Map<String, List<String>> dcp = new HashMap<String, List<String>>();
@@ -440,27 +449,30 @@ public class SosHelper {
         }
         return "";
     }
-//
-//    private static String getPostNamespaceForVersionAndOperation(String operation, String version) {
-//        if (version.equals(Sos1Constants.SERVICEVERSION)) {
-//            return Sos1Constants.NS_SOS;
-//        } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
-//            if (operation.equals(SosConstants.Operations.DescribeSensor.name())
-//                    || operation.equals(Sos2Constants.Operations.InsertSensor.name())
-//                    || operation.equals(Sos2Constants.Operations.DeleteSensor.name())) {
-//                return SWEConstants.NS_SWES_20;
-//            } else {
-//                return Sos2Constants.NS_SOS_20;
-//            }
-//        }
-//        return "";
-//    }
 
-    public static String getUrlPatternForHttpGetMethod(Collection<IBinding> bindings,
-            String operationName, DecoderKeyType decoderKey) throws OwsExceptionReport {
+    //
+    // private static String getPostNamespaceForVersionAndOperation(String
+    // operation, String version) {
+    // if (version.equals(Sos1Constants.SERVICEVERSION)) {
+    // return Sos1Constants.NS_SOS;
+    // } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
+    // if (operation.equals(SosConstants.Operations.DescribeSensor.name())
+    // || operation.equals(Sos2Constants.Operations.InsertSensor.name())
+    // || operation.equals(Sos2Constants.Operations.DeleteSensor.name())) {
+    // return SWEConstants.NS_SWES_20;
+    // } else {
+    // return Sos2Constants.NS_SOS_20;
+    // }
+    // }
+    // return "";
+    // }
+
+    public static String getUrlPatternForHttpGetMethod(Collection<IBinding> bindings, String operationName,
+            DecoderKeyType decoderKey) throws OwsExceptionReport {
         try {
             for (IBinding binding : bindings) {
-                if (binding.checkOperationHttpGetSupported(operationName, new DecoderKeyType(getKvpNamespaceForVersionAndOperation(operationName, decoderKey)))) {
+                if (binding.checkOperationHttpGetSupported(operationName, new DecoderKeyType(
+                        getKvpNamespaceForVersionAndOperation(operationName, decoderKey)))) {
                     return binding.getUrlPattern();
                 }
             }
@@ -468,7 +480,9 @@ public class SosHelper {
             if (e instanceof OwsExceptionReport) {
                 throw (OwsExceptionReport) e;
             }
-            OwsExceptionReport owse = new OwsExceptionReport(e);
+            // FIXME valid exception
+            OwsExceptionReport owse = new OwsExceptionReport();
+//            owse.addCodedException(invalidparametervalue, locator, message, e);
             throw owse;
         }
         return null;
@@ -658,10 +672,10 @@ public class SosHelper {
      * @return boolean true if application/zip
      */
     public static boolean checkResponseFormatForZipCompression(String responseFormat) throws OwsExceptionReport {
-         if (responseFormat.equalsIgnoreCase(SosConstants.CONTENT_TYPE_ZIP)) {
+        if (responseFormat.equalsIgnoreCase(SosConstants.CONTENT_TYPE_ZIP)) {
             return true;
         }
-         return false;
+        return false;
     }
 
     /**
@@ -821,4 +835,80 @@ public class SosHelper {
         return map;
     }
     
+    /**
+     * Generates a sensor id from description and current time as long.
+     * 
+     * @param message
+     *            sensor description
+     * @return generated sensor id as hex SHA-1.
+     */
+    public static String generateID(String message) {
+        long autoGeneratredID = new DateTime().getMillis();
+        String concate = message + Long.toString(autoGeneratredID);
+        return bytesToHex(SosConstants.MESSAGE_DIGEST.digest(concate.getBytes()));
+    }
+
+    /**
+     * Transforms byte to hex representation
+     * 
+     * @param b
+     *            bytes
+     * @return hex
+     */
+    private static String bytesToHex(byte[] b) {
+        StringBuffer buf = new StringBuffer();
+        for (int j = 0; j < b.length; j++) {
+            buf.append(SosConstants.HEX_DIGITS[(b[j] >> 4) & 0x0f]);
+            buf.append(SosConstants.HEX_DIGITS[b[j] & 0x0f]);
+        }
+        return buf.toString();
+    }
+
+    public static SosObservableProperty createSosOberavablePropertyFromSosSMLIo(SosSMLIo output) {
+        ISosSweSimpleType ioValue = output.getIoValue();
+        String identifier = ioValue.getDefinition();
+        String description = ioValue.getDescription();
+        String unit = null;
+        String valueType = SosConstants.NOT_DEFINED;
+        switch (ioValue.getSimpleType()) {
+        case Boolean:
+            valueType = "swe:Boolean";
+            break;
+        case Category:
+            valueType = "swe:Category";
+            break;
+        case Count:
+            valueType = "swe:Count";
+            break;
+        case CountRange:
+            valueType = "swe:CountRange";
+            break;
+        case ObservableProperty:
+            valueType = "swe:ObservableProperty";
+            break;
+        case Quantity:
+            unit = ((SosSweQuantity)ioValue).getUom();
+            valueType = "swe:Quantity";
+            break;
+        case QuantityRange:
+            valueType = "swe:QuantityRange";
+            break;
+        case Text:
+            valueType = "swe:Text";
+            break;
+        case Time:
+            unit = ((SosSweTime)ioValue).getUom();
+            valueType = "swe:Time";
+            break;
+        case TimeRange:
+            valueType = "swe:TimeRange";
+            break;
+        default:
+            break;
+        }
+        if (unit == null || (unit != null && unit.isEmpty())) {
+            unit = SosConstants.NOT_DEFINED;
+        }
+        return new SosObservableProperty(identifier, description, unit, valueType);
+    }
 }

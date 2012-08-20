@@ -1,8 +1,11 @@
 package org.n52.sos.encode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.opengis.swe.x20.AbstractDataComponentType;
 import net.opengis.swe.x20.QuantityType;
@@ -19,6 +22,7 @@ import org.n52.sos.ogc.swe.simpleType.ISosSweSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +55,30 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
     }
 
     @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return new HashMap<SupportedTypeKey, Set<String>>(0);
+    }
+
+    @Override
+    public Set<String> getConformanceClasses() {
+        Set<String> conformanceClasses = new HashSet<String>(0);
+        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/core");
+        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/uml-simple-components");
+        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/uml-record-components");
+        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/uml-block-components");
+        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/uml-simple-encodings");
+        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/xsd-simple-components");
+        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/xsd-record-components");
+        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/xsd-block-components");
+        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/xsd-simple-encodings");
+        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/general-encoding-rules");
+        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/text-encoding-rules");
+        return conformanceClasses;
+    }
+
+    @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
-        if (element instanceof SosSweQuantity ) {
+        if (element instanceof SosSweQuantity) {
             return addValuesToSimpleTypeQuantity((SosSweQuantity) element);
         } else if (element instanceof SosSweText) {
             return addValuesToSimpleTypeText((SosSweText) element);
@@ -67,8 +93,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
     }
 
     @Override
-    public XmlObject encode(Object response, Map<HelperValues, String> additionalValues)
-            throws OwsExceptionReport {
+    public XmlObject encode(Object response, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         return null;
     }
 
@@ -97,8 +122,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
      *            SOS internal representation
      */
     private QuantityType addValuesToSimpleTypeQuantity(SosSweQuantity quantity) {
-        QuantityType xbQuantity =
-                QuantityType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        QuantityType xbQuantity = QuantityType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (quantity.getDefinition() != null && !quantity.getDefinition().isEmpty()) {
             xbQuantity.setDefinition(quantity.getDefinition());
         }
@@ -127,8 +151,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
      *            SOS internal representation
      */
     private TextType addValuesToSimpleTypeText(SosSweText text) {
-        TextType xbText =
-                TextType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        TextType xbText = TextType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (text.getDefinition() != null && !text.getDefinition().isEmpty()) {
             xbText.setDefinition(text.getDefinition());
         }
@@ -142,8 +165,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
     }
 
     private TimeType addValuesToSimpleTypeTime(SosSweTime time) {
-        TimeType xbTime =
-                TimeType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        TimeType xbTime = TimeType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (time.getDefinition() != null && !time.getDefinition().isEmpty()) {
             xbTime.setDefinition(time.getDefinition());
         }
@@ -171,7 +193,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
     private Coordinate addValuesToCoordinate(SosSweCoordinate coordinate) {
         Coordinate xbCoordinate = Coordinate.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         xbCoordinate.setName(coordinate.getName().name());
-        xbCoordinate.setQuantity( addValuesToSimpleTypeQuantity((SosSweQuantity) coordinate.getValue()));
+        xbCoordinate.setQuantity(addValuesToSimpleTypeQuantity((SosSweQuantity) coordinate.getValue()));
         return xbCoordinate;
     }
 

@@ -28,42 +28,30 @@
 
 package org.n52.sos.request;
 
-import java.util.Collection;
 import java.util.List;
 
-import org.n52.sos.ogc.om.AbstractSosPhenomenon;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosProcedureDescription;
+import org.n52.sos.ogc.swe.SosFeatureRelationship;
 import org.n52.sos.ogc.swe.SosMetadata;
 
 public class InsertSensorRequest extends AbstractServiceRequest {
-    
-    private final String operationName = Sos2Constants.Operations.InsertSensor
-            .name();
 
-    /**
-     * phenomena, for which the sensor, which should be registered, offers
-     * values for
-     */
-    private Collection<AbstractSosPhenomenon> phenomena;
+    private final String operationName = Sos2Constants.Operations.InsertSensor.name();
 
-    /**
-     * features of interest whose properties are measured by this sensor
-     */
-    private Collection<SosAbstractFeature> featuresOfInterest;
+    private String procedureDescriptionFormat;
 
     /** String representing xml sensor description */
-    private String sensorDescription;
-
-    /** mobileEnabled parameter */
-    private boolean mobileEnabled;
+    private String procedureXmlDescription;
 
     /** observableProperty parameter */
     private List<String> observableProperty;
+    
+    private List<SosFeatureRelationship> relatedFeatures;
 
     /** SOS SensorML description */
-    private SensorML sensorML;
+    private SosProcedureDescription procedureDescription;
 
     /** metadata parameter */
     private SosMetadata metadata;
@@ -76,88 +64,26 @@ public class InsertSensorRequest extends AbstractServiceRequest {
     }
 
     /**
-     * constructor
-     * 
-     * @param systemp
-     *            sensor system, which should be registered
-     * @param sosComponents
-     *            offering ID, for which the sensor, which should be registered,
-     *            offers values for
-     * @param sensorDescriptionp
-     *            offering ID, for which the sensor, which should be registered,
-     *            offers values for
-     */
-    public InsertSensorRequest(Collection<AbstractSosPhenomenon> sosComponents,
-            String sensorDescriptionp, Collection<SosAbstractFeature> featuresOfInterest,
-            boolean mobileEnabled) {
-        this.phenomena = sosComponents;
-        this.sensorDescription = sensorDescriptionp;
-        this.featuresOfInterest = featuresOfInterest;
-        this.mobileEnabled = mobileEnabled;
-    }
-
-    /**
-     * @return the phenomena
-     */
-    public Collection<AbstractSosPhenomenon> getPhenomena() {
-        return phenomena;
-    }
-
-    /**
-     * @param phenomena
-     *            the phenomena to set
-     */
-    public void setPhenomena(Collection<AbstractSosPhenomenon> phenomena) {
-        this.phenomena = phenomena;
-    }
-
-    /**
      * @return the sensorDescription
      */
-    public String getSensorDescription() {
-        return sensorDescription;
+    public String getProcedureDescriptionString() {
+        return procedureXmlDescription;
     }
 
     /**
      * @param sensorDescription
      *            the sensorDescription to set
      */
-    public void setSensorDescription(String sensorDescription) {
-        this.sensorDescription = sensorDescription;
+    public void setProcedureDescriptionString(String procedureDescription) {
+        this.procedureXmlDescription = procedureDescription;
     }
 
-    /**
-     * 
-     * @return mobileEnabled
-     */
-    public boolean isMobileEnabled() {
-        return mobileEnabled;
+    public String getProcedureDescriptionFormat() {
+        return procedureDescriptionFormat;
     }
 
-    /**
-     * 
-     * @param mobileEnabled
-     */
-    public void setMobileEnabled(boolean mobileEnabled) {
-        this.mobileEnabled = mobileEnabled;
-    }
-
-    /**
-     * Get the features of interest contained in request.
-     * 
-     * @return Collection with features of interest
-     */
-    public Collection<SosAbstractFeature> getFeaturesOfInterest() {
-        return featuresOfInterest;
-    }
-
-    /**
-     * Set the features of interest contained in request.
-     * 
-     * @param featuresOfInterest
-     */
-    public void setFeaturesOfInterest(Collection<SosAbstractFeature> featuresOfInterest) {
-        this.featuresOfInterest = featuresOfInterest;
+    public void setProcedureDescriptionFormat(String procedureDescriptionFormat) {
+        this.procedureDescriptionFormat = procedureDescriptionFormat;
     }
 
     /**
@@ -184,8 +110,8 @@ public class InsertSensorRequest extends AbstractServiceRequest {
      * 
      * @return the sosSensorML
      */
-    public SensorML getSosSensorML() {
-        return sensorML;
+    public SosProcedureDescription getProcedureDescription() {
+        return procedureDescription;
     }
 
     /**
@@ -194,8 +120,8 @@ public class InsertSensorRequest extends AbstractServiceRequest {
      * @param sosSensorML
      *            the sosSensorML to set
      */
-    public void setSosSensorML(SensorML sosSensorML) {
-        this.sensorML = sosSensorML;
+    public void setProcedureDescription(SosProcedureDescription procedureDescription) {
+        this.procedureDescription = procedureDescription;
     }
 
     /**
@@ -220,6 +146,14 @@ public class InsertSensorRequest extends AbstractServiceRequest {
     @Override
     public String getOperationName() {
         return operationName;
+    }
+
+    public void setRelatedFeature(List<SosFeatureRelationship> relatedFeatures) {
+        this.relatedFeatures = relatedFeatures;
+    }
+    
+    public List<SosFeatureRelationship> getRelatatedFeature() {
+        return relatedFeatures;
     }
 
 }
