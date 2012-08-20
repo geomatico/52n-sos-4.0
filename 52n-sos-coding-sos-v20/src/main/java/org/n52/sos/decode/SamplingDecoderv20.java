@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObject> {
-    
+
     /**
      * logger, used for logging while initializing the constants from config
      * file
@@ -44,7 +44,7 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
     private static final Logger LOGGER = LoggerFactory.getLogger(SamplingDecoderv20.class);
 
     private List<DecoderKeyType> decoderKeyTypes;
-    
+
     private Set<String> supportedFeatureTypes;
 
     public SamplingDecoderv20() {
@@ -57,13 +57,13 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
             builder.append(", ");
         }
         builder.delete(builder.lastIndexOf(", "), builder.length());
-        
+
         supportedFeatureTypes = new HashSet<String>(0);
         supportedFeatureTypes.add(OGCConstants.UNKNOWN);
         supportedFeatureTypes.add(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_POINT);
         supportedFeatureTypes.add(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_CURVE);
         supportedFeatureTypes.add(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_SURFACE);
-        
+
         LOGGER.info("Decoder for the following namespaces initialized successfully: " + builder.toString() + "!");
     }
 
@@ -78,7 +78,7 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
         map.put(SupportedTypeKey.FeatureType, supportedFeatureTypes);
         return map;
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
         Set<String> conformanceClasses = new HashSet<String>(0);
@@ -110,10 +110,17 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
         sosFeat.setName(getNames(spatialSamplingFeature.getNameArray()));
         sosFeat.setFeatureType(getFeatureType(spatialSamplingFeature.getType()));
         sosFeat.setSampledFeatures(getSampledFeatures(spatialSamplingFeature.getSampledFeature()));
-        sosFeat.setXmlDescription(spatialSamplingFeature.xmlText(XmlOptionsHelper.getInstance().getXmlOptions()));
+        sosFeat.setXmlDescription(getXmlDescription(spatialSamplingFeature));
         sosFeat.setGeometry(getGeometry(spatialSamplingFeature.getShape()));
         checkTypeAndGeometry(sosFeat);
         return sosFeat;
+    }
+
+    private String getXmlDescription(SFSpatialSamplingFeatureType spatialSamplingFeature) {
+        SFSpatialSamplingFeatureDocument featureDoc =
+                SFSpatialSamplingFeatureDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        featureDoc.setSFSpatialSamplingFeature(spatialSamplingFeature);
+        return featureDoc.xmlText(XmlOptionsHelper.getInstance().getXmlOptions());
     }
 
     private List<String> getNames(CodeType[] nameArray) {

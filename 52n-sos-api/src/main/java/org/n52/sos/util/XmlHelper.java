@@ -432,4 +432,32 @@ public class XmlHelper {
         return namespaceURI;
     }
 
+    public static void updateGmlIDs(Node node, String gmlID, String oldGmlID) {
+        // check this node's attributes
+        NamedNodeMap attributes = node.getAttributes();
+        if (attributes != null) {
+            for (int i = 0, len = attributes.getLength(); i < len; i++) {
+                Attr attr = (Attr) attributes.item(i);
+                if (attr.getName().equals("gml:id")) {
+                    if (oldGmlID == null) {
+                        oldGmlID = attr.getValue();
+                        attr.setValue((gmlID));
+                    } else {
+                        String helperString = attr.getValue();
+                        helperString = helperString.replace(oldGmlID, gmlID);
+                        attr.setValue(helperString);
+                    }
+                }
+            }
+        }
+
+        // recurse this node's children
+        NodeList children = node.getChildNodes();
+        if (children != null) {
+            for (int i = 0, len = children.getLength(); i < len; i++) {
+                updateGmlIDs(children.item(i), gmlID, oldGmlID);
+            }
+        }
+    }
+
 }

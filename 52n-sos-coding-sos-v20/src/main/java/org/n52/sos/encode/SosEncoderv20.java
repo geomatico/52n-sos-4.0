@@ -12,6 +12,7 @@ import javax.xml.namespace.QName;
 
 import net.opengis.fes.x20.FilterCapabilitiesDocument;
 import net.opengis.fes.x20.FilterCapabilitiesDocument.FilterCapabilities;
+import net.opengis.gml.x32.AbstractFeatureType;
 import net.opengis.gml.x32.DirectPositionType;
 import net.opengis.gml.x32.EnvelopeType;
 import net.opengis.gml.x32.FeaturePropertyType;
@@ -107,7 +108,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
         return new HashMap<SupportedTypeKey, Set<String>>(0);
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
         return new HashSet<String>(0);
@@ -136,7 +137,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
         }
         return null;
     }
-    
+
     private XmlObject createCapabilitiesDocument(GetCapabilitiesResponse response) throws OwsExceptionReport {
         CapabilitiesDocument xbCapsDoc =
                 CapabilitiesDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
@@ -163,7 +164,9 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
             xbCaps.setServiceProvider((ServiceProvider) owsEncoder.encode(sosCapabilities.getServiceProvider()));
 
         }
-        if (sosCapabilities.getOperationsMetadata() != null && sosCapabilities.getOperationsMetadata().getOperations() != null && sosCapabilities.getOperationsMetadata().getOperations().isEmpty()) {
+        if (sosCapabilities.getOperationsMetadata() != null
+                && sosCapabilities.getOperationsMetadata().getOperations() != null
+                && sosCapabilities.getOperationsMetadata().getOperations().isEmpty()) {
             xbCaps.setOperationsMetadata((OperationsMetadata) owsEncoder.encode(sosCapabilities
                     .getOperationsMetadata()));
         }
@@ -247,8 +250,6 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
             throws OwsExceptionReport {
         int sfIdCounter = 1;
         HashMap<String, String> gmlID4sfIdentifier = new HashMap<String, String>();
-
-       // FIXME: gml:id not valid, always the same
         GetFeatureOfInterestResponseDocument xbGetFoiResponseDoc =
                 GetFeatureOfInterestResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance()
                         .getXmlOptions());
@@ -268,22 +269,11 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
                 if (gmlID4sfIdentifier.containsKey(identifier)) {
                     xbFeatMember.setHref("#" + gmlID4sfIdentifier.get(identifier));
                 } else {
-                    String gmlId = "sf_" + sfIdCounter;
-                    sfIdCounter++;
+                    String gmlId = "sf_" + sfIdCounter++;
                     if (feature instanceof SosSamplingFeature) {
                         SosSamplingFeature sampFeat = (SosSamplingFeature) feature;
-                        if (sampFeat.getXmlDescription() != null) {
-                            try {
-                                xbFeatMember.set(XmlObject.Factory.parse(sampFeat.getXmlDescription()));
-                                gmlID4sfIdentifier.put(identifier, gmlId);
-                            } catch (XmlException xmle) {
-                                String exceptionText =
-                                        "Error while encoding GetFeatureOfInterest response, invalid samplingFeature description!";
-                                LOGGER.debug(exceptionText, xmle);
-                                throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
-                            }
-                        } else if (sampFeat.getFeatureType() != null && 
-                                !sampFeat.getFeatureType().equalsIgnoreCase(OGCConstants.UNKNOWN)) {
+                        if (sampFeat.getFeatureType() != null
+                                && !sampFeat.getFeatureType().equalsIgnoreCase(OGCConstants.UNKNOWN)) {
                             IEncoder encoder =
                                     Configurator.getInstance().getEncoder(
                                             OMHelper.getNamespaceForFeatureType(sampFeat.getFeatureType()));
@@ -297,6 +287,17 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
                             additionalValues.put(HelperValues.GMLID, gmlId);
                             xbFeatMember.set((XmlObject) encoder.encode(sampFeat, additionalValues));
                             gmlID4sfIdentifier.put(identifier, gmlId);
+                        } else if (sampFeat.getXmlDescription() != null) {
+                            try {
+                                xbFeatMember.setAbstractFeature((AbstractFeatureType) XmlObject.Factory.parse(sampFeat
+                                        .getXmlDescription()));
+                                gmlID4sfIdentifier.put(identifier, gmlId);
+                            } catch (XmlException xmle) {
+                                String exceptionText =
+                                        "Error while encoding GetFeatureOfInterest response, invalid samplingFeature description!";
+                                LOGGER.debug(exceptionText, xmle);
+                                throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+                            }
                         } else if (sampFeat.getUrl() != null) {
                             xbFeatMember.setHref(identifier);
                             gmlID4sfIdentifier.put(identifier, gmlId);
@@ -513,8 +514,8 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
 
     private XmlObject createInsertionCapabilities(SosInsertionCapabilities sosInsertionCapabilities) {
         InsertionCapabilitiesDocument insertionCapabilitiesDoc = InsertionCapabilitiesDocument.Factory.newInstance();
-//        InsertionCapabilitiesType insertionCapabilities =
-//                InsertionCapabilitiesType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        // InsertionCapabilitiesType insertionCapabilities =
+        // InsertionCapabilitiesType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         InsertionCapabilitiesType insertionCapabilities = insertionCapabilitiesDoc.addNewInsertionCapabilities();
         for (String featureOfInterestType : sosInsertionCapabilities.getFeatureOfInterestTypes()) {
             if (!featureOfInterestType.equals(SosConstants.NOT_DEFINED)) {
@@ -538,7 +539,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
                 }
             }
         }
-//        return insertionCapabilities;
+        // return insertionCapabilities;
         return insertionCapabilitiesDoc;
     }
 
