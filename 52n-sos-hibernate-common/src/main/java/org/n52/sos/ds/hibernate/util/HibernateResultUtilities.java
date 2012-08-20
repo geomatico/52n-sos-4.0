@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.hibernate.Session;
 import org.joda.time.DateTime;
+import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.CategoryValue;
 import org.n52.sos.ds.hibernate.entities.CountValue;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
@@ -30,6 +31,8 @@ import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.quality.SosQuality;
 import org.n52.sos.ogc.om.quality.SosQuality.QualityType;
+import org.n52.sos.ogc.om.values.IValue;
+import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.Configurator;
@@ -55,15 +58,17 @@ public class HibernateResultUtilities {
      *             If an error occurs
      */
     public static List<SosObservation> createSosObservationFromObservations(List<Observation> observations,
-            String version, Session session) throws OwsExceptionReport {
+            String version, boolean singleValueObservation, Session session) throws OwsExceptionReport {
         List<SosObservation> observationCollection = new ArrayList<SosObservation>();
 
         Map<String, SosAbstractFeature> features = new HashMap<String, SosAbstractFeature>();
         Map<String, SosObservation> antiSubsettingObservations = new HashMap<String, SosObservation>();
         Map<String, AbstractSosPhenomenon> obsProps = new HashMap<String, AbstractSosPhenomenon>();
-        Map<Integer, SosObservationConstellation> observationConstellations = new HashMap<Integer, SosObservationConstellation>();
+        Map<Integer, SosObservationConstellation> observationConstellations =
+                new HashMap<Integer, SosObservationConstellation>();
 
-//        Map<String, DateTime> featureTimeForDynamicPosition = new HashMap<String, DateTime>();
+        // Map<String, DateTime> featureTimeForDynamicPosition = new
+        // HashMap<String, DateTime>();
         String observationType = OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION;
         if (observations != null) {
             // now iterate over resultset and create Measurement for each
@@ -90,16 +95,17 @@ public class HibernateResultUtilities {
 
                 // phenomenon
                 String phenID = hObservationConstellation.getObservableProperty().getIdentifier();
-                String valueType = hObservationConstellation.getObservableProperty().getValueType().getValueType();
-                String unit = hObservationConstellation.getObservableProperty().getUnit().getUnit();
+                String description = hObservationConstellation.getObservableProperty().getDescription();
                 if (!obsProps.containsKey(phenID)) {
-                    obsProps.put(phenID, new SosObservableProperty(phenID, null, unit, null, valueType));
+                    obsProps.put(phenID, new SosObservableProperty(phenID, description, null, null));
                 }
-//                if (!version.equals(Sos2Constants.SERVICEVERSION)
-//                        && Configurator.getInstance().isSetFoiLocationDynamically()
-//                        && phenID.equals(Configurator.getInstance().getSpatialObsProp4DynymicLocation())) {
-//                    featureTimeForDynamicPosition.put(foiID, timeDateTime);
-//                }
+                // if (!version.equals(Sos2Constants.SERVICEVERSION)
+                // && Configurator.getInstance().isSetFoiLocationDynamically()
+                // &&
+                // phenID.equals(Configurator.getInstance().getSpatialObsProp4DynymicLocation()))
+                // {
+                // featureTimeForDynamicPosition.put(foiID, timeDateTime);
+                // }
 
                 String offeringID = hObservationConstellation.getOffering().getIdentifier();
                 String mimeType = SosConstants.PARAMETER_NOT_SET;
@@ -128,39 +134,24 @@ public class HibernateResultUtilities {
                         }
                     }
                 }
-                Object value;
-                if (valueType.equalsIgnoreCase(SosConstants.ValueTypes.booleanType.name())) {
-                    value = Boolean.parseBoolean(getValueFromTextValueTable(hObservation.getTextValues()));
-                } else if (valueType.equalsIgnoreCase(SosConstants.ValueTypes.countType.name())) {
-                    value = (Long) getValueFromCountValueTable(hObservation.getCountValues());
-                } else if (valueType.equalsIgnoreCase(SosConstants.ValueTypes.numericType.name())) {
-                    value = getValueFromNumericValueTable(hObservation.getNumericValues());
-                    // } else if (valueType
-                    // .equalsIgnoreCase(SosConstants.ValueTypes.isoTimeType
-                    // .name())) {
-                    // value = new DateTime(resultSet.getLong(PGDAOConstants
-                    // .getNumericValueCn()));
-                } else if (valueType.equalsIgnoreCase(SosConstants.ValueTypes.textType.name())) {
-                    value = getValueFromTextValueTable(hObservation.getTextValues());
-                } else if (valueType.equalsIgnoreCase(SosConstants.ValueTypes.categoryType.name())) {
-                    value = getValueFromTextValueTable(hObservation.getTextValues());
-                } else if (valueType.equalsIgnoreCase(SosConstants.ValueTypes.spatialType.name())) {
-                    value = getValueFromGeometryValueTable(hObservation.getGeometryValues());
-                } else {
-                    value = getValueFromAllTable(hObservation);
+                IValue value = getValueFromAllTable(hObservation);
+                if (hObservation.getUnit() != null) {
+                    value.setUnit(hObservation.getUnit().getUnit());
                 }
-                SosObservationConstellation obsConst = new SosObservationConstellation(procID, obsProps.get(phenID),
-                        null, features.get(foiID), observationType);
+                checkOrSetObservablePropertyUnit(obsProps.get(phenID), value.getUnit());
+                SosObservationConstellation obsConst =
+                        new SosObservationConstellation(procID, obsProps.get(phenID), null, features.get(foiID),
+                                observationType);
                 int obsConstHash = obsConst.hashCode();
                 if (!observationConstellations.containsKey(obsConstHash)) {
                     observationConstellations.put(obsConstHash, obsConst);
                 }
 
-                if (hObservation.getAntiSubsetting() != null) {
+                if (hObservation.getAntiSubsetting() != null || !singleValueObservation) {
                     if (antiSubsettingObservations.containsKey(hObservation.getAntiSubsetting())) {
                         // TODO: code antiSubsetting
                     } else {
-                     // TODO: code antiSubsetting
+                        // TODO: code antiSubsetting
                     }
                 } else {
                     SosObservation sosObservation = new SosObservation();
@@ -175,23 +166,32 @@ public class HibernateResultUtilities {
                 }
             }
         }
-//        if (!obsConstObsMap.isEmpty()) {
-            // Map<String, SosAbstractFeature> sosAbstractFeatures =
-            // Configurator.getInstance().getFeatureQueryHandler()
-            // .getFeatures(features, null, session, version);
-            // for (SosAbstractFeature feat : sosAbstractFeatures.values()) {
-            // SosSamplingFeature feature = (SosSamplingFeature) feat;
-            // boundedBy = SosHelper.checkEnvelope(boundedBy,
-            // feature.getGeometry());
-            // }
-            // features.add(foiID);
-            // sosObservationCollection.setObservationMembers(obsConstObsMap.values());
-            // sosObservationCollection.setFeatures(sosAbstractFeatures);
-            // sosObservationCollection.setBoundedBy(boundedBy);
-            // sosObservationCollection.setSrid(srid);
+        // if (!obsConstObsMap.isEmpty()) {
+        // Map<String, SosAbstractFeature> sosAbstractFeatures =
+        // Configurator.getInstance().getFeatureQueryHandler()
+        // .getFeatures(features, null, session, version);
+        // for (SosAbstractFeature feat : sosAbstractFeatures.values()) {
+        // SosSamplingFeature feature = (SosSamplingFeature) feat;
+        // boundedBy = SosHelper.checkEnvelope(boundedBy,
+        // feature.getGeometry());
+        // }
+        // features.add(foiID);
+        // sosObservationCollection.setObservationMembers(obsConstObsMap.values());
+        // sosObservationCollection.setFeatures(sosAbstractFeatures);
+        // sosObservationCollection.setBoundedBy(boundedBy);
+        // sosObservationCollection.setSrid(srid);
 
-//        }
+        // }
         return observationCollection;
+    }
+
+    private static void checkOrSetObservablePropertyUnit(AbstractSosPhenomenon abstractSosPhenomenon, String unit) {
+       if(abstractSosPhenomenon instanceof SosObservableProperty) {
+           SosObservableProperty obsProp = (SosObservableProperty)abstractSosPhenomenon;
+           if (obsProp.getUnit() == null && unit != null) {
+               obsProp.setUnit(unit);
+           }
+       }
     }
 
     /**
@@ -201,17 +201,19 @@ public class HibernateResultUtilities {
      *            Observation object
      * @return Observation value
      */
-    private static Object getValueFromAllTable(Observation hObservation) {
-        if (hObservation.getNumericValues() != null && !hObservation.getNumericValues().isEmpty()) {
-            return getValueFromNumericValueTable(hObservation.getNumericValues());
-        } else if (hObservation.getTextValues() != null && !hObservation.getTextValues().isEmpty()) {
-            return getValueFromTextValueTable(hObservation.getTextValues());
-        } else if (hObservation.getGeometryValues() != null && !hObservation.getGeometryValues().isEmpty()) {
-            return getValueFromGeometryValueTable(hObservation.getGeometryValues());
-        } else if (hObservation.getCountValues() != null && !hObservation.getCountValues().isEmpty()) {
-            return getValueFromCountValueTable(hObservation.getCountValues());
+    private static IValue getValueFromAllTable(Observation hObservation) {
+        if (hObservation.getBooleanValues() != null && !hObservation.getBooleanValues().isEmpty()) {
+            return new org.n52.sos.ogc.om.values.BooleanValue(getValueFromBooleanValueTable(hObservation.getBooleanValues()));
         } else if (hObservation.getCategoryValues() != null && !hObservation.getCategoryValues().isEmpty()) {
-            return getValueFromCategoryValueTable(hObservation.getCategoryValues());
+            return new org.n52.sos.ogc.om.values.CategoryValue(getValueFromCategoryValueTable(hObservation.getCategoryValues()));
+        } else if (hObservation.getCountValues() != null && !hObservation.getCountValues().isEmpty()) {
+            return new org.n52.sos.ogc.om.values.CountValue(getValueFromCountValueTable(hObservation.getCountValues()));
+        } else if (hObservation.getNumericValues() != null && !hObservation.getNumericValues().isEmpty()) {
+            return new QuantityValue(getValueFromNumericValueTable(hObservation.getNumericValues()));
+        } else if (hObservation.getTextValues() != null && !hObservation.getTextValues().isEmpty()) {
+            return new org.n52.sos.ogc.om.values.TextValue(getValueFromTextValueTable(hObservation.getTextValues()));
+        } else if (hObservation.getGeometryValues() != null && !hObservation.getGeometryValues().isEmpty()) {
+            return new org.n52.sos.ogc.om.values.GeometryValue(getValueFromGeometryValueTable(hObservation.getGeometryValues()));
         }
         return null;
     }
@@ -225,16 +227,23 @@ public class HibernateResultUtilities {
      */
     private static Double getValueFromNumericValueTable(Set<NumericValue> numericValues) {
         for (NumericValue numericValue : numericValues) {
-            return (Double) numericValue.getValue();
+            return new Double(numericValue.getValue());
         }
         return Double.NaN;
     }
 
-    private static Long getValueFromCountValueTable(Set<CountValue> countValues) {
-        for (CountValue countValue : countValues) {
-            return (long) countValue.getValue();
+    private static Boolean getValueFromBooleanValueTable(Set<BooleanValue> booleanValues) {
+        for (BooleanValue booleanValue : booleanValues) {
+            return new Boolean(booleanValue.getValue());
         }
-        return Long.MIN_VALUE;
+        return null;
+    }
+
+    private static Integer getValueFromCountValueTable(Set<CountValue> countValues) {
+        for (CountValue countValue : countValues) {
+            return new Integer(countValue.getValue());
+        }
+        return Integer.MIN_VALUE;
     }
 
     /**
@@ -246,14 +255,14 @@ public class HibernateResultUtilities {
      */
     private static String getValueFromTextValueTable(Set<TextValue> textValues) {
         for (TextValue textValue : textValues) {
-            return (String) textValue.getValue();
+            return new String(textValue.getValue());
         }
         return "";
     }
 
     private static String getValueFromCategoryValueTable(Set<CategoryValue> categoryValues) {
         for (CategoryValue categoryValue : categoryValues) {
-            return (String) categoryValue.getValue();
+            return new String(categoryValue.getValue());
         }
         return "";
     }

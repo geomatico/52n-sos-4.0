@@ -73,9 +73,31 @@ public class HibernateConstants {
     public static final String PARAMETER_PHENOMENON_TIME_END = "phenomenonTimeEnd";
 
     public static final String PARAMETER_OBSERVATION = "observation";
-    
+
     public static final String PARAMETER_OBSERVATIONS = "observations";
 
     public static final String PARAMETER_OBSERVATION_TYPE = "observationType";
+    
+    public static final String PARAMETER_PROCEDURE_DESCRIPTION_FORMAT = "procedureDescriptionFormat";
+
+    public static final String PARAMETER_UNIT = "unit";
+
+    public static final String PARAMETER_RELATED_FEATURE_ROLE = "relatedFeatureRole";
+
+    public static final String PARAMETER_RESULT_TYPE = "resultType";
+
+    public static final String PARAMETER_VALUE_TYPE = "valueType";
+
+    public static final String PARAMETER_FEATURE_OF_INTEREST_TYPE = "featureOfInterestType";
+    
+    public static final String PARAMETER_FEATURE_OF_INTEREST_TYPES = "featureOfInterestTypes";
+
+    public static final String PARAMETER_VALUE = "value";
+
+    public static final String PARAMETER_RELATED_FEATURES = "relatedFeatures";
+
+    public static final String PARAMETER_OFFERINGS = "offerings";
+
+    public static final String PARAMETER_OBSERVATION_ID = "observationId";
 
 }

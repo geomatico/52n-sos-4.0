@@ -42,251 +42,210 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class PGGeometryValueExtractor52N extends AbstractJTSGeometryValueExtractor {
-    
+
     private static Pattern boxPattern = Pattern.compile(".*box.*\\((.*)\\)", Pattern.CASE_INSENSITIVE);
 
     public Geometry toJTS(Object object) {
-            if (object == null) {
-                    return null;
-            }
+        if (object == null) {
+            return null;
+        }
 
-            // in some cases, Postgis returns not PGgeometry objects
-            // but org.postgis.Geometry instances.
-            // This has been observed when retrieving GeometryCollections
-            // as the result of an SQL-operation such as Union.
-            if (object instanceof org.postgis.Geometry) {
-                    object = new PGgeometry((org.postgis.Geometry) object);
-            }
+        // in some cases, Postgis returns not PGgeometry objects
+        // but org.postgis.Geometry instances.
+        // This has been observed when retrieving GeometryCollections
+        // as the result of an SQL-operation such as Union.
+        if (object instanceof org.postgis.Geometry) {
+            object = new PGgeometry((org.postgis.Geometry) object);
+        }
 
-            if (object instanceof PGgeometry) {
-                    PGgeometry geom = (PGgeometry) object;
-                    com.vividsolutions.jts.geom.Geometry out = null;
-                    switch (geom.getGeoType()) {
-                            case org.postgis.Geometry.POINT:
-                                    out = convertPoint((org.postgis.Point) geom.getGeometry());
-                                    break;
-                            case org.postgis.Geometry.LINESTRING:
-                                    out = convertLineString(
-                                                    (org.postgis.LineString) geom
-                                                                    .getGeometry()
-                                    );
-                                    break;
-                            case org.postgis.Geometry.POLYGON:
-                                    out = convertPolygon((org.postgis.Polygon) geom.getGeometry());
-                                    break;
-                            case org.postgis.Geometry.MULTILINESTRING:
-                                    out = convertMultiLineString(
-                                                    (org.postgis.MultiLineString) geom
-                                                                    .getGeometry()
-                                    );
-                                    break;
-                            case org.postgis.Geometry.MULTIPOINT:
-                                    out = convertMultiPoint(
-                                                    (org.postgis.MultiPoint) geom
-                                                                    .getGeometry()
-                                    );
-                                    break;
-                            case org.postgis.Geometry.MULTIPOLYGON:
-                                    out = convertMultiPolygon(
-                                                    (org.postgis.MultiPolygon) geom
-                                                                    .getGeometry()
-                                    );
-                                    break;
-                            case org.postgis.Geometry.GEOMETRYCOLLECTION:
-                                    out = convertGeometryCollection(
-                                                    (org.postgis.GeometryCollection) geom
-                                                                    .getGeometry()
-                                    );
-                                    break;
-                            default:
-                                    throw new RuntimeException("Unknown type of PGgeometry");
-                    }
-                    out.setSRID(geom.getGeometry().srid);
-                    return out;
-            } else if (object instanceof org.postgis.PGboxbase) {
-                    return convertBox((org.postgis.PGboxbase) object);
-            // The next two else if blocks are added to support pre-ProstGIS 2.0 Versions
-            } else if (object instanceof PGobject && ((PGobject) object).getType().contains("box")) {
-                PGobject pgo = (PGobject) object;
-                //try to extract the box object (if available)
-                String boxStr = extractBoxString(pgo);
-                if (boxStr == null)
-                    throw new IllegalArgumentException("Can't convert object: " + pgo.getType() + " : " + pgo.getValue());
-                String[] pointsStr = boxStr.split(",");
-                Point ll = toPoint(pointsStr[0]);
-                Point ur = toPoint(pointsStr[1]);
-                return cornerPointsToPolygon(ll, ur, false);
+        if (object instanceof PGgeometry) {
+            PGgeometry geom = (PGgeometry) object;
+            com.vividsolutions.jts.geom.Geometry out = null;
+            switch (geom.getGeoType()) {
+            case org.postgis.Geometry.POINT:
+                out = convertPoint((org.postgis.Point) geom.getGeometry());
+                break;
+            case org.postgis.Geometry.LINESTRING:
+                out = convertLineString((org.postgis.LineString) geom.getGeometry());
+                break;
+            case org.postgis.Geometry.POLYGON:
+                out = convertPolygon((org.postgis.Polygon) geom.getGeometry());
+                break;
+            case org.postgis.Geometry.MULTILINESTRING:
+                out = convertMultiLineString((org.postgis.MultiLineString) geom.getGeometry());
+                break;
+            case org.postgis.Geometry.MULTIPOINT:
+                out = convertMultiPoint((org.postgis.MultiPoint) geom.getGeometry());
+                break;
+            case org.postgis.Geometry.MULTIPOLYGON:
+                out = convertMultiPolygon((org.postgis.MultiPolygon) geom.getGeometry());
+                break;
+            case org.postgis.Geometry.GEOMETRYCOLLECTION:
+                out = convertGeometryCollection((org.postgis.GeometryCollection) geom.getGeometry());
+                break;
+            default:
+                throw new RuntimeException("Unknown type of PGgeometry");
+            }
+            out.setSRID(geom.getGeometry().srid);
+            return out;
+        } else if (object instanceof org.postgis.PGboxbase) {
+            return convertBox((org.postgis.PGboxbase) object);
+            // The next two else if blocks are added to support pre-ProstGIS 2.0
+            // Versions
+        } else if (object instanceof PGobject && ((PGobject) object).getType().contains("box")) {
+            PGobject pgo = (PGobject) object;
+            // try to extract the box object (if available)
+            String boxStr = extractBoxString(pgo);
+            if (boxStr == null)
+                throw new IllegalArgumentException("Can't convert object: " + pgo.getType() + " : " + pgo.getValue());
+            String[] pointsStr = boxStr.split(",");
+            Point ll = toPoint(pointsStr[0]);
+            Point ur = toPoint(pointsStr[1]);
+            return cornerPointsToPolygon(ll, ur, false);
             // The Postgis driver not always registers geography objects
-            } else if (object instanceof PGobject && (((PGobject)object).getType().equals("geometry") ||
-                    ((PGobject)object).getType().equals("geography"))) {
-                return convertFromPGobject((PGobject) object);
-            } else {
-                    throw new IllegalArgumentException(
-                                    "Can't convert object of type "
-                                                    + object.getClass().getCanonicalName()
-                    );
+        } else if (object instanceof PGobject
+                && (((PGobject) object).getType().equals("geometry") || ((PGobject) object).getType().equals(
+                        "geography"))) {
+            return convertFromPGobject((PGobject) object);
+        } else {
+            throw new IllegalArgumentException("Can't convert object of type " + object.getClass().getCanonicalName());
 
-            }
+        }
 
     }
 
     private Geometry convertBox(PGboxbase box) {
-            Point ll = box.getLLB();
-            Point ur = box.getURT();
-            Coordinate[] ringCoords = new Coordinate[5];
-            if (box instanceof org.postgis.PGbox2d) {
-                    ringCoords[0] = new Coordinate(ll.x, ll.y);
-                    ringCoords[1] = new Coordinate(ur.x, ll.y);
-                    ringCoords[2] = new Coordinate(ur.x, ur.y);
-                    ringCoords[3] = new Coordinate(ll.x, ur.y);
-                    ringCoords[4] = new Coordinate(ll.x, ll.y);
-            } else {
-                    ringCoords[0] = new Coordinate(ll.x, ll.y, ll.z);
-                    ringCoords[1] = new Coordinate(ur.x, ll.y, ll.z);
-                    ringCoords[2] = new Coordinate(ur.x, ur.y, ur.z);
-                    ringCoords[3] = new Coordinate(ll.x, ur.y, ur.z);
-                    ringCoords[4] = new Coordinate(ll.x, ll.y, ll.z);
-            }
-            com.vividsolutions.jts.geom.LinearRing shell = getGeometryFactory()
-                            .createLinearRing(ringCoords);
-            return getGeometryFactory().createPolygon(shell, null);
+        Point ll = box.getLLB();
+        Point ur = box.getURT();
+        Coordinate[] ringCoords = new Coordinate[5];
+        if (box instanceof org.postgis.PGbox2d) {
+            ringCoords[0] = new Coordinate(ll.x, ll.y);
+            ringCoords[1] = new Coordinate(ur.x, ll.y);
+            ringCoords[2] = new Coordinate(ur.x, ur.y);
+            ringCoords[3] = new Coordinate(ll.x, ur.y);
+            ringCoords[4] = new Coordinate(ll.x, ll.y);
+        } else {
+            ringCoords[0] = new Coordinate(ll.x, ll.y, ll.z);
+            ringCoords[1] = new Coordinate(ur.x, ll.y, ll.z);
+            ringCoords[2] = new Coordinate(ur.x, ur.y, ur.z);
+            ringCoords[3] = new Coordinate(ll.x, ur.y, ur.z);
+            ringCoords[4] = new Coordinate(ll.x, ll.y, ll.z);
+        }
+        com.vividsolutions.jts.geom.LinearRing shell = getGeometryFactory().createLinearRing(ringCoords);
+        return getGeometryFactory().createPolygon(shell, null);
     }
 
     private Geometry convertGeometryCollection(GeometryCollection collection) {
-            org.postgis.Geometry[] geometries = collection.getGeometries();
-            com.vividsolutions.jts.geom.Geometry[] jtsGeometries = new com.vividsolutions.jts.geom.Geometry[geometries.length];
-            for (int i = 0; i < geometries.length; i++) {
-                    jtsGeometries[i] = toJTS(geometries[i]);
-                    //TODO  - refactor this so the following line is not necessary
-                    jtsGeometries[i].setSRID(0); // convert2JTS sets SRIDs, but constituent geometries in a collection must have srid  == 0
-            }
-            com.vividsolutions.jts.geom.GeometryCollection jtsGCollection = getGeometryFactory()
-                            .createGeometryCollection(jtsGeometries);
-            return jtsGCollection;
+        org.postgis.Geometry[] geometries = collection.getGeometries();
+        com.vividsolutions.jts.geom.Geometry[] jtsGeometries =
+                new com.vividsolutions.jts.geom.Geometry[geometries.length];
+        for (int i = 0; i < geometries.length; i++) {
+            jtsGeometries[i] = toJTS(geometries[i]);
+            // TODO - refactor this so the following line is not necessary
+            jtsGeometries[i].setSRID(0); // convert2JTS sets SRIDs, but
+                                         // constituent geometries in a
+                                         // collection must have srid == 0
+        }
+        com.vividsolutions.jts.geom.GeometryCollection jtsGCollection =
+                getGeometryFactory().createGeometryCollection(jtsGeometries);
+        return jtsGCollection;
     }
 
     private Geometry convertMultiPolygon(MultiPolygon pgMultiPolygon) {
-            com.vividsolutions.jts.geom.Polygon[] polygons = new com.vividsolutions.jts.geom.Polygon[pgMultiPolygon
-                            .numPolygons()];
+        com.vividsolutions.jts.geom.Polygon[] polygons =
+                new com.vividsolutions.jts.geom.Polygon[pgMultiPolygon.numPolygons()];
 
-            for (int i = 0; i < polygons.length; i++) {
-                    Polygon pgPolygon = pgMultiPolygon.getPolygon(i);
-                    polygons[i] = (com.vividsolutions.jts.geom.Polygon) convertPolygon(pgPolygon);
-            }
+        for (int i = 0; i < polygons.length; i++) {
+            Polygon pgPolygon = pgMultiPolygon.getPolygon(i);
+            polygons[i] = (com.vividsolutions.jts.geom.Polygon) convertPolygon(pgPolygon);
+        }
 
-            com.vividsolutions.jts.geom.MultiPolygon out = getGeometryFactory()
-                            .createMultiPolygon(polygons);
-            return out;
+        com.vividsolutions.jts.geom.MultiPolygon out = getGeometryFactory().createMultiPolygon(polygons);
+        return out;
     }
 
     private Geometry convertMultiPoint(MultiPoint pgMultiPoint) {
-            com.vividsolutions.jts.geom.Point[] points = new com.vividsolutions.jts.geom.Point[pgMultiPoint
-                            .numPoints()];
+        com.vividsolutions.jts.geom.Point[] points = new com.vividsolutions.jts.geom.Point[pgMultiPoint.numPoints()];
 
-            for (int i = 0; i < points.length; i++) {
-                    points[i] = convertPoint(pgMultiPoint.getPoint(i));
-            }
-            com.vividsolutions.jts.geom.MultiPoint out = getGeometryFactory()
-                            .createMultiPoint(points);
-            out.setSRID(pgMultiPoint.srid);
-            return out;
+        for (int i = 0; i < points.length; i++) {
+            points[i] = convertPoint(pgMultiPoint.getPoint(i));
+        }
+        com.vividsolutions.jts.geom.MultiPoint out = getGeometryFactory().createMultiPoint(points);
+        out.setSRID(pgMultiPoint.srid);
+        return out;
     }
 
-    private com.vividsolutions.jts.geom.Geometry convertMultiLineString(
-                    MultiLineString mlstr) {
-            com.vividsolutions.jts.geom.MultiLineString out;
-            if (mlstr.haveMeasure) {
-                    MLineString[] lstrs = new MLineString[mlstr.numLines()];
-                    for (int i = 0; i < mlstr.numLines(); i++) {
-                            MCoordinate[] coordinates = toJTSCoordinates(
-                                            mlstr.getLine(i)
-                                                            .getPoints()
-                            );
-                            lstrs[i] = getGeometryFactory().createMLineString(coordinates);
-                    }
-                    out = getGeometryFactory().createMultiMLineString(lstrs);
-            } else {
-                    com.vividsolutions.jts.geom.LineString[] lstrs = new com.vividsolutions.jts.geom.LineString[mlstr
-                                    .numLines()];
-                    for (int i = 0; i < mlstr.numLines(); i++) {
-                            lstrs[i] = getGeometryFactory().createLineString(
-                                            toJTSCoordinates(mlstr.getLine(i).getPoints())
-                            );
-                    }
-                    out = getGeometryFactory().createMultiLineString(lstrs);
+    private com.vividsolutions.jts.geom.Geometry convertMultiLineString(MultiLineString mlstr) {
+        com.vividsolutions.jts.geom.MultiLineString out;
+        if (mlstr.haveMeasure) {
+            MLineString[] lstrs = new MLineString[mlstr.numLines()];
+            for (int i = 0; i < mlstr.numLines(); i++) {
+                MCoordinate[] coordinates = toJTSCoordinates(mlstr.getLine(i).getPoints());
+                lstrs[i] = getGeometryFactory().createMLineString(coordinates);
             }
-            return out;
+            out = getGeometryFactory().createMultiMLineString(lstrs);
+        } else {
+            com.vividsolutions.jts.geom.LineString[] lstrs =
+                    new com.vividsolutions.jts.geom.LineString[mlstr.numLines()];
+            for (int i = 0; i < mlstr.numLines(); i++) {
+                lstrs[i] = getGeometryFactory().createLineString(toJTSCoordinates(mlstr.getLine(i).getPoints()));
+            }
+            out = getGeometryFactory().createMultiLineString(lstrs);
+        }
+        return out;
     }
 
-    private com.vividsolutions.jts.geom.Geometry convertPolygon(
-                    Polygon polygon) {
-            com.vividsolutions.jts.geom.LinearRing shell = getGeometryFactory()
-                            .createLinearRing(
-                                            toJTSCoordinates(polygon.getRing(0).getPoints())
-                            );
-            com.vividsolutions.jts.geom.Polygon out = null;
-            if (polygon.numRings() > 1) {
-                    com.vividsolutions.jts.geom.LinearRing[] rings = new com.vividsolutions.jts.geom.LinearRing[polygon
-                                    .numRings() - 1];
-                    for (int r = 1; r < polygon.numRings(); r++) {
-                            rings[r - 1] = getGeometryFactory().createLinearRing(
-                                            toJTSCoordinates(polygon.getRing(r).getPoints())
-                            );
-                    }
-                    out = getGeometryFactory().createPolygon(shell, rings);
-            } else {
-                    out = getGeometryFactory().createPolygon(shell, null);
+    private com.vividsolutions.jts.geom.Geometry convertPolygon(Polygon polygon) {
+        com.vividsolutions.jts.geom.LinearRing shell =
+                getGeometryFactory().createLinearRing(toJTSCoordinates(polygon.getRing(0).getPoints()));
+        com.vividsolutions.jts.geom.Polygon out = null;
+        if (polygon.numRings() > 1) {
+            com.vividsolutions.jts.geom.LinearRing[] rings =
+                    new com.vividsolutions.jts.geom.LinearRing[polygon.numRings() - 1];
+            for (int r = 1; r < polygon.numRings(); r++) {
+                rings[r - 1] = getGeometryFactory().createLinearRing(toJTSCoordinates(polygon.getRing(r).getPoints()));
             }
-            return out;
+            out = getGeometryFactory().createPolygon(shell, rings);
+        } else {
+            out = getGeometryFactory().createPolygon(shell, null);
+        }
+        return out;
     }
 
     private com.vividsolutions.jts.geom.Point convertPoint(Point pnt) {
-            com.vividsolutions.jts.geom.Point g = getGeometryFactory().createPoint(
-                            this.toJTSCoordinate(pnt)
-            );
-            return g;
+        com.vividsolutions.jts.geom.Point g = getGeometryFactory().createPoint(this.toJTSCoordinate(pnt));
+        return g;
     }
 
-    private com.vividsolutions.jts.geom.LineString convertLineString(
-                    org.postgis.LineString lstr) {
-            com.vividsolutions.jts.geom.LineString out = lstr.haveMeasure ? getGeometryFactory()
-                            .createMLineString(toJTSCoordinates(lstr.getPoints()))
-                            : getGeometryFactory().createLineString(
-                            toJTSCoordinates(lstr.getPoints())
-            );
-            return out;
+    private com.vividsolutions.jts.geom.LineString convertLineString(org.postgis.LineString lstr) {
+        com.vividsolutions.jts.geom.LineString out =
+                lstr.haveMeasure ? getGeometryFactory().createMLineString(toJTSCoordinates(lstr.getPoints()))
+                        : getGeometryFactory().createLineString(toJTSCoordinates(lstr.getPoints()));
+        return out;
     }
 
     private MCoordinate[] toJTSCoordinates(Point[] points) {
-            MCoordinate[] coordinates = new MCoordinate[points.length];
-            for (int i = 0; i < points.length; i++) {
-                    coordinates[i] = this.toJTSCoordinate(points[i]);
-            }
-            return coordinates;
+        MCoordinate[] coordinates = new MCoordinate[points.length];
+        for (int i = 0; i < points.length; i++) {
+            coordinates[i] = this.toJTSCoordinate(points[i]);
+        }
+        return coordinates;
     }
 
     private MCoordinate toJTSCoordinate(Point pt) {
-            MCoordinate mc;
-            if (pt.dimension == 2) {
-                    mc = pt.haveMeasure ? MCoordinate.create2dWithMeasure(
-                                    pt.getX(), pt
-                                    .getY(), pt.getM()
-                    ) : MCoordinate.create2d(
-                                    pt.getX(), pt
-                                    .getY()
-                    );
-            } else {
-                    mc = pt.haveMeasure ? MCoordinate.create3dWithMeasure(
-                                    pt.getX(), pt
-                                    .getY(), pt.getZ(), pt.getM()
-                    ) : MCoordinate.create3d(
-                                    pt
-                                                    .getX(), pt.getY(), pt.getZ()
-                    );
-            }
-            return mc;
+        MCoordinate mc;
+        if (pt.dimension == 2) {
+            mc =
+                    pt.haveMeasure ? MCoordinate.create2dWithMeasure(pt.getX(), pt.getY(), pt.getM()) : MCoordinate
+                            .create2d(pt.getX(), pt.getY());
+        } else {
+            mc =
+                    pt.haveMeasure ? MCoordinate.create3dWithMeasure(pt.getX(), pt.getY(), pt.getZ(), pt.getM())
+                            : MCoordinate.create3d(pt.getX(), pt.getY(), pt.getZ());
+        }
+        return mc;
     }
-    
+
     // added methods
     private String extractBoxString(PGobject pgo) {
         String boxStr = null;
@@ -297,7 +256,7 @@ public class PGGeometryValueExtractor52N extends AbstractJTSGeometryValueExtract
         return boxStr;
 
     }
-    
+
     private Geometry convertFromPGobject(PGobject object) {
         String value = object.getValue();
         try {
@@ -314,7 +273,7 @@ public class PGGeometryValueExtractor52N extends AbstractJTSGeometryValueExtract
         double y = Double.parseDouble(coords[1]);
         return new Point(x, y);
     }
-    
+
     private Geometry cornerPointsToPolygon(Point ll, Point ur, boolean is3D) {
         Coordinate[] ringCoords = new Coordinate[5];
         ringCoords[0] = is3D ? new Coordinate(ll.x, ll.y, ll.z) : new Coordinate(ll.x, ll.y);
@@ -322,8 +281,7 @@ public class PGGeometryValueExtractor52N extends AbstractJTSGeometryValueExtract
         ringCoords[2] = is3D ? new Coordinate(ur.x, ur.y, ur.z) : new Coordinate(ur.x, ur.y);
         ringCoords[3] = is3D ? new Coordinate(ll.x, ur.y, ur.z) : new Coordinate(ll.x, ur.y);
         ringCoords[4] = is3D ? new Coordinate(ll.x, ll.y, ll.z) : new Coordinate(ll.x, ll.y);
-        com.vividsolutions.jts.geom.LinearRing shell = getGeometryFactory()
-                .createLinearRing(ringCoords);
+        com.vividsolutions.jts.geom.LinearRing shell = getGeometryFactory().createLinearRing(ringCoords);
         return getGeometryFactory().createPolygon(shell, null);
     }
 }

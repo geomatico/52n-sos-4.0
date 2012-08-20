@@ -30,26 +30,25 @@ import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 
 public class PGGeometryTypeDescriptor52N implements SqlTypeDescriptor {
 
-
     public static final SqlTypeDescriptor INSTANCE = new PGGeometryTypeDescriptor52N();
 
     @Override
     public int getSqlType() {
-            return Types.STRUCT;
+        return Types.STRUCT;
     }
 
     @Override
     public boolean canBeRemapped() {
-            return false;
+        return false;
     }
 
     @Override
     public <X> ValueBinder<X> getBinder(final JavaTypeDescriptor<X> javaTypeDescriptor) {
-            return (ValueBinder<X>) new PGGeometryValueBinder();
+        return (ValueBinder<X>) new PGGeometryValueBinder();
     }
 
     @Override
     public <X> ValueExtractor<X> getExtractor(final JavaTypeDescriptor<X> javaTypeDescriptor) {
-            return (ValueExtractor<X>) new PGGeometryValueExtractor52N();
+        return (ValueExtractor<X>) new PGGeometryValueExtractor52N();
     }
 }

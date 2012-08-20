@@ -69,8 +69,10 @@ public class SessionFactoryProvider implements IConnectionProvider {
     public SessionFactoryProvider() throws OwsExceptionReport {
         try {
             Configuration configuration = new Configuration().addResource("hibernate.cfg.xml").configure();
-//            Configuration configuration = new Configuration();
-//            configuration.configure(new File(Configurator.getInstance().getBasePath() + "WEB-INF\\conf\\hibernate\\hibernate.cfg.xml"));
+            // Configuration configuration = new Configuration();
+            // configuration.configure(new
+            // File(Configurator.getInstance().getBasePath() +
+            // "WEB-INF\\conf\\hibernate\\hibernate.cfg.xml"));
             ServiceRegistry serviceRegistry =
                     new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
             this.sessionFactory = configuration.buildSessionFactory(serviceRegistry);
@@ -103,6 +105,7 @@ public class SessionFactoryProvider implements IConnectionProvider {
             if (connection instanceof Session) {
                 Session session = (Session) connection;
                 if (session.isOpen()) {
+                    session.clear();
                     session.close();
                 }
             }
@@ -130,5 +133,5 @@ public class SessionFactoryProvider implements IConnectionProvider {
             LOGGER.error("Error while closing connection provider!", he);
         }
     }
-    
+
 }
