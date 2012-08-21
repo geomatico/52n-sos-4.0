@@ -31,6 +31,8 @@ package org.n52.sos.ds.hibernate.util;
 import org.hibernate.Session;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.service.Configurator;
+import org.n52.sos.util.JTSHelper;
 
 public class HibernateFeatureCriteriaTransactionalUtilities {
 
@@ -44,7 +46,11 @@ public class HibernateFeatureCriteriaTransactionalUtilities {
             }
             if (samplingFeature.getGeometry() != null && !samplingFeature.getGeometry().isEmpty()) {
                 // TODO: transform to default EPSG
-                feature.setGeom(samplingFeature.getGeometry());
+                if (Configurator.getInstance().switchCoordinatesForEPSG(samplingFeature.getGeometry().getSRID())) {
+                    feature.setGeom(JTSHelper.switchCoordinate4Geometry(samplingFeature.getGeometry()));
+                } else {
+                    feature.setGeom(samplingFeature.getGeometry());
+                }
             }
             if (samplingFeature.getXmlDescription() != null && !samplingFeature.getXmlDescription().isEmpty()) {
                 feature.setDescriptionXml(samplingFeature.getXmlDescription());

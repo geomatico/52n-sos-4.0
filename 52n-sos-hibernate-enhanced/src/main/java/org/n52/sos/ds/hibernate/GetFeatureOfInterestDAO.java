@@ -58,6 +58,8 @@ import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
 
     /**
@@ -141,19 +143,22 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
             opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(), foiValues);
         }
 
-        // set param location/spatialFilter.
+        // set param spatial filter
         String parameterName = Sos2Constants.GetFeatureOfInterestParams.spatialFilter.name();
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             parameterName = Sos1Constants.GetFeatureOfInterestParams.location.name();
         }
-        // Envelope envelope =
-        // Configurator.getInstance().getFeatureQueryHandler().getEnvelopeforFeatureIDs(new
-        // ArrayList<String>(featureIDs), session);
-        // opsMeta.addParameterMinMaxMapValue(parameterName,
-        // SosUtilities.getMinMaxMapFromEnvelope(envelope));
-        List<String> locationValues = new ArrayList<String>(1);
-        locationValues.add(SosConstants.PARAMETER_ANY);
-        opsMeta.addParameterValue(parameterName, locationValues);
+        Envelope envelope =
+                Configurator.getInstance().getFeatureQueryHandler()
+                        .getEnvelopeforFeatureIDs((List<String>) featureIDs, session);
+        if (envelope != null) {
+            opsMeta.addParameterMinMaxMapValue(parameterName,
+                    SosHelper.getMinMaxMapFromEnvelope(envelope));
+        } else {
+            List<String> locationValues = new ArrayList<String>(1);
+            locationValues.add(SosConstants.PARAMETER_ANY);
+            opsMeta.addParameterValue(parameterName, locationValues);
+        }
         return opsMeta;
     }
 

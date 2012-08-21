@@ -47,9 +47,11 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
 import org.hibernate.spatial.criterion.SpatialRestrictions;
+import org.hibernate.transform.ResultTransformer;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.CategoryValue;
+import org.n52.sos.ds.hibernate.entities.CompositePhenomenon;
 import org.n52.sos.ds.hibernate.entities.CountValue;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
@@ -65,6 +67,7 @@ import org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
 import org.n52.sos.ds.hibernate.entities.ResultType;
+import org.n52.sos.ds.hibernate.entities.SpatialRefSys;
 import org.n52.sos.ds.hibernate.entities.SweType;
 import org.n52.sos.ds.hibernate.entities.TextValue;
 import org.n52.sos.ds.hibernate.entities.Unit;
@@ -895,5 +898,39 @@ public class HibernateCriteriaQueryUtilities {
         String parameter = HibernateConstants.PARAMETER_OFFERINGS;
         addAliasToMap(aliases, prefix, parameter, alias);
         return alias;
+    }
+
+    public static List<Procedure> getProcedureObjects(Session session) {
+        return(List<Procedure>) getDistinctObjects(session, Procedure.class);
+    }
+    
+    public static List<FeatureOfInterest> getFeatureOfInterestObjects(Session session) {
+        return (List<FeatureOfInterest>) getDistinctObjects(session, FeatureOfInterest.class);
+    }
+
+    public static List<RelatedFeature> getRelatedFeatureObjects(Session session) {
+        return (List<RelatedFeature>) getDistinctObjects(session, RelatedFeature.class);
+    }
+
+    public static List<Offering> getOfferingObjects(Session session) {
+        return (List<Offering>) getDistinctObjects(session, Offering.class);
+    }
+
+    public static List<ObservableProperty> getObservablePropertyObjects(Session session) {
+        return (List<ObservableProperty>) getDistinctObjects(session, ObservableProperty.class);
+    }
+
+    private static List<?> getDistinctObjects(Session session, Class<?> objectClass) {
+        Criteria criteria = session.createCriteria(objectClass);
+        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        return criteria.list();
+    }
+
+    public static List<CompositePhenomenon> getCompositePhenomenonObjects(Session session) {
+        return (List<CompositePhenomenon>) getDistinctObjects(session, CompositePhenomenon.class);
+    }
+
+    public static List<SpatialRefSys> getSpatialReySysObjects(Session session) {
+        return (List<SpatialRefSys>) getDistinctObjects(session, SpatialRefSys.class);
     }
 }

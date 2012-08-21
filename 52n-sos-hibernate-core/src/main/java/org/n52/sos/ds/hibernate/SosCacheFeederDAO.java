@@ -59,8 +59,6 @@ import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
 import org.n52.sos.ds.hibernate.entities.SpatialRefSys;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.sos.SosConstants.ValueTypes;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
@@ -97,7 +95,8 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
      */
     @Override
     public void initalizeCache(ACapabilitiesCache capabilitiesCache) throws OwsExceptionReport {
-
+        // TODO: cache minMax Times for Offering/all (reduce GetCaps query time)
+        // TODO: cache BBOX for Offering/all (reduce GetCaps query time)
         CapabilitiesCache cache = (CapabilitiesCache) capabilitiesCache;
         Session session = null;
         try {
@@ -194,7 +193,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         Map<String, Collection<String>> kOfferingVRelatedFeatures = new HashMap<String, Collection<String>>();
         Map<String, Collection<String>> kOfferingVObservationTypes = new HashMap<String, Collection<String>>();
         Map<String, Collection<String>> allowedkOfferingVObservationTypes = new HashMap<String, Collection<String>>();
-        List<Offering> hOfferings = session.createCriteria(Offering.class).list();
+        List<Offering> hOfferings = HibernateCriteriaQueryUtilities.getOfferingObjects(session);
         for (Offering offering : hOfferings) {
             if (!checkOfferingForDeletedProcedure(offering.getObservationConstellations())) {
                 kOfferingVName.put(offering.getIdentifier(), offering.getName());
@@ -228,11 +227,11 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
      *            Hibernate session
      */
     private void setProcedureValues(CapabilitiesCache cache, Session session) {
-        List<String> procedures = new ArrayList<String>();
+        Set<String> procedures = new HashSet<String>();
         Map<String, Collection<String>> kProcedureVOffering = new HashMap<String, Collection<String>>();
         Map<String, Collection<String>> kProcedureVObservableProperties = new HashMap<String, Collection<String>>();
         Map<String, Collection<String>> parentProcs = new HashMap<String, Collection<String>>();
-        List<Procedure> hProcedures = session.createCriteria(Procedure.class).list();
+        List<Procedure> hProcedures = HibernateCriteriaQueryUtilities.getProcedureObjects(session);
         for (Procedure procedure : hProcedures) {
             if (!procedure.isDeleted()) {
                 procedures.add(procedure.getIdentifier());
@@ -262,8 +261,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         List<String> observableProperties = new ArrayList<String>();
         Map<String, Collection<String>> kObservablePropertyVOffering = new HashMap<String, Collection<String>>();
         Map<String, Collection<String>> kObservablePropertyVProcedures = new HashMap<String, Collection<String>>();
-        Map<String, ValueTypes> kObservablePropertyVValutType = new HashMap<String, ValueTypes>();
-        List<ObservableProperty> hObservableProperties = session.createCriteria(ObservableProperty.class).list();
+        List<ObservableProperty> hObservableProperties = HibernateCriteriaQueryUtilities.getObservablePropertyObjects(session);
         for (ObservableProperty observableProperty : hObservableProperties) {
             observableProperties.add(observableProperty.getIdentifier());
             kObservablePropertyVOffering.put(observableProperty.getIdentifier(),
@@ -284,10 +282,9 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
      *            Hibernate session
      */
     private void setFeatureOfInterestValues(CapabilitiesCache cache, Session session) {
-        List<String> featurOfInterestList = new ArrayList<String>();
         Map<String, Collection<String>> kFeatureOfInterestVProcedure = new HashMap<String, Collection<String>>();
         Map<String, Collection<String>> parentFeatures = new HashMap<String, Collection<String>>();
-        List<FeatureOfInterest> hFeaturesOfInterest = session.createCriteria(FeatureOfInterest.class).list();
+        List<FeatureOfInterest> hFeaturesOfInterest = HibernateCriteriaQueryUtilities.getFeatureOfInterestObjects(session);
         for (FeatureOfInterest featureOfInterest : hFeaturesOfInterest) {
             kFeatureOfInterestVProcedure.put(featureOfInterest.getIdentifier(),
                     HibernateCriteriaQueryUtilities.getProceduresForFeatureOfInterest(session, featureOfInterest));
@@ -302,7 +299,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
 
     private void setRelatedFeatures(CapabilitiesCache cache, Session session) {
         Map<String, Collection<String>> relatedFeatureList = new HashMap<String, Collection<String>>();
-        List<RelatedFeature> relatedFeatures = session.createCriteria(RelatedFeature.class).list();
+        List<RelatedFeature> relatedFeatures = HibernateCriteriaQueryUtilities.getRelatedFeatureObjects(session);
         for (RelatedFeature relatedFeature : relatedFeatures) {
             Set<String> roles = new HashSet<String>();
             for (RelatedFeatureRole relatedFeatureRole : (Set<RelatedFeatureRole>) relatedFeature
@@ -325,7 +322,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
     private void setCompositePhenomenonValues(CapabilitiesCache cache, Session session) {
         Map<String, Collection<String>> kCompositePhenomenonVObservableProperty =
                 new HashMap<String, Collection<String>>();
-        List<CompositePhenomenon> compositePhenomenons = session.createCriteria(CompositePhenomenon.class).list();
+        List<CompositePhenomenon> compositePhenomenons = HibernateCriteriaQueryUtilities.getCompositePhenomenonObjects(session);
         for (CompositePhenomenon compositePhenomenon : compositePhenomenons) {
             kCompositePhenomenonVObservableProperty.put(compositePhenomenon.getIdentifier(),
                     getObservablePropertyIdentifierFromObservableProperties(compositePhenomenon
@@ -345,7 +342,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
      */
     private void setSridValues(CapabilitiesCache cache, Session session) {
         List<Integer> srids = new ArrayList<Integer>();
-        List<SpatialRefSys> spatialRefSyss = session.createCriteria(SpatialRefSys.class).list();
+        List<SpatialRefSys> spatialRefSyss = HibernateCriteriaQueryUtilities.getSpatialReySysObjects(session);
         for (SpatialRefSys spatialRefSys : spatialRefSyss) {
             srids.add(spatialRefSys.getSrid());
         }
@@ -381,6 +378,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             criteria.createAlias("oc.offering", "off");
             criteria.add(Restrictions.eq("off.identifier", offering));
             criteria.setProjection(Projections.distinct(Projections.property("featureOfInterest")));
+            criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
             List<FeatureOfInterest> featureOfInterests = criteria.list();
             kOfferingVFeatureOfInterest.put(offering, getFeatureOfInterestIdentifier(featureOfInterests));
         }
@@ -432,7 +430,9 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             Set<ObservationConstellation> observationConstellations) {
         Set<String> observableProperties = new HashSet<String>();
         for (ObservationConstellation observationConstellation : observationConstellations) {
-            observableProperties.add(observationConstellation.getObservableProperty().getIdentifier());
+            if (observationConstellation.getObservations() != null && !observationConstellation.getObservations().isEmpty()) {
+                observableProperties.add(observationConstellation.getObservableProperty().getIdentifier());
+            }
         }
         return new ArrayList<String>(observableProperties);
     }
@@ -471,9 +471,9 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         return new ArrayList<String>(observationTypes);
     }
 
-    private Collection<String> getObservationTypesFromObservationType(Set observationTypes) {
+    private Collection<String> getObservationTypesFromObservationType(Set<ObservationType> observationTypes) {
         Set<String> obsTypes = new HashSet<String>();
-        for (ObservationType obsType : (Set<ObservationType>) observationTypes) {
+        for (ObservationType obsType : observationTypes) {
             obsTypes.add(obsType.getObservationType());
         }
         return new ArrayList<String>(obsTypes);

@@ -62,6 +62,7 @@ import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
 import org.n52.sos.ogc.swe.simpleType.ISosSweSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -828,9 +829,16 @@ public class SosHelper {
 
     public static Map<MinMax, String> getMinMaxMapFromEnvelope(Envelope envelope) {
         Map<MinMax, String> map = new HashMap<MinMax, String>();
-        String minValue = envelope.getMinX() + " " + envelope.getMinY();
+        String minValue = null;
+        String maxValue = null;
+        if (Configurator.getInstance().switchCoordinatesForEPSG(Configurator.getInstance().getDefaultEPSG())){
+            minValue = envelope.getMinY() + " " + envelope.getMinX();
+            maxValue = envelope.getMaxY() + " " + envelope.getMaxX();
+        } else {
+            minValue = envelope.getMinX() + " " + envelope.getMinY();
+            maxValue = envelope.getMaxX() + " " + envelope.getMaxY();
+        }
         map.put(MinMax.MIN, minValue);
-        String maxValue = envelope.getMaxX() + " " + envelope.getMaxY();
         map.put(MinMax.MAX, maxValue);
         return map;
     }

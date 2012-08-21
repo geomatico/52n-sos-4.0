@@ -166,7 +166,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
         }
         if (sosCapabilities.getOperationsMetadata() != null
                 && sosCapabilities.getOperationsMetadata().getOperations() != null
-                && sosCapabilities.getOperationsMetadata().getOperations().isEmpty()) {
+                && !sosCapabilities.getOperationsMetadata().getOperations().isEmpty()) {
             xbCaps.setOperationsMetadata((OperationsMetadata) owsEncoder.encode(sosCapabilities
                     .getOperationsMetadata()));
         }

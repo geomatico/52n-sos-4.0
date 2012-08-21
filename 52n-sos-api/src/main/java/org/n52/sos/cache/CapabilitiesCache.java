@@ -37,7 +37,6 @@ import java.util.Map;
 
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.SosConstants.ValueTypes;
 import org.n52.sos.util.SosHelper;
 
 /**
@@ -57,7 +56,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     private Collection<Integer> srids;
 
     /** contains the procedure IDs offered in the database */
-    private List<String> procedures;
+    private Collection<String> procedures;
 
     /** contains the feature IDs offered in the database */
     private Collection<String> allFeatures;
@@ -355,7 +354,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @return Returns ListString containing all procedures which are used by
      *         the Offerings offered in this SOS
      */
-    protected List<String> getProcedures() {
+    protected Collection<String> getProcedures() {
         return procedures;
     }
 
@@ -559,7 +558,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * 
      * @param procedures
      */
-    public void setProcedures(List<String> procedures) {
+    public void setProcedures(Collection<String> procedures) {
         this.procedures = procedures;
     }
 
@@ -727,7 +726,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      *            returned
      * @return Returns offerings, for which passed procedure produces data
      */
-    protected List<String> getOfferings4Procedure(String procID) {
+    protected Collection<String> getOfferings4Procedure(String procID) {
         List<String> result = new ArrayList<String>();
         if (this.procOffs.containsKey(procID)) {
             result.addAll(this.procOffs.get(procID));
@@ -743,7 +742,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      *            returned
      * @return Returns offerings, to which passed phenomenon belongs to
      */
-    protected List<String> getOfferings4Phenomenon(String phenID) {
+    protected Collection<String> getOfferings4Phenomenon(String phenID) {
         List<String> result = new ArrayList<String>();
         if (this.phenOffs.containsKey(phenID)) {
             result.addAll(this.phenOffs.get(phenID));
@@ -786,7 +785,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
         }
 
         // get offerings for phenomenon of observation
-        List<String> offs =
+        Collection<String> offs =
                 this.getOfferings4Phenomenon(observation.getObservationConstellation().getObservableProperty()
                         .getIdentifier());
 
