@@ -28,9 +28,6 @@
         <property name="url" type="string">
             <column name="url" unique="true" />
         </property>
-        <property name="samplingFeature" type="boolean">
-            <column name="sampling_feature" not-null="true" />
-        </property>
         <set name="observations" table="observation" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="feature_of_interest_id" not-null="true" />
