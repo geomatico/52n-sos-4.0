@@ -36,10 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 import net.opengis.gml.x32.FeaturePropertyType;
-import net.opengis.sos.x20.SosInsertionMetadataDocument;
 import net.opengis.sos.x20.SosInsertionMetadataPropertyType;
 import net.opengis.sos.x20.SosInsertionMetadataType;
 import net.opengis.swes.x20.DeleteSensorDocument;
@@ -305,7 +302,6 @@ public class SwesDecoderv20 implements IXmlRequestDecoder {
                     feature.setUrl(fpt.getHref());
                 }
                 feature.setFeatureType(OGCConstants.UNKNOWN);
-                feature.setSampling(false);
                 sosFeatureRelationship.setFeature(feature);
             } else {
                 // TODO: decode encoded feature, XML-Represent

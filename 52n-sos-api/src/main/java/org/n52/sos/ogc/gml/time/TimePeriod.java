@@ -39,6 +39,8 @@ import org.joda.time.format.ISOPeriodFormat;
  * 
  */
 public class TimePeriod implements ITime {
+    
+    private String id;
 
     /** start Date of timePeriod */
     private DateTime start;
@@ -62,6 +64,32 @@ public class TimePeriod implements ITime {
     private String indeterminateValue;
 
     /**
+     * default constructor
+     * 
+     */
+    public TimePeriod() {
+    }
+
+    /**
+     * constructor with start and end date as parameters
+     * 
+     * @param start
+     *            start date of the time period
+     * @param end
+     *            end date of the timeperiod
+     */
+    public TimePeriod(DateTime start, DateTime end) {
+        this.start = start;
+        this.end = end;
+    }
+
+    public TimePeriod(DateTime start, DateTime end, String id) {
+        this.start = start;
+        this.end = end;
+        this.id = id;
+    }
+
+    /**
      * standard constructor
      * 
      * @param start
@@ -78,35 +106,25 @@ public class TimePeriod implements ITime {
      *             if parsing the time strings of start or end into
      *             java.util.Date failed
      */
-    public TimePeriod(DateTime start, String startIndet, DateTime end, String endIndet, String duration)
+    public TimePeriod(DateTime start, String startIndet, DateTime end, String endIndet, String duration, String id)
             throws ParseException {
         this.start = start;
         this.startIndet = startIndet;
         this.end = end;
         this.endIndet = endIndet;
         this.duration = ISOPeriodFormat.standard().parsePeriod(duration);
+        this.id = id;
     }
 
-    /**
-     * constructor with start and end date as parameters
-     * 
-     * @param start
-     *            start date of the time period
-     * @param end
-     *            end date of the timeperiod
-     */
-    public TimePeriod(DateTime start, DateTime end) {
-        this.start = start;
-        this.end = end;
+    @Override
+    public void setId(String id) {
+        this.id = id;
     }
 
-    /**
-     * default constructor
-     * 
-     */
-    public TimePeriod() {
+    @Override
+    public String getId() {
+        return this.id;
     }
-
     /**
      * Get duration
      * 

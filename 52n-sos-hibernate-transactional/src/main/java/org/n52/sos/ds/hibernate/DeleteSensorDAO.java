@@ -36,6 +36,7 @@ import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IDeleteSensorDAO;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ogc.ows.OWSOperation;
+import org.n52.sos.ogc.ows.OWSParameterValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -97,8 +98,8 @@ public class DeleteSensorDAO implements IDeleteSensorDAO {
         opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt,
                 Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set param procedure
-        opsMeta.addParameterValue(Sos2Constants.DeleteSensorParams.procedure.name(), Configurator.getInstance()
-                .getCapabilitiesCacheController().getProcedures());
+        opsMeta.addParameterValue(Sos2Constants.DeleteSensorParams.procedure.name(), new OWSParameterValue(Configurator.getInstance()
+                .getCapabilitiesCacheController().getProcedures()));
         return opsMeta;
     }
 

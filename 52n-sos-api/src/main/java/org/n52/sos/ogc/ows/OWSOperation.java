@@ -28,12 +28,9 @@
 
 package org.n52.sos.ogc.ows;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.n52.sos.ogc.ows.OWSConstants.MinMax;
 
 /**
  * Class represents a OperationMetadata. Used in SosCapabilities.
@@ -55,12 +52,12 @@ public class OWSOperation {
     /**
      * Map with names and allowed values for the parameter.
      */
-    private Map<String, Collection<String>> parameterValues;
+    private Map<String, IOWSParameterValue> parameterValues;
 
-    /**
-     * Map for min/max values, e. g. observation ids
-     */
-    private Map<String, Map<MinMax, String>> parameterminMaxMap;
+//    /**
+//     * Map for min/max values, e. g. observation ids
+//     */
+//    private Map<String, Map<MinMax, String>> parameterminMaxMap;
 
     /**
      * Get operation name
@@ -123,7 +120,7 @@ public class OWSOperation {
      * 
      * @return Parameter value map
      */
-    public Map<String, Collection<String>> getParameterValues() {
+    public Map<String,IOWSParameterValue> getParameterValues() {
         return parameterValues;
     }
 
@@ -133,7 +130,7 @@ public class OWSOperation {
      * @param parameterValues
      *            Parameter value map
      */
-    public void setParameterValues(Map<String, Collection<String>> parameterValues) {
+    public void setParameterValues(Map<String, IOWSParameterValue> parameterValues) {
         if (this.parameterValues == null) {
             this.parameterValues = parameterValues;
         } else {
@@ -150,37 +147,37 @@ public class OWSOperation {
      * @param allowedValues
      *            values to add
      */
-    public void addParameterValue(String parameterName, Collection<String> allowedValues) {
+    public void addParameterValue(String parameterName, IOWSParameterValue allowedValues) {
         if (parameterValues == null) {
-            parameterValues = new HashMap<String, Collection<String>>();
+            parameterValues = new HashMap<String, IOWSParameterValue>();
         }
         parameterValues.put(parameterName, allowedValues);
     }
 
-    /**
-     * Get min/max values map
-     * 
-     * @return min/max value map
-     */
-    public Map<String, Map<MinMax, String>> getParameterMinMaxMap() {
-        return parameterminMaxMap;
-    }
-
-    /**
-     * Set min/max value map
-     * 
-     * @param minMaxMap
-     *            min/max value map
-     */
-    public void addParameterMinMaxMapValue(String parameter, Map<MinMax, String> minMaxMap) {
-        if (parameterminMaxMap == null) {
-            parameterminMaxMap = new HashMap<String, Map<MinMax, String>>();
-        }
-        if (parameterminMaxMap.containsKey(parameter)) {
-            parameterminMaxMap.get(parameter).putAll(minMaxMap);
-        } else {
-            parameterminMaxMap.put(parameter, minMaxMap);
-        }
-    }
+//    /**
+//     * Get min/max values map
+//     * 
+//     * @return min/max value map
+//     */
+//    public Map<String, Map<MinMax, String>> getParameterMinMaxMap() {
+//        return parameterminMaxMap;
+//    }
+//
+//    /**
+//     * Set min/max value map
+//     * 
+//     * @param minMaxMap
+//     *            min/max value map
+//     */
+//    public void addParameterMinMaxMapValue(String parameter, Map<MinMax, String> minMaxMap) {
+//        if (parameterminMaxMap == null) {
+//            parameterminMaxMap = new HashMap<String, Map<MinMax, String>>();
+//        }
+//        if (parameterminMaxMap.containsKey(parameter)) {
+//            parameterminMaxMap.get(parameter).putAll(minMaxMap);
+//        } else {
+//            parameterminMaxMap.put(parameter, minMaxMap);
+//        }
+//    }
 
 }

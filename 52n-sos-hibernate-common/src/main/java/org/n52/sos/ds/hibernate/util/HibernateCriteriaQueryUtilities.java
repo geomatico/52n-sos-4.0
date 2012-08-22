@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Criteria;
-import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Criterion;
@@ -47,7 +46,6 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
 import org.hibernate.spatial.criterion.SpatialRestrictions;
-import org.hibernate.transform.ResultTransformer;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.CategoryValue;
@@ -479,7 +477,7 @@ public class HibernateCriteriaQueryUtilities {
      * @return Distinct projection
      */
     private static Projection getDistinctProjectionForIdentifier() {
-        return getDistinctProjection(HibernateConstants.PARAMETER_IDENTIFIER);
+        return getDistinctProjection(getIdentifierParameter(null));
 
     }
 
@@ -555,6 +553,13 @@ public class HibernateCriteriaQueryUtilities {
     public static String addProcedureAliasToMap(Map<String, String> aliases, String prefix) {
         String alias = "proc";
         String parameter = HibernateConstants.PARAMETER_PROCEDURE;
+        addAliasToMap(aliases, prefix, parameter, alias);
+        return alias;
+    }
+
+    private static String addProceduresAliasToMap(Map<String, String> aliases, String prefix) {
+        String alias = "procs";
+        String parameter = HibernateConstants.PARAMETER_PROCEDURES;
         addAliasToMap(aliases, prefix, parameter, alias);
         return alias;
     }
@@ -653,10 +658,10 @@ public class HibernateCriteriaQueryUtilities {
         return (ProcedureDescriptionFormat) criteria.uniqueResult();
     }
 
-    public static Collection<String> getProcedureDescriptionFormats(Session session) {
+    public static Collection<String> getProcedureDescriptionFormatIdentifiers(Session session) {
         Criteria criteria = session.createCriteria(ProcedureDescriptionFormat.class);
         List<ProcedureDescriptionFormat> procedureDescriptionFormats = criteria.list();
-        List<String> procDescTypes = new ArrayList<String>(0);
+        Set<String> procDescTypes = new HashSet<String>(0);
         if (procedureDescriptionFormats != null) {
             for (ProcedureDescriptionFormat procedureDescriptionFormat : procedureDescriptionFormats) {
                 procDescTypes.add(procedureDescriptionFormat.getProcedureDescriptionFormat());
@@ -688,7 +693,7 @@ public class HibernateCriteriaQueryUtilities {
             Session session) {
         if (featureOfInterestIDs != null && !featureOfInterestIDs.isEmpty()) {
             Criteria criteria = session.createCriteria(FeatureOfInterest.class);
-            criteria.add(Restrictions.in(HibernateConstants.PARAMETER_IDENTIFIER, featureOfInterestIDs));
+            criteria.add(Restrictions.in(getIdentifierParameter(null), featureOfInterestIDs));
             return criteria.list();
         }
         return new ArrayList<FeatureOfInterest>(0);
@@ -722,8 +727,7 @@ public class HibernateCriteriaQueryUtilities {
         List<Criterion> criterions = new ArrayList<Criterion>();
         List<Projection> projections = new ArrayList<Projection>();
         criterions.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offeringID));
-        projections.add(Projections.distinct(Projections.property(foiAlias + "."
-                + HibernateConstants.PARAMETER_IDENTIFIER)));
+        projections.add(Projections.distinct(Projections.property(getIdentifierParameter(foiAlias))));
         return (List<String>) getObject(aliases, criterions, projections, session, Observation.class);
     }
 
@@ -830,7 +834,7 @@ public class HibernateCriteriaQueryUtilities {
 
     public static List<ObservableProperty> getObservableProperties(List<String> identifiers, Session session) {
         Criteria criteria = session.createCriteria(ObservableProperty.class);
-        criteria.add(Restrictions.in(HibernateConstants.PARAMETER_IDENTIFIER, identifiers));
+        criteria.add(Restrictions.in(getIdentifierParameter(null), identifiers));
         return (List<ObservableProperty>) criteria.list();
     }
 
@@ -844,7 +848,7 @@ public class HibernateCriteriaQueryUtilities {
 
     public static FeatureOfInterest getFeatureOfInterest(String featureIdentifier, Session session) {
         Criteria criteria = session.createCriteria(FeatureOfInterest.class);
-        criteria.add(getEqualRestriction(HibernateConstants.PARAMETER_IDENTIFIER, featureIdentifier));
+        criteria.add(getEqualRestriction(getIdentifierParameter(null), featureIdentifier));
         return (FeatureOfInterest) criteria.uniqueResult();
     }
 

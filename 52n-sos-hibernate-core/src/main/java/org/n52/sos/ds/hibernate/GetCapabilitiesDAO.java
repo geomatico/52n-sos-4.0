@@ -48,7 +48,6 @@ import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.IDecoder;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IGetCapabilitiesDAO;
-import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.filter.FilterCapabilities;
@@ -63,6 +62,7 @@ import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSOperationsMetadata;
+import org.n52.sos.ogc.ows.OWSParameterValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
@@ -363,6 +363,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         OWSOperationsMetadata operationsMetadata = new OWSOperationsMetadata();
         List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>();
 
+        // FIXME: OpsMeata for InsertSensor, InsertObservation SOS 2.0
         Map<RequestOperatorKeyType, IRequestOperator> requestOperators =
                 Configurator.getInstance().getRequestOperator();
         opsMetadata.add(getOpsGetCapabilities(service, version, extensions));
@@ -374,8 +375,8 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
             }
         }
         operationsMetadata.setOperations(opsMetadata);
-        operationsMetadata.addCommonValue(OWSConstants.RequestParams.service.name(), SosConstants.SOS);
-        operationsMetadata.addCommonValues(OWSConstants.RequestParams.version.name(), new HashSet<String>(Configurator
+        operationsMetadata.addCommonValue(OWSConstants.RequestParams.service.name(), new OWSParameterValue(SosConstants.SOS));
+        operationsMetadata.addCommonValue(OWSConstants.RequestParams.version.name(), new OWSParameterValue(Configurator
                 .getInstance().getSupportedVersions()));
         return operationsMetadata;
     }
@@ -514,6 +515,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
      */
     private List<SosOfferingsForContents> getContentsForSosV2(String version, Session session)
             throws OwsExceptionReport {
+        int phenTimeCounter = 1;
         List<SosOfferingsForContents> sosOfferings = new ArrayList<SosOfferingsForContents>();
 
         Collection<String> offerings = Configurator.getInstance().getCapabilitiesCacheController().getOfferings();
@@ -580,7 +582,8 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                 // set up time
                 DateTime minDate = HibernateCriteriaQueryUtilities.getMinDate4Offering(offering, session);
                 DateTime maxDate = HibernateCriteriaQueryUtilities.getMaxDate4Offering(offering, session);
-                sosOffering.setTime(new TimePeriod(minDate, maxDate));
+                String phenTimeId = Sos2Constants.EN_PHENOMENON_TIME + "_" + phenTimeCounter++;
+                sosOffering.setTime(new TimePeriod(minDate, maxDate, phenTimeId));
 
                 // add related feature
                 Map<String, Collection<String>> relatedFeatures = new HashMap<String, Collection<String>>();
@@ -683,10 +686,10 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         // set param updateSequence
         List<String> updateSequenceValues = new ArrayList<String>();
         updateSequenceValues.add(SosConstants.PARAMETER_ANY);
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.updateSequence.name(), updateSequenceValues);
+        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.updateSequence.name(), new OWSParameterValue(updateSequenceValues));
         // set param AcceptVersions
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.AcceptVersions.name(), Configurator.getInstance()
-                .getSupportedVersions());
+        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.AcceptVersions.name(), new OWSParameterValue(Configurator.getInstance()
+                .getSupportedVersions()));
         // set param Sections
         List<String> sectionsValues = new ArrayList<String>();
         sectionsValues.add(SosConstants.CapabilitiesSections.ServiceIdentification.name());
@@ -702,10 +705,10 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         }
         sectionsValues.add(SosConstants.CapabilitiesSections.Contents.name());
         sectionsValues.add(SosConstants.CapabilitiesSections.All.name());
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.Sections.name(), sectionsValues);
+        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.Sections.name(), new OWSParameterValue(sectionsValues));
         // set param AcceptFormats
         opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.AcceptFormats.name(),
-                Arrays.asList(SosConstants.getAcceptFormats()));
+                new OWSParameterValue(Arrays.asList(SosConstants.getAcceptFormats())));
 
         return opsMeta;
     }

@@ -45,6 +45,8 @@ import org.n52.sos.ds.IGetFeatureOfInterestDAO;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ogc.om.features.SosFeatureCollection;
 import org.n52.sos.ogc.ows.OWSOperation;
+import org.n52.sos.ogc.ows.OWSParameterValue;
+import org.n52.sos.ogc.ows.OWSParameterValueRange;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sos.Sos1Constants;
@@ -115,32 +117,33 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
                 Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set param procedure
         if (Configurator.getInstance().isShowFullOperationsMetadata4Observations()) {
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), Configurator.getInstance()
-                    .getCapabilitiesCacheController().getProcedures());
+            
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), new OWSParameterValue(Configurator.getInstance()
+                    .getCapabilitiesCacheController().getProcedures()));
         } else {
             List<String> phenomenonValues = new ArrayList<String>(1);
             phenomenonValues.add(SosConstants.PARAMETER_ANY);
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), phenomenonValues);
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), new OWSParameterValue(phenomenonValues));
         }
         // set param observedProperty
         if (Configurator.getInstance().isShowFullOperationsMetadata4Observations()) {
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(), Configurator
-                    .getInstance().getCapabilitiesCacheController().getObservableProperties());
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(), new OWSParameterValue(Configurator
+                    .getInstance().getCapabilitiesCacheController().getObservableProperties()));
         } else {
             List<String> phenomenonValues = new ArrayList<String>(1);
             phenomenonValues.add(SosConstants.PARAMETER_ANY);
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(), phenomenonValues);
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(), new OWSParameterValue(phenomenonValues));
         }
         // set param foi
         Collection<String> featureIDs =
                 SosHelper.getFeatureIDs(Configurator.getInstance().getCapabilitiesCacheController().getFeatureOfInterest(),
                         version);
         if (Configurator.getInstance().isShowFullOperationsMetadata4Observations()) {
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(), featureIDs);
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(), new OWSParameterValue(featureIDs));
         } else {
             List<String> foiValues = new ArrayList<String>(1);
             foiValues.add(SosConstants.PARAMETER_ANY);
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(), foiValues);
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(), new OWSParameterValue(foiValues));
         }
 
         // set param spatial filter
@@ -152,12 +155,12 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
                 Configurator.getInstance().getFeatureQueryHandler()
                         .getEnvelopeforFeatureIDs((List<String>) featureIDs, session);
         if (envelope != null) {
-            opsMeta.addParameterMinMaxMapValue(parameterName,
-                    SosHelper.getMinMaxMapFromEnvelope(envelope));
+            opsMeta.addParameterValue(parameterName,
+                    new OWSParameterValueRange(SosHelper.getMinMaxMapFromEnvelope(envelope)));
         } else {
             List<String> locationValues = new ArrayList<String>(1);
             locationValues.add(SosConstants.PARAMETER_ANY);
-            opsMeta.addParameterValue(parameterName, locationValues);
+            opsMeta.addParameterValue(parameterName, new OWSParameterValueRange(SosHelper.getMinMaxMapFromEnvelope(envelope)));
         }
         return opsMeta;
     }

@@ -19,7 +19,6 @@ import net.opengis.gml.x32.ReferenceType;
 import net.opengis.gml.x32.TimeInstantType;
 import net.opengis.gml.x32.TimePeriodType;
 import net.opengis.gml.x32.TimePositionType;
-import net.opengis.swe.x20.Reference;
 
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
@@ -90,7 +89,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
     @Override
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         if (element instanceof ITime) {
-            return createTime((ITime) element, additionalValues.get(HelperValues.GMLID));
+            return createTime((ITime) element);
         }
         if (element instanceof Geometry) {
             return createPosition((Geometry) element, additionalValues.get(HelperValues.GMLID));
@@ -101,12 +100,12 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
         return null;
     }
     
-    private XmlObject createTime(ITime time, String id) throws OwsExceptionReport {
+    private XmlObject createTime(ITime time) throws OwsExceptionReport {
         if (time != null) {
             if (time instanceof TimeInstant) {
-                return createTimeInstant((TimeInstant) time, id);
+                return createTimeInstant((TimeInstant) time);
             } else if (time instanceof TimePeriod) {
-                return createTimePeriod((TimePeriod) time, id);
+                return createTimePeriod((TimePeriod) time);
             }
         }
         return null;
@@ -121,11 +120,11 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
      * @throws OwsExceptionReport
      *             if an error occurs.
      */
-    private TimePeriodType createTimePeriod(TimePeriod timePeriod, String id) throws OwsExceptionReport {
+    private TimePeriodType createTimePeriod(TimePeriod timePeriod) throws OwsExceptionReport {
         TimePeriodType xbTimePeriod =
                 TimePeriodType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        if (id != null && !id.isEmpty()) {
-            xbTimePeriod.setId(id);
+        if (timePeriod.getId() != null && !timePeriod.getId().isEmpty()) {
+            xbTimePeriod.setId(timePeriod.getId());
         }
         // beginPosition
         TimePositionType xbTimePositionBegin = TimePositionType.Factory.newInstance();
@@ -163,11 +162,11 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
      * @throws OwsExceptionReport
      *             if an error occurs.
      */
-    private TimeInstantType createTimeInstant(TimeInstant timeInstant, String id) throws OwsExceptionReport {
+    private TimeInstantType createTimeInstant(TimeInstant timeInstant) throws OwsExceptionReport {
         // create time instant
         TimeInstantType xbTime = TimeInstantType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        if (id != null && !id.isEmpty()) {
-            xbTime.setId(id);
+        if (timeInstant.getId() != null && !timeInstant.getId().isEmpty()) {
+            xbTime.setId(timeInstant.getId());
         }
         TimePositionType xb_posType = xbTime.addNewTimePosition();
 

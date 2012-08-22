@@ -5,13 +5,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class OWSOperationsMetadata {
 
     private Collection<OWSOperation> operations;
 
-    private Map<String, Set<String>> commonValues;
+    private Map<String, OWSParameterValue> commonValues;
 
     public Collection<OWSOperation> getOperations() {
         return operations;
@@ -21,11 +20,11 @@ public class OWSOperationsMetadata {
         this.operations = operations;
     }
 
-    public Map<String, Set<String>> getCommonValues() {
+    public Map<String, OWSParameterValue> getCommonValues() {
         return commonValues;
     }
 
-    public void setCommonValues(Map<String, Set<String>> commonValues) {
+    public void setCommonValues(Map<String, OWSParameterValue> commonValues) {
         this.commonValues = commonValues;
     }
 
@@ -36,30 +35,10 @@ public class OWSOperationsMetadata {
         operations.add(operation);
     }
 
-    public void addCommonValues(String name, Set<String> values) {
+    public void addCommonValue(String name, OWSParameterValue value) {
         if (commonValues == null) {
-            commonValues = new HashMap<String, Set<String>>();
+            commonValues = new HashMap<String, OWSParameterValue>();
         }
-        if (commonValues.containsKey(name)) {
-            commonValues.get(name).addAll(values);
-        } else {
-            commonValues.put(name, values);
-        }
-
+        commonValues.put(name, value);
     }
-
-    public void addCommonValue(String name, String value) {
-        if (commonValues == null) {
-            commonValues = new HashMap<String, Set<String>>();
-        }
-        if (commonValues.containsKey(name)) {
-            commonValues.get(name).add(value);
-        } else {
-            Set<String> values = new HashSet<String>();
-            values.add(value);
-            commonValues.put(name, values);
-        }
-
-    }
-
 }

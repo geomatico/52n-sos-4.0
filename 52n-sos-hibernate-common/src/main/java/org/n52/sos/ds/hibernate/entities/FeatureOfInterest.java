@@ -31,8 +31,6 @@ public class FeatureOfInterest implements java.io.Serializable {
 
     private String url;
 
-    private boolean samplingFeature;
-
     private Set<Observation> observations = new HashSet<Observation>(0);
 
     private Set<FeatureOfInterest> featureOfInterestsForChildFeatureId = new HashSet<FeatureOfInterest>(0);
@@ -44,15 +42,13 @@ public class FeatureOfInterest implements java.io.Serializable {
     public FeatureOfInterest() {
     }
 
-    public FeatureOfInterest(long featureOfInterestId, FeatureOfInterestType featureOfInterestType,
-            boolean samplingFeature) {
+    public FeatureOfInterest(long featureOfInterestId, FeatureOfInterestType featureOfInterestType) {
         this.featureOfInterestId = featureOfInterestId;
         this.featureOfInterestType = featureOfInterestType;
-        this.samplingFeature = samplingFeature;
     }
 
     public FeatureOfInterest(long featureOfInterestId, FeatureOfInterestType featureOfInterestType, String identifier, String name,
-            Geometry geom, String descriptionXml, String url, boolean samplingFeature, Set<Observation> observations,
+            Geometry geom, String descriptionXml, String url, Set<Observation> observations,
             Set<FeatureOfInterest> featureOfInterestsForChildFeatureId, Set<FeatureOfInterest> featureOfInterestsForParentFeatureId, Set<ResultTemplate> resultTemplates) {
         this.featureOfInterestId = featureOfInterestId;
         this.featureOfInterestType = featureOfInterestType;
@@ -61,7 +57,6 @@ public class FeatureOfInterest implements java.io.Serializable {
         this.geom = geom;
         this.descriptionXml = descriptionXml;
         this.url = url;
-        this.samplingFeature = samplingFeature;
         this.observations = observations;
         this.featureOfInterestsForChildFeatureId = featureOfInterestsForChildFeatureId;
         this.featureOfInterestsForParentFeatureId = featureOfInterestsForParentFeatureId;
@@ -122,14 +117,6 @@ public class FeatureOfInterest implements java.io.Serializable {
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public boolean isSamplingFeature() {
-        return this.samplingFeature;
-    }
-
-    public void setSamplingFeature(boolean samplingFeature) {
-        this.samplingFeature = samplingFeature;
     }
 
     public Set<Observation> getObservations() {

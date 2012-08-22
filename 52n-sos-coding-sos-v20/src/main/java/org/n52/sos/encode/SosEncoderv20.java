@@ -35,7 +35,6 @@ import net.opengis.sos.x20.InsertObservationResponseDocument;
 import net.opengis.sos.x20.InsertionCapabilitiesDocument;
 import net.opengis.sos.x20.InsertionCapabilitiesType;
 import net.opengis.sos.x20.ObservationOfferingType;
-import net.opengis.sos.x20.ObservationOfferingType.PhenomenonTime;
 import net.opengis.swes.x20.AbstractContentsType.Offering;
 import net.opengis.swes.x20.FeatureRelationshipType;
 
@@ -43,6 +42,7 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.OGCConstants;
+import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
@@ -65,7 +65,6 @@ import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.response.InsertObservationResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -413,7 +412,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
                 xbObsOff.setProcedure(procedure);
             }
             // TODO: procedureDescriptionFormat [0..*]
-            // set phenomenons [0..*]
+            // set observableProperties [0..*]
             for (String phenomenon : offering.getObservableProperties()) {
                 xbObsOff.addObservableProperty(phenomenon);
             }
@@ -439,16 +438,36 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
             if (offering.getTime() instanceof TimePeriod) {
                 TimePeriod tp = (TimePeriod) offering.getTime();
                 if (tp.getStart() != null && tp.getEnd() != null) {
-                    PhenomenonTime xbPhenTime = xbObsOff.addNewPhenomenonTime();
-                    TimePeriodType xbTime = xbPhenTime.addNewTimePeriod();
-                    xbTime.setId("pt_" + normalize(offering.getOffering()));
-                    xbTime.addNewBeginPosition().setStringValue(
-                            DateTimeHelper.formatDateTime2ResponseString(tp.getStart()));
-                    xbTime.addNewEndPosition().setStringValue(
-                            DateTimeHelper.formatDateTime2ResponseString(tp.getEnd()));
-                    xbObsOff.getPhenomenonTime().substitute(
-                            new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_PHENOMENON_TIME,
-                                    SosConstants.NS_SOS_PREFIX), xbObsOff.getPhenomenonTime().schemaType());
+                    IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
+                    if (encoder != null) {
+                        Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
+                        XmlObject xmlObject = (XmlObject) encoder.encode(offering.getTime());
+                        if (xmlObject instanceof TimePeriodType) {
+                            xbObsOff.addNewPhenomenonTime().setTimePeriod((TimePeriodType)xmlObject);
+                            xbObsOff.getPhenomenonTime().substitute(
+                                    new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_PHENOMENON_TIME,
+                                            SosConstants.NS_SOS_PREFIX), xbObsOff.getPhenomenonTime().schemaType());
+//                            XmlObject substitution =
+//                                    timeObjectPropertyType.addNewAbstractTimeObject().substitute(getQnameForITime(iTime),
+//                                            xmlObject.schemaType());
+//                            substitution.set((AbstractTimeObjectType) xmlObject);
+                        } else {
+                            // TODO: Exception
+                        }
+                    } else {
+                        String exceptionText = "Error while encoding phenomenon time, needed encoder is missing!";
+                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                    }
+//                    PhenomenonTime xbPhenTime = xbObsOff.addNewPhenomenonTime();
+//                    TimePeriodType xbTime = xbPhenTime.addNewTimePeriod();
+//                    xbTime.setId("pt_" + normalize(offering.getOffering()));
+//                    xbTime.addNewBeginPosition().setStringValue(
+//                            DateTimeHelper.formatDateTime2ResponseString(tp.getStart()));
+//                    xbTime.addNewEndPosition().setStringValue(
+//                            DateTimeHelper.formatDateTime2ResponseString(tp.getEnd()));
+//                    xbObsOff.getPhenomenonTime().substitute(
+//                            new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_PHENOMENON_TIME,
+//                                    SosConstants.NS_SOS_PREFIX), xbObsOff.getPhenomenonTime().schemaType());
                 }
             }
 
@@ -592,21 +611,6 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
         }
 
         return envelopeType;
-    }
-
-    /**
-     * @return a normalized String for use in a file path, i.e. all
-     *         [\,/,:,*,?,",<,>,;] characters are replaced by '_'.
-     */
-    private String normalize(String toNormalize) {
-        // toNormalize = toNormalize.replaceAll("ä", "ae");
-        // toNormalize = toNormalize.replaceAll("ö", "oe");
-        // toNormalize = toNormalize.replaceAll("ü", "ue");
-        // toNormalize = toNormalize.replaceAll("Ä", "AE");
-        // toNormalize = toNormalize.replaceAll("Ö", "OE");
-        // toNormalize = toNormalize.replaceAll("Ü", "UE");
-        // toNormalize = toNormalize.replaceAll("ß", "ss");
-        return toNormalize.replaceAll("[\\\\,/,:,\\*,?,\",<,>,;,#,%,=,@]", "_");
     }
 
     private void renameContentsElementNames(Contents xbContents) {

@@ -56,8 +56,6 @@ public class HibernateConstants {
 
     public static final String PARAMETER_FEATURE_OF_INTEREST = "featureOfInterest";
 
-    public static final String PARAMETER_SAMPLING_FEATURE = "samplingFeature";
-
     public static final String PARAMETER_FEATURE_OF_INTEREST_ID = "featureOfInterestId";
 
     public static final String PARAMETER_PROCEDURE = "procedure";
@@ -99,5 +97,7 @@ public class HibernateConstants {
     public static final String PARAMETER_OFFERINGS = "offerings";
 
     public static final String PARAMETER_OBSERVATION_ID = "observationId";
+
+    public static final String PARAMETER_PROCEDURES = "procedures";
 
 }

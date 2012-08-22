@@ -33,6 +33,10 @@ package org.n52.sos.ogc.gml.time;
  * 
  */
 public interface ITime extends Comparable<ITime> {
+    
+    public void setId(String id);
+    
+    public String getId();
 
     /**
      * Get indeterminate value

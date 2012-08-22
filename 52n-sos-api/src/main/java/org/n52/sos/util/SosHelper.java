@@ -919,4 +919,19 @@ public class SosHelper {
         }
         return new SosObservableProperty(identifier, description, unit, valueType);
     }
+    
+    /**
+     * @return a normalized String for use in a file path, i.e. all
+     *         [\,/,:,*,?,",<,>,;] characters are replaced by '_'.
+     */
+    public static String normalize(String toNormalize) {
+        // toNormalize = toNormalize.replaceAll("ä", "ae");
+        // toNormalize = toNormalize.replaceAll("ö", "oe");
+        // toNormalize = toNormalize.replaceAll("ü", "ue");
+        // toNormalize = toNormalize.replaceAll("Ä", "AE");
+        // toNormalize = toNormalize.replaceAll("Ö", "OE");
+        // toNormalize = toNormalize.replaceAll("Ü", "UE");
+        // toNormalize = toNormalize.replaceAll("ß", "ss");
+        return toNormalize.replaceAll("[\\\\,/,:,\\*,?,\",<,>,;,#,%,=,@]", "_");
+    }
 }

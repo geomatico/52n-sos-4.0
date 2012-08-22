@@ -35,6 +35,8 @@ import org.joda.time.DateTime;
  * 
  */
 public class TimeInstant implements ITime {
+    
+    private String id;
 
     /** date for this timeInstant */
     private DateTime value;
@@ -62,6 +64,16 @@ public class TimeInstant implements ITime {
      * 
      */
     public TimeInstant() {
+    }
+
+    @Override
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getId() {
+        return this.id;
     }
 
     /*

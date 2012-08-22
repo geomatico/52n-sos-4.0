@@ -59,9 +59,6 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     private Collection<String> procedures;
 
     /** contains the feature IDs offered in the database */
-    private Collection<String> allFeatures;
-
-    /** contains the procedure IDs offered in the database */
     private Collection<String> featuresOfInterest;
 
     /** contains the observation IDs offered in the database */
@@ -402,18 +399,16 @@ public class CapabilitiesCache extends ACapabilitiesCache {
         return this.unit4Phen.get(observedProperty);
     }
 
-    /**
-     * @return Returns all features
-     */
-    protected Collection<String> getAllFeature() {
-        return allFeatures;
-    }
 
     /**
      * @return Returns only FOIs which are sampling features
      */
     protected Collection<String> getFeatureOfInterest() {
         return featuresOfInterest;
+    }
+    
+    public void setFeatureOfInterest(Collection<String> featuresOfInterest) {
+        this.featuresOfInterest = featuresOfInterest;
     }
 
     /**
@@ -594,17 +589,8 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * 
      * @param fois
      */
-    public void setFeaturesOfInterest(Collection<String> featuresOfInterest) {
+    public void setAllFeatureOfInterests(Collection<String> featuresOfInterest) {
         this.featuresOfInterest = featuresOfInterest;
-    }
-
-    /**
-     * sets FOIs
-     * 
-     * @param fois
-     */
-    public void setAllFeatures(Collection<String> allFeatures) {
-        this.allFeatures = allFeatures;
     }
 
     /**
@@ -779,8 +765,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
         features.add(foiID);
 
         // if foi id is NOT contained add foi
-        if (!this.getAllFeature().contains(foiID)) {
-            this.allFeatures.add(foiID);
+        if (!this.featuresOfInterest.contains(foiID)) {
             this.featuresOfInterest.add(foiID);
         }
 

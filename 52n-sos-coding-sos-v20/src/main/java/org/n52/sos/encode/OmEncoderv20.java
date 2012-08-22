@@ -201,10 +201,12 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
         String observationType = sosObservation.getObservationConstellation().getObservationType();
         xbObs.addNewType().setHref(observationType);
         // set phenomenonTime
-        String phenTimeId = OMConstants.PHENOMENON_TIME_NAME + "_" + observationID;
-        addPhenomenonTime(xbObs.addNewPhenomenonTime(), phenTimeId, sosObservation.getPhenomenonTime());
+        if (sosObservation.getPhenomenonTime().getId() == null) {
+            sosObservation.getPhenomenonTime().setId(OMConstants.PHENOMENON_TIME_NAME + "_" + observationID);
+        }
+        addPhenomenonTime(xbObs.addNewPhenomenonTime(), sosObservation.getPhenomenonTime());
         // set resultTime
-        xbObs.addNewResultTime().setHref("#" + phenTimeId);
+        xbObs.addNewResultTime().setHref("#" + sosObservation.getPhenomenonTime().getId());
         // set procedure
         xbObs.addNewProcedure().setHref(sosObservation.getObservationConstellation().getProcedure());
         // set observedProperty (phenomenon)
@@ -467,13 +469,12 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
     // cursor.dispose();
     // }
 
-    private void addPhenomenonTime(TimeObjectPropertyType timeObjectPropertyType, String phenTimeId, ITime iTime)
+    private void addPhenomenonTime(TimeObjectPropertyType timeObjectPropertyType, ITime iTime)
             throws OwsExceptionReport {
         IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
         if (encoder != null) {
             Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
-            additionalValues.put(HelperValues.GMLID, phenTimeId);
-            XmlObject xmlObject = (XmlObject) encoder.encode(iTime, additionalValues);
+            XmlObject xmlObject = (XmlObject) encoder.encode(iTime);
             if (xmlObject instanceof AbstractTimeObjectType) {
                 XmlObject substitution =
                         timeObjectPropertyType.addNewAbstractTimeObject().substitute(getQnameForITime(iTime),

@@ -291,8 +291,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             parentFeatures.put(featureOfInterest.getIdentifier(),
                     getFeatureIDsFromFeatures(featureOfInterest.getFeatureOfInterestsForChildFeatureId()));
         }
-        cache.setFeaturesOfInterest(getFeatureOfInterestIdentifier(hFeaturesOfInterest));
-        cache.setAllFeatures(getFeatureIdentifier(hFeaturesOfInterest));
+        cache.setFeatureOfInterest(getFeatureIdentifier(hFeaturesOfInterest));
         cache.setKFeatureOfInterestVProcedures(kFeatureOfInterestVProcedure);
         cache.setFeatureHierarchies(parentFeatures);
     }
@@ -380,7 +379,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             criteria.setProjection(Projections.distinct(Projections.property("featureOfInterest")));
             criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
             List<FeatureOfInterest> featureOfInterests = criteria.list();
-            kOfferingVFeatureOfInterest.put(offering, getFeatureOfInterestIdentifier(featureOfInterests));
+            kOfferingVFeatureOfInterest.put(offering, getFeatureIdentifier(featureOfInterests));
         }
         return kOfferingVFeatureOfInterest;
     }
@@ -494,29 +493,10 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         return relatedFeatureList;
     }
 
-    /**
-     * Get FOI identifiers
-     * 
-     * @param featureOfInterests
-     *            FOI objects
-     * @return List wiht FOI identifiers
-     */
-    private List<String> getFeatureOfInterestIdentifier(List<FeatureOfInterest> featureOfInterests) {
-        List<String> featureOfInterestList = new ArrayList<String>();
-        for (FeatureOfInterest featureOfInterest : featureOfInterests) {
-            if (featureOfInterest.isSamplingFeature()) {
-                featureOfInterestList.add(featureOfInterest.getIdentifier());
-            }
-        }
-        return featureOfInterestList;
-    }
-
     private Collection<String> getFeatureIdentifier(List<FeatureOfInterest> featuresOfInterest) {
         List<String> featureList = new ArrayList<String>();
         for (FeatureOfInterest featureOfInterest : featuresOfInterest) {
-            if (featureOfInterest.isSamplingFeature()) {
-                featureList.add(featureOfInterest.getIdentifier());
-            }
+            featureList.add(featureOfInterest.getIdentifier());
         }
         return featureList;
     }

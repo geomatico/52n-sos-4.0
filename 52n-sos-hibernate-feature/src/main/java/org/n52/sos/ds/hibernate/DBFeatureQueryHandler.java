@@ -51,8 +51,6 @@ import org.n52.sos.ds.hibernate.util.HibernateFeatureCriteriaTransactionalUtilit
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
-import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -84,9 +82,6 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
         Session session = getSessionFromConnection(connection);
         try {
             Criteria criteria = session.createCriteria(FeatureOfInterest.class);
-            // extension
-            criteria.add(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                    HibernateConstants.PARAMETER_SAMPLING_FEATURE, Boolean.TRUE));
             criteria.add(Restrictions.eq("identifier", featureID));
             return createSosAbstractFeatureFromResult((FeatureOfInterest) criteria.uniqueResult(), version);
         } catch (HibernateException he) {
@@ -114,10 +109,6 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
                 String propertyName = HibernateConstants.PARAMETER_GEOMETRY;
                 criterions.add(HibernateCriteriaQueryUtilities.getCriterionForSpatialFilter(propertyName, filter));
             }
-            // extension
-            criterions.add(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                    HibernateConstants.PARAMETER_SAMPLING_FEATURE, Boolean.TRUE));
-
             return HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(aliases, criterions, projections,
                     session);
         } catch (HibernateException he) {
@@ -159,9 +150,6 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
                 }
                 criterions.add(disjunction);
             }
-            // extension
-            criterions.add(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                    HibernateConstants.PARAMETER_SAMPLING_FEATURE, Boolean.TRUE));
             return createSosAbstractFeaturesFromResult(HibernateFeatureCriteriaQueryUtilities.getFeatureOfInterests(
                     aliases, criterions, projections, session), version);
         } catch (HibernateException he) {
@@ -184,9 +172,6 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
         try {
             Criteria criteria = session.createCriteria(FeatureOfInterest.class);
             criteria.add(Restrictions.in(HibernateConstants.PARAMETER_IDENTIFIER, featureIDs));
-            // extension
-            criteria.add(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                    HibernateConstants.PARAMETER_SAMPLING_FEATURE, Boolean.TRUE));
             criteria.setProjection(SpatialProjections.extent("geom"));
             Geometry geom = (Geometry) criteria.uniqueResult();
             return geom.getEnvelopeInternal();
@@ -219,8 +204,7 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
      *             If WKT geometry string is invalid.
      */
     public static SosAbstractFeature getAbstractFeatureFromValues(String id, String description,
-            String xmlDescription, List<String> name, Geometry geometry, String featureType, String url,
-            boolean sampling) throws OwsExceptionReport {
+            String xmlDescription, List<String> name, Geometry geometry, String featureType, String url) throws OwsExceptionReport {
 
         SosSamplingFeature sampFeat = new SosSamplingFeature(id);
         sampFeat.setName(name);
@@ -230,7 +214,6 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
             sampFeat.setEpsgCode(geometry.getSRID());
         }
         sampFeat.setFeatureType(featureType);
-        sampFeat.setSampling(sampling);
         sampFeat.setUrl(url);
         sampFeat.setXmlDescription(xmlDescription);
         return sampFeat;
@@ -293,7 +276,7 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
             checkedFoiID = feature.getIdentifier();
         }
         return getAbstractFeatureFromValues(checkedFoiID, null, feature.getDescriptionXml(), null, feature.getGeom(), feature.getFeatureOfInterestType().getFeatureOfInterestType(),
-                feature.getUrl(), feature.isSamplingFeature());
+                feature.getUrl());
     }
 
     /**

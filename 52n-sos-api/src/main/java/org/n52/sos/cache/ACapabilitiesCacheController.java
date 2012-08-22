@@ -332,13 +332,6 @@ public abstract class ACapabilitiesCacheController extends TimerTask {
     public abstract String getUnit4ObservableProperty(String observedProperty);
 
     /**
-     * returns all features
-     * 
-     * @return ArrayList<String> the FOIs
-     */
-    public abstract Collection<String> getAllFeature();
-
-    /**
      * returns only FOIs which are sampling features
      * 
      * @return ArrayList<String> the FOIs

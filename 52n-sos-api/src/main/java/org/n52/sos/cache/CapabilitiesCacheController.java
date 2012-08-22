@@ -828,19 +828,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     /*
      * (non-Javadoc)
      * 
-     * @see org.n52.sos.cache.ACapabilitiesCacheController#getAllFeature()
-     */
-    @Override
-    public Collection<String> getAllFeature() {
-        if (this.capabilitiesCache.getAllFeature() != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getAllFeature());
-        }
-        return new ArrayList<String>();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
      * @see org.n52.sos.cache.ACapabilitiesCacheController#
      * getObservableProperties4CompositePhenomenons()
      */

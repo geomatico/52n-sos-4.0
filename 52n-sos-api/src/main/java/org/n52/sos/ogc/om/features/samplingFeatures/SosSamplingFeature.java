@@ -58,8 +58,6 @@ public class SosSamplingFeature extends SosAbstractFeature {
 
     private List<SosAbstractFeature> sampledFeatures;
 
-    private boolean sampling = false;
-
     /**
      * constructor
      * 
@@ -143,13 +141,5 @@ public class SosSamplingFeature extends SosAbstractFeature {
 
     public List<SosAbstractFeature> getSampledFeatures() {
         return sampledFeatures;
-    }
-
-    public boolean isSampling() {
-        return sampling;
-    }
-
-    public void setSampling(boolean sampling) {
-        this.sampling = sampling;
     }
 }

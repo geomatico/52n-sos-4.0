@@ -204,9 +204,7 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
                 }
             }
         }
-        if (feature != null) {
-            feature.setSampling(true);
-        } else {
+        if (feature == null) {
             String exceptionText = "The requested featureOfInterest type is not supported by this service!";
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createInvalidParameterValueException(

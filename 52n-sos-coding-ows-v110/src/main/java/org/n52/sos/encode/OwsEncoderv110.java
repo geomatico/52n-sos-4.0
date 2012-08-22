@@ -1,9 +1,9 @@
 package org.n52.sos.encode;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,11 +25,14 @@ import net.opengis.ows.x11.ServiceProviderDocument;
 import net.opengis.ows.x11.ServiceProviderDocument.ServiceProvider;
 
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.ogc.ows.IOWSParameterValue;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
-import org.n52.sos.ogc.ows.OWSConstants.MinMax;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSOperationsMetadata;
+import org.n52.sos.ogc.ows.OWSParameterDataType;
+import org.n52.sos.ogc.ows.OWSParameterValue;
+import org.n52.sos.ogc.ows.OWSParameterValueRange;
 import org.n52.sos.ogc.ows.OwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
@@ -196,21 +199,23 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
             // parameter
             if (operationMetadata.getParameterValues() != null) {
                 for (String parameterName : operationMetadata.getParameterValues().keySet()) {
-                    setParamList(operation.addNewParameter(), parameterName, operationMetadata.getParameterValues()
-                            .get(parameterName));
+                    setParameterValue(operation.addNewParameter(), parameterName, operationMetadata
+                            .getParameterValues().get(parameterName));
                 }
             }
-            if (operationMetadata.getParameterMinMaxMap() != null
-                    && !operationMetadata.getParameterMinMaxMap().isEmpty()) {
-                for (String parameterName : operationMetadata.getParameterMinMaxMap().keySet()) {
-                    setParamMinMax(operation.addNewParameter(), parameterName, operationMetadata
-                            .getParameterMinMaxMap().get(parameterName));
-                }
-            }
+            // if (operationMetadata.getParameterMinMaxMap() != null
+            // && !operationMetadata.getParameterMinMaxMap().isEmpty()) {
+            // for (String parameterName :
+            // operationMetadata.getParameterMinMaxMap().keySet()) {
+            // setParamMinMax(operation.addNewParameter(), parameterName,
+            // operationMetadata
+            // .getParameterMinMaxMap().get(parameterName));
+            // }
+            // }
         }
         // set SERVICE and VERSION for all operations.
         for (String name : operationsMetadata.getCommonValues().keySet()) {
-            setParamList(xbMeta.addNewParameter(), name, operationsMetadata.getCommonValues().get(name));
+            setParameterValue(xbMeta.addNewParameter(), name, operationsMetadata.getCommonValues().get(name));
         }
         return xbMeta;
     }
@@ -285,6 +290,23 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
         }
     }
 
+    private void setParameterValue(DomainType domainType, String parameterName, IOWSParameterValue parameterValue)
+            throws OwsExceptionReport {
+        if (parameterValue != null) {
+            if (parameterValue instanceof OWSParameterValue) {
+                setParamList(domainType, parameterName, (OWSParameterValue) parameterValue);
+            } else if (parameterValue instanceof OWSParameterValueRange) {
+                setParamRange(domainType, parameterName, (OWSParameterValueRange) parameterValue);
+            } else if (parameterValue instanceof OWSParameterDataType) {
+                setParamDataType(domainType, parameterName, (OWSParameterDataType) parameterValue);
+            }
+        } else {
+            domainType.setName(parameterName);
+            domainType.addNewNoValues();
+        }
+
+    }
+
     /**
      * Sets operation parameters to AnyValue, NoValues or AllowedValues.
      * 
@@ -292,16 +314,24 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
      *            Paramter.
      * @param name
      *            Parameter name.
-     * @param values
-     *            List of values.
+     * @param parameterValue
+     *            .getValues() List of values.
      */
-    private void setParamList(DomainType domainType, String name, Collection<String> values) {
+    private void setParamList(DomainType domainType, String name, OWSParameterValue parameterValue) {
         domainType.setName(name);
-        if (values != null) {
-            if (!values.isEmpty()) {
-                AllowedValues allowedValues = domainType.addNewAllowedValues();
-                for (String value : values) {
-                    allowedValues.addNewValue().setStringValue(value);
+        if (parameterValue.getValues() != null) {
+            if (!parameterValue.getValues().isEmpty()) {
+                AllowedValues allowedValues = null;
+                for (String value : parameterValue.getValues()) {
+                    if (value == null) {
+                        domainType.addNewNoValues();
+                        break;
+                    } else {
+                        if (allowedValues == null) {
+                            allowedValues = domainType.addNewAllowedValues();
+                        }
+                        allowedValues.addNewValue().setStringValue(value);
+                    }
                 }
             } else {
                 domainType.addNewAnyValue();
@@ -311,25 +341,35 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
         }
     }
 
+    private void setParamDataType(DomainType domainType, String parameterName, OWSParameterDataType parameterValue) {
+        domainType.setName(parameterName);
+        if (parameterValue.getReference() != null && !parameterValue.getReference().isEmpty()) {
+            domainType.addNewDataType().setReference(parameterValue.getReference());
+        } else {
+            domainType.addNewNoValues();
+        }
+
+    }
+
     /**
      * Sets the EventTime parameter.
      * 
      * @param domainType
      *            Parameter.
-     * @param map
+     * @param parameterValue
      * @throws OwsExceptionReport
      */
-    private void setParamMinMax(DomainType domainType, String parameterName, Map<MinMax, String> map)
+    private void setParamRange(DomainType domainType, String parameterName, OWSParameterValueRange parameterValue)
             throws OwsExceptionReport {
         domainType.setName(parameterName);
-
-        // set the min value
-        String minValue = map.get(OWSConstants.MinMax.MIN);
-        String maxValue = map.get(OWSConstants.MinMax.MAX);
-        if (minValue != null && !minValue.isEmpty() && maxValue != null && !maxValue.isEmpty()) {
-            RangeType range = domainType.addNewAllowedValues().addNewRange();
-            range.addNewMinimumValue().setStringValue(minValue);
-            range.addNewMaximumValue().setStringValue(maxValue);
+        if (parameterValue.getMinValue() != null && parameterValue.getMaxValue() != null) {
+            if (!parameterValue.getMinValue().isEmpty() && !parameterValue.getMaxValue().isEmpty()) {
+                RangeType range = domainType.addNewAllowedValues().addNewRange();
+                range.addNewMinimumValue().setStringValue(parameterValue.getMinValue());
+                range.addNewMaximumValue().setStringValue(parameterValue.getMaxValue());
+            } else {
+                domainType.addNewAnyValue();
+            }
         } else {
             domainType.addNewNoValues();
         }
