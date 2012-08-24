@@ -286,7 +286,7 @@ public final class Configurator {
     /** service identification keyword strings */
     private String[] serviceIdentificationKeywords;
 
-    private ServiceLoader<IAdminServiceOperator> serviceLoaderAdminRequestOperator;
+    private ServiceLoader<IAdminServiceOperator> serviceLoaderAdminServiceOperator;
 
     /** ServiceLoader for ICacheFeederDAO */
     private ServiceLoader<ICacheFeederDAO> serviceLoaderCacheFeederDAO;
@@ -361,7 +361,7 @@ public final class Configurator {
     /**
      * Implementation of ASosAdminRequestOperator
      */
-    private IAdminServiceOperator adminRequestOperator;
+    private IAdminServiceOperator adminServiceOperator;
 
     /**
      * definition of the observableProperty which holds the dynamic location
@@ -742,7 +742,7 @@ public final class Configurator {
         initalizeEncoder();
         initializeRequestOperators();
         initializeBindingOperator();
-        initializeAdminRequestOperator();
+        initializeAdminServiceOperator();
         initializeDataSource();
         initializeCapabilitiesCacheController();
         // TODO: 
@@ -803,15 +803,15 @@ public final class Configurator {
      * @throws OwsExceptionReport
      *             if initialization of a RequestListener failed
      */
-    private void initializeAdminRequestOperator() throws OwsExceptionReport {
-        serviceLoaderAdminRequestOperator = ServiceLoader.load(IAdminServiceOperator.class);
-        Iterator<IAdminServiceOperator> iter = serviceLoaderAdminRequestOperator.iterator();
+    private void initializeAdminServiceOperator() throws OwsExceptionReport {
+        serviceLoaderAdminServiceOperator = ServiceLoader.load(IAdminServiceOperator.class);
+        Iterator<IAdminServiceOperator> iter = serviceLoaderAdminServiceOperator.iterator();
         try {
-            this.adminRequestOperator = iter.hasNext() ? iter.next() : null;
+            this.adminServiceOperator = iter.hasNext() ? iter.next() : null;
         } catch (ServiceConfigurationError sce) {
             LOGGER.warn("An IAdminServiceOperator implementation could not be loaded!", sce);
         }
-        if (this.adminRequestOperator == null) {
+        if (this.adminServiceOperator == null) {
             String exceptionText = "No IAdminServiceOperator implementation is loaded!";
             LOGGER.error(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
@@ -1565,8 +1565,8 @@ public final class Configurator {
     /**
      * @return the implemented SOS administration request operator
      */
-    public IAdminServiceOperator getAdminRequestOperator() {
-        return adminRequestOperator;
+    public IAdminServiceOperator getAdminServiceOperator() {
+        return adminServiceOperator;
     }
 
     public int getDefaultEPSG() {

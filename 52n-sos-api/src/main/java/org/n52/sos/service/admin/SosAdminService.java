@@ -28,7 +28,6 @@
 
 package org.n52.sos.service.admin;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -41,14 +40,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.exception.AdministratorException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.admin.operator.IAdminServiceOperator;
-import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +99,7 @@ public class SosAdminService extends HttpServlet {
             }
 
         }
-        sosAdminOperator = Configurator.getInstance().getAdminRequestOperator();
+        sosAdminOperator = Configurator.getInstance().getAdminServiceOperator();
     }
 
     /*
@@ -141,8 +137,8 @@ public class SosAdminService extends HttpServlet {
         ServiceResponse sosResp = null;
         try {
             sosResp = sosAdminOperator.doPostOperation(req);
-        } catch (OwsExceptionReport owse) {
-            sosResp = handleOwsExceptionReport(owse);
+        } catch (AdministratorException ae) {
+            throw new ServletException(ae);
         }
         doResponse(resp, sosResp);
     }
@@ -175,43 +171,10 @@ public class SosAdminService extends HttpServlet {
         ServiceResponse sosResp = null;
         try {
             sosResp = sosAdminOperator.doGetOperation(req);
-        } catch (OwsExceptionReport owse) {
-            sosResp = handleOwsExceptionReport(owse);
+        } catch (AdministratorException ae) {
+            throw new ServletException(ae);
         }
         doResponse(resp, sosResp);
-    }
-    
-    private ServiceResponse handleOwsExceptionReport(OwsExceptionReport owsExceptionReport) throws ServletException {
-        try {
-            IEncoder encoder = Configurator.getInstance().getEncoder(owsExceptionReport.getNamespace());
-            if (encoder != null) {
-                Object encodedObject = encoder.encode(owsExceptionReport);
-                if (encodedObject instanceof XmlObject) {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
-                    return new ServiceResponse(baos, SosConstants.CONTENT_TYPE_XML, false, true);
-                } else if (encodedObject instanceof ServiceResponse) {
-                    return (ServiceResponse) encodedObject;
-                } else {
-                    String exceptionText = "Error while handle exception message response!";
-                    LOGGER.debug(exceptionText);
-                    throw new ServletException(exceptionText);
-                }
-            } else {
-                String exceptionText = "Error while handle exception message response!";
-                LOGGER.debug(exceptionText);
-                throw new ServletException(exceptionText);
-            }
-        } catch (OwsExceptionReport owse) {
-            String exceptionText = "Error while handle exception message response!";
-            LOGGER.debug(exceptionText, owse);
-            throw new ServletException(exceptionText);
-        } catch (IOException ioe) {
-            String exceptionText = "Error while handle exception message response!";
-            LOGGER.debug(exceptionText, ioe);
-            throw new ServletException(exceptionText);
-        }
-        
     }
 
     /**

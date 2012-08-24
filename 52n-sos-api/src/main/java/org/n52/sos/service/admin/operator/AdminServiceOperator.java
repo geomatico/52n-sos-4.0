@@ -34,16 +34,13 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.Sos1Constants;
-import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.exception.AdministratorException;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.admin.AdministratoConstants.AdministatorParams;
 import org.n52.sos.service.operator.IServiceOperator;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +71,7 @@ public class AdminServiceOperator extends IAdminServiceOperator {
      * .HttpServletRequest)
      */
     @Override
-    public ServiceResponse doGetOperation(HttpServletRequest req) throws OwsExceptionReport {
+    public ServiceResponse doGetOperation(HttpServletRequest req) throws AdministratorException {
 
         ServiceResponse response = null;
         AbstractServiceRequest request = null;
@@ -87,27 +84,25 @@ public class AdminServiceOperator extends IAdminServiceOperator {
             kvp.put(parameterName, parameterValue);
         }
         if (kvp.isEmpty()) {
-            OwsExceptionReport owse =
-                    Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.service.name());
-            owse.addOwsExceptionReport(Util4Exceptions
-                    .createMissingParameterValueException(OWSConstants.RequestParams.request.name()));
-            throw owse;
-        } else if (!kvp.isEmpty() && !kvp.containsKey(SosConstants.GetCapabilitiesParams.request.name())) {
-            throw Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.request.name());
-        } else if (!kvp.isEmpty() && !kvp.containsKey(SosConstants.GetCapabilitiesParams.service.name())) {
-            throw Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.service.name());
+            String exceptionText = "The request is empty!";
+            LOGGER.debug(exceptionText);
+            throw new AdministratorException(exceptionText);
+        } else if (!kvp.isEmpty() && !kvp.containsKey(AdministatorParams.request.name())) {
+            String exceptionText = "The request does not contain mandatory '" + AdministatorParams.request.name() + "' parameter!";
+            LOGGER.debug(exceptionText);
+            throw new AdministratorException(exceptionText);
+        } else if (!kvp.isEmpty() && !kvp.containsKey(AdministatorParams.service.name())) {
+            String exceptionText = "The request does not contain mandatory '" + AdministatorParams.service.name() + "' parameter!";
+            LOGGER.debug(exceptionText);
+            throw new AdministratorException(exceptionText);
         }
-        IServiceOperator requestOperator = null;
+        IAdminServiceOperator requestOperator = Configurator.getInstance().getAdminServiceOperator();
         if (requestOperator != null) {
+            // TODO: implement the functionality
             return response;
         }
-        OwsExceptionReport owse = Util4Exceptions.createOperationNotSupportedException("AdmininstratorOperation");
-        if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
-            owse.setVersion(Sos2Constants.SERVICEVERSION);
-        } else {
-            owse.setVersion(Sos1Constants.SERVICEVERSION);
-        }
-        throw owse;
+        String exceptionText = "The service administrator is not supported!";
+        throw new AdministratorException(exceptionText);
     }
 
     /*
@@ -118,41 +113,9 @@ public class AdminServiceOperator extends IAdminServiceOperator {
      * .HttpServletRequest)
      */
     @Override
-    public ServiceResponse doPostOperation(HttpServletRequest req) throws OwsExceptionReport {
+    public ServiceResponse doPostOperation(HttpServletRequest req) throws AdministratorException {
         String exceptionText = "The SOS administration backend does not support HTTP-Post requests!";
-        OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
-            owse.setVersion(Sos2Constants.SERVICEVERSION);
-        } else {
-            owse.setVersion(Sos1Constants.SERVICEVERSION);
-        }
-        throw owse;
+        throw new AdministratorException(exceptionText);
     }
-
-    // @Override
-    // public boolean checkOperationHttpGetSupported(String operationName,
-    // String version, String namespace)
-    // throws Exception {
-    // return true;
-    // }
-    //
-    // @Override
-    // public boolean checkOperationHttpPostSupported(String operationName,
-    // String version, String namespace)
-    // throws Exception {
-    // return false;
-    // }
-    //
-    // @Override
-    // public boolean hasImplementedDAO() {
-    // // TODO Auto-generated method stub
-    // return false;
-    // }
-    //
-    // @Override
-    // public String getOperationName() {
-    // // TODO Auto-generated method stub
-    // return null;
-    // }
 
 }

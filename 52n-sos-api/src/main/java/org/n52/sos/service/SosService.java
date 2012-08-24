@@ -66,7 +66,7 @@ public class SosService extends HttpServlet {
      * initializes the Servlet
      */
     public void init() throws ServletException {
-        if (Configurator.getInstance().getAdminRequestOperator() == null) {
+        if (Configurator.getInstance().getAdminServiceOperator() == null) {
             String exceptionText = "The instanziation of this service failed!";
             LOGGER.error(exceptionText);
             throw new UnavailableException(exceptionText);
