@@ -72,6 +72,19 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
     public List<EncoderKeyType> getEncoderKeyType() {
         return encoderKeyTypes;
     }
+    
+    @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return new HashMap<SupportedTypeKey, Set<String>>(0);
+    }
+
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
+    }
+
+    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
+    }
 
     @Override
     public ServiceResponse encode(SoapResponse response) throws OwsExceptionReport {
@@ -339,15 +352,5 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
         QName qName = new QName(W3CConstants.NS_XSI, W3CConstants.AN_SCHEMA_LOCATION, W3CConstants.NS_XSI_PREFIX);
         envelope.addAttribute(qName, string.toString());
         value = string.toString();
-    }
-
-    @Override
-    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
-    }
-
-    @Override
-    public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
     }
 }

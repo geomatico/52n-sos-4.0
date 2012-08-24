@@ -97,6 +97,7 @@ import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.DateTimeHelper;
+import org.n52.sos.util.GmlHelper;
 import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -164,6 +165,20 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
         conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/textObservation");
         return conformanceClasses;
     }
+    
+    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
+        nameSpacePrefixMap.put(OMConstants.NS_OM_2, OMConstants.NS_OM_PREFIX);
+    }
+
+    @Override
+    public boolean isObservationAndMeasurmentV20Type() {
+        return true;
+    }
+
+    @Override
+    public boolean mergeObservationValuesWithSameParameters() {
+        return false;
+    }
 
     @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
@@ -176,11 +191,6 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
             return createObservation((SosObservation) element, additionalValues);
         }
         return null;
-    }
-
-    @Override
-    public boolean isSingleValueEncoding() {
-        return true;
     }
 
     private XmlObject createObservation(SosObservation sosObservation, Map<HelperValues, String> additionalValues)
@@ -477,7 +487,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
             XmlObject xmlObject = (XmlObject) encoder.encode(iTime);
             if (xmlObject instanceof AbstractTimeObjectType) {
                 XmlObject substitution =
-                        timeObjectPropertyType.addNewAbstractTimeObject().substitute(getQnameForITime(iTime),
+                        timeObjectPropertyType.addNewAbstractTimeObject().substitute(GmlHelper.getQnameForITime(iTime),
                                 xmlObject.schemaType());
                 substitution.set((AbstractTimeObjectType) xmlObject);
             } else {
@@ -487,15 +497,6 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
             String exceptionText = "Error while encoding phenomenon time, needed encoder is missing!";
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
-    }
-
-    private QName getQnameForITime(ITime iTime) {
-        if (iTime instanceof TimeInstant) {
-            return new QName(GMLConstants.NS_GML_32, GMLConstants.EN_TIME_INSTANT, GMLConstants.NS_GML);
-        } else if (iTime instanceof TimePeriod) {
-            return new QName(GMLConstants.NS_GML_32, GMLConstants.EN_TIME_PERIOD, GMLConstants.NS_GML);
-        }
-        return new QName(GMLConstants.NS_GML_32, GMLConstants.EN_ABSTRACT_TIME_OBJECT, GMLConstants.NS_GML);
     }
 
     /**

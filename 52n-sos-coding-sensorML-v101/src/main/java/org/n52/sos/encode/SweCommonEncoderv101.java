@@ -54,6 +54,20 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
     }
 
     @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return new HashMap<SupportedTypeKey, Set<String>>(0);
+    }
+
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
+    }
+    
+    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
+        nameSpacePrefixMap.put(SWEConstants.NS_SWE, SWEConstants.NS_SWE_PREFIX);
+    }
+
+    @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
         return encode(element, null);
     }
@@ -70,11 +84,6 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
         return null;
     }
     
-    @Override
-    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
-    }
-
     /**
      * Adds values to SWE text
      * 
@@ -135,11 +144,6 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
         xbCoordinate.setName(coordinate.getName().name());
         xbCoordinate.setQuantity(addValuesToSimpleTypeQuantity((SosSweQuantity) coordinate.getValue()));
         return xbCoordinate;
-    }
-
-    @Override
-    public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
     }
 
 }

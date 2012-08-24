@@ -39,6 +39,7 @@ import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.ows.SosServiceProvider;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
+import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -71,6 +72,20 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
     @Override
     public List<EncoderKeyType> getEncoderKeyType() {
         return encoderKeyTypes;
+    }
+    
+    @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return new HashMap<SupportedTypeKey, Set<String>>(0);
+    }
+
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
+    }
+
+    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
+        nameSpacePrefixMap.put(OWSConstants.NS_OWS, OWSConstants.NS_OWS_PREFIX);
     }
 
     @Override
@@ -373,16 +388,6 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
         } else {
             domainType.addNewNoValues();
         }
-    }
-
-    @Override
-    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
-    }
-
-    @Override
-    public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
     }
 
 }

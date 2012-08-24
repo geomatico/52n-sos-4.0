@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
+import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
@@ -43,7 +44,21 @@ public class WsaEncoder implements IEncoder<Map<QName, String>, WsaHeader> {
     public List<EncoderKeyType> getEncoderKeyType() {
         return encoderKeyTypes;
     }
+    
+    @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return new HashMap<SupportedTypeKey, Set<String>>(0);
+    }
 
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
+    }
+
+    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
+    }
+    
+    
     @Override
     public Map<QName, String> encode(WsaHeader response) throws OwsExceptionReport {
         return encode(response, null);
@@ -63,16 +78,6 @@ public class WsaEncoder implements IEncoder<Map<QName, String>, WsaHeader> {
             wsaHeaderValues.put(WsaConstants.getQNameAction(), response.getActionValue());
         }
         return wsaHeaderValues;
-    }
-    
-    @Override
-    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
-    }
-
-    @Override
-    public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
     }
 
 }

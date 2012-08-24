@@ -36,6 +36,7 @@ import net.opengis.sensorML.x101.SystemDocument;
 import net.opengis.sensorML.x101.SystemType;
 import net.opengis.sensorML.x101.TermDocument.Term;
 import net.opengis.swe.x101.AnyScalarPropertyType;
+import net.opengis.swe.x101.DataRecordType;
 import net.opengis.swe.x101.PositionType;
 import net.opengis.swe.x101.SimpleDataRecordType;
 import net.opengis.swe.x101.TextDocument.Text;
@@ -44,6 +45,7 @@ import net.opengis.swe.x101.VectorType;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.SosGmlMetaDataProperty;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractMultiProcess;
@@ -108,6 +110,24 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
     }
 
     @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        Map<SupportedTypeKey, Set<String>> map = new HashMap<SupportedTypeKey, Set<String>>();
+        map.put(SupportedTypeKey.ProcedureDescriptionFormat, supportedProcedureDescriptionFormats);
+        return map;
+    }
+
+    @Override
+    public Set<String> getConformanceClasses() {
+        return new HashSet<String>(0);
+    }
+    
+    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
+        nameSpacePrefixMap.put(SensorMLConstants.NS_SML, SensorMLConstants.NS_SML_PREFIX);
+        // remove if GML 3.1.1 encoder is available
+        nameSpacePrefixMap.put(GMLConstants.NS_GML, GMLConstants.NS_GML_PREFIX);
+    }
+
+    @Override
     public XmlObject encode(Object response) throws OwsExceptionReport {
         return encode(response, null);
     }
@@ -121,13 +141,6 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
     }
     
     
-    @Override
-    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        Map<SupportedTypeKey, Set<String>> map = new HashMap<SupportedTypeKey, Set<String>>();
-        map.put(SupportedTypeKey.ProcedureDescriptionFormat, supportedProcedureDescriptionFormats);
-        return map;
-    }
-
     /**
      * creates sml:System
      * 
@@ -483,13 +496,13 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
      *            SOS SWE representation.
      * @throws OwsExceptionReport
      */
-    private Outputs createOutputs(List<SosSMLIo> outputs) throws OwsExceptionReport {
-        Outputs xbOutputs = Outputs.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        OutputList xbOutputList = xbOutputs.addNewOutputList();
-        for (SosSMLIo sosSMLIo : outputs) {
-            addIoComponentPropertyType(xbOutputList.addNewOutput(), sosSMLIo);
+    private Outputs createOutputs(List<SosSMLIo> sosOutputs) throws OwsExceptionReport {
+        Outputs outputs = Outputs.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        OutputList outputList = outputs.addNewOutputList();
+        for (SosSMLIo sosSMLIo : sosOutputs) {
+            addIoComponentPropertyType(outputList.addNewOutput(), sosSMLIo);
         }
-        return xbOutputs;
+        return outputs;
     }
 
     /**
@@ -503,18 +516,18 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
      * @throws OwsExceptionReport
      */
     private Components createComponents(List<SosSMLComponent> sosComponents) throws OwsExceptionReport {
-        Components xbComponents = Components.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        ComponentList xbComList = xbComponents.addNewComponentList();
+        Components components = Components.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        ComponentList componentList = components.addNewComponentList();
         for (SosSMLComponent sosSMLComponent : sosComponents) {
-            Component xb_component = xbComList.addNewComponent();
+            Component component = componentList.addNewComponent();
             if (sosSMLComponent.getName() != null) {
-                xb_component.setName(sosSMLComponent.getName());
+                component.setName(sosSMLComponent.getName());
             }
             if (sosSMLComponent.getTitle() != null) {
-                xb_component.setTitle(sosSMLComponent.getTitle());
+                component.setTitle(sosSMLComponent.getTitle());
             }
             if (sosSMLComponent.getHref() != null) {
-                xb_component.setHref(sosSMLComponent.getHref());
+                component.setHref(sosSMLComponent.getHref());
             }
             if (sosSMLComponent.getProcess() != null) {
                 XmlObject xmlObject = null;
@@ -550,15 +563,15 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
                         String exceptionText = "The sensor type is not supported by this SOS";
                         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
                     }
-                    xb_component.setProcess(xbProcess);
+                    component.setProcess(xbProcess);
                     if (schemaType == null) {
                         schemaType = xbProcess.schemaType();
                     }
-                    xb_component.getProcess().substitute(getQnameForType(schemaType), schemaType);
+                    component.getProcess().substitute(getQnameForType(schemaType), schemaType);
                 }
             }
         }
-        return xbComponents;
+        return components;
     }
 
     /**
@@ -650,15 +663,15 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
     /**
      * Adds a SOS SWE simple type to a XML SML IO component.
      * 
-     * @param xbIoComponentPopertyType
+     * @param ioComponentPopertyType
      *            SML IO component
      * @param sosSMLInput
      *            SOS SWE simple type.
      * @throws OwsExceptionReport
      */
-    private void addIoComponentPropertyType(IoComponentPropertyType xbIoComponentPopertyType, SosSMLIo sosSMLIO)
+    private void addIoComponentPropertyType(IoComponentPropertyType ioComponentPopertyType, SosSMLIo sosSMLIO)
             throws OwsExceptionReport {
-        xbIoComponentPopertyType.setName(sosSMLIO.getIoName());
+        ioComponentPopertyType.setName(sosSMLIO.getIoName());
         switch (sosSMLIO.getIoValue().getSimpleType()) {
         case Boolean:
             String exceptionTextBool =
@@ -685,14 +698,14 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
             LOGGER.debug(exceptionTextCountRange);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextCountRange);
         case ObservableProperty:
-            xbIoComponentPopertyType.addNewObservableProperty().setDefinition(
+            ioComponentPopertyType.addNewObservableProperty().setDefinition(
                     ((SosSweObservableProperty) sosSMLIO.getIoValue()).getDefinition());
             break;
         case Quantity:
             // FIXME: SWE Common NS
             IEncoder encoder = Configurator.getInstance().getEncoder(SWEConstants.NS_SWE);
             if (encoder != null) {
-                xbIoComponentPopertyType.addNewQuantity().set(
+                ioComponentPopertyType.addNewQuantity().set(
                         (XmlObject) encoder.encode((SosSweQuantity) sosSMLIO.getIoValue()));
             } else {
                 String exceptionTextText =
@@ -742,11 +755,6 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
             return SensorMLConstants.PROCESS_MODEL_QNAME;
         }
         return SensorMLConstants.ABSTRACT_PROCESS_QNAME;
-    }
-
-    @Override
-    public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
     }
 
 }

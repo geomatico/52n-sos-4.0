@@ -41,11 +41,9 @@ import org.n52.sos.ds.IGetObservationDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.IObservationEncoder;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.ows.OWSConstants;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.ows.IExtension;
-import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
@@ -137,20 +135,16 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
                     contentType = OMConstants.CONTENT_TYPE_OM_2;
                 }
                 // O&M 2.0 for SOS 2.0
-                else if (request.getVersion().equals(Sos2Constants.SERVICEVERSION)
-                        && responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2)) {
+                // TODO: check if responseFormat is OM-Subtype
+                else if (request.getVersion().equals(Sos2Constants.SERVICEVERSION) && checkForObservationAndMeasrurementV20Type(responseFormat)) {
+//                        && responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2)) {
+                    
                     namespace.append(Sos2Constants.NS_SOS_20);
                 } else {
-                    String exceptionText = "Received version in request is not supported!";
-                    LOGGER.debug(exceptionText);
-                    throw Util4Exceptions.createInvalidParameterValueException(
-                            OWSConstants.RequestParams.version.name(), exceptionText);
+                    namespace.append(responseFormat);
                 }
                 IEncoder encoder = Configurator.getInstance().getEncoder(namespace.toString());
                 if (encoder != null) {
-                    if (encoder instanceof IObservationEncoder) {
-                        sosRequest.setSingleEncodedValues(((IObservationEncoder)encoder).isSingleValueEncoding());
-                    }
                     GetObservationResponse response = this.dao.getObservation(sosRequest);
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     Object encodedObject = encoder.encode(response);
@@ -166,8 +160,7 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
                 } else {
                     String exceptionText =
                             "The value '" + responseFormat
-                                    + "' of the outputFormat parameter is incorrect and has to be '"
-                                    + SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL + "' for the requested sensor!";
+                                    + "' of the responseFormat parameter is not supported by this server!";
                     throw Util4Exceptions.createInvalidParameterValueException(
                             SosConstants.GetObservationParams.responseFormat.name(), exceptionText);
                 }
@@ -341,5 +334,13 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
             }
             Util4Exceptions.mergeExceptions(exceptions);
         }
+    }
+
+    private boolean checkForObservationAndMeasrurementV20Type(String responseFormat) throws OwsExceptionReport {
+        IEncoder encoder = Configurator.getInstance().getEncoder(responseFormat);
+        if (encoder != null && encoder instanceof IObservationEncoder) {
+            return ((IObservationEncoder)encoder).isObservationAndMeasurmentV20Type();
+        }
+        return false;
     }
 }

@@ -116,52 +116,6 @@ public class GetObservationDAO implements IGetObservationDAO {
         return OPERATION_NAME;
     }
 
-    // /**
-    // * @param resultSet
-    // * @throws OwsExceptionReport
-    // */
-    // private int checkMaxGetObsResults(ResultSet resultSet) throws
-    // OwsExceptionReport {
-    // int requestObs = 0;
-    // if (Configurator.getInstance().getMaxGetObsResults() > 0) {
-    // try {
-    // resultSet.last();
-    // requestObs += resultSet.getRow();
-    // resultSet.beforeFirst();
-    // if (requestObs > Configurator.getInstance().getMaxGetObsResults()) {
-    // throw Util4Exceptions.createResponseExceedsSizeLimitException(requestObs,
-    // Configurator
-    // .getInstance().getMaxGetObsResults());
-    // }
-    //
-    // } catch (SQLException sqle) {
-    // LOGGER.info("Error while checking GetObservation limit!", sqle);
-    // }
-    // }
-    // return requestObs;
-    // }
-    //
-    // /**
-    // * @param resultSetList
-    // * @throws OwsExceptionReport
-    // */
-    // private void checkMaxGetObsResultsList(List<ResultSet> resultSetList)
-    // throws OwsExceptionReport {
-    // if (Configurator.getInstance().getMaxGetObsResults() > 0) {
-    // int requestObs = 0;
-    // for (ResultSet resultSet : resultSetList) {
-    // requestObs += checkMaxGetObsResults(resultSet);
-    // if (requestObs > Configurator.getInstance().getMaxGetObsResults()) {
-    // throw Util4Exceptions.createResponseExceedsSizeLimitException(requestObs,
-    // Configurator
-    // .getInstance().getMaxGetObsResults());
-    // }
-    // }
-    // }
-    //
-    // }
-    //
-
     /*
      * (non-Javadoc)
      * 
@@ -296,7 +250,7 @@ public class GetObservationDAO implements IGetObservationDAO {
                     response.setVersion(request.getVersion());
                     response.setResponseFormat(request.getResponseFormat());
                     response.setObservationCollection(HibernateResultUtilities.createSosObservationFromObservations(
-                            observations, sosRequest.getVersion(), sosRequest.isSingleEncodedValues(), session));
+                            observations, sosRequest.getVersion(), session));
                     return response;
                 }
             } catch (HibernateException he) {

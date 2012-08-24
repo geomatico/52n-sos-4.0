@@ -61,4 +61,6 @@ public interface IEncoder<S, T> extends IConformanceClass {
     
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
     
+    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap);
+    
 }

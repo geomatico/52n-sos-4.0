@@ -23,8 +23,7 @@ public class SweDataArrayValue implements IValue<Map<ITime, Map<String, IValue>>
 
     @Override
     public void setUnit(String unit) {
-        this.unit = unit;
-        
+        // do nothing
     }
 
     @Override
@@ -33,6 +32,9 @@ public class SweDataArrayValue implements IValue<Map<ITime, Map<String, IValue>>
     }
     
     public void addValue(ITime time, String observedProperty, IValue value) {
+        if (values == null) {
+            values = new HashMap<ITime, Map<String,IValue>>(0);
+        }
         if (values.containsKey(time)) {
             Map<String, IValue> obsPropValue = values.get(time);
             obsPropValue.put(observedProperty, value);

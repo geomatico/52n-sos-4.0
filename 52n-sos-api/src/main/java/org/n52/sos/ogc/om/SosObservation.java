@@ -28,9 +28,13 @@
 
 package org.n52.sos.ogc.om;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
+import org.n52.sos.ogc.om.values.SweDataArrayValue;
 
 /**
  * Class represents a SOS observation
@@ -288,5 +292,44 @@ public class SosObservation implements Cloneable {
 
     public SosObservation clone() throws CloneNotSupportedException{
             return (SosObservation)super.clone();
+    }
+    
+    public void mergeWithObservation(SosObservation sosObservation, boolean mergeObsProps) {
+        // create compPhen or add obsProp to compPhen
+        if (this.observationConstellation.getObservableProperty() instanceof SosObservableProperty && mergeObsProps) {
+                List<SosObservableProperty> obsProps = new ArrayList<SosObservableProperty>();
+                obsProps.add((SosObservableProperty)this.observationConstellation.getObservableProperty());
+                obsProps.add((SosObservableProperty)sosObservation.getObservationConstellation().getObservableProperty());
+                SosCompositePhenomenon sosCompPhen = new SosCompositePhenomenon("CompositePhenomenon_" + this.observationConstellation.getProcedure(), null, obsProps);
+                this.observationConstellation.setObservableProperty(sosCompPhen);
+        } else if (this.observationConstellation.getObservableProperty() instanceof SosCompositePhenomenon) {
+                SosCompositePhenomenon sosCompPhen = (SosCompositePhenomenon)this.observationConstellation.getObservableProperty();
+                sosCompPhen.getPhenomenonComponents().add((SosObservableProperty)sosObservation.getObservationConstellation().getObservableProperty());
+        }
+        // add values
+        if (this.value instanceof SosSingleObservationValue) {
+            convertSingleValueToMultiValue((SosSingleObservationValue)this.value);
+        }
+        SweDataArrayValue dataArrayValue = (SweDataArrayValue)((SosMultiObservationValues)this.value).getValue();
+        if (sosObservation.getValue() instanceof SosSingleObservationValue) {
+            SosSingleObservationValue singleValue = (SosSingleObservationValue)sosObservation.getValue();
+            dataArrayValue.addValue(singleValue.getPhenomenonTime(), this.getObservationConstellation().getObservableProperty().getIdentifier(), singleValue.getValue());
+        } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
+            SosMultiObservationValues multiValue = (SosMultiObservationValues)sosObservation.getValue();
+            SweDataArrayValue dataArrayToAdd = (SweDataArrayValue)multiValue.getValue();
+            for (ITime time : dataArrayToAdd.getValue().keySet()) {
+                for (String obsProp : dataArrayToAdd.getValue().get(time).keySet()) {
+                    dataArrayValue.addValue(time, obsProp, dataArrayToAdd.getValue().get(time).get(obsProp));
+                }
+            }
+        }
+    }
+
+    private void convertSingleValueToMultiValue(SosSingleObservationValue singleValue) {
+        SosMultiObservationValues multiValue = new SosMultiObservationValues();
+        SweDataArrayValue dataArrayValue = new SweDataArrayValue();
+        dataArrayValue.addValue(singleValue.getPhenomenonTime(), this.getObservationConstellation().getObservableProperty().getIdentifier(), singleValue.getValue());
+        multiValue.setValue(dataArrayValue);
+        this.value = multiValue;
     }
 }

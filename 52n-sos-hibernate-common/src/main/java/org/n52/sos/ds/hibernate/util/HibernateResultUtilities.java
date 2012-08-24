@@ -24,6 +24,7 @@ import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.AbstractSosPhenomenon;
 import org.n52.sos.ogc.om.OMConstants;
+import org.n52.sos.ogc.om.SosMultiObservationValues;
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
@@ -33,6 +34,7 @@ import org.n52.sos.ogc.om.quality.SosQuality;
 import org.n52.sos.ogc.om.quality.SosQuality.QualityType;
 import org.n52.sos.ogc.om.values.IValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
+import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.Configurator;
@@ -58,11 +60,11 @@ public class HibernateResultUtilities {
      *             If an error occurs
      */
     public static List<SosObservation> createSosObservationFromObservations(List<Observation> observations,
-            String version, boolean singleValueObservation, Session session) throws OwsExceptionReport {
+            String version, Session session) throws OwsExceptionReport {
         List<SosObservation> observationCollection = new ArrayList<SosObservation>();
 
         Map<String, SosAbstractFeature> features = new HashMap<String, SosAbstractFeature>();
-        Map<String, SosObservation> antiSubsettingObservations = new HashMap<String, SosObservation>();
+        Map<Integer, SosObservation> antiSubsettingObservations = new HashMap<Integer, SosObservation>();
         Map<String, AbstractSosPhenomenon> obsProps = new HashMap<String, AbstractSosPhenomenon>();
         Map<Integer, SosObservationConstellation> observationConstellations =
                 new HashMap<Integer, SosObservationConstellation>();
@@ -147,11 +149,27 @@ public class HibernateResultUtilities {
                     observationConstellations.put(obsConstHash, obsConst);
                 }
 
-                if (hObservation.getAntiSubsetting() != null || !singleValueObservation) {
+                // TODO: compositePhenomenon
+                if (hObservation.getAntiSubsetting() != null) {
                     if (antiSubsettingObservations.containsKey(hObservation.getAntiSubsetting())) {
-                        // TODO: code antiSubsetting
+                        SosObservation sosObservation =
+                                antiSubsettingObservations.get(hObservation.getAntiSubsetting());
+                        ((SweDataArrayValue) ((SosMultiObservationValues) sosObservation.getValue()).getValue())
+                                .addValue(phenomenonTime, phenID, value);
                     } else {
-                        // TODO: code antiSubsetting
+                        SosObservation sosObservation = new SosObservation();
+                        sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
+                        sosObservation.setIdentifier(hObservation.getIdentifier());
+                        sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
+                        sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
+                        sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
+                        sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
+                        SweDataArrayValue dataArrayValue = new SweDataArrayValue();
+                        dataArrayValue.addValue(phenomenonTime, phenID, value);
+                        SosMultiObservationValues observationValue = new SosMultiObservationValues();
+                        observationValue.setValue(dataArrayValue);
+                        sosObservation.setValue(observationValue);
+                        antiSubsettingObservations.put(hObservation.getAntiSubsetting(), sosObservation);
                     }
                 } else {
                     SosObservation sosObservation = new SosObservation();
@@ -164,34 +182,21 @@ public class HibernateResultUtilities {
                     sosObservation.setValue(new SosSingleObservationValue(phenomenonTime, value, qualityList));
                     observationCollection.add(sosObservation);
                 }
+                if (antiSubsettingObservations.values() != null && !antiSubsettingObservations.values().isEmpty()) {
+                    observationCollection.addAll(antiSubsettingObservations.values());
+                }
             }
         }
-        // if (!obsConstObsMap.isEmpty()) {
-        // Map<String, SosAbstractFeature> sosAbstractFeatures =
-        // Configurator.getInstance().getFeatureQueryHandler()
-        // .getFeatures(features, null, session, version);
-        // for (SosAbstractFeature feat : sosAbstractFeatures.values()) {
-        // SosSamplingFeature feature = (SosSamplingFeature) feat;
-        // boundedBy = SosHelper.checkEnvelope(boundedBy,
-        // feature.getGeometry());
-        // }
-        // features.add(foiID);
-        // sosObservationCollection.setObservationMembers(obsConstObsMap.values());
-        // sosObservationCollection.setFeatures(sosAbstractFeatures);
-        // sosObservationCollection.setBoundedBy(boundedBy);
-        // sosObservationCollection.setSrid(srid);
-
-        // }
         return observationCollection;
     }
 
     private static void checkOrSetObservablePropertyUnit(AbstractSosPhenomenon abstractSosPhenomenon, String unit) {
-       if(abstractSosPhenomenon instanceof SosObservableProperty) {
-           SosObservableProperty obsProp = (SosObservableProperty)abstractSosPhenomenon;
-           if (obsProp.getUnit() == null && unit != null) {
-               obsProp.setUnit(unit);
-           }
-       }
+        if (abstractSosPhenomenon instanceof SosObservableProperty) {
+            SosObservableProperty obsProp = (SosObservableProperty) abstractSosPhenomenon;
+            if (obsProp.getUnit() == null && unit != null) {
+                obsProp.setUnit(unit);
+            }
+        }
     }
 
     /**
@@ -203,9 +208,11 @@ public class HibernateResultUtilities {
      */
     private static IValue getValueFromAllTable(Observation hObservation) {
         if (hObservation.getBooleanValues() != null && !hObservation.getBooleanValues().isEmpty()) {
-            return new org.n52.sos.ogc.om.values.BooleanValue(getValueFromBooleanValueTable(hObservation.getBooleanValues()));
+            return new org.n52.sos.ogc.om.values.BooleanValue(
+                    getValueFromBooleanValueTable(hObservation.getBooleanValues()));
         } else if (hObservation.getCategoryValues() != null && !hObservation.getCategoryValues().isEmpty()) {
-            return new org.n52.sos.ogc.om.values.CategoryValue(getValueFromCategoryValueTable(hObservation.getCategoryValues()));
+            return new org.n52.sos.ogc.om.values.CategoryValue(
+                    getValueFromCategoryValueTable(hObservation.getCategoryValues()));
         } else if (hObservation.getCountValues() != null && !hObservation.getCountValues().isEmpty()) {
             return new org.n52.sos.ogc.om.values.CountValue(getValueFromCountValueTable(hObservation.getCountValues()));
         } else if (hObservation.getNumericValues() != null && !hObservation.getNumericValues().isEmpty()) {
@@ -213,7 +220,8 @@ public class HibernateResultUtilities {
         } else if (hObservation.getTextValues() != null && !hObservation.getTextValues().isEmpty()) {
             return new org.n52.sos.ogc.om.values.TextValue(getValueFromTextValueTable(hObservation.getTextValues()));
         } else if (hObservation.getGeometryValues() != null && !hObservation.getGeometryValues().isEmpty()) {
-            return new org.n52.sos.ogc.om.values.GeometryValue(getValueFromGeometryValueTable(hObservation.getGeometryValues()));
+            return new org.n52.sos.ogc.om.values.GeometryValue(
+                    getValueFromGeometryValueTable(hObservation.getGeometryValues()));
         }
         return null;
     }

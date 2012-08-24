@@ -33,6 +33,7 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.GmlHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
@@ -97,6 +98,11 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
         conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/samplingCurve");
         conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/samplingSurface");
         return conformanceClasses;
+    }
+    
+    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
+        nameSpacePrefixMap.put(SFConstants.NS_SAMS, SFConstants.NS_SAMS_PREFIX);
+        nameSpacePrefixMap.put(SFConstants.NS_SF, SFConstants.NS_SF_PREFIX);
     }
 
     @Override
@@ -172,7 +178,7 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
                     XmlObject xmlObject = (XmlObject) encoder.encode(sampFeat.getGeometry(), additionalValues);
                     if (xmlObject instanceof AbstractGeometryType) {
                         XmlObject substitution =
-                                xbShape.addNewAbstractGeometry().substitute(getQnameForGeometry(sampFeat.getGeometry()),
+                                xbShape.addNewAbstractGeometry().substitute(GmlHelper.getQnameForGeometry(sampFeat.getGeometry()),
                                         xmlObject.schemaType());
                         substitution.set((AbstractGeometryType) xmlObject);
                     } else {
@@ -186,17 +192,6 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
             }
         }
         return xbSampFeatDoc;
-    }
-
-    private QName getQnameForGeometry(Geometry geom) {
-        if (geom instanceof Point) {
-            return new QName(GMLConstants.NS_GML_32, GMLConstants.EN_POINT, GMLConstants.NS_GML);
-        } else if (geom instanceof LineString) {
-            return new QName(GMLConstants.NS_GML_32, GMLConstants.EN_LINE_STRING, GMLConstants.NS_GML);
-        } else if (geom instanceof Polygon) {
-            return new QName(GMLConstants.NS_GML_32, GMLConstants.EN_POLYGON, GMLConstants.NS_GML);
-        }
-        return new QName(GMLConstants.NS_GML_32, GMLConstants.EN_ABSTRACT_GEOMETRY, GMLConstants.NS_GML);
     }
 
     private XmlObject createFeatureCollection(Map<SosAbstractFeature, String> foiGmlIds, boolean forObservation)

@@ -32,17 +32,13 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.apache.xmlbeans.XmlOptions;
+import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.OGCConstants;
-import org.n52.sos.ogc.filter.FilterConstants;
-import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.features.SFConstants;
-import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos1Constants;
-import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.swe.SWEConstants;
+import org.n52.sos.service.Configurator;
 
 /**
  * SOS XML utility class
@@ -55,7 +51,7 @@ public class XmlOptionsHelper {
      */
     private static XmlOptionsHelper instance = null;
 
-    private Map<String, String> prefixMap = getPrefixMap();
+    private Map<String, String> prefixMap = null;
 
     /**
      * XML options
@@ -71,6 +67,7 @@ public class XmlOptionsHelper {
     private void initialize(String characterEncoding) {
         if (xmlOptions == null) {
             xmlOptions = new XmlOptions();
+            prefixMap = getPrefixMap();
             xmlOptions.setSaveSuggestedPrefixes(prefixMap);
             xmlOptions.setSaveImplicitNamespaces(prefixMap);
             xmlOptions.setSaveAggressiveNamespaces();
@@ -84,25 +81,28 @@ public class XmlOptionsHelper {
 
     private Map<String, String> getPrefixMap() {
         Map<String, String> lPrefixMap = new Hashtable<String, String>();
-        lPrefixMap.put(SensorMLConstants.NS_SML, SensorMLConstants.NS_SML_PREFIX);
-        lPrefixMap.put(SWEConstants.NS_SWE, SWEConstants.NS_SWE_PREFIX);
-        lPrefixMap.put(GMLConstants.NS_GML, GMLConstants.NS_GML_PREFIX);
+//        lPrefixMap.put(SensorMLConstants.NS_SML, SensorMLConstants.NS_SML_PREFIX);
+//        lPrefixMap.put(SWEConstants.NS_SWE, SWEConstants.NS_SWE_PREFIX);
+//        lPrefixMap.put(GMLConstants.NS_GML, GMLConstants.NS_GML_PREFIX);
         lPrefixMap.put(OGCConstants.NS_OGC, OGCConstants.NS_OGC_PREFIX);
         lPrefixMap.put(OMConstants.NS_OM, OMConstants.NS_OM_PREFIX);
-        lPrefixMap.put(OWSConstants.NS_OWS, OWSConstants.NS_OWS_PREFIX);
+//        lPrefixMap.put(OWSConstants.NS_OWS, OWSConstants.NS_OWS_PREFIX);
         lPrefixMap.put(SFConstants.NS_SA, SFConstants.NS_SA_PREFIX);
         lPrefixMap.put(Sos1Constants.NS_SOS, SosConstants.NS_SOS_PREFIX);
         lPrefixMap.put(W3CConstants.NS_XLINK, W3CConstants.NS_XLINK_PREFIX);
         lPrefixMap.put(W3CConstants.NS_XSI, W3CConstants.NS_XSI_PREFIX);
         lPrefixMap.put(W3CConstants.NS_XS, W3CConstants.NS_XS_PREFIX);
-        lPrefixMap.put(SWEConstants.NS_SWE_20, SWEConstants.NS_SWE_PREFIX);
-        lPrefixMap.put(SWEConstants.NS_SWES_20, SWEConstants.NS_SWES_PREFIX);
-        lPrefixMap.put(GMLConstants.NS_GML_32, GMLConstants.NS_GML_PREFIX);
-        lPrefixMap.put(OMConstants.NS_OM_2, OMConstants.NS_OM_PREFIX);
-        lPrefixMap.put(SFConstants.NS_SF, SFConstants.NS_SF_PREFIX);
-        lPrefixMap.put(SFConstants.NS_SAMS, SFConstants.NS_SAMS_PREFIX);
-        lPrefixMap.put(FilterConstants.NS_FES_2, FilterConstants.NS_FES_2_PREFIX);
-        lPrefixMap.put(Sos2Constants.NS_SOS_20, SosConstants.NS_SOS_PREFIX);
+//        lPrefixMap.put(SWEConstants.NS_SWE_20, SWEConstants.NS_SWE_PREFIX);
+//        lPrefixMap.put(SWEConstants.NS_SWES_20, SWEConstants.NS_SWES_PREFIX);
+//        lPrefixMap.put(GMLConstants.NS_GML_32, GMLConstants.NS_GML_PREFIX);
+//        lPrefixMap.put(OMConstants.NS_OM_2, OMConstants.NS_OM_PREFIX);
+//        lPrefixMap.put(SFConstants.NS_SF, SFConstants.NS_SF_PREFIX);
+//        lPrefixMap.put(SFConstants.NS_SAMS, SFConstants.NS_SAMS_PREFIX);
+//        lPrefixMap.put(FilterConstants.NS_FES_2, FilterConstants.NS_FES_2_PREFIX);
+//        lPrefixMap.put(Sos2Constants.NS_SOS_20, SosConstants.NS_SOS_PREFIX);
+        for (IEncoder encoder : Configurator.getInstance().getEncoderMap().values()) {
+            encoder.addNamespacePrefixToMap(lPrefixMap);
+        }
         return lPrefixMap;
     }
 
@@ -129,8 +129,8 @@ public class XmlOptionsHelper {
      *            Defined character encoding
      * @return instance
      */
-    public static synchronized XmlOptionsHelper getInstance(String characterEncoding) {
-        if (instance == null) {
+    public static synchronized XmlOptionsHelper getInstance(String characterEncoding, boolean relaod) {
+        if (instance == null || relaod) {
             instance = new XmlOptionsHelper();
             instance.initialize(characterEncoding);
         }
@@ -149,5 +149,4 @@ public class XmlOptionsHelper {
         }
         return instance;
     }
-
 }

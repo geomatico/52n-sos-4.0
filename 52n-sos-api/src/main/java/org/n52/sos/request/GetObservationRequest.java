@@ -112,8 +112,6 @@ public class GetObservationRequest extends AbstractServiceRequest {
      * Response mode
      */
     private String responseMode;
-    
-    private boolean singleEncodedValues;
 
     /**
      * constructor
@@ -135,7 +133,6 @@ public class GetObservationRequest extends AbstractServiceRequest {
         resultModel = null;
         responseMode = notSet;
         namespaces = new HashMap<String, String>(1);
-        singleEncodedValues = true;
     }
 
     /**
@@ -428,13 +425,4 @@ public class GetObservationRequest extends AbstractServiceRequest {
     public Map<String, String> getNamespaces() {
         return namespaces;
     }
-
-    public boolean isSingleEncodedValues() {
-        return singleEncodedValues;
-    }
-
-    public void setSingleEncodedValues(boolean singleEncodedValues) {
-        this.singleEncodedValues = singleEncodedValues;
-    }
-
 }

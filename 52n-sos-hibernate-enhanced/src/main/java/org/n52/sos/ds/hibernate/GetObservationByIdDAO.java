@@ -132,7 +132,7 @@ public class GetObservationByIdDAO implements IGetObservationByIdDAO {
                     response.setVersion(request.getVersion());
                     response.setResponseFormat(sosRequest.getResponseFormat());
                     response.setObservationCollection(HibernateResultUtilities.createSosObservationFromObservations(
-                            observations, sosRequest.getVersion(), true, session));
+                            observations, sosRequest.getVersion(), session));
                     return response;
                 }
             } catch (HibernateException he) {

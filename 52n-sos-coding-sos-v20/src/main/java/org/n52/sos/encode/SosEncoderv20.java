@@ -112,6 +112,10 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
     public Set<String> getConformanceClasses() {
         return new HashSet<String>(0);
     }
+    
+    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
+        nameSpacePrefixMap.put(Sos2Constants.NS_SOS_20, SosConstants.NS_SOS_PREFIX);
+    }
 
     @Override
     public XmlObject encode(AbstractServiceResponse response) throws OwsExceptionReport {
@@ -199,16 +203,23 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
     }
 
     private XmlObject createObservationResponseDocument(GetObservationResponse response) throws OwsExceptionReport {
-        // GetObservationResponseDocument xbGetObsRespDoc =
-        // GetObservationResponseDocument.Factory.newInstance(SosXmlOptionsUtility.getInstance()
-        // .getXmlOptions4Sos2Swe200());
         GetObservationResponseDocument xbGetObsRespDoc =
                 GetObservationResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         GetObservationResponseType xbGetObsResp = xbGetObsRespDoc.addNewGetObservationResponse();
-        List<SosObservation> observationCollection = response.getObservationCollection();
+        Collection<SosObservation> observationCollection = null;
         IEncoder encoder = Configurator.getInstance().getEncoder(response.getResponseFormat());
         if (encoder == null) {
             String exceptionText = "Error while encoding GetObservation response, missing encoder!";
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        } else if (encoder instanceof IObservationEncoder) {
+            if (((IObservationEncoder)encoder).mergeObservationValuesWithSameParameters()) {
+                observationCollection = response.mergeObservations(((IObservationEncoder)encoder).mergeObservationValuesWithSameParameters());
+            } else {
+                observationCollection = response.getObservationCollection();
+            }
+        } else {
+            String exceptionText = "Error while encoding GetObservation response, encoder is not of type IObservationEncoder!";
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }

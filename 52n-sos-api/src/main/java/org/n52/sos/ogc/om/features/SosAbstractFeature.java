@@ -39,7 +39,7 @@ public abstract class SosAbstractFeature {
 
     /** identifier */
     private String identifier;
-    
+
     private String gmlId;
 
     /**
@@ -51,7 +51,7 @@ public abstract class SosAbstractFeature {
     public SosAbstractFeature(String featureIdentifier) {
         this.identifier = featureIdentifier;
     }
-    
+
     public SosAbstractFeature(String featureIdentifier, String gmlId) {
         this.identifier = featureIdentifier;
         this.gmlId = gmlId;
@@ -66,8 +66,15 @@ public abstract class SosAbstractFeature {
     public boolean equals(Object o) {
         if (o instanceof SosAbstractFeature) {
             SosAbstractFeature feature = (SosAbstractFeature) o;
-            if (feature.getIdentifier().equals(this.getIdentifier()) && feature.getGmlId().equals(this.getGmlId())) {
-                return true;
+            if (feature.getIdentifier() != null && this.getIdentifier() != null && feature.getGmlId() != null
+                    && this.getGmlId() != null) {
+                if (feature.getIdentifier().equals(this.getIdentifier()) && feature.getGmlId().equals(this.getGmlId())) {
+                    return true;
+                }
+            } else if (feature.getIdentifier() != null && this.getIdentifier() != null) {
+                if (feature.getIdentifier().equals(this.getIdentifier())) {
+                    return true;
+                }
             }
         }
         return false;

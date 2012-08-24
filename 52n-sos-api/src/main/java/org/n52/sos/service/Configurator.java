@@ -66,6 +66,7 @@ import org.n52.sos.service.operator.IServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -744,6 +745,8 @@ public final class Configurator {
         initializeAdminRequestOperator();
         initializeDataSource();
         initializeCapabilitiesCacheController();
+        // TODO: 
+        XmlOptionsHelper.getInstance(characterEnodingString, false);
     }
 
     /**

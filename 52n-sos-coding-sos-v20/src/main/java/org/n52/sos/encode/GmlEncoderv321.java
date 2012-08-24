@@ -23,6 +23,7 @@ import net.opengis.gml.x32.TimePositionType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
+import org.n52.sos.ogc.filter.FilterConstants;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -79,6 +80,10 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
     @Override
     public Set<String> getConformanceClasses() {
         return new HashSet<String>(0);
+    }
+    
+    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
+        nameSpacePrefixMap.put(GMLConstants.NS_GML_32, GMLConstants.NS_GML_PREFIX);
     }
     
     @Override

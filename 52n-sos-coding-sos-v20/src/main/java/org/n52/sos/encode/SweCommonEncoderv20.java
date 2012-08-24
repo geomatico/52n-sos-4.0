@@ -14,6 +14,7 @@ import net.opengis.swe.x20.TimeType;
 import net.opengis.swe.x20.VectorType.Coordinate;
 
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.swe.SWEConstants;
@@ -74,6 +75,10 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/general-encoding-rules");
         conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/text-encoding-rules");
         return conformanceClasses;
+    }
+    
+    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
+        nameSpacePrefixMap.put(SWEConstants.NS_SWE_20, SWEConstants.NS_SWE_PREFIX);
     }
 
     @Override

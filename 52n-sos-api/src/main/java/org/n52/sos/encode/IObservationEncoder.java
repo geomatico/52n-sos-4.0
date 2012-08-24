@@ -1,7 +1,11 @@
 package org.n52.sos.encode;
 
-public interface IObservationEncoder<S, T> extends IEncoder<S, T> {
+import org.apache.xmlbeans.XmlObject;
+
+public interface IObservationEncoder<XmlObject, Object> extends IEncoder<XmlObject, Object> {
     
-    public boolean isSingleValueEncoding();
+    public boolean isObservationAndMeasurmentV20Type();
+    
+    public boolean mergeObservationValuesWithSameParameters();
 
 }
