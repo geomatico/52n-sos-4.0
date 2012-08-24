@@ -65,7 +65,7 @@ import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSParameterDataType;
-import org.n52.sos.ogc.ows.OWSParameterValue;
+import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -133,8 +133,9 @@ public class InsertObservationDAO implements IInsertObservationDAO {
                 Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set offering
         opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.offering.name(),
-                new OWSParameterValue(Configurator.getInstance().getCapabilitiesCacheController().getOfferings()));
+                new OWSParameterValuePossibleValues(Configurator.getInstance().getCapabilitiesCacheController().getOfferings()));
         // set observation
+        opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.observation.name(), new OWSParameterValuePossibleValues(new ArrayList<String>(0)));
         opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.observation.name(), new OWSParameterDataType("http://schemas.opengis.net/om/2.0/observation.xsd#OM_Observation"));
         return opsMeta;
     }

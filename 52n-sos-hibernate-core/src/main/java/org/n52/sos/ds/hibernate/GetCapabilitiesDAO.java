@@ -62,7 +62,7 @@ import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSOperationsMetadata;
-import org.n52.sos.ogc.ows.OWSParameterValue;
+import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
@@ -375,8 +375,8 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
             }
         }
         operationsMetadata.setOperations(opsMetadata);
-        operationsMetadata.addCommonValue(OWSConstants.RequestParams.service.name(), new OWSParameterValue(SosConstants.SOS));
-        operationsMetadata.addCommonValue(OWSConstants.RequestParams.version.name(), new OWSParameterValue(Configurator
+        operationsMetadata.addCommonValue(OWSConstants.RequestParams.service.name(), new OWSParameterValuePossibleValues(SosConstants.SOS));
+        operationsMetadata.addCommonValue(OWSConstants.RequestParams.version.name(), new OWSParameterValuePossibleValues(Configurator
                 .getInstance().getSupportedVersions()));
         return operationsMetadata;
     }
@@ -686,9 +686,9 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         // set param updateSequence
         List<String> updateSequenceValues = new ArrayList<String>();
         updateSequenceValues.add(SosConstants.PARAMETER_ANY);
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.updateSequence.name(), new OWSParameterValue(updateSequenceValues));
+        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.updateSequence.name(), new OWSParameterValuePossibleValues(updateSequenceValues));
         // set param AcceptVersions
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.AcceptVersions.name(), new OWSParameterValue(Configurator.getInstance()
+        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.AcceptVersions.name(), new OWSParameterValuePossibleValues(Configurator.getInstance()
                 .getSupportedVersions()));
         // set param Sections
         List<String> sectionsValues = new ArrayList<String>();
@@ -705,10 +705,10 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         }
         sectionsValues.add(SosConstants.CapabilitiesSections.Contents.name());
         sectionsValues.add(SosConstants.CapabilitiesSections.All.name());
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.Sections.name(), new OWSParameterValue(sectionsValues));
+        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.Sections.name(), new OWSParameterValuePossibleValues(sectionsValues));
         // set param AcceptFormats
         opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.AcceptFormats.name(),
-                new OWSParameterValue(Arrays.asList(SosConstants.getAcceptFormats())));
+                new OWSParameterValuePossibleValues(Arrays.asList(SosConstants.getAcceptFormats())));
 
         return opsMeta;
     }

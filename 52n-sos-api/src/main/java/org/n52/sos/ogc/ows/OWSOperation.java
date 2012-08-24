@@ -28,6 +28,7 @@
 
 package org.n52.sos.ogc.ows;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,12 +53,7 @@ public class OWSOperation {
     /**
      * Map with names and allowed values for the parameter.
      */
-    private Map<String, IOWSParameterValue> parameterValues;
-
-//    /**
-//     * Map for min/max values, e. g. observation ids
-//     */
-//    private Map<String, Map<MinMax, String>> parameterminMaxMap;
+    private Map<String, List<IOWSParameterValue>> parameterValues;
 
     /**
      * Get operation name
@@ -120,23 +116,22 @@ public class OWSOperation {
      * 
      * @return Parameter value map
      */
-    public Map<String,IOWSParameterValue> getParameterValues() {
+    public Map<String, List<IOWSParameterValue>> getParameterValues() {
         return parameterValues;
     }
 
     /**
      * Set parameter and value map
      * 
-     * @param parameterValues
+     * @param parameterValuesrValues
      *            Parameter value map
      */
-    public void setParameterValues(Map<String, IOWSParameterValue> parameterValues) {
+    public void setParameterValues(Map<String, List<IOWSParameterValue>> parameterValues) {
         if (this.parameterValues == null) {
             this.parameterValues = parameterValues;
         } else {
-            // TODO: ...
+            // TODO: 
         }
-
     }
 
     /**
@@ -147,37 +142,16 @@ public class OWSOperation {
      * @param allowedValues
      *            values to add
      */
-    public void addParameterValue(String parameterName, IOWSParameterValue allowedValues) {
+    public void addParameterValue(String parameterName, IOWSParameterValue value) {
         if (parameterValues == null) {
-            parameterValues = new HashMap<String, IOWSParameterValue>();
+            parameterValues = new HashMap<String, List<IOWSParameterValue>>();
         }
-        parameterValues.put(parameterName, allowedValues);
+        if (!parameterValues.containsKey(parameterName)) {
+            List<IOWSParameterValue> list = new ArrayList<IOWSParameterValue>(1);
+            list.add(value);
+            parameterValues.put(parameterName, list);
+        } else {
+            parameterValues.get(parameterName).add(value);
+        }
     }
-
-//    /**
-//     * Get min/max values map
-//     * 
-//     * @return min/max value map
-//     */
-//    public Map<String, Map<MinMax, String>> getParameterMinMaxMap() {
-//        return parameterminMaxMap;
-//    }
-//
-//    /**
-//     * Set min/max value map
-//     * 
-//     * @param minMaxMap
-//     *            min/max value map
-//     */
-//    public void addParameterMinMaxMapValue(String parameter, Map<MinMax, String> minMaxMap) {
-//        if (parameterminMaxMap == null) {
-//            parameterminMaxMap = new HashMap<String, Map<MinMax, String>>();
-//        }
-//        if (parameterminMaxMap.containsKey(parameter)) {
-//            parameterminMaxMap.get(parameter).putAll(minMaxMap);
-//        } else {
-//            parameterminMaxMap.put(parameter, minMaxMap);
-//        }
-//    }
-
 }

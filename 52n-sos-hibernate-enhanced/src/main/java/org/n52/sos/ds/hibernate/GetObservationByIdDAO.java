@@ -45,7 +45,7 @@ import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateResultUtilities;
 import org.n52.sos.ogc.ows.OWSOperation;
-import org.n52.sos.ogc.ows.OWSParameterValue;
+import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sos.Sos1Constants;
@@ -111,7 +111,7 @@ public class GetObservationByIdDAO implements IGetObservationByIdDAO {
                 Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set identifier
         opsMeta.addParameterValue(Sos2Constants.GetObservationByIdParams.observation.name(),
-                new OWSParameterValue(HibernateCriteriaQueryUtilities.getObservationIdentifiers(session)));
+                new OWSParameterValuePossibleValues(HibernateCriteriaQueryUtilities.getObservationIdentifiers(session)));
         return opsMeta;
     }
 

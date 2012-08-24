@@ -19,7 +19,7 @@ import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
-import org.n52.sos.ogc.ows.OWSParameterValue;
+import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractSensorML;
 import org.n52.sos.ogc.sensorML.SensorML;
@@ -84,16 +84,16 @@ public class UpdateSensorDescriptionDAO implements IUpdateSensorDescriptionDAO {
                 Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set param procedure
         Collection<String> procedrues = Configurator.getInstance().getCapabilitiesCacheController().getProcedures();
-        opsMeta.addParameterValue(Sos2Constants.UpdateSensorDescriptionParams.procedure.name(), new OWSParameterValue(Configurator
+        opsMeta.addParameterValue(Sos2Constants.UpdateSensorDescriptionParams.procedure.name(), new OWSParameterValuePossibleValues(Configurator
                 .getInstance().getCapabilitiesCacheController().getProcedures()));
         // set param procedureDescriptionFormat
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
             opsMeta.addParameterValue(Sos2Constants.UpdateSensorDescriptionParams.procedureDescriptionFormat.name(),
-                    new OWSParameterValue(HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatIdentifiers(session)));
+                    new OWSParameterValuePossibleValues(HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatIdentifiers(session)));
         }
         // set param description
         opsMeta.addParameterValue(Sos2Constants.UpdateSensorDescriptionParams.description.name(),
-                new OWSParameterValue(new ArrayList<String>(1)));
+                new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
         return opsMeta;
     }
 

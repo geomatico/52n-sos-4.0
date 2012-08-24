@@ -54,7 +54,7 @@ import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSConstants.MinMax;
 import org.n52.sos.ogc.ows.OWSOperation;
-import org.n52.sos.ogc.ows.OWSParameterValue;
+import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OWSParameterValueRange;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
@@ -149,30 +149,30 @@ public class GetObservationDAO implements IGetObservationDAO {
                 Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set parameter for both versions
         // set param offering
-        opsMeta.addParameterValue(SosConstants.GetObservationParams.offering.name(), new OWSParameterValue(Configurator.getInstance()
+        opsMeta.addParameterValue(SosConstants.GetObservationParams.offering.name(), new OWSParameterValuePossibleValues(Configurator.getInstance()
                 .getCapabilitiesCacheController().getOfferings()));
         // set param procedure
-        opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), new OWSParameterValue(Configurator.getInstance()
+        opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), new OWSParameterValuePossibleValues(Configurator.getInstance()
                 .getCapabilitiesCacheController().getProcedures()));
         // set param observedProperty
         if (Configurator.getInstance().isShowFullOperationsMetadata4Observations()) {
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(), new OWSParameterValue(Configurator
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(), new OWSParameterValuePossibleValues(Configurator
                     .getInstance().getCapabilitiesCacheController().getObservableProperties()));
         } else {
             List<String> phenomenonValues = new ArrayList<String>(1);
             phenomenonValues.add(SosConstants.PARAMETER_ANY);
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(),new OWSParameterValue( phenomenonValues));
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(),new OWSParameterValuePossibleValues( phenomenonValues));
         }
         // set param foi
         Collection<String> featureIDs =
                 SosHelper.getFeatureIDs(Configurator.getInstance().getCapabilitiesCacheController()
                         .getFeatureOfInterest(), version);
         if (Configurator.getInstance().isShowFullOperationsMetadata4Observations()) {
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(), new OWSParameterValue(featureIDs));
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(), new OWSParameterValuePossibleValues(featureIDs));
         } else {
             List<String> foiValues = new ArrayList<String>(1);
             foiValues.add(SosConstants.PARAMETER_ANY);
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(), new OWSParameterValue(foiValues));
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(), new OWSParameterValuePossibleValues(foiValues));
         }
         // responseFormat
         setResponseFormats(opsMeta, version);
@@ -196,23 +196,23 @@ public class GetObservationDAO implements IGetObservationDAO {
             // set param srsName
             List<String> srsNameValues = new ArrayList<String>(1);
             srsNameValues.add(SosConstants.PARAMETER_ANY);
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.srsName.name(), new OWSParameterValue(srsNameValues));
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.srsName.name(), new OWSParameterValuePossibleValues(srsNameValues));
             // set param eventTime
             opsMeta.addParameterValue(Sos1Constants.GetObservationParams.eventTime.name(),
                     new OWSParameterValueRange(getEventTime(session)));
             // set param result
             List<String> resultValues = new ArrayList<String>(1);
             resultValues.add(SosConstants.PARAMETER_ANY);
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.result.name(), new OWSParameterValue(resultValues));
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.result.name(), new OWSParameterValuePossibleValues(resultValues));
             // set param resultModel
             List<String> resultModelsList = new ArrayList<String>();
             for (QName qname : Arrays.asList(OMConstants.getResultModels())) {
                 resultModelsList.add(qname.getPrefix() + ":" + qname.getLocalPart());
             }
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.resultModel.name(), new OWSParameterValue(resultModelsList));
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.resultModel.name(), new OWSParameterValuePossibleValues(resultModelsList));
             // set param reponseMode
             opsMeta.addParameterValue(SosConstants.GetObservationParams.responseMode.name(),
-                    new OWSParameterValue(Arrays.asList(SosConstants.getResponseModes())));
+                    new OWSParameterValuePossibleValues(Arrays.asList(SosConstants.getResponseModes())));
         }
         return opsMeta;
     }
@@ -686,10 +686,10 @@ public class GetObservationDAO implements IGetObservationDAO {
         // set param responseFormat
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             opsMeta.addParameterValue(SosConstants.GetObservationParams.responseFormat.name(),
-                   new OWSParameterValue(Arrays.asList(Sos1Constants.getResponseFormats())));
+                   new OWSParameterValuePossibleValues(Arrays.asList(Sos1Constants.getResponseFormats())));
         } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
             opsMeta.addParameterValue(SosConstants.GetObservationParams.responseFormat.name(),
-                    new OWSParameterValue(Arrays.asList(Sos2Constants.getResponseFormats())));
+                    new OWSParameterValuePossibleValues(Arrays.asList(Sos2Constants.getResponseFormats())));
         }
     }
 

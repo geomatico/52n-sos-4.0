@@ -3,14 +3,14 @@ package org.n52.sos.ogc.ows;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 public class OWSOperationsMetadata {
 
     private Collection<OWSOperation> operations;
 
-    private Map<String, OWSParameterValue> commonValues;
+    private Map<String, List<IOWSParameterValue>> commonValues;
 
     public Collection<OWSOperation> getOperations() {
         return operations;
@@ -20,11 +20,11 @@ public class OWSOperationsMetadata {
         this.operations = operations;
     }
 
-    public Map<String, OWSParameterValue> getCommonValues() {
+    public Map<String, List<IOWSParameterValue>> getCommonValues() {
         return commonValues;
     }
 
-    public void setCommonValues(Map<String, OWSParameterValue> commonValues) {
+    public void setCommonValues(Map<String, List<IOWSParameterValue>> commonValues) {
         this.commonValues = commonValues;
     }
 
@@ -35,10 +35,16 @@ public class OWSOperationsMetadata {
         operations.add(operation);
     }
 
-    public void addCommonValue(String name, OWSParameterValue value) {
+    public void addCommonValue(String parameterName, IOWSParameterValue value) {
         if (commonValues == null) {
-            commonValues = new HashMap<String, OWSParameterValue>();
+            commonValues = new HashMap<String, List<IOWSParameterValue>>();
         }
-        commonValues.put(name, value);
+        if (!commonValues.containsKey(parameterName)) {
+            List<IOWSParameterValue> list = new ArrayList<IOWSParameterValue>(1);
+            list.add(value);
+            commonValues.put(parameterName, list);
+        } else {
+            commonValues.get(parameterName).add(value);
+        }
     }
 }

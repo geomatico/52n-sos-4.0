@@ -3,16 +3,16 @@ package org.n52.sos.ogc.ows;
 import java.util.Collection;
 import java.util.HashSet;
 
-public class OWSParameterValue implements IOWSParameterValue {
+public class OWSParameterValuePossibleValues implements IOWSParameterValue {
     
     private Collection<String> values;
 
-    public OWSParameterValue(Collection<String> values) {
+    public OWSParameterValuePossibleValues(Collection<String> values) {
         super();
         this.values = values;
     }
 
-    public OWSParameterValue(String valueString) {
+    public OWSParameterValuePossibleValues(String valueString) {
         if (values == null) {
             values = new HashSet<String>();
         }

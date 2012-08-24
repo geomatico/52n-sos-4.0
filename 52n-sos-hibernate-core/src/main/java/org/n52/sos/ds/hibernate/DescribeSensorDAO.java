@@ -52,7 +52,7 @@ import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ogc.gml.SosGmlMetaDataProperty;
 import org.n52.sos.ogc.ows.OWSOperation;
-import org.n52.sos.ogc.ows.OWSParameterValue;
+import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sensorML.AbstractMultiProcess;
@@ -136,7 +136,7 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
         opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt,
                 Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set param procedure
-        opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), new OWSParameterValue(Configurator.getInstance()
+        opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), new OWSParameterValuePossibleValues(Configurator.getInstance()
                 .getCapabilitiesCacheController().getProcedures()));
         // set param output format
         List<String> outputFormatValues = new ArrayList<String>(1);
@@ -150,7 +150,7 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
            parameterName = Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name();
         }
         if (parameterName != null) { 
-            opsMeta.addParameterValue(parameterName, new OWSParameterValue(outputFormatValues));
+            opsMeta.addParameterValue(parameterName, new OWSParameterValuePossibleValues(outputFormatValues));
         }
         
         return opsMeta;

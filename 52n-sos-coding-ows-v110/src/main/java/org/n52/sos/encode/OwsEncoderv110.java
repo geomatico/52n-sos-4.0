@@ -3,7 +3,6 @@ package org.n52.sos.encode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +30,7 @@ import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSOperationsMetadata;
 import org.n52.sos.ogc.ows.OWSParameterDataType;
-import org.n52.sos.ogc.ows.OWSParameterValue;
+import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OWSParameterValueRange;
 import org.n52.sos.ogc.ows.OwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -39,7 +38,6 @@ import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.ows.SosServiceProvider;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
-import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -73,7 +71,7 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
     public List<EncoderKeyType> getEncoderKeyType() {
         return encoderKeyTypes;
     }
-    
+
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
         return new HashMap<SupportedTypeKey, Set<String>>(0);
@@ -305,21 +303,23 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
         }
     }
 
-    private void setParameterValue(DomainType domainType, String parameterName, IOWSParameterValue parameterValue)
-            throws OwsExceptionReport {
-        if (parameterValue != null) {
-            if (parameterValue instanceof OWSParameterValue) {
-                setParamList(domainType, parameterName, (OWSParameterValue) parameterValue);
-            } else if (parameterValue instanceof OWSParameterValueRange) {
-                setParamRange(domainType, parameterName, (OWSParameterValueRange) parameterValue);
-            } else if (parameterValue instanceof OWSParameterDataType) {
-                setParamDataType(domainType, parameterName, (OWSParameterDataType) parameterValue);
+    private void setParameterValue(DomainType domainType, String parameterName,
+            List<IOWSParameterValue> parameterValues) throws OwsExceptionReport {
+        if (parameterValues != null && !parameterValues.isEmpty()) {
+            domainType.setName(parameterName);
+            for (IOWSParameterValue parameterValue : parameterValues) {
+                if (parameterValue instanceof OWSParameterValuePossibleValues) {
+                    setParamList(domainType, (OWSParameterValuePossibleValues) parameterValue);
+                } else if (parameterValue instanceof OWSParameterValueRange) {
+                    setParamRange(domainType, (OWSParameterValueRange) parameterValue);
+                } else if (parameterValue instanceof OWSParameterDataType) {
+                    setParamDataType(domainType, (OWSParameterDataType) parameterValue);
+                }
             }
         } else {
             domainType.setName(parameterName);
             domainType.addNewNoValues();
         }
-
     }
 
     /**
@@ -332,8 +332,7 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
      * @param parameterValue
      *            .getValues() List of values.
      */
-    private void setParamList(DomainType domainType, String name, OWSParameterValue parameterValue) {
-        domainType.setName(name);
+    private void setParamList(DomainType domainType, OWSParameterValuePossibleValues parameterValue) {
         if (parameterValue.getValues() != null) {
             if (!parameterValue.getValues().isEmpty()) {
                 AllowedValues allowedValues = null;
@@ -356,8 +355,7 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
         }
     }
 
-    private void setParamDataType(DomainType domainType, String parameterName, OWSParameterDataType parameterValue) {
-        domainType.setName(parameterName);
+    private void setParamDataType(DomainType domainType, OWSParameterDataType parameterValue) {
         if (parameterValue.getReference() != null && !parameterValue.getReference().isEmpty()) {
             domainType.addNewDataType().setReference(parameterValue.getReference());
         } else {
@@ -374,9 +372,7 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
      * @param parameterValue
      * @throws OwsExceptionReport
      */
-    private void setParamRange(DomainType domainType, String parameterName, OWSParameterValueRange parameterValue)
-            throws OwsExceptionReport {
-        domainType.setName(parameterName);
+    private void setParamRange(DomainType domainType, OWSParameterValueRange parameterValue) throws OwsExceptionReport {
         if (parameterValue.getMinValue() != null && parameterValue.getMaxValue() != null) {
             if (!parameterValue.getMinValue().isEmpty() && !parameterValue.getMaxValue().isEmpty()) {
                 RangeType range = domainType.addNewAllowedValues().addNewRange();

@@ -45,7 +45,7 @@ import org.n52.sos.ds.IGetFeatureOfInterestDAO;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ogc.om.features.SosFeatureCollection;
 import org.n52.sos.ogc.ows.OWSOperation;
-import org.n52.sos.ogc.ows.OWSParameterValue;
+import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OWSParameterValueRange;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.IExtension;
@@ -118,32 +118,32 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
         // set param procedure
         if (Configurator.getInstance().isShowFullOperationsMetadata4Observations()) {
             
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), new OWSParameterValue(Configurator.getInstance()
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), new OWSParameterValuePossibleValues(Configurator.getInstance()
                     .getCapabilitiesCacheController().getProcedures()));
         } else {
             List<String> phenomenonValues = new ArrayList<String>(1);
             phenomenonValues.add(SosConstants.PARAMETER_ANY);
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), new OWSParameterValue(phenomenonValues));
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), new OWSParameterValuePossibleValues(phenomenonValues));
         }
         // set param observedProperty
         if (Configurator.getInstance().isShowFullOperationsMetadata4Observations()) {
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(), new OWSParameterValue(Configurator
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(), new OWSParameterValuePossibleValues(Configurator
                     .getInstance().getCapabilitiesCacheController().getObservableProperties()));
         } else {
             List<String> phenomenonValues = new ArrayList<String>(1);
             phenomenonValues.add(SosConstants.PARAMETER_ANY);
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(), new OWSParameterValue(phenomenonValues));
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(), new OWSParameterValuePossibleValues(phenomenonValues));
         }
         // set param foi
         Collection<String> featureIDs =
                 SosHelper.getFeatureIDs(Configurator.getInstance().getCapabilitiesCacheController().getFeatureOfInterest(),
                         version);
         if (Configurator.getInstance().isShowFullOperationsMetadata4Observations()) {
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(), new OWSParameterValue(featureIDs));
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(), new OWSParameterValuePossibleValues(featureIDs));
         } else {
             List<String> foiValues = new ArrayList<String>(1);
             foiValues.add(SosConstants.PARAMETER_ANY);
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(), new OWSParameterValue(foiValues));
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(), new OWSParameterValuePossibleValues(foiValues));
         }
 
         // set param spatial filter
