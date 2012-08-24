@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
 
 public class SoapBinding implements IBinding {
 
-    /** the logger, used to log exceptions and additonaly information */
+    /** the logger, used to log exceptions and additional information */
     private static final Logger LOGGER = LoggerFactory.getLogger(SoapBinding.class);
 
     private static final String urlPattern = "/sos/soap";
@@ -70,16 +70,9 @@ public class SoapBinding implements IBinding {
 
     @Override
     public ServiceResponse doGetOperation(HttpServletRequest req) throws OwsExceptionReport {
-        String exceptionText = "The requested service URL only supports HTTP-Post SOAP requests!";
-        OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
-            owse.setVersion(Sos2Constants.SERVICEVERSION);
-        } else {
-            owse.setVersion(Sos1Constants.SERVICEVERSION);
-        }
-        throw owse;
+        throw createOperationNotSupportedException();
     }
-
+    
     @Override
     public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport {
         String version = null;
@@ -174,7 +167,30 @@ public class SoapBinding implements IBinding {
         }
     }
 
-    @Override
+	@Override
+	public ServiceResponse doDeleteperation(HttpServletRequest request)
+			throws OwsExceptionReport {
+		throw createOperationNotSupportedException();
+	}
+
+	@Override
+	public ServiceResponse doPutOperation(HttpServletRequest request)
+			throws OwsExceptionReport {
+		throw createOperationNotSupportedException();
+	}
+
+	private OwsExceptionReport createOperationNotSupportedException() {
+		String exceptionText = "The requested service URL only supports HTTP-Post SOAP requests!";
+	    OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+	    if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
+	        owse.setVersion(Sos2Constants.SERVICEVERSION);
+	    } else {
+	        owse.setVersion(Sos1Constants.SERVICEVERSION);
+	    }
+	    return owse;
+	}
+
+	@Override
     public String getUrlPattern() {
         return urlPattern;
     }
@@ -195,7 +211,19 @@ public class SoapBinding implements IBinding {
         return false;
     }
 
-    private IDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
+	@Override
+	public boolean checkOperationHttpPutSupported(String operationName,
+			DecoderKeyType decoderKey) throws OwsExceptionReport {
+		return false;
+	}
+
+	@Override
+	public boolean checkOperationHttpDeleteSupported(String operationName,
+			DecoderKeyType decoderKey) throws OwsExceptionReport {
+		return false;
+	}
+
+	private IDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
         List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
         for (IDecoder iDecoder : decoder) {
             return iDecoder;

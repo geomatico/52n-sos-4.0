@@ -53,6 +53,26 @@ public interface IBinding extends IConformanceClass {
     public ServiceResponse doGetOperation(HttpServletRequest request) throws OwsExceptionReport;
 
     /**
+     * HTTP-Delete request handling method
+     * 
+     * @param request
+     *            HTTP-Delete request
+     * @return SOS response
+     * @throws ServletException
+     */
+    public ServiceResponse doDeleteperation(HttpServletRequest request) throws OwsExceptionReport;
+    
+    /**
+     * HTTP-Put request handling method
+     * 
+     * @param request
+     *            HTTP-Put request
+     * @return SOS response
+     * @throws OwsExceptionReport 
+     */
+    public ServiceResponse doPutOperation(HttpServletRequest request) throws OwsExceptionReport;
+
+    /**
      * HTTP-Post request handling method
      * 
      * @param request
@@ -69,8 +89,56 @@ public interface IBinding extends IConformanceClass {
      */
     public String getUrlPattern();
 
-    boolean checkOperationHttpGetSupported(String operationName, DecoderKeyType decoderKey) throws OwsExceptionReport;
+    /**
+     * Check, if the operation is supported by the decoder by the HTTP-Get method.
+     * 
+     * @param operationName
+     * 				name of the OGC::SOS operation like "GetCapabilities"
+     * @param decoderKey
+     * 				identifier of the decoder
+     * @return
+     * 				true, if the decoder <code>decoderKey</code> supports HTTP-Get for operation <code>operationName</code>
+     * @throws OwsExceptionReport
+     */
+    public boolean checkOperationHttpGetSupported(String operationName, DecoderKeyType decoderKey) throws OwsExceptionReport;
 
-    boolean checkOperationHttpPostSupported(String operationName, DecoderKeyType decoderKey) throws OwsExceptionReport;
+    /**
+     * Check, if the operation is supported by the decoder by the HTTP-Post method.
+     * 
+     * @param operationName
+     * 				name of the OGC::SOS operation like "GetCapabilities"
+     * @param decoderKey
+     * 				identifier of the decoder
+     * @return
+     * 				true, if the decoder <code>decoderKey</code> supports HTTP-Post for operation <code>operationName</code>
+     * @throws OwsExceptionReport
+     */
+    public boolean checkOperationHttpPostSupported(String operationName, DecoderKeyType decoderKey) throws OwsExceptionReport;
+    
+    /**
+     * Check, if the operation is supported by the decoder by the HTTP-Put method.
+     * 
+     * @param operationName
+     * 				name of the OGC::SOS operation like "GetCapabilities"
+     * @param decoderKey
+     * 				identifier of the decoder
+     * @return
+     * 				true, if the decoder <code>decoderKey</code> supports HTTP-Put for operation <code>operationName</code>
+     * @throws OwsExceptionReport
+     */
+    public boolean checkOperationHttpPutSupported(String operationName, DecoderKeyType decoderKey) throws OwsExceptionReport;
+    
+    /**
+     * Check, if the operation is supported by the decoder by the HTTP-Delete method.
+     * 
+     * @param operationName
+     * 				name of the OGC::SOS operation like "GetCapabilities"
+     * @param decoderKey
+     * 				identifier of the decoder
+     * @return
+     * 				true, if the decoder <code>decoderKey</code> supports HTTP-Delete for operation <code>operationName</code>
+     * @throws OwsExceptionReport
+     */
+    public boolean checkOperationHttpDeleteSupported(String operationName, DecoderKeyType decoderKey) throws OwsExceptionReport;
 
 }

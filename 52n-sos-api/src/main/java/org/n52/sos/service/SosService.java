@@ -86,7 +86,50 @@ public class SosService extends HttpServlet {
         super.destroy();
     }
 
-    /**
+	@Override
+	protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		
+		LOGGER.debug("\n**********\n(DELETE) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
+
+        this.setCorsHeaders(resp);
+        ServiceResponse sosResp = null;
+        try {
+            sosResp = getBindingOperatorForServletPath(req.getServletPath()).doDeleteperation(req);
+        } catch (OwsExceptionReport owse) {
+            sosResp = handleOwsExceptionReport(owse);
+        }
+        doResponse(resp, sosResp);
+	}
+
+	/**
+	 * handles all GET requests, the request will be passed to the
+	 * RequestOperator
+	 * 
+	 * @param req
+	 *            the incoming request
+	 * 
+	 * @param resp
+	 *            the response for the incomming request
+	 * 
+	 */
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+	
+	    LOGGER.debug("\n**********\n(GET) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
+	    LOGGER.trace("Query String: " + req.getQueryString());
+	
+	    this.setCorsHeaders(resp);
+	
+	    ServiceResponse sosResp = null;
+	    try {
+	        sosResp = getBindingOperatorForServletPath(req.getServletPath()).doGetOperation(req);
+	    } catch (OwsExceptionReport owse) {
+	        sosResp = handleOwsExceptionReport(owse);
+	    }
+	    doResponse(resp, sosResp);
+	}
+
+	/**
      * handles all POST requests, the request will be passed to the
      * requestOperator
      * 
@@ -109,35 +152,25 @@ public class SosService extends HttpServlet {
         }
         doResponse(resp, sosResp);
     }
+      
+	@Override
+	protected void doPut(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
 
-    /**
-     * handles all GET requests, the request will be passed to the
-     * RequestOperator
-     * 
-     * @param req
-     *            the incoming request
-     * 
-     * @param resp
-     *            the response for the incomming request
-     * 
-     */
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
-
-        LOGGER.debug("\n**********\n(GET) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
-        LOGGER.trace("Query String: " + req.getQueryString());
+		LOGGER.debug("\n**********\n(PUT) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
 
         this.setCorsHeaders(resp);
-
         ServiceResponse sosResp = null;
         try {
-            sosResp = getBindingOperatorForServletPath(req.getServletPath()).doGetOperation(req);
+            sosResp = getBindingOperatorForServletPath(req.getServletPath()).doPutOperation(req);
         } catch (OwsExceptionReport owse) {
             sosResp = handleOwsExceptionReport(owse);
         }
         doResponse(resp, sosResp);
-    }
+        
+	}
 
-    /**
+	/**
      * Handles OPTIONS request to enable Cross-Origin Resource Sharing.
      * 
      * @param req

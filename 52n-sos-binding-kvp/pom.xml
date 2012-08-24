@@ -14,13 +14,13 @@
 	</description>
 	<url>http://maven.apache.org</url>
 	<dependencies>
-			<dependency>
+		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-api</artifactId>
 			<version>${project.version}</version>
 			<optional>true</optional>
 		</dependency>
-				<dependency>
+			<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 		</dependency>

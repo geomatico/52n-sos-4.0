@@ -71,12 +71,6 @@ public class KvpBinding implements IBinding {
      */
     private static final String urlPattern = "/sos/kvp";
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.ISosRequestOperator#doGetOperation(javax.servlet.http.
-     * HttpServletRequest)
-     */
     @Override
     public ServiceResponse doGetOperation(HttpServletRequest req) throws OwsExceptionReport {
         ServiceResponse response = null;
@@ -132,26 +126,34 @@ public class KvpBinding implements IBinding {
         return response;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.ISosRequestOperator#doPostOperation(javax.servlet.http.
-     * HttpServletRequest)
-     */
     @Override
     public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport {
-        String exceptionText = "The requested service URL only supports HTTP-Get KVP requests!";
-        OwsExceptionReport owse =
-                Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
-            owse.setVersion(Sos2Constants.SERVICEVERSION);
-        } else {
-            owse.setVersion(Sos1Constants.SERVICEVERSION);
-        }
-        throw owse;
+        throw createOperationNotSupportedException();
     }
+    
+	@Override
+	public ServiceResponse doDeleteperation(HttpServletRequest request) throws OwsExceptionReport {
+		throw createOperationNotSupportedException();
+	}
 
-    /*
+	@Override
+	public ServiceResponse doPutOperation(HttpServletRequest request) throws OwsExceptionReport {
+		throw createOperationNotSupportedException();
+	}
+
+	private OwsExceptionReport createOperationNotSupportedException() {
+		String exceptionText = "The requested service URL only supports HTTP-Get KVP requests!";
+	    OwsExceptionReport owse =
+	            Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+	    if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
+	        owse.setVersion(Sos2Constants.SERVICEVERSION);
+	    } else {
+	        owse.setVersion(Sos1Constants.SERVICEVERSION);
+	    }
+	    return owse;
+	}
+
+	/*
      * (non-Javadoc)
      * 
      * @see org.n52.sos.ISosRequestOperator#getUrlPattern()
@@ -178,13 +180,6 @@ public class KvpBinding implements IBinding {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.sos.ISosRequestOperator#checkOperationHttpGetSupported(java.lang
-     * .String, java.lang.String)
-     */
     @Override
     public boolean checkOperationHttpGetSupported(String operationName, DecoderKeyType decoderKey)
             throws OwsExceptionReport {
@@ -195,20 +190,25 @@ public class KvpBinding implements IBinding {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.sos.ISosRequestOperator#checkOperationHttpPostSupported(java.
-     * lang.String, java.lang.String)
-     */
     @Override
     public boolean checkOperationHttpPostSupported(String operationName, DecoderKeyType decoderKey)
             throws OwsExceptionReport {
         return false;
     }
 
-    private IKvpDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
+    @Override
+	public boolean checkOperationHttpDeleteSupported(String operationName,
+			DecoderKeyType decoderKey) throws OwsExceptionReport {
+		return false;
+	}
+
+	@Override
+	public boolean checkOperationHttpPutSupported(String operationName,
+			DecoderKeyType decoderKey) throws OwsExceptionReport {
+		return false;
+	}
+
+	private IKvpDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
         List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
         for (IDecoder iDecoder : decoder) {
             if (iDecoder instanceof IKvpDecoder) {
