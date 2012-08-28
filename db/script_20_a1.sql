@@ -207,7 +207,6 @@ CREATE TABLE feature_of_interest (
   geom GEOMETRY NULL,
   description_xml TEXT NULL,
   url TEXT NULL,
-  sampling_feature BOOLEAN NOT NULL,
   UNIQUE (geom),
   UNIQUE (identifier,geom),
   UNIQUE (url),
