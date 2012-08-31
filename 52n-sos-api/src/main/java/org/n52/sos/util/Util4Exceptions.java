@@ -122,4 +122,10 @@ public class Util4Exceptions {
         }
     }
 
+    public static OwsExceptionReport createOptionNotSupportedException(String parameterName, String message) {
+        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+        owse.addCodedException(OwsExceptionCode.OptionNotSupported, parameterName, message);
+        return owse;
+    }
+
 }

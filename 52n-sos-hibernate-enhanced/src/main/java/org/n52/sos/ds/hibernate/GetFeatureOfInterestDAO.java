@@ -151,16 +151,19 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             parameterName = Sos1Constants.GetFeatureOfInterestParams.location.name();
         }
-        Envelope envelope =
-                Configurator.getInstance().getFeatureQueryHandler()
-                        .getEnvelopeforFeatureIDs((List<String>) featureIDs, session);
+        Envelope envelope = null;
+        if (featureIDs != null && !featureIDs.isEmpty()) {
+            envelope =
+                    Configurator.getInstance().getFeatureQueryHandler()
+                            .getEnvelopeForFeatureIDs((List<String>) featureIDs, session);
+        }
         if (envelope != null) {
             opsMeta.addParameterValue(parameterName,
                     new OWSParameterValueRange(SosHelper.getMinMaxMapFromEnvelope(envelope)));
         } else {
             List<String> locationValues = new ArrayList<String>(1);
             locationValues.add(SosConstants.PARAMETER_ANY);
-            opsMeta.addParameterValue(parameterName, new OWSParameterValueRange(SosHelper.getMinMaxMapFromEnvelope(envelope)));
+            opsMeta.addParameterValue(parameterName, new OWSParameterValuePossibleValues(locationValues));
         }
         return opsMeta;
     }

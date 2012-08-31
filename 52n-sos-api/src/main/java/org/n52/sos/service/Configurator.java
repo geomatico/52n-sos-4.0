@@ -1515,15 +1515,15 @@ public final class Configurator {
 
     public IServiceOperator getServiceOperator(ServiceOperatorKeyType serviceOperatorIdentifier)
             throws OwsExceptionReport {
-        IServiceOperator serviceOperator = serviceOperators.get(serviceOperatorIdentifier);
-        if (serviceOperator != null) {
-            return serviceOperator;
-        }
-        String exceptionText =
-                "The service (" + serviceOperatorIdentifier.getService() + ") and/or version ("
-                        + serviceOperatorIdentifier.getVersion() + ") is not supported by this server!";
-        LOGGER.debug(exceptionText);
-        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        return serviceOperators.get(serviceOperatorIdentifier);
+//        if (serviceOperator != null) {
+//            return serviceOperator;
+//        }
+//        String exceptionText =
+//                "The service (" + serviceOperatorIdentifier.getService() + ") and/or version ("
+//                        + serviceOperatorIdentifier.getVersion() + ") is not supported by this server!";
+//        LOGGER.debug(exceptionText);
+//        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
     /**

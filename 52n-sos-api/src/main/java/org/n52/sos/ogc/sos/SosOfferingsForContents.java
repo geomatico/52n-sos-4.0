@@ -127,6 +127,8 @@ public class SosOfferingsForContents {
      */
     private Collection<String> responseModes;
 
+    private Collection<String> procedureDescriptionFormats;
+
     /**
      * @return
      */
@@ -367,5 +369,13 @@ public class SosOfferingsForContents {
 
     public void setFeatureOfInterestTypes(Collection<String> featureOfInterestTypes) {
         this.featureOfInterestTypes = featureOfInterestTypes;
+    }
+
+    public void setProcedureDescriptionFormat(Collection<String> procedureDescriptionFormats) {
+       this.procedureDescriptionFormats = procedureDescriptionFormats;
+    }
+    
+    public Collection<String> getProcedureDescriptionFormat() {
+        return this.procedureDescriptionFormats;
     }
 }

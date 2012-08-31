@@ -94,7 +94,7 @@ public class SosGetCapabilitiesOperatorV20 implements IRequestOperator {
                     Object encodedObject = encoder.encode(response);
                     if (encodedObject instanceof XmlObject) {
                         ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
-                        return new ServiceResponse(baos, contentType, false, true);
+                        return new ServiceResponse(baos, contentType, zipCompr, true);
                     } else if (encodedObject instanceof ServiceResponse) {
                         return (ServiceResponse) encodedObject;
                     } else {

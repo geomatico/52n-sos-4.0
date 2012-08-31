@@ -45,6 +45,7 @@ import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.IServiceOperator;
@@ -69,7 +70,7 @@ public class KvpBinding implements IBinding {
     /**
      * URL pattern for KVP requests
      */
-    private static final String urlPattern = "/sos/kvp";
+    private static final String urlPattern = "/kvp";
 
     @Override
     public ServiceResponse doGetOperation(HttpServletRequest req) throws OwsExceptionReport {
@@ -77,10 +78,8 @@ public class KvpBinding implements IBinding {
         AbstractServiceRequest request = null;
         try {
             if (req.getParameterMap() == null || (req.getParameterMap() != null && req.getParameterMap().isEmpty())) {
-                OwsExceptionReport owse =
-                        Util4Exceptions
-                                .createMissingParameterValueException(OWSConstants.RequestParams.request.name());
-                throw owse;
+                LOGGER.debug("The mandatory parameter '" + OWSConstants.RequestParams.request.name() + "' is missing!");
+                throw Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.request.name());
             }
             Map<String, String> parameterValueMap = KvpHelper.getKvpParameterValueMap(req);
             IDecoder<AbstractServiceRequest, Map<String, String>> decoder =
@@ -104,15 +103,33 @@ public class KvpBinding implements IBinding {
                 }
             }
             if (response == null) {
-                String exceptionText =
-                        "The requested service (" + request.getService() + ") and/or version (" + request.getVersion()
-                                + ") is not supported by this server!";
-                throw Util4Exceptions.createInvalidParameterValueException(OWSConstants.RequestParams.service.name(),
-                        exceptionText);
+                if (request instanceof GetCapabilitiesRequest) {
+                    StringBuilder exceptionText = new StringBuilder();
+                    exceptionText.append("The requested ");
+                    exceptionText.append(SosConstants.GetCapabilitiesParams.AcceptVersions.name());
+                    exceptionText.append(" values (");
+                    for (String acceptVersion : ((GetCapabilitiesRequest) request).getAcceptVersions()) {
+                        exceptionText.append(acceptVersion);
+                        exceptionText.append(", ");
+                    }
+                    exceptionText.delete(exceptionText.lastIndexOf(", "), exceptionText.length());
+                    exceptionText.append(") are not supported by this server!");
+                    throw Util4Exceptions.createVersionNegotiationFailedException(exceptionText.toString());
+                } else {
+                    StringBuilder exceptionText = new StringBuilder();
+                    exceptionText.append("The requested service (");
+                    exceptionText.append(request.getService());
+                    exceptionText.append(") and/or version (");
+                    exceptionText.append(request.getVersion());
+                    exceptionText.append(") is not supported by this server!");
+                    LOGGER.debug(exceptionText.toString());
+                    throw Util4Exceptions.createInvalidParameterValueException(
+                            OWSConstants.RequestParams.service.name(), exceptionText.toString());
+                }
             }
         } catch (OwsExceptionReport owse) {
             LOGGER.debug("Error while performing KVP resquest", owse);
-            if (request.getVersion() != null) {
+            if (request != null && request.getVersion() != null) {
                 owse.setVersion(request.getVersion());
             } else {
                 if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
@@ -128,32 +145,33 @@ public class KvpBinding implements IBinding {
 
     @Override
     public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport {
+        // throw createOperationNotSupportedException();
+        // TODO: check what is the correct response if not supported ?!?
+        throw Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.request.name());
+    }
+
+    @Override
+    public ServiceResponse doDeleteperation(HttpServletRequest request) throws OwsExceptionReport {
         throw createOperationNotSupportedException();
     }
-    
-	@Override
-	public ServiceResponse doDeleteperation(HttpServletRequest request) throws OwsExceptionReport {
-		throw createOperationNotSupportedException();
-	}
 
-	@Override
-	public ServiceResponse doPutOperation(HttpServletRequest request) throws OwsExceptionReport {
-		throw createOperationNotSupportedException();
-	}
+    @Override
+    public ServiceResponse doPutOperation(HttpServletRequest request) throws OwsExceptionReport {
+        throw createOperationNotSupportedException();
+    }
 
-	private OwsExceptionReport createOperationNotSupportedException() {
-		String exceptionText = "The requested service URL only supports HTTP-Get KVP requests!";
-	    OwsExceptionReport owse =
-	            Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-	    if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
-	        owse.setVersion(Sos2Constants.SERVICEVERSION);
-	    } else {
-	        owse.setVersion(Sos1Constants.SERVICEVERSION);
-	    }
-	    return owse;
-	}
+    private OwsExceptionReport createOperationNotSupportedException() {
+        String exceptionText = "The requested service URL only supports HTTP-Get KVP requests!";
+        OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
+            owse.setVersion(Sos2Constants.SERVICEVERSION);
+        } else {
+            owse.setVersion(Sos1Constants.SERVICEVERSION);
+        }
+        return owse;
+    }
 
-	/*
+    /*
      * (non-Javadoc)
      * 
      * @see org.n52.sos.ISosRequestOperator#getUrlPattern()
@@ -163,12 +181,43 @@ public class KvpBinding implements IBinding {
         return urlPattern;
     }
 
-    private String getServiceParameterValue(Map<String, String> parameterValueMap) {
-        if (getParameterValue(RequestParams.request.name(), parameterValueMap).equals(
-                SosConstants.Operations.GetCapabilities.name())) {
+    private String getServiceParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
+        String service = getParameterValue(OWSConstants.RequestParams.service.name(), parameterValueMap);
+        if (getRequestParameterValue(parameterValueMap).equals(SosConstants.Operations.GetCapabilities.name()) && service == null) {
             return SosConstants.SOS;
         }
-        return getParameterValue(OWSConstants.RequestParams.service.name(), parameterValueMap);
+        if (service == null) {
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("The mandatory parameter '");
+            exceptionText.append(OWSConstants.RequestParams.service.name());
+            exceptionText.append("' is missing!");
+            LOGGER.debug(exceptionText.toString());
+            throw Util4Exceptions.createMissingParameterValueException(RequestParams.service.name());
+        }
+        // TODO: change SosConstants.SOS to dynamically support.
+        else if (service != null && !service.equals(SosConstants.SOS)) {
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("The value of parameter '");
+            exceptionText.append(OWSConstants.RequestParams.service.name());
+            exceptionText.append("' is invalid!");
+            LOGGER.debug(exceptionText.toString());
+            throw Util4Exceptions.createInvalidParameterValueException(RequestParams.service.name(),
+                    exceptionText.toString());
+        }
+        return service;
+    }
+
+    private String getRequestParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
+        String requestParameterValue = getParameterValue(RequestParams.request.name(), parameterValueMap);
+        if (requestParameterValue != null && !requestParameterValue.isEmpty()) {
+            return requestParameterValue;
+        }
+        StringBuilder exceptionText = new StringBuilder();
+        exceptionText.append("The mandatory parameter '");
+        exceptionText.append(OWSConstants.RequestParams.request.name());
+        exceptionText.append("' is missing!");
+        LOGGER.debug(exceptionText.toString());
+        throw Util4Exceptions.createMissingParameterValueException(RequestParams.request.name());
     }
 
     private String getParameterValue(String parameterName, Map<String, String> parameterMap) {
@@ -197,25 +246,35 @@ public class KvpBinding implements IBinding {
     }
 
     @Override
-	public boolean checkOperationHttpDeleteSupported(String operationName,
-			DecoderKeyType decoderKey) throws OwsExceptionReport {
-		return false;
-	}
+    public boolean checkOperationHttpDeleteSupported(String operationName, DecoderKeyType decoderKey)
+            throws OwsExceptionReport {
+        return false;
+    }
 
-	@Override
-	public boolean checkOperationHttpPutSupported(String operationName,
-			DecoderKeyType decoderKey) throws OwsExceptionReport {
-		return false;
-	}
+    @Override
+    public boolean checkOperationHttpPutSupported(String operationName, DecoderKeyType decoderKey)
+            throws OwsExceptionReport {
+        return false;
+    }
 
-	private IKvpDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
+    private IKvpDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
         List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
-        for (IDecoder iDecoder : decoder) {
-            if (iDecoder instanceof IKvpDecoder) {
-                return (IKvpDecoder) iDecoder;
+        if (decoder != null) {
+            for (IDecoder iDecoder : decoder) {
+                if (iDecoder instanceof IKvpDecoder) {
+                    return (IKvpDecoder) iDecoder;
+                }
             }
         }
-        return null;
+        StringBuilder exceptionText = new StringBuilder();
+        exceptionText.append("The value of parameter '");
+        exceptionText.append(OWSConstants.RequestParams.service.name());
+        exceptionText.append("' and/or '");
+        exceptionText.append(OWSConstants.RequestParams.version.name());
+        exceptionText.append("' is invalid!");
+        LOGGER.debug(exceptionText.toString());
+        throw Util4Exceptions.createInvalidParameterValueException(OWSConstants.RequestParams.version.name(),
+                exceptionText.toString());
     }
 
     @Override

@@ -226,6 +226,10 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
+        if (sosRequest.getTime() != null && !sosRequest.getTime().isEmpty()) {
+            String exceptionText = "The requested parameter is not supported by this server!";
+            exceptions.add(Util4Exceptions.createOptionNotSupportedException(Sos2Constants.DescribeSensorParams.validTime.name(), exceptionText));
+        }
         Util4Exceptions.mergeExceptions(exceptions);
     }
 

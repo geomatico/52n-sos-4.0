@@ -504,6 +504,12 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
                     xbObsOff.addFeatureOfInterestType(featureOfInterestType);
                 }
             }
+            
+            if (offering.getProcedureDescriptionFormat() != null && !offering.getProcedureDescriptionFormat().isEmpty()) {
+                for (String procedureDescriptionFormat : offering.getProcedureDescriptionFormat()) {
+                    xbObsOff.addProcedureDescriptionFormat(procedureDescriptionFormat);
+                }
+            }
 
             xbContType.addNewOffering().setAbstractOffering(xbObsOff);
         }

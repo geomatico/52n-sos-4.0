@@ -746,8 +746,9 @@ public class HibernateCriteriaQueryUtilities {
 
     public static List<String> getFeatureOfInterestTypes(Session session) {
         Criteria criteria = session.createCriteria(FeatureOfInterestType.class);
-        List<FeatureOfInterestType> featureTypes = criteria.list();
         criteria.add(Restrictions.ne(HibernateConstants.PARAMETER_FEATURE_OF_INTEREST_TYPE, OGCConstants.UNKNOWN));
+        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        List<FeatureOfInterestType> featureTypes = criteria.list();
         List<String> featureOfInterestTypes = new ArrayList<String>(0);
         if (featureTypes != null) {
             for (FeatureOfInterestType featureOfInterestType : featureTypes) {

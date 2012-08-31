@@ -215,7 +215,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                          */
                         if (!Sos1Constants.CapabilitiesSections.contains(section)
                                 && !Sos2Constants.CapabilitiesSections.contains(section)) {
-                            String exceptionText = "The requested section '" + section + "' does not exist!";
+                            String exceptionText = "The requested section '" + section + "' does not exist or is not supported!";
                             LOGGER.debug(exceptionText);
                             throw Util4Exceptions.createInvalidParameterValueException(
                                     SosConstants.GetCapabilitiesParams.Sections.name(), exceptionText);
@@ -625,8 +625,16 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                 // insert observationTypes
                 sosOffering.setObservationTypes(getObservationTypes(offering));
 
+                // TODO: if no foi contained, set allowed foitypes
                 // insert featureOfInterestTypes
-                sosOffering.setFeatureOfInterestTypes(getFeatureOfInterestTypes(offering, session));
+                Collection<String> featureTypes = getFeatureOfInterestTypes(offering, session);
+                if (featureTypes == null || (featureTypes != null && featureTypes.isEmpty())) {
+                    featureTypes = HibernateCriteriaQueryUtilities.getFeatureOfInterestTypes(session);
+                }
+                sosOffering.setFeatureOfInterestTypes(featureTypes);
+                
+                // TODO: set procDescFormat
+                sosOffering.setProcedureDescriptionFormat(HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatIdentifiers(session));
 
                 // set response format
                 // TODO: missing table in db
@@ -846,7 +854,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         session.clear();
         if (featureIDs != null && !featureIDs.isEmpty()) {
             Envelope envelope =
-                    Configurator.getInstance().getFeatureQueryHandler().getEnvelopeforFeatureIDs(featureIDs, session);
+                    Configurator.getInstance().getFeatureQueryHandler().getEnvelopeForFeatureIDs(featureIDs, session);
             SosEnvelope sosEnvelope = new SosEnvelope(envelope, Configurator.getInstance().getDefaultEPSG());
             return sosEnvelope;
         }

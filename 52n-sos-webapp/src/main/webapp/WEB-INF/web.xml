@@ -36,10 +36,10 @@
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>SOS</servlet-name>
-		<url-pattern>/sos/kvp</url-pattern>
+		<url-pattern>/kvp</url-pattern>
 	</servlet-mapping>
 		<servlet-mapping>
 		<servlet-name>SOS</servlet-name>
-		<url-pattern>/sos/soap</url-pattern>
+		<url-pattern>/soap</url-pattern>
 	</servlet-mapping>
 </web-app>

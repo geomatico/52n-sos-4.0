@@ -167,19 +167,22 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
      * .List)
      */
     @Override
-    public Envelope getEnvelopeforFeatureIDs(List<String> featureIDs, Object connection) throws OwsExceptionReport {
+    public Envelope getEnvelopeForFeatureIDs(List<String> featureIDs, Object connection) throws OwsExceptionReport {
         Session session = getSessionFromConnection(connection);
-        try {
-            Criteria criteria = session.createCriteria(FeatureOfInterest.class);
-            criteria.add(Restrictions.in(HibernateConstants.PARAMETER_IDENTIFIER, featureIDs));
-            criteria.setProjection(SpatialProjections.extent("geom"));
-            Geometry geom = (Geometry) criteria.uniqueResult();
-            return geom.getEnvelopeInternal();
-        } catch (HibernateException he) {
-            String exceptionText = "";
-            LOGGER.error(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+        if (featureIDs != null && !featureIDs.isEmpty()) {
+            try {
+                Criteria criteria = session.createCriteria(FeatureOfInterest.class);
+                criteria.add(Restrictions.in(HibernateConstants.PARAMETER_IDENTIFIER, featureIDs));
+                criteria.setProjection(SpatialProjections.extent("geom"));
+                Geometry geom = (Geometry) criteria.uniqueResult();
+                return geom.getEnvelopeInternal();
+            } catch (HibernateException he) {
+                String exceptionText = "";
+                LOGGER.error(exceptionText, he);
+                throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+            }
         }
+        return null;
     }
 
     /**

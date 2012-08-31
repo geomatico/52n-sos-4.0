@@ -183,9 +183,12 @@ public class GetObservationDAO implements IGetObservationDAO {
             opsMeta.addParameterValue(Sos2Constants.GetObservationParams.temporalFilter.name(),
                     new OWSParameterValueRange(getEventTime(session)));
             // set param spatial filter
-            Envelope envelope =
-                    Configurator.getInstance().getFeatureQueryHandler()
-                            .getEnvelopeforFeatureIDs((List<String>) featureIDs, session);
+            Envelope envelope = null;
+            if (featureIDs != null && !featureIDs.isEmpty()) {
+                envelope =
+                        Configurator.getInstance().getFeatureQueryHandler()
+                                .getEnvelopeForFeatureIDs((List<String>) featureIDs, session);
+            }
             if (envelope != null) {
                 opsMeta.addParameterValue(Sos2Constants.GetObservationParams.spatialFilter.name(),
                         new OWSParameterValueRange(SosHelper.getMinMaxMapFromEnvelope(envelope)));

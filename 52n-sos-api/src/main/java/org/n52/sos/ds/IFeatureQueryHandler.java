@@ -99,7 +99,7 @@ public interface IFeatureQueryHandler {
      * @return Envelope of requested FOI identifiers
      * @throws OwsExceptionReport
      */
-    public Envelope getEnvelopeforFeatureIDs(List<String> featureIDs, Object connection) throws OwsExceptionReport;
+    public Envelope getEnvelopeForFeatureIDs(List<String> featureIDs, Object connection) throws OwsExceptionReport;
     
     public String insertFeature(SosSamplingFeature samplingFeature, Object connection) throws OwsExceptionReport;
 

@@ -63,7 +63,7 @@ public class SoapBinding implements IBinding {
     /** the logger, used to log exceptions and additional information */
     private static final Logger LOGGER = LoggerFactory.getLogger(SoapBinding.class);
 
-    private static final String urlPattern = "/sos/soap";
+    private static final String urlPattern = "/soap";
 
     public SoapBinding() {
     }

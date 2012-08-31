@@ -36,7 +36,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,10 +67,14 @@ public class KvpHelper {
         if (!parameterValue.isEmpty() && parameterValue.split(",").length == 1) {
             return parameterValue;
         } else {
-            OwsExceptionReport owse = new OwsExceptionReport();
-            owse.addCodedException(OwsExceptionCode.InvalidParameterValue, parameterName, "The value of parameter "
-                    + parameterName + " (" + parameterValue + ") is invalid.");
-            throw owse;
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("The value of parameter '");
+            exceptionText.append(parameterName);
+            exceptionText.append("' (");
+            exceptionText.append(parameterValue);
+            exceptionText.append(") is invalid!");
+            LOGGER.debug(exceptionText.toString());
+            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText.toString());
         }
     }
 
@@ -80,10 +83,14 @@ public class KvpHelper {
         if (!parameterValues.isEmpty()) {
             return Arrays.asList(parameterValues.split(","));
         } else {
-            OwsExceptionReport owse = new OwsExceptionReport();
-            owse.addCodedException(OwsExceptionCode.InvalidParameterValue, parameterName, "The value of parameter "
-                    + parameterName + " (" + parameterValues + ") is invalid.");
-            throw owse;
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("The values of parameter '");
+            exceptionText.append(parameterName);
+            exceptionText.append("' (");
+            exceptionText.append(parameterValues);
+            exceptionText.append(") is invalid!");
+            LOGGER.debug(exceptionText.toString());
+            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText.toString());
         }
     }
 

@@ -151,7 +151,7 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
                     } else {
                         OwsExceptionReport owse = new OwsExceptionReport();
                         owse.addCodedException(OwsExceptionCode.InvalidParameterValue,
-                                SosConstants.GetObservationParams.offering.name(), "The value of parameter "
+                                SosConstants.GetCapabilitiesParams.AcceptVersions.name(), "The value of parameter "
                                         + parameterName + " (" + parameterValues + ") is invalid.");
                         throw owse;
                     }
@@ -234,13 +234,19 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
                 }
                 // valid time (optional)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.DescribeSensorParams.validTime.name())) {
-                    request.setTime(parseValidTime(parameterValues, parameterName));
-                    foundProcedureDescriptionFormat = true;
+                    try {
+                        request.setTime(parseValidTime(parameterValues, parameterName));
+                    } catch (OwsExceptionReport owse) {
+                        String exceptionText =
+                                "The optional parameter '" + parameterName + "' is not supported by this service!";
+                        LOGGER.debug(exceptionText);
+                        exceptions.add(Util4Exceptions.createOptionNotSupportedException(parameterName, exceptionText));
+                    }
                 } else {
                     String exceptionText =
-                            "The parameter '" + parameterName + "' is invalid for the DescribeSensor request!";
+                            "The optional parameter '" + parameterName + "' is not supported by this service!";
                     LOGGER.debug(exceptionText);
-                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
+                    exceptions.add(Util4Exceptions.createOptionNotSupportedException(parameterName, exceptionText));
                 }
             } catch (OwsExceptionReport owse) {
                 exceptions.add(owse);
