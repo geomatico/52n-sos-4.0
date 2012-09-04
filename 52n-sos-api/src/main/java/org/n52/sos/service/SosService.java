@@ -230,17 +230,26 @@ public class SosService extends HttpServlet {
      * @throws ServletException
      * 
      */
+    // FIXME what happens with responses having no output stream
     private void doResponse(HttpServletResponse resp, ServiceResponse sosResponse) throws ServletException {
         OutputStream out = null;
         GZIPOutputStream gzip = null;
         try {
             String contentType = sosResponse.getContentType();
-            int contentLength = sosResponse.getContentLength();
-            resp.setContentLength(contentLength);
-            out = resp.getOutputStream();
             resp.setContentType(contentType);
-            sosResponse.writeToOutputStream(out);
-            out.flush();
+            
+        	if (!sosResponse.isContentLess()){
+        		int contentLength = sosResponse.getContentLength();
+        		resp.setContentLength(contentLength);
+            	out = resp.getOutputStream();
+            	sosResponse.writeToOutputStream(out);
+            	out.flush();
+            }
+        	
+        	int httpResponseCode = sosResponse.getHttpResponseCode();
+        	if	(httpResponseCode != -1) {
+        		resp.setStatus(httpResponseCode);
+        	}
         } catch (IOException ioe) {
             String exceptionText = "Error while writing SOS response to ServletResponse!";
             LOGGER.error(exceptionText, ioe);
@@ -264,6 +273,7 @@ public class SosService extends HttpServlet {
      * 
      * @see <a href="http://www.w3.org/TR/cors/">http://www.w3.org/TR/cors/</a>
      */
+    // TODO Add HTTP-PUT and -DELETE?
     private void setCorsHeaders(HttpServletResponse resp) {
         resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
@@ -271,14 +281,14 @@ public class SosService extends HttpServlet {
     }
 
     /**
-     * Get the request operator for the URL pattern
+     * Get the implementation of {@link IBinding} that is registered for the given <code>urlPattern</code>.
      * 
-     * @param servletPath
-     *            URL pattern from request URL
-     * @return SOS request operator
-     * @throws UnavailableException
-     *             If the URL pattern is not supported by this SOS.
+     * @param urlPattern
+     *          URL pattern from request URL
+     * @return
+     * 			The implementation of {@link IBinding} that is registered for the given <code>urlPattern</code>.
      * @throws OwsExceptionReport 
+     * 			If the URL pattern is not supported by this SOS.
      */
     private IBinding getBindingOperatorForServletPath(String urlPattern) throws OwsExceptionReport {
         IBinding bindingOperator = Configurator.getInstance().getBindingOperator(urlPattern);
