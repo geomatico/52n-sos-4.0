@@ -37,7 +37,10 @@ import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.IConformanceClass;
 
 /**
- * Interface for binding implementations
+ * Interface for binding implementations<br />
+ * 
+ * <b>Context</b>: The <code>IBinding.check*()</code> methods are called during GetCapabilities processing when collecting the
+ * 		operations metadata.
  * 
  */
 public interface IBinding extends IConformanceClass {
@@ -83,7 +86,11 @@ public interface IBinding extends IConformanceClass {
     public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport;
 
     /**
-     * Get URL pattern for the operator
+     * Get URL pattern for the operator.<br />
+     * The URL pattern MUST start with "/", 
+     * MUST NOT contain any additional "/", 
+     * and MUST be unique over all bindings present in the SOS at runtime.<br />
+     * For example, a kvp binding could have the pattern "/kvp".
      * 
      * @return URL pattern
      */
