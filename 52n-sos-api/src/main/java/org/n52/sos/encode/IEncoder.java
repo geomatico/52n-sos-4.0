@@ -37,30 +37,43 @@ import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.IConformanceClass;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 
-public interface IEncoder<S, T> extends IConformanceClass {
+/**
+ * @param <EncodedType> the resulting type
+ * @param <TypeToEncode> the input type
+ */
+public interface IEncoder<EncodedType, TypeToEncode> extends IConformanceClass {
 
     /**
-     * @return
+     * @return List of supported encodings (identified by {@link EncoderKeyType}) of this implementation
      */
     public List<EncoderKeyType> getEncoderKeyType();
 
     /**
-     * @param element1
-     * @return
+     * @param objectToEncode
+     * 			the object that needs to be encoded
+     * @return 
+     * 			an Object of Type <code>EncodedType</code> representing the given <code>objectToEncode</code>
      * @throws OwsExceptionReport
+     * 			
      */
-    public S encode(T element1) throws OwsExceptionReport;
+    public EncodedType encode(TypeToEncode objectToEncode) throws OwsExceptionReport;
 
     /**
-     * @param element
+     * @param objectToEncode
+     * 			the object that needs to be encoded
      * @param additionalValues
+     * 			values that are added to the representation of the <code>objectToEncode</code>
      * @return
+     * 			an Object of Type <code>EncodedType</code> representing the given <code>objectToEncode</code>
+     * 			including the additional values from <code>additionalValues</code>
      * @throws OwsExceptionReport
      */
-    public S encode(T element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport;
+    public EncodedType encode(TypeToEncode objectToEncode, Map<HelperValues, String> additionalValues) throws OwsExceptionReport;
     
+    // TODO add javadoc
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
     
+    //TODO add javadoc
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap);
     
 }
