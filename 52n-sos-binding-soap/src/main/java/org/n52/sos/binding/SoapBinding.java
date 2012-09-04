@@ -107,6 +107,7 @@ public class SoapBinding implements IBinding {
                             if (serviceOperator != null) {
                                 ServiceResponse bodyResponse = serviceOperator.receiveRequest(bodyRequest);
                                 if (!bodyResponse.isXmlResponse()) {
+                                	// FIXME how to encode non xml encoded data in soap responses?
                                     return bodyResponse;
                                 }
                                 soapResponse.setSoapBodyContent(bodyResponse);
