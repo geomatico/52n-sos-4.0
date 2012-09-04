@@ -33,50 +33,106 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.GZIPOutputStream;
 
-import javax.xml.transform.TransformerException;
+import javax.servlet.http.HttpServletResponse;
 
 import org.n52.sos.ogc.sos.SosConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
- * 
+ * TODO add generic field for headers<br />
+ * v0.1 with enumeration and set of default headers<br />
+ * private Map<HeaderCode, String> httpHeaders;<br />
+ * could be extended in future versions
  */
 public class ServiceResponse {
 
-    /** the logger, used to log exceptions and additonaly information */
+    /**
+     * the logger, used to log exceptions and additonaly information
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceResponse.class);
 
-    /** output stream of document */
+    /**
+     * output stream of document
+     */
     private ByteArrayOutputStream byteArrayOutputStream;
-
+    
+    /**
+     * the HTTP response code as specified in {@link HttpServletResponse}
+     */
+    private int httpResponseCode;
+    
+    /**
+     * the content type of this response
+     */
     private String contentType;
 
-    /** indicator for compression usage */
+    /**
+     * indicator for compression usage
+     */
     private boolean applyZipCompression;
 
+    /**
+     * indicator for being xml encoded response
+     */
     private boolean xmlResponse;
 
     /**
-     * constructor
+     * constructor with content and response code
      * 
      * @param byteArrayOutputStream
-     *            Output stream of the SOS response
+     *          Output stream of the SOS response
      * @param contentType
-     *            Content type
+     *          Content type
      * @param applyZipCompression
-     *            indicator for zipping the output
-     * @param version
-     *            SOS version
+     *          indicator for compressing the output
+     * @param isXmlResponse
+     * 			indicator for being XML encoded or not
+     * @param httpResponseCode
+     * 			the HTTP response code as specified in {@link HttpServletResponse}
      */
-    public ServiceResponse(ByteArrayOutputStream byteArrayOutputStream, String contentType,
-            boolean applyZipCompression, boolean isXmlResponse) {
+    public ServiceResponse(ByteArrayOutputStream byteArrayOutputStream,
+    		String contentType,
+            boolean applyZipCompression,
+            boolean isXmlResponse,
+            int httpResponseCode) {
         super();
         this.byteArrayOutputStream = byteArrayOutputStream;
         this.contentType = contentType;
         this.applyZipCompression = applyZipCompression;
         this.xmlResponse = isXmlResponse;
+        this.httpResponseCode = httpResponseCode;
+    }
+    
+    /**
+     * constructor with content but not specified response code
+     * 
+     * @param byteArrayOutputStream
+     *          Output stream of the SOS response
+     * @param contentType
+     *          Content type
+     * @param applyZipCompression
+     *          indicator for compressing the output
+     * @param isXmlResponse
+     * 			indicator for being XML encoded or not
+     */
+    public ServiceResponse(ByteArrayOutputStream byteArrayOutputStream,
+    		String contentType,
+            boolean applyZipCompression,
+            boolean isXmlResponse) {
+    	this(byteArrayOutputStream, contentType, applyZipCompression, isXmlResponse, -1);
+    }
+    
+    /**
+     * constructor without content type but with specified response code
+     * 
+     * @param contentType
+     * 			Content type
+     * @param httpResponseCode
+     * 			the HTTP response code as specified in {@link HttpServletResponse}
+     */
+    public ServiceResponse(String contentType, int httpResponseCode) {
+    	this(null, contentType, false, false, httpResponseCode);
     }
 
     /**
@@ -90,25 +146,29 @@ public class ServiceResponse {
     }
 
     /**
-     * @return Returns the the length of the content in bytes
-     * @throws IOException
-     *             if getting the content length failed
-     * @throws TransformerException
-     *             if getting the content length failed
+     * @return Returns the number of valid bytes in the content or<br />
+     * 		<code>-1</code>, if this response is content less
+     * @see {@link #isContentLess()} 
+     * @see {@link ByteArrayOutputStream#size()}
      */
-    public int getContentLength() throws IOException {
-        return byteArrayOutputStream.size();
+    public int getContentLength() {
+    	if (byteArrayOutputStream != null) {
+    		return byteArrayOutputStream.size();
+    	}
+    	return -1;
     }
 
     /**
-     * @return Returns the response as byte[]
-     * @throws IOException
-     *             if getting the response as byte[] failed
-     * @throws TransformerException
-     *             if getting the response as byte[] failed
+     * @param outputStream
+     * 			The stream the content of this response is written to
+     * @see {@link #isContentLess()}
      */
-    public void writeToOutputStream(OutputStream outputStream) throws IOException {
+    public void writeToOutputStream(OutputStream outputStream) {
         GZIPOutputStream gzip = null;
+        if (byteArrayOutputStream == null ) {
+        	LOGGER.error("no response to write to.");
+        	return;
+        }
         try {
             if (applyZipCompression) {
 
@@ -118,19 +178,23 @@ public class ServiceResponse {
                 gzip.finish();
 
             } else {
+            	
                 byteArrayOutputStream.writeTo(outputStream);
                 byteArrayOutputStream.flush();
+                
             }
         } catch (IOException ioe) {
             LOGGER.error("doResponse", ioe);
         } finally {
             try {
+            	
                 if (gzip != null) {
                     gzip.close();
                 }
                 if (byteArrayOutputStream != null) {
                     byteArrayOutputStream.close();
                 }
+                
             } catch (IOException ioe) {
                 LOGGER.error("doSoapResponse, close streams", ioe);
             }
@@ -138,19 +202,53 @@ public class ServiceResponse {
     }
 
     /**
-     * @return Returns true if the response should compressed using gzip,
-     *         otherwise false
+     * @return <code>true</code>, if the response should compressed using gzip,<br />
+     * 			else <code>false</code>
      */
     public boolean getApplyGzipCompression() {
         return applyZipCompression;
     }
 
+    /**
+     * @return the content of this response as <code>byte[]</code>, or<br />
+     * 			<code>null</code>, if this response is content less.
+     * @see {@link #isContentLess()}
+     */
     public byte[] getByteArray() {
-        return byteArrayOutputStream.toByteArray();
+    	if (byteArrayOutputStream != null) {
+    		return byteArrayOutputStream.toByteArray();
+    	}
+    	return null;
     }
 
+    /**
+     * 
+     * @return <code>true</code>, if the response is encoded in XML,<br />
+     * 			else <code>false</code>
+     */
     public boolean isXmlResponse() {
         return xmlResponse;
     }
+    
+    /**
+     * Check, if this response contains content to be written.
+     * 
+     * @return <code>true</code>, if content is <b>NOT</b> available,<br />
+     * 			else<br />
+     * 			 <code>false</code>, if content is available
+     * @see {@link #writeToOutputStream(OutputStream)}.
+     */
+    public boolean isContentLess() {
+    	return byteArrayOutputStream == null;
+    }
+
+	/**
+	 * @return if set, should be used as specified in {@link HttpServletResponse}, <br />
+	 * 			else <code>-1</code>
+	 * @see {@link HttpServletResponse}
+	 */
+	public int getHttpResponseCode() {
+		return httpResponseCode;
+	}
 
 }
