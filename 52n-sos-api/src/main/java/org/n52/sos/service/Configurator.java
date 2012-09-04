@@ -482,13 +482,13 @@ public final class Configurator {
 
         this.defaultEPSG = Integer.valueOf(defaultEPSGstring).intValue();
 
-        String characterEnodingString = props.getProperty(CHARACTER_ENCODING);
-        if (characterEnodingString == null || (characterEnodingString != null && characterEnodingString.isEmpty())) {
+        String characterEncodingString = props.getProperty(CHARACTER_ENCODING);
+        if (characterEncodingString == null || (characterEncodingString != null && characterEncodingString.isEmpty())) {
             String exceptionText = "No characterEnoding is defined in the config file!";
             LOGGER.error(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
-        this.characterEncoding = characterEnodingString;
+        this.characterEncoding = characterEncodingString;
 
         String srsNamePrefixString = props.getProperty(SRS_NAME_PREFIX);
         if (srsNamePrefixString == null) {
@@ -745,8 +745,8 @@ public final class Configurator {
         initializeAdminServiceOperator();
         initializeDataSource();
         initializeCapabilitiesCacheController();
-        // TODO: 
-        XmlOptionsHelper.getInstance(characterEnodingString, false);
+        // TODO: what?
+        XmlOptionsHelper.getInstance(characterEncodingString, false);
     }
 
     /**
@@ -838,7 +838,10 @@ public final class Configurator {
                     bindingOperators.put(iBindingOperator.getUrlPattern(), iBindingOperator);
                 }
             } catch (ServiceConfigurationError sce) {
-                LOGGER.warn("An IBinding implementation could not be loaded!", sce);
+            	// TODO add more details like which class with qualified name failed to load
+            	LOGGER.warn("An IBinding implementation could not be loaded! Exception message: " 
+            			+ sce.getLocalizedMessage(),
+            			sce);
             }
         }
         if (this.bindingOperators.isEmpty()) {
