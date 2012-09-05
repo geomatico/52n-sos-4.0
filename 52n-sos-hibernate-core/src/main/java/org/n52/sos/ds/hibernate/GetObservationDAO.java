@@ -175,7 +175,8 @@ public class GetObservationDAO implements IGetObservationDAO {
             opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(), new OWSParameterValuePossibleValues(foiValues));
         }
         // responseFormat
-        setResponseFormats(opsMeta, version);
+        opsMeta.addParameterValue(SosConstants.GetObservationParams.responseFormat.name(),
+                new OWSParameterValuePossibleValues(SosHelper.getSupportedResponseFormats("SOS", version)));
 
         // SOS 2.0 parameter
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
@@ -675,25 +676,6 @@ public class GetObservationDAO implements IGetObservationDAO {
             eventTime.put(MinMax.MAX, DateTimeHelper.formatDateTime2ResponseString(maxDate));
         }
         return eventTime;
-    }
-
-    /**
-     * Set the response format depending on SOS version
-     * 
-     * @param opsMeta
-     *            OperationsMetadata
-     * @param version
-     *            SOS version
-     */
-    private void setResponseFormats(OWSOperation opsMeta, String version) {
-        // set param responseFormat
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.responseFormat.name(),
-                   new OWSParameterValuePossibleValues(Arrays.asList(Sos1Constants.getResponseFormats())));
-        } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.responseFormat.name(),
-                    new OWSParameterValuePossibleValues(Arrays.asList(Sos2Constants.getResponseFormats())));
-        }
     }
 
     @Override

@@ -105,16 +105,7 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
            
             GetObservationRequest sosRequest = (GetObservationRequest) request;
             checkRequestedParameters(sosRequest);
-            boolean zipCompression = false;
-            if (sosRequest.getResponseFormat() == null
-                    || (sosRequest.getResponseFormat() != null && sosRequest.getResponseFormat().isEmpty())) {
-                sosRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
-            } else {
-                zipCompression = SosHelper.checkResponseFormatForZipCompression(sosRequest.getResponseFormat());
-                if (zipCompression) {
-                    sosRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
-                }
-            }
+            boolean zipCompression = checkResponseFormat(sosRequest);
 
             String contentType = SosConstants.CONTENT_TYPE_XML;
             String responseFormat = sosRequest.getResponseFormat();
@@ -176,6 +167,8 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
             throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
         }
     }
+
+    
 
     /*
      * (non-Javadoc)
@@ -342,5 +335,29 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
             return ((IObservationEncoder)encoder).isObservationAndMeasurmentV20Type();
         }
         return false;
+    }
+
+    private boolean checkResponseFormat(GetObservationRequest request) throws OwsExceptionReport {
+        boolean zipCompression = false;
+        if (request.getResponseFormat() == null
+                || (request.getResponseFormat() != null && request.getResponseFormat().isEmpty())) {
+            request.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
+        } else {
+            zipCompression = SosHelper.checkResponseFormatForZipCompression(request.getResponseFormat());
+            if (zipCompression) {
+                request.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
+            } else {
+                Collection<String> supportedResponseFormats = SosHelper.getSupportedResponseFormats(request.getService(), request.getVersion());
+                if (!supportedResponseFormats.contains(request.getResponseFormat())) {
+                    StringBuilder exceptionText = new StringBuilder();
+                    exceptionText.append("The requested responseFormat (");
+                    exceptionText.append(request.getResponseFormat());
+                    exceptionText.append(") is not supported by this server!");
+                    LOGGER.debug(exceptionText.toString());
+                    throw Util4Exceptions.createInvalidParameterValueException(SosConstants.GetObservationParams.responseFormat.name(), exceptionText.toString());
+                }
+            }
+        }
+        return zipCompression;
     }
 }

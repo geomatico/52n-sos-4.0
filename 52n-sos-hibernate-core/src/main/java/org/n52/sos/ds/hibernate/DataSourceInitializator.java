@@ -50,9 +50,6 @@ public class DataSourceInitializator implements IDataSourceInitializator {
                     session);
             initializeSupportedSweTypes(typeMap.get(SupportedTypeKey.SweType), session);
             // initializeSupportedResultStructureTypes(session);
-            
-            // TODO: add responseFormat table and insert supported responseFormats
-            
             session.flush();
             session.clear();
             transaction.commit();
@@ -82,11 +79,15 @@ public class DataSourceInitializator implements IDataSourceInitializator {
         }
         Map<SupportedTypeKey, Set<String>> typeMap = new HashMap<SupportedTypeKey, Set<String>>(0);
         for (Map<SupportedTypeKey, Set<String>> map : list) {
-            for (SupportedTypeKey typeKey : map.keySet()) {
-                if (typeMap.containsKey(typeKey)) {
-                    typeMap.get(typeKey).addAll(map.get(typeKey));
-                } else {
-                    typeMap.put(typeKey, map.get(typeKey));
+            if (map != null && !map.isEmpty()) {
+                for (SupportedTypeKey typeKey : map.keySet()) {
+                    if (map.get(typeKey) != null && !map.get(typeKey).isEmpty()) {
+                        if (typeMap.containsKey(typeKey)) {
+                            typeMap.get(typeKey).addAll(map.get(typeKey));
+                        } else {
+                            typeMap.put(typeKey, map.get(typeKey));
+                        }
+                    }
                 }
             }
         }

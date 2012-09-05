@@ -35,7 +35,11 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweCommonEncoderv101.class);
 
     private List<EncoderKeyType> encoderKeyTypes;
-
+    
+    private Map<SupportedTypeKey, Set<String>> supportedTypes;
+    
+    private Set<String> conformanceClasses;
+    
     public SweCommonEncoderv101() {
         encoderKeyTypes = new ArrayList<EncoderKeyType>();
         encoderKeyTypes.add(new EncoderKeyType(SWEConstants.NS_SWE));
@@ -45,6 +49,8 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
             builder.append(", ");
         }
         builder.delete(builder.lastIndexOf(", "), builder.length());
+        supportedTypes = new HashMap<SupportedTypeKey, Set<String>>(0);
+        conformanceClasses = new HashSet<String>(0);
         LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
     }
 
@@ -55,12 +61,12 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
+        return supportedTypes;
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
+        return conformanceClasses;
     }
     
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {

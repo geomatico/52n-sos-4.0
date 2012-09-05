@@ -119,7 +119,13 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
 
     private List<EncoderKeyType> encoderKeyTypes;
 
-    private Set<String> supportedObservationTypes;
+    private Map<SupportedTypeKey, Set<String>> supportedObservationTypes;
+
+    private Set<String> conformanceClasses;
+
+    private Map<String, Map<String, Set<String>>> supportedResponseFormats;
+    
+    private boolean supported = true;
 
     public OmEncoderv20() {
         encoderKeyTypes = new ArrayList<EncoderKeyType>();
@@ -130,15 +136,9 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
             builder.append(", ");
         }
         builder.delete(builder.lastIndexOf(", "), builder.length());
-
-        supportedObservationTypes = new HashSet<String>(0);
-        supportedObservationTypes.add(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION);
-        supportedObservationTypes.add(OMConstants.OBS_TYPE_COUNT_OBSERVATION);
-//        supportedObservationTypes.add(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION);
-        supportedObservationTypes.add(OMConstants.OBS_TYPE_MEASUREMENT);
-        supportedObservationTypes.add(OMConstants.OBS_TYPE_TEXT_OBSERVATION);
-        supportedObservationTypes.add(OMConstants.OBS_TYPE_TRUTH_OBSERVATION);
-
+        setSupportedObservationTypes();
+        setConformaceClasses();
+        setSupportedResponseFormats();
         LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
     }
 
@@ -149,23 +149,14 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        Map<SupportedTypeKey, Set<String>> map = new HashMap<SupportedTypeKey, Set<String>>();
-        map.put(SupportedTypeKey.ObservationType, supportedObservationTypes);
-        return map;
+        return supportedObservationTypes;
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
-        Set<String> conformanceClasses = new HashSet<String>(0);
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/measurement");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/categoryObservation");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/countObservation");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/truthObservation");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/geometryObservation");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/textObservation");
         return conformanceClasses;
     }
-    
+
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(OMConstants.NS_OM_2, OMConstants.NS_OM_PREFIX);
     }
@@ -173,6 +164,26 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
     @Override
     public boolean isObservationAndMeasurmentV20Type() {
         return true;
+    }
+
+    @Override
+    public Set<String> getSupportedResponseFormats(String service, String version) {
+        if (supported && supportedResponseFormats.get(service) != null) {
+            if (supportedResponseFormats.get(service).get(version) != null) {
+                return supportedResponseFormats.get(service).get(version);
+            }
+        }
+        return new HashSet<String>(0);
+    }
+    
+    @Override
+    public boolean isSupported() {
+        return supported;
+    }
+
+    @Override
+    public void setSupported(boolean supportted) {
+        this.supported = supportted;
     }
 
     @Override
@@ -487,8 +498,8 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
             XmlObject xmlObject = (XmlObject) encoder.encode(iTime);
             if (xmlObject instanceof AbstractTimeObjectType) {
                 XmlObject substitution =
-                        timeObjectPropertyType.addNewAbstractTimeObject().substitute(GmlHelper.getQnameForITime(iTime),
-                                xmlObject.schemaType());
+                        timeObjectPropertyType.addNewAbstractTimeObject().substitute(
+                                GmlHelper.getQnameForITime(iTime), xmlObject.schemaType());
                 substitution.set((AbstractTimeObjectType) xmlObject);
             } else {
                 // TODO: Exception
@@ -1346,7 +1357,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
                         try {
                             xbFoiType.set(XmlObject.Factory.parse(sampFeat.getXmlDescription()));
                         } catch (XmlException xmle) {
-                           String exceptionText = "Error while encoding featureOfInterest in OMObservation!";
+                            String exceptionText = "Error while encoding featureOfInterest in OMObservation!";
                             LOGGER.error(exceptionText, xmle);
                             throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
                         }
@@ -1380,6 +1391,40 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
                 xbFoiType.setHref("#" + gmlId);
             }
         }
+    }
+
+    private void setSupportedObservationTypes() {
+        Map<SupportedTypeKey, Set<String>> supportedObservationTypes = new HashMap<SupportedTypeKey, Set<String>>();
+        Set<String> observationTypes = new HashSet<String>(0);
+        observationTypes.add(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION);
+        observationTypes.add(OMConstants.OBS_TYPE_COUNT_OBSERVATION);
+        // observationTypes.add(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION);
+        observationTypes.add(OMConstants.OBS_TYPE_MEASUREMENT);
+        observationTypes.add(OMConstants.OBS_TYPE_TEXT_OBSERVATION);
+        observationTypes.add(OMConstants.OBS_TYPE_TRUTH_OBSERVATION);
+        supportedObservationTypes.put(SupportedTypeKey.ObservationType, observationTypes);
+    }
+
+    private void setSupportedResponseFormats() {
+        supportedResponseFormats = new HashMap<String, Map<String, Set<String>>>(0);
+        Set<String> format = new HashSet<String>(0);
+        format.add(OMConstants.NS_OM_2);
+        // TODO: set this if service supports
+        format.add(SosConstants.CONTENT_TYPE_ZIP);
+        Map<String, Set<String>> versionMap = new HashMap<String, Set<String>>(0);
+        versionMap.put("2.0.0", format);
+        supportedResponseFormats.put("SOS", versionMap);
+    }
+
+    private void setConformaceClasses() {
+        conformanceClasses = new HashSet<String>(0);
+        // TODO: change to correct conformance class
+        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/measurement");
+        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/categoryObservation");
+        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/countObservation");
+        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/truthObservation");
+        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/geometryObservation");
+        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/textObservation");
     }
 
     // /**

@@ -36,7 +36,6 @@ import net.opengis.sensorML.x101.SystemDocument;
 import net.opengis.sensorML.x101.SystemType;
 import net.opengis.sensorML.x101.TermDocument.Term;
 import net.opengis.swe.x101.AnyScalarPropertyType;
-import net.opengis.swe.x101.DataRecordType;
 import net.opengis.swe.x101.PositionType;
 import net.opengis.swe.x101.SimpleDataRecordType;
 import net.opengis.swe.x101.TextDocument.Text;
@@ -86,8 +85,10 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
 
     private List<EncoderKeyType> encoderKeyTypes;
     
-    private Set<String> supportedProcedureDescriptionFormats;
-
+    private Map<SupportedTypeKey, Set<String>> supportedTypes;
+    
+    private Set<String> conformanceClasses;
+    
     public SensorMLEncoderv101() {
         encoderKeyTypes = new ArrayList<EncoderKeyType>();
         encoderKeyTypes.add(new EncoderKeyType(SensorMLConstants.NS_SML));
@@ -97,10 +98,11 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
             builder.append(", ");
         }
         builder.delete(builder.lastIndexOf(", "), builder.length());
-        
-        supportedProcedureDescriptionFormats = new HashSet<String>(0); 
-        supportedProcedureDescriptionFormats.add(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
-        
+        Set<String> outputFormatSet = new HashSet<String>(0); 
+        outputFormatSet.add(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
+        Map<SupportedTypeKey, Set<String>> map = new HashMap<SupportedTypeKey, Set<String>>();
+        map.put(SupportedTypeKey.ProcedureDescriptionFormat, outputFormatSet);
+        conformanceClasses = new HashSet<String>(0);
         LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
     }
 
@@ -111,14 +113,12 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        Map<SupportedTypeKey, Set<String>> map = new HashMap<SupportedTypeKey, Set<String>>();
-        map.put(SupportedTypeKey.ProcedureDescriptionFormat, supportedProcedureDescriptionFormats);
-        return map;
+        return supportedTypes;
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
+        return conformanceClasses;
     }
     
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {

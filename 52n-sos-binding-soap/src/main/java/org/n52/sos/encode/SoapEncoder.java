@@ -50,7 +50,11 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
     private static Logger LOGGER = Logger.getLogger(SoapEncoder.class);
 
     private List<EncoderKeyType> encoderKeyTypes;
-
+    
+    private Map<SupportedTypeKey, Set<String>> supportedTypes;
+    
+    private Set<String> conformanceClasses;
+    
     /**
      * constructor
      */
@@ -65,6 +69,8 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
             builder.append(", ");
         }
         builder.delete(builder.lastIndexOf(", "), builder.length());
+        supportedTypes = new HashMap<SupportedTypeKey, Set<String>>(0);
+        conformanceClasses = new HashSet<String>(0);
         LOGGER.info("Encoder for the following key initialized successfully: " + builder.toString() + "!");
     }
 
@@ -75,12 +81,12 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
     
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
+        return supportedTypes;
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
+        return conformanceClasses;
     }
 
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {

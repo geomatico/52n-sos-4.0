@@ -45,6 +45,8 @@ import java.util.Stack;
 import org.joda.time.DateTime;
 import org.n52.sos.binding.IBinding;
 import org.n52.sos.decode.DecoderKeyType;
+import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.IObservationEncoder;
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
@@ -936,5 +938,15 @@ public class SosHelper {
         // toNormalize = toNormalize.replaceAll("Ü", "UE");
         // toNormalize = toNormalize.replaceAll("ß", "ss");
         return toNormalize.replaceAll("[\\\\,/,:,\\*,?,\",<,>,;,#,%,=,@]", "_");
+    }
+
+    public static Collection<String> getSupportedResponseFormats(String service, String version) {
+        Set<String> responseFormats = new HashSet<String>();
+        for (IEncoder iEncoder : Configurator.getInstance().getEncoderMap().values()) {
+            if (iEncoder instanceof IObservationEncoder) {
+                responseFormats.addAll(((IObservationEncoder) iEncoder).getSupportedResponseFormats(service, version));
+            }
+        }
+        return responseFormats;
     }
 }

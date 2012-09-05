@@ -491,7 +491,9 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
             sosOffering.setResultModels(resultModels);
 
             // set response format
-            sosOffering.setResponseFormats(Arrays.asList(Sos1Constants.getResponseFormats()));
+            Collection<String> responseFormats = SosHelper.getSupportedResponseFormats(SosConstants.SOS, "1.0.0");
+            responseFormats.add(SosConstants.CONTENT_TYPE_ZIP);
+            sosOffering.setResponseFormats(responseFormats);
 
             // set response Mode
             sosOffering.setResponseModes(Arrays.asList(SosConstants.getResponseModes()));
@@ -637,8 +639,9 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                 sosOffering.setProcedureDescriptionFormat(HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatIdentifiers(session));
 
                 // set response format
-                // TODO: missing table in db
-                sosOffering.setResponseFormats(Arrays.asList(Sos2Constants.getResponseFormats()));
+                Collection<String> responseFormats = SosHelper.getSupportedResponseFormats(SosConstants.SOS, version);
+                responseFormats.add(SosConstants.CONTENT_TYPE_ZIP);
+                sosOffering.setResponseFormats(responseFormats);
 
                 sosOfferings.add(sosOffering);
             }
