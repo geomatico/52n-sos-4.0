@@ -37,15 +37,20 @@ import org.n52.sos.service.IConformanceClass;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 
 /**
- * @param <DecodedType> the result of the decoding process
- * @param <TypeToDecode> the input which is decoded
+ * @param <T>
+ *            the result of the decoding process, the "Target"
+ * @param <S>
+ *            the input which is decoded, the "Source"
  */
-public interface IDecoder<DecodedType, TypeToDecode> extends IConformanceClass {
+public interface IDecoder<T, S> extends IConformanceClass {
 
-    public List<DecoderKeyType> getDecoderKeyTypes();
+	/**
+	 * @return List encodings this implementation (identified by
+	 *         {@link DecoderKeyType}) is able to decode
+	 */
+	public List<DecoderKeyType> getDecoderKeyTypes();
 
-    public DecodedType decode(TypeToDecode element) throws OwsExceptionReport;
-    
-    public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
+	public T decode(S objectToDecode) throws OwsExceptionReport;
 
+	public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
 }
