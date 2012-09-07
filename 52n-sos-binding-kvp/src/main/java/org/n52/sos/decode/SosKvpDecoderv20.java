@@ -45,8 +45,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class SosKvpDecoderv20 implements IKvpDecoder {
 
     /**
-     * logger, used for logging while initializing the constants from config
-     * file
+     * logger, used for logging while initialising the constants from configuration file
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosKvpDecoderv20.class);
 
@@ -62,13 +61,15 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
         decoderKeyTypes.add(namespaceSosDKT);
         DecoderKeyType namespaceSwesDKT = new DecoderKeyType(SWEConstants.NS_SWES_20);
         decoderKeyTypes.add(namespaceSwesDKT);
-        StringBuilder builder = new StringBuilder();
+        StringBuilder logMsgBuilder = new StringBuilder();
+        logMsgBuilder.append("Decoder for the following namespaces initialized successfully: ");
         for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
-            builder.append(decoderKeyType.toString());
-            builder.append(", ");
+            logMsgBuilder.append(decoderKeyType.toString());
+            logMsgBuilder.append(", ");
         }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        LOGGER.info("Decoder for the following namespaces initialized successfully: " + builder.toString() + "!");
+        logMsgBuilder.delete(logMsgBuilder.lastIndexOf(", "), logMsgBuilder.length());
+        logMsgBuilder.append("!");
+        LOGGER.info(logMsgBuilder.toString());
     }
 
     @Override
