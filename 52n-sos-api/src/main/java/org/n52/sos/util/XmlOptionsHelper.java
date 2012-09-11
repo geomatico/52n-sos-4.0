@@ -129,8 +129,8 @@ public class XmlOptionsHelper {
      *            Defined character encoding
      * @return instance
      */
-    public static synchronized XmlOptionsHelper getInstance(String characterEncoding, boolean relaod) {
-        if (instance == null || relaod) {
+    public static synchronized XmlOptionsHelper getInstance(String characterEncoding, boolean reload) {
+        if (instance == null || reload) {
             instance = new XmlOptionsHelper();
             instance.initialize(characterEncoding);
         }
