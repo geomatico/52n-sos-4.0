@@ -92,7 +92,6 @@ public class SosService extends HttpServlet {
 		
 		LOGGER.debug("\n**********\n(DELETE) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
 
-        this.setCorsHeaders(resp);
         ServiceResponse sosResp = null;
         try {
             sosResp = getBindingOperatorForServletPath(req.getServletPath()).doDeleteperation(req);
@@ -113,12 +112,10 @@ public class SosService extends HttpServlet {
 	 *            the response for the incomming request
 	 * 
 	 */
-	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
 	
 	    LOGGER.debug("\n**********\n(GET) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
 	    LOGGER.trace("Query String: " + req.getQueryString());
-	
-	    this.setCorsHeaders(resp);
 	
 	    ServiceResponse sosResp = null;
 	    try {
@@ -139,11 +136,10 @@ public class SosService extends HttpServlet {
      * @param resp
      *            the response for the incoming request
      */
-    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
 
         LOGGER.debug("\n**********\n(POST) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
 
-        this.setCorsHeaders(resp);
         ServiceResponse sosResp = null;
         try {
             sosResp = getBindingOperatorForServletPath(req.getServletPath()).doPostOperation(req);
@@ -159,7 +155,6 @@ public class SosService extends HttpServlet {
 
 		LOGGER.debug("\n**********\n(PUT) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
 
-        this.setCorsHeaders(resp);
         ServiceResponse sosResp = null;
         try {
             sosResp = getBindingOperatorForServletPath(req.getServletPath()).doPutOperation(req);
@@ -179,7 +174,7 @@ public class SosService extends HttpServlet {
      * @param resp
      *            the response for the incoming request
      */
-    public void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         super.doOptions(req, resp);
         this.setCorsHeaders(resp);
     }
@@ -237,6 +232,7 @@ public class SosService extends HttpServlet {
         try {
             String contentType = sosResponse.getContentType();
             resp.setContentType(contentType);
+            this.setCorsHeaders(resp);
             
         	if (!sosResponse.isContentLess()){
         		int contentLength = sosResponse.getContentLength();
