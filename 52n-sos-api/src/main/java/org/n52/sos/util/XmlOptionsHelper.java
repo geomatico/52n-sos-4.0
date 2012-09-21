@@ -79,6 +79,7 @@ public class XmlOptionsHelper {
         }
     }
 
+    // TODO: To be used by other encoders to have common prefixes
     private Map<String, String> getPrefixMap() {
         Map<String, String> lPrefixMap = new Hashtable<String, String>();
 //        lPrefixMap.put(SensorMLConstants.NS_SML, SensorMLConstants.NS_SML_PREFIX);

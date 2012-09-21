@@ -31,6 +31,7 @@ package org.n52.sos.service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.ServletException;
@@ -234,6 +235,10 @@ public class SosService extends HttpServlet {
             resp.setContentType(contentType);
             this.setCorsHeaders(resp);
             
+            if (sosResponse.isSetHeaderMap()) {
+                this.setSpecifiedHeaders(sosResponse.getHeaderMap(),resp);
+            }
+            
         	if (!sosResponse.isContentLess()){
         		int contentLength = sosResponse.getContentLength();
         		resp.setContentLength(contentLength);
@@ -262,6 +267,23 @@ public class SosService extends HttpServlet {
                 LOGGER.debug("Error while closing output stream(s)!", ioe);
             }
         }
+    }
+
+    private void setSpecifiedHeaders(Map<String, String> headerMap,
+            HttpServletResponse resp)
+    {
+        for (String headerIdentifier : headerMap.keySet()) {
+            String value = headerMap.get(headerIdentifier).toString();
+            if (isHeaderAndValueSet(headerIdentifier, value)) {
+                resp.setHeader(headerIdentifier, value);
+            }
+        }
+    }
+
+    private boolean isHeaderAndValueSet(String headerIdentifier,
+            String value)
+    {
+        return headerIdentifier != null && !headerIdentifier.equalsIgnoreCase("") && value != null;
     }
 
     /**

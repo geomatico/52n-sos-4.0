@@ -31,6 +31,8 @@ package org.n52.sos.response;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
@@ -66,6 +68,11 @@ public class ServiceResponse {
      * the content type of this response
      */
     private String contentType;
+    
+    /**
+     * the header field and values to be set in the {@link HttpServletResponse}
+     */
+    private Map<String,String> headerMap;
 
     /**
      * indicator for compression usage
@@ -156,6 +163,27 @@ public class ServiceResponse {
     		return byteArrayOutputStream.size();
     	}
     	return -1;
+    }
+    
+    /**
+     * @return <b>true</b> if as minimum one header value is contained in the map
+     */
+    public boolean isSetHeaderMap()
+    {
+        return headerMap != null && headerMap.size() > 0;
+    }
+    
+    public void addHeaderKvpEntry(String headerIdentifier, String headerValue)
+    {
+        if (headerMap == null) {
+            headerMap = new HashMap<String, String>();
+        }
+        headerMap.put(headerIdentifier, headerValue);
+    }
+
+    public Map<String, String> getHeaderMap()
+    {
+        return headerMap;
     }
 
     /**
