@@ -83,13 +83,15 @@ public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
         decoderKeyTypes = new ArrayList<DecoderKeyType>();
         decoderKeyTypes.add(new DecoderKeyType(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE));
         decoderKeyTypes.add(new DecoderKeyType(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE));
-        StringBuilder builder = new StringBuilder();
+        StringBuilder logMsgBuilder = new StringBuilder();
+        logMsgBuilder.append("Decoder for the following namespaces initialized successfully: ");
         for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
-            builder.append(decoderKeyType.toString());
-            builder.append(", ");
+            logMsgBuilder.append(decoderKeyType.toString());
+            logMsgBuilder.append(", ");
         }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        LOGGER.debug("Decoder for the following keys initialized successfully: " + builder.toString() + "!");
+        logMsgBuilder.delete(logMsgBuilder.lastIndexOf(", "), logMsgBuilder.length());
+        logMsgBuilder.append("!");
+        LOGGER.info(logMsgBuilder.toString());
     }
 
     @Override
