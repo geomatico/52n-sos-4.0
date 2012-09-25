@@ -938,6 +938,14 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                 observationTypes.add(observationType);
             }
         }
+        if (observationTypes.isEmpty()) {
+            for (String observationType : Configurator.getInstance().getCapabilitiesCacheController()
+                    .getAllowedObservationTypes4Offering(offering)) {
+                if (!observationType.equals(SosConstants.NOT_DEFINED)) {
+                    observationTypes.add(observationType);
+                }
+            } 
+        }
         return observationTypes;
     }
 

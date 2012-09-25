@@ -175,7 +175,9 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
                 criteria.add(Restrictions.in(HibernateConstants.PARAMETER_IDENTIFIER, featureIDs));
                 criteria.setProjection(SpatialProjections.extent("geom"));
                 Geometry geom = (Geometry) criteria.uniqueResult();
-                return geom.getEnvelopeInternal();
+                if (geom != null) {
+                    return geom.getEnvelopeInternal();
+                }
             } catch (HibernateException he) {
                 String exceptionText = "";
                 LOGGER.error(exceptionText, he);

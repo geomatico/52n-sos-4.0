@@ -62,8 +62,6 @@ public class HibernateConstants {
 
     public static final String PARAMETER_OBSERVABLE_PROPERTY = "observableProperty";
 
-    public static final String PARAMETER_OFFERING = "offering";
-
     public static final String PARAMETER_OBSERVATION_CONSTELLATION = "observationConstellation";
 
     public static final String PARAMETER_PHENOMENON_TIME_START = "phenomenonTimeStart";

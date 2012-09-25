@@ -7,7 +7,7 @@
         <id name="spatialFilteringProfileId" type="long">
             <column name="spatial_filtering_profile_id" />
             <generator class="sequence">
-            	<param name="sequence">spatial_filtering_profile_spatial_filtering_profile_id_seq</param>
+            	<param name="sequence">spatial_filtering_profile_id_seq</param>
             </generator>
         </id>
         <property name="identifier" type="string">

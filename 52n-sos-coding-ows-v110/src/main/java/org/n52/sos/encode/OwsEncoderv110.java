@@ -91,6 +91,11 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(OWSConstants.NS_OWS, OWSConstants.NS_OWS_PREFIX);
     }
+    
+    @Override
+    public String getContentType() {
+        return "text/xml";
+    }
 
     @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {

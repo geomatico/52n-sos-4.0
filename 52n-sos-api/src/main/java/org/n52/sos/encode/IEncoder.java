@@ -45,22 +45,21 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
  */
 public interface IEncoder<T, S> extends IConformanceClass {
 
-	/**
-	 * @return List of supported encodings  of this implementation
-	 * 			(identified by {@link EncoderKeyType})
-	 */
-	public List<EncoderKeyType> getEncoderKeyType();
+    /**
+     * @return List of supported encodings of this implementation (identified by
+     *         {@link EncoderKeyType})
+     */
+    public List<EncoderKeyType> getEncoderKeyType();
 
-	public T encode(S objectToEncode)
-			throws OwsExceptionReport;
+    public T encode(S objectToEncode) throws OwsExceptionReport;
 
-	public T encode(S objectToEncode,
-			Map<HelperValues, String> additionalValues)
-			throws OwsExceptionReport;
+    public T encode(S objectToEncode, Map<HelperValues, String> additionalValues) throws OwsExceptionReport;
 
-	// TODO add javadoc
-	public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
+    // TODO add javadoc
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
 
-	public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap);
+    public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap);
+
+    public String getContentType();
 
 }

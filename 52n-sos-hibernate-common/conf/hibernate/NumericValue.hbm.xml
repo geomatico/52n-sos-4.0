@@ -7,7 +7,7 @@
         <id name="numericValueId" type="long">
             <column name="numeric_value_id" />
             <generator class="sequence">
-            	<param name="sequence">numeric_value_numeric_value_id_seq</param>
+            	<param name="sequence">numeric_value_id_seq</param>
             </generator>
         </id>
         <property name="value" type="double">

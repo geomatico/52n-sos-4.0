@@ -12,7 +12,7 @@ public class ObservationTemplate implements java.io.Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    private long observationNumericTemplateId;
+    private long observationTemplateId;
 
     private Request request;
 
@@ -23,26 +23,26 @@ public class ObservationTemplate implements java.io.Serializable {
     public ObservationTemplate() {
     }
 
-    public ObservationTemplate(long observationNumericTemplateId, Request request, Procedure procedure) {
-        this.observationNumericTemplateId = observationNumericTemplateId;
+    public ObservationTemplate(long observationTemplateId, Request request, Procedure procedure) {
+        this.observationTemplateId = observationTemplateId;
         this.request = request;
         this.procedure = procedure;
     }
 
-    public ObservationTemplate(long observationNumericTemplateId, Request request, Procedure procedure,
+    public ObservationTemplate(long observationTemplateId, Request request, Procedure procedure,
             String observationTemplate) {
-        this.observationNumericTemplateId = observationNumericTemplateId;
+        this.observationTemplateId = observationTemplateId;
         this.request = request;
         this.procedure = procedure;
         this.observationTemplate = observationTemplate;
     }
 
-    public long getObservationNumericTemplateId() {
-        return this.observationNumericTemplateId;
+    public long getObservationTemplateId() {
+        return this.observationTemplateId;
     }
 
-    public void setObservationNumericTemplateId(long observationNumericTemplateId) {
-        this.observationNumericTemplateId = observationNumericTemplateId;
+    public void setObservationTemplateId(long observationTemplateId) {
+        this.observationTemplateId = observationTemplateId;
     }
 
     public Request getRequest() {

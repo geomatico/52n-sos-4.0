@@ -40,6 +40,8 @@ import org.joda.time.format.ISOPeriodFormat;
  */
 public class TimePeriod implements ITime {
     
+    private static final long serialVersionUID = 1L;
+
     private String id;
 
     /** start Date of timePeriod */

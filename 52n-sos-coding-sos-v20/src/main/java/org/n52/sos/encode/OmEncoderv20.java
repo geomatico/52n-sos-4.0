@@ -192,6 +192,11 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
     }
 
     @Override
+    public String getContentType() {
+        return OMConstants.CONTENT_TYPE_OM_2;
+    }
+
+    @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
         return encode(element, new HashMap<HelperValues, String>());
     }

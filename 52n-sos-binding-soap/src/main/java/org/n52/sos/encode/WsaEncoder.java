@@ -62,6 +62,12 @@ public class WsaEncoder implements IEncoder<Map<QName, String>, WsaHeader> {
 
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
     }
+    
+    
+    @Override
+    public String getContentType() {
+        return "text/xml";
+    }
 
     @Override
     public Map<QName, String> encode(WsaHeader response) throws OwsExceptionReport {

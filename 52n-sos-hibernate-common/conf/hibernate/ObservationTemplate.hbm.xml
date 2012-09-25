@@ -4,10 +4,10 @@
 <!-- Generated 10.07.2012 15:18:27 by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
     <class name="org.n52.sos.ds.hibernate.entities.ObservationTemplate" table="observation_template">
-        <id name="observationNumericTemplateId" type="long">
-            <column name="observation_numeric_template_id" />
+        <id name="observationTemplateId" type="long">
+            <column name="observation_template_id" />
             <generator class="sequence">
-            	<param name="sequence">observation_template_observation_template_id_seq</param>
+            	<param name="sequence">observation_template_id_seq</param>
             </generator>
         </id>
         <many-to-one name="request" class="org.n52.sos.ds.hibernate.entities.Request" fetch="join">

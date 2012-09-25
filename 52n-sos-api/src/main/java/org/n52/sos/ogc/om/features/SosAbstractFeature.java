@@ -28,6 +28,8 @@
 
 package org.n52.sos.ogc.om.features;
 
+import java.io.Serializable;
+
 /**
  * Abstract class for encoding the feature of interest. Necessary because
  * different feature types should be supported. The SOS database or another
@@ -35,7 +37,9 @@ package org.n52.sos.ogc.om.features;
  * schema.
  * 
  */
-public abstract class SosAbstractFeature {
+public abstract class SosAbstractFeature implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /** identifier */
     private String identifier;

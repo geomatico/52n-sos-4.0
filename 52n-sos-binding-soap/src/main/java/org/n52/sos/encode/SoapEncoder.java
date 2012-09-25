@@ -91,6 +91,11 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
 
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
     }
+    
+    @Override
+    public String getContentType() {
+        return "application/soap+xml";
+    }
 
     @Override
     public ServiceResponse encode(SoapResponse response) throws OwsExceptionReport {
@@ -230,6 +235,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
      */
     private String createSOAPFaultFromExceptionResponse(SOAPFault soapFault, OwsExceptionReport owsExceptionReport)
             throws SOAPException {
+        // FIXME: check and fix support for ExceptionReport with multiple exceptions!
         if (owsExceptionReport.getExceptions() != null && !owsExceptionReport.getExceptions().isEmpty()) {
             OwsException firstException = owsExceptionReport.getExceptions().get(0);
             if (soapFault.getNamespaceURI().equalsIgnoreCase(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE)) {

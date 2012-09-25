@@ -104,6 +104,11 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
         nameSpacePrefixMap.put(SFConstants.NS_SAMS, SFConstants.NS_SAMS_PREFIX);
         nameSpacePrefixMap.put(SFConstants.NS_SF, SFConstants.NS_SF_PREFIX);
     }
+    
+    @Override
+    public String getContentType() {
+        return "text/xml";
+    }
 
     @Override
     public XmlObject encode(SosAbstractFeature response) throws OwsExceptionReport {

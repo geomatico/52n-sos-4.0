@@ -7,7 +7,7 @@
         <id name="unitId" type="long">
             <column name="unit_id" />
             <generator class="sequence">
-            	<param name="sequence">unit_unit_id_seq</param>
+            	<param name="sequence">unit_id_seq</param>
             </generator>
         </id>
         <property name="unit" type="string">

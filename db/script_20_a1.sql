@@ -45,31 +45,91 @@ DROP TABLE IF EXISTS observation_has_geometry_value CASCADE;
 DROP TABLE IF EXISTS related_feature_has_related_feature_role CASCADE;
 DROP TABLE IF EXISTS related_feature_role CASCADE;
 
+-- drop sequences
+DROP SEQUENCE IF EXISTS boolean_value_id_seq;
+DROP SEQUENCE IF EXISTS category_value_id_seq;
+DROP SEQUENCE IF EXISTS composite_phenomenon_id_seq;
+DROP SEQUENCE IF EXISTS count_value_id_seq;
+DROP SEQUENCE IF EXISTS feature_of_interest_id_seq;
+DROP SEQUENCE IF EXISTS feature_of_interest_type_id_seq;
+DROP SEQUENCE IF EXISTS geometry_value_id_seq;
+DROP SEQUENCE IF EXISTS numeric_value_id_seq;
+DROP SEQUENCE IF EXISTS observable_property_id_seq;
+DROP SEQUENCE IF EXISTS observation_constellation_id_seq;
+DROP SEQUENCE IF EXISTS observation_id_seq;
+DROP SEQUENCE IF EXISTS observation_template_id_seq;
+DROP SEQUENCE IF EXISTS observation_type_id_seq;
+DROP SEQUENCE IF EXISTS offering_id_seq;
+DROP SEQUENCE IF EXISTS procedure_description_format_id_seq;
+DROP SEQUENCE IF EXISTS procedure_id_seq;
+DROP SEQUENCE IF EXISTS quality_id_seq;
+DROP SEQUENCE IF EXISTS related_feature_id_seq;
+DROP SEQUENCE IF EXISTS related_feature_role_id_seq;
+DROP SEQUENCE IF EXISTS request_id_seq;
+DROP SEQUENCE IF EXISTS result_structure_type_id_seq;
+DROP SEQUENCE IF EXISTS result_template_id_seq;
+DROP SEQUENCE IF EXISTS result_type_id_seq;
+DROP SEQUENCE IF EXISTS spatial_filtering_profile_id_seq;
+DROP SEQUENCE IF EXISTS swe_type_id_seq;
+DROP SEQUENCE IF EXISTS text_value_id_seq;
+DROP SEQUENCE IF EXISTS unit_id_seq;
+DROP SEQUENCE IF EXISTS valid_procedure_time_id_seq;
+
 ------------------------------------------------------------
 
+-- create sequences
+CREATE SEQUENCE boolean_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE category_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE composite_phenomenon_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE count_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE feature_of_interest_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE feature_of_interest_type_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE geometry_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE numeric_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE observable_property_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE observation_constellation_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE observation_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE observation_template_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE observation_type_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE offering_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE procedure_description_format_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE procedure_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE quality_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE related_feature_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE related_feature_role_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE request_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE result_structure_type_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE result_template_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE result_type_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE spatial_filtering_profile_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE swe_type_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE text_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE unit_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE valid_procedure_time_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+
 CREATE TABLE result_type (
-  result_type_id bigserial NOT NULL,
+  result_type_id bigint NOT NULL DEFAULT nextval('result_type_id_seq'),
   result_type TEXT NOT NULL,
   UNIQUE (result_type),
   PRIMARY KEY(result_type_id)
 );
 
 CREATE TABLE result_structure_type (
-  result_structure_type_id bigserial NOT NULL,
+  result_structure_type_id bigint NOT NULL DEFAULT nextval('result_structure_type_id_seq'),
   result_structure_type TEXT NOT NULL,
   UNIQUE (result_structure_type),
   PRIMARY KEY(result_structure_type_id)
 );
 
 CREATE TABLE related_feature_role (
-  related_feature_role_id bigserial NOT NULL,
+  related_feature_role_id bigint NOT NULL DEFAULT nextval('related_feature_role_id_seq'),
   related_feature_role TEXT NOT NULL,
   UNIQUE (related_feature_role),
   PRIMARY KEY(related_feature_role_id)
 );
 
 CREATE TABLE spatial_filtering_profile (
-  spatial_filtering_profile_id bigserial NOT NULL,
+  spatial_filtering_profile_id bigint NOT NULL DEFAULT nextval('spatial_filtering_profile_id_seq'),
   identifier TEXT NOT NULL,
   geom GEOMETRY NOT NULL,
   UNIQUE (identifier),
@@ -77,7 +137,7 @@ CREATE TABLE spatial_filtering_profile (
 );
 
 CREATE TABLE offering (
-  offering_id bigserial NOT NULL,
+  offering_id bigint NOT NULL DEFAULT nextval('offering_id_seq'),
   identifier TEXT NOT NULL,
   name TEXT NULL,
   UNIQUE (identifier),
@@ -85,34 +145,34 @@ CREATE TABLE offering (
 );
 
 CREATE TABLE procedure_description_format (
-  procedure_description_format_id bigserial NOT NULL,
+  procedure_description_format_id bigint NOT NULL DEFAULT nextval('procedure_description_format_id_seq'),
   procedure_description_format TEXT NOT NULL,
   PRIMARY KEY(procedure_description_format_id)
 );
 
 CREATE TABLE related_feature (
-  related_feature_id bigserial NOT NULL,
+  related_feature_id bigint NOT NULL DEFAULT nextval('related_feature_id_seq'),
   feature_of_interest_id INTEGER NULL,
   UNIQUE (feature_of_interest_id),
   PRIMARY KEY(related_feature_id)
 );
 
 CREATE TABLE observation_type (
-  observation_type_id bigserial NOT NULL,
+  observation_type_id bigint NOT NULL DEFAULT nextval('observation_type_id_seq'),
   observation_type TEXT NOT NULL,
   UNIQUE (observation_type),
   PRIMARY KEY(observation_type_id)
 );
 
 CREATE TABLE swe_type (
-  swe_type_id bigserial NOT NULL,
+  swe_type_id bigint NOT NULL DEFAULT nextval('swe_type_id_seq'),
   swe_type TEXT NOT NULL,
   UNIQUE (swe_type),
   PRIMARY KEY(swe_type_id)
 );
 
 CREATE TABLE composite_phenomenon (
-  composite_phenomenon_id bigserial NOT NULL,
+  composite_phenomenon_id bigint NOT NULL DEFAULT nextval('composite_phenomenon_id_seq'),
   identifier TEXT NOT NULL,
   description TEXT NULL,
   UNIQUE (identifier),
@@ -120,63 +180,63 @@ CREATE TABLE composite_phenomenon (
 );
 
 CREATE TABLE feature_of_interest_type (
-  feature_of_interest_type_id bigserial NOT NULL,
+  feature_of_interest_type_id bigint NOT NULL DEFAULT nextval('feature_of_interest_type_id_seq'),
   feature_of_interest_type TEXT NOT NULL,
   UNIQUE (feature_of_interest_type),
   PRIMARY KEY(feature_of_interest_type_id)
 );
 
 CREATE TABLE geometry_value (
-  geometry_value_id bigserial NOT NULL,
+  geometry_value_id bigint NOT NULL DEFAULT nextval('geometry_value_id_seq'),
   value GEOMETRY NOT NULL,
   UNIQUE (value),
   PRIMARY KEY(geometry_value_id)
 );
 
 CREATE TABLE text_value (
-  text_value_id bigserial NOT NULL,
+  text_value_id bigint NOT NULL DEFAULT nextval('text_value_id_seq'),
   value TEXT NOT NULL,
   UNIQUE (value),
   PRIMARY KEY(text_value_id)
 );
 
 CREATE TABLE category_value (
-  category_value_id bigserial NOT NULL,
+  category_value_id bigint NOT NULL DEFAULT nextval('category_value_id_seq'),
   value TEXT NOT NULL,
   UNIQUE (value),
   PRIMARY KEY(category_value_id)
 );
 
 CREATE TABLE unit (
-  unit_id bigserial NOT NULL,
+  unit_id bigint NOT NULL DEFAULT nextval('unit_id_seq'),
   unit TEXT NOT NULL,
   UNIQUE (unit),
   PRIMARY KEY(unit_id)
 );
 
 CREATE TABLE numeric_value (
-  numeric_value_id bigserial NOT NULL,
+  numeric_value_id bigint NOT NULL DEFAULT nextval('numeric_value_id_seq'),
   value numeric NOT NULL,
   UNIQUE (value),
   PRIMARY KEY(numeric_value_id)
 );
 
 CREATE TABLE count_value (
-  count_value_id bigserial NOT NULL,
+  count_value_id bigint NOT NULL DEFAULT nextval('count_value_id_seq'),
   value integer NOT NULL,
   UNIQUE (value),
   PRIMARY KEY(count_value_id)
 );
 
 CREATE TABLE boolean_value (
-  boolean_value_id bigserial NOT NULL,
+  boolean_value_id bigint NOT NULL DEFAULT nextval('boolean_value_id_seq'),
   value boolean NOT NULL,
   UNIQUE (value),
   PRIMARY KEY(boolean_value_id)
 );
 
 CREATE TABLE request (
-  request_id bigserial NOT NULL,
+  request_id bigint NOT NULL DEFAULT nextval('request_id_seq'),
   offering_id INTEGER NOT NULL,
   request TEXT NOT NULL,
   begin_lease TIMESTAMP NULL,
@@ -185,7 +245,7 @@ CREATE TABLE request (
 );
 
 CREATE TABLE procedure (
-  procedure_id bigserial NOT NULL,
+  procedure_id bigint NOT NULL DEFAULT nextval('procedure_id_seq'),
   procedure_description_format_id INTEGER NOT NULL,
   identifier TEXT NOT NULL,
   deleted BOOL NOT NULL,
@@ -200,7 +260,7 @@ CREATE TABLE sensor_system (
 );
 
 CREATE TABLE feature_of_interest (
-  feature_of_interest_id bigserial NOT NULL,
+  feature_of_interest_id bigint NOT NULL DEFAULT nextval('feature_of_interest_id_seq'),
   feature_of_interest_type_id INTEGER NOT NULL,
   identifier TEXT NULL,
   name Text NULL,
@@ -220,7 +280,7 @@ CREATE TABLE feature_relation (
 );
 
 CREATE TABLE observable_property (
-  observable_property_id bigserial NOT NULL,
+  observable_property_id bigint NOT NULL DEFAULT nextval('observable_property_id_seq'),
   identifier TEXT NOT NULL,
   description TEXT NULL,
   UNIQUE (identifier),
@@ -240,7 +300,7 @@ CREATE TABLE offering_has_allowed_observation_type (
 );
 
 CREATE TABLE quality (
-  quality_id bigserial NOT NULL,
+  quality_id bigint NOT NULL DEFAULT nextval('quality_id_seq'),
   unit_id INTEGER NOT NULL,
   swe_type_id INTEGER NOT NULL,
   name TEXT NOT NULL,
@@ -261,11 +321,11 @@ CREATE TABLE procedure_has_feature_of_interest_type (
 );
 
 CREATE TABLE observation_template (
-  observation_numeric_template_id bigserial NOT NULL,
+  observation_template_id bigint NOT NULL DEFAULT nextval('observation_template_id_seq'),
   procedure_id INTEGER NOT NULL,
   request_id INTEGER NOT NULL,
   observation_template TEXT NULL,
-  PRIMARY KEY(observation_numeric_template_id)
+  PRIMARY KEY(observation_template_id)
 );
 
 CREATE TABLE request_has_composite_phenomenon (
@@ -287,7 +347,7 @@ CREATE TABLE related_feature_has_related_feature_role (
 );
 
 CREATE TABLE observation_constellation (
-  observation_constellation_id bigserial NOT NULL,
+  observation_constellation_id bigint NOT NULL DEFAULT nextval('observation_constellation_id_seq'),
   observation_type_id INTEGER NULL,
   procedure_id INTEGER NOT NULL,
   result_type_id INTEGER NULL,
@@ -298,7 +358,7 @@ CREATE TABLE observation_constellation (
 );
 
 CREATE TABLE valid_procedure_time (
-  valid_procedure_time_id bigserial NOT NULL,
+  valid_procedure_time_id bigint NOT NULL DEFAULT nextval('valid_procedure_time_id_seq'),
   procedure_id INTEGER NOT NULL,
   start_time TIMESTAMP NOT NULL,
   end_time TIMESTAMP NULL,
@@ -315,7 +375,7 @@ CREATE TABLE composite_phenomenon_has_observable_property (
 );
 
 CREATE TABLE observation (
-  observation_id bigserial NOT NULL,
+  observation_id bigint NOT NULL DEFAULT nextval('observation_id_seq'),
   feature_of_interest_id INTEGER NOT NULL,
   observation_constellation_id INTEGER NOT NULL,
   identifier TEXT NULL,
@@ -328,7 +388,7 @@ CREATE TABLE observation (
   anti_subsetting INTEGER NULL,
   UNIQUE (feature_of_interest_id,observation_constellation_id,phenomenon_time_start),
   PRIMARY KEY(observation_id)
-);
+  );
 
 CREATE TABLE observation_has_text_value (
   observation_id INTEGER NOT NULL,
@@ -343,7 +403,7 @@ CREATE TABLE observation_has_category_value (
 );
 
 CREATE TABLE result_template (
-  result_template_id bigserial NOT NULL,
+  result_template_id bigint NOT NULL DEFAULT nextval('result_template_id_seq'),
   observation_constellation_id INTEGER NOT NULL,
   result_structure_type_id INTEGER NOT NULL,
   feature_of_interest_id INTEGER NOT NULL,

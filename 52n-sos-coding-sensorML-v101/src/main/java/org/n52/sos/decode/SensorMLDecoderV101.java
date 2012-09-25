@@ -61,7 +61,6 @@ import net.opengis.swe.x101.SimpleDataRecordType;
 
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractSensorML;
 import org.n52.sos.ogc.sensorML.ProcessModel;
@@ -102,14 +101,18 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
 
     private List<String> removableComponentsRoles;
 
+    private List<String> removableIdentifier;
+
     {
         removableCapabilitiesNames = new ArrayList<String>();
         removableCapabilitiesNames.add("parentProcedures");
         removableCapabilitiesNames.add("featureOfInterest");
-        removableCapabilitiesNames.add("offering");
 
         removableComponentsRoles = new ArrayList<String>();
         removableComponentsRoles.add("childProcedure");
+
+        removableIdentifier = new ArrayList<String>();
+        removableIdentifier.add("offerings");
     }
 
     public SensorMLDecoderV101() {
@@ -161,8 +164,6 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
 
     private SensorML parseSensorML(SensorMLDocument xbSensorML) throws OwsExceptionReport {
         SensorML sensorML = new SensorML();
-        sensorML.setSensorDescriptionXmlString(xbSensorML.xmlText());
-
         // get member process
         for (Member xbMember : xbSensorML.getSensorML().getMemberArray()) {
             if (xbMember.getProcess() != null) {
@@ -176,7 +177,8 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
                     exceptionText.append(xbMember.getProcess());
                     exceptionText.append(") is not of type 'SystemType'!");
                     LOGGER.debug(exceptionText.toString());
-                    throw Util4Exceptions.createInvalidParameterValueException(xbMember.getDomNode().getLocalName(), exceptionText.toString());
+                    throw Util4Exceptions.createInvalidParameterValueException(xbMember.getDomNode().getLocalName(),
+                            exceptionText.toString());
                 }
             } else {
                 StringBuilder exceptionText = new StringBuilder();
@@ -184,9 +186,11 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
                 exceptionText.append(xbMember.getProcess());
                 exceptionText.append(")!");
                 LOGGER.debug(exceptionText.toString());
-                throw Util4Exceptions.createInvalidParameterValueException(xbMember.getDomNode().getLocalName(), exceptionText.toString());
+                throw Util4Exceptions.createInvalidParameterValueException(xbMember.getDomNode().getLocalName(),
+                        exceptionText.toString());
             }
         }
+        sensorML.setSensorDescriptionXmlString(xbSensorML.xmlText());
         return sensorML;
     }
 
@@ -194,6 +198,11 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         System system = new System();
         if (xbSystemType.getIdentificationArray() != null) {
             system.setIdentifications(parseIdentification(xbSystemType.getIdentificationArray()));
+            List<Integer> identificationsToRemove =
+                    checkIdentificationsForRemoval(xbSystemType.getIdentificationArray());
+            for (Integer integer : identificationsToRemove) {
+                xbSystemType.removeIdentification(integer);
+            }
         }
         if (xbSystemType.getClassificationArray() != null) {
             system.setClassifications(parseClassification(xbSystemType.getClassificationArray()));
@@ -208,21 +217,22 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
                 xbSystemType.removeCapabilities(integer);
             }
         }
-        if (xbSystemType.getPosition() != null) {
+        if (xbSystemType.isSetPosition()) {
             system.setPosition(parsePosition(xbSystemType.getPosition()));
         }
-        if (xbSystemType.getInputs() != null) {
+        if (xbSystemType.isSetInputs()) {
             system.setInputs(parseInputs(xbSystemType.getInputs()));
         }
-        if (xbSystemType.getOutputs() != null) {
+        if (xbSystemType.isSetOutputs()) {
             system.setOutputs(parseOutputs(xbSystemType.getOutputs()));
         }
-        if (xbSystemType.getComponents() != null) {
+        if (xbSystemType.isSetComponents()) {
             system.setComponents(parseComponents(xbSystemType.getComponents()));
             List<Integer> compsToRemove = checkComponentsForRemoval(xbSystemType.getComponents().getComponentList());
             for (Integer integer : compsToRemove) {
                 xbSystemType.getComponents().getComponentList().removeComponent(integer);
             }
+            checkAndRemoveEmptyComponents(xbSystemType);
         }
         system.setSensorDescriptionXmlString(addSensorMLWrapperForXmlDescription(xbSystemType));
         return system;
@@ -293,9 +303,11 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
                 }
                 sosCharacteristics.setCharacteristicsType(SweAggregateType.DataRecord);
             } else {
-                String exceptionText = "Error while parsing the characteristics of the SensorML (the characteristics' data record is not of type DataRecordPropertyType)!";
+                String exceptionText =
+                        "Error while parsing the characteristics of the SensorML (the characteristics' data record is not of type DataRecordPropertyType)!";
                 LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(xbCharacteristics.getDomNode().getLocalName(), exceptionText);
+                throw Util4Exceptions.createInvalidParameterValueException(xbCharacteristics.getDomNode()
+                        .getLocalName(), exceptionText);
             }
         }
         sosCharacteristicsList.add(sosCharacteristics);
@@ -348,9 +360,11 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
                 }
 
             } else {
-                String exceptionText = "Error while parsing the capabilities of the SensorML (the capabilities data record is not of type DataRecordPropertyType)!";
+                String exceptionText =
+                        "Error while parsing the capabilities of the SensorML (the capabilities data record is not of type DataRecordPropertyType)!";
                 LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(xbCpabilities.getDomNode().getLocalName(), exceptionText);
+                throw Util4Exceptions.createInvalidParameterValueException(xbCpabilities.getDomNode().getLocalName(),
+                        exceptionText);
             }
         }
         sosCapabilitiesList.add(sosCapabilities);
@@ -387,7 +401,8 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         } else {
             String exceptionText = "Error while parsing the position of the SensorML (the position is not set)!";
             LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(position.getDomNode().getLocalName(), exceptionText);
+            throw Util4Exceptions.createInvalidParameterValueException(position.getDomNode().getLocalName(),
+                    exceptionText);
         }
         return sosSMLPosition;
     }
@@ -467,7 +482,8 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         } else {
             String exceptionText = "An \"IoComponentProperty\" is not supported";
             LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(xbIoCompPropType.getDomNode().getLocalName(), exceptionText);
+            throw Util4Exceptions.createInvalidParameterValueException(xbIoCompPropType.getDomNode().getLocalName(),
+                    exceptionText);
         }
 
         List<IDecoder> decoderList = Configurator.getInstance().getDecoder(toEncode.getDomNode().getNamespaceURI());
@@ -507,7 +523,8 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
     private List<Integer> checkCapabilitiesForRemoval(Capabilities[] capabilitiesArray) {
         List<Integer> removeableCaps = new ArrayList<Integer>();
         for (int i = 0; i < capabilitiesArray.length; i++) {
-            if (capabilitiesArray[i].getName() != null && removableCapabilitiesNames.contains(capabilitiesArray[i].getName())) {
+            if (capabilitiesArray[i].getName() != null
+                    && removableCapabilitiesNames.contains(capabilitiesArray[i].getName())) {
                 removeableCaps.add(i);
             }
         }
@@ -528,4 +545,31 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         return removeableComponents;
     }
 
+    private List<Integer> checkIdentificationsForRemoval(Identification[] identifications) {
+        List<Integer> removeableIdentification = new ArrayList<Integer>();
+        for (int i = 0; i < identifications.length; i++) {
+            if (identifications[i].getTitle() != null && removableIdentifier.contains(identifications[i].getTitle())) {
+                removeableIdentification.add(i);
+            }
+        }
+        return removeableIdentification;
+    }
+
+    private void checkAndRemoveEmptyComponents(SystemType system) {
+        boolean removeComponents = false;
+        Components components = system.getComponents();
+        if (components != null) {
+            if (components.getComponentList() == null) {
+                removeComponents = true;
+            } else if (components.getComponentList().getComponentArray() == null
+                    || ((components.getComponentList().getComponentArray() != null && components.getComponentList()
+                            .getComponentArray().length == 0))) {
+                removeComponents = true;
+            }
+        }
+        if (removeComponents) {
+            system.setComponents(null);
+        }
+
+    }
 }

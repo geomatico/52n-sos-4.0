@@ -28,13 +28,16 @@
 
 package org.n52.sos.ogc.om;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 /**
  * Abstract class for phenomena
  * 
  */
-public class AbstractSosPhenomenon {
+public class AbstractSosPhenomenon implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /** phenomenon identifier */
     private String identifier;

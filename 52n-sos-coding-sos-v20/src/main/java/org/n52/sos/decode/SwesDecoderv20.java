@@ -186,7 +186,6 @@ public class SwesDecoderv20 implements IXmlRequestDecoder {
             XmlObject xmlObject =
                     XmlObject.Factory.parse(getNodeFromNodeList(xbInsertSensor.getProcedureDescription().getDomNode()
                             .getChildNodes()));
-            request.setProcedureDescriptionString(xmlObject.xmlText(XmlOptionsHelper.getInstance().getXmlOptions()));
             List<IDecoder> decoderList = Configurator.getInstance().getDecoder(new DecoderKeyType(XmlHelper.getNamespace(xmlObject)));
             if (decoderList != null) {
                 for (IDecoder decoder : decoderList) {

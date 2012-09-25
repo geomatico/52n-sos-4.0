@@ -3,7 +3,7 @@
 	<env:Body>
 		<swes:DescribeSensor service="SOS" version="2.0.0"
 			xmlns:swes="http://www.opengis.net/swes/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-			<swes:procedure>http://www.my_namespace.org/sensors/1</swes:procedure>
+			<swes:procedure>http://www.my_namespace.org/sensors/100</swes:procedure>
 			<swes:procedureDescriptionFormat>http://www.opengis.net/sensorML/1.0.1</swes:procedureDescriptionFormat>
 		</swes:DescribeSensor>
 	</env:Body>

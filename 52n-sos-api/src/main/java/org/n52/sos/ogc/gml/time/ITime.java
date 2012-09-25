@@ -28,11 +28,13 @@
 
 package org.n52.sos.ogc.gml.time;
 
+import java.io.Serializable;
+
 /**
  * Interface for time objects
  * 
  */
-public interface ITime extends Comparable<ITime> {
+public interface ITime extends Comparable<ITime>, Serializable {
     
     public void setId(String id);
     

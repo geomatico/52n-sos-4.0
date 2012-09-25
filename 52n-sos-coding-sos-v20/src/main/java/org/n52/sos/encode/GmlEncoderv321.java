@@ -87,6 +87,11 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
     }
     
     @Override
+    public String getContentType() {
+        return "text/xml";
+    }
+    
+    @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
         return encode(element, new HashMap<HelperValues, String>());
     }

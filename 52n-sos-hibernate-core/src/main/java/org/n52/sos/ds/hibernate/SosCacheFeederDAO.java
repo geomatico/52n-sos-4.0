@@ -111,8 +111,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             setObservationTypes(cache, session);
         } catch (HibernateException he) {
             String exceptionText = "Error while initializing CapabilitiesCache!";
-            LOGGER.debug(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+            LOGGER.error(exceptionText, he);
         } finally {
             connectionProvider.returnConnection(session);
         }
@@ -134,8 +133,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             session.close();
         } catch (HibernateException he) {
             String exceptionText = "Error while updateing CapabilitiesCache after sensor insertion!";
-            LOGGER.debug(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+            LOGGER.error(exceptionText, he);
         } finally {
             connectionProvider.returnConnection(session);
         }
@@ -152,8 +150,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             session.close();
         } catch (HibernateException he) {
             String exceptionText = "Error while updateing CapabilitiesCache after observation insertion!";
-            LOGGER.debug(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+            LOGGER.error(exceptionText, he);
         } finally {
             connectionProvider.returnConnection(session);
         }
@@ -171,8 +168,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             session.close();
         } catch (HibernateException he) {
             String exceptionText = "Error while updateing CapabilitiesCache after sensor deletion!";
-            LOGGER.debug(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+            LOGGER.error(exceptionText, he);
         } finally {
             connectionProvider.returnConnection(session);
         }
@@ -372,14 +368,8 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             Session session) {
         Map<String, Collection<String>> kOfferingVFeatureOfInterest = new HashMap<String, Collection<String>>();
         for (String offering : offerings) {
-            Criteria criteria = session.createCriteria(Observation.class);
-            criteria.createAlias("observationConstellation", "oc");
-            criteria.createAlias("oc.offering", "off");
-            criteria.add(Restrictions.eq("off.identifier", offering));
-            criteria.setProjection(Projections.distinct(Projections.property("featureOfInterest")));
-            criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-            List<FeatureOfInterest> featureOfInterests = criteria.list();
-            kOfferingVFeatureOfInterest.put(offering, getFeatureIdentifier(featureOfInterests));
+            List<String> featureOfInterestIdentifiers = HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(offering, session);
+            kOfferingVFeatureOfInterest.put(offering, featureOfInterestIdentifiers);
         }
         return kOfferingVFeatureOfInterest;
     }

@@ -7,7 +7,7 @@
         <id name="offeringId" type="long">
             <column name="offering_id" />
             <generator class="sequence">
-            	<param name="sequence">offering_offering_id_seq</param>
+            	<param name="sequence">offering_id_seq</param>
             </generator>
         </id>
         <property name="identifier" type="string">
@@ -16,11 +16,13 @@
         <property name="name" type="string">
             <column name="name" />
         </property>
-        <set name="observationConstellations" table="observation_constellation" inverse="true" lazy="true" fetch="join">
+        <set name="observationConstellations" table="observation_constellation_has_offering" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="offering_id" not-null="true" />
             </key>
-            <one-to-many class="org.n52.sos.ds.hibernate.entities.ObservationConstellation" />
+            <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.ObservationConstellation">
+                <column name="observation_constellation_id" not-null="true" />
+            </many-to-many>
         </set>
         <set name="requests" table="request" inverse="true" lazy="true" fetch="join">
             <key>
@@ -36,7 +38,7 @@
                 <column name="related_feature_id" not-null="true" />
             </many-to-many>
         </set>
-                <set name="observationTypes" table="offering_has_allowed_observation_type" inverse="false" lazy="true" fetch="join">
+        <set name="observationTypes" table="offering_has_allowed_observation_type" inverse="false" lazy="true" fetch="join">
             <key>
                 <column name="offering_id" not-null="true" />
             </key>

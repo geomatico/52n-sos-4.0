@@ -7,7 +7,7 @@
         <id name="qualityId" type="long">
             <column name="quality_id" />
             <generator class="sequence">
-            	<param name="sequence">quality_quality_id_seq</param>
+            	<param name="sequence">quality_id_seq</param>
             </generator>
         </id>
         <many-to-one name="sweType" class="org.n52.sos.ds.hibernate.entities.SweType" fetch="join">

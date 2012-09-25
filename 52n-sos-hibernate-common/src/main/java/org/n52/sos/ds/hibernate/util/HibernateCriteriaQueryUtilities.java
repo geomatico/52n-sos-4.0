@@ -145,6 +145,11 @@ public class HibernateCriteriaQueryUtilities {
      */
     public static DateTime getMinDate4Offering(String offering, Session session) {
         Criteria criteria = session.createCriteria(Observation.class);
+        Map<String, String> aliases = new HashMap<String, String>();
+        String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
+        String offeringAlias = addOfferingAliasToMap(aliases, obsConstAlias);
+        addAliasesToCriteria(criteria, aliases);
+        criteria.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering));
         Object min =
                 criteria.setProjection(Projections.min(HibernateConstants.PARAMETER_PHENOMENON_TIME_START))
                         .uniqueResult();
@@ -518,8 +523,8 @@ public class HibernateCriteriaQueryUtilities {
      * @return Alias prefix for offering
      */
     public static String addOfferingAliasToMap(Map<String, String> aliases, String prefix) {
-        String alias = "off";
-        String parameter = HibernateConstants.PARAMETER_OFFERING;
+        String alias = "offs";
+        String parameter = HibernateConstants.PARAMETER_OFFERINGS;
         addAliasToMap(aliases, prefix, parameter, alias);
         return alias;
     }
@@ -636,12 +641,12 @@ public class HibernateCriteriaQueryUtilities {
         Map<String, String> aliases = new HashMap<String, String>();
         String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
         String procedureAlias = addProcedureAliasToMap(aliases, obsConstAlias);
+        String foiAlias = addFeatureOfInterestAliasToMap(aliases, null);
         List<Projection> projections = new ArrayList<Projection>();
         projections.add(getDistinctProjection(HibernateConstants.PARAMETER_FEATURE_OF_INTEREST));
         projections.add(getDistinctProjection(getIdentifierParameter(procedureAlias)));
         List<Criterion> criterions = new ArrayList<Criterion>();
-        criterions.add(getEqualRestriction(HibernateConstants.PARAMETER_FEATURE_OF_INTEREST + "."
-                + HibernateConstants.PARAMETER_FEATURE_OF_INTEREST_ID, featureOfInterest.getFeatureOfInterestId()));
+        criterions.add(getEqualRestriction(getIdentifierParameter(foiAlias), featureOfInterest.getIdentifier()));
         return (List<String>) getObject(aliases, criterions, projections, session, Observation.class);
     }
 
@@ -703,7 +708,6 @@ public class HibernateCriteriaQueryUtilities {
         Map<String, String> aliases = new HashMap<String, String>();
         String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
         String offeringAlias = addOfferingAliasToMap(aliases, obsConstAlias);
-        String foiAlias = addFeatureOfInterestAliasToMap(aliases, null);
         List<Criterion> criterions = new ArrayList<Criterion>();
         List<Projection> projections = new ArrayList<Projection>();
         criterions.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offeringID));

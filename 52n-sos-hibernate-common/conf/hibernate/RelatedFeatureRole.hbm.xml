@@ -7,7 +7,7 @@
         <id name="relatedFeatureRoleId" type="long">
             <column name="related_feature_role_id" />
             <generator class="sequence">
-            	<param name="sequence">related_feature_role_related_feature_role_id_seq</param>
+            	<param name="sequence">related_feature_role_id_seq</param>
             </generator>
         </id>
         <property name="relatedFeatureRole" type="string">

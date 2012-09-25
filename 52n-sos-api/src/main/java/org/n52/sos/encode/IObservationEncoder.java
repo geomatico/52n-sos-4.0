@@ -4,7 +4,7 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 
-public interface IObservationEncoder<XmlObject, Object> extends IEncoder<XmlObject, Object> {
+public interface IObservationEncoder<S, T> extends IEncoder<Object, Object> {
     
     public boolean isObservationAndMeasurmentV20Type();
     

@@ -74,6 +74,11 @@ public class SwesEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespon
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(SWEConstants.NS_SWES_20, SWEConstants.NS_SWES_PREFIX);
     }
+    
+    @Override
+    public String getContentType() {
+        return "text/xml";
+    }
 
     @Override
     public XmlObject encode(AbstractServiceResponse response) throws OwsExceptionReport {

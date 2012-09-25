@@ -42,9 +42,6 @@ public class InsertSensorRequest extends AbstractServiceRequest {
 
     private String procedureDescriptionFormat;
 
-    /** String representing xml sensor description */
-    private String procedureXmlDescription;
-
     /** observableProperty parameter */
     private List<String> observableProperty;
     
@@ -61,21 +58,6 @@ public class InsertSensorRequest extends AbstractServiceRequest {
      */
     public InsertSensorRequest() {
 
-    }
-
-    /**
-     * @return the sensorDescription
-     */
-    public String getProcedureDescriptionString() {
-        return procedureXmlDescription;
-    }
-
-    /**
-     * @param sensorDescription
-     *            the sensorDescription to set
-     */
-    public void setProcedureDescriptionString(String procedureDescription) {
-        this.procedureXmlDescription = procedureDescription;
     }
 
     public String getProcedureDescriptionFormat() {

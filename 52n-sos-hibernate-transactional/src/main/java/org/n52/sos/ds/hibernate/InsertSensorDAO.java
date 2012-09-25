@@ -56,10 +56,12 @@ import org.n52.sos.ogc.ows.OWSParameterDataType;
 import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
+import org.n52.sos.ogc.sensorML.AbstractSensorML;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosInsertionCapabilities;
+import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosFeatureRelationship;
 import org.n52.sos.request.InsertSensorRequest;
@@ -86,7 +88,7 @@ public class InsertSensorDAO implements IInsertSensorDAO {
      * Instance of the IConnectionProvider
      */
     private IConnectionProvider connectionProvider;
-    
+
     /**
      * constructor
      */
@@ -112,20 +114,22 @@ public class InsertSensorDAO implements IInsertSensorDAO {
         }
 
         OWSOperation opsMeta = new OWSOperation();
-        
+
         // get data depending on SOS version
         DecoderKeyType dkt = null;
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
-         // set operation name
+            // set operation name
             opsMeta.setOperationName(Sos1Constants.Operations.RegisterSensor.name());
             dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
             // set DCP
-            opsMeta.setDcp(SosHelper.getDCP(Sos1Constants.Operations.RegisterSensor.name(), dkt, Configurator.getInstance().getBindingOperators()
-                    .values(), Configurator.getInstance().getServiceURL()));
+            opsMeta.setDcp(SosHelper.getDCP(Sos1Constants.Operations.RegisterSensor.name(), dkt, Configurator
+                    .getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
             // set param sensorDescription
-            opsMeta.addParameterValue(Sos1Constants.RegisterSensorParams.SensorDescription.name(), new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
+            opsMeta.addParameterValue(Sos1Constants.RegisterSensorParams.SensorDescription.name(),
+                    new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
             // set observationTemplate
-            opsMeta.addParameterValue(Sos1Constants.RegisterSensorParams.ObservationTemplate.name(), new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
+            opsMeta.addParameterValue(Sos1Constants.RegisterSensorParams.ObservationTemplate.name(),
+                    new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
         } else {
             // set operation name
             opsMeta.setOperationName(OPERATION_NAME);
@@ -134,15 +138,21 @@ public class InsertSensorDAO implements IInsertSensorDAO {
             opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt, Configurator.getInstance().getBindingOperators()
                     .values(), Configurator.getInstance().getServiceURL()));
             // set param procedureDescription
-            opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.procedureDescription.name(), new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
+            opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.procedureDescription.name(),
+                    new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
             // set param procedureDescriptionFormat
-            opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name(),
-                    new OWSParameterValuePossibleValues(HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatIdentifiers(session)));
+            opsMeta.addParameterValue(
+                    Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name(),
+                    new OWSParameterValuePossibleValues(HibernateCriteriaQueryUtilities
+                            .getProcedureDescriptionFormatIdentifiers(session)));
             // set param observableProperty
-            opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.observableProperty.name(), new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
+            opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.observableProperty.name(),
+                    new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
             // set param metadata
-            opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.metadata.name(), new OWSParameterValuePossibleValues(new ArrayList<String>(0)));
-            opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.metadata.name(), new OWSParameterDataType("http://schemas.opengis.net/sos/2.0/sosInsertionCapabilities.xsd#InsertionCapabilities"));
+            opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.metadata.name(),
+                    new OWSParameterValuePossibleValues(new ArrayList<String>(0)));
+            opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.metadata.name(), new OWSParameterDataType(
+                    "http://schemas.opengis.net/sos/2.0/sosInsertionCapabilities.xsd#InsertionCapabilities"));
         }
         return opsMeta;
     }
@@ -153,27 +163,40 @@ public class InsertSensorDAO implements IInsertSensorDAO {
         response.setService(request.getService());
         response.setVersion(request.getVersion());
         String assignedProcedureID = checkOrGetAssignedProcedureID(request);
-        SosOffering assignedOffering = checkOrGetAssignedOffering(request.getProcedureDescription().getOfferingIdentifier(), assignedProcedureID);
+        SosOffering assignedOffering = checkOrGetAssignedOffering(request, assignedProcedureID);
         Session session = null;
         Transaction transaction = null;
         try {
             session = (Session) connectionProvider.getConnection();
             transaction = session.beginTransaction();
-            ProcedureDescriptionFormat procedureDescriptionFormat = HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatObject(request.getProcedureDescriptionFormat(), session);
-            List<ObservationType> observationTypes = HibernateCriteriaQueryUtilities.getObservationTypeObjects(request.getMetadata().getObservationTypes(), session);
-            List<FeatureOfInterestType> featureOfInterestTypes = HibernateCriteriaQueryUtilities.getFeatureOfInterestTypeObjects(request.getMetadata().getFeatureOfInterestTypes(), session);
+            ProcedureDescriptionFormat procedureDescriptionFormat =
+                    HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatObject(
+                            request.getProcedureDescriptionFormat(), session);
+            List<ObservationType> observationTypes =
+                    HibernateCriteriaQueryUtilities.getObservationTypeObjects(request.getMetadata()
+                            .getObservationTypes(), session);
+            List<FeatureOfInterestType> featureOfInterestTypes =
+                    HibernateCriteriaQueryUtilities.getFeatureOfInterestTypeObjects(request.getMetadata()
+                            .getFeatureOfInterestTypes(), session);
             if (procedureDescriptionFormat != null && observationTypes != null && featureOfInterestTypes != null) {
-                Procedure procedure = HibernateCriteriaTransactionalUtilities.getOrInsertProcedure(assignedProcedureID, procedureDescriptionFormat, observationTypes, featureOfInterestTypes, session);
-                // TODO: set correct validTime
-                HibernateCriteriaTransactionalUtilities.insertValidProcedureTime(procedure, request.getProcedureDescriptionString(), new DateTime(), session);
-                List<ObservableProperty> obsProps = getOrInsertNewObservableProperties(request.getObservableProperty(), session);
-                Offering offering = insertNewOffering(assignedOffering, request.getRelatatedFeature(), observationTypes, session);
-                HibernateCriteriaTransactionalUtilities.insertObservationConstellation(procedure, obsProps, offering, session);
+                Procedure procedure =
+                        HibernateCriteriaTransactionalUtilities.getOrInsertProcedure(assignedProcedureID,
+                                procedureDescriptionFormat, observationTypes, featureOfInterestTypes, session);
+                // TODO: set correct validTime, 
+                HibernateCriteriaTransactionalUtilities.insertValidProcedureTime(procedure,
+                        getSensorDescriptionFromProcedureDescription(request.getProcedureDescription(), assignedProcedureID), new DateTime(), session);
+                List<ObservableProperty> obsProps =
+                        getOrInsertNewObservableProperties(request.getObservableProperty(), session);
+                Offering offering =
+                        insertNewOffering(assignedOffering, request.getRelatatedFeature(), observationTypes, session);
+                HibernateCriteriaTransactionalUtilities.checkOrInsertObservationConstellation(procedure, obsProps, offering,
+                        session);
                 // TODO: parent and child procedures
                 response.setAssignedProcedure(assignedProcedureID);
                 response.setAssignedOffering(assignedOffering.getOfferingIdentifier());
-            } else if (procedureDescriptionFormat == null && observationTypes != null && featureOfInterestTypes != null){
-               // TODO: invalid parameter value procDescFormat 
+            } else if (procedureDescriptionFormat == null && observationTypes != null
+                    && featureOfInterestTypes != null) {
+                // TODO: invalid parameter value procDescFormat
             } else {
                 // TODO: exception DB not initialized
             }
@@ -195,13 +218,12 @@ public class InsertSensorDAO implements IInsertSensorDAO {
     private String checkOrGetAssignedProcedureID(InsertSensorRequest request) throws OwsExceptionReport {
         // if procedureDescription is SensorML
         if (request.getProcedureDescription() instanceof SensorML) {
-            SensorML sensorML = (SensorML)request.getProcedureDescription();
+            SensorML sensorML = (SensorML) request.getProcedureDescription();
             // if SensorML is not a wrapper
             if (!sensorML.isWrapper()) {
-                if (request.getProcedureDescription().getProcedureIdentifier() != null && !request.getProcedureDescription().getProcedureIdentifier().isEmpty()) {
+                if (request.getProcedureDescription().getProcedureIdentifier() != null
+                        && !request.getProcedureDescription().getProcedureIdentifier().isEmpty()) {
                     return request.getProcedureDescription().getProcedureIdentifier();
-                } else {
-                    return Configurator.getInstance().getDefaultProcedurePrefix() + SosHelper.generateID(request.getProcedureDescriptionString());
                 }
             }
             // if SensorML is a wrapper and member size is 1
@@ -209,31 +231,59 @@ public class InsertSensorDAO implements IInsertSensorDAO {
                 AbstractProcess process = sensorML.getMembers().get(0);
                 if (process.getProcedureIdentifier() != null && !process.getProcedureIdentifier().isEmpty()) {
                     return process.getProcedureIdentifier();
-                } else {
-                    return Configurator.getInstance().getDefaultProcedurePrefix()
-                            + SosHelper.generateID(request.getProcedureDescriptionString());
                 }
-            } 
-            else {
-                return Configurator.getInstance().getDefaultProcedurePrefix() + SosHelper.generateID(request.getProcedureDescriptionString());
             }
-        } 
+            return Configurator.getInstance().getDefaultProcedurePrefix()
+                    + SosHelper.generateID(sensorML.getSensorDescriptionXmlString());
+        }
         // if procedureDescription not SensorML
         else {
-            if (request.getProcedureDescription().getProcedureIdentifier() != null && !request.getProcedureDescription().getProcedureIdentifier().isEmpty()) {
+            if (request.getProcedureDescription().getProcedureIdentifier() != null
+                    && !request.getProcedureDescription().getProcedureIdentifier().isEmpty()) {
                 return request.getProcedureDescription().getProcedureIdentifier();
             } else {
-                return Configurator.getInstance().getDefaultProcedurePrefix() + SosHelper.generateID(request.getProcedureDescriptionString());
-            }  
+                return Configurator.getInstance().getDefaultProcedurePrefix()
+                        + SosHelper.generateID(request.getProcedureDescription().toString());
+            }
         }
     }
 
-    private SosOffering checkOrGetAssignedOffering(SosOffering offering, String assignedProcedureID) throws OwsExceptionReport {
-        if (offering != null && offering.getOfferingIdentifier() != null && !offering.getOfferingIdentifier().isEmpty()) {
-            if (!Configurator.getInstance().getCapabilitiesCacheController().getKOfferingVProcedures().containsKey(offering.getOfferingIdentifier())) {
-                return offering;
+    private SosOffering checkOrGetAssignedOffering(InsertSensorRequest request, String assignedProcedureID)
+            throws OwsExceptionReport {
+        // if procedureDescription is SensorML
+        SosOffering sosOffering = null;
+        if (request.getProcedureDescription() instanceof SensorML) {
+            SensorML sensorML = (SensorML) request.getProcedureDescription();
+            // if SensorML is not a wrapper
+            if (!sensorML.isWrapper()) {
+                if (request.getProcedureDescription().getOfferingIdentifier() != null) {
+                    sosOffering = request.getProcedureDescription().getOfferingIdentifier();
+                }
+            }
+            // if SensorML is a wrapper and member size is 1
+            else if (sensorML.isWrapper() && sensorML.getMembers().size() == 1) {
+                AbstractProcess process = sensorML.getMembers().get(0);
+                if (process.getProcedureIdentifier() != null && !process.getProcedureIdentifier().isEmpty()) {
+                    sosOffering = process.getOfferingIdentifier();
+                }
+            }
+        }
+        // if procedureDescription not SensorML
+        else {
+            if (request.getProcedureDescription().getOfferingIdentifier() != null) {
+                sosOffering = request.getProcedureDescription().getOfferingIdentifier();
+            }
+        }
+        // check if offering is valid
+        if (sosOffering != null && sosOffering.getOfferingIdentifier() != null
+                && !sosOffering.getOfferingIdentifier().isEmpty()) {
+            if (!Configurator.getInstance().getCapabilitiesCacheController().getKOfferingVProcedures()
+                    .containsKey(sosOffering.getOfferingIdentifier())) {
+                return sosOffering;
             } else {
-                String exceptionText = "The requested offering identifier (" + offering.getOfferingIdentifier() + ") is already provided by this server!";
+                String exceptionText =
+                        "The requested offering identifier (" + sosOffering.getOfferingIdentifier()
+                                + ") is already provided by this server!";
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
             }
         } else {
@@ -242,16 +292,20 @@ public class InsertSensorDAO implements IInsertSensorDAO {
         }
     }
 
-    private Offering insertNewOffering(SosOffering assignedOffering, List<SosFeatureRelationship> relatedFeatures, List<ObservationType> observationTypes, Session session) throws OwsExceptionReport {
+    private Offering insertNewOffering(SosOffering assignedOffering, List<SosFeatureRelationship> relatedFeatures,
+            List<ObservationType> observationTypes, Session session) throws OwsExceptionReport {
         List<RelatedFeature> hRelatedFeatures = new ArrayList<RelatedFeature>();
         if (relatedFeatures != null && !relatedFeatures.isEmpty()) {
             for (SosFeatureRelationship relatedFeature : relatedFeatures) {
-                List<RelatedFeatureRole> relatedFeatureRoles = HibernateCriteriaTransactionalUtilities.getOrInsertRelatedFeatureRole(relatedFeature.getRole(), session);
+                List<RelatedFeatureRole> relatedFeatureRoles =
+                        HibernateCriteriaTransactionalUtilities.getOrInsertRelatedFeatureRole(
+                                relatedFeature.getRole(), session);
                 hRelatedFeatures.addAll(HibernateCriteriaTransactionalUtilities.getOrInsertRelatedFeature(
                         relatedFeature.getFeature(), relatedFeatureRoles, session));
             }
         }
-        return HibernateCriteriaTransactionalUtilities.insertOffering(assignedOffering.getOfferingIdentifier(), assignedOffering.getOfferingName(), hRelatedFeatures, observationTypes, session);
+        return HibernateCriteriaTransactionalUtilities.insertOffering(assignedOffering.getOfferingIdentifier(),
+                assignedOffering.getOfferingName(), hRelatedFeatures, observationTypes, session);
     }
 
     private List<ObservableProperty> getOrInsertNewObservableProperties(List<String> obsProps, Session session) {
@@ -260,6 +314,27 @@ public class InsertSensorDAO implements IInsertSensorDAO {
             observableProperties.add(new SosObservableProperty(observableProperty));
         }
         return HibernateCriteriaTransactionalUtilities.getOrInsertObservableProperty(observableProperties, session);
+    }
+
+    private String getSensorDescriptionFromProcedureDescription(SosProcedureDescription procedureDescription, String procedureIdentifier) {
+        if (procedureDescription instanceof SensorML) {
+            SensorML sensorML = (SensorML) procedureDescription;
+            // if SensorML is not a wrapper
+            if (!sensorML.isWrapper()) {
+                return sensorML.getSensorDescriptionXmlString();
+            }
+            // if SensorML is a wrapper and member size is 1
+            else if (sensorML.isWrapper() && sensorML.getMembers().size() == 1) {
+                return sensorML.getMembers().get(0).getSensorDescriptionXmlString();
+            } else {
+                // TODO: get sensor description for procedure identifier
+                return "";
+            }
+        }
+        // if procedureDescription not SensorML
+        else {
+            return ((AbstractSensorML)procedureDescription).getSensorDescriptionXmlString();
+        }
     }
 
     @Override
@@ -274,9 +349,11 @@ public class InsertSensorDAO implements IInsertSensorDAO {
         }
         SosInsertionCapabilities insertionCapabilities = new SosInsertionCapabilities();
         try {
-            insertionCapabilities.addFeatureOfInterestTypes(HibernateCriteriaQueryUtilities.getFeatureOfInterestTypes(session));
+            insertionCapabilities.addFeatureOfInterestTypes(HibernateCriteriaQueryUtilities
+                    .getFeatureOfInterestTypes(session));
             insertionCapabilities.addObservationTypes(HibernateCriteriaQueryUtilities.getObservationTypes(session));
-            insertionCapabilities.addProcedureDescriptionFormats(HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatIdentifiers(session));
+            insertionCapabilities.addProcedureDescriptionFormats(HibernateCriteriaQueryUtilities
+                    .getProcedureDescriptionFormatIdentifiers(session));
         } catch (HibernateException he) {
             String exceptionText = "Error while querying data for InsertionCapabilities!";
             LOGGER.error(exceptionText, he);
@@ -285,6 +362,5 @@ public class InsertSensorDAO implements IInsertSensorDAO {
 
         return insertionCapabilities;
     }
-    
-    
+
 }

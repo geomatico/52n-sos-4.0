@@ -43,6 +43,7 @@ import org.n52.sos.ds.IInsertObservationDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
+import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
@@ -133,10 +134,13 @@ public class InsertObservationDAO implements IInsertObservationDAO {
                 Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set offering
         opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.offering.name(),
-                new OWSParameterValuePossibleValues(Configurator.getInstance().getCapabilitiesCacheController().getOfferings()));
+                new OWSParameterValuePossibleValues(Configurator.getInstance().getCapabilitiesCacheController()
+                        .getOfferings()));
         // set observation
-        opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.observation.name(), new OWSParameterValuePossibleValues(new ArrayList<String>(0)));
-        opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.observation.name(), new OWSParameterDataType("http://schemas.opengis.net/om/2.0/observation.xsd#OM_Observation"));
+        opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.observation.name(),
+                new OWSParameterValuePossibleValues(new ArrayList<String>(0)));
+        opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.observation.name(), new OWSParameterDataType(
+                "http://schemas.opengis.net/om/2.0/observation.xsd#OM_Observation"));
         return opsMeta;
     }
 
@@ -152,18 +156,33 @@ public class InsertObservationDAO implements IInsertObservationDAO {
         try {
             session = (Session) connectionProvider.getConnection();
             transaction = session.beginTransaction();
+            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
             for (SosObservation observation : request.getObservation()) {
-                ObservationConstellation obsConst =
-                        checkObservationConstellationForObservation(observation.getObservationConstellation(), session);
-                FeatureOfInterest feature =
-                        checkOrInsertFeatureOfInterest(observation.getObservationConstellation()
-                                .getFeatureOfInterest(), session);
-                checkOrInsertFeatureOfInterestRelatedFeatureRelationShip(feature, obsConst.getOffering().getIdentifier(), session);
-                if (observation.getValue() instanceof SosSingleObservationValue) {
-                    insertObservationSingleValue(obsConst, feature, observation, session);
-                } else if (observation.getValue() instanceof SosMultiObservationValues) {
-                    insertObservationMutliValue(obsConst, feature, observation);
+                SosObservationConstellation sosObsConst = observation.getObservationConstellation();
+                ObservationConstellation obsConst = null;
+                try {
+                    obsConst =
+                            checkObservationConstellationForObservation(sosObsConst, obsConst.getOffering()
+                                    .getIdentifier(), session);
+                } catch (OwsExceptionReport owse) {
+                    exceptions.add(owse);
                 }
+                if (obsConst != null) {
+                    FeatureOfInterest feature =
+                            checkOrInsertFeatureOfInterest(observation.getObservationConstellation()
+                                    .getFeatureOfInterest(), session);
+                    checkOrInsertFeatureOfInterestRelatedFeatureRelationShip(feature, obsConst.getOffering(), session);
+                    if (observation.getValue() instanceof SosSingleObservationValue) {
+                        insertObservationSingleValue(obsConst, feature, observation, session);
+                    } else if (observation.getValue() instanceof SosMultiObservationValues) {
+                        insertObservationMutliValue(obsConst, feature, observation);
+                    }
+                }
+
+            }
+            // if no observationconstellation is valid, throw exception
+            if (exceptions.size() == request.getObservation().size()) {
+                Util4Exceptions.mergeExceptions(exceptions);
             }
             session.flush();
             transaction.commit();
@@ -185,14 +204,14 @@ public class InsertObservationDAO implements IInsertObservationDAO {
     }
 
     private ObservationConstellation checkObservationConstellationForObservation(
-            SosObservationConstellation sosObservationConstellation, Session session) throws OwsExceptionReport,
-            HibernateException {
+            SosObservationConstellation sosObservationConstellation, String offeringIdentifier, Session session)
+            throws OwsExceptionReport, HibernateException {
+        // check if multiple offeriungs.
         List<Criterion> criterions = new ArrayList<Criterion>();
         Map<String, String> aliases = new HashMap<String, String>();
         String offAlias = HibernateCriteriaQueryUtilities.addOfferingAliasToMap(aliases, null);
         criterions.add(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                HibernateCriteriaQueryUtilities.getIdentifierParameter(offAlias),
-                sosObservationConstellation.getOffering()));
+                HibernateCriteriaQueryUtilities.getIdentifierParameter(offAlias), offeringIdentifier));
         String obsPropAlias = HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, null);
         criterions.add(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateCriteriaQueryUtilities
                 .getIdentifierParameter(obsPropAlias), sosObservationConstellation.getObservableProperty()
@@ -217,7 +236,14 @@ public class InsertObservationDAO implements IInsertObservationDAO {
                     StringBuilder exceptionText = new StringBuilder();
                     exceptionText.append("The requested observationType (");
                     exceptionText.append(sosObservationConstellation.getObservationType());
-                    exceptionText.append(") is invalid for procedure, observedProperty and offering!");
+                    exceptionText.append(") is invalid for ");
+                    exceptionText.append("procedure = ");
+                    exceptionText.append(sosObservationConstellation.getProcedure());
+                    exceptionText.append(", observedProperty = ");
+                    exceptionText.append(sosObservationConstellation.getObservableProperty().getIdentifier());
+                    exceptionText.append("and offering = ");
+                    exceptionText.append(sosObservationConstellation.getOfferings());
+                    exceptionText.append("!");
                     exceptionText.append("The valid observationType is '");
                     exceptionText.append(obsConst.getObservationType().getObservationType());
                     exceptionText.append("'!");
@@ -229,13 +255,18 @@ public class InsertObservationDAO implements IInsertObservationDAO {
         } else {
             StringBuilder exceptionText = new StringBuilder();
             exceptionText.append("The requested observation constellation (");
-            exceptionText.append("procedure, observedProperty and offering)");
+            exceptionText.append("procedure = ");
+            exceptionText.append(sosObservationConstellation.getProcedure());
+            exceptionText.append(", observedProperty = ");
+            exceptionText.append(sosObservationConstellation.getObservableProperty().getIdentifier());
+            exceptionText.append("and offering = ");
+            exceptionText.append(sosObservationConstellation.getOfferings());
+            exceptionText.append(")");
             exceptionText.append(" is invalid!");
             LOGGER.debug(exceptionText.toString());
             throw Util4Exceptions.createInvalidParameterValueException(
                     Sos2Constants.InsertObservationParams.observation.name(), exceptionText.toString());
         }
-
     }
 
     private FeatureOfInterest checkOrInsertFeatureOfInterest(SosAbstractFeature featureOfInterest, Session session)
@@ -253,14 +284,15 @@ public class InsertObservationDAO implements IInsertObservationDAO {
     }
 
     private void checkOrInsertFeatureOfInterestRelatedFeatureRelationShip(FeatureOfInterest featureOfInterest,
-            String offeringID, Session session) {
-        List<RelatedFeature> relatedFeatures = HibernateCriteriaQueryUtilities.getRelatedFeatureForOffering(offeringID, session);
+            Offering offering, Session session) {
+        List<RelatedFeature> relatedFeatures =
+                HibernateCriteriaQueryUtilities.getRelatedFeatureForOffering(offering.getIdentifier(), session);
         if (relatedFeatures != null) {
             for (RelatedFeature relatedFeature : relatedFeatures) {
-                HibernateCriteriaTransactionalUtilities.insertFeatureOfInterestRelationShip(relatedFeature.getFeatureOfInterest(), featureOfInterest, session);
+                HibernateCriteriaTransactionalUtilities.insertFeatureOfInterestRelationShip(
+                        relatedFeature.getFeatureOfInterest(), featureOfInterest, session);
             }
         }
-        
     }
 
     private void insertObservationSingleValue(ObservationConstellation obsConst, FeatureOfInterest feature,
@@ -272,10 +304,12 @@ public class InsertObservationDAO implements IInsertObservationDAO {
         }
         hObservation.setObservationConstellation(obsConst);
         hObservation.setFeatureOfInterest(feature);
-        addPhenomeonTimeAndResultTimeToObservation(hObservation, observation.getPhenomenonTime(), observation.getResultTime());
+        addPhenomeonTimeAndResultTimeToObservation(hObservation, observation.getPhenomenonTime(),
+                observation.getResultTime());
         addValueToObservation(hObservation, value.getValue(), session);
         if (value.getValue().getUnit() != null) {
-            hObservation.setUnit(HibernateCriteriaTransactionalUtilities.getOrInsertUnit(value.getValue().getUnit(), session));
+            hObservation.setUnit(HibernateCriteriaTransactionalUtilities.getOrInsertUnit(value.getValue().getUnit(),
+                    session));
         }
         HibernateCriteriaTransactionalUtilities.insertObservation(hObservation, session);
     }
@@ -301,13 +335,14 @@ public class InsertObservationDAO implements IInsertObservationDAO {
         if (resultTime != null) {
             if (resultTime.getValue() != null) {
                 hObservation.setResultTime(resultTime.getValue().toDate());
-            } else if (resultTime.getIndeterminateValue().contains(Sos2Constants.EN_PHENOMENON_TIME) && phenomenonTime instanceof TimeInstant) {
-                hObservation.setResultTime(((TimeInstant)phenomenonTime).getValue().toDate());
+            } else if (resultTime.getIndeterminateValue().contains(Sos2Constants.EN_PHENOMENON_TIME)
+                    && phenomenonTime instanceof TimeInstant) {
+                hObservation.setResultTime(((TimeInstant) phenomenonTime).getValue().toDate());
             } else {
                 // TODO: exception not valid resultTime
             }
         } else {
-            // TODO: exception missing resultTime 
+            // TODO: exception missing resultTime
         }
     }
 
@@ -320,17 +355,23 @@ public class InsertObservationDAO implements IInsertObservationDAO {
 
     private void addValueToObservation(Observation hObservation, IValue value, Session session) {
         if (value instanceof BooleanValue) {
-            hObservation.setBooleanValues(HibernateCriteriaTransactionalUtilities.getOrInsertBooleanValue(((BooleanValue)value).getValue(), session));
+            hObservation.setBooleanValues(HibernateCriteriaTransactionalUtilities.getOrInsertBooleanValue(
+                    ((BooleanValue) value).getValue(), session));
         } else if (value instanceof CategoryValue) {
-            hObservation.setCategoryValues(HibernateCriteriaTransactionalUtilities.getOrInsertCategoryValue(((CategoryValue)value).getValue(), session));
+            hObservation.setCategoryValues(HibernateCriteriaTransactionalUtilities.getOrInsertCategoryValue(
+                    ((CategoryValue) value).getValue(), session));
         } else if (value instanceof CountValue) {
-            hObservation.setCountValues(HibernateCriteriaTransactionalUtilities.getOrInsertCountValue(((CountValue)value).getValue(), session));
+            hObservation.setCountValues(HibernateCriteriaTransactionalUtilities.getOrInsertCountValue(
+                    ((CountValue) value).getValue(), session));
         } else if (value instanceof GeometryValue) {
-            hObservation.setGeometryValues(HibernateCriteriaTransactionalUtilities.getOrInsertGeometryValue(((GeometryValue)value).getValue(), session));
+            hObservation.setGeometryValues(HibernateCriteriaTransactionalUtilities.getOrInsertGeometryValue(
+                    ((GeometryValue) value).getValue(), session));
         } else if (value instanceof QuantityValue) {
-            hObservation.setNumericValues(HibernateCriteriaTransactionalUtilities.getOrInsertQuantityValue(((QuantityValue)value).getValue(), session));
+            hObservation.setNumericValues(HibernateCriteriaTransactionalUtilities.getOrInsertQuantityValue(
+                    ((QuantityValue) value).getValue(), session));
         } else if (value instanceof TextValue) {
-            hObservation.setTextValues(HibernateCriteriaTransactionalUtilities.getOrInsertTextValue(((TextValue)value).getValue(), session));
+            hObservation.setTextValues(HibernateCriteriaTransactionalUtilities.getOrInsertTextValue(
+                    ((TextValue) value).getValue(), session));
         }
     }
 

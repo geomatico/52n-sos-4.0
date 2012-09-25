@@ -7,13 +7,13 @@
         <id name="observationId" type="long">
             <column name="observation_id" />
             <generator class="sequence">
-            	<param name="sequence">observation_observation_id_seq</param>
+            	<param name="sequence">observation_id_seq</param>
             </generator>
         </id>
-        <many-to-one name="featureOfInterest" class="org.n52.sos.ds.hibernate.entities.FeatureOfInterest" fetch="join">
+        <many-to-one name="featureOfInterest" class="org.n52.sos.ds.hibernate.entities.FeatureOfInterest" fetch="select">
             <column name="feature_of_interest_id" not-null="true" />
         </many-to-one>
-        <many-to-one name="observationConstellation" class="org.n52.sos.ds.hibernate.entities.ObservationConstellation" fetch="join">
+        <many-to-one name="observationConstellation" class="org.n52.sos.ds.hibernate.entities.ObservationConstellation" fetch="select">
             <column name="observation_constellation_id" not-null="true" />
         </many-to-one>
         <property name="identifier" type="string">

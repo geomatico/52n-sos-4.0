@@ -34,8 +34,6 @@ import org.n52.sos.ogc.filter.FilterConstants.ConformanceClassConstraintNames;
 import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -81,6 +79,11 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
     
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(FilterConstants.NS_FES_2, FilterConstants.NS_FES_2_PREFIX);
+    }
+    
+    @Override
+    public String getContentType() {
+        return "text/xml";
     }
 
     @Override

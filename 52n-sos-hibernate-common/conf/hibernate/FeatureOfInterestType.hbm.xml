@@ -7,7 +7,7 @@
         <id name="featureOfInterestTypeId" type="long">
             <column name="feature_of_interest_type_id" />
             <generator class="sequence">
-            	<param name="sequence">feature_of_interest_type_feature_of_interest_type_id_seq</param>
+            	<param name="sequence">feature_of_interest_type_id_seq</param>
             </generator>
         </id>
         <property name="featureOfInterestType" type="string">

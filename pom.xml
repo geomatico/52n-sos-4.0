@@ -106,47 +106,52 @@
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-gml-v321</artifactId>
-			    <version>1.1.0-SNAPSHOT</version>
+			    <version>1.1.2</version>
+			</dependency>
+			<dependency>
+			    <groupId>org.n52.sensorweb</groupId>
+			    <artifactId>52n-xml-filter-v20</artifactId>
+			    <version>1.1.2</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-sweCommon-v20</artifactId>
-			    <version>1.1.0-SNAPSHOT</version>
+			    <version>1.1.2</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-sweCommon-v101</artifactId>
-			    <version>1.1.0-SNAPSHOT</version>
+			    <version>1.1.2</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-sensorML-v101</artifactId>
-			    <version>1.1.0-SNAPSHOT</version>
+			    <version>1.1.2</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-om-v20</artifactId>
-			    <version>1.1.0-SNAPSHOT</version>
+			    <version>1.1.2</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-sampling-v20</artifactId>
-			    <version>1.1.0-SNAPSHOT</version>
+			    <version>1.1.2</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-ows-v110</artifactId>
-			    <version>1.1.0-SNAPSHOT</version>
+			    <version>1.1.2</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-sos-v20</artifactId>
-			    <version>1.1.0-SNAPSHOT</version>
+			    <version>1.1.2</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-sos-v100</artifactId>
-			    <version>1.1.0-SNAPSHOT</version>
+			    <version>1.1.2</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -315,6 +320,18 @@
 			<id>pox</id>
 			<modules>
 				<module>52n-sos-binding-xml</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>wml</id>
+			<modules>
+				<module>../52n-sos-coding-wml-v20</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>diagram</id>
+			<modules>
+				<module>../52n-sos-coding-diagram</module>
 			</modules>
 		</profile>
 	</profiles>

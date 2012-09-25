@@ -116,6 +116,11 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(Sos2Constants.NS_SOS_20, SosConstants.NS_SOS_PREFIX);
     }
+    
+    @Override
+    public String getContentType() {
+        return "text/xml";
+    }
 
     @Override
     public XmlObject encode(AbstractServiceResponse response) throws OwsExceptionReport {
@@ -419,6 +424,9 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
             ObservationOfferingType xbObsOff =
                     ObservationOfferingType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             xbObsOff.setIdentifier(offering.getOffering());
+            if (offering.getOfferingName() != null && !offering.getOfferingName().isEmpty()) {
+                xbObsOff.addNewName().setStringValue(offering.getOfferingName());
+            }
             for (String procedure : offering.getProcedures()) {
                 xbObsOff.setProcedure(procedure);
             }
@@ -660,6 +668,15 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
                         SosConstants.NS_SOS_PREFIX));
                 while (cursor.toNextSibling(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_OBSERVATION_TYPE))) {
                     cursor.setName(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_OBSERVATION_TYPE,
+                            SosConstants.NS_SOS_PREFIX));
+                }
+                cursor.toParent();
+            }
+            if (cursor.toChild(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_FEATURE_OF_INTEREST_TYPE))) {
+                cursor.setName(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_FEATURE_OF_INTEREST_TYPE,
+                        SosConstants.NS_SOS_PREFIX));
+                while (cursor.toNextSibling(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_FEATURE_OF_INTEREST_TYPE))) {
+                    cursor.setName(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_FEATURE_OF_INTEREST_TYPE,
                             SosConstants.NS_SOS_PREFIX));
                 }
             }

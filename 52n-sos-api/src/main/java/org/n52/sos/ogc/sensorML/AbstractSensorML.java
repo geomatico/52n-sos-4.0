@@ -125,12 +125,13 @@ public class AbstractSensorML extends SosProcedureDescription {
     public String getProcedureIdentifier() {
         if (identifications != null) {
             for (SosSMLIdentifier identification : identifications) {
-                if (identification.getDefinition() != null
-                        && (identification.getDefinition().equals("urn:ogc:def:identifier:OGC:uniqueID")
+                if ((identification.getName() != null && identification.getName().equals("uniqueID"))
+                        || (identification.getDefinition() != null
+                                && (identification.getDefinition().equals("urn:ogc:def:identifier:OGC:uniqueID")
                                 || identification.getDefinition().equals(
                                         "urn:ogc:def:identifier:OGC::identification.getDefinition()") || (identification
                                 .getDefinition().startsWith("urn:ogc:def:identifier:OGC:") && identification
-                                .getDefinition().contains("uniqueID")))) {
+                                .getDefinition().contains("uniqueID"))))) {
                     return identification.getValue();
                 }
             }
@@ -140,18 +141,12 @@ public class AbstractSensorML extends SosProcedureDescription {
 
     @Override
     public SosOffering getOfferingIdentifier() {
-        if (capabilities != null) {
-            for (SosSMLCapabilities capability : capabilities) {
-                if (capability.getName() != null && capability.getName().equals("offering")) {
-                    if (capability.getFields() != null) {
-                        for (SosSweField field : capability.getFields()) {
-                            if (field.getName() != null && field.getName().equals("Offering")) {
-                                if (field.getElement() != null && field.getElement().getDefinition() != null && field.getElement().getDefinition().equals("Offering identifier")) {
-                                    return new SosOffering(field.getElement().getValue(), field.getElement().getDescription());
-                                }
-                            }
-                        }
-                    }
+        if (identifications != null) {
+            for (SosSMLIdentifier identification : identifications) {
+                if (identification.getDefinition() != null
+                        && (identification.getDefinition().equals("urn:ogc:def:identifier:OGC:offeringID")
+                                || identification.getDefinition().contains("offering"))) {
+                            return new SosOffering(identification.getValue(), identification.getName());
                 }
             }
         }

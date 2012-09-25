@@ -31,20 +31,20 @@ package org.n52.sos.request.operator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.cache.ACapabilitiesCacheController;
-import org.n52.sos.cache.CapabilitiesCacheController;
 import org.n52.sos.ds.IInsertObservationDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -150,7 +150,7 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
-        addOfferingToObservationConstallation(request);
+        checkAndAddOfferingToObservationConstallation(request);
         try {
             OwsHelper.checkSingleVersionParameter(request.getVersion(), Configurator.getInstance()
                     .getSupportedVersions());
@@ -174,6 +174,7 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
     }
 
     private void checkOfferings(List<String> offerings) throws OwsExceptionReport {
+        // TODO: Check requirement for this case in SOS 2.0 specification
         if (offerings == null || (offerings != null && offerings.isEmpty())) {
             throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertObservationParams.offering
                     .name());
@@ -193,23 +194,22 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
         }
     }
 
-    private void addOfferingToObservationConstallation(InsertObservationRequest request) throws OwsExceptionReport {
-        List<SosObservation> updatededObservations = new ArrayList<SosObservation>();
-        try {
-            for (String offering : request.getOfferings()) {
+    private void checkAndAddOfferingToObservationConstallation(InsertObservationRequest request)
+            throws OwsExceptionReport {
+        for (String offeringIdentifier : request.getOfferings()) {
+            if (Configurator.getInstance().getCapabilitiesCacheController().getOfferings()
+                    .contains(offeringIdentifier)) {
                 for (SosObservation observation : request.getObservation()) {
-                    SosObservation updatedObservation = observation.clone();
-                    updatedObservation.getObservationConstellation().setOffering(offering);
-                    updatededObservations.add(updatedObservation);
+                    observation.getObservationConstellation().addOffering(offeringIdentifier);
                 }
+            } else {
+                StringBuilder exceptionText = new StringBuilder();
+                exceptionText.append("The requested offering (");
+                exceptionText.append(offeringIdentifier);
+                exceptionText.append(") is not supported by this server!");
+                LOGGER.warn(exceptionText.toString());
             }
-        } catch (CloneNotSupportedException cnse) {
-            String exceptionText = "Error while adding offering(s) to observation(s)!";
-            LOGGER.error(exceptionText, cnse);
-            throw Util4Exceptions.createNoApplicableCodeException(cnse, exceptionText);
         }
-
-        request.setObservation(updatededObservations);
     }
 
     private void checkObservations(List<SosObservation> observations) throws OwsExceptionReport {
@@ -230,18 +230,22 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
                     exceptions.add(Util4Exceptions.createInvalidParameterValueException(
                             Sos2Constants.InsertObservationParams.observationType.name(), exceptionText.toString()));
                 } else {
-                    if (!capsController.getAllowedObservationTypes4Offering(obsConstallation.getOffering())
-                            .contains(obsConstallation.getObservationType())) {
-                        StringBuilder exceptionText = new StringBuilder();
-                        exceptionText.append("The requested observationType (");
-                        exceptionText.append(obsConstallation.getObservationType());
-                        exceptionText.append(") is not allowed for the requested offering (");
-                        exceptionText.append(obsConstallation.getOffering());
-                        exceptionText.append(")!");
-                        exceptions
-                                .add(Util4Exceptions.createInvalidParameterValueException(
-                                        Sos2Constants.InsertObservationParams.observationType.name(),
-                                        exceptionText.toString()));
+                    for (String offeringID : obsConstallation.getOfferings()) {
+                        Collection<String> allowedObservationTypes =
+                                capsController.getAllowedObservationTypes4Offering(offeringID);
+                        if (allowedObservationTypes == null
+                                || (allowedObservationTypes != null && !allowedObservationTypes
+                                        .contains(obsConstallation.getObservationType()))) {
+                            StringBuilder exceptionText = new StringBuilder();
+                            exceptionText.append("The requested observationType (");
+                            exceptionText.append(obsConstallation.getObservationType());
+                            exceptionText.append(") is not allowed for the requested offering (");
+                            exceptionText.append(obsConstallation.getOfferings());
+                            exceptionText.append(")!");
+                            exceptions.add(Util4Exceptions.createInvalidParameterValueException(
+                                    Sos2Constants.InsertObservationParams.observationType.name(),
+                                    exceptionText.toString()));
+                        }
                     }
                 }
             }

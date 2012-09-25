@@ -7,7 +7,7 @@
         <id name="compositePhenomenonId" type="long">
             <column name="composite_phenomenon_id" />
             <generator class="sequence">
-            	<param name="sequence">composite_phenomenon_composite_phenomenon_id_seq</param>
+            	<param name="sequence">composite_phenomenon_id_seq</param>
             </generator>
         </id>
         <property name="identifier" type="string">

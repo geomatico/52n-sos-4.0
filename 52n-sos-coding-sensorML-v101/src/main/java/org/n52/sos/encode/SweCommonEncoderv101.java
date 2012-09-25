@@ -72,7 +72,12 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(SWEConstants.NS_SWE, SWEConstants.NS_SWE_PREFIX);
     }
-
+    
+    @Override
+    public String getContentType() {
+        return "text/xml";
+    }
+    
     @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
         return encode(element, null);

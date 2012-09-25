@@ -1,6 +1,6 @@
 package org.n52.sos.ds.hibernate.entities;
 
-// Generated 10.07.2012 15:18:23 by Hibernate Tools 3.4.0.CR1
+// Generated 19.09.2012 15:09:37 by Hibernate Tools 3.4.0.CR1
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,9 +10,6 @@ import java.util.Set;
  */
 public class ObservationConstellation implements java.io.Serializable {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     private long observationConstellationId;

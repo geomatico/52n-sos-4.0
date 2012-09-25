@@ -28,13 +28,20 @@
 
 package org.n52.sos.ogc.om;
 
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 
 /**
  * @author c_hollmann
  * 
  */
-public class SosObservationConstellation {
+public class SosObservationConstellation implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /** Identifier of the procedure by which the observation is made */
     private String procedure;
@@ -42,8 +49,8 @@ public class SosObservationConstellation {
     /** Identifier of the observableProperty to which the observation accords to */
     private AbstractSosPhenomenon observableProperty;
 
-    /** Identifier of the offering to which this observation belongs */
-    private String offering;
+    /** Identifiers of the offerings to which this observation belongs */
+    private Set<String> offerings;
 
     /** Identifier of the featureOfInterest to which this observation belongs */
     private SosAbstractFeature featureOfInterest;
@@ -72,12 +79,12 @@ public class SosObservationConstellation {
      * @param observationType
      *            Observation type
      */
-    public SosObservationConstellation(String procedure, AbstractSosPhenomenon observableProperty, String offering,
+    public SosObservationConstellation(String procedure, AbstractSosPhenomenon observableProperty, Set<String> offerings,
             SosAbstractFeature featureOfInterest, String observationType) {
         super();
         this.procedure = procedure;
         this.observableProperty = observableProperty;
-        this.offering = offering;
+        this.offerings = offerings;
         this.featureOfInterest = featureOfInterest;
         this.observationType = observationType;
     }
@@ -125,8 +132,8 @@ public class SosObservationConstellation {
      * 
      * @return the offering
      */
-    public String getOffering() {
-        return offering;
+    public Set<String> getOfferings() {
+        return offerings;
     }
 
     /**
@@ -135,10 +142,24 @@ public class SosObservationConstellation {
      * @param offering
      *            the offering to set
      */
-    public void setOffering(String offering) {
-        this.offering = offering;
+    public void setOfferings(Set<String> offerings) {
+        this.offerings = offerings;
     }
-
+    
+    public void setOfferings(List<String> offerings) {
+        if (this.offerings == null) {
+            this. offerings = new HashSet<String>(0);
+        }
+        this.offerings.addAll(offerings);
+    }
+    
+    public void addOffering(String offering) {
+        if (offerings == null) {
+            offerings = new HashSet<String>(0);
+        }
+        offerings.add(offering);
+    }
+    
     /**
      * Get featureOfInterest
      * 
@@ -186,13 +207,6 @@ public class SosObservationConstellation {
     public boolean equals(Object paramObject) {
         if (paramObject instanceof SosObservationConstellation) {
             SosObservationConstellation obsConst = (SosObservationConstellation) paramObject;
-            if (offering != null) {
-                return (procedure.equals(obsConst.getProcedure())
-                        && observableProperty.getIdentifier().equals(obsConst.getObservableProperty().getIdentifier())
-                        && offering.equals(obsConst.getOffering())
-                        && featureOfInterest.equals(obsConst.getFeatureOfInterest()) && observationType
-                            .equals(obsConst.getObservationType()));
-            }
             return (procedure.equals(obsConst.getProcedure())
                     && observableProperty.getIdentifier().equals(obsConst.getObservableProperty().getIdentifier())
                     && featureOfInterest.equals(obsConst.getFeatureOfInterest()) && observationType.equals(obsConst
@@ -211,9 +225,6 @@ public class SosObservationConstellation {
         int hash = 7;
         hash = 31 * hash + procedure.hashCode();
         hash = 31 * hash + observableProperty.hashCode();
-        if (offering != null) {
-            hash = 31 * hash + offering.hashCode();
-        }
         hash = 31 * hash + featureOfInterest.hashCode();
         hash = 31 * hash + observationType.hashCode();
         return hash;
@@ -227,11 +238,6 @@ public class SosObservationConstellation {
      * @return true if equals
      */
     public boolean equalsExcludingObsProp(SosObservationConstellation toCheckObsConst) {
-        if (offering != null) {
-            return (procedure.equals(toCheckObsConst.getProcedure()) && offering.equals(toCheckObsConst.getOffering())
-                    && featureOfInterest.equals(toCheckObsConst.getFeatureOfInterest())
-                    && observationType.equals(toCheckObsConst.getObservationType()) && checkObservationTypeForMerging());
-        }
         return (procedure.equals(toCheckObsConst.getProcedure())
                 && featureOfInterest.equals(toCheckObsConst.getFeatureOfInterest())
                 && observationType.equals(toCheckObsConst.getObservationType()) && checkObservationTypeForMerging());
@@ -244,13 +250,4 @@ public class SosObservationConstellation {
                     .equals(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION));
     }
 
-    /**
-     * Creates a copy of this element
-     * 
-     * @return Copy of observation constellation
-     */
-    public SosObservationConstellation copy() {
-        return new SosObservationConstellation(procedure, observableProperty, offering, featureOfInterest,
-                observationType);
-    }
 }

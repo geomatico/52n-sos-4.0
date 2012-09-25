@@ -126,6 +126,11 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
         // remove if GML 3.1.1 encoder is available
         nameSpacePrefixMap.put(GMLConstants.NS_GML, GMLConstants.NS_GML_PREFIX);
     }
+    
+    @Override
+    public String getContentType() {
+        return SensorMLConstants.SENSORML_CONTENT_TYPE;
+    }
 
     @Override
     public XmlObject encode(Object response) throws OwsExceptionReport {

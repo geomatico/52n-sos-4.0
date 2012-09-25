@@ -7,7 +7,7 @@
         <id name="procedureDescriptionFormatId" type="long">
             <column name="procedure_description_format_id" />
             <generator class="sequence">
-            	<param name="sequence">procedure_description_format_procedure_description_format_i_seq</param>
+            	<param name="sequence">procedure_description_format_id_seq</param>
             </generator>
         </id>
         <property name="procedureDescriptionFormat" type="string">

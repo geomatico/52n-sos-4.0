@@ -12,18 +12,9 @@ http://www.opengis.net/swes/2.0 http://schemas.opengis.net/swes/2.0/swes.xsd" xm
 		                <sml:IdentifierList>
 		                  <sml:identifier name="uniqueID">
 		                    <sml:Term definition="urn:ogc:def:identifier:OGC:uniqueID">
-		                      <sml:value>http://www.my_namespace.org/sensors/100</sml:value>
+		                      <sml:value>http://www.my_namespace.org/sensors/101</sml:value>
 		                    </sml:Term>
 		                  </sml:identifier>
-		                </sml:IdentifierList>
-		              </sml:identification>
-		              <sml:identification xlink:title="offerings">
-		                <sml:IdentifierList>
-		                  <sml:identifier name="Offering for sensor 100">
-                              <sml:Term definition="urn:ogc:def:identifier:OGC:offeringID">
-                                 <sml:value>http://www.my_namespace.org/sensors/100/observations</sml:value>
-                              </sml:Term>
-                           </sml:identifier>
 		                </sml:IdentifierList>
 		              </sml:identification>
 		              <capabilities name="parentProcedures">

@@ -28,6 +28,11 @@
 
 package org.n52.sos.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
@@ -48,6 +53,7 @@ import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.IObservationEncoder;
 import org.n52.sos.ogc.om.SosObservableProperty;
+import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSConstants.MinMax;
@@ -438,7 +444,8 @@ public class SosHelper {
             }
             // FIXME valid exception
             OwsExceptionReport owse = new OwsExceptionReport();
-//            owse.addCodedException(invalidparametervalue, locator, message, e);
+            // owse.addCodedException(invalidparametervalue, locator, message,
+            // e);
             throw owse;
         }
         Map<String, List<String>> dcp = new HashMap<String, List<String>>();
@@ -488,7 +495,8 @@ public class SosHelper {
             }
             // FIXME valid exception
             OwsExceptionReport owse = new OwsExceptionReport();
-//            owse.addCodedException(invalidparametervalue, locator, message, e);
+            // owse.addCodedException(invalidparametervalue, locator, message,
+            // e);
             throw owse;
         }
         return null;
@@ -836,7 +844,7 @@ public class SosHelper {
         Map<MinMax, String> map = new HashMap<MinMax, String>();
         String minValue = null;
         String maxValue = null;
-        if (Configurator.getInstance().switchCoordinatesForEPSG(Configurator.getInstance().getDefaultEPSG())){
+        if (Configurator.getInstance().switchCoordinatesForEPSG(Configurator.getInstance().getDefaultEPSG())) {
             minValue = envelope.getMinY() + " " + envelope.getMinX();
             maxValue = envelope.getMaxY() + " " + envelope.getMaxX();
         } else {
@@ -847,7 +855,7 @@ public class SosHelper {
         map.put(MinMax.MAX, maxValue);
         return map;
     }
-    
+
     /**
      * Generates a sensor id from description and current time as long.
      * 
@@ -900,7 +908,7 @@ public class SosHelper {
             valueType = "swe:ObservableProperty";
             break;
         case Quantity:
-            unit = ((SosSweQuantity)ioValue).getUom();
+            unit = ((SosSweQuantity) ioValue).getUom();
             valueType = "swe:Quantity";
             break;
         case QuantityRange:
@@ -910,7 +918,7 @@ public class SosHelper {
             valueType = "swe:Text";
             break;
         case Time:
-            unit = ((SosSweTime)ioValue).getUom();
+            unit = ((SosSweTime) ioValue).getUom();
             valueType = "swe:Time";
             break;
         case TimeRange:
@@ -924,7 +932,7 @@ public class SosHelper {
         }
         return new SosObservableProperty(identifier, description, unit, valueType);
     }
-    
+
     /**
      * @return a normalized String for use in a file path, i.e. all
      *         [\,/,:,*,?,",<,>,;] characters are replaced by '_'.
@@ -948,5 +956,25 @@ public class SosHelper {
             }
         }
         return responseFormats;
+    }
+
+    public static Object duplicateObject(Object objectToDuplicate) throws OwsExceptionReport {
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            objectOutputStream.writeObject(objectToDuplicate);
+            ByteArrayInputStream byteArrayIntputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayIntputStream);
+            Object duplicatedObject = objectInputStream.readObject();
+            return duplicatedObject;
+        } catch (IOException ioe) {
+            String exceptionText = "Error while duplicating object!";
+            LOGGER.error(exceptionText, ioe);
+            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+        } catch (ClassNotFoundException cnfe) {
+            String exceptionText = "Error while duplicating object!";
+            LOGGER.error(exceptionText, cnfe);
+            throw Util4Exceptions.createNoApplicableCodeException(cnfe, exceptionText);
+        }
     }
 }

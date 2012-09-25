@@ -7,7 +7,7 @@
         <id name="requestId" type="long">
             <column name="request_id" />
             <generator class="sequence">
-            	<param name="sequence">request_request_id_seq</param>
+            	<param name="sequence">request_id_seq</param>
             </generator>
         </id>
         <many-to-one name="offering" class="org.n52.sos.ds.hibernate.entities.Offering" fetch="join">

@@ -29,11 +29,14 @@
 package org.n52.sos.ds.hibernate.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.CategoryValue;
@@ -199,7 +202,7 @@ public class HibernateCriteriaTransactionalUtilities {
         return result;
     }
 
-    public static void insertObservationConstellation(Procedure proc, List<ObservableProperty> obsProps,
+    public static void checkOrInsertObservationConstellation(Procedure proc, List<ObservableProperty> obsProps,
             Offering offering, Session session) {
         for (ObservableProperty observableProperty : obsProps) {
             ObservationConstellation obsConst = new ObservationConstellation();
@@ -236,7 +239,7 @@ public class HibernateCriteriaTransactionalUtilities {
             feature.setFeatureOfInterestId(id);
             session.saveOrUpdate(feature);
             session.flush();
-        } else if (feature.getUrl() != null && !feature.getUrl().isEmpty() && url != null && !url.isEmpty()){
+        } else if (feature.getUrl() != null && !feature.getUrl().isEmpty() && url != null && !url.isEmpty()) {
             if (url != null && !url.isEmpty()) {
                 feature.setUrl(url);
                 session.saveOrUpdate(feature);
@@ -342,9 +345,13 @@ public class HibernateCriteriaTransactionalUtilities {
         return values;
     }
 
-    public static void insertObservation(Observation observation, Session session) {
-        session.save(observation);
+    public static Observation insertObservation(Observation observation, Session session) {
+        Long id = (Long) session.save(observation);
         session.flush();
+        observation.setObservationId(id);
+        session.update(observation);
+        session.flush();
+        return observation;
     }
 
     public static void insertFeatureOfInterestTypes(Set<String> featureTypes, Session session) {
@@ -400,9 +407,9 @@ public class HibernateCriteriaTransactionalUtilities {
         parentFeature.getFeatureOfInterestsForChildFeatureId().add(childFeature);
         session.saveOrUpdate(parentFeature);
         session.flush();
-//        childFeature.getFeatureOfInterestsForParentFeatureId().add(parentFeature);
-//        session.saveOrUpdate(childFeature);
-//        session.flush();
+        // childFeature.getFeatureOfInterestsForParentFeatureId().add(parentFeature);
+        // session.saveOrUpdate(childFeature);
+        // session.flush();
     }
 
 }

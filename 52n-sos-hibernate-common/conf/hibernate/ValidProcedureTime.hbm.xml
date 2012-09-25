@@ -7,7 +7,7 @@
         <id name="validProcedureTimeId" type="long">
             <column name="valid_procedure_time_id" />
             <generator class="sequence">
-            	<param name="sequence">valid_procedure_time_valid_procedure_time_id_seq</param>
+            	<param name="sequence">valid_procedure_time_id_seq</param>
             </generator>
         </id>
         <many-to-one name="procedure" class="org.n52.sos.ds.hibernate.entities.Procedure" fetch="join">

@@ -7,7 +7,7 @@
         <id name="observationTypeId" type="long">
             <column name="observation_type_id" />
             <generator class="sequence">
-            	<param name="sequence">observation_type_observation_type_id_seq</param>
+            	<param name="sequence">observation_type_id_seq</param>
             </generator>
         </id>
         <property name="observationType" type="string">

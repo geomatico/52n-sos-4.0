@@ -28,6 +28,7 @@
 
 package org.n52.sos.ogc.om;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,8 +41,10 @@ import org.n52.sos.ogc.om.values.SweDataArrayValue;
  * Class represents a SOS observation
  * 
  */
-public class SosObservation implements Cloneable {
+public class SosObservation implements Serializable {
     
+    private static final long serialVersionUID = 1L;
+
     /**
      * ID of this observation; in the standard 52n SOS PostgreSQL database, this
      * is implemented through a sequence type.
@@ -290,10 +293,6 @@ public class SosObservation implements Cloneable {
         this.value = value;
     }
 
-    public SosObservation clone() throws CloneNotSupportedException{
-            return (SosObservation)super.clone();
-    }
-    
     public void mergeWithObservation(SosObservation sosObservation, boolean mergeObsProps) {
         // create compPhen or add obsProp to compPhen
         if (this.observationConstellation.getObservableProperty() instanceof SosObservableProperty && mergeObsProps) {

@@ -70,6 +70,8 @@ public final class Sos2Constants {
 
     public static final String EN_OBSERVATION_TYPE = "observationType";
 
+    public static final String EN_FEATURE_OF_INTEREST_TYPE = "featureOfInterestType";
+
     /** private constructor, to enforce use of instance instead of instantiation */
     private Sos2Constants() {
     }

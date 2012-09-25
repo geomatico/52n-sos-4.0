@@ -28,6 +28,8 @@
 
 package org.n52.sos.ogc.gml.time;
 
+import java.io.Serializable;
+
 import org.joda.time.DateTime;
 
 /**
@@ -36,6 +38,8 @@ import org.joda.time.DateTime;
  */
 public class TimeInstant implements ITime {
     
+    private static final long serialVersionUID = 1L;
+
     private String id;
 
     /** date for this timeInstant */

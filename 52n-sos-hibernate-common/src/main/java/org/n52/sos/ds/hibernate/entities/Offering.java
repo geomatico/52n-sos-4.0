@@ -1,6 +1,6 @@
 package org.n52.sos.ds.hibernate.entities;
 
-// Generated 10.07.2012 15:18:23 by Hibernate Tools 3.4.0.CR1
+// Generated 19.09.2012 15:09:37 by Hibernate Tools 3.4.0.CR1
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,9 +10,6 @@ import java.util.Set;
  */
 public class Offering implements java.io.Serializable {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     private long offeringId;
@@ -25,9 +22,9 @@ public class Offering implements java.io.Serializable {
 
     private Set<Request> requests = new HashSet<Request>(0);
 
-    private Set<RelatedFeature> relatedFeatures = new HashSet<RelatedFeature>(0);
-    
     private Set<ObservationType> observationTypes = new HashSet<ObservationType>(0);
+
+    private Set<RelatedFeature> relatedFeatures = new HashSet<RelatedFeature>(0);
 
     public Offering() {
     }
@@ -37,15 +34,16 @@ public class Offering implements java.io.Serializable {
         this.identifier = identifier;
     }
 
-    public Offering(long offeringId, String identifier, String name, Set<ObservationConstellation> observationConstellations, Set<Request> requests,
-            Set<RelatedFeature> relatedFeatures, Set<ObservationType> observationTypes) {
+    public Offering(long offeringId, String identifier, String name,
+            Set<ObservationConstellation> observationConstellations, Set<Request> requests,
+            Set<ObservationType> observationTypes, Set<RelatedFeature> relatedFeatures) {
         this.offeringId = offeringId;
         this.identifier = identifier;
         this.name = name;
         this.observationConstellations = observationConstellations;
         this.requests = requests;
-        this.relatedFeatures = relatedFeatures;
         this.observationTypes = observationTypes;
+        this.relatedFeatures = relatedFeatures;
     }
 
     public long getOfferingId() {
@@ -88,20 +86,20 @@ public class Offering implements java.io.Serializable {
         this.requests = requests;
     }
 
-    public Set<RelatedFeature> getRelatedFeatures() {
-        return this.relatedFeatures;
-    }
-
-    public void setRelatedFeatures(Set<RelatedFeature> relatedFeatures) {
-        this.relatedFeatures = relatedFeatures;
-    }
-    
     public Set<ObservationType> getObservationTypes() {
         return this.observationTypes;
     }
 
     public void setObservationTypes(Set<ObservationType> observationTypes) {
         this.observationTypes = observationTypes;
+    }
+
+    public Set<RelatedFeature> getRelatedFeatures() {
+        return this.relatedFeatures;
+    }
+
+    public void setRelatedFeatures(Set<RelatedFeature> relatedFeatures) {
+        this.relatedFeatures = relatedFeatures;
     }
 
 }

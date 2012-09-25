@@ -220,6 +220,26 @@
 			</dependencies>
 		</profile>
 		<profile>
+			<id>wml</id>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-coding-wml-v20</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>diagram</id>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-coding-diagram</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
 			<!-- Profile for integration testing, run with: mvn -P itest clean install -->
 			<!-- To specify an alternate port: mvn -P itest clean install -Djetty.port=9090 -->
 			<id>itest</id>
