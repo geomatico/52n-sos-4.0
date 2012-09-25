@@ -32,17 +32,19 @@ public class WsaEncoder implements IEncoder<Map<QName, String>, WsaHeader> {
      */
     public WsaEncoder() {
         super();
-        encoderKeyTypes = new ArrayList<EncoderKeyType>();
-        encoderKeyTypes.add(new EncoderKeyType(WsaConstants.NS_WSA));
-        StringBuilder builder = new StringBuilder();
-        for (EncoderKeyType encoderKeyType : encoderKeyTypes) {
-            builder.append(encoderKeyType);
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
         supportedTypes = new HashMap<SupportedTypeKey, Set<String>>(0);
         conformanceClasses = new HashSet<String>(0);
-        LOGGER.info("Encoder for the following key initialized successfully: " + builder.toString() + "!");
+        encoderKeyTypes = new ArrayList<EncoderKeyType>();
+        encoderKeyTypes.add(new EncoderKeyType(WsaConstants.NS_WSA));
+        StringBuilder logMsgBuilder = new StringBuilder();
+        logMsgBuilder.append("Encoder for the following keys initialized successfully: ");
+        for (EncoderKeyType encoderKeyType : encoderKeyTypes) {
+            logMsgBuilder.append(encoderKeyType.toString());
+            logMsgBuilder.append(", ");
+        }
+        logMsgBuilder.delete(logMsgBuilder.lastIndexOf(", "), logMsgBuilder.length());
+        logMsgBuilder.append("!");
+        LOGGER.info(logMsgBuilder.toString());
     }
 
     @Override

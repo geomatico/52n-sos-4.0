@@ -60,18 +60,20 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
      */
     public SoapEncoder() {
         super();
+        supportedTypes = new HashMap<SupportedTypeKey, Set<String>>(0);
+        conformanceClasses = new HashSet<String>(0);
         encoderKeyTypes = new ArrayList<EncoderKeyType>();
         encoderKeyTypes.add(new EncoderKeyType(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE));
         encoderKeyTypes.add(new EncoderKeyType(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE));
-        StringBuilder builder = new StringBuilder();
+        StringBuilder logMsgBuilder = new StringBuilder();
+        logMsgBuilder.append("Encoder for the following keys initialized successfully: ");
         for (EncoderKeyType encoderKeyType : encoderKeyTypes) {
-            builder.append(encoderKeyType);
-            builder.append(", ");
+            logMsgBuilder.append(encoderKeyType.toString());
+            logMsgBuilder.append(", ");
         }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        supportedTypes = new HashMap<SupportedTypeKey, Set<String>>(0);
-        conformanceClasses = new HashSet<String>(0);
-        LOGGER.info("Encoder for the following key initialized successfully: " + builder.toString() + "!");
+        logMsgBuilder.delete(logMsgBuilder.lastIndexOf(", "), logMsgBuilder.length());
+        logMsgBuilder.append("!");
+        LOGGER.info(logMsgBuilder.toString());
     }
 
     @Override
