@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 10.07.2012 15:18:27 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="org.n52.sos.ds.hibernate.entities.BooleanValue" table="boolean_value">
+        <id name="booleanValueId" type="long">
+            <column name="boolean_value_id" />
+            <generator class="sequence">
+            	<param name="sequence">boolean_value_id_seq</param>
+            </generator>
+        </id>
+        <property name="value" type="boolean">
+            <column name="value" not-null="true" unique="true" />
+        </property>
+        <set name="observations" table="observation_has_boolean_value" inverse="true" lazy="true" fetch="join">
+            <key>
+                <column name="boolean_value_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.Observation">
+                <column name="observation_id" not-null="true" />
+            </many-to-many>
+        </set>
+    </class>
+</hibernate-mapping>

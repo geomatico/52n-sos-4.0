@@ -18,7 +18,7 @@
 			<artifactId>52n-sos-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- inherited
+				<!-- inherited
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
