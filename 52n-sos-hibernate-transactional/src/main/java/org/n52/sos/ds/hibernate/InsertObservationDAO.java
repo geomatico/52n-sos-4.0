@@ -155,27 +155,27 @@ public class InsertObservationDAO implements IInsertObservationDAO {
             for (SosObservation observation : request.getObservation()) {
                 SosObservationConstellation sosObsConst = observation.getObservationConstellation();
                 ObservationConstellation obsConst = null;
-                try {
-                    obsConst =
-                            checkObservationConstellationForObservation(sosObsConst, obsConst.getOffering()
-                                    .getIdentifier(), session);
-                } catch (OwsExceptionReport owse) {
-                    exceptions.add(owse);
-                }
-                if (obsConst != null) {
-                    FeatureOfInterest feature =
-                            checkOrInsertFeatureOfInterest(observation.getObservationConstellation()
-                                    .getFeatureOfInterest(), session);
-                    checkOrInsertFeatureOfInterestRelatedFeatureRelationShip(feature, obsConst.getOffering(), session);
-                    if (observation.getValue() instanceof SosSingleObservationValue) {
-                        insertObservationSingleValue(obsConst, feature, observation, session);
-                    } else if (observation.getValue() instanceof SosMultiObservationValues) {
-                        insertObservationMutliValue(obsConst, feature, observation);
+                for (String offeringID : sosObsConst.getOfferings()) {
+                    try {
+                        obsConst =
+                                checkObservationConstellationForObservation(sosObsConst, offeringID, session);
+                    } catch (OwsExceptionReport owse) {
+                        exceptions.add(owse);
+                    }
+                    if (obsConst != null) {
+                        FeatureOfInterest feature =
+                                checkOrInsertFeatureOfInterest(observation.getObservationConstellation()
+                                        .getFeatureOfInterest(), session);
+                        checkOrInsertFeatureOfInterestRelatedFeatureRelationShip(feature, obsConst.getOffering(), session);
+                        if (observation.getValue() instanceof SosSingleObservationValue) {
+                            insertObservationSingleValue(obsConst, feature, observation, session);
+                        } else if (observation.getValue() instanceof SosMultiObservationValues) {
+                            insertObservationMutliValue(obsConst, feature, observation);
+                        }
                     }
                 }
-
             }
-            // if no observationconstellation is valid, throw exception
+            // if no observationConstellation is valid, throw exception
             if (exceptions.size() == request.getObservation().size()) {
                 Util4Exceptions.mergeExceptions(exceptions);
             }
