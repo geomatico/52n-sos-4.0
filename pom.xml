@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.n52.sensorweb.sos</groupId>
 	<artifactId>52n-sos</artifactId>
-	<packaging>pom</packaging>
 	<version>4.0.0-M0</version>
 	<name>52North Sensor Observation Service</name>
 	<description>52North Sensor Observation Service - Parent POM for defining dependency versions</description>
-
+	<inceptionYear>2012</inceptionYear>
+	<packaging>pom</packaging>
 	<modules>
 		<module>52n-sos-api</module>
 		<module>52n-sos-binding-kvp</module>
