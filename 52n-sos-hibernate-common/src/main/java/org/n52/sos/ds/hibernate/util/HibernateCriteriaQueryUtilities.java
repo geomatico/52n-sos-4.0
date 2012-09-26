@@ -518,8 +518,8 @@ public class HibernateCriteriaQueryUtilities {
      * @return Alias prefix for offering
      */
     public static String addOfferingAliasToMap(Map<String, String> aliases, String prefix) {
-        String alias = "offs";
-        String parameter = HibernateConstants.PARAMETER_OFFERINGS;
+        String alias = "off";
+        String parameter = HibernateConstants.PARAMETER_OFFERING;
         addAliasToMap(aliases, prefix, parameter, alias);
         return alias;
     }

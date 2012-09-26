@@ -87,6 +87,8 @@ public class HibernateConstants {
 
     public static final String PARAMETER_RELATED_FEATURES = "relatedFeatures";
 
+    public static final String PARAMETER_OFFERING = "offering";
+
     public static final String PARAMETER_OFFERINGS = "offerings";
 
     public static final String PARAMETER_OBSERVATION_ID = "observationId";
