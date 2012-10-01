@@ -131,6 +131,8 @@ public class CapabilitiesCache extends ACapabilitiesCache {
 
     private Collection<String> observationTypes;
 
+    private Collection<String> resultTemplates;
+
     /**
      * constructor
      * 
@@ -973,5 +975,13 @@ public class CapabilitiesCache extends ACapabilitiesCache {
 
     public Collection<String> getObservationTypes() {
         return observationTypes;
+    }
+    
+    public void setResultTemplates(Collection<String> resultTemplates) {
+        this.resultTemplates = resultTemplates;
+    }
+
+    public Collection<String> getResultTemplates() {
+        return resultTemplates;
     }
 }

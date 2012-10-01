@@ -34,7 +34,7 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.admin.AdministratoConstants.AdministatorParams;
+import org.n52.sos.service.admin.AdministratorConstants.AdministatorParams;
 import org.n52.sos.service.operator.IServiceOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

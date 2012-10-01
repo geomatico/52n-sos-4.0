@@ -71,7 +71,7 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
 import org.n52.sos.ogc.swe.SWEConstants.SweAggregateType;
 import org.n52.sos.ogc.swe.SosSweField;
-import org.n52.sos.ogc.swe.simpleType.ISosSweSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.Util4Exceptions;
@@ -489,8 +489,8 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
                 break;
             }
         }
-        if (encodedObject != null && encodedObject instanceof ISosSweSimpleType) {
-            sosIo.setIoValue((ISosSweSimpleType) encodedObject);
+        if (encodedObject != null && encodedObject instanceof SosSweAbstractSimpleType) {
+            sosIo.setIoValue((SosSweAbstractSimpleType) encodedObject);
         }
         return sosIo;
     }

@@ -29,22 +29,12 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
  * SOS internal representation of SWE simpleType time
  * 
  */
-public class SosSweTime implements ISosSweSimpleType {
+public class SosSweTime extends SosSweAbstractSimpleType {
 
     /**
      * SWE simple type type
      */
     private SweSimpleType simpleType = SweSimpleType.Time;
-
-    /**
-     * definition
-     */
-    private String definition;
-
-    /**
-     * description
-     */
-    private String description;
 
     /**
      * quality data
@@ -98,50 +88,6 @@ public class SosSweTime implements ISosSweSimpleType {
     @Override
     public void setQuality(SosSweQuality quality) {
         this.quality = quality;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getDefinition()
-     */
-    @Override
-    public String getDefinition() {
-        return definition;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.ogc.swe.simpleType.ISosSweSimpleType#setDefinition(java.lang.
-     * String)
-     */
-    @Override
-    public void setDefinition(String definition) {
-        this.definition = definition;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getDescription()
-     */
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.ogc.swe.simpleType.ISosSweSimpleType#setDescription(java.lang
-     * .String)
-     */
-    @Override
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     /*

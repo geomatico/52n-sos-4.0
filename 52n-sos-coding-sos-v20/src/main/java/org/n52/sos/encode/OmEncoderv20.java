@@ -1402,6 +1402,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
         observationTypes.add(OMConstants.OBS_TYPE_MEASUREMENT);
         observationTypes.add(OMConstants.OBS_TYPE_TEXT_OBSERVATION);
         observationTypes.add(OMConstants.OBS_TYPE_TRUTH_OBSERVATION);
+        observationTypes.add(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
         supportedObservationTypes.put(SupportedTypeKey.ObservationType, observationTypes);
     }
 

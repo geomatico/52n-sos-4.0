@@ -108,6 +108,8 @@ public abstract class ACapabilitiesCacheController extends TimerTask {
     public abstract void updateAfterObservationInsertion() throws OwsExceptionReport;
 
     public abstract void updateAfterSensorDeletion() throws OwsExceptionReport;
+    
+    public abstract void updateAfterResultTemplateInsertion() throws OwsExceptionReport;
 
     /**
      * method for refreshing the metadata of fois in the capabilities cache; is
@@ -433,4 +435,6 @@ public abstract class ACapabilitiesCacheController extends TimerTask {
     public abstract Map<String, Collection<String>> getAllowedKOfferingVObservationTypes();
 
     public abstract Collection<String> getAllowedObservationTypes4Offering(String offering);
+    
+    public abstract Collection<String> getResultTemplates();
 }

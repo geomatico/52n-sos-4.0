@@ -232,6 +232,10 @@ public final class Sos2Constants {
     public enum GetResultParams {
         offering, observedProperty;
     }
+    
+    public enum InsertResult {
+        template, resultValues
+    }
 
     /** enum with parameter names for registerSensor request */
     public enum InsertSensorParams {

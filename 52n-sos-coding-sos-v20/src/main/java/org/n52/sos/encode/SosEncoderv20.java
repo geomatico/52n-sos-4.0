@@ -35,6 +35,7 @@ import javax.xml.namespace.QName;
 
 import net.opengis.fes.x20.FilterCapabilitiesDocument;
 import net.opengis.fes.x20.FilterCapabilitiesDocument.FilterCapabilities;
+import net.opengis.fes.x20.TemporalOpsType;
 import net.opengis.gml.x32.AbstractFeatureType;
 import net.opengis.gml.x32.DirectPositionType;
 import net.opengis.gml.x32.EnvelopeType;
@@ -54,7 +55,15 @@ import net.opengis.sos.x20.GetObservationByIdResponseDocument;
 import net.opengis.sos.x20.GetObservationByIdResponseType;
 import net.opengis.sos.x20.GetObservationResponseDocument;
 import net.opengis.sos.x20.GetObservationResponseType;
+import net.opengis.sos.x20.GetResultDocument;
+import net.opengis.sos.x20.GetResultTemplateDocument;
+import net.opengis.sos.x20.GetResultTemplateType;
+import net.opengis.sos.x20.GetResultType;
+import net.opengis.sos.x20.GetResultType.SpatialFilter;
 import net.opengis.sos.x20.InsertObservationResponseDocument;
+import net.opengis.sos.x20.InsertResultResponseDocument;
+import net.opengis.sos.x20.InsertResultTemplateResponseDocument;
+import net.opengis.sos.x20.InsertResultTemplateResponseType;
 import net.opengis.sos.x20.InsertionCapabilitiesDocument;
 import net.opengis.sos.x20.InsertionCapabilitiesType;
 import net.opengis.sos.x20.ObservationOfferingType;
@@ -65,6 +74,8 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.OGCConstants;
+import org.n52.sos.ogc.filter.FilterConstants;
+import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
@@ -80,12 +91,19 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.sos.SosInsertionCapabilities;
 import org.n52.sos.ogc.sos.SosOfferingsForContents;
+import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.request.GetCapabilitiesRequest;
+import org.n52.sos.request.GetResultRequest;
+import org.n52.sos.request.GetResultTemplateRequest;
 import org.n52.sos.response.AbstractServiceResponse;
 import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.response.GetFeatureOfInterestResponse;
 import org.n52.sos.response.GetObservationByIdResponse;
 import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.response.InsertObservationResponse;
+import org.n52.sos.response.InsertResultResponse;
+import org.n52.sos.response.InsertResultTemplateResponse;
+import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.N52XmlHelper;
@@ -99,7 +117,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceResponse> {
+public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommunicationObject> {
 
     /**
      * logger, used for logging while initializing the constants from config
@@ -146,15 +164,35 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
     }
 
     @Override
-    public XmlObject encode(AbstractServiceResponse response) throws OwsExceptionReport {
+    public XmlObject encode(AbstractServiceCommunicationObject communicationObject) throws OwsExceptionReport {
         Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
         additionalValues.put(HelperValues.VERSION, Sos2Constants.SERVICEVERSION);
-        return encode(response, additionalValues);
+        return encode(communicationObject, additionalValues);
     }
 
     @Override
-    public XmlObject encode(AbstractServiceResponse response, Map<HelperValues, String> additionalValues)
+    public XmlObject encode(AbstractServiceCommunicationObject communicationObject, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
+        if(communicationObject instanceof AbstractServiceRequest) {
+            return encodeRequests((AbstractServiceRequest)communicationObject);
+        } else if (communicationObject instanceof AbstractServiceResponse) {
+            return encodeResponse((AbstractServiceResponse)communicationObject);
+        }
+        return null;
+    }
+    
+    private XmlObject encodeRequests(AbstractServiceRequest request) throws OwsExceptionReport {
+        if (request instanceof GetResultTemplateRequest) {
+            return createGetResultTemplateRequest((GetResultTemplateRequest)request);
+        } else if (request instanceof GetResultRequest) {
+            return createGetResultRequest((GetResultRequest)request);
+        } else if (request instanceof GetCapabilitiesRequest) {
+            return createGetCapabilitiesRequest((GetCapabilitiesRequest)request);
+        }
+        return null;
+    }
+    
+    private XmlObject encodeResponse(AbstractServiceResponse response) throws OwsExceptionReport {
         if (response instanceof GetCapabilitiesResponse) {
             return createCapabilitiesDocument((GetCapabilitiesResponse) response);
         } else if (response instanceof GetObservationResponse) {
@@ -165,6 +203,10 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
             return createGetObservationByIdResponse((GetObservationByIdResponse) response);
         } else if (response instanceof InsertObservationResponse) {
             return createInsertObservationResponse((InsertObservationResponse) response);
+        } else if (response instanceof InsertResultTemplateResponse) {
+            return createInsertResultTemplateResponseDocument((InsertResultTemplateResponse)response);
+        } else if (response instanceof InsertResultResponse) {
+            return createInsertResultResponseDocument((InsertResultResponse)response);
         }
         return null;
     }
@@ -426,6 +468,59 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
         schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS200());
         N52XmlHelper.setSchemaLocationsToDocument(xbInsObsRespDoc, schemaLocations);
         return xbInsObsRespDoc;
+    }
+
+    private XmlObject createGetCapabilitiesRequest(GetCapabilitiesRequest request) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private XmlObject createGetResultTemplateRequest(GetResultTemplateRequest request) {
+        GetResultTemplateDocument getResultTemplateDoc = GetResultTemplateDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        GetResultTemplateType getResultTemplate = getResultTemplateDoc.addNewGetResultTemplate();
+        getResultTemplate.setService(request.getService());
+        getResultTemplate.setVersion(request.getVersion());
+        getResultTemplate.setOffering(request.getOffering());
+        getResultTemplate.setObservedProperty(request.getObservedProperty());
+        return getResultTemplateDoc;
+    }
+
+    private XmlObject createGetResultRequest(GetResultRequest request) throws OwsExceptionReport {
+       GetResultDocument getResultDoc = GetResultDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+       GetResultType getResult = getResultDoc.addNewGetResult();
+       getResult.setService(request.getService());
+       getResult.setVersion(request.getVersion());
+       getResult.setOffering(request.getOffering());
+       getResult.setObservedProperty(request.getObservedProperty());
+       if (request.hasFeatureOfInterest()) {
+           for (String featureOfInterest : request.getFeatureOfInterest()) {
+            getResult.addFeatureOfInterest(featureOfInterest);
+        }
+       }
+       if (request.hasTemporalFilter()) {
+           for (TemporalFilter temporalFilter : request.getTemporalFilter()) {
+            createTemporalFilter(getResult.addNewTemporalFilter(), temporalFilter);
+        }
+       }
+       if (request.hasSpatialFilter()) {
+           createSpatialFilter(getResult.addNewSpatialFilter(), request.getSpatialFilter());
+       }
+       
+        return getResultDoc;
+    }
+    
+    private XmlObject createInsertResultTemplateResponseDocument(InsertResultTemplateResponse response) throws OwsExceptionReport {
+        InsertResultTemplateResponseDocument insertResultTemplateResponseDoc = InsertResultTemplateResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        InsertResultTemplateResponseType insertResultTemplateResponse = insertResultTemplateResponseDoc.addNewInsertResultTemplateResponse();
+        insertResultTemplateResponse.setAcceptedTemplate(response.getAcceptedTemplate());
+        return insertResultTemplateResponseDoc;
+        
+    }
+    
+    private XmlObject createInsertResultResponseDocument(InsertResultResponse response) throws OwsExceptionReport {
+        InsertResultResponseDocument insertResultTemplateResponseDoc = InsertResultResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        insertResultTemplateResponseDoc.addNewInsertResultResponse();
+        return insertResultTemplateResponseDoc;
     }
 
     /**
@@ -705,6 +800,21 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespons
             }
             cursor.dispose();
         }
+    }
+
+
+    private void createTemporalFilter(net.opengis.sos.x20.GetResultType.TemporalFilter temporalFilter,
+            TemporalFilter sosTemporalFilter) throws OwsExceptionReport {
+        IEncoder encoder = Configurator.getInstance().getEncoder(FilterConstants.NS_FES_2);
+        XmlObject encodedObject = (XmlObject)encoder.encode(sosTemporalFilter);
+        temporalFilter.set(encodedObject);
+    }
+
+    private void createSpatialFilter(SpatialFilter spatialFilter,
+            org.n52.sos.ogc.filter.SpatialFilter sosSpatialFilter) throws OwsExceptionReport {
+        IEncoder encoder = Configurator.getInstance().getEncoder(FilterConstants.NS_FES_2);
+        XmlObject encodedObject = (XmlObject)encoder.encode(sosSpatialFilter);
+        spatialFilter.set(encodedObject);
     }
 
 }

@@ -23,13 +23,14 @@
  */
 package org.n52.sos.ogc.swe;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * SOS internal representation of SWE dataRecord
  * 
  */
-public class SosSweDataRecord {
+public class SosSweDataRecord extends SosSweAbstractDataComponent{
 
     /**
      * DataRecord fields
@@ -58,6 +59,9 @@ public class SosSweDataRecord {
      *            Field to add
      */
     public void addField(SosSweField field) {
+        if (fields == null) {
+            fields = new ArrayList<SosSweField>();
+        }
         this.fields.add(field);
     }
 

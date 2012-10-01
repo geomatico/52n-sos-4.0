@@ -49,5 +49,7 @@ public interface ICacheFeederDAO {
     public void updateAfterObservationInsertion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
 
     public void updateAfterSensorDeletion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
+
+    public void updateAfterResultTemplateInsertion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
     
 }

@@ -31,22 +31,12 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
  * @author Carsten Hollmann
  * @version 1.0.0
  */
-public class SosSweText implements ISosSweSimpleType {
+public class SosSweText extends SosSweAbstractSimpleType {
 
     /**
      * SWE simple type type
      */
     private SweSimpleType simpleType = SweSimpleType.Text;
-
-    /**
-     * definition
-     */
-    private String definition;
-
-    /**
-     * description
-     */
-    private String description;
 
     /**
      * quality data
@@ -94,50 +84,6 @@ public class SosSweText implements ISosSweSimpleType {
     @Override
     public void setQuality(SosSweQuality quality) {
         this.quality = quality;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getDefinition()
-     */
-    @Override
-    public String getDefinition() {
-        return definition;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.ogc.swe.simpleType.ISosSweSimpleType#setDefinition(java.lang.
-     * String)
-     */
-    @Override
-    public void setDefinition(String definition) {
-        this.definition = definition;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getDescription()
-     */
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.ogc.swe.simpleType.ISosSweSimpleType#setDescription(java.lang
-     * .String)
-     */
-    @Override
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     /*

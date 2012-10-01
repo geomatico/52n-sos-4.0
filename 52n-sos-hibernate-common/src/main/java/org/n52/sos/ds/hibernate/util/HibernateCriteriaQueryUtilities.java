@@ -59,6 +59,7 @@ import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
+import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.entities.ResultType;
 import org.n52.sos.ds.hibernate.entities.SpatialRefSys;
 import org.n52.sos.ds.hibernate.entities.SweType;
@@ -936,5 +937,18 @@ public class HibernateCriteriaQueryUtilities {
 
     public static List<SpatialRefSys> getSpatialReySysObjects(Session session) {
         return (List<SpatialRefSys>) getDistinctObjects(session, SpatialRefSys.class);
+    }
+
+    public static ResultTemplate getResultTemplateObject(String identifier, Session session) {
+        Criteria criteria = session.createCriteria(ResultTemplate.class);
+        criteria.add(getEqualRestriction(getIdentifierParameter(null), identifier));
+        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        return (ResultTemplate) criteria.uniqueResult();
+    }
+
+    public static List<ResultTemplate> getResultTemplateObjects(Session session) {
+        Criteria criteria = session.createCriteria(ResultTemplate.class);
+        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        return (List<ResultTemplate>)criteria.list();
     }
 }

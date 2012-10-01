@@ -24,8 +24,8 @@
 package org.n52.sos.decode;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.service.AbstractServiceCommunicationObject;
 
-public interface IXmlRequestDecoder extends IDecoder<AbstractServiceRequest, XmlObject> {
+public interface IXmlRequestDecoder extends IDecoder<AbstractServiceCommunicationObject, XmlObject> {
 
 }

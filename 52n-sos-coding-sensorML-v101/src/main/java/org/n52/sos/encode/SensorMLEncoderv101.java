@@ -85,12 +85,15 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
+import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SweAggregateType;
 import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
+import org.n52.sos.ogc.swe.SosSweDataArray;
+import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.SosSweField;
-import org.n52.sos.ogc.swe.simpleType.ISosSweSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweObservableProperty;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
@@ -107,11 +110,11 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SensorMLEncoderv101.class);
 
     private List<EncoderKeyType> encoderKeyTypes;
-    
+
     private Map<SupportedTypeKey, Set<String>> supportedTypes;
-    
+
     private Set<String> conformanceClasses;
-    
+
     public SensorMLEncoderv101() {
         encoderKeyTypes = new ArrayList<EncoderKeyType>();
         encoderKeyTypes.add(new EncoderKeyType(SensorMLConstants.NS_SML));
@@ -121,7 +124,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
             builder.append(", ");
         }
         builder.delete(builder.lastIndexOf(", "), builder.length());
-        Set<String> outputFormatSet = new HashSet<String>(0); 
+        Set<String> outputFormatSet = new HashSet<String>(0);
         outputFormatSet.add(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
         Map<SupportedTypeKey, Set<String>> map = new HashMap<SupportedTypeKey, Set<String>>();
         map.put(SupportedTypeKey.ProcedureDescriptionFormat, outputFormatSet);
@@ -143,13 +146,13 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
     public Set<String> getConformanceClasses() {
         return conformanceClasses;
     }
-    
+
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(SensorMLConstants.NS_SML, SensorMLConstants.NS_SML_PREFIX);
         // remove if GML 3.1.1 encoder is available
         nameSpacePrefixMap.put(GMLConstants.NS_GML, GMLConstants.NS_GML_PREFIX);
     }
-    
+
     @Override
     public String getContentType() {
         return SensorMLConstants.SENSORML_CONTENT_TYPE;
@@ -167,8 +170,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
         }
         return null;
     }
-    
-    
+
     /**
      * creates sml:System
      * 
@@ -237,7 +239,8 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
     }
 
     private XmlObject createSensorMLDescription(SensorML sensorDesc) {
-        SensorMLDocument sensorMLDoc = SensorMLDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        SensorMLDocument sensorMLDoc =
+                SensorMLDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         net.opengis.sensorML.x101.SensorMLDocument.SensorML sensorML = sensorMLDoc.addNewSensorML();
         sensorML.setVersion(SensorMLConstants.VERSION_V101);
         // TODO: set all other elements
@@ -398,7 +401,8 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
 
     /**
      * Creates the capabilities section of the SensorML description.
-     * @param oldCcapabilities 
+     * 
+     * @param oldCcapabilities
      * 
      * @param xbCapabilities
      *            Xml capabilities object
@@ -540,7 +544,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
      *            Xml components object
      * @param sosComponents
      *            SOS SWE representation.
-     * @param components 
+     * @param components
      * @throws OwsExceptionReport
      */
     private Components createComponents(List<SosSMLComponent> sosComponents) throws OwsExceptionReport {
@@ -610,79 +614,104 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
      * 
      * @param xbField
      *            XML SWE field
-     * @param sosSweSimpleType
+     * @param sosSweData
      *            SOS SWE simple type.
      * @throws OwsExceptionReport
      */
-    private void addSweSimpleTypeToField(AnyScalarPropertyType xbField, ISosSweSimpleType sosSweSimpleType)
+    private void addSweSimpleTypeToField(AnyScalarPropertyType xbField, SosSweAbstractDataComponent sosSweData)
             throws OwsExceptionReport {
-        switch (sosSweSimpleType.getSimpleType()) {
-        case Boolean:
-            String exceptionTextBool =
-                    "The SWE simpleType '" + SweSimpleType.Boolean.name()
-                            + "' is not supported by this SOS for SWE fields!";
-            LOGGER.debug(exceptionTextBool);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextBool);
-        case Category:
-            String exceptionTextCategory =
-                    "The SWE simpleType '" + SweSimpleType.Category.name()
-                            + "' is not supported by this SOS for SWE fields!";
-            LOGGER.debug(exceptionTextCategory);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextCategory);
-        case Count:
-            String exceptionTextCount =
-                    "The SWE simpleType '" + SweSimpleType.Count.name()
-                            + "' is not supported by this SOS for SWE fields!";
-            LOGGER.debug(exceptionTextCount);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextCount);
-        case CountRange:
-            String exceptionTextCountRange =
-                    "The SWE simpleType '" + SweSimpleType.CountRange.name()
-                            + "' is not supported by this SOS for SWE fields!";
-            LOGGER.debug(exceptionTextCountRange);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextCountRange);
+        if (sosSweData instanceof SosSweAbstractSimpleType) {
+            SosSweAbstractSimpleType sosSweSimpleType = (SosSweAbstractSimpleType) sosSweData;
+            switch (sosSweSimpleType.getSimpleType()) {
+            case Boolean:
+                String exceptionTextBool =
+                        "The SWE simpleType '" + SweSimpleType.Boolean.name()
+                                + "' is not supported by this SOS for SWE fields!";
+                LOGGER.debug(exceptionTextBool);
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextBool);
+            case Category:
+                String exceptionTextCategory =
+                        "The SWE simpleType '" + SweSimpleType.Category.name()
+                                + "' is not supported by this SOS for SWE fields!";
+                LOGGER.debug(exceptionTextCategory);
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextCategory);
+            case Count:
+                String exceptionTextCount =
+                        "The SWE simpleType '" + SweSimpleType.Count.name()
+                                + "' is not supported by this SOS for SWE fields!";
+                LOGGER.debug(exceptionTextCount);
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextCount);
+            case CountRange:
+                String exceptionTextCountRange =
+                        "The SWE simpleType '" + SweSimpleType.CountRange.name()
+                                + "' is not supported by this SOS for SWE fields!";
+                LOGGER.debug(exceptionTextCountRange);
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextCountRange);
 
-        case Quantity:
-            String exceptionTextQuantity =
-                    "The SWE simpleType '" + SweSimpleType.Quantity.name()
-                            + "' is not supported by this SOS for SWE fields!";
-            LOGGER.debug(exceptionTextQuantity);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextQuantity);
-        case QuantityRange:
-            String exceptionTextQuantityRange =
-                    "The SWE simpleType '" + SweSimpleType.QuantityRange.name()
-                            + "' is not supported by this SOS for SWE fields!";
-            LOGGER.debug(exceptionTextQuantityRange);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextQuantityRange);
-        case Text:
-            // FIXME: SWE Common NS
+            case Quantity:
+                String exceptionTextQuantity =
+                        "The SWE simpleType '" + SweSimpleType.Quantity.name()
+                                + "' is not supported by this SOS for SWE fields!";
+                LOGGER.debug(exceptionTextQuantity);
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextQuantity);
+            case QuantityRange:
+                String exceptionTextQuantityRange =
+                        "The SWE simpleType '" + SweSimpleType.QuantityRange.name()
+                                + "' is not supported by this SOS for SWE fields!";
+                LOGGER.debug(exceptionTextQuantityRange);
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextQuantityRange);
+            case Text:
+                // FIXME: SWE Common NS
+                IEncoder encoder = Configurator.getInstance().getEncoder(SWEConstants.NS_SWE);
+                if (encoder != null) {
+                    xbField.setText((Text) encoder.encode((SosSweText) sosSweData));
+                } else {
+                    String exceptionTextText =
+                            "The SWE simpleType '" + SweSimpleType.Text.name()
+                                    + "' is not supported by this SOS for SWE fields!";
+                    LOGGER.debug(exceptionTextText);
+                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextText);
+                }
+                break;
+            case Time:
+                String exceptionTextTime =
+                        "The SWE simpleType '" + SweSimpleType.Time.name()
+                                + "' is not supported by this SOS for SWE fields!";
+                LOGGER.debug(exceptionTextTime);
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextTime);
+            case TimeRange:
+                String exceptionTextTimeRange =
+                        "The SWE simpleType '" + SweSimpleType.TimeRange.name()
+                                + "' is not supported by this SOS for SWE fields!";
+                LOGGER.debug(exceptionTextTimeRange);
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextTimeRange);
+            default:
+                String exceptionTextDefault =
+                        "The SWE simpleType '" + sosSweSimpleType.getSimpleType().name()
+                                + "' is not supported by this SOS for SWE fields!";
+                LOGGER.debug(exceptionTextDefault);
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextDefault);
+            }
+        } else if (sosSweData instanceof SosSweDataArray) {
             IEncoder encoder = Configurator.getInstance().getEncoder(SWEConstants.NS_SWE);
             if (encoder != null) {
-                xbField.setText((Text) encoder.encode((SosSweText) sosSweSimpleType));
+                xbField.set((XmlObject) encoder.encode((SosSweDataArray) sosSweData));
             } else {
-                String exceptionTextText =
-                        "The SWE simpleType '" + SweSimpleType.Text.name()
-                                + "' is not supported by this SOS for SWE fields!";
+                String exceptionTextText = "The SweDataArray is not supported by this SOS for SWE fields!";
                 LOGGER.debug(exceptionTextText);
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextText);
             }
-            break;
-        case Time:
-            String exceptionTextTime =
-                    "The SWE simpleType '" + SweSimpleType.Time.name()
-                            + "' is not supported by this SOS for SWE fields!";
-            LOGGER.debug(exceptionTextTime);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextTime);
-        case TimeRange:
-            String exceptionTextTimeRange =
-                    "The SWE simpleType '" + SweSimpleType.TimeRange.name()
-                            + "' is not supported by this SOS for SWE fields!";
-            LOGGER.debug(exceptionTextTimeRange);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextTimeRange);
-        default:
-            String exceptionTextDefault =
-                    "The SWE simpleType '" + sosSweSimpleType.getSimpleType().name()
-                            + "' is not supported by this SOS for SWE fields!";
+        } else if (sosSweData instanceof SosSweDataRecord) {
+            IEncoder encoder = Configurator.getInstance().getEncoder(SWEConstants.NS_SWE);
+            if (encoder != null) {
+                xbField.set((XmlObject) encoder.encode((SosSweDataRecord) sosSweData));
+            } else {
+                String exceptionTextText = "The SosSweDataRecord is not supported by this SOS for SWE fields!";
+                LOGGER.debug(exceptionTextText);
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextText);
+            }
+        } else {
+            String exceptionTextDefault = "The SWE type is not supported by this SOS for SWE fields!";
             LOGGER.debug(exceptionTextDefault);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextDefault);
         }

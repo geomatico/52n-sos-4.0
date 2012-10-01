@@ -26,11 +26,14 @@ package org.n52.sos.ogc.swe;
 import java.util.List;
 import java.util.Map;
 
+import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SosSweCount;
+
 /**
  * SOS internal representation of SWE dataArray
  * 
  */
-public class SosSweDataArray {
+public class SosSweDataArray extends SosSweAbstractDataComponent{
 
     /**
      * DataArray values
@@ -42,6 +45,8 @@ public class SosSweDataArray {
      * DataRecord
      */
     private SosSweDataRecord dataRecord;
+
+    private SosSweCount elementCount;
 
     /**
      * @return the values
@@ -73,13 +78,23 @@ public class SosSweDataArray {
         this.dataRecord = dataRecord;
     }
 
-    /**
-     * Get element count
-     * 
-     * @return Count of elements
-     */
-    public int getElementCount() {
-        return values.size();
+//    /**
+//     * Get element count
+//     * 
+//     * @return Count of elements
+//     */
+//    public int getElementCount() {
+//        return values.size();
+//    }
+
+    public void setElementCount(SosSweCount elementCount) {
+        this.elementCount = elementCount;
     }
 
+    public SosSweCount getElementCount() {
+        if (elementCount == null) {
+            // TODO get count from values;
+        }
+        return elementCount;
+    }
 }

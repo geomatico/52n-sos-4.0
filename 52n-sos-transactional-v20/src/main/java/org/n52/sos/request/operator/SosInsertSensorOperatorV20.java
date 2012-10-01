@@ -125,9 +125,7 @@ public class SosInsertSensorOperatorV20 implements IRequestOperator {
                         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
                     }
                 } else {
-                    String exceptionText =
-                            "The value '" + null + "' of the outputFormat parameter is incorrect and has to be '"
-                                    + SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL + "' for the requested sensor!";
+                    String exceptionText = "Error while getting encoder for response!";
                     throw Util4Exceptions.createInvalidParameterValueException("", exceptionText);
                 }
             } catch (IOException ioe) {
@@ -136,7 +134,7 @@ public class SosInsertSensorOperatorV20 implements IRequestOperator {
                 throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
             }
         } else {
-            String exceptionText = "Received request is not a SosInsertSensorRequest!";
+            String exceptionText = "Received request is not a InsertSensorRequest!";
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
         }

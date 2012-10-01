@@ -37,6 +37,8 @@ import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.Timer;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.UnavailableException;
 
@@ -59,6 +61,7 @@ import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.admin.operator.IAdminServiceOperator;
 import org.n52.sos.service.operator.IServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.tasking.ASosTasking;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -309,6 +312,8 @@ public final class Configurator {
 
     /** ServiceLoader for ISosRequestListener */
     private ServiceLoader<IServiceOperator> serviceLoaderServiceOperators;
+    
+    private ServiceLoader<ASosTasking> serviceLoaderTasking;
 
     /** file of service provider information in XML format */
     private File serviceProvider;
@@ -395,6 +400,8 @@ public final class Configurator {
      * Timer for the ACapabilitiesCacheController implementation
      */
     private Timer timer;
+    
+    private Timer taskingExecutor;
 
     /** token seperator for result element */
     private String tokenSeperator;
@@ -742,6 +749,7 @@ public final class Configurator {
         initializeCapabilitiesCacheController();
         // TODO: what?
         XmlOptionsHelper.getInstance(characterEncodingString, false);
+        initializeTasking();
     }
 
     /**
@@ -754,6 +762,10 @@ public final class Configurator {
         if (timer != null) {
             timer.cancel();
             timer = null;
+        }
+        if (taskingExecutor != null) {
+            taskingExecutor.cancel();
+            taskingExecutor = null;
         }
     }
 
@@ -990,6 +1002,36 @@ public final class Configurator {
         serviceLoaderRequestOperators = ServiceLoader.load(IRequestOperator.class);
         setRequestOperatorMap();
         LOGGER.info("\n******\n RequestOperator(s) loaded successfully!\n******\n");
+    }
+    
+    private void initializeTasking() {
+        serviceLoaderTasking = ServiceLoader.load(ASosTasking.class);
+        Iterator<ASosTasking> iterator = serviceLoaderTasking.iterator();
+        if (iterator.hasNext()) {
+            taskingExecutor = new Timer("TaskingTimer");
+            long delayCounter = 0;
+//            List<ASosTasking> tasks = new ArrayList<ASosTasking>();
+            while (iterator.hasNext()) {
+                try {
+                    ASosTasking aSosTasking = (ASosTasking) iterator.next();
+                    taskingExecutor.scheduleAtFixedRate(aSosTasking, delayCounter, (aSosTasking.getExecutionIntervall()*60000));
+                    delayCounter += 60000;
+                    LOGGER.debug("The task '{}' is started!", aSosTasking.getName());
+                } catch (Exception e) {
+                    LOGGER.error("Error while starting task", e);
+                }
+//                tasks.add((ASosTasking) iterator.next());
+
+            }
+//            taskingExecutor = new Timer("TaskingTimer");
+//            LOGGER.debug("TaskingExecutor initialized with size {}!", tasks.size());
+//            long delayCounter = 0;
+//            for (ASosTasking aSosTasking : tasks) {
+//                taskingExecutor.scheduleAtFixedRate(aSosTasking, (delayCounter+60000), (aSosTasking.getExecutionIntervall()*60000));
+//                LOGGER.debug("The task '{}' is started!", aSosTasking.getName());
+//            }
+            LOGGER.info("\n******\n Task(s) loaded and started successfully!\n******\n");
+        }
     }
 
     /**

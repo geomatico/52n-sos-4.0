@@ -13,6 +13,11 @@
 	<description>52North Sensor Observation Service Result Handling Profile Hibernate DAOs module</description>
 	<url>http://maven.apache.org</url>
 	<dependencies>
+	<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>52n-sos-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-hibernate-common</artifactId>

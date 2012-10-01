@@ -24,7 +24,7 @@
 package org.n52.sos.ogc.swe;
 
 import org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName;
-import org.n52.sos.ogc.swe.simpleType.ISosSweSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 
 /**
  * SOS internal representation of SWE coordinates
@@ -40,7 +40,7 @@ public class SosSweCoordinate {
     /**
      * Coordinate value
      */
-    private ISosSweSimpleType value;
+    private SosSweAbstractSimpleType value;
 
     /**
      * constructor
@@ -50,7 +50,7 @@ public class SosSweCoordinate {
      * @param value
      *            Coordinate value
      */
-    public SosSweCoordinate(SweCoordinateName name, ISosSweSimpleType value) {
+    public SosSweCoordinate(SweCoordinateName name, SosSweAbstractSimpleType value) {
         super();
         this.name = name;
         this.value = value;
@@ -74,7 +74,7 @@ public class SosSweCoordinate {
     /**
      * @return the value
      */
-    public ISosSweSimpleType getValue() {
+    public SosSweAbstractSimpleType getValue() {
         return value;
     }
 
@@ -82,7 +82,7 @@ public class SosSweCoordinate {
      * @param value
      *            the value to set
      */
-    public void setValue(ISosSweSimpleType value) {
+    public void setValue(SosSweAbstractSimpleType value) {
         this.value = value;
     }
 

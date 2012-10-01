@@ -23,7 +23,6 @@
 --
 
 DROP TABLE IF EXISTS result_type CASCADE;
-DROP TABLE IF EXISTS result_structure_type CASCADE;
 DROP TABLE IF EXISTS spatial_filtering_profile CASCADE;
 DROP TABLE IF EXISTS sensor_system CASCADE;
 DROP TABLE IF EXISTS offering CASCADE;
@@ -90,7 +89,6 @@ DROP SEQUENCE IF EXISTS quality_id_seq;
 DROP SEQUENCE IF EXISTS related_feature_id_seq;
 DROP SEQUENCE IF EXISTS related_feature_role_id_seq;
 DROP SEQUENCE IF EXISTS request_id_seq;
-DROP SEQUENCE IF EXISTS result_structure_type_id_seq;
 DROP SEQUENCE IF EXISTS result_template_id_seq;
 DROP SEQUENCE IF EXISTS result_type_id_seq;
 DROP SEQUENCE IF EXISTS spatial_filtering_profile_id_seq;
@@ -122,7 +120,6 @@ CREATE SEQUENCE quality_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 92233720368547758
 CREATE SEQUENCE related_feature_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE related_feature_role_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE request_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
-CREATE SEQUENCE result_structure_type_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE result_template_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE result_type_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE spatial_filtering_profile_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
@@ -136,13 +133,6 @@ CREATE TABLE result_type (
   result_type TEXT NOT NULL,
   UNIQUE (result_type),
   PRIMARY KEY(result_type_id)
-);
-
-CREATE TABLE result_structure_type (
-  result_structure_type_id bigint NOT NULL DEFAULT nextval('result_structure_type_id_seq'),
-  result_structure_type TEXT NOT NULL,
-  UNIQUE (result_structure_type),
-  PRIMARY KEY(result_structure_type_id)
 );
 
 CREATE TABLE related_feature_role (
@@ -429,12 +419,11 @@ CREATE TABLE observation_has_category_value (
 CREATE TABLE result_template (
   result_template_id bigint NOT NULL DEFAULT nextval('result_template_id_seq'),
   observation_constellation_id INTEGER NOT NULL,
-  result_structure_type_id INTEGER NOT NULL,
   feature_of_interest_id INTEGER NOT NULL,
   identifier TEXT NOT NULL,
   result_structure TEXT NOT NULL,
   result_encoding TEXT NOT NULL,
-  UNIQUE (feature_of_interest_id,observation_constellation_id,result_structure_type_id,identifier,result_structure,result_encoding),
+  UNIQUE (feature_of_interest_id,observation_constellation_id,identifier,result_structure,result_encoding),
   PRIMARY KEY(result_template_id)
 );
 
@@ -517,7 +506,6 @@ CREATE INDEX observation_has_text_value_FKIndex2 ON observation_has_text_value(t
 CREATE INDEX observation_has_category_value_FKIndex1 ON observation_has_category_value(observation_id);
 CREATE INDEX observation_has_category_value_FKIndex2 ON observation_has_category_value(category_value_id);
 CREATE INDEX result_template_FKIndex1 ON result_template(feature_of_interest_id);
-CREATE INDEX result_template_FKIndex2 ON result_template(result_structure_type_id);
 CREATE INDEX result_template_FKIndex3 ON result_template(observation_constellation_id);
 CREATE INDEX observation_has_numeric_value_FKIndex1 ON observation_has_numeric_value(observation_id);
 CREATE INDEX observation_has_numeric_value_FKIndex2 ON observation_has_numeric_value(numeric_value_id);
@@ -572,7 +560,6 @@ ALTER TABLE observation_has_text_value ADD FOREIGN KEY (observation_id) REFERENC
 ALTER TABLE observation_has_text_value ADD FOREIGN KEY (text_value_id) REFERENCES text_value(text_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE result_template ADD FOREIGN KEY (observation_constellation_id) REFERENCES observation_constellation(observation_constellation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE result_template ADD FOREIGN KEY (feature_of_interest_id) REFERENCES feature_of_interest(feature_of_interest_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE result_template ADD FOREIGN KEY (result_structure_type_id) REFERENCES result_structure_type(result_structure_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_numeric_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_numeric_value ADD FOREIGN KEY (numeric_value_id) REFERENCES numeric_value(numeric_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_count_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;

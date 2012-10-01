@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 import net.opengis.gml.x32.AbstractRingPropertyType;
 import net.opengis.gml.x32.AbstractRingType;
 import net.opengis.gml.x32.DirectPositionListType;
@@ -39,14 +41,15 @@ import net.opengis.gml.x32.LinearRingType;
 import net.opengis.gml.x32.PointType;
 import net.opengis.gml.x32.PolygonType;
 import net.opengis.gml.x32.ReferenceType;
+import net.opengis.gml.x32.TimeInstantDocument;
 import net.opengis.gml.x32.TimeInstantType;
+import net.opengis.gml.x32.TimePeriodDocument;
 import net.opengis.gml.x32.TimePeriodType;
 import net.opengis.gml.x32.TimePositionType;
 
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
-import org.n52.sos.ogc.filter.FilterConstants;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -99,21 +102,21 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
         return new HashMap<SupportedTypeKey, Set<String>>(0);
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
         return new HashSet<String>(0);
     }
-    
+
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(GMLConstants.NS_GML_32, GMLConstants.NS_GML_PREFIX);
     }
-    
+
     @Override
     public String getContentType() {
         return "text/xml";
     }
-    
+
     @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
         return encode(element, new HashMap<HelperValues, String>());
@@ -122,26 +125,40 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
     @Override
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         if (element instanceof ITime) {
-            return createTime((ITime) element);
+            return createTime((ITime) element, additionalValues);
         }
         if (element instanceof Geometry) {
             return createPosition((Geometry) element, additionalValues.get(HelperValues.GMLID));
         }
         if (element instanceof CategoryValue) {
-            return createReferenceType((CategoryValue)element);
+            return createReferenceType((CategoryValue) element);
         }
         return null;
     }
-    
-    private XmlObject createTime(ITime time) throws OwsExceptionReport {
+
+    private XmlObject createTime(ITime time, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         if (time != null) {
             if (time instanceof TimeInstant) {
-                return createTimeInstant((TimeInstant) time);
+                if (additionalValues.containsKey(HelperValues.DOCUMENT)) {
+                    return createTimeInstantDocument((TimeInstant) time);
+                } else {
+                    return createTimeInstantType((TimeInstant) time, null);
+                }
             } else if (time instanceof TimePeriod) {
-                return createTimePeriod((TimePeriod) time);
+                if (additionalValues.containsKey(HelperValues.DOCUMENT)) {
+                    return createTimePeriodDocument((TimePeriod) time);
+                } else {
+                    return createTimePeriodType((TimePeriod) time, null);
+                }
             }
         }
         return null;
+    }
+
+    private XmlObject createTimePeriodDocument(TimePeriod time) throws OwsExceptionReport {
+        TimePeriodDocument timePeriodDoc = TimePeriodDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        createTimePeriodType(time, timePeriodDoc.addNewTimePeriod());
+        return timePeriodDoc;
     }
 
     /**
@@ -149,40 +166,48 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
      * 
      * @param timePeriod
      *            SOS time object
+     * @param timePeriodType 
      * @return XML TimePeriod
      * @throws OwsExceptionReport
      *             if an error occurs.
      */
-    private TimePeriodType createTimePeriod(TimePeriod timePeriod) throws OwsExceptionReport {
-        TimePeriodType xbTimePeriod =
-                TimePeriodType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+    private TimePeriodType createTimePeriodType(TimePeriod timePeriod, TimePeriodType timePeriodType) throws OwsExceptionReport {
+        if (timePeriodType == null) {
+                timePeriodType = TimePeriodType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        }
         if (timePeriod.getId() != null && !timePeriod.getId().isEmpty()) {
-            xbTimePeriod.setId(timePeriod.getId());
+            timePeriodType.setId(timePeriod.getId());
         }
         // beginPosition
         TimePositionType xbTimePositionBegin = TimePositionType.Factory.newInstance();
         String beginString = DateTimeHelper.formatDateTime2ResponseString(timePeriod.getStart());
-
+    
         // concat minutes for timeZone offset, because gml requires
         // xs:dateTime, which needs minutes in
         // timezone offset
         // TODO enable really
         xbTimePositionBegin.setStringValue(beginString);
-
+    
         // endPosition
         TimePositionType xbTimePositionEnd = TimePositionType.Factory.newInstance();
         String endString = DateTimeHelper.formatDateTime2ResponseString(timePeriod.getEnd());
-
+    
         // concat minutes for timeZone offset, because gml requires
         // xs:dateTime, which needs minutes in
         // timezone offset
         // TODO enable really
         xbTimePositionEnd.setStringValue(endString);
+    
+        timePeriodType.setBeginPosition(xbTimePositionBegin);
+        timePeriodType.setEndPosition(xbTimePositionEnd);
+    
+        return timePeriodType;
+    }
 
-        xbTimePeriod.setBeginPosition(xbTimePositionBegin);
-        xbTimePeriod.setEndPosition(xbTimePositionEnd);
-
-        return xbTimePeriod;
+    private XmlObject createTimeInstantDocument(TimeInstant time) throws OwsExceptionReport {
+        TimeInstantDocument timeInstantDoc = TimeInstantDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        createTimeInstantType(time, timeInstantDoc.addNewTimeInstant());
+        return timeInstantDoc;
     }
 
     /**
@@ -190,18 +215,21 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
      * 
      * @param timeInstant
      *            SOS time object
+     * @param timeInstantType 
      * @param xbTime
      * @return XML TimeInstant
      * @throws OwsExceptionReport
      *             if an error occurs.
      */
-    private TimeInstantType createTimeInstant(TimeInstant timeInstant) throws OwsExceptionReport {
+    private TimeInstantType createTimeInstantType(TimeInstant timeInstant, TimeInstantType timeInstantType) throws OwsExceptionReport {
         // create time instant
-        TimeInstantType xbTime = TimeInstantType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        if (timeInstant.getId() != null && !timeInstant.getId().isEmpty()) {
-            xbTime.setId(timeInstant.getId());
+        if (timeInstantType == null) {
+            timeInstantType = TimeInstantType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         }
-        TimePositionType xb_posType = xbTime.addNewTimePosition();
+        if (timeInstant.getId() != null && !timeInstant.getId().isEmpty()) {
+            timeInstantType.setId(timeInstant.getId());
+        }
+        TimePositionType xb_posType = timeInstantType.addNewTimePosition();
 
         // parse db date string and format into GML format
         DateTime date = timeInstant.getValue();
@@ -212,7 +240,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
         // timezone offset
         // TODO enable really
         xb_posType.setStringValue(timeString);
-        return xbTime;
+        return timeInstantType;
     }
 
     private XmlObject createPosition(Geometry geom, String foiId) {
@@ -355,19 +383,19 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
             }
         }
     }
-    
+
     private XmlObject createReferenceType(CategoryValue categoryValue) {
-        ReferenceType  xbRef = ReferenceType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        ReferenceType xbRef = ReferenceType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (categoryValue.getValue() != null && !categoryValue.getValue().isEmpty()) {
             if (categoryValue.getValue().startsWith("http://")) {
                 xbRef.setHref(categoryValue.getValue());
             } else {
-                xbRef.setTitle(categoryValue.getValue()); 
+                xbRef.setTitle(categoryValue.getValue());
             }
         } else {
             xbRef.setNil();
         }
-       return xbRef;
+        return xbRef;
     }
 
 }

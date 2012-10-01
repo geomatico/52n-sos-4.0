@@ -23,7 +23,6 @@
  */
 package org.n52.sos.ogc.swe;
 
-import org.n52.sos.ogc.swe.simpleType.ISosSweSimpleType;
 
 /**
  * SOS internal representation of SWE field
@@ -39,7 +38,7 @@ public class SosSweField {
     /**
      * field element
      */
-    private ISosSweSimpleType element;
+    private SosSweAbstractDataComponent element;
 
     /**
      * constructor
@@ -49,7 +48,7 @@ public class SosSweField {
      * @param element
      *            Field element
      */
-    public SosSweField(String name, ISosSweSimpleType element) {
+    public SosSweField(String name, SosSweAbstractDataComponent element) {
         super();
         this.name = name;
         this.element = element;
@@ -73,7 +72,7 @@ public class SosSweField {
     /**
      * @return the elements
      */
-    public ISosSweSimpleType getElement() {
+    public SosSweAbstractDataComponent getElement() {
         return element;
     }
 
@@ -81,7 +80,7 @@ public class SosSweField {
      * @param elements
      *            the elements to set
      */
-    public void setElements(ISosSweSimpleType element) {
+    public void setElements(SosSweAbstractDataComponent element) {
         this.element = element;
     }
 

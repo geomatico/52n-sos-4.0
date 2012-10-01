@@ -21,29 +21,26 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.service.admin;
+package org.n52.sos.ogc.sos;
 
-public class AdministratoConstants {
+import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
+
+public class SosResultStructure {
     
-    /** enum with parameter names for getCapabilities request */
-    public enum AdministatorParams {
-        service, request;
+    private SosSweAbstractDataComponent resultStructure;
+    
+    private String xml;
 
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (s.equals(AdministatorParams.service.name()))
-                            || (s.equals(AdministatorParams.request.name()));
-            return contained;
-        }
+    public String getXml() {
+        return resultStructure.getXml();
+    }
+
+    public void setResultStructure(SosSweAbstractDataComponent resultStructure) {
+        this.resultStructure = resultStructure;
+    }
+
+    public SosSweAbstractDataComponent getResultStructure() {
+        return resultStructure;
     }
 
 }

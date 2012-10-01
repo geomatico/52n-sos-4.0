@@ -32,33 +32,52 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import net.opengis.fes.x20.BBOXDocument;
+import net.opengis.fes.x20.BBOXType;
+import net.opengis.fes.x20.BinaryTemporalOpType;
 import net.opengis.fes.x20.ComparisonOperatorsType;
 import net.opengis.fes.x20.ConformanceType;
+import net.opengis.fes.x20.DuringDocument;
 import net.opengis.fes.x20.FilterCapabilitiesDocument.FilterCapabilities;
 import net.opengis.fes.x20.GeometryOperandsType;
 import net.opengis.fes.x20.IdCapabilitiesType;
 import net.opengis.fes.x20.ScalarCapabilitiesType;
 import net.opengis.fes.x20.SpatialCapabilitiesType;
+import net.opengis.fes.x20.SpatialOperatorNameType;
 import net.opengis.fes.x20.SpatialOperatorType;
 import net.opengis.fes.x20.SpatialOperatorsType;
+import net.opengis.fes.x20.TEqualsDocument;
 import net.opengis.fes.x20.TemporalCapabilitiesType;
 import net.opengis.fes.x20.TemporalOperandsType;
+import net.opengis.fes.x20.TemporalOperatorNameType;
 import net.opengis.fes.x20.TemporalOperatorType;
 import net.opengis.fes.x20.TemporalOperatorsType;
+import net.opengis.fes.x20.ValueReferenceDocument;
 import net.opengis.fes.x20.impl.ComparisonOperatorNameTypeImpl;
 import net.opengis.fes.x20.impl.SpatialOperatorNameTypeImpl;
 import net.opengis.fes.x20.impl.TemporalOperatorNameTypeImpl;
 import net.opengis.ows.x11.DomainType;
 
+import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.filter.FilterConstants;
 import org.n52.sos.ogc.filter.FilterConstants.ComparisonOperator;
 import org.n52.sos.ogc.filter.FilterConstants.ConformanceClassConstraintNames;
 import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
+import org.n52.sos.ogc.filter.FilterConstants.TimeOperator2;
+import org.n52.sos.ogc.filter.SpatialFilter;
+import org.n52.sos.ogc.filter.TemporalFilter;
+import org.n52.sos.ogc.gml.GMLConstants;
+import org.n52.sos.ogc.gml.time.TimeInstant;
+import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
+import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,16 +113,16 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
         return new HashMap<SupportedTypeKey, Set<String>>(0);
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
         return new HashSet<String>(0);
     }
-    
+
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(FilterConstants.NS_FES_2, FilterConstants.NS_FES_2_PREFIX);
     }
-    
+
     @Override
     public String getContentType() {
         return "text/xml";
@@ -118,10 +137,111 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         if (element instanceof org.n52.sos.ogc.filter.FilterCapabilities) {
             return encodeFilterCapabilities((org.n52.sos.ogc.filter.FilterCapabilities) element);
+        } else if (element instanceof TemporalFilter) {
+            return encodeTemporalFilter((TemporalFilter) element);
+        } else if (element instanceof SpatialFilter) {
+            return encodeSpatialFilter((SpatialFilter) element);
         }
         return null;
     }
-    
+
+    private XmlObject encodeTemporalFilter(TemporalFilter temporalFilter) throws OwsExceptionReport {
+        if (temporalFilter.getOperator().equals(TimeOperator.TM_During)) {
+            return encodeTemporalFilterDuring(temporalFilter);
+        } else if (temporalFilter.getOperator().equals(TimeOperator.TM_Equals)) {
+            return encodeTemporalFilterEquals(temporalFilter);
+        } else {
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("The temporal filter operand '");
+            exceptionText.append(temporalFilter.getOperator().name());
+            exceptionText.append("' is not supported!");
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+        }
+    }
+
+    private XmlObject encodeTemporalFilterDuring(TemporalFilter temporalFilter) throws OwsExceptionReport {
+        DuringDocument duringDoc = DuringDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        BinaryTemporalOpType during = duringDoc.addNewDuring();
+        if (temporalFilter.getTime() instanceof TimePeriod) {
+            IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
+            if (encoder != null) {
+                Map<HelperValues, String> additionalValues = new HashMap<SosConstants.HelperValues, String>();
+                additionalValues.put(HelperValues.DOCUMENT, "");
+                during.set((XmlObject) encoder.encode(temporalFilter.getTime(), additionalValues));
+            } else {
+                StringBuilder exceptionText = new StringBuilder();
+                exceptionText.append("The encoder is not supported!");
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            }
+        } else {
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("The temporal filter value is not a TimePeriod!");
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+        }
+        checkAndAddValueReference(during, temporalFilter);
+        return duringDoc;
+    }
+
+    private XmlObject encodeTemporalFilterEquals(TemporalFilter temporalFilter) throws OwsExceptionReport {
+        TEqualsDocument equalsDoc =
+                TEqualsDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        BinaryTemporalOpType equals = equalsDoc.addNewTEquals();
+        if (temporalFilter.getTime() instanceof TimeInstant) {
+            IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
+            if (encoder != null) {
+                XmlObject expression = equals.addNewExpression();
+                Map<HelperValues, String> additionalValues = new HashMap<SosConstants.HelperValues, String>();
+                additionalValues.put(HelperValues.DOCUMENT, "");
+                equals.set((XmlObject) encoder.encode(temporalFilter.getTime(), additionalValues));
+            } else {
+                StringBuilder exceptionText = new StringBuilder();
+                exceptionText.append("The encoder is not supported!");
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            }
+        } else {
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("The temporal filter value is not a TimeInstant!");
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+        }
+        checkAndAddValueReference(equals, temporalFilter);
+        return equalsDoc;
+    }
+
+    private XmlObject encodeExpression(Object object) throws OwsExceptionReport {
+        IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
+        if (encoder != null) {
+            return (XmlObject) encoder.encode(object);
+        } else {
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("The encoder is not supported!");
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+        }
+    }
+
+    private void checkAndAddValueReference(BinaryTemporalOpType binaryTemporalOp, TemporalFilter temporalFilter) {
+        if (temporalFilter.hasValueReference()) {
+            binaryTemporalOp.setValueReference(temporalFilter.getValueReference());
+        }
+    }
+
+    private XmlObject encodeSpatialFilter(SpatialFilter spatialFilter) throws OwsExceptionReport {
+        BBOXDocument bboxDoc = BBOXDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        BBOXType bbox = bboxDoc.addNewBBOX();
+        if (spatialFilter.hasValueReference()) {
+            bbox.set(encodeReferenceValue(spatialFilter.getValueReference()));
+        }
+        // TODO check if srid is needed, then add as HelperValue
+        bbox.setExpression(encodeExpression(spatialFilter.getGeometry()));
+        return bbox;
+    }
+
+    private XmlObject encodeReferenceValue(String sosValueReference) {
+        ValueReferenceDocument valueReferenceDoc =
+                ValueReferenceDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        valueReferenceDoc.setValueReference(sosValueReference);
+        return valueReferenceDoc;
+    }
+
     /**
      * Sets the filter capabilities section to capabilities
      * 

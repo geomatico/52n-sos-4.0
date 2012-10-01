@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.sensorML.elements;
 
-import org.n52.sos.ogc.swe.simpleType.ISosSweSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 
 /**
  * SOS internal representation of SensorML IOs
@@ -32,7 +32,7 @@ public class SosSMLIo {
 
     private String ioName;
 
-    private ISosSweSimpleType ioValue;
+    private SosSweAbstractSimpleType ioValue;
 
     /**
      * default constructor
@@ -47,7 +47,7 @@ public class SosSMLIo {
      * @param ioValue
      *            The IO value
      */
-    public SosSMLIo(ISosSweSimpleType ioValue) {
+    public SosSMLIo(SosSweAbstractSimpleType ioValue) {
         super();
         this.ioValue = ioValue;
     }
@@ -70,7 +70,7 @@ public class SosSMLIo {
     /**
      * @return the input
      */
-    public ISosSweSimpleType getIoValue() {
+    public SosSweAbstractSimpleType getIoValue() {
         return ioValue;
     }
 
@@ -78,7 +78,7 @@ public class SosSMLIo {
      * @param input
      *            the input to set
      */
-    public void setIoValue(ISosSweSimpleType ioValue) {
+    public void setIoValue(SosSweAbstractSimpleType ioValue) {
         this.ioValue = ioValue;
     }
 }

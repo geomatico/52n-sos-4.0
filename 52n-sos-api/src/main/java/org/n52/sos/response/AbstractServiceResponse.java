@@ -23,44 +23,13 @@
  */
 package org.n52.sos.response;
 
+import org.n52.sos.service.AbstractServiceCommunicationObject;
+
 /**
  * abstract super class for all service request classes
  * 
  */
-public abstract class AbstractServiceResponse {
+public abstract class AbstractServiceResponse extends AbstractServiceCommunicationObject {
 
-    /** service parameter */
-    private String service;
 
-    private String version;
-
-    /**
-     * @return the service
-     */
-    public String getService() {
-        return service;
-    }
-
-    /**
-     * @param service
-     *            the service to set
-     */
-    public void setService(String service) {
-        this.service = service;
-    }
-
-    /**
-     * @param version
-     *            the version to set
-     */
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    /**
-     * @return the version
-     */
-    public String getVersion() {
-        return version;
-    }
 }

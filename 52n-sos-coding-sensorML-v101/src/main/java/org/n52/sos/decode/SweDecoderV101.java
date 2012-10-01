@@ -34,6 +34,7 @@ import net.opengis.swe.x101.AnyScalarPropertyType;
 import net.opengis.swe.x101.CountDocument.Count;
 import net.opengis.swe.x101.CountRangeDocument.CountRange;
 import net.opengis.swe.x101.DataArrayDocument;
+import net.opengis.swe.x101.DataArrayType;
 import net.opengis.swe.x101.DataComponentPropertyType;
 import net.opengis.swe.x101.ObservablePropertyDocument.ObservableProperty;
 import net.opengis.swe.x101.PositionType;
@@ -52,7 +53,7 @@ import org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.ogc.swe.SosSweField;
-import org.n52.sos.ogc.swe.simpleType.ISosSweSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuality;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
@@ -92,6 +93,8 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
     public Object decode(Object element) throws OwsExceptionReport {
         if (element instanceof DataArrayDocument) {
             return parseSweDataArray((DataArrayDocument) element);
+        } else if (element instanceof DataArrayType) {
+            return parseSweDataArrayType((DataArrayType) element);
         } else if (element instanceof DataComponentPropertyType[]) {
             return parseDataRecordFieldArray((DataComponentPropertyType[]) element);
         } else if (element instanceof Count) {
@@ -128,8 +131,13 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
     }
 
     private SosSweDataArray parseSweDataArray(DataArrayDocument xbDataArray) throws OwsExceptionReport {
-        // TODO parse DataArray;
-        return null;
+        return parseSweDataArrayType(xbDataArray.getDataArray1());
+    }
+
+    private SosSweDataArray parseSweDataArrayType(DataArrayType xbDataArray) throws OwsExceptionReport {
+        SosSweDataArray dataArray = new SosSweDataArray();
+        // TODO
+        return dataArray;
     }
 
     private List<SosSweField> parseDataRecordFieldArray(DataComponentPropertyType[] fieldArray)
@@ -159,31 +167,31 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return sosFields;
     }
 
-    private ISosSweSimpleType parseBoolean(XmlObject xbBoolean) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType parseBoolean(XmlObject xbBoolean) throws OwsExceptionReport {
         String exceptionText = "The Boolean is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private ISosSweSimpleType parseCategory(XmlObject xbCategory) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType parseCategory(XmlObject xbCategory) throws OwsExceptionReport {
         String exceptionText = "The Category is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private ISosSweSimpleType parseCount(XmlObject xbCount) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType parseCount(XmlObject xbCount) throws OwsExceptionReport {
         String exceptionText = "The Count is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private ISosSweSimpleType parseCountRange(CountRange countRange) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType parseCountRange(CountRange countRange) throws OwsExceptionReport {
         String exceptionText = "The CountRange is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private ISosSweSimpleType parseObservableProperty(ObservableProperty observableProperty) {
+    private SosSweAbstractSimpleType parseObservableProperty(ObservableProperty observableProperty) {
         ObservableProperty xbObsProp = (ObservableProperty) observableProperty;
         SosSweText sosObservableProperty = new SosSweText();
         if (xbObsProp.isSetDefinition()) {
@@ -192,7 +200,7 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return sosObservableProperty;
     }
 
-    private ISosSweSimpleType parseQuantity(Quantity xbQuantity) {
+    private SosSweAbstractSimpleType parseQuantity(Quantity xbQuantity) {
         SosSweQuantity sosQuantity = new SosSweQuantity();
         if (xbQuantity.isSetAxisID()) {
             sosQuantity.setAxisID(xbQuantity.getAxisID());
@@ -215,13 +223,13 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return sosQuantity;
     }
 
-    private ISosSweSimpleType parseQuantityRange(QuantityRange quantityRange) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType parseQuantityRange(QuantityRange quantityRange) throws OwsExceptionReport {
         String exceptionText = "The QuantityRange is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private ISosSweSimpleType parseText(Text xbText) {
+    private SosSweAbstractSimpleType parseText(Text xbText) {
         SosSweText sosText = new SosSweText();
         if (xbText.isSetDefinition()) {
             sosText.setDefinition(xbText.getDefinition());
@@ -235,13 +243,13 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return sosText;
     }
 
-    private ISosSweSimpleType parseTime(Time time) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType parseTime(Time time) throws OwsExceptionReport {
         String exceptionText = "The Time is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private ISosSweSimpleType parseTimeRange(TimeRange timeRange) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType parseTimeRange(TimeRange timeRange) throws OwsExceptionReport {
         String exceptionText = "The TimeRange is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);

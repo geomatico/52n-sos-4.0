@@ -53,10 +53,10 @@ import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.CountValue;
+import org.n52.sos.ogc.om.values.NilTemplateValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
@@ -86,7 +86,6 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
             builder.append(", ");
         }
         builder.delete(builder.lastIndexOf(", "), builder.length());
-
         supportedObservationTypes = new HashSet<String>(0);
         supportedObservationTypes.add(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION);
         supportedObservationTypes.add(OMConstants.OBS_TYPE_COUNT_OBSERVATION);
@@ -94,7 +93,7 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
         supportedObservationTypes.add(OMConstants.OBS_TYPE_MEASUREMENT);
         supportedObservationTypes.add(OMConstants.OBS_TYPE_TEXT_OBSERVATION);
         supportedObservationTypes.add(OMConstants.OBS_TYPE_TRUTH_OBSERVATION);
-
+        supportedObservationTypes.add(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
         LOGGER.info("Decoder for the following namespaces initialized successfully: " + builder.toString() + "!");
     }
 
@@ -127,16 +126,15 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
         Map<String, SosAbstractFeature> featureMap = new HashMap<String, SosAbstractFeature>();
         SosObservation sosObservation = new SosObservation();
         sosObservation.setIdentifier(getIdentifier(omObservation));
-        SosObservationConstellation observationCollection = getObservationConstellation(omObservation);
+        SosObservationConstellation observationConstallation = getObservationConstellation(omObservation);
         SosAbstractFeature featureOfInterest = getFeatureOfInterest(omObservation.getFeatureOfInterest());
-        observationCollection.setFeatureOfInterest(checkFeatureWithMap(featureOfInterest, featureMap));
-        sosObservation.setObservationConstellation(observationCollection);
+        observationConstallation.setFeatureOfInterest(checkFeatureWithMap(featureOfInterest, featureMap));
+        sosObservation.setObservationConstellation(observationConstallation);
         sosObservation.setResultTime(getResultTime(omObservation));
         sosObservation.setValidTime(getValidTime(omObservation));
 
         // TODO: later for spatial filtering profile
         // omObservation.getParameterArray();
-
         sosObservation.setValue(getObservationValue(omObservation));
         checkOrSetObservationType(sosObservation);
         return sosObservation;
@@ -237,13 +235,21 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
     }
 
     private ITime getPhenomenonTime(OMObservationType omObservation) throws OwsExceptionReport {
-        String namespace = XmlHelper.getNamespace(omObservation.getPhenomenonTime().getAbstractTimeObject());
-        List<IDecoder> decoderList = Configurator.getInstance().getDecoder(namespace);
-        if (decoderList != null) {
-            for (IDecoder decoder : decoderList) {
-                Object decodedObject = decoder.decode(omObservation.getPhenomenonTime().getAbstractTimeObject());
-                if (decodedObject != null && decodedObject instanceof ITime) {
-                    return (ITime) decodedObject;
+        if (omObservation.getPhenomenonTime().isSetNilReason()
+                && omObservation.getPhenomenonTime().getNilReason() instanceof String
+                && ((String) omObservation.getPhenomenonTime().getNilReason()).equals("template")) {
+            TimeInstant timeInstant = new TimeInstant();
+            timeInstant.setIndeterminateValue((String) omObservation.getPhenomenonTime().getNilReason());
+            return timeInstant;
+        } else {
+            String namespace = XmlHelper.getNamespace(omObservation.getPhenomenonTime().getAbstractTimeObject());
+            List<IDecoder> decoderList = Configurator.getInstance().getDecoder(namespace);
+            if (decoderList != null) {
+                for (IDecoder decoder : decoderList) {
+                    Object decodedObject = decoder.decode(omObservation.getPhenomenonTime().getAbstractTimeObject());
+                    if (decodedObject != null && decodedObject instanceof ITime) {
+                        return (ITime) decodedObject;
+                    }
                 }
             }
         }
@@ -257,6 +263,12 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
         if (omObservation.getResultTime().isSetHref()) {
             TimeInstant timeInstant = new TimeInstant();
             timeInstant.setIndeterminateValue(omObservation.getResultTime().getHref());
+            return timeInstant;
+        } else if (omObservation.getResultTime().isSetNilReason()
+                && omObservation.getResultTime().getNilReason() instanceof String
+                && ((String) omObservation.getResultTime().getNilReason()).equals("template")) {
+            TimeInstant timeInstant = new TimeInstant();
+            timeInstant.setIndeterminateValue((String) omObservation.getResultTime().getNilReason());
             return timeInstant;
         } else {
             String namespace = XmlHelper.getNamespace(omObservation.getResultTime().getTimeInstant());
@@ -297,8 +309,16 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
     }
 
     private IObservationValue getObservationValue(OMObservationType omObservation) throws OwsExceptionReport {
-        IObservationValue observationValue = getResult(omObservation);
-        observationValue.setPhenomenonTime(getPhenomenonTime(omObservation));
+        ITime phenomenonTime = getPhenomenonTime(omObservation);
+        IObservationValue observationValue = null;
+        if (phenomenonTime.getIndeterminateValue().equals("template")) {
+            observationValue = new SosSingleObservationValue();
+            observationValue.setPhenomenonTime(phenomenonTime);
+            observationValue.setValue(new NilTemplateValue());
+        } else {
+            observationValue = getResult(omObservation);
+            observationValue.setPhenomenonTime(phenomenonTime);
+        }
         return observationValue;
     }
 

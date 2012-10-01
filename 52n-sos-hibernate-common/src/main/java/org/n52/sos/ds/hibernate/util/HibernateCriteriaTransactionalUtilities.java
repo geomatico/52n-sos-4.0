@@ -24,14 +24,11 @@
 package org.n52.sos.ds.hibernate.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.CategoryValue;
@@ -49,13 +46,17 @@ import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
+import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.entities.TextValue;
 import org.n52.sos.ds.hibernate.entities.Unit;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
 import org.n52.sos.ogc.om.SosObservableProperty;
+import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.Util4Exceptions;
 
@@ -405,6 +406,42 @@ public class HibernateCriteriaTransactionalUtilities {
         // childFeature.getFeatureOfInterestsForParentFeatureId().add(parentFeature);
         // session.saveOrUpdate(childFeature);
         // session.flush();
+    }
+    
+    public static void insertResultTemplate(InsertResultTemplateRequest request, ObservationConstellation observationConstellation,
+            FeatureOfInterest featureOfInterest, Session session) {
+       ResultTemplate resultTemplate = new ResultTemplate();
+       resultTemplate.setIdentifier(request.getIdentifier());
+       resultTemplate.setObservationConstellation(observationConstellation);
+       resultTemplate.setFeatureOfInterest(featureOfInterest);
+       resultTemplate.setResultStructure(request.getResultStructure().getXml());
+       resultTemplate.setResultEncoding(request.getResultEncoding().getXml());
+       session.save(resultTemplate);
+       session.flush();
+    }
+    
+    public static void insertObservationSingleValue(ObservationConstellation obsConst, FeatureOfInterest feature,
+            SosObservation observation, Session session) {
+        SosSingleObservationValue value = (SosSingleObservationValue) observation.getValue();
+        Observation hObservation = new Observation();
+        if (observation.getIdentifier() != null && !observation.getIdentifier().isEmpty()) {
+            hObservation.setIdentifier(observation.getIdentifier());
+        }
+        hObservation.setObservationConstellation(obsConst);
+        hObservation.setFeatureOfInterest(feature);
+        HibernateUtilities.addPhenomeonTimeAndResultTimeToObservation(hObservation, observation.getPhenomenonTime(),
+                observation.getResultTime());
+        HibernateUtilities.addValueToObservation(hObservation, value.getValue(), session);
+        if (value.getValue().getUnit() != null) {
+            hObservation.setUnit(HibernateCriteriaTransactionalUtilities.getOrInsertUnit(value.getValue().getUnit(),
+                    session));
+        }
+        HibernateCriteriaTransactionalUtilities.insertObservation(hObservation, session);
+    }
+
+    public static void insertObservationMutliValue(ObservationConstellation obsConst, FeatureOfInterest feature,
+            SosObservation observation) {
+        // TODO Auto-generated method stub
     }
 
 }

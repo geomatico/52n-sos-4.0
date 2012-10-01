@@ -23,50 +23,16 @@
  */
 package org.n52.sos.request;
 
+import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 
 /**
  * abstract super class for all service request classes
  * 
  */
-public abstract class AbstractServiceRequest {
+public abstract class AbstractServiceRequest extends AbstractServiceCommunicationObject {
 
     protected ServiceOperatorKeyType[] serviceOperatorKeyTypes;
-
-    /** service parameter */
-    private String service;
-
-    private String version;
-
-    /**
-     * @return the service
-     */
-    public String getService() {
-        return service;
-    }
-
-    /**
-     * @param service
-     *            the service to set
-     */
-    public void setService(String service) {
-        this.service = service;
-    }
-
-    /**
-     * @param version
-     *            the version to set
-     */
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    /**
-     * @return the version
-     */
-    public String getVersion() {
-        return version;
-    }
 
     /**
      * @return the operationName
@@ -76,7 +42,7 @@ public abstract class AbstractServiceRequest {
     public ServiceOperatorKeyType[] getServiceOperatorKeyType() {
         if (serviceOperatorKeyTypes == null) {
             serviceOperatorKeyTypes = new ServiceOperatorKeyType[1];
-            serviceOperatorKeyTypes[0] = new ServiceOperatorKeyType(service, version);
+            serviceOperatorKeyTypes[0] = new ServiceOperatorKeyType(getService(), getVersion());
         }
         return serviceOperatorKeyTypes;
     }

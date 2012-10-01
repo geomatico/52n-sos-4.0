@@ -51,11 +51,11 @@ import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
+import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.entities.SpatialRefSys;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,6 +104,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             setCompositePhenomenonValues(cache, session);
             setSridValues(cache, session);
             setObservationTypes(cache, session);
+            setResultTemplateValues(cache, session);
         } catch (HibernateException he) {
             String exceptionText = "Error while initializing CapabilitiesCache!";
             LOGGER.error(exceptionText, he);
@@ -163,6 +164,29 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             session.close();
         } catch (HibernateException he) {
             String exceptionText = "Error while updateing CapabilitiesCache after sensor deletion!";
+            LOGGER.error(exceptionText, he);
+        } finally {
+            connectionProvider.returnConnection(session);
+        }
+    }
+
+    @Override
+    public void updateAfterResultTemplateInsertion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport {
+        CapabilitiesCache cache = (CapabilitiesCache) capabilitiesCache;
+        Session session = null;
+        try {
+            // TODO: check which setter are necessary
+            session = (Session) connectionProvider.getConnection();
+            setOfferingValues(cache, session);
+            setProcedureValues(cache, session);
+            setObservablePropertyValues(cache, session);
+            setFeatureOfInterestValues(cache, session);
+            setRelatedFeatures(cache, session);
+            setCompositePhenomenonValues(cache, session);
+            setResultTemplateValues(cache, session);
+            session.close();
+        } catch (HibernateException he) {
+            String exceptionText = "Error while updateing CapabilitiesCache after resultTemplate insertion!";
             LOGGER.error(exceptionText, he);
         } finally {
             connectionProvider.returnConnection(session);
@@ -500,5 +524,14 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             featureIDs.add(feature.getIdentifier());
         }
         return featureIDs;
+    }
+
+    private void setResultTemplateValues(CapabilitiesCache cache, Session session) {
+        List<ResultTemplate> resultTemplateObjects = HibernateCriteriaQueryUtilities.getResultTemplateObjects(session);
+        List<String> resultTemplates = new ArrayList<String>();
+        for (ResultTemplate resultTemplateObject : resultTemplateObjects) {
+            resultTemplates.add(resultTemplateObject.getIdentifier());
+        }
+        cache.setResultTemplates(resultTemplates);
     }
 }

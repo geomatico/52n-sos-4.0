@@ -439,7 +439,7 @@ public final class SosConstants {
     }
 
     public enum HelperValues {
-        GMLID, EXIST_FOI_IN_DOC, VERSION
+        GMLID, EXIST_FOI_IN_DOC, VERSION, TYPE, DOCUMENT
     }
 
     public enum SosExceptionCode implements IExceptionCode {

@@ -51,14 +51,14 @@ http://www.opengis.net/swes/2.0 http://schemas.opengis.net/swes/2.0/swes.xsd" xm
 		              <sml:inputs>
 		                <sml:InputList>
 		                  <sml:input name="">
-		                    <swe:ObservableProperty definition="http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl#Discharge"/>
+		                    <swe:ObservableProperty definition="http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl#Waterlevel"/>
 		                  </sml:input>
 		                </sml:InputList>
 		              </sml:inputs>
 		              <sml:outputs>
 		                <sml:OutputList>
 		                  <sml:output name="">
-		                    <swe:Quantity definition="http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl#Discharge">
+		                    <swe:Quantity definition="http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl#Waterlevel">
 		                      <swe:uom code="NOT_DEFINED"/>
 		                    </swe:Quantity>
 		                  </sml:output>
@@ -127,14 +127,14 @@ http://www.opengis.net/swes/2.0 http://schemas.opengis.net/swes/2.0/swes.xsd" xm
 		          </sml:member>
 		        </sml:SensorML>
 			</swes:procedureDescription>
-			<swes:observableProperty>http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl#Discharge</swes:observableProperty>
+			<swes:observableProperty>http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl#Waterlevel</swes:observableProperty>
 			<swes:observableProperty>http://52north.org/def/obsProp/count</swes:observableProperty>
 			<swes:observableProperty>http://52north.org/def/obsProp/category</swes:observableProperty>
 			<swes:observableProperty>http://52north.org/def/obsProp/text</swes:observableProperty>
 			<swes:observableProperty>http://52north.org/def/obsProp/boolean</swes:observableProperty>
 			<swes:relatedFeature>
 				<swes:FeatureRelationship>
-					<swes:target xlink:href="http://52north.org/relatedFeature/100" />
+					<swes:target xlink:href="http://52north.org/relatedFeature/101" />
 					<swes:role>http://www.opengis.net/def/nil/OGC/0/unknown</swes:role>
 				</swes:FeatureRelationship>
 			</swes:relatedFeature>

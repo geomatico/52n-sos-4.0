@@ -37,8 +37,6 @@ public class ResultTemplate implements java.io.Serializable {
 
     private long resultTemplateId;
 
-    private ResultStructureType resultStructureType;
-
     private FeatureOfInterest featureOfInterest;
 
     private ObservationConstellation observationConstellation;
@@ -52,11 +50,10 @@ public class ResultTemplate implements java.io.Serializable {
     public ResultTemplate() {
     }
 
-    public ResultTemplate(long resultTemplateId, ResultStructureType resultStructureType,
-            FeatureOfInterest featureOfInterest, ObservationConstellation observationConstellation, String identifier,
-            String resultStructure, String resultEncoding) {
+    public ResultTemplate(long resultTemplateId, FeatureOfInterest featureOfInterest,
+            ObservationConstellation observationConstellation, String identifier, String resultStructure,
+            String resultEncoding) {
         this.resultTemplateId = resultTemplateId;
-        this.resultStructureType = resultStructureType;
         this.featureOfInterest = featureOfInterest;
         this.observationConstellation = observationConstellation;
         this.identifier = identifier;
@@ -70,14 +67,6 @@ public class ResultTemplate implements java.io.Serializable {
 
     public void setResultTemplateId(long resultTemplateId) {
         this.resultTemplateId = resultTemplateId;
-    }
-
-    public ResultStructureType getResultStructureType() {
-        return this.resultStructureType;
-    }
-
-    public void setResultStructureType(ResultStructureType resultStructureType) {
-        this.resultStructureType = resultStructureType;
     }
 
     public FeatureOfInterest getFeatureOfInterest() {

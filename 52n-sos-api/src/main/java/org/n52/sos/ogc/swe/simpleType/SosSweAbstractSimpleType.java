@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ogc.swe.simpleType;
 
+import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
 
 /**
@@ -31,21 +32,21 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
  * @author Carsten Hollmann
  * @version 1.0.0
  */
-public interface ISosSweSimpleType {
+public abstract class SosSweAbstractSimpleType extends SosSweAbstractDataComponent {
 
     /**
      * Get type of simpleType
      * 
      * @return Type of simpleType
      */
-    public SweSimpleType getSimpleType();
+    public abstract SweSimpleType getSimpleType();
 
     /**
      * Get quality information
      * 
      * @return Quality information
      */
-    public SosSweQuality getQuality();
+    public abstract SosSweQuality getQuality();
 
     /**
      * Set quality information
@@ -53,44 +54,14 @@ public interface ISosSweSimpleType {
      * @param quality
      *            quality information to set
      */
-    public void setQuality(SosSweQuality quality);
-
-    /**
-     * Get definition
-     * 
-     * @return definition
-     */
-    public String getDefinition();
-
-    /**
-     * Set definition
-     * 
-     * @param definition
-     *            definition to set
-     */
-    public void setDefinition(String definition);
-
-    /**
-     * Get description
-     * 
-     * @return description
-     */
-    public String getDescription();
-
-    /**
-     * Set description
-     * 
-     * @param description
-     *            description to set
-     */
-    public void setDescription(String description);
+    public abstract void setQuality(SosSweQuality quality);
 
     /**
      * Get value
      * 
      * @return value
      */
-    public String getValue();
+    public abstract String getValue();
 
     /**
      * Set value
@@ -98,6 +69,6 @@ public interface ISosSweSimpleType {
      * @param value
      *            value to set
      */
-    public void setValue(String value);
+    public abstract void setValue(String value);
 
 }

@@ -57,6 +57,8 @@
 				requests[index++]=datafolder_sos2+"GetObservationByIds.xml";
 				// Transactional
 				requests[index++]=datafolder_sos2+"Transactional/InsertSensor.xml";
+				requests[index++]=datafolder_sos2+"Transactional/InsertSensor_OnlyProcID.xml";
+				requests[index++]=datafolder_sos2+"Transactional/InsertSensor_NoIDs.xml";
 				requests[index++]=datafolder_sos2+"Transactional/InsertObservation_Measurement.xml";
 				requests[index++]=datafolder_sos2+"Transactional/InsertObservation_Category.xml";
 				requests[index++]=datafolder_sos2+"Transactional/InsertObservation_Count.xml";
@@ -64,7 +66,11 @@
 				requests[index++]=datafolder_sos2+"Transactional/InsertObservation_Truth.xml";
 				requests[index++]=datafolder_sos2+"Transactional/UpdateSensor.xml";
 				requests[index++]=datafolder_sos2+"Transactional/DeleteSensor.xml";
-				
+				// ResultHandling
+				requests[index++]=datafolder_sos2+"ResultHandling/InsertResultTemplate_SingleValue.xml";
+				requests[index++]=datafolder_sos2+"ResultHandling/InsertResultTemplate_KomplexValue.xml";
+				requests[index++]=datafolder_sos2+"ResultHandling/InsertResult_SingleValue.xml";
+				requests[index++]=datafolder_sos2+"ResultHandling/InsertResult_KomplexValue.xml";
 				
 				//fill the select element
 				var selRequest = document.getElementById("selRequest");

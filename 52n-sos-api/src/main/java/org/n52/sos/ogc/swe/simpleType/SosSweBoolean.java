@@ -25,12 +25,16 @@ package org.n52.sos.ogc.swe.simpleType;
 
 import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
 
-public class SosSweBoolean implements ISosSweSimpleType {
+public class SosSweBoolean extends SosSweAbstractSimpleType {
+    
+    /**
+     * SWE simple type type
+     */
+    private SweSimpleType simpleType = SweSimpleType.Boolean;
 
     @Override
     public SweSimpleType getSimpleType() {
-        // TODO Auto-generated method stub
-        return null;
+        return simpleType;
     }
 
     @Override
@@ -46,30 +50,6 @@ public class SosSweBoolean implements ISosSweSimpleType {
     }
 
     @Override
-    public String getDefinition() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setDefinition(String definition) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public String getDescription() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setDescription(String description) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
     public String getValue() {
         // TODO Auto-generated method stub
         return null;
@@ -80,5 +60,7 @@ public class SosSweBoolean implements ISosSweSimpleType {
         // TODO Auto-generated method stub
         
     }
+
+   
 
 }

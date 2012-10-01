@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2003/05/soap-envelope http://www.w3.org/2003/05/soap-envelope/soap-envelope.xsd http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sos.xsd"
+ xmlns:swes="http://www.opengis.net/swes/2.0" xmlns:sos="http://www.opengis.net/sos/2.0" xmlns:swe="http://www.opengis.net/swe/2.0" xmlns:sml="http://www.opengis.net/sensorML/1.0.1" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:om="http://www.opengis.net/om/2.0" 
+ xmlns:sams="http://www.opengis.net/samplingSpatial/2.0" xmlns:sf="http://www.opengis.net/sampling/2.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<env:Body>
+		<sos:InsertResult service="SOS" version="2.0.0">
+			<sos:template>http://www.my_namespace.org/sensors/100/template/2</sos:template>
+			<sos:resultValues>2012-07-16T13:30:00+02:00,26,95,30,270,40,270,50,270,60,270,70,270,80,270,90,270,100,270,110,270,120,270,130,270,140,270,150,270,160,270,170,270,180,270,190,270,200,270,210,270,220,270,230,270,240,270,250,270,260,270,270,270,280,270,290,270,300,270,310,270,320,270,330,270,340,270,350,270,360,270,370,270,380,270,390,270,400,270,410,270,420,270,430,270,440,270,450,270,460,270,470,270,480,270,490,270,500,270;2012-07-16T13:40:00+02:00,27,95,30,270,40,270,50,270,60,270,70,270,80,270,90,270,100,270,110,270,120,270,130,270,140,270,150,270,160,270,170,270,180,270,190,270,200,270,210,270,220,270,230,270,240,270,250,270,260,270,270,270,280,270,290,270,300,270,310,270,320,270,330,270,340,270,350,270,360,270,370,270,380,270,390,270,400,270,410,270,420,270,430,270,440,270,450,270,460,270,470,270,480,270,490,270,500,270;</sos:resultValues>
+		</sos:InsertResult>
+	</env:Body>
+</env:Envelope>

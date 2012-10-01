@@ -62,7 +62,7 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.SosExceptionCode;
 import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
-import org.n52.sos.ogc.swe.simpleType.ISosSweSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.service.Configurator;
@@ -881,7 +881,7 @@ public class SosHelper {
     }
 
     public static SosObservableProperty createSosOberavablePropertyFromSosSMLIo(SosSMLIo output) {
-        ISosSweSimpleType ioValue = output.getIoValue();
+        SosSweAbstractSimpleType ioValue = output.getIoValue();
         String identifier = ioValue.getDefinition();
         String description = ioValue.getDescription();
         String unit = null;

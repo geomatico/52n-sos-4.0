@@ -37,12 +37,11 @@ import net.opengis.swe.x20.TimeType;
 import net.opengis.swe.x20.VectorType.Coordinate;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
-import org.n52.sos.ogc.swe.simpleType.ISosSweSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
@@ -119,8 +118,8 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
             return addValuesToSimpleTypeTime((SosSweTime) element);
         } else if (element instanceof SosSweCoordinate) {
             return addValuesToCoordinate((SosSweCoordinate) element);
-        } else if (element instanceof ISosSweSimpleType) {
-            return addSweSimpleTypToField((ISosSweSimpleType) element);
+        } else if (element instanceof SosSweAbstractSimpleType) {
+            return addSweSimpleTypToField((SosSweAbstractSimpleType) element);
         }
         return null;
     }
@@ -135,7 +134,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
      * @return
      * @throws OwsExceptionReport
      */
-    private AbstractDataComponentType addSweSimpleTypToField(ISosSweSimpleType element) throws OwsExceptionReport {
+    private AbstractDataComponentType addSweSimpleTypToField(SosSweAbstractSimpleType element) throws OwsExceptionReport {
         if (element instanceof SosSweQuantity) {
             return addValuesToSimpleTypeQuantity((SosSweQuantity) element);
         } else if (element instanceof SosSweText) {

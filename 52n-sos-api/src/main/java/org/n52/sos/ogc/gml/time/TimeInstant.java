@@ -63,6 +63,10 @@ public class TimeInstant implements ITime {
     public TimeInstant() {
     }
 
+    public TimeInstant(DateTime dateTime) {
+        this.value = dateTime;
+    }
+
     @Override
     public void setId(String id) {
         this.id = id;

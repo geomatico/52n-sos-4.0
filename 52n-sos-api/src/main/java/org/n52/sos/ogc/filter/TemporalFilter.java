@@ -149,4 +149,8 @@ public class TemporalFilter {
         return "Temporal filter: " + operator + time.toString();
     }
 
+    public boolean hasValueReference() {
+        return valueReference != null && !valueReference.isEmpty();
+    }
+
 }

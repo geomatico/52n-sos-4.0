@@ -144,4 +144,8 @@ public class SpatialFilter {
     public void setValueReference(String valueReference) {
         this.valueReference = valueReference;
     }
+
+    public boolean hasValueReference() {
+        return valueReference != null && !valueReference.isEmpty();
+    }
 }
