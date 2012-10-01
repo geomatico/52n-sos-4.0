@@ -307,7 +307,7 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    // private ISosSweSimpleType parseObservableProperty(ObservableProperty
+    // private SosSweAbstractSimpleType parseObservableProperty(ObservableProperty
     // observableProperty) {
     // ObservableProperty xbObsProp = (ObservableProperty) observableProperty;
     // SosSweText sosObservableProperty = new SosSweText();

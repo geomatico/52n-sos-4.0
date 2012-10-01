@@ -52,54 +52,26 @@ public class SosSweObservableProperty extends SosSweAbstractSimpleType {
     public SosSweObservableProperty() {
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getSimpleType()
-     */
     @Override
     public SweSimpleType getSimpleType() {
         return simpleType;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getQuality()
-     */
     @Override
     public SosSweQuality getQuality() {
         return quality;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.ogc.swe.simpleType.ISosSweSimpleType#setQuality(org.n52.ogc.swe
-     * .simpleType.SosSweQuality)
-     */
     @Override
     public void setQuality(SosSweQuality quality) {
         this.quality = quality;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.ogc.swe.simpleType.ISosSweSimpleType#getValue()
-     */
     @Override
     public String getValue() {
         return value;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.ogc.swe.simpleType.ISosSweSimpleType#setValue(java.lang.String)
-     */
     @Override
     public void setValue(String value) {
         this.value = value;
