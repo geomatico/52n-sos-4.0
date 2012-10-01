@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.n52.sos.exception.AdministratorException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.admin.operator.IAdminServiceOperator;
 import org.slf4j.Logger;
@@ -82,10 +83,10 @@ public class SosAdminService extends HttpServlet {
         try {
             Configurator.getInstance(configStream, basepath);
             configStream.close();
-        } catch (OwsExceptionReport owse) {
-            throw new UnavailableException(owse.getMessage());
         } catch (IOException ioe) {
             throw new UnavailableException(ioe.getMessage());
+        } catch (ConfigurationException ce) {
+            throw new UnavailableException(ce.getMessage());
         } finally {
             try {
                 configStream.close();
