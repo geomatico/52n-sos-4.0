@@ -50,7 +50,6 @@
         <mapping resource="RelatedFeature.hbm.xml"/>
         <mapping resource="RelatedFeatureRole.hbm.xml"/>
         <mapping resource="Request.hbm.xml"/>
-        <mapping resource="ResultStructureType.hbm.xml"/>
         <mapping resource="ResultTemplate.hbm.xml"/>
         <mapping resource="ResultType.hbm.xml"/>
         <mapping resource="SpatialFilteringProfile.hbm.xml"/>

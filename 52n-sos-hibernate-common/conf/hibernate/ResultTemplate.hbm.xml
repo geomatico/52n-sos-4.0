@@ -10,9 +10,6 @@
             	<param name="sequence">result_template_id_seq</param>
             </generator>
         </id>
-        <many-to-one name="resultStructureType" class="org.n52.sos.ds.hibernate.entities.ResultStructureType" fetch="join">
-            <column name="result_structure_type_id" not-null="true" />
-        </many-to-one>
         <many-to-one name="featureOfInterest" class="org.n52.sos.ds.hibernate.entities.FeatureOfInterest" fetch="join">
             <column name="feature_of_interest_id" not-null="true" />
         </many-to-one>
