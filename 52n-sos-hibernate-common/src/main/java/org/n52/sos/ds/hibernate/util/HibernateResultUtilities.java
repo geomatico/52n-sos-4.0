@@ -98,102 +98,87 @@ public class HibernateResultUtilities {
             // now iterate over resultset and create Measurement for each
             // row
             for (Observation hObservation : observations) {
-                    // check remaining heap size
-                    SosHelper.checkFreeMemory();
-                    
-                    ObservationConstellation hObservationConstellation = hObservation.getObservationConstellation();
-                    FeatureOfInterest hFeatureOfInterest = hObservation.getFeatureOfInterest();
+                // check remaining heap size
+                SosHelper.checkFreeMemory();
 
-                    String procID = hObservationConstellation.getProcedure().getIdentifier();
-                    observationType = hObservationConstellation.getObservationType().getObservationType();
+                ObservationConstellation hObservationConstellation = hObservation.getObservationConstellation();
+                FeatureOfInterest hFeatureOfInterest = hObservation.getFeatureOfInterest();
 
-                    DateTime timeDateTime = new DateTime(hObservation.getPhenomenonTimeStart());
+                String procID = hObservationConstellation.getProcedure().getIdentifier();
+                observationType = hObservationConstellation.getObservationType().getObservationType();
 
-                    // feature of interest
-                    String foiID = hFeatureOfInterest.getIdentifier();
-                    if (!features.containsKey(foiID)) {
-                        features.put(foiID,
-                                Configurator.getInstance().getFeatureQueryHandler()
-                                        .getFeatureByID(foiID, session, version));
-                    }
+                DateTime timeDateTime = new DateTime(hObservation.getPhenomenonTimeStart());
 
-                    // phenomenon
-                    String phenID = hObservationConstellation.getObservableProperty().getIdentifier();
-                    String description = hObservationConstellation.getObservableProperty().getDescription();
-                    if (!obsProps.containsKey(phenID)) {
-                        obsProps.put(phenID, new SosObservableProperty(phenID, description, null, null));
-                    }
-                    // if (!version.equals(Sos2Constants.SERVICEVERSION)
-                    // && Configurator.getInstance().isSetFoiLocationDynamically()
-                    // &&
-                    // phenID.equals(Configurator.getInstance().getSpatialObsProp4DynymicLocation()))
-                    // {
-                    // featureTimeForDynamicPosition.put(foiID, timeDateTime);
-                    // }
+                // feature of interest
+                String foiID = hFeatureOfInterest.getIdentifier();
+                if (!features.containsKey(foiID)) {
+                    features.put(foiID,
+                            Configurator.getInstance().getFeatureQueryHandler()
+                            .getFeatureByID(foiID, session, version));
+                }
 
-                    // TODO: add offering ids to response if needed later.
-//                    String offeringID = hObservationConstellation.getOffering().getIdentifier();
-//                    String mimeType = SosConstants.PARAMETER_NOT_SET;
+                // phenomenon
+                String phenID = hObservationConstellation.getObservableProperty().getIdentifier();
+                String description = hObservationConstellation.getObservableProperty().getDescription();
+                if (!obsProps.containsKey(phenID)) {
+                    obsProps.put(phenID, new SosObservableProperty(phenID, description, null, null));
+                }
+                // if (!version.equals(Sos2Constants.SERVICEVERSION)
+                // && Configurator.getInstance().isSetFoiLocationDynamically()
+                // &&
+                // phenID.equals(Configurator.getInstance().getSpatialObsProp4DynymicLocation()))
+                // {
+                // featureTimeForDynamicPosition.put(foiID, timeDateTime);
+                // }
 
-                    // create time element
-                    ITime phenomenonTime = null;
-                    if (hObservation.getPhenomenonTimeEnd() == null) {
-                        phenomenonTime = new TimeInstant(timeDateTime, "");
-                    } else {
-                        phenomenonTime = new TimePeriod(timeDateTime, new DateTime(hObservation.getPhenomenonTimeEnd()));
-                    }
-                    // create quality
-                    ArrayList<SosQuality> qualityList = null;
-                    if (Configurator.getInstance().isSupportsQuality()) {
-                        hObservation.getQualities();
-                        for (Quality hQuality : (Set<Quality>) hObservation.getQualities()) {
-                            String qualityTypeString = hQuality.getSweType().getSweType();
-                            String qualityUnit = hQuality.getUnit().getUnit();
-                            String qualityName = hQuality.getName();
-                            String qualityValue = hQuality.getValue();
-                            qualityList = new ArrayList<SosQuality>();
-                            if (qualityValue != null) {
-                                QualityType qualityType = QualityType.valueOf(qualityTypeString);
-                                SosQuality quality = new SosQuality(qualityName, qualityUnit, qualityValue, qualityType);
-                                qualityList.add(quality);
-                            }
+                // TODO: add offering ids to response if needed later.
+                //                    String offeringID = hObservationConstellation.getOffering().getIdentifier();
+                //                    String mimeType = SosConstants.PARAMETER_NOT_SET;
+
+                // create time element
+                ITime phenomenonTime = null;
+                if (hObservation.getPhenomenonTimeEnd() == null) {
+                    phenomenonTime = new TimeInstant(timeDateTime, "");
+                } else {
+                    phenomenonTime = new TimePeriod(timeDateTime, new DateTime(hObservation.getPhenomenonTimeEnd()));
+                }
+                // create quality
+                ArrayList<SosQuality> qualityList = null;
+                if (Configurator.getInstance().isSupportsQuality()) {
+                    hObservation.getQualities();
+                    for (Quality hQuality : (Set<Quality>) hObservation.getQualities()) {
+                        String qualityTypeString = hQuality.getSweType().getSweType();
+                        String qualityUnit = hQuality.getUnit().getUnit();
+                        String qualityName = hQuality.getName();
+                        String qualityValue = hQuality.getValue();
+                        qualityList = new ArrayList<SosQuality>();
+                        if (qualityValue != null) {
+                            QualityType qualityType = QualityType.valueOf(qualityTypeString);
+                            SosQuality quality = new SosQuality(qualityName, qualityUnit, qualityValue, qualityType);
+                            qualityList.add(quality);
                         }
                     }
-                    IValue value = getValueFromAllTable(hObservation);
-                    if (hObservation.getUnit() != null) {
-                        value.setUnit(hObservation.getUnit().getUnit());
-                    }
-                    checkOrSetObservablePropertyUnit(obsProps.get(phenID), value.getUnit());
-                    SosObservationConstellation obsConst =
-                            new SosObservationConstellation(procID, obsProps.get(phenID), null, features.get(foiID),
-                                    observationType);
-                    int obsConstHash = obsConst.hashCode();
-                    if (!observationConstellations.containsKey(obsConstHash)) {
-                        observationConstellations.put(obsConstHash, obsConst);
-                    }
+                }
+                IValue value = getValueFromAllTable(hObservation);
+                if (hObservation.getUnit() != null) {
+                    value.setUnit(hObservation.getUnit().getUnit());
+                }
+                checkOrSetObservablePropertyUnit(obsProps.get(phenID), value.getUnit());
+                SosObservationConstellation obsConst =
+                        new SosObservationConstellation(procID, obsProps.get(phenID), null, features.get(foiID),
+                                observationType);
+                int obsConstHash = obsConst.hashCode();
+                if (!observationConstellations.containsKey(obsConstHash)) {
+                    observationConstellations.put(obsConstHash, obsConst);
+                }
 
-                    // TODO: compositePhenomenon
-                    if (hObservation.getAntiSubsetting() != null) {
-                        if (antiSubsettingObservations.containsKey(hObservation.getAntiSubsetting())) {
-                            SosObservation sosObservation =
-                                    antiSubsettingObservations.get(hObservation.getAntiSubsetting());
-                            ((SweDataArrayValue) ((SosMultiObservationValues) sosObservation.getValue()).getValue())
-                                    .addValue(phenomenonTime, phenID, value);
-                        } else {
-                            SosObservation sosObservation = new SosObservation();
-                            sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
-                            sosObservation.setIdentifier(hObservation.getIdentifier());
-                            sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
-                            sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
-                            sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
-                            sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
-                            SweDataArrayValue dataArrayValue = new SweDataArrayValue();
-                            dataArrayValue.addValue(phenomenonTime, phenID, value);
-                            SosMultiObservationValues observationValue = new SosMultiObservationValues();
-                            observationValue.setValue(dataArrayValue);
-                            sosObservation.setValue(observationValue);
-                            antiSubsettingObservations.put(hObservation.getAntiSubsetting(), sosObservation);
-                        }
+                // TODO: compositePhenomenon
+                if (hObservation.getAntiSubsetting() != null) {
+                    if (antiSubsettingObservations.containsKey(hObservation.getAntiSubsetting())) {
+                        SosObservation sosObservation =
+                                antiSubsettingObservations.get(hObservation.getAntiSubsetting());
+                        ((SweDataArrayValue) ((SosMultiObservationValues) sosObservation.getValue()).getValue())
+                        .addValue(phenomenonTime, phenID, value);
                     } else {
                         SosObservation sosObservation = new SosObservation();
                         sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
@@ -202,13 +187,27 @@ public class HibernateResultUtilities {
                         sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
                         sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
                         sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
-                        sosObservation.setValue(new SosSingleObservationValue(phenomenonTime, value, qualityList));
-                        observationCollection.add(sosObservation);
+                        SweDataArrayValue dataArrayValue = new SweDataArrayValue();
+                        dataArrayValue.addValue(phenomenonTime, phenID, value);
+                        SosMultiObservationValues observationValue = new SosMultiObservationValues();
+                        observationValue.setValue(dataArrayValue);
+                        sosObservation.setValue(observationValue);
+                        antiSubsettingObservations.put(hObservation.getAntiSubsetting(), sosObservation);
                     }
-                    if (antiSubsettingObservations.values() != null && !antiSubsettingObservations.values().isEmpty()) {
-                        observationCollection.addAll(antiSubsettingObservations.values());
-                    }
-                    break;
+                } else {
+                    SosObservation sosObservation = new SosObservation();
+                    sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
+                    sosObservation.setIdentifier(hObservation.getIdentifier());
+                    sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
+                    sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
+                    sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
+                    sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
+                    sosObservation.setValue(new SosSingleObservationValue(phenomenonTime, value, qualityList));
+                    observationCollection.add(sosObservation);
+                }
+                if (antiSubsettingObservations.values() != null && !antiSubsettingObservations.values().isEmpty()) {
+                    observationCollection.addAll(antiSubsettingObservations.values());
+                }
             }
         }
         return observationCollection;
