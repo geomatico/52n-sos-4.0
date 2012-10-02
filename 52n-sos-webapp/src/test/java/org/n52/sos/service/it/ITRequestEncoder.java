@@ -63,6 +63,7 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -386,6 +387,7 @@ public class ITRequestEncoder {
      */
     public static void addTimeObject(ITime sosTime, BinaryTemporalOpType xb_binaryTempOps)
             throws OwsExceptionReport {
+        try {
         if (sosTime == null) {
             return;
         } else if (sosTime instanceof TimeInstant) {
@@ -421,6 +423,11 @@ public class ITRequestEncoder {
 
             xb_timePeriod.addNewBeginPosition().setStringValue(beginTimeStr);
             xb_timePeriod.addNewEndPosition().setStringValue(endTimeStr);
+        }
+        } catch (DateTimeException dte) {
+            String exceptionText = "Error while creating time objects!";
+            LOGGER.error(exceptionText, dte);
+            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
         }
     }
 

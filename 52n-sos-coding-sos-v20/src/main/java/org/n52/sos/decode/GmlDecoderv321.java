@@ -63,6 +63,7 @@ import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.SosHelper;
@@ -83,7 +84,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GmlDecoderv321.class);
 
     private List<DecoderKeyType> decoderKeyTypes;
-    
+
     private static final String CS = ",";
 
     private static final String DECIMAL = ".";
@@ -117,7 +118,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
     public Set<String> getConformanceClasses() {
         return new HashSet<String>(0);
     }
-    
+
     @Override
     public Object decode(XmlObject xmlObject) throws OwsExceptionReport {
         if (xmlObject instanceof EnvelopeDocument) {
@@ -131,21 +132,21 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         } else if (xmlObject instanceof TimePeriodDocument) {
             return parseTimePeriod(((TimePeriodDocument) xmlObject).getTimePeriod());
         } else if (xmlObject instanceof ReferenceType) {
-            return parseReferenceType((ReferenceType)xmlObject);
+            return parseReferenceType((ReferenceType) xmlObject);
         } else if (xmlObject instanceof MeasureType) {
-            return parseMeasureType((MeasureType)xmlObject);
+            return parseMeasureType((MeasureType) xmlObject);
         } else if (xmlObject instanceof PointType) {
-            return parsePointType((PointType)xmlObject);
+            return parsePointType((PointType) xmlObject);
         } else if (xmlObject instanceof LineStringType) {
-            return parseLineStringType((LineStringType)xmlObject);
+            return parseLineStringType((LineStringType) xmlObject);
         } else if (xmlObject instanceof PolygonType) {
-            return parsePolygonType((PolygonType)xmlObject);
+            return parsePolygonType((PolygonType) xmlObject);
         } else if (xmlObject instanceof CompositeSurfaceType) {
-            return parseCompositeSurfaceType((CompositeSurfaceType)xmlObject);
+            return parseCompositeSurfaceType((CompositeSurfaceType) xmlObject);
         }
         return null;
     }
-    
+
     /**
      * parses the BBOX element of the featureOfInterest element contained in the
      * GetObservation request and returns a String representing the BOX in
@@ -249,18 +250,24 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
      * @throws OwsExceptionReport
      */
     private TimeInstant parseTimeInstant(TimeInstantType xbTimeIntant) throws OwsExceptionReport {
-        TimeInstant ti = new TimeInstant();
-        TimePositionType xbTimePositionType = xbTimeIntant.getTimePosition();
-        String timeString = xbTimePositionType.getStringValue();
-        if (timeString != null && !timeString.equals("")) {
-            ti.setValue(DateTimeHelper.parseIsoString2DateTime(timeString));
-            ti.setRequestedTimeLength(timeString.length());
+        try {
+            TimeInstant ti = new TimeInstant();
+            TimePositionType xbTimePositionType = xbTimeIntant.getTimePosition();
+            String timeString = xbTimePositionType.getStringValue();
+            if (timeString != null && !timeString.equals("")) {
+                ti.setValue(DateTimeHelper.parseIsoString2DateTime(timeString));
+                ti.setRequestedTimeLength(timeString.length());
+            }
+            if (xbTimePositionType.getIndeterminatePosition() != null) {
+                ti.setIndeterminateValue(xbTimePositionType.getIndeterminatePosition().toString());
+                ti.setRequestedTimeLength(xbTimePositionType.getIndeterminatePosition().toString().length());
+            }
+            return ti;
+        } catch (DateTimeException dte) {
+            String exceptionText = "Error while parsing TimeInstant!";
+            LOGGER.error(exceptionText, dte);
+            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
         }
-        if (xbTimePositionType.getIndeterminatePosition() != null) {
-            ti.setIndeterminateValue(xbTimePositionType.getIndeterminatePosition().toString());
-            ti.setRequestedTimeLength(xbTimePositionType.getIndeterminatePosition().toString().length());
-        }
-        return ti;
     }
 
     /**
@@ -273,34 +280,39 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
      * @throws OwsExceptionReport
      */
     private TimePeriod parseTimePeriod(TimePeriodType xbTimePeriod) throws OwsExceptionReport {
+        try {
+            // begin position
+            TimePositionType xbBeginTPT = xbTimePeriod.getBeginPosition();
+            DateTime begin = null;
+            if (xbBeginTPT != null) {
+                String beginString = xbBeginTPT.getStringValue();
+                begin = DateTimeHelper.parseIsoString2DateTime(beginString);
+            } else {
+                String exceptionText = "gml:TimePeriod! must contain beginPos Element with valid ISO:8601 String!!";
+                LOGGER.debug(exceptionText);
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            }
 
-        // begin position
-        TimePositionType xbBeginTPT = xbTimePeriod.getBeginPosition();
-        DateTime begin = null;
-        if (xbBeginTPT != null) {
-            String beginString = xbBeginTPT.getStringValue();
-            begin = DateTimeHelper.parseIsoString2DateTime(beginString);
-        } else {
-            String exceptionText = "gml:TimePeriod! must contain beginPos Element with valid ISO:8601 String!!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            // end position
+            DateTime end = null;
+            TimePositionType xbEndTPT = xbTimePeriod.getEndPosition();
+            if (xbEndTPT != null) {
+                String endString = xbEndTPT.getStringValue();
+                end =
+                        DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
+                                DateTimeHelper.parseIsoString2DateTime(endString), endString.length());
+            } else {
+                String exceptionText = "gml:TimePeriod! must contain endPos Element with valid ISO:8601 String!!";
+                LOGGER.debug(exceptionText);
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            }
+
+            return new TimePeriod(begin, end);
+        } catch (DateTimeException dte) {
+            String exceptionText = "Error while parsing TimePeriod!";
+            LOGGER.error(exceptionText, dte);
+            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
         }
-
-        // end position
-        DateTime end = null;
-        TimePositionType xbEndTPT = xbTimePeriod.getEndPosition();
-        if (xbEndTPT != null) {
-            String endString = xbEndTPT.getStringValue();
-            end =
-                    DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
-                            DateTimeHelper.parseIsoString2DateTime(endString), endString.length());
-        } else {
-            String exceptionText = "gml:TimePeriod! must contain endPos Element with valid ISO:8601 String!!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        }
-
-        return new TimePeriod(begin, end);
     }
 
     private SosSingleObservationValue parseReferenceType(ReferenceType referenceType) {
@@ -323,7 +335,9 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         String geomWKT = null;
         int srid = -1;
         if (xbPointType.getSrsName() != null) {
-            srid = SosHelper.parseSrsName(xbPointType.getSrsName(), Configurator.getInstance().getSrsNamePrefixSosV2());
+            srid =
+                    SosHelper.parseSrsName(xbPointType.getSrsName(), Configurator.getInstance()
+                            .getSrsNamePrefixSosV2());
         }
 
         if (xbPointType.getPos() != null) {
@@ -363,7 +377,9 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         String geomWKT = null;
         int srid = -1;
         if (xbLineStringType.getSrsName() != null) {
-            srid = SosHelper.parseSrsName(xbLineStringType.getSrsName(), Configurator.getInstance().getSrsNamePrefixSosV2());
+            srid =
+                    SosHelper.parseSrsName(xbLineStringType.getSrsName(), Configurator.getInstance()
+                            .getSrsNamePrefixSosV2());
         }
 
         DirectPositionType[] xbPositions = xbLineStringType.getPosArray();
@@ -371,7 +387,9 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         StringBuffer positions = new StringBuffer();
         if (xbPositions != null && xbPositions.length > 0) {
             if (srid == -1 && xbPositions[0].getSrsName() != null && !(xbPositions[0].getSrsName().equals(""))) {
-                srid = SosHelper.parseSrsName(xbPositions[0].getSrsName(), Configurator.getInstance().getSrsNamePrefixSosV2());
+                srid =
+                        SosHelper.parseSrsName(xbPositions[0].getSrsName(), Configurator.getInstance()
+                                .getSrsNamePrefixSosV2());
             }
             positions.append(getString4PosArray(xbLineStringType.getPosArray()));
         }
@@ -389,7 +407,9 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         Geometry geom = null;
         int srid = -1;
         if (xbPolygonType.getSrsName() != null) {
-            srid = SosHelper.parseSrsName(xbPolygonType.getSrsName(), Configurator.getInstance().getSrsNamePrefixSosV2());
+            srid =
+                    SosHelper.parseSrsName(xbPolygonType.getSrsName(), Configurator.getInstance()
+                            .getSrsNamePrefixSosV2());
         }
         String exteriorCoordString = null;
         StringBuilder geomWKT = new StringBuilder();
@@ -436,19 +456,21 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         return geom;
     }
 
-
-
     private Geometry parseCompositeSurfaceType(CompositeSurfaceType xbCompositeSurface) throws OwsExceptionReport {
         SurfacePropertyType[] xbCurfaceProperties = xbCompositeSurface.getSurfaceMemberArray();
         int srid = -1;
         ArrayList<Polygon> polygons = new ArrayList<Polygon>(xbCurfaceProperties.length);
         if (xbCompositeSurface.getSrsName() != null) {
-            srid = SosHelper.parseSrsName(xbCompositeSurface.getSrsName(), Configurator.getInstance().getSrsNamePrefixSosV2());
+            srid =
+                    SosHelper.parseSrsName(xbCompositeSurface.getSrsName(), Configurator.getInstance()
+                            .getSrsNamePrefixSosV2());
         }
         for (SurfacePropertyType xbSurfaceProperty : xbCurfaceProperties) {
             AbstractSurfaceType xbAbstractSurface = xbSurfaceProperty.getAbstractSurface();
             if (srid == -1 && xbAbstractSurface.getSrsName() != null) {
-                srid = SosHelper.parseSrsName(xbAbstractSurface.getSrsName(), Configurator.getInstance().getSrsNamePrefixSosV2());
+                srid =
+                        SosHelper.parseSrsName(xbAbstractSurface.getSrsName(), Configurator.getInstance()
+                                .getSrsNamePrefixSosV2());
             }
             if (xbAbstractSurface instanceof PolygonType) {
                 polygons.add((Polygon) parsePolygonType((PolygonType) xbAbstractSurface));
@@ -475,7 +497,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         geom.setSRID(srid);
         return geom;
     }
-    
+
     /**
      * method parses the passed linearRing(generated thru XmlBEans) and returns
      * a string containing the coordinate values of the passed ring
@@ -613,6 +635,5 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
         }
     }
-
 
 }

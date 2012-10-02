@@ -31,7 +31,6 @@ import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.ISOPeriodFormat;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +72,7 @@ public class DateTimeHelper {
      * @throws OwsExceptionReport
      *             IF an error occurs.
      */
-    public static DateTime parseIsoString2DateTime(String timeString) throws OwsExceptionReport {
+    public static DateTime parseIsoString2DateTime(String timeString) throws DateTimeException {
         if (timeString == null || timeString.equals("")) {
             return null;
         }
@@ -87,15 +86,11 @@ public class DateTimeHelper {
         } catch (IllegalArgumentException iae) {
             String exceptionText = "Error while parse time String to DateTime!";
             LOGGER.error(exceptionText, iae);
-            OwsExceptionReport owse = new OwsExceptionReport();
-            owse.addCodedException(OwsExceptionCode.InvalidParameterValue, null, exceptionText, iae);
-            throw owse;
+            throw new DateTimeException(exceptionText, iae);
         } catch (UnsupportedOperationException uoe) {
             String exceptionText = "Error while parse time String to DateTime!";
             LOGGER.error(exceptionText, uoe);
-            OwsExceptionReport owse = new OwsExceptionReport();
-            owse.addCodedException(OwsExceptionCode.InvalidParameterValue, null, exceptionText, uoe);
-            throw owse;
+            throw new DateTimeException(exceptionText, uoe);
         }
     }
 
@@ -122,7 +117,7 @@ public class DateTimeHelper {
      * @throws OwsExceptionReport
      *             If an error occurs.
      */
-    public static String formatDateTime2ResponseString(DateTime dateTime) throws OwsExceptionReport {
+    public static String formatDateTime2ResponseString(DateTime dateTime) throws DateTimeException {
         return formatDateTime2FormattedString(dateTime, responseFormat);
     }
 
@@ -136,7 +131,7 @@ public class DateTimeHelper {
      *             If an error occurs.
      */
     public static String formatDateTime2FormattedString(DateTime dateTime, String dateFormat)
-            throws OwsExceptionReport {
+            throws DateTimeException {
         try {
             if (dateFormat == null || dateFormat.equals("")) {
                 return formatDateTime2IsoString(dateTime);
@@ -150,9 +145,7 @@ public class DateTimeHelper {
         } catch (IllegalArgumentException iae) {
             String exceptionText = "Error while parse time String to DateTime!";
             LOGGER.error(exceptionText, iae);
-            OwsExceptionReport owse = new OwsExceptionReport();
-            owse.addCodedException(OwsExceptionCode.InvalidParameterValue, null, exceptionText, iae);
-            throw owse;
+            throw new DateTimeException(exceptionText, iae);
         }
     }
 

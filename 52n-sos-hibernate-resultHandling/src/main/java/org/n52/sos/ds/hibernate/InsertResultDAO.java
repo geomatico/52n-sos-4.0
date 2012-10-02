@@ -62,6 +62,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.request.InsertResultRequest;
 import org.n52.sos.response.InsertResultResponse;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -220,17 +221,23 @@ public class InsertResultDAO implements IInsertResultDAO {
     }
 
     private ITime getPhenomenonTime(String timeString) throws OwsExceptionReport {
-        ITime phenomenonTime = null;
-        if (timeString.contains("/")) {
-            String[] times = timeString.split("/");
-            DateTime start = DateTimeHelper.parseIsoString2DateTime(times[0]);
-            DateTime end = DateTimeHelper.parseIsoString2DateTime(times[1]);
-            phenomenonTime = new TimePeriod(start, end);
-        } else {
-            DateTime dateTime = DateTimeHelper.parseIsoString2DateTime(timeString);
-            phenomenonTime = new TimeInstant(dateTime);
+        try {
+            ITime phenomenonTime = null;
+            if (timeString.contains("/")) {
+                String[] times = timeString.split("/");
+                DateTime start = DateTimeHelper.parseIsoString2DateTime(times[0]);
+                DateTime end = DateTimeHelper.parseIsoString2DateTime(times[1]);
+                phenomenonTime = new TimePeriod(start, end);
+            } else {
+                DateTime dateTime = DateTimeHelper.parseIsoString2DateTime(timeString);
+                phenomenonTime = new TimeInstant(dateTime);
+            }
+            return phenomenonTime;
+        } catch (DateTimeException dte) {
+            String exceptionText = "Error while parsing phenomenonTime!";
+            LOGGER.error(exceptionText, dte);
+            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
         }
-        return phenomenonTime;
     }
 
     private String getTokenSeparator(SosSweAbstractEncoding encoding) {
@@ -283,13 +290,20 @@ public class InsertResultDAO implements IInsertResultDAO {
 
     private TimeInstant getResultTime(String[] singleValues, SosSweAbstractDataComponent resultStructure)
             throws OwsExceptionReport {
-        int resultTimeIndex = hasResultTime(resultStructure);
-        if (resultTimeIndex != -1) {
-            TimeInstant time = new TimeInstant();
-            DateTime dateTime = DateTimeHelper.parseIsoString2DateTime(singleValues[resultTimeIndex]);
-            time.setValue(dateTime);
+        try {
+            int resultTimeIndex = hasResultTime(resultStructure);
+            if (resultTimeIndex != -1) {
+                TimeInstant time = new TimeInstant();
+                DateTime dateTime = DateTimeHelper.parseIsoString2DateTime(singleValues[resultTimeIndex]);
+                time.setValue(dateTime);
+                return time;
+            }
+            return null;
+        } catch (DateTimeException dte) {
+            String exceptionText = "Error while parsing resultTime!";
+            LOGGER.error(exceptionText, dte);
+            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
         }
-        return null;
     }
 
     private String[] getSingleValues(String block, SosSweAbstractEncoding encoding) {

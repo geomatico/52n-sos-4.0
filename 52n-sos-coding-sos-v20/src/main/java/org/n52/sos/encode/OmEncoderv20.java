@@ -91,6 +91,7 @@ import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.GmlHelper;
 import org.n52.sos.util.OMHelper;
@@ -739,17 +740,24 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
      * @throws OwsExceptionReport
      */
     private String getTimeString(ITime time) throws OwsExceptionReport {
-        StringBuilder timeString = new StringBuilder();
-        if (time instanceof TimeInstant) {
-            TimeInstant ti = (TimeInstant) time;
-            timeString.append(DateTimeHelper.formatDateTime2ResponseString(ti.getValue()));
-        } else if (time instanceof TimePeriod) {
-            TimePeriod tp = (TimePeriod) time;
-            timeString.append(DateTimeHelper.formatDateTime2ResponseString(tp.getStart()));
-            timeString.append("/");
-            timeString.append(DateTimeHelper.formatDateTime2ResponseString(tp.getEnd()));
+        try {
+            StringBuilder timeString = new StringBuilder();
+            if (time instanceof TimeInstant) {
+                TimeInstant ti = (TimeInstant) time;
+                timeString.append(DateTimeHelper.formatDateTime2ResponseString(ti.getValue()));
+            } else if (time instanceof TimePeriod) {
+                TimePeriod tp = (TimePeriod) time;
+                timeString.append(DateTimeHelper.formatDateTime2ResponseString(tp.getStart()));
+                timeString.append("/");
+                timeString.append(DateTimeHelper.formatDateTime2ResponseString(tp.getEnd()));
+            }
+            return timeString.toString(); 
+        } catch (DateTimeException dte) {
+            String exceptionText = "Error while creating time string!";
+            LOGGER.error(exceptionText, dte);
+            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
         }
-        return timeString.toString();
+        
     }
 
     /**

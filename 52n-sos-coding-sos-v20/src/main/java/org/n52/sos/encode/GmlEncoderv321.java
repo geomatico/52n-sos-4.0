@@ -59,8 +59,10 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
+import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,7 +158,8 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
     }
 
     private XmlObject createTimePeriodDocument(TimePeriod time) throws OwsExceptionReport {
-        TimePeriodDocument timePeriodDoc = TimePeriodDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        TimePeriodDocument timePeriodDoc =
+                TimePeriodDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         createTimePeriodType(time, timePeriodDoc.addNewTimePeriod());
         return timePeriodDoc;
     }
@@ -166,46 +169,54 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
      * 
      * @param timePeriod
      *            SOS time object
-     * @param timePeriodType 
+     * @param timePeriodType
      * @return XML TimePeriod
      * @throws OwsExceptionReport
      *             if an error occurs.
      */
-    private TimePeriodType createTimePeriodType(TimePeriod timePeriod, TimePeriodType timePeriodType) throws OwsExceptionReport {
-        if (timePeriodType == null) {
+    private TimePeriodType createTimePeriodType(TimePeriod timePeriod, TimePeriodType timePeriodType)
+            throws OwsExceptionReport {
+        try {
+            if (timePeriodType == null) {
                 timePeriodType = TimePeriodType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+            }
+            if (timePeriod.getId() != null && !timePeriod.getId().isEmpty()) {
+                timePeriodType.setId(timePeriod.getId());
+            }
+            // beginPosition
+            TimePositionType xbTimePositionBegin = TimePositionType.Factory.newInstance();
+            String beginString = DateTimeHelper.formatDateTime2ResponseString(timePeriod.getStart());
+
+            // concat minutes for timeZone offset, because gml requires
+            // xs:dateTime, which needs minutes in
+            // timezone offset
+            // TODO enable really
+            xbTimePositionBegin.setStringValue(beginString);
+
+            // endPosition
+            TimePositionType xbTimePositionEnd = TimePositionType.Factory.newInstance();
+            String endString = DateTimeHelper.formatDateTime2ResponseString(timePeriod.getEnd());
+
+            // concat minutes for timeZone offset, because gml requires
+            // xs:dateTime, which needs minutes in
+            // timezone offset
+            // TODO enable really
+            xbTimePositionEnd.setStringValue(endString);
+
+            timePeriodType.setBeginPosition(xbTimePositionBegin);
+            timePeriodType.setEndPosition(xbTimePositionEnd);
+
+            return timePeriodType;
+        } catch (DateTimeException dte) {
+            String exceptionText = "Error while creating TimePeriod!";
+            LOGGER.error(exceptionText, dte);
+            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
         }
-        if (timePeriod.getId() != null && !timePeriod.getId().isEmpty()) {
-            timePeriodType.setId(timePeriod.getId());
-        }
-        // beginPosition
-        TimePositionType xbTimePositionBegin = TimePositionType.Factory.newInstance();
-        String beginString = DateTimeHelper.formatDateTime2ResponseString(timePeriod.getStart());
-    
-        // concat minutes for timeZone offset, because gml requires
-        // xs:dateTime, which needs minutes in
-        // timezone offset
-        // TODO enable really
-        xbTimePositionBegin.setStringValue(beginString);
-    
-        // endPosition
-        TimePositionType xbTimePositionEnd = TimePositionType.Factory.newInstance();
-        String endString = DateTimeHelper.formatDateTime2ResponseString(timePeriod.getEnd());
-    
-        // concat minutes for timeZone offset, because gml requires
-        // xs:dateTime, which needs minutes in
-        // timezone offset
-        // TODO enable really
-        xbTimePositionEnd.setStringValue(endString);
-    
-        timePeriodType.setBeginPosition(xbTimePositionBegin);
-        timePeriodType.setEndPosition(xbTimePositionEnd);
-    
-        return timePeriodType;
     }
 
     private XmlObject createTimeInstantDocument(TimeInstant time) throws OwsExceptionReport {
-        TimeInstantDocument timeInstantDoc = TimeInstantDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        TimeInstantDocument timeInstantDoc =
+                TimeInstantDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         createTimeInstantType(time, timeInstantDoc.addNewTimeInstant());
         return timeInstantDoc;
     }
@@ -215,32 +226,40 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
      * 
      * @param timeInstant
      *            SOS time object
-     * @param timeInstantType 
+     * @param timeInstantType
      * @param xbTime
      * @return XML TimeInstant
      * @throws OwsExceptionReport
      *             if an error occurs.
      */
-    private TimeInstantType createTimeInstantType(TimeInstant timeInstant, TimeInstantType timeInstantType) throws OwsExceptionReport {
-        // create time instant
-        if (timeInstantType == null) {
-            timeInstantType = TimeInstantType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        }
-        if (timeInstant.getId() != null && !timeInstant.getId().isEmpty()) {
-            timeInstantType.setId(timeInstant.getId());
-        }
-        TimePositionType xb_posType = timeInstantType.addNewTimePosition();
+    private TimeInstantType createTimeInstantType(TimeInstant timeInstant, TimeInstantType timeInstantType)
+            throws OwsExceptionReport {
+        try {
+            // create time instant
+            if (timeInstantType == null) {
+                timeInstantType = TimeInstantType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+            }
+            if (timeInstant.getId() != null && !timeInstant.getId().isEmpty()) {
+                timeInstantType.setId(timeInstant.getId());
+            }
+            TimePositionType xb_posType = timeInstantType.addNewTimePosition();
 
-        // parse db date string and format into GML format
-        DateTime date = timeInstant.getValue();
-        String timeString = DateTimeHelper.formatDateTime2ResponseString(date);
+            // parse db date string and format into GML format
+            DateTime date = timeInstant.getValue();
+            String timeString = DateTimeHelper.formatDateTime2ResponseString(date);
 
-        // concat minutes for timeZone offset, because gml requires xs:dateTime,
-        // which needs minutes in
-        // timezone offset
-        // TODO enable really
-        xb_posType.setStringValue(timeString);
-        return timeInstantType;
+            // concat minutes for timeZone offset, because gml requires
+            // xs:dateTime,
+            // which needs minutes in
+            // timezone offset
+            // TODO enable really
+            xb_posType.setStringValue(timeString);
+            return timeInstantType;
+        } catch (DateTimeException dte) {
+            String exceptionText = "Error while creating TimeInstant!";
+            LOGGER.error(exceptionText, dte);
+            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+        }
     }
 
     private XmlObject createPosition(Geometry geom, String foiId) {
