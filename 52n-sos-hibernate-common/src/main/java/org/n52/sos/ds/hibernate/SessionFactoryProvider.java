@@ -63,7 +63,8 @@ public class SessionFactoryProvider implements IConnectionProvider {
      */
     public SessionFactoryProvider() throws OwsExceptionReport {
         try {
-            Configuration configuration = new Configuration().addResource("hibernate.cfg.xml").configure();
+//            Configuration configuration = new Configuration().addResource("/sos-hibernate.cfg.xml").configure();
+            Configuration configuration = new Configuration().configure("/sos-hibernate.cfg.xml");
             // Configuration configuration = new Configuration();
             // configuration.configure(new
             // File(Configurator.getInstance().getBasePath() +
