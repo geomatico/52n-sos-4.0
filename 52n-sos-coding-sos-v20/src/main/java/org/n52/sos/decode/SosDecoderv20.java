@@ -542,7 +542,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
 
     private String parseResultValues(XmlObject resultValues) throws OwsExceptionReport {
         if (resultValues.schemaType() == XmlString.type) {
-            return ((XmlString) resultValues).getStringValue();
+            return ((XmlString) resultValues).getStringValue().trim();
         } else if (resultValues.schemaType() == XmlObject.type) {
             Node resultValuesNode = resultValues.getDomNode();
             if (resultValuesNode.hasChildNodes()) {
@@ -550,7 +550,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
                 for (int i = 0; i < childNodes.getLength(); i++) {
                     Node childNode = childNodes.item(i);
                     if (childNode.getNodeType() == Node.TEXT_NODE) {
-                        return childNode.getNodeValue();
+                        return childNode.getNodeValue().trim();
                     }
                 }
             }

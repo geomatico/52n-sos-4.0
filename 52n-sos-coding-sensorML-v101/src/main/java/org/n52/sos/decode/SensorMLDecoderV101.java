@@ -24,6 +24,7 @@
 package org.n52.sos.decode;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +38,7 @@ import net.opengis.sensorML.x101.CapabilitiesDocument.Capabilities;
 import net.opengis.sensorML.x101.CharacteristicsDocument.Characteristics;
 import net.opengis.sensorML.x101.ClassificationDocument.Classification;
 import net.opengis.sensorML.x101.ClassificationDocument.Classification.ClassifierList.Classifier;
+import net.opengis.sensorML.x101.ComponentType;
 import net.opengis.sensorML.x101.ComponentsDocument.Components;
 import net.opengis.sensorML.x101.ComponentsDocument.Components.ComponentList;
 import net.opengis.sensorML.x101.ComponentsDocument.Components.ComponentList.Component;
@@ -57,6 +59,7 @@ import net.opengis.swe.x101.SimpleDataRecordType;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sensorML.AbstractProcess;
 import org.n52.sos.ogc.sensorML.AbstractSensorML;
 import org.n52.sos.ogc.sensorML.ProcessModel;
 import org.n52.sos.ogc.sensorML.SensorML;
@@ -166,11 +169,14 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
                     sensorML.addMember(parseSystem((SystemType) xbMember.getProcess()));
                 } else if (xbMember.getProcess() instanceof ProcessModelType) {
                     sensorML.addMember(parseProcessModel((ProcessModelType) xbMember.getProcess()));
-                } else {
+                } else if (xbMember.getProcess() instanceof ComponentType) {
+                    sensorML.addMember(parseComponent((ComponentType)xbMember.getProcess()));
+                }
+                else {
                     StringBuilder exceptionText = new StringBuilder();
                     exceptionText.append("The process of a member of the SensorML Document (");
-                    exceptionText.append(xbMember.getProcess());
-                    exceptionText.append(") is not of type 'SystemType'!");
+                    exceptionText.append(xbMember.getProcess().getDomNode().getNodeName());
+                    exceptionText.append(") is not supported!");
                     LOGGER.debug(exceptionText.toString());
                     throw Util4Exceptions.createInvalidParameterValueException(xbMember.getDomNode().getLocalName(),
                             exceptionText.toString());
@@ -231,6 +237,42 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         }
         system.setSensorDescriptionXmlString(addSensorMLWrapperForXmlDescription(xbSystemType));
         return system;
+    }
+
+    private AbstractProcess parseComponent(ComponentType componentType) throws OwsExceptionReport {
+        org.n52.sos.ogc.sensorML.Component component = new org.n52.sos.ogc.sensorML.Component();
+        if (componentType.getIdentificationArray() != null) {
+            component.setIdentifications(parseIdentification(componentType.getIdentificationArray()));
+            List<Integer> identificationsToRemove =
+                    checkIdentificationsForRemoval(componentType.getIdentificationArray());
+            for (Integer integer : identificationsToRemove) {
+                componentType.removeIdentification(integer);
+            }
+        }
+        if (componentType.getClassificationArray() != null) {
+            component.setClassifications(parseClassification(componentType.getClassificationArray()));
+        }
+        if (componentType.getCharacteristicsArray() != null) {
+            component.setCharacteristics(parseCharacteristics(componentType.getCharacteristicsArray()));
+        }
+        if (componentType.getCapabilitiesArray() != null) {
+            component.setCapabilities(parseCapabilities(componentType.getCapabilitiesArray()));
+            List<Integer> capsToRemove = checkCapabilitiesForRemoval(componentType.getCapabilitiesArray());
+            for (Integer integer : capsToRemove) {
+                componentType.removeCapabilities(integer);
+            }
+        }
+        if (componentType.isSetPosition()) {
+            component.setPosition(parsePosition(componentType.getPosition()));
+        }
+        if (componentType.isSetInputs()) {
+            component.setInputs(parseInputs(componentType.getInputs()));
+        }
+        if (componentType.isSetOutputs()) {
+            component.setOutputs(parseOutputs(componentType.getOutputs()));
+        }
+        component.setSensorDescriptionXmlString(addSensorMLWrapperForXmlDescription(componentType));
+        return component;
     }
 
     private ProcessModel parseProcessModel(ProcessModelType xbProcessModel) {
@@ -523,6 +565,8 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
                 removeableCaps.add(i);
             }
         }
+        Collections.sort(removeableCaps);
+        Collections.reverse(removeableCaps);
         return removeableCaps;
     }
 

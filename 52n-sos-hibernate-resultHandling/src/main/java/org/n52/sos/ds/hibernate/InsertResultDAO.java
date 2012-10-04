@@ -212,7 +212,7 @@ public class InsertResultDAO implements IInsertResultDAO {
                 }
             }
         }
-        if (tokenSeparator != null) {
+        if (tokenSeparator != null && builder.length() > 0) {
             builder.delete(builder.lastIndexOf(tokenSeparator), builder.length());
         }
         TextValue textValue = new TextValue(builder.toString());
@@ -225,11 +225,11 @@ public class InsertResultDAO implements IInsertResultDAO {
             ITime phenomenonTime = null;
             if (timeString.contains("/")) {
                 String[] times = timeString.split("/");
-                DateTime start = DateTimeHelper.parseIsoString2DateTime(times[0]);
-                DateTime end = DateTimeHelper.parseIsoString2DateTime(times[1]);
+                DateTime start = DateTimeHelper.parseIsoString2DateTime(times[0].trim());
+                DateTime end = DateTimeHelper.parseIsoString2DateTime(times[1].trim());
                 phenomenonTime = new TimePeriod(start, end);
             } else {
-                DateTime dateTime = DateTimeHelper.parseIsoString2DateTime(timeString);
+                DateTime dateTime = DateTimeHelper.parseIsoString2DateTime(timeString.trim());
                 phenomenonTime = new TimeInstant(dateTime);
             }
             return phenomenonTime;
@@ -294,7 +294,7 @@ public class InsertResultDAO implements IInsertResultDAO {
             int resultTimeIndex = hasResultTime(resultStructure);
             if (resultTimeIndex != -1) {
                 TimeInstant time = new TimeInstant();
-                DateTime dateTime = DateTimeHelper.parseIsoString2DateTime(singleValues[resultTimeIndex]);
+                DateTime dateTime = DateTimeHelper.parseIsoString2DateTime(singleValues[resultTimeIndex].trim());
                 time.setValue(dateTime);
                 return time;
             }

@@ -34,6 +34,7 @@ import java.util.Set;
 import net.opengis.gml.x32.FeaturePropertyType;
 import net.opengis.sos.x20.SosInsertionMetadataPropertyType;
 import net.opengis.sos.x20.SosInsertionMetadataType;
+import net.opengis.sos.x20.impl.SosInsertionMetadataDocumentImpl;
 import net.opengis.swes.x20.DeleteSensorDocument;
 import net.opengis.swes.x20.DescribeSensorDocument;
 import net.opengis.swes.x20.DescribeSensorType;
@@ -254,11 +255,18 @@ public class SwesDecoderv20 implements IXmlRequestDecoder {
         SosMetadata sosMetadata = new SosMetadata();
         try {
             for (Metadata metadata : metadataArray) {
-                if (metadata.getDomNode().hasChildNodes()) {
-                    Node node = getNodeFromNodeList(metadata.getDomNode().getChildNodes());
-                    SosInsertionMetadataPropertyType xbMetadata = SosInsertionMetadataPropertyType.Factory.parse(node);
-                    SosInsertionMetadataType xbSosInsertionMetadata = xbMetadata.getSosInsertionMetadata();
-                    // featureOfInterest types
+                SosInsertionMetadataType xbSosInsertionMetadata = null;
+                if ( metadata.getInsertionMetadata() != null &&  metadata.getInsertionMetadata().schemaType() == SosInsertionMetadataType.type) {
+                    xbSosInsertionMetadata = (SosInsertionMetadataType) metadata.getInsertionMetadata();
+                } else {
+                    if (metadata.getDomNode().hasChildNodes()) {
+                        Node node = getNodeFromNodeList(metadata.getDomNode().getChildNodes());
+                        SosInsertionMetadataPropertyType xbMetadata = SosInsertionMetadataPropertyType.Factory.parse(node);
+                        xbSosInsertionMetadata = xbMetadata.getSosInsertionMetadata();
+                    }
+                }
+                if (xbSosInsertionMetadata != null)  {
+                 // featureOfInterest types
                     if (xbSosInsertionMetadata.getFeatureOfInterestTypeArray() != null) {
                         sosMetadata.setFeatureOfInterestTypes(Arrays.asList(xbSosInsertionMetadata
                                 .getFeatureOfInterestTypeArray()));

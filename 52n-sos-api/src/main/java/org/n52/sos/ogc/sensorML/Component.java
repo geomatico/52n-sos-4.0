@@ -23,15 +23,17 @@
  */
 package org.n52.sos.ogc.sensorML;
 
-public class ProcessModel extends AbstractSingleProcess {
-    
-    private ProcessMethod method;
+import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
 
-    public ProcessMethod getMethod() {
-        return method;
+public class Component extends AbstractSingleProcess {
+    
+    private SosSMLPosition position;
+
+    public SosSMLPosition getPosition() {
+        return position;
     }
 
-    public void setMethod(ProcessMethod method) {
-        this.method = method;
+    public void setPosition(SosSMLPosition position) {
+        this.position = position;
     }
 }

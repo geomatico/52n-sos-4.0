@@ -127,6 +127,7 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
             throws OwsExceptionReport {
         SosSamplingFeature sosFeat = new SosSamplingFeature(null, spatialSamplingFeature.getId());
         if (spatialSamplingFeature.getIdentifier() != null
+                && spatialSamplingFeature.getIdentifier().getStringValue() != null
                 && !spatialSamplingFeature.getIdentifier().getStringValue().isEmpty()) {
             sosFeat.setIdentifier(spatialSamplingFeature.getIdentifier().getStringValue());
         }

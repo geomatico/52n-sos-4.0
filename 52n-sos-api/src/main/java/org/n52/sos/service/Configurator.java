@@ -724,7 +724,7 @@ public final class Configurator {
         this.configFilePath = props.getProperty(CONFIG_FILE_PATH, "/WEB-INF/conf/");
 
         // get config file names and identifiers
-        String configFileMapString = props.getProperty(CONFIGURATION_FILES, "/WEB-INF/conf/");
+        String configFileMapString = props.getProperty(CONFIGURATION_FILES, "");
         this.configFileMap = new HashMap<String, String>();
         if (configFileMapString != null && !configFileMapString.isEmpty()) {
             for (String kvp : configFileMapString.split(";")) {
@@ -873,9 +873,11 @@ public final class Configurator {
             }
         }
         if (this.bindingOperators.isEmpty()) {
-            String exceptionText = "No IBinding implementation could is loaded!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
+            StringBuilder exceptionText = new StringBuilder(); 
+            exceptionText.append("No IBinding implementation could is loaded!");
+            exceptionText.append(" If the SOS is not used as webapp, this has no effect!");
+            exceptionText.append(" Else add a IBinding implementation!");
+            LOGGER.warn(exceptionText.toString());
         }
         LOGGER.info("\n******\n Binding(s) loaded successfully!\n******\n");
     }
