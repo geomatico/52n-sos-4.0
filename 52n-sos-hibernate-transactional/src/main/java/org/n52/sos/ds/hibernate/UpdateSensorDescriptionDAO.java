@@ -107,12 +107,15 @@ public class UpdateSensorDescriptionDAO implements IUpdateSensorDescriptionDAO {
                 Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set param procedure
         Collection<String> procedrues = Configurator.getInstance().getCapabilitiesCacheController().getProcedures();
-        opsMeta.addParameterValue(Sos2Constants.UpdateSensorDescriptionParams.procedure.name(), new OWSParameterValuePossibleValues(Configurator
-                .getInstance().getCapabilitiesCacheController().getProcedures()));
+        opsMeta.addParameterValue(Sos2Constants.UpdateSensorDescriptionParams.procedure.name(),
+                new OWSParameterValuePossibleValues(Configurator.getInstance().getCapabilitiesCacheController()
+                        .getProcedures()));
         // set param procedureDescriptionFormat
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
-            opsMeta.addParameterValue(Sos2Constants.UpdateSensorDescriptionParams.procedureDescriptionFormat.name(),
-                    new OWSParameterValuePossibleValues(HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatIdentifiers(session)));
+            opsMeta.addParameterValue(
+                    Sos2Constants.UpdateSensorDescriptionParams.procedureDescriptionFormat.name(),
+                    new OWSParameterValuePossibleValues(HibernateCriteriaQueryUtilities
+                            .getProcedureDescriptionFormatIdentifiers(session)));
         }
         // set param description
         opsMeta.addParameterValue(Sos2Constants.UpdateSensorDescriptionParams.description.name(),
@@ -121,7 +124,8 @@ public class UpdateSensorDescriptionDAO implements IUpdateSensorDescriptionDAO {
     }
 
     @Override
-    public synchronized UpdateSensorResponse updateSensorDescription(UpdateSensorRequest request) throws OwsExceptionReport {
+    public synchronized UpdateSensorResponse updateSensorDescription(UpdateSensorRequest request)
+            throws OwsExceptionReport {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -132,7 +136,8 @@ public class UpdateSensorDescriptionDAO implements IUpdateSensorDescriptionDAO {
             response.setVersion(request.getVersion());
             for (SosProcedureDescription procedureDescription : request.getProcedureDescriptions()) {
                 DateTime currentTime = new DateTime();
-                // TODO: check for all validTimes of descriptions for this identifier
+                // TODO: check for all validTimes of descriptions for this
+                // identifier
                 // ITime validTime =
                 // getValidTimeForProcedure(procedureDescription);
                 Procedure procedure =
@@ -145,7 +150,8 @@ public class UpdateSensorDescriptionDAO implements IUpdateSensorDescriptionDAO {
                         HibernateCriteriaTransactionalUtilities.updateValidProcedureTime(validProcedureTime, session);
                     }
                 }
-                HibernateCriteriaTransactionalUtilities.insertValidProcedureTime(procedure, request.getProcedureXmlDescription(), currentTime, session);
+                HibernateCriteriaTransactionalUtilities.insertValidProcedureTime(procedure,
+                        procedureDescription.getSensorDescriptionXmlString(), currentTime, session);
             }
             session.flush();
             transaction.commit();

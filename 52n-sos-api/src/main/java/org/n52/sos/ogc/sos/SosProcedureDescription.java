@@ -27,7 +27,17 @@ import org.n52.sos.ogc.om.SosOffering;
 
 public abstract class SosProcedureDescription {
     
+    private String sensorDescriptionXmlString;
+    
     public abstract String getProcedureIdentifier();
 
     public abstract SosOffering getOfferingIdentifier();
+    
+    public String getSensorDescriptionXmlString() {
+        return sensorDescriptionXmlString;
+    }
+
+    public void setSensorDescriptionXmlString(String sensorDescriptionXmlString) {
+        this.sensorDescriptionXmlString = sensorDescriptionXmlString;
+    }
 }

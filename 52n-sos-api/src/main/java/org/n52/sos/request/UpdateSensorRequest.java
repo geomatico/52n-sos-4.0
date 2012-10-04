@@ -42,8 +42,8 @@ public class UpdateSensorRequest extends AbstractServiceRequest {
     
     private String procedureDescriptionFormat;
 
-    /** String representing xml sensor description */
-    private String procedureXmlDescription;
+//    /** String representing xml sensor description */
+//    private String procedureXmlDescription;
 
     /** SOS SensorML description */
     private List<SosProcedureDescription> procedureDescriptions;
@@ -79,13 +79,13 @@ public class UpdateSensorRequest extends AbstractServiceRequest {
         this.procedureDescriptionFormat = procedureDescriptionFormat;
     }
 
-    public String getProcedureXmlDescription() {
-        return procedureXmlDescription;
-    }
-
-    public void setProcedureXmlDescription(String procedureXmlDescription) {
-        this.procedureXmlDescription = procedureXmlDescription;
-    }
+//    public String getProcedureXmlDescription() {
+//        return procedureXmlDescription;
+//    }
+//
+//    public void setProcedureXmlDescription(String procedureXmlDescription) {
+//        this.procedureXmlDescription = procedureXmlDescription;
+//    }
 
     public List<SosProcedureDescription> getProcedureDescriptions() {
         return procedureDescriptions;

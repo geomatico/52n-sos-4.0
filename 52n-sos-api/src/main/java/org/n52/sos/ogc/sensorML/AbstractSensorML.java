@@ -36,8 +36,6 @@ import org.n52.sos.ogc.sos.SosProcedureDescription;
 
 public class AbstractSensorML extends SosProcedureDescription {
 
-    private String sensorDescriptionXmlString;
-
     private List<String> keywords;
 
     private List<SosSMLIdentifier> identifications;
@@ -55,14 +53,6 @@ public class AbstractSensorML extends SosProcedureDescription {
     private String documentation;
 
     private String history;
-
-    public String getSensorDescriptionXmlString() {
-        return sensorDescriptionXmlString;
-    }
-
-    public void setSensorDescriptionXmlString(String sensorDescriptionXmlString) {
-        this.sensorDescriptionXmlString = sensorDescriptionXmlString;
-    }
 
     public List<String> getKeywords() {
         return keywords;

@@ -328,7 +328,7 @@ public class InsertSensorDAO implements IInsertSensorDAO {
         }
         // if procedureDescription not SensorML
         else {
-            return ((AbstractSensorML)procedureDescription).getSensorDescriptionXmlString();
+            return procedureDescription.getSensorDescriptionXmlString();
         }
     }
 
