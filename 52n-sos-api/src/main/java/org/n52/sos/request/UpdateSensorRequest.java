@@ -26,7 +26,6 @@ package org.n52.sos.request;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 

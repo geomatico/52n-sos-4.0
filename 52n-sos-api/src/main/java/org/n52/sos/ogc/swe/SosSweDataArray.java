@@ -26,7 +26,6 @@ package org.n52.sos.ogc.swe;
 import java.util.List;
 import java.util.Map;
 
-import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweCount;
 
 /**

@@ -31,10 +31,6 @@ public class DeleteSensorRequest extends AbstractServiceRequest {
 
     private String procedureIdentifier;
 
-    public DeleteSensorRequest() {
-        // TODO Auto-generated constructor stub
-    }
-
     /**
      * @param procedureIdentifier
      *            the procedureIdentifier to set

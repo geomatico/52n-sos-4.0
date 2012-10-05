@@ -72,7 +72,7 @@ public class HibernateCriteriaTransactionalUtilities {
             session.saveOrUpdate(procedure);
             session.flush();
         } else {
-            String exceptionText = "The requested identifier is not cotnained in database";
+            String exceptionText = "The requested identifier is not contained in database";
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
     }

@@ -26,7 +26,6 @@ package org.n52.sos.service.operator;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.IConformanceClass;
 
 /**
  * interface for the request listeners
