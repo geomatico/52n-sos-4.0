@@ -42,7 +42,6 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
 
-import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.ows.OWSConstants;
@@ -63,6 +62,8 @@ import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3CConstants;
 import org.n52.sos.wsa.WsaConstants;
 import org.n52.sos.wsa.WsaHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -70,7 +71,7 @@ import org.w3c.dom.Node;
 public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
 
     /** the logger, used to log exceptions and additonaly information */
-    private static Logger LOGGER = Logger.getLogger(SoapEncoder.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(SoapEncoder.class);
 
     private List<EncoderKeyType> encoderKeyTypes;
     

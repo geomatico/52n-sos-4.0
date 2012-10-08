@@ -40,7 +40,6 @@ import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPHeaderElement;
 import javax.xml.soap.SOAPMessage;
 
-import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.ows.OwsException;
@@ -56,6 +55,8 @@ import org.n52.sos.util.W3cHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsa.WsaConstants;
 import org.n52.sos.wsa.WsaHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
@@ -66,7 +67,7 @@ import org.w3c.dom.Document;
 public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
 
     /** the logger, used to log exceptions and additonaly information */
-    private static Logger LOGGER = Logger.getLogger(SoapDecoder.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(SoapDecoder.class);
 
     private List<DecoderKeyType> decoderKeyTypes;
 

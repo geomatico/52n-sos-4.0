@@ -32,17 +32,18 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.apache.log4j.Logger;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.wsa.WsaConstants;
 import org.n52.sos.wsa.WsaHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WsaEncoder implements IEncoder<Map<QName, String>, WsaHeader> {
 
     /** the logger, used to log exceptions and additonaly information */
-    private static Logger LOGGER = Logger.getLogger(WsaEncoder.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(WsaEncoder.class);
 
     private List<EncoderKeyType> encoderKeyTypes;
     

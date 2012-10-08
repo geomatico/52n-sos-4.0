@@ -26,10 +26,11 @@ package org.n52.sos.ogc.ows;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.n52.sos.exception.IExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of the ows service exception. The exception codes are defined
@@ -41,7 +42,7 @@ public class OwsExceptionReport extends Exception {
     private static final long serialVersionUID = 9069373009339881302L;
 
     /** logger */
-    private static final Logger LOGGER = Logger.getLogger(OwsExceptionReport.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(OwsExceptionReport.class.getName());
 
     /** Exception types */
     private List<OwsException> owsExceptions = new ArrayList<OwsException>();

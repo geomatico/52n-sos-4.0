@@ -57,6 +57,10 @@
 	</build>
 	<dependencies>
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-api</artifactId>
 			<version>${project.version}</version>
@@ -235,6 +239,16 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-coding-diagram</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>task</id>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-getResultTasking</artifactId>
 					<version>${project.version}</version>
 				</dependency>
 			</dependencies>

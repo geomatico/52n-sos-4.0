@@ -34,15 +34,16 @@ import java.util.Set;
 import javax.xml.soap.Node;
 import javax.xml.soap.SOAPHeaderElement;
 
-import org.apache.log4j.Logger;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.wsa.WsaConstants;
 import org.n52.sos.wsa.WsaHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WsaDecoder implements IDecoder<WsaHeader, List<SOAPHeaderElement>> {
 
     /** the logger, used to log exceptions and additonaly information */
-    private static Logger LOGGER = Logger.getLogger(WsaDecoder.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(WsaDecoder.class);
 
     private List<DecoderKeyType> decoderKeyTypes;
 
