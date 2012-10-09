@@ -109,6 +109,8 @@ public abstract class ACapabilitiesCacheController extends TimerTask {
 
     public abstract void updateAfterSensorDeletion() throws OwsExceptionReport;
     
+    public abstract void updateAfterObservationDeletion() throws OwsExceptionReport; 
+    
     public abstract void updateAfterResultTemplateInsertion() throws OwsExceptionReport;
 
     /**
@@ -437,4 +439,5 @@ public abstract class ACapabilitiesCacheController extends TimerTask {
     public abstract Collection<String> getAllowedObservationTypes4Offering(String offering);
     
     public abstract Collection<String> getResultTemplates();
+
 }

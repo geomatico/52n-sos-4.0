@@ -40,6 +40,8 @@ public class Observation implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
 
     private long observationId;
+    
+    private Boolean deleted;
 
     private FeatureOfInterest featureOfInterest;
 
@@ -81,18 +83,19 @@ public class Observation implements java.io.Serializable {
     }
 
     public Observation(long observationId, FeatureOfInterest featureOfInterest,
-            ObservationConstellation observationConstellation, Date phenomenonTimeStart) {
+            ObservationConstellation observationConstellation, Date phenomenonTimeStart, boolean deleted) {
         this.observationId = observationId;
         this.featureOfInterest = featureOfInterest;
         this.observationConstellation = observationConstellation;
         this.phenomenonTimeStart = phenomenonTimeStart;
+        this.deleted = deleted;
     }
 
     public Observation(long observationId, FeatureOfInterest featureOfInterest,
             ObservationConstellation observationConstellation, String identifier, Date phenomenonTimeStart,
             Date phenomenonTimeEnd, Date resultTime, Date validTimeStart, Date validTimeEnd, Unit unit, Integer antiSubsetting,
             Set<SpatialFilteringProfile> spatialFilteringProfiles, Set<Quality> qualities, Set<CountValue> countValues, Set<BooleanValue> booleanValues,Set<GeometryValue> geometryValues, Set<CategoryValue> categoryValues,
-            Set<NumericValue> numericValues, Set<TextValue> textValues) {
+            Set<NumericValue> numericValues, Set<TextValue> textValues, boolean deleted) {
         this.observationId = observationId;
         this.featureOfInterest = featureOfInterest;
         this.observationConstellation = observationConstellation;
@@ -112,6 +115,7 @@ public class Observation implements java.io.Serializable {
         this.categoryValues = categoryValues;
         this.numericValues = numericValues;
         this.textValues = textValues;
+        this.deleted = deleted;
     }
 
     public long getObservationId() {
@@ -264,6 +268,16 @@ public class Observation implements java.io.Serializable {
 
     public void setTextValues(Set<TextValue> textValues) {
         this.textValues = textValues;
+    }
+
+    public Boolean getDeleted()
+    {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted)
+    {
+        this.deleted = deleted;
     }
 
 }

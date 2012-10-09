@@ -38,6 +38,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projection;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IConnectionProvider;
@@ -318,6 +319,9 @@ public class GetObservationDAO implements IGetObservationDAO {
                 criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                         HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), request.getProcedures()));
             }
+            // deleted
+            // XXX DeleteObservation Extension
+            criterions.add(Restrictions.eq("deleted", false));
         }
         // temporal filters
         if (request.getEventTimes() != null && !request.getEventTimes().isEmpty()) {

@@ -19,6 +19,9 @@
         <property name="identifier" type="string">
             <column name="identifier" />
         </property>
+        <property name="deleted" type="boolean">
+            <column name="deleted" not-null="true" />
+        </property>
         <property name="phenomenonTimeStart" type="timestamp">
             <column name="phenomenon_time_start" length="29" not-null="true" />
         </property>

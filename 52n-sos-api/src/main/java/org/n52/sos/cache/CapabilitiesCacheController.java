@@ -152,6 +152,38 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     }
 
     @Override
+    public void updateAfterSensorDeletion() throws OwsExceptionReport {
+        boolean timeNotElapsed = true;
+        try {
+            // thread safe updating of the cache map
+            timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
+    
+            // has waiting for lock got a time out?
+            if (!timeNotElapsed) {
+                LOGGER.warn("\n******\nupdateAfterSensorDeletion() not successful "
+                        + "because of time out while waiting for update lock." + "\nWaited "
+                        + SosConstants.UPDATE_TIMEOUT + " milliseconds.\n******\n");
+                return;
+            }
+            while (!isUpdateIsFree()) {
+    
+                getUpdateFree().await();
+            }
+            setUpdateIsFree(false);
+            this.cacheFeederDAO.updateAfterSensorDeletion(capabilitiesCache);
+    
+        } catch (InterruptedException e) {
+            LOGGER.error("Problem while threadsafe capabilities cache update", e);
+        } finally {
+            if (timeNotElapsed) {
+                getUpdateLock().unlock();
+                setUpdateIsFree(true);
+            }
+        }
+        
+    }
+
+    @Override
     public void updateAfterObservationInsertion() throws OwsExceptionReport {
         boolean timeNotElapsed = true;
         try {
@@ -182,8 +214,12 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.n52.sos.cache.ACapabilitiesCacheController#updateAfterObservationDeletion()
+     */
     @Override
-    public void updateAfterSensorDeletion() throws OwsExceptionReport {
+    public void updateAfterObservationDeletion() throws OwsExceptionReport
+    {
         boolean timeNotElapsed = true;
         try {
             // thread safe updating of the cache map
@@ -191,17 +227,16 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
             // has waiting for lock got a time out?
             if (!timeNotElapsed) {
-                LOGGER.warn("\n******\nupdateAfterSensorDeletion() not successful "
+                LOGGER.warn("\n******\nupdateAfterObservationDeletion() not successful "
                         + "because of time out while waiting for update lock." + "\nWaited "
                         + SosConstants.UPDATE_TIMEOUT + " milliseconds.\n******\n");
                 return;
             }
             while (!isUpdateIsFree()) {
-
                 getUpdateFree().await();
             }
             setUpdateIsFree(false);
-            this.cacheFeederDAO.updateAfterSensorDeletion(capabilitiesCache);
+            this.cacheFeederDAO.updateAfterObservationDeletion(capabilitiesCache);
 
         } catch (InterruptedException e) {
             LOGGER.error("Problem while threadsafe capabilities cache update", e);
@@ -211,7 +246,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
                 setUpdateIsFree(true);
             }
         }
-        
     }
 
     @Override
