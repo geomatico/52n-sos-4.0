@@ -248,7 +248,7 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
-        Util4Exceptions.mergeExceptions(exceptions);
+        Util4Exceptions.mergeAndThrowExceptions(exceptions);
     }
 
     /**
@@ -279,7 +279,7 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
                             SosConstants.GetObservationParams.observedProperty.name(), exceptionText));
                 }
             }
-            Util4Exceptions.mergeExceptions(exceptions);
+            Util4Exceptions.mergeAndThrowExceptions(exceptions);
         }
     }
 
@@ -322,7 +322,7 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
                     }
                 }
             }
-            Util4Exceptions.mergeExceptions(exceptions);
+            Util4Exceptions.mergeAndThrowExceptions(exceptions);
         }
     }
 

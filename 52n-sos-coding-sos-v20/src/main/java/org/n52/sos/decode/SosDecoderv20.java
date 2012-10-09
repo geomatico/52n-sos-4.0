@@ -357,7 +357,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
                             Sos2Constants.InsertObservationParams.observation.name(), exceptionText.toString()));
                 }
             }
-            Util4Exceptions.mergeExceptions(exceptions);
+            Util4Exceptions.mergeAndThrowExceptions(exceptions);
             // TODO: add offering to observationConstellation (duplicate obs if
             // more than one offering)
         }

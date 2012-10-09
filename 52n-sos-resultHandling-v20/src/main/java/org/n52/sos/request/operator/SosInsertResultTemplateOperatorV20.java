@@ -159,7 +159,7 @@ public class SosInsertResultTemplateOperatorV20 implements IRequestOperator {
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
-        Util4Exceptions.mergeExceptions(exceptions);
+        Util4Exceptions.mergeAndThrowExceptions(exceptions);
      // TODO check parameter as defined in SOS 2.0 spec
     }
 

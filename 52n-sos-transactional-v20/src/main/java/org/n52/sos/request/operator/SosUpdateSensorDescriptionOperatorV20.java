@@ -165,7 +165,7 @@ public class SosUpdateSensorDescriptionOperatorV20 implements IRequestOperator {
         }
         
         
-        Util4Exceptions.mergeExceptions(exceptions);
+        Util4Exceptions.mergeAndThrowExceptions(exceptions);
     }
 
 

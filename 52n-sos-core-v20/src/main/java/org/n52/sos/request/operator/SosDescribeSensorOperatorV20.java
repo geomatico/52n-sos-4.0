@@ -225,7 +225,7 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
             String exceptionText = "The requested parameter is not supported by this server!";
             exceptions.add(Util4Exceptions.createOptionNotSupportedException(Sos2Constants.DescribeSensorParams.validTime.name(), exceptionText));
         }
-        Util4Exceptions.mergeExceptions(exceptions);
+        Util4Exceptions.mergeAndThrowExceptions(exceptions);
     }
 
 }

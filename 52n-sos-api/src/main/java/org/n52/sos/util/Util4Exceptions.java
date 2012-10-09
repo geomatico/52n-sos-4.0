@@ -103,7 +103,7 @@ public class Util4Exceptions {
         return owse;
     }
 
-    public static void mergeExceptions(List<OwsExceptionReport> exceptions) throws OwsExceptionReport {
+    public static void mergeAndThrowExceptions(List<OwsExceptionReport> exceptions) throws OwsExceptionReport {
         if (!exceptions.isEmpty()) {
             OwsExceptionReport owse = null;
             for (OwsExceptionReport owsExceptionReport : exceptions) {

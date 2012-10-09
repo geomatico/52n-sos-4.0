@@ -157,7 +157,7 @@ public class SosDeleteSensorOperatorV20 implements IRequestOperator {
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
-        Util4Exceptions.mergeExceptions(exceptions);
+        Util4Exceptions.mergeAndThrowExceptions(exceptions);
     }
 
     private void checkProcedureIdentifier(String procedureIdentifier) throws OwsExceptionReport {

@@ -159,7 +159,7 @@ public class InsertObservationDAO implements IInsertObservationDAO {
             }
             // if no observationConstellation is valid, throw exception
             if (exceptions.size() == request.getObservation().size()) {
-                Util4Exceptions.mergeExceptions(exceptions);
+                Util4Exceptions.mergeAndThrowExceptions(exceptions);
             }
             session.flush();
             transaction.commit();

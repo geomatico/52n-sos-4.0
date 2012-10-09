@@ -202,7 +202,7 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
                 exceptions.add(owse);
             }
         }
-        Util4Exceptions.mergeExceptions(exceptions);
+        Util4Exceptions.mergeAndThrowExceptions(exceptions);
 
         return request;
 
@@ -311,7 +311,7 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
             exceptions.add(owse);
         }
 
-        Util4Exceptions.mergeExceptions(exceptions);
+        Util4Exceptions.mergeAndThrowExceptions(exceptions);
 
         return request;
     }
@@ -421,7 +421,7 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
             exceptions.add(owse);
         }
 
-        Util4Exceptions.mergeExceptions(exceptions);
+        Util4Exceptions.mergeAndThrowExceptions(exceptions);
 
         return request;
     }
@@ -520,7 +520,7 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
             exceptions.add(owse);
         }
 
-        Util4Exceptions.mergeExceptions(exceptions);
+        Util4Exceptions.mergeAndThrowExceptions(exceptions);
 
         return request;
     }
@@ -607,7 +607,7 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
                             + " must be contained in your request!");
             exceptions.add(owse);
         }
-        Util4Exceptions.mergeExceptions(exceptions);
+        Util4Exceptions.mergeAndThrowExceptions(exceptions);
 
         return request;
     }
@@ -714,7 +714,7 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
                             + " must be contained in your request!");
             exceptions.add(owse);
         }
-        Util4Exceptions.mergeExceptions(exceptions);
+        Util4Exceptions.mergeAndThrowExceptions(exceptions);
         return request;
     }
 

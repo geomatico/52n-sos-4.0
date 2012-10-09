@@ -174,7 +174,7 @@ public class SosInsertSensorOperatorV20 implements IRequestOperator {
             exceptions.add(Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertSensorParams.featureOfInterestType.name()));
             exceptions.add(Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertSensorParams.observationType.name()));
         }
-        Util4Exceptions.mergeExceptions(exceptions);
+        Util4Exceptions.mergeAndThrowExceptions(exceptions);
     }
 
     private void checkObservablePropterty(List<String> observableProperty) throws OwsExceptionReport {
