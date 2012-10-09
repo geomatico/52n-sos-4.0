@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.IConformanceClass;
@@ -54,8 +53,16 @@ public interface IEncoder<T, S> extends IConformanceClass {
     // TODO add javadoc
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
 
+    /**
+     * Add the namespace prefix of this {@linkplain IEncoder} instance to the given {@linkplain Map}.
+     * 
+     * @param nameSpacePrefixMap
+     */
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap);
 
+    /**
+     * @return the content type of the encoded response.
+     */
     public String getContentType();
 
 }
