@@ -74,7 +74,7 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
                 new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION),
                         OPERATION_NAME);
         this.dao = (IInsertObservationDAO) Configurator.getInstance().getOperationDAOs().get(OPERATION_NAME);
-        LOGGER.info("SosInsertObservationOperatorV20 initialized successfully!");
+        LOGGER.info(String.format("%s initialized successfully!",this.getClass().getName()));
     }
 
     @Override
