@@ -261,15 +261,7 @@ public class KvpBinding implements IBinding {
                 }
             }
         }
-        StringBuilder exceptionText = new StringBuilder();
-        exceptionText.append("The value of parameter '");
-        exceptionText.append(OWSConstants.RequestParams.service.name());
-        exceptionText.append("' and/or '");
-        exceptionText.append(OWSConstants.RequestParams.version.name());
-        exceptionText.append("' is invalid!");
-        LOGGER.debug(exceptionText.toString());
-        throw Util4Exceptions.createInvalidParameterValueException(OWSConstants.RequestParams.version.name(),
-                exceptionText.toString());
+        return null;
     }
 
     @Override
