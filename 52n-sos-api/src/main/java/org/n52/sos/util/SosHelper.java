@@ -48,7 +48,6 @@ import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.IObservationEncoder;
 import org.n52.sos.ogc.om.SosObservableProperty;
-import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSConstants.MinMax;
@@ -71,9 +70,6 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Utility class for SOS
@@ -421,6 +417,8 @@ public class SosHelper {
             Collection<IBinding> bindings, String serviceURL) throws OwsExceptionReport {
         List<String> httpGetUrls = new ArrayList<String>();
         List<String> httpPostUrls = new ArrayList<String>();
+        List<String> httpPutUrls = new ArrayList<String>();
+        List<String> httpDeleteUrls = new ArrayList<String>();
         try {
             for (IBinding binding : bindings) {
                 // HTTP-Get
@@ -431,6 +429,15 @@ public class SosHelper {
                 if (binding.checkOperationHttpPostSupported(operation, decoderKey)) {
                     httpPostUrls.add(serviceURL + binding.getUrlPattern());
                 }
+                // HTTP-PUT
+                if (binding.checkOperationHttpPutSupported(operation, decoderKey)) {
+                    httpPutUrls.add(serviceURL + binding.getUrlPattern());
+                }
+                // HTTP-DELETE
+                if (binding.checkOperationHttpDeleteSupported(operation, decoderKey)) {
+                    httpDeleteUrls.add(serviceURL + binding.getUrlPattern());
+                }
+                
 
             }
         } catch (Exception e) {
@@ -446,6 +453,8 @@ public class SosHelper {
         Map<String, List<String>> dcp = new HashMap<String, List<String>>();
         dcp.put(SosConstants.HTTP_GET, httpGetUrls);
         dcp.put(SosConstants.HTTP_POST, httpPostUrls);
+        dcp.put(SosConstants.HTTP_PUT, httpPutUrls);
+        dcp.put(SosConstants.HTTP_DELETE, httpDeleteUrls);
         return dcp;
     }
 
@@ -763,7 +772,7 @@ public class SosHelper {
                     exceptions.add(owse);
                 }
             }
-            Util4Exceptions.mergeExceptions(exceptions);
+            Util4Exceptions.mergeAndThrowExceptions(exceptions);
         }
     }
 
@@ -780,7 +789,7 @@ public class SosHelper {
                     exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
                 }
             }
-            Util4Exceptions.mergeExceptions(exceptions);
+            Util4Exceptions.mergeAndThrowExceptions(exceptions);
         }
     }
 
@@ -796,7 +805,7 @@ public class SosHelper {
                     exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
                 }
             }
-            Util4Exceptions.mergeExceptions(exceptions);
+            Util4Exceptions.mergeAndThrowExceptions(exceptions);
         }
     }
 

@@ -335,6 +335,15 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
         for (String dcpPost : supportedDcp.get(SosConstants.HTTP_POST)) {
             http.addNewPost().setHref(dcpPost);
         }
+        // TODO add if ows supports more than get and post
+        /*
+        for (String dcpPut : supportedDcp.get(SosConstants.HTTP_PUT)) {
+            http.addNewPut().setHref(dcpPut);
+        }
+        for (String dcpDelete : supportedDcp.get(SosConstants.HTTP_DELETE)) {
+            http.addNewDelete().setHref(dcpDelete);
+        }
+        */
     }
 
     private void setParameterValue(DomainType domainType, String parameterName,
