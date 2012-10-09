@@ -311,7 +311,7 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
     private IObservationValue getObservationValue(OMObservationType omObservation) throws OwsExceptionReport {
         ITime phenomenonTime = getPhenomenonTime(omObservation);
         IObservationValue observationValue = null;
-        if (phenomenonTime.getIndeterminateValue().equals("template")) {
+        if (phenomenonTime.getIndeterminateValue() != null && phenomenonTime.getIndeterminateValue().equals("template")) {
             observationValue = new SosSingleObservationValue();
             observationValue.setPhenomenonTime(phenomenonTime);
             observationValue.setValue(new NilTemplateValue());
