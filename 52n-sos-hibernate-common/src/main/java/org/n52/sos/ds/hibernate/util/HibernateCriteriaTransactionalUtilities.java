@@ -424,6 +424,7 @@ public class HibernateCriteriaTransactionalUtilities {
             SosObservation observation, Session session) {
         SosSingleObservationValue value = (SosSingleObservationValue) observation.getValue();
         Observation hObservation = new Observation();
+        hObservation.setDeleted(false);
         if (observation.getIdentifier() != null && !observation.getIdentifier().isEmpty()) {
             hObservation.setIdentifier(observation.getIdentifier());
         }

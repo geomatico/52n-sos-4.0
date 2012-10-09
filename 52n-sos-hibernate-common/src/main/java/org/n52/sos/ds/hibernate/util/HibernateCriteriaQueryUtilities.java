@@ -237,6 +237,7 @@ public class HibernateCriteriaQueryUtilities {
      */
     public static List<Observation> getObservations(Map<String, String> aliases, List<Criterion> criterions,
             List<Projection> projections, Session session) {
+        criterions.add(Restrictions.eq("deleted", false)); // XXX Does it work?
         return (List<Observation>) getObject(aliases, criterions, projections, session, Observation.class);
     }
 
