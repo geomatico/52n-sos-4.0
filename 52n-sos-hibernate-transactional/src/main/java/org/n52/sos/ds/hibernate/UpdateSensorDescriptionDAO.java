@@ -106,7 +106,7 @@ public class UpdateSensorDescriptionDAO implements IUpdateSensorDescriptionDAO {
         opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt,
                 Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set param procedure
-        Collection<String> procedrues = Configurator.getInstance().getCapabilitiesCacheController().getProcedures();
+        Collection<String> procedures = Configurator.getInstance().getCapabilitiesCacheController().getProcedures();
         opsMeta.addParameterValue(Sos2Constants.UpdateSensorDescriptionParams.procedure.name(),
                 new OWSParameterValuePossibleValues(Configurator.getInstance().getCapabilitiesCacheController()
                         .getProcedures()));
