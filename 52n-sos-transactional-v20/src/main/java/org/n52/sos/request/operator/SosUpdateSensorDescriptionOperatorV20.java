@@ -33,17 +33,15 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IUpdateSensorDescriptionDAO;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.request.UpdateSensorRequest;
-import org.n52.sos.response.DeleteSensorResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.response.UpdateSensorResponse;
 import org.n52.sos.service.Configurator;
@@ -66,7 +64,7 @@ public class SosUpdateSensorDescriptionOperatorV20 implements IRequestOperator {
     private RequestOperatorKeyType requestOperatorKeyType;
 
     /** logger */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SosDeleteSensorOperatorV20.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SosUpdateSensorDescriptionOperatorV20.class);
 
     public SosUpdateSensorDescriptionOperatorV20() {
         requestOperatorKeyType =
