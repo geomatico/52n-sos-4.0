@@ -274,4 +274,9 @@ public class ServiceResponse {
 		return httpResponseCode;
 	}
 
+    public void setHttpResponseCode(int httpResponseCode)
+    {
+        this.httpResponseCode = httpResponseCode;
+    }
+	
 }

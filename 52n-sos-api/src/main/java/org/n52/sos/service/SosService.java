@@ -187,26 +187,27 @@ public class SosService extends HttpServlet {
                 } else if (encodedObject instanceof ServiceResponse) {
                     return (ServiceResponse) encodedObject;
                 } else {
-                    String exceptionText = "Error while handle exception message response!";
-                    LOGGER.debug(exceptionText);
-                    throw new ServletException(exceptionText);
+                    throw logExceptionAndCreateServletException(null);
                 }
             } else {
-                String exceptionText = "Error while handle exception message response!";
-                LOGGER.debug(exceptionText);
-                throw new ServletException(exceptionText);
+                throw logExceptionAndCreateServletException(null);
             }
-        } catch (OwsExceptionReport owse) {
-            String exceptionText = "Error while handle exception message response!";
-            LOGGER.debug(exceptionText, owse);
-            throw new ServletException(exceptionText);
-        } catch (IOException ioe) {
-            String exceptionText = "Error while handle exception message response!";
-            LOGGER.debug(exceptionText, ioe);
-            throw new ServletException(exceptionText);
-        }
-        
+        } catch (Exception owse) {
+            throw logExceptionAndCreateServletException(owse);
+        }        
     }
+
+    private ServletException logExceptionAndCreateServletException(Exception e) 
+    {
+        String exceptionText = "Error while encoding exception response!";
+        if (e != null) {
+            LOGGER.debug(exceptionText, e);
+        } else {
+            LOGGER.debug(exceptionText);
+        }
+        return new ServletException(exceptionText);
+    }
+
 
     /**
      * writes the content of the SosResponse to the outputStream of the
@@ -234,6 +235,11 @@ public class SosService extends HttpServlet {
                 this.setSpecifiedHeaders(sosResponse.getHeaderMap(),resp);
             }
             
+            int httpResponseCode = sosResponse.getHttpResponseCode();
+            if  (httpResponseCode != -1) {
+                resp.setStatus(httpResponseCode);
+            }
+            
         	if (!sosResponse.isContentLess()){
         		int contentLength = sosResponse.getContentLength();
         		resp.setContentLength(contentLength);
@@ -242,10 +248,6 @@ public class SosService extends HttpServlet {
             	out.flush();
             }
         	
-        	int httpResponseCode = sosResponse.getHttpResponseCode();
-        	if	(httpResponseCode != -1) {
-        		resp.setStatus(httpResponseCode);
-        	}
         } catch (IOException ioe) {
             String exceptionText = "Error while writing SOS response to ServletResponse!";
             LOGGER.error(exceptionText, ioe);
