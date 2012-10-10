@@ -223,7 +223,7 @@ public class HibernateCriteriaQueryUtilities {
     }
 
     /**
-     * Get Observation objects for the defined restrictions
+     * Get Observation objects for the defined restrictions which are marked as not deleted
      * 
      * @param aliases
      *            Aliases for query between tables
@@ -237,7 +237,7 @@ public class HibernateCriteriaQueryUtilities {
      */
     public static List<Observation> getObservations(Map<String, String> aliases, List<Criterion> criterions,
             List<Projection> projections, Session session) {
-        criterions.add(Restrictions.eq("deleted", false)); // XXX Does it work?
+        criterions.add(Restrictions.eq("deleted", false));
         return (List<Observation>) getObject(aliases, criterions, projections, session, Observation.class);
     }
 
