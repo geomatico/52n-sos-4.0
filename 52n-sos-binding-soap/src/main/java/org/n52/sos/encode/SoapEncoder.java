@@ -278,9 +278,12 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
                 }
             }
             soapFault.addFaultReasonText(SoapHelper.getSoapFaultReasonText(firstException.getCode()), Locale.ENGLISH);
+            Detail detail = null;
             for (OwsException exception : owsExceptionReport.getExceptions()) {
                 // set fault detail
-                Detail detail = soapFault.addDetail();
+                if (detail == null) {
+                    detail = soapFault.addDetail();
+                }
                 createSOAPFaultDetail(detail, exception);
             }
             return SoapHelper.getExceptionActionURI(firstException.getCode());

@@ -307,15 +307,19 @@ public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
         for (String headerElementsNamespace : headerElementsMap.keySet()) {
             try {
                 List<IDecoder> decoderList = Configurator.getInstance().getDecoder(headerElementsNamespace);
-                SoapHeader headerElement = null;
-                for (IDecoder decoder : decoderList) {
-                    headerElement = (SoapHeader) decoder.decode(headerElementsMap.get(headerElementsNamespace));
-                    if (headerElement != null) {
-                        break;
+                if (decoderList != null) {
+                    SoapHeader headerElement = null;
+                    for (IDecoder decoder : decoderList) {
+                        headerElement = (SoapHeader) decoder.decode(headerElementsMap.get(headerElementsNamespace));
+                        if (headerElement != null) {
+                            break;
+                        }
                     }
-                }
-                if (headerElement != null && headerElement instanceof SoapHeader) {
-                    soapHeaders.put(headerElementsNamespace, (SoapHeader) headerElement);
+                    if (headerElement != null && headerElement instanceof SoapHeader) {
+                        soapHeaders.put(headerElementsNamespace, (SoapHeader) headerElement);
+                    }
+                } else {
+                    LOGGER.info("The SOAP-Header elements for namespace '{}' are not supported by this server!", headerElementsNamespace);
                 }
             } catch (OwsExceptionReport owse) {
                 LOGGER.debug("Requested SOAPHeader element is not supported", owse);
