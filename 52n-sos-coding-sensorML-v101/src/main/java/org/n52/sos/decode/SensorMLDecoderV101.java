@@ -516,6 +516,10 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
             toEncode = xbIoCompPropType.getTime();
         } else if (xbIoCompPropType.isSetTimeRange()) {
             toEncode = xbIoCompPropType.getTimeRange();
+        } else if (xbIoCompPropType.isSetAbstractDataArray1()) {
+            toEncode = xbIoCompPropType.getAbstractDataArray1();
+        } else if (xbIoCompPropType.isSetAbstractDataRecord()) {
+            toEncode = xbIoCompPropType.getAbstractDataRecord();
         } else {
             String exceptionText = "An \"IoComponentProperty\" is not supported";
             LOGGER.debug(exceptionText);
