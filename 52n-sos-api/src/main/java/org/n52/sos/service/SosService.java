@@ -171,8 +171,19 @@ public class SosService extends HttpServlet {
      *            the response for the incoming request
      */
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doOptions(req, resp);
-        this.setCorsHeaders(resp);
+        LOGGER.debug("\n**********\n(OPTIONS) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
+
+        ServiceResponse sosResp = null;
+        try {
+            sosResp = getBindingOperatorForServletPath(req.getServletPath()).doOptionsOperation(req);
+        } catch (OwsExceptionReport owse) {
+            sosResp = handleOwsExceptionReport(owse);
+        }
+        if (sosResp.getHttpResponseCode() == HttpServletResponse.SC_NOT_IMPLEMENTED) {
+            super.doOptions(req, resp);
+            this.setCorsHeaders(resp);
+        }
+        doResponse(resp, sosResp);
     }
     
     private ServiceResponse handleOwsExceptionReport(OwsExceptionReport owsExceptionReport) throws ServletException {
