@@ -43,7 +43,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.joda.time.DateTime;
-import org.n52.sos.binding.IBinding;
+import org.n52.sos.binding.Binding;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.IObservationEncoder;
@@ -414,13 +414,13 @@ public class SosHelper {
      * @throws OwsExceptionReport
      */
     public static Map<String, List<String>> getDCP(String operation, DecoderKeyType decoderKey,
-            Collection<IBinding> bindings, String serviceURL) throws OwsExceptionReport {
+            Collection<Binding> bindings, String serviceURL) throws OwsExceptionReport {
         List<String> httpGetUrls = new ArrayList<String>();
         List<String> httpPostUrls = new ArrayList<String>();
         List<String> httpPutUrls = new ArrayList<String>();
         List<String> httpDeleteUrls = new ArrayList<String>();
         try {
-            for (IBinding binding : bindings) {
+            for (Binding binding : bindings) {
                 // HTTP-Get
                 if (binding.checkOperationHttpGetSupported(operation, decoderKey)) {
                     httpGetUrls.add(serviceURL + binding.getUrlPattern() + "?");
@@ -484,10 +484,10 @@ public class SosHelper {
     // return "";
     // }
 
-    public static String getUrlPatternForHttpGetMethod(Collection<IBinding> bindings, String operationName,
+    public static String getUrlPatternForHttpGetMethod(Collection<Binding> bindings, String operationName,
             DecoderKeyType decoderKey) throws OwsExceptionReport {
         try {
-            for (IBinding binding : bindings) {
+            for (Binding binding : bindings) {
                 if (binding.checkOperationHttpGetSupported(operationName, new DecoderKeyType(
                         getKvpNamespaceForVersionAndOperation(operationName, decoderKey)))) {
                     return binding.getUrlPattern();

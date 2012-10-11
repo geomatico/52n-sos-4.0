@@ -38,7 +38,7 @@ import org.apache.xmlbeans.XmlObject;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
-import org.n52.sos.binding.IBinding;
+import org.n52.sos.binding.Binding;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.IDecoder;
 import org.n52.sos.ds.IConnectionProvider;
@@ -325,7 +325,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
 
     private List<String> getProfiles() {
         Set<String> profiles = new HashSet<String>();
-        for (IBinding bindig : Configurator.getInstance().getBindingOperators().values()) {
+        for (Binding bindig : Configurator.getInstance().getBindingOperators().values()) {
             profiles.addAll(bindig.getConformanceClasses());
         }
         for (IRequestOperator requestOperator : Configurator.getInstance().getRequestOperator().values()) {

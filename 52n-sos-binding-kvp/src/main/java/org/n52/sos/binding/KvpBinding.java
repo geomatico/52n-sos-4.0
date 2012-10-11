@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  * SOS operator for Key-Value-Pair (HTTP-Get) requests
  * 
  */
-public class KvpBinding implements IBinding {
+public class KvpBinding extends Binding {
 
     /**
      * logger
@@ -138,34 +138,6 @@ public class KvpBinding implements IBinding {
         return response;
     }
 
-    @Override
-    public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport {
-        // throw createOperationNotSupportedException();
-        // TODO: check what is the correct response if not supported ?!?
-        throw Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.request.name());
-    }
-
-    @Override
-    public ServiceResponse doDeleteperation(HttpServletRequest request) throws OwsExceptionReport {
-        throw createOperationNotSupportedException();
-    }
-
-    @Override
-    public ServiceResponse doPutOperation(HttpServletRequest request) throws OwsExceptionReport {
-        throw createOperationNotSupportedException();
-    }
-
-    private OwsExceptionReport createOperationNotSupportedException() {
-        String exceptionText = "The requested service URL only supports HTTP-Get KVP requests!";
-        OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
-            owse.setVersion(Sos2Constants.SERVICEVERSION);
-        } else {
-            owse.setVersion(Sos1Constants.SERVICEVERSION);
-        }
-        return owse;
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -234,24 +206,6 @@ public class KvpBinding implements IBinding {
         return false;
     }
 
-    @Override
-    public boolean checkOperationHttpPostSupported(String operationName, DecoderKeyType decoderKey)
-            throws OwsExceptionReport {
-        return false;
-    }
-
-    @Override
-    public boolean checkOperationHttpDeleteSupported(String operationName, DecoderKeyType decoderKey)
-            throws OwsExceptionReport {
-        return false;
-    }
-
-    @Override
-    public boolean checkOperationHttpPutSupported(String operationName, DecoderKeyType decoderKey)
-            throws OwsExceptionReport {
-        return false;
-    }
-
     private IKvpDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
         List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
         if (decoder != null) {
@@ -270,5 +224,4 @@ public class KvpBinding implements IBinding {
         conformanceClasses.add("http://www.opengis.net/spec/SOS/2.0/conf/kvp-core");
         return conformanceClasses;
     }
-
 }

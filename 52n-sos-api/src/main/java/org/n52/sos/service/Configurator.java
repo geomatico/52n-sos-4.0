@@ -40,7 +40,7 @@ import java.util.Timer;
 
 import javax.servlet.UnavailableException;
 
-import org.n52.sos.binding.IBinding;
+import org.n52.sos.binding.Binding;
 import org.n52.sos.cache.ACapabilitiesCacheController;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.IDecoder;
@@ -290,7 +290,7 @@ public final class Configurator {
     private ServiceLoader<ACapabilitiesCacheController> serviceLoaderCapabilitiesCacheController;
 
     /** ServiceLoader for ISosRequestOperator */
-    private ServiceLoader<IBinding> serviceLoaderBindingOperator;
+    private ServiceLoader<Binding> serviceLoaderBindingOperator;
 
     private ServiceLoader<IDataSourceInitializator> serviceLoaderDataSourceInitializator;
 
@@ -351,7 +351,7 @@ public final class Configurator {
     /**
      * Implemented ISosRequestOperator
      */
-    private Map<String, IBinding> bindingOperators;
+    private Map<String, Binding> bindingOperators;
 
     private Map<RequestOperatorKeyType, IRequestOperator> requestOperators;
 
@@ -855,28 +855,26 @@ public final class Configurator {
      *             if initialization of a RequestListener failed
      */
     private void initializeBindingOperator() throws ConfigurationException {
-        bindingOperators = new HashMap<String, IBinding>();
-        serviceLoaderBindingOperator = ServiceLoader.load(IBinding.class);
-        Iterator<IBinding> iter = serviceLoaderBindingOperator.iterator();
+        bindingOperators = new HashMap<String, Binding>();
+        serviceLoaderBindingOperator = ServiceLoader.load(Binding.class);
+        Iterator<Binding> iter = serviceLoaderBindingOperator.iterator();
         while (iter.hasNext()) {
             try {
-                IBinding iBindingOperator = (IBinding) iter.next();
-                if (!(iBindingOperator instanceof IAdminServiceOperator)) {
-                    bindingOperators.put(iBindingOperator.getUrlPattern(), iBindingOperator);
-                }
+                Binding iBindingOperator = (Binding) iter.next();
+                bindingOperators.put(iBindingOperator.getUrlPattern(), iBindingOperator);
             } catch (ServiceConfigurationError sce) {
                 // TODO add more details like which class with qualified name
                 // failed to load
                 LOGGER.warn(
-                        "An IBinding implementation could not be loaded! Exception message: "
+                        "An Binding implementation could not be loaded! Exception message: "
                                 + sce.getLocalizedMessage(), sce);
             }
         }
         if (this.bindingOperators.isEmpty()) {
             StringBuilder exceptionText = new StringBuilder(); 
-            exceptionText.append("No IBinding implementation could is loaded!");
+            exceptionText.append("No Binding implementation could is loaded!");
             exceptionText.append(" If the SOS is not used as webapp, this has no effect!");
-            exceptionText.append(" Else add a IBinding implementation!");
+            exceptionText.append(" Else add a Binding implementation!");
             LOGGER.warn(exceptionText.toString());
         }
         LOGGER.info("\n******\n Binding(s) loaded successfully!\n******\n");
@@ -1695,7 +1693,7 @@ public final class Configurator {
         // return iEncoder;
     }
 
-    public IBinding getBindingOperator(String urlPattern) {
+    public Binding getBindingOperator(String urlPattern) {
         return bindingOperators.get(urlPattern);
     }
 
@@ -1707,7 +1705,7 @@ public final class Configurator {
         return requestOperators;
     }
 
-    public Map<String, IBinding> getBindingOperators() {
+    public Map<String, Binding> getBindingOperators() {
         return bindingOperators;
     }
 

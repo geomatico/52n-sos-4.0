@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.binding.IBinding;
+import org.n52.sos.binding.Binding;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -296,17 +296,17 @@ public class SosService extends HttpServlet {
     }
 
     /**
-     * Get the implementation of {@link IBinding} that is registered for the given <code>urlPattern</code>.
+     * Get the implementation of {@link Binding} that is registered for the given <code>urlPattern</code>.
      * 
      * @param urlPattern
      *          URL pattern from request URL
      * @return
-     * 			The implementation of {@link IBinding} that is registered for the given <code>urlPattern</code>.
+     * 			The implementation of {@link Binding} that is registered for the given <code>urlPattern</code>.
      * @throws OwsExceptionReport 
      * 			If the URL pattern is not supported by this SOS.
      */
-    private IBinding getBindingOperatorForServletPath(String urlPattern) throws OwsExceptionReport {
-        IBinding bindingOperator = Configurator.getInstance().getBindingOperator(urlPattern);
+    private Binding getBindingOperatorForServletPath(String urlPattern) throws OwsExceptionReport {
+        Binding bindingOperator = Configurator.getInstance().getBindingOperator(urlPattern);
         if (bindingOperator == null) {
             String exceptionText =
                     "The requested servlet path with pattern '" + urlPattern + "' is not supported by this SOS!";

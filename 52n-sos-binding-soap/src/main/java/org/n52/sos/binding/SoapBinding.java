@@ -53,7 +53,7 @@ import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SoapBinding implements IBinding {
+public class SoapBinding extends Binding {
 
     /** the logger, used to log exceptions and additional information */
     private static final Logger LOGGER = LoggerFactory.getLogger(SoapBinding.class);
@@ -63,11 +63,6 @@ public class SoapBinding implements IBinding {
     public SoapBinding() {
     }
 
-    @Override
-    public ServiceResponse doGetOperation(HttpServletRequest req) throws OwsExceptionReport {
-        throw createOperationNotSupportedException();
-    }
-    
     @Override
     public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport {
         String version = null;
@@ -166,18 +161,6 @@ public class SoapBinding implements IBinding {
         }
     }
 
-	@Override
-	public ServiceResponse doDeleteperation(HttpServletRequest request)
-			throws OwsExceptionReport {
-		throw createOperationNotSupportedException();
-	}
-
-	@Override
-	public ServiceResponse doPutOperation(HttpServletRequest request)
-			throws OwsExceptionReport {
-		throw createOperationNotSupportedException();
-	}
-
 	private OwsExceptionReport createOperationNotSupportedException() {
 		String exceptionText = "The requested service URL only supports HTTP-Post SOAP requests!";
 	    OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
@@ -195,12 +178,6 @@ public class SoapBinding implements IBinding {
     }
 
     @Override
-    public boolean checkOperationHttpGetSupported(String operationName, DecoderKeyType decoderKey)
-            throws OwsExceptionReport {
-        return false;
-    }
-
-    @Override
     public boolean checkOperationHttpPostSupported(String operationName, DecoderKeyType decoderKey)
             throws OwsExceptionReport {
         IXmlRequestDecoder decoder = getIXmlRequestDecoder(decoderKey);
@@ -209,18 +186,6 @@ public class SoapBinding implements IBinding {
         }
         return false;
     }
-
-	@Override
-	public boolean checkOperationHttpPutSupported(String operationName,
-			DecoderKeyType decoderKey) throws OwsExceptionReport {
-		return false;
-	}
-
-	@Override
-	public boolean checkOperationHttpDeleteSupported(String operationName,
-			DecoderKeyType decoderKey) throws OwsExceptionReport {
-		return false;
-	}
 
 	private IDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
         List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
