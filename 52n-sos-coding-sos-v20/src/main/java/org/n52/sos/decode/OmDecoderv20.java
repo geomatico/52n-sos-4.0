@@ -394,7 +394,7 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
 
     private SosAbstractFeature checkFeatureWithMap(SosAbstractFeature featureOfInterest,
             Map<String, SosAbstractFeature> featureMap) {
-        if (featureOfInterest.getGmlId() != null || !featureOfInterest.getGmlId().isEmpty()) {
+        if (featureOfInterest.getGmlId() != null && !featureOfInterest.getGmlId().isEmpty()) {
             if (featureMap.containsKey(featureOfInterest.getGmlId())) {
                 return featureMap.get(featureOfInterest.getGmlId());
             } else {
