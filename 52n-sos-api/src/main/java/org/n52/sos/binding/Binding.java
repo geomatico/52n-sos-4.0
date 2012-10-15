@@ -48,7 +48,7 @@ public abstract class Binding implements IConformanceClass {
      * The default response for each binding not overriding one of the doHTTP-Method methods.
      * 
      */
-    private ServiceResponse createNotImplementedContentLessServiceResponse()
+    protected ServiceResponse createNotImplementedContentLessServiceResponse()
     {
         return new ServiceResponse(null, HttpServletResponse.SC_NOT_IMPLEMENTED);
     }
