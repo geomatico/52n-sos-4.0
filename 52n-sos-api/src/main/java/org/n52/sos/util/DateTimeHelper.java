@@ -73,6 +73,7 @@ public class DateTimeHelper {
      *             IF an error occurs.
      */
     public static DateTime parseIsoString2DateTime(String timeString) throws DateTimeException {
+        checkForValidity(timeString);
         if (timeString == null || timeString.equals("")) {
             return null;
         }
@@ -91,6 +92,12 @@ public class DateTimeHelper {
             String exceptionText = "Error while parse time String to DateTime!";
             LOGGER.error(exceptionText, uoe);
             throw new DateTimeException(exceptionText, uoe);
+        }
+    }
+
+    private static void checkForValidity(String timeString) throws DateTimeException {
+        if (!(timeString.length() == 4 || timeString.length() == 7 || timeString.length() >= 10)) {
+            throw new DateTimeException("The requested time has no ISO 8601 format!");
         }
     }
 
@@ -130,8 +137,7 @@ public class DateTimeHelper {
      * @throws OwsExceptionReport
      *             If an error occurs.
      */
-    public static String formatDateTime2FormattedString(DateTime dateTime, String dateFormat)
-            throws DateTimeException {
+    public static String formatDateTime2FormattedString(DateTime dateTime, String dateFormat) throws DateTimeException {
         try {
             if (dateFormat == null || dateFormat.equals("")) {
                 return formatDateTime2IsoString(dateTime);

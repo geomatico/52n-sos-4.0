@@ -55,6 +55,7 @@ import org.n52.sos.request.SosGetResultRequest;
 import org.n52.sos.request.SosGetResultTemplateRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.KvpHelper;
@@ -260,11 +261,16 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.DescribeSensorParams.validTime.name())) {
                     try {
                         request.setTime(parseValidTime(parameterValues, parameterName));
-                    } catch (OwsExceptionReport owse) {
+                    } catch (DecoderException e) {
                         String exceptionText =
                                 "The optional parameter '" + parameterName + "' is not supported by this service!";
-                        LOGGER.debug(exceptionText);
-                        exceptions.add(Util4Exceptions.createOptionNotSupportedException(parameterName, exceptionText));
+                        LOGGER.debug(exceptionText, e);
+                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
+                    } catch (DateTimeException e) {
+                        String exceptionText =
+                                "The optional parameter '" + parameterName + "' is not supported by this service!";
+                        LOGGER.debug(exceptionText, e);
+                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
                     }
                 } else {
                     String exceptionText =
@@ -376,8 +382,22 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
 
                 // eventTime (optional)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.temporalFilter.name())) {
-                    request.setEventTimes(parseTemporalFilter(
-                            KvpHelper.checkParameterMultipleValues(parameterValues, parameterName), parameterName));
+                    try {
+                        request.setEventTimes(parseTemporalFilter(
+                                KvpHelper.checkParameterMultipleValues(parameterValues, parameterName), parameterName));
+                    } catch (DecoderException e) {
+                        OwsExceptionReport owse = new OwsExceptionReport();
+                        owse.addCodedException(OwsExceptionCode.InvalidParameterValue,
+                                Sos2Constants.GetObservationParams.temporalFilter.name(), "The value of parameter "
+                                        + Sos2Constants.GetObservationParams.temporalFilter.name() + " is invalid.");
+                        throw owse;
+                    } catch (DateTimeException e) {
+                        OwsExceptionReport owse = new OwsExceptionReport();
+                        owse.addCodedException(OwsExceptionCode.InvalidParameterValue,
+                                Sos2Constants.GetObservationParams.temporalFilter.name(), "The value of parameter "
+                                        + Sos2Constants.GetObservationParams.temporalFilter.name() + " is invalid.");
+                        throw owse;
+                    }
                 }
 
                 // spatialFilter (optional)
@@ -655,8 +675,17 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
 
                 // eventTime (optional)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.temporalFilter.name())) {
-                    request.setEventTimes(parseTemporalFilter(
-                            KvpHelper.checkParameterMultipleValues(parameterValues, parameterName), parameterName));
+                    try {
+                        request.setEventTimes(parseTemporalFilter(
+                                KvpHelper.checkParameterMultipleValues(parameterValues, parameterName), parameterName));
+                    } catch (DecoderException e) {
+                        throw Util4Exceptions.createInvalidParameterValueException(parameterName,
+                              "The parameter value is not valid!");
+                    } catch (DateTimeException e) {
+                        throw Util4Exceptions.createInvalidParameterValueException(parameterName,
+                              "The parameter value is not valid!");
+                    } 
+                    
                 }
 
                 // spatialFilter (optional)
@@ -718,7 +747,7 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
         return request;
     }
 
-    private List<TemporalFilter> parseValidTime(String parameterValue, String parameterName) throws OwsExceptionReport {
+    private List<TemporalFilter> parseValidTime(String parameterValue, String parameterName) throws DecoderException, DateTimeException {
         List<TemporalFilter> filterList = new ArrayList<TemporalFilter>();
         filterList.add(createTemporalFilterFromValue(parameterValue, null));
         return filterList;
@@ -782,11 +811,12 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
     }
 
     private List<TemporalFilter> parseTemporalFilter(List<String> parameterValues, String parameterName)
-            throws OwsExceptionReport {
+            throws DecoderException, DateTimeException {
         List<TemporalFilter> filterList = new ArrayList<TemporalFilter>();
         if (parameterValues.size() != 2) {
-            throw Util4Exceptions.createInvalidParameterValueException(parameterName,
-                    "The parameter value is not valid!");
+            throw new DecoderException("The parameter value is not valid!");
+//            throw Util4Exceptions.createInvalidParameterValueException(parameterName,
+//                    "The parameter value is not valid!");
         }
         filterList.add(createTemporalFilterFromValue(parameterValues.get(1), parameterValues.get(0)));
         return filterList;
@@ -806,10 +836,9 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
     }
 
     private TemporalFilter createTemporalFilterFromValue(String value, String valueReference)
-            throws OwsExceptionReport {
+            throws DecoderException, DateTimeException {
         TemporalFilter temporalFilter = new TemporalFilter();
         temporalFilter.setValueReference(valueReference);
-        try {
             String[] times = value.split("/");
 
             if (times.length == 1) {
@@ -855,24 +884,9 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
                 temporalFilter.setTime(tp);
 
             } else {
-                OwsExceptionReport owse = new OwsExceptionReport();
-                owse.addCodedException(OwsExceptionCode.InvalidParameterValue,
-                        Sos2Constants.GetObservationParams.temporalFilter.name(), "The value of parameter "
-                                + Sos2Constants.GetObservationParams.temporalFilter.name() + " is invalid.");
-                throw owse;
+                throw new DecoderException(String.format("The paramter value '{}' is invalid!", value));
             }
             return temporalFilter;
-        } catch (Exception e) {
-            if (e instanceof OwsExceptionReport) {
-                throw (OwsExceptionReport) e;
-            } else {
-                OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-                LOGGER.error("Error while parse time String to DateTime!", e);
-                owse.addCodedException(null, null, "Error while parse time String to DateTime!");
-                throw owse;
-            }
-
-        }
     }
 
     @Override
