@@ -58,7 +58,7 @@ public class SoapBinding extends Binding {
     /** the logger, used to log exceptions and additional information */
     private static final Logger LOGGER = LoggerFactory.getLogger(SoapBinding.class);
 
-    private static final String urlPattern = "/soap";
+    private static final String urlPattern = "/sos/soap";
 
     public SoapBinding() {
     }
@@ -72,6 +72,7 @@ public class SoapBinding extends Binding {
         try {
             String soapAction = SoapHelper.checkSoapHeader(request);
             XmlObject doc = XmlHelper.parseXmlSosRequest(request);
+            LOGGER.debug("SOAP-REQUEST: {}", doc.xmlText());
             String reqNamespaceURI = XmlHelper.getNamespace(doc);
             IDecoder decoder = getDecoder(new DecoderKeyType(reqNamespaceURI));
             // decode SOAP message

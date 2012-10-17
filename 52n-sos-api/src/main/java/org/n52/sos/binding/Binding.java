@@ -120,10 +120,10 @@ public abstract class Binding implements IConformanceClass {
 
     /**
      * Get URL pattern for the operator.<br />
-     * The URL pattern MUST start with "/", 
+     * The URL pattern MUST start with "/sos", 
      * MUST NOT contain any additional "/", 
      * and MUST be unique over all bindings present in the SOS at runtime.<br />
-     * For example, a kvp binding could have the pattern "/kvp".
+     * For example, a kvp binding could have the pattern "/sos/kvp".
      * 
      * @return URL pattern
      */
