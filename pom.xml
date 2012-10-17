@@ -11,8 +11,6 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>52n-sos-api</module>
-		<module>52n-sos-binding-kvp</module>
-		<module>52n-sos-binding-soap</module>
 		<module>52n-sos-hibernate-common</module>
 		<module>52n-sos-hibernate-feature</module>
 		<module>52n-sos-hibernate-core</module>
@@ -31,7 +29,12 @@
 		<conf.sos.build.properties>${project.parent.basedir}/build.properties</conf.sos.build.properties>
 		<!-- Source encoding during build process ** !!! DO NOT CHANGE !!! ** -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<conf.n52.common-xml.version>1.1.2</conf.n52.common-xml.version>
+		<n52.common.xml.version>1.1.2</n52.common.xml.version>
+		<!-- Logger configuration --> 
+		<config.logger.fileappender.filepath>${catalina.base}/logs</config.logger.fileappender.filepath>
+		<config.logger.fileappender.filename>${conf.sos.name}</config.logger.fileappender.filename>
+		<config.logger.level>INFO</config.logger.level>
+		<config.logger.history.max>30</config.logger.history.max>
 	</properties>
 
 	<dependencyManagement>
@@ -51,6 +54,11 @@
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
 				<version>1.6.6</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>1.0.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -107,52 +115,52 @@
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-gml-v321</artifactId>
-			    <version>${conf.n52.common-xml.version}</version>
+			    <version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-filter-v20</artifactId>
-			    <version>${conf.n52.common-xml.version}</version>
+			    <version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-sweCommon-v20</artifactId>
-			    <version>${conf.n52.common-xml.version}</version>
+			    <version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-sweCommon-v101</artifactId>
-			    <version>${conf.n52.common-xml.version}</version>
+			    <version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-sensorML-v101</artifactId>
-			    <version>${conf.n52.common-xml.version}</version>
+			    <version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-om-v20</artifactId>
-			    <version>${conf.n52.common-xml.version}</version>
+			    <version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-sampling-v20</artifactId>
-			    <version>${conf.n52.common-xml.version}</version>
+			    <version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-ows-v110</artifactId>
-			    <version>${conf.n52.common-xml.version}</version>
+			    <version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-sos-v20</artifactId>
-			    <version>${conf.n52.common-xml.version}</version>
+			    <version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.n52.sensorweb</groupId>
 			    <artifactId>52n-xml-sos-v100</artifactId>
-			    <version>${conf.n52.common-xml.version}</version>
+			    <version>${n52.common.xml.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -323,6 +331,31 @@
 	</repositories>
 
 	<profiles>
+		<profile>
+			<id>both</id>
+			<modules>
+				<module>52n-sos-binding-kvp</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>kvp</id>
+			<properties>
+				<conf.sos.name>52nSOSv4.0.0_kvp</conf.sos.name>
+			</properties>
+			<modules>
+				<module>52n-sos-binding-kvp</module>
+				<module>52n-sos-binding-soap</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>soap</id>
+			<properties>
+				<conf.sos.name>52nSOSv4.0.0_soap</conf.sos.name>
+			</properties>
+			<modules>
+				<module>52n-sos-binding-soap</module>
+			</modules>
+		</profile>
 		<profile>
 			<id>develope</id>
 			<modules>
