@@ -118,37 +118,45 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
     @Override
     public OWSOperation getOperationsMetadata(String service, String version, Object connection)
             throws OwsExceptionReport {
-        OWSOperation opsMeta = new OWSOperation();
-        // set operation name
-        opsMeta.setOperationName(OPERATION_NAME);
-        // set param DCP
+        // get DCP
         DecoderKeyType dkt = null;
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
         } else {
             dkt = new DecoderKeyType(SWEConstants.NS_SWES_20);
         }
-        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt,
-                Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
-        // set param procedure
-        opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(), new OWSParameterValuePossibleValues(Configurator.getInstance()
-                .getCapabilitiesCacheController().getProcedures()));
-        // set param output format
-        List<String> outputFormatValues = new ArrayList<String>(1);
-        String parameterName = null;
-     // FIXME: getTypes from Decoder
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            outputFormatValues.add(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE);
-            parameterName = Sos1Constants.DescribeSensorParams.outputFormat.name();
-        } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
-            outputFormatValues.add(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
-           parameterName = Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name();
+        Map<String, List<String>> dcpMap =
+                SosHelper.getDCP(OPERATION_NAME, dkt, Configurator.getInstance().getBindingOperators().values(),
+                        Configurator.getInstance().getServiceURL());
+        if (dcpMap != null && !dcpMap.isEmpty()) {
+            OWSOperation opsMeta = new OWSOperation();
+            // set operation name
+            opsMeta.setOperationName(OPERATION_NAME);
+            // set DCP
+            opsMeta.setDcp(dcpMap);
+            // set param procedure
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(),
+                    new OWSParameterValuePossibleValues(Configurator.getInstance().getCapabilitiesCacheController()
+                            .getProcedures()));
+            // set param output format
+            List<String> outputFormatValues = new ArrayList<String>(1);
+            String parameterName = null;
+            // FIXME: getTypes from Decoder
+            if (version.equals(Sos1Constants.SERVICEVERSION)) {
+                outputFormatValues.add(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE);
+                parameterName = Sos1Constants.DescribeSensorParams.outputFormat.name();
+            } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
+                outputFormatValues.add(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
+                parameterName = Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name();
+            }
+            if (parameterName != null) {
+                opsMeta.addParameterValue(parameterName, new OWSParameterValuePossibleValues(outputFormatValues));
+            }
+
+            return opsMeta;
         }
-        if (parameterName != null) { 
-            opsMeta.addParameterValue(parameterName, new OWSParameterValuePossibleValues(outputFormatValues));
-        }
-        
-        return opsMeta;
+        return null;
+
     }
 
     /*
@@ -203,7 +211,7 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
         String filename = null;
         String smlFile = null;
         String descriptionFormat = null;
-        // TODO: check and query for validTime parameter 
+        // TODO: check and query for validTime parameter
         Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(procID, session);
         Set<ValidProcedureTime> validProcedureTimes = procedure.getValidProcedureTimes();
         for (ValidProcedureTime validProcedureTime : validProcedureTimes) {

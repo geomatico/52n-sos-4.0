@@ -23,6 +23,9 @@
  */
 package org.n52.sos.ds.hibernate;
 
+import java.util.List;
+import java.util.Map;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -85,17 +88,23 @@ public class DeleteSensorDAO implements IDeleteSensorDAO {
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
 
-        OWSOperation opsMeta = new OWSOperation();
-        // set operation name
-        opsMeta.setOperationName(OPERATION_NAME);
-        // set DCP
+        // get DCP
         DecoderKeyType dkt = new DecoderKeyType(SWEConstants.NS_SWES_20);
-        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt,
-                Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
-        // set param procedure
-        opsMeta.addParameterValue(Sos2Constants.DeleteSensorParams.procedure.name(), new OWSParameterValuePossibleValues(Configurator.getInstance()
-                .getCapabilitiesCacheController().getProcedures()));
-        return opsMeta;
+        Map<String, List<String>> dcpMap = SosHelper.getDCP(OPERATION_NAME, dkt,
+                Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL());
+        if (dcpMap != null && !dcpMap.isEmpty()) {
+            OWSOperation opsMeta = new OWSOperation();
+            // set operation name
+            opsMeta.setOperationName(OPERATION_NAME);
+           // set DCP
+            opsMeta.setDcp(dcpMap);
+            // set param procedure
+            opsMeta.addParameterValue(Sos2Constants.DeleteSensorParams.procedure.name(), new OWSParameterValuePossibleValues(Configurator.getInstance()
+                    .getCapabilitiesCacheController().getProcedures()));
+            return opsMeta;
+        }
+        return null;
+
     }
 
     @Override

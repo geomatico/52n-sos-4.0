@@ -23,6 +23,9 @@
  */
 package org.n52.sos.ds.hibernate;
 
+import java.util.List;
+import java.util.Map;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -86,16 +89,21 @@ public class InsertResultTemplateDAO implements IInsertResultTemplateDAO {
             LOGGER.error(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
-
-        OWSOperation opsMeta = new OWSOperation();
-        // set operation name
-        opsMeta.setOperationName(OPERATION_NAME);
-        // set DCP
+        // get DCP
         DecoderKeyType dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
-        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt,
-                Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
-        // TODO set parameter
-        return opsMeta;
+        Map<String, List<String>> dcpMap =
+                SosHelper.getDCP(OPERATION_NAME, dkt, Configurator.getInstance().getBindingOperators().values(),
+                        Configurator.getInstance().getServiceURL());
+        if (dcpMap != null && !dcpMap.isEmpty()) {
+            OWSOperation opsMeta = new OWSOperation();
+            // set operation name
+            opsMeta.setOperationName(OPERATION_NAME);
+            // set DCP
+            opsMeta.setDcp(dcpMap);
+            // TODO set parameter
+            return opsMeta;
+        }
+        return null;
     }
 
     @Override
@@ -133,7 +141,8 @@ public class InsertResultTemplateDAO implements IInsertResultTemplateDAO {
                     // TODO make better exception.
                     StringBuilder exceptionText = new StringBuilder();
                     exceptionText.append("The observationType is not supported!");
-                    throw Util4Exceptions.createInvalidParameterValueException("observationType", exceptionText.toString());
+                    throw Util4Exceptions.createInvalidParameterValueException("observationType",
+                            exceptionText.toString());
                 }
             }
             transaction.commit();

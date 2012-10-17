@@ -25,6 +25,7 @@ package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
@@ -52,6 +53,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosResultEncoding;
 import org.n52.sos.ogc.sos.SosResultStructure;
+import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
@@ -114,16 +116,21 @@ public class InsertResultDAO implements IInsertResultDAO {
             LOGGER.error(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
-
-        OWSOperation opsMeta = new OWSOperation();
-        // set operation name
-        opsMeta.setOperationName(OPERATION_NAME);
-        // set DCP
+        // get DCP
         DecoderKeyType dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
-        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt,
-                Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
-        // TODO set parameter
-        return opsMeta;
+        Map<String, List<String>> dcpMap =
+                SosHelper.getDCP(OPERATION_NAME, dkt, Configurator.getInstance().getBindingOperators().values(),
+                        Configurator.getInstance().getServiceURL());
+        if (dcpMap != null && !dcpMap.isEmpty()) {
+            OWSOperation opsMeta = new OWSOperation();
+            // set operation name
+            opsMeta.setOperationName(OPERATION_NAME);
+            // set DCP
+            opsMeta.setDcp(dcpMap);
+            // TODO set parameter
+            return opsMeta;
+        }
+        return null;
     }
 
     @Override

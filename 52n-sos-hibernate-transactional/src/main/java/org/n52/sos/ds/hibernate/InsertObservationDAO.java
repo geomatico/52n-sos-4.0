@@ -25,6 +25,7 @@ package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -96,29 +97,35 @@ public class InsertObservationDAO implements IInsertObservationDAO {
             LOGGER.error(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
-
-        OWSOperation opsMeta = new OWSOperation();
-        // set operation name
-        opsMeta.setOperationName(OPERATION_NAME);
-
+        
+        // get DCP
         DecoderKeyType dkt = null;
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
         } else {
             dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
         }
-        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt,
-                Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
-        // set offering
-        opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.offering.name(),
-                new OWSParameterValuePossibleValues(Configurator.getInstance().getCapabilitiesCacheController()
-                        .getOfferings()));
-        // set observation
-        opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.observation.name(),
-                new OWSParameterValuePossibleValues(new ArrayList<String>(0)));
-        opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.observation.name(), new OWSParameterDataType(
-                "http://schemas.opengis.net/om/2.0/observation.xsd#OM_Observation"));
-        return opsMeta;
+        Map<String, List<String>> dcpMap = SosHelper.getDCP(OPERATION_NAME, dkt,
+                Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL());
+        if (dcpMap != null && !dcpMap.isEmpty()) {
+            OWSOperation opsMeta = new OWSOperation();
+            // set operation name
+            opsMeta.setOperationName(OPERATION_NAME);
+    
+            // set DCP
+            opsMeta.setDcp(dcpMap);
+            // set offering
+            opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.offering.name(),
+                    new OWSParameterValuePossibleValues(Configurator.getInstance().getCapabilitiesCacheController()
+                            .getOfferings()));
+            // set observation
+            opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.observation.name(),
+                    new OWSParameterValuePossibleValues(new ArrayList<String>(0)));
+            opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.observation.name(), new OWSParameterDataType(
+                    "http://schemas.opengis.net/om/2.0/observation.xsd#OM_Observation"));
+            return opsMeta;
+        }
+        return null;
     }
 
     @Override

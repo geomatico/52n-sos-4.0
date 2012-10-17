@@ -25,6 +25,7 @@ package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -51,7 +52,6 @@ import org.n52.sos.ogc.ows.OWSParameterDataType;
 import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
-import org.n52.sos.ogc.sensorML.AbstractSensorML;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -108,48 +108,54 @@ public class InsertSensorDAO implements IInsertSensorDAO {
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
 
-        OWSOperation opsMeta = new OWSOperation();
-
         // get data depending on SOS version
         DecoderKeyType dkt = null;
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            // set operation name
-            opsMeta.setOperationName(Sos1Constants.Operations.RegisterSensor.name());
             dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
-            // set DCP
-            opsMeta.setDcp(SosHelper.getDCP(Sos1Constants.Operations.RegisterSensor.name(), dkt, Configurator
-                    .getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
-            // set param sensorDescription
-            opsMeta.addParameterValue(Sos1Constants.RegisterSensorParams.SensorDescription.name(),
-                    new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
-            // set observationTemplate
-            opsMeta.addParameterValue(Sos1Constants.RegisterSensorParams.ObservationTemplate.name(),
-                    new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
         } else {
-            // set operation name
-            opsMeta.setOperationName(OPERATION_NAME);
             dkt = new DecoderKeyType(SWEConstants.NS_SWES_20);
-            // set DCP
-            opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt, Configurator.getInstance().getBindingOperators()
-                    .values(), Configurator.getInstance().getServiceURL()));
-            // set param procedureDescription
-            opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.procedureDescription.name(),
-                    new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
-            // set param procedureDescriptionFormat
-            opsMeta.addParameterValue(
-                    Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name(),
-                    new OWSParameterValuePossibleValues(HibernateCriteriaQueryUtilities
-                            .getProcedureDescriptionFormatIdentifiers(session)));
-            // set param observableProperty
-            opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.observableProperty.name(),
-                    new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
-            // set param metadata
-            opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.metadata.name(),
-                    new OWSParameterValuePossibleValues(new ArrayList<String>(0)));
-            opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.metadata.name(), new OWSParameterDataType(
-                    "http://schemas.opengis.net/sos/2.0/sosInsertionCapabilities.xsd#InsertionCapabilities"));
         }
-        return opsMeta;
+        Map<String, List<String>> dcpMap =
+                SosHelper.getDCP(Sos1Constants.Operations.RegisterSensor.name(), dkt, Configurator.getInstance()
+                        .getBindingOperators().values(), Configurator.getInstance().getServiceURL());
+        if (dcpMap != null && !dcpMap.isEmpty()) {
+            OWSOperation opsMeta = new OWSOperation();
+            if (version.equals(Sos1Constants.SERVICEVERSION)) {
+                // set operation name
+                opsMeta.setOperationName(Sos1Constants.Operations.RegisterSensor.name());
+                // set DCP
+                opsMeta.setDcp(dcpMap);
+                // set param sensorDescription
+                opsMeta.addParameterValue(Sos1Constants.RegisterSensorParams.SensorDescription.name(),
+                        new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
+                // set observationTemplate
+                opsMeta.addParameterValue(Sos1Constants.RegisterSensorParams.ObservationTemplate.name(),
+                        new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
+            } else {
+                // set operation name
+                opsMeta.setOperationName(OPERATION_NAME);
+                // set DCP
+                opsMeta.setDcp(dcpMap);
+                // set param procedureDescription
+                opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.procedureDescription.name(),
+                        new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
+                // set param procedureDescriptionFormat
+                opsMeta.addParameterValue(
+                        Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name(),
+                        new OWSParameterValuePossibleValues(HibernateCriteriaQueryUtilities
+                                .getProcedureDescriptionFormatIdentifiers(session)));
+                // set param observableProperty
+                opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.observableProperty.name(),
+                        new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
+                // set param metadata
+                opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.metadata.name(),
+                        new OWSParameterValuePossibleValues(new ArrayList<String>(0)));
+                opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.metadata.name(), new OWSParameterDataType(
+                        "http://schemas.opengis.net/sos/2.0/sosInsertionCapabilities.xsd#InsertionCapabilities"));
+            }
+            return opsMeta;
+        }
+        return null;
     }
 
     @Override
@@ -177,15 +183,17 @@ public class InsertSensorDAO implements IInsertSensorDAO {
                 Procedure procedure =
                         HibernateCriteriaTransactionalUtilities.getOrInsertProcedure(assignedProcedureID,
                                 procedureDescriptionFormat, observationTypes, featureOfInterestTypes, session);
-                // TODO: set correct validTime, 
-                HibernateCriteriaTransactionalUtilities.insertValidProcedureTime(procedure,
-                        getSensorDescriptionFromProcedureDescription(request.getProcedureDescription(), assignedProcedureID), new DateTime(), session);
+                // TODO: set correct validTime,
+                HibernateCriteriaTransactionalUtilities.insertValidProcedureTime(
+                        procedure,
+                        getSensorDescriptionFromProcedureDescription(request.getProcedureDescription(),
+                                assignedProcedureID), new DateTime(), session);
                 List<ObservableProperty> obsProps =
                         getOrInsertNewObservableProperties(request.getObservableProperty(), session);
                 Offering offering =
                         insertNewOffering(assignedOffering, request.getRelatatedFeature(), observationTypes, session);
-                HibernateCriteriaTransactionalUtilities.checkOrInsertObservationConstellation(procedure, obsProps, offering,
-                        session);
+                HibernateCriteriaTransactionalUtilities.checkOrInsertObservationConstellation(procedure, obsProps,
+                        offering, session);
                 // TODO: parent and child procedures
                 response.setAssignedProcedure(assignedProcedureID);
                 response.setAssignedOffering(assignedOffering.getOfferingIdentifier());
@@ -311,7 +319,8 @@ public class InsertSensorDAO implements IInsertSensorDAO {
         return HibernateCriteriaTransactionalUtilities.getOrInsertObservableProperty(observableProperties, session);
     }
 
-    private String getSensorDescriptionFromProcedureDescription(SosProcedureDescription procedureDescription, String procedureIdentifier) {
+    private String getSensorDescriptionFromProcedureDescription(SosProcedureDescription procedureDescription,
+            String procedureIdentifier) {
         if (procedureDescription instanceof SensorML) {
             SensorML sensorML = (SensorML) procedureDescription;
             // if SensorML is not a wrapper

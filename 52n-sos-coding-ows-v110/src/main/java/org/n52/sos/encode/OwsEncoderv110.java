@@ -329,19 +329,27 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
      */
     private void encodeDCP(DCP dcp, Map<String, List<String>> supportedDcp) {
         HTTP http = dcp.addNewHTTP();
-        for (String dcpGet : supportedDcp.get(SosConstants.HTTP_GET)) {
-            http.addNewGet().setHref(dcpGet);
+        if (supportedDcp.containsKey(SosConstants.HTTP_GET)) {
+            for (String dcpGet : supportedDcp.get(SosConstants.HTTP_GET)) {
+                http.addNewGet().setHref(dcpGet);
+            }
         }
-        for (String dcpPost : supportedDcp.get(SosConstants.HTTP_POST)) {
-            http.addNewPost().setHref(dcpPost);
+        if (supportedDcp.containsKey(SosConstants.HTTP_POST)) {
+            for (String dcpPost : supportedDcp.get(SosConstants.HTTP_POST)) {
+                http.addNewPost().setHref(dcpPost);
+            }
         }
         // TODO add if ows supports more than get and post
         /*
-        for (String dcpPut : supportedDcp.get(SosConstants.HTTP_PUT)) {
-            http.addNewPut().setHref(dcpPut);
+        if (supportedDcp.containsKey(SosConstants.HTTP_PUT)) {
+            for (String dcpPut : supportedDcp.get(SosConstants.HTTP_PUT)) {
+                http.addNewPut().setHref(dcpPut);
+            }
         }
-        for (String dcpDelete : supportedDcp.get(SosConstants.HTTP_DELETE)) {
-            http.addNewDelete().setHref(dcpDelete);
+        if (supportedDcp.containsKey(SosConstants.HTTP_DELETE)) {
+            for (String dcpDelete : supportedDcp.get(SosConstants.HTTP_DELETE)) {
+                http.addNewDelete().setHref(dcpDelete);
+            }
         }
         */
     }

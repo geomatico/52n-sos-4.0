@@ -450,11 +450,20 @@ public class SosHelper {
             // e);
             throw owse;
         }
+        
         Map<String, List<String>> dcp = new HashMap<String, List<String>>();
-        dcp.put(SosConstants.HTTP_GET, httpGetUrls);
-        dcp.put(SosConstants.HTTP_POST, httpPostUrls);
-        dcp.put(SosConstants.HTTP_PUT, httpPutUrls);
-        dcp.put(SosConstants.HTTP_DELETE, httpDeleteUrls);
+        if (!httpGetUrls.isEmpty()) {
+            dcp.put(SosConstants.HTTP_GET, httpGetUrls);
+        }
+        if (!httpPostUrls.isEmpty()) {
+            dcp.put(SosConstants.HTTP_POST, httpPostUrls);
+        }
+        if (!httpPutUrls.isEmpty()) {
+            dcp.put(SosConstants.HTTP_PUT, httpPutUrls);
+        }
+        if (!httpDeleteUrls.isEmpty()) {
+            dcp.put(SosConstants.HTTP_DELETE, httpDeleteUrls);
+        }
         return dcp;
     }
 

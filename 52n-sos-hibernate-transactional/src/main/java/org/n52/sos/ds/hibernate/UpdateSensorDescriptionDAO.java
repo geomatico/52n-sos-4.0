@@ -25,6 +25,8 @@ package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.HibernateException;
@@ -97,30 +99,36 @@ public class UpdateSensorDescriptionDAO implements IUpdateSensorDescriptionDAO {
             LOGGER.error(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
-
-        OWSOperation opsMeta = new OWSOperation();
-        // set operation name
-        opsMeta.setOperationName(OPERATION_NAME);
-        // set DCP
+        // get DCP
         DecoderKeyType dkt = new DecoderKeyType(SWEConstants.NS_SWES_20);
-        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt,
-                Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
-        // set param procedure
-        Collection<String> procedures = Configurator.getInstance().getCapabilitiesCacheController().getProcedures();
-        opsMeta.addParameterValue(Sos2Constants.UpdateSensorDescriptionParams.procedure.name(),
-                new OWSParameterValuePossibleValues(Configurator.getInstance().getCapabilitiesCacheController()
-                        .getProcedures()));
-        // set param procedureDescriptionFormat
-        if (version.equals(Sos2Constants.SERVICEVERSION)) {
-            opsMeta.addParameterValue(
-                    Sos2Constants.UpdateSensorDescriptionParams.procedureDescriptionFormat.name(),
-                    new OWSParameterValuePossibleValues(HibernateCriteriaQueryUtilities
-                            .getProcedureDescriptionFormatIdentifiers(session)));
+        Map<String, List<String>> dcpMap =
+                SosHelper.getDCP(OPERATION_NAME, dkt, Configurator.getInstance().getBindingOperators().values(),
+                        Configurator.getInstance().getServiceURL());
+        if (dcpMap != null && !dcpMap.isEmpty()) {
+            OWSOperation opsMeta = new OWSOperation();
+            // set operation name
+            opsMeta.setOperationName(OPERATION_NAME);
+            // set DCP
+            opsMeta.setDcp(dcpMap);
+            // set param procedure
+            Collection<String> procedures =
+                    Configurator.getInstance().getCapabilitiesCacheController().getProcedures();
+            opsMeta.addParameterValue(Sos2Constants.UpdateSensorDescriptionParams.procedure.name(),
+                    new OWSParameterValuePossibleValues(Configurator.getInstance().getCapabilitiesCacheController()
+                            .getProcedures()));
+            // set param procedureDescriptionFormat
+            if (version.equals(Sos2Constants.SERVICEVERSION)) {
+                opsMeta.addParameterValue(
+                        Sos2Constants.UpdateSensorDescriptionParams.procedureDescriptionFormat.name(),
+                        new OWSParameterValuePossibleValues(HibernateCriteriaQueryUtilities
+                                .getProcedureDescriptionFormatIdentifiers(session)));
+            }
+            // set param description
+            opsMeta.addParameterValue(Sos2Constants.UpdateSensorDescriptionParams.description.name(),
+                    new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
+            return opsMeta;
         }
-        // set param description
-        opsMeta.addParameterValue(Sos2Constants.UpdateSensorDescriptionParams.description.name(),
-                new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
-        return opsMeta;
+        return null;
     }
 
     @Override

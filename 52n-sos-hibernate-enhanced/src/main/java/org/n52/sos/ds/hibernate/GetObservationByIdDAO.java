@@ -92,22 +92,30 @@ public class GetObservationByIdDAO implements IGetObservationByIdDAO {
             LOGGER.error(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
-        OWSOperation opsMeta = new OWSOperation();
-        // set operation name
-        opsMeta.setOperationName(OPERATION_NAME);
-        // set DCP
+        // get DCP
         DecoderKeyType dkt = null;
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
         } else {
             dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
         }
-        opsMeta.setDcp(SosHelper.getDCP(OPERATION_NAME, dkt,
-                Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
-        // set identifier
-        opsMeta.addParameterValue(Sos2Constants.GetObservationByIdParams.observation.name(),
-                new OWSParameterValuePossibleValues(HibernateCriteriaQueryUtilities.getObservationIdentifiers(session)));
-        return opsMeta;
+        Map<String, List<String>> dcpMap =
+                SosHelper.getDCP(OPERATION_NAME, dkt, Configurator.getInstance().getBindingOperators().values(),
+                        Configurator.getInstance().getServiceURL());
+        if (dcpMap != null && !dcpMap.isEmpty()) {
+            OWSOperation opsMeta = new OWSOperation();
+            // set operation name
+            opsMeta.setOperationName(OPERATION_NAME);
+            // set DCP
+            opsMeta.setDcp(dcpMap);
+            // set identifier
+            opsMeta.addParameterValue(
+                    Sos2Constants.GetObservationByIdParams.observation.name(),
+                    new OWSParameterValuePossibleValues(HibernateCriteriaQueryUtilities
+                            .getObservationIdentifiers(session)));
+            return opsMeta;
+        }
+        return null;
     }
 
     @Override

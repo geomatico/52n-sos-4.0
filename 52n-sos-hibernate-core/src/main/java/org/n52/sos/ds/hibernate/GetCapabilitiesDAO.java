@@ -365,8 +365,12 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         for (RequestOperatorKeyType requestOperatorKeyType : requestOperators.keySet()) {
             if (!requestOperatorKeyType.getOperationName().equals(OPERATION_NAME)
                     && requestOperatorKeyType.getServiceOperatorKeyType().getVersion().equals(version)) {
-                opsMetadata.add(requestOperators.get(requestOperatorKeyType).getOperationMetadata(service, version,
-                        session));
+                OWSOperation operationMetadata = requestOperators.get(requestOperatorKeyType).getOperationMetadata(service, version,
+                        session);
+                if (operationMetadata != null) {
+                    opsMetadata.add(requestOperators.get(requestOperatorKeyType).getOperationMetadata(service, version,
+                            session));
+                }
             }
         }
         operationsMetadata.setOperations(opsMetadata);
@@ -635,8 +639,12 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
 
                 // set response format
                 Collection<String> responseFormats = SosHelper.getSupportedResponseFormats(SosConstants.SOS, version);
-                responseFormats.add(SosConstants.CONTENT_TYPE_ZIP);
                 sosOffering.setResponseFormats(responseFormats);
+                // TODO set as property
+                if (true) {
+                    responseFormats.add(SosConstants.CONTENT_TYPE_ZIP);
+                }
+                
 
                 sosOfferings.add(sosOffering);
             }
