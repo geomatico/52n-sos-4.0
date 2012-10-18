@@ -138,7 +138,7 @@ public class GetObservationDAO implements IGetObservationDAO {
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
         } else {
-            dkt = new DecoderKeyType(SWEConstants.NS_SWES_20);
+            dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
         }
         Map<String, List<String>> dcpMap =
                 SosHelper.getDCP(OPERATION_NAME, dkt, Configurator.getInstance().getBindingOperators().values(),
