@@ -336,13 +336,13 @@
 			<id>both</id>
 			<modules>
 				<module>52n-sos-binding-kvp</module>
+				<module>52n-sos-binding-soap</module>
 			</modules>
 		</profile>
 		<profile>
 			<id>kvp</id>
 			<modules>
 				<module>52n-sos-binding-kvp</module>
-				<module>52n-sos-binding-soap</module>
 			</modules>
 		</profile>
 		<profile>
@@ -354,6 +354,8 @@
 		<profile>
 			<id>develope</id>
 			<modules>
+				<module>52n-sos-binding-kvp</module>
+				<module>52n-sos-binding-soap</module>
 				<module>52n-sos-enhanced-v20</module>
 				<module>52n-sos-hibernate-enhanced</module>
 				<module>52n-sos-transactional-v20</module>
