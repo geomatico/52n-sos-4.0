@@ -26,11 +26,11 @@ http://www.opengis.net/swes/2.0 http://schemas.opengis.net/swes/2.0/swes.xsd" xm
                            </sml:identifier>
 		                </sml:IdentifierList>
 		              </sml:identification>
-		              <capabilities name="parentProcedures">
+		              <sml:capabilities name="parentProcedures">
 		                <swe:SimpleDataRecord>
 		                  <gml:metaDataProperty xlink:title="http://www.my_namespace.org/sensors/1821241365" xlink:href="http://localhost:8080/52nSOSv4.0.0/kvp?request=DescribeSensor&amp;service=SOS&amp;version=2.0.0&amp;procedure=http://www.my_namespace.org/sensors/1821241365&amp;procedureDescriptionFormat=http%3A%2F%2Fwww.opengis.net%2FsensorML%2F1.0.1"/>
 		                </swe:SimpleDataRecord>
-		              </capabilities>
+		              </sml:capabilities>
 		              <sml:position name="sensorPosition">
 		                <swe:Position referenceFrame="urn:ogc:def:crs:EPSG::4326">
 		                  <swe:location>
@@ -89,7 +89,7 @@ http://www.opengis.net/swes/2.0 http://schemas.opengis.net/swes/2.0/swes.xsd" xm
 		                      <sml:position name="sensorPosition">
 		                        <swe:Position referenceFrame="urn:ogc:def:crs:EPSG::4326">
 		                          <swe:location>
-		                            <swe:Vector gml:id="STATION_LOCATION">
+		                            <swe:Vector gml:id="STATION_LOCATION_2">
 		                              <swe:coordinate name="easting">
 		                                <swe:Quantity axisID="x">
 		                                  <swe:uom code="degree"/>
@@ -143,8 +143,8 @@ http://www.opengis.net/swes/2.0 http://schemas.opengis.net/swes/2.0/swes.xsd" xm
 			<swes:observableProperty>http://52north.org/def/obsProp/boolean</swes:observableProperty>
 			<swes:relatedFeature>
 				<swes:FeatureRelationship>
-					<swes:target xlink:href="http://52north.org/relatedFeature/100" />
 					<swes:role>http://www.opengis.net/def/nil/OGC/0/unknown</swes:role>
+					<swes:target xlink:href="http://52north.org/relatedFeature/100" />
 				</swes:FeatureRelationship>
 			</swes:relatedFeature>
 			<swes:metadata>
