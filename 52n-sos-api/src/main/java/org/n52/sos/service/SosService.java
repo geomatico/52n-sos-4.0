@@ -90,7 +90,7 @@ public class SosService extends HttpServlet {
 
         ServiceResponse sosResp = null;
         try {
-            sosResp = getBindingOperatorForServletPath(req.getRequestURI()).doDeleteperation(req);
+            sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doDeleteperation(req);
         } catch (OwsExceptionReport owse) {
             sosResp = handleOwsExceptionReport(owse);
         }
@@ -115,7 +115,7 @@ public class SosService extends HttpServlet {
 	
 	    ServiceResponse sosResp = null;
 	    try {
-	        sosResp = getBindingOperatorForServletPath(req.getRequestURI()).doGetOperation(req);
+	        sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doGetOperation(req);
 	    } catch (OwsExceptionReport owse) {
 	        sosResp = handleOwsExceptionReport(owse);
 	    }
@@ -138,7 +138,7 @@ public class SosService extends HttpServlet {
 
         ServiceResponse sosResp = null;
         try {
-            sosResp = getBindingOperatorForServletPath(req.getRequestURI()).doPostOperation(req);
+            sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doPostOperation(req);
         } catch (OwsExceptionReport owse) {
             sosResp = handleOwsExceptionReport(owse);
         }
@@ -153,7 +153,7 @@ public class SosService extends HttpServlet {
 
         ServiceResponse sosResp = null;
         try {
-            sosResp = getBindingOperatorForServletPath(req.getRequestURI()).doPutOperation(req);
+            sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doPutOperation(req);
         } catch (OwsExceptionReport owse) {
             sosResp = handleOwsExceptionReport(owse);
         }
@@ -175,7 +175,7 @@ public class SosService extends HttpServlet {
 
         ServiceResponse sosResp = null;
         try {
-            sosResp = getBindingOperatorForServletPath(req.getRequestURI()).doOptionsOperation(req);
+            sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doOptionsOperation(req);
         } catch (OwsExceptionReport owse) {
             sosResp = handleOwsExceptionReport(owse);
         }
@@ -316,7 +316,7 @@ public class SosService extends HttpServlet {
      * @throws OwsExceptionReport 
      * 			If the URL pattern is not supported by this SOS.
      */
-    private Binding getBindingOperatorForServletPath(String requestURI) throws OwsExceptionReport {
+    private Binding getBindingOperatorForRequestURI(String requestURI) throws OwsExceptionReport {
         Binding bindingOperator = null;
         for (String bindingOperatorKey : Configurator.getInstance().getBindingOperators().keySet()) {
             if (requestURI.contains(bindingOperatorKey)) {
