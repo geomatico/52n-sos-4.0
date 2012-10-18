@@ -56,7 +56,11 @@ import net.opengis.sos.x20.GetObservationByIdResponseType;
 import net.opengis.sos.x20.GetObservationResponseDocument;
 import net.opengis.sos.x20.GetObservationResponseType;
 import net.opengis.sos.x20.GetResultDocument;
+import net.opengis.sos.x20.GetResultResponseDocument;
+import net.opengis.sos.x20.GetResultResponseType;
 import net.opengis.sos.x20.GetResultTemplateDocument;
+import net.opengis.sos.x20.GetResultTemplateResponseDocument;
+import net.opengis.sos.x20.GetResultTemplateResponseType;
 import net.opengis.sos.x20.GetResultTemplateType;
 import net.opengis.sos.x20.GetResultType;
 import net.opengis.sos.x20.GetResultType.SpatialFilter;
@@ -100,6 +104,8 @@ import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.response.GetFeatureOfInterestResponse;
 import org.n52.sos.response.GetObservationByIdResponse;
 import org.n52.sos.response.GetObservationResponse;
+import org.n52.sos.response.GetResultResponse;
+import org.n52.sos.response.GetResultTemplateResponse;
 import org.n52.sos.response.InsertObservationResponse;
 import org.n52.sos.response.InsertResultResponse;
 import org.n52.sos.response.InsertResultTemplateResponse;
@@ -207,6 +213,10 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             return createInsertResultTemplateResponseDocument((InsertResultTemplateResponse)response);
         } else if (response instanceof InsertResultResponse) {
             return createInsertResultResponseDocument((InsertResultResponse)response);
+        } else if (response instanceof GetResultResponse) {
+            createGetResultResponseDocument((GetResultResponse)response);
+        } else if (response instanceof GetResultTemplateResponse) {
+            createGetResultTemplateResponseDocument((GetResultTemplateResponse)response);
         }
         return null;
     }
@@ -469,6 +479,34 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         return xbInsObsRespDoc;
     }
 
+    private XmlObject createInsertResultTemplateResponseDocument(InsertResultTemplateResponse response) throws OwsExceptionReport {
+        InsertResultTemplateResponseDocument insertResultTemplateResponseDoc = InsertResultTemplateResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        InsertResultTemplateResponseType insertResultTemplateResponse = insertResultTemplateResponseDoc.addNewInsertResultTemplateResponse();
+        insertResultTemplateResponse.setAcceptedTemplate(response.getAcceptedTemplate());
+        return insertResultTemplateResponseDoc;
+        
+    }
+    
+    private XmlObject createInsertResultResponseDocument(InsertResultResponse response) throws OwsExceptionReport {
+        InsertResultResponseDocument insertResultTemplateResponseDoc = InsertResultResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        insertResultTemplateResponseDoc.addNewInsertResultResponse();
+        return insertResultTemplateResponseDoc;
+    }
+    
+    private XmlObject createGetResultResponseDocument(GetResultResponse response) {
+        GetResultResponseDocument getResultResponseDoc = GetResultResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        GetResultResponseType getResultResponse = getResultResponseDoc.addNewGetResultResponse();
+        // TODO ...
+        return getResultResponse;
+    }
+    
+    private XmlObject createGetResultTemplateResponseDocument(GetResultTemplateResponse response) {
+        GetResultTemplateResponseDocument getResultTemplateResponseDoc = GetResultTemplateResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        GetResultTemplateResponseType getResultTemplateResponse = getResultTemplateResponseDoc.addNewGetResultTemplateResponse();
+        // TODO ...
+        return getResultTemplateResponseDoc;
+    }
+
     private XmlObject createGetCapabilitiesRequest(GetCapabilitiesRequest request) {
         // TODO Auto-generated method stub
         return null;
@@ -504,22 +542,8 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
        if (request.hasSpatialFilter()) {
            createSpatialFilter(getResult.addNewSpatialFilter(), request.getSpatialFilter());
        }
-       
+    
         return getResultDoc;
-    }
-    
-    private XmlObject createInsertResultTemplateResponseDocument(InsertResultTemplateResponse response) throws OwsExceptionReport {
-        InsertResultTemplateResponseDocument insertResultTemplateResponseDoc = InsertResultTemplateResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        InsertResultTemplateResponseType insertResultTemplateResponse = insertResultTemplateResponseDoc.addNewInsertResultTemplateResponse();
-        insertResultTemplateResponse.setAcceptedTemplate(response.getAcceptedTemplate());
-        return insertResultTemplateResponseDoc;
-        
-    }
-    
-    private XmlObject createInsertResultResponseDocument(InsertResultResponse response) throws OwsExceptionReport {
-        InsertResultResponseDocument insertResultTemplateResponseDoc = InsertResultResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        insertResultTemplateResponseDoc.addNewInsertResultResponse();
-        return insertResultTemplateResponseDoc;
     }
 
     /**

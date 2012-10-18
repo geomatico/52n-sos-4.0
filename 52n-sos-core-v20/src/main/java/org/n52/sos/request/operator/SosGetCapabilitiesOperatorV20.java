@@ -77,7 +77,7 @@ public class SosGetCapabilitiesOperatorV20 implements IRequestOperator {
                 new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION),
                         OPERATION_NAME);
         this.dao = (IGetCapabilitiesDAO) Configurator.getInstance().getOperationDAOs().get(OPERATION_NAME);
-        LOGGER.info("SosGetCapabilitiesOperatorV20 initialized successfully!");
+        LOGGER.info("{} initialized successfully!", this.getClass().getSimpleName());
     }
 
     @Override

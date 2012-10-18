@@ -80,7 +80,7 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
                 new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION),
                         OPERATION_NAME);
         this.dao = (IDescribeSensorDAO) Configurator.getInstance().getOperationDAOs().get(OPERATION_NAME);
-        LOGGER.info("SosDescribeSensorOperatorV20 initialized successfully!");
+        LOGGER.info("{} initialized successfully!", this.getClass().getSimpleName());
     }
 
     /*

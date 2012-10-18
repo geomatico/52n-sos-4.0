@@ -45,6 +45,8 @@ import net.opengis.sos.x20.GetResultResponseType;
 import net.opengis.sos.x20.GetResultTemplateDocument;
 import net.opengis.sos.x20.GetResultTemplateResponseDocument;
 import net.opengis.sos.x20.GetResultTemplateResponseType;
+import net.opengis.sos.x20.GetResultTemplateType;
+import net.opengis.sos.x20.GetResultType;
 import net.opengis.sos.x20.InsertObservationDocument;
 import net.opengis.sos.x20.InsertObservationType;
 import net.opengis.sos.x20.InsertObservationType.Observation;
@@ -74,6 +76,8 @@ import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.request.GetFeatureOfInterestRequest;
 import org.n52.sos.request.GetObservationByIdRequest;
 import org.n52.sos.request.GetObservationRequest;
+import org.n52.sos.request.GetResultRequest;
+import org.n52.sos.request.GetResultTemplateRequest;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.request.InsertResultRequest;
 import org.n52.sos.request.InsertResultTemplateRequest;
@@ -259,9 +263,9 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
         getObsRequest.setOfferings(Arrays.asList(getObsType.getOfferingArray()));
         getObsRequest.setObservedProperties(Arrays.asList(getObsType.getObservedPropertyArray()));
         getObsRequest.setProcedures(Arrays.asList(getObsType.getProcedureArray()));
-        getObsRequest.setEventTimes(Arrays.asList(parseTemporalFilters(getObsType.getTemporalFilterArray())));
+        getObsRequest.setEventTimes(Arrays.asList(parseTemporalFilters4GetObservation(getObsType.getTemporalFilterArray())));
         if (getObsType.isSetSpatialFilter()) {
-            getObsRequest.setSpatialFilter(parseSpatialFilter4GetObs(getObsType.getSpatialFilter()));
+            getObsRequest.setSpatialFilter(parseSpatialFilter4GetObservation(getObsType.getSpatialFilter()));
         }
         getObsRequest.setFeatureIdentifiers(Arrays.asList(getObsType.getFeatureOfInterestArray()));
         if (getObsType.isSetResponseFormat()) {
@@ -294,7 +298,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
         getFoiRequest.setFeatureIdentifiers(Arrays.asList(getFoiType.getFeatureOfInterestArray()));
         getFoiRequest.setObservedProperties(Arrays.asList(getFoiType.getObservedPropertyArray()));
         getFoiRequest.setProcedures(Arrays.asList(getFoiType.getProcedureArray()));
-        getFoiRequest.setSpatialFilters(parseSpatialFilters4GetFoi(getFoiType.getSpatialFilterArray()));
+        getFoiRequest.setSpatialFilters(parseSpatialFilters4GetFeatureOfInterest(getFoiType.getSpatialFilterArray()));
 
         return getFoiRequest;
     }
@@ -384,14 +388,30 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
         return sosInsertResultRequest;
     }
 
-    private AbstractServiceRequest parseGetResult(GetResultDocument getResultTemplateDoc) {
-        // TODO Auto-generated method stub
-        return null;
+    private AbstractServiceRequest parseGetResult(GetResultDocument getResultDoc) throws OwsExceptionReport {
+        GetResultType getResult = getResultDoc.getGetResult();
+        GetResultRequest sosGetResultRequest = new GetResultRequest();
+        sosGetResultRequest.setService(getResult.getService());
+        sosGetResultRequest.setVersion(getResult.getVersion());
+        sosGetResultRequest.setOffering(getResult.getOffering());
+        sosGetResultRequest.setObservedProperty(getResult.getObservedProperty());
+        sosGetResultRequest.setFeatureOfInterest(Arrays.asList(getResult.getFeatureOfInterestArray()));
+        getResult.getFeatureOfInterestArray();
+        if (getResult.isSetSpatialFilter()) {
+            sosGetResultRequest.setSpatialFilter(parseSpatialFilter4GetResult(getResult.getSpatialFilter()));
+        }
+        sosGetResultRequest.setTemporalFilter(parseTemporalFilters4GetResult(getResult.getTemporalFilterArray()));
+        return sosGetResultRequest;
     }
 
     private AbstractServiceRequest parseGetResultTemplate(GetResultTemplateDocument getResultTemplateDoc) {
-        // TODO Auto-generated method stub
-        return null;
+        GetResultTemplateType getResultTemplate = getResultTemplateDoc.getGetResultTemplate();
+        GetResultTemplateRequest sosGetResultTemplateRequest = new GetResultTemplateRequest();
+        sosGetResultTemplateRequest.setService(getResultTemplate.getService());
+        sosGetResultTemplateRequest.setVersion(getResultTemplate.getVersion());
+        sosGetResultTemplateRequest.setOffering(getResultTemplate.getOffering());
+        sosGetResultTemplateRequest.setObservedProperty(getResultTemplate.getObservedProperty());
+        return sosGetResultTemplateRequest;
     }
 
     private AbstractServiceResponse parseGetResultTemplateResponse(
@@ -428,7 +448,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
      * @throws OwsExceptionReport
      *             if creation of the SpatialFilter failed
      */
-    private SpatialFilter parseSpatialFilter4GetObs(net.opengis.sos.x20.GetObservationType.SpatialFilter spatialFilter)
+    private SpatialFilter parseSpatialFilter4GetObservation(net.opengis.sos.x20.GetObservationType.SpatialFilter spatialFilter)
             throws OwsExceptionReport {
         if (spatialFilter != null && spatialFilter.getSpatialOps() != null) {
             Object filter = decodeXmlToObject(spatialFilter.getSpatialOps());
@@ -450,7 +470,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
      * @throws OwsExceptionReport
      *             if creation of the SpatialFilter failed
      */
-    private List<SpatialFilter> parseSpatialFilters4GetFoi(
+    private List<SpatialFilter> parseSpatialFilters4GetFeatureOfInterest(
             net.opengis.sos.x20.GetFeatureOfInterestType.SpatialFilter[] spatialFilters) throws OwsExceptionReport {
         List<SpatialFilter> sosSpatialFilters = new ArrayList<SpatialFilter>(spatialFilters.length);
         for (net.opengis.sos.x20.GetFeatureOfInterestType.SpatialFilter spatialFilter : spatialFilters) {
@@ -460,6 +480,17 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
             }
         }
         return sosSpatialFilters;
+    }
+
+    private SpatialFilter parseSpatialFilter4GetResult(net.opengis.sos.x20.GetResultType.SpatialFilter spatialFilter)
+            throws OwsExceptionReport {
+        if (spatialFilter != null && spatialFilter.getSpatialOps() != null) {
+            Object filter = decodeXmlToObject(spatialFilter.getSpatialOps());
+            if (filter != null && filter instanceof SpatialFilter) {
+                return (SpatialFilter) filter;
+            }
+        }
+        return null;
     }
 
     /**
@@ -473,10 +504,22 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
      * @throws OwsExceptionReport
      *             if parsing of the element failed
      */
-    private TemporalFilter[] parseTemporalFilters(
+    private TemporalFilter[] parseTemporalFilters4GetObservation(
             net.opengis.sos.x20.GetObservationType.TemporalFilter[] temporalFilters) throws OwsExceptionReport {
         List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>();
         for (net.opengis.sos.x20.GetObservationType.TemporalFilter temporalFilter : temporalFilters) {
+            Object filter = decodeXmlToObject(temporalFilter.getTemporalOps());
+            if (filter != null && filter instanceof TemporalFilter) {
+                sosTemporalFilters.add((TemporalFilter) filter);
+            }
+        }
+        return sosTemporalFilters.toArray(new TemporalFilter[0]);
+    }
+
+    private TemporalFilter[] parseTemporalFilters4GetResult(
+            net.opengis.sos.x20.GetResultType.TemporalFilter[] temporalFilters) throws OwsExceptionReport {
+        List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>();
+        for (net.opengis.sos.x20.GetResultType.TemporalFilter temporalFilter : temporalFilters) {
             Object filter = decodeXmlToObject(temporalFilter.getTemporalOps());
             if (filter != null && filter instanceof TemporalFilter) {
                 sosTemporalFilters.add((TemporalFilter) filter);

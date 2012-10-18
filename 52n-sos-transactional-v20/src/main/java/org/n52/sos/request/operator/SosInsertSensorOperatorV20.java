@@ -33,10 +33,9 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IInsertSensorDAO;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.ows.IExtension;
-import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.swe.SWEConstants;
@@ -71,7 +70,7 @@ public class SosInsertSensorOperatorV20 implements IRequestOperator {
                 new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION),
                         OPERATION_NAME);
         this.dao = (IInsertSensorDAO) Configurator.getInstance().getOperationDAOs().get(OPERATION_NAME);
-        LOGGER.info(String.format("%s initialized successfully!",this.getClass().getName()));
+        LOGGER.info("{} initialized successfully!", this.getClass().getSimpleName());
     }
 
     @Override

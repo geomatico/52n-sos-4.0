@@ -33,15 +33,14 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IDeleteSensorDAO;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.DeleteSensorRequest;
-import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.DeleteSensorResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
@@ -71,7 +70,7 @@ public class SosDeleteSensorOperatorV20 implements IRequestOperator {
                 new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION),
                         OPERATION_NAME);
         this.dao = (IDeleteSensorDAO) Configurator.getInstance().getOperationDAOs().get(OPERATION_NAME);
-        LOGGER.info(String.format("%s initialized successfully!",this.getClass().getName()));
+        LOGGER.info("{} initialized successfully!", this.getClass().getSimpleName());
     }
 
     @Override

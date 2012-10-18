@@ -24,7 +24,6 @@
 package org.n52.sos.request;
 
 import java.util.List;
-import java.util.Set;
 
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
@@ -38,9 +37,9 @@ public class GetResultRequest extends AbstractServiceRequest {
 
     private String observedProperty;
 
-    private Set<String> featureOfInterest;
+    private List<String> featureOfInterest;
 
-    private List<TemporalFilter> temporalFilter;
+    private TemporalFilter[] temporalFilter;
 
     private SpatialFilter spatialFilter;
     
@@ -61,11 +60,11 @@ public class GetResultRequest extends AbstractServiceRequest {
         return observedProperty;
     }
 
-    public Set<String> getFeatureOfInterest() {
+    public List<String> getFeatureOfInterest() {
         return featureOfInterest;
     }
 
-    public List<TemporalFilter> getTemporalFilter() {
+    public TemporalFilter[] getTemporalFilter() {
         return temporalFilter;
     }
 
@@ -81,12 +80,12 @@ public class GetResultRequest extends AbstractServiceRequest {
         this.observedProperty = observedProperty;
     }
 
-    public void setFeatureOfInterest(Set<String> featureOfInterest) {
+    public void setFeatureOfInterest(List<String> featureOfInterest) {
         this.featureOfInterest = featureOfInterest;
     }
 
-    public void setTemporalFilter(List<TemporalFilter> temporalFilter) {
-        this.temporalFilter = temporalFilter;
+    public void setTemporalFilter(TemporalFilter[] temporalFilters) {
+        this.temporalFilter = temporalFilters;
     }
 
     public void setSpatialFilter(SpatialFilter spatialFilter) {
@@ -98,7 +97,7 @@ public class GetResultRequest extends AbstractServiceRequest {
     }
 
     public boolean hasTemporalFilter() {
-        return temporalFilter != null && !temporalFilter.isEmpty();
+        return temporalFilter != null && temporalFilter.length > 0;
     }
 
     public boolean hasSpatialFilter() {

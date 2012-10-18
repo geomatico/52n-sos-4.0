@@ -1,2 +1,4 @@
 org.n52.sos.ds.hibernate.InsertResultTemplateDAO
 org.n52.sos.ds.hibernate.InsertResultDAO
+org.n52.sos.ds.hibernate.GetResultTemplateDAO
+org.n52.sos.ds.hibernate.GetResultDAO
