@@ -555,6 +555,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
         List<IDecoder> decoderList = Configurator.getInstance().getDecoder(XmlHelper.getNamespace(xmlObject));
         if (decoderList != null) {
             for (IDecoder decoder : decoderList) {
+                // TODO: check if decoding returns null or throws exception: in both cases try next decoder in list
                 return decoder.decode(xmlObject);
             }
         }
