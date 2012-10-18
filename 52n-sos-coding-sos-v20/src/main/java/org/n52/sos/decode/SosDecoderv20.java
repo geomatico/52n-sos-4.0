@@ -133,6 +133,9 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
     public AbstractServiceCommunicationObject decode(XmlObject xmlObject) throws OwsExceptionReport {
         AbstractServiceCommunicationObject response = null;
         LOGGER.debug("REQUESTTYPE:" + xmlObject.getClass());
+        
+        // validate document
+        XmlHelper.validateDocument(xmlObject);
 
         // getCapabilities request
         if (xmlObject instanceof GetCapabilitiesDocument) {
@@ -214,9 +217,6 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
     private AbstractServiceRequest parseGetCapabilities(GetCapabilitiesDocument getCapsDoc) throws OwsExceptionReport {
         GetCapabilitiesRequest request = new GetCapabilitiesRequest();
 
-        // validate document
-        XmlHelper.validateDocument(getCapsDoc);
-
         GetCapabilitiesType getCapsType = getCapsDoc.getGetCapabilities2();
 
         request.setService(getCapsType.getService());
@@ -251,9 +251,6 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
      *             If parsing the XmlBean failed
      */
     private AbstractServiceRequest parseGetObservation(GetObservationDocument getObsDoc) throws OwsExceptionReport {
-        // validate document
-        XmlHelper.validateDocument(getObsDoc);
-
         GetObservationRequest getObsRequest = new GetObservationRequest();
         GetObservationType getObsType = getObsDoc.getGetObservation();
         // TODO: check
@@ -289,8 +286,6 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
      */
     private AbstractServiceRequest parseGetFeatureOfInterest(GetFeatureOfInterestDocument getFoiDoc)
             throws OwsExceptionReport {
-        // validate document
-        XmlHelper.validateDocument(getFoiDoc);
 
         GetFeatureOfInterestRequest getFoiRequest = new GetFeatureOfInterestRequest();
         GetFeatureOfInterestType getFoiType = getFoiDoc.getGetFeatureOfInterest();
@@ -306,8 +301,6 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
 
     private AbstractServiceRequest parseGetObservationById(GetObservationByIdDocument getObsByIdDoc)
             throws OwsExceptionReport {
-        // validate document
-        XmlHelper.validateDocument(getObsByIdDoc);
         GetObservationByIdRequest getObsByIdRequest = new GetObservationByIdRequest();
         GetObservationByIdType getObsByIdType = getObsByIdDoc.getGetObservationById();
         getObsByIdRequest.setService(getObsByIdType.getService());
@@ -329,8 +322,6 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
             }
         }
         cursor.dispose();
-        // validate document
-        XmlHelper.validateDocument(insertObservationDoc);
         InsertObservationRequest insertObservationRequest = new InsertObservationRequest();
         InsertObservationType insertObservationType = insertObservationDoc.getInsertObservation();
         insertObservationRequest.setService(insertObservationType.getService());

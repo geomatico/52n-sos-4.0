@@ -115,7 +115,8 @@ public class SwesDecoderv20 implements IXmlRequestDecoder {
     public AbstractServiceRequest decode(XmlObject xmlObject) throws OwsExceptionReport {
         AbstractServiceRequest request = null;
         LOGGER.debug("REQUESTTYPE:" + xmlObject.getClass());
-
+        // validate document
+        XmlHelper.validateDocument(xmlObject);
         if (xmlObject instanceof DescribeSensorDocument) {
             DescribeSensorDocument obsDoc = (DescribeSensorDocument) xmlObject;
             request = parseDescribeSensor(obsDoc);
@@ -143,9 +144,6 @@ public class SwesDecoderv20 implements IXmlRequestDecoder {
      *             if validation of the request failed
      */
     private AbstractServiceRequest parseDescribeSensor(DescribeSensorDocument xbDescSenDoc) throws OwsExceptionReport {
-        // validate document
-        XmlHelper.validateDocument(xbDescSenDoc);
-
         DescribeSensorRequest descSensorRequest = new DescribeSensorRequest();
         DescribeSensorType xbDescSensor = xbDescSenDoc.getDescribeSensor();
         descSensorRequest.setService(xbDescSensor.getService());

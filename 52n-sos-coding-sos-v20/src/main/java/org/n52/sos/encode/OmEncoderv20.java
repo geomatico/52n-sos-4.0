@@ -1418,8 +1418,6 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
         supportedResponseFormats = new HashMap<String, Map<String, Set<String>>>(0);
         Set<String> format = new HashSet<String>(0);
         format.add(OMConstants.NS_OM_2);
-        // TODO: set this if service supports
-        format.add(SosConstants.CONTENT_TYPE_ZIP);
         Map<String, Set<String>> versionMap = new HashMap<String, Set<String>>(0);
         versionMap.put("2.0.0", format);
         supportedResponseFormats.put("SOS", versionMap);

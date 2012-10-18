@@ -40,6 +40,7 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlValidationError;
+import org.joda.time.Weeks;
 import org.n52.sos.exception.IExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -72,6 +73,7 @@ public class XmlHelper {
         laxValidationCases.add(new GML311AbstractFeatureLaxCase());
         laxValidationCases.add(new GML321AbstractFeatureLaxCase());
         laxValidationCases.add(new GML321AbstractTimeLaxCase());
+        laxValidationCases.add(new SosInsertionMetadataLaxCase());
     }
 
     /**
@@ -154,10 +156,12 @@ public class XmlHelper {
             while (iter.hasNext()) {
                 XmlError error = iter.next();
                 boolean shouldPass = false;
-                for (LaxValidationCase lvc : laxValidationCases) {
-                    if (lvc.shouldPass((XmlValidationError) error)) {
-                        shouldPass = true;
-                        break;
+                if (error instanceof XmlValidationError) {
+                    for (LaxValidationCase lvc : laxValidationCases) {
+                        if (lvc.shouldPass((XmlValidationError) error)) {
+                            shouldPass = true;
+                            break;
+                        }
                     }
                 }
                 if (shouldPass) {
@@ -330,6 +334,33 @@ public class XmlHelper {
         public boolean shouldPass(XmlValidationError xve) {
             if (xve.getExpectedQNames() != null && xve.getExpectedQNames().contains(TIME_QN)) {
                 return true;
+            }
+            return false;
+        }
+
+    }
+
+    private static class SosInsertionMetadataLaxCase implements LaxValidationCase {
+
+        private static final Object INSERTION_METADATA_QN = new QName("http://www.opengis.net/swes/2.0",
+                "InsertionMetadata");
+
+        private static final Object SOS_INSERTION_METADATA_QN = new QName("http://www.opengis.net/sos/2.0",
+                "SosInsertionMetadata");
+
+        private static final Object METADATA_QN = new QName("http://www.opengis.net/swes/2.0", "metadata");
+        
+        private static final String BEFORE_END_CONTENT_ELEMENT = "before the end of the content in element";
+
+        @Override
+        public boolean shouldPass(XmlValidationError xve) {
+            if (xve.getFieldQName() != null && xve.getFieldQName().equals(METADATA_QN)
+                    && xve.getExpectedQNames() != null && xve.getExpectedQNames().contains(INSERTION_METADATA_QN)) {
+                if (xve.getOffendingQName() != null && xve.getOffendingQName().equals(SOS_INSERTION_METADATA_QN)) {
+                    return true;
+                } else if (xve.getMessage().contains(BEFORE_END_CONTENT_ELEMENT)) {
+                    return true;
+                }
             }
             return false;
         }
