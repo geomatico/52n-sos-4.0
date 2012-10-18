@@ -67,11 +67,6 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>52n-sos-binding-soap</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-coding-ows-v110</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -164,11 +159,61 @@
 
 	<profiles>
 		<profile>
+			<id>develope</id>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-binding-kvp</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-binding-soap</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-enhanced-v20</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-hibernate-enhanced</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-transactional-v20</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-hibernate-transactional</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-resultHandling-v20</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-hibernate-resultHandling</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>	
+		<profile>
 			<id>both</id>
 			<dependencies>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-binding-kvp</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-binding-soap</artifactId>
 					<version>${project.version}</version>
 				</dependency>
 			</dependencies>
@@ -179,11 +224,6 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-binding-kvp</artifactId>
-					<version>${project.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>${project.groupId}</groupId>
-					<artifactId>52n-sos-binding-soap</artifactId>
 					<version>${project.version}</version>
 				</dependency>
 			</dependencies>

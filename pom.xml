@@ -339,9 +339,6 @@
 		</profile>
 		<profile>
 			<id>kvp</id>
-			<properties>
-				<conf.sos.name>52nSOSv4.0.0_kvp</conf.sos.name>
-			</properties>
 			<modules>
 				<module>52n-sos-binding-kvp</module>
 				<module>52n-sos-binding-soap</module>
@@ -349,9 +346,6 @@
 		</profile>
 		<profile>
 			<id>soap</id>
-			<properties>
-				<conf.sos.name>52nSOSv4.0.0_soap</conf.sos.name>
-			</properties>
 			<modules>
 				<module>52n-sos-binding-soap</module>
 			</modules>

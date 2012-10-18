@@ -884,7 +884,7 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
                 temporalFilter.setTime(tp);
 
             } else {
-                throw new DecoderException(String.format("The paramter value '{}' is invalid!", value));
+                throw new DecoderException(String.format("The paramter value '%s' is invalid!", value));
             }
             return temporalFilter;
     }

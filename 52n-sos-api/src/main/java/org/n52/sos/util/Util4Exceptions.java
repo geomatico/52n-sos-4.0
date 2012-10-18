@@ -29,6 +29,7 @@ import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.SosExceptionCode;
+import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
 
 /**
  * class offers util methods for Exceptions used in this SOS
@@ -57,7 +58,7 @@ public class Util4Exceptions {
             throws OwsExceptionReport {
         OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
         owse.addCodedException(OwsExceptionCode.MissingParameterValue, parameterName,
-                "The mandatory parameter value '" + parameterName + "' is missing in the request!");
+                String.format("The value for the mandatory parameter '%s' is missing in the request!", parameterName));
         return owse;
     }
 
@@ -80,13 +81,13 @@ public class Util4Exceptions {
 
     public static OwsExceptionReport createOperationNotSupportedException(String operationName) {
         OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-        owse.addCodedException(OwsExceptionCode.OperationNotSupported, operationName, "The requested operation '"
-                + operationName + "' is not supported by this service!");
+        owse.addCodedException(OwsExceptionCode.OperationNotSupported, operationName,
+                String.format("The requested operation '%s' is not supported by this service!", operationName));
         return owse;
     }
 
     public static OwsExceptionReport createNoApplicableCodeException(Exception exception, String message) {
-        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions); 
+        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
         owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, message, exception);
         return owse;
     }
@@ -120,6 +121,12 @@ public class Util4Exceptions {
     public static OwsExceptionReport createOptionNotSupportedException(String parameterName, String message) {
         OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
         owse.addCodedException(OwsExceptionCode.OptionNotSupported, parameterName, message);
+        return owse;
+    }
+
+    public static OwsExceptionReport createInvalidRequestException(String message, Exception exception) {
+        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+        owse.addCodedException(SwesExceptionCode.InvalidRequest, null, message, exception);
         return owse;
     }
 

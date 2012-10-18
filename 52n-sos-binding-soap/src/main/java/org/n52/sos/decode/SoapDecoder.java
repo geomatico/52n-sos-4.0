@@ -282,11 +282,11 @@ public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
         } catch (SOAPException soape) {
             String exceptionText = "Error while parsing SOAPMessage body content!";
             LOGGER.debug(exceptionText, soape);
-            throw Util4Exceptions.createNoApplicableCodeException(soape, exceptionText);
+            throw Util4Exceptions.createInvalidRequestException(exceptionText, soape);
         } catch (XmlException xmle) {
             String exceptionText = "Error while parsing SOAPMessage body content!";
             LOGGER.debug(exceptionText, xmle);
-            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+            throw Util4Exceptions.createInvalidRequestException(exceptionText, xmle);
         }
     }
 

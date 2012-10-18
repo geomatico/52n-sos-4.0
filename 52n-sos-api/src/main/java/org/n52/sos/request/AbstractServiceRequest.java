@@ -23,8 +23,14 @@
  */
 package org.n52.sos.request;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.n52.sos.ogc.ows.OWSConstants;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.util.Util4Exceptions;
 
 /**
  * abstract super class for all service request classes
@@ -39,12 +45,27 @@ public abstract class AbstractServiceRequest extends AbstractServiceCommunicatio
      */
     public abstract String getOperationName();
 
-    public ServiceOperatorKeyType[] getServiceOperatorKeyType() {
+    public ServiceOperatorKeyType[] getServiceOperatorKeyType() throws OwsExceptionReport {
         if (serviceOperatorKeyTypes == null) {
+            checkServiceAndVersionParameter();
             serviceOperatorKeyTypes = new ServiceOperatorKeyType[1];
             serviceOperatorKeyTypes[0] = new ServiceOperatorKeyType(getService(), getVersion());
         }
         return serviceOperatorKeyTypes;
+    }
+    
+    private void checkServiceAndVersionParameter() throws OwsExceptionReport {
+        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+        if (getService() == null) {
+            exceptions.add(Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.service.name()));
+        } else if ( (getService() != null && getService().isEmpty())) {
+            exceptions.add(Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.service.name()));
+        } else if (getVersion() == null) {
+            exceptions.add(Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.version.name()));
+        } else if ( (getVersion() != null && getVersion().isEmpty())) {
+            exceptions.add(Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.version.name()));
+        }
+        Util4Exceptions.mergeAndThrowExceptions(exceptions);
     }
 
 }
