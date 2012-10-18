@@ -12,6 +12,7 @@
 	<modules>
 		<module>52n-sos-api</module>
 		<module>52n-sos-hibernate-common</module>
+		<module>52n-sos-hibernate-dialect</module>
 		<module>52n-sos-hibernate-feature</module>
 		<module>52n-sos-hibernate-core</module>
 		<module>52n-sos-core-v20</module>

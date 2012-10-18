@@ -92,6 +92,11 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
+			<artifactId>52n-sos-hibernate-dialect</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-hibernate-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
