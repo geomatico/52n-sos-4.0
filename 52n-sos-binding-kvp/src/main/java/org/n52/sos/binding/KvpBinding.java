@@ -141,7 +141,8 @@ public class KvpBinding extends Binding {
     
     @Override
     public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport {
-         OwsExceptionReport owse = Util4Exceptions.createOperationNotSupportedException("requestedOperation");
+        String message = "HTTP POST is no supported for KVP binding!";
+         OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, message);
         if (Configurator.getInstance().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
             owse.setVersion(Sos1Constants.SERVICEVERSION);
         } else {

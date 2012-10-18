@@ -66,7 +66,8 @@ public class SoapBinding extends Binding {
     @Override
     public ServiceResponse doGetOperation(HttpServletRequest request) throws OwsExceptionReport {
         SoapResponse soapResponse = new SoapResponse();
-        OwsExceptionReport owse = Util4Exceptions.createOperationNotSupportedException("requestedOperation");
+        String message = "HTTP GET is no supported for SOAP binding!";
+        OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, message);
         if (Configurator.getInstance().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
             owse.setVersion(Sos1Constants.SERVICEVERSION);
         } else {
