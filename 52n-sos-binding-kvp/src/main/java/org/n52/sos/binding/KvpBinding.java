@@ -138,6 +138,17 @@ public class KvpBinding extends Binding {
         }
         return response;
     }
+    
+    @Override
+    public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport {
+         OwsExceptionReport owse = Util4Exceptions.createOperationNotSupportedException("requestedOperation");
+        if (Configurator.getInstance().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
+            owse.setVersion(Sos1Constants.SERVICEVERSION);
+        } else {
+            owse.setVersion(Sos2Constants.SERVICEVERSION);
+        }
+        throw owse;
+    }
 
     /*
      * (non-Javadoc)

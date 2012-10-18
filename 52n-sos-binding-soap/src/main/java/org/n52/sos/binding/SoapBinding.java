@@ -64,6 +64,27 @@ public class SoapBinding extends Binding {
     }
 
     @Override
+    public ServiceResponse doGetOperation(HttpServletRequest request) throws OwsExceptionReport {
+        SoapResponse soapResponse = new SoapResponse();
+        OwsExceptionReport owse = Util4Exceptions.createOperationNotSupportedException("requestedOperation");
+        if (Configurator.getInstance().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
+            owse.setVersion(Sos1Constants.SERVICEVERSION);
+        } else {
+            owse.setVersion(Sos2Constants.SERVICEVERSION);
+        }
+        soapResponse.setException(owse);
+        soapResponse.setSoapVersion(SOAPConstants.SOAP_1_2_PROTOCOL);
+        soapResponse.setSoapNamespace(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE);
+        IEncoder encoder = Configurator.getInstance().getEncoder(soapResponse.getSoapNamespace());
+        if (encoder != null) {
+            return (ServiceResponse) encoder.encode(soapResponse);
+        } else {
+            throw Util4Exceptions.createNoApplicableCodeException(null,
+                    "Error while encoding exception with SOAP envelope!");
+        }
+    }
+
+    @Override
     public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport {
         String version = null;
         String soapVersion = null;
@@ -101,7 +122,8 @@ public class SoapBinding extends Binding {
                             if (serviceOperator != null) {
                                 ServiceResponse bodyResponse = serviceOperator.receiveRequest(bodyRequest);
                                 if (!bodyResponse.isXmlResponse()) {
-                                	// FIXME how to encode non xml encoded data in soap responses?
+                                    // FIXME how to encode non xml encoded data
+                                    // in soap responses?
                                     return bodyResponse;
                                 }
                                 soapResponse.setSoapBodyContent(bodyResponse);
@@ -162,18 +184,18 @@ public class SoapBinding extends Binding {
         }
     }
 
-	private OwsExceptionReport createOperationNotSupportedException() {
-		String exceptionText = "The requested service URL only supports HTTP-Post SOAP requests!";
-	    OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-	    if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
-	        owse.setVersion(Sos2Constants.SERVICEVERSION);
-	    } else {
-	        owse.setVersion(Sos1Constants.SERVICEVERSION);
-	    }
-	    return owse;
-	}
+    private OwsExceptionReport createOperationNotSupportedException() {
+        String exceptionText = "The requested service URL only supports HTTP-Post SOAP requests!";
+        OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
+            owse.setVersion(Sos2Constants.SERVICEVERSION);
+        } else {
+            owse.setVersion(Sos1Constants.SERVICEVERSION);
+        }
+        return owse;
+    }
 
-	@Override
+    @Override
     public String getUrlPattern() {
         return urlPattern;
     }
@@ -188,7 +210,7 @@ public class SoapBinding extends Binding {
         return false;
     }
 
-	private IDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
+    private IDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
         List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
         for (IDecoder iDecoder : decoder) {
             return iDecoder;
