@@ -23,6 +23,7 @@
  */
 package org.n52.sos.cache;
 
+import com.vividsolutions.jts.geom.Envelope;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TimerTask;
@@ -446,5 +447,6 @@ public abstract class ACapabilitiesCacheController extends TimerTask {
 	public abstract SosEnvelope getEnvelopeForOffering(String offering);
 	public abstract DateTime getMinTimeForOffering(String offering);
 	public abstract DateTime getMaxTimeForOffering(String offering);
+	public abstract Envelope getEnvelopeForFeatures();
 
 }

@@ -341,7 +341,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
      * @param session
      *            Hibernate session
      */
-    private void setFeatureOfInterestValues(CapabilitiesCache cache, Session session) {
+    private void setFeatureOfInterestValues(CapabilitiesCache cache, Session session) throws OwsExceptionReport {
         Map<String, Collection<String>> kFeatureOfInterestVProcedure = new HashMap<String, Collection<String>>();
         Map<String, Collection<String>> parentFeatures = new HashMap<String, Collection<String>>();
         List<FeatureOfInterest> hFeaturesOfInterest = HibernateCriteriaQueryUtilities.getFeatureOfInterestObjects(session);
@@ -351,9 +351,12 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             parentFeatures.put(featureOfInterest.getIdentifier(),
                     getFeatureIDsFromFeatures(featureOfInterest.getFeatureOfInterestsForChildFeatureId()));
         }
-        cache.setFeatureOfInterest(getFeatureIdentifier(hFeaturesOfInterest));
+		List<String> ids = getFeatureIdentifier(hFeaturesOfInterest);
+        cache.setFeatureOfInterest(ids);
         cache.setKFeatureOfInterestVProcedures(kFeatureOfInterestVProcedure);
         cache.setFeatureHierarchies(parentFeatures);
+		cache.setEnvelopeForFeatureOfInterest(Configurator.getInstance().getFeatureQueryHandler()
+			.getEnvelopeForFeatureIDs(ids, session));
     }
 
     private void setRelatedFeatures(CapabilitiesCache cache, Session session) {
@@ -547,7 +550,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         return relatedFeatureList;
     }
 
-    private Collection<String> getFeatureIdentifier(List<FeatureOfInterest> featuresOfInterest) {
+    private List<String> getFeatureIdentifier(List<FeatureOfInterest> featuresOfInterest) {
         List<String> featureList = new ArrayList<String>();
         for (FeatureOfInterest featureOfInterest : featuresOfInterest) {
             featureList.add(featureOfInterest.getIdentifier());

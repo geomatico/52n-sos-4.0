@@ -158,9 +158,7 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
             }
             Envelope envelope = null;
             if (featureIDs != null && !featureIDs.isEmpty()) {
-                envelope =
-                        Configurator.getInstance().getFeatureQueryHandler()
-                                .getEnvelopeForFeatureIDs((List<String>) featureIDs, session);
+                envelope = Configurator.getInstance().getCapabilitiesCacheController().getEnvelopeForFeatures();
             }
             if (envelope != null) {
                 opsMeta.addParameterValue(parameterName,

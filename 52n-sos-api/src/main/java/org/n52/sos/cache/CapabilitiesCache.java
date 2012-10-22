@@ -23,6 +23,7 @@
  */
 package org.n52.sos.cache;
 
+import com.vividsolutions.jts.geom.Envelope;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -137,6 +138,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
 	private Map<String, SosEnvelope> kOfferingVEnvelope;
 	private Map<String, DateTime> kOfferingVMinTime;
 	private Map<String, DateTime> kOfferingVMaxTime;
+	private Envelope envelopeForFeatureOfInterest;
 
     /**
      * constructor
@@ -1015,5 +1017,23 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      */
 	public void setKOfferingVMaxTime(Map<String, DateTime> kOfferingVMaxTime) {
 		this.kOfferingVMaxTime = kOfferingVMaxTime;
+	}
+			
+	/**
+	 * get the envelope for all features
+	 *
+	 * @return the envelope
+	 */
+	public Envelope getEnvelopeForFeatureOfInterest() {
+		return this.envelopeForFeatureOfInterest;
+	}
+
+	/**
+	 * sets the envlope for all features
+	 *
+	 * @param envelope the envelope
+	 */
+	public void setEnvelopeForFeatureOfInterest(Envelope envelope) {
+		this.envelopeForFeatureOfInterest = envelope;
 	}
 }

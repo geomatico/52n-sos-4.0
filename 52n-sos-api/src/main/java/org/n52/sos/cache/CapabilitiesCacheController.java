@@ -23,6 +23,7 @@
  */
 package org.n52.sos.cache;
 
+import com.vividsolutions.jts.geom.Envelope;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -1079,5 +1080,10 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 			return this.capabilitiesCache.getKOfferingVMaxTime().get(offering);
 		}
 		return null;
+	}
+
+	@Override
+	public Envelope getEnvelopeForFeatures() {
+		return this.capabilitiesCache.getEnvelopeForFeatureOfInterest();
 	}
 }
