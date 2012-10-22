@@ -23,7 +23,6 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import com.vividsolutions.jts.geom.Envelope;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -57,6 +56,8 @@ import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Implementation of the interface ICacheFeederDAO
@@ -271,7 +272,6 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
 	private SosEnvelope getEnvelopeForOffering(String offeringID, Session session) throws OwsExceptionReport {
 		List<String> featureIDs =
                 HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(offeringID, session);
-        session.clear();
         if (featureIDs != null && !featureIDs.isEmpty()) {
             Envelope envelope = Configurator.getInstance().getFeatureQueryHandler()
 						.getEnvelopeForFeatureIDs(featureIDs, session);
