@@ -59,7 +59,6 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.sos.SosConstants.SosExceptionCode;
 import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
@@ -273,10 +272,8 @@ public class SosHelper {
                             + Runtime.getRuntime().maxMemory()
                             + " Byte of the virtual machine! "
                             + "Please either refine your getObservation request to reduce the number of observations in the response or ask the administrator of this SOS to increase the maximum heap size of the virtual machine!";
-            LOGGER.info(exceptionText);
-            OwsExceptionReport se = new OwsExceptionReport();
-            se.addCodedException(SosExceptionCode.ResponseExceedsSizeLimit, null, exceptionText);
-            throw se;
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createResponseExceedsSizeLimitException(exceptionText);
         }
     }
 
@@ -437,7 +434,6 @@ public class SosHelper {
                 if (binding.checkOperationHttpDeleteSupported(operation, decoderKey)) {
                     httpDeleteUrls.add(serviceURL + binding.getUrlPattern());
                 }
-                
 
             }
         } catch (Exception e) {
@@ -450,7 +446,7 @@ public class SosHelper {
             // e);
             throw owse;
         }
-        
+
         Map<String, List<String>> dcp = new HashMap<String, List<String>>();
         if (!httpGetUrls.isEmpty()) {
             dcp.put(SosConstants.HTTP_GET, httpGetUrls);
@@ -675,7 +671,7 @@ public class SosHelper {
             OwsExceptionReport se =
                     Util4Exceptions.createMissingParameterValueException(SosConstants.GetCapabilitiesParams.service
                             .name());
-            LOGGER.error("checkServiceParameter", se);
+            LOGGER.debug("checkServiceParameter", se);
             throw se;
         }
         // if not null, but incorrect, throw also exception
@@ -718,7 +714,7 @@ public class SosHelper {
             String exceptionText =
                     "The value of the mandatory parameter '" + parameterName
                             + "' was not found in the request or is incorrect!";
-            LOGGER.error(exceptionText);
+            LOGGER.debug(exceptionText);
             throw Util4Exceptions.createMissingParameterValueException(SosConstants.DescribeSensorParams.procedure
                     .toString());
         }
@@ -756,7 +752,7 @@ public class SosHelper {
             String exceptionText =
                     "The value of the mandatory parameter '" + parameterName
                             + "' was not found in the request or is incorrect!";
-            LOGGER.error(exceptionText);
+            LOGGER.debug(exceptionText);
             throw Util4Exceptions.createMissingParameterValueException(parameterName);
         }
         if (!validProcedures.contains(procedureID)) {
@@ -764,7 +760,7 @@ public class SosHelper {
                     "The value of the '"
                             + parameterName
                             + "' parameter is incorrect. Please check the capabilities response document for valid values!";
-            LOGGER.error(exceptionText);
+            LOGGER.debug(exceptionText);
             throw Util4Exceptions.createInvalidParameterValueException(
                     SosConstants.DescribeSensorParams.procedure.name(), exceptionText);
         }
@@ -794,7 +790,7 @@ public class SosHelper {
                     String exceptionText =
                             "The value '" + featureOfInterest + "' of the parameter '" + parameterName
                                     + "' is invalid";
-                    LOGGER.error(exceptionText);
+                    LOGGER.debug(exceptionText);
                     exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
                 }
             }
@@ -807,14 +803,47 @@ public class SosHelper {
         if (observedProperties != null) {
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
             for (String observedProperty : observedProperties) {
-                if (!validObservedProperties.contains(observedProperty)) {
-                    String exceptionText =
-                            "The value '" + observedProperty + "' of the parameter '" + parameterName + "' is invalid";
-                    LOGGER.error(exceptionText);
-                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
+                try {
+                    checkObservedProperty(observedProperty, validObservedProperties, parameterName);
+                } catch (OwsExceptionReport e) {
+                    exceptions.add(e);
                 }
             }
             Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        }
+    }
+
+    public static void checkObservedProperty(String observedProperty, Collection<String> validObservedProperties,
+            String parameterName) throws OwsExceptionReport {
+        if (!validObservedProperties.contains(observedProperty)) {
+            String exceptionText =
+                    "The value '" + observedProperty + "' of the parameter '" + parameterName + "' is invalid";
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+        }
+    }
+
+    public static void checkOfferings(Set<String> offerings, Collection<String> validOfferings, String parameterName)
+            throws OwsExceptionReport {
+        if (offerings != null) {
+            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            for (String offering : offerings) {
+                try {
+                    checkObservedProperty(offering, validOfferings, parameterName);
+                } catch (OwsExceptionReport e) {
+                    exceptions.add(e);
+                }
+            }
+            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        }
+    }
+
+    public static void checkOffering(String offering, Collection<String> validOfferings, String parameterName)
+            throws OwsExceptionReport {
+        if (!validOfferings.contains(offering)) {
+            String exceptionText = "The value '" + offering + "' of the parameter '" + parameterName + "' is invalid";
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
         }
     }
 

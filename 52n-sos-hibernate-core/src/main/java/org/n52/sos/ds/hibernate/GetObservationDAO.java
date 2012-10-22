@@ -243,7 +243,6 @@ public class GetObservationDAO implements IGetObservationDAO {
      */
     @Override
     public GetObservationResponse getObservation(GetObservationRequest request) throws OwsExceptionReport {
-        if (request instanceof GetObservationRequest) {
             GetObservationRequest sosRequest = (GetObservationRequest) request;
             // setting a global "now" for this request
             now = new DateTime();
@@ -277,12 +276,6 @@ public class GetObservationDAO implements IGetObservationDAO {
             } finally {
                 connectionProvider.returnConnection(session);
             }
-        } else {
-            String exceptionText = "The SOS request is not a SosGetObservationRequest!";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        }
-
     }
 
     /**

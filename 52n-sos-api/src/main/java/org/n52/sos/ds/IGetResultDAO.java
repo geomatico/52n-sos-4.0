@@ -23,11 +23,9 @@
  */
 package org.n52.sos.ds;
 
-import java.util.List;
-
-import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.request.GetResultRequest;
+import org.n52.sos.response.GetResultResponse;
 
 /**
  * interface for the specific DAOFactories, offers methods to create the
@@ -47,6 +45,6 @@ public interface IGetResultDAO extends IOperationDAO {
      * @throws OwsExceptionReport
      *             If an error occurs.
      */
-    public List<SosObservation> getResult(AbstractServiceRequest request) throws OwsExceptionReport;
+    public GetResultResponse getResult(GetResultRequest request) throws OwsExceptionReport;
 
 }

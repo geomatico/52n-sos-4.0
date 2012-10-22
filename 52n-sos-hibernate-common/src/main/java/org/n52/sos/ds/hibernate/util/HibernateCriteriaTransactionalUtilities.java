@@ -28,6 +28,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javassist.bytecode.ExceptionTable;
+
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
@@ -407,19 +410,19 @@ public class HibernateCriteriaTransactionalUtilities {
         // session.saveOrUpdate(childFeature);
         // session.flush();
     }
-    
-    public static void insertResultTemplate(InsertResultTemplateRequest request, ObservationConstellation observationConstellation,
-            FeatureOfInterest featureOfInterest, Session session) {
-       ResultTemplate resultTemplate = new ResultTemplate();
-       resultTemplate.setIdentifier(request.getIdentifier());
-       resultTemplate.setObservationConstellation(observationConstellation);
-       resultTemplate.setFeatureOfInterest(featureOfInterest);
-       resultTemplate.setResultStructure(request.getResultStructure().getXml());
-       resultTemplate.setResultEncoding(request.getResultEncoding().getXml());
-       session.save(resultTemplate);
-       session.flush();
+
+    public static void insertResultTemplate(InsertResultTemplateRequest request,
+            ObservationConstellation observationConstellation, FeatureOfInterest featureOfInterest, Session session) {
+        ResultTemplate resultTemplate = new ResultTemplate();
+        resultTemplate.setIdentifier(request.getIdentifier());
+        resultTemplate.setObservationConstellation(observationConstellation);
+        resultTemplate.setFeatureOfInterest(featureOfInterest);
+        resultTemplate.setResultStructure(request.getResultStructure().getXml());
+        resultTemplate.setResultEncoding(request.getResultEncoding().getXml());
+        session.save(resultTemplate);
+        session.flush();
     }
-    
+
     public static void insertObservationSingleValue(ObservationConstellation obsConst, FeatureOfInterest feature,
             SosObservation observation, Session session) {
         SosSingleObservationValue value = (SosSingleObservationValue) observation.getValue();

@@ -32,7 +32,10 @@ public class SosResultStructure {
     private String xml;
 
     public String getXml() {
-        return resultStructure.getXml();
+        if (resultStructure != null) {
+            return resultStructure.getXml();
+        }
+        return xml;
     }
 
     public void setResultStructure(SosSweAbstractDataComponent resultStructure) {
@@ -40,7 +43,15 @@ public class SosResultStructure {
     }
 
     public SosSweAbstractDataComponent getResultStructure() {
-        return resultStructure;
+        if (resultStructure == null && xml != null && !xml.isEmpty()) {
+            // TODO decode from xmlString
+            return null;
+        }
+       return resultStructure;
+    }
+
+    public void setXml(String xml) {
+        this.xml = xml;
     }
 
 }

@@ -94,7 +94,6 @@ public class SosInsertResultOperatorV20 implements IRequestOperator {
                 String namespace = Sos2Constants.NS_SOS_20;
                 IEncoder encoder = Configurator.getInstance().getEncoder(namespace);
                 if (encoder != null) {
-                    // TODO valid response object
                     Object encodedObject = encoder.encode(response);
                     if (encodedObject instanceof XmlObject) {
                         ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());

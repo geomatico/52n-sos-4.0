@@ -29,6 +29,6 @@ import org.n52.sos.response.InsertSensorResponse;
 
 public interface IInsertSensorDAO extends IOperationDAO {
 
-    InsertSensorResponse insertSensor(InsertSensorRequest insertSensorRequest) throws OwsExceptionReport;
+    InsertSensorResponse insertSensor(InsertSensorRequest request) throws OwsExceptionReport;
 
 }

@@ -37,6 +37,7 @@ import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.IDecoder;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IInsertResultDAO;
+import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
@@ -45,6 +46,7 @@ import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.IObservationValue;
 import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.IExtension;
@@ -403,5 +405,4 @@ public class InsertResultDAO implements IInsertResultDAO {
         }
         return null;
     }
-
 }

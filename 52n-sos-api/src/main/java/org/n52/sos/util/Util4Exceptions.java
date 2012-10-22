@@ -78,6 +78,13 @@ public class Util4Exceptions {
                 + " observations, which exceeds this " + " server's limit of " + responseLimit);
         return owse;
     }
+    
+    public static OwsExceptionReport createResponseExceedsSizeLimitException(String message)
+            throws OwsExceptionReport {
+        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+        owse.addCodedException(SosExceptionCode.ResponseExceedsSizeLimit, null, message);
+        return owse;
+    }
 
     public static OwsExceptionReport createOperationNotSupportedException(String operationName) {
         OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
@@ -127,6 +134,12 @@ public class Util4Exceptions {
     public static OwsExceptionReport createInvalidRequestException(String message, Exception exception) {
         OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
         owse.addCodedException(SwesExceptionCode.InvalidRequest, null, message, exception);
+        return owse;
+    }
+
+    public static OwsExceptionReport createInvalidPropertyOfferingCombination(String message) {
+        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+        owse.addCodedException(SosExceptionCode.InvalidPropertyOfferingCombination, null, message);
         return owse;
     }
 

@@ -36,11 +36,14 @@ import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateUtilities;
+import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.swe.SosSweDataArray;
+import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.service.Configurator;
@@ -127,6 +130,15 @@ public class InsertResultTemplateDAO implements IInsertResultTemplateDAO {
             SosObservationConstellation sosObsConst = request.getObservationConstellation();
             ObservationConstellation obsConst = null;
             for (String offeringID : sosObsConst.getOfferings()) {
+                if (request.getResultStructure().getResultStructure() instanceof SosSweDataArray
+                        || request.getResultStructure().getResultStructure() instanceof SosSweDataRecord) {
+                    sosObsConst.setObservationType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
+                } else {
+                    String exceptionText = "The requested resultStructure is not supporte!";
+                    throw Util4Exceptions.createInvalidParameterValueException(
+                            Sos2Constants.InsertResultTemplateParams.observationType.name(), exceptionText);
+                }
+                // TODO obsType should be set, currently not
                 obsConst =
                         HibernateUtilities.checkObservationConstellationForObservation(sosObsConst, offeringID,
                                 session);

@@ -35,7 +35,6 @@ import javax.xml.namespace.QName;
 
 import net.opengis.fes.x20.FilterCapabilitiesDocument;
 import net.opengis.fes.x20.FilterCapabilitiesDocument.FilterCapabilities;
-import net.opengis.fes.x20.TemporalOpsType;
 import net.opengis.gml.x32.AbstractFeatureType;
 import net.opengis.gml.x32.DirectPositionType;
 import net.opengis.gml.x32.EnvelopeType;
@@ -61,6 +60,8 @@ import net.opengis.sos.x20.GetResultResponseType;
 import net.opengis.sos.x20.GetResultTemplateDocument;
 import net.opengis.sos.x20.GetResultTemplateResponseDocument;
 import net.opengis.sos.x20.GetResultTemplateResponseType;
+import net.opengis.sos.x20.GetResultTemplateResponseType.ResultEncoding;
+import net.opengis.sos.x20.GetResultTemplateResponseType.ResultStructure;
 import net.opengis.sos.x20.GetResultTemplateType;
 import net.opengis.sos.x20.GetResultType;
 import net.opengis.sos.x20.GetResultType.SpatialFilter;
@@ -71,6 +72,7 @@ import net.opengis.sos.x20.InsertResultTemplateResponseType;
 import net.opengis.sos.x20.InsertionCapabilitiesDocument;
 import net.opengis.sos.x20.InsertionCapabilitiesType;
 import net.opengis.sos.x20.ObservationOfferingType;
+import net.opengis.swe.x20.AbstractEncodingType;
 import net.opengis.swes.x20.AbstractContentsType.Offering;
 import net.opengis.swes.x20.FeatureRelationshipType;
 
@@ -95,6 +97,9 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.sos.SosInsertionCapabilities;
 import org.n52.sos.ogc.sos.SosOfferingsForContents;
+import org.n52.sos.ogc.sos.SosResultEncoding;
+import org.n52.sos.ogc.sos.SosResultStructure;
+import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.request.GetResultRequest;
@@ -159,11 +164,11 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
     public Set<String> getConformanceClasses() {
         return new HashSet<String>(0);
     }
-    
+
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(Sos2Constants.NS_SOS_20, SosConstants.NS_SOS_PREFIX);
     }
-    
+
     @Override
     public String getContentType() {
         return "text/xml";
@@ -177,27 +182,27 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
     }
 
     @Override
-    public XmlObject encode(AbstractServiceCommunicationObject communicationObject, Map<HelperValues, String> additionalValues)
-            throws OwsExceptionReport {
-        if(communicationObject instanceof AbstractServiceRequest) {
-            return encodeRequests((AbstractServiceRequest)communicationObject);
+    public XmlObject encode(AbstractServiceCommunicationObject communicationObject,
+            Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+        if (communicationObject instanceof AbstractServiceRequest) {
+            return encodeRequests((AbstractServiceRequest) communicationObject);
         } else if (communicationObject instanceof AbstractServiceResponse) {
-            return encodeResponse((AbstractServiceResponse)communicationObject);
+            return encodeResponse((AbstractServiceResponse) communicationObject);
         }
         return null;
     }
-    
+
     private XmlObject encodeRequests(AbstractServiceRequest request) throws OwsExceptionReport {
         if (request instanceof GetResultTemplateRequest) {
-            return createGetResultTemplateRequest((GetResultTemplateRequest)request);
+            return createGetResultTemplateRequest((GetResultTemplateRequest) request);
         } else if (request instanceof GetResultRequest) {
-            return createGetResultRequest((GetResultRequest)request);
+            return createGetResultRequest((GetResultRequest) request);
         } else if (request instanceof GetCapabilitiesRequest) {
-            return createGetCapabilitiesRequest((GetCapabilitiesRequest)request);
+            return createGetCapabilitiesRequest((GetCapabilitiesRequest) request);
         }
         return null;
     }
-    
+
     private XmlObject encodeResponse(AbstractServiceResponse response) throws OwsExceptionReport {
         if (response instanceof GetCapabilitiesResponse) {
             return createCapabilitiesDocument((GetCapabilitiesResponse) response);
@@ -210,13 +215,13 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         } else if (response instanceof InsertObservationResponse) {
             return createInsertObservationResponse((InsertObservationResponse) response);
         } else if (response instanceof InsertResultTemplateResponse) {
-            return createInsertResultTemplateResponseDocument((InsertResultTemplateResponse)response);
+            return createInsertResultTemplateResponseDocument((InsertResultTemplateResponse) response);
         } else if (response instanceof InsertResultResponse) {
-            return createInsertResultResponseDocument((InsertResultResponse)response);
+            return createInsertResultResponseDocument((InsertResultResponse) response);
         } else if (response instanceof GetResultResponse) {
-            createGetResultResponseDocument((GetResultResponse)response);
+            return createGetResultResponseDocument((GetResultResponse) response);
         } else if (response instanceof GetResultTemplateResponse) {
-            createGetResultTemplateResponseDocument((GetResultTemplateResponse)response);
+            return createGetResultTemplateResponseDocument((GetResultTemplateResponse) response);
         }
         return null;
     }
@@ -293,13 +298,16 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         } else if (encoder instanceof IObservationEncoder) {
-            if (((IObservationEncoder)encoder).mergeObservationValuesWithSameParameters()) {
-                observationCollection = response.mergeObservations(((IObservationEncoder)encoder).mergeObservationValuesWithSameParameters());
+            if (((IObservationEncoder) encoder).mergeObservationValuesWithSameParameters()) {
+                observationCollection =
+                        response.mergeObservations(((IObservationEncoder) encoder)
+                                .mergeObservationValuesWithSameParameters());
             } else {
                 observationCollection = response.getObservationCollection();
             }
         } else {
-            String exceptionText = "Error while encoding GetObservation response, encoder is not of type IObservationEncoder!";
+            String exceptionText =
+                    "Error while encoding GetObservation response, encoder is not of type IObservationEncoder!";
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
@@ -479,31 +487,41 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         return xbInsObsRespDoc;
     }
 
-    private XmlObject createInsertResultTemplateResponseDocument(InsertResultTemplateResponse response) throws OwsExceptionReport {
-        InsertResultTemplateResponseDocument insertResultTemplateResponseDoc = InsertResultTemplateResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        InsertResultTemplateResponseType insertResultTemplateResponse = insertResultTemplateResponseDoc.addNewInsertResultTemplateResponse();
+    private XmlObject createInsertResultTemplateResponseDocument(InsertResultTemplateResponse response)
+            throws OwsExceptionReport {
+        InsertResultTemplateResponseDocument insertResultTemplateResponseDoc =
+                InsertResultTemplateResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance()
+                        .getXmlOptions());
+        InsertResultTemplateResponseType insertResultTemplateResponse =
+                insertResultTemplateResponseDoc.addNewInsertResultTemplateResponse();
         insertResultTemplateResponse.setAcceptedTemplate(response.getAcceptedTemplate());
         return insertResultTemplateResponseDoc;
-        
+
     }
-    
+
     private XmlObject createInsertResultResponseDocument(InsertResultResponse response) throws OwsExceptionReport {
-        InsertResultResponseDocument insertResultTemplateResponseDoc = InsertResultResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        InsertResultResponseDocument insertResultTemplateResponseDoc =
+                InsertResultResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         insertResultTemplateResponseDoc.addNewInsertResultResponse();
         return insertResultTemplateResponseDoc;
     }
-    
+
     private XmlObject createGetResultResponseDocument(GetResultResponse response) {
-        GetResultResponseDocument getResultResponseDoc = GetResultResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        GetResultResponseDocument getResultResponseDoc =
+                GetResultResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         GetResultResponseType getResultResponse = getResultResponseDoc.addNewGetResultResponse();
-        // TODO ...
+     // TODO ...
+//        getResultResponse.setResultValues(response.getResultValues());
         return getResultResponse;
     }
-    
-    private XmlObject createGetResultTemplateResponseDocument(GetResultTemplateResponse response) {
-        GetResultTemplateResponseDocument getResultTemplateResponseDoc = GetResultTemplateResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        GetResultTemplateResponseType getResultTemplateResponse = getResultTemplateResponseDoc.addNewGetResultTemplateResponse();
-        // TODO ...
+
+    private XmlObject createGetResultTemplateResponseDocument(GetResultTemplateResponse response) throws OwsExceptionReport {
+        GetResultTemplateResponseDocument getResultTemplateResponseDoc =
+                GetResultTemplateResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        GetResultTemplateResponseType getResultTemplateResponse =
+                getResultTemplateResponseDoc.addNewGetResultTemplateResponse();
+        getResultTemplateResponse.setResultEncoding(createResultEncoding(response.getResultEncoding()));
+        getResultTemplateResponse.setResultStructure(createResultStructure(response.getResultStructure()));
         return getResultTemplateResponseDoc;
     }
 
@@ -513,7 +531,8 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
     }
 
     private XmlObject createGetResultTemplateRequest(GetResultTemplateRequest request) {
-        GetResultTemplateDocument getResultTemplateDoc = GetResultTemplateDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        GetResultTemplateDocument getResultTemplateDoc =
+                GetResultTemplateDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         GetResultTemplateType getResultTemplate = getResultTemplateDoc.addNewGetResultTemplate();
         getResultTemplate.setService(request.getService());
         getResultTemplate.setVersion(request.getVersion());
@@ -523,26 +542,27 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
     }
 
     private XmlObject createGetResultRequest(GetResultRequest request) throws OwsExceptionReport {
-       GetResultDocument getResultDoc = GetResultDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-       GetResultType getResult = getResultDoc.addNewGetResult();
-       getResult.setService(request.getService());
-       getResult.setVersion(request.getVersion());
-       getResult.setOffering(request.getOffering());
-       getResult.setObservedProperty(request.getObservedProperty());
-       if (request.hasFeatureOfInterest()) {
-           for (String featureOfInterest : request.getFeatureOfInterest()) {
-            getResult.addFeatureOfInterest(featureOfInterest);
+        GetResultDocument getResultDoc =
+                GetResultDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        GetResultType getResult = getResultDoc.addNewGetResult();
+        getResult.setService(request.getService());
+        getResult.setVersion(request.getVersion());
+        getResult.setOffering(request.getOffering());
+        getResult.setObservedProperty(request.getObservedProperty());
+        if (request.hasFeatureOfInterest()) {
+            for (String featureOfInterest : request.getFeatureOfInterest()) {
+                getResult.addFeatureOfInterest(featureOfInterest);
+            }
         }
-       }
-       if (request.hasTemporalFilter()) {
-           for (TemporalFilter temporalFilter : request.getTemporalFilter()) {
-            createTemporalFilter(getResult.addNewTemporalFilter(), temporalFilter);
+        if (request.hasTemporalFilter()) {
+            for (TemporalFilter temporalFilter : request.getTemporalFilter()) {
+                createTemporalFilter(getResult.addNewTemporalFilter(), temporalFilter);
+            }
         }
-       }
-       if (request.hasSpatialFilter()) {
-           createSpatialFilter(getResult.addNewSpatialFilter(), request.getSpatialFilter());
-       }
-    
+        if (request.hasSpatialFilter()) {
+            createSpatialFilter(getResult.addNewSpatialFilter(), request.getSpatialFilter());
+        }
+
         return getResultDoc;
     }
 
@@ -603,14 +623,15 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                         Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
                         XmlObject xmlObject = (XmlObject) encoder.encode(offering.getTime());
                         if (xmlObject instanceof TimePeriodType) {
-                            xbObsOff.addNewPhenomenonTime().setTimePeriod((TimePeriodType)xmlObject);
+                            xbObsOff.addNewPhenomenonTime().setTimePeriod((TimePeriodType) xmlObject);
                             xbObsOff.getPhenomenonTime().substitute(
                                     new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_PHENOMENON_TIME,
                                             SosConstants.NS_SOS_PREFIX), xbObsOff.getPhenomenonTime().schemaType());
-//                            XmlObject substitution =
-//                                    timeObjectPropertyType.addNewAbstractTimeObject().substitute(getQnameForITime(iTime),
-//                                            xmlObject.schemaType());
-//                            substitution.set((AbstractTimeObjectType) xmlObject);
+                            // XmlObject substitution =
+                            // timeObjectPropertyType.addNewAbstractTimeObject().substitute(getQnameForITime(iTime),
+                            // xmlObject.schemaType());
+                            // substitution.set((AbstractTimeObjectType)
+                            // xmlObject);
                         } else {
                             // TODO: Exception
                         }
@@ -618,16 +639,19 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                         String exceptionText = "Error while encoding phenomenon time, needed encoder is missing!";
                         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
                     }
-//                    PhenomenonTime xbPhenTime = xbObsOff.addNewPhenomenonTime();
-//                    TimePeriodType xbTime = xbPhenTime.addNewTimePeriod();
-//                    xbTime.setId("pt_" + normalize(offering.getOffering()));
-//                    xbTime.addNewBeginPosition().setStringValue(
-//                            DateTimeHelper.formatDateTime2ResponseString(tp.getStart()));
-//                    xbTime.addNewEndPosition().setStringValue(
-//                            DateTimeHelper.formatDateTime2ResponseString(tp.getEnd()));
-//                    xbObsOff.getPhenomenonTime().substitute(
-//                            new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_PHENOMENON_TIME,
-//                                    SosConstants.NS_SOS_PREFIX), xbObsOff.getPhenomenonTime().schemaType());
+                    // PhenomenonTime xbPhenTime =
+                    // xbObsOff.addNewPhenomenonTime();
+                    // TimePeriodType xbTime = xbPhenTime.addNewTimePeriod();
+                    // xbTime.setId("pt_" + normalize(offering.getOffering()));
+                    // xbTime.addNewBeginPosition().setStringValue(
+                    // DateTimeHelper.formatDateTime2ResponseString(tp.getStart()));
+                    // xbTime.addNewEndPosition().setStringValue(
+                    // DateTimeHelper.formatDateTime2ResponseString(tp.getEnd()));
+                    // xbObsOff.getPhenomenonTime().substitute(
+                    // new QName(Sos2Constants.NS_SOS_20,
+                    // Sos2Constants.EN_PHENOMENON_TIME,
+                    // SosConstants.NS_SOS_PREFIX),
+                    // xbObsOff.getPhenomenonTime().schemaType());
                 }
             }
 
@@ -653,8 +677,9 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                     xbObsOff.addFeatureOfInterestType(featureOfInterestType);
                 }
             }
-            
-            if (offering.getProcedureDescriptionFormat() != null && !offering.getProcedureDescriptionFormat().isEmpty()) {
+
+            if (offering.getProcedureDescriptionFormat() != null
+                    && !offering.getProcedureDescriptionFormat().isEmpty()) {
                 for (String procedureDescriptionFormat : offering.getProcedureDescriptionFormat()) {
                     xbObsOff.addProcedureDescriptionFormat(procedureDescriptionFormat);
                 }
@@ -816,7 +841,8 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             if (cursor.toChild(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_FEATURE_OF_INTEREST_TYPE))) {
                 cursor.setName(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_FEATURE_OF_INTEREST_TYPE,
                         SosConstants.NS_SOS_PREFIX));
-                while (cursor.toNextSibling(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_FEATURE_OF_INTEREST_TYPE))) {
+                while (cursor.toNextSibling(new QName(Sos2Constants.NS_SOS_20,
+                        Sos2Constants.EN_FEATURE_OF_INTEREST_TYPE))) {
                     cursor.setName(new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_FEATURE_OF_INTEREST_TYPE,
                             SosConstants.NS_SOS_PREFIX));
                 }
@@ -825,19 +851,72 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         }
     }
 
-
     private void createTemporalFilter(net.opengis.sos.x20.GetResultType.TemporalFilter temporalFilter,
             TemporalFilter sosTemporalFilter) throws OwsExceptionReport {
         IEncoder encoder = Configurator.getInstance().getEncoder(FilterConstants.NS_FES_2);
-        XmlObject encodedObject = (XmlObject)encoder.encode(sosTemporalFilter);
+        XmlObject encodedObject = (XmlObject) encoder.encode(sosTemporalFilter);
         temporalFilter.set(encodedObject);
     }
 
-    private void createSpatialFilter(SpatialFilter spatialFilter,
-            org.n52.sos.ogc.filter.SpatialFilter sosSpatialFilter) throws OwsExceptionReport {
+    private void createSpatialFilter(SpatialFilter spatialFilter, org.n52.sos.ogc.filter.SpatialFilter sosSpatialFilter)
+            throws OwsExceptionReport {
         IEncoder encoder = Configurator.getInstance().getEncoder(FilterConstants.NS_FES_2);
-        XmlObject encodedObject = (XmlObject)encoder.encode(sosSpatialFilter);
+        XmlObject encodedObject = (XmlObject) encoder.encode(sosSpatialFilter);
         spatialFilter.set(encodedObject);
+    }
+
+    private ResultEncoding createResultEncoding(SosResultEncoding sosResultEncoding) throws OwsExceptionReport {
+        ResultEncoding resultEncoding =
+                ResultEncoding.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        if (sosResultEncoding.getXml() != null && !sosResultEncoding.getXml().isEmpty()) {
+            try {
+                resultEncoding.addNewAbstractEncoding().set(XmlObject.Factory.parse(sosResultEncoding.getXml()));
+            } catch (XmlException e) {
+                String exceptionText = "ResultEncoding element encoding is not supported!";
+               throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+            }
+        } else {
+            IEncoder encoder = Configurator.getInstance().getEncoder(SWEConstants.NS_SWE_20);
+            if (encoder == null) {
+                String exceptionText = "Missing encoder for ResultEncoding!";
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            }
+            Object encodedObject = encoder.encode(sosResultEncoding.getEncoding());
+            if (encodedObject instanceof XmlObject) {
+                resultEncoding.addNewAbstractEncoding().set((XmlObject) encodedObject);
+            } else {
+                String exceptionText = "ResultEncoding element encoding is not supported!";
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            }
+        }
+        return resultEncoding;
+    }
+
+    private ResultStructure createResultStructure(SosResultStructure sosResultStructure) throws OwsExceptionReport {
+        ResultStructure resultStructure =
+                ResultStructure.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        if (sosResultStructure.getXml() != null && !sosResultStructure.getXml().isEmpty()) {
+            try {
+                resultStructure.addNewAbstractDataComponent().set(XmlObject.Factory.parse(sosResultStructure.getXml()));
+            } catch (XmlException e) {
+                String exceptionText = "ResultStructure element encoding is not supported!";
+               throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+            }
+        } else {
+            IEncoder encoder = Configurator.getInstance().getEncoder(SWEConstants.NS_SWE_20);
+            if (encoder == null) {
+                String exceptionText = "Missing encoder for ResultStructure!";
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            }
+            Object encodedObject = encoder.encode(sosResultStructure.getResultStructure());
+            if (encodedObject instanceof XmlObject) {
+                resultStructure.addNewAbstractDataComponent().set((XmlObject) encodedObject);
+            } else {
+                String exceptionText = "ResultStructure element encoding is not supported!";
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            }
+        }
+        return resultStructure;
     }
 
 }

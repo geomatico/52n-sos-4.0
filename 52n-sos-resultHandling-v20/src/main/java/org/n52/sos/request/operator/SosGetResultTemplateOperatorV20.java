@@ -1,25 +1,64 @@
+/**
+ * Copyright (C) 2012
+ * by 52 North Initiative for Geospatial Open Source Software GmbH
+ *
+ * Contact: Andreas Wytzisk
+ * 52 North Initiative for Geospatial Open Source Software GmbH
+ * Martin-Luther-King-Weg 24
+ * 48155 Muenster, Germany
+ * info@52north.org
+ *
+ * This program is free software; you can redistribute and/or modify it under
+ * the terms of the GNU General Public License version 2 as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; even without the implied
+ * WARRANTY OF MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program (see gnu-gpl v2.txt). If not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
+ * visit the Free Software Foundation web page, http://www.fsf.org.
+ */
 package org.n52.sos.request.operator;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.ds.IGetResultDAO;
+import org.n52.sos.ds.IGetResultTemplateDAO;
 import org.n52.sos.ds.IInsertResultDAO;
+import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.request.GetResultTemplateRequest;
+import org.n52.sos.request.InsertResultTemplateRequest;
+import org.n52.sos.response.GetResultTemplateResponse;
+import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.util.OwsHelper;
+import org.n52.sos.util.SosHelper;
+import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SosGetResultTemplateOperatorV20 implements IRequestOperator {
     
     /** the data access object for the DescribeSensor operation */
-    private IInsertResultDAO dao;
+    private IGetResultTemplateDAO dao;
 
     /** Name of the operation the listener implements */
     private static final String OPERATION_NAME = Sos2Constants.Operations.GetResultTemplate.name();
@@ -33,7 +72,7 @@ public class SosGetResultTemplateOperatorV20 implements IRequestOperator {
         requestOperatorKeyType =
                 new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION),
                         OPERATION_NAME);
-        this.dao = (IInsertResultDAO) Configurator.getInstance().getOperationDAOs().get(OPERATION_NAME);
+        this.dao = (IGetResultTemplateDAO) Configurator.getInstance().getOperationDAOs().get(OPERATION_NAME);
         LOGGER.info("{} initialized successfully!", this.getClass().getSimpleName());
     }
 
@@ -49,8 +88,41 @@ public class SosGetResultTemplateOperatorV20 implements IRequestOperator {
 
     @Override
     public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
-        // TODO Auto-generated method stub
-        return null;
+        if (request instanceof GetResultTemplateRequest) {
+            GetResultTemplateRequest sosRequest = (GetResultTemplateRequest) request;
+            checkRequestedParameter(sosRequest);
+            
+            GetResultTemplateResponse response = this.dao.getResultTemplate(sosRequest);
+            String contentType = SosConstants.CONTENT_TYPE_XML;
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                String namespace = Sos2Constants.NS_SOS_20;
+                IEncoder encoder = Configurator.getInstance().getEncoder(namespace);
+                if (encoder != null) {
+                    Object encodedObject = encoder.encode(response);
+                    if (encodedObject instanceof XmlObject) {
+                        ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
+                        return new ServiceResponse(baos, contentType, false, true);
+                    } else if (encodedObject instanceof ServiceResponse) {
+                        return (ServiceResponse) encodedObject;
+                    } else {
+                        String exceptionText = "The encoder response is not supported!";
+                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                    }
+                } else {
+                    String exceptionText = "Error while getting encoder for response!";
+                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                }
+            } catch (IOException ioe) {
+                String exceptionText = "Error occurs while saving response to output stream!";
+                LOGGER.error(exceptionText, ioe);
+                throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            }
+        }
+        String exceptionText = "Received request is not a GetResultTemplateRequest!";
+        LOGGER.debug(exceptionText);
+        throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
+      
     }
 
     @Override
@@ -75,6 +147,64 @@ public class SosGetResultTemplateOperatorV20 implements IRequestOperator {
     @Override
     public IExtension getExtension(Object connection) throws OwsExceptionReport {
         return dao.getExtension(connection);
+    }
+    
+    private void checkRequestedParameter(GetResultTemplateRequest request) throws OwsExceptionReport {
+        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+        try {
+            SosHelper.checkServiceParameter(request.getService());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            OwsHelper.checkSingleVersionParameter(request.getVersion(), Configurator.getInstance()
+                    .getSupportedVersions());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            checkOffering(request.getOffering());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            checkObservedProperty(request.getObservedProperty());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        Util4Exceptions.mergeAndThrowExceptions(exceptions);
+    }
+
+
+    private void checkOffering(String offering) throws OwsExceptionReport {
+        if (offering == null || (offering != null && offering.isEmpty())) {
+            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.GetResultTemplateParams.offering.name());
+        } else if (offering != null
+                && !Configurator.getInstance().getCapabilitiesCacheController().getOfferings()
+                        .contains(offering)) {
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("The requested offering (");
+            exceptionText.append(offering);
+            exceptionText.append(") is not supported by this server!");
+            throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.GetResultTemplateParams.offering.name(),
+                    exceptionText.toString());
+        }
+    }
+
+
+    private void checkObservedProperty(String observedProperty) throws OwsExceptionReport {
+        if (observedProperty == null || (observedProperty != null && observedProperty.isEmpty())) {
+            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.GetResultTemplateParams.observedProperty.name());
+        } else if (observedProperty != null
+                && !Configurator.getInstance().getCapabilitiesCacheController().getObservableProperties()
+                        .contains(observedProperty)) {
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("The requested observedProperty (");
+            exceptionText.append(observedProperty);
+            exceptionText.append(") is not supported by this server!");
+            throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.GetResultTemplateParams.observedProperty.name(),
+                    exceptionText.toString());
+        }
     }
 
 }

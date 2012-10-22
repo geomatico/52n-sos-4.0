@@ -29,6 +29,6 @@ import org.n52.sos.response.UpdateSensorResponse;
 
 public interface IUpdateSensorDescriptionDAO extends IOperationDAO {
     
-   public UpdateSensorResponse updateSensorDescription(UpdateSensorRequest updateSensorRequest) throws OwsExceptionReport;
+   public UpdateSensorResponse updateSensorDescription(UpdateSensorRequest request) throws OwsExceptionReport;
 
 }

@@ -26,12 +26,16 @@ package org.n52.sos.ogc.sos;
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 
 public class SosResultEncoding {
-    
+
+    private String xml;
+
     private SosSweAbstractEncoding encoding;
 
-
     public String getXml() {
-        return encoding.getXml();
+        if (encoding != null) {
+            return encoding.getXml();
+        }
+        return xml;
     }
 
     public void setEncoding(SosSweAbstractEncoding encoding) {
@@ -39,7 +43,15 @@ public class SosResultEncoding {
     }
 
     public SosSweAbstractEncoding getEncoding() {
-        return encoding;
+        if (encoding == null && xml != null && !xml.isEmpty()) {
+            // TODO decode from xmlString
+            return null;
+        }
+       return encoding;
     }
-    
+
+    public void setXml(String xml) {
+        this.xml = xml;
+    }
+
 }

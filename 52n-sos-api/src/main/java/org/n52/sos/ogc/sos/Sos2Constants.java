@@ -228,9 +228,13 @@ public final class Sos2Constants {
     public enum GetResultTemplateParams {
         offering, observedProperty;
     }
+    
+    public enum InsertResultTemplateParams {
+        offering, observedProperty, procedure, observationType;
+    }
 
     public enum GetResultParams {
-        offering, observedProperty;
+        offering, observedProperty, featureOfInterest, temporalFilter, spatialFilter;
     }
     
     public enum InsertResult {

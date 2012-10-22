@@ -36,16 +36,20 @@ import net.opengis.swe.x20.TextType;
 import net.opengis.swe.x20.TimeType;
 import net.opengis.swe.x20.VectorType.Coordinate;
 
+import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.swe.SWEConstants;
+import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
+import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,6 +114,11 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 
     @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
+        return encode(element, null);
+    }
+
+    @Override
+    public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         if (element instanceof SosSweQuantity) {
             return addValuesToSimpleTypeQuantity((SosSweQuantity) element);
         } else if (element instanceof SosSweText) {
@@ -120,12 +129,11 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
             return addValuesToCoordinate((SosSweCoordinate) element);
         } else if (element instanceof SosSweAbstractSimpleType) {
             return addSweSimpleTypToField((SosSweAbstractSimpleType) element);
+        } else if (element instanceof SosSweAbstractEncoding) {
+            return createAbstractEncoding((SosSweAbstractEncoding)element);
+        } else if (element instanceof SosSweAbstractDataComponent) {
+            return createAbstractDataComponent((SosSweAbstractDataComponent)element);
         }
-        return null;
-    }
-
-    @Override
-    public XmlObject encode(Object response, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         return null;
     }
 
@@ -227,6 +235,36 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         xbCoordinate.setName(coordinate.getName().name());
         xbCoordinate.setQuantity(addValuesToSimpleTypeQuantity((SosSweQuantity) coordinate.getValue()));
         return xbCoordinate;
+    }
+
+    private XmlObject createAbstractDataComponent(SosSweAbstractDataComponent sosSweAbstractDataComponent) throws OwsExceptionReport {
+        try {
+            if (sosSweAbstractDataComponent.getXml() != null && !sosSweAbstractDataComponent.getXml().isEmpty()) {
+                XmlObject xmlObject = XmlObject.Factory.parse(sosSweAbstractDataComponent.getXml());
+                return xmlObject;
+            } else {
+                String exceptionText = "AbstractDataComponent can not be encoded!";
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText); 
+            }
+        } catch (XmlException e) {
+            String exceptionText = "Error while encoding AbstractDataComponent!";
+            throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+        }
+    }
+
+    private XmlObject createAbstractEncoding(SosSweAbstractEncoding sosSweAbstractEncoding) throws OwsExceptionReport {
+        try {
+            if (sosSweAbstractEncoding.getXml() != null && !sosSweAbstractEncoding.getXml().isEmpty()) {
+                XmlObject xmlObject = XmlObject.Factory.parse(sosSweAbstractEncoding.getXml());
+                return xmlObject;
+            } else {
+                String exceptionText = "AbstractEncoding can not be encoded!";
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText); 
+            }
+        } catch (XmlException e) {
+            String exceptionText = "Error while encoding AbstractEncoding!";
+            throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+        }
     }
 
 }
