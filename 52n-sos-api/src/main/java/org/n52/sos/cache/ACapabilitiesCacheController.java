@@ -448,5 +448,7 @@ public abstract class ACapabilitiesCacheController extends TimerTask {
 	public abstract DateTime getMinTimeForOffering(String offering);
 	public abstract DateTime getMaxTimeForOffering(String offering);
 	public abstract Envelope getEnvelopeForFeatures();
+	public abstract DateTime getMinEventTime();
+	public abstract DateTime getMaxEventTime();
 
 }

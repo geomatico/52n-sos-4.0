@@ -1086,4 +1086,15 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 	public Envelope getEnvelopeForFeatures() {
 		return this.capabilitiesCache.getEnvelopeForFeatureOfInterest();
 	}
+	
+	@Override
+	public DateTime getMinEventTime() {
+		return this.capabilitiesCache.getMinEventTime();
+	}
+	
+	@Override
+	public DateTime getMaxEventTime() {
+		return this.capabilitiesCache.getMaxEventTime();
+	}
+
 }

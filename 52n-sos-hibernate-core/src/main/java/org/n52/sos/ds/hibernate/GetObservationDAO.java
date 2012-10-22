@@ -195,8 +195,7 @@ public class GetObservationDAO implements IGetObservationDAO {
                 Envelope envelope = null;
                 if (featureIDs != null && !featureIDs.isEmpty()) {
                     envelope =
-                            Configurator.getInstance().getFeatureQueryHandler()
-                                    .getEnvelopeForFeatureIDs((List<String>) featureIDs, session);
+                            Configurator.getInstance().getCapabilitiesCacheController().getEnvelopeForFeatures();
                 }
                 if (envelope != null) {
                     opsMeta.addParameterValue(Sos2Constants.GetObservationParams.spatialFilter.name(),
@@ -679,8 +678,8 @@ public class GetObservationDAO implements IGetObservationDAO {
     private Map<MinMax, String> getEventTime(Session session) throws OwsExceptionReport {
         try {
             Map<MinMax, String> eventTime = new HashMap<MinMax, String>(2);
-            DateTime minDate = HibernateCriteriaQueryUtilities.getMinObservationTime(session);
-            DateTime maxDate = HibernateCriteriaQueryUtilities.getMaxObservationTime(session);
+            DateTime minDate = Configurator.getInstance().getCapabilitiesCacheController().getMinEventTime();
+            DateTime maxDate = Configurator.getInstance().getCapabilitiesCacheController().getMaxEventTime();
             if (minDate != null && maxDate != null) {
                 eventTime.put(MinMax.MIN, DateTimeHelper.formatDateTime2ResponseString(minDate));
                 eventTime.put(MinMax.MAX, DateTimeHelper.formatDateTime2ResponseString(maxDate));

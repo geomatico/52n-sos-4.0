@@ -139,6 +139,8 @@ public class CapabilitiesCache extends ACapabilitiesCache {
 	private Map<String, DateTime> kOfferingVMinTime;
 	private Map<String, DateTime> kOfferingVMaxTime;
 	private Envelope envelopeForFeatureOfInterest;
+	private DateTime minEventTime;
+	private DateTime maxEventTime;
 
     /**
      * constructor
@@ -1036,4 +1038,21 @@ public class CapabilitiesCache extends ACapabilitiesCache {
 	public void setEnvelopeForFeatureOfInterest(Envelope envelope) {
 		this.envelopeForFeatureOfInterest = envelope;
 	}
+
+	public DateTime getMinEventTime() {
+		return this.minEventTime;
+	}
+	
+	public void setMinEventTime(DateTime minEventTime) {
+		this.minEventTime = minEventTime;
+	}
+	
+	public DateTime getMaxEventTime() {
+		return this.maxEventTime;
+	}
+	
+	public void setMaxEventTime(DateTime maxEventTime) {
+		this.maxEventTime = maxEventTime;
+	}
+
 }

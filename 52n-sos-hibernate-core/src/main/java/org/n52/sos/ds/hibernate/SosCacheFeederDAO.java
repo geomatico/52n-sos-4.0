@@ -104,6 +104,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             setSridValues(cache, session);
             setObservationTypes(cache, session);
             setResultTemplateValues(cache, session);
+			setEventTimeValues(cache, session);
         } catch (HibernateException he) {
             String exceptionText = "Error while initializing CapabilitiesCache!";
             LOGGER.error(exceptionText, he);
@@ -161,6 +162,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             session = (Session) connectionProvider.getConnection();
             setFeatureOfInterestValues(cache, session);
 			setOfferingValues(cache, session);
+			setEventTimeValues(cache, session);
             session.close();
         } catch (HibernateException he) {
             String exceptionText = "Error while updating CapabilitiesCache after observation insertion!";
@@ -180,6 +182,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             session = (Session) connectionProvider.getConnection();
             setFeatureOfInterestValues(cache, session);
             setOfferingValues(cache, session);
+			setEventTimeValues(cache, session);
             session.close();
         } catch (HibernateException he) {
             String exceptionText = "Error while updating CapabilitiesCache after observation deletion!";
@@ -358,6 +361,11 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
 		cache.setEnvelopeForFeatureOfInterest(Configurator.getInstance().getFeatureQueryHandler()
 			.getEnvelopeForFeatureIDs(ids, session));
     }
+	
+	private void setEventTimeValues(CapabilitiesCache cache, Session session) {
+		cache.setMinEventTime(HibernateCriteriaQueryUtilities.getMinObservationTime(session));
+		cache.setMaxEventTime(HibernateCriteriaQueryUtilities.getMaxObservationTime(session));
+	}
 
     private void setRelatedFeatures(CapabilitiesCache cache, Session session) {
         Map<String, Collection<String>> relatedFeatureList = new HashMap<String, Collection<String>>();
