@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -60,7 +61,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     private Collection<String> obsIds;
 
     /** hash map containing the phenomenons for each offering */
-    private Map<String, Collection<String>> offPhenomenons;
+    private Map<String, Collection<String>> kOfferingVObservableProperties;
 
     /** hash map containing the name for each offering */
     private Map<String, String> offName;
@@ -69,13 +70,13 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     private Map<String, Collection<String>> kOffferingVObservationTypes;
 
     /** hash map containing the procedures for each offering */
-    private Map<String, Collection<String>> offProcedures;
+    private Map<String, Collection<String>> KOfferingVProcedures;
 
     /** hash map containing the features of interest for each offering */
-    private Map<String, Collection<String>> offFeatures;
+    private Map<String, Collection<String>> kOfferingVFeaturesOfInterest;
 
     /** hash map containing the procedures for each feature of interest */
-    private Map<String, Collection<String>> foiProcedures;
+    private Map<String, Collection<String>> kFeatureOfInterestVProcedures;
 
     /**
      * hash map containing the phenomenon components of each compositePhenomenon
@@ -86,7 +87,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * hash map containing the offering IDs as keys and the corresponding
      * composite phenomena ids as values
      */
-    private Map<String, Collection<String>> offCompPhens;
+    private Map<String, Collection<String>> kOfferingVCompositePhenomenon;
 
     /** hash map containing parent procedures for each procedure */
     private Map<String, Collection<String>> parentProcs;
@@ -95,10 +96,10 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     private Map<String, Collection<String>> childProcs;
 
     /** hash map containing the corresponding phenomena for each procedure */
-    private Map<String, Collection<String>> procPhens;
+    private Map<String, Collection<String>> kProcedureVObservableProperties;
 
     /** hash map containing the offerings(values) for each procedure (key) */
-    private Map<String, Collection<String>> procOffs;
+    private Map<String, Collection<String>> kProcedureVOfferings;
 
     private Map<String, Collection<String>> parentFeatures;
 
@@ -108,10 +109,10 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * hash map containing the phenomenon IDs as keys and the corresponding
      * procedure ids as values
      */
-    private Map<String, Collection<String>> phenProcs;
+    private Map<String, Collection<String>> kObservablePropertiesVProcedures;
 
     /** map contains the offerings for each phenomenon */
-    private Map<String, Collection<String>> phenOffs;
+    private Map<String, Collection<String>> kObservablePropertyVOfferings;
 
     private Map<String, String[]> times4Offerings;
 
@@ -122,7 +123,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     private int srid;
 
     /** hash map containing the related features for each offering */
-    private Map<String, Collection<String>> offRelatedFeatures;
+    private Map<String, Collection<String>> kOfferingVRelatedFEatures;
 
     /** hash map containing the roles for each related feature */
     private Map<String, Collection<String>> kRelatedFeatureVRole;
@@ -151,7 +152,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      *         offering
      */
     protected Collection<String> getPhenomenons4Offering(String offering) {
-        return this.offPhenomenons.get(offering);
+        return this.kOfferingVObservableProperties.get(offering);
     }
 
     /**
@@ -165,17 +166,17 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @return List<String> containing all phenomena which belong to the
      *         offering
      */
-    protected Collection<String> getAllPhenomenons4Offering(String offering) {
+    protected Collection<String> getObservableProperties4Offering(String offering) {
         List<String> result = new ArrayList<String>();
 
         // single phenomena
-        if (this.offPhenomenons.containsKey(offering)) {
+        if (this.kOfferingVObservableProperties.containsKey(offering)) {
 
-            result.addAll(this.offPhenomenons.get(offering));
+            result.addAll(this.kOfferingVObservableProperties.get(offering));
 
             // components of composite phenomena
-            if (this.offCompPhens.containsKey(offering)) {
-                Collection<String> compPhens = this.offCompPhens.get(offering);
+            if (this.kOfferingVCompositePhenomenon.containsKey(offering)) {
+                Collection<String> compPhens = this.kOfferingVCompositePhenomenon.get(offering);
                 for (String cp : compPhens) {
                     if (this.phens4CompPhens.containsKey(cp)) {
                         result.addAll(this.phens4CompPhens.get(cp));
@@ -187,8 +188,8 @@ public class CapabilitiesCache extends ACapabilitiesCache {
 
         // only components of composite phenomena
         else {
-            if (this.offCompPhens.containsKey(offering)) {
-                Collection<String> compPhens = this.offCompPhens.get(offering);
+            if (this.kOfferingVCompositePhenomenon.containsKey(offering)) {
+                Collection<String> compPhens = this.kOfferingVCompositePhenomenon.get(offering);
                 for (String cp : compPhens) {
                     if (this.phens4CompPhens.containsKey(cp)) {
                         result.addAll(this.phens4CompPhens.get(cp));
@@ -205,20 +206,9 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * 
      * @return List<String> containing the phenomenons of all offerings
      */
-    protected Collection<String> getAllPhenomenons() {
-        List<String> phenomenons = new ArrayList<String>();
-        for (String s : this.offName.keySet()) {
-
-            // get single phenomena
-            if (this.offPhenomenons.containsKey(s)) {
-                Collection<String> phen = this.offPhenomenons.get(s);
-                for (String p : phen) {
-                    if (!phenomenons.contains(p)) {
-                        phenomenons.add(p);
-                    }
-                }
-            }
-
+    protected Collection<String> getObservableProperties() {
+        Set<String> observableProperties = new HashSet<String>(0);
+        observableProperties.addAll(kObservablePropertyVOfferings.keySet());
             // // get composite phenomena
             // if (this.offCompPhens.containsKey(s)) {
             // Collection<String> phen = this.offCompPhens.get(s);
@@ -242,8 +232,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
             // }
             // }
             // }
-        }
-        return phenomenons;
+        return observableProperties;
     }
 
     /**
@@ -282,7 +271,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @return
      */
     protected Map<String, Collection<String>> getOffPhenomenons() {
-        return offPhenomenons;
+        return kOfferingVObservableProperties;
     }
 
     /**
@@ -309,7 +298,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @return
      */
     protected Map<String, Collection<String>> getOffProcedures() {
-        return offProcedures;
+        return KOfferingVProcedures;
     }
 
     /**
@@ -328,7 +317,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      *         observedProperties
      */
     protected Map<String, Collection<String>> getObsPhenomenons() {
-        return offPhenomenons;
+        return kOfferingVObservableProperties;
     }
 
     /**
@@ -360,7 +349,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @return String[] containing the procedures for the requested offering
      */
     protected Collection<String> getProcedures4Offering(String offering) {
-        return this.offProcedures.get(offering);
+        return this.KOfferingVProcedures.get(offering);
     }
 
     /**
@@ -371,7 +360,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @return String representing the procedureID
      */
     protected Collection<String> getProc4FOI(String foiID) {
-        return this.foiProcedures.get(foiID);
+        return this.kFeatureOfInterestVProcedures.get(foiID);
     }
 
     /**
@@ -380,7 +369,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @return Map<String, List<String>> foiProcedures
      */
     protected Map<String, Collection<String>> getFoiProcedures() {
-        return foiProcedures;
+        return kFeatureOfInterestVProcedures;
     }
 
     /**
@@ -396,14 +385,13 @@ public class CapabilitiesCache extends ACapabilitiesCache {
         return this.unit4Phen.get(observedProperty);
     }
 
-
     /**
      * @return Returns only FOIs which are sampling features
      */
     protected Collection<String> getFeatureOfInterest() {
         return featuresOfInterest;
     }
-    
+
     public void setFeatureOfInterest(Collection<String> featuresOfInterest) {
         this.featuresOfInterest = featuresOfInterest;
     }
@@ -419,14 +407,14 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @return Returns the offCompPhens.
      */
     protected Map<String, Collection<String>> getOffCompPhens() {
-        return offCompPhens;
+        return kOfferingVCompositePhenomenon;
     }
 
     /**
      * @return Returns the phenProcs.
      */
     protected Map<String, Collection<String>> getPhenProcs() {
-        return phenProcs;
+        return kObservablePropertiesVProcedures;
     }
 
     /**
@@ -524,7 +512,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @param offFeatures
      */
     public void setKOffrtingVFeatures(Map<String, Collection<String>> offFeatures) {
-        this.offFeatures = offFeatures;
+        this.kOfferingVFeaturesOfInterest = offFeatures;
     }
 
     /**
@@ -533,7 +521,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @param offPhenomenons
      */
     public void setKOfferingVObservableProperties(Map<String, Collection<String>> offPhenomenons) {
-        this.offPhenomenons = offPhenomenons;
+        this.kOfferingVObservableProperties = offPhenomenons;
     }
 
     /**
@@ -569,7 +557,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @param offProcedures
      */
     public void setKOfferingVProcedures(Map<String, Collection<String>> offProcedures) {
-        this.offProcedures = offProcedures;
+        this.KOfferingVProcedures = offProcedures;
     }
 
     /**
@@ -578,7 +566,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @param procOffs
      */
     public void setKProcedureVOfferings(Map<String, Collection<String>> procOffs) {
-        this.procOffs = procOffs;
+        this.kProcedureVOfferings = procOffs;
     }
 
     /**
@@ -596,7 +584,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @param foiProcedures
      */
     public void setKFeatureOfInterestVProcedures(Map<String, Collection<String>> foiProcedures) {
-        this.foiProcedures = foiProcedures;
+        this.kFeatureOfInterestVProcedures = foiProcedures;
     }
 
     /**
@@ -614,7 +602,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @param offCompPhens
      */
     public void setKOfferingVCompositePhenomenon(Map<String, Collection<String>> offCompPhens) {
-        this.offCompPhens = offCompPhens;
+        this.kOfferingVCompositePhenomenon = offCompPhens;
     }
 
     /**
@@ -632,7 +620,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @param phenOffs
      */
     public void setKObservablePropertyVOfferings(Map<String, Collection<String>> phenOffs) {
-        this.phenOffs = phenOffs;
+        this.kObservablePropertyVOfferings = phenOffs;
     }
 
     /**
@@ -642,7 +630,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      *            The phenProcs to set.
      */
     public void setKObservablePropertyKProcedures(Map<String, Collection<String>> phenProcs) {
-        this.phenProcs = phenProcs;
+        this.kObservablePropertiesVProcedures = phenProcs;
     }
 
     /**
@@ -651,7 +639,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @return Returns the procPhens.
      */
     protected Map<String, Collection<String>> getProcPhens() {
-        return procPhens;
+        return kProcedureVObservableProperties;
     }
 
     /**
@@ -661,7 +649,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      *            The procPhens to set.
      */
     public void setProcPhens(Map<String, Collection<String>> procPhens) {
-        this.procPhens = procPhens;
+        this.kProcedureVObservableProperties = procPhens;
     }
 
     /**
@@ -698,7 +686,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      *         corresponding features as values
      */
     protected Map<String, Collection<String>> getOffFeatures() {
-        return offFeatures;
+        return kOfferingVFeaturesOfInterest;
     }
 
     /**
@@ -711,8 +699,8 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      */
     protected Collection<String> getOfferings4Procedure(String procID) {
         List<String> result = new ArrayList<String>();
-        if (this.procOffs.containsKey(procID)) {
-            result.addAll(this.procOffs.get(procID));
+        if (this.kProcedureVOfferings.containsKey(procID)) {
+            result.addAll(this.kProcedureVOfferings.get(procID));
         }
         return result;
     }
@@ -727,8 +715,8 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      */
     protected Collection<String> getOfferings4Phenomenon(String phenID) {
         List<String> result = new ArrayList<String>();
-        if (this.phenOffs.containsKey(phenID)) {
-            result.addAll(this.phenOffs.get(phenID));
+        if (this.kObservablePropertyVOfferings.containsKey(phenID)) {
+            result.addAll(this.kObservablePropertyVOfferings.get(phenID));
         }
         return result;
     }
@@ -792,10 +780,10 @@ public class CapabilitiesCache extends ACapabilitiesCache {
         }
 
         // insert proc_foi relationsship
-        if (this.foiProcedures.get(foiID) != null) {
-            this.foiProcedures.get(foiID).add(procID);
+        if (this.kFeatureOfInterestVProcedures.get(foiID) != null) {
+            this.kFeatureOfInterestVProcedures.get(foiID).add(procID);
         } else {
-            this.foiProcedures.put(foiID, procs);
+            this.kFeatureOfInterestVProcedures.put(foiID, procs);
         }
     }
 
@@ -806,7 +794,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      *            the relatedFeatures to set
      */
     public void setKOfferingVRelatedFeatures(Map<String, Collection<String>> offRelatedFeatures) {
-        this.offRelatedFeatures = offRelatedFeatures;
+        this.kOfferingVRelatedFEatures = offRelatedFeatures;
     }
 
     /**
@@ -815,7 +803,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @return the relatedFeatures Map with related features for offerings
      */
     protected Map<String, Collection<String>> getKOfferingVRelatedFeatures() {
-        return offRelatedFeatures;
+        return kOfferingVRelatedFEatures;
     }
 
     protected Map<String, Collection<String>> getKRelatedFeatureVRole() {
@@ -825,7 +813,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     /**
      * method to set the related features for a offering
      * 
-     * @param offRelatedFeatures
+     * @param kOfferingVRelatedFEatures
      *            the relatedFeatures to set
      */
     public void setKRelatedFeaturesVRole(Map<String, Collection<String>> kRelatedFeatureVRole) {
@@ -867,7 +855,8 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * @return Collection<String> containing the passed procedure id's parents
      *         (and optionally themselves)
      */
-    protected Collection<String> getParentProcs(Collection<String> procIds, boolean fullHierarchy, boolean includeSelves) {
+    protected Collection<String> getParentProcs(Collection<String> procIds, boolean fullHierarchy,
+            boolean includeSelves) {
         Collection<String> collectionParentProcs = new HashSet<String>();
 
         for (String procId : procIds) {
@@ -964,7 +953,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     protected Map<String, Collection<String>> getAllowedKOfferingVObservationType() {
         return allowedKOfferingVObservationType;
     }
-    
+
     public void setAllowedKOfferingVObservationType(Map<String, Collection<String>> allowedKOfferingVObservationType) {
         this.allowedKOfferingVObservationType = allowedKOfferingVObservationType;
     }
@@ -976,7 +965,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     public Collection<String> getObservationTypes() {
         return observationTypes;
     }
-    
+
     public void setResultTemplates(Collection<String> resultTemplates) {
         this.resultTemplates = resultTemplates;
     }

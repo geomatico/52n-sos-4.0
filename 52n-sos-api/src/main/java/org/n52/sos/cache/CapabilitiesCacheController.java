@@ -435,7 +435,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      *         offering
      */
     public List<String> getAllPhenomenons4Offering(String offering) {
-        return new ArrayList<String>(this.capabilitiesCache.getAllPhenomenons4Offering(offering));
+        return new ArrayList<String>(this.capabilitiesCache.getObservableProperties4Offering(offering));
     }
 
     /**
@@ -444,7 +444,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @return List<String> containing the phenomenons of all offerings
      */
     public List<String> getAllPhenomenons() {
-        return new ArrayList<String>(this.capabilitiesCache.getAllPhenomenons());
+        return new ArrayList<String>(this.capabilitiesCache.getObservableProperties());
     }
 
     /**
@@ -824,8 +824,8 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      */
     @Override
     public Collection<String> getObservableProperties() {
-        if (this.capabilitiesCache.getAllPhenomenons() != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getAllPhenomenons());
+        if (this.capabilitiesCache.getObservableProperties() != null) {
+            return new ArrayList<String>(this.capabilitiesCache.getObservableProperties());
         }
         return new ArrayList<String>();
     }
