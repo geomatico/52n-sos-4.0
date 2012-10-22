@@ -30,9 +30,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.joda.time.DateTime;
 
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.util.SosHelper;
 
 /**
@@ -114,8 +116,6 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     /** map contains the offerings for each phenomenon */
     private Map<String, Collection<String>> kObservablePropertyVOfferings;
 
-    private Map<String, String[]> times4Offerings;
-
     /** contains the unit (value) for each phenomenon (key) */
     private Map<String, String> unit4Phen;
 
@@ -133,6 +133,10 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     private Collection<String> observationTypes;
 
     private Collection<String> resultTemplates;
+	
+	private Map<String, SosEnvelope> kOfferingVEnvelope;
+	private Map<String, DateTime> kOfferingVMinTime;
+	private Map<String, DateTime> kOfferingVMaxTime;
 
     /**
      * constructor
@@ -653,25 +657,6 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     }
 
     /**
-     * returns the time offering relations
-     * 
-     * @return the times4Offerings
-     */
-    protected Map<String, String[]> getTimes4Offerings() {
-        return times4Offerings;
-    }
-
-    /**
-     * sets the time offering relations
-     * 
-     * @param times4Offerings
-     *            the times4Offerings to set
-     */
-    public void setTimes4Offerings(Map<String, String[]> times4Offerings) {
-        this.times4Offerings = times4Offerings;
-    }
-
-    /**
      * returns the SRID
      * 
      * @return Returns Srid of coordinates stored in SOS database
@@ -973,4 +958,62 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     public Collection<String> getResultTemplates() {
         return resultTemplates;
     }
+	
+	/**
+     * gets relationships between offerings and en
+     * 
+     * @return the envelopes of the offerings
+     *
+	 */
+	public Map<String, SosEnvelope> getKOfferingVEnvelope() {
+		return this.kOfferingVEnvelope;
+	}
+	
+	/**
+     * sets relationships between offerings and envelopes
+     * 
+     * @param kOfferingVEnvelope
+     */
+	public void setKOfferingVEnvelope(Map<String, SosEnvelope> kOfferingVEnvelope) {
+		this.kOfferingVEnvelope = kOfferingVEnvelope;
+	}
+	
+	/**
+     * gets relationships between offerings and their min time
+     * 
+     * @return the min times of the offerings
+     *
+	 */
+	public Map<String, DateTime> getKOfferingVMinTime() {
+		return this.kOfferingVMinTime;
+	}
+	
+	/**
+     * sets relationships between offerings and their min time
+     * 
+     * @param kOfferingVMinTime
+     */
+	public void setKOfferingVMinTime(Map<String, DateTime> kOfferingVMinTime) {
+		this.kOfferingVMinTime = kOfferingVMinTime;
+	}
+
+
+	/**
+     * gets relationships between offerings and their max time
+     * 
+     * @return the max times of the offerings
+     *
+	 */
+	public Map<String, DateTime> getKOfferingVMaxTime() {
+		return this.kOfferingVMaxTime;
+	}
+	
+	/**
+     * sets relationships between offerings and their max time
+     * 
+     * @param kOfferingVMaxTime
+     */
+	public void setKOfferingVMaxTime(Map<String, DateTime> kOfferingVMaxTime) {
+		this.kOfferingVMaxTime = kOfferingVMaxTime;
+	}
 }

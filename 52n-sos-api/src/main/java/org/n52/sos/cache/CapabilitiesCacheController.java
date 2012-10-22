@@ -30,11 +30,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import org.joda.time.DateTime;
 
 import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -710,18 +712,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     }
 
     /**
-     * returns the the times for offerings
-     * 
-     * @return Map<String, String[]> the times for offerings
-     */
-    public Map<String, String[]> getTimes4Offerings() {
-        if (this.capabilitiesCache.getTimes4Offerings() != null) {
-            return new HashMap<String, String[]>(this.capabilitiesCache.getTimes4Offerings());
-        }
-        return new HashMap<String, String[]>();
-    }
-
-    /**
      * Returns Srid of coordinates stored in SOS database
      * 
      * @return int Srid of coordinates stored in SOS database
@@ -1066,4 +1056,28 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         }
         return new ArrayList<String>();
     }
+	
+	@Override
+	public SosEnvelope getEnvelopeForOffering(String offering) {
+		if (this.capabilitiesCache.getKOfferingVEnvelope() != null) {
+			return this.capabilitiesCache.getKOfferingVEnvelope().get(offering);
+		}
+		return null;
+	}
+	
+	@Override
+	public DateTime getMinTimeForOffering(String offering) {
+		if (this.capabilitiesCache.getKOfferingVMinTime() != null) {
+			return this.capabilitiesCache.getKOfferingVMinTime().get(offering);
+		}
+		return null;
+	}
+	
+	@Override
+	public DateTime getMaxTimeForOffering(String offering) {
+		if (this.capabilitiesCache.getKOfferingVMaxTime() != null) {
+			return this.capabilitiesCache.getKOfferingVMaxTime().get(offering);
+		}
+		return null;
+	}
 }

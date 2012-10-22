@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ds.hibernate;
 
+import com.vividsolutions.jts.geom.Envelope;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.joda.time.DateTime;
 import org.n52.sos.cache.ACapabilitiesCache;
 import org.n52.sos.cache.CapabilitiesCache;
 import org.n52.sos.ds.ICacheFeederDAO;
@@ -51,6 +53,7 @@ import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.entities.SpatialRefSys;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -157,6 +160,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             // TODO: check which setter are necessary
             session = (Session) connectionProvider.getConnection();
             setFeatureOfInterestValues(cache, session);
+			setOfferingValues(cache, session);
             session.close();
         } catch (HibernateException he) {
             String exceptionText = "Error while updating CapabilitiesCache after observation insertion!";
@@ -216,13 +220,17 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
      * @param session
      *            Hibernate session
      */
-    private void setOfferingValues(CapabilitiesCache cache, Session session) {
+    private void setOfferingValues(CapabilitiesCache cache, Session session) throws OwsExceptionReport {
         Map<String, String> kOfferingVName = new HashMap<String, String>();
         Map<String, Collection<String>> kOfferingVProcedures = new HashMap<String, Collection<String>>();
         Map<String, Collection<String>> kOfferingVObservableProperties = new HashMap<String, Collection<String>>();
         Map<String, Collection<String>> kOfferingVRelatedFeatures = new HashMap<String, Collection<String>>();
         Map<String, Collection<String>> kOfferingVObservationTypes = new HashMap<String, Collection<String>>();
         Map<String, Collection<String>> allowedkOfferingVObservationTypes = new HashMap<String, Collection<String>>();
+		Map<String, DateTime> kOfferingVMinTime = new HashMap<String, DateTime>();
+		Map<String, DateTime> kOfferingVMaxTime = new HashMap<String, DateTime>();
+		Map<String, SosEnvelope> kOfferingVEnvelope = new HashMap<String, SosEnvelope>();
+				
         List<Offering> hOfferings = HibernateCriteriaQueryUtilities.getOfferingObjects(session);
         for (Offering offering : hOfferings) {
             if (!checkOfferingForDeletedProcedure(offering.getObservationConstellations())) {
@@ -237,6 +245,12 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
                         getObservationTypesFromObservationConstellation(offering.getObservationConstellations()));
                 allowedkOfferingVObservationTypes.put(offering.getIdentifier(),
                         getObservationTypesFromObservationType(offering.getObservationTypes()));
+				kOfferingVMinTime.put(offering.getIdentifier(),
+						HibernateCriteriaQueryUtilities.getMinDate4Offering(offering.getIdentifier(), session));
+				kOfferingVMaxTime.put(offering.getIdentifier(),
+						HibernateCriteriaQueryUtilities.getMaxDate4Offering(offering.getIdentifier(), session));
+				kOfferingVEnvelope.put(offering.getIdentifier(),
+						getEnvelopeForOffering(offering.getIdentifier(), session));
             }
         }
         cache.setKOfferingVName(kOfferingVName);
@@ -246,7 +260,23 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         cache.setKOfferingVObservationTypes(kOfferingVObservationTypes);
         cache.setKOffrtingVFeatures(getFeaturesFromObservationForOfferings(kOfferingVName.keySet(), session));
         cache.setAllowedKOfferingVObservationType(allowedkOfferingVObservationTypes);
+		cache.setKOfferingVEnvelope(kOfferingVEnvelope);
+		cache.setKOfferingVMinTime(kOfferingVMinTime);
+		cache.setKOfferingVMaxTime(kOfferingVMaxTime);
     }
+	
+	private SosEnvelope getEnvelopeForOffering(String offeringID, Session session) throws OwsExceptionReport {
+		List<String> featureIDs =
+                HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(offeringID, session);
+        session.clear();
+        if (featureIDs != null && !featureIDs.isEmpty()) {
+            Envelope envelope = Configurator.getInstance().getFeatureQueryHandler()
+						.getEnvelopeForFeatureIDs(featureIDs, session);
+            SosEnvelope sosEnvelope = new SosEnvelope(envelope, Configurator.getInstance().getDefaultEPSG());
+            return sosEnvelope;
+        }
+        return null;
+	}
 
     /**
      * Set cache values related to procedure
@@ -288,12 +318,12 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
      *            Hibernate session
      */
     private void setObservablePropertyValues(CapabilitiesCache cache, Session session) {
-        List<String> observableProperties = new ArrayList<String>();
+        //List<String> observableProperties = new ArrayList<String>();
         Map<String, Collection<String>> kObservablePropertyVOffering = new HashMap<String, Collection<String>>();
         Map<String, Collection<String>> kObservablePropertyVProcedures = new HashMap<String, Collection<String>>();
         List<ObservableProperty> hObservableProperties = HibernateCriteriaQueryUtilities.getObservablePropertyObjects(session);
         for (ObservableProperty observableProperty : hObservableProperties) {
-            observableProperties.add(observableProperty.getIdentifier());
+			//observableProperties.add(observableProperty.getIdentifier());
             kObservablePropertyVOffering.put(observableProperty.getIdentifier(),
                     getOfferingsFromObservationCollection(observableProperty.getObservationConstellations()));
             kObservablePropertyVProcedures.put(observableProperty.getIdentifier(),
@@ -549,4 +579,6 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         }
         cache.setResultTemplates(resultTemplates);
     }
+
+	
 }

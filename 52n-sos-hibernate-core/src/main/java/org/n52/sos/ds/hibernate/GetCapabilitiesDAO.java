@@ -26,6 +26,7 @@ package org.n52.sos.ds.hibernate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -368,8 +369,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                 OWSOperation operationMetadata = requestOperators.get(requestOperatorKeyType).getOperationMetadata(service, version,
                         session);
                 if (operationMetadata != null) {
-                    opsMetadata.add(requestOperators.get(requestOperatorKeyType).getOperationMetadata(service, version,
-                            session));
+                    opsMetadata.add(operationMetadata);
                 }
             }
         }
@@ -424,7 +424,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
 
             // only if fois are contained for the offering set the values of the
             // envelope
-            sosOffering.setObservedArea(getBBOX4Offering(offering, session));
+            sosOffering.setObservedArea(Configurator.getInstance().getCapabilitiesCacheController().getEnvelopeForOffering(offering));
             // SosEnvelope sosEnvelope = getBBOX4Offering(offering, session);
             // sosOffering.setBoundeBy(sosEnvelope.getEnvelope());
             // sosOffering.setSrid(sosEnvelope.getSrid());
@@ -454,8 +454,8 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
             sosOffering.setPhens4CompPhens(phens4CompPhens);
 
             // set up time
-            DateTime minDate = HibernateCriteriaQueryUtilities.getMinDate4Offering(offering, session);
-            DateTime maxDate = HibernateCriteriaQueryUtilities.getMaxDate4Offering(offering, session);
+            DateTime minDate = Configurator.getInstance().getCapabilitiesCacheController().getMinTimeForOffering(offering);
+            DateTime maxDate = Configurator.getInstance().getCapabilitiesCacheController().getMaxTimeForOffering(offering);
             sosOffering.setTime(new TimePeriod(minDate, maxDate));
 
             // add feature of interests
@@ -535,7 +535,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
             for (String procedure : procedures) {
                 SosOfferingsForContents sosOffering = new SosOfferingsForContents();
                 sosOffering.setOffering(offering);
-                sosOffering.setObservedArea(getBBOX4Offering(offering, session));
+                sosOffering.setObservedArea(Configurator.getInstance().getCapabilitiesCacheController().getEnvelopeForOffering(offering));
                 // if (sosEnvelope != null) {
                 // sosOffering.setBoundeBy(sosEnvelope.getEnvelope());
                 // sosOffering.setSrid(sosEnvelope.getSrid());
@@ -689,7 +689,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         // set operation name
         opsMeta.setOperationName(SosConstants.Operations.GetCapabilities.name());
         // set DCP
-        DecoderKeyType dkt = null;
+        DecoderKeyType dkt;
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
         } else {
@@ -750,7 +750,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         filterCapabilities.setSpatialOperands(operands);
 
         // set SpatialOperators
-        Map<SpatialOperator, List<QName>> spatialOperators = new HashMap<SpatialOperator, List<QName>>();
+        Map<SpatialOperator, List<QName>> spatialOperators = new EnumMap<SpatialOperator, List<QName>>(SpatialOperator.class);
         // set BBOX
         List<QName> operands4BBox = new ArrayList<QName>();
         operands4BBox.add(GMLConstants.QN_ENVELOPE);
@@ -799,7 +799,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         filterCapabilities.setTemporalOperands(operands);
 
         // set TemporalOperators
-        Map<TimeOperator, List<QName>> temporalOperators = new HashMap<TimeOperator, List<QName>>();
+        Map<TimeOperator, List<QName>> temporalOperators = new EnumMap<TimeOperator, List<QName>>(TimeOperator.class);
         // set TM_During
         List<QName> operands4During = new ArrayList<QName>();
         operands4During.add(GMLConstants.QN_TIME_PERIOD);
@@ -840,32 +840,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         comparisonOperators.add(ComparisonOperator.PropertyIsGreaterThanOrEqualTo);
         comparisonOperators.add(ComparisonOperator.PropertyIsLike);
         filterCapabilities.setComparisonOperators(comparisonOperators);
-    }
-
-    /**
-     * Get Envelope for offering
-     * 
-     * @param offeringID
-     *            Offering identifier
-     * @param session
-     *            Hibernate session
-     * @return Envelope for offering from FOIs or values
-     *         (SpatialFilertingProfile)
-     * @throws OwsExceptionReport
-     *             If an error occurs
-     */
-    private SosEnvelope getBBOX4Offering(String offeringID, Session session) throws OwsExceptionReport {
-        List<String> featureIDs =
-                HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(offeringID, session);
-        session.clear();
-        if (featureIDs != null && !featureIDs.isEmpty()) {
-            Envelope envelope =
-                    Configurator.getInstance().getFeatureQueryHandler().getEnvelopeForFeatureIDs(featureIDs, session);
-            SosEnvelope sosEnvelope = new SosEnvelope(envelope, Configurator.getInstance().getDefaultEPSG());
-            return sosEnvelope;
-        }
-        return null;
-    }
+	}
 
     /**
      * Get FOIs contained in an offering

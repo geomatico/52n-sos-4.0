@@ -28,9 +28,11 @@ import java.util.Map;
 import java.util.TimerTask;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+import org.joda.time.DateTime;
 
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -439,5 +441,10 @@ public abstract class ACapabilitiesCacheController extends TimerTask {
     public abstract Collection<String> getAllowedObservationTypes4Offering(String offering);
     
     public abstract Collection<String> getResultTemplates();
+	
+	
+	public abstract SosEnvelope getEnvelopeForOffering(String offering);
+	public abstract DateTime getMinTimeForOffering(String offering);
+	public abstract DateTime getMaxTimeForOffering(String offering);
 
 }
