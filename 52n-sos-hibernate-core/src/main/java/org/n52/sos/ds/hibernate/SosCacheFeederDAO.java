@@ -453,7 +453,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             Set<ObservationConstellation> observationConstellations) {
         Set<String> observableProperties = new HashSet<String>();
         for (ObservationConstellation observationConstellation : observationConstellations) {
-            if (observationConstellation.getObservations() != null && !observationConstellation.getObservations().isEmpty()) {
+            if (observationConstellation.getObservableProperty() != null) {
                 observableProperties.add(observationConstellation.getObservableProperty().getIdentifier());
             }
         }
