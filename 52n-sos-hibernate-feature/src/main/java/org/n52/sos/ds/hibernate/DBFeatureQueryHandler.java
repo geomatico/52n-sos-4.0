@@ -121,7 +121,7 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
      * org.n52.sos.ogc.filter.SpatialFilter)
      */
     @Override
-    public Map<String, SosAbstractFeature> getFeatures(List<String> featureIDs, List<SpatialFilter> filters,
+    public Map<String, SosAbstractFeature> getFeatures(List<String> featureIDs, List<SpatialFilter> spatialFilters,
             Object connection, String version) throws OwsExceptionReport {
         Session session = getSessionFromConnection(connection);
         Map<String, String> aliases = new HashMap<String, String>();
@@ -132,21 +132,29 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
                 criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                         HibernateConstants.PARAMETER_IDENTIFIER, featureIDs));
             }
-            if (filters != null && !filters.isEmpty()) {
+            if (spatialFilters != null && !spatialFilters.isEmpty()) {
                 // String foiAlias = HibernateCriteriaQueryUtilities
                 // .addFeatureOfInterestAliasToMap(aliases, null);
                 // String propertyName = foiAlias + "."
                 // + HibernateConstants.PARAMETER_GEOMETRY;
                 String propertyName = HibernateConstants.PARAMETER_GEOMETRY;
                 Disjunction disjunction = Restrictions.disjunction();
-                for (SpatialFilter filter : filters) {
+                for (SpatialFilter filter : spatialFilters) {
                     disjunction
                             .add(HibernateCriteriaQueryUtilities.getCriterionForSpatialFilter(propertyName, filter));
                 }
                 criterions.add(disjunction);
             }
-            return createSosAbstractFeaturesFromResult(HibernateFeatureCriteriaQueryUtilities.getFeatureOfInterests(
-                    aliases, criterions, projections, session), version);
+            if (!criterions.isEmpty())
+            {
+                return createSosAbstractFeaturesFromResult(HibernateFeatureCriteriaQueryUtilities.getFeatureOfInterests(
+                        aliases, criterions, projections, session), version);                
+            }
+            else
+            {
+                return new HashMap<String, SosAbstractFeature>(0);
+            }
+
         } catch (HibernateException he) {
             String exceptionText = "Error while querying features from data source!";
             LOGGER.error(exceptionText, he);
