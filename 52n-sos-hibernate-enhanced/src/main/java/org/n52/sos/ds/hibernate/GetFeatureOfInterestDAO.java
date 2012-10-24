@@ -188,9 +188,6 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
                 } else {
                     Set<String> foiIDs = new HashSet<String>(queryFeatureIdentifiersForParameter(sosRequest, session));
                     // feature of interest
-                    if (sosRequest.getFeatureIdentifiers() != null && !sosRequest.getFeatureIdentifiers().isEmpty()) {
-                        foiIDs.addAll(sosRequest.getFeatureIdentifiers());
-                    }
                     SosFeatureCollection featureCollection =
                             new SosFeatureCollection(Configurator
                                     .getInstance()
@@ -225,6 +222,13 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
         String obsAlias = HibernateCriteriaQueryUtilities.addObservationAliasToMap(aliases, null);
         String obsConstAlias =
                 HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, obsAlias);
+        // featureOfInterest identifiers
+        if (sosRequest.getFeatureIdentifiers() != null && !sosRequest.getFeatureIdentifiers().isEmpty()) {
+            String foiAlias = HibernateCriteriaQueryUtilities.addFeatureOfInterestAliasToMap(aliases, obsAlias);
+            criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+                    HibernateCriteriaQueryUtilities.getIdentifierParameter(foiAlias),
+                    sosRequest.getFeatureIdentifiers()));
+        }
         // observableProperties
         if (sosRequest.getObservedProperties() != null && !sosRequest.getObservedProperties().isEmpty()) {
             String obsPropAlias =
@@ -243,12 +247,8 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
         if (sosRequest.getEventTimes() != null && !sosRequest.getEventTimes().isEmpty()) {
             criterions.add(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(sosRequest.getEventTimes()));
         }
-        if (!criterions.isEmpty()) {
-            return HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(aliases, criterions, projections,
-                    session);
-        }
-
-        return new ArrayList<String>();
+        return HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(aliases, criterions, projections,
+                session);
     }
 
     @Override
