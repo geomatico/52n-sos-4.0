@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
@@ -40,7 +42,6 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlValidationError;
-import org.joda.time.Weeks;
 import org.n52.sos.exception.IExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -89,7 +90,8 @@ public class XmlHelper {
         XmlObject doc;
         try {
             if (request.getParameterMap().isEmpty()) {
-                doc = XmlObject.Factory.parse(request.getInputStream());
+                String requestContent = convertStreamToString(request.getInputStream());
+                doc = XmlObject.Factory.parse( requestContent );
             } else {
                 doc =
                         XmlObject.Factory.parse(SosHelper.parseHttpPostBodyWithParameter(request.getParameterNames(),
@@ -105,6 +107,21 @@ public class XmlHelper {
 
         return doc;
     }
+    
+    private static String convertStreamToString(InputStream is) throws OwsExceptionReport {
+        try {
+            Scanner scanner = new Scanner(is).useDelimiter("\\A");
+            if (scanner.hasNext()) {
+                return scanner.next();
+            }
+        } catch (NoSuchElementException nSEE) {
+            String msg = String.format("Error while reading content of HTTP request: %s", nSEE.getMessage());
+            LOGGER.debug(msg,nSEE);
+            throw Util4Exceptions.createNoApplicableCodeException(nSEE,msg);
+        }
+        return "";
+    }
+
 
     /**
      * Get element Node from NodeList.
