@@ -21,29 +21,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.service.admin;
+package org.n52.sos.service.admin.request.operator;
 
-public class AdministratorConstants {
+import org.n52.sos.exception.AdministratorException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.response.AbstractServiceResponse;
+import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.admin.request.AdminRequest;
+
+public interface IAdminRequestOperator {
     
-    /** enum with parameter names for getCapabilities request */
-    public enum AdministatorParams {
-        service, request, parameter;
+    public ServiceResponse receiveRequest(AdminRequest request) throws AdministratorException, OwsExceptionReport;
 
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (s.equals(AdministatorParams.service.name()))
-                            || (s.equals(AdministatorParams.request.name()));
-            return contained;
-        }
-    }
-
+    public String getKey();
+    
 }

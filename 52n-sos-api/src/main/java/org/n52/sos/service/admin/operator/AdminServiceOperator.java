@@ -23,19 +23,27 @@
  */
 package org.n52.sos.service.admin.operator;
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.encode.IEncoder;
 import org.n52.sos.exception.AdministratorException;
+import org.n52.sos.ogc.ows.OWSConstants;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.admin.AdministratorConstants.AdministatorParams;
-import org.n52.sos.service.operator.IServiceOperator;
+import org.n52.sos.service.admin.request.AdminRequest;
+import org.n52.sos.service.admin.request.operator.IAdminRequestOperator;
+import org.n52.sos.util.KvpHelper;
+import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,22 +70,28 @@ public class AdminServiceOperator extends IAdminServiceOperator {
      * (non-Javadoc)
      * 
      * @see
-     * org.n52.sos.ASosAdminRequestOperator#doGetOperation(javax.servlet.http
+     * org.n52.sos.IAdminRequestOperator#doGetOperation(javax.servlet.http
      * .HttpServletRequest)
      */
     @Override
-    public ServiceResponse doGetOperation(HttpServletRequest req) throws AdministratorException {
+    public ServiceResponse doGetOperation(HttpServletRequest req) throws AdministratorException, OwsExceptionReport {
 
-        ServiceResponse response = null;
-        AbstractServiceRequest request = null;
-        Map<String, String> kvp = new HashMap<String, String>();
-        Iterator<?> parameterNames = req.getParameterMap().keySet().iterator();
-        while (parameterNames.hasNext()) {
-            // all key names to lower case
-            String parameterName = (String) parameterNames.next();
-            String parameterValue = (String) req.getParameterMap().get(parameterName);
-            kvp.put(parameterName, parameterValue);
+        AdminRequest request = null;
+        if (req.getParameterMap() == null || (req.getParameterMap() != null && req.getParameterMap().isEmpty())) {
+            LOGGER.debug("The mandatory parameter '" + OWSConstants.RequestParams.request.name() + "' is missing!");
+            throw Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.request.name());
         }
+        Map<String, String> parameterValueMap = KvpHelper.getKvpParameterValueMap(req);
+        request = getRequestFromValues(parameterValueMap);
+        IAdminRequestOperator requestOperator = Configurator.getInstance().getAdminRequestOperator(request.getService());
+        if (requestOperator != null) {
+            return requestOperator.receiveRequest(request);
+        }
+        String exceptionText = "The service administrator is not supported!";
+        throw new AdministratorException(exceptionText);
+    }
+
+    private AdminRequest getRequestFromValues(Map<String, String> kvp) throws AdministratorException {
         if (kvp.isEmpty()) {
             String exceptionText = "The request is empty!";
             LOGGER.debug(exceptionText);
@@ -91,26 +105,10 @@ public class AdminServiceOperator extends IAdminServiceOperator {
             LOGGER.debug(exceptionText);
             throw new AdministratorException(exceptionText);
         }
-        IAdminServiceOperator requestOperator = Configurator.getInstance().getAdminServiceOperator();
-        if (requestOperator != null) {
-            // TODO: implement the functionality
-            return response;
-        }
-        String exceptionText = "The service administrator is not supported!";
-        throw new AdministratorException(exceptionText);
+        AdminRequest request = new AdminRequest();
+        request.setService(kvp.get(AdministatorParams.service.name()));
+        request.setRequest(kvp.get(AdministatorParams.request.name()));
+        request.setParameters(kvp.get(AdministatorParams.parameter.name()));
+        return request;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.sos.ASosAdminRequestOperator#doPostOperation(javax.servlet.http
-     * .HttpServletRequest)
-     */
-    @Override
-    public ServiceResponse doPostOperation(HttpServletRequest req) throws AdministratorException {
-        String exceptionText = "The SOS administration backend does not support HTTP-Post requests!";
-        throw new AdministratorException(exceptionText);
-    }
-
 }

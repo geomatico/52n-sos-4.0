@@ -23,6 +23,7 @@
  */
 package org.n52.sos.service.admin;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,12 +36,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.encode.IEncoder;
 import org.n52.sos.exception.AdministratorException;
+import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.admin.operator.IAdminServiceOperator;
+import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,36 +116,6 @@ public class SosAdminService extends HttpServlet {
     }
 
     /**
-     * handles all POST requests, the request will be passed to the
-     * requestOperator
-     * 
-     * @param req
-     *            the incomming request
-     * 
-     * @param resp
-     *            the response for the incoming request
-     */
-    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
-
-        LOGGER.debug("\n**********\n(POST) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
-
-        this.setCorsHeaders(resp);
-
-        // Set service URL in configurator
-        if (Configurator.getInstance().getServiceURL() == null) {
-            Configurator.getInstance().setServiceURL(req.getRequestURL().toString());
-        }
-
-        ServiceResponse sosResp = null;
-        try {
-            sosResp = sosAdminOperator.doPostOperation(req);
-        } catch (AdministratorException ae) {
-            throw new ServletException(ae);
-        }
-        doResponse(resp, sosResp);
-    }
-
-    /**
      * handles all GET requests, the request will be passed to the
      * RequestOperator
      * 
@@ -157,19 +133,16 @@ public class SosAdminService extends HttpServlet {
 
         this.setCorsHeaders(resp);
 
-        // Set service URL in configurator
-        if (Configurator.getInstance().getServiceURL() == null) {
-            Configurator.getInstance().setServiceURL(req.getRequestURL().toString());
-        }
-        // ///////////////////////////////////////////////
-        // forward GET-request to RequestOperator
-
         ServiceResponse sosResp = null;
         try {
             sosResp = sosAdminOperator.doGetOperation(req);
-        } catch (AdministratorException ae) {
-            throw new ServletException(ae);
-        }
+        } catch (AdministratorException e) {
+            OwsExceptionReport owsExceptionReport = new OwsExceptionReport();
+            owsExceptionReport.addCodedException(OwsExceptionCode.NoApplicableCode, null, "Error", e);
+            sosResp = handleException(owsExceptionReport);
+        } catch (OwsExceptionReport e) {
+            sosResp = handleException(e);
+        } 
         doResponse(resp, sosResp);
     }
 
@@ -235,6 +208,39 @@ public class SosAdminService extends HttpServlet {
         resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
         resp.addHeader("Access-Control-Allow-Headers", "Content-Type");
+    }
+    
+    private ServiceResponse handleException(OwsExceptionReport owsExceptionReport) throws ServletException {
+        try {
+            IEncoder encoder = Configurator.getInstance().getEncoder(owsExceptionReport.getNamespace());
+            if (encoder != null) {
+                Object encodedObject = encoder.encode(owsExceptionReport);
+                if (encodedObject instanceof XmlObject) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
+                    return new ServiceResponse(baos, SosConstants.CONTENT_TYPE_XML, false, true);
+                } else if (encodedObject instanceof ServiceResponse) {
+                    return (ServiceResponse) encodedObject;
+                } else {
+                    throw logExceptionAndCreateServletException(null);
+                }
+            } else {
+                throw logExceptionAndCreateServletException(null);
+            }
+        } catch (Exception owse) {
+            throw logExceptionAndCreateServletException(owse);
+        }        
+    }
+    
+    private ServletException logExceptionAndCreateServletException(Exception e) 
+    {
+        String exceptionText = "Error while encoding exception response!";
+        if (e != null) {
+            LOGGER.debug(exceptionText, e);
+        } else {
+            LOGGER.debug(exceptionText);
+        }
+        return new ServletException(exceptionText);
     }
 
 }

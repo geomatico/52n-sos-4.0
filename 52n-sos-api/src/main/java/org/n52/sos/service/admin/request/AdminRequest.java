@@ -21,29 +21,38 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.service.admin;
+package org.n52.sos.service.admin.request;
 
-public class AdministratorConstants {
+public class AdminRequest {
     
-    /** enum with parameter names for getCapabilities request */
-    public enum AdministatorParams {
-        service, request, parameter;
+    private String service;
+    
+    private String request;
+    
+    private String parameters;
+    
+    public String getService() {
+        return service;
+    }
 
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (s.equals(AdministatorParams.service.name()))
-                            || (s.equals(AdministatorParams.request.name()));
-            return contained;
-        }
+    public String getRequest() {
+        return request;
+    }
+
+    public void setService(String service) {
+        this.service = service;
+    }
+
+    public void setRequest(String request) {
+        this.request = request;
+    }
+
+    public void setParameters(String parameter) {
+        this.parameters = parameter;
+    }
+    
+    public String[] getParameters() {
+        return parameters.split(",");
     }
 
 }

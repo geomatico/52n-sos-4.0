@@ -26,6 +26,7 @@ package org.n52.sos.service.admin.operator;
 import javax.servlet.http.HttpServletRequest;
 
 import org.n52.sos.exception.AdministratorException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.response.ServiceResponse;
 
 /**
@@ -47,16 +48,7 @@ public abstract class IAdminServiceOperator {
      * @return SOS response
      * @throws OwsExceptionReport 
      */
-    public abstract ServiceResponse doGetOperation(HttpServletRequest request) throws AdministratorException;
-
-    /**
-     * HTTP-Post request handling method
-     * 
-     * @param request
-     *            HTTP-Post request
-     * @return SOS response
-     */
-    public abstract ServiceResponse doPostOperation(HttpServletRequest request) throws AdministratorException;
+    public abstract ServiceResponse doGetOperation(HttpServletRequest request) throws AdministratorException, OwsExceptionReport;
 
     /**
      * Get URL pattern for the administration interface

@@ -57,6 +57,7 @@ import org.n52.sos.ogc.sos.Range;
 import org.n52.sos.request.operator.IRequestOperator;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.admin.operator.IAdminServiceOperator;
+import org.n52.sos.service.admin.request.operator.IAdminRequestOperator;
 import org.n52.sos.service.operator.IServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.tasking.ASosTasking;
@@ -201,7 +202,7 @@ public final class Configurator {
     /**
      * Map with indicator and name of additional config files for modules
      */
-    private Map<String, String> configFileMap;
+    private Map<String, String> configFileMap = new HashMap<String, String>(0);
 
     /**
      * Implementation of IConnectionProvider
@@ -210,7 +211,7 @@ public final class Configurator {
 
     private IDataSourceInitializator dataSourceInitializator;
 
-    private Map<DecoderKeyType, List<IDecoder>> decoder;
+    private Map<DecoderKeyType, List<IDecoder>> decoder = new HashMap<DecoderKeyType, List<IDecoder>>(0);
 
     /**
      * default EPSG code of stored geometries
@@ -230,7 +231,7 @@ public final class Configurator {
     /** decimal separator for result element */
     private String decimalSeparator;
 
-    private Map<EncoderKeyType, IEncoder> encoder;
+    private Map<EncoderKeyType, IEncoder> encoder = new HashMap<EncoderKeyType, IEncoder>(0);
 
     /**
      * Implementation of IFeatureQueryHandler
@@ -270,7 +271,7 @@ public final class Configurator {
     private ISosRequestEncoder reqEncoder;
 
     /** Implemented ISosRequestListener */
-    private Map<ServiceOperatorKeyType, IServiceOperator> serviceOperators;
+    private Map<ServiceOperatorKeyType, IServiceOperator> serviceOperators = new HashMap<ServiceOperatorKeyType, IServiceOperator>(0);
 
     /** directory of sensor descriptions in SensorML format */
     private File sensorDir;
@@ -282,6 +283,8 @@ public final class Configurator {
     private String[] serviceIdentificationKeywords;
 
     private ServiceLoader<IAdminServiceOperator> serviceLoaderAdminServiceOperator;
+    
+    private ServiceLoader<IAdminRequestOperator> serviceLoaderAdminRequesteOperator;
 
     /** ServiceLoader for ICacheFeederDAO */
     private ServiceLoader<ICacheFeederDAO> serviceLoaderCacheFeederDAO;
@@ -346,19 +349,22 @@ public final class Configurator {
     /**
      * Implemented ISosOperationDAO
      */
-    private Map<String, IOperationDAO> operationDAOs;
+    private Map<String, IOperationDAO> operationDAOs = new HashMap<String, IOperationDAO>(0);
 
     /**
      * Implemented ISosRequestOperator
      */
-    private Map<String, Binding> bindingOperators;
+    private Map<String, Binding> bindingOperators = new HashMap<String, Binding>(0);
 
-    private Map<RequestOperatorKeyType, IRequestOperator> requestOperators;
+    private Map<RequestOperatorKeyType, IRequestOperator> requestOperators = new HashMap<RequestOperatorKeyType, IRequestOperator>(0);
 
     /**
      * Implementation of ASosAdminRequestOperator
      */
     private IAdminServiceOperator adminServiceOperator;
+    
+    
+    private Map<String, IAdminRequestOperator> adminRequestOperators = new HashMap<String, IAdminRequestOperator>(0);
 
     /**
      * definition of the observableProperty which holds the dynamic location
@@ -391,7 +397,7 @@ public final class Configurator {
     private Set<String> supportedVersions;
 
     /** boolean indicates the order of x and y components of coordinates */
-    private List<Range> switchCoordinatesForEPSG = new ArrayList<Range>();
+    private List<Range> switchCoordinatesForEPSG = new ArrayList<Range>(0);
 
     /**
      * Timer for the ACapabilitiesCacheController implementation
@@ -725,7 +731,6 @@ public final class Configurator {
 
         // get config file names and identifiers
         String configFileMapString = props.getProperty(CONFIGURATION_FILES, "");
-        this.configFileMap = new HashMap<String, String>();
         if (configFileMapString != null && !configFileMapString.isEmpty()) {
             for (String kvp : configFileMapString.split(";")) {
                 String[] keyValue = kvp.split(" ");
@@ -764,6 +769,7 @@ public final class Configurator {
         initializeRequestOperators();
         initializeBindingOperator();
         initializeAdminServiceOperator();
+        initializeAdminRequestOperator();
         initializeDataSource();
         initializeCapabilitiesCacheController();
         // TODO: what?
@@ -845,6 +851,31 @@ public final class Configurator {
         }
         LOGGER.info("\n******\n IAdminServiceOperator loaded successfully!\n******\n");
     }
+    
+    private void initializeAdminRequestOperator() throws ConfigurationException {
+        serviceLoaderAdminRequesteOperator = ServiceLoader.load(IAdminRequestOperator.class);
+        Iterator<IAdminRequestOperator> iter = serviceLoaderAdminRequesteOperator.iterator();
+        while (iter.hasNext()) {
+            try {
+                IAdminRequestOperator adminRequestOperator = (IAdminRequestOperator) iter.next();
+                adminRequestOperators.put(adminRequestOperator.getKey(), adminRequestOperator);
+            } catch (ServiceConfigurationError sce) {
+                // TODO add more details like which class with qualified name
+                // failed to load
+                LOGGER.warn(
+                        "An IAdminRequestOperator implementation could not be loaded! Exception message: "
+                                + sce.getLocalizedMessage(), sce);
+            }
+        }
+        if (this.bindingOperators.isEmpty()) {
+            StringBuilder exceptionText = new StringBuilder(); 
+            exceptionText.append("No IAdminRequestOperator implementation could be loaded!");
+            exceptionText.append(" If the SOS is not used as webapp, this has no effect!");
+            exceptionText.append(" Else add a IAdminRequestOperator implementation!");
+            LOGGER.warn(exceptionText.toString());
+        }
+        LOGGER.info("\n******\n IAdminRequestOperator(s) loaded successfully!\n******\n");
+    }
 
     /**
      * reads the requestListeners from the configFile and returns a
@@ -855,28 +886,8 @@ public final class Configurator {
      *             if initialization of a RequestListener failed
      */
     private void initializeBindingOperator() throws ConfigurationException {
-        bindingOperators = new HashMap<String, Binding>();
         serviceLoaderBindingOperator = ServiceLoader.load(Binding.class);
-        Iterator<Binding> iter = serviceLoaderBindingOperator.iterator();
-        while (iter.hasNext()) {
-            try {
-                Binding iBindingOperator = (Binding) iter.next();
-                bindingOperators.put(iBindingOperator.getUrlPattern(), iBindingOperator);
-            } catch (ServiceConfigurationError sce) {
-                // TODO add more details like which class with qualified name
-                // failed to load
-                LOGGER.warn(
-                        "An Binding implementation could not be loaded! Exception message: "
-                                + sce.getLocalizedMessage(), sce);
-            }
-        }
-        if (this.bindingOperators.isEmpty()) {
-            StringBuilder exceptionText = new StringBuilder(); 
-            exceptionText.append("No Binding implementation could is loaded!");
-            exceptionText.append(" If the SOS is not used as webapp, this has no effect!");
-            exceptionText.append(" Else add a Binding implementation!");
-            LOGGER.warn(exceptionText.toString());
-        }
+        setBindings();
         LOGGER.info("\n******\n Binding(s) loaded successfully!\n******\n");
     }
 
@@ -971,14 +982,12 @@ public final class Configurator {
     }
 
     private void initalizeDecoder() throws ConfigurationException {
-        decoder = new HashMap<DecoderKeyType, List<IDecoder>>();
         serviceLoaderDecoder = ServiceLoader.load(IDecoder.class);
         setDecoder();
         LOGGER.info("\n******\n Decoder(s) loaded successfully!\n******\n");
     }
 
     private void initalizeEncoder() throws ConfigurationException {
-        encoder = new HashMap<EncoderKeyType, IEncoder>();
         serviceLoaderEncoder = ServiceLoader.load(IEncoder.class);
         setEncoder();
         LOGGER.info("\n******\n Encoder(s) loaded successfully!\n******\n");
@@ -1003,7 +1012,6 @@ public final class Configurator {
      *             If no operation dao is implemented
      */
     private void initializeOperationDAOs() throws ConfigurationException {
-        operationDAOs = new HashMap<String, IOperationDAO>();
         serviceLoaderOperationDAOs = ServiceLoader.load(IOperationDAO.class);
         setOperationDAOs();
         LOGGER.info("\n******\n OperationDAO(s) loaded successfully!\n******\n");
@@ -1016,14 +1024,12 @@ public final class Configurator {
      *             If no request listener is implemented
      */
     private void initializeServiceOperators() throws ConfigurationException {
-        serviceOperators = new HashMap<ServiceOperatorKeyType, IServiceOperator>();
         serviceLoaderServiceOperators = ServiceLoader.load(IServiceOperator.class);
         setServiceOperatorMap();
         LOGGER.info("\n******\n ServiceOperator(s) loaded successfully!\n******\n");
     }
 
     private void initializeRequestOperators() throws ConfigurationException {
-        requestOperators = new HashMap<RequestOperatorKeyType, IRequestOperator>();
         serviceLoaderRequestOperators = ServiceLoader.load(IRequestOperator.class);
         setRequestOperatorMap();
         LOGGER.info("\n******\n RequestOperator(s) loaded successfully!\n******\n");
@@ -1081,6 +1087,29 @@ public final class Configurator {
             String exceptionText = "No ICacheFeederDAO implementations is loaded!";
             LOGGER.error(exceptionText);
             throw new ConfigurationException(exceptionText);
+        }
+    }
+    
+    private void setBindings() throws ConfigurationException {
+        Iterator<Binding> iter = serviceLoaderBindingOperator.iterator();
+        while (iter.hasNext()) {
+            try {
+                Binding iBindingOperator = (Binding) iter.next();
+                bindingOperators.put(iBindingOperator.getUrlPattern(), iBindingOperator);
+            } catch (ServiceConfigurationError sce) {
+                // TODO add more details like which class with qualified name
+                // failed to load
+                LOGGER.warn(
+                        "An Binding implementation could not be loaded! Exception message: "
+                                + sce.getLocalizedMessage(), sce);
+            }
+        }
+        if (this.bindingOperators.isEmpty()) {
+            StringBuilder exceptionText = new StringBuilder(); 
+            exceptionText.append("No Binding implementation could be loaded!");
+            exceptionText.append(" If the SOS is not used as webapp, this has no effect!");
+            exceptionText.append(" Else add a Binding implementation!");
+            LOGGER.warn(exceptionText.toString());
         }
     }
 
@@ -1218,13 +1247,22 @@ public final class Configurator {
         }
     }
 
+    public void updateBindigs() throws ConfigurationException {
+        bindingOperators.clear();
+        serviceLoaderBindingOperator.reload();
+        setBindings();
+        LOGGER.info("\n******\n Binding(s) re-initialized successfully!\n******\n");
+    }
+
     public void updateDecoder() throws ConfigurationException {
+        decoder.clear();
         serviceLoaderDecoder.reload();
         setDecoder();
         LOGGER.info("\n******\n Decoder(s) re-initialized successfully!\n******\n");
     }
 
     public void updateEncoder() throws ConfigurationException {
+        encoder.clear();
         serviceLoaderEncoder.reload();
         setEncoder();
         LOGGER.info("\n******\n Encoder(s) re-initialized successfully!\n******\n");
@@ -1237,12 +1275,15 @@ public final class Configurator {
      *             If no operation dao is implemented
      */
     public void updateOperationDAOs() throws ConfigurationException {
-        serviceLoaderServiceOperators.reload();
+        operationDAOs.clear();
+        serviceLoaderOperationDAOs.reload();
         setOperationDAOs();
         LOGGER.info("\n******\n OperationDAO(s) re-initialized successfully!\n******\n");
     }
 
     public void updateRequestOperator() throws ConfigurationException {
+        updateOperationDAOs();
+        requestOperators.clear();
         serviceLoaderRequestOperators.reload();
         setRequestOperatorMap();
         LOGGER.info("\n******\n RequestOperator(s) re-initialized successfully!\n******\n");
@@ -1255,6 +1296,8 @@ public final class Configurator {
      *             If no request listener is implemented
      */
     public void updateServiceOperators() throws ConfigurationException {
+        updateRequestOperator();
+        serviceOperators.clear();
         serviceLoaderServiceOperators.reload();
         setServiceOperatorMap();
         LOGGER.info("\n******\n ServiceOperator(s) re-initialized successfully!\n******\n");
@@ -1715,5 +1758,18 @@ public final class Configurator {
 
     public Map<EncoderKeyType, IEncoder> getEncoderMap() {
         return encoder;
+    }
+
+    public IAdminRequestOperator getAdminRequestOperator(String key) {
+        return adminRequestOperators.get(key);
+    }
+
+    public void updateConfiguration() throws ConfigurationException {
+        updateBindigs();
+        updateOperationDAOs();
+        updateDecoder();
+        updateEncoder();
+        updateServiceOperators();
+        updateRequestOperator();
     }
 }
