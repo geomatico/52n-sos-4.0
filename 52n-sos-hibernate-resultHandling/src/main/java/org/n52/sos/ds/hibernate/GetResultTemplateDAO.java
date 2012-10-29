@@ -36,6 +36,7 @@ import org.n52.sos.ds.IGetResultTemplateDAO;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
+import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
@@ -142,8 +143,8 @@ public class GetResultTemplateDAO implements IGetResultTemplateDAO {
                 GetResultTemplateResponse response = new GetResultTemplateResponse();
                 response.setService(request.getService());
                 response.setVersion(request.getVersion());
-                response.setResultEncoding(createSosResultEncoding(resultRemplate.getResultEncoding()));
-                response.setResultStructure(createSosResultStructure(resultRemplate.getResultStructure()));
+                response.setResultEncoding(ResultHandlingHelper.createSosResultEncoding(resultRemplate.getResultEncoding()));
+                response.setResultStructure(ResultHandlingHelper.createSosResultStructure(resultRemplate.getResultStructure()));
                 return response;
             }
             StringBuilder exceptionText = new StringBuilder();
@@ -160,18 +161,6 @@ public class GetResultTemplateDAO implements IGetResultTemplateDAO {
         } finally {
             connectionProvider.returnConnection(session);
         }
-    }
-
-    private SosResultEncoding createSosResultEncoding(String resultEncoding) {
-        SosResultEncoding sosResultEncoding = new SosResultEncoding();
-        sosResultEncoding.setXml(resultEncoding);
-        return sosResultEncoding;
-    }
-
-    private SosResultStructure createSosResultStructure(String resultStructure) {
-        SosResultStructure sosResultStructure = new SosResultStructure();
-        sosResultStructure.setXml(resultStructure);
-        return sosResultStructure;
     }
 
 }

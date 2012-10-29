@@ -23,13 +23,37 @@
  */
 package org.n52.sos.ogc.sos;
 
+import java.util.List;
+
+import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.decode.IDecoder;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
+import org.n52.sos.service.Configurator;
+import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SosResultEncoding {
+    
+    /**
+     * logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(SosResultEncoding.class);
 
     private String xml;
 
     private SosSweAbstractEncoding encoding;
+    
+    public SosResultEncoding() {
+    }
+
+    public SosResultEncoding(String resultEncoding) throws OwsExceptionReport {
+        this.xml = resultEncoding;
+        encoding = parseResultEncoding();
+    }
 
     public String getXml() {
         if (encoding != null) {
@@ -42,16 +66,45 @@ public class SosResultEncoding {
         this.encoding = encoding;
     }
 
-    public SosSweAbstractEncoding getEncoding() {
+    public SosSweAbstractEncoding getEncoding() throws OwsExceptionReport {
         if (encoding == null && xml != null && !xml.isEmpty()) {
-            // TODO decode from xmlString
-            return null;
+            encoding = parseResultEncoding();
         }
        return encoding;
     }
 
     public void setXml(String xml) {
         this.xml = xml;
+    }
+    
+    private SosSweAbstractEncoding parseResultEncoding() throws OwsExceptionReport {
+        try {
+            Object decodedObject = decodeXmlToObject(XmlObject.Factory.parse(xml));
+            if (decodedObject != null && decodedObject instanceof SosSweAbstractEncoding) {
+                SosSweAbstractEncoding sosSweEncoding = (SosSweAbstractEncoding) decodedObject;
+                return sosSweEncoding;
+            } else {
+                StringBuilder exceptionText = new StringBuilder();
+                exceptionText.append("Error while parsing result encoding!");
+                LOGGER.debug(exceptionText.toString());
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            }
+        } catch (XmlException xmle) {
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("Error while parsing result encoding!");
+            LOGGER.debug(exceptionText.toString());
+            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText.toString());
+        }
+    }
+    
+    private Object decodeXmlToObject(XmlObject xmlObject) throws OwsExceptionReport {
+        List<IDecoder> decoderList = Configurator.getInstance().getDecoder(XmlHelper.getNamespace(xmlObject));
+        if (decoderList != null) {
+            for (IDecoder decoder : decoderList) {
+                return decoder.decode(xmlObject);
+            }
+        }
+        return null;
     }
 
 }

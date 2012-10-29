@@ -23,6 +23,8 @@
  */
 package org.n52.sos.ds.hibernate;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -30,12 +32,19 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Projection;
+import org.hibernate.criterion.Restrictions;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IGetResultDAO;
+import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
+import org.n52.sos.ds.hibernate.util.HibernateResultUtilities;
+import org.n52.sos.ds.hibernate.util.QueryHelper;
+import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
@@ -43,6 +52,8 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.sos.SosResultEncoding;
+import org.n52.sos.ogc.sos.SosResultStructure;
 import org.n52.sos.request.GetResultRequest;
 import org.n52.sos.response.GetResultResponse;
 import org.n52.sos.service.Configurator;
@@ -67,7 +78,7 @@ public class GetResultDAO implements IGetResultDAO {
      * Instance of the IConnectionProvider
      */
     private IConnectionProvider connectionProvider;
-    
+
     public GetResultDAO() {
         this.connectionProvider = Configurator.getInstance().getConnectionProvider();
     }
@@ -131,11 +142,11 @@ public class GetResultDAO implements IGetResultDAO {
                         new OWSParameterValuePossibleValues(featureOfInterest));
                 // TODO get the values for temporal and spatial filtering
                 // set param temporalFilter
-//                opsMeta.addParameterValue(Sos2Constants.GetResultParams.temporalFilter.name(),
-//                        new OWSParameterValuePossibleValues(null));
-//                // set param spatialFilter
-//                opsMeta.addParameterValue(Sos2Constants.GetResultParams.spatialFilter.name(),
-//                        new OWSParameterValuePossibleValues(null));
+                // opsMeta.addParameterValue(Sos2Constants.GetResultParams.temporalFilter.name(),
+                // new OWSParameterValuePossibleValues(null));
+                // // set param spatialFilter
+                // opsMeta.addParameterValue(Sos2Constants.GetResultParams.spatialFilter.name(),
+                // new OWSParameterValuePossibleValues(null));
             }
             return opsMeta;
         }
@@ -156,9 +167,19 @@ public class GetResultDAO implements IGetResultDAO {
             GetResultResponse response = new GetResultResponse();
             response.setService(request.getService());
             response.setVersion(request.getVersion());
-
-            // TODO Auto-generated method stub
-
+            Set<String> featureIdentifier =
+                    QueryHelper.getFeatureIdentifier(request.getSpatialFilter(), request.getFeatureOfInterest(),
+                            session);
+            List<ResultTemplate> resultTemplates = queryResultTemplate(request, featureIdentifier, session);
+            if (resultTemplates != null && !resultTemplates.isEmpty()) {
+                SosResultEncoding sosResultEncoding =
+                        ResultHandlingHelper.createSosResultEncoding(resultTemplates.get(0).getResultEncoding());
+                SosResultStructure sosResultStructure =
+                        ResultHandlingHelper.createSosResultStructure(resultTemplates.get(0).getResultStructure());
+                List<Observation> observations = queryObservation(request, featureIdentifier, session);
+                response.setResultValues(ResultHandlingHelper.createResultValuesFromObservations(observations,
+                        sosResultEncoding, sosResultStructure));
+            }
             return response;
         } catch (HibernateException he) {
             String exceptionText = "Error while querying result data!";
@@ -167,6 +188,63 @@ public class GetResultDAO implements IGetResultDAO {
         } finally {
             connectionProvider.returnConnection(session);
         }
+    }
+
+    private List<ResultTemplate> queryResultTemplate(GetResultRequest request, Set<String> featureIdentifier,
+            Session session) {
+        List<ResultTemplate> resultTemplates =
+                HibernateCriteriaQueryUtilities.getResultTemplateObject(request.getOffering(),
+                        request.getObservedProperty(), featureIdentifier, session);
+        return resultTemplates;
+    }
+
+    /**
+     * Query observations from database depending on requested filters
+     * 
+     * @param request
+     *            GetObservation request
+     * @param featureIdentifier
+     * @param session
+     *            Hibernate session
+     * @return List of Observation objects
+     * @throws OwsExceptionReport
+     *             If an error occurs.
+     */
+    protected List<Observation> queryObservation(GetResultRequest request, Set<String> featureIdentifier,
+            Session session) throws OwsExceptionReport {
+        Map<String, String> aliases = new HashMap<String, String>();
+        List<Criterion> criterions = new ArrayList<Criterion>();
+        List<Projection> projections = new ArrayList<Projection>();
+        String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
+        // offering
+        String offAlias = HibernateCriteriaQueryUtilities.addOfferingAliasToMap(aliases, obsConstAlias);
+        criterions.add(HibernateCriteriaQueryUtilities.getEqualRestriction(
+                HibernateCriteriaQueryUtilities.getIdentifierParameter(offAlias), request.getOffering()));
+        // observableProperties
+        String obsPropAlias = HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, obsConstAlias);
+        criterions.add(HibernateCriteriaQueryUtilities.getEqualRestriction(
+                HibernateCriteriaQueryUtilities.getIdentifierParameter(obsPropAlias), request.getObservedProperty()));
+        // deleted
+        // XXX DeleteObservation Extension
+        criterions.add(Restrictions.eq("deleted", false));
+        // temporal filters
+        if (request.hasTemporalFilter()) {
+            criterions
+                    .add(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(request.getTemporalFilter()));
+        }
+        if (featureIdentifier != null && featureIdentifier.isEmpty()) {
+            return null;
+        } else if (featureIdentifier != null && !featureIdentifier.isEmpty()) {
+            String foiAlias = HibernateCriteriaQueryUtilities.addFeatureOfInterestAliasToMap(aliases, null);
+            criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+                    HibernateCriteriaQueryUtilities.getIdentifierParameter(foiAlias), new ArrayList<String>(
+                            featureIdentifier)));
+        }
+        // ...
+        List<Observation> observations =
+                HibernateCriteriaQueryUtilities.getObservations(aliases, criterions, projections, session);
+        return observations;
+
     }
 
 }

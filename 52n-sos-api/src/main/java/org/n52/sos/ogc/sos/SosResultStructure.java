@@ -23,13 +23,37 @@
  */
 package org.n52.sos.ogc.sos;
 
+import java.util.List;
+
+import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.decode.IDecoder;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
+import org.n52.sos.service.Configurator;
+import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SosResultStructure {
+    
+    /**
+     * logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(SosResultStructure.class);
     
     private SosSweAbstractDataComponent resultStructure;
     
     private String xml;
+
+    public SosResultStructure() {
+    }
+    
+    public SosResultStructure(String resultStructure) throws OwsExceptionReport {
+        this.xml = resultStructure;
+        this.resultStructure = parseResultStructure();
+    }
 
     public String getXml() {
         if (resultStructure != null) {
@@ -42,16 +66,45 @@ public class SosResultStructure {
         this.resultStructure = resultStructure;
     }
 
-    public SosSweAbstractDataComponent getResultStructure() {
+    public SosSweAbstractDataComponent getResultStructure() throws OwsExceptionReport {
         if (resultStructure == null && xml != null && !xml.isEmpty()) {
-            // TODO decode from xmlString
-            return null;
+           resultStructure = parseResultStructure();
         }
        return resultStructure;
     }
 
     public void setXml(String xml) {
         this.xml = xml;
+    }
+    
+    private SosSweAbstractDataComponent parseResultStructure() throws OwsExceptionReport {
+        try {
+            Object decodedObject = decodeXmlToObject(XmlObject.Factory.parse(xml));
+            if (decodedObject != null && decodedObject instanceof SosSweAbstractDataComponent) {
+                SosSweAbstractDataComponent sosSweData = (SosSweAbstractDataComponent) decodedObject;
+                return sosSweData;
+            } else {
+                StringBuilder exceptionText = new StringBuilder();
+                exceptionText.append("Error while parsing result structure!");
+                LOGGER.debug(exceptionText.toString());
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            }
+        } catch (XmlException xmle) {
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("Error while parsing result structure!");
+            LOGGER.debug(exceptionText.toString());
+            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText.toString());
+        }
+    }
+
+    private Object decodeXmlToObject(XmlObject xmlObject) throws OwsExceptionReport {
+        List<IDecoder> decoderList = Configurator.getInstance().getDecoder(XmlHelper.getNamespace(xmlObject));
+        if (decoderList != null) {
+            for (IDecoder decoder : decoderList) {
+                return decoder.decode(xmlObject);
+            }
+        }
+        return null;
     }
 
 }

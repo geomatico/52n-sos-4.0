@@ -1217,6 +1217,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
 
     private void addResultToObservation(XmlObject addNewResult, SosObservation sosObservation,
             List<SosObservableProperty> phenComponents, String observationID) throws OwsExceptionReport {
+        // TODO if OM_SWEArrayObservation and get ResultEncoding and ResultStructure exists, 
         String observationType = sosObservation.getObservationConstellation().getObservationType();
         if (sosObservation.getValue() instanceof SosSingleObservationValue) {
             addSingleObservationToResultSet(addNewResult, (SosSingleObservationValue) sosObservation.getValue(),

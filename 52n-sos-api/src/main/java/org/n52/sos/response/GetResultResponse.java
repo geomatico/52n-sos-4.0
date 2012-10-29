@@ -23,40 +23,36 @@
  */
 package org.n52.sos.response;
 
-import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
-import org.n52.sos.ogc.swe.SosSweDataArray;
-import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
-
 public class GetResultResponse extends AbstractServiceResponse {
     
-    private SosSweAbstractDataComponent resultStructure;
-    
-    private SosSweAbstractEncoding resultEncoding;
+//    private SosResultStructure resultStructure;
+//    
+//    private SosResultEncoding resultEncoding;
     
     private String resultValues;
+
+//    public SosResultStructure getResultStructure() {
+//        return resultStructure;
+//    }
+//
+//    public SosResultEncoding getResultEncoding() {
+//        return resultEncoding;
+//    }
+//
+//    public void setResultStructure(SosResultStructure sosResultStructure) {
+//        this.resultStructure = sosResultStructure;
+//    }
+//
+//    public void setResultEncoding(SosResultEncoding sosResultEncoding) {
+//        this.resultEncoding = sosResultEncoding;
+//    }
 
     public void setResultValues(String resultValues) {
         this.resultValues = resultValues;
     }
-
+    
     public String getResultValues() {
         return resultValues;
-    }
-
-    public SosSweAbstractDataComponent getResultStructure() {
-        return resultStructure;
-    }
-
-    public SosSweAbstractEncoding getResultEncoding() {
-        return resultEncoding;
-    }
-
-    public void setResultStructure(SosSweAbstractDataComponent resultStructure) {
-        this.resultStructure = resultStructure;
-    }
-
-    public void setResultEncoding(SosSweAbstractEncoding resultEncoding) {
-        this.resultEncoding = resultEncoding;
     }
 
 }

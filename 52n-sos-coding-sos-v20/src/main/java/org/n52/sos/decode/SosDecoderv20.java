@@ -263,7 +263,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
         getObsRequest.setOfferings(Arrays.asList(getObsType.getOfferingArray()));
         getObsRequest.setObservedProperties(Arrays.asList(getObsType.getObservedPropertyArray()));
         getObsRequest.setProcedures(Arrays.asList(getObsType.getProcedureArray()));
-        getObsRequest.setEventTimes(Arrays.asList(parseTemporalFilters4GetObservation(getObsType.getTemporalFilterArray())));
+        getObsRequest.setEventTimes(parseTemporalFilters4GetObservation(getObsType.getTemporalFilterArray()));
         if (getObsType.isSetSpatialFilter()) {
             getObsRequest.setSpatialFilter(parseSpatialFilter4GetObservation(getObsType.getSpatialFilter()));
         }
@@ -433,7 +433,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
         GetResultResponse sosGetResultResponse = new GetResultResponse();
         GetResultResponseType getResultResponse = getResultResponseDoc.getGetResultResponse();
         String resultValues = parseResultValues(getResultResponse.getResultValues());
-        sosGetResultResponse.setResultValues(resultValues);
+//        sosGetResultResponse.setResultValues(resultValues);
         return sosGetResultResponse;
     }
 
@@ -504,7 +504,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
      * @throws OwsExceptionReport
      *             if parsing of the element failed
      */
-    private TemporalFilter[] parseTemporalFilters4GetObservation(
+    private List<TemporalFilter> parseTemporalFilters4GetObservation(
             net.opengis.sos.x20.GetObservationType.TemporalFilter[] temporalFilters) throws OwsExceptionReport {
         List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>();
         for (net.opengis.sos.x20.GetObservationType.TemporalFilter temporalFilter : temporalFilters) {
@@ -513,10 +513,10 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
                 sosTemporalFilters.add((TemporalFilter) filter);
             }
         }
-        return sosTemporalFilters.toArray(new TemporalFilter[0]);
+        return sosTemporalFilters;
     }
 
-    private TemporalFilter[] parseTemporalFilters4GetResult(
+    private List<TemporalFilter> parseTemporalFilters4GetResult(
             net.opengis.sos.x20.GetResultType.TemporalFilter[] temporalFilters) throws OwsExceptionReport {
         List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>();
         for (net.opengis.sos.x20.GetResultType.TemporalFilter temporalFilter : temporalFilters) {
@@ -525,7 +525,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
                 sosTemporalFilters.add((TemporalFilter) filter);
             }
         }
-        return sosTemporalFilters.toArray(new TemporalFilter[0]);
+        return sosTemporalFilters;
     }
 
     private SosObservationConstellation parseObservationTemplate(ObservationTemplate observationTemplate) throws OwsExceptionReport {

@@ -28,9 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javassist.bytecode.ExceptionTable;
-
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
@@ -59,6 +56,7 @@ import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.Util4Exceptions;
@@ -411,7 +409,37 @@ public class HibernateCriteriaTransactionalUtilities {
         // session.flush();
     }
 
-    public static void insertResultTemplate(InsertResultTemplateRequest request,
+    public static void checkOrInsertResultTemplate(InsertResultTemplateRequest request,
+            ObservationConstellation observationConstellation, FeatureOfInterest featureOfInterest, Session session)
+            throws OwsExceptionReport {
+        List<String> features = new ArrayList<String>();
+        features.add(featureOfInterest.getIdentifier());
+        List<ResultTemplate> resultTemplates =
+                HibernateCriteriaQueryUtilities.getResultTemplateObject(observationConstellation.getOffering()
+                        .getIdentifier(), observationConstellation.getObservableProperty().getIdentifier(), features,
+                        session);
+        if (resultTemplates == null || (resultTemplates != null && resultTemplates.isEmpty())) {
+            createAndSaveResultTemplate(request, observationConstellation, featureOfInterest, session);
+        } else if (resultTemplates != null && !resultTemplates.isEmpty()) {
+            ResultTemplate storedResultTemplate = resultTemplates.get(0);
+            if (!storedResultTemplate.getResultStructure().equals(request.getResultStructure().getXml())) {
+                StringBuilder exceptionText = new StringBuilder();
+                exceptionText
+                        .append("The requested resultStructure is different from already inserted result template for procedure (");
+                exceptionText.append (observationConstellation.getProcedure().getIdentifier());
+                exceptionText.append(") observedProperty (");
+                exceptionText.append(observationConstellation.getObservableProperty().getIdentifier());
+                exceptionText.append(") and offering (");
+                exceptionText.append(observationConstellation.getOffering().getIdentifier());
+                exceptionText.append(")!");
+                throw Util4Exceptions.createInvalidParameterValueException(
+                        Sos2Constants.InsertResultTemplateParams.resultStructure.name(), exceptionText.toString());
+            }
+            createAndSaveResultTemplate(request, observationConstellation, featureOfInterest, session);
+        }
+    }
+
+    private static void createAndSaveResultTemplate(InsertResultTemplateRequest request,
             ObservationConstellation observationConstellation, FeatureOfInterest featureOfInterest, Session session) {
         ResultTemplate resultTemplate = new ResultTemplate();
         resultTemplate.setIdentifier(request.getIdentifier());

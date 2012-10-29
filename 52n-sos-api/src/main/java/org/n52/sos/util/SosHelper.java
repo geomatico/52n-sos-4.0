@@ -1019,4 +1019,5 @@ public class SosHelper {
             throw Util4Exceptions.createNoApplicableCodeException(cnfe, exceptionText);
         }
     }
+    
 }

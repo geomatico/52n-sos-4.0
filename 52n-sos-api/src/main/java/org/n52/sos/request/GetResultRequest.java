@@ -39,7 +39,7 @@ public class GetResultRequest extends AbstractServiceRequest {
 
     private List<String> featureOfInterest;
 
-    private TemporalFilter[] temporalFilter;
+    private List<TemporalFilter> temporalFilter;
 
     private SpatialFilter spatialFilter;
     
@@ -64,7 +64,7 @@ public class GetResultRequest extends AbstractServiceRequest {
         return featureOfInterest;
     }
 
-    public TemporalFilter[] getTemporalFilter() {
+    public List<TemporalFilter> getTemporalFilter() {
         return temporalFilter;
     }
 
@@ -84,7 +84,7 @@ public class GetResultRequest extends AbstractServiceRequest {
         this.featureOfInterest = featureOfInterest;
     }
 
-    public void setTemporalFilter(TemporalFilter[] temporalFilters) {
+    public void setTemporalFilter(List<TemporalFilter> temporalFilters) {
         this.temporalFilter = temporalFilters;
     }
 
@@ -97,7 +97,7 @@ public class GetResultRequest extends AbstractServiceRequest {
     }
 
     public boolean hasTemporalFilter() {
-        return temporalFilter != null && temporalFilter.length > 0;
+        return temporalFilter != null && !temporalFilter.isEmpty();
     }
 
     public boolean hasSpatialFilter() {

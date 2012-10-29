@@ -965,4 +965,21 @@ public class HibernateCriteriaQueryUtilities {
         criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         return (ResultTemplate) criteria.uniqueResult();
     }
+
+    public static List<ResultTemplate> getResultTemplateObject(String offering, String observedProperty,
+            Collection<String> featureOfInterest, Session session) {
+        Criteria criteria = session.createCriteria(ResultTemplate.class);
+        Map<String, String> aliases = new HashMap<String, String>();
+        String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
+        String offeringAlias = addOfferingAliasToMap(aliases, obsConstAlias);
+        String obsPropAlias = addObservablePropertyAliasToMap(aliases, obsConstAlias);
+        criteria.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering));
+        criteria.add(getEqualRestriction(getIdentifierParameter(obsPropAlias), observedProperty));
+        if (featureOfInterest != null && !featureOfInterest.isEmpty()) {
+            String foiAlias = addFeatureOfInterestAliasToMap(aliases, null);
+            criteria.add(Restrictions.in(getIdentifierParameter(foiAlias), new ArrayList<String>(featureOfInterest)));
+        }
+        addAliasesToCriteria(criteria, aliases);
+        return criteria.list();
+    }
 }

@@ -138,17 +138,17 @@ public class InsertResultTemplateDAO implements IInsertResultTemplateDAO {
                     throw Util4Exceptions.createInvalidParameterValueException(
                             Sos2Constants.InsertResultTemplateParams.observationType.name(), exceptionText);
                 }
-                // TODO obsType should be set, currently not
                 obsConst =
                         HibernateUtilities.checkObservationConstellationForObservation(sosObsConst, offeringID,
                                 session);
                 if (obsConst != null) {
+                    
                     FeatureOfInterest feature =
                             HibernateUtilities.checkOrInsertFeatureOfInterest(sosObsConst.getFeatureOfInterest(),
                                     session);
                     HibernateUtilities.checkOrInsertFeatureOfInterestRelatedFeatureRelation(feature,
                             obsConst.getOffering(), session);
-                    HibernateCriteriaTransactionalUtilities.insertResultTemplate(request, obsConst, feature, session);
+                    HibernateCriteriaTransactionalUtilities.checkOrInsertResultTemplate(request, obsConst, feature, session);
                 } else {
                     // TODO make better exception.
                     StringBuilder exceptionText = new StringBuilder();

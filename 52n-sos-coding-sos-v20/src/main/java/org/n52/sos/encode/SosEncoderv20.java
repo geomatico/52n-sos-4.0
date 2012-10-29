@@ -79,6 +79,7 @@ import net.opengis.swes.x20.FeatureRelationshipType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.apache.xmlbeans.XmlString;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.filter.FilterConstants;
 import org.n52.sos.ogc.filter.TemporalFilter;
@@ -207,7 +208,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         if (response instanceof GetCapabilitiesResponse) {
             return createCapabilitiesDocument((GetCapabilitiesResponse) response);
         } else if (response instanceof GetObservationResponse) {
-            return createObservationResponseDocument((GetObservationResponse) response);
+            return createGetObservationResponseDocument((GetObservationResponse) response);
         } else if (response instanceof GetFeatureOfInterestResponse) {
             return createGetFeatureOfInterestResponse((GetFeatureOfInterestResponse) response);
         } else if (response instanceof GetObservationByIdResponse) {
@@ -287,7 +288,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         return xbCapsDoc;
     }
 
-    private XmlObject createObservationResponseDocument(GetObservationResponse response) throws OwsExceptionReport {
+    private XmlObject createGetObservationResponseDocument(GetObservationResponse response) throws OwsExceptionReport {
         GetObservationResponseDocument xbGetObsRespDoc =
                 GetObservationResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         GetObservationResponseType xbGetObsResp = xbGetObsRespDoc.addNewGetObservationResponse();
@@ -298,7 +299,9 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         } else if (encoder instanceof IObservationEncoder) {
-            if (((IObservationEncoder) encoder).mergeObservationValuesWithSameParameters()) {
+            IObservationEncoder iObservationEncoder = (IObservationEncoder) encoder;
+            if (iObservationEncoder.mergeObservationValuesWithSameParameters()) {
+                // TODO get List of mergable ObsTyps, ...
                 observationCollection =
                         response.mergeObservations(((IObservationEncoder) encoder)
                                 .mergeObservationValuesWithSameParameters());
@@ -510,8 +513,9 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         GetResultResponseDocument getResultResponseDoc =
                 GetResultResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         GetResultResponseType getResultResponse = getResultResponseDoc.addNewGetResultResponse();
-     // TODO ...
-//        getResultResponse.setResultValues(response.getResultValues());
+        XmlString xmlString = XmlString.Factory.newInstance();
+        xmlString.setStringValue(response.getResultValues());
+        getResultResponse.addNewResultValues().set(xmlString);
         return getResultResponse;
     }
 
