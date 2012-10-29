@@ -46,6 +46,7 @@ import org.n52.sos.ds.IGetObservationDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateResultUtilities;
+import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSConstants.MinMax;
@@ -57,7 +58,6 @@ import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.GetObservationParams;
-import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.service.Configurator;
@@ -194,8 +194,7 @@ public class GetObservationDAO implements IGetObservationDAO {
                 // set param spatial filter
                 Envelope envelope = null;
                 if (featureIDs != null && !featureIDs.isEmpty()) {
-                    envelope =
-                            Configurator.getInstance().getCapabilitiesCacheController().getEnvelopeForFeatures();
+                    envelope = Configurator.getInstance().getCapabilitiesCacheController().getEnvelopeForFeatures();
                 }
                 if (envelope != null) {
                     opsMeta.addParameterValue(Sos2Constants.GetObservationParams.spatialFilter.name(),
@@ -242,39 +241,40 @@ public class GetObservationDAO implements IGetObservationDAO {
      */
     @Override
     public GetObservationResponse getObservation(GetObservationRequest request) throws OwsExceptionReport {
-            GetObservationRequest sosRequest = (GetObservationRequest) request;
-            // setting a global "now" for this request
-            now = new DateTime();
-            Session session = null;
-            try {
-                session = (Session) connectionProvider.getConnection();
-                if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION)
-                        && sosRequest.getObservedProperties().isEmpty()) {
-                    throw Util4Exceptions.createMissingParameterValueException(GetObservationParams.observedProperty
-                            .name());
-                } else {
-                    boolean hasSpatialPhen = false;
-                    if (sosRequest.getObservedProperties().contains(
-                            Configurator.getInstance().getSpatialObsProp4DynymicLocation())) {
-                        hasSpatialPhen = true;
-                    }
-                    List<Observation> observations = queryObservation(sosRequest, session);
-
-                    GetObservationResponse response = new GetObservationResponse();
-                    response.setService(request.getService());
-                    response.setVersion(request.getVersion());
-                    response.setResponseFormat(request.getResponseFormat());
-                    response.setObservationCollection(HibernateResultUtilities.createSosObservationFromObservations(
-                            observations, sosRequest.getVersion(), session));
-                    return response;
+        GetObservationRequest sosRequest = (GetObservationRequest) request;
+        // setting a global "now" for this request
+        now = new DateTime();
+        Session session = null;
+        try {
+            session = (Session) connectionProvider.getConnection();
+            if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION)
+                    && sosRequest.getObservedProperties().isEmpty()) {
+                throw Util4Exceptions.createMissingParameterValueException(GetObservationParams.observedProperty
+                        .name());
+            } else {
+                boolean hasSpatialPhen = false;
+                if (sosRequest.getObservedProperties().contains(
+                        Configurator.getInstance().getSpatialObsProp4DynymicLocation())) {
+                    hasSpatialPhen = true;
                 }
-            } catch (HibernateException he) {
-                String exceptionText = "Error while querying data observation data!";
-                LOGGER.error(exceptionText, he);
-                throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
-            } finally {
-                connectionProvider.returnConnection(session);
+                List<Observation> observations = queryObservation(sosRequest, session);
+
+                GetObservationResponse response = new GetObservationResponse();
+                response.setService(request.getService());
+                response.setVersion(request.getVersion());
+                response.setResponseFormat(request.getResponseFormat());
+                response.setObservationCollection(HibernateResultUtilities.createSosObservationFromObservations(
+                        observations, sosRequest.getVersion(), session));
+                // TODO if OM_SWEArrayObservation and ResultTemplate exits, get ResultEncoding and ResultStructure
+                return response;
             }
+        } catch (HibernateException he) {
+            String exceptionText = "Error while querying data observation data!";
+            LOGGER.error(exceptionText, he);
+            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+        } finally {
+            connectionProvider.returnConnection(session);
+        }
     }
 
     /**
@@ -326,37 +326,20 @@ public class GetObservationDAO implements IGetObservationDAO {
         if (request.getEventTimes() != null && !request.getEventTimes().isEmpty()) {
             criterions.add(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(request.getEventTimes()));
         }
-        Set<String> foiIDs = null;
-        // spatial filter
-        if (request.getSpatialFilter() != null) {
-            if (request.getSpatialFilter().getValueReference().contains("om:featureOfInterest")
-                    && request.getSpatialFilter().getValueReference().contains("sams:shape")) {
-                foiIDs =
-                        new HashSet<String>(Configurator.getInstance().getFeatureQueryHandler()
-                                .getFeatureIDs(request.getSpatialFilter(), session));
-            } else {
-                throw Util4Exceptions.createNoApplicableCodeException(null,
-                        "The requested valueReference for spatial filters is not supported by this server!");
-            }
-            if (foiIDs.isEmpty()) {
-                return null;
-            }
-        }
-        // feature of interest
-        if ((request.getFeatureIdentifiers() != null && !request.getFeatureIdentifiers().isEmpty()) || foiIDs != null) {
-            if (foiIDs == null) {
-                foiIDs = new HashSet<String>();
-            }
-            foiIDs.addAll(request.getFeatureIdentifiers());
+        Set<String> featureIdentifier = QueryHelper.getFeatureIdentifier(request.getSpatialFilter(), request.getFeatureIdentifiers(), session);
+        if (featureIdentifier != null && featureIdentifier.isEmpty()) {
+            return null;
+        } else if (featureIdentifier != null && !featureIdentifier.isEmpty()) {
             String foiAlias = HibernateCriteriaQueryUtilities.addFeatureOfInterestAliasToMap(aliases, null);
             criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
-                    HibernateCriteriaQueryUtilities.getIdentifierParameter(foiAlias), new ArrayList<String>(foiIDs)));
-
+                    HibernateCriteriaQueryUtilities.getIdentifierParameter(foiAlias), new ArrayList<String>(
+                            featureIdentifier)));
         }
         // ...
         List<Observation> observations =
                 HibernateCriteriaQueryUtilities.getObservations(aliases, criterions, projections, session);
         return observations;
+
     }
 
     // /**
