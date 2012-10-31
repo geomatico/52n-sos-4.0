@@ -29,6 +29,12 @@ package org.n52.sos.util;
  */
 public class W3CConstants {
 
+    // attribute names
+	
+    public static final String AN_HREF = "href";
+	
+    public static final String AN_TITLE = "title";
+	
     // namespaces and schema locations
 
     public static final String NS_XLINK = "http://www.w3.org/1999/xlink";

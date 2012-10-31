@@ -54,6 +54,10 @@ public class GMLConstants {
 
     public static final String EN_TIME_POSITION = "timePosition";
 
+    public static final String EN_BEGIN_POSITION = "beginPosition";
+
+	public static final String EN_END_POSITION = "endPosition";
+
     public static final String GML_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 
     // nil values from GML 3.2 Section 8.2.3.1
@@ -99,6 +103,10 @@ public class GMLConstants {
 
     public static final String EN_UPPER_CORNER = "upperCorner";
 
+    /* attribute names in GML */
+
+    public static final String AN_ID = "id";
+	
     /* QNames for elements */
 
     public static final QName QN_ENVELOPE = new QName(NS_GML, EN_ENVELOPE, NS_GML_PREFIX);

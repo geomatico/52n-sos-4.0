@@ -127,6 +127,12 @@ public class OMConstants {
     public static final String EN_WV_STATION = "WVStation";
 
     public static final String EN_TEMPORAL_OPS = "temporalOps";
+	
+    public static final String EN_PROCEDURE = "procedure";
+
+    public static final String EN_PHENOMENON_TIME = "phenomenonTime";
+
+    public static final String EN_FEATURE_OF_INTEREST = "featureOfInterest";
 
     // /////////////////////////////////////////////////////////////////////////////////
     // other constants
