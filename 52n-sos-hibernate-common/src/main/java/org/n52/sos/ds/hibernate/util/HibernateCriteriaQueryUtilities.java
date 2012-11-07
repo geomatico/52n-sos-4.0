@@ -89,6 +89,7 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return min time
      */
+    // FIXME BUG im Cache -> Event-Times
     public static DateTime getMinObservationTime(Session session) {
         Object min =
                 session.createCriteria(Observation.class)
@@ -107,6 +108,7 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return max time
      */
+    // FIXME BUG im Cache -> Event-Times
     public static DateTime getMaxObservationTime(Session session) {
         Object maxStart =
                 session.createCriteria(Observation.class)
@@ -139,6 +141,7 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return min time for offering
      */
+    // FIXME BUG im Cache -> Event-Times
     public static DateTime getMinDate4Offering(String offering, Session session) {
         Criteria criteria = session.createCriteria(Observation.class);
         Map<String, String> aliases = new HashMap<String, String>();
@@ -164,6 +167,7 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return max time for offering
      */
+    // FIXME BUG im Cache -> Event-Times
     public static DateTime getMaxDate4Offering(String offering, Session session) {
         Criteria criteriaStart = session.createCriteria(Observation.class);
         Map<String, String> aliases = new HashMap<String, String>();
