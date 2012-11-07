@@ -58,6 +58,15 @@ public class SosService extends HttpServlet {
     /** the logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosService.class);
 
+    private static final String ACCEPT_ENCODING = "Accept-Encoding";
+
+    private static final String CONTENT_ENCODING = "Content-Encoding";
+
+    private static final String GZIP = "gzip";
+    
+    // TODO make this value configurable
+    private static final int MINIMUM_GZIP_SIZE = 1000000;
+
     /**
      * initializes the Servlet
      */
@@ -82,47 +91,46 @@ public class SosService extends HttpServlet {
         super.destroy();
     }
 
-	@Override
-	protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		
-		LOGGER.debug("\n**********\n(DELETE) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+        LOGGER.debug("\n**********\n(DELETE) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
+        boolean clientSupportsGzip = checkForClientGZipSupport(req);
         ServiceResponse sosResp = null;
         try {
             sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doDeleteperation(req);
         } catch (OwsExceptionReport owse) {
             sosResp = handleOwsExceptionReport(owse);
         }
-        doResponse(resp, sosResp);
-	}
+        doResponse(resp, sosResp, clientSupportsGzip);
+    }
 
-	/**
-	 * handles all GET requests, the request will be passed to the
-	 * RequestOperator
-	 * 
-	 * @param req
-	 *            the incoming request
-	 * 
-	 * @param resp
-	 *            the response for the incomming request
-	 * 
-	 */
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
-	
-	    LOGGER.debug("\n**********\n(GET) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
-	    LOGGER.trace("Query String: " + req.getQueryString());
-	
-	    ServiceResponse sosResp = null;
-	    try {
-	        sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doGetOperation(req);
-	    } catch (OwsExceptionReport owse) {
-	        sosResp = handleOwsExceptionReport(owse);
-	    }
-	    doResponse(resp, sosResp);
-	}
+    /**
+     * handles all GET requests, the request will be passed to the
+     * RequestOperator
+     * 
+     * @param req
+     *            the incoming request
+     * 
+     * @param resp
+     *            the response for the incomming request
+     * 
+     */
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
 
-	/**
+        LOGGER.debug("\n**********\n(GET) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
+        LOGGER.trace("Query String: " + req.getQueryString());
+        boolean clientSupportsGzip = checkForClientGZipSupport(req);
+        ServiceResponse sosResp = null;
+        try {
+            sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doGetOperation(req);
+        } catch (OwsExceptionReport owse) {
+            sosResp = handleOwsExceptionReport(owse);
+        }
+        doResponse(resp, sosResp, clientSupportsGzip);
+    }
+
+    /**
      * handles all POST requests, the request will be passed to the
      * requestOperator
      * 
@@ -135,33 +143,32 @@ public class SosService extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
 
         LOGGER.debug("\n**********\n(POST) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
-
+        boolean clientSupportsGzip = checkForClientGZipSupport(req);
         ServiceResponse sosResp = null;
         try {
             sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doPostOperation(req);
         } catch (OwsExceptionReport owse) {
             sosResp = handleOwsExceptionReport(owse);
         }
-        doResponse(resp, sosResp);
+        doResponse(resp, sosResp, clientSupportsGzip);
     }
-      
-	@Override
-	protected void doPut(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
 
-		LOGGER.debug("\n**********\n(PUT) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+        LOGGER.debug("\n**********\n(PUT) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
+        boolean clientSupportsGzip = checkForClientGZipSupport(req);
         ServiceResponse sosResp = null;
         try {
             sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doPutOperation(req);
         } catch (OwsExceptionReport owse) {
             sosResp = handleOwsExceptionReport(owse);
         }
-        doResponse(resp, sosResp);
-        
-	}
+        doResponse(resp, sosResp, clientSupportsGzip);
 
-	/**
+    }
+
+    /**
      * Handles OPTIONS request to enable Cross-Origin Resource Sharing.
      * 
      * @param req
@@ -172,7 +179,7 @@ public class SosService extends HttpServlet {
      */
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         LOGGER.debug("\n**********\n(OPTIONS) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
-
+        boolean clientSupportsGzip = checkForClientGZipSupport(req);
         ServiceResponse sosResp = null;
         try {
             sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doOptionsOperation(req);
@@ -183,9 +190,9 @@ public class SosService extends HttpServlet {
             super.doOptions(req, resp);
             this.setCorsHeaders(resp);
         }
-        doResponse(resp, sosResp);
+        doResponse(resp, sosResp, clientSupportsGzip);
     }
-    
+
     private ServiceResponse handleOwsExceptionReport(OwsExceptionReport owsExceptionReport) throws ServletException {
         try {
             IEncoder encoder = Configurator.getInstance().getEncoder(owsExceptionReport.getNamespace());
@@ -205,11 +212,10 @@ public class SosService extends HttpServlet {
             }
         } catch (Exception owse) {
             throw logExceptionAndCreateServletException(owse);
-        }        
+        }
     }
 
-    private ServletException logExceptionAndCreateServletException(Exception e) 
-    {
+    private ServletException logExceptionAndCreateServletException(Exception e) {
         String exceptionText = "Error while encoding exception response!";
         if (e != null) {
             LOGGER.debug(exceptionText, e);
@@ -218,7 +224,6 @@ public class SosService extends HttpServlet {
         }
         return new ServletException(exceptionText);
     }
-
 
     /**
      * writes the content of the SosResponse to the outputStream of the
@@ -234,31 +239,46 @@ public class SosService extends HttpServlet {
      * 
      */
     // FIXME what happens with responses having no output stream
-    private void doResponse(HttpServletResponse resp, ServiceResponse sosResponse) throws ServletException {
+    private void doResponse(HttpServletResponse resp, ServiceResponse sosResponse, boolean clientAcceptsGzip)
+            throws ServletException {
         OutputStream out = null;
         GZIPOutputStream gzip = null;
         try {
             String contentType = sosResponse.getContentType();
             resp.setContentType(contentType);
             this.setCorsHeaders(resp);
-            
+
             if (sosResponse.isSetHeaderMap()) {
-                this.setSpecifiedHeaders(sosResponse.getHeaderMap(),resp);
+                this.setSpecifiedHeaders(sosResponse.getHeaderMap(), resp);
             }
-            
+
             int httpResponseCode = sosResponse.getHttpResponseCode();
-            if  (httpResponseCode != -1) {
+            if (httpResponseCode != -1) {
                 resp.setStatus(httpResponseCode);
             }
-            
-        	if (!sosResponse.isContentLess()){
-        		int contentLength = sosResponse.getContentLength();
-        		resp.setContentLength(contentLength);
-            	out = resp.getOutputStream();
-            	sosResponse.writeToOutputStream(out);
-            	out.flush();
+
+            // TODO check for which contentLength gzip is faster than sending unzipped response
+            if (!sosResponse.isContentLess()) {
+                out = resp.getOutputStream();
+                int contentLength = sosResponse.getContentLength();
+                resp.setContentLength(contentLength);
+                resp.setContentType(contentType);
+                if ((sosResponse.getApplyGzipCompression() || clientAcceptsGzip) && contentLength > MINIMUM_GZIP_SIZE ) {
+                    if (clientAcceptsGzip) {
+                        resp.addHeader(CONTENT_ENCODING, GZIP);
+                    } else {
+                        resp.setContentType(SosConstants.CONTENT_TYPE_ZIP);
+                    }
+                    gzip = new GZIPOutputStream(out);
+                    sosResponse.writeToOutputStream(gzip);
+                    gzip.flush();
+                    gzip.finish();
+                } else {
+                    sosResponse.writeToOutputStream(out);
+                    out.flush();
+                }
             }
-        	
+
         } catch (IOException ioe) {
             String exceptionText = "Error while writing SOS response to ServletResponse!";
             LOGGER.error(exceptionText, ioe);
@@ -277,9 +297,7 @@ public class SosService extends HttpServlet {
         }
     }
 
-    private void setSpecifiedHeaders(Map<String, String> headerMap,
-            HttpServletResponse resp)
-    {
+    private void setSpecifiedHeaders(Map<String, String> headerMap, HttpServletResponse resp) {
         for (String headerIdentifier : headerMap.keySet()) {
             String value = headerMap.get(headerIdentifier).toString();
             if (isHeaderAndValueSet(headerIdentifier, value)) {
@@ -288,10 +306,21 @@ public class SosService extends HttpServlet {
         }
     }
 
-    private boolean isHeaderAndValueSet(String headerIdentifier,
-            String value)
-    {
+    private boolean isHeaderAndValueSet(String headerIdentifier, String value) {
         return headerIdentifier != null && !headerIdentifier.equalsIgnoreCase("") && value != null;
+    }
+    
+    private boolean checkForClientGZipSupport(HttpServletRequest req) {
+        String header = req.getHeader(ACCEPT_ENCODING);
+        if (header != null && !header.isEmpty()) {
+            String[] split = header.split(",");
+            for (String string : split) {
+                if (string.equalsIgnoreCase(GZIP)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -307,14 +336,15 @@ public class SosService extends HttpServlet {
     }
 
     /**
-     * Get the implementation of {@link Binding} that is registered for the given <code>urlPattern</code>.
+     * Get the implementation of {@link Binding} that is registered for the
+     * given <code>urlPattern</code>.
      * 
      * @param requestURI
-     *          URL pattern from request URL
-     * @return
-     * 			The implementation of {@link Binding} that is registered for the given <code>urlPattern</code>.
-     * @throws OwsExceptionReport 
-     * 			If the URL pattern is not supported by this SOS.
+     *            URL pattern from request URL
+     * @return The implementation of {@link Binding} that is registered for the
+     *         given <code>urlPattern</code>.
+     * @throws OwsExceptionReport
+     *             If the URL pattern is not supported by this SOS.
      */
     private Binding getBindingOperatorForRequestURI(String requestURI) throws OwsExceptionReport {
         Binding bindingOperator = null;
