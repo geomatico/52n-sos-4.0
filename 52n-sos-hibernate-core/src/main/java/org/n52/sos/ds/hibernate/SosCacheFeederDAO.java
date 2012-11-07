@@ -269,6 +269,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
 		cache.setKOfferingVMaxTime(kOfferingVMaxTime);
     }
 	
+    // FIXME BUG im Cache -> Offering-Envelope
 	private SosEnvelope getEnvelopeForOffering(String offeringID, Session session) throws OwsExceptionReport {
 		List<String> featureIDs =
                 HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(offeringID, session);
