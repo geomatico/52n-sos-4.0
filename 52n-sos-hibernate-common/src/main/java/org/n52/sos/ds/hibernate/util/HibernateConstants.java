@@ -72,6 +72,8 @@ public class HibernateConstants {
     public static final String PARAMETER_PROCEDURE_DESCRIPTION_FORMAT = "procedureDescriptionFormat";
 
     public static final String PARAMETER_UNIT = "unit";
+	
+	public static final String DELETED = "deleted";
 
     public static final String PARAMETER_RELATED_FEATURE_ROLE = "relatedFeatureRole";
 

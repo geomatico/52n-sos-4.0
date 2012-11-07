@@ -89,11 +89,11 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return min time
      */
-    // FIXME BUG im Cache -> Event-Times
     public static DateTime getMinObservationTime(Session session) {
         Object min =
                 session.createCriteria(Observation.class)
                         .setProjection(Projections.min(HibernateConstants.PARAMETER_PHENOMENON_TIME_START))
+						.add(getEqualRestriction(HibernateConstants.DELETED, false))
                         .uniqueResult();
         if (min != null) {
             return new DateTime(min);
@@ -108,15 +108,16 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return max time
      */
-    // FIXME BUG im Cache -> Event-Times
     public static DateTime getMaxObservationTime(Session session) {
         Object maxStart =
                 session.createCriteria(Observation.class)
                         .setProjection(Projections.max(HibernateConstants.PARAMETER_PHENOMENON_TIME_START))
+						.add(getEqualRestriction(HibernateConstants.DELETED, false))
                         .uniqueResult();
         Object maxEnd =
                 session.createCriteria(Observation.class)
                         .setProjection(Projections.max(HibernateConstants.PARAMETER_PHENOMENON_TIME_END))
+						.add(getEqualRestriction(HibernateConstants.DELETED, false))
                         .uniqueResult();
         if (maxStart == null && maxEnd == null) {
             return null;
@@ -141,14 +142,14 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return min time for offering
      */
-    // FIXME BUG im Cache -> Event-Times
     public static DateTime getMinDate4Offering(String offering, Session session) {
         Criteria criteria = session.createCriteria(Observation.class);
         Map<String, String> aliases = new HashMap<String, String>();
         String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
         String offeringAlias = addOfferingAliasToMap(aliases, obsConstAlias);
         addAliasesToCriteria(criteria, aliases);
-        criteria.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering));
+        criteria.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering))
+				.add(getEqualRestriction(HibernateConstants.DELETED, false));
         Object min =
                 criteria.setProjection(Projections.min(HibernateConstants.PARAMETER_PHENOMENON_TIME_START))
                         .uniqueResult();
@@ -167,20 +168,21 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return max time for offering
      */
-    // FIXME BUG im Cache -> Event-Times
     public static DateTime getMaxDate4Offering(String offering, Session session) {
         Criteria criteriaStart = session.createCriteria(Observation.class);
         Map<String, String> aliases = new HashMap<String, String>();
         String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
         String offeringAlias = addOfferingAliasToMap(aliases, obsConstAlias);
         addAliasesToCriteria(criteriaStart, aliases);
-        criteriaStart.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering));
+        criteriaStart.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering))
+				.add(getEqualRestriction(HibernateConstants.DELETED, false));
         Object maxStart =
                 criteriaStart.setProjection(Projections.max(HibernateConstants.PARAMETER_PHENOMENON_TIME_START))
                         .uniqueResult();
         Criteria criteriaEnd = session.createCriteria(Observation.class);
         addAliasesToCriteria(criteriaEnd, aliases);
-        criteriaEnd.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering));
+        criteriaEnd.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering))
+				.add(getEqualRestriction(HibernateConstants.DELETED, false));
         Object maxEnd =
                 criteriaEnd.setProjection(Projections.max(HibernateConstants.PARAMETER_PHENOMENON_TIME_END))
                         .uniqueResult();
@@ -241,7 +243,7 @@ public class HibernateCriteriaQueryUtilities {
      */
     public static List<Observation> getObservations(Map<String, String> aliases, List<Criterion> criterions,
             List<Projection> projections, Session session) {
-        criterions.add(Restrictions.eq("deleted", false));
+        criterions.add(getEqualRestriction(HibernateConstants.DELETED, false));
         return (List<Observation>) getObject(aliases, criterions, projections, session, Observation.class);
     }
 
@@ -967,7 +969,9 @@ public class HibernateCriteriaQueryUtilities {
         criteria.add(getEqualRestriction(getIdentifierParameter(obsPropAlias), observedProperty));
         addAliasesToCriteria(criteria, aliases);
         criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        return (ResultTemplate) criteria.uniqueResult();
+		/* there can be mutliple but equal result tamplates... */
+		List<ResultTemplate> templates = (List<ResultTemplate>) criteria.list();
+        return (templates.isEmpty()) ? null : templates.iterator().next();
     }
 
     public static List<ResultTemplate> getResultTemplateObject(String offering, String observedProperty,
