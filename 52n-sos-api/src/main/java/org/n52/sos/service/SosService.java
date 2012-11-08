@@ -261,7 +261,6 @@ public class SosService extends HttpServlet {
             if (!sosResponse.isContentLess()) {
                 out = resp.getOutputStream();
                 int contentLength = sosResponse.getContentLength();
-                resp.setContentLength(contentLength);
                 resp.setContentType(contentType);
                 if ((sosResponse.getApplyGzipCompression() || clientAcceptsGzip) && contentLength > MINIMUM_GZIP_SIZE ) {
                     if (clientAcceptsGzip) {
@@ -274,6 +273,7 @@ public class SosService extends HttpServlet {
                     gzip.flush();
                     gzip.finish();
                 } else {
+                    resp.setContentLength(contentLength);
                     sosResponse.writeToOutputStream(out);
                     out.flush();
                 }
