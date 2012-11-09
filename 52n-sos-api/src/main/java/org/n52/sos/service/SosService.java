@@ -310,6 +310,7 @@ public class SosService extends HttpServlet {
         return headerIdentifier != null && !headerIdentifier.equalsIgnoreCase("") && value != null;
     }
     
+    // FIXME current version checks only first accept header and not all
     private boolean checkForClientGZipSupport(HttpServletRequest req) {
         String header = req.getHeader(ACCEPT_ENCODING);
         if (header != null && !header.isEmpty()) {
