@@ -970,7 +970,7 @@ public class HibernateCriteriaQueryUtilities {
         criteria.add(getEqualRestriction(getIdentifierParameter(obsPropAlias), observedProperty));
         addAliasesToCriteria(criteria, aliases);
         criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		/* there can be mutliple but equal result tamplates... */
+		/* there can be multiple but equal result templates... */
 		List<ResultTemplate> templates = (List<ResultTemplate>) criteria.list();
         return (templates.isEmpty()) ? null : templates.iterator().next();
     }
