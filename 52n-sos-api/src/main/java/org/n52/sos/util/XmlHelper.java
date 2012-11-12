@@ -437,6 +437,7 @@ public class XmlHelper {
         if (attributes != null) {
             for (int i = 0, len = attributes.getLength(); i < len; i++) {
                 Attr attr = (Attr) attributes.item(i);
+                // TODO: what if ns of gml has prefix other than "gml"?
                 if (attr.getName().equals("gml:id")) {
                     String gmlId = attr.getValue();
                     if (foundIds.containsKey(gmlId)) {
