@@ -31,6 +31,10 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
+import org.n52.sos.ds.hibernate.entities.BooleanValue;
+import org.n52.sos.ds.hibernate.entities.CategoryValue;
+import org.n52.sos.ds.hibernate.entities.CountValue;
+import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.TextValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -144,8 +148,31 @@ public class ResultHandlingHelper {
 
     private static String getValueAsStringForObservedProperty(Observation observation, String definition) {
         String observedProperty = observation.getObservationConstellation().getObservableProperty().getIdentifier();
-        if (observedProperty.equals(definition)) {
-            // TODO get values from the other tables
+        
+		if (observedProperty.equals(definition)) {
+            // TODO multiple values?
+			Set<BooleanValue> booleanValues = observation.getBooleanValues();
+			if (booleanValues != null && !booleanValues.isEmpty()) {
+				return String.valueOf(booleanValues.iterator().next().getValue());
+			}
+			
+			Set<CategoryValue> categoryValues = observation.getCategoryValues();
+			if (categoryValues != null && !categoryValues.isEmpty()) {
+				return categoryValues.iterator().next().getValue();
+			}
+			
+			Set<CountValue> countValues = observation.getCountValues();
+			if (countValues != null && !countValues.isEmpty()) {
+				return String.valueOf(countValues.iterator().next().getValue());
+			}
+			
+			Set<NumericValue> numericValues = observation.getNumericValues();
+			if (numericValues != null && !numericValues.isEmpty()) {
+				return String.valueOf(numericValues.iterator().next().getValue());
+			}
+			
+			//TODO geometry values;
+			
             Set<TextValue> textValues = observation.getTextValues();
             if (textValues != null && !textValues.isEmpty()) {
                 StringBuilder builder = new StringBuilder();
@@ -195,15 +222,17 @@ public class ResultHandlingHelper {
     }
 
     public static int checkFields(List<SosSweField> fields, String definition) {
-        for (int i = 0; i < fields.size(); i++) {
-            SosSweAbstractDataComponent element = fields.get(i).getElement();
+		int i = 0;
+		for (SosSweField f : fields) {
+			SosSweAbstractDataComponent element = f.getElement();
             if (element instanceof SosSweAbstractSimpleType) {
                 SosSweAbstractSimpleType simpleType = (SosSweAbstractSimpleType) element;
                 if (simpleType.isSetDefinition() && simpleType.getDefinition().equals(definition)) {
                     return i;
                 }
             }
-        }
+			++i;
+		}
         return -1;
     }
 

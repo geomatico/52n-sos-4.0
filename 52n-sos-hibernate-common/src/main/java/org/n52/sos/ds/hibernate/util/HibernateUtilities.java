@@ -66,7 +66,7 @@ public class HibernateUtilities {
     public static ObservationConstellation checkObservationConstellationForObservation(
             SosObservationConstellation sosObservationConstellation, String offeringIdentifier, Session session)
             throws OwsExceptionReport, HibernateException {
-        // check if multiple offeriungs.
+        // check if multiple offerings.
         List<Criterion> criterions = new ArrayList<Criterion>();
         Map<String, String> aliases = new HashMap<String, String>();
         String offAlias = HibernateCriteriaQueryUtilities.addOfferingAliasToMap(aliases, null);
@@ -157,11 +157,11 @@ public class HibernateUtilities {
     
     public static void addPhenomeonTimeAndResultTimeToObservation(Observation hObservation, ITime phenomenonTime,
             TimeInstant resultTime) {
-        addPhenomeonTimeToObservation(hObservation, phenomenonTime);
+        addPhenomenonTimeToObservation(hObservation, phenomenonTime);
         addResultTimeToObservation(hObservation, resultTime, phenomenonTime);
     }
 
-    public static void addPhenomeonTimeToObservation(Observation hObservation, ITime phenomenonTime) {
+    public static void addPhenomenonTimeToObservation(Observation hObservation, ITime phenomenonTime) {
         if (phenomenonTime instanceof TimeInstant) {
             TimeInstant time = (TimeInstant) phenomenonTime;
             hObservation.setPhenomenonTimeStart(time.getValue().toDate());

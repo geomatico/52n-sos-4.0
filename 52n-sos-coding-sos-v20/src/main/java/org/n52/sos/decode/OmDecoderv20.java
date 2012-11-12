@@ -24,6 +24,7 @@
 package org.n52.sos.decode;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -78,7 +79,7 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
     private Set<String> supportedObservationTypes;
 
     public OmDecoderv20() {
-        decoderKeyTypes = new ArrayList<DecoderKeyType>();
+        decoderKeyTypes = new ArrayList<DecoderKeyType>(1);
         decoderKeyTypes.add(new DecoderKeyType(OMConstants.NS_OM_2));
         StringBuilder builder = new StringBuilder();
         for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
@@ -104,7 +105,7 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        Map<SupportedTypeKey, Set<String>> map = new HashMap<SupportedTypeKey, Set<String>>();
+        Map<SupportedTypeKey, Set<String>> map = new EnumMap<SupportedTypeKey, Set<String>>(SupportedTypeKey.class);
         map.put(SupportedTypeKey.ObservationType, supportedObservationTypes);
         return map;
     }

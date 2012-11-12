@@ -26,7 +26,6 @@ package org.n52.sos.encode;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -104,6 +103,10 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
+import java.util.Arrays;
+import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
+import org.n52.sos.ogc.swe.SosSweDataRecord;
+import org.n52.sos.ogc.swe.SosSweField;
 
 public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
 
@@ -222,13 +225,15 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
 
         String observationType = sosObservation.getObservationConstellation().getObservationType();
         xbObs.addNewType().setHref(observationType);
+		/* SosMultiObservationValues will generate always a new ITime... */
+		ITime phenomenonTime = sosObservation.getPhenomenonTime();
         // set phenomenonTime
-        if (sosObservation.getPhenomenonTime().getId() == null) {
-            sosObservation.getPhenomenonTime().setId(OMConstants.PHENOMENON_TIME_NAME + "_" + observationID);
+        if (phenomenonTime.getId() == null) {
+            phenomenonTime.setId(OMConstants.PHENOMENON_TIME_NAME + "_" + observationID);
         }
-        addPhenomenonTime(xbObs.addNewPhenomenonTime(), sosObservation.getPhenomenonTime());
+        addPhenomenonTime(xbObs.addNewPhenomenonTime(), phenomenonTime);
         // set resultTime
-        xbObs.addNewResultTime().setHref("#" + sosObservation.getPhenomenonTime().getId());
+        xbObs.addNewResultTime().setHref("#" + phenomenonTime.getId());
         // set procedure
         xbObs.addNewProcedure().setHref(sosObservation.getObservationConstellation().getProcedure());
         // set observedProperty (phenomenon)
@@ -549,20 +554,48 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
             DataRecordDocument xbDataRecordDoc = DataRecordDocument.Factory.newInstance();
             DataRecordType xb_dataRecord = xbDataRecordDoc.addNewDataRecord();
 
-            // add time component
-            Field xbField = xb_dataRecord.addNewField();
-            xbField.setName(OMConstants.PHENOMENON_TIME_NAME);
-            TimeType xbTimeComponent =
-                    (TimeType) xbField.addNewAbstractDataComponent().substitute(SWEConstants.QN_TIME_SWE_200,
-                            TimeType.type);
-            xbTimeComponent.setDefinition(OMConstants.PHENOMENON_TIME);
-            xbTimeComponent.addNewUom().setHref(OMConstants.PHEN_UOM_ISO8601);
-
-            // add phenomenon components
-            for (SosObservableProperty observableProperty : phenComponents) {
-                Field field = xb_dataRecord.addNewField();
-                addDataComponentToField(field, observableProperty, valueMap.values());
-            }
+            /* keep the order of the result template */
+			SosSweDataRecord r = sosObservation.getResultStructure();
+			if (r != null) {
+				for (SosSweField f : r.getFields()) {
+					String definition = ((SosSweAbstractDataComponent) f.getElement()).getDefinition();
+					if (definition.equals(OMConstants.PHENOMENON_TIME)) {
+						// add time component
+						Field xbField = xb_dataRecord.addNewField();
+						xbField.setName(OMConstants.PHENOMENON_TIME_NAME);
+						TimeType xbTimeComponent =
+								(TimeType) xbField.addNewAbstractDataComponent().substitute(SWEConstants.QN_TIME_SWE_200,
+										TimeType.type);
+						xbTimeComponent.setDefinition(OMConstants.PHENOMENON_TIME);
+						xbTimeComponent.addNewUom().setHref(OMConstants.PHEN_UOM_ISO8601);
+					} else {
+						Field field = xb_dataRecord.addNewField();
+						SosObservableProperty observableProperty = null;
+						for (SosObservableProperty obsProp : phenComponents) {
+							if (obsProp.getIdentifier().equals(definition)) {
+								observableProperty = obsProp; break;
+							}
+						}
+						addDataComponentToField(field, observableProperty, valueMap.values());
+					}
+				}
+			} else {
+				// add time component
+				Field xbField = xb_dataRecord.addNewField();
+				xbField.setName(OMConstants.PHENOMENON_TIME_NAME);
+				TimeType xbTimeComponent =
+						(TimeType) xbField.addNewAbstractDataComponent().substitute(SWEConstants.QN_TIME_SWE_200,
+								TimeType.type);
+				xbTimeComponent.setDefinition(OMConstants.PHENOMENON_TIME);
+				xbTimeComponent.addNewUom().setHref(OMConstants.PHEN_UOM_ISO8601);
+				
+				// add phenomenon components
+				for (SosObservableProperty observableProperty : phenComponents) {
+					Field field = xb_dataRecord.addNewField();
+					addDataComponentToField(field, observableProperty, valueMap.values());
+				}
+			
+			}
 
             // set components to SimpleDataRecord
             xb_elementType.set(xbDataRecordDoc);
@@ -572,10 +605,11 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
             TextEncodingType xb_textBlock =
                     (TextEncodingType) xbDataArray.addNewEncoding().addNewAbstractEncoding()
                             .substitute(SWEConstants.QN_TEXT_ENCODING_SWE_200, TextEncodingType.type);
-
+			
+			/* TODO customizable decimal seperator */
             xb_textBlock.setDecimalSeparator(Configurator.getInstance().getDecimalSeparator());
-            xb_textBlock.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
-            xb_textBlock.setBlockSeparator(Configurator.getInstance().getTupleSeperator());
+            xb_textBlock.setTokenSeparator(sosObservation.getTokenSeparator() == null ? Configurator.getInstance().getTokenSeperator() : sosObservation.getTokenSeparator());
+            xb_textBlock.setBlockSeparator(sosObservation.getTupleSeparator() == null ? Configurator.getInstance().getTupleSeperator() : sosObservation.getTupleSeparator());
 
             EncodedValuesPropertyType xb_values = xbDataArray.addNewValues();
             xb_values.newCursor().setTextValue(createResultString(phenComponents, sosObservation, valueMap));
@@ -604,7 +638,12 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
                                 SWEConstants.QN_QUANTITY_SWE_200, QuantityType.type);
                 xbQuantity.setDefinition(observableProperty.getIdentifier());
                 UnitReference xb_uom = xbQuantity.addNewUom();
-                xb_uom.setCode(observableProperty.getUnit());
+				/* FIXME set the unit of the observed property while inserting result */
+				String uom = observableProperty.getUnit();
+				if (uom == null || uom.trim().isEmpty()) {
+					uom = value.getUnit() == null ? "" : value.getUnit();
+				}
+                xb_uom.setCode(uom);
             }
             // else if (value instanceof t) {
             // TimeType xbTime =
@@ -643,7 +682,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
 
     private IValue getValueForObservableProperty(Collection<Map<String, IValue>> values, String identifier) {
         for (Map<String, IValue> map : values) {
-            if (map.containsKey(identifier) && map.get(identifier) != null) {
+            if (map.get(identifier) != null) {
                 return map.get(identifier);
             }
         }
@@ -667,69 +706,69 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
     private String createResultString(List<SosObservableProperty> phenComponents, SosObservation sosObservation,
             Map<ITime, Map<String, IValue>> valueMap) throws OwsExceptionReport {
 
-        // save the position for values of each phenomenon in a hash map with
-        // the phen id as key
-        // and the postion as value
-        HashMap<String, Integer> phenIdsAndValueStringPos = new HashMap<String, Integer>();
-        int i = 2;
-        for (SosObservableProperty phenComp : phenComponents) {
-            phenIdsAndValueStringPos.put(phenComp.getIdentifier(), Integer.valueOf(i));
-            i++;
-        }
-
-        // Map<ITime, Map<String, String>> values = new HashMap<ITime,
-        // Map<String, String>>();
-        // for (SosObservableProperty sosObservableProperty : phenComponents) {
-        // List<SosObservationValue> timeValueTupel =
-        // sosObs.getValues().get(sosObservableProperty.getIdentifier());
-        // for (SosObservationValue sosObservationValue : timeValueTupel) {
-        //
-        // Map<String, String> map = null;
-        // if (values.containsKey(sosObservationValue.getPhenomenonTime())) {
-        // map = values.get(sosObservationValue.getPhenomenonTime());
-        // } else {
-        // map = new HashMap<String, String>();
-        // }
-        // map.put(sosObservableProperty.getIdentifier(),
-        // getStringValue(sosObservableProperty.getIdentifier(),
-        // sosObservationValue.getValue()));
-        // values.put(sosObservationValue.getPhenomenonTime(), map);
-        // }
-        // }
-
+		if (!(phenComponents instanceof ArrayList)) {
+			phenComponents = new ArrayList<SosObservableProperty>(phenComponents);
+		}
         String noDataValue = sosObservation.getNoDataValue();
         String tokenSeperator = sosObservation.getTokenSeparator();
         String tupleSeperator = sosObservation.getTupleSeparator();
-
-        // value matrix which should be built
-        StringBuffer valueMatrix = new StringBuffer();
-        List<ITime> times = new ArrayList<ITime>(valueMap.keySet());
-        Collections.sort(times);
-        for (ITime time : times) {
-            String timeString = getTimeString(time);
-            valueMatrix.append(timeString);
-            valueMatrix.append(tokenSeperator);
-            Map<String, IValue> map = valueMap.get(time);
-            for (SosObservableProperty obsProp : phenComponents) {
-                if (map.containsKey(obsProp.getIdentifier())) {
-                    IValue value = map.get(obsProp.getIdentifier());
-                    if (value == null) {
-                        valueMatrix.append(noDataValue);
-                    } else {
-                        valueMatrix.append(getStringValue(value, noDataValue));
-                    }
-                } else {
-                    valueMatrix.append(noDataValue);
-                }
-                valueMatrix.append(tokenSeperator);
-            }
-            // delete last TokenSeperator
-            int tokenSepLength = tokenSeperator.length();
-            valueMatrix.delete(valueMatrix.length() - tokenSepLength, valueMatrix.length());
-            valueMatrix.append(tupleSeperator);
-        }
-        return valueMatrix.toString();
+		SosSweDataRecord r = sosObservation.getResultStructure();
+		
+		String[] phens = new String[phenComponents.size() + 1];
+		int timeIndex = -1;
+		if (r == null) {
+			phens[timeIndex = 0] = OMConstants.PHENOMENON_TIME;
+			for (int i = 0; i < phenComponents.size(); ++i) {
+				phens[i+1] = phenComponents.get(i).getIdentifier();
+			}
+		} else {
+			int i = 0;
+			for (SosSweField f : r.getFields()) {
+				if (f.getElement().getDefinition().equals(OMConstants.PHENOMENON_TIME)) {
+					phens[timeIndex = i] = OMConstants.PHENOMENON_TIME;	
+				} else {
+					phens[i] = f.getElement().getDefinition();
+				}
+				++i;
+			}
+		}
+		if (timeIndex < 0) {
+			/* TODO no phentimeindex found... */
+		}
+		ITime[] times = new ArrayList<ITime>(valueMap.keySet())
+			.toArray(new ITime[valueMap.keySet().size()]);
+		Arrays.sort(times);
+		StringBuilder b = new StringBuilder();
+		
+		/* dimensions will always be greater than (1,1).. 
+		 * so partly roll out the loop to gain some performance */
+		b.append(getValue(0, 0, times, phens, timeIndex, noDataValue, valueMap));
+		for (int j = 1; j < phens.length; ++j) {
+			b.append(tokenSeperator);
+			b.append(getValue(0, j, times, phens, timeIndex, noDataValue, valueMap));
+		}
+		for (int i = 1; i < times.length; ++i) {
+			b.append(tupleSeperator);
+			b.append(getValue(i, 0, times, phens, timeIndex, noDataValue, valueMap));
+			for (int j = 1; j < phens.length; ++j) {
+				b.append(tokenSeperator);
+				b.append(getValue(i, j, times, phens, timeIndex, noDataValue, valueMap));
+			}
+		}
+		b.append(tupleSeperator);
+		return b.toString();
     }
+	
+	private String getValue(int i, int j, ITime[] times, String[] phens, int phenTimeIndex,
+			String noDataValue, Map<ITime, Map<String, IValue>> valueMap) throws OwsExceptionReport {
+		if (j == phenTimeIndex) {
+			return getTimeString(times[i]);
+		} else {
+			Map<String, IValue> value = valueMap.get(times[i]);
+			return (value == null) ? noDataValue 
+					: getStringValue(value.get(phens[j]), noDataValue); 
+		}
+	}
 
     /**
      * Get time as text for TimePeriod or TimeInstant
@@ -772,6 +811,9 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
      * @return value as text.
      */
     private String getStringValue(IValue value, String noDataValue) {
+		if (value == null) {
+			return noDataValue;
+		}
         WKTWriter wktWriter = new WKTWriter();
         if (value instanceof BooleanValue) {
             BooleanValue booleanValue = (BooleanValue) value;
@@ -789,6 +831,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
                 return Integer.toString(countValue.getValue().intValue());
             }
         } else if (value instanceof QuantityValue) {
+			/* TODO customizable decimal seperator */
             QuantityValue quantityValue = (QuantityValue) value;
             if (quantityValue.getValue() == null
                     || (quantityValue.getValue() != null && quantityValue.getValue().equals(Double.NaN))) {
@@ -806,7 +849,8 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
         // }
         else if (value instanceof TextValue) {
             TextValue textValue = (TextValue) value;
-            if (textValue.getValue() == null || (textValue.getValue() != null && !textValue.getValue().isEmpty())) {
+			/*  TODO should it really be testet for empty strings? isn't that a valid observation value? */
+            if (textValue.getValue() == null || (textValue.getValue() != null && textValue.getValue().isEmpty())) {
                 return noDataValue;
             } else {
                 return textValue.getValue().toString();

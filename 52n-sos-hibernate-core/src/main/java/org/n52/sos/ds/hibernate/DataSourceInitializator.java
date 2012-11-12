@@ -24,7 +24,7 @@
 package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,6 +60,7 @@ public class DataSourceInitializator implements IDataSourceInitializator {
         connectionProvider = Configurator.getInstance().getConnectionProvider();
     }
 
+	@Override
     public void initializeDataSource() throws OwsExceptionReport {
         Session session = null;
         Transaction transaction = null;
@@ -100,7 +101,8 @@ public class DataSourceInitializator implements IDataSourceInitializator {
         for (IEncoder encoder : Configurator.getInstance().getEncoderMap().values()) {
             list.add(encoder.getSupportedTypes());
         }
-        Map<SupportedTypeKey, Set<String>> typeMap = new HashMap<SupportedTypeKey, Set<String>>(0);
+		
+        Map<SupportedTypeKey, Set<String>> typeMap = new EnumMap<SupportedTypeKey, Set<String>>(SupportedTypeKey.class);
         for (Map<SupportedTypeKey, Set<String>> map : list) {
             if (map != null && !map.isEmpty()) {
                 for (SupportedTypeKey typeKey : map.keySet()) {

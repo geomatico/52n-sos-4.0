@@ -134,7 +134,7 @@ public class InsertResultTemplateDAO implements IInsertResultTemplateDAO {
                         || request.getResultStructure().getResultStructure() instanceof SosSweDataRecord) {
                     sosObsConst.setObservationType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
                 } else {
-                    String exceptionText = "The requested resultStructure is not supporte!";
+                    String exceptionText = "The requested resultStructure is not supported!";
                     throw Util4Exceptions.createInvalidParameterValueException(
                             Sos2Constants.InsertResultTemplateParams.observationType.name(), exceptionText);
                 }

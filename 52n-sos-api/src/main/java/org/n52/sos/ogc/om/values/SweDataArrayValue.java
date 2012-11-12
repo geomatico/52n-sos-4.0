@@ -58,14 +58,10 @@ public class SweDataArrayValue implements IValue<Map<ITime, Map<String, IValue>>
         if (values == null) {
             values = new HashMap<ITime, Map<String,IValue>>(0);
         }
-        if (values.containsKey(time)) {
-            Map<String, IValue> obsPropValue = values.get(time);
-            obsPropValue.put(observedProperty, value);
-        } else {
-            Map<String, IValue> obsPropValue = new HashMap<String, IValue>();
-            obsPropValue.put(observedProperty, value);
-            values.put(time, obsPropValue);
-        }
+		Map<String, IValue> obsPropValue = values.get(time);
+		if (obsPropValue == null) {
+			values.put(time, obsPropValue = new HashMap<String, IValue>());
+		}
+        obsPropValue.put(observedProperty, value);
     }
-
 }

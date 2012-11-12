@@ -468,7 +468,7 @@ public final class Configurator {
         // creating common SOS properties object from inputStream
         // default lease is 6 hours.
         String leaseString = props.getProperty(LEASE, "600");
-        if (leaseString == null || leaseString.equals("")) {
+        if (leaseString == null || leaseString.isEmpty()) {
             String exceptionText =
                     "No lease is defined in the config file! Please set the lease property on an integer value!";
             LOGGER.error(exceptionText);
@@ -478,7 +478,7 @@ public final class Configurator {
         // creating common SOS properties object from inputStream
         // default lease is 6 hours.
         String defaultEPSGstring = props.getProperty(DEFAULT_EPSG, "4326");
-        if (defaultEPSGstring == null || defaultEPSGstring.equals("")) {
+        if (defaultEPSGstring == null || defaultEPSGstring.isEmpty()) {
             String exceptionText =
                     "No default EPSG code is defined in the config file! Please set the default EPSG code property on an integer value!";
             LOGGER.error(exceptionText);
@@ -745,7 +745,7 @@ public final class Configurator {
         this.decimalSeparator = props.getProperty(DECIMAL_SEPARATOR, ".");
         this.gmlDateFormat = props.getProperty(GML_DATE_FORMAT, "");
         // if format is set
-        if (gmlDateFormat != null && !gmlDateFormat.equals("")) {
+        if (gmlDateFormat != null && !gmlDateFormat.isEmpty()) {
             DateTimeHelper.setResponseFormat(gmlDateFormat);
         }
         this.noDataValue = props.getProperty(NO_DATA_VALUE, "noData");
@@ -857,7 +857,7 @@ public final class Configurator {
         Iterator<IAdminRequestOperator> iter = serviceLoaderAdminRequesteOperator.iterator();
         while (iter.hasNext()) {
             try {
-                IAdminRequestOperator adminRequestOperator = (IAdminRequestOperator) iter.next();
+                IAdminRequestOperator adminRequestOperator = iter.next();
                 adminRequestOperators.put(adminRequestOperator.getKey(), adminRequestOperator);
             } catch (ServiceConfigurationError sce) {
                 // TODO add more details like which class with qualified name
@@ -1044,7 +1044,7 @@ public final class Configurator {
             // List<ASosTasking> tasks = new ArrayList<ASosTasking>();
             while (iterator.hasNext()) {
                 try {
-                    ASosTasking aSosTasking = (ASosTasking) iterator.next();
+                    ASosTasking aSosTasking = iterator.next();
                     taskingExecutor.scheduleAtFixedRate(aSosTasking, delayCounter,
                             (aSosTasking.getExecutionIntervall() * 60000));
                     delayCounter += 60000;
@@ -1091,10 +1091,8 @@ public final class Configurator {
     }
     
     private void setBindings() throws ConfigurationException {
-        Iterator<Binding> iter = serviceLoaderBindingOperator.iterator();
-        while (iter.hasNext()) {
+		for (Binding iBindingOperator : serviceLoaderBindingOperator) {
             try {
-                Binding iBindingOperator = (Binding) iter.next();
                 bindingOperators.put(iBindingOperator.getUrlPattern(), iBindingOperator);
             } catch (ServiceConfigurationError sce) {
                 // TODO add more details like which class with qualified name
@@ -1114,12 +1112,9 @@ public final class Configurator {
     }
 
     private void setDecoder() throws ConfigurationException {
-        Iterator<IDecoder> iter = serviceLoaderDecoder.iterator();
-
-        while (iter.hasNext()) {
+		for (IDecoder<?, ?> aDecoder : serviceLoaderDecoder) {
             try {
-                IDecoder aDecoder = (IDecoder) iter.next();
-                for (DecoderKeyType decoderKeyType : (List<DecoderKeyType>) aDecoder.getDecoderKeyTypes()) {
+                for (DecoderKeyType decoderKeyType : aDecoder.getDecoderKeyTypes()) {
                     if (decoder.containsKey(decoderKeyType)) {
                         decoder.get(decoderKeyType).add(aDecoder);
                     } else {
@@ -1141,11 +1136,9 @@ public final class Configurator {
     }
 
     private void setEncoder() throws ConfigurationException {
-        Iterator<IEncoder> iter = serviceLoaderEncoder.iterator();
-        while (iter.hasNext()) {
+		for (IEncoder<?,?> aEncoder : serviceLoaderEncoder) {
             try {
-                IEncoder aEncoder = (IEncoder) iter.next();
-                for (EncoderKeyType encoderKeyType : (List<EncoderKeyType>) aEncoder.getEncoderKeyType()) {
+                for (EncoderKeyType encoderKeyType : aEncoder.getEncoderKeyType()) {
                     encoder.put(encoderKeyType, aEncoder);
                 }
             } catch (ServiceConfigurationError sce) {
@@ -1191,7 +1184,7 @@ public final class Configurator {
         Iterator<IOperationDAO> iter = serviceLoaderOperationDAOs.iterator();
         while (iter.hasNext()) {
             try {
-                IOperationDAO aOperationDAO = (IOperationDAO) iter.next();
+                IOperationDAO aOperationDAO = iter.next();
                 operationDAOs.put(aOperationDAO.getOperationName(), aOperationDAO);
             } catch (ServiceConfigurationError sce) {
                 LOGGER.warn("An IOperationDAO implementation could not be loaded!", sce);
@@ -1205,10 +1198,8 @@ public final class Configurator {
     }
 
     private void setRequestOperatorMap() throws ConfigurationException {
-        Iterator<IRequestOperator> iter = serviceLoaderRequestOperators.iterator();
-        while (iter.hasNext()) {
+		for (IRequestOperator aRequestOperator : serviceLoaderRequestOperators) {
             try {
-                IRequestOperator aRequestOperator = (IRequestOperator) iter.next();
                 requestOperators.put(aRequestOperator.getRequestOperatorKeyType(), aRequestOperator);
             } catch (ServiceConfigurationError sce) {
                 LOGGER.warn("An IRequestOperator implementation could not be loaded!", sce);
@@ -1230,10 +1221,8 @@ public final class Configurator {
      *             If no request listener is implemented
      */
     private void setServiceOperatorMap() throws ConfigurationException {
-        Iterator<IServiceOperator> iter = serviceLoaderServiceOperators.iterator();
-        while (iter.hasNext()) {
+		for (IServiceOperator iServiceOperator : serviceLoaderServiceOperators) {
             try {
-                IServiceOperator iServiceOperator = iter.next();
                 serviceOperators.put(iServiceOperator.getServiceOperatorKeyType(), iServiceOperator);
                 supportedVersions.add(iServiceOperator.getServiceOperatorKeyType().getVersion());
             } catch (ServiceConfigurationError sce) {

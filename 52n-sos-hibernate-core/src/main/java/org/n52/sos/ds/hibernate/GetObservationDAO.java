@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,6 +68,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
+import org.n52.sos.ds.hibernate.util.HibernateConstants;
 
 /**
  * Implementation of the interface IGetObservationDAO
@@ -265,7 +265,6 @@ public class GetObservationDAO implements IGetObservationDAO {
                 response.setResponseFormat(request.getResponseFormat());
                 response.setObservationCollection(HibernateResultUtilities.createSosObservationFromObservations(
                         observations, sosRequest.getVersion(), session));
-                // TODO if OM_SWEArrayObservation and ResultTemplate exits, get ResultEncoding and ResultStructure
                 return response;
             }
         } catch (HibernateException he) {
@@ -320,7 +319,7 @@ public class GetObservationDAO implements IGetObservationDAO {
             }
             // deleted
             // XXX DeleteObservation Extension
-            criterions.add(Restrictions.eq("deleted", false));
+            criterions.add(Restrictions.eq(HibernateConstants.DELETED, false));
         }
         // temporal filters
         if (request.getEventTimes() != null && !request.getEventTimes().isEmpty()) {

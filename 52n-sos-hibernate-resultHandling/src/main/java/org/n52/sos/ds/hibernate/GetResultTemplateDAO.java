@@ -136,15 +136,15 @@ public class GetResultTemplateDAO implements IGetResultTemplateDAO {
         Session session = null;
         try {
             session = (Session) connectionProvider.getConnection();
-            ResultTemplate resultRemplate =
+            ResultTemplate resultTemplate =
                     HibernateCriteriaQueryUtilities.getResultTemplateObject(request.getOffering(),
                             request.getObservedProperty(), session);
-            if (resultRemplate != null) {
+            if (resultTemplate != null) {
                 GetResultTemplateResponse response = new GetResultTemplateResponse();
                 response.setService(request.getService());
                 response.setVersion(request.getVersion());
-                response.setResultEncoding(ResultHandlingHelper.createSosResultEncoding(resultRemplate.getResultEncoding()));
-                response.setResultStructure(ResultHandlingHelper.createSosResultStructure(resultRemplate.getResultStructure()));
+                response.setResultEncoding(ResultHandlingHelper.createSosResultEncoding(resultTemplate.getResultEncoding()));
+                response.setResultStructure(ResultHandlingHelper.createSosResultStructure(resultTemplate.getResultStructure()));
                 return response;
             }
             StringBuilder exceptionText = new StringBuilder();

@@ -172,7 +172,13 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
         sosSweDataArray.setDefinition(dataArray.getDefinition());
         sosSweDataArray.setDescription(dataArray.getDescription());
         sosSweDataArray.setElementCount(parseCount(dataArray.getElementCount().getCount()));
-        // TODO
+		/* TODO
+		DataArrayType.ElementType elementType = dataArray.getElementType();
+		if (elementType != null && elementType.getAbstractDataComponent() != null) {
+			sosSweDataArray.setElementType((SosSweDataRecord) 
+				getAbstractDataComponent(elementType.getAbstractDataComponent()));
+		}
+		*/
         return sosSweDataArray;
     }
 
