@@ -25,6 +25,7 @@ package org.n52.sos.encode;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -88,6 +89,9 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.swe.SWEConstants;
+import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
+import org.n52.sos.ogc.swe.SosSweDataRecord;
+import org.n52.sos.ogc.swe.SosSweField;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.DateTimeException;
@@ -103,10 +107,6 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTWriter;
-import java.util.Arrays;
-import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
-import org.n52.sos.ogc.swe.SosSweDataRecord;
-import org.n52.sos.ogc.swe.SosSweField;
 
 public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
 
@@ -1406,16 +1406,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
             if (!existFoiInDoc) {
                 if (foi instanceof SosSamplingFeature) {
                     SosSamplingFeature sampFeat = (SosSamplingFeature) foi;
-                    if (sampFeat.getXmlDescription() != null) {
-                        try {
-                            xbFoiType.set(XmlObject.Factory.parse(sampFeat.getXmlDescription()));
-                        } catch (XmlException xmle) {
-                            String exceptionText = "Error while encoding featureOfInterest in OMObservation!";
-                            LOGGER.error(exceptionText, xmle);
-                            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
-                        }
-
-                    } else if (sampFeat.getUrl() != null) {
+                    if (sampFeat.getUrl() != null) {
                         xbFoiType.setHref(sampFeat.getUrl());
                     } else {
                         IEncoder encoder =
@@ -1426,6 +1417,16 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
                             additionalValues.put(HelperValues.GMLID, gmlId);
                             xbFoiType.set((XmlObject) encoder.encode(sampFeat, additionalValues));
                         } else {
+                            if (sampFeat.getXmlDescription() != null) {
+                                try {
+                                    // TODO how set gml:id in already existing XmlDescription?
+                                    xbFoiType.set(XmlObject.Factory.parse(sampFeat.getXmlDescription()));
+                                } catch (XmlException xmle) {
+                                    String exceptionText = "Error while encoding featureOfInterest in OMObservation!";
+                                    LOGGER.error(exceptionText, xmle);
+                                    throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+                                }
+                            } 
                             String exceptionText =
                                     "Error while encoding geometry for featureOfInterest, needed encoder is missing!";
                             LOGGER.debug(exceptionText);
