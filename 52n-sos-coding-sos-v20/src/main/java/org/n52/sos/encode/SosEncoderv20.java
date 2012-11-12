@@ -72,7 +72,6 @@ import net.opengis.sos.x20.InsertResultTemplateResponseType;
 import net.opengis.sos.x20.InsertionCapabilitiesDocument;
 import net.opengis.sos.x20.InsertionCapabilitiesType;
 import net.opengis.sos.x20.ObservationOfferingType;
-import net.opengis.swe.x20.AbstractEncodingType;
 import net.opengis.swes.x20.AbstractContentsType.Offering;
 import net.opengis.swes.x20.FeatureRelationshipType;
 
@@ -326,7 +325,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                                 .getIdentifier());
                 foiHelper.put(HelperValues.EXIST_FOI_IN_DOC, Boolean.toString(true));
             } else {
-                gmlId = "sf_" + sfIdCounter;
+                gmlId = "sf_" + sfIdCounter++;
                 gmlID4sfIdentifier.put(sosObservation.getObservationConstellation().getFeatureOfInterest()
                         .getIdentifier(), gmlId);
                 foiHelper.put(HelperValues.EXIST_FOI_IN_DOC, Boolean.toString(false));
