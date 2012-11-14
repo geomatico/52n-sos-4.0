@@ -26,6 +26,7 @@ package org.n52.sos.ds.hibernate.util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +42,7 @@ import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Quality;
+import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.entities.TextValue;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -59,18 +61,16 @@ import org.n52.sos.ogc.om.values.IValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.service.Configurator;
-import org.n52.sos.util.SosHelper;
-
-import com.vividsolutions.jts.geom.Geometry;
-import java.util.LinkedList;
-import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ogc.sos.SosResultEncoding;
 import org.n52.sos.ogc.sos.SosResultStructure;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
+import org.n52.sos.service.Configurator;
+import org.n52.sos.util.SosHelper;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 public class HibernateResultUtilities {
 
@@ -249,8 +249,9 @@ public class HibernateResultUtilities {
 						
 						SosSweAbstractDataComponent comp = new SosResultStructure
 								(resultTemplate.getResultStructure()).getResultStructure();
-						if (comp instanceof SosSweDataArray) {
-							o.setResultStructure(((SosSweDataArray) comp).getElementType());
+						if (comp instanceof SosSweDataArray && 
+						        ((SosSweDataArray)comp).getElementType() instanceof SosSweDataRecord) {
+							o.setResultStructure((SosSweDataRecord) ((SosSweDataArray) comp).getElementType());
 						} else if (comp instanceof SosSweDataRecord) {
 							o.setResultStructure((SosSweDataRecord) comp);						
 						}

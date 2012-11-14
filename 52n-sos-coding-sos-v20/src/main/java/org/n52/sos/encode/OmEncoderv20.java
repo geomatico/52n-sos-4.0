@@ -45,7 +45,6 @@ import net.opengis.swe.x20.CategoryType;
 import net.opengis.swe.x20.CountPropertyType;
 import net.opengis.swe.x20.CountType;
 import net.opengis.swe.x20.DataArrayDocument;
-import net.opengis.swe.x20.DataArrayPropertyType;
 import net.opengis.swe.x20.DataArrayType;
 import net.opengis.swe.x20.DataArrayType.ElementType;
 import net.opengis.swe.x20.DataRecordDocument;
@@ -544,7 +543,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
 
             // set element count
             CountPropertyType xb_elementCount = xbDataArray.addNewElementCount();
-            // TODOD: CHECK SIZE
+            // TODO: CHECK SIZE
 
             // element count
 

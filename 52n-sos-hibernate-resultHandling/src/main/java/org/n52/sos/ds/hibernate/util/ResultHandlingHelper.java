@@ -118,9 +118,9 @@ public class ResultHandlingHelper {
     private static TreeMap<Integer, String> getValueOrderMap(
             SosSweAbstractDataComponent sweDataElement) {
         Map<Integer, String> valueOrder = new HashMap<Integer, String>(0);
-        if (sweDataElement instanceof SosSweDataArray) {
+        if (sweDataElement instanceof SosSweDataArray && ((SosSweDataArray) sweDataElement).getElementType() instanceof SosSweDataRecord) {
             SosSweDataArray dataArray = (SosSweDataArray) sweDataElement;
-            addOrderAndDefinitionToMap(dataArray.getElementType().getFields(), valueOrder);
+            addOrderAndDefinitionToMap(((SosSweDataRecord) dataArray.getElementType()).getFields(), valueOrder);
         } else if (sweDataElement instanceof SosSweDataRecord) {
             SosSweDataRecord dataRecord = (SosSweDataRecord) sweDataElement;
             addOrderAndDefinitionToMap(dataRecord.getFields(), valueOrder);
@@ -200,9 +200,9 @@ public class ResultHandlingHelper {
     }
     
     public static int hasResultTime(SosSweAbstractDataComponent sweDataElement) {
-        if (sweDataElement instanceof SosSweDataArray) {
+        if (sweDataElement instanceof SosSweDataArray && ((SosSweDataArray) sweDataElement).getElementType() instanceof SosSweDataRecord) {
             SosSweDataArray dataArray = (SosSweDataArray) sweDataElement;
-            return checkFields(dataArray.getElementType().getFields(), RESULT_TIME);
+            return checkFields(((SosSweDataRecord) dataArray.getElementType()).getFields(), RESULT_TIME);
         } else if (sweDataElement instanceof SosSweDataRecord) {
             SosSweDataRecord dataRecord = (SosSweDataRecord) sweDataElement;
             return checkFields(dataRecord.getFields(), RESULT_TIME);
@@ -211,9 +211,9 @@ public class ResultHandlingHelper {
     }
     
     public static int hasPhenomenonTime(SosSweAbstractDataComponent sweDataElement) {
-        if (sweDataElement instanceof SosSweDataArray) {
+        if (sweDataElement instanceof SosSweDataArray && ((SosSweDataArray) sweDataElement).getElementType() instanceof SosSweDataRecord) {
             SosSweDataArray dataArray = (SosSweDataArray) sweDataElement;
-            return checkFields(dataArray.getElementType().getFields(), PHENOMENON_TIME);
+            return checkFields(((SosSweDataRecord) dataArray.getElementType()).getFields(), PHENOMENON_TIME);
         } else if (sweDataElement instanceof SosSweDataRecord) {
             SosSweDataRecord dataRecord = (SosSweDataRecord) sweDataElement;
             return checkFields(dataRecord.getFields(), PHENOMENON_TIME);

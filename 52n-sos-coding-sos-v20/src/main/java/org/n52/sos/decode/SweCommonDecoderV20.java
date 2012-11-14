@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.opengis.swe.x20.AbstractDataComponentType;
+import net.opengis.swe.x20.AbstractEncodingType;
 import net.opengis.swe.x20.AnyScalarPropertyType;
 import net.opengis.swe.x20.CountRangeType;
 import net.opengis.swe.x20.CountType;
@@ -39,6 +40,7 @@ import net.opengis.swe.x20.DataArrayType;
 import net.opengis.swe.x20.DataRecordDocument;
 import net.opengis.swe.x20.DataRecordType;
 import net.opengis.swe.x20.DataRecordType.Field;
+import net.opengis.swe.x20.EncodedValuesPropertyType;
 import net.opengis.swe.x20.QuantityRangeType;
 import net.opengis.swe.x20.QuantityType;
 import net.opengis.swe.x20.TextEncodingDocument;
@@ -48,15 +50,17 @@ import net.opengis.swe.x20.TimeRangeType;
 import net.opengis.swe.x20.TimeType;
 import net.opengis.swe.x20.VectorType.Coordinate;
 
+import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SWEConstants;
+import org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName;
+import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.SosSweField;
-import org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName;
+import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
@@ -107,10 +111,6 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
         } else if (element instanceof DataArrayType) {
             DataArrayType dataArrayType = (DataArrayType) element;
             SosSweDataArray sosDataArray = parseDataArray(dataArrayType);
-            DataArrayDocument dataArrayDoc =
-                    DataArrayDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-            dataArrayDoc.setDataArray1(dataArrayType);
-            sosDataArray.setXml(dataArrayDoc.xmlText(XmlOptionsHelper.getInstance().getXmlOptions()));
             return sosDataArray;
         } else if (element instanceof DataRecordDocument) {
             DataRecordDocument dataRecordDoc = (DataRecordDocument) element;
@@ -167,25 +167,127 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
         return new HashMap<SupportedTypeKey, Set<String>>(0);
     }
 
-    private SosSweDataArray parseDataArray(DataArrayType dataArray) throws OwsExceptionReport {
+    private SosSweDataArray parseDataArray(DataArrayType xbDataArray) throws OwsExceptionReport {
         SosSweDataArray sosSweDataArray = new SosSweDataArray();
-        sosSweDataArray.setDefinition(dataArray.getDefinition());
-        sosSweDataArray.setDescription(dataArray.getDescription());
-        sosSweDataArray.setElementCount(parseCount(dataArray.getElementCount().getCount()));
-		/* TODO
-		DataArrayType.ElementType elementType = dataArray.getElementType();
-		if (elementType != null && elementType.getAbstractDataComponent() != null) {
-			sosSweDataArray.setElementType((SosSweDataRecord) 
-				getAbstractDataComponent(elementType.getAbstractDataComponent()));
-		}
-		*/
+        sosSweDataArray.setDefinition(xbDataArray.getDefinition());
+        sosSweDataArray.setDescription(xbDataArray.getDescription());
+        sosSweDataArray.setElementCount(parseCount(xbDataArray.getElementCount().getCount()));
+        
+        // parse data record to elementType
+        DataArrayType.ElementType xbElementType = xbDataArray.getElementType();
+        if (xbElementType != null && xbElementType.getAbstractDataComponent() != null)
+        {
+            sosSweDataArray.setElementType(parseAbstractDataComponent(xbElementType.getAbstractDataComponent()));
+        }
+
+        sosSweDataArray.setEncoding(parseEncoding(xbDataArray.getEncoding().getAbstractEncoding()));
+        
+        // parse values
+        if (xbDataArray.isSetValues())
+        {
+            sosSweDataArray.setValues(parseValues(sosSweDataArray.getElementCount(),
+                    sosSweDataArray.getElementType(),
+                    sosSweDataArray.getEncoding(),
+                    xbDataArray.getValues()));
+        }
+        // set XML
+        DataArrayDocument dataArrayDoc =
+                DataArrayDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        dataArrayDoc.setDataArray1(xbDataArray);
+        sosSweDataArray.setXml(dataArrayDoc.xmlText(XmlOptionsHelper.getInstance().getXmlOptions()));
         return sosSweDataArray;
+    }
+
+    private List<Map<String, String>> parseValues(SosSweCount elementCount,
+            SosSweAbstractDataComponent elementType,
+            SosSweAbstractEncoding encoding,
+            EncodedValuesPropertyType encodedValuesPropertyType) throws OwsExceptionReport
+    {
+        assert elementCount != null;
+        assert elementType != null;
+        assert encoding != null;
+        // Get swe values String via cursor as String
+        if (checkParameterTypes(elementType, encoding))
+        {
+            String values = null;
+            XmlCursor xbCursor = encodedValuesPropertyType.newCursor();
+            xbCursor.toFirstContentToken();
+            if (xbCursor.isText())
+            {
+                values = xbCursor.getTextValue().trim();
+                if (values != null && !values.isEmpty())
+                {
+                    SosSweTextEncoding textEncoding = (SosSweTextEncoding)encoding;
+                    SosSweDataRecord valuesMetadata = (SosSweDataRecord)elementType;
+                    List<SosSweField> fields = valuesMetadata.getFields();
+                    
+                    String[] blocks = values.split(textEncoding.getBlockSeparator());
+                    List<Map<String,String>> resultValues = new ArrayList<Map<String,String>>();
+                    for (String block : blocks)
+                    {
+                        String[] tokens = block.split(textEncoding.getTokenSeparator());
+                        Map<String,String> blockMap = new HashMap<String, String>();
+                        for (int i = 0; i < tokens.length; i++)
+                        {
+                            String token = tokens[i];
+                            blockMap.put(fields.get(i).getElement().getDefinition(), token);
+                        }
+                        resultValues.add(blockMap);
+                    }
+                    return resultValues;
+                }
+            }
+        }
+        assert false;
+        return null;
+    }
+
+    private boolean checkParameterTypes(SosSweAbstractDataComponent elementType,
+            SosSweAbstractEncoding encoding) throws OwsExceptionReport
+    {
+        if (!(encoding instanceof SosSweTextEncoding))
+        {
+            String exceptionMsg = String.format("Received encoding type \"%s\" of swe:values is not supported.",
+                    encoding!=null?encoding.getClass().getName():encoding);
+            LOGGER.debug(exceptionMsg);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
+        }
+        if (!(elementType instanceof SosSweDataRecord))
+        {
+            String exceptionMsg = String.format("Received elementType \"%s\" in combination with swe:values is not supported.",
+                    elementType!=null?elementType.getClass().getName():elementType);
+            LOGGER.debug(exceptionMsg);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
+        }
+        return true;
+    }
+
+    private List<Map<String, String>> parseValuesString(SosSweTextEncoding encoding,
+            String values)
+    {
+        // TODO get tokens
+        // TODO Auto-generated method "parseValuesString" stub generated on 14.11.2012 around 16:06:26 by eike
+        return null;
+    }
+
+    private SosSweAbstractEncoding parseEncoding(AbstractEncodingType abstractEncodingType) throws OwsExceptionReport
+    {
+        assert abstractEncodingType != null;
+        if (abstractEncodingType instanceof TextEncodingType)
+        {
+            return parseTextEncoding((TextEncodingType) abstractEncodingType);
+        }
+        String exceptionMsg = String.format("Encoding type not supported: %s. Currently supported: %s",
+                abstractEncodingType!=null?abstractEncodingType.getClass().getName():abstractEncodingType,
+                        TextEncodingType.type.getName());
+        LOGGER.debug(exceptionMsg);
+        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
     }
 
     private SosSweDataRecord parseDataRecord(DataRecordType dataRecord) throws OwsExceptionReport {
         SosSweDataRecord sosSweDataRecord = new SosSweDataRecord();
         for (Field field : dataRecord.getFieldArray()) {
-            sosSweDataRecord.addField(new SosSweField(field.getName(), getAbstractDataComponent(field
+            sosSweDataRecord.addField(new SosSweField(field.getName(), parseAbstractDataComponent(field
                     .getAbstractDataComponent())));
         }
         return sosSweDataRecord;
@@ -228,7 +330,7 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
     // return sosFields;
     // }
 
-    private SosSweAbstractDataComponent getAbstractDataComponent(AbstractDataComponentType abstractDataComponent)
+    private SosSweAbstractDataComponent parseAbstractDataComponent(AbstractDataComponentType abstractDataComponent)
             throws OwsExceptionReport {
         if (abstractDataComponent instanceof CountType) {
             return parseCount((CountType) abstractDataComponent);
@@ -238,6 +340,8 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
             return parseTime((TimeType) abstractDataComponent);
         } else if (abstractDataComponent instanceof DataArrayDocument) {
             return parseDataArray(((DataArrayDocument) abstractDataComponent).getDataArray1());
+        } else if (abstractDataComponent instanceof DataRecordType) {
+            return parseDataRecord((DataRecordType) abstractDataComponent);
         }
         return null;
     }

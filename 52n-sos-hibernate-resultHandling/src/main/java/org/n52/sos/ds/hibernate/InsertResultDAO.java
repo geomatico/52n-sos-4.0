@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -47,9 +46,7 @@ import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.IObservationValue;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.om.SosCompositePhenomenon;
 import org.n52.sos.ogc.om.SosMultiObservationValues;
-import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.values.BooleanValue;
@@ -73,11 +70,7 @@ import org.n52.sos.ogc.swe.SosSweField;
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
-import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
-import org.n52.sos.ogc.swe.simpleType.SosSweCount;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
-import org.n52.sos.ogc.swe.simpleType.SosSweText;
-import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.request.InsertResultRequest;
 import org.n52.sos.response.InsertResultResponse;
 import org.n52.sos.service.Configurator;
@@ -230,9 +223,9 @@ public class InsertResultDAO implements IInsertResultDAO {
 		int phenomenonTimeIndex = ResultHandlingHelper.hasPhenomenonTime(resultStructure);
 		
 		SosSweDataRecord record = null;
-		if (resultStructure instanceof SosSweDataArray) {
+		if (resultStructure instanceof SosSweDataArray && ((SosSweDataArray) resultStructure).getElementType() instanceof SosSweDataRecord) {
 			SosSweDataArray array = (SosSweDataArray) resultStructure;
-			record = array.getElementType();
+			record = (SosSweDataRecord) array.getElementType();
 		} else if (resultStructure instanceof SosSweDataRecord) {
 			record = (SosSweDataRecord) resultStructure;
 		} else {

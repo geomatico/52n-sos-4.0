@@ -482,7 +482,7 @@ public class XmlHelper {
         if (attributes != null) {
             for (int i = 0, len = attributes.getLength(); i < len; i++) {
                 Attr attr = (Attr) attributes.item(i);
-                if (attr.getName().equals("gml:id")) {
+                if (attr.getName().equals("gml:id")) { // TODO how to handle other prefixes than gml for gml ns?
                     if (oldGmlID == null) {
                         oldGmlID = attr.getValue();
                         attr.setValue((gmlID));

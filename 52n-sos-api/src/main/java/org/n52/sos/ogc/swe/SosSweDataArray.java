@@ -26,26 +26,33 @@ package org.n52.sos.ogc.swe;
 import java.util.List;
 import java.util.Map;
 
+import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.ogc.swe.simpleType.SosSweCount;
 
 /**
  * SOS internal representation of SWE dataArray
- * 
+ * TODO document that this implementation supports only simple types in swe:elementType.swe:DataRecord in TWiki
  */
 public class SosSweDataArray extends SosSweAbstractDataComponent{
 
     /**
-     * DataArray values
+     * swe:values<br />
+     * Each list entry represents one block. The map contains the values using 
+     * the swe:AbstractDataComponentProperty@definition from swe:elementType as key.
      */
     private List<Map<String, String>> values;
 
     /**
-     * 
-     * DataRecord
+     * swe:elementType
      */
-    private SosSweDataRecord dataRecord;
+    private SosSweAbstractDataComponent elementType;
 
     private SosSweCount elementCount;
+    
+    /**
+     * 
+     */
+    private SosSweAbstractEncoding encoding;
 
     /**
      * @return the values
@@ -55,6 +62,7 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
     }
 
     /**
+     *
      * @param values
      *            the values to set
      */
@@ -65,16 +73,16 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
     /**
      * @return the elementType
      */
-    public SosSweDataRecord getElementType() {
-        return dataRecord;
+    public SosSweAbstractDataComponent getElementType() {
+        return elementType;
     }
 
     /**
-     * @param dataRecord
-     *            the dataRecord to set
+     * @param elementType
+     *            the elementType to set
      */
-    public void setElementType(SosSweDataRecord dataRecord) {
-        this.dataRecord = dataRecord;
+    public void setElementType(SosSweAbstractDataComponent elementType) {
+        this.elementType = elementType;
     }
 
 //    /**
@@ -95,5 +103,15 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
             // TODO get count from values;
         }
         return elementCount;
+    }
+
+    public SosSweAbstractEncoding getEncoding()
+    {
+        return encoding;
+    }
+
+    public void setEncoding(SosSweAbstractEncoding encoding)
+    {
+        this.encoding = encoding;
     }
 }

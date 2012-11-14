@@ -29,8 +29,14 @@ public abstract class SosSweAbstractDataComponent {
     
     private String description;
     
+    /**
+     * optional: swe:identifier
+     */
     private String identifier;
 
+    /**
+     * pre-set XML representation
+     */
     private String xml;
     
     public String getDefinition() {
