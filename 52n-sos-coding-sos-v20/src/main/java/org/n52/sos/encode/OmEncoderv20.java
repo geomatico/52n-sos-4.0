@@ -45,6 +45,7 @@ import net.opengis.swe.x20.CategoryType;
 import net.opengis.swe.x20.CountPropertyType;
 import net.opengis.swe.x20.CountType;
 import net.opengis.swe.x20.DataArrayDocument;
+import net.opengis.swe.x20.DataArrayPropertyType;
 import net.opengis.swe.x20.DataArrayType;
 import net.opengis.swe.x20.DataArrayType.ElementType;
 import net.opengis.swe.x20.DataRecordDocument;
@@ -63,6 +64,7 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlInteger;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
+import org.joda.time.DateTime;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
@@ -101,6 +103,7 @@ import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3CConstants;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -259,6 +262,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
         // set result
         addResultToObservation(xbObs.addNewResult(), sosObservation, phenComponents, observationID);
 
+        XmlHelper.validateDocument(xbObs);
         return xbObs;
 
         // ----------------------------------------------
@@ -529,14 +533,14 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
      *         CommonObservation
      * @throws OwsExceptionReport
      */
-    private DataArrayDocument createDataArrayResult(List<SosObservableProperty> phenComponents,
+    private DataArrayPropertyType createDataArrayResult(List<SosObservableProperty> phenComponents,
             SosObservation sosObservation) throws OwsExceptionReport {
         SosMultiObservationValues sosObservationValue = (SosMultiObservationValues) sosObservation.getValue();
         if (sosObservationValue.getValue() instanceof SweDataArrayValue) {
             // TODO: move this to SweCommonEncoderv20
-            DataArrayDocument xbDataArrayDoc =
-                    DataArrayDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-            DataArrayType xbDataArray = xbDataArrayDoc.addNewDataArray1();
+            DataArrayPropertyType dataArrayProperty =
+                    DataArrayPropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+            DataArrayType xbDataArray = dataArrayProperty.addNewDataArray1();
 
             // set element count
             CountPropertyType xb_elementCount = xbDataArray.addNewElementCount();
@@ -613,7 +617,12 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
 
             EncodedValuesPropertyType xb_values = xbDataArray.addNewValues();
             xb_values.newCursor().setTextValue(createResultString(phenComponents, sosObservation, valueMap));
-            return xbDataArrayDoc;
+            
+            // change prefix to 'swe' because Xmlbeans.XmlOptions do not work proper for elements with anyType.
+            XmlCursor newCursor = dataArrayProperty.newCursor();
+            newCursor.toFirstChild();
+            newCursor.insertNamespace(SWEConstants.NS_SWE_PREFIX, SWEConstants.NS_SWE_20);
+            return dataArrayProperty;
         }
         return null;
     }
@@ -669,9 +678,11 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
                 xbText.setDefinition(observableProperty.getIdentifier());
             }
             String[] uriParts = observableProperty.getIdentifier().split("/|:");
-            field.setName(uriParts[uriParts.length - 1]);
+//            field.setName(uriParts[uriParts.length - 1]);
+            field.setName("_" + new DateTime().getMillis());
         } else {
-            field.setName(observableProperty.getIdentifier().replace(SosConstants.PHENOMENON_PREFIX, ""));
+//            field.setName(observableProperty.getIdentifier().replace(SosConstants.PHENOMENON_PREFIX, ""));
+            field.setName("_" + new DateTime().getMillis());
             TextType xbText =
                     (TextType) field.addNewAbstractDataComponent().substitute(SWEConstants.QN_TEXT_SWE_200,
                             TextType.type);
@@ -1370,11 +1381,12 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
         if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)
                 || observationType.equals(OMConstants.RESULT_MODEL_OBSERVATION)) {
             XmlObject xbRresult = addNewResult;
-            DataArrayDocument xb_dataArrayDoc = createDataArrayResult(phenComponents, sosObservation);
-            xbRresult.set(xb_dataArrayDoc);
-            XmlCursor cursor = xbRresult.newCursor();
-            cursor.setAttributeText(new QName(W3CConstants.NS_XSI, "type"), "swe:DataArrayPropertyType");
-            cursor.dispose();
+            // TODO move the DataArray creation to SweCommonEncoderv20
+            DataArrayPropertyType dataArrayProperty = createDataArrayResult(phenComponents, sosObservation);
+            xbRresult.set(dataArrayProperty);
+//            XmlCursor cursor = xbRresult.newCursor();
+//            cursor.setAttributeText(new QName(W3CConstants.NS_XSI, "type"), "swe:DataArrayPropertyType");
+//            cursor.dispose();
         }
     }
 
