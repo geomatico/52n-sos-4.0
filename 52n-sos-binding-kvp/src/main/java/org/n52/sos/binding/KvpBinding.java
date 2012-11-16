@@ -74,13 +74,15 @@ public class KvpBinding extends Binding {
         AbstractServiceRequest request = null;
         try {
             if (req.getParameterMap() == null || (req.getParameterMap() != null && req.getParameterMap().isEmpty())) {
-                LOGGER.debug("The mandatory parameter '" + OWSConstants.RequestParams.request.name() + "' is missing!");
-                throw Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.request.name());
+                LOGGER.debug("The mandatory parameter '" + RequestParams.request.name() + "' is missing!");
+                throw Util4Exceptions.createMissingParameterValueException(RequestParams.request.name());
             }
             Map<String, String> parameterValueMap = KvpHelper.getKvpParameterValueMap(req);
+            // check if request contains request parameter
+            checkParameterValue(getRequestParameterValue(parameterValueMap), RequestParams.request.name());
             IDecoder<AbstractServiceRequest, Map<String, String>> decoder =
                     getDecoder(new DecoderKeyType(getServiceParameterValue(parameterValueMap), getParameterValue(
-                            OWSConstants.RequestParams.version.name(), parameterValueMap)));
+                            RequestParams.version.name(), parameterValueMap)));
             if (decoder != null) {
                 request = decoder.decode(parameterValueMap);
             } else {
@@ -163,23 +165,16 @@ public class KvpBinding extends Binding {
 
     private String getServiceParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
         String service = getParameterValue(OWSConstants.RequestParams.service.name(), parameterValueMap);
-        if (getRequestParameterValue(parameterValueMap).equals(SosConstants.Operations.GetCapabilities.name()) && service == null) {
+        String requestValue = getRequestParameterValue(parameterValueMap);
+        if (requestValue != null && requestValue.equals(SosConstants.Operations.GetCapabilities.name()) && service == null) {
             return SosConstants.SOS;
         }
-        if (service == null) {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The mandatory parameter '");
-            exceptionText.append(OWSConstants.RequestParams.service.name());
-            exceptionText.append("' is missing!");
-            LOGGER.debug(exceptionText.toString());
-            throw Util4Exceptions.createMissingParameterValueException(RequestParams.service.name());
-        }
         // TODO: change SosConstants.SOS to dynamically support.
-        else if (service != null && !service.equals(SosConstants.SOS)) {
+        else if (!Configurator.getInstance().isServiceSupported(service)) {
             StringBuilder exceptionText = new StringBuilder();
             exceptionText.append("The value of parameter '");
             exceptionText.append(OWSConstants.RequestParams.service.name());
-            exceptionText.append("' is invalid!");
+            exceptionText.append("' is invalid or the service is not supported!");
             LOGGER.debug(exceptionText.toString());
             throw Util4Exceptions.createInvalidParameterValueException(RequestParams.service.name(),
                     exceptionText.toString());
@@ -189,24 +184,33 @@ public class KvpBinding extends Binding {
 
     private String getRequestParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
         String requestParameterValue = getParameterValue(RequestParams.request.name(), parameterValueMap);
-        if (requestParameterValue != null && !requestParameterValue.isEmpty()) {
-            return requestParameterValue;
-        }
-        StringBuilder exceptionText = new StringBuilder();
-        exceptionText.append("The mandatory parameter '");
-        exceptionText.append(OWSConstants.RequestParams.request.name());
-        exceptionText.append("' is missing!");
-        LOGGER.debug(exceptionText.toString());
-        throw Util4Exceptions.createMissingParameterValueException(RequestParams.request.name());
+        checkParameterValue(requestParameterValue, RequestParams.request.name());
+        return requestParameterValue;
     }
 
-    private String getParameterValue(String parameterName, Map<String, String> parameterMap) {
+    private String getParameterValue(String parameterName, Map<String, String> parameterMap) throws OwsExceptionReport {
         for (String key : parameterMap.keySet()) {
             if (key.equalsIgnoreCase(parameterName)) {
-                return parameterMap.get(key);
+                 return parameterMap.get(key);
+//                if (parameterValue == null || (parameterValue != null && parameterValue.isEmpty())) {
+//                    StringBuilder exceptionText = new StringBuilder();
+//                    exceptionText.append("The mandatory parameter '");
+//                    exceptionText.append(parameterName);
+//                    exceptionText.append("' is missing!");
+//                    LOGGER.debug(exceptionText.toString());
+//                    throw Util4Exceptions.createMissingParameterValueException(parameterName);
+//                }
+//                return parameterValue;
             }
         }
         return null;
+    }
+
+    private void checkParameterValue(String parameterValue, String parameterName) throws OwsExceptionReport {
+        if (parameterValue == null || (parameterValue != null && parameterValue.isEmpty())) {
+            LOGGER.debug("The mandatory parameter '" + parameterName + "' is missing!");
+            throw Util4Exceptions.createMissingParameterValueException(parameterName);
+        }
     }
 
     @Override
@@ -220,7 +224,8 @@ public class KvpBinding extends Binding {
     }
 
     private IKvpDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
-        List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
+        Configurator configurator = Configurator.getInstance();
+        List<IDecoder> decoder = configurator.getDecoder(decoderKey);
         if (decoder != null) {
             for (IDecoder iDecoder : decoder) {
                 if (iDecoder instanceof IKvpDecoder) {
@@ -228,6 +233,14 @@ public class KvpBinding extends Binding {
                 }
             }
         }
+        if (!configurator.isVersionSupported(decoderKey.getVersion())) {
+            String exceptionText = "The requested version is not supported!";
+            throw Util4Exceptions.createInvalidParameterValueException(RequestParams.version.name(), exceptionText);
+        } 
+//        else if (!configurator.isServiceSupported(decoderKey.getService())) {
+//            String exceptionText = "The requested service is not supported!";
+//            throw Util4Exceptions.createInvalidParameterValueException(RequestParams.service.name(), exceptionText);
+//        }
         return null;
     }
 

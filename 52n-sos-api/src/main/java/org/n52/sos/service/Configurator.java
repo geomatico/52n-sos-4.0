@@ -394,8 +394,11 @@ public final class Configurator {
     private boolean supportsQuality = true;
 
     /** supported SOS versions */
-    private Set<String> supportedVersions;
-
+    private Set<String> supportedVersions = new HashSet<String>(0);
+    
+    /** supported services */
+    private Set<String> supportedServices = new HashSet<String>(0);
+    
     /** boolean indicates the order of x and y components of coordinates */
     private List<Range> switchCoordinatesForEPSG = new ArrayList<Range>(0);
 
@@ -455,8 +458,9 @@ public final class Configurator {
      * @param docBuildFactory
      */
     private void initialize() throws ConfigurationException {
-
-        supportedVersions = new HashSet<String>();
+        
+        supportedServices.clear();
+        supportedVersions.clear();
 
         String maxGetObsResultsString = props.getProperty(MAX_GET_OBS_RESULTS, "0");
         if (maxGetObsResultsString != null && maxGetObsResultsString.trim().length() > 0) {
@@ -1225,6 +1229,7 @@ public final class Configurator {
             try {
                 serviceOperators.put(iServiceOperator.getServiceOperatorKeyType(), iServiceOperator);
                 supportedVersions.add(iServiceOperator.getServiceOperatorKeyType().getVersion());
+                supportedServices.add(iServiceOperator.getServiceOperatorKeyType().getService());
             } catch (ServiceConfigurationError sce) {
                 LOGGER.warn("An IServiceOperator implementation could not be loaded!", sce);
             }
@@ -1352,6 +1357,17 @@ public final class Configurator {
 
     public boolean isVersionSupported(String version) {
         return supportedVersions.contains(version);
+    }
+    
+    /**
+     * @return the supportedVersions
+     */
+    public Set<String> getSupportedServices() {
+        return supportedServices;
+    }
+
+    public boolean isServiceSupported(String service) {
+        return supportedServices.contains(service);
     }
 
     /**
