@@ -84,7 +84,7 @@ public class N52XmlHelper {
      * 
      * @return QName of schema location
      */
-    private static QName getSchemaLocationQName() {
+    public static QName getSchemaLocationQName() {
         return new QName(W3CConstants.NS_XSI, W3CConstants.AN_SCHEMA_LOCATION);
     }
 

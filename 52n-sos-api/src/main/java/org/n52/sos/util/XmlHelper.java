@@ -43,7 +43,6 @@ import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlValidationError;
 import org.n52.sos.exception.IExceptionCode;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
 import org.slf4j.Logger;
@@ -104,7 +103,7 @@ public class XmlHelper {
             throw Util4Exceptions.createNoApplicableCodeException(ioe,
                     "Error while reading request! Message: " + ioe.getMessage());
         }
-
+//        validateDocument(doc);
         return doc;
     }
     
@@ -187,6 +186,7 @@ public class XmlHelper {
                     errors.add(error);
                 }
             }
+            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
             for (XmlError error : errors) {
 
                 // ExceptionCode for Exception
@@ -195,109 +195,117 @@ public class XmlHelper {
                 // get name of the missing or invalid parameter
                 message = error.getMessage();
                 if (message != null) {
-
-                    // check, if parameter is missing or value of parameter
-                    // is
-                    // invalid to ensure, that correct
-                    // exceptioncode in exception response is used
-
-                    // invalid parameter value
-                    if (message.startsWith("The value")) {
-                        exCode = OwsExceptionCode.InvalidParameterValue;
-
-                        // split message string to get attribute name
-                        String[] messAndAttribute = message.split("attribute '");
-                        if (messAndAttribute.length == 2) {
-                            parameterName = messAndAttribute[1].replace("'", "");
-                        }
-                    }
-
-                    // invalid enumeration value --> InvalidParameterValue
-                    else if (message.contains("not a valid enumeration value")) {
-                        exCode = OwsExceptionCode.InvalidParameterValue;
-
-                        // get attribute name
-                        String[] messAndAttribute = message.split(" ");
-                        parameterName = messAndAttribute[10];
-                    }
-
-                    // mandatory attribute is missing -->
-                    // missingParameterValue
-                    else if (message.startsWith("Expected attribute")) {
-                        exCode = OwsExceptionCode.MissingParameterValue;
-
-                        // get attribute name
-                        String[] messAndAttribute = message.split("attribute: ");
-                        if (messAndAttribute.length == 2) {
-                            String[] attrAndRest = messAndAttribute[1].split(" in");
-                            if (attrAndRest.length == 2) {
-                                parameterName = attrAndRest[0];
-                            }
-                        }
-                    }
-
-                    // mandatory element is missing -->
-                    // missingParameterValue
-                    else if (message.startsWith("Expected element")) {
-                        exCode = SwesExceptionCode.InvalidRequest;
-
-                        // get element name
-                        String[] messAndElements = message.split(" '");
-                        if (messAndElements.length >= 2) {
-                            String elements = messAndElements[1];
-                            if (elements.contains("offering")) {
-                                parameterName = "offering";
-                            } else if (elements.contains("observedProperty")) {
-                                parameterName = "observedProperty";
-                            } else if (elements.contains("responseFormat")) {
-                                parameterName = "responseFormat";
-                            } else if (elements.contains("procedure")) {
-                                parameterName = "procedure";
-                            } else if (elements.contains("featureOfInterest")) {
-                                parameterName = "featureOfInterest";
-                            } else {
-                                // TODO check if other elements are invalid
-                            }
-                        }
-                    }
-                    // invalidParameterValue
-                    else if (message.startsWith("Element")) {
-                        exCode = OwsExceptionCode.InvalidParameterValue;
-
-                        // get element name
-                        String[] messAndElements = message.split(" '");
-                        if (messAndElements.length >= 2) {
-                            String elements = messAndElements[1];
-                            if (elements.contains("offering")) {
-                                parameterName = "offering";
-                            } else if (elements.contains("observedProperty")) {
-                                parameterName = "observedProperty";
-                            } else if (elements.contains("responseFormat")) {
-                                parameterName = "responseFormat";
-                            } else if (elements.contains("procedure")) {
-                                parameterName = "procedure";
-                            } else if (elements.contains("featureOfInterest")) {
-                                parameterName = "featureOfInterest";
-                            } else {
-                                // TODO check if other elements are invalid
-                            }
-                        }
-                    } else {
-                        // create service exception
-                        OwsExceptionReport se = new OwsExceptionReport();
-                        se.addCodedException(SwesExceptionCode.InvalidRequest, message,
-                                "[XmlBeans validation error:] " + message);
-                        LOGGER.error("The request is invalid!", se);
-                        throw se;
-                    }
-
-                    // create service exception
+                    
                     OwsExceptionReport se = new OwsExceptionReport();
-                    se.addCodedException(exCode, message, "[XmlBeans validation error:] " + message);
+                    se.addCodedException(SwesExceptionCode.InvalidRequest, message,
+                            "[XmlBeans validation error:] " + message);
                     LOGGER.error("The request is invalid!", se);
-                    throw se;
+                    exceptions.add(se);
+
+                    // TODO check if code can be used for validation of SOS 1.0.0 requests
+//                    // check, if parameter is missing or value of parameter
+//                    // is
+//                    // invalid to ensure, that correct
+//                    // exceptioncode in exception response is used
+//
+//                    // invalid parameter value
+//                    if (message.startsWith("The value")) {
+//                        exCode = OwsExceptionCode.InvalidParameterValue;
+//
+//                        // split message string to get attribute name
+//                        String[] messAndAttribute = message.split("attribute '");
+//                        if (messAndAttribute.length == 2) {
+//                            parameterName = messAndAttribute[1].replace("'", "");
+//                        }
+//                    }
+//
+//                    // invalid enumeration value --> InvalidParameterValue
+//                    else if (message.contains("not a valid enumeration value")) {
+//                        exCode = OwsExceptionCode.InvalidParameterValue;
+//
+//                        // get attribute name
+//                        String[] messAndAttribute = message.split(" ");
+//                        parameterName = messAndAttribute[10];
+//                    }
+//
+//                    // mandatory attribute is missing -->
+//                    // missingParameterValue
+//                    else if (message.startsWith("Expected attribute")) {
+//                        exCode = OwsExceptionCode.MissingParameterValue;
+//
+//                        // get attribute name
+//                        String[] messAndAttribute = message.split("attribute: ");
+//                        if (messAndAttribute.length == 2) {
+//                            String[] attrAndRest = messAndAttribute[1].split(" in");
+//                            if (attrAndRest.length == 2) {
+//                                parameterName = attrAndRest[0];
+//                            }
+//                        }
+//                    }
+//
+//                    // mandatory element is missing -->
+//                    // missingParameterValue
+//                    else if (message.startsWith("Expected element")) {
+//                        exCode = SwesExceptionCode.InvalidRequest;
+//
+//                        // get element name
+//                        String[] messAndElements = message.split(" '");
+//                        if (messAndElements.length >= 2) {
+//                            String elements = messAndElements[1];
+//                            if (elements.contains("offering")) {
+//                                parameterName = "offering";
+//                            } else if (elements.contains("observedProperty")) {
+//                                parameterName = "observedProperty";
+//                            } else if (elements.contains("responseFormat")) {
+//                                parameterName = "responseFormat";
+//                            } else if (elements.contains("procedure")) {
+//                                parameterName = "procedure";
+//                            } else if (elements.contains("featureOfInterest")) {
+//                                parameterName = "featureOfInterest";
+//                            } else {
+//                                // TODO check if other elements are invalid
+//                            }
+//                        }
+//                    }
+//                    // invalidParameterValue
+//                    else if (message.startsWith("Element")) {
+//                        exCode = OwsExceptionCode.InvalidParameterValue;
+//
+//                        // get element name
+//                        String[] messAndElements = message.split(" '");
+//                        if (messAndElements.length >= 2) {
+//                            String elements = messAndElements[1];
+//                            if (elements.contains("offering")) {
+//                                parameterName = "offering";
+//                            } else if (elements.contains("observedProperty")) {
+//                                parameterName = "observedProperty";
+//                            } else if (elements.contains("responseFormat")) {
+//                                parameterName = "responseFormat";
+//                            } else if (elements.contains("procedure")) {
+//                                parameterName = "procedure";
+//                            } else if (elements.contains("featureOfInterest")) {
+//                                parameterName = "featureOfInterest";
+//                            } else {
+//                                // TODO check if other elements are invalid
+//                            }
+//                        }
+//                    } else {
+//                        // create service exception
+//                        OwsExceptionReport se = new OwsExceptionReport();
+//                        se.addCodedException(SwesExceptionCode.InvalidRequest, message,
+//                                "[XmlBeans validation error:] " + message);
+//                        LOGGER.error("The request is invalid!", se);
+//                        throw se;
+//                    }
+//
+//                    // create service exception
+//                    OwsExceptionReport se = new OwsExceptionReport();
+//                    se.addCodedException(exCode, message, "[XmlBeans validation error:] " + message);
+//                    LOGGER.error("The request is invalid!", se);
+//                    throw se;
                 }
             }
+            Util4Exceptions.mergeAndThrowExceptions(exceptions);
         }
     }
 

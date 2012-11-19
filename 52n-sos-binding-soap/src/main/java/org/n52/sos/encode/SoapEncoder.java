@@ -58,6 +58,7 @@ import org.n52.sos.soap.SoapFault;
 import org.n52.sos.soap.SoapHeader;
 import org.n52.sos.soap.SoapHelper;
 import org.n52.sos.soap.SoapResponse;
+import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3CConstants;
 import org.n52.sos.wsa.WsaConstants;
@@ -144,7 +145,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
                     action =
                             createSOAPFaultFromExceptionResponse(soapResponseMessage.getSOAPBody().addFault(),
                                     soapResponse.getException());
-
+                    addSchemaLocationForExceptionToSOAPMessage(soapResponseMessage);
                 } else {
                     action =
                             createSOAPBody(soapResponseMessage, soapResponse.getSoapBodyContent(),
@@ -176,6 +177,8 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
             } else {
                 soapResponseMessage.getSOAPHeader().detachNode();
             }
+            soapResponseMessage.setProperty(SOAPMessage.WRITE_XML_DECLARATION, "true");
+            
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             soapResponseMessage.writeTo(baos);
             boolean applicationZip = false;
@@ -333,10 +336,14 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
                 exceptionText.append("\n");
             }
         }
-        exRep.addAttribute(new QName(OWSConstants.NS_OWS, OWSConstants.EN_EXCEPTION_CODE, OWSConstants.NS_OWS_PREFIX),
+//        exRep.addAttribute(new QName(OWSConstants.NS_OWS, OWSConstants.EN_EXCEPTION_CODE, OWSConstants.NS_OWS_PREFIX),
+//                code);
+        exRep.addAttribute(new QName(OWSConstants.EN_EXCEPTION_CODE),
                 code);
         if (locator != null && !locator.equals("")) {
-            exRep.addAttribute(new QName(OWSConstants.NS_OWS, OWSConstants.EN_LOCATOR, OWSConstants.NS_OWS_PREFIX),
+//            exRep.addAttribute(new QName(OWSConstants.NS_OWS, OWSConstants.EN_LOCATOR, OWSConstants.NS_OWS_PREFIX),
+//                    locator);
+            exRep.addAttribute(new QName(OWSConstants.EN_LOCATOR),
                     locator);
         }
         if (exceptionText.length() != 0) {
@@ -378,14 +385,17 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
         }
         SOAPEnvelope envelope = soapResponseMessage.getSOAPPart().getEnvelope();
         StringBuilder string = new StringBuilder();
-        if (soapResponseMessage.getSOAPPart().getEnvelope().getNamespaceURI()
-                .equalsIgnoreCase(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE)) {
-            string.append(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE + " http://schemas.xmlsoap.org/soap/envelope");
-        } else if (soapResponseMessage.getSOAPPart().getEnvelope().getNamespaceURI()
-                .equalsIgnoreCase(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE)) {
-            string.append(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE + " http://www.w3.org/2003/05/soap-envelope");
-
-        }
+        string.append(envelope.getNamespaceURI());
+        string.append(" ");
+        string.append(envelope.getNamespaceURI());
+//        if (soapResponseMessage.getSOAPPart().getEnvelope().getNamespaceURI()
+//                .equalsIgnoreCase(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE)) {
+//            string.append(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE + " http://schemas.xmlsoap.org/soap/envelope");
+//        } else if (soapResponseMessage.getSOAPPart().getEnvelope().getNamespaceURI()
+//                .equalsIgnoreCase(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE)) {
+//            string.append(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE + " http://www.w3.org/2003/05/soap-envelope");
+//
+//        }
         if (value != null && !value.isEmpty()) {
             string.append(" ");
             string.append(value);
@@ -393,5 +403,16 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
         QName qName = new QName(W3CConstants.NS_XSI, W3CConstants.AN_SCHEMA_LOCATION, W3CConstants.NS_XSI_PREFIX);
         envelope.addAttribute(qName, string.toString());
         value = string.toString();
+    }
+
+    private void addSchemaLocationForExceptionToSOAPMessage(SOAPMessage soapResponseMessage) throws SOAPException {
+        SOAPEnvelope envelope = soapResponseMessage.getSOAPPart().getEnvelope();
+        StringBuilder schemaLocation = new StringBuilder();
+        schemaLocation.append(envelope.getNamespaceURI());
+        schemaLocation.append(" ");
+        schemaLocation.append(envelope.getNamespaceURI());
+        schemaLocation.append(" ");
+        schemaLocation.append(N52XmlHelper.getSchemaLocationForOWS110());
+        envelope.addAttribute(N52XmlHelper.getSchemaLocationQName(), schemaLocation.toString());
     }
 }
