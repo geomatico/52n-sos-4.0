@@ -31,6 +31,9 @@ import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.ISOPeriodFormat;
+import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.TimeInstant;
+import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,6 +102,33 @@ public class DateTimeHelper {
         if (!(timeString.length() == 4 || timeString.length() == 7 || timeString.length() >= 10)) {
             throw new DateTimeException("The requested time has no ISO 8601 format!");
         }
+    }
+    
+    /**
+     * Formats the given ITime to ISO 8601 string.
+     * @param time an {@link ITime} object to be formatted
+     * @return an ISO 8601 conform {@link String}.
+     * @throws IllegalArgumentException in the case of receiving <tt>null</tt> or not supported types.
+     * @see {@link #formatDateTime2IsoString}
+     */
+    public static String format(ITime time)
+    {
+        if (time != null)
+        {
+            if (time instanceof TimeInstant)
+            {
+                return formatDateTime2IsoString(((TimeInstant) time).getValue());
+            }
+            else if (time instanceof TimePeriod)
+            {
+                return String.format("%s/%s",
+                        formatDateTime2IsoString(((TimePeriod) time).getStart()),
+                        formatDateTime2IsoString(((TimePeriod) time).getEnd()));
+            }
+        }
+        String exceptionMsg = String.format("Given ITime object is not valid: %s", time!=null?time.getClass().getName():"null");
+        LOGGER.debug(exceptionMsg);
+        throw new IllegalArgumentException(exceptionMsg);
     }
 
     /**
