@@ -214,7 +214,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                             String exceptionText = "The requested section '" + section + "' does not exist or is not supported!";
                             LOGGER.debug(exceptionText);
                             throw Util4Exceptions.createInvalidParameterValueException(
-                                    SosConstants.GetCapabilitiesParams.Sections.name(), exceptionText);
+                                    SosConstants.GetCapabilitiesParams.Section.name(), exceptionText);
                         }
 
                         // if name is correct, check which section is requested

@@ -251,7 +251,7 @@ public final class SosConstants {
 
     /** enum with parameter names for getCapabilities request */
     public enum GetCapabilitiesParams {
-        Sections, AcceptVersions, updateSequence, AcceptFormats, service, request;
+        Sections, AcceptVersions, updateSequence, AcceptFormats, service, request, Section;
 
         /**
          * method checks whether the string parameter is contained in this

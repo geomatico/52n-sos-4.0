@@ -69,7 +69,8 @@ import com.vividsolutions.jts.geom.Geometry;
 public class SosKvpDecoderv20 implements IKvpDecoder {
 
     /**
-     * logger, used for logging while initialising the constants from configuration file
+     * logger, used for logging while initialising the constants from
+     * configuration file
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosKvpDecoderv20.class);
 
@@ -234,43 +235,52 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
             try {
                 // service (mandatory)
                 if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.service.name())) {
-                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues,
+                            OWSConstants.RequestParams.service.name()));
                     foundService = true;
                 }
                 // version (mandatory)
                 else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.version.name())) {
-                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues,
+                            OWSConstants.RequestParams.version.name()));
                     foundVersion = true;
                 }
                 // request (mandatory)
                 else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.request.name())) {
-                    KvpHelper.checkParameterSingleValue(parameterValues, parameterName);
+                    KvpHelper.checkParameterSingleValue(parameterValues, OWSConstants.RequestParams.request.name());
                 }
                 // procedure
                 else if (parameterName.equalsIgnoreCase(SosConstants.DescribeSensorParams.procedure.name())) {
-                    request.setProcedures(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    request.setProcedures(KvpHelper.checkParameterSingleValue(parameterValues,
+                            SosConstants.DescribeSensorParams.procedure.name()));
                     foundProcedure = true;
                 }
                 // procedureDescriptionFormat
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.DescribeSensorParams.procedureDescriptionFormat
                         .name())) {
-                    request.setOutputFormat(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    request.setOutputFormat(KvpHelper.checkParameterSingleValue(parameterValues,
+                            Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name()));
                     foundProcedureDescriptionFormat = true;
                 }
                 // valid time (optional)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.DescribeSensorParams.validTime.name())) {
                     try {
-                        request.setTime(parseValidTime(parameterValues, parameterName));
+                        request.setTime(parseValidTime(parameterValues,
+                                Sos2Constants.DescribeSensorParams.validTime.name()));
                     } catch (DecoderException e) {
                         String exceptionText =
-                                "The optional parameter '" + parameterName + "' is not supported by this service!";
+                                "The optional parameter '" + Sos2Constants.DescribeSensorParams.validTime.name()
+                                        + "' is not supported by this service!";
                         LOGGER.debug(exceptionText, e);
-                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
+                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(
+                                Sos2Constants.DescribeSensorParams.validTime.name(), exceptionText));
                     } catch (DateTimeException e) {
                         String exceptionText =
-                                "The optional parameter '" + parameterName + "' is not supported by this service!";
+                                "The optional parameter '" + Sos2Constants.DescribeSensorParams.validTime.name()
+                                        + "' is not supported by this service!";
                         LOGGER.debug(exceptionText, e);
-                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
+                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(
+                                Sos2Constants.DescribeSensorParams.validTime.name(), exceptionText));
                     }
                 } else {
                     String exceptionText =
@@ -344,47 +354,52 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
             try {
                 // service (mandatory)
                 if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.service.name())) {
-                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues,
+                            OWSConstants.RequestParams.service.name()));
                     foundService = true;
                 }
 
                 // version (mandatory)
                 else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.version.name())) {
-                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues,
+                            OWSConstants.RequestParams.version.name()));
                     foundVersion = true;
                 }
                 // request (mandatory)
                 else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.request.name())) {
-                    KvpHelper.checkParameterSingleValue(parameterValues, parameterName);
+                    KvpHelper.checkParameterSingleValue(parameterValues, OWSConstants.RequestParams.request.name());
                 }
 
                 // offering (optional)
                 else if (parameterName.equalsIgnoreCase(SosConstants.GetObservationParams.offering.name())) {
-                    request.setOfferings(KvpHelper.checkParameterMultipleValues(parameterValues, parameterName));
+                    request.setOfferings(KvpHelper.checkParameterMultipleValues(parameterValues,
+                            SosConstants.GetObservationParams.offering.name()));
                 }
 
                 // observedProperty (optional)
                 else if (parameterName.equalsIgnoreCase(SosConstants.GetObservationParams.observedProperty.name())) {
                     request.setObservedProperties(KvpHelper.checkParameterMultipleValues(parameterValues,
-                            parameterName));
+                            SosConstants.GetObservationParams.observedProperty.name()));
                 }
 
                 // procedure (optional)
                 else if (parameterName.equalsIgnoreCase(SosConstants.GetObservationParams.procedure.name())) {
-                    request.setProcedures(KvpHelper.checkParameterMultipleValues(parameterValues, parameterName));
+                    request.setProcedures(KvpHelper.checkParameterMultipleValues(parameterValues,
+                            SosConstants.GetObservationParams.procedure.name()));
                 }
 
                 // featureOfInterest (optional)
                 else if (parameterName.equalsIgnoreCase(SosConstants.GetObservationParams.featureOfInterest.name())) {
                     request.setFeatureIdentifiers(KvpHelper.checkParameterMultipleValues(parameterValues,
-                            parameterName));
+                            SosConstants.GetObservationParams.featureOfInterest.name()));
                 }
 
                 // eventTime (optional)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.temporalFilter.name())) {
                     try {
-                        request.setEventTimes(parseTemporalFilter(
-                                KvpHelper.checkParameterMultipleValues(parameterValues, parameterName), parameterName));
+                        request.setEventTimes(parseTemporalFilter(KvpHelper.checkParameterMultipleValues(
+                                parameterValues, Sos2Constants.GetObservationParams.temporalFilter.name()),
+                                parameterName));
                     } catch (DecoderException e) {
                         OwsExceptionReport owse = new OwsExceptionReport();
                         owse.addCodedException(OwsExceptionCode.InvalidParameterValue,
@@ -470,43 +485,46 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
             try {
                 // service (mandatory)
                 if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.service.name())) {
-                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues,
+                            OWSConstants.RequestParams.service.name()));
                     foundService = true;
                 }
 
                 // version (mandatory)
                 else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.version.name())) {
-                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues,
+                            OWSConstants.RequestParams.version.name()));
                     foundVersion = true;
                 }
                 // request (mandatory)
                 else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.request.name())) {
-                    KvpHelper.checkParameterSingleValue(parameterValues, parameterName);
+                    KvpHelper.checkParameterSingleValue(parameterValues, OWSConstants.RequestParams.request.name());
                 }
                 // observedProperty (optional)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetFeatureOfInterestParams.observedProperty
                         .name())) {
                     request.setObservedProperties(KvpHelper.checkParameterMultipleValues(parameterValues,
-                            parameterName));
+                            Sos2Constants.GetFeatureOfInterestParams.observedProperty.name()));
                 }
 
                 // procedure (optional)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetFeatureOfInterestParams.procedure.name())) {
-                    request.setProcedures(KvpHelper.checkParameterMultipleValues(parameterValues, parameterName));
+                    request.setProcedures(KvpHelper.checkParameterMultipleValues(parameterValues,
+                            Sos2Constants.GetFeatureOfInterestParams.procedure.name()));
                 }
 
                 // featureOfInterest (optional)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetFeatureOfInterestParams.featureOfInterest
                         .name())) {
                     request.setFeatureIdentifiers(KvpHelper.checkParameterMultipleValues(parameterValues,
-                            parameterName));
+                            Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name()));
                 }
 
                 // spatialFilter (optional)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetFeatureOfInterestParams.spatialFilter.name())) {
                     List<SpatialFilter> spatialFilters = new ArrayList<SpatialFilter>();
-                    spatialFilters.add(parseSpatialFilter(
-                            KvpHelper.checkParameterMultipleValues(parameterValues, parameterName), parameterName));
+                    spatialFilters.add(parseSpatialFilter(KvpHelper.checkParameterMultipleValues(parameterValues,
+                            Sos2Constants.GetFeatureOfInterestParams.spatialFilter.name()), parameterName));
                     request.setSpatialFilters(spatialFilters);
                 }
                 // namespaces (conditional)
@@ -559,18 +577,20 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
             try {
                 // service (mandatory)
                 if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.service.name())) {
-                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues,
+                            OWSConstants.RequestParams.service.name()));
                     foundService = true;
                 }
 
                 // version (mandatory)
                 else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.version.name())) {
-                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues,
+                            OWSConstants.RequestParams.version.name()));
                     foundVersion = true;
                 }
                 // request (mandatory)
                 else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.request.name())) {
-                    KvpHelper.checkParameterSingleValue(parameterValues, parameterName);
+                    KvpHelper.checkParameterSingleValue(parameterValues, OWSConstants.RequestParams.request.name());
                 }
 
                 // offering (mandatory)
@@ -580,7 +600,8 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
 
                 // observedProperty (mandatory)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetResultTemplateParams.observedProperty.name())) {
-                    request.setObservedProperty(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    request.setObservedProperty(KvpHelper.checkParameterSingleValue(parameterValues,
+                            Sos2Constants.GetResultTemplateParams.offering.name()));
                 } else {
                     String exceptionText =
                             "The parameter '" + parameterName + "' is invalid for the GetResultTemplate request!";
@@ -646,52 +667,59 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
             try {
                 // service (mandatory)
                 if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.service.name())) {
-                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues,
+                            OWSConstants.RequestParams.service.name()));
                     foundService = true;
                 }
                 // version (mandatory)
                 else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.version.name())) {
-                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues,
+                            OWSConstants.RequestParams.version.name()));
                     foundVersion = true;
                 }
                 // request (mandatory)
                 else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.request.name())) {
-                    KvpHelper.checkParameterSingleValue(parameterValues, parameterName);
+                    KvpHelper.checkParameterSingleValue(parameterValues, OWSConstants.RequestParams.request.name());
                 }
                 // offering (mandatory)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetResultTemplateParams.offering.name())) {
-                    request.setOffering(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    request.setOffering(KvpHelper.checkParameterSingleValue(parameterValues,
+                            Sos2Constants.GetResultTemplateParams.offering.name()));
                 }
 
                 // observedProperty (mandatory)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetResultTemplateParams.observedProperty.name())) {
-                    request.setObservedProperty(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    request.setObservedProperty(KvpHelper.checkParameterSingleValue(parameterValues,
+                            Sos2Constants.GetResultTemplateParams.observedProperty.name()));
                 }
                 // featureOfInterest (optional)
                 else if (parameterName.equalsIgnoreCase(SosConstants.GetObservationParams.featureOfInterest.name())) {
                     request.setFeatureIdentifiers(KvpHelper.checkParameterMultipleValues(parameterValues,
-                            parameterName));
+                            SosConstants.GetObservationParams.featureOfInterest.name()));
                 }
 
                 // eventTime (optional)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.temporalFilter.name())) {
                     try {
-                        request.setEventTimes(parseTemporalFilter(
-                                KvpHelper.checkParameterMultipleValues(parameterValues, parameterName), parameterName));
+                        request.setEventTimes(parseTemporalFilter(KvpHelper.checkParameterMultipleValues(
+                                parameterValues, Sos2Constants.GetObservationParams.temporalFilter.name()),
+                                parameterName));
                     } catch (DecoderException e) {
-                        throw Util4Exceptions.createInvalidParameterValueException(parameterName,
-                              "The parameter value is not valid!");
+                        throw Util4Exceptions.createInvalidParameterValueException(
+                                Sos2Constants.GetObservationParams.temporalFilter.name(),
+                                "The parameter value is not valid!");
                     } catch (DateTimeException e) {
-                        throw Util4Exceptions.createInvalidParameterValueException(parameterName,
-                              "The parameter value is not valid!");
-                    } 
-                    
+                        throw Util4Exceptions.createInvalidParameterValueException(
+                                Sos2Constants.GetObservationParams.temporalFilter.name(),
+                                "The parameter value is not valid!");
+                    }
+
                 }
 
                 // spatialFilter (optional)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.spatialFilter.name())) {
-                    request.setSpatialFilter(parseSpatialFilter(
-                            KvpHelper.checkParameterMultipleValues(parameterValues, parameterName), parameterName));
+                    request.setSpatialFilter(parseSpatialFilter(KvpHelper.checkParameterMultipleValues(
+                            parameterValues, Sos2Constants.GetObservationParams.spatialFilter.name()), parameterName));
                 }
                 // xmlWrapper (default = false) (optional)
                 // namespaces (conditional)
@@ -747,7 +775,8 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
         return request;
     }
 
-    private List<TemporalFilter> parseValidTime(String parameterValue, String parameterName) throws DecoderException, DateTimeException {
+    private List<TemporalFilter> parseValidTime(String parameterValue, String parameterName) throws DecoderException,
+            DateTimeException {
         List<TemporalFilter> filterList = new ArrayList<TemporalFilter>();
         filterList.add(createTemporalFilterFromValue(parameterValue, null));
         return filterList;
@@ -815,8 +844,9 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
         List<TemporalFilter> filterList = new ArrayList<TemporalFilter>();
         if (parameterValues.size() != 2) {
             throw new DecoderException("The parameter value is not valid!");
-//            throw Util4Exceptions.createInvalidParameterValueException(parameterName,
-//                    "The parameter value is not valid!");
+            // throw
+            // Util4Exceptions.createInvalidParameterValueException(parameterName,
+            // "The parameter value is not valid!");
         }
         filterList.add(createTemporalFilterFromValue(parameterValues.get(1), parameterValues.get(0)));
         return filterList;
@@ -835,58 +865,58 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
         return namespaces;
     }
 
-    private TemporalFilter createTemporalFilterFromValue(String value, String valueReference)
-            throws DecoderException, DateTimeException {
+    private TemporalFilter createTemporalFilterFromValue(String value, String valueReference) throws DecoderException,
+            DateTimeException {
         TemporalFilter temporalFilter = new TemporalFilter();
         temporalFilter.setValueReference(valueReference);
-            String[] times = value.split("/");
+        String[] times = value.split("/");
 
-            if (times.length == 1) {
-                DateTime instant = DateTimeHelper.parseIsoString2DateTime(times[0]);
-                TimeInstant ti = new TimeInstant();
-                ti.setValue(instant);
-                String valueSplit = null;
-                if (times[0].contains("Z")) {
-                    valueSplit = times[0].substring(0, times[0].indexOf("Z"));
-                } else if (times[0].contains("+")) {
-                    valueSplit = times[0].substring(0, times[0].indexOf("+"));
-                }
-                if (valueSplit != null) {
-                    ti.setRequestedTimeLength(valueSplit.length());
-                } else {
-                    ti.setRequestedTimeLength(times[0].length());
-                }
-                temporalFilter.setOperator(TimeOperator.TM_Equals);
-                temporalFilter.setTime(ti);
-            } else if (times.length == 2) {
-                DateTime start = DateTimeHelper.parseIsoString2DateTime(times[0]);
-                // check if end time is a full ISO 8106 string
-                String valueSplit = null;
-                if (times[1].contains("Z")) {
-                    valueSplit = times[1].substring(0, times[1].indexOf("Z"));
-                } else if (times[1].contains("+")) {
-                    valueSplit = times[1].substring(0, times[1].indexOf("+"));
-                }
-                DateTime end = null;
-                if (valueSplit != null) {
-                    end =
-                            DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
-                                    DateTimeHelper.parseIsoString2DateTime(times[1]), valueSplit.length());
-                } else {
-                    end =
-                            DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
-                                    DateTimeHelper.parseIsoString2DateTime(times[1]), times[1].length());
-                }
-                TimePeriod tp = new TimePeriod();
-                tp.setStart(start);
-                tp.setEnd(end);
-                temporalFilter.setOperator(TimeOperator.TM_During);
-                temporalFilter.setTime(tp);
-
-            } else {
-                throw new DecoderException(String.format("The paramter value '%s' is invalid!", value));
+        if (times.length == 1) {
+            DateTime instant = DateTimeHelper.parseIsoString2DateTime(times[0]);
+            TimeInstant ti = new TimeInstant();
+            ti.setValue(instant);
+            String valueSplit = null;
+            if (times[0].contains("Z")) {
+                valueSplit = times[0].substring(0, times[0].indexOf("Z"));
+            } else if (times[0].contains("+")) {
+                valueSplit = times[0].substring(0, times[0].indexOf("+"));
             }
-            return temporalFilter;
+            if (valueSplit != null) {
+                ti.setRequestedTimeLength(valueSplit.length());
+            } else {
+                ti.setRequestedTimeLength(times[0].length());
+            }
+            temporalFilter.setOperator(TimeOperator.TM_Equals);
+            temporalFilter.setTime(ti);
+        } else if (times.length == 2) {
+            DateTime start = DateTimeHelper.parseIsoString2DateTime(times[0]);
+            // check if end time is a full ISO 8106 string
+            String valueSplit = null;
+            if (times[1].contains("Z")) {
+                valueSplit = times[1].substring(0, times[1].indexOf("Z"));
+            } else if (times[1].contains("+")) {
+                valueSplit = times[1].substring(0, times[1].indexOf("+"));
+            }
+            DateTime end = null;
+            if (valueSplit != null) {
+                end =
+                        DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
+                                DateTimeHelper.parseIsoString2DateTime(times[1]), valueSplit.length());
+            } else {
+                end =
+                        DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
+                                DateTimeHelper.parseIsoString2DateTime(times[1]), times[1].length());
+            }
+            TimePeriod tp = new TimePeriod();
+            tp.setStart(start);
+            tp.setEnd(end);
+            temporalFilter.setOperator(TimeOperator.TM_During);
+            temporalFilter.setTime(tp);
+
+        } else {
+            throw new DecoderException(String.format("The paramter value '%s' is invalid!", value));
+        }
+        return temporalFilter;
     }
 
     @Override

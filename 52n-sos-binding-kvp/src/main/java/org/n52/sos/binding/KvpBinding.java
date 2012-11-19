@@ -80,9 +80,10 @@ public class KvpBinding extends Binding {
             Map<String, String> parameterValueMap = KvpHelper.getKvpParameterValueMap(req);
             // check if request contains request parameter
             checkParameterValue(getRequestParameterValue(parameterValueMap), RequestParams.request.name());
+            String service = getServiceParameterValue(parameterValueMap);
+            String version = getVersionParameterValue(RequestParams.version.name(), parameterValueMap);
             IDecoder<AbstractServiceRequest, Map<String, String>> decoder =
-                    getDecoder(new DecoderKeyType(getServiceParameterValue(parameterValueMap), getParameterValue(
-                            RequestParams.version.name(), parameterValueMap)));
+                    getDecoder(new DecoderKeyType(service, version));
             if (decoder != null) {
                 request = decoder.decode(parameterValueMap);
             } else {
@@ -164,13 +165,14 @@ public class KvpBinding extends Binding {
     }
 
     private String getServiceParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
-        String service = getParameterValue(OWSConstants.RequestParams.service.name(), parameterValueMap);
-        String requestValue = getRequestParameterValue(parameterValueMap);
-        if (requestValue != null && requestValue.equals(SosConstants.Operations.GetCapabilities.name()) && service == null) {
+        String service = getParameterValue(RequestParams.service.name(), parameterValueMap);
+        boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
+        if (isGetCapabilities && service == null) {
             return SosConstants.SOS;
+        } else {
+            checkParameterValue(service, RequestParams.service.name());
         }
-        // TODO: change SosConstants.SOS to dynamically support.
-        else if (!Configurator.getInstance().isServiceSupported(service)) {
+        if (!Configurator.getInstance().isServiceSupported(service)) {
             StringBuilder exceptionText = new StringBuilder();
             exceptionText.append("The value of parameter '");
             exceptionText.append(OWSConstants.RequestParams.service.name());
@@ -180,6 +182,32 @@ public class KvpBinding extends Binding {
                     exceptionText.toString());
         }
         return service;
+    }
+
+    private String getVersionParameterValue(String name, Map<String, String> parameterValueMap) throws OwsExceptionReport {
+        String version = getParameterValue(RequestParams.version.name(), parameterValueMap);
+        boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
+        if (!isGetCapabilities) {
+            checkParameterValue(version, RequestParams.version.name());
+            if (!Configurator.getInstance().isVersionSupported(version)) {
+                StringBuilder exceptionText = new StringBuilder();
+                exceptionText.append("The value of parameter '");
+                exceptionText.append(OWSConstants.RequestParams.version.name());
+                exceptionText.append("' is invalid or the version is not supported!");
+                LOGGER.debug(exceptionText.toString());
+                throw Util4Exceptions.createInvalidParameterValueException(RequestParams.version.name(),
+                        exceptionText.toString());
+            }
+        } 
+        return version;
+    }
+    
+    private boolean checkForGetCapabilities(Map<String, String> parameterValueMap) throws OwsExceptionReport {
+        String requestValue = getRequestParameterValue(parameterValueMap);
+        if (requestValue != null && requestValue.equals(SosConstants.Operations.GetCapabilities.name())) {
+            return true;
+        }
+        return false;
     }
 
     private String getRequestParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
@@ -192,15 +220,6 @@ public class KvpBinding extends Binding {
         for (String key : parameterMap.keySet()) {
             if (key.equalsIgnoreCase(parameterName)) {
                  return parameterMap.get(key);
-//                if (parameterValue == null || (parameterValue != null && parameterValue.isEmpty())) {
-//                    StringBuilder exceptionText = new StringBuilder();
-//                    exceptionText.append("The mandatory parameter '");
-//                    exceptionText.append(parameterName);
-//                    exceptionText.append("' is missing!");
-//                    LOGGER.debug(exceptionText.toString());
-//                    throw Util4Exceptions.createMissingParameterValueException(parameterName);
-//                }
-//                return parameterValue;
             }
         }
         return null;
@@ -208,7 +227,7 @@ public class KvpBinding extends Binding {
 
     private void checkParameterValue(String parameterValue, String parameterName) throws OwsExceptionReport {
         if (parameterValue == null || (parameterValue != null && parameterValue.isEmpty())) {
-            LOGGER.debug("The mandatory parameter '" + parameterName + "' is missing!");
+            LOGGER.debug("The value for parameter '" + parameterName + "' is missing!");
             throw Util4Exceptions.createMissingParameterValueException(parameterName);
         }
     }

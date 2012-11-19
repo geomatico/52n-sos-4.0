@@ -58,7 +58,7 @@ public class Util4Exceptions {
             throws OwsExceptionReport {
         OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
         owse.addCodedException(OwsExceptionCode.MissingParameterValue, parameterName,
-                String.format("The value for the mandatory parameter '%s' is missing in the request!", parameterName));
+                String.format("The value for the parameter '%s' is missing in the request!", parameterName));
         return owse;
     }
 

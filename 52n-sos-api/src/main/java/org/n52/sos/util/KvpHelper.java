@@ -59,7 +59,7 @@ public class KvpHelper {
 
     public static String checkParameterSingleValue(String parameterValue, String parameterName)
             throws OwsExceptionReport {
-        if (!parameterValue.isEmpty() && parameterValue.split(",").length == 1) {
+        if (checkParameterMultipleValues(parameterValue, parameterName).size() == 1) {
             return parameterValue;
         } else {
             StringBuilder exceptionText = new StringBuilder();
@@ -75,18 +75,17 @@ public class KvpHelper {
 
     public static List<String> checkParameterMultipleValues(String parameterValues, String parameterName)
             throws OwsExceptionReport {
-        if (!parameterValues.isEmpty()) {
-            return Arrays.asList(parameterValues.split(","));
-        } else {
+        if (parameterValues.isEmpty()) {
             StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The values of parameter '");
+            exceptionText.append("Value(s) of parameter '");
             exceptionText.append(parameterName);
             exceptionText.append("' (");
             exceptionText.append(parameterValues);
-            exceptionText.append(") is invalid!");
+            exceptionText.append(") is/are missing!");
             LOGGER.debug(exceptionText.toString());
-            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText.toString());
+            throw Util4Exceptions.createMissingParameterValueException(parameterName);
         }
+        return Arrays.asList(parameterValues.split(","));
     }
 
 }
