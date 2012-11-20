@@ -6,13 +6,13 @@
 		<sos:InsertResultTemplate service="SOS" version="2.0.0">
 			<sos:proposedTemplate>
 				<sos:ResultTemplate>
-					<swes:identifier>http://www.my_namespace.org/sensors/100/template/1</swes:identifier>
-					<sos:offering>http://www.my_namespace.org/sensors/100/observations</sos:offering>
+					<swes:identifier>http://www.my_namespace.org/sensors/101/template/1</swes:identifier>
+					<sos:offering>http://www.my_namespace.org/sensors/101/observations</sos:offering>
 					<sos:observationTemplate>
 						<om:OM_Observation gml:id="sensor2obsTemplate">
 							<om:phenomenonTime nilReason="template"/>
 							<om:resultTime nilReason="template"/>
-							<om:procedure xlink:href="http://www.my_namespace.org/sensors/100"/>
+							<om:procedure xlink:href="http://www.my_namespace.org/sensors/101"/>
 							<om:observedProperty xlink:href="http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl#Discharge"/>
 							<om:featureOfInterest>
 								<sams:SF_SpatialSamplingFeature gml:id="sf_1">
