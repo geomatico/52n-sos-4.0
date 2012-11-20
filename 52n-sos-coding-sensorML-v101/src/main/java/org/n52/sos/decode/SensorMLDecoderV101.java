@@ -57,6 +57,7 @@ import net.opengis.swe.x101.DataRecordPropertyType;
 import net.opengis.swe.x101.SimpleDataRecordType;
 
 import org.apache.xmlbeans.SchemaType;
+import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
@@ -235,7 +236,9 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
             }
             checkAndRemoveEmptyComponents(xbSystemType);
         }
-        system.setSensorDescriptionXmlString(addSensorMLWrapperForXmlDescription(xbSystemType));
+        String xmlDescription = addSensorMLWrapperForXmlDescription(xbSystemType);
+        // TODO find a better solution to remove components element
+        system.setSensorDescriptionXmlString(xmlDescription.replace("<sml:components xsi:nil=\"true\"/>", ""));
         return system;
     }
 
@@ -613,6 +616,5 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         if (removeComponents) {
             system.setComponents(null);
         }
-
     }
 }

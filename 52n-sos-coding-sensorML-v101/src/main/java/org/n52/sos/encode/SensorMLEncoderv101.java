@@ -303,7 +303,10 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
         }
         // set components
         if (absProcess.getComponents() != null && !absProcess.getComponents().isEmpty()) {
-            xbSystem.setComponents(createComponents(absProcess.getComponents()));
+            Components components = createComponents(absProcess.getComponents());
+            if (components != null && components.getComponentList() != null && components.getComponentList().sizeOfComponentArray() > 0) {
+                xbSystem.setComponents(createComponents(absProcess.getComponents()));
+            }
         }
     }
 

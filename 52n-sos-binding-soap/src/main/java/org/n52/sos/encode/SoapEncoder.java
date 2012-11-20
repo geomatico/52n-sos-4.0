@@ -42,8 +42,12 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
 
+import net.opengis.ows.x11.ExceptionDocument;
+import net.opengis.ows.x11.ExceptionType;
+
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.apache.xmlbeans.XmlString;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsException;
@@ -61,10 +65,20 @@ import org.n52.sos.soap.SoapResponse;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3CConstants;
+import org.n52.sos.util.XmlHelper;
+import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsa.WsaConstants;
 import org.n52.sos.wsa.WsaHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3.x2003.x05.soapEnvelope.Body;
+import org.w3.x2003.x05.soapEnvelope.Envelope;
+import org.w3.x2003.x05.soapEnvelope.EnvelopeDocument;
+import org.w3.x2003.x05.soapEnvelope.Fault;
+import org.w3.x2003.x05.soapEnvelope.FaultDocument;
+import org.w3.x2003.x05.soapEnvelope.Faultcode;
+import org.w3.x2003.x05.soapEnvelope.Reasontext;
+import org.w3.x2003.x05.soapEnvelope.Subcode;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -75,11 +89,11 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
     private static Logger LOGGER = LoggerFactory.getLogger(SoapEncoder.class);
 
     private List<EncoderKeyType> encoderKeyTypes;
-    
+
     private Map<SupportedTypeKey, Set<String>> supportedTypes;
-    
+
     private Set<String> conformanceClasses;
-    
+
     /**
      * constructor
      */
@@ -105,7 +119,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
     public List<EncoderKeyType> getEncoderKeyType() {
         return encoderKeyTypes;
     }
-    
+
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
         return supportedTypes;
@@ -118,7 +132,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
 
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
     }
-    
+
     @Override
     public String getContentType() {
         return "application/soap+xml";
@@ -132,7 +146,15 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
     @Override
     public ServiceResponse encode(SoapResponse response, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
-        SoapResponse soapResponse = (SoapResponse) response;
+        if (response.getSoapVersion().equalsIgnoreCase(SOAPConstants.SOAP_1_1_PROTOCOL)) {
+            return encodeSoap11Response(response);
+        } else {
+            return encodeSoap12Response(response);
+        }
+
+    }
+
+    private ServiceResponse encodeSoap11Response(SoapResponse soapResponse) throws OwsExceptionReport {
         String soapVersion = soapResponse.getSoapVersion();
         SOAPMessage soapResponseMessage = null;
         String action = null;
@@ -178,11 +200,10 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
                 soapResponseMessage.getSOAPHeader().detachNode();
             }
             soapResponseMessage.setProperty(SOAPMessage.WRITE_XML_DECLARATION, "true");
-            
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             soapResponseMessage.writeTo(baos);
             boolean applicationZip = false;
-            if (soapResponse.getSoapBodyContent() != null){
+            if (soapResponse.getSoapBodyContent() != null) {
                 applicationZip = soapResponse.getSoapBodyContent().getApplyGzipCompression();
             }
             return new ServiceResponse(baos, SosConstants.CONTENT_TYPE_XML, applicationZip, true);
@@ -264,7 +285,8 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
      */
     private String createSOAPFaultFromExceptionResponse(SOAPFault soapFault, OwsExceptionReport owsExceptionReport)
             throws SOAPException {
-        // FIXME: check and fix support for ExceptionReport with multiple exceptions!
+        // FIXME: check and fix support for ExceptionReport with multiple
+        // exceptions!
         if (owsExceptionReport.getExceptions() != null && !owsExceptionReport.getExceptions().isEmpty()) {
             OwsException firstException = owsExceptionReport.getExceptions().get(0);
             if (soapFault.getNamespaceURI().equalsIgnoreCase(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE)) {
@@ -336,15 +358,15 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
                 exceptionText.append("\n");
             }
         }
-//        exRep.addAttribute(new QName(OWSConstants.NS_OWS, OWSConstants.EN_EXCEPTION_CODE, OWSConstants.NS_OWS_PREFIX),
-//                code);
-        exRep.addAttribute(new QName(OWSConstants.EN_EXCEPTION_CODE),
-                code);
+        // exRep.addAttribute(new QName(OWSConstants.NS_OWS,
+        // OWSConstants.EN_EXCEPTION_CODE, OWSConstants.NS_OWS_PREFIX),
+        // code);
+        exRep.addAttribute(new QName(OWSConstants.EN_EXCEPTION_CODE), code);
         if (locator != null && !locator.equals("")) {
-//            exRep.addAttribute(new QName(OWSConstants.NS_OWS, OWSConstants.EN_LOCATOR, OWSConstants.NS_OWS_PREFIX),
-//                    locator);
-            exRep.addAttribute(new QName(OWSConstants.EN_LOCATOR),
-                    locator);
+            // exRep.addAttribute(new QName(OWSConstants.NS_OWS,
+            // OWSConstants.EN_LOCATOR, OWSConstants.NS_OWS_PREFIX),
+            // locator);
+            exRep.addAttribute(new QName(OWSConstants.EN_LOCATOR), locator);
         }
         if (exceptionText.length() != 0) {
             SOAPElement execText =
@@ -352,6 +374,179 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
                             OWSConstants.NS_OWS_PREFIX));
             execText.setTextContent(exceptionText.toString());
         }
+    }
+
+    private ServiceResponse encodeSoap12Response(SoapResponse response) throws OwsExceptionReport {
+        String action = null;
+        EnvelopeDocument envelopeDoc = EnvelopeDocument.Factory.newInstance();
+        Envelope envelope = envelopeDoc.addNewEnvelope();
+        Body body = envelope.addNewBody();
+        if (response.getSoapFault() != null) {
+            body.set(createSOAP12Fault(response.getSoapFault()));
+        } else {
+            if (response.getException() != null) {
+                if (response.getException().getExceptions() != null
+                        && !response.getException().getExceptions().isEmpty()) {
+                    OwsException firstException = response.getException().getExceptions().get(0);
+                    action = SoapHelper.getExceptionActionURI(firstException.getCode());
+                }
+                body.set(createSOAP12FaultFromExceptionResponse(response.getException()));
+                List<String> schemaLocations = new ArrayList<String>();
+                schemaLocations.add(N52XmlHelper.getSchemaLocationForSOAP12());
+                schemaLocations.add(N52XmlHelper.getSchemaLocationForOWS110Exception());
+                N52XmlHelper.setSchemaLocationsToDocument(envelopeDoc, schemaLocations);
+            } else {
+                action = response.getSoapAction();
+                XmlObject bodyContent = createSOAP12Body(response.getSoapBodyContent());
+                String value = null;
+                Node nodeToRemove = null;
+                NamedNodeMap attributeMap = bodyContent.getDomNode().getFirstChild().getAttributes();
+                for (int i = 0; i < attributeMap.getLength(); i++) {
+                    Node node = attributeMap.item(i);
+                    if (node.getLocalName().equals(W3CConstants.AN_SCHEMA_LOCATION)) {
+                        value = node.getNodeValue();
+                        nodeToRemove = node;
+                    }
+                }
+                if (nodeToRemove != null) {
+                    attributeMap.removeNamedItem(nodeToRemove.getNodeName());
+                }
+                List<String> schemaLocations = new ArrayList<String>();
+                schemaLocations.add(N52XmlHelper.getSchemaLocationForSOAP12());
+                if (value != null && !value.isEmpty()) {
+                    schemaLocations.add(value);
+                }
+                N52XmlHelper.setSchemaLocationsToDocument(envelopeDoc, schemaLocations);
+                body.set(bodyContent);
+            }
+        }
+        
+        // if (response.getHeader() != null) {
+        // Map<String, SoapHeader> headers = response.getHeader();
+        // for (String namespace : headers.keySet()) {
+        // SoapHeader header = headers.get(namespace);
+        // if (namespace.equals(WsaConstants.NS_WSA)) {
+        // WsaHeader wsa = (WsaHeader) header;
+        // wsa.setActionValue(action);
+        // }
+        // try {
+        // IEncoder encoder = Configurator.getInstance().getEncoder(namespace);
+        // if (encoder != null) {
+        // Map<QName, String> headerElements = (Map<QName, String>)
+        // encoder.encode(header);
+        // for (QName qName : headerElements.keySet()) {
+        // soapResponseMessage.getSOAPHeader().addChildElement(qName)
+        // .setTextContent(headerElements.get(qName));
+        // }
+        // }
+        // } catch (OwsExceptionReport owse) {
+        // throw owse;
+        // }
+        // }
+        //
+        // } else {
+        // soapResponseMessage.getSOAPHeader().detachNode();
+        // }
+
+        // TODO for testing an validating
+        checkAndValidateSoapMessage(envelopeDoc);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            envelopeDoc.save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
+
+            boolean applicationZip = false;
+            if (response.getSoapBodyContent() != null) {
+                applicationZip = response.getSoapBodyContent().getApplyGzipCompression();
+            }
+            return new ServiceResponse(baos, SosConstants.CONTENT_TYPE_XML, applicationZip, true);
+        } catch (IOException e) {
+            String exceptionText = "Error while encoding SOAPMessage!";
+            LOGGER.debug(exceptionText, e);
+            throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+        }
+    }
+
+    private XmlObject createSOAP12Body(ServiceResponse response) throws OwsExceptionReport {
+        try {
+            return XmlObject.Factory.parse(new String(response.getByteArray()));
+        } catch (XmlException xmle) {
+            String exceptionText = "Error while creating SOAP body!";
+            LOGGER.error(exceptionText, xmle);
+            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+        }
+    }
+
+    private XmlObject createSOAP12Fault(SoapFault soapFault) {
+        FaultDocument faultDoc = FaultDocument.Factory.newInstance();
+        Fault fault = faultDoc.addNewFault();
+        fault.addNewCode().setValue(soapFault.getFaultCode());
+        Reasontext addNewText = fault.addNewReason().addNewText();
+        addNewText.setLang(soapFault.getLocale().getDisplayLanguage());
+        addNewText.setStringValue(soapFault.getFaultReason());
+        if (soapFault.getDetailText() != null) {
+            XmlString xmlString = XmlString.Factory.newInstance();
+            xmlString.setStringValue(soapFault.getDetailText());
+            fault.addNewDetail().set(xmlString);
+        }
+        return faultDoc;
+    }
+
+    private XmlObject createSOAP12FaultFromExceptionResponse(OwsExceptionReport owsExceptionReport) {
+        FaultDocument faultDoc = FaultDocument.Factory.newInstance();
+        Fault fault = faultDoc.addNewFault();
+        Faultcode code = fault.addNewCode();
+        code.setValue(SOAPConstants.SOAP_SENDER_FAULT);
+
+        if (owsExceptionReport.getExceptions() != null && !owsExceptionReport.getExceptions().isEmpty()) {
+            OwsException firstException = owsExceptionReport.getExceptions().get(0);
+            Subcode subcode = code.addNewSubcode();
+            QName qName = null;
+            if (firstException.getCode() != null) {
+                qName =
+                        new QName(OWSConstants.NS_OWS, firstException.getCode().toString(), OWSConstants.NS_OWS_PREFIX);
+            } else {
+                qName =
+                        new QName(OWSConstants.NS_OWS, OwsExceptionCode.NoApplicableCode.name(),
+                                OWSConstants.NS_OWS_PREFIX);
+            }
+            subcode.setValue(qName);
+            Reasontext addNewText = fault.addNewReason().addNewText();
+            addNewText.setLang(Locale.ENGLISH.getDisplayLanguage());
+            addNewText.setStringValue(SoapHelper.getSoapFaultReasonText(firstException.getCode()));
+            ExceptionDocument exceptionDoc = ExceptionDocument.Factory.newInstance();
+            ExceptionType exception = exceptionDoc.addNewException();
+            boolean first = true;
+            for (OwsException owsException : owsExceptionReport.getExceptions()) {
+                if (first) {
+                    exception.setExceptionCode(owsException.getCode().toString());
+                    if (owsException.getLocator() != null && !owsException.getLocator().isEmpty()) {
+                        exception.setLocator(owsException.getLocator());
+                    }
+                }
+                StringBuilder exceptionText = new StringBuilder();
+                for (String text : owsException.getMessages()) {
+                    exceptionText.append(text);
+                    exceptionText.append("\n");
+                }
+                if (owsException.getException() != null) {
+                    exceptionText.append("\n[EXEPTION]: \n");
+                    if (owsException.getException().getLocalizedMessage() != null
+                            && !owsException.getException().getLocalizedMessage().isEmpty()) {
+                        exceptionText.append(owsException.getException().getLocalizedMessage());
+                        exceptionText.append("\n");
+                    }
+                    if (owsException.getException().getMessage() != null
+                            && !owsException.getException().getMessage().isEmpty()) {
+                        exceptionText.append(owsException.getException().getMessage());
+                        exceptionText.append("\n");
+                    }
+                }
+                exception.addExceptionText(exceptionText.toString());
+            }
+            fault.addNewDetail().set(exceptionDoc);
+        }
+        return faultDoc;
     }
 
     /**
@@ -388,31 +583,42 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
         string.append(envelope.getNamespaceURI());
         string.append(" ");
         string.append(envelope.getNamespaceURI());
-//        if (soapResponseMessage.getSOAPPart().getEnvelope().getNamespaceURI()
-//                .equalsIgnoreCase(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE)) {
-//            string.append(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE + " http://schemas.xmlsoap.org/soap/envelope");
-//        } else if (soapResponseMessage.getSOAPPart().getEnvelope().getNamespaceURI()
-//                .equalsIgnoreCase(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE)) {
-//            string.append(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE + " http://www.w3.org/2003/05/soap-envelope");
-//
-//        }
+        // if (soapResponseMessage.getSOAPPart().getEnvelope().getNamespaceURI()
+        // .equalsIgnoreCase(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE)) {
+        // string.append(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE +
+        // " http://schemas.xmlsoap.org/soap/envelope");
+        // } else if
+        // (soapResponseMessage.getSOAPPart().getEnvelope().getNamespaceURI()
+        // .equalsIgnoreCase(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE)) {
+        // string.append(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE +
+        // " http://www.w3.org/2003/05/soap-envelope");
+        //
+        // }
         if (value != null && !value.isEmpty()) {
             string.append(" ");
             string.append(value);
         }
-        QName qName = new QName(W3CConstants.NS_XSI, W3CConstants.AN_SCHEMA_LOCATION, W3CConstants.NS_XSI_PREFIX);
-        envelope.addAttribute(qName, string.toString());
+        envelope.addAttribute(N52XmlHelper.getSchemaLocationQNameWithPrefix(), string.toString());
         value = string.toString();
     }
 
     private void addSchemaLocationForExceptionToSOAPMessage(SOAPMessage soapResponseMessage) throws SOAPException {
         SOAPEnvelope envelope = soapResponseMessage.getSOAPPart().getEnvelope();
+        envelope.addNamespaceDeclaration(W3CConstants.NS_XSI_PREFIX, W3CConstants.NS_XSI);
         StringBuilder schemaLocation = new StringBuilder();
         schemaLocation.append(envelope.getNamespaceURI());
         schemaLocation.append(" ");
         schemaLocation.append(envelope.getNamespaceURI());
         schemaLocation.append(" ");
-        schemaLocation.append(N52XmlHelper.getSchemaLocationForOWS110());
-        envelope.addAttribute(N52XmlHelper.getSchemaLocationQName(), schemaLocation.toString());
+        schemaLocation.append(N52XmlHelper.getSchemaLocationForOWS110Exception());
+        envelope.addAttribute(N52XmlHelper.getSchemaLocationQNameWithPrefix(), schemaLocation.toString());
+    }
+
+    private void checkAndValidateSoapMessage(XmlObject response) {
+        try {
+            XmlHelper.validateDocument(response);
+        } catch (OwsExceptionReport e) {
+            LOGGER.info("Error while checking SOAP response", e);
+        }
     }
 }

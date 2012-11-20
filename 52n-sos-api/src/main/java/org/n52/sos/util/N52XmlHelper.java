@@ -26,6 +26,7 @@ package org.n52.sos.util;
 import java.util.List;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPConstants;
 
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
@@ -86,6 +87,15 @@ public class N52XmlHelper {
      */
     public static QName getSchemaLocationQName() {
         return new QName(W3CConstants.NS_XSI, W3CConstants.AN_SCHEMA_LOCATION);
+    }
+    
+    /**
+     * W3C XSI schema location with prefix
+     * 
+     * @return QName of schema location
+     */
+    public static QName getSchemaLocationQNameWithPrefix() {
+        return new QName(W3CConstants.NS_XSI, W3CConstants.AN_SCHEMA_LOCATION, W3CConstants.NS_XSI_PREFIX);
     }
 
     /**
@@ -159,6 +169,15 @@ public class N52XmlHelper {
     public static String getSchemaLocationForOWS110() {
         return OWSConstants.NS_OWS + " " + OWSConstants.SCHEMA_LOCATION_OWS;
     }
+    
+    /**
+     * OWS 1.1.0 schema location
+     * 
+     * @return QName of schema location
+     */
+    public static String getSchemaLocationForOWS110Exception() {
+        return OWSConstants.NS_OWS + " " + OWSConstants.SCHEMA_LOCATION_OWS_EXCEPTIONREPORT;
+    }
 
     /**
      * Sampling 1.0.0 schema location
@@ -230,6 +249,10 @@ public class N52XmlHelper {
      */
     public static String getSchemaLocationForXLINK() {
         return W3CConstants.NS_XLINK + " " + W3CConstants.SCHEMA_LOCATION_XLINK;
+    }
+
+    public static String getSchemaLocationForSOAP12() {
+        return SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE + " " + SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE;
     }
 
 }
