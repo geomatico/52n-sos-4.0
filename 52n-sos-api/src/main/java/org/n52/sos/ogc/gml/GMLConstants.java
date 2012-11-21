@@ -74,12 +74,16 @@ public class GMLConstants {
     public static final String EN_ENVELOPE = "Envelope";
 
     public static final String EN_ABSTRACT_TIME_OBJECT = "_TimeObject";
+	
+	public static final String EN_ABSTRACT_TIME_OBJECT_32 = "AbstractTimeObject";
 
     public static final String EN_ABSTRACT_ENCODING = "_Encoding";
 
     public static final String EN_ABSTRACT_OBSERVATION = "AbstractObservation";
 
     public static final String EN_ABSTRACT_FEATURE = "_Feature";
+	
+	public static final String EN_ABSTRACT_FEATURE_32 = "AbstractFeature";
 
     public static final String EN_ABSTRACT_FEATURE_COLLECTION = "_FeatureCollection";
 
@@ -151,6 +155,12 @@ public class GMLConstants {
 
     public static final QName QN_ABSTRACT_TIME_GEOM_PRIM =
             new QName(NS_GML, EN_ABSTRACT_TIME_GEOM_PRIM, NS_GML_PREFIX);
+	
+	public static final QName QN_ABSTRACT_FEATURE_GML = new QName(GMLConstants.NS_GML, GMLConstants.EN_ABSTRACT_FEATURE, NS_GML_PREFIX);
+	
+	public static final QName QN_ABSTRACT_FEATURE_GML_32 = new QName(GMLConstants.NS_GML_32, GMLConstants.EN_ABSTRACT_FEATURE_32, NS_GML_PREFIX);
+	
+	public static final QName QN_ABSTRACT_TIME_32 = new QName(GMLConstants.NS_GML_32, GMLConstants.EN_ABSTRACT_TIME_OBJECT_32, NS_GML_PREFIX);
 
     /** string constant for ascending sorting order */
     public static final String SORT_ORDER_ASC = SortingOrder.ASC.name();

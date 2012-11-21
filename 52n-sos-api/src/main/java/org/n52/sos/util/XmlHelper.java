@@ -43,7 +43,10 @@ import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlValidationError;
 import org.n52.sos.exception.IExceptionCode;
+import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,19 +65,6 @@ public class XmlHelper {
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlHelper.class);
-
-    /**
-     * use this list to define special validation cases (mostly substitution
-     * groups)
-     */
-    private static List<LaxValidationCase> laxValidationCases;
-    static {
-        laxValidationCases = new ArrayList<LaxValidationCase>();
-        laxValidationCases.add(new GML311AbstractFeatureLaxCase());
-        laxValidationCases.add(new GML321AbstractFeatureLaxCase());
-        laxValidationCases.add(new GML321AbstractTimeLaxCase());
-        laxValidationCases.add(new SosInsertionMetadataLaxCase());
-    }
 
     /**
      * Parse XML document from HTTP-Post request
@@ -173,7 +163,7 @@ public class XmlHelper {
                 XmlError error = iter.next();
                 boolean shouldPass = false;
                 if (error instanceof XmlValidationError) {
-                    for (LaxValidationCase lvc : laxValidationCases) {
+                    for (LaxValidationCase lvc : LaxValidationCase.values()) {
                         if (lvc.shouldPass((XmlValidationError) error)) {
                             shouldPass = true;
                             break;
@@ -313,85 +303,52 @@ public class XmlHelper {
      * Interface for providing exceptional cases in XML validation (e.g.
      * substituation groups).
      */
-    private interface LaxValidationCase {
+    private enum LaxValidationCase {
+		ABSTRACT_OFFERING {
+			@Override
+			public boolean shouldPass(XmlValidationError xve) {
+				return xve.getExpectedQNames() != null
+						&& xve.getExpectedQNames().contains(SWEConstants.QN_ABSTRACT_OFFERING)
+						&& xve.getOffendingQName() != null
+						&& xve.getOffendingQName().equals(Sos2Constants.QN_OBSERVATION_OFFERING);
+			}
+		},
+		/**
+		 * Allow substitutions of gml:AbstractFeature. This lax validation lets
+		 * pass every child, hence it checks not _if_ this is a valid
+		 * substitution.
+		 */
+		ABSTRACT_FEATURE_GML {
+			@Override
+			public boolean shouldPass(XmlValidationError xve) {
+				return xve.getExpectedQNames() != null 
+						&& (xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_FEATURE_GML)
+							|| xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_FEATURE_GML_32));
+			}
+		},
+		ABSTRACT_TIME_GML_3_2_1 {
+			@Override
+			public boolean shouldPass(XmlValidationError xve) {
+				return xve.getExpectedQNames() != null 
+						&& xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_TIME_32);
+			}
+		},
+		SOS_INSERTION_META_DATA {
+			@Override
+			public boolean shouldPass(XmlValidationError xve) {
+				return xve.getFieldQName() != null && xve.getExpectedQNames() != null
+					&& xve.getFieldQName().equals(SWEConstants.QN_METADATA)
+					&& xve.getExpectedQNames().contains(SWEConstants.QN_INSERTION_METADATA) 
+					&& (xve.getMessage().contains(BEFORE_END_CONTENT_ELEMENT) || (xve.getOffendingQName() != null 
+							&& xve.getOffendingQName().equals(Sos2Constants.QN_SOS_INSERTION_METADATA)));
+			}
+		};
+		
+		private static final String BEFORE_END_CONTENT_ELEMENT = "before the end of the content in element";
 
-        public boolean shouldPass(XmlValidationError xve);
-
-    }
-
-    /**
-     * Allow substitutions of gml:AbstractFeature. This lax validation lets pass
-     * every child, hence it checks not _if_ this is a valid substitution.
-     */
-    private static class GML311AbstractFeatureLaxCase implements LaxValidationCase {
-
-        private static final Object FEATURE_QN = new QName("http://www.opengis.net/gml", "_Feature");
-
-        @Override
-        public boolean shouldPass(XmlValidationError xve) {
-            if (xve.getExpectedQNames() != null && xve.getExpectedQNames().contains(FEATURE_QN)) {
-                return true;
-            }
-            return false;
-        }
-
-    }
-
-    private static class GML321AbstractFeatureLaxCase implements LaxValidationCase {
-
-        private static final Object FEATURE_QN = new QName("http://www.opengis.net/gml/3.2", "AbstractFeature");
-
-        @Override
-        public boolean shouldPass(XmlValidationError xve) {
-            if (xve.getExpectedQNames() != null && xve.getExpectedQNames().contains(FEATURE_QN)) {
-                return true;
-            }
-            return false;
-        }
-
-    }
-
-    private static class GML321AbstractTimeLaxCase implements LaxValidationCase {
-
-        private static final Object TIME_QN = new QName("http://www.opengis.net/gml/3.2", "AbstractTimeObject");
-
-        @Override
-        public boolean shouldPass(XmlValidationError xve) {
-            if (xve.getExpectedQNames() != null && xve.getExpectedQNames().contains(TIME_QN)) {
-                return true;
-            }
-            return false;
-        }
-
-    }
-
-    private static class SosInsertionMetadataLaxCase implements LaxValidationCase {
-
-        private static final Object INSERTION_METADATA_QN = new QName("http://www.opengis.net/swes/2.0",
-                "InsertionMetadata");
-
-        private static final Object SOS_INSERTION_METADATA_QN = new QName("http://www.opengis.net/sos/2.0",
-                "SosInsertionMetadata");
-
-        private static final Object METADATA_QN = new QName("http://www.opengis.net/swes/2.0", "metadata");
-        
-        private static final String BEFORE_END_CONTENT_ELEMENT = "before the end of the content in element";
-
-        @Override
-        public boolean shouldPass(XmlValidationError xve) {
-            if (xve.getFieldQName() != null && xve.getFieldQName().equals(METADATA_QN)
-                    && xve.getExpectedQNames() != null && xve.getExpectedQNames().contains(INSERTION_METADATA_QN)) {
-                if (xve.getOffendingQName() != null && xve.getOffendingQName().equals(SOS_INSERTION_METADATA_QN)) {
-                    return true;
-                } else if (xve.getMessage().contains(BEFORE_END_CONTENT_ELEMENT)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-    }
-
+		public abstract boolean shouldPass(XmlValidationError xve);
+	}
+	
     /**
      * Loads a XML document from File.
      * 

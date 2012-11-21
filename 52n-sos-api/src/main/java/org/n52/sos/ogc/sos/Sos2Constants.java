@@ -52,11 +52,6 @@ public final class Sos2Constants {
      */
     public static final String EN_OBSERVATION_OFFERING = "ObservationOffering";
 
-    public static final String EN_ABSTRACT_OFFERING = "AbstractOffering";
-
-    public static final QName QN_OBSERVATION_OFFERING = new QName(NS_SOS_20, EN_OBSERVATION_OFFERING,
-            SosConstants.NS_SOS_PREFIX);
-
     public static final String EN_OBSERVED_AREA = "observedArea";
 
     public static final String EN_PHENOMENON_TIME = "phenomenonTime";
@@ -66,6 +61,12 @@ public final class Sos2Constants {
     public static final String EN_OBSERVATION_TYPE = "observationType";
 
     public static final String EN_FEATURE_OF_INTEREST_TYPE = "featureOfInterestType";
+	
+	public static final String EN_SOS_INSERTION_METADATA = "SosInsertionMetadata";
+	
+	public static final QName QN_OBSERVATION_OFFERING = new QName(NS_SOS_20, EN_OBSERVATION_OFFERING, SosConstants.NS_SOS_PREFIX);
+	
+	public static final QName QN_SOS_INSERTION_METADATA = new QName(NS_SOS_20, EN_SOS_INSERTION_METADATA, SosConstants.NS_SOS_PREFIX);
 
     /** private constructor, to enforce use of instance instead of instantiation */
     private Sos2Constants() {
