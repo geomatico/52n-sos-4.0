@@ -54,8 +54,7 @@ public class Util4Exceptions {
      *         MissingParameterValue and corresponding message
      * 
      */
-    public static OwsExceptionReport createMissingParameterValueException(String parameterName)
-            throws OwsExceptionReport {
+    public static OwsExceptionReport createMissingParameterValueException(String parameterName) {
         OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
         owse.addCodedException(OwsExceptionCode.MissingParameterValue, parameterName,
                 String.format("The value for the parameter '%s' is missing in the request!", parameterName));
@@ -71,16 +70,14 @@ public class Util4Exceptions {
      *         ResponseExceedsSizeLimit and corresponding message
      * 
      */
-    public static OwsExceptionReport createResponseExceedsSizeLimitException(int responseSize, int responseLimit)
-            throws OwsExceptionReport {
+    public static OwsExceptionReport createResponseExceedsSizeLimitException(int responseSize, int responseLimit) {
         OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
         owse.addCodedException(SosExceptionCode.ResponseExceedsSizeLimit, null, "The request matched " + responseSize
                 + " observations, which exceeds this " + " server's limit of " + responseLimit);
         return owse;
     }
     
-    public static OwsExceptionReport createResponseExceedsSizeLimitException(String message)
-            throws OwsExceptionReport {
+    public static OwsExceptionReport createResponseExceedsSizeLimitException(String message) {
         OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
         owse.addCodedException(SosExceptionCode.ResponseExceedsSizeLimit, null, message);
         return owse;

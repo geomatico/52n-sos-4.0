@@ -34,8 +34,7 @@ public class SosSweCategory extends SosSweAbstractSimpleType {
     @Override
     public SweSimpleType getSimpleType()
     {
-        // TODO Auto-generated method "getSimpleType"
-        return null;
+        return SweSimpleType.Category;
     }
 
     @Override

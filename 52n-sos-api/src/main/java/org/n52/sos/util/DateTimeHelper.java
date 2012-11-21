@@ -34,7 +34,6 @@ import org.joda.time.format.ISOPeriodFormat;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,12 +71,12 @@ public class DateTimeHelper {
      * @param timeString
      *            Time String
      * @return DateTime object
-     * @throws OwsExceptionReport
+     * @throws DateTimeException
      *             IF an error occurs.
      */
     public static DateTime parseIsoString2DateTime(String timeString) throws DateTimeException {
         checkForValidity(timeString);
-        if (timeString == null || timeString.equals("")) {
+        if (timeString == null || timeString.isEmpty()) {
             return null;
         }
         try {
@@ -151,7 +150,7 @@ public class DateTimeHelper {
      * @param dateTime
      *            Time object
      * @return Response formatted time String
-     * @throws OwsExceptionReport
+     * @throws DateTimeException
      *             If an error occurs.
      */
     public static String formatDateTime2ResponseString(DateTime dateTime) throws DateTimeException {
@@ -164,12 +163,12 @@ public class DateTimeHelper {
      * @param dateTime
      *            Time object
      * @return Specified formatted time String
-     * @throws OwsExceptionReport
+     * @throws DateTimeException
      *             If an error occurs.
      */
     public static String formatDateTime2FormattedString(DateTime dateTime, String dateFormat) throws DateTimeException {
         try {
-            if (dateFormat == null || dateFormat.equals("")) {
+            if (dateFormat == null || dateFormat.isEmpty()) {
                 return formatDateTime2IsoString(dateTime);
             } else {
                 if (dateTime == null) {

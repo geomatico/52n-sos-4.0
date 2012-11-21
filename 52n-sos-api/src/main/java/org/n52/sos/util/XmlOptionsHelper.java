@@ -139,10 +139,6 @@ public class XmlOptionsHelper {
      * @return instance
      */
     public static synchronized XmlOptionsHelper getInstance() {
-        if (instance == null) {
-            instance = new XmlOptionsHelper();
-            instance.initialize("UTF-8");
-        }
-        return instance;
+        return getInstance("UTF-8", false);
     }
 }

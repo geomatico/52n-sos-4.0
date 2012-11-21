@@ -79,4 +79,7 @@ public class SFConstants {
     public static final String FT_SAMPLINGPOINT = NS_SA_PREFIX + ":" + EN_SAMPLINGPOINT;
 
     public static final String FT_SAMPLINGSURFACE = NS_SA_PREFIX + ":" + EN_SAMPLINGSURFACE;
+
+    private SFConstants() {
+    }
 }

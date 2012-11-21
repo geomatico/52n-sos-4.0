@@ -80,15 +80,12 @@ public final class Sos2Constants {
         InsertSensor, DeleteSensor, InsertResult, InsertResultTemplate, GetResultTemplate, UpdateSensorDescription;
 
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (SosConstants.Operations.contains(s)) || (s.equals(Operations.InsertSensor.name()))
-                            || (s.equals(Operations.DeleteSensor.name()))
-                            || (s.equals(Operations.InsertResult.name()))
-                            || (s.equals(Operations.UpdateSensorDescription.name()))
-                            || (s.equals(Operations.InsertResultTemplate.name()))
-                            || (s.equals(Operations.GetResultTemplate.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return SosConstants.Operations.contains(s);
         }
     }
 
@@ -108,11 +105,12 @@ public final class Sos2Constants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (SosConstants.CapabilitiesSections.contains(s))
-                            || (s.equals(CapabilitiesSections.FilterCapabilities.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return SosConstants.CapabilitiesSections.contains(s);
         }
     }
 
@@ -129,12 +127,12 @@ public final class Sos2Constants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (SosConstants.GetObservationParams.contains(s))
-                            || (s.equals(GetObservationParams.temporalFilter.name()))
-                            || (s.equals(GetObservationParams.spatialFilter.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return SosConstants.GetObservationParams.contains(s);
         }
     }
 
@@ -154,11 +152,12 @@ public final class Sos2Constants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (OWSConstants.RequestParams.contains(s)) || (s.equals(InsertObservationParams.offering.name()))
-                            || (s.equals(InsertObservationParams.observation.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return OWSConstants.RequestParams.contains(s);
         }
     }
 
@@ -178,12 +177,12 @@ public final class Sos2Constants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (SosConstants.DescribeSensorParams.contains(s))
-                            || (s.equals(DescribeSensorParams.procedureDescriptionFormat.name()))
-                            || (s.equals(DescribeSensorParams.validTime.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return SosConstants.DescribeSensorParams.contains(s);
         }
     }
 
@@ -203,14 +202,12 @@ public final class Sos2Constants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (OWSConstants.RequestParams.contains(s))
-                            || (s.equals(GetFeatureOfInterestParams.featureOfInterest.name()))
-                            || (s.equals(GetFeatureOfInterestParams.observedProperty.name()))
-                            || (s.equals(GetFeatureOfInterestParams.procedure.name()))
-                            || (s.equals(GetFeatureOfInterestParams.spatialFilter.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return OWSConstants.RequestParams.contains(s);
         }
     }
 
@@ -218,11 +215,12 @@ public final class Sos2Constants {
         observation;
 
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (OWSConstants.RequestParams.contains(s))
-                            || (s.equals(GetObservationByIdParams.observation.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return OWSConstants.RequestParams.contains(s);
         }
     }
 
@@ -255,29 +253,25 @@ public final class Sos2Constants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (s.equals(InsertSensorParams.service.name())) || (s.equals(InsertSensorParams.version.name()))
-                            || (s.equals(InsertSensorParams.procedureDescriptionFormat.name()))
-                            || (s.equals(InsertSensorParams.procedureDescription.name()))
-                            || (s.equals(InsertSensorParams.observableProperty.name()))
-                            || (s.equals(InsertSensorParams.metadata.name()))
-                            || (s.equals(InsertSensorParams.featureOfInterestType.name()))
-                            || (s.equals(InsertSensorParams.observationType.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
     public enum DeleteSensorParams {
-        service, version, procedure;
+        service, version, procedure, procedureDescriptionFormat;
 
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (s.equals(DeleteSensorParams.service.name())) || (s.equals(DeleteSensorParams.version.name()))
-                            || (s.equals(DeleteSensorParams.procedure.name()))
-                            || (s.equals(UpdateSensorDescriptionParams.procedureDescriptionFormat.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
@@ -294,14 +288,12 @@ public final class Sos2Constants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (s.equals(UpdateSensorDescriptionParams.service.name()))
-                            || (s.equals(UpdateSensorDescriptionParams.version.name()))
-                            || (s.equals(UpdateSensorDescriptionParams.procedure.name()))
-                            || (s.equals(UpdateSensorDescriptionParams.procedureDescriptionFormat.name()))
-                            || (s.equals(UpdateSensorDescriptionParams.description.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 

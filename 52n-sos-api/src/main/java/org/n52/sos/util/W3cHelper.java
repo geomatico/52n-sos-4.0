@@ -37,6 +37,7 @@ import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -94,7 +95,7 @@ public class W3cHelper {
      *            local name
      * @return Text content.
      */
-    public static String getContentFromElement(org.w3c.dom.Element element, String namespaceURI, String localName) {
+    public static String getContentFromElement(Element element, String namespaceURI, String localName) {
         String elementContent = null;
         NodeList nodes = element.getElementsByTagNameNS(namespaceURI, localName);
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -103,4 +104,6 @@ public class W3cHelper {
         return elementContent;
     }
 
+    private W3cHelper() {
+    }
 }

@@ -51,4 +51,6 @@ public class OMHelper {
         return true;
     }
 
+    private OMHelper() {
+    }
 }

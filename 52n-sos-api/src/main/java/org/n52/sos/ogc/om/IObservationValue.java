@@ -28,15 +28,15 @@ import java.io.Serializable;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.om.values.IValue;
 
-public interface IObservationValue extends Serializable {
+public interface IObservationValue<T> extends Serializable {
     
     /** phenomenon or sampling time of the observation */
     public ITime getPhenomenonTime();
     
     public void setPhenomenonTime(ITime phenomenonTime);
 
-    public IValue getValue();
+    public IValue<T> getValue();
 
-    public void setValue(IValue value);
+    public void setValue(IValue<T> value);
 
 }

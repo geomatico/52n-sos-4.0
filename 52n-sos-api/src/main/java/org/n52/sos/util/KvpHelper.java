@@ -88,4 +88,6 @@ public class KvpHelper {
         return Arrays.asList(parameterValues.split(","));
     }
 
+    private KvpHelper() {
+    }
 }

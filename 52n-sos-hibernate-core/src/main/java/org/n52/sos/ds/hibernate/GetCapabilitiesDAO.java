@@ -66,7 +66,6 @@ import org.n52.sos.ogc.ows.SosServiceProvider;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.ogc.sos.SosInsertionCapabilities;
 import org.n52.sos.ogc.sos.SosOfferingsForContents;
 import org.n52.sos.request.GetCapabilitiesRequest;
@@ -79,8 +78,6 @@ import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Implementation of the interface IGetCapabilitiesDAO
@@ -160,13 +157,12 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
     public GetCapabilitiesResponse getCapabilities(GetCapabilitiesRequest request) throws OwsExceptionReport {
         Session session = null;
         try {
-            GetCapabilitiesRequest sosRequest = (GetCapabilitiesRequest) request;
             session = (Session) connectionProvider.getConnection();
             GetCapabilitiesResponse response = new GetCapabilitiesResponse();
             response.setService(SosConstants.SOS);
             if (request.getVersion() == null) {
-                if (sosRequest.getAcceptVersions() != null) {
-                    String[] acceptedVersion = sosRequest.getAcceptVersions();
+                if (request.getAcceptVersions() != null) {
+                    String[] acceptedVersion = request.getAcceptVersions();
                     for (int i = 0; i < acceptedVersion.length; i++) {
                         if (Configurator.getInstance().isVersionSupported(acceptedVersion[i])) {
                             response.setVersion(acceptedVersion[i]);
@@ -201,8 +197,8 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
             boolean all = false;
 
             // handle sections array and set requested sections 'true'
-            if (sosRequest.getSections() != null) {
-                for (String section : sosRequest.getSections()) {
+            if (request.getSections() != null) {
+                for (String section : request.getSections()) {
 
                     if (!section.isEmpty()) {
                         /*

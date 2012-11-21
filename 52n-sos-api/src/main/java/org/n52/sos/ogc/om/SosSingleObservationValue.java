@@ -31,28 +31,28 @@ import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.IValue;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 
-public class SosSingleObservationValue implements IObservationValue {
+public class SosSingleObservationValue<T> implements IObservationValue<T> {
 
     private ITime phenomenonTime;
 
-    private IValue value;
+    private IValue<T> value;
 
     private List<SosQuality> qualityList;
 
     public SosSingleObservationValue() {
     }
 
-    public SosSingleObservationValue(IValue value) {
+    public SosSingleObservationValue(IValue<T> value) {
         this.value = value;
     }
 
-    public SosSingleObservationValue(ITime phenomenonTime, IValue value, List<SosQuality> qualityList) {
+    public SosSingleObservationValue(ITime phenomenonTime, IValue<T> value, List<SosQuality> qualityList) {
         this.phenomenonTime = phenomenonTime;
         this.value = value;
         this.qualityList = qualityList;
     }
 
-    public SosSingleObservationValue(ITime phenomenonTime, IValue value) {
+    public SosSingleObservationValue(ITime phenomenonTime, IValue<T> value) {
         this.phenomenonTime = phenomenonTime;
         this.value = value;
     }
@@ -62,12 +62,13 @@ public class SosSingleObservationValue implements IObservationValue {
         return phenomenonTime;
     }
 
-    public IValue getValue() {
+    @Override
+    public IValue<T> getValue() {
         return value;
     }
 
     @Override
-    public void setValue(IValue value) {
+    public void setValue(IValue<T> value) {
         this.value = value;
     }
 
@@ -79,6 +80,7 @@ public class SosSingleObservationValue implements IObservationValue {
         return qualityList;
     }
 
+    @Override
     public void setPhenomenonTime(ITime phenomenonTime) {
         this.phenomenonTime = phenomenonTime;
     }

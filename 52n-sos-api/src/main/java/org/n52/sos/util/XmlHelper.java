@@ -35,7 +35,6 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.namespace.QName;
 
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlException;
@@ -152,7 +151,6 @@ public class XmlHelper {
         if (!isValid) {
 
             String message = null;
-            String parameterName = null;
 
             // getValidation error and throw service exception for the first
             // error
@@ -399,21 +397,30 @@ public class XmlHelper {
     public static void makeGmlIdsUnique(Node node, Map<String, Integer> foundIds) {
         // check this node's attributes
         NamedNodeMap attributes = node.getAttributes();
+        String nodeNamespace = node.getNamespaceURI();
         if (attributes != null) {
             for (int i = 0, len = attributes.getLength(); i < len; i++) {
                 Attr attr = (Attr) attributes.item(i);
-                // TODO: what if ns of gml has prefix other than "gml"?
-                if (attr.getName().equals("gml:id")) {
-                    String gmlId = attr.getValue();
-                    if (foundIds.containsKey(gmlId)) {
-                        // id has already been found, suffix this one with the
-                        // found count for this id
-                        attr.setValue(gmlId + foundIds.get(gmlId));
-                        // increment the found count for this id
-                        foundIds.put(gmlId, foundIds.get(gmlId) + 1);
-                    } else {
-                        // id is new, add it to the foundIds map
-                        foundIds.put(gmlId, 1);
+                if (attr.getLocalName().equals(GMLConstants.AN_ID)) {
+                    String attrNamespace = attr.getNamespaceURI();
+                    if ((attrNamespace != null
+                            && GMLConstants.NS_GML.equals(attrNamespace)
+                            || GMLConstants.NS_GML_32.equals(attrNamespace))
+                        || (attrNamespace == null && nodeNamespace != null
+                            && GMLConstants.NS_GML.equals(nodeNamespace)
+                            || GMLConstants.NS_GML_32.equals(nodeNamespace))
+                        || (attr.getName().equals("gml:id"))) {
+                        String gmlId = attr.getValue();
+                        if (foundIds.containsKey(gmlId)) {
+                            // id has already been found, suffix this one with the
+                            // found count for this id
+                            attr.setValue(gmlId + foundIds.get(gmlId));
+                            // increment the found count for this id
+                            foundIds.put(gmlId, foundIds.get(gmlId) + 1);
+                        } else {
+                            // id is new, add it to the foundIds map
+                            foundIds.put(gmlId, 1);
+                        }
                     }
                 }
             }
@@ -443,30 +450,41 @@ public class XmlHelper {
 
     public static void updateGmlIDs(Node node, String gmlID, String oldGmlID) {
         // check this node's attributes
+        String nodeNamespace = node.getNamespaceURI();
         NamedNodeMap attributes = node.getAttributes();
         if (attributes != null) {
             for (int i = 0, len = attributes.getLength(); i < len; i++) {
                 Attr attr = (Attr) attributes.item(i);
-                if (attr.getName().equals("gml:id")) { // TODO how to handle other prefixes than gml for gml ns?
-                    if (oldGmlID == null) {
-                        oldGmlID = attr.getValue();
-                        attr.setValue((gmlID));
-                    } else {
-                        String helperString = attr.getValue();
-                        helperString = helperString.replace(oldGmlID, gmlID);
-                        attr.setValue(helperString);
+                if (attr.getLocalName().equals(GMLConstants.AN_ID)) {
+                    String attrNamespace = attr.getNamespaceURI();
+                    if ((attrNamespace != null
+                            && GMLConstants.NS_GML.equals(attrNamespace)
+                            || GMLConstants.NS_GML_32.equals(attrNamespace))
+                            || (attrNamespace == null && nodeNamespace != null
+                            && GMLConstants.NS_GML.equals(nodeNamespace)
+                            || GMLConstants.NS_GML_32.equals(nodeNamespace))
+                            || (attr.getName().equals("gml:id"))) {
+                        if (oldGmlID == null) {
+                            oldGmlID = attr.getValue();
+                            attr.setValue((gmlID));
+                        } else {
+                            String helperString = attr.getValue();
+                            helperString = helperString.replace(oldGmlID, gmlID);
+                            attr.setValue(helperString);
+                        }
                     }
                 }
             }
-        }
-
-        // recurse this node's children
-        NodeList children = node.getChildNodes();
-        if (children != null) {
-            for (int i = 0, len = children.getLength(); i < len; i++) {
-                updateGmlIDs(children.item(i), gmlID, oldGmlID);
+            // recurse this node's children
+            NodeList children = node.getChildNodes();
+            if (children != null) {
+                for (int i = 0, len = children.getLength(); i < len; i++) {
+                    updateGmlIDs(children.item(i), gmlID, oldGmlID);
+                }
             }
         }
     }
 
+    private XmlHelper() {
+    }
 }

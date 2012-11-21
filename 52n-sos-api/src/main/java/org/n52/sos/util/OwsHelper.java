@@ -141,7 +141,7 @@ public class OwsHelper {
     public static void checkAcceptedVersionsParameter(String versionsString, Set<String> supportedVersions)
             throws OwsExceptionReport {
         // check acceptVersions
-        if (versionsString != null && !versionsString.equals("")) {
+        if (versionsString != null && !versionsString.isEmpty()) {
             String[] versionsArray = versionsString.split(",");
             checkAcceptedVersionsParameter(Arrays.asList(versionsArray), supportedVersions);
         } else {
@@ -154,4 +154,6 @@ public class OwsHelper {
         }
     }
 
+    private OwsHelper() {
+    }
 }

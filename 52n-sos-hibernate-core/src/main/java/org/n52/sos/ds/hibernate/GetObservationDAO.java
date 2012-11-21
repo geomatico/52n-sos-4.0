@@ -241,7 +241,7 @@ public class GetObservationDAO implements IGetObservationDAO {
      */
     @Override
     public GetObservationResponse getObservation(GetObservationRequest request) throws OwsExceptionReport {
-        GetObservationRequest sosRequest = (GetObservationRequest) request;
+        GetObservationRequest sosRequest = request;
         // setting a global "now" for this request
         now = new DateTime();
         Session session = null;

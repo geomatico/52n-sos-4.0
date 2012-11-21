@@ -86,7 +86,7 @@ public class N52XmlHelper {
      * @return QName of schema location
      */
     public static QName getSchemaLocationQName() {
-        return new QName(W3CConstants.NS_XSI, W3CConstants.AN_SCHEMA_LOCATION);
+        return W3CConstants.QN_SCHEMA_LOCATION;
     }
     
     /**
@@ -95,7 +95,7 @@ public class N52XmlHelper {
      * @return QName of schema location
      */
     public static QName getSchemaLocationQNameWithPrefix() {
-        return new QName(W3CConstants.NS_XSI, W3CConstants.AN_SCHEMA_LOCATION, W3CConstants.NS_XSI_PREFIX);
+        return W3CConstants.QN_SCHEMA_LOCATION_PREFIXED;
     }
 
     /**
@@ -255,4 +255,6 @@ public class N52XmlHelper {
         return SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE + " " + SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE;
     }
 
+    private N52XmlHelper() {
+    }
 }

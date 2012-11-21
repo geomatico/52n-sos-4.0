@@ -104,11 +104,12 @@ public class OWSConstants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (s.equals(RequestParams.request.name())) || (s.equals(RequestParams.service.name()))
-                            || (s.equals(RequestParams.version.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
@@ -127,5 +128,8 @@ public class OWSConstants {
     /** Exception levels */
     public enum ExceptionLevel {
         PlainExceptions, DetailedExceptions
+    }
+
+    private OWSConstants() {
     }
 }

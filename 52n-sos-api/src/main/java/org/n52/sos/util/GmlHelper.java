@@ -52,12 +52,13 @@ public class GmlHelper {
 
     public static QName getQnameForITime(ITime iTime) {
         if (iTime instanceof TimeInstant) {
-            return new QName(GMLConstants.NS_GML_32, GMLConstants.EN_TIME_INSTANT, GMLConstants.NS_GML);
+            return GMLConstants.QN_TIME_INSTANT_32;
         } else if (iTime instanceof TimePeriod) {
-            return new QName(GMLConstants.NS_GML_32, GMLConstants.EN_TIME_PERIOD, GMLConstants.NS_GML);
+            return GMLConstants.QN_TIME_PERIOD_32;
         }
-        return new QName(GMLConstants.NS_GML_32, GMLConstants.EN_ABSTRACT_TIME_OBJECT, GMLConstants.NS_GML);
+        return GMLConstants.QN_ABSTRACT_TIME_32;
     }
 
-
+    private GmlHelper() {
+    }
 }

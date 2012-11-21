@@ -102,7 +102,7 @@ public class JTSHelper {
 
             // switch coordinates
             Coordinate[] coordArraySource = sourceGeom.getCoordinates();
-            List<Coordinate> coordList = new ArrayList<Coordinate>();
+            List<Coordinate> coordList = new ArrayList<Coordinate>(coordArraySource.length);
             for (Coordinate coordinate : coordArraySource) {
                 if (Double.doubleToLongBits(coordinate.z) == Double.doubleToLongBits(Double.NaN)) {
                     coordList.add(new Coordinate(coordinate.y, coordinate.x, coordinate.z));
@@ -149,7 +149,7 @@ public class JTSHelper {
      * @return Switched coordinates as a String
      */
     public static String switchCoordinates4String(Geometry sourceGeom) {
-        StringBuffer switchedCoords = new StringBuffer();
+        StringBuilder switchedCoords = new StringBuilder();
         Coordinate[] sourceCoords = sourceGeom.getCoordinates();
 
         for (Coordinate coordinate : sourceCoords) {
@@ -160,7 +160,7 @@ public class JTSHelper {
                 switchedCoords.append(" ");
             } else {
                 switchedCoords.append(" ");
-                switchedCoords.append(coordinate.z + " ");
+                switchedCoords.append(coordinate.z).append(" ");
             }
         }
 
@@ -178,7 +178,7 @@ public class JTSHelper {
      * @return Coordinates as String
      */
     public static String getCoordinates4String(Geometry sourceGeom) {
-        StringBuffer stringCoords = new StringBuffer();
+        StringBuilder stringCoords = new StringBuilder();
         Coordinate[] sourceCoords = sourceGeom.getCoordinates();
 
         for (Coordinate coordinate : sourceCoords) {
@@ -189,7 +189,7 @@ public class JTSHelper {
                 stringCoords.append(" ");
             } else {
                 stringCoords.append(" ");
-                stringCoords.append(coordinate.z + " ");
+                stringCoords.append(coordinate.z).append(" ");
             }
         }
 
@@ -242,12 +242,15 @@ public class JTSHelper {
         String maxX = upperCorner.split(" ")[0];
         String maxY = upperCorner.split(" ")[1];
         StringBuilder sb = new StringBuilder();
-        sb.append(JTSConstants.WKT_POLYGON + " ((");
-        sb.append(minX + " " + minY + ",");
-        sb.append(minX + " " + maxY + ",");
-        sb.append(maxX + " " + maxY + ",");
-        sb.append(maxX + " " + minY + ",");
-        sb.append(minX + " " + minY + "))");
+        sb.append(JTSConstants.WKT_POLYGON).append(" ((");
+        sb.append(minX).append(" ").append(minY).append(",");
+        sb.append(minX).append(" ").append(maxY).append(",");
+        sb.append(maxX).append(" ").append(maxY).append(",");
+        sb.append(maxX).append(" ").append(minY).append(",");
+        sb.append(minX).append(" ").append(minY).append("))");
         return sb.toString();
+    }
+
+    private JTSHelper() {
     }
 }

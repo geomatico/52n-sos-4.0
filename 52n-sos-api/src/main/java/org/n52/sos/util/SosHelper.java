@@ -69,6 +69,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import java.util.EnumMap;
 
 /**
  * Utility class for SOS
@@ -128,22 +129,22 @@ public class SosHelper {
     public static String getFoiGetUrl(String version, String serviceURL, String urlPattern) {
         StringBuilder url = new StringBuilder();
         // service URL
-        url.append(serviceURL + "?");
+        url.append(serviceURL).append("?");
         // URL pattern for KVP
         url.append(urlPattern);
         // ?
         url.append("?");
         // request
-        url.append(RequestParams.request.name() + "=" + SosConstants.Operations.GetFeatureOfInterest.name());
+        url.append(RequestParams.request.name()).append("=").append(SosConstants.Operations.GetFeatureOfInterest.name());
         // service
-        url.append("&" + OWSConstants.RequestParams.service.name() + "=" + SosConstants.SOS);
+        url.append("&").append(OWSConstants.RequestParams.service.name()).append("=").append(SosConstants.SOS);
         // version
-        url.append("&" + OWSConstants.RequestParams.version.name() + "=" + version);
+        url.append("&").append(OWSConstants.RequestParams.version.name()).append("=").append(version);
         // FOI identifier
         if (version.equalsIgnoreCase(Sos1Constants.SERVICEVERSION)) {
-            url.append("&" + Sos1Constants.GetFeatureOfInterestParams.featureOfInterestID.name() + "=");
+            url.append("&").append(Sos1Constants.GetFeatureOfInterestParams.featureOfInterestID.name()).append("=");
         } else {
-            url.append("&" + Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name() + "=");
+            url.append("&").append(Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name()).append("=");
         }
 
         return url.toString();
@@ -236,7 +237,7 @@ public class SosHelper {
      */
     public static int parseSrsName(String srsName, String srsNamePrefix) throws OwsExceptionReport {
         int srid = -1;
-        if (srsName != null && !srsName.equals("") && !srsName.equalsIgnoreCase("NOT_SET")) {
+        if (srsName != null && !srsName.isEmpty() && !srsName.equalsIgnoreCase("NOT_SET")) {
             try {
                 srid = Integer.valueOf(srsName.replace(srsNamePrefix, ""));
             } catch (NumberFormatException nfe) {
@@ -587,20 +588,20 @@ public class SosHelper {
         // ?
         url.append("?");
         // request
-        url.append(RequestParams.request.name() + "=" + SosConstants.Operations.DescribeSensor.name());
+        url.append(RequestParams.request.name()).append("=").append(SosConstants.Operations.DescribeSensor.name());
         // service
-        url.append("&" + OWSConstants.RequestParams.service.name() + "=" + SosConstants.SOS);
+        url.append("&").append(OWSConstants.RequestParams.service.name()).append("=").append(SosConstants.SOS);
         // version
-        url.append("&" + OWSConstants.RequestParams.version.name() + "=" + version);
+        url.append("&").append(OWSConstants.RequestParams.version.name()).append("=").append(version);
         // procedure
-        url.append("&" + SosConstants.DescribeSensorParams.procedure.name() + "=" + procedureId);
+        url.append("&").append(SosConstants.DescribeSensorParams.procedure.name()).append("=").append(procedureId);
         // outputFormat
         if (version.equalsIgnoreCase(Sos1Constants.SERVICEVERSION)) {
-            url.append("&" + Sos1Constants.DescribeSensorParams.outputFormat + "="
-                    + URLEncoder.encode(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE, "UTF-8"));
+            url.append("&").append(Sos1Constants.DescribeSensorParams.outputFormat).append("=")
+                    .append(URLEncoder.encode(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE, "UTF-8"));
         } else {
-            url.append("&" + Sos2Constants.DescribeSensorParams.procedureDescriptionFormat + "="
-                    + URLEncoder.encode(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL, "UTF-8"));
+            url.append("&").append(Sos2Constants.DescribeSensorParams.procedureDescriptionFormat).append("=")
+                    .append(URLEncoder.encode(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL, "UTF-8"));
         }
 
         return url.toString();
@@ -694,7 +695,7 @@ public class SosHelper {
      *            String containing the value of the responseFormat parameter
      * @return boolean true if application/zip
      */
-    public static boolean checkResponseFormatForZipCompression(String responseFormat) throws OwsExceptionReport {
+    public static boolean checkResponseFormatForZipCompression(String responseFormat) {
         if (responseFormat.equalsIgnoreCase(SosConstants.CONTENT_TYPE_ZIP)) {
             return true;
         }
@@ -710,7 +711,7 @@ public class SosHelper {
      *             if the value of the outputFormat parameter is incorrect
      */
     public static void checkProcedureOutputFormat(String outputFormat, String parameterName) throws OwsExceptionReport {
-        if (outputFormat == null || outputFormat.isEmpty() || outputFormat == SosConstants.PARAMETER_NOT_SET) {
+        if (outputFormat == null || outputFormat.isEmpty() || outputFormat.equals(SosConstants.PARAMETER_NOT_SET)) {
             String exceptionText =
                     "The value of the mandatory parameter '" + parameterName
                             + "' was not found in the request or is incorrect!";
@@ -883,9 +884,8 @@ public class SosHelper {
     }
 
     public static Map<MinMax, String> getMinMaxMapFromEnvelope(Envelope envelope) {
-        Map<MinMax, String> map = new HashMap<MinMax, String>();
-        String minValue = null;
-        String maxValue = null;
+        Map<MinMax, String> map = new EnumMap<MinMax, String>(MinMax.class);
+        String minValue, maxValue;
         if (Configurator.getInstance().switchCoordinatesForEPSG(Configurator.getInstance().getDefaultEPSG())) {
             minValue = envelope.getMinY() + " " + envelope.getMinX();
             maxValue = envelope.getMaxY() + " " + envelope.getMaxX();
@@ -919,7 +919,7 @@ public class SosHelper {
      * @return hex
      */
     private static String bytesToHex(byte[] b) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int j = 0; j < b.length; j++) {
             buf.append(SosConstants.HEX_DIGITS[(b[j] >> 4) & 0x0f]);
             buf.append(SosConstants.HEX_DIGITS[b[j] & 0x0f]);

@@ -57,14 +57,12 @@ public final class Sos1Constants {
         GetFeatureOfInterestTime, DescribeFeatureType, DescribeObservtionType, DescribeResultModel, RegisterSensor;
 
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (SosConstants.Operations.contains(s)) || (s.equals(Operations.GetFeatureOfInterestTime.name()))
-                            || (s.equals(Operations.DescribeFeatureType.name()))
-                            || (s.equals(Operations.DescribeObservtionType.name()))
-                            || (s.equals(Operations.DescribeResultModel.name()))
-                            || (s.equals(Operations.RegisterSensor.name()));
-            return contained;
+            for (Operations o : values()) {
+                if (o.name().equals(s)) {
+                    return true;
+                }
+            }
+            return SosConstants.Operations.contains(s);
         }
     }
 
@@ -84,11 +82,12 @@ public final class Sos1Constants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (SosConstants.CapabilitiesSections.contains(s))
-                            || (s.equals(CapabilitiesSections.Filter_Capabilities.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return SosConstants.CapabilitiesSections.contains(s);
         }
     }
 
@@ -108,11 +107,12 @@ public final class Sos1Constants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (SosConstants.GetObservationParams.contains(s))
-                            || (s.equals(GetObservationParams.eventTime.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return SosConstants.GetObservationParams.contains(s);
         }
     }
 
@@ -132,12 +132,12 @@ public final class Sos1Constants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (OWSConstants.RequestParams.contains(s))
-                            || (s.equals(InsertObservationParams.AssignedSensorId.name()))
-                            || (s.equals(InsertObservationParams.Observation.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return OWSConstants.RequestParams.contains(s);
         }
     }
 
@@ -157,12 +157,12 @@ public final class Sos1Constants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (SosConstants.DescribeSensorParams.contains(s))
-                            || (s.equals(DescribeSensorParams.outputFormat.name()))
-                            || (s.equals(DescribeSensorParams.time.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return SosConstants.DescribeSensorParams.contains(s);
         }
     }
 
@@ -182,12 +182,12 @@ public final class Sos1Constants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (OWSConstants.RequestParams.contains(s))
-                            || (s.equals(GetFeatureOfInterestParams.featureOfInterestID.name()))
-                            || (s.equals(GetFeatureOfInterestParams.location.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return OWSConstants.RequestParams.contains(s);
         }
     }
 
@@ -204,14 +204,12 @@ public final class Sos1Constants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (OWSConstants.RequestParams.contains(s))
-                            || (s.equals(GetFeatureOfInterestTimeParams.featureOfInterestID.name()))
-                            || (s.equals(GetFeatureOfInterestTimeParams.location.name()))
-                            || (s.equals(GetFeatureOfInterestTimeParams.observedProperty.name()))
-                            || (s.equals(GetFeatureOfInterestTimeParams.procedure.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return OWSConstants.RequestParams.contains(s);
         }
     }
 
@@ -228,12 +226,12 @@ public final class Sos1Constants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (OWSConstants.RequestParams.contains(s))
-                            || (s.equals(RegisterSensorParams.SensorDescription.name()))
-                            || (s.equals(RegisterSensorParams.ObservationTemplate.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return OWSConstants.RequestParams.contains(s);
         }
     }
 
@@ -253,15 +251,12 @@ public final class Sos1Constants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (OWSConstants.RequestParams.contains(s)) || (s.equals(GetObservationByIdParams.srsName.name()))
-                            || (s.equals(GetObservationByIdParams.ObservationId.name()))
-                            || (s.equals(GetObservationByIdParams.responseFormat.name()))
-                            || (s.equals(GetObservationByIdParams.resultModel.name()))
-                            || (s.equals(GetObservationByIdParams.responseMode.name()))
-                            || (s.equals(GetObservationByIdParams.SortBy.name()));
-            return contained;
+            for (Enum<?> p : values()) {
+                if (p.name().equals(s)) {
+                    return true;
+                }
+            }
+            return OWSConstants.RequestParams.contains(s);
         }
     }
 

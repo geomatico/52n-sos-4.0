@@ -26,6 +26,7 @@ package org.n52.sos.service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
@@ -64,7 +65,7 @@ public class SosService extends HttpServlet {
 
     private static final String GZIP = "gzip";
     
-    // TODO make this value configurable
+    // TODO make this value configurable (already done in gsoc-sos-administrator-v4.0.0)
     private static final int MINIMUM_GZIP_SIZE = 1000000;
 
     /**
@@ -310,14 +311,16 @@ public class SosService extends HttpServlet {
         return headerIdentifier != null && !headerIdentifier.equalsIgnoreCase("") && value != null;
     }
     
-    // FIXME current version checks only first accept header and not all
     private boolean checkForClientGZipSupport(HttpServletRequest req) {
-        String header = req.getHeader(ACCEPT_ENCODING);
-        if (header != null && !header.isEmpty()) {
-            String[] split = header.split(",");
-            for (String string : split) {
-                if (string.equalsIgnoreCase(GZIP)) {
-                    return true;
+        Enumeration<?> headers = req.getHeaders(ACCEPT_ENCODING);
+        while (headers.hasMoreElements()) {
+            String header = (String) headers.nextElement();
+            if (header != null && !header.isEmpty()) {
+                String[] split = header.split(",");
+                for (String string : split) {
+                    if (string.equalsIgnoreCase(GZIP)) {
+                        return true;
+                    }
                 }
             }
         }
@@ -329,7 +332,10 @@ public class SosService extends HttpServlet {
      * 
      * @see <a href="http://www.w3.org/TR/cors/">http://www.w3.org/TR/cors/</a>
      */
-    // TODO Add HTTP-PUT and -DELETE?
+    // 
+    /* TODO Add HTTP-PUT and -DELETE?
+     * TODO Should be moved to ConfiguredService.java after merging back GSOC Installer
+     */
     private void setCorsHeaders(HttpServletResponse resp) {
         resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");

@@ -23,6 +23,8 @@
  */
 package org.n52.sos.util;
 
+import javax.xml.namespace.QName;
+
 /**
  * Constants class for W3C
  * 
@@ -53,4 +55,10 @@ public class W3CConstants {
 
     public static final String NS_XS_PREFIX = "xs";
 
+    public static final QName QN_SCHEMA_LOCATION = new QName(NS_XSI, AN_SCHEMA_LOCATION);
+
+    public static final QName QN_SCHEMA_LOCATION_PREFIXED = new QName(NS_XSI, AN_SCHEMA_LOCATION, NS_XSI_PREFIX);
+
+    private W3CConstants() {
+    }
 }

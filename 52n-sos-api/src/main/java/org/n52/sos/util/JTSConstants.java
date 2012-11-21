@@ -34,4 +34,6 @@ public class JTSConstants {
 
     public static final String WKT_POLYGON = "POLYGON";
 
+    private JTSConstants() {
+    }
 }
