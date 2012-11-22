@@ -68,11 +68,14 @@ public class SWEConstants {
 
     public static final String EN_TEXT_ENCODING = "TextEncoding";
 
-	public static final String EN_INSERTION_METADATA = "InsertionMetadata";
-	
-	public static final String EN_METADATA = "metadata";
-	public static final String EN_ABSTRACT_OFFERING = "AbstractOffering";
-	
+    public static final String EN_INSERTION_METADATA = "InsertionMetadata";
+
+    public static final String EN_METADATA = "metadata";
+
+    public static final String EN_ABSTRACT_OFFERING = "AbstractOffering";
+
+    public static final String EN_OFFERING = "offering";
+
     // QNames for elements
 
     public static final QName QN_SIMPLEDATARECORD_SWE_101 = new QName(NS_SWE, EN_SIMPLEDATARECORD, NS_SWE_PREFIX);
@@ -90,12 +93,14 @@ public class SWEConstants {
     public static final QName QN_TIME_SWE_200 = new QName(NS_SWE_20, EN_TIME, NS_SWE_PREFIX);
 
     public static final QName QN_TEXT_ENCODING_SWE_200 = new QName(NS_SWE_20, EN_TEXT_ENCODING, NS_SWE_PREFIX);
-	
+
 	public static final QName QN_INSERTION_METADATA = new QName(NS_SWES_20, EN_INSERTION_METADATA, NS_SWES_PREFIX);
 
-	public static final QName QN_METADATA = new QName(NS_SWES_20, EN_METADATA, NS_SWES_PREFIX);
-	
-	public static final QName QN_ABSTRACT_OFFERING = new QName(NS_SWES_20, EN_ABSTRACT_OFFERING, NS_SWES_PREFIX);
+    public static final QName QN_METADATA = new QName(NS_SWES_20, EN_METADATA, NS_SWES_PREFIX);
+
+    public static final QName QN_ABSTRACT_OFFERING = new QName(NS_SWES_20, EN_ABSTRACT_OFFERING, NS_SWES_PREFIX);
+
+    public static final QName QN_OFFERING = new QName(NS_SWES_20, EN_OFFERING, NS_SWES_PREFIX);
 
     public static final String SOAP_REASON_INVALID_REQUEST =
             "The request did not conform to its XML Schema definition.";

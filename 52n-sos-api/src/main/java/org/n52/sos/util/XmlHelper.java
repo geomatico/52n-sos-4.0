@@ -302,51 +302,52 @@ public class XmlHelper {
      * substituation groups).
      */
     private enum LaxValidationCase {
-		ABSTRACT_OFFERING {
-			@Override
-			public boolean shouldPass(XmlValidationError xve) {
-				return xve.getExpectedQNames() != null
-						&& xve.getExpectedQNames().contains(SWEConstants.QN_ABSTRACT_OFFERING)
-						&& xve.getOffendingQName() != null
-						&& xve.getOffendingQName().equals(Sos2Constants.QN_OBSERVATION_OFFERING);
-			}
-		},
-		/**
-		 * Allow substitutions of gml:AbstractFeature. This lax validation lets
-		 * pass every child, hence it checks not _if_ this is a valid
-		 * substitution.
-		 */
-		ABSTRACT_FEATURE_GML {
-			@Override
-			public boolean shouldPass(XmlValidationError xve) {
-				return xve.getExpectedQNames() != null 
-						&& (xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_FEATURE_GML)
-							|| xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_FEATURE_GML_32));
-			}
-		},
-		ABSTRACT_TIME_GML_3_2_1 {
-			@Override
-			public boolean shouldPass(XmlValidationError xve) {
-				return xve.getExpectedQNames() != null 
-						&& xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_TIME_32);
-			}
-		},
-		SOS_INSERTION_META_DATA {
-			@Override
-			public boolean shouldPass(XmlValidationError xve) {
-				return xve.getFieldQName() != null && xve.getExpectedQNames() != null
-					&& xve.getFieldQName().equals(SWEConstants.QN_METADATA)
-					&& xve.getExpectedQNames().contains(SWEConstants.QN_INSERTION_METADATA) 
-					&& (xve.getMessage().contains(BEFORE_END_CONTENT_ELEMENT) || (xve.getOffendingQName() != null 
-							&& xve.getOffendingQName().equals(Sos2Constants.QN_SOS_INSERTION_METADATA)));
-			}
-		};
-		
-		private static final String BEFORE_END_CONTENT_ELEMENT = "before the end of the content in element";
+        ABSTRACT_OFFERING {
+            @Override
+            public boolean shouldPass(XmlValidationError xve) {
+                return xve.getFieldQName() != null && xve.getExpectedQNames() != null
+                    && xve.getFieldQName().equals(SWEConstants.QN_OFFERING)
+                    && xve.getExpectedQNames().contains(SWEConstants.QN_ABSTRACT_OFFERING) 
+                    && (xve.getMessage().contains(BEFORE_END_CONTENT_ELEMENT) || (xve.getOffendingQName() != null 
+                            && xve.getOffendingQName().equals(Sos2Constants.QN_OBSERVATION_OFFERING)));
+            }
+        },
+        /**
+         * Allow substitutions of gml:AbstractFeature. This lax validation lets
+         * pass every child, hence it checks not _if_ this is a valid
+         * substitution.
+         */
+        ABSTRACT_FEATURE_GML {
+            @Override
+            public boolean shouldPass(XmlValidationError xve) {
+                return xve.getExpectedQNames() != null 
+                        && (xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_FEATURE_GML)
+                            || xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_FEATURE_GML_32));
+            }
+        },
+        ABSTRACT_TIME_GML_3_2_1 {
+            @Override
+            public boolean shouldPass(XmlValidationError xve) {
+                return xve.getExpectedQNames() != null 
+                        && xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_TIME_32);
+            }
+        },
+        SOS_INSERTION_META_DATA {
+            @Override
+            public boolean shouldPass(XmlValidationError xve) {
+                return xve.getFieldQName() != null && xve.getExpectedQNames() != null
+                    && xve.getFieldQName().equals(SWEConstants.QN_METADATA)
+                    && xve.getExpectedQNames().contains(SWEConstants.QN_INSERTION_METADATA) 
+                    && (xve.getMessage().contains(BEFORE_END_CONTENT_ELEMENT) || (xve.getOffendingQName() != null 
+                        && xve.getOffendingQName().equals(Sos2Constants.QN_SOS_INSERTION_METADATA)));
+            }
+        };
 
-		public abstract boolean shouldPass(XmlValidationError xve);
-	}
-	
+        private static final String BEFORE_END_CONTENT_ELEMENT = "before the end of the content in element";
+
+        public abstract boolean shouldPass(XmlValidationError xve);
+    }
+
     /**
      * Loads a XML document from File.
      * 
