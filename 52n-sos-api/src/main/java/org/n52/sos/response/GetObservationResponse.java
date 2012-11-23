@@ -23,8 +23,6 @@
  */
 package org.n52.sos.response;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.n52.sos.ogc.om.SosObservation;
@@ -51,6 +49,7 @@ public class GetObservationResponse extends AbstractServiceResponse {
         this.observationCollection = observationCollection;
     }
 
+    /* TODO uncomment when WaterML support is activated
     public Collection<SosObservation> mergeObservations(boolean mergeObservationValuesWithSameParameters) {
         Collection<SosObservation> combinedObsCol = new ArrayList<SosObservation>();
         int obsIdCounter = 1;
@@ -84,5 +83,6 @@ public class GetObservationResponse extends AbstractServiceResponse {
         }
         return combinedObsCol;
     }
+    */
 
 }

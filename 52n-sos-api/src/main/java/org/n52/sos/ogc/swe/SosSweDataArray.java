@@ -24,7 +24,6 @@
 package org.n52.sos.ogc.swe;
 
 import java.util.List;
-import java.util.Map;
 
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.ogc.swe.simpleType.SosSweCount;
@@ -37,10 +36,10 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
 
     /**
      * swe:values<br />
-     * Each list entry represents one block. The map contains the values using 
-     * the swe:AbstractDataComponentProperty@definition from swe:elementType as key.
+     * Each list entry represents one block, a list of tokens.<br />
+     * Atm, this implementation using java.lang.String to represent each token.
      */
-    private List<Map<String, String>> values;
+    private List<List<String>> values;
 
     /**
      * swe:elementType
@@ -57,7 +56,7 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
     /**
      * @return the values
      */
-    public List<Map<String, String>> getValues() {
+    public List<List<String>> getValues() {
         return values;
     }
 
@@ -66,7 +65,7 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
      * @param values
      *            the values to set
      */
-    public void setValues(List<Map<String, String>> values) {
+    public void setValues(List<List<String>> values) {
         this.values = values;
     }
 
@@ -99,8 +98,10 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
     }
 
     public SosSweCount getElementCount() {
-        if (elementCount == null) {
-            // TODO get count from values;
+        if (elementCount == null && values != null) {
+            elementCount = new SosSweCount();
+            // TODO Eike: set correct value 
+            return elementCount; 
         }
         return elementCount;
     }

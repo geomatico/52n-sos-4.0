@@ -23,25 +23,27 @@
  */
 package org.n52.sos.ogc.om.values;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collection;
+import java.util.List;
 
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.swe.SosSweDataArray;
 
-public class SweDataArrayValue implements IValue<Map<ITime, Map<String, IValue>>> {
+public class SweDataArrayValue implements IValue<SosSweDataArray> {
     
-    private Map<ITime, Map<String, IValue>> values;
+    private static final long serialVersionUID = 52L;
+
+    private SosSweDataArray value;
     
     private String unit;
 
     @Override
-    public void setValue(Map<ITime, Map<String, IValue>> value) {
-        this.values = value;
+    public void setValue(SosSweDataArray value) {
+        this.value = value;
     }
 
     @Override
-    public Map<ITime, Map<String, IValue>> getValue() {
-        return values;
+    public SosSweDataArray getValue() {
+        return value;
     }
 
     @Override
@@ -54,14 +56,20 @@ public class SweDataArrayValue implements IValue<Map<ITime, Map<String, IValue>>
         return unit;
     }
     
-    public void addValue(ITime time, String observedProperty, IValue value) {
-        if (values == null) {
-            values = new HashMap<ITime, Map<String,IValue>>(0);
+    /**
+     * Adds the given block - a {@link List}<{@link String}> - add the end of the current list of blocks
+     * @param blockOfTokensToAddAtTheEnd
+     * @return <tt>true</tt> (as specified by {@link Collection#add}) <br />
+     *          <tt>false</tt> if value is not set, or block could not be added
+     * @see #setValue(SosSweDataArray)
+     */
+    public boolean addBlock(List<String> blockOfTokensToAddAtTheEnd)
+    {
+        if (value != null)
+        {
+            List<List<String>> blocks =  value.getValues();
+            return blocks.add(blockOfTokensToAddAtTheEnd);
         }
-		Map<String, IValue> obsPropValue = values.get(time);
-		if (obsPropValue == null) {
-			values.put(time, obsPropValue = new HashMap<String, IValue>());
-		}
-        obsPropValue.put(observedProperty, value);
+        return false;
     }
 }

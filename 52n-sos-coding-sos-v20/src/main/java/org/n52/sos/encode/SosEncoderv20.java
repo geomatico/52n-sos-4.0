@@ -299,14 +299,16 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         } else if (encoder instanceof IObservationEncoder) {
             IObservationEncoder iObservationEncoder = (IObservationEncoder) encoder;
-            if (iObservationEncoder.mergeObservationValuesWithSameParameters()) {
-                // TODO get List of mergable ObsTyps, ...
+            /* TODO uncomment when WaterML support is activated
+             * if (iObservationEncoder.shouldObservationsWithSameXBeMerged()) {
+                // TODO get List of markable ObsTyps, ...
                 observationCollection =
-                        response.mergeObservations(((IObservationEncoder) encoder)
-                                .mergeObservationValuesWithSameParameters());
-            } else {
+                        response.mergeObservations(
+                                iObservationEncoder.shouldObservationsWithSameXBeMerged()
+                                );
+            } else {*/
                 observationCollection = response.getObservationCollection();
-            }
+            /*}*/
         } else {
             String exceptionText =
                     "Error while encoding GetObservation response, encoder is not of type IObservationEncoder!";

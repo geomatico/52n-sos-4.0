@@ -23,66 +23,128 @@
  */
 package org.n52.sos.ogc.om;
 
+import java.util.List;
+
 import org.joda.time.DateTime;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.values.IValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
+import org.n52.sos.ogc.swe.SosSweDataArray;
+import org.n52.sos.ogc.swe.SosSweDataRecord;
+import org.n52.sos.ogc.swe.SosSweField;
+import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.util.DateTimeException;
+import org.n52.sos.util.DateTimeHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class SosMultiObservationValues implements IObservationValue {
+public class SosMultiObservationValues<T> implements IObservationValue<T> {
 
-    private IValue values;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SosMultiObservationValues.class);
+
+    private static final long serialVersionUID = 1L;
+
+    private IValue<T> values;
 
     private ITime phenomenonTime;
 
     @Override
-    public ITime getPhenomenonTime() {
-        if (phenomenonTime == null && values instanceof SweDataArrayValue) {
+    public ITime getPhenomenonTime()
+    {
+        if (phenomenonTime == null && values != null && values instanceof SweDataArrayValue) {
             SweDataArrayValue dataArrayValue = (SweDataArrayValue) values;
-            dataArrayValue.getValue().keySet();
+            SosSweDataArray dataArray = dataArrayValue.getValue();
             DateTime start = null;
             DateTime end = null;
-            for (ITime time : dataArrayValue.getValue().keySet()) {
-                if (time instanceof TimeInstant) {
-                    TimeInstant ti = (TimeInstant) time;
-                    if (start == null || ti.getValue().isBefore(start)) {
-                        start = ti.getValue();
+            int dateTokenIndex = -1;
+            // TODO Eike: implement
+            if (dataArray != null && dataArray.getElementType() != null && dataArray.getEncoding() != null) {
+                // get index of time token from elementtype
+                if (dataArray.getElementType() instanceof SosSweDataRecord) {
+                    SosSweDataRecord elementType = (SosSweDataRecord) dataArray.getElementType();
+                    List<SosSweField> fields = elementType.getFields();
+                    for (int i = 0; i < fields.size(); i++) {
+                        SosSweField sweField = fields.get(i);
+                        if (sweField.getElement() instanceof SosSweTime) {
+                            dateTokenIndex = i;
+                            break;
+                        }
                     }
-                    if (end == null || ti.getValue().isAfter(end)) {
-                        end = ti.getValue();
+
+                }
+            } else {
+                String errorMsg = String.format("Value of type \"%s\" not set correct.", SweDataArrayValue.class.getName());
+                LOGGER.error(errorMsg);
+            }
+            if (dateTokenIndex > -1) {
+                for (List<String> block : dataArray.getValues()) {
+                    // check for "/" to identify time periods (Is conform with
+                    // ISO
+                    // 8601 (see WP))
+                    // datetimehelper to DateTime from joda time
+                    String token = block.get(dateTokenIndex);
+                    ITime time = null;
+                    try {
+                        if (token.contains("/")) {
+                            String[] subTokens = token.split("/");
+                            time = new TimePeriod(DateTimeHelper.parseIsoString2DateTime(subTokens[0]), DateTimeHelper.parseIsoString2DateTime(subTokens[1]));
+                        } else {
+                            time = new TimeInstant(DateTimeHelper.parseIsoString2DateTime(token));
+                        }
+                    } catch (DateTimeException dte) {
+                        String exceptionMsg = String.format("Could not parse ISO8601 string \"%s\". Exception thrown: \"%s\"; Message: \"%s\"", token, dte.getClass().getName(), dte.getMessage());
+                        LOGGER.error(exceptionMsg);
+                        // TODO throw exception here?
+                        continue; // try next block;
                     }
-                } else if (time instanceof TimePeriod) {
-                    TimePeriod tp = (TimePeriod) time;
-                    if (start == null || tp.getStart().isBefore(start)) {
-                        start = tp.getStart();
-                    }
-                    if (end == null || tp.getEnd().isAfter(end)) {
-                        end = tp.getEnd();
+                    if (time instanceof TimeInstant) {
+                        TimeInstant ti = (TimeInstant) time;
+                        if (start == null || ti.getValue().isBefore(start)) {
+                            start = ti.getValue();
+                        }
+                        if (end == null || ti.getValue().isAfter(end)) {
+                            end = ti.getValue();
+                        }
+                    } else if (time instanceof TimePeriod) {
+                        TimePeriod tp = (TimePeriod) time;
+                        if (start == null || tp.getStart().isBefore(start)) {
+                            start = tp.getStart();
+                        }
+                        if (end == null || tp.getEnd().isAfter(end)) {
+                            end = tp.getEnd();
+                        }
                     }
                 }
+            } else {
+                String errorMsg = "PhenomenonTime field could not be found in ElementType";
+                LOGGER.error(errorMsg);
             }
             if (start.isEqual(end)) {
-               return new TimeInstant(start, null);
+                return new TimeInstant(start);
             } else {
-               return new TimePeriod(start, end);
+                return new TimePeriod(start, end);
             }
         }
         return phenomenonTime;
     }
 
     @Override
-    public IValue getValue() {
+    public IValue<T> getValue()
+    {
         return values;
     }
 
     @Override
-    public void setValue(IValue value) {
+    public void setValue(IValue<T> value)
+    {
         this.values = value;
     }
 
     @Override
-    public void setPhenomenonTime(ITime phenomenonTime) {
+    public void setPhenomenonTime(ITime phenomenonTime)
+    {
         this.phenomenonTime = phenomenonTime;
     }
 

@@ -45,6 +45,7 @@ import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.AbstractSosPhenomenon;
 import org.n52.sos.ogc.om.IObservationValue;
 import org.n52.sos.ogc.om.OMConstants;
+import org.n52.sos.ogc.om.SosMultiObservationValues;
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
@@ -56,9 +57,11 @@ import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.CountValue;
 import org.n52.sos.ogc.om.values.NilTemplateValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
+import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.Util4Exceptions;
@@ -342,15 +345,26 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
             TextValue StringValue = new TextValue(xbString.getStringValue());
             return new SosSingleObservationValue(StringValue);
         }
-        // result elements with other encoding
+        // result elements with other encoding like SWE_ARRAY_OBSERVATION
         else {
             String namespace = omObservation.getResult().schemaType().getName().getNamespaceURI();
             List<IDecoder> decoderList = Configurator.getInstance().getDecoder(namespace);
             if (decoderList != null) {
                 for (IDecoder decoder : decoderList) {
                     Object decodedObject = decoder.decode(omObservation.getResult());
-                    if (decodedObject != null && decodedObject instanceof IObservationValue) {
+                    if (decodedObject != null && decodedObject instanceof IObservationValue){
                         return (IObservationValue) decodedObject;
+                    }
+                    else if (decodedObject != null && decodedObject instanceof SosSweDataArray)
+                    /*
+                     * TODO Eike: create SosMultipleObservationValues from SosSweDataArray
+                     */
+                    {
+                        SosMultiObservationValues result = new SosMultiObservationValues();
+                        SweDataArrayValue value = new SweDataArrayValue();
+                        value.setValue((SosSweDataArray) decodedObject);
+                        result.setValue(value);
+                        return result;
                     }
                 }
             }

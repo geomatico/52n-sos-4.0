@@ -24,6 +24,7 @@
 package org.n52.sos.decode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -198,7 +199,7 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
         return sosSweDataArray;
     }
 
-    private List<Map<String, String>> parseValues(SosSweCount elementCount,
+    private List<List<String>> parseValues(SosSweCount elementCount,
             SosSweAbstractDataComponent elementType,
             SosSweAbstractEncoding encoding,
             EncodedValuesPropertyType encodedValuesPropertyType) throws OwsExceptionReport
@@ -206,33 +207,32 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
         assert elementCount != null;
         assert elementType != null;
         assert encoding != null;
-        // Get swe values String via cursor as String
         if (checkParameterTypes(elementType, encoding))
         {
+            // Get swe values String via cursor as String
             String values = null;
+            // TODO replace XmlCursor
+            /* if (encodedValuesPropertyType.schemaType() == XmlString.type)
+            {
+                XmlString xbString */
+            // @see SosDecoderv20#parseResultValues
             XmlCursor xbCursor = encodedValuesPropertyType.newCursor();
             xbCursor.toFirstContentToken();
             if (xbCursor.isText())
             {
                 values = xbCursor.getTextValue().trim();
+                xbCursor.dispose();
                 if (values != null && !values.isEmpty())
                 {
                     SosSweTextEncoding textEncoding = (SosSweTextEncoding)encoding;
-                    SosSweDataRecord valuesMetadata = (SosSweDataRecord)elementType;
-                    List<SosSweField> fields = valuesMetadata.getFields();
                     
                     String[] blocks = values.split(textEncoding.getBlockSeparator());
-                    List<Map<String,String>> resultValues = new ArrayList<Map<String,String>>();
+                    List<List<String>> resultValues = new ArrayList<List<String>>();
                     for (String block : blocks)
                     {
                         String[] tokens = block.split(textEncoding.getTokenSeparator());
-                        Map<String,String> blockMap = new HashMap<String, String>();
-                        for (int i = 0; i < tokens.length; i++)
-                        {
-                            String token = tokens[i];
-                            blockMap.put(fields.get(i).getElement().getDefinition(), token);
-                        }
-                        resultValues.add(blockMap);
+                        List<String> tokenList = Arrays.asList(tokens);
+                        resultValues.add(tokenList);
                     }
                     return resultValues;
                 }
@@ -260,14 +260,6 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
         }
         return true;
-    }
-
-    private List<Map<String, String>> parseValuesString(SosSweTextEncoding encoding,
-            String values)
-    {
-        // TODO get tokens
-        // TODO Auto-generated method "parseValuesString" stub generated on 14.11.2012 around 16:06:26 by eike
-        return null;
     }
 
     private SosSweAbstractEncoding parseEncoding(AbstractEncodingType abstractEncodingType) throws OwsExceptionReport

@@ -24,13 +24,10 @@
 package org.n52.sos.ogc.om;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
 
 /**
@@ -292,6 +289,7 @@ public class SosObservation implements Serializable {
         this.value = value;
     }
 
+    /* TODO uncomment when WaterML support is activated
     public void mergeWithObservation(SosObservation sosObservation, boolean mergeObsProps) {
         // create compPhen or add obsProp to compPhen
         if (this.observationConstellation.getObservableProperty() instanceof SosObservableProperty && mergeObsProps) {
@@ -306,7 +304,7 @@ public class SosObservation implements Serializable {
         }
         // add values
         if (this.value instanceof SosSingleObservationValue) {
-            convertSingleValueToMultiValue((SosSingleObservationValue)this.value);
+            convertSingleValueToMultiValue((SosSingleObservationValue)this.value); // 
         }
         SweDataArrayValue dataArrayValue = (SweDataArrayValue)((SosMultiObservationValues)this.value).getValue();
         if (sosObservation.getValue() instanceof SosSingleObservationValue) {
@@ -330,6 +328,7 @@ public class SosObservation implements Serializable {
         multiValue.setValue(dataArrayValue);
         this.value = multiValue;
     }
+    */
 
 	/**
 	 * Get a predefined result structure.

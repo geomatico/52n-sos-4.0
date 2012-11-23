@@ -27,11 +27,11 @@ import java.util.List;
 
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.om.quality.SosQuality;
-import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.IValue;
-import org.n52.sos.ogc.swe.simpleType.SosSweText;
 
 public class SosSingleObservationValue<T> implements IObservationValue<T> {
+
+    private static final long serialVersionUID = 52L;
 
     private ITime phenomenonTime;
 

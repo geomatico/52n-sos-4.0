@@ -57,6 +57,7 @@ import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.IExtension;
+import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -70,7 +71,13 @@ import org.n52.sos.ogc.swe.SosSweField;
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
+import org.n52.sos.ogc.swe.simpleType.SosSweCategory;
+import org.n52.sos.ogc.swe.simpleType.SosSweCount;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
+import org.n52.sos.ogc.swe.simpleType.SosSweText;
+import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
 import org.n52.sos.request.InsertResultRequest;
 import org.n52.sos.response.InsertResultResponse;
 import org.n52.sos.service.Configurator;
@@ -183,39 +190,122 @@ public class InsertResultDAO implements IInsertResultDAO {
         SosResultStructure resultStructure = new SosResultStructure(resultTemplate.getResultStructure());
         String[] blockValues = getBlockValues(resultValues, resultEncoding.getEncoding());
 		SosObservation o = getObservation(resultTemplate.getObservationConstellation(),
-				blockValues, resultStructure.getResultStructure(), resultEncoding.getEncoding());
+				blockValues,
+				resultStructure.getResultStructure(),
+				resultEncoding.getEncoding());
 		return unfoldObservation(o);
     }
 	
-	private List<SosObservation> unfoldObservation(SosObservation o) {
-		if (o.getValue() instanceof SosSingleObservationValue) {
-			return Collections.singletonList(o);
-		} else {
-			SweDataArrayValue arrayValue = ((SweDataArrayValue) ((SosMultiObservationValues) o.getValue()).getValue());
-			Map<ITime,Map<String,IValue>> values = arrayValue.getValue();
-			List<SosObservation> observationCollection = new ArrayList(values.keySet().size() * 3);
-			
-			for (ITime phenomenonTime : values.keySet()) {
-				for (String observedProperty : values.get(phenomenonTime).keySet()) {
-					IObservationValue value = new SosSingleObservationValue(phenomenonTime, 
-							values.get(phenomenonTime).get(observedProperty));
-					SosObservation no = new SosObservation();
-					no.setNoDataValue(o.getNoDataValue());
-					/* TODO create new ObservationConstellation only with the 
-					 * specified observed property. */
-					no.setObservationConstellation(o.getObservationConstellation());
-					no.setValidTime(o.getValidTime());
-					no.setResultTime(o.getResultTime());
-					no.setTokenSeparator(o.getTokenSeparator());
-					no.setTupleSeparator(o.getTupleSeparator());
-					no.setResultType(o.getResultType());
-					no.setValue(value);
-					observationCollection.add(no);
-				}
-			}
-			return observationCollection;
-		}
-	}
+	// TODO move to helper class?
+    private List<SosObservation> unfoldObservation(SosObservation multiObservation) throws OwsExceptionReport {
+        if (multiObservation.getValue() instanceof SosSingleObservationValue) {
+            return Collections.singletonList(multiObservation);
+        } else {
+            SweDataArrayValue arrayValue = ((SweDataArrayValue) ((SosMultiObservationValues) multiObservation.getValue()).getValue());
+            List<List<String>> values = arrayValue.getValue().getValues();
+            List<SosObservation> observationCollection = new ArrayList<SosObservation>(values.size());
+            SosSweDataRecord elementType = null;
+            if (arrayValue.getValue().getElementType() != null && 
+                    arrayValue.getValue().getElementType() instanceof SosSweDataRecord)
+            {
+                elementType = (SosSweDataRecord) arrayValue.getValue().getElementType();
+            }
+            else
+            {
+                String exceptionMsg = String.format("sweElementType type \"%s\" not supported", 
+                        elementType!=null?elementType.getClass().getName():"null");
+                LOGGER.debug(exceptionMsg);
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
+            }
+
+            // each block represents one observation
+            for (List<String> block : values) {
+                int tokenIndex = 0;
+                ITime phenomenonTime = null;
+                IValue observedValue = null;
+                for (String token : block) {
+                    // get values from block via definition in
+                    // SosSweDataArray#getElementType
+                    SosSweAbstractDataComponent fieldForToken = elementType.getFields().get(tokenIndex).getElement();
+                    /*
+                     * get phenomenon time
+                     */
+
+                    if (fieldForToken instanceof SosSweTime) {
+                        try {
+                            if (fieldForToken instanceof SosSweTimeRange) {
+                                String[] subTokens = token.split("/");
+                                phenomenonTime = new TimePeriod(DateTimeHelper.parseIsoString2DateTime(subTokens[0]), DateTimeHelper.parseIsoString2DateTime(subTokens[1]));
+                            } else {
+                                phenomenonTime = new TimeInstant(DateTimeHelper.parseIsoString2DateTime(token));
+                            }
+                        } catch (Exception e) {
+                            if (e instanceof OwsExceptionReport) {
+                                throw (OwsExceptionReport) e;
+                            } else {
+                                OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+                                String exceptionMsg = "Error while parse time String to DateTime!";
+                                LOGGER.error(exceptionMsg, e);
+                                owse.addCodedException(null, null, exceptionMsg);
+                                throw owse;
+                            }
+                        }
+                    }
+                    /*
+                     *  observation values
+                     */
+                    else if (fieldForToken instanceof SosSweQuantity)
+                    {
+                        observedValue = new QuantityValue(Double.parseDouble(token));
+                        observedValue.setUnit(((SosSweQuantity) fieldForToken).getUom());
+                    }
+                    else if (fieldForToken instanceof SosSweBoolean)
+                    {
+                        observedValue = new BooleanValue(Boolean.parseBoolean(token));
+                    }
+                    else if (fieldForToken instanceof SosSweText)
+                    {
+                        observedValue = new TextValue(token);
+                    }
+                    else if (fieldForToken instanceof SosSweCategory)
+                    {
+                        observedValue = new CategoryValue(token);
+                        observedValue.setUnit(((SosSweCategory) fieldForToken).getCodeSpace());
+                    }
+                    else if (fieldForToken instanceof SosSweCount)
+                    {
+                        observedValue = new CountValue(Integer.parseInt(token));
+                    }
+                    else
+                    {
+                        String exceptionMsg = String.format("sweField type \"%s\" not supported", 
+                                fieldForToken!=null?fieldForToken.getClass().getName():"null");
+                        LOGGER.debug(exceptionMsg);
+                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
+                    }
+                    tokenIndex++;
+                }
+                // TODO: Eike implement usage of elementType
+                IObservationValue value = new SosSingleObservationValue(phenomenonTime,observedValue);
+                SosObservation newObservation = new SosObservation();
+                newObservation.setNoDataValue(multiObservation.getNoDataValue());
+                /* 
+                 * TODO create new ObservationConstellation only with the 
+                 * specified observed property.
+                 * 
+                 */
+                newObservation.setObservationConstellation(multiObservation.getObservationConstellation());
+                newObservation.setValidTime(multiObservation.getValidTime());
+                newObservation.setResultTime(multiObservation.getResultTime());
+                newObservation.setTokenSeparator(multiObservation.getTokenSeparator());
+                newObservation.setTupleSeparator(multiObservation.getTupleSeparator());
+                newObservation.setResultType(multiObservation.getResultType());
+                newObservation.setValue(value);
+                observationCollection.add(newObservation);
+            }
+            return observationCollection;
+        }
+    }
 	
 	private SosObservation getObservation(ObservationConstellation obsConst, String[] blockValues,
             SosSweAbstractDataComponent resultStructure, SosSweAbstractEncoding encoding) throws OwsExceptionReport {
@@ -223,7 +313,8 @@ public class InsertResultDAO implements IInsertResultDAO {
 		int phenomenonTimeIndex = ResultHandlingHelper.hasPhenomenonTime(resultStructure);
 		
 		SosSweDataRecord record = null;
-		if (resultStructure instanceof SosSweDataArray && ((SosSweDataArray) resultStructure).getElementType() instanceof SosSweDataRecord) {
+		if (resultStructure instanceof SosSweDataArray && 
+		        ((SosSweDataArray) resultStructure).getElementType() instanceof SosSweDataRecord) {
 			SosSweDataArray array = (SosSweDataArray) resultStructure;
 			record = (SosSweDataRecord) array.getElementType();
 		} else if (resultStructure instanceof SosSweDataRecord) {
