@@ -399,7 +399,7 @@ CREATE TABLE observation (
   valid_time_start TIMESTAMP NULL,
   valid_time_end TIMESTAMP NULL,
   unit_id INTEGER NULL,
-  anti_subsetting INTEGER NULL,
+  anti_subsetting TEXT NULL,
   deleted BOOL NOT NULL DEFAULT false,
   UNIQUE (feature_of_interest_id,observation_constellation_id,phenomenon_time_start,identifier),
   PRIMARY KEY(observation_id)

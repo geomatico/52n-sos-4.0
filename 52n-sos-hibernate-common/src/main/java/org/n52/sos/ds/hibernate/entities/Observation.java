@@ -61,7 +61,7 @@ public class Observation implements java.io.Serializable {
     
     private Unit unit;
 
-    private Integer antiSubsetting;
+    private String antiSubsetting;
 
     private Set<SpatialFilteringProfile> spatialFilteringProfiles = new HashSet<SpatialFilteringProfile>(0);
 
@@ -93,7 +93,7 @@ public class Observation implements java.io.Serializable {
 
     public Observation(long observationId, FeatureOfInterest featureOfInterest,
             ObservationConstellation observationConstellation, String identifier, Date phenomenonTimeStart,
-            Date phenomenonTimeEnd, Date resultTime, Date validTimeStart, Date validTimeEnd, Unit unit, Integer antiSubsetting,
+            Date phenomenonTimeEnd, Date resultTime, Date validTimeStart, Date validTimeEnd, Unit unit, String antiSubsetting,
             Set<SpatialFilteringProfile> spatialFilteringProfiles, Set<Quality> qualities, Set<CountValue> countValues, Set<BooleanValue> booleanValues,Set<GeometryValue> geometryValues, Set<CategoryValue> categoryValues,
             Set<NumericValue> numericValues, Set<TextValue> textValues, boolean deleted) {
         this.observationId = observationId;
@@ -198,11 +198,11 @@ public class Observation implements java.io.Serializable {
         this.unit = unit;
     }
 
-    public Integer getAntiSubsetting() {
+    public String getAntiSubsetting() {
         return this.antiSubsetting;
     }
 
-    public void setAntiSubsetting(Integer antiSubsetting) {
+    public void setAntiSubsetting(String antiSubsetting) {
         this.antiSubsetting = antiSubsetting;
     }
 

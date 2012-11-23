@@ -43,6 +43,7 @@ import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IGetObservationDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
+import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateResultUtilities;
 import org.n52.sos.ds.hibernate.util.QueryHelper;
@@ -68,7 +69,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
-import org.n52.sos.ds.hibernate.util.HibernateConstants;
 
 /**
  * Implementation of the interface IGetObservationDAO
@@ -263,8 +263,8 @@ public class GetObservationDAO implements IGetObservationDAO {
                 response.setService(request.getService());
                 response.setVersion(request.getVersion());
                 response.setResponseFormat(request.getResponseFormat());
-                response.setObservationCollection(HibernateResultUtilities.createSosObservationFromObservations(
-                        observations, sosRequest.getVersion(), session));
+                response.setObservationCollection(HibernateResultUtilities.createSosObservationsFromObservations(
+                        observations, sosRequest, session));
                 return response;
             }
         } catch (HibernateException he) {
