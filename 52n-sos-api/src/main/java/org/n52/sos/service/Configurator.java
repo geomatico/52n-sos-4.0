@@ -51,7 +51,6 @@ import org.n52.sos.ds.IFeatureQueryHandler;
 import org.n52.sos.ds.IOperationDAO;
 import org.n52.sos.encode.EncoderKeyType;
 import org.n52.sos.encode.IEncoder;
-import org.n52.sos.encode.ISosRequestEncoder;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Range;
 import org.n52.sos.request.operator.IRequestOperator;
@@ -266,9 +265,6 @@ public final class Configurator {
 
     /** common SOS properties from configFile */
     private Properties props;
-
-    /** encoder for encoding requests */
-    private ISosRequestEncoder reqEncoder;
 
     /** Implemented ISosRequestListener */
     private Map<ServiceOperatorKeyType, IServiceOperator> serviceOperators = new HashMap<ServiceOperatorKeyType, IServiceOperator>(0);
@@ -1433,14 +1429,6 @@ public final class Configurator {
      */
     public String getNoDataValue() {
         return noDataValue;
-    }
-
-    /**
-     * 
-     * @return Returns the encoder for requests
-     */
-    public ISosRequestEncoder getRequestEncoder() {
-        return reqEncoder;
     }
 
     /**
