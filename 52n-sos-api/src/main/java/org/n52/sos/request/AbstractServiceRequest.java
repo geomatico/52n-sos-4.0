@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.swes.SwesExtensions;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.Util4Exceptions;
@@ -39,6 +40,8 @@ import org.n52.sos.util.Util4Exceptions;
 public abstract class AbstractServiceRequest extends AbstractServiceCommunicationObject {
 
     protected ServiceOperatorKeyType[] serviceOperatorKeyTypes;
+    
+    protected SwesExtensions extensions;
 
     /**
      * @return the operationName
@@ -66,6 +69,14 @@ public abstract class AbstractServiceRequest extends AbstractServiceCommunicatio
             exceptions.add(Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.version.name()));
         }
         Util4Exceptions.mergeAndThrowExceptions(exceptions);
+    }
+
+    public SwesExtensions getExtensions() {
+        return extensions;
+    }
+    
+    public void setExtensions(SwesExtensions extensions) {
+        this.extensions = extensions;
     }
 
 }

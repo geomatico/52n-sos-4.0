@@ -43,6 +43,13 @@ public final class Sos2Constants {
     /** Constant for the content types of the response formats */
     private static String[] RESPONSE_FORMATS = { OMConstants.RESPONSE_FORMAT_OM_2, SosConstants.CONTENT_TYPE_ZIP };
 
+    /**
+     * The names of the extensions that we know off and might support
+     */
+    public enum Extensions{
+        AntiSubsetting;
+    }
+
     /** Constant for actual implementing version */
     public static final String SERVICEVERSION = "2.0.0";
 
