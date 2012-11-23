@@ -449,7 +449,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
         // }
 
         // TODO for testing an validating
-        checkAndValidateSoapMessage(envelopeDoc);
+//        checkAndValidateSoapMessage(envelopeDoc);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
