@@ -924,7 +924,7 @@ public final class Configurator {
         }
         LOGGER.info("\n******\n ACapabilitiesCacheController loaded successfully!\n******\n");
         if (updateIntervall > 0) {
-            timer = new Timer();
+            timer = new Timer("52n-sos-capabilities-cache-controller");
             timer.scheduleAtFixedRate(this.capabilitiesCacheController, getUpdateIntervallInMillis(),
                     getUpdateIntervallInMillis());
             LOGGER.info("\n******\n ACapabilitiesCacheController timertask started successfully!\n******\n");
