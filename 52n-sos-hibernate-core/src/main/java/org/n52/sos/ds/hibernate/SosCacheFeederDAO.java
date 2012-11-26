@@ -89,8 +89,6 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
      */
     @Override
     public void initalizeCache(ACapabilitiesCache capabilitiesCache) throws OwsExceptionReport {
-        // TODO: cache minMax Times for Offering/all (reduce GetCaps query time)
-        // TODO: cache BBOX for Offering/all (reduce GetCaps query time)
         CapabilitiesCache cache = (CapabilitiesCache) capabilitiesCache;
         Session session = null;
         try {

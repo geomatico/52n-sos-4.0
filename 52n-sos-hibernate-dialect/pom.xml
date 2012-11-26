@@ -24,12 +24,10 @@
 		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.postgis</groupId>
 			<artifactId>postgis-jdbc</artifactId>
-			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

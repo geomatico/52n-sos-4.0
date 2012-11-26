@@ -29,10 +29,10 @@
 	</appender>
 
 	<logger name="org.n52" level="${config.logger.level}" />
-	<logger name="org.hibernate.sql" level="${config.logger.level}" />
+	<logger name="org.hibernate.sql" level="WARN" />
 
 	<root level="INFO">
 		<appender-ref ref="FILE" />
-		<!-- <appender-ref ref="STDOUT" />-->
+		<appender-ref ref="STDOUT" />
 	</root>
 </configuration>

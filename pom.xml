@@ -22,20 +22,28 @@
 		<module>52n-sos-webapp</module>
 	</modules>
 
+	<licenses>
+		<license>
+			<name>GPLv2</name>
+			<url>http://www.gnu.org/licenses/gpl-2.0.html</url>
+			<distribution>repo</distribution>
+			<comments>See also http://52north.org/about/licensing/ for all information about 52°North licenses.</comments>
+		</license>
+	</licenses>
+
 	<properties>
 		<!-- sos name -->
-		<conf.sos.name>52nSOSv4.0.0</conf.sos.name>
-		<!-- default path and name for the build.properties file, can be set to 
-			a customized file -->
-		<conf.sos.build.properties>${project.parent.basedir}/build.properties</conf.sos.build.properties>
+		<conf.sos.name>52nSOSv${project.version}</conf.sos.name>
 		<!-- Source encoding during build process ** !!! DO NOT CHANGE !!! ** -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<n52.common.xml.version>1.1.2</n52.common.xml.version>
-		<!-- Logger configuration --> 
+		<org.springframework.version>3.1.2.RELEASE</org.springframework.version>
+		<!-- Logger configuration -->
 		<config.logger.fileappender.filepath>${catalina.base}/logs</config.logger.fileappender.filepath>
 		<config.logger.fileappender.filename>${conf.sos.name}</config.logger.fileappender.filename>
 		<config.logger.level>INFO</config.logger.level>
 		<config.logger.history.max>30</config.logger.history.max>
+		<postgresql.version>9.1-901.jdbc4</postgresql.version>
 	</properties>
 
 	<dependencyManagement>
@@ -111,69 +119,174 @@
 			<dependency>
 				<groupId>postgresql</groupId>
 				<artifactId>postgresql</artifactId>
-				<version>9.1-901.jdbc4</version>
-				<scope>provided</scope>
+				<version>${postgresql.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.postgis</groupId>
 				<artifactId>postgis-jdbc</artifactId>
 				<version>1.3.3</version>
-				<scope>provided</scope>
 			</dependency>
 			<dependency>
-			    <groupId>org.n52.sensorweb</groupId>
-			    <artifactId>52n-xml-gml-v321</artifactId>
-			    <version>${n52.common.xml.version}</version>
+				<groupId>org.n52.sensorweb</groupId>
+				<artifactId>52n-xml-gml-v321</artifactId>
+				<version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.n52.sensorweb</groupId>
-			    <artifactId>52n-xml-filter-v20</artifactId>
-			    <version>${n52.common.xml.version}</version>
+				<groupId>org.n52.sensorweb</groupId>
+				<artifactId>52n-xml-filter-v20</artifactId>
+				<version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.n52.sensorweb</groupId>
-			    <artifactId>52n-xml-sweCommon-v20</artifactId>
-			    <version>${n52.common.xml.version}</version>
+				<groupId>org.n52.sensorweb</groupId>
+				<artifactId>52n-xml-sweCommon-v20</artifactId>
+				<version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.n52.sensorweb</groupId>
-			    <artifactId>52n-xml-sweCommon-v101</artifactId>
-			    <version>${n52.common.xml.version}</version>
+				<groupId>org.n52.sensorweb</groupId>
+				<artifactId>52n-xml-sweCommon-v101</artifactId>
+				<version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.n52.sensorweb</groupId>
-			    <artifactId>52n-xml-sensorML-v101</artifactId>
-			    <version>${n52.common.xml.version}</version>
+				<groupId>org.n52.sensorweb</groupId>
+				<artifactId>52n-xml-sensorML-v101</artifactId>
+				<version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.n52.sensorweb</groupId>
-			    <artifactId>52n-xml-om-v20</artifactId>
-			    <version>${n52.common.xml.version}</version>
+				<groupId>org.n52.sensorweb</groupId>
+				<artifactId>52n-xml-om-v20</artifactId>
+				<version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.n52.sensorweb</groupId>
-			    <artifactId>52n-xml-sampling-v20</artifactId>
-			    <version>${n52.common.xml.version}</version>
+				<groupId>org.n52.sensorweb</groupId>
+				<artifactId>52n-xml-sampling-v20</artifactId>
+				<version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.n52.sensorweb</groupId>
-			    <artifactId>52n-xml-ows-v110</artifactId>
-			    <version>${n52.common.xml.version}</version>
+				<groupId>org.n52.sensorweb</groupId>
+				<artifactId>52n-xml-ows-v110</artifactId>
+				<version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.n52.sensorweb</groupId>
-			    <artifactId>52n-xml-sos-v20</artifactId>
-			    <version>${n52.common.xml.version}</version>
+				<groupId>org.n52.sensorweb</groupId>
+				<artifactId>52n-xml-sos-v20</artifactId>
+				<version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.n52.sensorweb</groupId>
-			    <artifactId>52n-xml-sos-v100</artifactId>
-			    <version>${n52.common.xml.version}</version>
+				<groupId>org.n52.sensorweb</groupId>
+				<artifactId>52n-xml-sos-v100</artifactId>
+				<version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
-			    <groupId>org.n52.sensorweb</groupId>
-			    <artifactId>52n-xml-soap-v12</artifactId>
-			    <version>${n52.common.xml.version}</version>
+				<groupId>org.n52.sensorweb</groupId>
+				<artifactId>52n-xml-soap-v12</artifactId>
+				<version>${n52.common.xml.version}</version>
+			</dependency>
+			<!-- Spring -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-expression</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-beans</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-aop</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context-support</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-tx</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-jdbc</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-orm</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-oxm</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-web</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-webmvc</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-webmvc-portlet</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-test</artifactId>
+				<version>${org.springframework.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-config</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-core</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-web</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-taglibs</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.jettison</groupId>
+				<artifactId>jettison</artifactId>
+				<version>1.3.2</version>
+			</dependency>
+			<dependency>
+				<groupId>jstl</groupId>
+				<artifactId>jstl</artifactId>
+				<version>1.2</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>4.2.2</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -239,53 +352,64 @@
 					</execution>
 				</executions>
 			</plugin>
-							<plugin>
-					<!-- check for correct source file headers during test phase: http://code.google.com/p/maven-license-plugin/wiki/HowTo -->
-					<!-- add profiles to command: e.g -PenhancedV20,transactionalV20,... -->
-					<!-- run "mvn license:check -Dyear=2012" to check -->
-					<!-- run "mvn license:format -Dyear=2012" to add to the files-->
-					<groupId>com.mycila.maven-license-plugin</groupId>
-					<artifactId>maven-license-plugin</artifactId>
-					<version>1.9.0</version>
-					<configuration>
-						<header>misc/52N_license.txt</header>
-						<excludes>
-							<exclude>**/log4j*</exclude>
-							<exclude>**/*.xml</exclude>
-							<exclude>**/*.html</exclude>
-							<exclude>**/webapp/codemirror/**</exclude>
-							<exclude>**/webapp/WEB-INF/web.xml</exclude>
-							<exclude>**/webapp/WEB-INF/wsdl/*.*</exclude>
-							<exclude>**/buildNumber.properties</exclude>
-						</excludes>
-						<includes>
-							<include>**/*.java</include>
-							<include>**/*.jsp</include>
-							<include>**/*.js</include>
-							<include>**/*.xsl</include>
-							<include>**/*.sql</include>
-						</includes>
-						<strictCheck>true</strictCheck>
-						<properties>
-							<year>${project.inceptionYear}</year>
-						</properties>
-						<mapping>
-							<sch>XML_STYLE</sch>
-						</mapping>
-					</configuration>
-					<executions>
-						<execution>
-							<phase>test</phase>
-							<!-- test will fail if license headers are not correct, run license:format 
-								to add the headers. -->
-							<goals>
-								<!-- <goal>check</goal> -->
-								<goal>format</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
+			<plugin>
+				<!-- check for correct source file headers during test phase: http://code.google.com/p/maven-license-plugin/wiki/HowTo -->
+				<!-- add profiles to command: e.g -PenhancedV20,transactionalV20,... -->
+				<!-- run "mvn license:check -Dyear=2012" to check -->
+				<!-- run "mvn license:format -Dyear=2012" to add to the files -->
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<version>1.9.0</version>
+				<inherited>false</inherited>
+				<configuration>
+					<aggregate>true</aggregate>
+					<header>misc/52N_license.txt</header>
+					<excludes>
+						<exclude>**/log4j*</exclude>
+						<exclude>**/*.xml</exclude>
+						<exclude>**/*.html</exclude>
+						<exclude>**/webapp/codemirror/**</exclude>
+						<exclude>**/webapp/WEB-INF/web.xml</exclude>
+						<exclude>**/webapp/WEB-INF/wsdl/*.*</exclude>
+						<exclude>**/buildNumber.properties</exclude>
+					</excludes>
+					<includes>
+						<include>**/*.java</include>
+						<include>**/*.jsp</include>
+						<include>**/*.js</include>
+						<include>**/*.xsl</include>
+						<include>**/*.sql</include>
+					</includes>
+					<strictCheck>true</strictCheck>
+					<properties>
+						<year>${project.inceptionYear}</year>
+					</properties>
+					<mapping>
+						<sch>XML_STYLE</sch>
+					</mapping>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>test</phase>
+						<!-- test will fail if license headers are not correct, run license:format 
+							to add the headers. -->
+						<goals>
+							<!-- <goal>check</goal> -->
+							<goal>format</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>2.1.1</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<!-- SVN connection -->
 	<scm>
@@ -340,10 +464,14 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-
 	</repositories>
-
 	<profiles>
+		<profile>
+			<id>preconfigured</id>
+			<modules>
+				<module>52n-sos-webapp-preconfigured</module>
+			</modules>
+		</profile>
 		<profile>
 			<id>both</id>
 			<modules>
@@ -365,7 +493,11 @@
 		</profile>
 		<profile>
 			<id>develope</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<modules>
+				<module>52n-sos-webapp-preconfigured</module>
 				<module>52n-sos-binding-kvp</module>
 				<module>52n-sos-binding-soap</module>
 				<module>52n-sos-enhanced-v20</module>

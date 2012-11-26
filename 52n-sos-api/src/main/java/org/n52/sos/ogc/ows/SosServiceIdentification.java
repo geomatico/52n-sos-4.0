@@ -31,11 +31,15 @@ import org.apache.xmlbeans.XmlObject;
 public class SosServiceIdentification {
 
     private XmlObject serviceIdentification;
+	
+	private String title;
+	private String abstrakt;
+	private String serviceType;
+	private String fees;
+	private String accessConstraints;
 
     private Collection<String> versions;
-
     private List<String> profiles;
-
     private List<String> keywords;
 
     public XmlObject getServiceIdentification() {
@@ -69,5 +73,45 @@ public class SosServiceIdentification {
     public void setKeywords(List<String> keywords) {
         this.keywords = keywords;
     }
+	
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getAbstract() {
+		return abstrakt;
+	}
+
+	public void setAbstract(String abstrakt) {
+		this.abstrakt = abstrakt;
+	}
+
+	public String getServiceType() {
+		return serviceType;
+	}
+
+	public void setServiceType(String serviceType) {
+		this.serviceType = serviceType;
+	}
+
+	public String getFees() {
+		return fees;
+	}
+
+	public void setFees(String fees) {
+		this.fees = fees;
+	}
+
+	public String getAccessConstraints() {
+		return accessConstraints;
+	}
+
+	public void setAccessConstraints(String accessConstraints) {
+		this.accessConstraints = accessConstraints;
+	}
 
 }

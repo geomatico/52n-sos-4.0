@@ -65,7 +65,7 @@ public class KvpBinding extends Binding {
     /**
      * URL pattern for KVP requests
      */
-    private static final String urlPattern = "/sos/kvp";
+    private static final String urlPattern = "/kvp";
 
     @Override
     public ServiceResponse doGetOperation(HttpServletRequest req) throws OwsExceptionReport {

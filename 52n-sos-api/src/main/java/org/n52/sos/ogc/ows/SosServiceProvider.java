@@ -28,6 +28,106 @@ import org.apache.xmlbeans.XmlObject;
 public class SosServiceProvider {
 
     private XmlObject serviceProvider;
+	
+	private String name;
+	private String site;
+	private String individualName;
+	private String positionName;
+	private String phone;
+	private String deliveryPoint;
+	private String city;
+	private String postalCode;
+	private String country;
+	private String mailAddress;
+	private String administrativeArea;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getSite() {
+		return site;
+	}
+
+	public void setSite(String site) {
+		this.site = site;
+	}
+
+	public String getIndividualName() {
+		return individualName;
+	}
+
+	public void setIndividualName(String individualName) {
+		this.individualName = individualName;
+	}
+
+	public String getPositionName() {
+		return positionName;
+	}
+
+	public void setPositionName(String positionName) {
+		this.positionName = positionName;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getDeliveryPoint() {
+		return deliveryPoint;
+	}
+
+	public void setDeliveryPoint(String deliveryPoint) {
+		this.deliveryPoint = deliveryPoint;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getPostalCode() {
+		return postalCode;
+	}
+
+	public void setPostalCode(String postalCode) {
+		this.postalCode = postalCode;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public String getMailAddress() {
+		return mailAddress;
+	}
+
+	public void setMailAddress(String mailAddress) {
+		this.mailAddress = mailAddress;
+	}
+
+	public String getAdministrativeArea() {
+		return administrativeArea;
+	}
+
+	public void setAdministrativeArea(String administrativeArea) {
+		this.administrativeArea = administrativeArea;
+	}
 
     public XmlObject getServiceProvider() {
         return serviceProvider;

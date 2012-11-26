@@ -26,6 +26,7 @@ package org.n52.sos.cache;
 import com.vividsolutions.jts.geom.Envelope;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -34,6 +35,7 @@ import org.joda.time.DateTime;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
+import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * 
  * 
  */
-public abstract class ACapabilitiesCacheController extends TimerTask {
+public abstract class ACapabilitiesCacheController {
 
     /** logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(ACapabilitiesCacheController.class);
@@ -55,27 +57,52 @@ public abstract class ACapabilitiesCacheController extends TimerTask {
     private final Condition updateFree = updateLock.newCondition();
 
     private boolean updateIsFree = true;
-
+	private Timer timer = new Timer("52n-sos-capabilities-cache-controller");
+	private TimerTask current = null;
+	
     /**
      * default constructor
      */
     public ACapabilitiesCacheController() {
+		schedule();
     }
 
-    /**
-     * Implements TimerTask's abstract run method.
-     */
-    public void run() {
-        try {
-            if (update(true)) {
-                LOGGER.info("Timertask: capabilities cache update successful!");
-            } else {
-                LOGGER.warn("Timertask: capabilities cache update not successful!");
-            }
-        } catch (OwsExceptionReport e) {
-            LOGGER.error("Fatal error: Timertask couldn't update capabilities cache!");
-        }
-    }
+	protected final void schedule() {
+		/* timers can not be rescheduled. to make the 
+		 * interval changable schedule a anonymous timer */
+		this.current = new TimerTask() {
+			@Override
+			public void run() {
+				try {
+					if (update(true)) {
+						LOGGER.info("Timertask: capabilities cache update successful!");
+					} else {
+						LOGGER.warn("Timertask: capabilities cache update not successful!");
+					}
+					schedule();
+				} catch (OwsExceptionReport e) {
+					LOGGER.error("Fatal error: Timertask couldn't update capabilities cache!");
+				}
+			}
+		};
+		long delay = Configurator.getInstance().getUpdateIntervallInMillis();
+		if (delay > 0) {
+			LOGGER.info("Next CapabilitiesCacheUpdate in {}ms", delay);
+			this.timer.schedule(this.current, delay);
+		}
+	}
+	
+	
+	public void reschedule() {
+		if (this.current != null) {
+			this.current.cancel();
+		}
+		schedule();
+	}
+	
+	public void cancel() {
+		this.timer.cancel();
+	}
 
     /*
      * (non-Javadoc)
@@ -85,7 +112,7 @@ public abstract class ACapabilitiesCacheController extends TimerTask {
     @Override
     protected void finalize() {
         try {
-            cancel();
+			this.cancel();
             super.finalize();
         } catch (Throwable e) {
             LOGGER.error("Could not finalize CapabilitiesCacheController! " + e.getMessage());
@@ -104,7 +131,6 @@ public abstract class ACapabilitiesCacheController extends TimerTask {
      *             if the query of one of the values described upside failed
      */
     public abstract boolean update(boolean checkLastUpdateTime) throws OwsExceptionReport;
-    
     
     public abstract void updateAfterSensorInsertion() throws OwsExceptionReport;
 
@@ -285,7 +311,7 @@ public abstract class ACapabilitiesCacheController extends TimerTask {
      *            collection of procedure ids to find children for
      * @param fullHierarchy
      *            whether or not to navigate the full procedure hierarchy
-     * @param includeSelf
+     * @param includeSelves
      *            whether or not to include the passed procedure id in the
      *            result
      * 

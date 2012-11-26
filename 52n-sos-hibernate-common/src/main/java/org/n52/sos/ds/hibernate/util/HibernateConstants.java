@@ -97,4 +97,17 @@ public class HibernateConstants {
 
     public static final String PARAMETER_PROCEDURES = "procedures";
 
+	public static final String PARAMETER_SETTING_KEY = "key";
+
+	public static final String PARAMETER_SETTING_VALUE = "value";
+	
+	public static final String ADMIN_USERNAME_KEY = "admin_username";
+	public static final String ADMIN_PASSWORD_KEY = "admin_password";
+	public static final String TABLE_NAME_SETTINGS = "global_settings";
+	
+	/* dssos.config properties */
+	public static final String DRIVER_PROPERTY = "hibernate.connection.driver_class";
+	public static final String PASS_PROPERTY = "hibernate.connection.password";
+	public static final String USER_PROPERTY = "hibernate.connection.username";
+	public static final String CONNECTION_STRING_PROPERTY = "hibernate.connection.url";
 }

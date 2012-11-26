@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ds.hibernate;
 
+import java.util.Properties;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -34,7 +35,7 @@ import org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider;
 import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.service.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,25 +59,9 @@ public class SessionFactoryProvider implements IConnectionProvider {
     /**
      * constructor. Opens a new Hibernate SessionFactory
      * 
-     * @throws OwsExceptionReport
-     *             If an error occurs during instantiation.
      */
-    public SessionFactoryProvider() throws OwsExceptionReport {
-        try {
-//            Configuration configuration = new Configuration().addResource("/sos-hibernate.cfg.xml").configure();
-            Configuration configuration = new Configuration().configure("/sos-hibernate.cfg.xml");
-            // Configuration configuration = new Configuration();
-            // configuration.configure(new
-            // File(Configurator.getInstance().getBasePath() +
-            // "WEB-INF\\conf\\hibernate\\hibernate.cfg.xml"));
-            ServiceRegistry serviceRegistry =
-                    new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
-            this.sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-        } catch (HibernateException he) {
-            String exceptionText = "An error occurs during instantiation of the database connection pool!";
-            LOGGER.error(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
-        }
+    public SessionFactoryProvider() {
+        
     }
 
     /*
@@ -86,7 +71,10 @@ public class SessionFactoryProvider implements IConnectionProvider {
      */
     @Override
     public Session getConnection() {
-        return sessionFactory.openSession();
+		if (sessionFactory == null) {
+			return null;
+		}
+		return sessionFactory.openSession();
     }
 
     /*
@@ -115,19 +103,38 @@ public class SessionFactoryProvider implements IConnectionProvider {
      */
     @Override
     public void cleanup() {
-        try {
-            if (sessionFactory instanceof SessionFactoryImpl) {
-                SessionFactoryImpl sf = (SessionFactoryImpl) sessionFactory;
-                ConnectionProvider conn = sf.getConnectionProvider();
-                if (conn instanceof C3P0ConnectionProvider) {
-                    ((C3P0ConnectionProvider) conn).close();
-                }
-            }
-            this.sessionFactory.close();
-            LOGGER.info("Connection provider closed successfully!");
-        } catch (HibernateException he) {
-            LOGGER.error("Error while closing connection provider!", he);
-        }
+		if (this.sessionFactory != null) {
+			try {
+				if (this.sessionFactory instanceof SessionFactoryImpl) {
+					SessionFactoryImpl sf = (SessionFactoryImpl) this.sessionFactory;
+					ConnectionProvider conn = sf.getConnectionProvider();
+					if (conn instanceof C3P0ConnectionProvider) {
+						((C3P0ConnectionProvider) conn).close();
+					}
+				}
+				this.sessionFactory.close();
+				LOGGER.info("Connection provider closed successfully!");
+			} catch (HibernateException he) {
+				LOGGER.error("Error while closing connection provider!", he);
+			}
+		}
     }
+
+	@Override
+	public void initialize(Properties properties) throws ConfigurationException {
+		try {
+			LOGGER.debug("Instantiating session factory with {}", properties);
+            Configuration configuration = new Configuration()
+					.configure("/sos-hibernate.cfg.xml")
+					.mergeProperties(properties);
+            ServiceRegistry serviceRegistry =
+                    new ServiceRegistryBuilder().applySettings(configuration.getProperties()).buildServiceRegistry();
+            this.sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+        } catch (HibernateException he) {
+            String exceptionText = "An error occurs during instantiation of the database connection pool!";
+            LOGGER.error(exceptionText, he);
+			throw new ConfigurationException(exceptionText, he);
+        }
+	}
 
 }

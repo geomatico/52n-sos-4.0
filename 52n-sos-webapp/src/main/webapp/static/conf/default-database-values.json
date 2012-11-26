@@ -1,0 +1,4 @@
+{
+	"jdbc_uri": "jdbc:postgresql://localhost:5432/sos?user=postgres&password=postgres",
+	"driver": "org.postgresql.Driver"
+}

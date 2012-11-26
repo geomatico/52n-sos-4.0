@@ -29,8 +29,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.print.attribute.ResolutionSyntax;
+import net.opengis.ows.x11.AddressType;
 
 import net.opengis.ows.x11.AllowedValuesDocument.AllowedValues;
+import net.opengis.ows.x11.ContactType;
 import net.opengis.ows.x11.DCPDocument.DCP;
 import net.opengis.ows.x11.DomainType;
 import net.opengis.ows.x11.ExceptionReportDocument;
@@ -41,6 +44,7 @@ import net.opengis.ows.x11.KeywordsType;
 import net.opengis.ows.x11.OperationDocument.Operation;
 import net.opengis.ows.x11.OperationsMetadataDocument.OperationsMetadata;
 import net.opengis.ows.x11.RangeType;
+import net.opengis.ows.x11.ResponsiblePartySubsetType;
 import net.opengis.ows.x11.ServiceIdentificationDocument;
 import net.opengis.ows.x11.ServiceIdentificationDocument.ServiceIdentification;
 import net.opengis.ows.x11.ServiceProviderDocument;
@@ -151,8 +155,9 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
      */
     private XmlObject encodeServiceIdentification(SosServiceIdentification sosServiceIdentification)
             throws OwsExceptionReport {
+		ServiceIdentification serviceIdent;
         if (sosServiceIdentification.getServiceIdentification() != null) {
-            ServiceIdentification serviceIdent;
+            
             if (sosServiceIdentification.getServiceIdentification() instanceof ServiceIdentificationDocument) {
                 serviceIdent =
                         ((ServiceIdentificationDocument) sosServiceIdentification.getServiceIdentification())
@@ -165,33 +170,36 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
                 LOGGER.debug(exceptionText);
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
             }
-            // set service type versions
-            if (sosServiceIdentification.getVersions() != null && !sosServiceIdentification.getVersions().isEmpty()) {
-                serviceIdent.setServiceTypeVersionArray(sosServiceIdentification.getVersions().toArray(new String[0]));
-            }
+		} else {
+			/* TODO check for required fields and fail on missing ones */
+			serviceIdent = ServiceIdentification.Factory.newInstance();
+			serviceIdent.addAccessConstraints(sosServiceIdentification.getAccessConstraints());
+			serviceIdent.setFees(sosServiceIdentification.getFees());
+			serviceIdent.addNewAbstract().setStringValue(sosServiceIdentification.getAbstract());
+			serviceIdent.addNewServiceType().setStringValue(sosServiceIdentification.getServiceType());
+			serviceIdent.addNewTitle().setStringValue(sosServiceIdentification.getTitle());
+		}
+		// set service type versions
+		if (sosServiceIdentification.getVersions() != null && !sosServiceIdentification.getVersions().isEmpty()) {
+			serviceIdent.setServiceTypeVersionArray(sosServiceIdentification.getVersions().toArray(new String[sosServiceIdentification.getVersions().size()]));
+		}
 
-            // set Profiles
-            if (sosServiceIdentification.getProfiles() != null && !sosServiceIdentification.getProfiles().isEmpty()) {
-                serviceIdent.setProfileArray(sosServiceIdentification.getProfiles().toArray(new String[0]));
-            }
-            // set keywords if they're not already in the service identification
-            // doc
-            if (sosServiceIdentification.getKeywords() != null && !sosServiceIdentification.getKeywords().isEmpty()) {
-                if (serviceIdent.getKeywordsArray().length == 0) {
-                    KeywordsType keywordsType = serviceIdent.addNewKeywords();
-                    for (String keyword : sosServiceIdentification.getKeywords()) {
-                        keywordsType.addNewKeyword().setStringValue(keyword.trim());
-                    }
-                }
-            }
+		// set Profiles
+		if (sosServiceIdentification.getProfiles() != null && !sosServiceIdentification.getProfiles().isEmpty()) {
+			serviceIdent.setProfileArray(sosServiceIdentification.getProfiles().toArray(new String[sosServiceIdentification.getProfiles().size()]));
+		}
+		// set keywords if they're not already in the service identification
+		// doc
+		if (sosServiceIdentification.getKeywords() != null && !sosServiceIdentification.getKeywords().isEmpty()) {
+			if (serviceIdent.getKeywordsArray().length == 0) {
+				KeywordsType keywordsType = serviceIdent.addNewKeywords();
+				for (String keyword : sosServiceIdentification.getKeywords()) {
+					keywordsType.addNewKeyword().setStringValue(keyword.trim());
+				}
+			}
+		}
 
-            return serviceIdent;
-        } else {
-            String exceptionText =
-                    "The service identification file is not a ServiceIdentificationDocument, ServiceIdentification or invalid! Check the file in the Tomcat webapps: /SOS_webapp/WEB-INF/conf/capabilities/.";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        }
+		return serviceIdent;
     }
 
     /**
@@ -217,10 +225,23 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
             }
         } else {
-            String exceptionText =
-                    "The service identification file is not a ServiceProviderDocument, ServiceProvider or invalid! Check the file in the Tomcat webapps: /SOS_webapp/WEB-INF/conf/capabilities/.";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+			/* TODO check for required fields and fail on missing ones */
+			ServiceProvider serviceProvider = ServiceProvider.Factory.newInstance();
+			serviceProvider.setProviderName(sosServiceProvider.getName());
+			serviceProvider.addNewProviderSite().setHref(sosServiceProvider.getSite());
+			ResponsiblePartySubsetType responsibleParty = serviceProvider.addNewServiceContact();
+			responsibleParty.setIndividualName(sosServiceProvider.getIndividualName());
+			responsibleParty.setPositionName(sosServiceProvider.getPositionName());
+			ContactType contact = responsibleParty.addNewContactInfo();
+			contact.addNewPhone().addVoice(sosServiceProvider.getPhone());
+			AddressType address = contact.addNewAddress();
+			address.addDeliveryPoint(sosServiceProvider.getDeliveryPoint());
+			address.addElectronicMailAddress(sosServiceProvider.getMailAddress());
+			address.setAdministrativeArea(sosServiceProvider.getAdministrativeArea());
+			address.setCity(sosServiceProvider.getCity());
+			address.setCountry(sosServiceProvider.getCountry());
+			address.setPostalCode(sosServiceProvider.getPostalCode());
+			return serviceProvider;
         }
 
     }
@@ -274,7 +295,7 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
         // er.setLanguage("en");
         er.setVersion(owsExceptionReport.getVersion());
         if (owsExceptionReport.getExceptions() != null) {
-            List<ExceptionType> exceptionTypes = new ArrayList<ExceptionType>();
+            List<ExceptionType> exceptionTypes = new ArrayList<ExceptionType>(owsExceptionReport.getExceptions().size());
             for (OwsException owsException : owsExceptionReport.getExceptions()) {
                 ExceptionType exceptionType =
                         ExceptionType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
@@ -300,10 +321,10 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
                         exceptionText.append(". Message: ");
                         exceptionText.append(message);
                     } else if (owsExceptionReport.getExcLevel().compareTo(ExceptionLevel.DetailedExceptions) == 0) {
-                        exceptionText.append(": " + name + "\n");
-                        exceptionText.append("[EXC] message: " + message + "\n");
+                        exceptionText.append(": ").append(name).append("\n");
+                        exceptionText.append("[EXC] message: ").append(message).append("\n");
                         for (StackTraceElement stackTraceElement : stackTraces) {
-                            exceptionText.append("[EXC]" + stackTraceElement.toString() + "\n");
+                            exceptionText.append("[EXC]").append(stackTraceElement.toString()).append("\n");
                         }
                     } else {
                         LOGGER.warn("addCodedException: unknown ExceptionLevel " + "("
@@ -313,7 +334,7 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
                 exceptionType.addExceptionText(exceptionText.toString());
                 exceptionTypes.add(exceptionType);
             }
-            er.setExceptionArray(exceptionTypes.toArray(new ExceptionType[0]));
+            er.setExceptionArray(exceptionTypes.toArray(new ExceptionType[exceptionTypes.size()]));
         }
         N52XmlHelper.setSchemaLocationToDocument(erd, N52XmlHelper.getSchemaLocationForOWS110());
         return erd;

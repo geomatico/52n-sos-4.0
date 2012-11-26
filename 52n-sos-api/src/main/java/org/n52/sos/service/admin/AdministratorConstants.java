@@ -26,7 +26,7 @@ package org.n52.sos.service.admin;
 public class AdministratorConstants {
     
     /** enum with parameter names for getCapabilities request */
-    public enum AdministatorParams {
+    public enum AdministratorParams {
         service, request, parameter;
 
         /**
@@ -38,11 +38,12 @@ public class AdministratorConstants {
          * @return true if the name is contained in the enumeration
          */
         public static boolean contains(String s) {
-            boolean contained = false;
-            contained =
-                    (s.equals(AdministatorParams.service.name()))
-                            || (s.equals(AdministatorParams.request.name()));
-            return contained;
+			for (AdministratorParams p : values()) {
+				if (p.name().equals(s)) {
+					return true;
+				}
+			}
+			return false;
         }
     }
 

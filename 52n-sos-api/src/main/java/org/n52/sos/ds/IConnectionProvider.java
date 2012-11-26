@@ -23,6 +23,9 @@
  */
 package org.n52.sos.ds;
 
+import java.util.Properties;
+import org.n52.sos.service.ConfigurationException;
+
 /**
  * Interface for a connection provider that handles the connection to the
  * underlying data source (e.g. database, web service). Implementation can
@@ -51,5 +54,14 @@ public interface IConnectionProvider {
      * connection.
      */
     public void cleanup();
+	
+	/**
+	 * Initializes the connection provider.
+	 * 
+	 * @param properties the properties
+	 * 
+	 * @throws ConfigurationException if the initialization failed 
+	 */
+	public void initialize(Properties properties) throws ConfigurationException;
 
 }

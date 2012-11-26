@@ -45,7 +45,7 @@ import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.admin.AdministratorConstants.AdministatorParams;
+import org.n52.sos.service.admin.AdministratorConstants.AdministratorParams;
 import org.n52.sos.service.admin.request.AdminRequest;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -135,7 +135,7 @@ public class SosAdminRequestOperator implements IAdminRequestOperator {
                 } else {
                     String exceptionTex = "";
                     exceptions.add(Util4Exceptions.createInvalidParameterValueException(
-                            AdministatorParams.parameter.name(), exceptionTex));
+                            AdministratorParams.parameter.name(), exceptionTex));
                 }
                 builder.append(", ");
             }
@@ -145,7 +145,7 @@ public class SosAdminRequestOperator implements IAdminRequestOperator {
             builder.delete(builder.lastIndexOf(", "), builder.length());
             return createServiceResponse(builder.toString());
         } else {
-            throw Util4Exceptions.createMissingParameterValueException(AdministatorParams.parameter.name());
+            throw Util4Exceptions.createMissingParameterValueException(AdministratorParams.parameter.name());
         }
     }
 
@@ -158,7 +158,7 @@ public class SosAdminRequestOperator implements IAdminRequestOperator {
         opsMetadata.add(getOpsMetadataForCapabilities());
         opsMetadata.add(getOpsMetadataForUpdate());
         operationsMetadata.setOperations(opsMetadata);
-        operationsMetadata.addCommonValue(AdministatorParams.service.name(), new OWSParameterValuePossibleValues(KEY));
+        operationsMetadata.addCommonValue(AdministratorParams.service.name(), new OWSParameterValuePossibleValues(KEY));
         sosCapabilities.setOperationsMetadata(operationsMetadata);
         response.setCapabilities(sosCapabilities);
         return createServiceResponse(response);
@@ -171,7 +171,7 @@ public class SosAdminRequestOperator implements IAdminRequestOperator {
         // set DCP
         opsMeta.setDcp(getDCP());
         // set parameter
-        opsMeta.addParameterValue(AdministatorParams.parameter.name(), new OWSParameterValuePossibleValues(
+        opsMeta.addParameterValue(AdministratorParams.parameter.name(), new OWSParameterValuePossibleValues(
                 new ArrayList<String>(0)));
         return opsMeta;
     }
@@ -190,7 +190,7 @@ public class SosAdminRequestOperator implements IAdminRequestOperator {
         parameterValues.add(UPDATE_ENCODER);
         parameterValues.add(UPDATE_OPERATIONS);
         parameterValues.add(UPDATE_SERVICES);
-        opsMeta.addParameterValue(AdministatorParams.parameter.name(), new OWSParameterValuePossibleValues(
+        opsMeta.addParameterValue(AdministratorParams.parameter.name(), new OWSParameterValuePossibleValues(
                 parameterValues));
         return opsMeta;
     }

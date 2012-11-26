@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ows:ServiceIdentification xmlns:ows="http://www.opengis.net/ows/1.1">
-	<ows:Title>${conf.sos.capabilities.identification.title}</ows:Title>
-	<ows:Abstract>${conf.sos.capabilities.identification.abstract} (SVN: ${buildNumber} @ ${timestamp})</ows:Abstract>
-	<ows:ServiceType codeSpace="http://opengeospatial.net">${conf.sos.capabilities.identification.servicetype}</ows:ServiceType>
-	<ows:Fees>${conf.sos.capabilities.identification.fees}</ows:Fees>
-	<ows:AccessConstraints>${conf.sos.capabilities.identification.accessconstrains}</ows:AccessConstraints>
-</ows:ServiceIdentification>

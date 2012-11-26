@@ -26,6 +26,7 @@ package org.n52.sos.ds.hibernate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,7 +36,6 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.apache.xmlbeans.XmlObject;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
@@ -62,7 +62,6 @@ import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
-import org.n52.sos.ogc.ows.SosServiceProvider;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -75,7 +74,6 @@ import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,16 +94,6 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
     private static final String OPERATION_NAME = SosConstants.Operations.GetCapabilities.name();
 
     /**
-     * XML object of the service identification section, loaded from file
-     */
-    private XmlObject serviceIdentification;
-
-    /**
-     * XML object of the service provider section, loaded from file
-     */
-    private XmlObject serviceProvider;
-
-    /**
      * Instance of the IConnectionProvider
      */
     private IConnectionProvider connectionProvider;
@@ -117,9 +105,6 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
      *             If an error occurs If a file could not be loaded
      */
     public GetCapabilitiesDAO() throws OwsExceptionReport {
-        this.serviceIdentification =
-                XmlHelper.loadXmlDocumentFromFile(Configurator.getInstance().getServiceIdentification());
-        this.serviceProvider = XmlHelper.loadXmlDocumentFromFile(Configurator.getInstance().getServiceProvider());
         this.connectionProvider = Configurator.getInstance().getConnectionProvider();
     }
 
@@ -248,7 +233,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
             SosCapabilities sosCapabilities = new SosCapabilities();
             if (all) {
                 sosCapabilities.setServiceIdentification(getServiceIdentification(response.getVersion()));
-                sosCapabilities.setServiceProvider(getServiceProvicer());
+                sosCapabilities.setServiceProvider(Configurator.getInstance().getServiceProvider());
                 sosCapabilities.setFilterCapabilities(getFilterCapabilities(response.getVersion()));
                 sosCapabilities.setOperationsMetadata(getOperationsMetadataForOperations(response.getService(),
                         response.getVersion(), extensions, session));
@@ -263,7 +248,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                 sosCapabilities.setServiceIdentification(getServiceIdentification(response.getVersion()));
             }
             if (serviceProviderSection) {
-                sosCapabilities.setServiceProvider(getServiceProvicer());
+                sosCapabilities.setServiceProvider(Configurator.getInstance().getServiceProvider());
             }
             if (operationsMetadataSection) {
                 sosCapabilities.setOperationsMetadata(getOperationsMetadataForOperations(response.getService(),
@@ -299,25 +284,12 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         return null;
     }
 
-    private SosServiceIdentification getServiceIdentification(String version) {
-        SosServiceIdentification serviceIdentification = new SosServiceIdentification();
-        serviceIdentification.setServiceIdentification(this.serviceIdentification);
-        serviceIdentification.setVersions(Configurator.getInstance().getSupportedVersions());
-        serviceIdentification.setKeywords(getKeywords());
+    private SosServiceIdentification getServiceIdentification(String version) throws OwsExceptionReport {
+		SosServiceIdentification serviceIdentification = Configurator.getInstance().getServiceIdentification();
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
             serviceIdentification.setProfiles(getProfiles());
         }
         return serviceIdentification;
-    }
-
-    private SosServiceProvider getServiceProvicer() {
-        SosServiceProvider serviceProvider = new SosServiceProvider();
-        serviceProvider.setServiceProvider(this.serviceProvider);
-        return serviceProvider;
-    }
-
-    private List<String> getKeywords() {
-        return Arrays.asList(Configurator.getInstance().getServiceIdentificationKeywords());
     }
 
     private List<String> getProfiles() {
@@ -353,11 +325,10 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
     private OWSOperationsMetadata getOperationsMetadataForOperations(String service, String version,
             List<IExtension> extensions, Session session) throws OwsExceptionReport {
         OWSOperationsMetadata operationsMetadata = new OWSOperationsMetadata();
-        List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>();
-
         // FIXME: OpsMeata for InsertSensor, InsertObservation SOS 2.0
         Map<RequestOperatorKeyType, IRequestOperator> requestOperators =
                 Configurator.getInstance().getRequestOperator();
+		List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>(requestOperators.size());
         opsMetadata.add(getOpsGetCapabilities(service, version, extensions));
         for (RequestOperatorKeyType requestOperatorKeyType : requestOperators.keySet()) {
             if (!requestOperatorKeyType.getOperationName().equals(OPERATION_NAME)
@@ -409,10 +380,8 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
      */
     private List<SosOfferingsForContents> getContents(SosCapabilities sosCapabilities, Session session)
             throws OwsExceptionReport {
-        List<SosOfferingsForContents> sosOfferings = new ArrayList<SosOfferingsForContents>();
-
         Collection<String> offerings = Configurator.getInstance().getCapabilitiesCacheController().getOfferings();
-
+		List<SosOfferingsForContents> sosOfferings = new ArrayList<SosOfferingsForContents>(offerings.size());
         for (String offering : offerings) {
             SosOfferingsForContents sosOffering = new SosOfferingsForContents();
 
@@ -513,11 +482,10 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
     private List<SosOfferingsForContents> getContentsForSosV2(String version, Session session)
             throws OwsExceptionReport {
         int phenTimeCounter = 1;
-        List<SosOfferingsForContents> sosOfferings = new ArrayList<SosOfferingsForContents>();
-
         Collection<String> offerings = Configurator.getInstance().getCapabilitiesCacheController().getOfferings();
-
-        for (String offering : offerings) {
+		List<SosOfferingsForContents> sosOfferings = new ArrayList<SosOfferingsForContents>(offerings.size());
+        
+		for (String offering : offerings) {
             Collection<String> procedures =
                     Configurator.getInstance().getCapabilitiesCacheController().getProcedures4Offering(offering);
             if (procedures == null || procedures.isEmpty()) {
@@ -537,9 +505,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                 // sosOffering.setSrid(sosEnvelope.getSrid());
                 // }
 
-                Collection<String> offProc = new ArrayList<String>();
-                offProc.add(procedure);
-                sosOffering.setProcedures(offProc);
+                sosOffering.setProcedures(Collections.singletonList(procedure));
 
                 // TODO: add intended application
                 // xb_oo.addIntendedApplication("");
@@ -656,9 +622,9 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
      * @throws OwsExceptionReport
      */
     private List<IExtension> getExtensions(Session session) throws OwsExceptionReport {
-        List<IExtension> extensions = new ArrayList<IExtension>();
         Map<RequestOperatorKeyType, IRequestOperator> requestOperators =
                 Configurator.getInstance().getRequestOperator();
+		List<IExtension> extensions = new ArrayList<IExtension>(requestOperators.size());
         for (IRequestOperator requestOperator : requestOperators.values()) {
             IExtension extension = requestOperator.getExtension(session);
             if (extension != null) {
@@ -694,14 +660,12 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         opsMeta.setDcp(SosHelper.getDCP(SosConstants.Operations.GetCapabilities.name(), dkt, Configurator
                 .getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set param updateSequence
-        List<String> updateSequenceValues = new ArrayList<String>();
-        updateSequenceValues.add(SosConstants.PARAMETER_ANY);
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.updateSequence.name(), new OWSParameterValuePossibleValues(updateSequenceValues));
+        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.updateSequence.name(), new OWSParameterValuePossibleValues(Collections.singletonList(SosConstants.PARAMETER_ANY)));
         // set param AcceptVersions
         opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.AcceptVersions.name(), new OWSParameterValuePossibleValues(Configurator.getInstance()
                 .getSupportedVersions()));
         // set param Sections
-        List<String> sectionsValues = new ArrayList<String>();
+        List<String> sectionsValues = new ArrayList<String>(8);
         sectionsValues.add(SosConstants.CapabilitiesSections.ServiceIdentification.name());
         sectionsValues.add(SosConstants.CapabilitiesSections.ServiceProvider.name());
         sectionsValues.add(SosConstants.CapabilitiesSections.OperationsMetadata.name());
@@ -734,7 +698,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
     private void getSpatialFilterCapabilities(FilterCapabilities filterCapabilities, String version) {
 
         // set GeometryOperands
-        List<QName> operands = new ArrayList<QName>();
+        List<QName> operands = new ArrayList<QName>(4);
         operands.add(GMLConstants.QN_ENVELOPE);
         // additional spatial operands for SOS 1.0
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
@@ -748,26 +712,24 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         // set SpatialOperators
         Map<SpatialOperator, List<QName>> spatialOperators = new EnumMap<SpatialOperator, List<QName>>(SpatialOperator.class);
         // set BBOX
-        List<QName> operands4BBox = new ArrayList<QName>();
-        operands4BBox.add(GMLConstants.QN_ENVELOPE);
-        spatialOperators.put(SpatialOperator.BBOX, operands4BBox);
+        spatialOperators.put(SpatialOperator.BBOX, Collections.singletonList(GMLConstants.QN_ENVELOPE));
 
         // additional spatial operators for SOS 1.0
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             // set Contains
-            List<QName> operands4Contains = new ArrayList<QName>();
+            List<QName> operands4Contains = new ArrayList<QName>(3);
             operands4Contains.add(GMLConstants.QN_POINT);
             operands4Contains.add(GMLConstants.QN_LINESTRING);
             operands4Contains.add(GMLConstants.QN_POLYGON);
             spatialOperators.put(SpatialOperator.Contains, operands4Contains);
             // set Intersects
-            List<QName> operands4Intersects = new ArrayList<QName>();
+            List<QName> operands4Intersects = new ArrayList<QName>(3);
             operands4Intersects.add(GMLConstants.QN_POINT);
             operands4Intersects.add(GMLConstants.QN_LINESTRING);
             operands4Intersects.add(GMLConstants.QN_POLYGON);
             spatialOperators.put(SpatialOperator.Intersects, operands4Intersects);
             // set Overlaps
-            List<QName> operands4Overlaps = new ArrayList<QName>();
+            List<QName> operands4Overlaps = new ArrayList<QName>(3);
             operands4Overlaps.add(GMLConstants.QN_POINT);
             operands4Overlaps.add(GMLConstants.QN_LINESTRING);
             operands4Overlaps.add(GMLConstants.QN_POLYGON);
@@ -788,7 +750,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
     private void getTemporalFilterCapabilities(FilterCapabilities filterCapabilities, String version) {
 
         // set TemporalOperands
-        List<QName> operands = new ArrayList<QName>();
+        List<QName> operands = new ArrayList<QName>(2);
         operands.add(GMLConstants.QN_TIME_PERIOD);
         operands.add(GMLConstants.QN_TIME_INSTANT);
 
@@ -797,21 +759,21 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         // set TemporalOperators
         Map<TimeOperator, List<QName>> temporalOperators = new EnumMap<TimeOperator, List<QName>>(TimeOperator.class);
         // set TM_During
-        List<QName> operands4During = new ArrayList<QName>();
+        List<QName> operands4During = new ArrayList<QName>(1);
         operands4During.add(GMLConstants.QN_TIME_PERIOD);
         temporalOperators.put(TimeOperator.TM_During, operands4During);
         // set TM_Equals
-        List<QName> operands4Equals = new ArrayList<QName>();
+        List<QName> operands4Equals = new ArrayList<QName>(1);
         operands4Equals.add(GMLConstants.QN_TIME_INSTANT);
         temporalOperators.put(TimeOperator.TM_Equals, operands4Equals);
         // additional temporal operators for SOS 1.0
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             // set TM_After
-            List<QName> operands4After = new ArrayList<QName>();
+            List<QName> operands4After = new ArrayList<QName>(1);
             operands4After.add(GMLConstants.QN_TIME_INSTANT);
             temporalOperators.put(TimeOperator.TM_After, operands4After);
             // set TM_Before
-            List<QName> operands4Before = new ArrayList<QName>();
+            List<QName> operands4Before = new ArrayList<QName>(1);
             operands4Before.add(GMLConstants.QN_TIME_INSTANT);
             temporalOperators.put(TimeOperator.TM_Before, operands4Before);
         }
@@ -826,7 +788,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
      *            FilterCapabilities
      */
     private void getScalarFilterCapabilities(FilterCapabilities filterCapabilities) {
-        List<ComparisonOperator> comparisonOperators = new ArrayList<ComparisonOperator>();
+        List<ComparisonOperator> comparisonOperators = new ArrayList<ComparisonOperator>(8);
         comparisonOperators.add(ComparisonOperator.PropertyIsBetween);
         comparisonOperators.add(ComparisonOperator.PropertyIsEqualTo);
         comparisonOperators.add(ComparisonOperator.PropertyIsNotEqualTo);
@@ -863,7 +825,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
      * @return QNames for resultModel parameter
      */
     private Collection<QName> getQNamesForResultModel(Collection<String> resultModels4Offering) {
-        List<QName> resultModels = new ArrayList<QName>();
+        List<QName> resultModels = new ArrayList<QName>(9);
         for (String string : resultModels4Offering) {
             if (string.equals(OMConstants.OBS_TYPE_MEASUREMENT)) {
                 resultModels.add(OMConstants.RESULT_MODEL_MEASUREMENT);

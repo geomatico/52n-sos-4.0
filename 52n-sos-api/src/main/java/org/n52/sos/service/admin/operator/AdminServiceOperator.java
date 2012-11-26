@@ -39,7 +39,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.admin.AdministratorConstants.AdministatorParams;
+import org.n52.sos.service.admin.AdministratorConstants.AdministratorParams;
 import org.n52.sos.service.admin.request.AdminRequest;
 import org.n52.sos.service.admin.request.operator.IAdminRequestOperator;
 import org.n52.sos.util.KvpHelper;
@@ -96,19 +96,19 @@ public class AdminServiceOperator extends IAdminServiceOperator {
             String exceptionText = "The request is empty!";
             LOGGER.debug(exceptionText);
             throw new AdministratorException(exceptionText);
-        } else if (!kvp.isEmpty() && !kvp.containsKey(AdministatorParams.request.name())) {
-            String exceptionText = "The request does not contain mandatory '" + AdministatorParams.request.name() + "' parameter!";
+        } else if (!kvp.isEmpty() && !kvp.containsKey(AdministratorParams.request.name())) {
+            String exceptionText = "The request does not contain mandatory '" + AdministratorParams.request.name() + "' parameter!";
             LOGGER.debug(exceptionText);
             throw new AdministratorException(exceptionText);
-        } else if (!kvp.isEmpty() && !kvp.containsKey(AdministatorParams.service.name())) {
-            String exceptionText = "The request does not contain mandatory '" + AdministatorParams.service.name() + "' parameter!";
+        } else if (!kvp.isEmpty() && !kvp.containsKey(AdministratorParams.service.name())) {
+            String exceptionText = "The request does not contain mandatory '" + AdministratorParams.service.name() + "' parameter!";
             LOGGER.debug(exceptionText);
             throw new AdministratorException(exceptionText);
         }
         AdminRequest request = new AdminRequest();
-        request.setService(kvp.get(AdministatorParams.service.name()));
-        request.setRequest(kvp.get(AdministatorParams.request.name()));
-        request.setParameters(kvp.get(AdministatorParams.parameter.name()));
+        request.setService(kvp.get(AdministratorParams.service.name()));
+        request.setRequest(kvp.get(AdministratorParams.request.name()));
+        request.setParameters(kvp.get(AdministratorParams.parameter.name()));
         return request;
     }
 }

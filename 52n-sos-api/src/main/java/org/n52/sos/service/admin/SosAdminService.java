@@ -24,8 +24,8 @@
 package org.n52.sos.service.admin;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -43,6 +43,7 @@ import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.ConfiguratedHttpServlet;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.admin.operator.IAdminServiceOperator;
@@ -55,65 +56,21 @@ import org.slf4j.LoggerFactory;
  * HttpGet requests and sends the operation result documents to the client
  * 
  */
-public class SosAdminService extends HttpServlet {
+public class SosAdminService extends ConfiguratedHttpServlet {
 
     private static final long serialVersionUID = 1L;
 
     /** the logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosAdminService.class);
 
-    /** The init parameter of the configFile */
-    private static final String INIT_PARAM_CONFIG_FILE = "configFile";
-
-    /**
-     * The request operator for the adminstration backend
-     */
-    private IAdminServiceOperator sosAdminOperator;
-
-    /**
-     * initializes the Servlet
-     */
-    public void init() throws ServletException {
-
-        // get ServletContext
-        ServletContext context = getServletContext();
-        String basepath = context.getRealPath("/");
-
-        // get configFile as InputStream
-        InputStream configStream = context.getResourceAsStream(getInitParameter(INIT_PARAM_CONFIG_FILE));
-
-        if (configStream == null) {
-            throw new UnavailableException("could not open the config file");
-        }
-        // initialize configurator
-        try {
-            Configurator.getInstance(configStream, basepath);
-            configStream.close();
-        } catch (IOException ioe) {
-            throw new UnavailableException(ioe.getMessage());
-        } catch (ConfigurationException ce) {
-            throw new UnavailableException(ce.getMessage());
-        } finally {
-            try {
-                configStream.close();
-            } catch (IOException ioe) {
-                LOGGER.error("cannot close input streams!", ioe);
-            }
-
-        }
-        sosAdminOperator = Configurator.getInstance().getAdminServiceOperator();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.servlet.GenericServlet#destroy()
-     */
-    @Override
-    public void destroy() {
-        Configurator.getInstance().cleanup();
-        super.destroy();
-    }
+	/**
+	 * initializes the Servlet
+	 */
+	@Override
+	public void init() throws ServletException {
+		super.init();
+		LOGGER.info("Admin endpoint initalized successfully!");
+	}
 
     /**
      * handles all GET requests, the request will be passed to the
@@ -133,9 +90,9 @@ public class SosAdminService extends HttpServlet {
 
         this.setCorsHeaders(resp);
 
-        ServiceResponse sosResp = null;
+        ServiceResponse sosResp;
         try {
-            sosResp = sosAdminOperator.doGetOperation(req);
+            sosResp = Configurator.getInstance().getAdminServiceOperator().doGetOperation(req);
         } catch (AdministratorException e) {
             OwsExceptionReport owsExceptionReport = new OwsExceptionReport();
             owsExceptionReport.addCodedException(OwsExceptionCode.NoApplicableCode, null, "Error", e);
@@ -194,6 +151,7 @@ public class SosAdminService extends HttpServlet {
      * @param resp
      *            the response for the incoming request
      */
+	@Override
     public void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         super.doOptions(req, resp);
         this.setCorsHeaders(resp);
@@ -232,8 +190,7 @@ public class SosAdminService extends HttpServlet {
         }        
     }
     
-    private ServletException logExceptionAndCreateServletException(Exception e) 
-    {
+    private ServletException logExceptionAndCreateServletException(Exception e) {
         String exceptionText = "Error while encoding exception response!";
         if (e != null) {
             LOGGER.debug(exceptionText, e);

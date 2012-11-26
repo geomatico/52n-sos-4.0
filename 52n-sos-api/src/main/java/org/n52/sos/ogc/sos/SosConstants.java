@@ -199,7 +199,7 @@ public final class SosConstants {
 
     public static final String SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION =
             "Observations for the requested combination of observedProperty and offering do not use SWE Common encoded results.";
-
+	
     /** private constructor, to enforce use of instance instead of instantiation */
     private SosConstants() {
     }

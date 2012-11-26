@@ -21,6 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
+
 package org.n52.sos.service.it;
 
 import java.io.IOException;
@@ -32,12 +33,12 @@ public class SosV2IT extends SosITBase {
 
     /**
      * Verify v2 test client exists
-     *
+     * 
      * @throws IOException
      * @throws URISyntaxException
      */
     @Test
-    public void verifyTestClientSosV2() throws IOException, URISyntaxException{
+    public void verifyTestClientSosV2() throws IOException, URISyntaxException {
         verifyPathExists("testClient-SOSv2.html");
     }
 }
