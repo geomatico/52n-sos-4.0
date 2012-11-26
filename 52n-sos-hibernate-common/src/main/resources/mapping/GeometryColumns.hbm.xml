@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 10.07.2012 15:18:27 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="org.n52.sos.ds.hibernate.entities.GeometryColumns" table="geometry_columns">
+        <composite-id name="id" class="org.n52.sos.ds.hibernate.entities.GeometryColumnsId">
+            <key-property name="FTableCatalog" type="string">
+                <column name="f_table_catalog" length="256" />
+            </key-property>
+            <key-property name="FTableSchema" type="string">
+                <column name="f_table_schema" length="256" />
+            </key-property>
+            <key-property name="FTableName" type="string">
+                <column name="f_table_name" length="256" />
+            </key-property>
+            <key-property name="FGeometryColumn" type="string">
+                <column name="f_geometry_column" length="256" />
+            </key-property>
+            <key-property name="coordDimension" type="java.lang.Integer">
+                <column name="coord_dimension" />
+            </key-property>
+            <key-property name="srid" type="java.lang.Integer">
+                <column name="srid" />
+            </key-property>
+            <key-property name="type" type="string">
+                <column name="type" length="30" />
+            </key-property>
+        </composite-id>
+    </class>
+</hibernate-mapping>

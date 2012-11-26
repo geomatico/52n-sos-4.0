@@ -34,7 +34,6 @@ import org.hibernate.service.ServiceRegistryBuilder;
 import org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider;
 import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
 import org.n52.sos.ds.IConnectionProvider;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -34,34 +34,6 @@
 		</dependency>
 	</dependencies>
 	
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>../52n-sos-webapp/src/main/resources</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${project.basedir}/conf/hibernate</directory>
-								</resource>
-							</resources>
-							<overwrite>true</overwrite>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-
 	<profiles>
 		<profile>
 			<id>postgresql</id>
