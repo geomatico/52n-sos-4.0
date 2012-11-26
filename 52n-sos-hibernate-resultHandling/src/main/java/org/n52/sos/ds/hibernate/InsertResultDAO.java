@@ -24,6 +24,7 @@
 package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -312,18 +313,7 @@ public class InsertResultDAO implements IInsertResultDAO {
 		int resultTimeIndex = ResultHandlingHelper.hasResultTime(resultStructure);
 		int phenomenonTimeIndex = ResultHandlingHelper.hasPhenomenonTime(resultStructure);
 		
-		SosSweDataRecord record = null;
-		if (resultStructure instanceof SosSweDataArray && 
-		        ((SosSweDataArray) resultStructure).getElementType() instanceof SosSweDataRecord) {
-			SosSweDataArray array = (SosSweDataArray) resultStructure;
-			record = (SosSweDataRecord) array.getElementType();
-		} else if (resultStructure instanceof SosSweDataRecord) {
-			record = (SosSweDataRecord) resultStructure;
-		} else {
-			String exceptionText = "Unsupported ResultStructure!";
-			LOGGER.error(exceptionText);
-			throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-		}
+		SosSweDataRecord record = setRecordFrom(resultStructure);
 		
 		Map<Integer, String> observedProperties 
 			= new HashMap<Integer, String>(record.getFields().size()-1);
@@ -350,33 +340,62 @@ public class InsertResultDAO implements IInsertResultDAO {
 			// TODO composite phenomenon
 		}
 		
-		SweDataArrayValue values = new SweDataArrayValue();
+		SosMultiObservationValues<SosSweDataArray> sosValues = createObservationValueFrom(blockValues,
+		        record,
+		        encoding,
+		        resultTimeIndex,
+		        phenomenonTimeIndex,
+		        types,
+		        units);
+		
+		SosObservation o = new SosObservation();
+        o.setResultType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
+        o.setValue(sosValues);
+        return o;
+	}
+
+    private SosMultiObservationValues<SosSweDataArray> createObservationValueFrom(String[] blockValues,
+            SosSweAbstractDataComponent recordFromResultStructure,
+            SosSweAbstractEncoding encoding,
+            int resultTimeIndex,
+            int phenomenonTimeIndex,
+            Map<Integer, SWEConstants.SweSimpleType> types,
+            Map<Integer, String> units) throws OwsExceptionReport
+    {
+        SosSweDataArray dataArray = new SosSweDataArray();
+        dataArray.setElementType(recordFromResultStructure);
+        dataArray.setEncoding(encoding);
+		
+		SweDataArrayValue dataArrayValue = new SweDataArrayValue();
+		dataArrayValue.setValue(dataArray);
+		
         for (String block : blockValues) {
             String[] singleValues = getSingleValues(block, encoding);
             if (singleValues != null && singleValues.length > 0) {
-				ITime phenomenonTime = getPhenomenonTime(singleValues[phenomenonTimeIndex]);
-				TimeInstant resultTime = null;
-				if (resultTimeIndex >= 0) {
-					/* TODO result time can't be set in an SweDataArrayValue.Value */
-					resultTime = getResultTime(singleValues[resultTimeIndex]);
-				}
-				for (int i = 0; i < singleValues.length; ++i) {
-					if (i != resultTimeIndex && i != phenomenonTimeIndex) {
-						Integer index = Integer.valueOf(i);
-						IValue value = getValue(types.get(index), singleValues[i]);
-						value.setUnit(units.get(index));
-						values.addValue(phenomenonTime, observedProperties.get(index), value);
-					}
-				}
+                dataArrayValue.addBlock(Arrays.asList(singleValues));
             }
         }
-		SosObservation o = new SosObservation();
-		o.setResultType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
-		SosMultiObservationValues sosValues = new SosMultiObservationValues();
-		sosValues.setValue(values);
-		o.setValue(sosValues);
-        return o;
-	}
+		SosMultiObservationValues<SosSweDataArray> sosValues = new SosMultiObservationValues<SosSweDataArray>();
+		sosValues.setValue(dataArrayValue);
+        return sosValues;
+    }
+
+    private SosSweDataRecord setRecordFrom(SosSweAbstractDataComponent resultStructure) throws OwsExceptionReport
+    {
+        SosSweDataRecord record = null;
+        if (resultStructure instanceof SosSweDataArray && 
+		        ((SosSweDataArray) resultStructure).getElementType() instanceof SosSweDataRecord) {
+			SosSweDataArray array = (SosSweDataArray) resultStructure;
+			record = (SosSweDataRecord) array.getElementType();
+		} else if (resultStructure instanceof SosSweDataRecord) {
+			record = (SosSweDataRecord) resultStructure;
+		} else {
+			String exceptionText = "Unsupported ResultStructure!";
+			LOGGER.error(exceptionText);
+			throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+		}
+        return record;
+    }
 	
 	private IValue getValue(SWEConstants.SweSimpleType type, String value) throws OwsExceptionReport {
 		switch(type) {
@@ -404,7 +423,7 @@ public class InsertResultDAO implements IInsertResultDAO {
 				}
 			case Time:
 				try {
-					/* testing for validity */
+					// testing for validity
 					value = value.trim();
 					DateTimeHelper.parseIsoString2DateTime(value);
 					return new TextValue(value);
@@ -465,7 +484,7 @@ public class InsertResultDAO implements IInsertResultDAO {
         SosSingleObservationValue observation = new SosSingleObservationValue(phenomenonTime, textValue);
         return observation;
     }
-
+    // TODO move to helper class
     private ITime getPhenomenonTime(String timeString) throws OwsExceptionReport {
         try {
             ITime phenomenonTime;
