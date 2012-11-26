@@ -420,4 +420,46 @@ public class GetObservationRequest extends AbstractServiceRequest {
     public Map<String, String> getNamespaces() {
         return namespaces;
     }
+
+    public boolean isSetOffering() {
+        if (offerings != null && !offerings.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isSetObservableProperty() {
+        if (observedProperties != null && !observedProperties.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isSetProcedure() {
+        if (procedures != null && !procedures.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isSetFeatureOfInterest() {
+        if (featureIdentifiers != null && !featureIdentifiers.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isSetTemporalFilter() {
+        if (eventTimes != null && !eventTimes.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isSetSpatialFilter() {
+        if (spatialFilter != null) {
+            return true;
+        }
+        return false;
+    }
 }

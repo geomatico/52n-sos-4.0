@@ -224,6 +224,11 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
+
+        // check if parameters are set, if not throw ResponseExceedsSizeLimit
+        // exception
+        checkQueryParametersIfAllEmpty(sosRequest);
+
         try {
             checkOfferingId(sosRequest.getOfferings());
         } catch (OwsExceptionReport owse) {
@@ -358,5 +363,14 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
             }
         }
         return zipCompression;
+    }
+
+    private void checkQueryParametersIfAllEmpty(GetObservationRequest request) throws OwsExceptionReport {
+        if (!request.isSetOffering() && !request.isSetObservableProperty() && !request.isSetProcedure()
+                && !request.isSetFeatureOfInterest() && !request.isSetTemporalFilter() && !request.isSetSpatialFilter()) {
+            String exceptionText = "The response exceeds the size limit! Please define some filtering parameters.";
+            throw Util4Exceptions.createResponseExceedsSizeLimitException(exceptionText);
+        }
+
     }
 }
