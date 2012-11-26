@@ -127,7 +127,7 @@ public class KvpBinding extends Binding {
                 }
             }
         } catch (OwsExceptionReport owse) {
-            LOGGER.debug("Error while performing KVP resquest", owse);
+            LOGGER.debug("Error while performing KVP request", owse);
             if (request != null && request.getVersion() != null) {
                 owse.setVersion(request.getVersion());
             } else {
