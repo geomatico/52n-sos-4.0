@@ -33,7 +33,7 @@
 	<jsp:param name="lead-paragraph" value="Use this functionality with care!" />
 </jsp:include>
 <hr/>
-<p>If you click on the Reset button the database access copnfiguration of this SOS instance will be deleted. The database will stay intact and can be used for a new SOS install.</p>
+<p>If you click on the Reset button the database access configuration of this SOS instance will be deleted. The database will stay intact and can be used for a new SOS install.</p>
 
 <p>If you merely want to remove test data, use the test data removal function on the database admin page. If you want to overwrite the existing database please select the option to delete existing tables in the installation wizard.</p>
 
