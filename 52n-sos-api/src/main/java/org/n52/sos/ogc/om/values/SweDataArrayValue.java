@@ -60,15 +60,13 @@ public class SweDataArrayValue implements IValue<SosSweDataArray> {
      * Adds the given block - a {@link List}<{@link String}> - add the end of the current list of blocks
      * @param blockOfTokensToAddAtTheEnd
      * @return <tt>true</tt> (as specified by {@link Collection#add}) <br />
-     *          <tt>false</tt> if value is not set, or block could not be added
-     * @see #setValue(SosSweDataArray)
+     *          <tt>false</tt> if block could not be added
      */
     public boolean addBlock(List<String> blockOfTokensToAddAtTheEnd)
     {
         if (value != null)
         {
-            List<List<String>> blocks =  value.getValues();
-            return blocks.add(blockOfTokensToAddAtTheEnd);
+            return value.add(blockOfTokensToAddAtTheEnd);
         }
         return false;
     }

@@ -23,6 +23,8 @@
  */
 package org.n52.sos.ogc.swe;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
@@ -114,5 +116,20 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
     public void setEncoding(SosSweAbstractEncoding encoding)
     {
         this.encoding = encoding;
+    }
+
+    /**
+     * Adds the given block - a {@link List}<{@link String}> - add the end of the current list of blocks
+     * @param blockOfTokensToAddAtTheEnd
+     * @return <tt>true</tt> (as specified by {@link Collection#add}) <br />
+     *          <tt>false</tt> if block could not be added
+     */
+    public boolean add(List<String> blockOfTokensToAddAtTheEnd)
+    {
+        if (values == null)
+        {
+            values = new ArrayList<List<String>>();
+        }
+        return values.add(blockOfTokensToAddAtTheEnd);
     }
 }
