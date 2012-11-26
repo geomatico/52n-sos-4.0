@@ -187,10 +187,7 @@ public class KvpBinding extends Binding {
     private String getVersionParameterValue(String name, Map<String, String> parameterValueMap) throws OwsExceptionReport {
         String version = getParameterValue(RequestParams.version.name(), parameterValueMap);
         boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
-        if (isGetCapabilities && version == null) {
-            version = Sos2Constants.SERVICEVERSION;
-        }
-        else if (!isGetCapabilities) {
+        if (!isGetCapabilities) {
             checkParameterValue(version, RequestParams.version.name());
             if (!Configurator.getInstance().isVersionSupported(version)) {
                 StringBuilder exceptionText = new StringBuilder();
