@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.opengis.gml.x32.AbstractTimeObjectType;
+import net.opengis.gml.x32.CodeWithAuthorityType;
 import net.opengis.gml.x32.FeaturePropertyType;
 import net.opengis.gml.x32.MeasureType;
 import net.opengis.om.x20.OMObservationType;
@@ -190,7 +191,10 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
             observationID = xbObs.getId().replace("o_", "");
         }
         if (sosObservation.getIdentifier() != null) {
-            xbObs.addNewIdentifier().setStringValue(sosObservation.getIdentifier());
+            CodeWithAuthorityType identifier = xbObs.addNewIdentifier();
+            identifier.setStringValue(sosObservation.getIdentifier());
+            // FIXME get codespace from sosObservation (store codespace).
+            identifier.setCodeSpace("");
         }
 
         String observationType = sosObservation.getObservationConstellation().getObservationType();
