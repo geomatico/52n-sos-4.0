@@ -383,7 +383,7 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
             if (!sosObservation.getObservationConstellation().getObservationType().equals(obsTypeFromValue)) {
                 StringBuilder exceptionText = new StringBuilder();
                 exceptionText.append("The requested observation is invalid!");
-                exceptionText.append("The result element does not comply with the defined type (");
+                exceptionText.append(" The result element does not comply with the defined type (");
                 exceptionText.append(sosObservation.getObservationConstellation().getObservationType());
                 exceptionText.append(")!");
                 LOGGER.debug(exceptionText.toString());
@@ -395,15 +395,23 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
     private String getObservationTypeFromValue(Object value) {
         if (value instanceof BooleanValue) {
             return OMConstants.OBS_TYPE_TRUTH_OBSERVATION;
-        } else if (value instanceof CategoryValue) {
+        }
+        else if (value instanceof CategoryValue) {
             return OMConstants.OBS_TYPE_CATEGORY_OBSERVATION;
-        } else if (value instanceof CountValue) {
+        }
+        else if (value instanceof CountValue) {
             return OMConstants.OBS_TYPE_COUNT_OBSERVATION;
-        } else if (value instanceof QuantityValue) {
+        }
+        else if (value instanceof QuantityValue) {
             return OMConstants.OBS_TYPE_MEASUREMENT;
-        } else if (value instanceof TextValue) {
+        }
+        else if (value instanceof TextValue){
             return OMConstants.OBS_TYPE_TEXT_OBSERVATION;
         }
+        else if (value instanceof SweDataArrayValue) {
+            return OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION;
+        }
+        // TODO why is this default? What about not supported types?
         return OMConstants.OBS_TYPE_OBSERVATION;
     }
 
