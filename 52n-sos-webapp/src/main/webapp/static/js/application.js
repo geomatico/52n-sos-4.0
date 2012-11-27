@@ -242,7 +242,12 @@ function setSetting(id, val, settings) {
                     $("select[name=" + setting + "]").val(val);
                     break;
                 case "boolean":
-                    $("select[name=" + setting + "]").attr("checked", val === "true" || val === true);
+                    if (val === "true" || val === true) {
+                        $("select[name=" + setting + "]").attr("checked", true);
+                    } else {
+                        $("select[name=" + setting + "]").removeAttr("checked");
+                    }
+                    
                     break;
                 }
                 return;

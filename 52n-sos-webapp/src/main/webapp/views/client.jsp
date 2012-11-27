@@ -49,14 +49,13 @@
 	<input id="input-url" class="span12" type="text" placeholder="Service URL" value=""/>
 	<h3>Request</h3>
 	<div class="controls-row">
-		<select id="input-version" class="span4">
+		<select id="input-version" class="span3">
 			<option value="" disabled selected style="display: none;">Select the SOS version &hellip;</option>
-			<%-- TODO reenable if v1.0.0 is supported
-			<option value="1.0.0">Version 1.0.0</option>-->
-			--%>
-			<option value="2.0.0">Version 2.0.0</option>
 		</select>
-		<select id="input-request" class="span8 pull-right">
+		<select id="input-binding" class="span3">
+			<option value="" disabled selected style="display: none;">Select the request binding &hellip;</option>
+		</select>
+		<select id="input-request" class="span6 pull-right">
 			<option value="" disabled selected style="display: none;">Select a example request &hellip;</option>
 		</select>
 	</div>
@@ -71,42 +70,69 @@
 </form>
 <script type="text/javascript">
 	$(function() {
-		var version;
-		var sosUrl = "<c:url value="/sos" />";
+		var $version = $("#input-version");
+		var $binding = $("#input-binding");
+		var $request = $("#input-request");
+		var $url = $("#input-url");
+		var $send = $("#send-button");
+		var version, binding;
+		var sosUrl = document.location.protocol +"//"+ document.location.host + "<c:url value="/sos" />";
+
+		function appendDefaultBindingOption() {
+			$("<option>")
+				.val("")
+				.attr("disabled", true)
+				.attr("selected", true)
+				.css("display", "none")
+				.html("Select the request binding &hellip;")
+				.appendTo($binding)
+					
+		}
+		function appendDefaultRequestOption() {
+			$("<option>")
+				.val("")
+				.attr("disabled", true)
+				.attr("selected", true)
+				.css("display", "none")
+				.html("Select a example request &hellip;")
+				.appendTo($request);
+		}
 
 		var editor = CodeMirror.fromTextArea($("#editor").get(0), { 
-            "mode": "xml", 
-            "lineNumbers": true, 
-            "lineWrapping": true
+            "mode": "xml", "lineNumbers": true, "lineWrapping": true
         });
 
 		$("#form").attr("action", sosUrl);
-		$("#input-request").addClass("disable").attr("disabled", true);
-		$("#input-url").val(sosUrl).change(function() {
-			var val = $(this).val();
-			$("#form").attr("action", val);
-			if (val) {
-				$("#send-button").removeClass("disable").attr("disabled", false);
+		$("#input-request, #input-binding").attr("disabled", true);
+
+		$url.val(sosUrl).change(function() {
+			var url = $url.val();
+			$("#form").attr("action", url);
+			if (url) {
+				$send.removeAttr("disabled");
 			} else {
-				$("#send-button").addClass("disable").attr("disabled", true);
+				$send.attr("disabled", true);
 			}
 		});
+
 		$("#send-button").click(function() {
 			var request = $.trim(editor.getValue());
 			if (!$("#input-send-inline").attr("checked")) {
 				if (request) {
-					$("#form").submit();	
+					$("#form").submit();
 				} else {
-					window.location.href = $("#input-url").val();
+					window.location.href = $url.val();
 				}
 			} else {
-				$.ajax($("#input-url").val(), {
+				$send.addClass("disable").attr("disabled", true);
+				$.ajax($url.val(), {
 					"type": (request) ? "POST" : "GET",
 					"contentType": "application/xml",
 					"accepts": "application/xml",
 					"data": request
 				}).fail(function(error) {
 					showError("Request failed: " + error.status + " " + error.statusText);
+					$send.removeClass("disable").attr("disabled", false);
 				}).done(function(data) {
 					var xml = data.xml ? data.xml : new XMLSerializer().serializeToString(data);
 					var $response = $("#response");
@@ -124,53 +150,65 @@
 					$response.fadeIn("fast");
 					$("html, body").animate({
 						scrollTop: $("#response").offset().top
-					}, "slow"); 
+					}, "slow");
+					$send.removeAttr("disabled");
 				});
 			}
 		});
 
-		$.get("<c:url value="/static/conf/client-requests.json"/>", function(settings) {
-			if ((typeof settings) === "string") {
-				settings = JSON.parse(settings);
+		$.getJSON("<c:url value="/static/conf/client-requests.json"/>", function(settings) {
+
+			/* FIXME enable the sections if they are supported */
+			delete settings.requests["1.0.0"];
+			delete settings.requests["2.0.0"]["POX"];
+
+			for (var key in settings.requests) {
+				$("<option>").html(key).appendTo($version);
 			}
 
-			$("#input-version").change(function() {
+			$version.change(function() {
 				var oldVersion = version;
-				version = $(this).val();
+				version = $version.val();
 				if (version && version != oldVersion) {
-					$("#response").fadeOut("fast").children().remove();
-					$("#input-request option").remove()
-					$("#input-request")
-						.append($("<option>")
-							.val("")
-							.attr("disabled", true)
-							.attr("selected", true)
-							.css("display", "none")
-							.html("Select a example request &hellip;"));
+					$binding.children("option").remove();
+					appendDefaultBindingOption();
+					appendDefaultRequestOption();
+
 					editor.setValue("");
-					var requests = settings.versions[$(this).val()].requests;
-					var $dropdown = $("#input-request");
-					$.each(requests, function(i, e) {
-						$dropdown.append($("<option>").val(i).html(e.name));
-					});
-					$dropdown.removeClass("disable").attr("disabled", false);
+					for (var key in settings.requests[version]) {
+						$("<option>").html(key).appendTo($binding);
+					}
+					$binding.removeAttr("disabled");
+					$request.attr("disabled", true);
+					binding = null;
 				}
 			}).trigger("change");
 
-			$("#input-request").change(function() {
-				var url = settings.versions[$("#input-version").val()].requests[$(this).val()].request;
-
-				var serviceUrl = settings.versions[$("#input-version").val()].requests[$(this).val()].url;
-				if (serviceUrl) {
-					$("#input-url").val(sosUrl + serviceUrl).trigger("change");
-				} else {
-					$("#input-url").val(sosUrl).trigger("change");
+			$binding.change(function() {
+				var oldBinding = binding;
+				binding = $binding.val();
+				if (binding && binding != oldBinding) {
+					$request.children("option").remove()
+					editor.setValue("");
+					appendDefaultRequestOption();
+					for (var key in settings.requests[version][binding]) {
+						$("<option>").html(key).appendTo($request);
+					}
+					$request.removeAttr("disabled");
 				}
-					
-				$.get(url, function(data) {
-					var xml = data.xml ? data.xml : new XMLSerializer().serializeToString(data);
-					editor.setValue(vkbeautify.xml(xml, 2));
-				});
+			});
+
+			$request.change(function() {
+				var def = settings.requests[version][binding][$request.val()];
+				var url = sosUrl + settings.bindings[binding];
+				if (def.url) url += def.url;
+				$url.val(url).trigger("change");
+				if (def.request) {
+					$.get(def.request, function(data) {
+						var xml = data.xml ? data.xml : new XMLSerializer().serializeToString(data);
+						editor.setValue(vkbeautify.xml(xml, 2));
+					});
+				}
 			});
 		});
 	});
