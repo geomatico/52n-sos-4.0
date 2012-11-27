@@ -19,7 +19,6 @@
 		<module>52n-sos-coding-sensorML-v101</module>
 		<module>52n-sos-coding-sos-v20</module>
 		<module>52n-sos-webapp</module>
-    <module>52n-sos-test</module>
   </modules>
 
 	<licenses>
@@ -466,6 +465,12 @@
 		</repository>
 	</repositories>
 	<profiles>
+		<profile>
+			<id>test</id>
+			<modules>
+				<module>52n-sos-test</module>
+			</modules>
+		</profile>
 		<profile>
 			<id>preconfigured</id>
 			<modules>
