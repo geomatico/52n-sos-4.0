@@ -34,6 +34,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,7 +70,6 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import java.util.EnumMap;
 
 /**
  * Utility class for SOS
@@ -265,7 +265,7 @@ public class SosHelper {
         // check remaining free memory on heap if too small, throw exception to
         // avoid an OutOfMemoryError
         freeMem = Runtime.getRuntime().freeMemory();
-        LOGGER.debug("Remaining Heap Size: " + freeMem);
+        LOGGER.debug("Remaining Heap Size: " + (freeMem/1024) + "KB");
         if (Runtime.getRuntime().totalMemory() == Runtime.getRuntime().maxMemory() && freeMem < 256000) { // 256000
             // accords to 256 kB create service exception
             String exceptionText =
