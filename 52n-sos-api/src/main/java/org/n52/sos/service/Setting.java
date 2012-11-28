@@ -24,6 +24,8 @@
 package org.n52.sos.service;
 
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 public enum Setting {
 	CAPABILITIES_CACHE_UPDATE_INTERVAL(Type.INTEGER),
@@ -79,6 +81,10 @@ public enum Setting {
 	
 	public static enum Type {
 		FILE, STRING, INTEGER, BOOLEAN;
+        
+        public String getName() {
+            return name();
+        }
 	}
 	
 	private final Type type;
@@ -168,4 +174,21 @@ public enum Setting {
 		}
 		return true;
 	}
+    
+    public String getName() {
+        return name();
+    }
+    
+    public Type getType() {
+        return type();
+    }
+    
+    public static Set<String> getNames() {
+        Setting[] settings = values();
+        HashSet<String> names = new HashSet<String>(settings.length);
+        for (Setting s : settings) {
+            names.add(s.name());
+        }
+        return names;
+    }
 }

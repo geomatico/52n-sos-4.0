@@ -30,11 +30,10 @@
 	
 	<context:annotation-config />
 
-	<!-- FIXME find a way to recover a forgotten password
 	<beans:bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
-	-->
+	<!--
 	<beans:bean id="passwordEncoder" class="org.springframework.security.crypto.password.NoOpPasswordEncoder" />
-
+    -->
 	<beans:bean id="customAuthenticationProvider" class="org.n52.sos.web.admin.auth.UserService"/>
 
 	<authentication-manager>

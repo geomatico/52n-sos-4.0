@@ -330,7 +330,6 @@ public final class Configurator {
 	
 	
 	private Properties connectionProviderProperties;
-	private File connectionProviderPropertiesFile;
 
     /**
      * private constructor due to the singelton pattern.
@@ -347,20 +346,20 @@ public final class Configurator {
      *             if the
      * @throws IOException
      */
-    private Configurator(File config, String basepath) throws ConfigurationException {
+    private Configurator(Properties config, String basepath) throws ConfigurationException {
 		if (basepath == null) {
 			String message = "No basepath available!";
 			LOGGER.info(message);
 			throw new ConfigurationException(message);
 		}
-		if (config == null || !config.exists()) {
+		if (config == null) {
 			String message = "No connection provider configuration available!";
 			LOGGER.info(message);
 			throw new ConfigurationException(message);
 		}
 		
 		this.basepath = basepath;
-		this.connectionProviderPropertiesFile = config;
+		this.connectionProviderProperties = config;
         LOGGER.info("\n******\nConfig File loaded successfully!\n******\n");
     }
 	
@@ -655,7 +654,7 @@ public final class Configurator {
 		if (this.setFoiLocationDynamically && !this.supportDynamicLocation) {
             String exceptionText =
                     "Support for dynamic location is set to false! To set dynamic foi location set '"
-                            + supportDynamicLocation + "' to true!";
+                            + Setting.SUPPORT_DYNAMIC_LOCATION + "' to true!";
             LOGGER.error(exceptionText);
             throw new ConfigurationException(exceptionText);
         }
@@ -670,40 +669,7 @@ public final class Configurator {
 		/* TODO assert that required fields or xml of service provider are present */
 	}
 	
-	private void loadConnectionProviderProperties() throws ConfigurationException {
-		if (this.connectionProviderPropertiesFile != null) {
-			try {
-				Properties p = new Properties();
-				p.load(new FileInputStream(this.connectionProviderPropertiesFile));
-				this.connectionProviderProperties = p;
-			} catch (IOException ex) {
-				String message = "Can not load ConnectionProvider settings from file '" + this.connectionProviderPropertiesFile.getAbsolutePath() + "'!";
-				LOGGER.error(message, ex);
-				throw new ConfigurationException(message, ex);
-				
-			}
-		}
-	}
-	
-	public void reloadConnectionProviderProperties() throws ConfigurationException {
-		if (this.connectionProvider != null) {
-			try {
-				this.connectionProvider.cleanup();
-				loadConnectionProviderProperties();
-				this.connectionProvider.initialize(this.connectionProviderProperties);
-			} catch (ConfigurationException ex) {
-				String message = "Can not reload ConnectionProvider settings from file '" + this.connectionProviderPropertiesFile.getAbsolutePath() + "'!";
-				LOGGER.error(message, ex);
-				throw new ConfigurationException(message, ex);
-			}
-		}
-	}
-	
-	
 	public Properties getConnectionProviderProperties() throws ConfigurationException {
-		if (this.connectionProviderProperties == null) {
-			loadConnectionProviderProperties();
-		}
 		return this.connectionProviderProperties;
 	}
 	
@@ -783,7 +749,7 @@ public final class Configurator {
      * 
 	 * @throws ConfigurationException if the initialization failed
      */
-    public static synchronized Configurator getInstance(File config, String basepath)
+    public static synchronized Configurator getInstance(Properties config, String basepath)
             throws ConfigurationException {
         if (instance == null) {
 			try {
@@ -1274,28 +1240,6 @@ public final class Configurator {
     }
 
     /**
-     * method (re-)loads the configFile
-     * 
-     * @param is
-     *            InputStream containing the configFile
-     * @return Returns the configFile property
-     * @throws ConfigurationException
-     */
-    public Properties loadProperties(InputStream is) throws ConfigurationException {
-        try {
-            Properties properties = new Properties();
-            if (is != null) {
-                properties.load(is);
-            } else {
-                LOGGER.info("No configuration file is available. SOS will use default configuration!");
-            }
-            return properties;
-        } catch (IOException ioe) {
-            throw new ConfigurationException(ioe);
-        }
-    }
-
-    /**
 	 * @return Returns the service identification
 	 * @throws OwsExceptionReport  
      */
@@ -1591,6 +1535,7 @@ public final class Configurator {
     /**
      * @return the setFoiLocationDynamically
      */
+    
     public boolean isSetFoiLocationDynamically() {
         return setFoiLocationDynamically;
     }

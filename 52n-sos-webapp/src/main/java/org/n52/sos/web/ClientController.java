@@ -24,16 +24,30 @@
 
 package org.n52.sos.web;
 
+import java.util.HashMap;
+import java.util.Map;
+import org.n52.sos.service.Configurator;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping(ControllerConstants.Paths.CLIENT)
 public class ClientController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.GET)
-    public String get() {
-        return ControllerConstants.Views.CLIENT;
+    public ModelAndView get() {
+        if (Configurator.getInstance() != null) {
+            Map<String, Object> map = new HashMap<String, Object>(2);
+            map.put("bindings", Configurator.getInstance().getBindingOperators().keySet());
+            map.put("versions", Configurator.getInstance().getSupportedVersions());
+            return new ModelAndView(ControllerConstants.Views.CLIENT, map);
+            
+        } else {
+            return new ModelAndView(ControllerConstants.Views.CLIENT);
+        }
+        
+        
     }
 }

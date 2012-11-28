@@ -25,11 +25,11 @@
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:include page="common/header.jsp">
-    <jsp:param name="active-menu" value="home" />
+    <jsp:param name="activeMenu" value="home" />
 </jsp:include>
 <jsp:include page="common/logotitle.jsp">
 	<jsp:param name="title" value="52&deg;North SOS" />
-	<jsp:param name="lead-paragraph" value="Open Source Sensor Observation Service" />
+	<jsp:param name="leadParagraph" value="Open Source Sensor Observation Service" />
 </jsp:include>
 <hr/>
 <p>The 52&deg; North SOS is an open source software implementation of the Open Geospatial Consortium's Sensor Observation Service (SOS) Standard.</p>

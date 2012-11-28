@@ -29,7 +29,7 @@
 </jsp:include>
 <jsp:include page="../common/logotitle.jsp">
 	<jsp:param name="title" value="52&deg; North's SOS Installation Wizard" />
-	<jsp:param name="lead-paragraph" value="Welcome to installation wizard." />
+	<jsp:param name="leadParagraph" value="Welcome to installation wizard." />
 </jsp:include>
 
 <p>This software is licensed under the <a target="_blank" href="http://www.gnu.org/licenses/gpl-2.0.html">GNU General Public License v2</a>. This wizard will guide you through the installation, database setup and initial configuration of SOS. Click the "Start" button below to get your SOS up and running.</p>

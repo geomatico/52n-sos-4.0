@@ -63,7 +63,7 @@
 				</div>
 			</div>
 			<script type="text/javascript">
-				$("#ja-cssmenu li:nth-child(<%= request.getParameter("step") %>) a")
+				$("#ja-cssmenu li:nth-child(${param.step}) a")
 					.addClass("active");
 				$("#ja-cssmenu li,#ja-cssmenu a,#ja-cssmenu span").hover(function(e){
 					e.preventDefault();
@@ -82,8 +82,9 @@
 			</script>
 			<div class="container">  
 				<div id="content" class="span12">
-					<% if (session.getAttribute("error") != null) { %>
-					<div class="alert alert-error">
-						<strong>Error!</strong> <%= session.getAttribute("error") %>
-					</div>
-					<% session.removeAttribute("error"); } %>
+					<c:if test="${not empty sessionScope.error}">
+						<div class="alert alert-error">
+							<strong>Error!</strong> ${sessionScope.error}
+						</div>
+						<c:remove var="error" scope="session" />
+					</c:if>

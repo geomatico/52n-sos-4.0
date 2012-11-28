@@ -25,14 +25,8 @@
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:include page="common/header.jsp">
-    <jsp:param name="active-menu" value="client" />
+    <jsp:param name="activeMenu" value="client" />
 </jsp:include>
-<script type="text/javascript">
-	/* redirect from "client/"" to "client" */
-	if (window.location.pathname.slice(-1) === "/") {
-		window.location.href = window.location.href.slice(0,-1);
-	}
-</script>
 <link rel="stylesheet" href="<c:url value="/static/css/prettify.css" />" type="text/css" />
 <link rel="stylesheet" href="<c:url value="/static/css/codemirror-2.34.css" />" type="text/css" />
 <link rel="stylesheet" href="<c:url value="/static/css/codemirror.custom.css" />" type="text/css" />
@@ -42,8 +36,16 @@
 <script type="text/javascript" src="<c:url value="/static/js/vkbeautify-0.99.00.beta.js" />"></script>
 <jsp:include page="common/logotitle.jsp">
 	<jsp:param name="title" value="52&deg;North SOS Test Client" />
-	<jsp:param name="lead-paragraph" value="Choose a request from the examples or write your own to test the SOS." />
+	<jsp:param name="leadParagraph" value="Choose a request from the examples or write your own to test the SOS." />
 </jsp:include>
+
+<script type="text/javascript">
+	/* redirect from "client/"" to "client" */
+	if (window.location.pathname.slice(-1) === "/") {
+		window.location.href = window.location.href.slice(0,-1);
+	}
+</script>
+
 <form id="form" action="" method="POST">
 	<h3 id="top">Service URL</h3>
 	<input id="input-url" class="span12" type="text" placeholder="Service URL" value=""/>
@@ -68,8 +70,18 @@
 	</div>
 	<div id="response" class="span12" style="margin-left: 0;"></div>
 </form>
+
 <script type="text/javascript">
 	$(function() {
+		var availableBindings = [];
+		var availableVersions = [];
+<c:forEach items="${bindings}" var="b">
+		availableBindings.push("${b}");
+</c:forEach>
+<c:forEach items="${versions}" var="v">
+		availableVersions.push("${v}");
+</c:forEach>
+
 		var $version = $("#input-version");
 		var $binding = $("#input-binding");
 		var $request = $("#input-request");
@@ -124,7 +136,7 @@
 					window.location.href = $url.val();
 				}
 			} else {
-				$send.addClass("disable").attr("disabled", true);
+				$send.attr("disabled", true);
 				$.ajax($url.val(), {
 					"type": (request) ? "POST" : "GET",
 					"contentType": "application/xml",
@@ -132,7 +144,7 @@
 					"data": request
 				}).fail(function(error) {
 					showError("Request failed: " + error.status + " " + error.statusText);
-					$send.removeClass("disable").attr("disabled", false);
+					$send.attr("disabled", false);
 				}).done(function(data) {
 					var xml = data.xml ? data.xml : new XMLSerializer().serializeToString(data);
 					var $response = $("#response");
@@ -156,13 +168,21 @@
 			}
 		});
 
-		$.getJSON("<c:url value="/static/conf/client-requests.json"/>", function(settings) {
+		$.getJSON("<c:url value="/static/conf/client-requests.json"/>", function(requests) {
 
-			/* FIXME enable the sections if they are supported */
-			delete settings.requests["1.0.0"];
-			delete settings.requests["2.0.0"]["POX"];
+			for (var v in requests) {
+				if (!availableVersions.contains(v)) {
+					delete requests[v];
+				} else {
+					for (var b in requests[v]) {
+						if (!availableBindings.contains(b)) {
+							delete requests[v][b];
+						}
+					}
+				}
 
-			for (var key in settings.requests) {
+			}
+			for (var key in requests) {
 				$("<option>").html(key).appendTo($version);
 			}
 
@@ -175,7 +195,7 @@
 					appendDefaultRequestOption();
 
 					editor.setValue("");
-					for (var key in settings.requests[version]) {
+					for (var key in requests[version]) {
 						$("<option>").html(key).appendTo($binding);
 					}
 					$binding.removeAttr("disabled");
@@ -191,16 +211,18 @@
 					$request.children("option").remove()
 					editor.setValue("");
 					appendDefaultRequestOption();
-					for (var key in settings.requests[version][binding]) {
+					for (var key in requests[version][binding]) {
 						$("<option>").html(key).appendTo($request);
 					}
+					var url = sosUrl + binding;
+					$url.val(url).trigger("change");
 					$request.removeAttr("disabled");
 				}
 			});
 
 			$request.change(function() {
-				var def = settings.requests[version][binding][$request.val()];
-				var url = sosUrl + settings.bindings[binding];
+				var def = requests[version][binding][$request.val()];
+				var url = sosUrl + binding;
 				if (def.url) url += def.url;
 				$url.val(url).trigger("change");
 				if (def.request) {
@@ -210,6 +232,13 @@
 					});
 				}
 			});
+
+			if (availableVersions.length === 0) {
+				editor.setOption("readOnly", true);
+				[ $version, $binding, $request, $url, $send].forEach(function($e) {
+					$e.attr("disabled", true);
+				});
+			}
 		});
 	});
 </script>

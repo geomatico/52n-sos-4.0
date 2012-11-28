@@ -25,12 +25,12 @@
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:include page="../common/header.jsp">
-    <jsp:param name="active-menu" value="admin" />
+    <jsp:param name="activeMenu" value="admin" />
 </jsp:include>
 
 <jsp:include page="../common/logotitle.jsp">
 	<jsp:param name="title" value="Reset SOS" />
-	<jsp:param name="lead-paragraph" value="Use this functionality with care!" />
+	<jsp:param name="leadParagraph" value="Use this functionality with care!" />
 </jsp:include>
 <hr/>
 <p>If you click on the Reset button the database access configuration of this SOS instance will be deleted. The database will stay intact and can be used for a new SOS install.</p>

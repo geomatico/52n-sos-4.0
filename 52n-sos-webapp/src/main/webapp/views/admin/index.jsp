@@ -25,10 +25,10 @@
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:include page="../common/header.jsp">
-	<jsp:param name="active-menu" value="admin" />
+	<jsp:param name="activeMenu" value="admin" />
 </jsp:include>
 <jsp:include page="../common/logotitle.jsp">
 	<jsp:param name="title" value="Administration Panel" />
-	<jsp:param name="lead-paragraph" value="Use the menu above to select different administrative tasks." />
+	<jsp:param name="leadParagraph" value="Use the menu above to select different administrative tasks." />
 </jsp:include>
 <jsp:include page="../common/footer.jsp" />

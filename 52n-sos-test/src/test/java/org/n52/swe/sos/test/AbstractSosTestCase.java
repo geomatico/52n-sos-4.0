@@ -23,8 +23,8 @@
  */
 package org.n52.swe.sos.test;
 
-import java.io.File;
-import java.net.URISyntaxException;
+import java.io.IOException;
+import java.util.Properties;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.n52.sos.service.ConfigurationException;
@@ -35,10 +35,11 @@ public abstract class AbstractSosTestCase extends Assert {
     private static final String DATASOURCE_PROEPERTIES = "/datasource.properties";
     
     @BeforeClass
-    public static void beforeClass() throws URISyntaxException, ConfigurationException {
+    public static void beforeClass() throws ConfigurationException, IOException {
         if (Configurator.getInstance() == null) {
-            File f = new File(AbstractSosTestCase.class.getResource(DATASOURCE_PROEPERTIES).toURI());
-            Configurator.getInstance(f, "/");
+            Properties p = new Properties();
+            p.load(AbstractSosTestCase.class.getResourceAsStream(DATASOURCE_PROEPERTIES));
+            Configurator.getInstance(p, "/");
         }
     }
     

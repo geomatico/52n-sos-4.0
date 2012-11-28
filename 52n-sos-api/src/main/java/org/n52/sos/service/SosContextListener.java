@@ -24,11 +24,12 @@
 package org.n52.sos.service;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Driver;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Enumeration;
-import java.util.logging.Level;
+import java.util.Properties;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -48,18 +49,37 @@ public class SosContextListener implements ServletContextListener {
 			if (initParam == null) {
 				throw new RuntimeException("Missing InitParameter '" + INIT_PARAM_DATA_SOURCE_CONFIG_LOCATION + "'");
 			}
-			String configpath = context.getRealPath(initParam);
-			if (new File(configpath).exists()) {
+			File config = new File(context.getRealPath(initParam));
+			if (config.exists()) {
 				try {
-					log.debug("Initialising Configurator ({},{})",configpath, context.getRealPath("/"));
-					Configurator.getInstance(new File(configpath), context.getRealPath("/"));
+					log.debug("Initialising Configurator ({},{})", 
+                            config.getAbsolutePath(), context.getRealPath("/"));
+                    FileInputStream in = null;
+                    Properties p = new Properties();
+                    try {
+                        in = new FileInputStream(config);
+                        p.load(in);
+                    } catch(IOException e) {
+                        log.error("Can not load configuration file");
+                        throw new RuntimeException(e);
+                    } finally {
+                        if (in != null) {
+                            try {
+                                in.close();
+                            } catch(IOException e) {
+                                log.error("Can not close file", e);
+                            }
+                        }
+                    }
+					Configurator.getInstance(p, context.getRealPath("/"));
 				} catch (ConfigurationException ce) {
 					String message = "Configurator initialization failed!";
 					log.error(message, ce);
 					throw new RuntimeException(message, ce);
 				}
 			} else {
-				log.warn("Can not initialize Configurator; config file is not present: {}", configpath);
+				log.warn("Can not initialize Configurator; config file is not present: {}", 
+                        config.getAbsolutePath());
 			}
 		} else {
 			log.warn("Configurator already instantiated.");

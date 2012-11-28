@@ -29,7 +29,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:include page="../common/logotitle.jsp">
 	<jsp:param name="title" value="Finishing Installation" />
-	<jsp:param name="lead-paragraph" value="All configuration options are set. Click on 'Install' to finish the installation." />
+	<jsp:param name="leadParagraph" value="All configuration options are set. Click on 'Install' to finish the installation." />
 </jsp:include>
 
 <p>Please enter credentials to login into the administrator parnel below. The password is stored as clear text in the database.</p>

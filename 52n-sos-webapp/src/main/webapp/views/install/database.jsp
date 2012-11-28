@@ -30,7 +30,7 @@
 <script type="text/javascript" src="<c:url value="/static/js/parseuri.js" />"></script>
 <jsp:include page="../common/logotitle.jsp">
 	<jsp:param name="title" value="Database configuration" />
-	<jsp:param name="lead-paragraph" value="Please enter the details of the database you want to use for SOS." />
+	<jsp:param name="leadParagraph" value="Please enter the details of the database you want to use for SOS." />
 </jsp:include>
 
 <form action="<c:url value="/install/database" />" method="POST" class="form-horizontal">
@@ -110,7 +110,7 @@
 		<div class="controls">
 			<label class="checkbox">
 				<input type="checkbox" name="create_tables" checked="checked" />
-				Checking this checkbox will create the necessary tables in the database.
+				<strong>Create tables</strong> &mdash; checking this checkbox will the necessary tables in the database.
 			</label>
 		</div>
 	</div>
@@ -118,7 +118,7 @@
 		<div class="controls">
 			<label class="checkbox">
 				<input type="checkbox" name="overwrite_tables" />
-				Checking this checkbox will delete all existing tables in the database.
+				<strong>Delete existing tables</strong> &mdash; Checking this checkbox will delete all existing tables in the database.
 			</label>
 			<span style="display: none;" class="help-block"><span class="label label-important">Warning!</span> This will erase the entire database.</span>
 		</div>
@@ -127,7 +127,7 @@
 		<div class="controls">
 			<label class="checkbox">
 				<input type="checkbox" name="create_test_data" checked="checked" />
-				Checking this checkbox will insert the dummy data in the tables thus created.
+				<strong>Create test data</strong> &mdash; Checking this checkbox will insert the dummy data in the tables thus created.
 			</label>
 		</div>
 	</div>
@@ -193,14 +193,13 @@
 		
 		var jdbc_uri = settings["jdbc_uri"];
 		var driver = settings["driver"];
-		<% 
-			if (session.getAttribute("jdbc_uri") != null) { 
-				out.print("jdbc_uri = \"" + session.getAttribute("jdbc_uri") + "\";");
-			}
-			if (session.getAttribute("driver") != null) { 
-				out.print("driver = \"" + session.getAttribute("driver") + "\";");
-			}
-		%>
+
+		<c:if test="${not empty sessionScope.jdbc_uri}">
+			jdbc_uri = "${sessionScope.jdbc_uri}"; 
+		</c:if>
+		<c:if test="${not empty sessionScope.driver}">
+			driver = "${sessionScope.driver}"; 
+		</c:if>
 				
 		jdbc_uri = jdbc_uri.replace("jdbc:postgresql://","");
 		$("#driver").val(driver);

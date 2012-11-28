@@ -69,11 +69,9 @@ public class InstallFinishController extends AbstractInstallController {
         HttpSession session = req.getSession(false);
         if (session == null) {
             return new ModelAndView(new RedirectView(ControllerConstants.Paths.INSTALL_INDEX, true));
-        }
-        else if (session.getAttribute(InstallConstants.DBCONFIG_COMPLETE) == null) {
+        } else if (session.getAttribute(InstallConstants.DBCONFIG_COMPLETE) == null) {
             return new ModelAndView(new RedirectView(ControllerConstants.Paths.INSTALL_DATABASE_CONFIGURATION, true));
-        }
-        else if (session.getAttribute(InstallConstants.OPTIONAL_COMPLETE) == null) {
+        } else if (session.getAttribute(InstallConstants.OPTIONAL_COMPLETE) == null) {
             return new ModelAndView(new RedirectView(ControllerConstants.Paths.INSTALL_SETTINGS, true));
         }
         return new ModelAndView(ControllerConstants.Views.INSTALL_FINISH, getSettings(session));
@@ -84,21 +82,17 @@ public class InstallFinishController extends AbstractInstallController {
         HttpSession session = req.getSession(false);
         if (session == null) {
             return new ModelAndView(new RedirectView(ControllerConstants.Paths.INSTALL_INDEX, true));
-        }
-        else if (session.getAttribute(InstallConstants.DBCONFIG_COMPLETE) == null) {
+        } else if (session.getAttribute(InstallConstants.DBCONFIG_COMPLETE) == null) {
             return new ModelAndView(new RedirectView(ControllerConstants.Paths.INSTALL_DATABASE_CONFIGURATION, true));
-        }
-        else if (session.getAttribute(InstallConstants.OPTIONAL_COMPLETE) == null) {
+        } else if (session.getAttribute(InstallConstants.OPTIONAL_COMPLETE) == null) {
             return new ModelAndView(new RedirectView(ControllerConstants.Paths.INSTALL_SETTINGS, true));
         }
         Map<String, Object> settings = process(getParameters(req), getSettings(session));
         setSettings(session, settings);
         if (wasSuccessfull(settings)) {
-            /* TODO redirect to index */
             session.invalidate();
             return new ModelAndView(new RedirectView(ControllerConstants.Paths.INDEX + "?install=finished", true));
-        }
-        else {
+        } else {
             return new ModelAndView(ControllerConstants.Views.INSTALL_FINISH, settings);
         }
     }
@@ -124,8 +118,7 @@ public class InstallFinishController extends AbstractInstallController {
         JdbcUrl jdbc;
         try {
             jdbc = new JdbcUrl(connectionString);
-        }
-        catch (URISyntaxException ex) {
+        } catch (URISyntaxException ex) {
             return error(settings, ex.getMessage());
         }
         String error = jdbc.isValid();
@@ -151,8 +144,7 @@ public class InstallFinishController extends AbstractInstallController {
                 try {
                     SqlUtils.executeSQLFile(con,
                                             getContext().getRealPath(ControllerConstants.CREATE_DATAMODEL_SQL_FILE));
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     return error(settings, "Could not create sos tables: " + e);
                 }
             }
@@ -163,9 +155,8 @@ public class InstallFinishController extends AbstractInstallController {
                 try {
                     SqlUtils.executeSQLFile(con,
                                             getContext().getRealPath(ControllerConstants.INSERT_TEST_DATA_SQL_FILE));
-                }
-                catch (Exception e) {
-                    return error(settings, "Could insert test data:" + e);
+                } catch (Exception e) {
+                    return error(settings, "Could insert test data: " + e);
                 }
             }
 
@@ -177,62 +168,52 @@ public class InstallFinishController extends AbstractInstallController {
                     s.put(sosSetting.name(), (String) settings.get(sosSetting.name()));
                 }
                 dao.save(s, con);
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 return error(settings, "Could not insert settings into the database: " + e.getMessage(), e);
             }
 
             /* save admin credentials */
             try {
                 userService.saveAdmin(new AdminUser(username, password), properties);
-            }
-            catch (Throwable e) {
+            } catch (Throwable e) {
                 return error(settings, "Could not save admin credentials into the database: " + e.getMessage());
             }
-        }
-        catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             return error(settings, "Could not connect to the database: " + e.getMessage());
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             return error(settings, "Could not connect to the database: " + e.getMessage());
-        }
-        finally {
+        } finally {
             if (con != null) {
                 try {
                     con.close();
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                 }
             }
         }
 
-        /* write dssos.config */
-        try {
-            writeDsSosConfig(driver, properties);
-        }
-        catch (IOException e) {
-            return error(settings, "Could not write dssos.config: " + e.getMessage());
-        }
+        
 
         /* instantiate sos configurator */
         if (Configurator.getInstance() == null) {
             log.info("Instantiation Configurator...");
             try {
-                Configurator.getInstance(new File(getDsSosConfigPath()), getBasePath());
+                Configurator.getInstance(properties, getBasePath());
             }
             catch (ConfigurationException ex) {
-                String message = "Cannot instantiate Configurator:" + ex.getMessage();
-                File f = new File(getDsSosConfigPath());
-                /* configuration error: delete the datasource file */
-                if (f.exists()) {
-                    f.delete();
-                }
+                String message = "Cannot instantiate Configurator: " + ex.getMessage();
                 return error(settings, message, ex);
             }
-        }
-        else {
+        } else {
             log.warn("Configurator seems to be already instantiated...");
         }
+        
+        /* write dssos.config */
+        try {
+            writeDsSosConfig(driver, properties);
+        } catch (IOException e) {
+            return error(settings, "Could not write datasource config: " + e.getMessage());
+        }
+        
         return success(settings);
     }
 
@@ -250,6 +231,7 @@ public class InstallFinishController extends AbstractInstallController {
                     out.close();
                 }
                 catch (Exception e) {
+                    log.error("Error closing OutputStream.", e);
                 }
             }
         }

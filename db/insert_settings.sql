@@ -22,8 +22,16 @@
 -- visit the Free Software Foundation web page, http://www.fsf.org.
 --
 
+DROP TABLE IF EXISTS global_settings CASCADE;
+
+CREATE TABLE global_settings (
+  key VARCHAR(256) NOT NULL,
+  value TEXT,
+  PRIMARY KEY(key)
+);
+
 INSERT INTO global_settings(key,value) VALUES
-	('admin_password', 'password'),
+	('admin_password', '$2a$10$vbp9aXCDMP/fXwEsqe/1.eon44mMdUyC4ub2JfOrkPfaer5ciLOly'),
 	('admin_username', 'admin'),
 	('CAPABILITIES_CACHE_UPDATE_INTERVAL', '5'),
 	('CHARACTER_ENCODING', 'UTF-8'),

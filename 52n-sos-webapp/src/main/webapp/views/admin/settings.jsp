@@ -25,15 +25,23 @@
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:include page="../common/header.jsp">
-    <jsp:param name="active-menu" value="admin" />
+    <jsp:param name="activeMenu" value="admin" />
 </jsp:include>
 <jsp:include page="../common/logotitle.jsp">
 	<jsp:param name="title" value="Change SOS Configuration" />
-	<jsp:param name="lead-paragraph" value="You can download the current configuration <a href=\"settings.json\" target=\"_blank\">here</a> to backup or us it for a new SOS installation." />
+	<jsp:param name="leadParagraph" value="You can download the current configuration <a href=\"settings.json\" target=\"_blank\">here</a> to backup or us it for a new SOS installation." />
 </jsp:include>
 
 <form id="settings" class="form-horizontal"></form>
-
+<script type="text/javascript">
+    function overwriteDefaultSettings(settings) {
+    <c:forEach items="<%=org.n52.sos.service.Setting.getNames()%>" var="setting">
+        <c:if test="${not empty requestScope[setting]}">
+            setSetting("${setting}","${requestScope[setting]}", settings);
+        </c:if>
+    </c:forEach>
+    }
+</script>
 <script type="text/javascript">
     $(function(){
         $.getJSON('<c:url value="/static/conf/sos-settings.json" />', function(settings) {
@@ -84,21 +92,6 @@
             $("input[name=SOS_URL]").val(window.location.toString()
                 .replace(/admin\/settings.*/, "sos")).trigger("input");
 
-            <%
-            /* overwrite default values with session variables */
-            for (org.n52.sos.service.Setting s : org.n52.sos.service.Setting.values()) {
-                if (request.getAttribute(s.name()) != null) {
-                    out.println("setSetting('" + s.name() + "', '" 
-                        + request.getAttribute(s.name()) + "', settings);");
-                }
-            }
-            String user = org.n52.sos.ds.hibernate.util.HibernateConstants.ADMIN_USERNAME_KEY;
-            if (request.getAttribute(user) != null) {
-                out.println("setSetting('" + user + "', '" 
-                    + request.getAttribute(user) + "', settings);");
-            }
-            %>
-            
             $(".required").bind("keyup input change", function() {
                 var valid = true;
                 $(".required").each(function(){ 
@@ -111,6 +104,8 @@
                     $button.attr("disabled", true);
                 }
             });
+            
+            overwriteDefaultSettings(settings);
 
             $(".required:first").trigger("change");
 			
@@ -126,6 +121,5 @@
         });
     });
 </script>
-
 <br/>
 <jsp:include page="../common/footer.jsp" />

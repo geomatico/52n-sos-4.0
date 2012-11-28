@@ -25,11 +25,11 @@
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:include page="../common/header.jsp">
-	<jsp:param name="active-menu" value="admin" />
+	<jsp:param name="activeMenu" value="admin" />
 </jsp:include>
 <jsp:include page="../common/logotitle.jsp">
 	<jsp:param name="title" value="52&deg;SOS Administration Login" />
-	<jsp:param name="lead-paragraph" value="Please login to view the admin console." />
+	<jsp:param name="leadParagraph" value="Please login to view the admin console." />
 </jsp:include>
 <hr/>
 <form action="<c:url value="/j_spring_security_check" />" method="POST" class="form-horizontal">

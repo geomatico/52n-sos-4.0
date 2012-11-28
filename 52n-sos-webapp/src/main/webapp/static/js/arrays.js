@@ -144,3 +144,11 @@ if (!Array.prototype.some) {
         return false;
     };
 }
+
+if (!Array.prototype.contains) {
+    Array.prototype.contains = function(e) {
+        "use strict";
+        return this.indexOf(e) >= 0;
+    };
+}
+

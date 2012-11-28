@@ -29,12 +29,24 @@
 </jsp:include>
 <jsp:include page="../common/logotitle.jsp">
 	<jsp:param name="title" value="Settings - change with care!" />
-	<jsp:param name="lead-paragraph" value="You can change these settings later in the administrative backend." />
+	<jsp:param name="leadParagraph" value="You can change these settings later in the administrative backend." />
 </jsp:include>
+
+<script type="text/javascript">
+    function overwriteDefaultSettings(settings) {
+        <c:forEach items="<%=org.n52.sos.service.Setting.getNames()%>" var="setting">
+            <c:if test="${not empty requestScope[setting]}">
+                setSetting("${setting}","${requestScope[setting]}", settings);
+            </c:if>
+        </c:forEach>
+    }
+</script>
+
 <form action="<c:url value="/install/settings" />" method="POST" class="form-horizontal">
-	<div id="settings">
-		
-	</div>
+	<div id="settings"></div>
+
+
+    
 	<script type="text/javascript">
 	$.getJSON('<c:url value="/static/conf/sos-settings.json" />', function(settings) {
  		var $container = $("#settings");
@@ -43,15 +55,7 @@
 		$("input[name=SOS_URL]").val(window.location.toString()
 			.replace(/install\/settings.*/, "sos")).trigger("input");		
 
-		<%
-            /* overwrite default values with session variables */
-            for (org.n52.sos.service.Setting s : org.n52.sos.service.Setting.values()) {
-                if (request.getAttribute(s.name()) != null) {
-                    out.println("setSetting('" + s.name() + "', '" 
-                        + request.getAttribute(s.name()) + "', settings);");
-                }
-            }
-		%>
+		overwriteDefaultSettings(settings);
 
 		$(".required").bind("keyup input change", function() {
             var valid = true;

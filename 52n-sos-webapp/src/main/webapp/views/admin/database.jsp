@@ -25,7 +25,7 @@
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:include page="../common/header.jsp">
-    <jsp:param name="active-menu" value="admin" />
+    <jsp:param name="activeMenu" value="admin" />
 </jsp:include>
 
 <link rel="stylesheet" href="<c:url value="/static/css/prettify.css" />" type="text/css" />
@@ -38,7 +38,7 @@
 
 <jsp:include page="../common/logotitle.jsp">
 	<jsp:param name="title" value="Database Panel" />
-	<jsp:param name="lead-paragraph" value="Here you can query the database directly." />
+	<jsp:param name="leadParagraph" value="Here you can query the database directly." />
 </jsp:include>
 
 <div class="pull-right">
@@ -66,7 +66,7 @@
 
 <script type="text/javascript">
 	$(function() {
-		var testDataInstalled = <%= request.getAttribute("IS_TEST_DATA_SET_INSTALLED_MODEL_ATTRIBUTE") %>;
+		var testDataInstalled = ${IS_TEST_DATA_SET_INSTALLED_MODEL_ATTRIBUTE};
 		var $button = $("#testdata");
 		
 		function create() {

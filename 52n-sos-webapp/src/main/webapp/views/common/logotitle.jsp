@@ -26,8 +26,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div class="row">
 	<div class="span9">
-		<h2><%= request.getParameter("title")%></h2>
-		<p class="lead"><%= request.getParameter("lead-paragraph")%></p>
+
+		<h2>${param.title}</h2>
+		<p class="lead">${param.leadParagraph}</p>
 	</div>
 	<div class="span3 header-img-span">
 		<img src="<c:url value="/static/images/52n-logo-220x80.png"/>"/>
