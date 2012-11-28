@@ -53,4 +53,10 @@ public class BooleanValue implements IValue<Boolean> {
         return unit;
     }
 
+	@Override
+	public String toString()
+	{
+		return String.format("BooleanValue [value=%s, unit=%s]", value, unit);
+	}
+    
 }

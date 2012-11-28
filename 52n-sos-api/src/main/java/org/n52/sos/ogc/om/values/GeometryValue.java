@@ -55,4 +55,10 @@ public class GeometryValue implements IValue<Geometry> {
         return unit;
     }
 
+	@Override
+	public String toString()
+	{
+		return String.format("GeometryValue [value=%s, unit=%s]", value, unit);
+	}
+
 }

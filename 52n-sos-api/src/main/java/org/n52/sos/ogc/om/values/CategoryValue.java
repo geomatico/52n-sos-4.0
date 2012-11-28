@@ -53,4 +53,10 @@ public class CategoryValue implements IValue<String> {
         return unit;
     }
 
+	@Override
+	public String toString()
+	{
+		return String.format("CategoryValue [value=%s, unit=%s]", value, unit);
+	}
+
 }

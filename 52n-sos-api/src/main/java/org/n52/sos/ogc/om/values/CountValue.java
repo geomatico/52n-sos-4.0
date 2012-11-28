@@ -53,4 +53,10 @@ public class CountValue implements IValue<Integer> {
         return unit;
     }
 
+	@Override
+	public String toString()
+	{
+		return String.format("CountValue [value=%s, unit=%s]", value, unit);
+	}
+
 }

@@ -53,4 +53,10 @@ public class TextValue implements IValue<String> {
         return unit;
     }
 
+	@Override
+	public String toString()
+	{
+		return String.format("TextValue [value=%s, unit=%s]", value, unit);
+	}
+
 }

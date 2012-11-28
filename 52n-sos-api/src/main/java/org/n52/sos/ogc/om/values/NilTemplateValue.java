@@ -28,10 +28,6 @@ public class NilTemplateValue implements IValue<String> {
 
     private static final long serialVersionUID = -3751934124688213692L;
     
-    private String value;
-    
-    private String unit;
-
     @Override
     public void setValue(String value) {
     }
@@ -49,5 +45,11 @@ public class NilTemplateValue implements IValue<String> {
     public String getUnit() {
         return null;
     }
+
+	@Override
+	public String toString()
+	{
+		return String.format("NilTemplateValue [value=%s, unit=null]", getValue());
+	}
 
 }

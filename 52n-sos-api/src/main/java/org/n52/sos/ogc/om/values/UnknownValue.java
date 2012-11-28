@@ -53,4 +53,10 @@ public class UnknownValue implements IValue<Object> {
         return unit;
     }
 
+	@Override
+	public String toString()
+	{
+		return String.format("UnknownValue [value=%s, unit=%s]", value, unit);
+	}
+
 }

@@ -53,4 +53,10 @@ public class QuantityValue implements IValue<Double> {
         return unit;
     }
 
+	@Override
+	public String toString()
+	{
+		return String.format("QuantityValue [value=%s, unit=%s]", value, unit);
+	}
+
 }

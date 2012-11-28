@@ -34,8 +34,6 @@ public class SweDataArrayValue implements IValue<SosSweDataArray> {
 
     private SosSweDataArray value;
     
-    private String unit;
-
     @Override
     public void setValue(SosSweDataArray value) {
         this.value = value;
@@ -53,7 +51,7 @@ public class SweDataArrayValue implements IValue<SosSweDataArray> {
 
     @Override
     public String getUnit() {
-        return unit;
+        return null;
     }
     
     /**
@@ -70,4 +68,10 @@ public class SweDataArrayValue implements IValue<SosSweDataArray> {
         }
         return false;
     }
+
+	@Override
+	public String toString()
+	{
+		return String.format("SweDataArrayValue [value=%s, unit=null]", value);
+	}
 }
