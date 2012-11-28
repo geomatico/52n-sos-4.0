@@ -25,6 +25,12 @@ package org.n52.sos.util;
 
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.features.SFConstants;
+import org.n52.sos.ogc.om.values.BooleanValue;
+import org.n52.sos.ogc.om.values.CategoryValue;
+import org.n52.sos.ogc.om.values.CountValue;
+import org.n52.sos.ogc.om.values.QuantityValue;
+import org.n52.sos.ogc.om.values.SweDataArrayValue;
+import org.n52.sos.ogc.om.values.TextValue;
 
 /**
  * Utility class for Observation and Measurement
@@ -49,6 +55,29 @@ public class OMHelper {
                     || responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2);
         }
         return true;
+    }
+    
+    public static String getObservationTypeFromValue(Object value) {
+        if (value instanceof BooleanValue) {
+            return OMConstants.OBS_TYPE_TRUTH_OBSERVATION;
+        }
+        else if (value instanceof CategoryValue) {
+            return OMConstants.OBS_TYPE_CATEGORY_OBSERVATION;
+        }
+        else if (value instanceof CountValue) {
+            return OMConstants.OBS_TYPE_COUNT_OBSERVATION;
+        }
+        else if (value instanceof QuantityValue) {
+            return OMConstants.OBS_TYPE_MEASUREMENT;
+        }
+        else if (value instanceof TextValue){
+            return OMConstants.OBS_TYPE_TEXT_OBSERVATION;
+        }
+        else if (value instanceof SweDataArrayValue) {
+            return OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION;
+        }
+        // TODO why is this default? What about not supported types?
+        return OMConstants.OBS_TYPE_OBSERVATION;
     }
 
     private OMHelper() {

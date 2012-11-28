@@ -53,10 +53,8 @@ import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.om.values.BooleanValue;
-import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.CountValue;
 import org.n52.sos.ogc.om.values.NilTemplateValue;
-import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -64,6 +62,7 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
@@ -265,9 +264,16 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
 
     private TimeInstant getResultTime(OMObservationType omObservation) throws OwsExceptionReport {
         if (omObservation.getResultTime().isSetHref()) {
-            TimeInstant timeInstant = new TimeInstant();
-            timeInstant.setIndeterminateValue(omObservation.getResultTime().getHref());
-            return timeInstant;
+        	TimeInstant timeInstant = new TimeInstant();
+        	if (omObservation.getResultTime().getHref().charAt(0) == '#') {
+        		// document internal link
+        		// TODO parse linked element
+        		timeInstant.setIndeterminateValue(Sos2Constants.EN_PHENOMENON_TIME);
+        	}
+        	else {
+        		timeInstant.setIndeterminateValue(omObservation.getResultTime().getHref());
+        	}
+        	return timeInstant;
         } else if (omObservation.getResultTime().isSetNilReason()
                 && omObservation.getResultTime().getNilReason() instanceof String
                 && ((String) omObservation.getResultTime().getNilReason()).equals("template")) {
@@ -376,7 +382,7 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
     }
 
     private void checkOrSetObservationType(SosObservation sosObservation) throws OwsExceptionReport {
-        String obsTypeFromValue = getObservationTypeFromValue(sosObservation.getValue().getValue());
+        String obsTypeFromValue = OMHelper.getObservationTypeFromValue(sosObservation.getValue().getValue());
         if (sosObservation.getObservationConstellation().getObservationType() == null) {
             sosObservation.getObservationConstellation().setObservationType(obsTypeFromValue);
         } else {
@@ -390,29 +396,6 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
             }
         }
-    }
-
-    private String getObservationTypeFromValue(Object value) {
-        if (value instanceof BooleanValue) {
-            return OMConstants.OBS_TYPE_TRUTH_OBSERVATION;
-        }
-        else if (value instanceof CategoryValue) {
-            return OMConstants.OBS_TYPE_CATEGORY_OBSERVATION;
-        }
-        else if (value instanceof CountValue) {
-            return OMConstants.OBS_TYPE_COUNT_OBSERVATION;
-        }
-        else if (value instanceof QuantityValue) {
-            return OMConstants.OBS_TYPE_MEASUREMENT;
-        }
-        else if (value instanceof TextValue){
-            return OMConstants.OBS_TYPE_TEXT_OBSERVATION;
-        }
-        else if (value instanceof SweDataArrayValue) {
-            return OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION;
-        }
-        // TODO why is this default? What about not supported types?
-        return OMConstants.OBS_TYPE_OBSERVATION;
     }
 
     private SosAbstractFeature checkFeatureWithMap(SosAbstractFeature featureOfInterest,
