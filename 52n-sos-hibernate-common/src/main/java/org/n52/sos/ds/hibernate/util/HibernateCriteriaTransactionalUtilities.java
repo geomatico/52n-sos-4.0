@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.hibernate.Session;
 import org.joda.time.DateTime;
@@ -451,13 +452,26 @@ public class HibernateCriteriaTransactionalUtilities {
         session.flush();
     }
 
-    public static void insertObservationSingleValue(ObservationConstellation obsConst, FeatureOfInterest feature,
-            SosObservation observation, Session session) {
+    public static void insertObservationSingleValue(ObservationConstellation obsConst,
+            FeatureOfInterest feature,
+            SosObservation observation,
+            Session session) {
+        insertObservationSingleValueWithAntiSubSettingId(obsConst, feature, observation, null, session);
+    }
+    
+    private static void insertObservationSingleValueWithAntiSubSettingId(ObservationConstellation obsConst,
+            FeatureOfInterest feature,
+            SosObservation observation,
+            String antiSubsettingId,
+            Session session) {
         SosSingleObservationValue value = (SosSingleObservationValue) observation.getValue();
         Observation hObservation = new Observation();
         hObservation.setDeleted(false);
         if (observation.getIdentifier() != null && !observation.getIdentifier().isEmpty()) {
             hObservation.setIdentifier(observation.getIdentifier());
+        }
+        if (antiSubsettingId != null && !antiSubsettingId.isEmpty()) {
+            hObservation.setAntiSubsetting(antiSubsettingId);
         }
         hObservation.setObservationConstellation(obsConst);
         hObservation.setFeatureOfInterest(feature);
@@ -471,9 +485,41 @@ public class HibernateCriteriaTransactionalUtilities {
         HibernateCriteriaTransactionalUtilities.insertObservation(hObservation, session);
     }
 
-    public static void insertObservationMutliValue(ObservationConstellation obsConst, FeatureOfInterest feature,
-            SosObservation observation) {
-        // TODO Auto-generated method stub
+    // TODO antisubsetting not yet tested - request observations of subset by id is working
+    public static void insertObservationMutliValue(ObservationConstellation obsConst,
+            FeatureOfInterest feature,
+            SosObservation containerObservation,
+            Session session) throws OwsExceptionReport {
+        List<SosObservation> unfoldObservations = HibernateObservationUtilities.unfoldObservation(containerObservation);
+        int subObservationIndex = 0;
+        for (SosObservation sosObservation : unfoldObservations) {
+            String antiSubsettingId = getAntiSubsettingId(containerObservation);
+            setIdentifier(containerObservation, sosObservation, antiSubsettingId, subObservationIndex+"");
+            
+            insertObservationSingleValueWithAntiSubSettingId(obsConst, feature, sosObservation, antiSubsettingId, session);
+            subObservationIndex++;
+        }
+    }
+
+    private static void setIdentifier(SosObservation containerObservation,
+            SosObservation sosObservation,
+            String antiSubsettingId,
+            String idExtension)
+    {
+        if (containerObservation.getIdentifier() != null && !containerObservation.getIdentifier().isEmpty()) {
+            String subObservationIdentifier = String.format("%s-%s", antiSubsettingId, idExtension); 
+            sosObservation.setIdentifier(subObservationIdentifier);    
+        }
+    }
+
+    private static String getAntiSubsettingId(SosObservation containerObservation)
+    {
+        String antiSubsettingId = containerObservation.getIdentifier();
+        if (antiSubsettingId == null || antiSubsettingId.isEmpty()) {
+            // if identifier of sweArrayObservation is not set, generate UUID for antisubsetting column
+            antiSubsettingId = UUID.randomUUID().toString();
+        }
+        return antiSubsettingId;
     }
 
 }
