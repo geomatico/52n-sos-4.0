@@ -24,24 +24,44 @@
 package org.n52.swe.sos.test;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractSosTestCase extends Assert {
-    
+
+    protected static final Logger log = LoggerFactory.getLogger(AbstractSosTestCase.class);
     private static final String DATASOURCE_PROEPERTIES = "/datasource.properties";
-    
+
     @BeforeClass
     public static void beforeClass() throws ConfigurationException, IOException {
         if (Configurator.getInstance() == null) {
             Properties p = new Properties();
-            p.load(AbstractSosTestCase.class.getResourceAsStream(DATASOURCE_PROEPERTIES));
+            InputStream in = null;
+            try {
+                in = AbstractSosTestCase.class.getResourceAsStream(DATASOURCE_PROEPERTIES);
+                if (in == null) {
+                    throw new ConfigurationException("No datasource.properties found.");
+                }
+                p.load(AbstractSosTestCase.class.getResourceAsStream(DATASOURCE_PROEPERTIES));
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                        log.error("Error closing file", e);
+                    }
+                }
+            }
             Configurator.getInstance(p, "/");
         }
     }
-    
-    public AbstractSosTestCase() {}
+
+    public AbstractSosTestCase() {
+    }
 }
