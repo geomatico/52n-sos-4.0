@@ -45,7 +45,7 @@ import org.n52.sos.ds.IGetObservationDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
-import org.n52.sos.ds.hibernate.util.HibernateResultUtilities;
+import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
 import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.IExtension;
@@ -263,7 +263,7 @@ public class GetObservationDAO implements IGetObservationDAO {
                 response.setService(request.getService());
                 response.setVersion(request.getVersion());
                 response.setResponseFormat(request.getResponseFormat());
-                response.setObservationCollection(HibernateResultUtilities.createSosObservationsFromObservations(
+                response.setObservationCollection(HibernateObservationUtilities.createSosObservationsFromObservations(
                         observations, sosRequest, session));
                 return response;
             }

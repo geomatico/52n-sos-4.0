@@ -38,7 +38,7 @@ import org.n52.sos.ds.IGetObservationByIdDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
-import org.n52.sos.ds.hibernate.util.HibernateResultUtilities;
+import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
@@ -134,7 +134,7 @@ public class GetObservationByIdDAO implements IGetObservationByIdDAO {
                     response.setService(request.getService());
                     response.setVersion(request.getVersion());
                     response.setResponseFormat(sosRequest.getResponseFormat());
-                    response.setObservationCollection(HibernateResultUtilities.createSosObservationsFromObservations(
+                    response.setObservationCollection(HibernateObservationUtilities.createSosObservationsFromObservations(
                             observations, sosRequest, session));
                     return response;
                 }

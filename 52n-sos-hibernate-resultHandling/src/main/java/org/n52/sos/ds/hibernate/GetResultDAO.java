@@ -42,7 +42,6 @@ import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
-import org.n52.sos.ds.hibernate.util.HibernateResultUtilities;
 import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
 import org.n52.sos.ogc.ows.IExtension;

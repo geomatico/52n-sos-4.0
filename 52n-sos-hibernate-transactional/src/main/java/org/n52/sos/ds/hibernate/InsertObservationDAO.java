@@ -159,7 +159,7 @@ public class InsertObservationDAO implements IInsertObservationDAO {
                         if (observation.getValue() instanceof SosSingleObservationValue) {
                             HibernateCriteriaTransactionalUtilities.insertObservationSingleValue(obsConst, feature, observation, session);
                         } else if (observation.getValue() instanceof SosMultiObservationValues) {
-                            HibernateCriteriaTransactionalUtilities.insertObservationMutliValue(obsConst, feature, observation);
+                            HibernateCriteriaTransactionalUtilities.insertObservationMutliValue(obsConst, feature, observation,session);
                         }
                     }
                 }

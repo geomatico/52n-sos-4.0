@@ -24,6 +24,7 @@
 package org.n52.sos.ds.hibernate.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -48,6 +49,7 @@ import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.AbstractSosPhenomenon;
+import org.n52.sos.ogc.om.IObservationValue;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosMultiObservationValues;
 import org.n52.sos.ogc.om.SosObservableProperty;
@@ -60,6 +62,7 @@ import org.n52.sos.ogc.om.quality.SosQuality.QualityType;
 import org.n52.sos.ogc.om.values.IValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
+import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosResultEncoding;
@@ -82,15 +85,17 @@ import org.n52.sos.ogc.swes.SwesExtensions;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeHelper;
+import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.SosHelper;
+import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class HibernateResultUtilities {
+public class HibernateObservationUtilities {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateResultUtilities.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateObservationUtilities.class);
 
     /**
      * Create SOS internal observation from Observation objects
@@ -253,14 +258,17 @@ public class HibernateResultUtilities {
                         sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
                         sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
                         
+
+                        SosSweDataArray dataArray = new SosSweDataArray();
+                        dataArray.setElementType(createElementType(sosObservation.getObservationConstellation(),hObservation));
+                        
                         SweDataArrayValue dataArrayValue = new SweDataArrayValue();
                         // FIXME where to get element type from? -> ObservationConstellation -> Annahme: 1 ObsProp.
                         // phenTime, resultTime?, phenID, value
                         // MetaPhen -> Not Supported now
                         // 
-                        SosSweDataArray dataArray = new SosSweDataArray();
-                        dataArray.setElementType(createElementType(sosObservation.getObservationConstellation(),hObservation));
-                        List<String> newBlock = createBlock(dataArrayValue.getValue().getElementType(),phenomenonTime, phenID, value);
+                        dataArrayValue.setValue(dataArray);
+                        List<String> newBlock = createBlock(dataArray.getElementType(),phenomenonTime, phenID, value);
                         dataArrayValue.addBlock(newBlock);
                         
                         SosMultiObservationValues observationValue = new SosMultiObservationValues();
@@ -311,6 +319,7 @@ public class HibernateResultUtilities {
                     sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
                     sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
                     sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
+                    sosObservation.setResultTime(new TimeInstant(new DateTime(hObservation.getResultTime())));
 					sosObservation.setValue(new SosSingleObservationValue(phenomenonTime, value, qualityList));
                     observationCollection.add(sosObservation);
                 }
@@ -459,7 +468,7 @@ public class HibernateResultUtilities {
 
     private static boolean isAntiSubsettingExtensionSet(SwesExtensions extensions)
     {
-        return extensions.isBooleanExentsionSet(Sos2Constants.Extensions.AntiSubsetting);
+        return extensions!=null?extensions.isBooleanExentsionSet(Sos2Constants.Extensions.AntiSubsetting):false;
     }
 
     private static void checkOrSetObservablePropertyUnit(AbstractSosPhenomenon abstractSosPhenomenon, String unit) {
@@ -588,5 +597,143 @@ public class HibernateResultUtilities {
         feature4proc.put(procID, features);
         return feature4proc;
     }
+    
+    public static List<SosObservation> unfoldObservation(SosObservation multiObservation) throws OwsExceptionReport {
+        if (multiObservation.getValue() instanceof SosSingleObservationValue) {
+            return Collections.singletonList(multiObservation);
+        } else {
+            SweDataArrayValue arrayValue = ((SweDataArrayValue) ((SosMultiObservationValues) multiObservation.getValue()).getValue());
+            List<List<String>> values = arrayValue.getValue().getValues();
+            List<SosObservation> observationCollection = new ArrayList<SosObservation>(values.size());
+            SosSweDataRecord elementType = null;
+            if (arrayValue.getValue().getElementType() != null && 
+                    arrayValue.getValue().getElementType() instanceof SosSweDataRecord)
+            {
+                elementType = (SosSweDataRecord) arrayValue.getValue().getElementType();
+            }
+            else
+            {
+                String exceptionMsg = String.format("sweElementType type \"%s\" not supported", 
+                        elementType!=null?elementType.getClass().getName():"null");
+                LOGGER.debug(exceptionMsg);
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
+            }
+
+            // FIXME each block represents one observation <-- this is not always true!
+            for (List<String> block : values) {
+                int tokenIndex = 0;
+                ITime phenomenonTime = null;
+                List<IValue> observedValues = new ArrayList<IValue>();
+                // map to store the observed properties
+                Map<IValue,String> definitionsForObservedValues = new HashMap<IValue, String>();
+                IValue observedValue = null;
+                for (String token : block) {
+                    // get values from block via definition in
+                    // SosSweDataArray#getElementType
+                    SosSweAbstractDataComponent fieldForToken = elementType.getFields().get(tokenIndex).getElement();
+                    /*
+                     * get phenomenon time
+                     */
+
+                    if (fieldForToken instanceof SosSweTime) {
+                        try {
+                            if (fieldForToken instanceof SosSweTimeRange) {
+                                String[] subTokens = token.split("/");
+                                phenomenonTime = new TimePeriod(DateTimeHelper.parseIsoString2DateTime(subTokens[0]), DateTimeHelper.parseIsoString2DateTime(subTokens[1]));
+                            } else {
+                                phenomenonTime = new TimeInstant(DateTimeHelper.parseIsoString2DateTime(token));
+                            }
+                        } catch (Exception e) {
+                            if (e instanceof OwsExceptionReport) {
+                                throw (OwsExceptionReport) e;
+                            } else {
+                                OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
+                                String exceptionMsg = "Error while parse time String to DateTime!";
+                                LOGGER.error(exceptionMsg, e);
+                                owse.addCodedException(null, null, exceptionMsg);
+                                throw owse;
+                            }
+                        }
+                    }
+                    /*
+                     *  observation values
+                     */
+                    else if (fieldForToken instanceof SosSweQuantity)
+                    {
+                        observedValue = new QuantityValue(Double.parseDouble(token));
+                        observedValue.setUnit(((SosSweQuantity) fieldForToken).getUom());
+                    }
+                    else if (fieldForToken instanceof SosSweBoolean)
+                    {
+                        observedValue = new org.n52.sos.ogc.om.values.BooleanValue(Boolean.parseBoolean(token));
+                    }
+                    else if (fieldForToken instanceof SosSweText)
+                    {
+                        observedValue = new org.n52.sos.ogc.om.values.TextValue(token);
+                    }
+                    else if (fieldForToken instanceof SosSweCategory)
+                    {
+                        observedValue = new org.n52.sos.ogc.om.values.CategoryValue(token);
+                        observedValue.setUnit(((SosSweCategory) fieldForToken).getCodeSpace());
+                    }
+                    else if (fieldForToken instanceof SosSweCount)
+                    {
+                        observedValue = new org.n52.sos.ogc.om.values.CountValue(Integer.parseInt(token));
+                    }
+                    else
+                    {
+                        String exceptionMsg = String.format("sweField type \"%s\" not supported", 
+                                fieldForToken!=null?fieldForToken.getClass().getName():"null");
+                        LOGGER.debug(exceptionMsg);
+                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
+                    }
+                    if (observedValue != null) {
+                        definitionsForObservedValues.put(observedValue, fieldForToken.getDefinition());
+                    	observedValues.add(observedValue);
+                    	observedValue = null;
+                    }
+                    tokenIndex++;
+                }
+                // TODO: Eike implement usage of elementType
+                for (IValue iValue : observedValues) {
+                	IObservationValue value = new SosSingleObservationValue(phenomenonTime,iValue);
+                    SosObservation newObservation = new SosObservation();
+                    newObservation.setNoDataValue(multiObservation.getNoDataValue());
+                    /* 
+                     * TODO create new ObservationConstellation only with the 
+                     * specified observed property and observation type
+                     * 
+                     */
+                    SosObservationConstellation obsConst = createObservationConstellationForSubObservation(
+                    		multiObservation.getObservationConstellation(),
+                    		iValue,
+                    		definitionsForObservedValues.get(iValue));
+                    newObservation.setObservationConstellation(obsConst);
+                    newObservation.setValidTime(multiObservation.getValidTime());
+                    newObservation.setResultTime(multiObservation.getResultTime());
+                    newObservation.setTokenSeparator(multiObservation.getTokenSeparator());
+                    newObservation.setTupleSeparator(multiObservation.getTupleSeparator());
+                    newObservation.setResultType(multiObservation.getResultType());
+                    newObservation.setValue(value);
+                    observationCollection.add(newObservation);
+				}
+            }
+            return observationCollection;
+        }
+    }
+
+	private static SosObservationConstellation createObservationConstellationForSubObservation(
+			SosObservationConstellation observationConstellation,
+			IValue iValue,
+			String phenomenonID)
+	{
+		SosObservationConstellation constellation = new SosObservationConstellation();
+		constellation.setFeatureOfInterest(observationConstellation.getFeatureOfInterest());
+		constellation.setObservableProperty(new AbstractSosPhenomenon(phenomenonID));
+		constellation.setObservationType(OMHelper.getObservationTypeFromValue(iValue));
+		constellation.setOfferings(observationConstellation.getOfferings());
+		constellation.setProcedure(observationConstellation.getProcedure());
+		return constellation;
+	}
 
 }
