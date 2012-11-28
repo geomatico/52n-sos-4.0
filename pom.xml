@@ -507,10 +507,23 @@
 			</modules>
 		</profile>
 		<profile>
-			<id>develope</id>
+			<id>default</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
+			<modules>
+				<module>52n-sos-binding-kvp</module>
+				<module>52n-sos-binding-soap</module>
+				<module>52n-sos-enhanced-v20</module>
+				<module>52n-sos-hibernate-enhanced</module>
+				<module>52n-sos-transactional-v20</module>
+				<module>52n-sos-hibernate-transactional</module>
+				<module>52n-sos-resultHandling-v20</module>
+				<module>52n-sos-hibernate-resultHandling</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>develope</id>
 			<modules>
 				<module>52n-sos-webapp-preconfigured</module>
 				<module>52n-sos-binding-kvp</module>
