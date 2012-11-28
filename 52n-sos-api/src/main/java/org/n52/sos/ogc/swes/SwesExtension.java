@@ -38,10 +38,18 @@ public class SwesExtension<T> {
     {
         return definition;
     }
+    
+    public void setDefinition(String definition) {
+    	this.definition = definition;
+    }
 
     public T getValue()
     {
         return value;
+    }
+    
+    public void setValue(T value) {
+    	this.value = value;
     }
 
 }
