@@ -23,8 +23,8 @@
  */
 package org.n52.sos.ogc.swe.simpleType;
 
-import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
+import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 
 /**
  * Interface for the SOS internal representation of SWE simpleTypes
@@ -34,7 +34,9 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
  */
 public abstract class SosSweAbstractSimpleType extends SosSweAbstractDataComponent {
 
-    /**
+    private SosSweQuality quality;
+
+	/**
      * Get type of simpleType
      * 
      * @return Type of simpleType
@@ -46,7 +48,9 @@ public abstract class SosSweAbstractSimpleType extends SosSweAbstractDataCompone
      * 
      * @return Quality information
      */
-    public abstract SosSweQuality getQuality();
+    public SosSweQuality getQuality() {
+        return quality;
+    }
 
     /**
      * Set quality information
@@ -54,7 +58,9 @@ public abstract class SosSweAbstractSimpleType extends SosSweAbstractDataCompone
      * @param quality
      *            quality information to set
      */
-    public abstract void setQuality(SosSweQuality quality);
+    public void setQuality(SosSweQuality quality) {
+    	this.quality = quality;        
+    }
 
     /**
      * Get value
@@ -70,5 +76,17 @@ public abstract class SosSweAbstractSimpleType extends SosSweAbstractDataCompone
      *            value to set
      */
     public abstract void setValue(String value);
+
+	@Override
+	public String toString()
+	{
+		return String.format("%s [value=%s; quality=%s; simpleType=%s]",
+				this.getClass().getSimpleName(),
+				getValue(),
+				getQuality(),
+				getSimpleType());
+	}
+    
+    
 
 }

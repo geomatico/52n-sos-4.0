@@ -31,49 +31,41 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
  */
 public class SosSweCategory extends SosSweAbstractSimpleType {
 
-    @Override
+	private String value;
+	private String codeSpace;
+
+	@Override
     public SweSimpleType getSimpleType()
     {
         return SweSimpleType.Category;
     }
 
     @Override
-    public SosSweQuality getQuality()
-    {
-        // TODO Auto-generated method "getQuality"
-        return null;
-    }
-
-    @Override
-    public void setQuality(SosSweQuality quality)
-    {
-        // TODO Auto-generated method "setQuality"
-
-    }
-
-    @Override
     public String getValue()
     {
-        // TODO Auto-generated method "getValue"
-        return null;
+        return value;
     }
 
     @Override
     public void setValue(String value)
     {
-        // TODO Auto-generated method "setValue"
-
+    	this.value = value;
     }
     
     public void setCodeSpace(String codeSpace)
     {
-        // TODO Auto-generated method "setCodeSpace"
+        this.codeSpace = codeSpace;
     }
     
     public String getCodeSpace()
     {
-        // TODO Auto-generated method "getCodeSpace"
-        return null;
+        return codeSpace;
     }
 
+	@Override
+	public String toString()
+	{
+		return String.format("SosSweCategory [quality=%s, value=%s, codeSpace=%s, simpleType=%s]", getQuality(), value, codeSpace, getSimpleType());
+	}
+	   
 }

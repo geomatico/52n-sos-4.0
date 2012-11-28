@@ -33,99 +33,97 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
  */
 public class SosSweQuantity extends SosSweAbstractSimpleType {
 
-    /**
-     * SWE simple type type
-     */
-    private SweSimpleType simpleType = SweSimpleType.Quantity;
+	/**
+	 * SWE simple type type
+	 */
+	private SweSimpleType simpleType = SweSimpleType.Quantity;
 
-    /**
-     * axis ID
-     */
-    private String axisID;
+	/**
+	 * axis ID
+	 */
+	private String axisID;
 
-    /**
-     * quality data
-     */
-    private SosSweQuality quality;
+	/**
+	 * value
+	 */
+	private String value;
 
-    /**
-     * value
-     */
-    private String value;
+	/**
+	 * unit of measurement
+	 */
+	private String uom;
 
-    /**
-     * unit of measurement
-     */
-    private String uom;
+	/**
+	 * constructor
+	 */
+	public SosSweQuantity() {
+	}
 
-    /**
-     * constructor
-     */
-    public SosSweQuantity() {
-    }
+	@Override
+	public SweSimpleType getSimpleType()
+	{
+		return simpleType;
+	}
 
-    @Override
-    public SweSimpleType getSimpleType() {
-        return simpleType;
-    }
+	/**
+	 * Get axis ID
+	 * 
+	 * @return the axisID
+	 */
+	public String getAxisID()
+	{
+		return axisID;
+	}
 
-    @Override
-    public SosSweQuality getQuality() {
-        return quality;
-    }
+	/**
+	 * set axis ID
+	 * 
+	 * @param axisID
+	 *            the axisID to set
+	 */
+	public void setAxisID(String axisID)
+	{
+		this.axisID = axisID;
+	}
 
-    @Override
-    public void setQuality(SosSweQuality quality) {
-        this.quality = quality;
-    }
+	@Override
+	public String getValue()
+	{
+		return value;
+	}
 
-    /**
-     * Get axis ID
-     * 
-     * @return the axisID
-     */
-    public String getAxisID() {
-        return axisID;
-    }
+	@Override
+	public void setValue(String value)
+	{
+		this.value = value;
+	}
 
-    /**
-     * set axis ID
-     * 
-     * @param axisID
-     *            the axisID to set
-     */
-    public void setAxisID(String axisID) {
-        this.axisID = axisID;
-    }
+	/**
+	 * Get unit of measurement
+	 * 
+	 * @return the uom
+	 */
+	public String getUom()
+	{
+		return uom;
+	}
 
-    @Override
-    public String getValue() {
-        return value;
-    }
+	/**
+	 * Set unit of measurement
+	 * 
+	 * @param uom
+	 *            the uom to set
+	 */
 
-    @Override
-    public void setValue(String value) {
-        this.value = value;
-    }
+	public void setUom(String uom)
+	{
+		this.uom = uom;
+	}
 
-    /**
-     * Get unit of measurement
-     * 
-     * @return the uom
-     */
-    public String getUom() {
-        return uom;
-    }
-
-    /**
-     * Set unit of measurement
-     * 
-     * @param uom
-     *            the uom to set
-     */
-
-    public void setUom(String uom) {
-        this.uom = uom;
-    }
+	@Override
+	public String toString()
+	{
+		return String.format("SosSweQuantity [simpleType=%s, axisID=%s, value=%s, uom=%s, quality=%s]", simpleType, axisID, value, uom, getQuality());
+	}
 
 }

@@ -39,11 +39,6 @@ public class SosSweText extends SosSweAbstractSimpleType {
     private SweSimpleType simpleType = SweSimpleType.Text;
 
     /**
-     * quality data
-     */
-    private SosSweQuality quality;
-
-    /**
      * value
      */
     private String value;
@@ -57,16 +52,6 @@ public class SosSweText extends SosSweAbstractSimpleType {
     @Override
     public SweSimpleType getSimpleType() {
         return simpleType;
-    }
-
-    @Override
-    public SosSweQuality getQuality() {
-        return quality;
-    }
-
-    @Override
-    public void setQuality(SosSweQuality quality) {
-        this.quality = quality;
     }
 
     @Override

@@ -31,6 +31,8 @@ public class SosSweCount extends SosSweAbstractSimpleType {
      * SWE simple type type
      */
     private SweSimpleType simpleType = SweSimpleType.Count;
+    
+    private int value;
 
     @Override
     public SweSimpleType getSimpleType() {
@@ -38,28 +40,13 @@ public class SosSweCount extends SosSweAbstractSimpleType {
     }
 
     @Override
-    public SosSweQuality getQuality() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setQuality(SosSweQuality quality) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
     public String getValue() {
-        // TODO Auto-generated method stub
-        return null;
+        return Integer.toString(value);
     }
 
     @Override
     public void setValue(String value) {
-        // TODO Auto-generated method stub
-        
+        this.value = Integer.parseInt(value);
     }
-
 
 }

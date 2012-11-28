@@ -37,11 +37,6 @@ public class SosSweTime extends SosSweAbstractSimpleType {
     private SweSimpleType simpleType = SweSimpleType.Time;
 
     /**
-     * quality data
-     */
-    private SosSweQuality quality;
-
-    /**
      * value
      */
     private String value;
@@ -61,16 +56,6 @@ public class SosSweTime extends SosSweAbstractSimpleType {
     @Override
     public SweSimpleType getSimpleType() {
         return simpleType;
-    }
-
-    @Override
-    public SosSweQuality getQuality() {
-        return quality;
-    }
-
-    @Override
-    public void setQuality(SosSweQuality quality) {
-        this.quality = quality;
     }
 
     @Override
@@ -102,4 +87,10 @@ public class SosSweTime extends SosSweAbstractSimpleType {
         this.uom = uom;
     }
 
+	@Override
+	public String toString()
+	{
+		return String.format("%s [simpleType=%s, value=%s, uom=%s, quality=%s]",this.getClass().getSimpleName(), simpleType, value, uom, getQuality());
+	}
+    
 }
