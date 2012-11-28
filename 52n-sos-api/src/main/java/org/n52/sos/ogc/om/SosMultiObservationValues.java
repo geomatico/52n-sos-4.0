@@ -74,57 +74,57 @@ public class SosMultiObservationValues<T> implements IObservationValue<T> {
                     }
 
                 }
+                if (dateTokenIndex > -1) {
+                    for (List<String> block : dataArray.getValues()) {
+                        // check for "/" to identify time periods (Is conform with
+                        // ISO
+                        // 8601 (see WP))
+                        // datetimehelper to DateTime from joda time
+                        String token = block.get(dateTokenIndex);
+                        ITime time = null;
+                        try {
+                            if (token.contains("/")) {
+                                String[] subTokens = token.split("/");
+                                time = new TimePeriod(DateTimeHelper.parseIsoString2DateTime(subTokens[0]), DateTimeHelper.parseIsoString2DateTime(subTokens[1]));
+                            } else {
+                                time = new TimeInstant(DateTimeHelper.parseIsoString2DateTime(token));
+                            }
+                        } catch (DateTimeException dte) {
+                            String exceptionMsg = String.format("Could not parse ISO8601 string \"%s\". Exception thrown: \"%s\"; Message: \"%s\"", token, dte.getClass().getName(), dte.getMessage());
+                            LOGGER.error(exceptionMsg);
+                            // TODO throw exception here?
+                            continue; // try next block;
+                        }
+                        if (time instanceof TimeInstant) {
+                            TimeInstant ti = (TimeInstant) time;
+                            if (start == null || ti.getValue().isBefore(start)) {
+                                start = ti.getValue();
+                            }
+                            if (end == null || ti.getValue().isAfter(end)) {
+                                end = ti.getValue();
+                            }
+                        } else if (time instanceof TimePeriod) {
+                            TimePeriod tp = (TimePeriod) time;
+                            if (start == null || tp.getStart().isBefore(start)) {
+                                start = tp.getStart();
+                            }
+                            if (end == null || tp.getEnd().isAfter(end)) {
+                                end = tp.getEnd();
+                            }
+                        }
+                    }
+                } else {
+                    String errorMsg = "PhenomenonTime field could not be found in ElementType";
+                    LOGGER.error(errorMsg);
+                }
+                if (start.isEqual(end)) {
+                    return new TimeInstant(start);
+                } else {
+                    return new TimePeriod(start, end);
+                }
             } else {
                 String errorMsg = String.format("Value of type \"%s\" not set correct.", SweDataArrayValue.class.getName());
                 LOGGER.error(errorMsg);
-            }
-            if (dateTokenIndex > -1) {
-                for (List<String> block : dataArray.getValues()) {
-                    // check for "/" to identify time periods (Is conform with
-                    // ISO
-                    // 8601 (see WP))
-                    // datetimehelper to DateTime from joda time
-                    String token = block.get(dateTokenIndex);
-                    ITime time = null;
-                    try {
-                        if (token.contains("/")) {
-                            String[] subTokens = token.split("/");
-                            time = new TimePeriod(DateTimeHelper.parseIsoString2DateTime(subTokens[0]), DateTimeHelper.parseIsoString2DateTime(subTokens[1]));
-                        } else {
-                            time = new TimeInstant(DateTimeHelper.parseIsoString2DateTime(token));
-                        }
-                    } catch (DateTimeException dte) {
-                        String exceptionMsg = String.format("Could not parse ISO8601 string \"%s\". Exception thrown: \"%s\"; Message: \"%s\"", token, dte.getClass().getName(), dte.getMessage());
-                        LOGGER.error(exceptionMsg);
-                        // TODO throw exception here?
-                        continue; // try next block;
-                    }
-                    if (time instanceof TimeInstant) {
-                        TimeInstant ti = (TimeInstant) time;
-                        if (start == null || ti.getValue().isBefore(start)) {
-                            start = ti.getValue();
-                        }
-                        if (end == null || ti.getValue().isAfter(end)) {
-                            end = ti.getValue();
-                        }
-                    } else if (time instanceof TimePeriod) {
-                        TimePeriod tp = (TimePeriod) time;
-                        if (start == null || tp.getStart().isBefore(start)) {
-                            start = tp.getStart();
-                        }
-                        if (end == null || tp.getEnd().isAfter(end)) {
-                            end = tp.getEnd();
-                        }
-                    }
-                }
-            } else {
-                String errorMsg = "PhenomenonTime field could not be found in ElementType";
-                LOGGER.error(errorMsg);
-            }
-            if (start.isEqual(end)) {
-                return new TimeInstant(start);
-            } else {
-                return new TimePeriod(start, end);
             }
         }
         return phenomenonTime;
