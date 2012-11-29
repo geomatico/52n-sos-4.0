@@ -252,13 +252,7 @@ public class GetObservationDAO implements IGetObservationDAO {
                 throw Util4Exceptions.createMissingParameterValueException(GetObservationParams.observedProperty
                         .name());
             } else {
-                boolean hasSpatialPhen = false;
-                if (sosRequest.getObservedProperties().contains(
-                        Configurator.getInstance().getSpatialObsProp4DynymicLocation())) {
-                    hasSpatialPhen = true;
-                }
                 List<Observation> observations = queryObservation(sosRequest, session);
-
                 GetObservationResponse response = new GetObservationResponse();
                 response.setService(request.getService());
                 response.setVersion(request.getVersion());
