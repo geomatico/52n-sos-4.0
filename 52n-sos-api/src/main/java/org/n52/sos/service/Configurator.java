@@ -24,9 +24,7 @@
 package org.n52.sos.service;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -237,12 +235,6 @@ public final class Configurator {
     private String serviceURL;
 
     /**
-     * indicates if the FOI location should be set dynamically from spatial
-     * observableProperties
-     */
-    private boolean setFoiLocationDynamically;
-
-    /**
      * boolean, indicates if possible values for operation parameters should be
      * included in capabilities
      */
@@ -282,12 +274,6 @@ public final class Configurator {
     private Map<String, IAdminRequestOperator> adminRequestOperators = new HashMap<String, IAdminRequestOperator>(0);
 
     /**
-     * definition of the observableProperty which holds the dynamic location
-     * values
-     */
-    private String spatialObsProp4DynymicLocation;
-
-    /**
      * prefix URN for the spatial reference system
      */
     private String srsNamePrefix;
@@ -296,11 +282,6 @@ public final class Configurator {
      * prefix URN for the spatial reference system
      */
     private String srsNamePrefixSosV2;
-
-    /**
-     * indicates if dynamic locations are supported
-     */
-    private boolean supportDynamicLocation;
 
     /**
      * boolean indicates, whether SOS supports quality information in
@@ -397,9 +378,6 @@ public final class Configurator {
 			case DEFAULT_PROCEDURE_PREFIX:
 				this.defaultProcedurePrefix = parseString(setting, value, true);
 				break;
-			case SET_FOI_LOCATION_DYNAMICALLY:
-				this.setFoiLocationDynamically = parseBoolean(setting, value);
-				break;
 			case FOI_ENCODED_IN_OBSERVATION:
 				this.foiEncodedInObservation = parseBoolean(setting, value);
 				break;
@@ -441,12 +419,6 @@ public final class Configurator {
 				break;
 			case SOS_URL:
 				setServiceURL(parseString(setting, value, false));
-				break;
-			case SPATIAL_OBSERVABLE_PROPERTY:
-				this.spatialObsProp4DynymicLocation = parseString(setting, value, false);
-				break;
-			case SUPPORT_DYNAMIC_LOCATION:
-				this.supportDynamicLocation = parseBoolean(setting, value);
 				break;
 			case SUPPORTS_QUALITY:
 				this.supportsQuality = parseBoolean(setting, value);
@@ -651,20 +623,6 @@ public final class Configurator {
 	}
 	
 	private void validate() throws ConfigurationException {
-		if (this.setFoiLocationDynamically && !this.supportDynamicLocation) {
-            String exceptionText =
-                    "Support for dynamic location is set to false! To set dynamic foi location set '"
-                            + Setting.SUPPORT_DYNAMIC_LOCATION + "' to true!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
-		if (this.supportDynamicLocation == true
-                && (this.spatialObsProp4DynymicLocation == null 
-					|| this.spatialObsProp4DynymicLocation.isEmpty())) {
-            String exceptionText = "Dynamic location support is set to true but no observable property is defined!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
 		/* TODO assert that required fields or xml of service identification are present */
 		/* TODO assert that required fields or xml of service provider are present */
 	}
@@ -1096,6 +1054,10 @@ public final class Configurator {
             LOGGER.error(exceptionText);
             throw new ConfigurationException(exceptionText);
         }
+        /* reinitialize XmlOptionHelper to get the correct prefixes */
+        if (getCharacterEncoding() != null) {
+            XmlOptionsHelper.getInstance(getCharacterEncoding(), true);
+        }
     }
 
     /**
@@ -1523,28 +1485,6 @@ public final class Configurator {
             url = serviceURL;
         }
         this.serviceURL = url;
-    }
-
-    /**
-     * @return the supportDynamicLocation
-     */
-    public boolean isSupportDynamicLocation() {
-        return supportDynamicLocation;
-    }
-
-    /**
-     * @return the setFoiLocationDynamically
-     */
-    
-    public boolean isSetFoiLocationDynamically() {
-        return setFoiLocationDynamically;
-    }
-
-    /**
-     * @return the spatialObsProp4DynymicLocation
-     */
-    public String getSpatialObsProp4DynymicLocation() {
-        return spatialObsProp4DynymicLocation;
     }
 
     public String getDefaultOfferingPrefix() {

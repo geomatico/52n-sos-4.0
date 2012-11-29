@@ -185,18 +185,6 @@
 					"title": "Show full operations metadata for observations",
 					"description": "Include allowed values for featureOfInterest in OperationMetadata of GetObservation."
 				},
-				"DYNAMIC_FOI_LOCATION": {
-					"type": "boolean",
-					"default": false,
-					"title": "Dynamic Locations",
-					"description": "Support for dynamic locations as spatial values."
-				},
-				"SET_FOI_LOCATION_DYNAMICALLY": {
-					"type": "boolean",
-					"default": false,
-					"title": "Set FOI locations dynamically.",
-					"description": "Set the location of FOI's dynamically."
-				},
 				"CHILD_PROCEDURES_ENCODED_IN_PARENTS_DESCRIBE_SENSOR": {
 					"type": "boolean",
 					"default": false,
@@ -318,13 +306,6 @@
 					"required": true,
 					"title": "Default Procedure Prefix",
 					"description": "The default prefix for generated procedures (if not defined in RegisterSensor requests)."
-				},
-				"SPATIAL_OBSERVABLE_PROPERTY": {
-					"type": "string",
-					"default": "urn:ogc:def:phenomenon:OGC:1.0.30:Position",
-					"required": true,
-					"title": "Observed Property of Dynamic Locations",
-					"description": "The ObservableProperty of dynamic locations."
 				},
 				"CHARACTER_ENCODING": {
 					"type": "string",

@@ -27,6 +27,8 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
+/* TODO modularize it to enable submodules to supply settings. Include 
+ * title,type,description,etc to let the client generate the UI dynamically */
 public enum Setting {
 	CAPABILITIES_CACHE_UPDATE_INTERVAL(Type.INTEGER),
 	CHARACTER_ENCODING(Type.STRING),
@@ -43,7 +45,6 @@ public enum Setting {
 	TUPLE_SEPERATOR(Type.STRING),
 	NO_DATA_VALUE(Type.STRING),
 	DEFAULT_EPSG(Type.INTEGER),
-	SET_FOI_LOCATION_DYNAMICALLY(Type.BOOLEAN),
 	FOI_LISTED_IN_OFFERINGS(Type.BOOLEAN),
 	GML_DATE_FORMAT(Type.STRING),
 	FOI_ENCODED_IN_OBSERVATION(Type.BOOLEAN),
@@ -54,9 +55,7 @@ public enum Setting {
 	SOS_URL(Type.STRING) { 
 		@Override public boolean isAllowedValue(String s) { return isUrl(s); }
 	},
-	SPATIAL_OBSERVABLE_PROPERTY(Type.STRING),
 	CONFIGURATION_FILES(Type.STRING),
-	SUPPORT_DYNAMIC_LOCATION(Type.BOOLEAN),
 	SUPPORTS_QUALITY(Type.BOOLEAN),
 	SWITCH_COORDINATES_FOR_EPSG_CODES(Type.STRING),
 	SERVICE_PROVIDER_FILE(Type.FILE),
