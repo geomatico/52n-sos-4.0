@@ -128,16 +128,16 @@ public class InsertResultTemplateDAO implements IInsertResultTemplateDAO {
             session = (Session) connectionProvider.getConnection();
             transaction = session.beginTransaction();
             SosObservationConstellation sosObsConst = request.getObservationConstellation();
+            if (request.getResultStructure().getResultStructure() instanceof SosSweDataArray
+                    || request.getResultStructure().getResultStructure() instanceof SosSweDataRecord) {
+                sosObsConst.setObservationType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
+            } else {
+                String exceptionText = "The requested resultStructure is not supported!";
+                throw Util4Exceptions.createInvalidParameterValueException(
+                        Sos2Constants.InsertResultTemplateParams.observationType.name(), exceptionText);
+            }
             ObservationConstellation obsConst = null;
             for (String offeringID : sosObsConst.getOfferings()) {
-                if (request.getResultStructure().getResultStructure() instanceof SosSweDataArray
-                        || request.getResultStructure().getResultStructure() instanceof SosSweDataRecord) {
-                    sosObsConst.setObservationType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
-                } else {
-                    String exceptionText = "The requested resultStructure is not supported!";
-                    throw Util4Exceptions.createInvalidParameterValueException(
-                            Sos2Constants.InsertResultTemplateParams.observationType.name(), exceptionText);
-                }
                 obsConst =
                         HibernateUtilities.checkObservationConstellationForObservation(sosObsConst, offeringID,
                                 session);
@@ -162,7 +162,7 @@ public class InsertResultTemplateDAO implements IInsertResultTemplateDAO {
             if (transaction != null) {
                 transaction.rollback();
             }
-            String exceptionText = "!";
+            String exceptionText = "Insert result template into database failed!";
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
