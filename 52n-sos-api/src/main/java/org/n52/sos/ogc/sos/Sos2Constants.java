@@ -47,7 +47,7 @@ public final class Sos2Constants {
      * The names of the extensions that we know off and might support
      */
     public enum Extensions{
-        AntiSubsetting;
+        Subsetting;
     }
 
     /** Constant for actual implementing version */

@@ -23,13 +23,10 @@
  */
 package org.n52.sos.ogc.swes;
 
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.Sos2Constants.Extensions;
-
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
- *
  */
+@SuppressWarnings("rawtypes")
 public class SwesExtensions {
 
     private SwesExtension[] extensions;
@@ -43,10 +40,10 @@ public class SwesExtensions {
      * @param extensionId
      * @return
      */
-    public boolean isBooleanExentsionSet(Extensions extensionId)
+    public boolean isBooleanExentsionSet(String extensionName)
     {
         for (SwesExtension<?> swesExtension : extensions) {
-            if (swesExtension.getDefinition().equals(Sos2Constants.Extensions.AntiSubsetting.name())) {
+            if (swesExtension.getDefinition().equals(extensionName)) {
                 Object value = swesExtension.getValue();
                 if (value instanceof Boolean) {
                     return (Boolean)value;
@@ -56,6 +53,5 @@ public class SwesExtensions {
         }
         return false;
     }
-
     
 }
