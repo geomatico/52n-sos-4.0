@@ -31,7 +31,7 @@ public class TestCaseTest extends AbstractSosTestCase {
     public TestCaseTest() {}
     
     @Test
-    public void testConfigurator() {
+    public void configuratorGetInstanceDoesNotReturnNull() {
         assertNotNull(Configurator.getInstance());
     }
 }
