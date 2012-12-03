@@ -395,7 +395,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
         sosGetResultRequest.setVersion(getResult.getVersion());
         sosGetResultRequest.setOffering(getResult.getOffering());
         sosGetResultRequest.setObservedProperty(getResult.getObservedProperty());
-        sosGetResultRequest.setFeatureOfInterest(Arrays.asList(getResult.getFeatureOfInterestArray()));
+        sosGetResultRequest.setFeatureIdentifiers(Arrays.asList(getResult.getFeatureOfInterestArray()));
         getResult.getFeatureOfInterestArray();
         if (getResult.isSetSpatialFilter()) {
             sosGetResultRequest.setSpatialFilter(parseSpatialFilter4GetResult(getResult.getSpatialFilter()));

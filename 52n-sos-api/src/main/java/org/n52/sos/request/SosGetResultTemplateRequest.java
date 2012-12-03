@@ -29,6 +29,7 @@ import org.n52.sos.ogc.sos.Sos2Constants;
  * SOS GetResultTemplate request
  * 
  */
+@Deprecated
 public class SosGetResultTemplateRequest extends AbstractServiceRequest {
 
     /**

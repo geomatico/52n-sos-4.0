@@ -66,7 +66,7 @@ public class GetResultDAO implements IGetResultDAO {
     /**
      * logger
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(InsertResultDAO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GetResultDAO.class);
 
     /**
      * supported SOS operation
@@ -167,7 +167,7 @@ public class GetResultDAO implements IGetResultDAO {
             response.setService(request.getService());
             response.setVersion(request.getVersion());
             Set<String> featureIdentifier =
-                    QueryHelper.getFeatureIdentifier(request.getSpatialFilter(), request.getFeatureOfInterest(),
+                    QueryHelper.getFeatureIdentifier(request.getSpatialFilter(), request.getFeatureIdentifiers(),
                             session);
             List<ResultTemplate> resultTemplates = queryResultTemplate(request, featureIdentifier, session);
             if (resultTemplates != null && !resultTemplates.isEmpty()) {

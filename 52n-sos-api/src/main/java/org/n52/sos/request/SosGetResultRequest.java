@@ -34,6 +34,7 @@ import org.n52.sos.ogc.sos.SosConstants;
  * SOS GetResult request
  * 
  */
+@Deprecated
 public class SosGetResultRequest extends AbstractServiceRequest {
 
     /**
