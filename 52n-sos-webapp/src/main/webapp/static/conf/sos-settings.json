@@ -48,7 +48,7 @@
 					"type": "string",
 					"required": false,
 					"title": "Service Identification File",
-					"description": "The path to a file containing a ows:ServiceIdentification overriding the above settings. It can be either a absolute path (like <code>/home/user/sosconfig/identification.xml</code>) or a path relative to the web application directory (e.g. <code>WEB-INF/identification.xml</code>)."
+					"description": "The path to a file containing an ows:ServiceIdentification overriding the above settings. It can be either an absolute path (like <code>/home/user/sosconfig/identification.xml</code>) or a path relative to the web application directory (e.g. <code>WEB-INF/identification.xml</code>)."
 				}
 			}
 		},
@@ -60,14 +60,14 @@
 					"default": "52North",
 					"required": true,
 					"title": "Name",
-					"description": "SOS service provider name"
+					"description": "Your or your company's name."
 				},
 				"SERVICE_PROVIDER_SITE": {
 					"type": "string",
 					"default": "http://52north.org/swe",
 					"required": true,
 					"title": "Website",
-					"description": "SOS service provider website"
+					"description": "Your website."
 				},
 				"SERVICE_PROVIDER_INDIVIDUAL_NAME": {
 					"type": "string",
@@ -130,13 +130,13 @@
 					"default": "info@52north.org",
 					"required": true,
 					"title": "Mail-Address",
-					"description": "The mail address of the responsible person."
+					"description": "The electronic mail address of the responsible person."
 				},
 				"SERVICE_PROVIDER_FILE": {
 					"type": "string",
 					"required": false,
 					"title": "Service Provider File",
-					"description": "The path to a file containing a ows:ServiceProvider overriding the above settings. It can be either a absolute path (like <code>/home/user/sosconfig/provider.xml</code>) or a path relative to the web application directory (e.g. <code>WEB-INF/provider.xml</code>)."
+					"description": "The path to a file containing an ows:ServiceProvider overriding the above settings. It can be either an absolute path (like <code>/home/user/sosconfig/provider.xml</code>) or a path relative to the web application directory (e.g. <code>WEB-INF/provider.xml</code>)."
 				}
 			}
 		},
@@ -232,7 +232,7 @@
 					"type": "string",
 					"required": false,
 					"title": "Sensor Directory",
-					"description": "The path to a directory with the sensor descriptions in SensorML format. It can be either a absolute path (like <code>/home/user/sosconfig/sensors</code>) or a path relative to the web application directory (e.g. <code>WEB-INF/sensors</code>)."
+					"description": "The path to a directory with the sensor descriptions in SensorML format. It can be either an absolute path (like <code>/home/user/sosconfig/sensors</code>) or a path relative to the web application directory (e.g. <code>WEB-INF/sensors</code>)."
 				},
 				"CONFIGURATION_FILES": {
 					"type": "string",

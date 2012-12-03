@@ -76,6 +76,7 @@ public class InstallDatabaseController extends AbstractInstallController {
         }
     }
 
+    // TODO move user message text strings out of Java into properties file.
     private Map<String, Object> process(Map<String, String> parameters, Map<String, Object> settings) {
 
         String driver = parameters.get(InstallConstants.DRIVER_PARAMETER);
@@ -158,7 +159,7 @@ public class InstallDatabaseController extends AbstractInstallController {
 
             if (createTables) {
                 if ( !overwriteTables && alreadyExistent) {
-                    return error(settings, "Tables already created, but should not overwrite.");
+                    return error(settings, "Tables already created, but should not overwrite. Please take a look at the 'Actions' section.");
                 }
             }
             else if ( !alreadyExistent) {
@@ -176,7 +177,7 @@ public class InstallDatabaseController extends AbstractInstallController {
                 st.execute(InstallConstants.CAN_READ_SPATIAL_REF_SYS);
             }
             catch (SQLException e) {
-                return error(settings, "Cannot read 'spatial_ref_sys'. Please revise your database configuration.", e);
+                return error(settings, "Cannot read 'spatial_ref_sys' table of PostGIS. Please revise your database configuration.", e);
             }
 
         }

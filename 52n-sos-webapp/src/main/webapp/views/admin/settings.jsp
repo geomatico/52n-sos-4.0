@@ -29,7 +29,7 @@
 </jsp:include>
 <jsp:include page="../common/logotitle.jsp">
 	<jsp:param name="title" value="Change SOS Configuration" />
-	<jsp:param name="leadParagraph" value="You can download the current configuration <a href=\"settings.json\" target=\"_blank\">here</a> to backup or us it for a new SOS installation." />
+	<jsp:param name="leadParagraph" value="You can download the current configuration <a href=\"settings.json\" target=\"_blank\">here</a> to backup or use it for a new SOS installation." />
 </jsp:include>
 
 <form id="settings" class="form-horizontal"></form>
