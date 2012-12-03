@@ -50,60 +50,48 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-api</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-coding-ows-v110</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-coding-sensorML-v101</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-coding-sos-v20</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-core-v20</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-hibernate-common</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-hibernate-dialect</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-hibernate-core</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-hibernate-feature</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<!-- dependencies for integration test -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.3</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.8.1</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.n52.sensorweb</groupId>
@@ -197,7 +185,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
@@ -225,9 +212,13 @@
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
+			<artifactId>jsp-api</artifactId>
+        </dependency>
+        <dependency>
+			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
-		</dependency>
-		<dependency>
+        </dependency>
+        <dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 		</dependency>
@@ -235,49 +226,38 @@
 	<profiles>
 		<profile>
 			<id>develope</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
 			<dependencies>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-binding-kvp</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-binding-soap</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-enhanced-v20</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-hibernate-enhanced</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-transactional-v20</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-hibernate-transactional</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-resultHandling-v20</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-hibernate-resultHandling</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -287,12 +267,10 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-binding-kvp</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-binding-soap</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -302,7 +280,6 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-binding-kvp</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -312,7 +289,6 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-binding-soap</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -322,12 +298,10 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-enhanced-v20</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-hibernate-enhanced</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -337,12 +311,10 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-transactional-v20</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-hibernate-transactional</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -352,12 +324,10 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-resultHandling-v20</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-hibernate-resultHandling</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -367,7 +337,6 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-binding-xml</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -377,7 +346,6 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-coding-wml-v20</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -387,7 +355,6 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-coding-diagram</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -397,7 +364,6 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-getResultTasking</artifactId>
-					<version>${project.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -413,7 +379,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
-						<version>2.12</version>
 						<executions>
 							<execution>
 								<goals>
@@ -426,7 +391,6 @@
 					<plugin>
 						<groupId>org.mortbay.jetty</groupId>
 						<artifactId>maven-jetty-plugin</artifactId>
-						<version>6.1.26</version>
 						<configuration>
 							<scanIntervalSeconds>10</scanIntervalSeconds>
 							<stopPort>9999</stopPort>
@@ -474,7 +438,6 @@
 						<inherited>true</inherited>
 						<groupId>org.codehaus.cargo</groupId>
 						<artifactId>cargo-maven2-plugin</artifactId>
-						<version>1.2.0</version>
 						<executions>
 							<execution>
 								<id>verify-deploy</id>
@@ -521,7 +484,6 @@
 									</deployable>
 								</deployables>
 							</deployer>
-
 						</configuration>
 					</plugin>
 				</plugins>
