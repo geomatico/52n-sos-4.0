@@ -132,29 +132,11 @@ public class SoapHelper {
      * @return SOAP action URI
      */
     public static String getExceptionActionURI(IExceptionCode exceptionCode) {
-        if (exceptionCode.equals(OwsExceptionCode.InvalidParameterValue)) {
+        if (exceptionCode instanceof OwsExceptionCode) {
             return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode.equals(SwesExceptionCode.InvalidRequest)) {
+        } else if (exceptionCode instanceof SwesExceptionCode) {
             return SosSoapConstants.RESP_ACTION_SWES;
-        } else if (exceptionCode.equals(OwsExceptionCode.InvalidUpdateSequence)) {
-            return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode.equals(OwsExceptionCode.MissingParameterValue)) {
-            return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode.equals(OwsExceptionCode.NoApplicableCode)) {
-            return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode.equals(OwsExceptionCode.NoDataAvailable)) {
-            return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode.equals(OwsExceptionCode.OperationNotSupported)) {
-            return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode.equals(OwsExceptionCode.OptionNotSupported)) {
-            return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode.equals(SwesExceptionCode.RequestExtensionNotSupported)) {
-            return SosSoapConstants.RESP_ACTION_SWES;
-        } else if (exceptionCode.equals(OwsExceptionCode.VersionNegotiationFailed)) {
-            return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode.equals(SosExceptionCode.InvalidPropertyOfferingCombination)) {
-            return SosSoapConstants.RESP_ACTION_SOS;
-        } else if (exceptionCode.equals(SosExceptionCode.ResponseExceedsSizeLimit)) {
+        } else if (exceptionCode instanceof SosExceptionCode) {
             return SosSoapConstants.RESP_ACTION_SOS;
         } else {
             return SosSoapConstants.RESP_ACTION_OWS;
@@ -169,30 +151,8 @@ public class SoapHelper {
      * @return Text for SOAP fault reason
      */
     public static String getSoapFaultReasonText(IExceptionCode exceptionCode) {
-        if (exceptionCode.equals(OwsExceptionCode.InvalidParameterValue)) {
-            return OWSConstants.SOAP_REASON_INVALID_PARAMETER_VALUE;
-        } else if (exceptionCode.equals(SwesExceptionCode.InvalidRequest)) {
-            return SWEConstants.SOAP_REASON_INVALID_REQUEST;
-        } else if (exceptionCode.equals(OwsExceptionCode.InvalidUpdateSequence)) {
-            return OWSConstants.SOAP_REASON_INVALID_UPDATE_SEQUENCES;
-        } else if (exceptionCode.equals(OwsExceptionCode.MissingParameterValue)) {
-            return OWSConstants.SOAP_REASON_MISSING_PARAMETER_VALUE;
-        } else if (exceptionCode.equals(OwsExceptionCode.NoApplicableCode)) {
-            return OWSConstants.SOAP_REASON_NO_APPLICABLE_CODE;
-        } else if (exceptionCode.equals(OwsExceptionCode.NoDataAvailable)) {
-            return OWSConstants.SOAP_REASON_NO_DATA_AVAILABLE;
-        } else if (exceptionCode.equals(OwsExceptionCode.OperationNotSupported)) {
-            return OWSConstants.SOAP_REASON_OPERATION_NOT_SUPPORTED;
-        } else if (exceptionCode.equals(OwsExceptionCode.OptionNotSupported)) {
-            return OWSConstants.SOAP_REASON_OPTION_NOT_SUPPORTED;
-        } else if (exceptionCode.equals(SwesExceptionCode.RequestExtensionNotSupported)) {
-            return OWSConstants.SOAP_REASON_REQUEST_EXTENSION_NOT_SUPPORTED;
-        } else if (exceptionCode.equals(OwsExceptionCode.VersionNegotiationFailed)) {
-            return OWSConstants.SOAP_REASON_VERSION_NEGOTIATION_FAILED;
-        } else if (exceptionCode.equals(SosExceptionCode.InvalidPropertyOfferingCombination)) {
-            return OWSConstants.SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION;
-        } else if (exceptionCode.equals(SosExceptionCode.ResponseExceedsSizeLimit)) {
-            return OWSConstants.SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT;
+        if (exceptionCode != null && exceptionCode.getSoapFaultReason() != null) {
+            return exceptionCode.getSoapFaultReason();
         } else {
             return OWSConstants.SOAP_REASON_UNKNOWN;
         }

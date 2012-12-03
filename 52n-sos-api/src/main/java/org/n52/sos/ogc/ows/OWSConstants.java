@@ -42,35 +42,35 @@ public class OWSConstants {
             "http://schemas.opengis.net/ows/1.1.0/owsExceptionReport.xsd";
 
     // exception messages
-    public static final String SOAP_REASON_INVALID_PARAMETER_VALUE =
+    private static final String SOAP_REASON_INVALID_PARAMETER_VALUE =
             "The request contained an invalid parameter value.";
 
-    public static final String SOAP_REASON_INVALID_UPDATE_SEQUENCES =
+    private static final String SOAP_REASON_INVALID_UPDATE_SEQUENCES =
             "The value of the updateSequence parameter in the GetCapabilities operation request was greater than the current value of the service metadata updateSequence number.";
 
-    public static final String SOAP_REASON_MISSING_PARAMETER_VALUE =
+    private static final String SOAP_REASON_MISSING_PARAMETER_VALUE =
             "The request did not include a value for a required parameter and this server does not declare a default value for it.";
 
-    public static final String SOAP_REASON_NO_APPLICABLE_CODE = "A server exception was encountered.";
+    private static final String SOAP_REASON_NO_APPLICABLE_CODE = "A server exception was encountered.";
 
-    public static final String SOAP_REASON_NO_DATA_AVAILABLE = "There are no data available.";
+    private static final String SOAP_REASON_NO_DATA_AVAILABLE = "There are no data available.";
 
-    public static final String SOAP_REASON_OPERATION_NOT_SUPPORTED =
+    private static final String SOAP_REASON_OPERATION_NOT_SUPPORTED =
             "The requested operation is not supported by this server.";
 
-    public static final String SOAP_REASON_OPTION_NOT_SUPPORTED =
+    private static final String SOAP_REASON_OPTION_NOT_SUPPORTED =
             "The request included/targeted an option that is not supported by this server.";
 
-    public static final String SOAP_REASON_REQUEST_EXTENSION_NOT_SUPPORTED =
+    private static final String SOAP_REASON_REQUEST_EXTENSION_NOT_SUPPORTED =
             "The request included an extension that is not supported by this server.";
 
-    public static final String SOAP_REASON_VERSION_NEGOTIATION_FAILED =
+    private static final String SOAP_REASON_VERSION_NEGOTIATION_FAILED =
             "The list of versions in the ‘AcceptVersions’ parameter value of the GetCapabilities operation request did not include any version supported by this server.";
 
-    public static final String SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT =
+    private static final String SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT =
             "The requested result set exceeds the response size limit of this service and thus cannot be delivered.";
 
-    public static final String SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION =
+    private static final String SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION =
             "Observations for the requested combination of observedProperty and offering do not use SWE Common encoded results.";
 
     public static final String SOAP_REASON_UNKNOWN = "A server exception was encountered.";
@@ -122,7 +122,25 @@ public class OWSConstants {
      * 1.1.0
      */
     public enum OwsExceptionCode implements IExceptionCode {
-        OperationNotSupported, MissingParameterValue, InvalidParameterValue, VersionNegotiationFailed, InvalidUpdateSequence, OptionNotSupported, NoApplicableCode, NoDataAvailable
+        OperationNotSupported(SOAP_REASON_OPTION_NOT_SUPPORTED),
+        MissingParameterValue(SOAP_REASON_MISSING_PARAMETER_VALUE),
+        InvalidParameterValue(SOAP_REASON_INVALID_PARAMETER_VALUE),
+        VersionNegotiationFailed(SOAP_REASON_VERSION_NEGOTIATION_FAILED),
+        InvalidUpdateSequence(SOAP_REASON_INVALID_UPDATE_SEQUENCES),
+        OptionNotSupported(SOAP_REASON_OPERATION_NOT_SUPPORTED),
+        NoApplicableCode(SOAP_REASON_NO_APPLICABLE_CODE),
+        NoDataAvailable(SOAP_REASON_NO_DATA_AVAILABLE);
+        
+        private final String soapFaulReason;
+
+        private OwsExceptionCode(String soapFaultReason) {
+            this.soapFaulReason = soapFaultReason;
+        }
+
+        @Override
+        public String getSoapFaultReason() {
+            return soapFaulReason;
+        }
     }
 
     /** Exception levels */

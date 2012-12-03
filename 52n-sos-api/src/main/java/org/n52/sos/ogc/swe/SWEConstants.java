@@ -143,6 +143,18 @@ public class SWEConstants {
     }
 
     public enum SwesExceptionCode implements IExceptionCode {
-        InvalidRequest, RequestExtensionNotSupported
+        InvalidRequest(SOAP_REASON_INVALID_REQUEST), 
+        RequestExtensionNotSupported(SOAP_REASON_REQUEST_EXTENSION_NOT_SUPPORTED);
+
+        private final String soapFaultReason;
+        
+        private SwesExceptionCode(String soapFaultReason) {
+            this.soapFaultReason = soapFaultReason;
+        }
+        
+        @Override
+        public String getSoapFaultReason() {
+            return this.soapFaultReason;
+        }
     }
 }

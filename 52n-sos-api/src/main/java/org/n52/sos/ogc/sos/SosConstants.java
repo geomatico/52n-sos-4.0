@@ -194,10 +194,10 @@ public final class SosConstants {
 
     public static final String PROPERTY_NAME_SPATIAL_VALUE = "urn:ogc:data:spatialValue";
 
-    public static final String SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT =
+    private static final String SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT =
             "The requested result set exceeds the response size limit of this service and thus cannot be delivered.";
 
-    public static final String SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION =
+    private static final String SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION =
             "Observations for the requested combination of observedProperty and offering do not use SWE Common encoded results.";
 	
     /** private constructor, to enforce use of instance instead of instantiation */
@@ -404,6 +404,18 @@ public final class SosConstants {
     }
 
     public enum SosExceptionCode implements IExceptionCode {
-        ResponseExceedsSizeLimit, InvalidPropertyOfferingCombination
+        ResponseExceedsSizeLimit(SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT), 
+        InvalidPropertyOfferingCombination(SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION);
+        
+        private final String soapFaultReason;
+        
+        private SosExceptionCode(String soapFaultReason) {
+            this.soapFaultReason = soapFaultReason;
+        }
+
+        @Override
+        public String getSoapFaultReason() {
+            return this.soapFaultReason;
+        }
     }
 }
