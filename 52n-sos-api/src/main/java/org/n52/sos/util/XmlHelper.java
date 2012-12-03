@@ -35,6 +35,7 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.namespace.QName;
 
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlException;
@@ -487,5 +488,10 @@ public class XmlHelper {
     }
 
     private XmlHelper() {
+    }
+
+    public static void substituteElement(XmlObject elementToSubstitute, XmlObject substitutionElement) {
+       Node domNode = substitutionElement.getDomNode();
+       elementToSubstitute.substitute(new QName(domNode.getNamespaceURI(), domNode.getLocalName()), substitutionElement.schemaType());
     }
 }

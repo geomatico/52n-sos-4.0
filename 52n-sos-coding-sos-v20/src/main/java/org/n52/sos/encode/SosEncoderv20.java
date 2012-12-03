@@ -72,6 +72,8 @@ import net.opengis.sos.x20.InsertResultTemplateResponseType;
 import net.opengis.sos.x20.InsertionCapabilitiesDocument;
 import net.opengis.sos.x20.InsertionCapabilitiesType;
 import net.opengis.sos.x20.ObservationOfferingType;
+import net.opengis.swe.x20.DataRecordDocument;
+import net.opengis.swe.x20.TextEncodingDocument;
 import net.opengis.swes.x20.AbstractContentsType.Offering;
 import net.opengis.swes.x20.FeatureRelationshipType;
 
@@ -873,9 +875,12 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
     private ResultEncoding createResultEncoding(SosResultEncoding sosResultEncoding) throws OwsExceptionReport {
         ResultEncoding resultEncoding =
                 ResultEncoding.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        // TODO move encoding to SWECommonEncoder
         if (sosResultEncoding.getXml() != null && !sosResultEncoding.getXml().isEmpty()) {
             try {
-                resultEncoding.addNewAbstractEncoding().set(XmlObject.Factory.parse(sosResultEncoding.getXml()));
+                TextEncodingDocument textEncodingDoc = (TextEncodingDocument) XmlObject.Factory.parse(sosResultEncoding.getXml());
+                resultEncoding.addNewAbstractEncoding().set(textEncodingDoc.getTextEncoding());
+                XmlHelper.substituteElement(resultEncoding.getAbstractEncoding(), textEncodingDoc.getTextEncoding());
             } catch (XmlException e) {
                 String exceptionText = "ResultEncoding element encoding is not supported!";
                throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
@@ -888,7 +893,9 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             }
             Object encodedObject = encoder.encode(sosResultEncoding.getEncoding());
             if (encodedObject instanceof XmlObject) {
-                resultEncoding.addNewAbstractEncoding().set((XmlObject) encodedObject);
+                TextEncodingDocument textEncodingDoc = (TextEncodingDocument) encodedObject;
+                resultEncoding.addNewAbstractEncoding().set(textEncodingDoc.getTextEncoding());
+                XmlHelper.substituteElement(resultEncoding.getAbstractEncoding(), textEncodingDoc.getTextEncoding());
             } else {
                 String exceptionText = "ResultEncoding element encoding is not supported!";
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
@@ -900,9 +907,12 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
     private ResultStructure createResultStructure(SosResultStructure sosResultStructure) throws OwsExceptionReport {
         ResultStructure resultStructure =
                 ResultStructure.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        // TODO move encoding to SWECommonEncoder
         if (sosResultStructure.getXml() != null && !sosResultStructure.getXml().isEmpty()) {
             try {
-                resultStructure.addNewAbstractDataComponent().set(XmlObject.Factory.parse(sosResultStructure.getXml()));
+                DataRecordDocument dataRecordDoc = (DataRecordDocument) XmlObject.Factory.parse(sosResultStructure.getXml());
+                resultStructure.addNewAbstractDataComponent().set(dataRecordDoc.getDataRecord());
+                XmlHelper.substituteElement(resultStructure.getAbstractDataComponent(), dataRecordDoc.getDataRecord());
             } catch (XmlException e) {
                 String exceptionText = "ResultStructure element encoding is not supported!";
                throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
@@ -915,7 +925,9 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             }
             Object encodedObject = encoder.encode(sosResultStructure.getResultStructure());
             if (encodedObject instanceof XmlObject) {
-                resultStructure.addNewAbstractDataComponent().set((XmlObject) encodedObject);
+                DataRecordDocument dataRecordDoc = (DataRecordDocument) encodedObject;
+                resultStructure.addNewAbstractDataComponent().set(dataRecordDoc.getDataRecord());
+                XmlHelper.substituteElement(resultStructure.getAbstractDataComponent(), dataRecordDoc.getDataRecord());
             } else {
                 String exceptionText = "ResultStructure element encoding is not supported!";
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
