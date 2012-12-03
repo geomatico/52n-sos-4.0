@@ -24,9 +24,11 @@
 package org.n52.sos.ds.hibernate;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -44,10 +46,13 @@ import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
+import org.n52.sos.ogc.om.AbstractSosPhenomenon;
 import org.n52.sos.ogc.om.IObservationValue;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosMultiObservationValues;
+import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CategoryValue;
@@ -188,6 +193,18 @@ public class InsertResultDAO implements IInsertResultDAO {
 				resultEncoding.getEncoding());
 		return HibernateObservationUtilities.unfoldObservation(o);
     }
+    
+    private SosObservationConstellation getSosObservationConstellation(ObservationConstellation c) {
+        String procedure = c.getProcedure().getIdentifier();
+        Set<String> offerings = Collections.singleton(c.getOffering().getIdentifier());
+        String observationType = c.getObservationType().getObservationType();
+        AbstractSosPhenomenon observablePropety = new SosObservableProperty(
+                c.getObservableProperty().getIdentifier());
+        /* FIXME where is the feature?! */
+        return new SosObservationConstellation(procedure, 
+                observablePropety, offerings, null, observationType);
+    }
+            
 	
 	private SosObservation getObservation(ObservationConstellation obsConst, String[] blockValues,
             SosSweAbstractDataComponent resultStructure, SosSweAbstractEncoding encoding) throws OwsExceptionReport {
@@ -228,8 +245,9 @@ public class InsertResultDAO implements IInsertResultDAO {
 		        phenomenonTimeIndex,
 		        types,
 		        units);
-		
+        
 		SosObservation o = new SosObservation();
+        o.setObservationConstellation(getSosObservationConstellation(obsConst));
         o.setResultType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
         o.setValue(sosValues);
         return o;

@@ -201,11 +201,14 @@ public class SosObservationConstellation implements Serializable {
     @Override
     public boolean equals(Object paramObject) {
         if (paramObject instanceof SosObservationConstellation) {
+            return this.hashCode() == paramObject.hashCode();
+            /*
             SosObservationConstellation obsConst = (SosObservationConstellation) paramObject;
             return (procedure.equals(obsConst.getProcedure())
                     && observableProperty.getIdentifier().equals(obsConst.getObservableProperty().getIdentifier())
                     && featureOfInterest.equals(obsConst.getFeatureOfInterest()) && observationType.equals(obsConst
                     .getObservationType()));
+            */
         }
         return false;
     }
@@ -218,10 +221,10 @@ public class SosObservationConstellation implements Serializable {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 31 * hash + procedure.hashCode();
-        hash = 31 * hash + observableProperty.hashCode();
-        hash = 31 * hash + featureOfInterest.hashCode();
-        hash = 31 * hash + observationType.hashCode();
+        hash = (procedure == null) ? 0 : 31 * hash + procedure.hashCode();
+        hash = (procedure == null) ? 0 : 31 * hash + observableProperty.hashCode();
+        hash = (procedure == null) ? 0 : 31 * hash + featureOfInterest.hashCode();
+        hash = (procedure == null) ? 0 : 31 * hash + observationType.hashCode();
         return hash;
     }
 

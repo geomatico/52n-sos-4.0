@@ -84,6 +84,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.io.WKTWriter;
+import org.n52.sos.ogc.om.values.SweDataArrayValue;
 
 public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 
@@ -329,17 +330,25 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
      * @throws OwsExceptionReport
      */
     private DataArrayPropertyType createDataArrayResult(SosMultiObservationValues sosObservationValue) throws OwsExceptionReport {
-        if (sosObservationValue.getValue() instanceof SosSweDataArray) {
-            DataArrayPropertyType dataArrayProperty =
-                    DataArrayPropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-            XmlObject xbAbstractDataComponent = createAbstractDataComponent((SosSweAbstractDataComponent) sosObservationValue.getValue());
-            if (xbAbstractDataComponent.schemaType() == DataArrayDocument.type) {
-                dataArrayProperty.setDataArray1(((DataArrayDocument)xbAbstractDataComponent).getDataArray1());
-            }
-            else if (xbAbstractDataComponent.schemaType() == DataArrayType.type) {
-                dataArrayProperty.setDataArray1((DataArrayType) xbAbstractDataComponent);
-            }}
-        return null;
+        SosSweDataArray array = null;
+        if (sosObservationValue.getValue() instanceof SweDataArrayValue) {
+            array = ((SweDataArrayValue) sosObservationValue.getValue()).getValue();
+        } else if (sosObservationValue.getValue() instanceof SosSweDataArray) {
+            array = (SosSweDataArray) sosObservationValue.getValue();
+        } else {
+            return null;
+        }
+
+        DataArrayPropertyType dataArrayProperty =
+                DataArrayPropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        XmlObject xbAbstractDataComponent = createAbstractDataComponent((SosSweAbstractDataComponent) array);
+        if (xbAbstractDataComponent.schemaType() == DataArrayDocument.type) {
+            dataArrayProperty.setDataArray1(((DataArrayDocument) xbAbstractDataComponent).getDataArray1());
+        } else if (xbAbstractDataComponent.schemaType() == DataArrayType.type) {
+            dataArrayProperty.setDataArray1((DataArrayType) xbAbstractDataComponent);
+        }
+        
+        return dataArrayProperty;
     }
     
     /**

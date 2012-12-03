@@ -92,6 +92,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
+import org.n52.sos.ogc.ows.OWSConstants;
 
 public class HibernateObservationUtilities {
     
@@ -285,6 +286,9 @@ public class HibernateObservationUtilities {
 						ResultTemplate resultTemplate = resultTemplates.iterator().next();
 						SosResultEncoding encoding = new SosResultEncoding(resultTemplate.getResultEncoding());
 						SosSweTextEncoding sweTextEncoding = (SosSweTextEncoding) encoding.getEncoding();
+                        SosResultStructure structure = new SosResultStructure(resultTemplate.getResultStructure());
+                        SosSweAbstractDataComponent sosSweStructure = structure.getResultStructure();
+                        
 						o = new SosObservation();
 						o.setObservationID(Long.toString(hObservation.getObservationId()));
                         o.setIdentifier(hObservation.getIdentifier());
@@ -302,6 +306,10 @@ public class HibernateObservationUtilities {
 							o.setResultStructure((SosSweDataRecord) comp);						
 						}
 						dataArrayValue = new SweDataArrayValue();
+                        SosSweDataArray da = new SosSweDataArray();
+                        da.setEncoding(sweTextEncoding);
+                        da.setElementType(sosSweStructure);
+                        dataArrayValue.setValue(da);
                         SosMultiObservationValues observationValue = new SosMultiObservationValues();
                         observationValue.setValue(dataArrayValue);
                         o.setValue(observationValue);
@@ -309,8 +317,8 @@ public class HibernateObservationUtilities {
 					} else {
 						dataArrayValue = (SweDataArrayValue) ((SosMultiObservationValues) o.getValue()).getValue();
 					}
-					// TODO check for NPE in next statement
-					dataArrayValue.addBlock(createBlock(dataArrayValue.getValue().getElementType(),phenomenonTime, phenID, value));
+                    // TODO check for NPE in next statement
+					dataArrayValue.addBlock(createBlock(o.getResultStructure(), phenomenonTime, phenID, value));
                 } else {
 					SosObservation sosObservation = new SosObservation();
                     sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
@@ -650,7 +658,8 @@ public class HibernateObservationUtilities {
                                 OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
                                 String exceptionMsg = "Error while parse time String to DateTime!";
                                 LOGGER.error(exceptionMsg, e);
-                                owse.addCodedException(null, null, exceptionMsg);
+                                /* FIXME what is the valid exception code if the result is not correct? */
+                                owse.addCodedException(OWSConstants.OwsExceptionCode.NoApplicableCode, null, exceptionMsg);
                                 throw owse;
                             }
                         }

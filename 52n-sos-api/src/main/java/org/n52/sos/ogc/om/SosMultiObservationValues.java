@@ -76,9 +76,7 @@ public class SosMultiObservationValues<T> implements IObservationValue<T> {
                 }
                 if (dateTokenIndex > -1) {
                     for (List<String> block : dataArray.getValues()) {
-                        // check for "/" to identify time periods (Is conform with
-                        // ISO
-                        // 8601 (see WP))
+                        // check for "/" to identify time periods (Is conform with ISO8601 (see WP))
                         // datetimehelper to DateTime from joda time
                         String token = block.get(dateTokenIndex);
                         ITime time = null;
