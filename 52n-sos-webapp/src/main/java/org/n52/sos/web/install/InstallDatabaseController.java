@@ -86,10 +86,32 @@ public class InstallDatabaseController extends AbstractInstallController {
         settings.put(InstallConstants.DRIVER_PARAMETER, driver);
         try {
             Class.forName(driver);
-        }
-        catch (Throwable ex) {
+        } catch (Throwable ex) {
             return error(settings, "Could not load Driver:" + ex.getMessage(), ex);
         }
+
+        String connectionPool = parameters.get(InstallConstants.CONNECTION_POOL_PARAMETER);
+        if (connectionPool == null) {
+            return error(settings, "no connection pool specified");
+        }
+        settings.put(InstallConstants.CONNECTION_POOL_PARAMETER, connectionPool);
+        try {
+            Class.forName(connectionPool);
+        } catch (Throwable ex) {
+            return error(settings, "Could not load connection pool:" + ex.getMessage(), ex);
+        }
+
+        String dialect = parameters.get(InstallConstants.JDBC_DIALECT_PARAMETER);
+        if (dialect == null) {
+            return error(settings, "no dialect specified");
+        }
+        settings.put(InstallConstants.JDBC_DIALECT_PARAMETER, dialect);
+        try {
+            Class.forName(dialect);
+        } catch (Throwable ex) {
+            return error(settings, "Could not load dialect:" + ex.getMessage(), ex);
+        }
+        
 
         String jdbc = parameters.get(InstallConstants.JDBC_PARAMETER);
         if (jdbc == null) {
@@ -98,8 +120,7 @@ public class InstallDatabaseController extends AbstractInstallController {
         JdbcUrl url;
         try {
             url = new JdbcUrl(jdbc);
-        }
-        catch (URISyntaxException ex) {
+        } catch (URISyntaxException ex) {
             return error(settings, "Invalid JDBC URL.");
         }
         String error = url.isValid();
@@ -137,23 +158,20 @@ public class InstallDatabaseController extends AbstractInstallController {
             con = DriverManager.getConnection(jdbc);
             try {
                 st = con.createStatement();
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 return error(settings, "Cannot create Statement: " + e.getMessage(), e);
             }
             if (createTables || createTestData) {
                 try {
                     st.execute(InstallConstants.CAN_CREATE_TABLES);
-                }
-                catch (SQLException e) {
+                } catch (SQLException e) {
                     return error(settings, "Cannot create tables: " + e.getMessage(), e);
                 }
             }
             boolean alreadyExistent = true;
             try {
                 st.execute(InstallConstants.TABLES_ALREADY_EXISTENT);
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 alreadyExistent = false;
             }
 
@@ -161,22 +179,19 @@ public class InstallDatabaseController extends AbstractInstallController {
                 if ( !overwriteTables && alreadyExistent) {
                     return error(settings, "Tables already created, but should not overwrite. Please take a look at the 'Actions' section.");
                 }
-            }
-            else if ( !alreadyExistent) {
+            } else if ( !alreadyExistent) {
                 return error(settings, "No tables are present in the database and no tables should be created.");
             }
 
             try {
                 st.execute(InstallConstants.IS_POSTGIS_INSTALLED);
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 return error(settings, "PostGIS is not installed in the database.", e);
             }
 
             try {
                 st.execute(InstallConstants.CAN_READ_SPATIAL_REF_SYS);
-            }
-            catch (SQLException e) {
+            } catch (SQLException e) {
                 return error(settings, "Cannot read 'spatial_ref_sys' table of PostGIS. Please revise your database configuration.", e);
             }
 
@@ -188,15 +203,13 @@ public class InstallDatabaseController extends AbstractInstallController {
             if (st != null) {
                 try {
                     st.close();
-                }
-                catch (SQLException ex) {
+                } catch (SQLException ex) {
                 }
             }
             if (con != null) {
                 try {
                     con.close();
-                }
-                catch (SQLException ex) {
+                } catch (SQLException ex) {
                 }
             }
         }

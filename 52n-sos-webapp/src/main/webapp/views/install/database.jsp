@@ -38,10 +38,28 @@
 	<legend>Database Server Configuration</legend>
 	
 	<div class="control-group">
-		<label class="control-label" for="driver">Database driver</label>
+		<label class="control-label" for="driver">Database Driver</label>
 		<div class="controls">
-			<input type="text" id="driver" name="driver">
+			<input type="text" class="span8" id="driver" name="driver">
 				<span class="help-block"><span class="label label-warning">required</span> Set this to the class of the JDBC driver. The default value for PostgreSQL driver is "org.postgresql.Driver".</span>
+			</input>
+		</div>
+	</div>
+    
+    <div class="control-group">
+		<label class="control-label" for="connection_pool">Connection Pool</label>
+		<div class="controls">
+			<input type="text" class="span8" id="driver" name="connection_pool">
+            <span class="help-block"><span class="label label-warning">required</span> Set this to the class of the connection pool. The default value is the <a href="http://www.mchange.com/projects/c3p0/" title="C3P0">C3P0</a> connection pool.</span>
+			</input>
+		</div>
+	</div>
+    
+    <div class="control-group">
+		<label class="control-label" for="jdbc_dialect">Database Dialect</label>
+		<div class="controls">
+			<input type="text" class="span8" id="driver" name="jdbc_dialect">
+				<span class="help-block"><span class="label label-warning">required</span> Set this to the class of the JDBC dialect. The default value for PostgreSQL is the custom 52&deg; North dialect.</span>
 			</input>
 		</div>
 	</div>
@@ -49,7 +67,7 @@
 	<div class="control-group">
 		<label class="control-label" for="host-input">Database host</label>
 		<div class="controls">
-			<input class="jdbccomponent" type="text" id="host-input">
+			<input class="jdbccomponent span8" type="text" id="host-input">
 				<span class="help-block"><span class="label label-warning">required</span> Set this to the IP/net location of PostgreSQL database server. The default value for PostgreSQL is "localhost".</span>
 			</input>
 		</div>
@@ -58,7 +76,7 @@
 	<div class="control-group">
 		<label class="control-label" for="port-input">Database port</label>
 		<div class="controls">
-			<input class="jdbccomponent" type="text" id="port-input">
+			<input class="jdbccomponent span8" type="text" id="port-input">
 				<span class="help-block"><span class="label label-warning">required</span> Set this to the port number of your PostgreSQL server. The default value for PostgreSQL is "5432".</span>
 			</input>
 		</div>
@@ -69,7 +87,7 @@
 	<div class="control-group">
 		<label class="control-label" for="user-input">Database user name</label>
 		<div class="controls">
-			<input class="jdbccomponent" type="text" id="user-input">
+			<input class="jdbccomponent span8" type="text" id="user-input">
 				<span class="help-block"><span class="label label-warning">required</span> Your database server user name. The default value for PostgreSQL is "postgres".</span>
 			</input>
 		</div>
@@ -78,7 +96,7 @@
 	<div class="control-group">
 		<label class="control-label" for="pass-input">Database password</label>
 		<div class="controls">
-			<input class="jdbccomponent" type="text" id="pass-input">
+			<input class="jdbccomponent span8" type="text" id="pass-input">
 				<span class="help-block"><span class="label label-warning">required</span> Your database server password. The default value is "postgres".</span>
 			</input>
 		</div>
@@ -87,7 +105,7 @@
 	<div class="control-group">
 		<label class="control-label" for="db-input">Database name</label>
 		<div class="controls">
-			<input class="jdbccomponent" type="text" id="db-input">
+			<input class="jdbccomponent span8" type="text" id="db-input">
 				<span class="help-block"><span class="label label-warning">required</span> Set this to the name of the database you want to use for SOS.</span>
 			</input>
 		</div>
@@ -97,8 +115,8 @@
 		<label class="control-label" for="jdbc-input">Connection string</label>
 		<div class="controls">
 			<div class="input-prepend">
-				<span class="add-on">jdbc:postgresql://</span>
-				<input class="input-xxlarge" id="jdbc-input" type="text" />
+				<span id="jdbc-input-addon"class="add-on">jdbc:postgresql://</span>
+				<input id="jdbc-input" type="text" />
 			</div>
 			<input type="hidden" name="jdbc_uri" />
 			<span style="margin-top:10px;"class="help-block"><span class="label label-info">optional</span> The connection string that will be used to connect with your database.</span>
@@ -141,10 +159,7 @@
 
 
 <script type="text/javascript">
-	$.get("<c:url value="/static/conf/default-database-values.json" />", function(settings) {
-		if ((typeof settings) === "string") {
-			settings = JSON.parse(settings);
-		}
+	$.getJSON("<c:url value="/static/conf/default-database-values.json" />", function(settings) {
 		var jdbc = {};
 		
 		function buildJdbcString(j) {
@@ -193,23 +208,32 @@
 		
 		var jdbc_uri = settings["jdbc_uri"];
 		var driver = settings["driver"];
-
+        var dialect = settings["jdbc_dialect"];
+        var connectionPool = settings["connection_pool"];
+        
 		<c:if test="${not empty sessionScope.jdbc_uri}">
-			jdbc_uri = "${sessionScope.jdbc_uri}"; 
+			jdbc_uri = "${sessionScope.jdbc_uri}";
 		</c:if>
 		<c:if test="${not empty sessionScope.driver}">
-			driver = "${sessionScope.driver}"; 
+			driver = "${sessionScope.driver}";
 		</c:if>
+        <c:if test="${not empty sessionScope.jdbc_dialect}">
+            dialect = "${sessionScope.jdbc_dialect}";
+        </c:if>
+        <c:if test="${not empty sessionScope.connection_pool}">
+            connectionPool = "${sessionScope.connection_pool}";
+        </c:if>
+            
+        $("input[name=connection_pool]").val(connectionPool);
+        $("input[name=jdbc_dialect]").val(dialect);
 				
 		jdbc_uri = jdbc_uri.replace("jdbc:postgresql://","");
 		$("#driver").val(driver);
 		$(".jdbccomponent")
-			.bind("keyup", setJdbcString)
-			.bind("input", setJdbcString);
+			.bind("keyup input", setJdbcString)
 		$("#jdbc-input")
 			.val(jdbc_uri)
-			.bind("keyup", setInputs)
-			.bind("input", setInputs)
+			.bind("keyup input", setInputs)
 			.trigger("input");
 		$("input[type=text],input[type=password],textarea").trigger("input");
 		$("#next").click(function() {

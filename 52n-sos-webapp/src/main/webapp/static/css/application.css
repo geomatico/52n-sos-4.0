@@ -37,3 +37,6 @@ div#footer {
     overflow-y: hidden !important;
     overflow-x: auto !important;
 }
+
+#jdbc-input { width: 475px; }
+#jdbc-input-addon { width: 120px; }

@@ -114,7 +114,9 @@ public class InstallFinishController extends AbstractInstallController {
         /* get the database properties */
         String driver = (String) settings.get(InstallConstants.DRIVER_PARAMETER);
         String connectionString = (String) settings.get(InstallConstants.JDBC_PARAMETER);
-
+        String dialect = (String) settings.get(InstallConstants.JDBC_DIALECT_PARAMETER);
+        String connectionPool = (String) settings.get(InstallConstants.CONNECTION_POOL_PARAMETER);
+        
         JdbcUrl jdbc;
         try {
             jdbc = new JdbcUrl(connectionString);
@@ -131,6 +133,8 @@ public class InstallFinishController extends AbstractInstallController {
         properties.put(HibernateConstants.DRIVER_PROPERTY, driver);
         properties.put(HibernateConstants.USER_PROPERTY, jdbc.getUser());
         properties.put(HibernateConstants.PASS_PROPERTY, jdbc.getPassword());
+        properties.put(HibernateConstants.CONNECTION_POOL_PROPERTY, connectionPool);
+        properties.put(HibernateConstants.DIALECT_PROPERTY, dialect);
 
         Connection con = null;
 

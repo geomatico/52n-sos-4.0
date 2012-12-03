@@ -43,6 +43,9 @@ public interface InstallConstants {
     /* request parameters */
     public static final String DRIVER_PARAMETER = "driver";
     public static final String JDBC_PARAMETER = "jdbc_uri";
+    public static final String CONNECTION_POOL_PARAMETER = "connection_pool";
+    public static final String JDBC_DIALECT_PARAMETER = "jdbc_dialect";
+    
     public static final String OVERWRITE_TABLES_PARAMETER = "overwrite_tables";
     public static final String CREATE_TEST_DATA_PARAMETER = "create_test_data";
     public static final String CREATE_TABLES_PARAMETER = "create_tables";
