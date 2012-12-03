@@ -32,7 +32,7 @@
 	<jsp:param name="leadParagraph" value="All configuration options are set. Click on 'Install' to finish the installation." />
 </jsp:include>
 
-<p>Please enter credentials to login into the administrator parnel below. The password is stored as clear text in the database.</p>
+<p>Please enter credentials to login into the administrator panel below.</p>
 
 <hr />
 
@@ -57,7 +57,7 @@
 
 	<hr/>
 	
-	 <p>Clicking 'Install' will persist all settings in the database and (depending on your configuration) create or delete tables and insert test data. Thanks for using the 52&deg; SOS!</p>
+	 <p>Clicking 'Install' will persist all settings in the database and (depending on your configuration) create or delete tables and insert test data. Thanks for using the 52&deg; North SOS!</p>
 
 	<div>
 		<a href="<c:url value="/install/settings" />" class="btn">Back</a>

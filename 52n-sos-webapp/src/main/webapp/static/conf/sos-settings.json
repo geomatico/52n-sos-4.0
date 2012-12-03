@@ -92,14 +92,14 @@
 				},
 				"SERVICE_PROVIDER_ADDRESS": {
 					"type": "string",
-					"default": "Marin-Luther-King-Weg 24",
+					"default": "Martin-Luther-King-Weg 24",
 					"required": true,
 					"title": "Address",
 					"description": "The street address of the responsible person."
 				},
 				"SERVICE_PROVIDER_CITY": {
 					"type": "string",
-					"default": "Muenster",
+					"default": "Münster",
 					"required": true,
 					"title": "City",
 					"description": "The city of the responsible person."
