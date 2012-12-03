@@ -64,8 +64,8 @@
             </div>
         </div>
     </fieldset>
-    <fieldset>
-        <legend>Database Server configuration</legend>
+    <fieldset id="server-config">
+        <legend><a href="#">Database Server configuration</a></legend>
         <div class="control-group">
             <label class="control-label" for="host-input">Database Host</label>
             <div class="controls">
@@ -247,10 +247,11 @@
         $("input[name=overwrite_tables]").click(function(){
             $(this).parent().next().toggle("fast");
         });
-        $("#advanced legend").click(function(e) {
+        $("#advanced, #server-config").children("legend").click(function(e) {
             e.preventDefault();
             $(this).parent().children("div").toggle();
-        }).trigger("click").children("a").tooltip();
+        }).trigger("click")
+        $("#advanced legend a").tooltip();
         $("input[name=overwrite_tables]").change(function() {
             var $create_tables = $("input[name=create_tables]");
             if ($(this).attr("checked")) {
