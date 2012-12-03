@@ -468,7 +468,7 @@ public class HibernateObservationUtilities {
 
     private static boolean isAntiSubsettingExtensionSet(SwesExtensions extensions)
     {
-        return extensions!=null?extensions.isBooleanExentsionSet(Sos2Constants.Extensions.AntiSubsetting):false;
+        return extensions != null ? extensions.isBooleanExentsionSet(Sos2Constants.Extensions.Subsetting.name()) : false;
     }
 
     private static void checkOrSetObservablePropertyUnit(AbstractSosPhenomenon abstractSosPhenomenon, String unit) {
