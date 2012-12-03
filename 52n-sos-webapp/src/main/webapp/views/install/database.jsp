@@ -24,13 +24,13 @@
 
 --%>
 <jsp:include page="header.jsp">
-	<jsp:param name="step" value="2" />
+    <jsp:param name="step" value="2" />
 </jsp:include>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <script type="text/javascript" src="<c:url value="/static/js/parseuri.js" />"></script>
 <jsp:include page="../common/logotitle.jsp">
-	<jsp:param name="title" value="Database configuration" />
-	<jsp:param name="leadParagraph" value="Please enter the details of the database you want to use for SOS." />
+    <jsp:param name="title" value="Database configuration" />
+    <jsp:param name="leadParagraph" value="Please enter the details of the database you want to use for SOS." />
 </jsp:include>
 
 <form action="<c:url value="/install/database" />" method="POST" class="form-horizontal">
@@ -154,73 +154,73 @@
         </div>
     </fieldset>
 
-	<hr/>
-	<div>
-		<a href="<c:url value="/install/index" />" class="btn">Back</a>
-		<button id="next" type="button" class="btn btn-info pull-right">Next</button>
-	</div>
+    <hr/>
+    <div>
+        <a href="<c:url value="/install/index" />" class="btn">Back</a>
+        <button id="next" type="button" class="btn btn-info pull-right">Next</button>
+    </div>
 </form>
 
 
 <script type="text/javascript">
-	$.getJSON("<c:url value="/static/conf/default-database-values.json" />", function(settings) {
-		var jdbc = {};
-		
-		function buildJdbcString(j) {
-			var string = j.host;
-			if (j.port != undefined) {
-				string += ":" + j.port;
-			}
-			string += "/" + encodeURIComponent(j.db);
-			if (j.user || j.pass) {
-				 string += "?";
-			}
-			if (j.user) {
-				string += "user=" + encodeURIComponent(j.user);
-			}
-			if (j.pass) {
-				if (j.user) string += "&";
-				string += "password=" + encodeURIComponent(j.pass);
-			}
-			return encodeURI(string);
-		}
+    $.getJSON("<c:url value="/static/conf/default-database-values.json" />", function(settings) {
+        var jdbc = {};
+        
+        function buildJdbcString(j) {
+            var string = j.host;
+            if (j.port != undefined) {
+                string += ":" + j.port;
+            }
+            string += "/" + encodeURIComponent(j.db);
+            if (j.user || j.pass) {
+                 string += "?";
+            }
+            if (j.user) {
+                string += "user=" + encodeURIComponent(j.user);
+            }
+            if (j.pass) {
+                if (j.user) string += "&";
+                string += "password=" + encodeURIComponent(j.pass);
+            }
+            return encodeURI(string);
+        }
 
-		function parseJdbcString(j) {
-			var parsed = parseUri("postgresql://" + j.replace("jdbc:postgresql://",""));
-			return {
-				port: parsed.port,
-				user: parsed.queryKey.user,
-				pass: parsed.queryKey.password,
-				host: parsed.host,
-				db: parsed.path.slice(1)
-			};
-		}
+        function parseJdbcString(j) {
+            var parsed = parseUri("postgresql://" + j.replace("jdbc:postgresql://",""));
+            return {
+                port: parsed.port,
+                user: parsed.queryKey.user,
+                pass: parsed.queryKey.password,
+                host: parsed.host,
+                db: parsed.path.slice(1)
+            };
+        }
 
-		function setJdbcString() {
-			var $this = $(this);
-			var id = $this.attr("id").replace(/-input/, "");
-			jdbc[id] = $this.val();
-			$("#jdbc-input").val(buildJdbcString(jdbc));
-		}
+        function setJdbcString() {
+            var $this = $(this);
+            var id = $this.attr("id").replace(/-input/, "");
+            jdbc[id] = $this.val();
+            $("#jdbc-input").val(buildJdbcString(jdbc));
+        }
 
-		function setInputs() {
-			jdbc = parseJdbcString($(this).val());
-			for (key in jdbc) {
-				$("#" + key + "-input").val(jdbc[key]);
-			}
-		}
-		
-		var jdbc_uri = settings["jdbc_uri"];
-		var driver = settings["driver"];
+        function setInputs() {
+            jdbc = parseJdbcString($(this).val());
+            for (key in jdbc) {
+                $("#" + key + "-input").val(jdbc[key]);
+            }
+        }
+        
+        var jdbc_uri = settings["jdbc_uri"];
+        var driver = settings["driver"];
         var dialect = settings["jdbc_dialect"];
         var connectionPool = settings["connection_pool"];
         
-		<c:if test="${not empty sessionScope.jdbc_uri}">
-			jdbc_uri = "${sessionScope.jdbc_uri}";
-		</c:if>
-		<c:if test="${not empty sessionScope.driver}">
-			driver = "${sessionScope.driver}";
-		</c:if>
+        <c:if test="${not empty sessionScope.jdbc_uri}">
+            jdbc_uri = "${sessionScope.jdbc_uri}";
+        </c:if>
+        <c:if test="${not empty sessionScope.driver}">
+            driver = "${sessionScope.driver}";
+        </c:if>
         <c:if test="${not empty sessionScope.jdbc_dialect}">
             dialect = "${sessionScope.jdbc_dialect}";
         </c:if>
@@ -230,28 +230,41 @@
             
         $("input[name=connection_pool]").val(connectionPool);
         $("input[name=jdbc_dialect]").val(dialect);
-				
-		jdbc_uri = jdbc_uri.replace("jdbc:postgresql://","");
-		$("#driver").val(driver);
-		$(".jdbccomponent")
-			.bind("keyup input", setJdbcString)
-		$("#jdbc-input")
-			.val(jdbc_uri)
-			.bind("keyup input", setInputs)
-			.trigger("input");
-		$("input[type=text],input[type=password],textarea").trigger("input");
-		$("#next").click(function() {
-			$("input[name=jdbc_uri]").val("jdbc:postgresql://" + $("#jdbc-input").val())
-			$(this).parents("form").submit();
-		});
-		$("input[name=overwrite_tables]").click(function(){
-			$(this).parent().next().toggle("fast");
-		});
-		$("#advanced legend").click(function(e) {
-			e.preventDefault();
-			$(this).parent().children("div").toggle();
-		}).trigger("click").children("a").tooltip();
-	});
+                
+        jdbc_uri = jdbc_uri.replace("jdbc:postgresql://","");
+        $("#driver").val(driver);
+        $(".jdbccomponent")
+            .bind("keyup input", setJdbcString)
+        $("#jdbc-input")
+            .val(jdbc_uri)
+            .bind("keyup input", setInputs)
+            .trigger("input");
+        $("input[type=text],input[type=password],textarea").trigger("input");
+        $("#next").click(function() {
+            $("input[name=jdbc_uri]").val("jdbc:postgresql://" + $("#jdbc-input").val())
+            $(this).parents("form").submit();
+        });
+        $("input[name=overwrite_tables]").click(function(){
+            $(this).parent().next().toggle("fast");
+        });
+        $("#advanced legend").click(function(e) {
+            e.preventDefault();
+            $(this).parent().children("div").toggle();
+        }).trigger("click").children("a").tooltip();
+        $("input[name=overwrite_tables]").change(function() {
+            var $create_tables = $("input[name=create_tables]");
+            if ($(this).attr("checked")) {
+                $create_tables.attr({ 
+                    "checked": "checked", 
+                    "disabled": true })
+                .parent("label").addClass("muted")
+            } else {
+                $create_tables.removeAttr("disabled")
+                    .parent("label").removeClass("muted");
+            }
+        });
+    
+    });
 </script>
 
 <jsp:include page="../common/footer.jsp" />
