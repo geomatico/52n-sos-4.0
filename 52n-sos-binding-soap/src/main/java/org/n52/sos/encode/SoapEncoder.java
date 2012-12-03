@@ -469,7 +469,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
 
     private XmlObject createSOAP12Body(ServiceResponse response) throws OwsExceptionReport {
         try {
-            return XmlObject.Factory.parse(new String(response.getByteArray()));
+            return XmlObject.Factory.parse(new String(response.getByteArray()), XmlOptionsHelper.getInstance().getXmlOptions());
         } catch (XmlException xmle) {
             String exceptionText = "Error while creating SOAP body!";
             LOGGER.error(exceptionText, xmle);
