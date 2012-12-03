@@ -122,15 +122,10 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
                 sosRequest = parseGetObservation(element);
             } else if (requestParameterValue.equalsIgnoreCase(SosConstants.Operations.GetFeatureOfInterest.name())) {
                 sosRequest = parseGetFeatureOfInterest(element);
-                // } else if
-                // (paramValue.equalsIgnoreCase(SosConstants.Operations.GetResult.name()))
-                // {
-                // sosRequest =
-                // parseGetResultTemplateRequest(parameterValueMap);
-                // } else if
-                // (paramValue.equalsIgnoreCase(Sos2Constants.Operations.GetResultTemplate.name()))
-                // {
-                // sosRequest = parseGetResultRequest(parameterValueMap);
+            } else if (requestParameterValue.equalsIgnoreCase(SosConstants.Operations.GetResult.name())) {
+                sosRequest = parseGetResultTemplate(element);
+            } else if (requestParameterValue.equalsIgnoreCase(Sos2Constants.Operations.GetResultTemplate.name())) {
+                sosRequest = parseGetResult(element);
             } else {
                 throw Util4Exceptions.createOperationNotSupportedException(RequestParams.request.name());
             }
