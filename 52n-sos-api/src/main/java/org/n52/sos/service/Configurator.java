@@ -515,7 +515,14 @@ public final class Configurator {
 			case SERVICE_IDENTIFICATION_KEYWORDS:
 				String keywords = parseString(setting, value, true);
 				if (keywords != null) {
-					this.serviceIdentificationKeywords = keywords.split(",");
+                    String[] keywordArray = keywords.split(",");
+                    ArrayList<String> keywordList = new ArrayList<String>(keywordArray.length);
+                    for (String s : keywordArray) {
+                        if (s != null && !s.trim().isEmpty()) {
+                            keywordList.add(s.trim());
+                        }
+                    }
+					this.serviceIdentificationKeywords = keywordList.toArray(new String[keywordList.size()]);
 				} else {
 					this.serviceIdentificationKeywords = new String[0];
 				}
@@ -550,7 +557,6 @@ public final class Configurator {
 			default:
 				String message = "Can not decode setting '" + setting.name() + "'!";
 				LOGGER.error(message);
-				throw new ConfigurationException(message);
 		}
 	}
 	private File parseFile(Setting setting, String value, boolean canBeNull) throws ConfigurationException {
