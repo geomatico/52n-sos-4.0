@@ -24,18 +24,26 @@
 
 package org.n52.sos.web.admin;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
+import org.n52.sos.web.MetaDataHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping({ControllerConstants.Paths.ADMIN_INDEX, ControllerConstants.Paths.ADMIN_ROOT})
 public class AdminIndexController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.GET)
-    public String get() {
-        return ControllerConstants.Views.ADMIN_INDEX;
+    public ModelAndView get() {
+        Map<String,String> model = new HashMap<String, String>(MetaDataHandler.Metadata.values().length);
+        for (MetaDataHandler.Metadata m : MetaDataHandler.Metadata.values()) {
+            model.put(m.name(), MetaDataHandler.getInstance().getMetadata(m));
+        }
+        return new ModelAndView(ControllerConstants.Views.ADMIN_INDEX, model);
     }
 }

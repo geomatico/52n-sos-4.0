@@ -29,6 +29,24 @@
 </jsp:include>
 <jsp:include page="../common/logotitle.jsp">
 	<jsp:param name="title" value="Administration Panel" />
-	<jsp:param name="leadParagraph" value="Use the menu above to select different administrative tasks." />
+	<jsp:param name="leadParagraph" value="Use the admin menu above to select different administrative tasks." />
 </jsp:include>
+
+<div class="row">
+    <div class="span12">
+        <c:if test="${not empty VERSION}">
+            <p><strong>Version:</strong> ${VERSION}</p>
+        </c:if>
+        <c:if test="${not empty SVN_VERSION}">
+            <p><strong>Revision:</strong> ${SVN_VERSION}</p>
+        </c:if>
+        <c:if test="${not empty BUILD_DATE}">
+            <p><strong>Build date:</strong> ${BUILD_DATE}</p>
+        </c:if>
+        <c:if test="${not empty INSTALL_DATE}">
+            <p><strong>Installation date:</strong> ${INSTALL_DATE}</p>
+        </c:if>
+    </div>
+</div>
+    
 <jsp:include page="../common/footer.jsp" />

@@ -24,7 +24,6 @@
 
 package org.n52.sos.web.install;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -40,6 +39,9 @@ import java.util.ServiceLoader;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import org.n52.sos.ds.ISettingsDao;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
@@ -48,6 +50,7 @@ import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.Setting;
 import org.n52.sos.web.ControllerConstants;
+import org.n52.sos.web.MetaDataHandler;
 import org.n52.sos.web.SqlUtils;
 import org.n52.sos.web.admin.auth.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -213,15 +216,19 @@ public class InstallFinishController extends AbstractInstallController {
         
         /* write dssos.config */
         try {
-            writeDsSosConfig(driver, properties);
+            writeDsSosConfig(properties);
         } catch (IOException e) {
             return error(settings, "Could not write datasource config: " + e.getMessage());
         }
         
+        /* save the installation date (same format as maven svn buildnumber plugin produces) */
+        DateTimeFormatter f = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+        MetaDataHandler.getInstance().saveMetadata(MetaDataHandler.Metadata.INSTALL_DATE, 
+                f.print(new DateTime()));
         return success(settings);
     }
 
-    private void writeDsSosConfig(String driver, Properties p) throws IOException {
+    private void writeDsSosConfig(Properties p) throws IOException {
         OutputStream out = null;
         try {
             out = new FileOutputStream(getDsSosConfigPath());
