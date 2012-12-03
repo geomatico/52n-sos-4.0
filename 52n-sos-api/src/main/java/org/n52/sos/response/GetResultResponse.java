@@ -55,4 +55,8 @@ public class GetResultResponse extends AbstractServiceResponse {
         return resultValues;
     }
 
+    public boolean hasResultValues() {
+       return resultValues != null && resultValues.isEmpty();
+    }
+
 }

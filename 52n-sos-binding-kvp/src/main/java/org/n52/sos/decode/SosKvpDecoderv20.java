@@ -51,6 +51,8 @@ import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.request.GetFeatureOfInterestRequest;
 import org.n52.sos.request.GetObservationRequest;
+import org.n52.sos.request.GetResultRequest;
+import org.n52.sos.request.GetResultTemplateRequest;
 import org.n52.sos.request.SosGetResultRequest;
 import org.n52.sos.request.SosGetResultTemplateRequest;
 import org.n52.sos.service.Configurator;
@@ -122,9 +124,9 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
                 sosRequest = parseGetObservation(element);
             } else if (requestParameterValue.equalsIgnoreCase(SosConstants.Operations.GetFeatureOfInterest.name())) {
                 sosRequest = parseGetFeatureOfInterest(element);
-            } else if (requestParameterValue.equalsIgnoreCase(SosConstants.Operations.GetResult.name())) {
-                sosRequest = parseGetResultTemplate(element);
             } else if (requestParameterValue.equalsIgnoreCase(Sos2Constants.Operations.GetResultTemplate.name())) {
+                sosRequest = parseGetResultTemplate(element);
+            } else if (requestParameterValue.equalsIgnoreCase(SosConstants.Operations.GetResult.name())) {
                 sosRequest = parseGetResult(element);
             } else {
                 throw Util4Exceptions.createOperationNotSupportedException(RequestParams.request.name());
@@ -558,8 +560,8 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
         return request;
     }
 
-    private SosGetResultTemplateRequest parseGetResultTemplate(Map<String, String> element) throws OwsExceptionReport {
-        SosGetResultTemplateRequest request = new SosGetResultTemplateRequest();
+    private GetResultTemplateRequest parseGetResultTemplate(Map<String, String> element) throws OwsExceptionReport {
+        GetResultTemplateRequest request = new GetResultTemplateRequest();
         List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
 
         boolean foundService = false;
@@ -591,12 +593,13 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
                 // offering (mandatory)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetResultTemplateParams.offering.name())) {
                     request.setOffering(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    foundOffering = true;
                 }
 
                 // observedProperty (mandatory)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetResultTemplateParams.observedProperty.name())) {
-                    request.setObservedProperty(KvpHelper.checkParameterSingleValue(parameterValues,
-                            Sos2Constants.GetResultTemplateParams.offering.name()));
+                    request.setObservedProperty(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    foundObservedProperty = true;
                 } else {
                     String exceptionText =
                             "The parameter '" + parameterName + "' is invalid for the GetResultTemplate request!";
@@ -648,8 +651,8 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
         return request;
     }
 
-    private SosGetResultRequest parseGetResult(Map<String, String> element) throws OwsExceptionReport {
-        SosGetResultRequest request = new SosGetResultRequest();
+    private GetResultRequest parseGetResult(Map<String, String> element) throws OwsExceptionReport {
+        GetResultRequest request = new GetResultRequest();
         List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
 
         boolean foundService = false;
@@ -662,41 +665,39 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
             try {
                 // service (mandatory)
                 if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.service.name())) {
-                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues,
-                            OWSConstants.RequestParams.service.name()));
+                    request.setService(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
                     foundService = true;
                 }
                 // version (mandatory)
                 else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.version.name())) {
-                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues,
-                            OWSConstants.RequestParams.version.name()));
+                    request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
                     foundVersion = true;
                 }
                 // request (mandatory)
                 else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.request.name())) {
-                    KvpHelper.checkParameterSingleValue(parameterValues, OWSConstants.RequestParams.request.name());
+                    KvpHelper.checkParameterSingleValue(parameterValues, parameterName);
                 }
                 // offering (mandatory)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetResultTemplateParams.offering.name())) {
-                    request.setOffering(KvpHelper.checkParameterSingleValue(parameterValues,
-                            Sos2Constants.GetResultTemplateParams.offering.name()));
+                    request.setOffering(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    foundOffering = true;
                 }
 
                 // observedProperty (mandatory)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetResultTemplateParams.observedProperty.name())) {
-                    request.setObservedProperty(KvpHelper.checkParameterSingleValue(parameterValues,
-                            Sos2Constants.GetResultTemplateParams.observedProperty.name()));
+                    request.setObservedProperty(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    foundObservedProperty = true;
                 }
+                
                 // featureOfInterest (optional)
                 else if (parameterName.equalsIgnoreCase(SosConstants.GetObservationParams.featureOfInterest.name())) {
-                    request.setFeatureIdentifiers(KvpHelper.checkParameterMultipleValues(parameterValues,
-                            SosConstants.GetObservationParams.featureOfInterest.name()));
+                    request.setFeatureIdentifiers(KvpHelper.checkParameterMultipleValues(parameterValues, parameterName));
                 }
 
                 // eventTime (optional)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.temporalFilter.name())) {
                     try {
-                        request.setEventTimes(parseTemporalFilter(KvpHelper.checkParameterMultipleValues(
+                        request.setTemporalFilter(parseTemporalFilter(KvpHelper.checkParameterMultipleValues(
                                 parameterValues, Sos2Constants.GetObservationParams.temporalFilter.name()),
                                 parameterName));
                     } catch (DecoderException e) {

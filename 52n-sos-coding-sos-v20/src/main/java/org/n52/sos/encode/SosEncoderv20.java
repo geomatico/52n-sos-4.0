@@ -490,6 +490,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         List<String> schemaLocations = new ArrayList<String>();
         schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS200());
         N52XmlHelper.setSchemaLocationsToDocument(xbInsObsRespDoc, schemaLocations);
+        
         return xbInsObsRespDoc;
     }
 
@@ -501,14 +502,21 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         InsertResultTemplateResponseType insertResultTemplateResponse =
                 insertResultTemplateResponseDoc.addNewInsertResultTemplateResponse();
         insertResultTemplateResponse.setAcceptedTemplate(response.getAcceptedTemplate());
+        // set schema location
+        List<String> schemaLocations = new ArrayList<String>();
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS200());
+        N52XmlHelper.setSchemaLocationsToDocument(insertResultTemplateResponseDoc, schemaLocations);
         return insertResultTemplateResponseDoc;
-
     }
 
     private XmlObject createInsertResultResponseDocument(InsertResultResponse response) throws OwsExceptionReport {
         InsertResultResponseDocument insertResultTemplateResponseDoc =
                 InsertResultResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         insertResultTemplateResponseDoc.addNewInsertResultResponse();
+        // set schema location
+        List<String> schemaLocations = new ArrayList<String>();
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS200());
+        N52XmlHelper.setSchemaLocationsToDocument(insertResultTemplateResponseDoc, schemaLocations);
         return insertResultTemplateResponseDoc;
     }
 
@@ -516,10 +524,17 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         GetResultResponseDocument getResultResponseDoc =
                 GetResultResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         GetResultResponseType getResultResponse = getResultResponseDoc.addNewGetResultResponse();
-        XmlString xmlString = XmlString.Factory.newInstance();
-        xmlString.setStringValue(response.getResultValues());
-        getResultResponse.addNewResultValues().set(xmlString);
-        return getResultResponse;
+        XmlObject resultValues = getResultResponse.addNewResultValues();
+        if (response.hasResultValues()) {
+            XmlString xmlString = XmlString.Factory.newInstance();
+            xmlString.setStringValue(response.getResultValues());
+            resultValues.set(xmlString);
+        }
+        // set schema location
+        List<String> schemaLocations = new ArrayList<String>();
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS200());
+        N52XmlHelper.setSchemaLocationsToDocument(getResultResponseDoc, schemaLocations);
+        return getResultResponseDoc;
     }
 
     private XmlObject createGetResultTemplateResponseDocument(GetResultTemplateResponse response) throws OwsExceptionReport {
@@ -529,6 +544,10 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                 getResultTemplateResponseDoc.addNewGetResultTemplateResponse();
         getResultTemplateResponse.setResultEncoding(createResultEncoding(response.getResultEncoding()));
         getResultTemplateResponse.setResultStructure(createResultStructure(response.getResultStructure()));
+        // set schema location
+        List<String> schemaLocations = new ArrayList<String>();
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS200());
+        N52XmlHelper.setSchemaLocationsToDocument(getResultTemplateResponseDoc, schemaLocations);
         return getResultTemplateResponseDoc;
     }
 
@@ -557,7 +576,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         getResult.setOffering(request.getOffering());
         getResult.setObservedProperty(request.getObservedProperty());
         if (request.hasFeatureOfInterest()) {
-            for (String featureOfInterest : request.getFeatureOfInterest()) {
+            for (String featureOfInterest : request.getFeatureIdentifiers()) {
                 getResult.addFeatureOfInterest(featureOfInterest);
             }
         }
