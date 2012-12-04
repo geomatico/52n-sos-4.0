@@ -8,13 +8,11 @@ body {
     margin:0;
     font-family:'Trebuchet MS',Helvetica,sans-serif;
     line-height: 1.6;
-    font-size: 12px;
 }
 p {
 	line-height: 1.6;
 	font-family:'Trebuchet MS', Helvetica, sans-serif;
 	color: #626250;
-	font-size: 12px;
 }
 a {
 	text-decoration: none;
