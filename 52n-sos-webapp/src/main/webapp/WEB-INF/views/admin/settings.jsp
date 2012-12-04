@@ -88,9 +88,12 @@
             generateSettings(settings, $container, true);
 
             $("<div>").addClass("form-actions").append($button).appendTo($container);
-
-            $("input[name=SOS_URL]").val(window.location.toString()
-                .replace(/admin\/settings.*/, "sos")).trigger("input");
+            function setSosUrl() {
+                $("input[name=SOS_URL]").val(window.location.toString()
+                    .replace(/admin\/settings.*/, "sos")).trigger("input");    
+            }
+            setSosUrl();
+            
 
             $(".required").bind("keyup input change", function() {
                 var valid = true;
@@ -118,6 +121,39 @@
 			}).bind("keyup input", function() {
 				$("input[name=admin_password]").val($(this).val());
 			});
+
+            var $defaultButton = $("<button>").attr("type", "button")
+                .attr("disabled", true).css("margin-left", "5px").addClass("btn")
+                .text("Defaults").click(function() {
+                function getSettings(section) {
+                    for (var i = 0; i < settings.sections.length; ++i) {
+                        if (settings.sections[i].title == section) {
+                            return settings.sections[i].settings;
+                        }
+                    }
+                }
+                var activeId = $(".tab-pane.active").attr("id")
+                var section = $(".nav.nav-tabs li a[href=#" + activeId + "]").text();
+                var s = getSettings(section);
+                for (var key in s) {
+                    if (key === "SOS_URL") {
+                        setSosUrl();
+                    } else {
+                        setSetting(key, (s[key]["default"] !== undefined) ? s[key]["default"] : "", settings);    
+                    }
+                }
+                $(".required").trigger("input").trigger("change");
+            });
+            $("div.form-actions").append($defaultButton);
+
+            $('a[data-toggle=tab]').on('shown', function (e) {
+                var id = $(e.target).attr("href");
+                if (id === "#service_settings" || id === "#miscellaneous_settings") {
+                    $defaultButton.removeAttr("disabled");
+                } else {
+                    $defaultButton.attr("disabled", true);
+                }
+            })
         });
     });
 </script>

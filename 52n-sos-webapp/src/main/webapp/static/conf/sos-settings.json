@@ -141,7 +141,7 @@
 			}
 		},
 		{
-			"title": "Services settings",
+			"title": "Service settings",
 			"settings": {
 				"SOS_URL": {
 					"type": "string",

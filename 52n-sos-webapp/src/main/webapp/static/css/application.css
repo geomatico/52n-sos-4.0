@@ -3,7 +3,8 @@ body, div#footer {
 }
 div#footer h3 { 
 	color: #ccc; 
-	font-size: 14px !important; 
+	font-size: 14px !important;
+	line-height: 24px;
 }
 .header-img-span { 
 	margin-top: 10px; 
@@ -24,12 +25,12 @@ body > #wrap {
 	min-height: 100%;
 }
 #main {
-	padding-bottom: 361px;
+	padding-bottom: 310px;
 }
 div#footer {
 	position: relative;
-	margin-top: -361px;
-	height: 361px;
+	margin-top: -310px;
+	height: 310px;
 	clear:both;
 }
 .CodeMirror-scroll {
@@ -40,3 +41,6 @@ div#footer {
 
 #jdbc-input { width: 475px; }
 #jdbc-input-addon { width: 120px; }
+
+ul.fn_list { margin: 0px !important; }
+#f_bottom { padding-bottom: 0px !important; }
