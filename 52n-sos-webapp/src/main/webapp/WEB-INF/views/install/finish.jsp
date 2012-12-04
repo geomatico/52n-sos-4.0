@@ -32,6 +32,14 @@
 	<jsp:param name="leadParagraph" value="All configuration options are set. Click on 'Install' to finish the installation." />
 </jsp:include>
 
+<script type="text/javascript">
+    if (document.referrer) {
+        if (document.referrer.matches(/install\/settings/)) {
+            showSuccess("Settings successfully tested.")
+        }
+    }
+</script>
+
 <p>Please enter credentials to login into the administrator panel below. You can reset your admin password by executing the file <code>sql/reset_admin.sql</code> (located inside the SOS installation directory in the webapps folder of your application server) on your database.</p>
 
 <hr />

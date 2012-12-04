@@ -24,12 +24,12 @@ body > #wrap {
 	min-height: 100%;
 }
 #main {
-	padding-bottom: 330px;
+	padding-bottom: 361px;
 }
 div#footer {
 	position: relative;
-	margin-top: -350px;
-	height: 330px;
+	margin-top: -361px;
+	height: 361px;
 	clear:both;
 }
 .CodeMirror-scroll {

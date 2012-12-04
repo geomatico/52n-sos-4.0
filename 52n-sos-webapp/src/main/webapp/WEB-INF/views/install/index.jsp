@@ -43,24 +43,23 @@
 	the <a target="_blank" href="http://postgis.refractions.net/documentation/manual-2.0/postgis_installation.html">PostGIS documentation</a>
 	for a description how to install and enable it for your database).</p>
 
-<div id="upload">
-    <h3>Upload a previous configuration file</h3>
-    <p>You can upload the exported configuration of a previous SOS installation:</p>
-    <input type="file" id="file" style="display: none;">
-        <div class="input-append">
-            <input type="text" id="fileCover" class="input-large" disabled>
-            <button type="button" class="btn" onclick="$('input[id=file]').click();">Browse</button>
-            <button type="button" id="upload" class="btn" disabled>Upload</button>
-         </div>
-    </input>
+<div id="uploadForm">
+	<h3>Upload a previous configuration file</h3>
+	<p>You can upload the exported configuration of a previous SOS installation:</p>
+	<input type="file" id="file" style="display: none;" />
+	<div class="input-append">
+		<span id="fileCover" class="input-large uneditable-input disabled"></span>
+		<button type="button" class="btn" onclick="$('input[id=file]').click();">Browse</button>
+		<button type="button" id="upload" class="btn" disabled="disabled">Upload</button>
+	</div>
 </div>
 
 <script type="text/javascript">
 	if (!window.File || !window.FileReader) {
-		$("#upload").remove();
+		$("#uploadForm").remove();
 	} else {
 		$('#file').change(function() {
-			$('#fileCover').val($(this).val().replace("C:\\fakepath\\", ""));
+			$('#fileCover').text($(this).val().replace("C:\\fakepath\\", ""));
 			$('#upload').removeAttr("disabled");
 		});
 		$('#upload').click(function() {

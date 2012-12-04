@@ -33,6 +33,14 @@
 </jsp:include>
 
 <script type="text/javascript">
+    if (document.referrer) {
+        if (document.referrer.matches(/install\/database/)) {
+            showSuccess("Database configuration successfully tested.")
+        }
+    }
+</script>
+
+<script type="text/javascript">
     function overwriteDefaultSettings(settings) {
         <c:forEach items="<%=org.n52.sos.service.Setting.getNames()%>" var="setting">
             <c:if test="${not empty requestScope[setting]}">

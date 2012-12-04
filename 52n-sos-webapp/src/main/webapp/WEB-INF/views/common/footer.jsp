@@ -72,7 +72,7 @@
 				<ul>
 					<li><a href="http://52north.org/about/contact" target="_blank">Contact</a></li>
 					<li><a href="http://52north.org/about/imprint" target="_blank">Imprint</a></li>
-					<li><a id="scrollToTop"href="#">Top</a></li>
+					<li><a id="scrollToTop" href="#">Top</a></li>
 				</ul>
 				<script type="text/javascript">
 					$("#scrollToTop").click(function() {
@@ -80,6 +80,8 @@
 						return false;
 					});
 				</script>
+				<small>Tested in Firefox 17.0.1, Google Chrome 23.0.1271.95, Safari 6, Internet Explorer 10</small>
+				<br/>
 				<small>Copyright &copy; 
 				<script type="text/javascript">document.write(new Date().getFullYear());</script>
 				<noscript>2012</noscript>

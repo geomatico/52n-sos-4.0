@@ -23,13 +23,25 @@
  */
 if (typeof String.prototype.startsWith != "function") {
     String.prototype.startsWith = function(str) {
+        "use strict";
+        if (this == null) throw new TypeError();
         return this.slice(0, str.length) === str;
     };
 }
 
 if (typeof String.prototype.endsWith != "function") {
     String.prototype.endsWith = function(str) {
+        "use strict";
+        if (this == null) throw new TypeError();
         return this.slice(-str.length) === str;
+    };
+}
+
+if (!String.prototype.matches) {
+    String.prototype.matches = function(regexp) {
+        "use strict";
+        if (this == null) throw new TypeError();
+        return this.match(regexp) ? true : false;
     };
 }
 
