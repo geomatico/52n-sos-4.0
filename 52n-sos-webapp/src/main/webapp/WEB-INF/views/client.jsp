@@ -235,7 +235,7 @@
 
 			if (availableVersions.length === 0) {
 				editor.setOption("readOnly", true);
-				[ $version, $binding, $request, $url, $send].forEach(function($e) {
+				[ $version, $binding, $request, $url, $send ].forEach(function($e) {
 					$e.attr("disabled", true);
 				});
 			}

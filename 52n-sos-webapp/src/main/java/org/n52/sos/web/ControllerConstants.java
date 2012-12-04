@@ -52,6 +52,7 @@ public interface ControllerConstants {
         public static final String ADMIN_SETTINGS_UPDATE = "/admin/settings";
         public static final String ADMIN_DATABASE = "/admin/database";
         public static final String ADMIN_DATABASE_EXECUTE = "/admin/database";
+        public static final String ADMIN_RELOAD_CAPABILITIES_CACHE = "/admin/cache/reload";
         public static final String ADMIN_DATABASE_REMOVE_TEST_DATA = "/admin/database/testdata/remove";
         public static final String ADMIN_DATABASE_CREATE_TEST_DATA = "/admin/database/testdata/create";
 

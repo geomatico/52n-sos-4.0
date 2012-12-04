@@ -31,6 +31,27 @@
 	<jsp:param name="title" value="Administration Panel" />
 	<jsp:param name="leadParagraph" value="Use the admin menu above to select different administrative tasks." />
 </jsp:include>
+<p class="pull-right">
+<button type="button" id="reloadCapsCache" class="btn">Reload Capabilities Cache</button>
+</p>
+    
+<script type="text/javascript">
+    $("#reloadCapsCache").click(function() {
+        var $b = $(this);
+        $b.attr("disabled", true);
+        $.ajax({
+            url: "<c:url value="/admin/cache/reload"/>",
+            type: "POST"
+        }).done(function(e) {
+            showSuccess("Capabilties cache reloaded.");
+            $b.removeAttr("disabled");
+        }).fail(function(error){
+            showError("Capabilites cache reload failed: " + error.responseText);
+            $b.removeAttr("disabled");
+        });
+    });
+</script>
+
 
 <div class="row">
     <div class="span12">
