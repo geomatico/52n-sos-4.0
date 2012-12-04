@@ -42,7 +42,9 @@
 	<div class="control-group">
 		<label class="control-label" for="j_password">Password</label>
 		<div class="controls">
-			<input class="input-xlarge" type="password" name="j_password" autocomplete="off"/>
+			<input class="input-xlarge" type="password" name="j_password" autocomplete="off">
+				<span id="passwordReset" class="help-block">You can reset your admin password by executing the file <code>sql/reset_admin.sql</code> (located inside the SOS installation directory in the webapps folder of your application server) on your database.</span>
+			</input>
 		</div>
 	</div>
 	<div class="form-actions">
@@ -51,21 +53,18 @@
 </form>
 <script type="text/javascript">
 	$(function(){
+		$("#passwordReset").hide();
 		if ($.queryParam["error"]) {
 			showError("Incorrect username/password. Please try again!");
+			$("#passwordReset").fadeIn();
 		}
-		function onchange() {
+		$("input[type=text],input[type=password]").bind("keyup input", function() {
 			var empty = false;
 			$("input[type=text], input[type=password]").each(function(i,e) {
 				if ($(e).val() === "") { empty = true; }
 			});
-
 			$("button[type=submit]").attr("disabled", empty);	
-
-		}
-		$("input[type=text],input[type=password]")
-			.bind("keyup", onchange).bind("input", onchange)
-			.trigger("input");
+		}).trigger("input");
 	});
 </script>
 <jsp:include page="../common/footer.jsp" />
