@@ -24,6 +24,7 @@
 
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <jsp:include page="../common/header.jsp">
 	<jsp:param name="activeMenu" value="admin" />
 </jsp:include>
@@ -56,16 +57,16 @@
 <div class="row">
     <div class="span12">
         <c:if test="${not empty VERSION}">
-            <p><strong>Version:</strong> ${VERSION}</p>
+            <p><strong>Version:</strong> ${fn:escapeXml(VERSION)}</p>
         </c:if>
         <c:if test="${not empty SVN_VERSION}">
-            <p><strong>Revision:</strong> ${SVN_VERSION}</p>
+            <p><strong>Revision:</strong> ${fn:escapeXml(SVN_VERSION)}</p>
         </c:if>
         <c:if test="${not empty BUILD_DATE}">
-            <p><strong>Build date:</strong> ${BUILD_DATE}</p>
+            <p><strong>Build date:</strong> ${fn:escapeXml(BUILD_DATE)}</p>
         </c:if>
         <c:if test="${not empty INSTALL_DATE}">
-            <p><strong>Installation date:</strong> ${INSTALL_DATE}</p>
+            <p><strong>Installation date:</strong> ${fn:escapeXml(INSTALL_DATE)}</p>
         </c:if>
     </div>
 </div>
