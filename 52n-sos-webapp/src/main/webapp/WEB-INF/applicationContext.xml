@@ -1,4 +1,4 @@
-<beans:beans xmlns="http://www.springframework.org/schema/security"
+<beans:beans xmlns:sec="http://www.springframework.org/schema/security"
 			 xmlns:beans="http://www.springframework.org/schema/beans"
 			 xmlns:security="http://www.springframework.org/schema/security"
 			 xmlns:mvc="http://www.springframework.org/schema/mvc"
@@ -8,35 +8,41 @@
 								 http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 								 http://www.springframework.org/schema/security 
 								 http://www.springframework.org/schema/security/spring-security-3.1.xsd
-									 http://www.springframework.org/schema/context
+								 http://www.springframework.org/schema/context
 								 http://www.springframework.org/schema/context/spring-context-3.1.xsd">
-	
-	<http pattern="/static/**" security="none" />
-	<http pattern="/install/**" security="none" />
-	<http pattern="/sos" security="none" />
-	
-	<http auto-config="true" use-expressions="true">
-		<intercept-url pattern="/index" access="hasRole('ROLE_ADMIN') or hasRole('ROLE_ANONYMOUS')" />
-		<intercept-url pattern="/client" access="hasRole('ROLE_ADMIN') or hasRole('ROLE_ANONYMOUS')" />
-		<intercept-url pattern="/admin" access="hasRole('ROLE_ADMIN')" />
-		<intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')" />
-		<intercept-url pattern="/j_spring_security_check" access="hasRole('ROLE_ANONYMOUS')" />
-		<form-login login-page="/login"
-					default-target-url="/admin/index" 
-					authentication-failure-url="/login?error=true"
-					login-processing-url="/j_spring_security_check" />
-		<logout logout-success-url="/index" />
-	</http>
-	
 	<context:annotation-config />
 
 	<beans:bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
-	<!--
-	<beans:bean id="passwordEncoder" class="org.springframework.security.crypto.password.NoOpPasswordEncoder" />
-    -->
-	<beans:bean id="customAuthenticationProvider" class="org.n52.sos.web.admin.auth.UserService"/>
+	<beans:bean id="authenticationProvider" class="org.n52.sos.web.admin.auth.UserService"/>
 
-	<authentication-manager>
-		<authentication-provider ref="customAuthenticationProvider" />
-	</authentication-manager>
+	<sec:authentication-manager alias="authenticationManager">
+		<sec:authentication-provider ref="authenticationProvider" />
+	</sec:authentication-manager>
+
+	<beans:bean id="httpBasicAuthenticationEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
+		<beans:property name="realmName" value="Your realm here" />
+	</beans:bean>
+
+	<beans:bean id="httpBasicAuthenticationFilter" class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
+		<beans:property name="authenticationManager" ref="authenticationManager" />
+		<beans:property name="authenticationEntryPoint" ref="httpBasicAuthenticationEntryPoint" />
+	</beans:bean>
+
+	<sec:http pattern="/static/**" security="none" />
+	<sec:http pattern="/install/**" security="none" />
+	<sec:http pattern="/sos" security="none" />
+
+	<sec:http auto-config="true" use-expressions="true">
+		<sec:intercept-url pattern="/index" access="hasRole('ROLE_ADMIN') or hasRole('ROLE_ANONYMOUS')" />
+		<sec:intercept-url pattern="/client" access="hasRole('ROLE_ADMIN') or hasRole('ROLE_ANONYMOUS')" />
+		<sec:intercept-url pattern="/admin" access="hasRole('ROLE_ADMIN')" />
+		<sec:intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')" />
+		<sec:intercept-url pattern="/j_spring_security_check" access="hasRole('ROLE_ANONYMOUS')" />
+		<sec:custom-filter before="SECURITY_CONTEXT_FILTER" ref="httpBasicAuthenticationFilter" />
+		<sec:form-login login-page="/login"
+						default-target-url="/admin/index" 
+						authentication-failure-url="/login?error=true"
+						login-processing-url="/j_spring_security_check" />
+		<sec:logout logout-success-url="/index" />
+	</sec:http>
 </beans:beans>
