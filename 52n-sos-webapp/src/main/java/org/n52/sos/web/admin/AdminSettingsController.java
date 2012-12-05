@@ -176,9 +176,8 @@ public class AdminSettingsController extends AbstractController {
         }
     }
 
-    @RequestMapping(value = ControllerConstants.Paths.ADMIN_SETTINGS_DUMP, method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody
-    String dump() {
+    @RequestMapping(value = ControllerConstants.Paths.ADMIN_SETTINGS_DUMP, method = RequestMethod.GET, produces = "application/json; charset=UTF-8")
+    public @ResponseBody String dump() {
         try {
             ISettingsDao dao = daoServiceLoader.iterator().next();
             Map<String, String> settings = dao.get();

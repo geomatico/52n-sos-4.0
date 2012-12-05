@@ -21,10 +21,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-
 package org.n52.sos.web.admin;
 
-import java.io.File;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
@@ -45,14 +43,10 @@ public class AdminResetController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.POST)
     public View post() {
-        String dsSosConfig = getDsSosConfigPath();
-        File f = new File(dsSosConfig);
-		if (Configurator.getInstance() != null) {
-			Configurator.getInstance().cleanup();
-		}
-        if (f.exists()) {
-            f.delete();
+        if (Configurator.getInstance() != null) {
+            Configurator.getInstance().cleanup();
         }
+        getDatabaseSettingsHandler().delete();
         return new RedirectView(ControllerConstants.Paths.LOGOUT, true);
     }
 }

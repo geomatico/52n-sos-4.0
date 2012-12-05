@@ -21,17 +21,30 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.web;
+package org.n52.sos.service;
 
-import org.n52.sos.service.DatabaseSettingsHandler;
 import javax.servlet.ServletContext;
 
-public class JstlFunctions {
+public class DatabaseSettingsHandler extends AbstractPropertyFileHandler {
     
-    public static boolean configurated(ServletContext ctx) {
-        return DatabaseSettingsHandler.getInstance(ctx).exists();
+    public static final String INIT_PARAM_DATA_SOURCE_CONFIG_LOCATION = "datasourceConfigLocation";
+    private static DatabaseSettingsHandler instance;
+
+    public static synchronized DatabaseSettingsHandler getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("Not yet initialized");
+        }
+        return instance;
     }
 
-    private JstlFunctions() {
+    public static synchronized DatabaseSettingsHandler getInstance(ServletContext ctx) {
+        if (instance == null) {
+            instance = new DatabaseSettingsHandler(ctx);
+        }
+        return instance;
+    }
+
+    private DatabaseSettingsHandler(ServletContext ctx) {
+        super(ctx, ctx.getInitParameter(INIT_PARAM_DATA_SOURCE_CONFIG_LOCATION));
     }
 }

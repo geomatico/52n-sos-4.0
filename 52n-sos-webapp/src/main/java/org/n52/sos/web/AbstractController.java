@@ -24,7 +24,9 @@
 
 package org.n52.sos.web;
 
+import org.n52.sos.service.DatabaseSettingsHandler;
 import javax.servlet.ServletContext;
+import org.n52.sos.service.ConfigurationException;
 
 import org.n52.sos.service.SosContextListener;
 import org.n52.sos.web.install.AbstractInstallController;
@@ -49,13 +51,15 @@ public class AbstractController {
         this.context = context;
     }
 
-    public String getDsSosConfigPath() {
-        String contextParam = getContext().getInitParameter(SosContextListener.INIT_PARAM_DATA_SOURCE_CONFIG_LOCATION);
-        log.debug("Database config file: {}", contextParam);
-        return getContext().getRealPath(contextParam);
-    }
-
     public String getBasePath() {
         return getContext().getRealPath("/");
+    }
+    
+    public MetaDataHandler getMetaDataHandler() {
+        return MetaDataHandler.getInstance(getContext());
+    }
+    
+    public DatabaseSettingsHandler getDatabaseSettingsHandler() {
+        return DatabaseSettingsHandler.getInstance(getContext());
     }
 }

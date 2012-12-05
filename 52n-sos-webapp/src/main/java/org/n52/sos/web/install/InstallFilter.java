@@ -24,34 +24,31 @@
 
 package org.n52.sos.web.install;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
-import org.n52.sos.service.SosContextListener;
+import org.n52.sos.service.DatabaseSettingsHandler;
 
 public class InstallFilter implements Filter {
 
-    private String file;
+    private DatabaseSettingsHandler dbsh;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        ServletContext ctx = filterConfig.getServletContext();
-        this.file = ctx.getRealPath(ctx.getInitParameter(SosContextListener.INIT_PARAM_DATA_SOURCE_CONFIG_LOCATION));
+        this.dbsh = DatabaseSettingsHandler.getInstance(filterConfig.getServletContext());
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
             ServletException {
-        if (new File(this.file).exists()) {
+        if (dbsh.exists()) {
             ((HttpServletResponse) response).sendError(404);
         } else {
             chain.doFilter(request, response);

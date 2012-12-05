@@ -23,13 +23,9 @@
  */
 package org.n52.sos.service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.util.Enumeration;
-import java.util.Properties;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -38,40 +34,18 @@ import org.slf4j.LoggerFactory;
 
 public class SosContextListener implements ServletContextListener {
 	
-	public static final String INIT_PARAM_DATA_SOURCE_CONFIG_LOCATION = "datasourceConfigLocation";
 	private static final Logger log = LoggerFactory.getLogger(SosContextListener.class);
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		if (Configurator.getInstance() == null) {
 			ServletContext context = sce.getServletContext();
-			String initParam = context.getInitParameter(INIT_PARAM_DATA_SOURCE_CONFIG_LOCATION);
-			if (initParam == null) {
-				throw new RuntimeException("Missing InitParameter '" + INIT_PARAM_DATA_SOURCE_CONFIG_LOCATION + "'");
-			}
-			File config = new File(context.getRealPath(initParam));
-			if (config.exists()) {
+            DatabaseSettingsHandler dbsh = DatabaseSettingsHandler.getInstance(context);
+			if (dbsh.exists()) {
 				try {
 					log.debug("Initialising Configurator ({},{})", 
-                            config.getAbsolutePath(), context.getRealPath("/"));
-                    FileInputStream in = null;
-                    Properties p = new Properties();
-                    try {
-                        in = new FileInputStream(config);
-                        p.load(in);
-                    } catch(IOException e) {
-                        log.error("Can not load configuration file");
-                        throw new RuntimeException(e);
-                    } finally {
-                        if (in != null) {
-                            try {
-                                in.close();
-                            } catch(IOException e) {
-                                log.error("Can not close file", e);
-                            }
-                        }
-                    }
-					Configurator.getInstance(p, context.getRealPath("/"));
+                            dbsh.getPath(), context.getRealPath("/"));
+					Configurator.getInstance(dbsh.getAll(), context.getRealPath("/"));
 				} catch (ConfigurationException ce) {
 					String message = "Configurator initialization failed!";
 					log.error(message, ce);
@@ -79,7 +53,7 @@ public class SosContextListener implements ServletContextListener {
 				}
 			} else {
 				log.warn("Can not initialize Configurator; config file is not present: {}", 
-                        config.getAbsolutePath());
+                        dbsh.getPath());
 			}
 		} else {
 			log.warn("Configurator already instantiated.");

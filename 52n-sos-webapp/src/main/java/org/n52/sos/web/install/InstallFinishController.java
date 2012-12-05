@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -198,8 +200,6 @@ public class InstallFinishController extends AbstractInstallController {
             }
         }
 
-        
-
         /* instantiate sos configurator */
         if (Configurator.getInstance() == null) {
             log.info("Instantiation Configurator...");
@@ -211,41 +211,25 @@ public class InstallFinishController extends AbstractInstallController {
                 return error(settings, message, ex);
             }
         } else {
-            log.warn("Configurator seems to be already instantiated...");
+            log.error("Configurator seems to be already instantiated...");
         }
         
-        /* write dssos.config */
         try {
-            writeDsSosConfig(properties);
-        } catch (IOException e) {
+            getDatabaseSettingsHandler().saveAll(properties);
+        } catch (ConfigurationException e) {
+            /* TODO desctruct configurator? */
             return error(settings, "Could not write datasource config: " + e.getMessage());
         }
         
-        /* save the installation date (same format as maven svn buildnumber plugin produces) */
-        DateTimeFormatter f = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-        MetaDataHandler.getInstance().saveMetadata(MetaDataHandler.Metadata.INSTALL_DATE, 
-                f.print(new DateTime()));
+        try {
+            /* save the installation date (same format as maven svn buildnumber plugin produces) */
+            DateTimeFormatter f = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+            getMetaDataHandler().save(MetaDataHandler.Metadata.INSTALL_DATE,
+                    f.print(new DateTime()));
+        } catch (ConfigurationException ex) {
+            /* don't fail on this one */
+            log.error("Error saveing installation date", ex);
+        }
         return success(settings);
     }
-
-    private void writeDsSosConfig(Properties p) throws IOException {
-        OutputStream out = null;
-        try {
-            out = new FileOutputStream(getDsSosConfigPath());
-            p.store(out, "####################################################################\n"
-                    + "### configuration of the SOS's datasource\n"
-                    + "####################################################################\n");
-        }
-        finally {
-            if (out != null) {
-                try {
-                    out.close();
-                }
-                catch (Exception e) {
-                    log.error("Error closing OutputStream.", e);
-                }
-            }
-        }
-    }
-
 }

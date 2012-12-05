@@ -21,11 +21,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-
 package org.n52.sos.web.admin;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.MetaDataHandler;
@@ -40,9 +40,13 @@ public class AdminIndexController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView get() {
-        Map<String,String> model = new HashMap<String, String>(MetaDataHandler.Metadata.values().length);
-        for (MetaDataHandler.Metadata m : MetaDataHandler.Metadata.values()) {
-            model.put(m.name(), MetaDataHandler.getInstance().getMetadata(m));
+        Map<String, String> model = new HashMap<String, String>(MetaDataHandler.Metadata.values().length);
+        try {
+            for (MetaDataHandler.Metadata m : MetaDataHandler.Metadata.values()) {
+                model.put(m.name(), getMetaDataHandler().get(m));
+            }
+        } catch (ConfigurationException ex) {
+            log.error("Error reading metadata properties", ex);
         }
         return new ModelAndView(ControllerConstants.Views.ADMIN_INDEX, model);
     }

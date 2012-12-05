@@ -23,102 +23,36 @@
  */
 package org.n52.sos.web;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URISyntaxException;
-import java.util.Properties;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.servlet.ServletContext;
 
-public class MetaDataHandler {
+public class MetaDataHandler extends AbstractEnumPropertiesFileHandler<MetaDataHandler.Metadata> {
+
     public enum Metadata {
         SVN_VERSION,
         VERSION,
         BUILD_DATE,
         INSTALL_DATE;
     }
-    private static final Logger log = LoggerFactory.getLogger(MetaDataHandler.class);
-    private static final String PROPERTIES = "/meta.properties";
-    private static MetaDataHandler instance = new MetaDataHandler();
-    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private Properties cache;
+    
+    private static final String PROPERTIES = "/WEB-INF/classes/meta.properties";
+    private static MetaDataHandler instance;
 
-    public static synchronized MetaDataHandler getInstance() {
+    static synchronized MetaDataHandler getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("Not yet initialized");
+        }
+        return instance;
+    }
+    
+    static synchronized MetaDataHandler getInstance(ServletContext ctx) {
+        if (instance == null) {
+            instance = new MetaDataHandler(ctx);
+        }
         return instance;
     }
 
-    private MetaDataHandler() {
+    private MetaDataHandler(ServletContext ctx) {
+        super(ctx, PROPERTIES);
     }
 
-    private Properties load() throws IOException {
-        if (this.cache == null) {
-            InputStream is = null;
-            try {
-                is = MetaDataHandler.class.getResourceAsStream(PROPERTIES);
-                Properties p = new Properties();
-                p.load(is);
-                cache = p;
-            } finally {
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (IOException e) {
-                        log.error("Error closing input stream", e);
-                    }
-                }
-            }
-        }
-        return cache;
-    }
-
-    private void save(Properties p) throws IOException {
-        OutputStream os = null;
-        try {
-            File f = new File(MetaDataHandler.class.getResource(PROPERTIES).toURI());
-            os = new FileOutputStream(f);
-            p.store(os, null);
-            this.cache = p;
-        } catch (URISyntaxException ex) {
-            throw new FileNotFoundException(ex.getMessage());
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    log.error("Error closing output stream", e);
-                }
-            }
-        }
-    }
-
-    public String getMetadata(Metadata m) {
-        lock.readLock().lock();
-        try {
-            return load().getProperty(m.name());
-        } catch (IOException e) {
-            String message = "Error reading properties";
-            throw new RuntimeException(message, e);
-        } finally {
-            lock.readLock().unlock();
-        }
-    }
-
-    public void saveMetadata(Metadata m, String value) {
-        lock.writeLock().lock();
-        try {
-            Properties p = load();
-            p.setProperty(m.name(), value);
-            save(p);
-        } catch (IOException e) {
-            String message = "Error writing properties";
-            throw new RuntimeException(message, e);
-        } finally {
-            lock.writeLock().unlock();
-        }
-    }
 }

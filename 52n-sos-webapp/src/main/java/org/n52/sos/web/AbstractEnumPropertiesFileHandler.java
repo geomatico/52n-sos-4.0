@@ -23,15 +23,21 @@
  */
 package org.n52.sos.web;
 
-import org.n52.sos.service.DatabaseSettingsHandler;
+import org.n52.sos.service.AbstractPropertyFileHandler;
 import javax.servlet.ServletContext;
+import org.n52.sos.service.ConfigurationException;
 
-public class JstlFunctions {
+public abstract class AbstractEnumPropertiesFileHandler<E extends Enum<E>> extends AbstractPropertyFileHandler {
     
-    public static boolean configurated(ServletContext ctx) {
-        return DatabaseSettingsHandler.getInstance(ctx).exists();
+    protected AbstractEnumPropertiesFileHandler(ServletContext ctx, String name) {
+        super(ctx,name);
     }
-
-    private JstlFunctions() {
+    
+    public String get(E e) throws ConfigurationException {
+        return get(e.name());
+    }
+    
+    public void save(E e, String value) throws ConfigurationException {
+        save(e.name(), value);
     }
 }
