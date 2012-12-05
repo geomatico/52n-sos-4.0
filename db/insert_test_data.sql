@@ -156,9 +156,9 @@ $$
 	xmlns:gml="http://www.opengis.net/gml/3.2" gml:id="ssf_'::text || $1 || '">
 	<gml:identifier codeSpace="">'::text || $1 || '</gml:identifier>
 	<sf:type xlink:href="http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint"/>
-	<sf:sampledFeature xlink:href="'::text || $1 || '"/>
+	<sf:sampledFeature xlink:href="http://www.opengis.net/def/nil/OGC/0/unknown"/>
 	<sams:shape>
-		<gml:Point gml:id="'::text || $1 || '">
+		<gml:Point gml:id="p_ssf_'::text || $1 || '">
 			<gml:pos srsName="http://www.opengis.net/def/crs/EPSG/0/4326">'::text|| $3 || ' '::text || $2 || '</gml:pos>
 		</gml:Point>
 	</sams:shape>
