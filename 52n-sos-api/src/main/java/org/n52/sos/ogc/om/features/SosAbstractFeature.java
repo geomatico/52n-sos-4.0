@@ -120,4 +120,8 @@ public abstract class SosAbstractFeature implements Serializable {
         this.gmlId = gmlId;
     }
 
+    public boolean isSetGmlID() {
+       return gmlId != null && !gmlId.isEmpty();
+    }
+
 }

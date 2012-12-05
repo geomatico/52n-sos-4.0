@@ -225,10 +225,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
             phenComponents = compPhen.getPhenomenonComponents();
         }
         // set feature
-        String gmlID = additionalValues.get(HelperValues.GMLID);
-        boolean existFoiInDoc = Boolean.parseBoolean(additionalValues.get(HelperValues.EXIST_FOI_IN_DOC));
-        encodeFeatureOfInterest(xbObs, sosObservation.getObservationConstellation().getFeatureOfInterest(), gmlID,
-                existFoiInDoc);
+        encodeFeatureOfInterest(xbObs, sosObservation.getObservationConstellation().getFeatureOfInterest());
 
         // set result
         addResultToObservation(xbObs.addNewResult(), sosObservation, phenComponents, observationID);
@@ -1009,67 +1006,54 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
      * Encodes a SosAbstractFeature to an SpatialSamplingFeature under
      * consideration of duplicated SpatialSamplingFeature in the XML document.
      * 
-     * @param xbObs
+     * @param observation
      *            XmlObject O&M observation
      * @param absObs
      *            SOS observation
      * @throws OwsExceptionReport
      */
-    private void encodeFeatureOfInterest(OMObservationType xbObs, SosAbstractFeature foi, String gmlId,
-            boolean existFoiInDoc) throws OwsExceptionReport {
+    private void encodeFeatureOfInterest(OMObservationType observation, SosAbstractFeature feature) throws OwsExceptionReport {
         String urlPattern =
                 SosHelper.getUrlPatternForHttpGetMethod(Configurator.getInstance().getBindingOperators().values(),
                         SosConstants.Operations.GetFeatureOfInterest.name(), new DecoderKeyType(SosConstants.SOS,
                                 Sos2Constants.SERVICEVERSION));
-        FeaturePropertyType xbFoiType = xbObs.addNewFeatureOfInterest();
-        if (!Configurator.getInstance().isFoiEncodedInObservation()) {
+        SosSamplingFeature samplingFeature = (SosSamplingFeature) feature;
+        FeaturePropertyType featureProperty = observation.addNewFeatureOfInterest();
+        if (!Configurator.getInstance().isFoiEncodedInObservation() || !(feature instanceof SosSamplingFeature)) {
             if (urlPattern != null) {
-                xbFoiType.setHref(SosHelper.createFoiGetUrl(foi.getIdentifier(), Sos2Constants.SERVICEVERSION,
+                featureProperty.setHref(SosHelper.createFoiGetUrl(feature.getIdentifier(), Sos2Constants.SERVICEVERSION,
                         Configurator.getInstance().getServiceURL(), urlPattern));
             } else {
-                xbFoiType.setHref(foi.getIdentifier());
+                featureProperty.setHref(feature.getIdentifier());
+            }
+            if (samplingFeature.isSetNames()) {
+                featureProperty.setTitle(samplingFeature.getFirstName());
             }
         } else {
-            if (!existFoiInDoc) {
-                if (foi instanceof SosSamplingFeature) {
-                    SosSamplingFeature sampFeat = (SosSamplingFeature) foi;
-                    if (sampFeat.getUrl() != null) {
-                        xbFoiType.setHref(sampFeat.getUrl());
-                    } else {
-                        IEncoder encoder =
-                                Configurator.getInstance().getEncoder(
-                                        OMHelper.getNamespaceForFeatureType(sampFeat.getFeatureType()));
-                        if (encoder != null) {
-                            Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
-                            additionalValues.put(HelperValues.GMLID, gmlId);
-                            xbFoiType.set((XmlObject) encoder.encode(sampFeat, additionalValues));
-                        } else {
-                            if (sampFeat.getXmlDescription() != null) {
-                                try {
-                                    // TODO how set gml:id in already existing XmlDescription?
-                                    xbFoiType.set(XmlObject.Factory.parse(sampFeat.getXmlDescription()));
-                                } catch (XmlException xmle) {
-                                    String exceptionText = "Error while encoding featureOfInterest in OMObservation!";
-                                    LOGGER.error(exceptionText, xmle);
-                                    throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
-                                }
-                            } 
-                            String exceptionText =
-                                    "Error while encoding geometry for featureOfInterest, needed encoder is missing!";
-                            LOGGER.debug(exceptionText);
-                            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-                        }
-                    }
-                } else {
-                    if (urlPattern != null) {
-                        xbFoiType.setHref(SosHelper.createFoiGetUrl(foi.getIdentifier(), Sos2Constants.SERVICEVERSION,
-                                Configurator.getInstance().getServiceURL(), urlPattern));
-                    } else {
-                        xbFoiType.setHref(foi.getIdentifier());
-                    }
-                }
+            if (samplingFeature.getUrl() != null) {
+                featureProperty.setHref(samplingFeature.getUrl());
             } else {
-                xbFoiType.setHref("#" + gmlId);
+                IEncoder encoder =
+                        Configurator.getInstance().getEncoder(
+                                OMHelper.getNamespaceForFeatureType(samplingFeature.getFeatureType()));
+                if (encoder != null) {
+                    featureProperty.set((XmlObject) encoder.encode(samplingFeature));
+                } else {
+                    if (samplingFeature.getXmlDescription() != null) {
+                        try {
+                            // TODO how set gml:id in already existing XmlDescription?
+                            featureProperty.set(XmlObject.Factory.parse(samplingFeature.getXmlDescription()));
+                        } catch (XmlException xmle) {
+                            String exceptionText = "Error while encoding featureOfInterest in OMObservation!";
+                            LOGGER.error(exceptionText, xmle);
+                            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+                        }
+                    } 
+                    String exceptionText =
+                            "Error while encoding geometry for featureOfInterest, needed encoder is missing!";
+                    LOGGER.debug(exceptionText);
+                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                }
             }
         }
     }

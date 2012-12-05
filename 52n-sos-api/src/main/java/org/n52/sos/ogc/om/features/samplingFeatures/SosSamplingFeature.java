@@ -137,4 +137,16 @@ public class SosSamplingFeature extends SosAbstractFeature {
     public List<SosAbstractFeature> getSampledFeatures() {
         return sampledFeatures;
     }
+
+    public boolean isSetNames() {
+        return name != null && !name.isEmpty();
+    }
+    
+    public String getFirstName() {
+        if (isSetNames()) {
+            return name.get(0);
+        }
+        return null;
+    }
+    
 }

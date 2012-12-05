@@ -317,27 +317,27 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
-        HashMap<String, String> gmlID4sfIdentifier = new HashMap<String, String>();
-        int sfIdCounter = 1;
+//        HashMap<String, String> gmlID4sfIdentifier = new HashMap<String, String>();
+//        int sfIdCounter = 1;
         for (SosObservation sosObservation : observationCollection) {
-            Map<HelperValues, String> foiHelper = new HashMap<SosConstants.HelperValues, String>();
-            String gmlId = null;
-            if (gmlID4sfIdentifier.containsKey(sosObservation.getObservationConstellation().getFeatureOfInterest()
-                    .getIdentifier())) {
-                gmlId =
-                        gmlID4sfIdentifier.get(sosObservation.getObservationConstellation().getFeatureOfInterest()
-                                .getIdentifier());
-                foiHelper.put(HelperValues.EXIST_FOI_IN_DOC, Boolean.toString(true));
-            } else {
-                gmlId = "sf_" + sfIdCounter++;
-                gmlID4sfIdentifier.put(sosObservation.getObservationConstellation().getFeatureOfInterest()
-                        .getIdentifier(), gmlId);
-                foiHelper.put(HelperValues.EXIST_FOI_IN_DOC, Boolean.toString(false));
-            }
-            foiHelper.put(HelperValues.GMLID, gmlId);
+//            Map<HelperValues, String> foiHelper = new HashMap<SosConstants.HelperValues, String>();
+//            String gmlId = null;
+//            if (gmlID4sfIdentifier.containsKey(sosObservation.getObservationConstellation().getFeatureOfInterest()
+//                    .getIdentifier())) {
+//                gmlId =
+//                        gmlID4sfIdentifier.get(sosObservation.getObservationConstellation().getFeatureOfInterest()
+//                                .getIdentifier());
+//                foiHelper.put(HelperValues.EXIST_FOI_IN_DOC, Boolean.toString(true));
+//            } else {
+//                gmlId = "sf_" + sfIdCounter++;
+//                gmlID4sfIdentifier.put(sosObservation.getObservationConstellation().getFeatureOfInterest()
+//                        .getIdentifier(), gmlId);
+//                foiHelper.put(HelperValues.EXIST_FOI_IN_DOC, Boolean.toString(false));
+//            }
+//            foiHelper.put(HelperValues.GMLID, gmlId);
 
             xbGetObsResp.addNewObservationData().setOMObservation(
-                    (OMObservationType) encoder.encode(sosObservation, foiHelper));
+                    (OMObservationType) encoder.encode(sosObservation, null));
         }
         // set schema location
         XmlHelper.makeGmlIdsUnique(xbGetObsRespDoc.getDomNode());
@@ -352,8 +352,8 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
 
     private XmlObject createGetFeatureOfInterestResponse(GetFeatureOfInterestResponse response)
             throws OwsExceptionReport {
-        int sfIdCounter = 1;
-        HashMap<String, String> gmlID4sfIdentifier = new HashMap<String, String>();
+//        int sfIdCounter = 1;
+//        HashMap<String, String> gmlID4sfIdentifier = new HashMap<String, String>();
         GetFeatureOfInterestResponseDocument xbGetFoiResponseDoc =
                 GetFeatureOfInterestResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance()
                         .getXmlOptions());
@@ -362,7 +362,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         if (sosAbstractFeature instanceof SosFeatureCollection) {
             Map<String, SosAbstractFeature> sosFeatColMap = ((SosFeatureCollection) sosAbstractFeature).getMembers();
             for (String sosFeatID : sosFeatColMap.keySet()) {
-                FeaturePropertyType xbFeatMember = xbGetFoiResponse.addNewFeatureMember();
+                FeaturePropertyType featureProperty = xbGetFoiResponse.addNewFeatureMember();
                 SosAbstractFeature feature = sosFeatColMap.get(sosFeatID);
                 String identifier = null;
                 if (feature.getIdentifier() != null && !feature.getIdentifier().isEmpty()) {
@@ -370,46 +370,32 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                 } else {
                     identifier = sosFeatID;
                 }
-                if (gmlID4sfIdentifier.containsKey(identifier)) {
-                    xbFeatMember.setHref("#" + gmlID4sfIdentifier.get(identifier));
+                SosSamplingFeature sampFeat = (SosSamplingFeature) feature;
+                if (sampFeat.getUrl() != null) {
+                    featureProperty.setHref(sampFeat.getUrl());
+                    if (sampFeat.isSetNames()) {
+                        featureProperty.setTitle(sampFeat.getFirstName());
+                    }
                 } else {
-                    String gmlId = "sf_" + sfIdCounter++;
-                    if (feature instanceof SosSamplingFeature) {
-                        SosSamplingFeature sampFeat = (SosSamplingFeature) feature;
-                        if (sampFeat.getFeatureType() != null
-                                && !sampFeat.getFeatureType().equalsIgnoreCase(OGCConstants.UNKNOWN)) {
-                            IEncoder encoder =
-                                    Configurator.getInstance().getEncoder(
-                                            OMHelper.getNamespaceForFeatureType(sampFeat.getFeatureType()));
-                            if (encoder == null) {
-                                String exceptionText =
-                                        "Error while encoding GetFeatureOfInterest response, missing encoder!";
-                                LOGGER.debug(exceptionText);
-                                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-                            }
-                            Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
-                            additionalValues.put(HelperValues.GMLID, gmlId);
-                            xbFeatMember.set((XmlObject) encoder.encode(sampFeat, additionalValues));
-                            gmlID4sfIdentifier.put(identifier, gmlId);
-                        } else if (sampFeat.getXmlDescription() != null) {
+                    IEncoder encoder =
+                            Configurator.getInstance().getEncoder(
+                                    OMHelper.getNamespaceForFeatureType(sampFeat.getFeatureType()));
+                    if (encoder != null) {
+                        featureProperty.set((XmlObject) encoder.encode(sampFeat));
+                    } else {
+                        if (sampFeat.getXmlDescription() != null) {
                             try {
-                                xbFeatMember.setAbstractFeature((AbstractFeatureType) XmlObject.Factory.parse(sampFeat
-                                        .getXmlDescription()));
-                                gmlID4sfIdentifier.put(identifier, gmlId);
+                                featureProperty.set(XmlObject.Factory.parse(sampFeat.getXmlDescription()));
                             } catch (XmlException xmle) {
-                                String exceptionText =
-                                        "Error while encoding GetFeatureOfInterest response, invalid samplingFeature description!";
-                                LOGGER.debug(exceptionText, xmle);
+                                String exceptionText = "Error while encoding featureOfInterest in OMObservation!";
+                                LOGGER.error(exceptionText, xmle);
                                 throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
                             }
-                        } else if (sampFeat.getUrl() != null) {
-                            xbFeatMember.setHref(identifier);
-                            gmlID4sfIdentifier.put(identifier, gmlId);
-                        } else {
-                            xbFeatMember.setHref(sampFeat.getIdentifier());
-                            gmlID4sfIdentifier.put(identifier, gmlId);
-                        }
-
+                        } 
+                        String exceptionText =
+                                "Error while encoding geometry for featureOfInterest, needed encoder is missing!";
+                        LOGGER.debug(exceptionText);
+                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
                     }
                 }
             }
@@ -417,16 +403,13 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             if (sosAbstractFeature instanceof SosSamplingFeature) {
                 SosSamplingFeature sampFeat = (SosSamplingFeature) sosAbstractFeature;
 
-                String gmlId = "sf_" + sfIdCounter;
                 IEncoder encoder = Configurator.getInstance().getEncoder(sampFeat.getFeatureType());
                 if (encoder == null) {
                     String exceptionText = "Error while encoding GetFeatureOfInterest response, missing encoder!";
                     LOGGER.debug(exceptionText);
                     throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
                 }
-                Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
-                additionalValues.put(HelperValues.GMLID, gmlId);
-                xbGetFoiResponse.set((XmlObject) encoder.encode(sampFeat, additionalValues));
+                xbGetFoiResponse.set((XmlObject) encoder.encode(sampFeat));
             }
         }
         // set schemLocation
