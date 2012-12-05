@@ -23,6 +23,7 @@
  */
 package org.n52.sos.binding;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -74,14 +75,18 @@ public class KvpBinding extends Binding {
         AbstractServiceRequest request = null;
         try {
             if (req.getParameterMap() == null || (req.getParameterMap() != null && req.getParameterMap().isEmpty())) {
-                LOGGER.debug("The mandatory parameter '" + RequestParams.request.name() + "' is missing!");
-                throw Util4Exceptions.createMissingParameterValueException(RequestParams.request.name());
+                LOGGER.debug("The mandatory parameters '" + RequestParams.request.name() + "' and '"
+                        + RequestParams.service.name() + "' are missing!");
+                List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(2);
+                exceptions.add(Util4Exceptions.createMissingParameterValueException(RequestParams.request.name()));
+                exceptions.add(Util4Exceptions.createMissingParameterValueException(RequestParams.service.name()));
+                Util4Exceptions.mergeAndThrowExceptions(exceptions);
             }
             Map<String, String> parameterValueMap = KvpHelper.getKvpParameterValueMap(req);
             // check if request contains request parameter
-            checkParameterValue(getRequestParameterValue(parameterValueMap), RequestParams.request.name());
+            getRequestParameterValue(parameterValueMap);
             String service = getServiceParameterValue(parameterValueMap);
-            String version = getVersionParameterValue(RequestParams.version.name(), parameterValueMap);
+            String version = getVersionParameterValue(parameterValueMap);
             IDecoder<AbstractServiceRequest, Map<String, String>> decoder =
                     getDecoder(new DecoderKeyType(service, version));
             if (decoder != null) {
@@ -141,11 +146,11 @@ public class KvpBinding extends Binding {
         }
         return response;
     }
-    
+
     @Override
     public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport {
         String message = "HTTP POST is no supported for KVP binding!";
-         OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, message);
+        OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, message);
         if (Configurator.getInstance().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
             owse.setVersion(Sos1Constants.SERVICEVERSION);
         } else {
@@ -164,14 +169,15 @@ public class KvpBinding extends Binding {
         return urlPattern;
     }
 
+    private String getRequestParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
+        String requestParameterValue = getParameterValue(RequestParams.request.name(), parameterValueMap);
+        checkParameterValue(requestParameterValue, RequestParams.request.name());
+        return requestParameterValue;
+    }
+
     private String getServiceParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
         String service = getParameterValue(RequestParams.service.name(), parameterValueMap);
-        boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
-        if (isGetCapabilities && service == null) {
-            return SosConstants.SOS;
-        } else {
-            checkParameterValue(service, RequestParams.service.name());
-        }
+        checkParameterValue(service, RequestParams.service.name());
         if (!Configurator.getInstance().isServiceSupported(service)) {
             StringBuilder exceptionText = new StringBuilder();
             exceptionText.append("The value of parameter '");
@@ -184,7 +190,8 @@ public class KvpBinding extends Binding {
         return service;
     }
 
-    private String getVersionParameterValue(String name, Map<String, String> parameterValueMap) throws OwsExceptionReport {
+    private String getVersionParameterValue(Map<String, String> parameterValueMap)
+            throws OwsExceptionReport {
         String version = getParameterValue(RequestParams.version.name(), parameterValueMap);
         boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
         if (!isGetCapabilities) {
@@ -198,10 +205,10 @@ public class KvpBinding extends Binding {
                 throw Util4Exceptions.createInvalidParameterValueException(RequestParams.version.name(),
                         exceptionText.toString());
             }
-        } 
+        }
         return version;
     }
-    
+
     private boolean checkForGetCapabilities(Map<String, String> parameterValueMap) throws OwsExceptionReport {
         String requestValue = getRequestParameterValue(parameterValueMap);
         if (requestValue != null && requestValue.equals(SosConstants.Operations.GetCapabilities.name())) {
@@ -210,16 +217,10 @@ public class KvpBinding extends Binding {
         return false;
     }
 
-    private String getRequestParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
-        String requestParameterValue = getParameterValue(RequestParams.request.name(), parameterValueMap);
-        checkParameterValue(requestParameterValue, RequestParams.request.name());
-        return requestParameterValue;
-    }
-
     private String getParameterValue(String parameterName, Map<String, String> parameterMap) throws OwsExceptionReport {
         for (String key : parameterMap.keySet()) {
             if (key.equalsIgnoreCase(parameterName)) {
-                 return parameterMap.get(key);
+                return parameterMap.get(key);
             }
         }
         return null;
@@ -255,11 +256,7 @@ public class KvpBinding extends Binding {
         if (!configurator.isVersionSupported(decoderKey.getVersion())) {
             String exceptionText = "The requested version is not supported!";
             throw Util4Exceptions.createInvalidParameterValueException(RequestParams.version.name(), exceptionText);
-        } 
-//        else if (!configurator.isServiceSupported(decoderKey.getService())) {
-//            String exceptionText = "The requested service is not supported!";
-//            throw Util4Exceptions.createInvalidParameterValueException(RequestParams.service.name(), exceptionText);
-//        }
+        }
         return null;
     }
 
