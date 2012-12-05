@@ -34,7 +34,6 @@
 </jsp:include>
 
 <form action="<c:url value="/install/database" />" method="POST" class="form-horizontal">
-
     <fieldset>
         <legend>Database Configuration</legend>
         <div class="control-group">
@@ -65,7 +64,7 @@
         </div>
     </fieldset>
     <fieldset id="server-config">
-        <legend><a href="#">Database Server configuration</a></legend>
+        <legend><a href="#"><i class="icon-chevron-down"></i>Database Server configuration</a></legend>
         <div class="control-group">
             <label class="control-label" for="host-input">Database Host</label>
             <div class="controls">
@@ -84,9 +83,8 @@
             </div>
         </div>
     </fieldset>
-
     <fieldset id="advanced">
-        <legend><a href="#" rel="tooltip" data-trigger="hover" data-placement="right" data-original-title="These should only be changed if you know what your're doing.">Advanced database server configuration</a></legend>
+        <legend><a href="#" rel="tooltip" data-trigger="hover" data-placement="right" data-original-title="These should only be changed if you know what your're doing."><i class="icon-chevron-down"></i>Advanced database server configuration</a></legend>
         <div>
             <div class="control-group">
                 <label class="control-label" for="driver">Database Driver</label>
@@ -153,7 +151,6 @@
             </div>
         </div>
     </fieldset>
-
     <hr/>
     <div>
         <a href="<c:url value="/install/index" />" class="btn">Back</a>
@@ -249,8 +246,11 @@
         });
         $("#advanced, #server-config").children("legend").click(function(e) {
             e.preventDefault();
-            $(this).parent().children("div").toggle();
-        }).trigger("click")
+            $(this).find("i").toggleClass("icon-chevron-right icon-chevron-down")
+            $(this).parent().children("div").slideToggle();
+        }).parent().children("div").toggle();
+        $("#advanced, #server-config").children("legend").find("i")
+            .toggleClass("icon-chevron-right icon-chevron-down");
         $("#advanced legend a").tooltip();
         $("input[name=overwrite_tables]").change(function() {
             var $create_tables = $("input[name=create_tables]");

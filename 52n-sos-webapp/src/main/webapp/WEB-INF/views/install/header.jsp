@@ -40,7 +40,13 @@
 		<link rel="stylesheet" href="<c:url value="/static/css/bootstrap-2.1.1.min.css" />" type="text/css" />
 		<link rel="stylesheet" href="<c:url value="/static/css/application.css" />" type="text/css" />
 		<style type="text/css">
-			#ja-cssmenu li { cursor: default !important; }
+			#ja-cssmenu li { 
+				cursor: default !important; 
+			}
+			[class^="icon-"], [class*=" icon-"] { 
+				vertical-align: baseline !important;
+				margin-right: 5px;
+			}
 		</style>
 		<script type="text/javascript" src="<c:url value="/static/js/jquery-1.8.2.min.js" />"></script>
 		<script type="text/javascript" src="<c:url value="/static/js/bootstrap-2.1.1.min.js" />"></script>
