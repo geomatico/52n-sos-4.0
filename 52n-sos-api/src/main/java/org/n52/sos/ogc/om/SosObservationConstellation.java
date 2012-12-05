@@ -226,9 +226,9 @@ public class SosObservationConstellation implements Serializable {
     public int hashCode() {
         int hash = 7;
         hash = (procedure == null) ? 0 : 31 * hash + procedure.hashCode();
-        hash = (procedure == null) ? 0 : 31 * hash + observableProperty.hashCode();
-        hash = (procedure == null) ? 0 : 31 * hash + featureOfInterest.hashCode();
-        hash = (procedure == null) ? 0 : 31 * hash + observationType.hashCode();
+        hash = (observableProperty == null) ? 0 : 31 * hash + observableProperty.hashCode();
+        hash = (featureOfInterest == null) ? 0 : 31 * hash + featureOfInterest.hashCode();
+        hash = (observationType == null) ? 0 : 31 * hash + observationType.hashCode();
         return hash;
     }
 
