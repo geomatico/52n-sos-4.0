@@ -32,11 +32,11 @@
 	<jsp:param name="leadParagraph" value="Open Source Sensor Observation Service" />
 </jsp:include>
 <hr/>
-<p>The 52&deg; North SOS is an open source software implementation of the Open Geospatial Consortium's Sensor Observation Service (SOS) Standard.</p>
+<p>The 52&deg;North SOS is an open source software implementation of the Open Geospatial Consortium's Sensor Observation Service (SOS) Standard.</p>
 
 <p>From the menu at the top you can access a basic form-based test client and the administrative backend.</p>
 
-<p>More information about the SOS and further software components, for example clients, can be found on the <a href="http://52north.org/communities/sensorweb/" title="52&deg; North Sensor Web Community Website">Sensor Web community homepage</a>.</p>
+<p>More information about the SOS and further software components, for example clients, can be found on the <a href="http://52north.org/communities/sensorweb/" title="52&deg;North Sensor Web Community Website">Sensor Web community homepage</a>.</p>
 
 <br/>
 

@@ -108,7 +108,7 @@
                 <label class="control-label" for="jdbc_dialect">Database Dialect</label>
                 <div class="controls">
                     <input type="text" class="span8" id="driver" name="jdbc_dialect">
-                        <span class="help-block"><span class="label label-warning">required</span> Set this to the class of the JDBC dialect. The default value for PostgreSQL is the custom 52&deg; North dialect.</span>
+                        <span class="help-block"><span class="label label-warning">required</span> Set this to the class of the JDBC dialect. The default value for PostgreSQL is the custom 52&deg;North dialect.</span>
                     </input>
                 </div>
             </div>

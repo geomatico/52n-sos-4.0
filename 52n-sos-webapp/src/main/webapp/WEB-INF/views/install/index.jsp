@@ -28,7 +28,7 @@
 	<jsp:param name="step" value="1" />
 </jsp:include>
 <jsp:include page="../common/logotitle.jsp">
-	<jsp:param name="title" value="52&deg; North's SOS Installation Wizard" />
+	<jsp:param name="title" value="52&deg;North SOS Installation Wizard" />
 	<jsp:param name="leadParagraph" value="Welcome to installation wizard." />
 </jsp:include>
 
