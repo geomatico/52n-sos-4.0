@@ -277,9 +277,6 @@
     "2.0.0": {
         "/kvp": {
             "GetCapabilities - GetCapabilities minimal request": {
-                "url": "?request=GetCapabilities"
-            },
-            "GetCapabilities - GetCapabilities request with service": {
                 "url": "?service=SOS&request=GetCapabilities"
             },
             "GetCapabilities - GetCapabilities request with AcceptVersions=2.0.0": {
