@@ -23,6 +23,8 @@
  */
 package org.n52.sos.response;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.n52.sos.ogc.om.SosObservation;
@@ -47,6 +49,47 @@ public class GetObservationResponse extends AbstractServiceResponse {
 
     public void setObservationCollection(List<SosObservation> observationCollection) {
         this.observationCollection = observationCollection;
+    }
+
+    public void mergeObservationsWithResultTemplate() {
+        List<SosObservation> mergedObservations = new ArrayList<SosObservation>(0);
+        // TODO merge observations with the same antiSubsetting identifier.
+        this.observationCollection = mergedObservations;
+    }
+
+    public Collection<SosObservation> mergeObservations() {
+        // TODO merge all observations with the same observationContellation (proc, obsProp, foi)
+        List<SosObservation> mergedObservations = new ArrayList<SosObservation>(0);
+        int obsIdCounter = 1;
+        for (SosObservation sosObservation : observationCollection) {
+            if (mergedObservations.isEmpty()) {
+                sosObservation.setObservationID(Integer.toString(obsIdCounter++));
+                mergedObservations.add(sosObservation);
+            } else {
+                boolean combined = false;
+                for (SosObservation combinedSosObs : mergedObservations) {
+                    if (combinedSosObs.getObservationConstellation().equals(
+                        sosObservation.getObservationConstellation())) {
+                        combinedSosObs.mergeWithObservation(sosObservation);
+                        combined = true;
+                        break;
+                    }
+                }
+                if (!combined) {
+                    mergedObservations.add(sosObservation);
+                }
+            }
+        }
+        return mergedObservations;
+    }
+
+    public boolean hasObservationsWithResultTemplate() {
+       for (SosObservation sosObservation : observationCollection) {
+           if (sosObservation.getObservationConstellation().isSetResultTemplate()) {
+               return true;
+           }
+       }
+        return false;
     }
 
     /* TODO uncomment when WaterML support is activated

@@ -28,6 +28,8 @@ import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 
 public class ResultTemplate {
     
+    private String identifier;
+    
     private String xmlResultStructure;
     
     private String xmResultEncoding;
@@ -35,6 +37,10 @@ public class ResultTemplate {
     private SosSweAbstractDataComponent resultStructure;
     
     private SosSweAbstractEncoding resultEncoding;
+    
+    public String getIdentifier() {
+        return identifier;
+    }
 
     public String getXmlResultStructure() {
         return xmlResultStructure;
@@ -50,6 +56,10 @@ public class ResultTemplate {
 
     public SosSweAbstractEncoding getResultEncoding() {
         return resultEncoding;
+    }
+    
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 
     public void setXmlResultStructure(String xmlResultStructure) {

@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.sos.ResultTemplate;
+import org.n52.sos.ogc.sos.SosResultEncoding;
 
 /**
  * @author c_hollmann
@@ -52,6 +54,8 @@ public class SosObservationConstellation implements Serializable {
 
     /** type of the observation */
     private String observationType;
+    
+    private ResultTemplate resultTemplate;
 
     /**
      * default constructor
@@ -246,6 +250,18 @@ public class SosObservationConstellation implements Serializable {
         return (!observationType.equals(OMConstants.OBS_TYPE_MEASUREMENT)
                 && !observationType.equals(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION) && !observationType
                     .equals(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION));
+    }
+    
+    public ResultTemplate getResultTemplate() {
+        return resultTemplate;
+    }
+    
+    public void setResultTemplate(ResultTemplate resultTemplate) {
+        this.resultTemplate = resultTemplate;
+    }
+
+    public boolean isSetResultTemplate() {
+        return resultTemplate != null;
     }
 
 }

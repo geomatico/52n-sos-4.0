@@ -24,10 +24,12 @@
 package org.n52.sos.ogc.om;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
+import org.n52.sos.ogc.om.values.TVPValue;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
 
 /**
@@ -347,4 +349,32 @@ public class SosObservation implements Serializable {
 	public void setResultStructure(SosSweDataRecord resultStructure) {
 		this.resultStructure = resultStructure;
 	}
+
+    public void mergeWithObservation(SosObservation sosObservation) {
+        TVPValue tvpValue = null;
+        if (this.value instanceof SosSingleObservationValue) {
+            tvpValue = convertSingleValueToMultiValue((SosSingleObservationValue)this.value); // 
+        } else {
+            tvpValue = (TVPValue)((SosMultiObservationValues)this.value).getValue();
+        }
+        if (sosObservation.getValue() instanceof SosSingleObservationValue) {
+            SosSingleObservationValue singleValue = (SosSingleObservationValue)sosObservation.getValue();
+            TimeValuePair timeValuePair = new TimeValuePair(singleValue.getPhenomenonTime(), singleValue.getValue());
+            tvpValue.addValue(timeValuePair);
+        } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
+            SosMultiObservationValues multiValue = (SosMultiObservationValues)sosObservation.getValue();
+            tvpValue.addValues((List<TimeValuePair>)(TVPValue)multiValue.getValue().getValue());
+        }
+        
+    }
+    
+    private TVPValue convertSingleValueToMultiValue(SosSingleObservationValue singleValue) {
+        SosMultiObservationValues multiValue = new SosMultiObservationValues();
+        TVPValue tvpValue = new TVPValue();
+        TimeValuePair timeValuePair = new TimeValuePair(singleValue.getPhenomenonTime(), singleValue.getValue());
+        tvpValue.addValue(timeValuePair);
+        multiValue.setValue(tvpValue);
+        this.value = multiValue;
+        return tvpValue;
+    }
 }
