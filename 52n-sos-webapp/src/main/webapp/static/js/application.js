@@ -267,3 +267,49 @@ function setSetting(id, val, settings) {
         }
     }
 }
+
+var jdbc = {};
+
+function buildJdbcString(j) {
+    var string = j.host;
+    if (j.port != undefined) {
+        string += ":" + j.port;
+    }
+    string += "/" + encodeURIComponent(j.db);
+    if (j.user || j.pass) {
+         string += "?";
+    }
+    if (j.user) {
+        string += "user=" + encodeURIComponent(j.user);
+    }
+    if (j.pass) {
+        if (j.user) string += "&";
+        string += "password=" + encodeURIComponent(j.pass);
+    }
+    return encodeURI(string);
+}
+
+function parseJdbcString(j) {
+    var parsed = parseUri("postgresql://" + j.replace("jdbc:postgresql://",""));
+    return {
+        port: parsed.port,
+        user: parsed.queryKey.user,
+        pass: parsed.queryKey.password,
+        host: parsed.host,
+        db: parsed.path.slice(1)
+    };
+}
+
+function setJdbcString() {
+    var $this = $(this);
+    var id = $this.attr("id").replace(/-input/, "");
+    jdbc[id] = $this.val();
+    $("#jdbc-input").val(buildJdbcString(jdbc));
+}
+
+function setJdbcInputs() {
+    jdbc = parseJdbcString($(this).val());
+    for (key in jdbc) {
+        $("#" + key + "-input").val(jdbc[key]);
+    }
+}

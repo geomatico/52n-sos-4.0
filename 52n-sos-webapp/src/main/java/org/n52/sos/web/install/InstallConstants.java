@@ -35,14 +35,12 @@ public interface InstallConstants {
     public static final String CAN_READ_SPATIAL_REF_SYS = "SELECT * FROM spatial_ref_sys LIMIT 0;";
 
     /* session attributes */
-    public static final String ERROR_MESSAGE_ATTRIBUTE = "error";
     public static final String SUCCESS = "success";
     public static final String DBCONFIG_COMPLETE = ControllerConstants.Views.INSTALL_DATABASE + "_complete";
     public static final String OPTIONAL_COMPLETE = ControllerConstants.Views.INSTALL_SETTINGS + "_complete";
 
     /* request parameters */
     public static final String DRIVER_PARAMETER = "driver";
-    public static final String JDBC_PARAMETER = "jdbc_uri";
     public static final String CONNECTION_POOL_PARAMETER = "connection_pool";
     public static final String JDBC_DIALECT_PARAMETER = "jdbc_dialect";
     

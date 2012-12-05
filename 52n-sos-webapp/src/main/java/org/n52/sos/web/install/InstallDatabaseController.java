@@ -28,6 +28,7 @@
 
 package org.n52.sos.web.install;
 
+import org.n52.sos.web.JdbcUrl;
 import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -113,7 +114,7 @@ public class InstallDatabaseController extends AbstractInstallController {
         }
         
 
-        String jdbc = parameters.get(InstallConstants.JDBC_PARAMETER);
+        String jdbc = parameters.get(ControllerConstants.JDBC_PARAMETER);
         if (jdbc == null) {
             return error(settings, "No JDBC URL specified.");
         }
@@ -126,10 +127,10 @@ public class InstallDatabaseController extends AbstractInstallController {
         String error = url.isValid();
         if (error != null) {
             url.correct();
-            settings.put(InstallConstants.JDBC_PARAMETER, url.toString());
+            settings.put(ControllerConstants.JDBC_PARAMETER, url.toString());
             return error(settings, "Invalid JDBC URL: " + error);
         }
-        settings.put(InstallConstants.JDBC_PARAMETER, jdbc);
+        settings.put(ControllerConstants.JDBC_PARAMETER, jdbc);
 
         boolean createTables = true;
         Boolean createTablesParameter = parseBoolean(parameters, InstallConstants.CREATE_TABLES_PARAMETER);

@@ -21,16 +21,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-
-package org.n52.sos.web.install;
+package org.n52.sos.web;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Properties;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.n52.sos.ds.hibernate.util.HibernateConstants;
 
 public class JdbcUrl {
+
     private static final String QUERY_PARAMETER_USER = "user";
     private static final String QUERY_PARAMETER_PASSWORD = "password";
     private static final String DEFAULT_USERNAME = "user";
@@ -61,8 +63,28 @@ public class JdbcUrl {
     public JdbcUrl(String uri) throws URISyntaxException {
         this.parse(uri);
     }
+    
+    public JdbcUrl(Properties p) throws URISyntaxException {
+        this(toURI(p));
+    }
 
-    protected void parse(String string) throws URISyntaxException {
+    public Properties toProperties() {
+        Properties properties = new Properties();
+        properties.put(HibernateConstants.CONNECTION_STRING_PROPERTY, getConnectionString());
+        properties.put(HibernateConstants.USER_PROPERTY, getUser());
+        properties.put(HibernateConstants.PASS_PROPERTY, getPassword());
+        return properties;
+    }
+    
+    private static String toURI(Properties p) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(p.getProperty(HibernateConstants.CONNECTION_STRING_PROPERTY));
+        sb.append("?").append(QUERY_PARAMETER_USER).append("=").append(p.getProperty(HibernateConstants.USER_PROPERTY));
+        sb.append("&").append(QUERY_PARAMETER_PASSWORD).append("=").append(p.getProperty(HibernateConstants.PASS_PROPERTY));
+        return sb.toString();
+    } 
+
+    protected final void parse(String string) throws URISyntaxException {
         URI uri = new URI(string);
         scheme = uri.getScheme();
         uri = new URI(uri.getSchemeSpecificPart());
@@ -72,15 +94,13 @@ public class JdbcUrl {
         String[] path = uri.getPath().split("/");
         if (path.length == 1 && !path[0].isEmpty()) {
             database = path[0];
-        }
-        else if (path.length == 2 && path[0].isEmpty() && !path[1].isEmpty()) {
+        } else if (path.length == 2 && path[0].isEmpty() && !path[1].isEmpty()) {
             database = path[1];
         }
         for (NameValuePair nvp : URLEncodedUtils.parse(uri, "UTF-8")) {
             if (nvp.getName().equals(QUERY_PARAMETER_USER)) {
                 user = nvp.getValue();
-            }
-            else if (nvp.getName().equals(QUERY_PARAMETER_PASSWORD)) {
+            } else if (nvp.getName().equals(QUERY_PARAMETER_PASSWORD)) {
                 password = nvp.getValue();
             }
         }
@@ -110,25 +130,25 @@ public class JdbcUrl {
     }
 
     public void correct() {
-        if ( !isSchemeValid()) {
+        if (!isSchemeValid()) {
             setScheme(SCHEME);
         }
-        if ( !isTypeValid()) {
+        if (!isTypeValid()) {
             setType(TYPE);
         }
-        if ( !isHostValid()) {
+        if (!isHostValid()) {
             setHost(DEFAULT_HOST);
         }
-        if ( !isPortValid()) {
+        if (!isPortValid()) {
             setPort(DEFAULT_PORT);
         }
-        if ( !isDatabaseValid()) {
+        if (!isDatabaseValid()) {
             setDatabase(DEFAULT_DATABASE);
         }
-        if ( !isUserValid()) {
+        if (!isUserValid()) {
             setUser(DEFAULT_USERNAME);
         }
-        if ( !isPasswordValid()) {
+        if (!isPasswordValid()) {
             setPassword(DEFAULT_PASSWORD);
         }
     }

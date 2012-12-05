@@ -24,6 +24,7 @@
 
 package org.n52.sos.web.install;
 
+import org.n52.sos.web.JdbcUrl;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -118,7 +119,7 @@ public class InstallFinishController extends AbstractInstallController {
 
         /* get the database properties */
         String driver = (String) settings.get(InstallConstants.DRIVER_PARAMETER);
-        String connectionString = (String) settings.get(InstallConstants.JDBC_PARAMETER);
+        String connectionString = (String) settings.get(ControllerConstants.JDBC_PARAMETER);
         String dialect = (String) settings.get(InstallConstants.JDBC_DIALECT_PARAMETER);
         String connectionPool = (String) settings.get(InstallConstants.CONNECTION_POOL_PARAMETER);
         
@@ -133,11 +134,8 @@ public class InstallFinishController extends AbstractInstallController {
             return error(settings, error);
         }
 
-        Properties properties = new Properties();
-        properties.put(HibernateConstants.CONNECTION_STRING_PROPERTY, jdbc.getConnectionString());
+        Properties properties = jdbc.toProperties();
         properties.put(HibernateConstants.DRIVER_PROPERTY, driver);
-        properties.put(HibernateConstants.USER_PROPERTY, jdbc.getUser());
-        properties.put(HibernateConstants.PASS_PROPERTY, jdbc.getPassword());
         properties.put(HibernateConstants.CONNECTION_POOL_PROPERTY, connectionPool);
         properties.put(HibernateConstants.DIALECT_PROPERTY, dialect);
 

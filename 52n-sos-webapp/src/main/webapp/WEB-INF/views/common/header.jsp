@@ -93,6 +93,11 @@
 													</a>
 												</li>
 												<li>
+													<a href="<c:url value="/admin/database/settings" />">
+														<span class="menu-title">Database Settings</span>
+													</a>
+												</li>
+												<li>
 													<a href="<c:url value="/admin/reset" />">
 														<span class="menu-title">Reset</span>
 													</a>

@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.n52.sos.web.AbstractController;
+import org.n52.sos.web.ControllerConstants;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -47,7 +48,7 @@ public abstract class AbstractInstallController extends AbstractController {
     }
 
     protected Map<String, Object> getSettings(HttpSession s) {
-        s.removeAttribute(InstallConstants.ERROR_MESSAGE_ATTRIBUTE);
+        s.removeAttribute(ControllerConstants.ERROR_MESSAGE_ATTRIBUTE);
         Map<String, Object> settings = new HashMap<String, Object>();
         Enumeration< ? > e = s.getAttributeNames();
         while (e.hasMoreElements()) {
@@ -74,19 +75,19 @@ public abstract class AbstractInstallController extends AbstractController {
     }
 
     protected boolean hasError(Map<String, Object> settings) {
-        return settings.containsKey(InstallConstants.ERROR_MESSAGE_ATTRIBUTE);
+        return settings.containsKey(ControllerConstants.ERROR_MESSAGE_ATTRIBUTE);
     }
 
     protected Map<String, Object> error(Map<String, Object> settings, String message) {
         log.error(message);
-        settings.put(InstallConstants.ERROR_MESSAGE_ATTRIBUTE, message);
+        settings.put(ControllerConstants.ERROR_MESSAGE_ATTRIBUTE, message);
         settings.put(InstallConstants.SUCCESS, Boolean.FALSE);
         return settings;
     }
 
     protected Map<String, Object> error(Map<String, Object> settings, String message, Throwable t) {
         log.error(message, t);
-        settings.put(InstallConstants.ERROR_MESSAGE_ATTRIBUTE, message);
+        settings.put(ControllerConstants.ERROR_MESSAGE_ATTRIBUTE, message);
         settings.put(InstallConstants.SUCCESS, Boolean.FALSE);
         return settings;
     }

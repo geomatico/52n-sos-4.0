@@ -21,16 +21,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-
 package org.n52.sos.web;
 
 public interface ControllerConstants {
 
     public static interface Views {
+
         public static final String INDEX = "index";
         public static final String CLIENT = "client";
         public static final String ADMIN_INDEX = "admin/index";
         public static final String ADMIN_DATABASE = "admin/database";
+        public static final String ADMIN_DATABASE_SETTINGS = "admin/database-settings";
         public static final String ADMIN_LOGIN = "admin/login";
         public static final String ADMIN_RESET = "admin/reset";
         public static final String ADMIN_SETTINGS = "admin/settings";
@@ -42,6 +43,7 @@ public interface ControllerConstants {
     }
 
     public static interface Paths {
+
         public static final String ROOT = "/";
         public static final String INDEX = "/index";
         public static final String CLIENT = "/client";
@@ -52,10 +54,10 @@ public interface ControllerConstants {
         public static final String ADMIN_SETTINGS_UPDATE = "/admin/settings";
         public static final String ADMIN_DATABASE = "/admin/database";
         public static final String ADMIN_DATABASE_EXECUTE = "/admin/database";
+        public static final String ADMIN_DATABASE_SETTINGS = "/admin/database/settings";
         public static final String ADMIN_RELOAD_CAPABILITIES_CACHE = "/admin/cache/reload";
         public static final String ADMIN_DATABASE_REMOVE_TEST_DATA = "/admin/database/testdata/remove";
         public static final String ADMIN_DATABASE_CREATE_TEST_DATA = "/admin/database/testdata/create";
-
         public static final String ADMIN_RESET = "/admin/reset";
         public static final String INSTALL_ROOT = "/install";
         public static final String INSTALL_INDEX = "/install/index";
@@ -66,7 +68,8 @@ public interface ControllerConstants {
         public static final String LOGIN = "/login";
         public static final String LOGOUT = "/j_spring_security_logout";
     }
-
+    public static final String ERROR_MESSAGE_ATTRIBUTE = "error";
+    public static final String JDBC_PARAMETER = "jdbc_uri";
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
 
     /* SQL file paths */
