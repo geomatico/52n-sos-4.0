@@ -93,7 +93,7 @@ public class SosGetCapabilitiesOperatorV20 implements IRequestOperator {
      * .AbstractSosRequest)
      */
     @Override
-    public synchronized ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
+    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
         GetCapabilitiesRequest sosRequest;
         if (request instanceof GetCapabilitiesRequest) {
             sosRequest = (GetCapabilitiesRequest) request;

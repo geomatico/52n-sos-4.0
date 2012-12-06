@@ -95,7 +95,7 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
      * .AbstractSosRequest)
      */
     @Override
-    public synchronized ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
+    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
         if (request instanceof GetObservationRequest) {
 
             GetObservationRequest sosRequest = (GetObservationRequest) request;
