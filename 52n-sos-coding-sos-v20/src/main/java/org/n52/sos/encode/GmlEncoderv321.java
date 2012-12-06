@@ -30,10 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 import net.opengis.gml.x32.AbstractRingPropertyType;
 import net.opengis.gml.x32.AbstractRingType;
+import net.opengis.gml.x32.CodeWithAuthorityType;
 import net.opengis.gml.x32.DirectPositionListType;
 import net.opengis.gml.x32.DirectPositionType;
 import net.opengis.gml.x32.LineStringType;
@@ -50,6 +49,7 @@ import net.opengis.gml.x32.TimePositionType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
+import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -133,7 +133,13 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
             return createPosition((Geometry) element, additionalValues.get(HelperValues.GMLID));
         }
         if (element instanceof CategoryValue) {
-            return createReferenceType((CategoryValue) element);
+            return createReferenceTypeForCategroyValue((CategoryValue) element);
+        }
+        if (element instanceof org.n52.sos.ogc.gml.ReferenceType) {
+            return createReferencType((org.n52.sos.ogc.gml.ReferenceType) element);
+        }
+        if (element instanceof CodeWithAuthority) {
+            return createCodeWithAuthorityType((CodeWithAuthority) element);
         }
         return null;
     }
@@ -403,7 +409,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
         }
     }
 
-    private XmlObject createReferenceType(CategoryValue categoryValue) {
+    private XmlObject createReferenceTypeForCategroyValue(CategoryValue categoryValue) {
         ReferenceType xbRef = ReferenceType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (categoryValue.getValue() != null && !categoryValue.getValue().isEmpty()) {
             if (categoryValue.getValue().startsWith("http://")) {
@@ -415,6 +421,32 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
             xbRef.setNil();
         }
         return xbRef;
+    }
+    
+    private XmlObject createReferencType(org.n52.sos.ogc.gml.ReferenceType sosReferenceType) {
+        if (sosReferenceType.isSetHref()) {
+            ReferenceType referenceType = ReferenceType.Factory.newInstance();
+            referenceType.setHref(sosReferenceType.getHref());
+            if (sosReferenceType.isSetTitle()) {
+                referenceType.setTitle(sosReferenceType.getTitle());
+            }
+            if (sosReferenceType.isSetRole()) {
+                referenceType.setRole(sosReferenceType.getRole());
+            }
+            return referenceType;
+        }
+        return null;
+        
+    }
+    
+    private XmlObject createCodeWithAuthorityType(CodeWithAuthority sosCodeWithAuthority) {
+        if (sosCodeWithAuthority.isSetValue()) {
+            CodeWithAuthorityType codeWithAuthority = CodeWithAuthorityType.Factory.newInstance();
+            codeWithAuthority.setStringValue(sosCodeWithAuthority.getValue());
+            codeWithAuthority.setCodeSpace(sosCodeWithAuthority.getCodeSpace());
+            return codeWithAuthority;
+        }
+        return null;
     }
 
 }

@@ -45,6 +45,7 @@ import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Quality;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.entities.TextValue;
+import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
@@ -253,7 +254,7 @@ public class HibernateObservationUtilities {
                         // observation new => create new one
                         SosObservation sosObservation = new SosObservation();
                         sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
-                        sosObservation.setIdentifier(hObservation.getIdentifier());
+                        sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
                         sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
                         sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
                         sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
@@ -292,7 +293,7 @@ public class HibernateObservationUtilities {
 
                         o = new SosObservation();
                         o.setObservationID(Long.toString(hObservation.getObservationId()));
-                        o.setIdentifier(hObservation.getIdentifier());
+                        o.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
                         o.setNoDataValue(Configurator.getInstance().getNoDataValue());
                         o.setTokenSeparator(sweTextEncoding.getTokenSeparator());
                         o.setTupleSeparator(sweTextEncoding.getBlockSeparator());
@@ -323,7 +324,7 @@ public class HibernateObservationUtilities {
                 } else {
                     SosObservation sosObservation = new SosObservation();
                     sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
-                    sosObservation.setIdentifier(hObservation.getIdentifier());
+                    sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
                     sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
                     sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
                     sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());

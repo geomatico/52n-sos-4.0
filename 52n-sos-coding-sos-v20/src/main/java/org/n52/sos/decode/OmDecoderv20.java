@@ -39,6 +39,7 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlInteger;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
+import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
@@ -143,9 +144,18 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
         return sosObservation;
     }
 
-    private String getIdentifier(OMObservationType omObservation) {
+    private CodeWithAuthority getIdentifier(OMObservationType omObservation) throws OwsExceptionReport {
         if (omObservation.getIdentifier() != null) {
-            return omObservation.getIdentifier().getStringValue();
+            String namespace = XmlHelper.getNamespace(omObservation.getPhenomenonTime().getAbstractTimeObject());
+            List<IDecoder> decoderList = Configurator.getInstance().getDecoder(XmlHelper.getNamespace(omObservation.getIdentifier()));
+            if (decoderList != null) {
+                for (IDecoder decoder : decoderList) {
+                    Object decodedObject = decoder.decode(omObservation.getIdentifier());
+                    if (decodedObject != null && decodedObject instanceof CodeWithAuthority) {
+                        return (CodeWithAuthority) decodedObject;
+                    }
+                }
+            }
         }
         return null;
     }

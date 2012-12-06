@@ -51,6 +51,7 @@ import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.entities.TextValue;
 import org.n52.sos.ds.hibernate.entities.Unit;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
+import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosSingleObservationValue;
@@ -467,8 +468,8 @@ public class HibernateCriteriaTransactionalUtilities {
         SosSingleObservationValue value = (SosSingleObservationValue) observation.getValue();
         Observation hObservation = new Observation();
         hObservation.setDeleted(false);
-        if (observation.getIdentifier() != null && !observation.getIdentifier().isEmpty()) {
-            hObservation.setIdentifier(observation.getIdentifier());
+        if (observation.getIdentifier() != null && !observation.getIdentifier().isSetValue()) {
+            hObservation.setIdentifier(observation.getIdentifier().getValue());
         }
         if (antiSubsettingId != null && !antiSubsettingId.isEmpty()) {
             hObservation.setAntiSubsetting(antiSubsettingId);
@@ -506,15 +507,15 @@ public class HibernateCriteriaTransactionalUtilities {
             String antiSubsettingId,
             String idExtension)
     {
-        if (containerObservation.getIdentifier() != null && !containerObservation.getIdentifier().isEmpty()) {
+        if (containerObservation.getIdentifier() != null && !containerObservation.getIdentifier().isSetValue()) {
             String subObservationIdentifier = String.format("%s-%s", antiSubsettingId, idExtension); 
-            sosObservation.setIdentifier(subObservationIdentifier);    
+            sosObservation.setIdentifier(new CodeWithAuthority(subObservationIdentifier));    
         }
     }
 
     private static String getAntiSubsettingId(SosObservation containerObservation)
     {
-        String antiSubsettingId = containerObservation.getIdentifier();
+        String antiSubsettingId = containerObservation.getIdentifier().getValue();
         if (antiSubsettingId == null || antiSubsettingId.isEmpty()) {
             // if identifier of sweArrayObservation is not set, generate UUID for antisubsetting column
             antiSubsettingId = UUID.randomUUID().toString();

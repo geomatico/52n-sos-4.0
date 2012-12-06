@@ -26,6 +26,7 @@ package org.n52.sos.ogc.om;
 import java.io.Serializable;
 import java.util.List;
 
+import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
@@ -49,7 +50,7 @@ public class SosObservation implements Serializable {
     /**
      * identifier of this observation gml:identifier
      */
-    private String identifier;
+    private CodeWithAuthority identifier;
 
     /** result time of the observation */
     private TimeInstant resultTime;
@@ -135,7 +136,7 @@ public class SosObservation implements Serializable {
      * 
      * @return the identifier
      */
-    public String getIdentifier() {
+    public CodeWithAuthority getIdentifier() {
         return identifier;
     }
 
@@ -145,7 +146,7 @@ public class SosObservation implements Serializable {
      * @param identifier
      *            the identifier to set
      */
-    public void setIdentifier(String identifier) {
+    public void setIdentifier(CodeWithAuthority identifier) {
         this.identifier = identifier;
     }
 

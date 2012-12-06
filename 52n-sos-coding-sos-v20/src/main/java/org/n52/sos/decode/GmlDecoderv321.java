@@ -33,6 +33,7 @@ import java.util.Set;
 import net.opengis.gml.x32.AbstractRingPropertyType;
 import net.opengis.gml.x32.AbstractRingType;
 import net.opengis.gml.x32.AbstractSurfaceType;
+import net.opengis.gml.x32.CodeWithAuthorityType;
 import net.opengis.gml.x32.CompositeSurfaceType;
 import net.opengis.gml.x32.CoordinatesType;
 import net.opengis.gml.x32.DirectPositionListType;
@@ -54,6 +55,7 @@ import net.opengis.gml.x32.TimePositionType;
 
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
+import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
@@ -143,6 +145,8 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
             return parsePolygonType((PolygonType) xmlObject);
         } else if (xmlObject instanceof CompositeSurfaceType) {
             return parseCompositeSurfaceType((CompositeSurfaceType) xmlObject);
+        } else if (xmlObject.schemaType() == CodeWithAuthorityType.type) {
+            return parseCodeWithAuthorityTye((CodeWithAuthorityType) xmlObject);
         }
         return null;
     }
@@ -496,6 +500,14 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         Geometry geom = factory.createMultiPolygon(polygons.toArray(new Polygon[polygons.size()]));
         geom.setSRID(srid);
         return geom;
+    }
+
+    private Object parseCodeWithAuthorityTye(CodeWithAuthorityType xmlObject) {
+        if (xmlObject.getStringValue() != null && !xmlObject.getStringValue().isEmpty()) {
+            CodeWithAuthority codeWithAuthority = new CodeWithAuthority(xmlObject.getStringValue());
+            codeWithAuthority.setCodeSpace(xmlObject.getCodeSpace());
+        }
+        return null;
     }
 
     /**

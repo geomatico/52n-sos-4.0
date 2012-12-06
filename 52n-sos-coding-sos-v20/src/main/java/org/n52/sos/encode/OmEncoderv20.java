@@ -191,10 +191,15 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
             observationID = xbObs.getId().replace("o_", "");
         }
         if (sosObservation.getIdentifier() != null) {
-            CodeWithAuthorityType identifier = xbObs.addNewIdentifier();
-            identifier.setStringValue(sosObservation.getIdentifier());
-            // FIXME get codespace from sosObservation (store codespace).
-            identifier.setCodeSpace("");
+            IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
+            if (encoder != null) {
+                XmlObject xmlObject =
+                        (XmlObject) encoder.encode(sosObservation.getIdentifier());
+                xbObs.addNewIdentifier().set(xmlObject);
+            } else {
+                String exceptionText = "Error while encoding geometry value, needed encoder is missing!";
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            }
         }
 
         String observationType = sosObservation.getObservationConstellation().getObservationType();
