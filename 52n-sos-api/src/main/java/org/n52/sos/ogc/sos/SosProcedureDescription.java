@@ -33,6 +33,8 @@ public abstract class SosProcedureDescription {
 
     public abstract SosOffering getOfferingIdentifier();
     
+    public abstract String getProcedureDescriptionFormat();
+    
     public String getSensorDescriptionXmlString() {
         return sensorDescriptionXmlString;
     }

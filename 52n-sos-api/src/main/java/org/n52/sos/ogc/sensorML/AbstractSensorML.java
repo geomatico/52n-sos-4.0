@@ -164,4 +164,9 @@ public class AbstractSensorML extends SosProcedureDescription {
         }
         return null;
     }
+
+    @Override
+    public String getProcedureDescriptionFormat() {
+        return SensorMLConstants.NS_SML;
+    }
 }
