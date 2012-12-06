@@ -55,20 +55,20 @@ public class ReferenceType {
         this.role = role;
     }
     
-    public boolean hasHref() {
+    public boolean isSetHref() {
         return href != null && !href.isEmpty();
     }
     
-    public boolean hasTitle() {
+    public boolean isSetTitle() {
         return title != null && !title.isEmpty();
     }
     
-    public boolean hasRole() {
+    public boolean isSetRole() {
         return role != null && !role.isEmpty();
     }
     
     public boolean hasValues() {
-        return hasHref() && hasRole() && hasTitle();
+        return isSetHref() && isSetRole() && isSetTitle();
     }
 
 }
