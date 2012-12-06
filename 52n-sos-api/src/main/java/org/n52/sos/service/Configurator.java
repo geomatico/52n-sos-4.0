@@ -44,6 +44,8 @@ import javax.servlet.UnavailableException;
 
 import org.n52.sos.binding.Binding;
 import org.n52.sos.cache.ACapabilitiesCacheController;
+import org.n52.sos.convert.ConverterKeyType;
+import org.n52.sos.convert.IConverter;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.IDecoder;
 import org.n52.sos.ds.ICacheFeederDAO;
@@ -92,8 +94,8 @@ public final class Configurator {
      */
     private boolean childProceduresEncodedInParentsDescribeSensor = false;
 
-    /**se
-     * Implementation of ICacheFeederDAO
+    /**
+     * se Implementation of ICacheFeederDAO
      */
     private ICacheFeederDAO cacheFeederDAO;
 
@@ -109,6 +111,8 @@ public final class Configurator {
      * Implementation of IConnectionProvider
      */
     private IConnectionProvider connectionProvider;
+
+    private Map<ConverterKeyType, IConverter> converter = new HashMap<ConverterKeyType, IConverter>(0);
 
     private IDataSourceInitializator dataSourceInitializator;
 
@@ -166,7 +170,8 @@ public final class Configurator {
     private String noDataValue;
 
     /** Implemented ISosRequestListener */
-    private Map<ServiceOperatorKeyType, IServiceOperator> serviceOperators = new HashMap<ServiceOperatorKeyType, IServiceOperator>(0);
+    private Map<ServiceOperatorKeyType, IServiceOperator> serviceOperators =
+            new HashMap<ServiceOperatorKeyType, IServiceOperator>(0);
 
     /** directory of sensor descriptions in SensorML format */
     private File sensorDir;
@@ -176,14 +181,19 @@ public final class Configurator {
 
     /** service identification keyword strings */
     private String[] serviceIdentificationKeywords;
-	private String serviceIdentificationTitle;
-	private String serviceIdentificationAbstract;
-	private String serviceIdentificationServiceType;
-	private String serviceIdentificationFees;
-	private String serviceIdentificationAccessConstraints;
+
+    private String serviceIdentificationTitle;
+
+    private String serviceIdentificationAbstract;
+
+    private String serviceIdentificationServiceType;
+
+    private String serviceIdentificationFees;
+
+    private String serviceIdentificationAccessConstraints;
 
     private ServiceLoader<IAdminServiceOperator> serviceLoaderAdminServiceOperator;
-    
+
     private ServiceLoader<IAdminRequestOperator> serviceLoaderAdminRequesteOperator;
 
     /** ServiceLoader for ICacheFeederDAO */
@@ -191,6 +201,9 @@ public final class Configurator {
 
     /** ServiceLoader for ACapabilitiesCacheController */
     private ServiceLoader<ACapabilitiesCacheController> serviceLoaderCapabilitiesCacheController;
+
+    /** ServiceLoader for IConverter */
+    private ServiceLoader<IConverter> serviceLoaderConverter;
 
     /** ServiceLoader for ISosRequestOperator */
     private ServiceLoader<Binding> serviceLoaderBindingOperator;
@@ -217,19 +230,30 @@ public final class Configurator {
 
     /** file of service provider information in XML format */
     private File serviceProvider;
-	
-	private String serviceProviderName;
-	private String serviceProviderSite;
-	private String serviceProviderIndividualName;
-	private String serviceProviderPositionName;
-	private String serviceProviderPhone;
-	private String serviceProviderDeliveryPoint;
-	private String serviceProviderCity;
-	private String serviceProviderPostalCode;
-	private String serviceProviderCountry;
-	private String serviceProviderMailAddress;
-	private String serviceProviderAdministrativeArea;
-	private int minimumGzipSize;
+
+    private String serviceProviderName;
+
+    private String serviceProviderSite;
+
+    private String serviceProviderIndividualName;
+
+    private String serviceProviderPositionName;
+
+    private String serviceProviderPhone;
+
+    private String serviceProviderDeliveryPoint;
+
+    private String serviceProviderCity;
+
+    private String serviceProviderPostalCode;
+
+    private String serviceProviderCountry;
+
+    private String serviceProviderMailAddress;
+
+    private String serviceProviderAdministrativeArea;
+
+    private int minimumGzipSize;
 
     /** URL of this service */
     private String serviceURL;
@@ -263,14 +287,14 @@ public final class Configurator {
      */
     private Map<String, Binding> bindingOperators = new HashMap<String, Binding>(0);
 
-    private Map<RequestOperatorKeyType, IRequestOperator> requestOperators = new HashMap<RequestOperatorKeyType, IRequestOperator>(0);
+    private Map<RequestOperatorKeyType, IRequestOperator> requestOperators =
+            new HashMap<RequestOperatorKeyType, IRequestOperator>(0);
 
     /**
      * Implementation of ASosAdminRequestOperator
      */
     private IAdminServiceOperator adminServiceOperator;
-    
-    
+
     private Map<String, IAdminRequestOperator> adminRequestOperators = new HashMap<String, IAdminRequestOperator>(0);
 
     /**
@@ -291,10 +315,10 @@ public final class Configurator {
 
     /** supported SOS versions */
     private Set<String> supportedVersions = new HashSet<String>(0);
-    
+
     /** supported services */
     private Set<String> supportedServices = new HashSet<String>(0);
-    
+
     /** boolean indicates the order of x and y components of coordinates */
     private List<Range> switchCoordinatesForEPSG;
 
@@ -307,10 +331,9 @@ public final class Configurator {
     private String tupleSeperator;
 
     /** update interval for capabilities cache */
-	private long updateIntervall;
-	
-	
-	private Properties connectionProviderProperties;
+    private long updateIntervall;
+
+    private Properties connectionProviderProperties;
 
     /**
      * private constructor due to the singelton pattern.
@@ -328,348 +351,358 @@ public final class Configurator {
      * @throws IOException
      */
     private Configurator(Properties config, String basepath) throws ConfigurationException {
-		if (basepath == null) {
-			String message = "No basepath available!";
-			LOGGER.info(message);
-			throw new ConfigurationException(message);
-		}
-		if (config == null) {
-			String message = "No connection provider configuration available!";
-			LOGGER.info(message);
-			throw new ConfigurationException(message);
-		}
-		
-		this.basepath = basepath;
-		this.connectionProviderProperties = config;
+        if (basepath == null) {
+            String message = "No basepath available!";
+            LOGGER.info(message);
+            throw new ConfigurationException(message);
+        }
+        if (config == null) {
+            String message = "No connection provider configuration available!";
+            LOGGER.info(message);
+            throw new ConfigurationException(message);
+        }
+
+        this.basepath = basepath;
+        this.connectionProviderProperties = config;
         LOGGER.info("\n******\nConfig File loaded successfully!\n******\n");
     }
-	
-	public void changeSetting(Setting setting, String newValue) throws ConfigurationException {
-		setSetting(setting, newValue, false);
-	}
-	
-	private void setSetting(Setting setting, String value, boolean initial) throws ConfigurationException {
-		/* TODO check what has to be reinitialized when settings change */
-		switch(setting) {
-			case CAPABILITIES_CACHE_UPDATE_INTERVAL:
-				int capCacheUpdateIntervall = parseInteger(setting, value);
-				if (this.updateIntervall != capCacheUpdateIntervall) {
-					this.updateIntervall  = capCacheUpdateIntervall;
-				}
-				if (!initial) {
-					this.capabilitiesCacheController.reschedule();
-				}
-				break;
-			case CHARACTER_ENCODING:
-				if (value == null || value.isEmpty()) {
-					String exceptionText = "No characterEnoding is defined in the config file!";
-					LOGGER.error(exceptionText);
-					throw new ConfigurationException(exceptionText);
-				}
-				this.characterEncoding = value;
-				XmlOptionsHelper.getInstance(this.characterEncoding, true);
-				break;
-			case CHILD_PROCEDURES_ENCODED_IN_PARENTS_DESCRIBE_SENSOR:
-				this.childProceduresEncodedInParentsDescribeSensor = parseBoolean(setting, value);
-				break;
-			case DEFAULT_OFFERING_PREFIX:
-				this.defaultOfferingPrefix = parseString(setting, value, true);
-				break;
-			case DEFAULT_PROCEDURE_PREFIX:
-				this.defaultProcedurePrefix = parseString(setting, value, true);
-				break;
-			case FOI_ENCODED_IN_OBSERVATION:
-				this.foiEncodedInObservation = parseBoolean(setting, value);
-				break;
-			case FOI_LISTED_IN_OFFERINGS:
-				this.foiListedInOfferings = parseBoolean(setting, value);
-				break;
-			case GML_DATE_FORMAT:
-				this.gmlDateFormat = parseString(setting, value, true);
-				if (this.gmlDateFormat != null && !this.gmlDateFormat.isEmpty()) {
-					DateTimeHelper.setResponseFormat(this.gmlDateFormat);
-				}
-				break;
-			case LEASE:
-				if (value == null | value.isEmpty()) {
-					String exceptionText =
-							"No lease is defined in the config file! Please set the lease property on an integer value!";
-					LOGGER.error(exceptionText);
-					throw new ConfigurationException(exceptionText);
-				}
-				this.lease = Integer.valueOf(value).intValue();
-				break;
-			case MAX_GET_OBSERVATION_RESULTS:
-				this.maxGetObsResults = parseInteger(setting, value);
-				break;
-			case NO_DATA_VALUE:
-				this.noDataValue = parseString(setting, value, false);
-				break;
-			case SENSOR_DIRECTORY:
-				this.sensorDir = parseFile(setting, value, true);
-				break;
-			case SHOW_FULL_OPERATIONS_METADATA:
-				this.showFullOperationsMetadata = parseBoolean(setting, value);
-				break;
-			case SHOW_FULL_OPERATIONS_METADATA_FOR_OBSERVATIONS:
-				this.showFullOperationsMetadata4Observations = parseBoolean(setting, value);
-				break;
-			case SKIP_DUPLICATE_OBSERVATIONS:
-				this.skipDuplicateObservations = parseBoolean(setting, value);
-				break;
-			case SOS_URL:
-				setServiceURL(parseString(setting, value, false));
-				break;
-			case SUPPORTS_QUALITY:
-				this.supportsQuality = parseBoolean(setting, value);
-				break;
-			case DEFAULT_EPSG:
-				this.defaultEPSG = parseInteger(setting, value);
-				break;
-			case SRS_NAME_PREFIX_SOS_V1:
-				String srsPrefixV1 = parseString(setting, value, true);
-				if (!srsPrefixV1.endsWith(":") && srsPrefixV1.length() != 0) {
-					srsPrefixV1 += ":";
-				}
-				this.srsNamePrefix = srsPrefixV1;
-				break;
-			case SRS_NAME_PREFIX_SOS_V2:
-				String srsPrefixV2 = parseString(setting, value, true);
-				if (!srsPrefixV2.endsWith("/") && srsPrefixV2.length() != 0) {
-					srsPrefixV2 += "/";
-				}
-				this.srsNamePrefixSosV2 = srsPrefixV2;
-				break;
-			case SWITCH_COORDINATES_FOR_EPSG_CODES:
-				String[] switchCoordinatesForEPSGStrings = parseString(setting, value, true).split(";");
-				this.switchCoordinatesForEPSG = new ArrayList<Range>(switchCoordinatesForEPSGStrings.length);
-				for (String switchCoordinatesForEPSGEntry : switchCoordinatesForEPSGStrings) {
-					String[] splittedSwitchCoordinatesForEPSGEntry = switchCoordinatesForEPSGEntry.split("-");
-					if (splittedSwitchCoordinatesForEPSGEntry.length == 1) {
-						Range r =
-								new Range(Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[0]),
-										Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[0]));
-						switchCoordinatesForEPSG.add(r);
-					} else if (splittedSwitchCoordinatesForEPSGEntry.length == 2) {
-						Range r =
-								new Range(Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[0]),
-										Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[1]));
-						switchCoordinatesForEPSG.add(r);
-					} else {
-						StringBuilder exceptionText = new StringBuilder();
-						exceptionText.append("Invalid format of entry in 'switchCoordinatesForEPSG': ");
-						exceptionText.append(switchCoordinatesForEPSGEntry);
-						LOGGER.error(exceptionText.toString());
-						throw new ConfigurationException(exceptionText.toString());
-					}
-				}
-				break;
-			case TOKEN_SEPERATOR:
-				this.tokenSeperator = parseString(setting, value, false);
-				break;
-			case DECIMAL_SEPARATOR:
-				this.decimalSeparator = parseString(setting, value, false);
-				break;
-			case TUPLE_SEPERATOR:
-				this.tupleSeperator = parseString(setting, value, false);
-				break;
-			case SERVICE_PROVIDER_FILE:
-				this.serviceProvider = parseFile(setting, value, true);
-				break;
-			case SERVICE_PROVIDER_NAME:
-				this.serviceProviderName = parseString(setting, value, true);
-				break;
-			case SERVICE_PROVIDER_SITE:
-				this.serviceProviderSite = parseString(setting, value, true);
-				break;
-			case SERVICE_PROVIDER_INDIVIDUAL_NAME:
-				this.serviceProviderIndividualName = parseString(setting, value, true);
-				break;
-			case SERVICE_PROVIDER_POSITION_NAME:
-				this.serviceProviderPositionName = parseString(setting, value, true);
-				break;
-			case SERVICE_PROVIDER_PHONE:
-				this.serviceProviderPhone = parseString(setting, value, true);
-				break;
-			case SERVICE_PROVIDER_ADDRESS:
-				this.serviceProviderDeliveryPoint = parseString(setting, value, true);
-				break;
-			case SERVICE_PROVIDER_CITY:
-				this.serviceProviderCity = parseString(setting, value, true);
-				break;
-			case SERVICE_PROVIDER_ZIP:
-				this.serviceProviderPostalCode = parseString(setting, value, true);
-				break;
-			case SERVICE_PROVIDER_STATE:
-				this.serviceProviderAdministrativeArea = parseString(setting, value, true);
-				break;
-			case SERVICE_PROVIDER_COUNTRY:
-				this.serviceProviderCountry = parseString(setting, value, true);
-				break;
-			case SERVICE_PROVIDER_EMAIL:
-				this.serviceProviderMailAddress = parseString(setting, value, true);
-				break;
-			case SERVICE_IDENTIFICATION_FILE:
-				this.serviceIdentification = parseFile(setting, value, true);
-				break;
-			case SERVICE_IDENTIFICATION_KEYWORDS:
-				String keywords = parseString(setting, value, true);
-				if (keywords != null) {
-                    String[] keywordArray = keywords.split(",");
-                    ArrayList<String> keywordList = new ArrayList<String>(keywordArray.length);
-                    for (String s : keywordArray) {
-                        if (s != null && !s.trim().isEmpty()) {
-                            keywordList.add(s.trim());
-                        }
+
+    public void changeSetting(Setting setting, String newValue) throws ConfigurationException {
+        setSetting(setting, newValue, false);
+    }
+
+    private void setSetting(Setting setting, String value, boolean initial) throws ConfigurationException {
+        /* TODO check what has to be reinitialized when settings change */
+        switch (setting) {
+        case CAPABILITIES_CACHE_UPDATE_INTERVAL:
+            int capCacheUpdateIntervall = parseInteger(setting, value);
+            if (this.updateIntervall != capCacheUpdateIntervall) {
+                this.updateIntervall = capCacheUpdateIntervall;
+            }
+            if (!initial) {
+                this.capabilitiesCacheController.reschedule();
+            }
+            break;
+        case CHARACTER_ENCODING:
+            if (value == null || value.isEmpty()) {
+                String exceptionText = "No characterEnoding is defined in the config file!";
+                LOGGER.error(exceptionText);
+                throw new ConfigurationException(exceptionText);
+            }
+            this.characterEncoding = value;
+            XmlOptionsHelper.getInstance(this.characterEncoding, true);
+            break;
+        case CHILD_PROCEDURES_ENCODED_IN_PARENTS_DESCRIBE_SENSOR:
+            this.childProceduresEncodedInParentsDescribeSensor = parseBoolean(setting, value);
+            break;
+        case DEFAULT_OFFERING_PREFIX:
+            this.defaultOfferingPrefix = parseString(setting, value, true);
+            break;
+        case DEFAULT_PROCEDURE_PREFIX:
+            this.defaultProcedurePrefix = parseString(setting, value, true);
+            break;
+        case FOI_ENCODED_IN_OBSERVATION:
+            this.foiEncodedInObservation = parseBoolean(setting, value);
+            break;
+        case FOI_LISTED_IN_OFFERINGS:
+            this.foiListedInOfferings = parseBoolean(setting, value);
+            break;
+        case GML_DATE_FORMAT:
+            this.gmlDateFormat = parseString(setting, value, true);
+            if (this.gmlDateFormat != null && !this.gmlDateFormat.isEmpty()) {
+                DateTimeHelper.setResponseFormat(this.gmlDateFormat);
+            }
+            break;
+        case LEASE:
+            if (value == null | value.isEmpty()) {
+                String exceptionText =
+                        "No lease is defined in the config file! Please set the lease property on an integer value!";
+                LOGGER.error(exceptionText);
+                throw new ConfigurationException(exceptionText);
+            }
+            this.lease = Integer.valueOf(value).intValue();
+            break;
+        case MAX_GET_OBSERVATION_RESULTS:
+            this.maxGetObsResults = parseInteger(setting, value);
+            break;
+        case NO_DATA_VALUE:
+            this.noDataValue = parseString(setting, value, false);
+            break;
+        case SENSOR_DIRECTORY:
+            this.sensorDir = parseFile(setting, value, true);
+            break;
+        case SHOW_FULL_OPERATIONS_METADATA:
+            this.showFullOperationsMetadata = parseBoolean(setting, value);
+            break;
+        case SHOW_FULL_OPERATIONS_METADATA_FOR_OBSERVATIONS:
+            this.showFullOperationsMetadata4Observations = parseBoolean(setting, value);
+            break;
+        case SKIP_DUPLICATE_OBSERVATIONS:
+            this.skipDuplicateObservations = parseBoolean(setting, value);
+            break;
+        case SOS_URL:
+            setServiceURL(parseString(setting, value, false));
+            break;
+        case SUPPORTS_QUALITY:
+            this.supportsQuality = parseBoolean(setting, value);
+            break;
+        case DEFAULT_EPSG:
+            this.defaultEPSG = parseInteger(setting, value);
+            break;
+        case SRS_NAME_PREFIX_SOS_V1:
+            String srsPrefixV1 = parseString(setting, value, true);
+            if (!srsPrefixV1.endsWith(":") && srsPrefixV1.length() != 0) {
+                srsPrefixV1 += ":";
+            }
+            this.srsNamePrefix = srsPrefixV1;
+            break;
+        case SRS_NAME_PREFIX_SOS_V2:
+            String srsPrefixV2 = parseString(setting, value, true);
+            if (!srsPrefixV2.endsWith("/") && srsPrefixV2.length() != 0) {
+                srsPrefixV2 += "/";
+            }
+            this.srsNamePrefixSosV2 = srsPrefixV2;
+            break;
+        case SWITCH_COORDINATES_FOR_EPSG_CODES:
+            String[] switchCoordinatesForEPSGStrings = parseString(setting, value, true).split(";");
+            this.switchCoordinatesForEPSG = new ArrayList<Range>(switchCoordinatesForEPSGStrings.length);
+            for (String switchCoordinatesForEPSGEntry : switchCoordinatesForEPSGStrings) {
+                String[] splittedSwitchCoordinatesForEPSGEntry = switchCoordinatesForEPSGEntry.split("-");
+                if (splittedSwitchCoordinatesForEPSGEntry.length == 1) {
+                    Range r =
+                            new Range(Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[0]),
+                                    Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[0]));
+                    switchCoordinatesForEPSG.add(r);
+                } else if (splittedSwitchCoordinatesForEPSGEntry.length == 2) {
+                    Range r =
+                            new Range(Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[0]),
+                                    Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[1]));
+                    switchCoordinatesForEPSG.add(r);
+                } else {
+                    StringBuilder exceptionText = new StringBuilder();
+                    exceptionText.append("Invalid format of entry in 'switchCoordinatesForEPSG': ");
+                    exceptionText.append(switchCoordinatesForEPSGEntry);
+                    LOGGER.error(exceptionText.toString());
+                    throw new ConfigurationException(exceptionText.toString());
+                }
+            }
+            break;
+        case TOKEN_SEPERATOR:
+            this.tokenSeperator = parseString(setting, value, false);
+            break;
+        case DECIMAL_SEPARATOR:
+            this.decimalSeparator = parseString(setting, value, false);
+            break;
+        case TUPLE_SEPERATOR:
+            this.tupleSeperator = parseString(setting, value, false);
+            break;
+        case SERVICE_PROVIDER_FILE:
+            this.serviceProvider = parseFile(setting, value, true);
+            break;
+        case SERVICE_PROVIDER_NAME:
+            this.serviceProviderName = parseString(setting, value, true);
+            break;
+        case SERVICE_PROVIDER_SITE:
+            this.serviceProviderSite = parseString(setting, value, true);
+            break;
+        case SERVICE_PROVIDER_INDIVIDUAL_NAME:
+            this.serviceProviderIndividualName = parseString(setting, value, true);
+            break;
+        case SERVICE_PROVIDER_POSITION_NAME:
+            this.serviceProviderPositionName = parseString(setting, value, true);
+            break;
+        case SERVICE_PROVIDER_PHONE:
+            this.serviceProviderPhone = parseString(setting, value, true);
+            break;
+        case SERVICE_PROVIDER_ADDRESS:
+            this.serviceProviderDeliveryPoint = parseString(setting, value, true);
+            break;
+        case SERVICE_PROVIDER_CITY:
+            this.serviceProviderCity = parseString(setting, value, true);
+            break;
+        case SERVICE_PROVIDER_ZIP:
+            this.serviceProviderPostalCode = parseString(setting, value, true);
+            break;
+        case SERVICE_PROVIDER_STATE:
+            this.serviceProviderAdministrativeArea = parseString(setting, value, true);
+            break;
+        case SERVICE_PROVIDER_COUNTRY:
+            this.serviceProviderCountry = parseString(setting, value, true);
+            break;
+        case SERVICE_PROVIDER_EMAIL:
+            this.serviceProviderMailAddress = parseString(setting, value, true);
+            break;
+        case SERVICE_IDENTIFICATION_FILE:
+            this.serviceIdentification = parseFile(setting, value, true);
+            break;
+        case SERVICE_IDENTIFICATION_KEYWORDS:
+            String keywords = parseString(setting, value, true);
+            if (keywords != null) {
+                String[] keywordArray = keywords.split(",");
+                ArrayList<String> keywordList = new ArrayList<String>(keywordArray.length);
+                for (String s : keywordArray) {
+                    if (s != null && !s.trim().isEmpty()) {
+                        keywordList.add(s.trim());
                     }
-					this.serviceIdentificationKeywords = keywordList.toArray(new String[keywordList.size()]);
-				} else {
-					this.serviceIdentificationKeywords = new String[0];
-				}
-				break;
-			case SERVICE_IDENTIFICATION_SERVICE_TYPE:
-				this.serviceIdentificationServiceType = parseString(setting, value, true);
-				break;
-			case SERVICE_IDENTIFICATION_TITLE:
-				this.serviceIdentificationTitle = parseString(setting, value, true);
-				break;
-			case SERVICE_IDENTIFICATION_ABSTRACT:
-				this.serviceIdentificationAbstract = parseString(setting, value, true);
-				break;
-			case SERVICE_IDENTIFICATION_FEES:
-				this.serviceIdentificationFees = parseString(setting, value, true);
-				break;
-			case SERVICE_IDENTIFICATION_ACCESS_CONSTRAINTS:
-				this.serviceIdentificationAccessConstraints = parseString(setting, value, true);
-				break;
-			case CONFIGURATION_FILES:
-				String configFileMapString = parseString(setting, value, true);
-				if (configFileMapString != null && !configFileMapString.isEmpty()) {
-					for (String kvp : configFileMapString.split(";")) {
-						String[] keyValue = kvp.split(" ");
-						this.configFileMap.put(keyValue[0], keyValue[1]);
-					}
-				}
-				break;
-			case MINIMUM_GZIP_SIZE:
-				this.minimumGzipSize = parseInteger(setting, value);
-				break;
-			default:
-				String message = "Can not decode setting '" + setting.name() + "'!";
-				LOGGER.error(message);
-		}
-	}
-	private File parseFile(Setting setting, String value, boolean canBeNull) throws ConfigurationException {
-		if (value == null || value.isEmpty()) {
-			return null;
-		}
-		String fileName = parseString(setting, value, canBeNull);
-		if (fileName == null) {
-			return null;
-		}
-		File f = new File (fileName);
-		if (f.exists()) {
-			return f;
-		} else {
-			f = new File(getBasePath() + fileName);
-			if (f.exists()) {
-				return f;
-			} else {
-				StringBuilder exceptionText = new StringBuilder();
-				exceptionText.append("Can not find file '(").append(getBasePath()).append(")").append(fileName).append("'!");
-				LOGGER.error(exceptionText.toString());
-				throw new ConfigurationException(exceptionText.toString());
-			}
-		}
-	}
-	
-	private int parseInteger(Setting setting, String value) throws ConfigurationException {
-		Integer val = null;
-		try {
-			if (value != null && !value.isEmpty()) {
-				val = Integer.valueOf(value);
-			}
-		} catch(NumberFormatException e) {}
-		
-		if (val == null) {
-			String exceptionText =
-					"'" + setting.name() + "' is not properly defined! Please set '" 
-					    + setting.name() + "' property to an integer value!";
-			LOGGER.error(exceptionText);
-			throw new ConfigurationException(exceptionText);
-		} else {
-			return val.intValue();
-		}
-	}
-	
-	private boolean parseBoolean(Setting setting, String value) throws ConfigurationException {
-		Boolean val = null;
-		if (value != null && !value.isEmpty()) {
-			val = value.equalsIgnoreCase("true") ? Boolean.TRUE : 
-					value.equalsIgnoreCase("false") ? Boolean.FALSE : null;
-		}
-		if (val == null) {
-			String exceptionText =
-					"'" + setting.name() + "' is not properly defined! Please set '" 
-					    + setting.name() + "' property to an boolean value!";
-			LOGGER.error(exceptionText);
-			throw new ConfigurationException(exceptionText);
-		} else {
-			return val.booleanValue();
-		}
-	}
-	
-	private String parseString(Setting setting, String value, boolean canBeEmpty) throws ConfigurationException {
-		if (value == null || (value.isEmpty() && !canBeEmpty)) {
-			String exceptionText = "String property '" + setting.name() + "' is not defined!";
+                }
+                this.serviceIdentificationKeywords = keywordList.toArray(new String[keywordList.size()]);
+            } else {
+                this.serviceIdentificationKeywords = new String[0];
+            }
+            break;
+        case SERVICE_IDENTIFICATION_SERVICE_TYPE:
+            this.serviceIdentificationServiceType = parseString(setting, value, true);
+            break;
+        case SERVICE_IDENTIFICATION_TITLE:
+            this.serviceIdentificationTitle = parseString(setting, value, true);
+            break;
+        case SERVICE_IDENTIFICATION_ABSTRACT:
+            this.serviceIdentificationAbstract = parseString(setting, value, true);
+            break;
+        case SERVICE_IDENTIFICATION_FEES:
+            this.serviceIdentificationFees = parseString(setting, value, true);
+            break;
+        case SERVICE_IDENTIFICATION_ACCESS_CONSTRAINTS:
+            this.serviceIdentificationAccessConstraints = parseString(setting, value, true);
+            break;
+        case CONFIGURATION_FILES:
+            String configFileMapString = parseString(setting, value, true);
+            if (configFileMapString != null && !configFileMapString.isEmpty()) {
+                for (String kvp : configFileMapString.split(";")) {
+                    String[] keyValue = kvp.split(" ");
+                    this.configFileMap.put(keyValue[0], keyValue[1]);
+                }
+            }
+            break;
+        case MINIMUM_GZIP_SIZE:
+            this.minimumGzipSize = parseInteger(setting, value);
+            break;
+        default:
+            String message = "Can not decode setting '" + setting.name() + "'!";
+            LOGGER.error(message);
+        }
+    }
+
+    private File parseFile(Setting setting, String value, boolean canBeNull) throws ConfigurationException {
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+        String fileName = parseString(setting, value, canBeNull);
+        if (fileName == null) {
+            return null;
+        }
+        File f = new File(fileName);
+        if (f.exists()) {
+            return f;
+        } else {
+            f = new File(getBasePath() + fileName);
+            if (f.exists()) {
+                return f;
+            } else {
+                StringBuilder exceptionText = new StringBuilder();
+                exceptionText.append("Can not find file '(").append(getBasePath()).append(")").append(fileName)
+                        .append("'!");
+                LOGGER.error(exceptionText.toString());
+                throw new ConfigurationException(exceptionText.toString());
+            }
+        }
+    }
+
+    private int parseInteger(Setting setting, String value) throws ConfigurationException {
+        Integer val = null;
+        try {
+            if (value != null && !value.isEmpty()) {
+                val = Integer.valueOf(value);
+            }
+        } catch (NumberFormatException e) {
+        }
+
+        if (val == null) {
+            String exceptionText =
+                    "'" + setting.name() + "' is not properly defined! Please set '" + setting.name()
+                            + "' property to an integer value!";
             LOGGER.error(exceptionText);
             throw new ConfigurationException(exceptionText);
-		}
-		return value;
-	}
-	
-	private void validate() throws ConfigurationException {
-		/* TODO assert that required fields or xml of service identification are present */
-		/* TODO assert that required fields or xml of service provider are present */
-	}
-	
-	public Properties getConnectionProviderProperties() throws ConfigurationException {
-		return this.connectionProviderProperties;
-	}
-	
+        } else {
+            return val.intValue();
+        }
+    }
+
+    private boolean parseBoolean(Setting setting, String value) throws ConfigurationException {
+        Boolean val = null;
+        if (value != null && !value.isEmpty()) {
+            val =
+                    value.equalsIgnoreCase("true") ? Boolean.TRUE : value.equalsIgnoreCase("false") ? Boolean.FALSE
+                            : null;
+        }
+        if (val == null) {
+            String exceptionText =
+                    "'" + setting.name() + "' is not properly defined! Please set '" + setting.name()
+                            + "' property to an boolean value!";
+            LOGGER.error(exceptionText);
+            throw new ConfigurationException(exceptionText);
+        } else {
+            return val.booleanValue();
+        }
+    }
+
+    private String parseString(Setting setting, String value, boolean canBeEmpty) throws ConfigurationException {
+        if (value == null || (value.isEmpty() && !canBeEmpty)) {
+            String exceptionText = "String property '" + setting.name() + "' is not defined!";
+            LOGGER.error(exceptionText);
+            throw new ConfigurationException(exceptionText);
+        }
+        return value;
+    }
+
+    private void validate() throws ConfigurationException {
+        /*
+         * TODO assert that required fields or xml of service identification are
+         * present
+         */
+        /*
+         * TODO assert that required fields or xml of service provider are
+         * present
+         */
+    }
+
+    public Properties getConnectionProviderProperties() throws ConfigurationException {
+        return this.connectionProviderProperties;
+    }
+
     /**
      * Initialize this class. Since this initialization is not done in the
      * constructor, dependent classes can use the SosConfigurator already when
      * called from here.
      */
     private void initialize() throws ConfigurationException {
-		
-		/* do this first as we need access to the database */
-		initializeConnectionProvider();
-		
-		Iterator<ISettingsDao> i = ServiceLoader.load(ISettingsDao.class).iterator();
-		if (!i.hasNext()) {
-			throw new ConfigurationException("No ISettingsDao implementation is present");
-		}
-		ISettingsDao settingsDao = i.next();
-		
-		Map<String, String> settings;
-		try {
-			settings = settingsDao.get();
-		} catch (SQLException ex) {
-			throw new ConfigurationException("Can not load settings from database", ex);
-		}
-		
-		/* set settings */
-		for (Setting setting : Setting.values()) {
-			String value = settings.get(setting.name());
-			if (value == null) {
-				LOGGER.warn("Setting {} is not present.", setting.name());
-			}
-			setSetting(setting, value, true);
-		}
-		
-		validate();
+
+        /* do this first as we need access to the database */
+        initializeConnectionProvider();
+
+        Iterator<ISettingsDao> i = ServiceLoader.load(ISettingsDao.class).iterator();
+        if (!i.hasNext()) {
+            throw new ConfigurationException("No ISettingsDao implementation is present");
+        }
+        ISettingsDao settingsDao = i.next();
+
+        Map<String, String> settings;
+        try {
+            settings = settingsDao.get();
+        } catch (SQLException ex) {
+            throw new ConfigurationException("Can not load settings from database", ex);
+        }
+
+        /* set settings */
+        for (Setting setting : Setting.values()) {
+            String value = settings.get(setting.name());
+            if (value == null) {
+                LOGGER.warn("Setting {} is not present.", setting.name());
+            }
+            setSetting(setting, value, true);
+        }
+
+        validate();
 
         initializeOperationDAOs();
         initializeServiceOperators();
@@ -677,6 +710,7 @@ public final class Configurator {
         initalizeCacheFeederDAO();
         initalizeDecoder();
         initalizeEncoder();
+        initalizeConverter();
         initializeRequestOperators();
         initializeBindingOperator();
         initializeAdminServiceOperator();
@@ -702,36 +736,37 @@ public final class Configurator {
             taskingExecutor.cancel();
             taskingExecutor = null;
         }
-		instance = null;
+        instance = null;
     }
 
     /**
-	 * @param config 
-	 * @param basepath 
-	 * @return Returns an instance of the SosConfigurator. This method is used
+     * @param config
+     * @param basepath
+     * @return Returns an instance of the SosConfigurator. This method is used
      *         to implement the singelton pattern
      * 
-	 * @throws ConfigurationException if the initialization failed
+     * @throws ConfigurationException
+     *             if the initialization failed
      */
     public static synchronized Configurator getInstance(Properties config, String basepath)
             throws ConfigurationException {
         if (instance == null) {
-			try {
-				instance = new Configurator(config, basepath);
-				instance.initialize();
-			} catch(RuntimeException t) {
-				if (instance != null) {
-					instance.cleanup();
-					instance = null;
-				}
-				throw t;
-			} catch(ConfigurationException t) {
-				if (instance != null) {
-					instance.cleanup();
-					instance = null;
-				}
-				throw t;
-			}
+            try {
+                instance = new Configurator(config, basepath);
+                instance.initialize();
+            } catch (RuntimeException t) {
+                if (instance != null) {
+                    instance.cleanup();
+                    instance = null;
+                }
+                throw t;
+            } catch (ConfigurationException t) {
+                if (instance != null) {
+                    instance.cleanup();
+                    instance = null;
+                }
+                throw t;
+            }
         }
         return instance;
     }
@@ -768,7 +803,7 @@ public final class Configurator {
         }
         LOGGER.info("\n******\n IAdminServiceOperator loaded successfully!\n******\n");
     }
-    
+
     private void initializeAdminRequestOperator() throws ConfigurationException {
         serviceLoaderAdminRequesteOperator = ServiceLoader.load(IAdminRequestOperator.class);
         Iterator<IAdminRequestOperator> iter = serviceLoaderAdminRequesteOperator.iterator();
@@ -785,7 +820,7 @@ public final class Configurator {
             }
         }
         if (this.bindingOperators.isEmpty()) {
-            StringBuilder exceptionText = new StringBuilder(); 
+            StringBuilder exceptionText = new StringBuilder();
             exceptionText.append("No IAdminRequestOperator implementation could be loaded!");
             exceptionText.append(" If the SOS is not used as webapp, this has no effect!");
             exceptionText.append(" Else add a IAdminRequestOperator implementation!");
@@ -847,7 +882,13 @@ public final class Configurator {
             throw new ConfigurationException(owse);
         }
     }
-	
+
+    private void initalizeConverter() throws ConfigurationException {
+        serviceLoaderConverter = ServiceLoader.load(IConverter.class);
+        setConverter();
+        LOGGER.info("\n******\n Converter(s) loaded successfully!\n******\n");
+    }
+
     /**
      * Load the connection provider implementation
      * 
@@ -866,7 +907,7 @@ public final class Configurator {
             LOGGER.error(exceptionText);
             throw new ConfigurationException(exceptionText);
         }
-		this.connectionProvider.initialize(getConnectionProviderProperties());
+        this.connectionProvider.initialize(getConnectionProviderProperties());
         LOGGER.info("\n******\n ConnectionProvider loaded successfully!\n******\n");
     }
 
@@ -999,9 +1040,9 @@ public final class Configurator {
             throw new ConfigurationException(exceptionText);
         }
     }
-    
+
     private void setBindings() throws ConfigurationException {
-		for (Binding iBindingOperator : serviceLoaderBindingOperator) {
+        for (Binding iBindingOperator : serviceLoaderBindingOperator) {
             try {
                 bindingOperators.put(iBindingOperator.getUrlPattern(), iBindingOperator);
             } catch (ServiceConfigurationError sce) {
@@ -1013,7 +1054,7 @@ public final class Configurator {
             }
         }
         if (this.bindingOperators.isEmpty()) {
-            StringBuilder exceptionText = new StringBuilder(); 
+            StringBuilder exceptionText = new StringBuilder();
             exceptionText.append("No Binding implementation could be loaded!");
             exceptionText.append(" If the SOS is not used as webapp, this has no effect!");
             exceptionText.append(" Else add a Binding implementation!");
@@ -1021,8 +1062,21 @@ public final class Configurator {
         }
     }
 
+    private void setConverter() throws ConfigurationException {
+        for (IConverter<?, ?> aConverter : serviceLoaderConverter) {
+            try {
+                for (ConverterKeyType converterKeyType : aConverter.getConverterKeyTypes()) {
+                    converter.put(converterKeyType, aConverter);
+                }
+            } catch (ServiceConfigurationError sce) {
+                LOGGER.warn("An IConverter implementation could not be loaded!", sce);
+            }
+        }
+        // TODO check for encoder/decoder used by converter 
+    }
+
     private void setDecoder() throws ConfigurationException {
-		for (IDecoder<?, ?> aDecoder : serviceLoaderDecoder) {
+        for (IDecoder<?, ?> aDecoder : serviceLoaderDecoder) {
             try {
                 for (DecoderKeyType decoderKeyType : aDecoder.getDecoderKeyTypes()) {
                     if (decoder.containsKey(decoderKeyType)) {
@@ -1046,7 +1100,7 @@ public final class Configurator {
     }
 
     private void setEncoder() throws ConfigurationException {
-		for (IEncoder<?,?> aEncoder : serviceLoaderEncoder) {
+        for (IEncoder<?, ?> aEncoder : serviceLoaderEncoder) {
             try {
                 for (EncoderKeyType encoderKeyType : aEncoder.getEncoderKeyType()) {
                     encoder.put(encoderKeyType, aEncoder);
@@ -1112,7 +1166,7 @@ public final class Configurator {
     }
 
     private void setRequestOperatorMap() throws ConfigurationException {
-		for (IRequestOperator aRequestOperator : serviceLoaderRequestOperators) {
+        for (IRequestOperator aRequestOperator : serviceLoaderRequestOperators) {
             try {
                 requestOperators.put(aRequestOperator.getRequestOperatorKeyType(), aRequestOperator);
             } catch (ServiceConfigurationError sce) {
@@ -1135,7 +1189,7 @@ public final class Configurator {
      *             If no request listener is implemented
      */
     private void setServiceOperatorMap() throws ConfigurationException {
-		for (IServiceOperator iServiceOperator : serviceLoaderServiceOperators) {
+        for (IServiceOperator iServiceOperator : serviceLoaderServiceOperators) {
             try {
                 serviceOperators.put(iServiceOperator.getServiceOperatorKeyType(), iServiceOperator);
                 supportedVersions.add(iServiceOperator.getServiceOperatorKeyType().getVersion());
@@ -1156,6 +1210,13 @@ public final class Configurator {
         serviceLoaderBindingOperator.reload();
         setBindings();
         LOGGER.info("\n******\n Binding(s) re-initialized successfully!\n******\n");
+    }
+    
+    public void updateConverter() throws ConfigurationException {
+        converter.clear();
+        serviceLoaderConverter.reload();
+        setConverter();
+        LOGGER.info("\n******\n Converter(s) re-initialized successfully!\n******\n");
     }
 
     public void updateDecoder() throws ConfigurationException {
@@ -1208,44 +1269,45 @@ public final class Configurator {
     }
 
     /**
-	 * @return Returns the service identification
-	 * @throws OwsExceptionReport  
+     * @return Returns the service identification
+     * @throws OwsExceptionReport
      */
     public SosServiceIdentification getServiceIdentification() throws OwsExceptionReport {
-		SosServiceIdentification sosServiceIdentification = new SosServiceIdentification();
-		if (this.serviceIdentification != null) {
-			sosServiceIdentification.setServiceIdentification(XmlHelper.loadXmlDocumentFromFile(this.serviceIdentification));
-		}
-		sosServiceIdentification.setAbstract(this.serviceIdentificationAbstract);
-		sosServiceIdentification.setAccessConstraints(this.serviceIdentificationAccessConstraints);
-		sosServiceIdentification.setFees(this.serviceIdentificationFees);
-		sosServiceIdentification.setServiceType(this.serviceIdentificationServiceType);
-		sosServiceIdentification.setTitle(this.serviceIdentificationTitle);
-		sosServiceIdentification.setVersions(this.getSupportedVersions());
-		sosServiceIdentification.setKeywords(Arrays.asList(this.serviceIdentificationKeywords));
+        SosServiceIdentification sosServiceIdentification = new SosServiceIdentification();
+        if (this.serviceIdentification != null) {
+            sosServiceIdentification.setServiceIdentification(XmlHelper
+                    .loadXmlDocumentFromFile(this.serviceIdentification));
+        }
+        sosServiceIdentification.setAbstract(this.serviceIdentificationAbstract);
+        sosServiceIdentification.setAccessConstraints(this.serviceIdentificationAccessConstraints);
+        sosServiceIdentification.setFees(this.serviceIdentificationFees);
+        sosServiceIdentification.setServiceType(this.serviceIdentificationServiceType);
+        sosServiceIdentification.setTitle(this.serviceIdentificationTitle);
+        sosServiceIdentification.setVersions(this.getSupportedVersions());
+        sosServiceIdentification.setKeywords(Arrays.asList(this.serviceIdentificationKeywords));
         return sosServiceIdentification;
     }
 
     /**
-	 * @return Returns the service provider
-	 * @throws OwsExceptionReport  
+     * @return Returns the service provider
+     * @throws OwsExceptionReport
      */
     public SosServiceProvider getServiceProvider() throws OwsExceptionReport {
-		SosServiceProvider sosServiceProvider = new SosServiceProvider();
-		if (this.serviceProvider != null) {
-			sosServiceProvider.setServiceProvider(XmlHelper.loadXmlDocumentFromFile(this.serviceProvider));
-		}
-		sosServiceProvider.setAdministrativeArea(this.serviceProviderAdministrativeArea);
-		sosServiceProvider.setCity(this.serviceProviderCity);
-		sosServiceProvider.setCountry(this.serviceProviderCountry);
-		sosServiceProvider.setDeliveryPoint(this.serviceProviderDeliveryPoint);
-		sosServiceProvider.setIndividualName(this.serviceProviderIndividualName);
-		sosServiceProvider.setMailAddress(this.serviceProviderMailAddress);
-		sosServiceProvider.setName(this.serviceProviderName);
-		sosServiceProvider.setPhone(this.serviceProviderPhone);
-		sosServiceProvider.setPositionName(this.serviceProviderPositionName);
-		sosServiceProvider.setPostalCode(this.serviceProviderPostalCode);
-		sosServiceProvider.setSite(this.serviceProviderSite);
+        SosServiceProvider sosServiceProvider = new SosServiceProvider();
+        if (this.serviceProvider != null) {
+            sosServiceProvider.setServiceProvider(XmlHelper.loadXmlDocumentFromFile(this.serviceProvider));
+        }
+        sosServiceProvider.setAdministrativeArea(this.serviceProviderAdministrativeArea);
+        sosServiceProvider.setCity(this.serviceProviderCity);
+        sosServiceProvider.setCountry(this.serviceProviderCountry);
+        sosServiceProvider.setDeliveryPoint(this.serviceProviderDeliveryPoint);
+        sosServiceProvider.setIndividualName(this.serviceProviderIndividualName);
+        sosServiceProvider.setMailAddress(this.serviceProviderMailAddress);
+        sosServiceProvider.setName(this.serviceProviderName);
+        sosServiceProvider.setPhone(this.serviceProviderPhone);
+        sosServiceProvider.setPositionName(this.serviceProviderPositionName);
+        sosServiceProvider.setPostalCode(this.serviceProviderPostalCode);
+        sosServiceProvider.setSite(this.serviceProviderSite);
         return sosServiceProvider;
     }
 
@@ -1266,7 +1328,7 @@ public final class Configurator {
     public boolean isVersionSupported(String version) {
         return supportedVersions.contains(version);
     }
-    
+
     /**
      * @return the supportedVersions
      */
@@ -1314,13 +1376,13 @@ public final class Configurator {
     public String getTokenSeperator() {
         return tokenSeperator;
     }
-	
-	/**
-	 * @return the minimum threshold for gzipping responses
-	 */
-	public int getMinimumGzipSize() {
-		return minimumGzipSize;
-	}
+
+    /**
+     * @return the minimum threshold for gzipping responses
+     */
+    public int getMinimumGzipSize() {
+        return minimumGzipSize;
+    }
 
     /**
      * @return Returns the tupleSeperator.
@@ -1330,8 +1392,8 @@ public final class Configurator {
     }
 
     /**
-	 * @return Returns decimal separator.
-	 */
+     * @return Returns decimal separator.
+     */
     public String getDecimalSeparator() {
         return decimalSeparator;
     }
@@ -1509,9 +1571,9 @@ public final class Configurator {
     }
 
     /**
-	 * @param service 
-	 * @param version 
-	 * @return the implemented request listener
+     * @param service
+     * @param version
+     * @return the implemented request listener
      * @throws OwsExceptionReport
      */
     public IServiceOperator getServiceOperator(String service, String version) throws OwsExceptionReport {
@@ -1580,10 +1642,18 @@ public final class Configurator {
     public int getDefaultEPSG() {
         return defaultEPSG;
     }
+    
+    public IConverter getConverter(String fromNamespace, String toNamespace) {
+        return getConverter(new ConverterKeyType(fromNamespace, toNamespace));
+    }
+    
+    public IConverter getConverter(ConverterKeyType key) {
+        return converter.get(key);
+    }
 
     /**
-	 * @param namespace 
-	 * @return the decoder
+     * @param namespace
+     * @return the decoder
      * @throws OwsExceptionReport
      */
     public List<IDecoder> getDecoder(String namespace) throws OwsExceptionReport {
@@ -1591,9 +1661,9 @@ public final class Configurator {
     }
 
     /**
-	 * @param service 
-	 * @param version 
-	 * @return the decoder
+     * @param service
+     * @param version
+     * @return the decoder
      * @throws OwsExceptionReport
      */
     public List<IDecoder> getDecoder(String service, String version) throws OwsExceptionReport {
@@ -1601,8 +1671,8 @@ public final class Configurator {
     }
 
     /**
-	 * @param decoderKeyType 
-	 * @return the decoder
+     * @param decoderKeyType
+     * @return the decoder
      * @throws OwsExceptionReport
      */
     public List<IDecoder> getDecoder(DecoderKeyType decoderKeyType) throws OwsExceptionReport {
@@ -1610,8 +1680,8 @@ public final class Configurator {
     }
 
     /**
-	 * @param namespace 
-	 * @return the encoder
+     * @param namespace
+     * @return the encoder
      * @throws OwsExceptionReport
      */
     public IEncoder getEncoder(String namespace) throws OwsExceptionReport {
