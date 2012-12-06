@@ -255,7 +255,7 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
                 // procedureDescriptionFormat
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.DescribeSensorParams.procedureDescriptionFormat
                         .name())) {
-                    request.setOutputFormat(KvpHelper.checkParameterSingleValue(parameterValues,
+                    request.setProcedureDescriptionFormat(KvpHelper.checkParameterSingleValue(parameterValues,
                             Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name()));
                     foundProcedureDescriptionFormat = true;
                 }

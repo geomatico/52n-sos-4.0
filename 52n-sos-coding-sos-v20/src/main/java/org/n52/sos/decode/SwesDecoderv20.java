@@ -151,9 +151,9 @@ public class SwesDecoderv20 implements IXmlRequestDecoder {
         descSensorRequest.setProcedures(xbDescSensor.getProcedure());
         if (xbDescSensor.getProcedureDescriptionFormat() != null
                 && !xbDescSensor.getProcedureDescriptionFormat().equals("")) {
-            descSensorRequest.setOutputFormat(xbDescSensor.getProcedureDescriptionFormat());
+            descSensorRequest.setProcedureDescriptionFormat(xbDescSensor.getProcedureDescriptionFormat());
         } else {
-            descSensorRequest.setOutputFormat(SosConstants.PARAMETER_NOT_SET);
+            descSensorRequest.setProcedureDescriptionFormat(SosConstants.PARAMETER_NOT_SET);
         }
         return descSensorRequest;
     }
