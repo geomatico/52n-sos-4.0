@@ -90,8 +90,11 @@ public class ResultHandlingHelper {
             builder.delete(builder.lastIndexOf(tokenSeparator), builder.length());
             builder.append(blockSeparator);
         }
-        builder.delete(builder.lastIndexOf(blockSeparator), builder.length());
-        return builder.toString();
+        if (builder.length() > 0) {
+            builder.delete(builder.lastIndexOf(blockSeparator), builder.length());
+            return builder.toString();
+        }
+        return null;
     }
 
     private static Object getTimeStringForResultTime(Date resultTime) {
