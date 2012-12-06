@@ -172,7 +172,7 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
         Session session = null;
         try {
             session = (Session) connectionProvider.getConnection();
-            SensorML result = queryProcedure(request.getProcedure(), request.getOutputFormat(), session);
+            SensorML result = queryProcedure(request.getProcedure(), request.getProcedureDescriptionFormat(), session);
             AbstractMultiProcess member = new AbstractMultiProcess();
             // fois
             List<String> procedures = new ArrayList<String>(1);
@@ -189,13 +189,13 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
                 member.addCapabilities(parentProcCapabilities);
             }
             // child procs
-            member.addComponents(getChildProcedures(request.getProcedure(), request.getOutputFormat(),
+            member.addComponents(getChildProcedures(request.getProcedure(), request.getProcedureDescriptionFormat(),
                     request.getVersion(), session));
             result.addMember(member);
             DescribeSensorResponse response = new DescribeSensorResponse();
             response.setService(request.getService());
             response.setVersion(request.getVersion());
-            response.setOutputFormat(request.getOutputFormat());
+            response.setOutputFormat(request.getProcedureDescriptionFormat());
             response.setSensorDescription(result);
             return response;
         } catch (HibernateException he) {

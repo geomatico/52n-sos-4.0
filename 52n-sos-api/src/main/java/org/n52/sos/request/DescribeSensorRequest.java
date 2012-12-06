@@ -47,7 +47,7 @@ public class DescribeSensorRequest extends AbstractServiceRequest {
     /**
      * Output format
      */
-    private String outputFormat;
+    private String procedureDescriptionFormat;
 
     /**
      * Temporal filters
@@ -59,8 +59,8 @@ public class DescribeSensorRequest extends AbstractServiceRequest {
      * 
      * @return output format
      */
-    public String getOutputFormat() {
-        return outputFormat;
+    public String getProcedureDescriptionFormat() {
+        return procedureDescriptionFormat;
     }
 
     /**
@@ -69,8 +69,8 @@ public class DescribeSensorRequest extends AbstractServiceRequest {
      * @param outputFormat
      *            output format
      */
-    public void setOutputFormat(String outputFormat) {
-        this.outputFormat = outputFormat;
+    public void setProcedureDescriptionFormat(String procedureDescriptionFormat) {
+        this.procedureDescriptionFormat = procedureDescriptionFormat;
     }
 
     /**

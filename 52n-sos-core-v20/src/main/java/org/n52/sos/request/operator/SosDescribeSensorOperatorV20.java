@@ -98,7 +98,7 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
         if (request instanceof DescribeSensorRequest) {
             DescribeSensorRequest sosRequest = (DescribeSensorRequest) request;
             checkRequestedParameters(sosRequest);
-            if (sosRequest.getOutputFormat().equals(SosConstants.CONTENT_TYPE_ZIP)) {
+            if (sosRequest.getProcedureDescriptionFormat().equals(SosConstants.CONTENT_TYPE_ZIP)) {
                 applyZIPcomp = true;
             }
 
@@ -113,8 +113,8 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
                     namespace = SWEConstants.NS_SWES_20;
                 } else if (response.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
                     namespace = SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL;
-                    if (sosRequest.getOutputFormat().equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)
-                            || sosRequest.getOutputFormat().equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
+                    if (sosRequest.getProcedureDescriptionFormat().equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)
+                            || sosRequest.getProcedureDescriptionFormat().equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
                         contentType = SensorMLConstants.SENSORML_CONTENT_TYPE;
                     }
                 } else {
@@ -144,7 +144,7 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
                     }
                     StringBuilder exceptionText = new StringBuilder();
                     exceptionText.append("The value '");
-                    exceptionText.append(sosRequest.getOutputFormat());
+                    exceptionText.append(sosRequest.getProcedureDescriptionFormat());
                     exceptionText.append("' of the outputFormat parameter is incorrect and has to be '");
                     exceptionText.append(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
                     exceptionText.append("' for the requested sensor!");
@@ -216,7 +216,7 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkProcedureOutputFormat(sosRequest.getOutputFormat(),
+            SosHelper.checkProcedureOutputFormat(sosRequest.getProcedureDescriptionFormat(),
                     Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
