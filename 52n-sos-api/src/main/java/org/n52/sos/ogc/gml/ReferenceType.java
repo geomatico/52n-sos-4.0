@@ -21,15 +21,54 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.convert;
+package org.n52.sos.ogc.gml;
 
-import java.util.List;
-
-
-public interface IConverter<T, S> {
+public class ReferenceType {
     
-    public List<ConverterKeyType> getConverterKeyTypes();
+    private String href;
     
-    public T convert(S objectToConvert) throws ConverterException;
+    private String title;
+    
+    private String role;
+
+    public String getHref() {
+        return href;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setHref(String href) {
+        this.href = href;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+    
+    public boolean hasHref() {
+        return href != null && !href.isEmpty();
+    }
+    
+    public boolean hasTitle() {
+        return title != null && !title.isEmpty();
+    }
+    
+    public boolean hasRole() {
+        return role != null && !role.isEmpty();
+    }
+    
+    public boolean hasValues() {
+        return hasHref() && hasRole() && hasTitle();
+    }
 
 }
