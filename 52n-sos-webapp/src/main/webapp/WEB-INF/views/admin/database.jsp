@@ -37,12 +37,12 @@
 <script type="text/javascript" src="<c:url value="/static/js/vkbeautify-0.99.00.beta.js" />"></script>
 
 <jsp:include page="../common/logotitle.jsp">
-	<jsp:param name="title" value="Database Panel" />
-	<jsp:param name="leadParagraph" value="Here you can query the database directly." />
+    <jsp:param name="title" value="Database Panel" />
+    <jsp:param name="leadParagraph" value="Here you can query the database directly." />
 </jsp:include>
 
 <div class="pull-right">
-	<button id="testdata" type="button" class="btn btn-danger"></button>
+    <button id="testdata" type="button" class="btn btn-danger"></button>
 </div>
 
 <form id="form" action="" method="POST">
@@ -65,62 +65,62 @@
 <div id="result"></div>
 
 <script type="text/javascript">
-	$(function() {
-		var testDataInstalled = ${IS_TEST_DATA_SET_INSTALLED_MODEL_ATTRIBUTE};
-		var $button = $("#testdata");
-		
-		function create() {
-			$button.attr("disabled", true);
-			$.ajax({
-				"url": "<c:url value="/admin/database/testdata/create" />",
-				"type": "POST"
-			}).fail(function(error) {
-				showError("Request failed: " + error.status + " " + error.statusText);
-				$button.removeAttr("disabled");
-			}).done(function() {
-				showSuccess("Test data set was inserted.");
-				testDataInstalled = !testDataInstalled;
-				setButtonLabel();
-				$button.removeAttr("disabled");
-			});
-		}
+    $(function() {
+        var testDataInstalled = ${IS_TEST_DATA_SET_INSTALLED_MODEL_ATTRIBUTE};
+        var $button = $("#testdata");
+        
+        function create() {
+            $button.attr("disabled", true);
+            $.ajax({
+                "url": "<c:url value="/admin/database/testdata/create" />",
+                "type": "POST"
+            }).fail(function(error) {
+                showError("Request failed: " + error.status + " " + error.statusText);
+                $button.removeAttr("disabled");
+            }).done(function() {
+                showSuccess("Test data set was inserted.");
+                testDataInstalled = !testDataInstalled;
+                setButtonLabel();
+                $button.removeAttr("disabled");
+            });
+        }
 
-		function remove() {
-			$button.attr("disabled", true);
-			$.ajax({
-				"url": "<c:url value="/admin/database/testdata/remove" />",
-				"type": "POST"
-			}).fail(function(error) {
-				showError("Request failed: " + error.status + " " + error.statusText);
-				$button.removeAttr("disabled");
-			}).done(function() {
-				showSuccess("The test data was removed.");
-				testDataInstalled = !testDataInstalled;
-				setButtonLabel();
-				$button.removeAttr("disabled");
-			});
-		}
+        function remove() {
+            $button.attr("disabled", true);
+            $.ajax({
+                "url": "<c:url value="/admin/database/testdata/remove" />",
+                "type": "POST"
+            }).fail(function(error) {
+                showError("Request failed: " + error.status + " " + error.statusText);
+                $button.removeAttr("disabled");
+            }).done(function() {
+                showSuccess("The test data was removed.");
+                testDataInstalled = !testDataInstalled;
+                setButtonLabel();
+                $button.removeAttr("disabled");
+            });
+        }
 
-		
-		
-		function setButtonLabel() {
-			if (testDataInstalled) {
-				$button.text("Remove test data set");
-			} else {
-				$button.text("Insert test data set");
-			}
-		}
+        
+        
+        function setButtonLabel() {
+            if (testDataInstalled) {
+                $button.text("Remove test data set");
+            } else {
+                $button.text("Insert test data set");
+            }
+        }
 
-		$button.click(function() {
-			if (testDataInstalled) {
-				remove();
-			} else {
-				create();
-			}
-		});
-		
-		setButtonLabel();
-	});
+        $button.click(function() {
+            if (testDataInstalled) {
+                remove();
+            } else {
+                create();
+            }
+        });
+        
+        setButtonLabel();
+    });
 </script>
 
 <script type="text/javascript">
@@ -148,25 +148,50 @@ $(function() {
                 showError("No query specified.");
             } else {
                 var $result = $("#result")
-                $result.fadeOut("fast");
+                $result.slideUp("fast");
                 $result.children().remove();
                 $.ajax({
-					"url": "<c:url value="/admin/database" />",
+                    "url": "<c:url value="/admin/database" />",
                     "type": "POST",
-                    "data": query,
-					"contentType": "text/plain"
+                    "data": encodeURIComponent(query),
+                    "contentType": "text/plain",
+                    "dataType": "json"
                 }).fail(function(error){
                     showError("Request failed: " + error.status + " " + error.statusText);
                 }).done(function(response){
-                    if (response.startsWith("<table>")) {
-                        $result.append($("<h3>").text("Result")).append($(response));
-                        $result.children("table").addClass("table table-striped table-bordered table-condensed")
-                        $result.fadeIn("fast");
-                        $("html, body").animate({
-                             scrollTop: $("#result").offset().top
-                         }, "slow");
+                    if (typeof(response) === "string") {
+                        response = $.parseJSON(response);
+                    }
+                    if (response.error) {
+                        showError(response.error);
+                    } else if (response.message) {
+                        showSuccess(response.message);
                     } else {
-                        showError(response);
+                        $("<h3>").text("Result").appendTo($result);
+                        $("html, body").animate({ 
+                            scrollTop: $("#result").offset().top
+                         }, "slow");
+                        var $table = $("<table>");
+                        $table.addClass("table table-striped table-bordered table-condensed");
+                        $table.appendTo($result);
+                        if (response.names) {
+                            var $tr = $("<tr>");
+                            for (var i = 0; i < response.names.length; ++i) {
+                                $("<th>").text(response.names[i]).appendTo($tr);
+                            }
+                            $tr.appendTo($table)
+                        }
+                        if (response.rows) {
+                            for (var i = 0; i < response.rows.length; ++i) {
+                                var row = response.rows[i];
+                                var $row = $("<tr>");
+                                for (var j = 0; j < row.length; ++j) {
+                                    $("<td>").text(row[j]).appendTo($row);
+                                }
+                                $row.appendTo($table)
+                            }
+                        }
+                        $result.slideDown();
                     }
                 });
             }

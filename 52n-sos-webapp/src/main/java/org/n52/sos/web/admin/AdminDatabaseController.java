@@ -31,7 +31,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.ServiceLoader;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -113,13 +116,30 @@ public class AdminDatabaseController extends AbstractController {
         }
     }
 
+    private static final String ROWS = "rows";
+    private static final String NAMES = "names";
+    
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE_EXECUTE, method = RequestMethod.POST)
     public @ResponseBody String processQuery(@RequestBody String querySQL) {
         try {
             String q = URLDecoder.decode(querySQL, "UTF-8");
             log.info("Query: {}", q);
             IGeneralQueryDao dao = daoServiceLoader.iterator().next();
-            return dao.query(q);
+            IGeneralQueryDao.QueryResult rs = dao.query(q);
+            
+            JSONObject j = new JSONObject();
+            if (rs.getMessage() != null) {
+                j.put(rs.isError() ? "error" : "message", rs.getMessage());
+                return j.toString();
+            }
+            
+            JSONArray names = new JSONArray(rs.getColumnNames());
+            JSONArray rows = new JSONArray();
+            for (IGeneralQueryDao.Row row : rs.getRows()) {
+                rows.put(new JSONArray(row.getValues()));
+            }
+            
+            return new JSONObject().put(ROWS, rows).put(NAMES, names).toString();
         }
         catch (UnsupportedEncodingException ex) {
             log.error("Could not decode String", ex);

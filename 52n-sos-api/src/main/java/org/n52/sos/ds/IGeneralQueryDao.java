@@ -26,19 +26,76 @@ package org.n52.sos.ds;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 public interface IGeneralQueryDao extends IInitializableDao {
 
-	/**
-	 * Method which query the SOS DB
-	 *
-	 * @param query
-	 *        normal sql query concerning any table
-	 * @return query result
-	 * @throws SQLException
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	public String query(String query) throws SQLException, FileNotFoundException, IOException;
-	
+    public static class QueryResult {
+
+        private boolean error;
+        private String message;
+        private List<String> columnNames = new ArrayList<String>(0);
+        private List<Row> columns = new LinkedList<Row>();
+
+        public QueryResult(){
+            
+        }
+        public QueryResult(String message, boolean isError){
+            this.message = message;
+            this.error = isError;
+        }
+        
+        public List<String> getColumnNames() {
+            return Collections.unmodifiableList(this.columnNames);
+        }
+
+        public void setColumnNames(List<String> columnNames) {
+            this.columnNames = new ArrayList<String>(columnNames);
+        }
+
+        public List<Row> getRows() {
+            return Collections.unmodifiableList(this.columns);
+        }
+
+        public void addRow(Row column) {
+            this.columns.add(column);
+        }
+
+        public boolean isError() {
+            return error;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+    }
+
+    public static class Row {
+
+        private List<String> values = new LinkedList<String>();
+
+        public List<String> getValues() {
+            return Collections.unmodifiableList(this.values);
+        }
+
+        public void addValue(String value) {
+            this.values.add(value);
+        }
+    }
+
+    /**
+     * Method which query the SOS DB
+     *
+     * @param query normal sql query concerning any table
+     *
+     * @return query result
+     *
+     * @throws SQLException
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public QueryResult query(String query) throws SQLException, FileNotFoundException, IOException;
 }
