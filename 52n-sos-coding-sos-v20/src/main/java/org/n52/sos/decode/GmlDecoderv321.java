@@ -145,7 +145,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
             return parsePolygonType((PolygonType) xmlObject);
         } else if (xmlObject instanceof CompositeSurfaceType) {
             return parseCompositeSurfaceType((CompositeSurfaceType) xmlObject);
-        } else if (xmlObject.schemaType() == CodeWithAuthorityType.type) {
+        } else if (xmlObject instanceof CodeWithAuthorityType) {
             return parseCodeWithAuthorityTye((CodeWithAuthorityType) xmlObject);
         }
         return null;
@@ -502,10 +502,11 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         return geom;
     }
 
-    private Object parseCodeWithAuthorityTye(CodeWithAuthorityType xmlObject) {
-        if (xmlObject.getStringValue() != null && !xmlObject.getStringValue().isEmpty()) {
-            CodeWithAuthority codeWithAuthority = new CodeWithAuthority(xmlObject.getStringValue());
-            codeWithAuthority.setCodeSpace(xmlObject.getCodeSpace());
+    private CodeWithAuthority parseCodeWithAuthorityTye(CodeWithAuthorityType xbCodeWithAuthority) {
+        if (xbCodeWithAuthority.getStringValue() != null && !xbCodeWithAuthority.getStringValue().isEmpty()) {
+            CodeWithAuthority sosCodeWithAuthority = new CodeWithAuthority(xbCodeWithAuthority.getStringValue());
+            sosCodeWithAuthority.setCodeSpace(xbCodeWithAuthority.getCodeSpace());
+            return sosCodeWithAuthority;
         }
         return null;
     }

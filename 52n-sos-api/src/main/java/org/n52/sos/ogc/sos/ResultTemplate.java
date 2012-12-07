@@ -23,12 +23,13 @@
  */
 package org.n52.sos.ogc.sos;
 
+import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 
 public class ResultTemplate {
     
-    private String identifier;
+    private CodeWithAuthority identifier;
     
     private String xmlResultStructure;
     
@@ -38,7 +39,7 @@ public class ResultTemplate {
     
     private SosSweAbstractEncoding resultEncoding;
     
-    public String getIdentifier() {
+    public CodeWithAuthority getIdentifier() {
         return identifier;
     }
 
@@ -58,7 +59,7 @@ public class ResultTemplate {
         return resultEncoding;
     }
     
-    public void setIdentifier(String identifier) {
+    public void setIdentifier(CodeWithAuthority identifier) {
         this.identifier = identifier;
     }
 
