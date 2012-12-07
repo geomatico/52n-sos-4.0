@@ -155,6 +155,11 @@ USING   procedure AS p
 WHERE   p.procedure_id = t.procedure_id AND 
         p.identifier LIKE 'http://www.example.org/sensors/%'; 
 
+DELETE FROM offering_has_allowed_observation_type AS ohawt
+USING   offering AS o
+WHERE   o.offering_id = ohawt.offering_id AND
+        o.identifier LIKE 'test_offering%';
+
 DELETE FROM procedure WHERE identifier LIKE 'http://www.example.org/sensors/%';
 DELETE FROM offering WHERE identifier LIKE 'test_offering%';
 DELETE FROM feature_of_interest WHERE identifier LIKE 'test_feature%';

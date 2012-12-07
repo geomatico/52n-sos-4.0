@@ -273,6 +273,9 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insert_observation_constellation(bigint,bigint,bigint,bigint) RETURNS bigint AS
 $$
+	INSERT INTO offering_has_allowed_observation_type(offering_id, observation_type_id)
+	SELECT $3, $1 WHERE $3 NOT IN (
+		SELECT offering_id FROM offering_has_allowed_observation_type WHERE offering_id = $3);
 	INSERT INTO observation_constellation(observation_type_id, procedure_id, offering_id, observable_property_id)
 	SELECT $1,$2,$3,$4 WHERE $1 NOT IN (SELECT observation_type_id 
 		FROM observation_constellation  WHERE observation_type_id = $1 
