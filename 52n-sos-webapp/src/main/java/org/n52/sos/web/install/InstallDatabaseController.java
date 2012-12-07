@@ -32,6 +32,7 @@ import org.n52.sos.web.JdbcUrl;
 import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
@@ -39,8 +40,10 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.n52.sos.service.ConfigurationException;
 
 import org.n52.sos.web.ControllerConstants;
+import org.n52.sos.web.MetaDataHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -177,11 +180,39 @@ public class InstallDatabaseController extends AbstractInstallController {
             }
 
             if (createTables) {
-                if ( !overwriteTables && alreadyExistent) {
+                if (!overwriteTables && alreadyExistent) {
                     return error(settings, "Tables already created, but should not overwrite. Please take a look at the 'Actions' section.");
                 }
-            } else if ( !alreadyExistent) {
+            } else if (!alreadyExistent) {
                 return error(settings, "No tables are present in the database and no tables should be created.");
+            } else {
+                /* check version, but for now do not fail on this one... */
+                String version = null;
+                String currentVersion = null;
+                ResultSet rs = null;
+                try {
+                    rs = st.executeQuery(InstallConstants.GET_VERSION_OF_DATABASE_INSTALLATION);
+                    if (rs.next()) {
+                        version = rs.getString(1);
+                    }
+                } catch (SQLException e) {
+                    log.error("Could not determine version of installed database schema.", e);
+                } finally {
+                    rs.close();
+                }
+                
+                try {
+                    currentVersion = getMetaDataHandler().get(MetaDataHandler.Metadata.VERSION);
+                } catch (ConfigurationException e) {
+                    log.error("Can not load version metadata property", e);
+                }
+                
+                if (currentVersion != null && !currentVersion.equals(version)) {
+                    /* TODO do some conversion? */
+                    log.warn("Installed database schema ({}) is not the current one ({}).", version, currentVersion);
+                }
+                
+                
             }
 
             try {

@@ -33,6 +33,7 @@ public interface InstallConstants {
     public static final String IS_POSTGIS_INSTALLED = "SELECT version(), postgis_version()";
     public static final String TABLES_ALREADY_EXISTENT = "SELECT observation_id FROM observation LIMIT 0;";
     public static final String CAN_READ_SPATIAL_REF_SYS = "SELECT * FROM spatial_ref_sys LIMIT 0;";
+    public static final String GET_VERSION_OF_DATABASE_INSTALLATION = "SELECT value FROM global_settings WHERE key = 'VERSION';";
 
     /* session attributes */
     public static final String SUCCESS = "success";

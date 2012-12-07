@@ -25,9 +25,6 @@
 package org.n52.sos.web.install;
 
 import org.n52.sos.web.JdbcUrl;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -174,6 +171,14 @@ public class InstallFinishController extends AbstractInstallController {
                 for (Setting sosSetting : Setting.values()) {
                     s.put(sosSetting.name(), (String) settings.get(sosSetting.name()));
                 }
+                try {
+                    s.put(MetaDataHandler.Metadata.VERSION.name(), 
+                            getMetaDataHandler().get(MetaDataHandler.Metadata.VERSION));
+                } catch (ConfigurationException ex) {
+                    /* don't fail on this one... */
+                    log.error("Could not load SOS version", ex);
+                }
+                
                 dao.save(s, con);
             } catch (SQLException e) {
                 return error(settings, "Could not insert settings into the database: " + e.getMessage(), e);
