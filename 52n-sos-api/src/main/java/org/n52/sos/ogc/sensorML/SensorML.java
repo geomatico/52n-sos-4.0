@@ -76,4 +76,8 @@ public class SensorML extends AbstractSensorML {
                 && (members != null && !members.isEmpty());
     }
 
+    public boolean isSetMembers() {
+        return members != null && members.isEmpty();
+    }
+
 }

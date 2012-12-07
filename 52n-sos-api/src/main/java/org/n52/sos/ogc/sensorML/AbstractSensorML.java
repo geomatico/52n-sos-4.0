@@ -36,17 +36,17 @@ import org.n52.sos.ogc.sos.SosProcedureDescription;
 
 public class AbstractSensorML extends SosProcedureDescription {
 
-    private List<String> keywords;
+    private List<String> keywords = new ArrayList<String>(0);
 
-    private List<SosSMLIdentifier> identifications;
+    private List<SosSMLIdentifier> identifications = new ArrayList<SosSMLIdentifier>(0);
 
-    private List<SosSMLClassifier> classifications;
+    private List<SosSMLClassifier> classifications = new ArrayList<SosSMLClassifier>(0);
 
     private ITime validTime;
 
-    private List<SosSMLCharacteristics> characteristics;
+    private List<SosSMLCharacteristics> characteristics = new ArrayList<SosSMLCharacteristics>(0);
 
-    private List<SosSMLCapabilities> capabilities;
+    private List<SosSMLCapabilities> capabilities = new ArrayList<SosSMLCapabilities>(0);
 
     private String contact;
 
@@ -149,6 +149,10 @@ public class AbstractSensorML extends SosProcedureDescription {
             }
         }
         return null;
+    }
+    
+    public void addIdentifier(SosSMLIdentifier identifier) {
+        this.identifications.add(identifier);
     }
 
     @Override

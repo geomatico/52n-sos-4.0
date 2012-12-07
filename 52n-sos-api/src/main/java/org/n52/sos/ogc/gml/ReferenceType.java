@@ -31,6 +31,10 @@ public class ReferenceType {
     
     private String role;
 
+    public ReferenceType(String href) {
+        this.href = href;
+    }
+
     public String getHref() {
         return href;
     }
