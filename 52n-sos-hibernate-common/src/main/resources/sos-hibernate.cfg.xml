@@ -18,8 +18,10 @@
         <property name="hibernate.connection.autoReconnectForPools">true</property>
         <property name="hibernate.connection.testOnBorrow">true</property>
         <!-- <property name="hibernate.connection.oracle.jdbc.V8Compatible">true</property> -->
-        <property name="hibernate.show_sql">false</property>
-        <property name="hibernate.format_sql">false</property>
+<!-- No sql output in std out.
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">true</property>
+-->
         
         <!-- Hibernate mapping files -->
         <mapping resource="mapping/BooleanValue.hbm.xml"/>
