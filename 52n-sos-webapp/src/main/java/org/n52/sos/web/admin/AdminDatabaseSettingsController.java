@@ -30,9 +30,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.hibernate.Hibernate;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
@@ -44,7 +41,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
@@ -67,7 +63,7 @@ public class AdminDatabaseSettingsController extends AbstractController {
     
     @RequestMapping(method = RequestMethod.POST)
     public ModelAndView save(@RequestParam(ControllerConstants.JDBC_PARAMETER) String jdbc) {
-        log.info("JDBCURI: {}", jdbc);
+        log.debug("JDBCURI: {}", jdbc);
         try {
             JdbcUrl jdbcUrl = new JdbcUrl(jdbc);
             String error = jdbcUrl.isValid();

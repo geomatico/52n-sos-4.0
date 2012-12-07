@@ -26,6 +26,7 @@ package org.n52.sos.web.admin;
 import javax.servlet.UnavailableException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -37,11 +38,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
 @RequestMapping(ControllerConstants.Paths.ADMIN_RELOAD_CAPABILITIES_CACHE)
-public class AdminReloadCacheController {
+public class AdminReloadCacheController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void reload() throws OwsExceptionReport, UnavailableException {
+        log.debug("Reloading Capabilitities Cache");
         if (Configurator.getInstance() != null) {
             Configurator.getInstance().getCapabilitiesCacheController().update(false);   
         } else {

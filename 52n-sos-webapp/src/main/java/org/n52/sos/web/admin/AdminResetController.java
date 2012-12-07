@@ -43,7 +43,9 @@ public class AdminResetController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.POST)
     public View post() {
+        log.debug("Resetting Service.");
         if (Configurator.getInstance() != null) {
+            log.debug("Resetting configurator.");
             Configurator.getInstance().cleanup();
         }
         getDatabaseSettingsHandler().delete();
