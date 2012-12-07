@@ -26,9 +26,6 @@ package org.n52.sos.web;
 
 import org.n52.sos.service.DatabaseSettingsHandler;
 import javax.servlet.ServletContext;
-import org.n52.sos.service.ConfigurationException;
-
-import org.n52.sos.service.SosContextListener;
 import org.n52.sos.web.install.AbstractInstallController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +35,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class AbstractController {
 
-    protected static final Logger log = LoggerFactory.getLogger(AbstractInstallController.class);
+    protected static final Logger log = LoggerFactory.getLogger(AbstractController.class);
 
     @Autowired
     private ServletContext context;

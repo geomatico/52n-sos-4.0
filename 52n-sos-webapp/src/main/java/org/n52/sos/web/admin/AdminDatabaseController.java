@@ -116,8 +116,8 @@ public class AdminDatabaseController extends AbstractController {
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE_EXECUTE, method = RequestMethod.POST)
     public @ResponseBody String processQuery(@RequestBody String querySQL) {
         try {
-            log.info("Query: {}", querySQL);
             String q = URLDecoder.decode(querySQL, "UTF-8");
+            log.info("Query: {}", q);
             IGeneralQueryDao dao = daoServiceLoader.iterator().next();
             return dao.query(q);
         }
