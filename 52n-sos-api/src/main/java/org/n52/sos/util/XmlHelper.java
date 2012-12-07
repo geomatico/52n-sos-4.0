@@ -57,7 +57,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * XML utility class
- * 
+ * TODO add javadoc to public methods
  */
 public class XmlHelper {
 
