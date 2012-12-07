@@ -172,6 +172,7 @@
 								<id>default-settings</id>
 								<phase>generate-resources</phase>
 								<configuration>
+									<enableFiltering>true</enableFiltering>
 									<srcFiles>
 										<srcFile>${project.parent.basedir}/db/insert_settings.sql</srcFile>
 									</srcFiles>
@@ -197,6 +198,7 @@
 								<id>custom-settings</id>
 								<phase>generate-resources</phase>
 								<configuration>
+									<enableFiltering>true</enableFiltering>
 									<srcFiles>
 										<srcFile>${project.parent.basedir}/db/custom_settings.sql</srcFile>
 									</srcFiles>
