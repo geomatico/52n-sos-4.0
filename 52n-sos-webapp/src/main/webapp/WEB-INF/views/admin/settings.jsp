@@ -86,7 +86,10 @@
                 }
             });
             generateSettings(settings, $container, true);
-
+            $("#service_identification .control-group:first").before("<legend>Standard Settings</legend>");
+            $("#service_provider .control-group:first").before("<legend>Standard Settings</legend>");
+            $("#service_identification .control-group:last").before("<legend>Extended Settings</legend>");
+            $("#service_provider .control-group:last").before("<legend>Extended Settings</legend>");
             $("<div>").addClass("form-actions").append($button).appendTo($container);
             function setSosUrl() {
                 $("input[name=SOS_URL]").val(window.location.toString()
