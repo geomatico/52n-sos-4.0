@@ -11,12 +11,10 @@
 	<packaging>jar</packaging>
 	<name>52North SOS 2.0 Core Profile Operator</name>
 	<description>52North Sensor Observation Service 2.0 Core Profile operator module</description>
-	<url>http://maven.apache.org</url>
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-api</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 	

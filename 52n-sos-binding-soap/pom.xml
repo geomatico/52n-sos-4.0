@@ -10,14 +10,11 @@
 	<artifactId>52n-sos-binding-soap</artifactId>
 	<packaging>jar</packaging>
 	<name>52North SOS SOAP binding</name>
-	<description>52North Sensor Observation Service SOAP binding
-	</description>
-	<url>http://maven.apache.org</url>
+	<description>52North Sensor Observation Service SOAP binding</description>
 	<dependencies>
 			<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-api</artifactId>
-			<version>${project.version}</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>

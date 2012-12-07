@@ -10,14 +10,11 @@
 	<artifactId>52n-sos-coding-sos-v20</artifactId>
 	<packaging>jar</packaging>
 	<name>52North SOS XML Request Coding</name>
-	<description>52North Sensor Observation Service XML request Coding
-	</description>
-	<url>http://maven.apache.org</url>
+	<description>52North Sensor Observation Service XML request Coding</description>
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-api</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<!-- XML Beans Generated Classes -->
 		<dependency>

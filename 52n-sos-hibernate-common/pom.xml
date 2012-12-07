@@ -11,12 +11,10 @@
 	<packaging>jar</packaging>
 	<name>52North SOS Hibernate common</name>
 	<description>52North Sensor Observation Service Hibernate common module</description>
-	<url>http://maven.apache.org</url>
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-api</artifactId>
-			<version>${project.version}</version>
 			<optional>true</optional>
 		</dependency>
 		<!-- Hibernate Core Dependencies -->
@@ -26,14 +24,38 @@
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<classifier>sources</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-c3p0</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-c3p0</artifactId>
+			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-spatial</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-spatial</artifactId>
+			<classifier>sources</classifier>
+		</dependency>
+		<dependency>
+			<groupId>c3p0</groupId>
+			<artifactId>c3p0</artifactId>
+			<classifier>sources</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate.common</groupId>
+			<artifactId>hibernate-commons-annotations</artifactId>
+			<classifier>sources</classifier>
+		</dependency>
 	</dependencies>
-	
 	<profiles>
 		<profile>
 			<id>postgresql</id>

@@ -11,31 +11,14 @@
 	<packaging>jar</packaging>
 	<name>52North SOS Core Hibernate DAOs</name>
 	<description>52North Sensor Observation Service Core Profile Hibernate DAOs module</description>
-	<url>http://maven.apache.org</url>
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-api</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-hibernate-common</artifactId>
-			<version>${project.version}</version>
 		</dependency>
-		<!-- Hibernate Core Dependencies
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-c3p0</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-spatial</artifactId>
-		</dependency> -->
 	</dependencies>
-	
 </project>
