@@ -30,7 +30,6 @@ import java.util.Set;
 
 import org.hibernate.Session;
 import org.junit.Test;
-import org.junit.Ignore;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
@@ -74,7 +73,6 @@ public class HibernateObservationUtilitiesTest extends AbstractSosTestCase{
 	}
 	
 	@Test
-	@Ignore
 	public void createSubObservationOfSweArrayObservationViaGetObservationById() throws OwsExceptionReport
 	{
 		// PREPARE
