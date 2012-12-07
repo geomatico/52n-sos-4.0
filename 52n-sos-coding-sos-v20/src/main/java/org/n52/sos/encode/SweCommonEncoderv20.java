@@ -23,14 +23,15 @@
  */
 package org.n52.sos.encode;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 import net.opengis.swe.x20.AbstractDataComponentType;
 import net.opengis.swe.x20.BooleanType;
@@ -39,29 +40,18 @@ import net.opengis.swe.x20.CountType;
 import net.opengis.swe.x20.DataArrayDocument;
 import net.opengis.swe.x20.DataArrayPropertyType;
 import net.opengis.swe.x20.DataArrayType;
+import net.opengis.swe.x20.DataRecordDocument;
+import net.opengis.swe.x20.DataRecordType;
 import net.opengis.swe.x20.DataRecordType.Field;
 import net.opengis.swe.x20.QuantityType;
+import net.opengis.swe.x20.Reference;
 import net.opengis.swe.x20.TextType;
 import net.opengis.swe.x20.TimeType;
-import net.opengis.swe.x20.UnitReference;
 import net.opengis.swe.x20.VectorType.Coordinate;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
-import org.joda.time.DateTime;
-import org.n52.sos.ogc.gml.time.ITime;
-import org.n52.sos.ogc.gml.time.TimeInstant;
-import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosMultiObservationValues;
-import org.n52.sos.ogc.om.SosObservableProperty;
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.values.BooleanValue;
-import org.n52.sos.ogc.om.values.CategoryValue;
-import org.n52.sos.ogc.om.values.CountValue;
-import org.n52.sos.ogc.om.values.IValue;
-import org.n52.sos.ogc.om.values.QuantityValue;
-import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.swe.SWEConstants;
@@ -72,26 +62,21 @@ import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.SosSweField;
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
+import org.n52.sos.ogc.swe.simpleType.SosSweCategory;
+import org.n52.sos.ogc.swe.simpleType.SosSweCount;
+import org.n52.sos.ogc.swe.simpleType.SosSweObservableProperty;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.util.DateTimeException;
-import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.io.WKTWriter;
-import org.n52.sos.ogc.om.values.SweDataArrayValue;
-
 public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SweCommonEncoderv20.class);
 
     private List<EncoderKeyType> encoderKeyTypes;
@@ -145,57 +130,76 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
     }
 
     @Override
-    public XmlObject encode(Object element) throws OwsExceptionReport {
-        return encode(element, null);
+    public XmlObject encode(Object sosSweType) throws OwsExceptionReport {
+        return encode(sosSweType, null);
     }
 
     @Override
-    public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
-        if (element instanceof SosSweQuantity) {
-            return addValuesToSimpleTypeQuantity((SosSweQuantity) element);
-        } else if (element instanceof SosSweText) {
-            return addValuesToSimpleTypeText((SosSweText) element);
-        } else if (element instanceof SosSweTime) {
-            return addValuesToSimpleTypeTime((SosSweTime) element);
-        } else if (element instanceof SosSweCoordinate) {
-            return addValuesToCoordinate((SosSweCoordinate) element);
-        } else if (element instanceof SosSweAbstractSimpleType) {
-            return addSweSimpleTypToField((SosSweAbstractSimpleType) element);
-        } else if (element instanceof SosSweAbstractEncoding) {
-            return createAbstractEncoding((SosSweAbstractEncoding)element);
-        } else if (element instanceof SosSweAbstractDataComponent) {
-            return createAbstractDataComponent((SosSweAbstractDataComponent)element);
-        } else if (element instanceof SosMultiObservationValues) {
-            return createDataArrayResult((SosMultiObservationValues)element);
+    public XmlObject encode(Object sosSweType, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+    	
+        if (sosSweType instanceof SosSweCoordinate) {
+            return createCoordinate((SosSweCoordinate) sosSweType);
         }
+        else if (sosSweType instanceof SosSweAbstractSimpleType) {
+            return createSimpleType((SosSweAbstractSimpleType) sosSweType);
+        } 
+        else if (sosSweType instanceof SosSweAbstractEncoding) {
+            return createAbstractEncoding((SosSweAbstractEncoding)sosSweType);
+        } 
+        else if (sosSweType instanceof SosSweAbstractDataComponent) {
+            return createAbstractDataComponent((SosSweAbstractDataComponent)sosSweType);
+        } 
+        else if (sosSweType instanceof SosMultiObservationValues) {
+            return createDataArrayResult((SosMultiObservationValues)sosSweType);
+        }
+        // TODO throw exception that element could not be encoded?
         return null;
     }
 
-    /**
-     * @param element
-     * @return
-     * @throws OwsExceptionReport
-     */
-    private AbstractDataComponentType addSweSimpleTypToField(SosSweAbstractSimpleType element) throws OwsExceptionReport {
-        if (element instanceof SosSweQuantity) {
-            return addValuesToSimpleTypeQuantity((SosSweQuantity) element);
-        } else if (element instanceof SosSweText) {
-            return addValuesToSimpleTypeText((SosSweText) element);
-        } else if (element instanceof SosSweTime) {
-            return addValuesToSimpleTypeTime((SosSweTime) element);
-        } else {
-            // TODO: NOT SUPPORTED EXCEPTION
-            throw new OwsExceptionReport();
+    private AbstractDataComponentType createSimpleType(SosSweAbstractSimpleType sosSimpleType) throws OwsExceptionReport {
+        
+    	if (sosSimpleType instanceof SosSweQuantity) {
+            return createQuantity((SosSweQuantity) sosSimpleType);
         }
+        else if (sosSimpleType instanceof SosSweText) {
+            return createText((SosSweText) sosSimpleType);
+        }
+        else if (sosSimpleType instanceof SosSweTime) {
+            return createTime((SosSweTime) sosSimpleType);
+        }
+        else if (sosSimpleType instanceof SosSweBoolean)
+        {
+        	return createBoolean((SosSweBoolean) sosSimpleType);
+        }
+        else if (sosSimpleType instanceof SosSweCategory)
+        {
+        	return createCategoy((SosSweCategory) sosSimpleType);
+        }
+        else if (sosSimpleType instanceof SosSweCount)
+        {
+        	return createCount((SosSweCount) sosSimpleType);
+        }
+        else if (sosSimpleType instanceof SosSweObservableProperty)
+        {
+        	return createObservableProperty((SosSweObservableProperty) sosSimpleType);
+        }
+        else if (sosSimpleType instanceof SosSweQuantity)
+        {
+        	return createQuantity((SosSweQuantity) sosSimpleType);
+        }
+        else if (sosSimpleType instanceof SosSweText)
+        {
+        	return createText((SosSweText) sosSimpleType);
+        }
+        else if (sosSimpleType instanceof SosSweTime)
+        {
+        	return createTime((SosSweTime) sosSimpleType);
+        }
+    	// TODO: NOT SUPPORTED EXCEPTION
+    	throw new OwsExceptionReport();
     }
 
-    /**
-     * Adds values to SWE quantity
-     * 
-     * @param quantity
-     *            SOS internal representation
-     */
-    private QuantityType addValuesToSimpleTypeQuantity(SosSweQuantity quantity) {
+    private QuantityType createQuantity(SosSweQuantity quantity) {
         QuantityType xbQuantity = QuantityType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (quantity.getDefinition() != null && !quantity.getDefinition().isEmpty()) {
             xbQuantity.setDefinition(quantity.getDefinition());
@@ -218,13 +222,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         return xbQuantity;
     }
 
-    /**
-     * Adds values to SWE text
-     * 
-     * @param text
-     *            SOS internal representation
-     */
-    private TextType addValuesToSimpleTypeText(SosSweText text) {
+    private TextType createText(SosSweText text) {
         TextType xbText = TextType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (text.getDefinition() != null && !text.getDefinition().isEmpty()) {
             xbText.setDefinition(text.getDefinition());
@@ -238,7 +236,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         return xbText;
     }
 
-    private TimeType addValuesToSimpleTypeTime(SosSweTime time) {
+    private TimeType createTime(SosSweTime time) {
         TimeType xbTime = TimeType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (time.getDefinition() != null && !time.getDefinition().isEmpty()) {
             xbTime.setDefinition(time.getDefinition());
@@ -258,30 +256,27 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         return xbTime;
     }
 
-    /**
-     * Adds values to SWE coordinates
-     * 
-     * @param coordinate
-     *            SOS internal representation
-     */
-    private Coordinate addValuesToCoordinate(SosSweCoordinate coordinate) {
+    private Coordinate createCoordinate(SosSweCoordinate coordinate) {
         Coordinate xbCoordinate = Coordinate.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         xbCoordinate.setName(coordinate.getName().name());
-        xbCoordinate.setQuantity(addValuesToSimpleTypeQuantity((SosSweQuantity) coordinate.getValue()));
+        xbCoordinate.setQuantity(createQuantity((SosSweQuantity) coordinate.getValue()));
         return xbCoordinate;
     }
 
     private XmlObject createAbstractDataComponent(SosSweAbstractDataComponent sosSweAbstractDataComponent) throws OwsExceptionReport {
         try {
+        	if (sosSweAbstractDataComponent instanceof SosSweAbstractSimpleType) {
+                return createSimpleType((SosSweAbstractSimpleType) sosSweAbstractDataComponent);
+            } 
             // TODO implement encoding if getXml() returns nothing
             if (sosSweAbstractDataComponent instanceof SosSweDataRecord)
             {
-                // TODO Eike: create SweDataRecordDocument from xml
-                throw new RuntimeException("NOT YET IMPLEMENTED");
+            	return createDataRecord((SosSweDataRecord) sosSweAbstractDataComponent);
+                // throw new RuntimeException("NOT YET IMPLEMENTED");
             }
             else if (sosSweAbstractDataComponent instanceof SosSweDataArray)
             {
-                // TODO Eike: create SweDataArrayDocument from xml
+                // TODO Eike: create SweDataArrayDocument from internal object
                 throw new RuntimeException("NOT YET IMPLEMENTED");
             }
             else if (sosSweAbstractDataComponent.getXml() != null && !sosSweAbstractDataComponent.getXml().isEmpty()) {
@@ -299,7 +294,107 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         }
     }
 
-    private XmlObject createAbstractEncoding(SosSweAbstractEncoding sosSweAbstractEncoding) throws OwsExceptionReport {
+	private AbstractDataComponentType createObservableProperty(SosSweObservableProperty sosSweAbstractDataComponent)
+	{
+		throw new RuntimeException("NOT YET IMPLEMENTED");
+	}
+
+	private CountType createCount(SosSweCount sosCount)
+	{
+		CountType xbCount = CountType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+		if (sosCount.getValue() != null)
+		{
+			BigInteger bigInt = new BigInteger(sosCount.getValue());
+			xbCount.setValue(bigInt);
+		}
+		if (sosCount.isSetDefinition())
+		{
+			xbCount.setDefinition(sosCount.getDefinition());
+		}
+		return xbCount;
+	}
+
+	private CategoryType createCategoy(SosSweCategory sosCategory)
+	{
+		CategoryType xbCategory = CategoryType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+		if (sosCategory.getCodeSpace() != null)
+		{
+			Reference xbCodespace = xbCategory.addNewCodeSpace();
+			xbCodespace.setHref(sosCategory.getCodeSpace());
+		}
+		if (sosCategory.isSetDefinition())
+		{
+			xbCategory.setDefinition(sosCategory.getDefinition());
+		}
+		return xbCategory;
+	}
+
+	private DataRecordType.Field createField(SosSweField sweField) throws OwsExceptionReport
+	{
+		// TODO substitute element to right xml element
+		SosSweAbstractDataComponent sosElement = sweField.getElement();
+		DataRecordType.Field xbField = DataRecordType.Field.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+		if (sweField.getName() != null)
+		{
+			xbField.setName(sweField.getName());
+		}
+		AbstractDataComponentType xbDCD = xbField.addNewAbstractDataComponent();
+		if (sosElement instanceof SosSweTime)
+		{
+			xbDCD.set(createTime((SosSweTime)sosElement));
+			xbField.getAbstractDataComponent().substitute(new QName(SWEConstants.NS_SWE_20,SWEConstants.EN_TIME,SWEConstants.NS_SWE_PREFIX), TimeType.type);
+		}
+		else if (sosElement instanceof SosSweBoolean)
+		{
+			xbDCD.set(createBoolean((SosSweBoolean) sosElement));
+			xbField.getAbstractDataComponent().substitute(new QName(SWEConstants.NS_SWE_20, SWEConstants.EN_BOOLEAN, SWEConstants.NS_SWE_PREFIX), BooleanType.type);
+		}
+		// FIXME
+		// FIXME	add all other simple types here
+		// FIXME
+		return xbField;
+	}
+
+	private BooleanType createBoolean(SosSweBoolean sosElement)
+	{
+		BooleanType xbBoolean = BooleanType.Factory.newInstance();
+		xbBoolean.setValue(Boolean.parseBoolean((sosElement).getValue()));
+		return xbBoolean;
+	}
+
+	private AbstractDataComponentType createDataRecord(SosSweDataRecord sosDataRecord) throws OwsExceptionReport
+	{
+		// TODO Eike: create SweDataRecordDocument from internal object
+		List<SosSweField> sosFields = sosDataRecord.getFields();
+		DataRecordDocument dataRecordDoc = DataRecordDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+		DataRecordType xbDataRecord = dataRecordDoc.addNewDataRecord();
+		if (sosDataRecord.isSetDefinition())
+		{
+			xbDataRecord.setDefinition(sosDataRecord.getDefinition());
+		}
+		if (sosDataRecord.isSetDescription())
+		{
+			xbDataRecord.setDescription(sosDataRecord.getDescription());
+		}
+		if (sosDataRecord.isSetIdentifier())
+		{
+			xbDataRecord.setIdentifier(sosDataRecord.getIdentifier());
+		}
+		if (sosFields != null) {
+			Field[] xbFields = new Field[sosFields.size()];
+			int xbFieldIndex = 0;
+			for (SosSweField sosSweField : sosFields) {
+				Field xbField = (DataRecordType.Field) createField(sosSweField);
+				xbFields[xbFieldIndex] = xbField;
+				xbFieldIndex++;
+			}
+			xbDataRecord.setFieldArray(xbFields);
+		}
+		return dataRecordDoc.getAbstractDataComponent();
+	}
+
+	private XmlObject createAbstractEncoding(SosSweAbstractEncoding sosSweAbstractEncoding) throws OwsExceptionReport {
+		// TODO implement encoding not using the getXml() but the real internal object
         try {
             if (sosSweAbstractEncoding.getXml() != null && !sosSweAbstractEncoding.getXml().isEmpty()) {
                 XmlObject xmlObject = XmlObject.Factory.parse(sosSweAbstractEncoding.getXml());
@@ -316,55 +411,24 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         }
     }
     
-    /**
-     * creates the swe:DataArray, which is used for the result element of a
-     * generic om:Observation
-     * 
-     * @param absObs
-     * @param phenComponents
-     * 
-     * @param phenComponents
-     *            ids of the phenomena of the common observation
-     * @return DataDefinitionType representing the DataDefinition element of a
-     *         CommonObservation
-     * @throws OwsExceptionReport
-     */
-    private DataArrayPropertyType createDataArrayResult(SosMultiObservationValues sosObservationValue) throws OwsExceptionReport {
-        SosSweDataArray array = null;
-        if (sosObservationValue.getValue() instanceof SweDataArrayValue) {
-            array = ((SweDataArrayValue) sosObservationValue.getValue()).getValue();
-        } else if (sosObservationValue.getValue() instanceof SosSweDataArray) {
-            array = (SosSweDataArray) sosObservationValue.getValue();
-        } else {
-            return null;
+    @SuppressWarnings("rawtypes")
+	private DataArrayPropertyType createDataArrayResult(SosMultiObservationValues sosObservationValue) throws OwsExceptionReport {
+        if (sosObservationValue.getValue() instanceof SosSweDataArray) {
+            DataArrayPropertyType dataArrayProperty =
+                    DataArrayPropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+            XmlObject xbAbstractDataComponent = createAbstractDataComponent((SosSweAbstractDataComponent) sosObservationValue.getValue());
+            if (xbAbstractDataComponent.schemaType() == DataArrayDocument.type) {
+                dataArrayProperty.setDataArray1(((DataArrayDocument)xbAbstractDataComponent).getDataArray1());
+            }
+            else if (xbAbstractDataComponent.schemaType() == DataArrayType.type) {
+                dataArrayProperty.setDataArray1((DataArrayType) xbAbstractDataComponent);
+            }
         }
-
-        DataArrayPropertyType dataArrayProperty =
-                DataArrayPropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        XmlObject xbAbstractDataComponent = createAbstractDataComponent((SosSweAbstractDataComponent) array);
-        if (xbAbstractDataComponent.schemaType() == DataArrayDocument.type) {
-            dataArrayProperty.setDataArray1(((DataArrayDocument) xbAbstractDataComponent).getDataArray1());
-        } else if (xbAbstractDataComponent.schemaType() == DataArrayType.type) {
-            dataArrayProperty.setDataArray1((DataArrayType) xbAbstractDataComponent);
-        }
-        
-        return dataArrayProperty;
+        return null;
     }
     
-    /**
-     * creates a result string representing the value matrix of the common
-     * observation or getResult response document
+    /* FIXME Clarify: Are these methods still required?
      * 
-     * @param phenComponents
-     *            the phenomenon components of the values of the value matrix
-     * @param valueMap
-     * @param valueMap
-     *            HashMap containing the time as key, and an ArrayList with
-     *            pairs of phenomena and values at the key time as values
-     * @return String representing the value matrix of the result element
-     * @throws OwsExceptionReport
-     * @throws ServiceException
-     */
     private String createResultString(List<SosObservableProperty> phenComponents, SosObservation sosObservation,
             Map<ITime, Map<String, IValue>> valueMap) throws OwsExceptionReport {
 
@@ -395,15 +459,15 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
             }
         }
         if (timeIndex < 0) {
-            /* TODO no phentimeindex found... */
+            // TODO no phentimeindex found...
         }
         ITime[] times = new ArrayList<ITime>(valueMap.keySet())
             .toArray(new ITime[valueMap.keySet().size()]);
         Arrays.sort(times);
         StringBuilder b = new StringBuilder();
         
-        /* dimensions will always be greater than (1,1).. 
-         * so partly roll out the loop to gain some performance */
+        // dimensions will always be greater than (1,1).. 
+        // so partly roll out the loop to gain some performance
         b.append(getValue(0, 0, times, phens, timeIndex, noDataValue, valueMap));
         for (int j = 1; j < phens.length; ++j) {
             b.append(tokenSeperator);
@@ -420,63 +484,24 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         b.append(tupleSeperator);
         return b.toString();
     }
+
     
     private String getValue(int i, int j, ITime[] times, String[] phens, int phenTimeIndex,
             String noDataValue, Map<ITime, Map<String, IValue>> valueMap) throws OwsExceptionReport {
         if (j == phenTimeIndex) {
-            return getTimeString(times[i]);
+            return DateTimeHelper.format(times[i]);
         } else {
             Map<String, IValue> value = valueMap.get(times[i]);
             return (value == null) ? noDataValue 
                     : getStringValue(value.get(phens[j]), noDataValue); 
         }
     }
+ 
     
-    /**
-     * Get time as text for TimePeriod or TimeInstant
-     * 
-     * @param time
-     *            To to get text from.
-     * @return time string
-     * @throws OwsExceptionReport
-     */
-    private String getTimeString(ITime time) throws OwsExceptionReport {
-        try {
-            StringBuilder timeString = new StringBuilder();
-            if (time instanceof TimeInstant) {
-                TimeInstant ti = (TimeInstant) time;
-                timeString.append(DateTimeHelper.formatDateTime2ResponseString(ti.getValue()));
-            } else if (time instanceof TimePeriod) {
-                TimePeriod tp = (TimePeriod) time;
-                timeString.append(DateTimeHelper.formatDateTime2ResponseString(tp.getStart()));
-                timeString.append("/");
-                timeString.append(DateTimeHelper.formatDateTime2ResponseString(tp.getEnd()));
-            }
-            return timeString.toString(); 
-        } catch (DateTimeException dte) {
-            String exceptionText = "Error while creating time string!";
-            LOGGER.error(exceptionText, dte);
-            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
-        }
-        
-    }
-    
-    /**
-     * Get value as text.
-     * 
-     * @param noDataValue
-     * 
-     * @param obsPropID
-     *            observableProperty
-     * @param object
-     *            value
-     * @return value as text.
-     */
     private String getStringValue(IValue value, String noDataValue) {
         if (value == null) {
             return noDataValue;
         }
-        WKTWriter wktWriter = new WKTWriter();
         if (value instanceof BooleanValue) {
             BooleanValue booleanValue = (BooleanValue) value;
             if (booleanValue.getValue() == null) {
@@ -493,7 +518,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
                 return Integer.toString(countValue.getValue().intValue());
             }
         } else if (value instanceof QuantityValue) {
-            /* TODO customizable decimal seperator */
+            // TODO customizable decimal seperator
             QuantityValue quantityValue = (QuantityValue) value;
             if (quantityValue.getValue() == null
                     || (quantityValue.getValue() != null && quantityValue.getValue().equals(Double.NaN))) {
@@ -511,7 +536,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         // }
         else if (value instanceof TextValue) {
             TextValue textValue = (TextValue) value;
-            /*  TODO should it really be testet for empty strings? isn't that a valid observation value? */
+            // TODO should it really be tested for empty strings? isn't that a valid observation value? 
             if (textValue.getValue() == null || (textValue.getValue() != null && textValue.getValue().isEmpty())) {
                 return noDataValue;
             } else {
@@ -533,9 +558,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
             }
         }
     }
-
-
-
+    
     private void addDataComponentToField(Field field, SosObservableProperty observableProperty,
             Collection<Map<String, IValue>> values) {
         IValue value = getValueForObservableProperty(values, observableProperty.getIdentifier());
@@ -556,7 +579,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
                                 SWEConstants.QN_QUANTITY_SWE_200, QuantityType.type);
                 xbQuantity.setDefinition(observableProperty.getIdentifier());
                 UnitReference xb_uom = xbQuantity.addNewUom();
-                /* FIXME set the unit of the observed property while inserting result */
+                // FIXME set the unit of the observed property while inserting result
                 String uom = observableProperty.getUnit();
                 if (uom == null || uom.trim().isEmpty()) {
                     uom = value.getUnit() == null ? "" : value.getUnit();
@@ -608,5 +631,5 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         }
         return null;
     }
-
+*/
 }
