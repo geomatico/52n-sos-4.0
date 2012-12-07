@@ -236,9 +236,10 @@ public class HibernateObservationUtilities {
                 }
 
                 // TODO: compositePhenomenon
-                if (hObservation.getAntiSubsetting() != null && !hObservation.getAntiSubsetting().isEmpty()
-                        && !isAntiSubsettingExtensionSet(request.getExtensions())) {
-                    if (antiSubsettingObservations.containsKey(hObservation.getAntiSubsetting())) {
+                if (isSubsetIdAvailable(hObservation) &&
+                        !isSubsettingExtensionSet(request.getExtensions())) {
+                    if (antiSubsettingObservations.containsKey(hObservation.getAntiSubsetting()))
+                    {
                         // observation already create => merge values
                         SosObservation sosObservation =
                                 antiSubsettingObservations.get(hObservation.getAntiSubsetting());
@@ -342,8 +343,16 @@ public class HibernateObservationUtilities {
         return observationCollection;
     }
 
-    private static SosSweAbstractDataComponent createElementType(SosObservationConstellation observationConstellation,
-            Observation hObservation) {
+	private static boolean isSubsetIdAvailable(Observation hObservation)
+	{
+		return hObservation.getAntiSubsetting() != null && 
+		        !hObservation.getAntiSubsetting().isEmpty();
+	}
+
+    private static SosSweAbstractDataComponent createElementType(
+    		SosObservationConstellation observationConstellation,
+            Observation hObservation)
+    {
         SosSweDataRecord elementType = new SosSweDataRecord();
         String observationType = observationConstellation.getObservationType();
         String observedProperty = observationConstellation.getObservableProperty().getIdentifier();
@@ -392,26 +401,38 @@ public class HibernateObservationUtilities {
         if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_MEASUREMENT)) {
             observedValueFieldElement = new SosSweQuantity();
             ((SosSweQuantity) observedValueFieldElement).setUom(hObservation.getUnit().getUnit());
-        } else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION)) {
+        } 
+        else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION)) {
             observedValueFieldElement = new SosSweCategory();
             ((SosSweCategory) observedValueFieldElement).setCodeSpace(hObservation.getUnit().getUnit());
-        } else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_COUNT_OBSERVATION)) {
+        } 
+        else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_COUNT_OBSERVATION)) {
             observedValueFieldElement = new SosSweCount();
-        } else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_COMPLEX_OBSERVATION)) {
+        } 
+        else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_COMPLEX_OBSERVATION)) {
             // TODO what todo in the case of complex observations?
             String exceptionMsg = String.format("Received observation type is not supported: %s", observationType);
             LOGGER.debug(exceptionMsg);
             throw new IllegalArgumentException(exceptionMsg);
-        } else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_OBSERVATION)) {
+        } 
+        else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_OBSERVATION)) {
             // TODO what todo in the case of a generic observation?
             String exceptionMsg = String.format("Received observation type is not supported: %s", observationType);
             LOGGER.debug(exceptionMsg);
             throw new IllegalArgumentException(exceptionMsg);
-        } else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_TEXT_OBSERVATION)) {
+        } 
+        else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_TEXT_OBSERVATION)) {
             observedValueFieldElement = new SosSweText();
-        } else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_TRUTH_OBSERVATION)) {
+        } 
+        else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_TRUTH_OBSERVATION)) {
             observedValueFieldElement = new SosSweBoolean();
-        } else {
+        }
+        else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION))
+        {
+        	observedValueFieldElement = new SosSweDataArray();
+        }
+        else
+        {
             String exceptionMsg = String.format("Received observation type is not supported: %s", observationType);
             LOGGER.debug(exceptionMsg);
             throw new IllegalArgumentException(exceptionMsg);
@@ -445,9 +466,11 @@ public class HibernateObservationUtilities {
         throw new IllegalArgumentException(exceptionMsg);
     }
 
-    private static boolean isAntiSubsettingExtensionSet(SwesExtensions extensions) {
-        return extensions != null ? extensions.isBooleanExentsionSet(Sos2Constants.Extensions.Subsetting.name())
-                : false;
+    private static boolean isSubsettingExtensionSet(SwesExtensions extensions)
+    {
+        return extensions!=null?
+        		extensions.isBooleanExentsionSet(Sos2Constants.Extensions.Subsetting.name()):
+        			false;
     }
 
     private static void checkOrSetObservablePropertyUnit(AbstractSosPhenomenon abstractSosPhenomenon, String unit) {
@@ -679,10 +702,10 @@ public class HibernateObservationUtilities {
                      * TODO create new ObservationConstellation only with the
                      * specified observed property and observation type
                      */
-                    SosObservationConstellation obsConst =
-                            createObservationConstellationForSubObservation(
-                                    multiObservation.getObservationConstellation(), iValue,
-                                    definitionsForObservedValues.get(iValue));
+                    SosObservationConstellation obsConst = multiObservation.getObservationConstellation();/*createObservationConstellationForSubObservation(
+                    		multiObservation.getObservationConstellation(),
+                    		iValue,
+                    		definitionsForObservedValues.get(iValue))*/;
                     newObservation.setObservationConstellation(obsConst);
                     newObservation.setValidTime(multiObservation.getValidTime());
                     newObservation.setResultTime(multiObservation.getResultTime());
