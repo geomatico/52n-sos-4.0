@@ -62,10 +62,14 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.Util4Exceptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 
 public class HibernateCriteriaTransactionalUtilities {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(HibernateCriteriaTransactionalUtilities.class);
 
     public static synchronized void setDeleteSensorFlag(String identifier, boolean deleteFlag, Session session)
             throws OwsExceptionReport {
@@ -420,26 +424,30 @@ public class HibernateCriteriaTransactionalUtilities {
                 HibernateCriteriaQueryUtilities.getResultTemplateObject(observationConstellation.getOffering()
                         .getIdentifier(), observationConstellation.getObservableProperty().getIdentifier(), features,
                         session);
-        if (resultTemplates == null || (resultTemplates != null && resultTemplates.isEmpty())) {
+        if (!resultTemplateListContainsElements(resultTemplates)) {
             createAndSaveResultTemplate(request, observationConstellation, featureOfInterest, session);
-        } else if (resultTemplates != null && !resultTemplates.isEmpty()) {
+        } else {
+        	// TODO Iterate over result templates and throw exception after checking all?!
             ResultTemplate storedResultTemplate = resultTemplates.get(0);
             if (!storedResultTemplate.getResultStructure().equals(request.getResultStructure().getXml())) {
-                StringBuilder exceptionText = new StringBuilder();
-                exceptionText
-                        .append("The requested resultStructure is different from already inserted result template for procedure (");
-                exceptionText.append (observationConstellation.getProcedure().getIdentifier());
-                exceptionText.append(") observedProperty (");
-                exceptionText.append(observationConstellation.getObservableProperty().getIdentifier());
-                exceptionText.append(") and offering (");
-                exceptionText.append(observationConstellation.getOffering().getIdentifier());
-                exceptionText.append(")!");
+                String exceptionText = String.format(
+                		"The requested resultStructure is different from already inserted result template " +
+                		"for procedure (%s) observedProperty (%s) and offering (%s)!",
+                		observationConstellation.getProcedure().getIdentifier(),
+                		observationConstellation.getObservableProperty().getIdentifier(),
+                		observationConstellation.getOffering().getIdentifier());
+                LOGGER.error(exceptionText);
                 throw Util4Exceptions.createInvalidParameterValueException(
-                        Sos2Constants.InsertResultTemplateParams.resultStructure.name(), exceptionText.toString());
+                        Sos2Constants.InsertResultTemplateParams.resultStructure.name(), exceptionText);
             }
             createAndSaveResultTemplate(request, observationConstellation, featureOfInterest, session);
         }
     }
+
+	private static boolean resultTemplateListContainsElements(List<ResultTemplate> resultTemplates)
+	{
+		return resultTemplates != null && !resultTemplates.isEmpty();
+	}
 
     private static void createAndSaveResultTemplate(InsertResultTemplateRequest request,
             ObservationConstellation observationConstellation, FeatureOfInterest featureOfInterest, Session session) {
@@ -494,9 +502,9 @@ public class HibernateCriteriaTransactionalUtilities {
         List<SosObservation> unfoldObservations = HibernateObservationUtilities.unfoldObservation(containerObservation);
         int subObservationIndex = 0;
         for (SosObservation sosObservation : unfoldObservations) {
+        	// TODO Eike: continue here: Save result structure for observation
             String antiSubsettingId = getAntiSubsettingId(containerObservation);
             setIdentifier(containerObservation, sosObservation, antiSubsettingId, subObservationIndex+"");
-            
             insertObservationSingleValueWithAntiSubSettingId(obsConst, feature, sosObservation, antiSubsettingId, session);
             subObservationIndex++;
         }
