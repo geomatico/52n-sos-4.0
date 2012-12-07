@@ -28,7 +28,7 @@ package org.n52.sos.ogc.swe;
  * SOS internal representation of SWE field
  * 
  */
-public class SosSweField {
+public class SosSweField extends SosSweAbstractDataComponent{
 
     /**
      * field name
@@ -70,17 +70,17 @@ public class SosSweField {
     }
 
     /**
-     * @return the elements
+     * @return the element
      */
     public SosSweAbstractDataComponent getElement() {
         return element;
     }
 
     /**
-     * @param elements
-     *            the elements to set
+     * @param element
+     *            the element to set
      */
-    public void setElements(SosSweAbstractDataComponent element) {
+    public void setElement(SosSweAbstractDataComponent element) {
         this.element = element;
     }
 
