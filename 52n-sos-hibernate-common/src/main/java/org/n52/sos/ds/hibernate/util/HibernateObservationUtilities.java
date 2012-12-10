@@ -63,6 +63,7 @@ import org.n52.sos.ogc.om.quality.SosQuality.QualityType;
 import org.n52.sos.ogc.om.values.IValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
+import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -93,7 +94,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
-import org.n52.sos.ogc.ows.OWSConstants;
 
 public class HibernateObservationUtilities {
 
@@ -489,20 +489,32 @@ public class HibernateObservationUtilities {
      *            Observation object
      * @return Observation value
      */
-    private static IValue getValueFromAllTable(Observation hObservation) {
-        if (hObservation.getBooleanValues() != null && !hObservation.getBooleanValues().isEmpty()) {
+    private static IValue getValueFromAllTable(Observation hObservation)
+    {
+        if (hObservation.getBooleanValues() != null && !hObservation.getBooleanValues().isEmpty())
+        {
             return new org.n52.sos.ogc.om.values.BooleanValue(
                     getValueFromBooleanValueTable(hObservation.getBooleanValues()));
-        } else if (hObservation.getCategoryValues() != null && !hObservation.getCategoryValues().isEmpty()) {
+        } 
+        else if (hObservation.getCategoryValues() != null && !hObservation.getCategoryValues().isEmpty())
+        {
             return new org.n52.sos.ogc.om.values.CategoryValue(
                     getValueFromCategoryValueTable(hObservation.getCategoryValues()));
-        } else if (hObservation.getCountValues() != null && !hObservation.getCountValues().isEmpty()) {
+        } 
+        else if (hObservation.getCountValues() != null && !hObservation.getCountValues().isEmpty())
+        {
             return new org.n52.sos.ogc.om.values.CountValue(getValueFromCountValueTable(hObservation.getCountValues()));
-        } else if (hObservation.getNumericValues() != null && !hObservation.getNumericValues().isEmpty()) {
+        } 
+        else if (hObservation.getNumericValues() != null && !hObservation.getNumericValues().isEmpty())
+        {
             return new QuantityValue(getValueFromNumericValueTable(hObservation.getNumericValues()));
-        } else if (hObservation.getTextValues() != null && !hObservation.getTextValues().isEmpty()) {
+        } 
+        else if (hObservation.getTextValues() != null && !hObservation.getTextValues().isEmpty())
+        {
             return new org.n52.sos.ogc.om.values.TextValue(getValueFromTextValueTable(hObservation.getTextValues()));
-        } else if (hObservation.getGeometryValues() != null && !hObservation.getGeometryValues().isEmpty()) {
+        } 
+        else if (hObservation.getGeometryValues() != null && !hObservation.getGeometryValues().isEmpty())
+        {
             return new org.n52.sos.ogc.om.values.GeometryValue(
                     getValueFromGeometryValueTable(hObservation.getGeometryValues()));
         }
@@ -593,7 +605,7 @@ public class HibernateObservationUtilities {
             features = new HashSet<String>();
         }
         if (!features.contains(foiID)) {
-
+        	// TODO do something or remove if-statement
         }
         features.add(foiID);
         feature4proc.put(procID, features);
@@ -620,8 +632,6 @@ public class HibernateObservationUtilities {
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
             }
 
-            // FIXME each block represents one observation <-- this is not
-            // always true!
             for (List<String> block : values) {
                 int tokenIndex = 0;
                 ITime phenomenonTime = null;
@@ -636,7 +646,6 @@ public class HibernateObservationUtilities {
                     /*
                      * get phenomenon time
                      */
-
                     if (fieldForToken instanceof SosSweTime) {
                         try {
                             if (fieldForToken instanceof SosSweTimeRange) {
@@ -693,32 +702,39 @@ public class HibernateObservationUtilities {
                     }
                     tokenIndex++;
                 }
-                // TODO: Eike implement usage of elementType
                 for (IValue iValue : observedValues) {
-                    IObservationValue value = new SosSingleObservationValue(phenomenonTime, iValue);
-                    SosObservation newObservation = new SosObservation();
-                    newObservation.setNoDataValue(multiObservation.getNoDataValue());
-                    /*
-                     * TODO create new ObservationConstellation only with the
-                     * specified observed property and observation type
-                     */
-                    SosObservationConstellation obsConst = multiObservation.getObservationConstellation();/*createObservationConstellationForSubObservation(
-                    		multiObservation.getObservationConstellation(),
-                    		iValue,
-                    		definitionsForObservedValues.get(iValue))*/;
-                    newObservation.setObservationConstellation(obsConst);
-                    newObservation.setValidTime(multiObservation.getValidTime());
-                    newObservation.setResultTime(multiObservation.getResultTime());
-                    newObservation.setTokenSeparator(multiObservation.getTokenSeparator());
-                    newObservation.setTupleSeparator(multiObservation.getTupleSeparator());
-                    newObservation.setResultType(multiObservation.getResultType());
-                    newObservation.setValue(value);
+                    SosObservation newObservation = createSingleValueObservation(multiObservation, phenomenonTime, iValue);
                     observationCollection.add(newObservation);
                 }
             }
             return observationCollection;
         }
     }
+
+	private static SosObservation createSingleValueObservation(SosObservation multiObservation,
+			ITime phenomenonTime,
+			IValue iValue)
+	{
+		IObservationValue value = new SosSingleObservationValue(phenomenonTime, iValue);
+		SosObservation newObservation = new SosObservation();
+		newObservation.setNoDataValue(multiObservation.getNoDataValue());
+		/*
+		 * TODO create new ObservationConstellation only with the
+		 * specified observed property and observation type
+		 */
+		SosObservationConstellation obsConst = multiObservation.getObservationConstellation();/*createObservationConstellationForSubObservation(
+				multiObservation.getObservationConstellation(),
+				iValue,
+				definitionsForObservedValues.get(iValue))*/;
+		newObservation.setObservationConstellation(obsConst);
+		newObservation.setValidTime(multiObservation.getValidTime());
+		newObservation.setResultTime(multiObservation.getResultTime());
+		newObservation.setTokenSeparator(multiObservation.getTokenSeparator());
+		newObservation.setTupleSeparator(multiObservation.getTupleSeparator());
+		newObservation.setResultType(multiObservation.getResultType());
+		newObservation.setValue(value);
+		return newObservation;
+	}
 
     private static SosObservationConstellation createObservationConstellationForSubObservation(
             SosObservationConstellation observationConstellation, IValue iValue, String phenomenonID) {
