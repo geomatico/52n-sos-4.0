@@ -173,7 +173,6 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
         SosSweDataArray sosSweDataArray = new SosSweDataArray();
         sosSweDataArray.setDefinition(xbDataArray.getDefinition());
         sosSweDataArray.setDescription(xbDataArray.getDescription());
-        sosSweDataArray.setElementCount(parseCount(xbDataArray.getElementCount().getCount()));
         
         // parse data record to elementType
         DataArrayType.ElementType xbElementType = xbDataArray.getElementType();
