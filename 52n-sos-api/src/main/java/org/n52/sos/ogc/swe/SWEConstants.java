@@ -65,6 +65,8 @@ public class SWEConstants {
     public static final String EN_TEXT = "Text";
 
     public static final String EN_TIME = "Time";
+    
+    public static final String EN_TIME_RANGE = "TimeRange";
 
     public static final String EN_TEXT_ENCODING = "TextEncoding";
 
@@ -75,7 +77,7 @@ public class SWEConstants {
     public static final String EN_ABSTRACT_OFFERING = "AbstractOffering";
 
     public static final String EN_OFFERING = "offering";
-
+    
     // QNames for elements
 
     public static final QName QN_SIMPLEDATARECORD_SWE_101 = new QName(NS_SWE, EN_SIMPLEDATARECORD, NS_SWE_PREFIX);
@@ -157,4 +159,5 @@ public class SWEConstants {
             return this.soapFaultReason;
         }
     }
+
 }
