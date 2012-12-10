@@ -28,6 +28,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import net.opengis.swe.x20.DataRecordDocument;
+import net.opengis.swe.x20.DataRecordType;
+import net.opengis.swe.x20.TextEncodingDocument;
+import net.opengis.swe.x20.TextEncodingType;
+
 import org.apache.xmlbeans.XmlObject;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -151,76 +156,31 @@ public class InsertObservationDAO implements IInsertObservationDAO {
             session = (Session) connectionProvider.getConnection();
             transaction = session.beginTransaction();
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
-            for (SosObservation observation : request.getObservation()) {
-                SosObservationConstellation sosObsConst = observation.getObservationConstellation();
-                ObservationConstellation obsConst = null;
+            for (SosObservation sosObservation : request.getObservation()) {
+                SosObservationConstellation sosObsConst = sosObservation.getObservationConstellation();
+                ObservationConstellation hObsConst = null;
                 for (String offeringID : sosObsConst.getOfferings()) {
                     try {
-                        obsConst =
+                        hObsConst =
                                 HibernateUtilities.checkObservationConstellationForObservation(sosObsConst, offeringID, session);
                     } catch (OwsExceptionReport owse) {
                         exceptions.add(owse);
                     }
-                    if (obsConst != null) {
-                    	FeatureOfInterest feature =
-                                HibernateUtilities.checkOrInsertFeatureOfInterest(observation.getObservationConstellation()
+                    if (hObsConst != null) {
+                    	FeatureOfInterest hFeature =
+                                HibernateUtilities.checkOrInsertFeatureOfInterest(sosObservation.getObservationConstellation()
                                         .getFeatureOfInterest(), session);
-                        HibernateUtilities.checkOrInsertFeatureOfInterestRelatedFeatureRelation(feature, obsConst.getOffering(), session);
-                        // TODO Eike: store result structure if observationType == SweArrayObservation
-                    	if (obsConst.getObservationType().getObservationType().equalsIgnoreCase(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION))
+                        HibernateUtilities.checkOrInsertFeatureOfInterestRelatedFeatureRelation(hFeature, hObsConst.getOffering(), session);
+                    	if (isSweArrayObservation(hObsConst))
                     	{
-                    		ResultTemplate resultTemplate = new ResultTemplate();
-                    		// TODO identifier handling: ignoring codespace now
-                    		String identifier = null;
-                    		if (observation.getIdentifier() != null && observation.getIdentifier().getValue() != null && !observation.getIdentifier().getValue().isEmpty())
-                    		{
-                    			identifier = observation.getIdentifier().getValue();
-                    		}
-                    		else {
-                    			identifier = UUID.randomUUID().toString();
-                    		}
-                    		resultTemplate.setIdentifier(identifier);
-                    		resultTemplate.setObservationConstellation(obsConst);
-                    		resultTemplate.setFeatureOfInterest(feature);
-                    		SosSweDataArray dataArray = ((SweDataArrayValue)observation.getValue().getValue()).getValue();
-                    		SweCommonEncoderv20 sweEncoder = null;
-                    		if (dataArray.getElementType().getXml() == null || dataArray.getEncoding().getXml() == null)
-                    		{
-                    			IEncoder encoder = Configurator.getInstance().getEncoder(SWEConstants.NS_SWE_20);
-                    			if (encoder instanceof SweCommonEncoderv20)
-                    			{
-                    				sweEncoder = (SweCommonEncoderv20) encoder;
-                    			}
-                    			else
-                    			{
-                    				// TODO throw exception because encoder could not be found but is urgently required!
-                    			}
-                    		}
-                    		if (dataArray.getElementType().getXml() == null)
-                    		{
-                    			XmlObject encodedXMLObject = sweEncoder.encode(dataArray.getElementType());
-                    			resultTemplate.setResultStructure(encodedXMLObject.xmlText(XmlOptionsHelper.getInstance().getXmlOptions()));
-                    		}
-                    		else
-                    		{
-                    			resultTemplate.setResultStructure(dataArray.getElementType().getXml());
-                    		}
-                    		if (dataArray.getEncoding().getXml() == null)
-                    		{
-                    			XmlObject encodedXmlObject = sweEncoder.encode(dataArray.getEncoding());
-                    			resultTemplate.setResultEncoding(encodedXmlObject.xmlText(XmlOptionsHelper.getInstance().getXmlOptions()));
-                    		}
-                    		else
-                    		{
-                    			resultTemplate.setResultEncoding(dataArray.getEncoding().getXml());
-                    		}
+                    		ResultTemplate resultTemplate = createResultTemplate(sosObservation, hObsConst, hFeature);
                     		session.save(resultTemplate);
                     		session.flush();
                     	}
-                        if (observation.getValue() instanceof SosSingleObservationValue) {
-                            HibernateCriteriaTransactionalUtilities.insertObservationSingleValue(obsConst, feature, observation, session);
-                        } else if (observation.getValue() instanceof SosMultiObservationValues) {
-                            HibernateCriteriaTransactionalUtilities.insertObservationMutliValue(obsConst, feature, observation,session);
+                        if (sosObservation.getValue() instanceof SosSingleObservationValue) {
+                            HibernateCriteriaTransactionalUtilities.insertObservationSingleValue(hObsConst, hFeature, sosObservation, session);
+                        } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
+                            HibernateCriteriaTransactionalUtilities.insertObservationMutliValue(hObsConst, hFeature, sosObservation, session);
                         }
                     }
                 }
@@ -247,6 +207,82 @@ public class InsertObservationDAO implements IInsertObservationDAO {
 
         return response;
     }
+
+	private boolean isSweArrayObservation(ObservationConstellation obsConst)
+	{
+		return obsConst.getObservationType().getObservationType().equalsIgnoreCase(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
+	}
+
+	private ResultTemplate createResultTemplate(SosObservation observation,
+			ObservationConstellation obsConst,
+			FeatureOfInterest feature) throws OwsExceptionReport
+	{
+		ResultTemplate resultTemplate = new ResultTemplate();
+		// TODO identifier handling: ignoring code space now
+		String identifier = null;
+		if (observation.getIdentifier() != null && observation.getIdentifier().getValue() != null && !observation.getIdentifier().getValue().isEmpty())
+		{
+			identifier = observation.getIdentifier().getValue();
+		}
+		else {
+			identifier = UUID.randomUUID().toString();
+		}
+		resultTemplate.setIdentifier(identifier);
+		resultTemplate.setObservationConstellation(obsConst);
+		resultTemplate.setFeatureOfInterest(feature);
+		SosSweDataArray dataArray = ((SweDataArrayValue)observation.getValue().getValue()).getValue();
+		SweCommonEncoderv20 sweEncoder = null;
+		if (isEncoderRequired(dataArray))
+		{
+			IEncoder encoder = Configurator.getInstance().getEncoder(SWEConstants.NS_SWE_20);
+			if (encoder instanceof SweCommonEncoderv20)
+			{
+				sweEncoder = (SweCommonEncoderv20) encoder;
+			}
+			else
+			{
+				String errorMsg = String.format("Could not find encoder for namespace \"%s\".", SWEConstants.NS_SWE_20);
+				LOGGER.error(errorMsg);
+				throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+			}
+		}
+		if (dataArray.getElementType().getXml() == null)
+		{
+			XmlObject encodedXMLObject = sweEncoder.encode(dataArray.getElementType());
+			if (encodedXMLObject instanceof DataRecordType)
+			{
+				DataRecordDocument xbDataRecord = DataRecordDocument.Factory.newInstance();
+				xbDataRecord.setDataRecord((DataRecordType) encodedXMLObject);
+				encodedXMLObject = xbDataRecord;
+			}
+			resultTemplate.setResultStructure(encodedXMLObject.xmlText(XmlOptionsHelper.getInstance().getXmlOptions()));
+		}
+		else
+		{
+			resultTemplate.setResultStructure(dataArray.getElementType().getXml());
+		}
+		if (dataArray.getEncoding().getXml() == null)
+		{
+			XmlObject encodedXmlObject = sweEncoder.encode(dataArray.getEncoding());
+			if (encodedXmlObject instanceof TextEncodingType)
+			{
+				TextEncodingDocument xbTextEncodingDoc = TextEncodingDocument.Factory.newInstance();
+				xbTextEncodingDoc.setTextEncoding((TextEncodingType) encodedXmlObject);
+				encodedXmlObject = xbTextEncodingDoc;
+			}
+			resultTemplate.setResultEncoding(encodedXmlObject.xmlText(XmlOptionsHelper.getInstance().getXmlOptions()));
+		}
+		else
+		{
+			resultTemplate.setResultEncoding(dataArray.getEncoding().getXml());
+		}
+		return resultTemplate;
+	}
+
+	private boolean isEncoderRequired(SosSweDataArray dataArray)
+	{
+		return dataArray.getElementType().getXml() == null || dataArray.getEncoding().getXml() == null;
+	}
 
     @Override
     public IExtension getExtension(Object connection) throws OwsExceptionReport {
