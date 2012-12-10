@@ -125,7 +125,7 @@ public class InstallDatabaseController extends AbstractInstallController {
         try {
             url = new JdbcUrl(jdbc);
         } catch (URISyntaxException ex) {
-            return error(settings, "Invalid JDBC URL.");
+            return error(settings, "Invalid JDBC URL.", ex);
         }
         String error = url.isValid();
         if (error != null) {
@@ -134,20 +134,22 @@ public class InstallDatabaseController extends AbstractInstallController {
             return error(settings, "Invalid JDBC URL: " + error);
         }
         settings.put(ControllerConstants.JDBC_PARAMETER, jdbc);
-
-        boolean createTables = true;
-        Boolean createTablesParameter = parseBoolean(parameters, InstallConstants.CREATE_TABLES_PARAMETER);
-        if (createTablesParameter != null) {
-            createTables = createTablesParameter.booleanValue();
-        }
-        settings.put(InstallConstants.CREATE_TABLES_PARAMETER, createTables);
-
+        
         boolean overwriteTables = false;
         Boolean overwriteTablesParameter = parseBoolean(parameters, InstallConstants.OVERWRITE_TABLES_PARAMETER);
         if (overwriteTablesParameter != null) {
             overwriteTables = overwriteTablesParameter.booleanValue();
         }
         settings.put(InstallConstants.OVERWRITE_TABLES_PARAMETER, overwriteTables);
+
+        boolean createTables = true;
+        Boolean createTablesParameter = parseBoolean(parameters, InstallConstants.CREATE_TABLES_PARAMETER);
+        if (createTablesParameter != null) {
+            createTables = (overwriteTables) ? overwriteTables : createTablesParameter.booleanValue();
+        }
+        settings.put(InstallConstants.CREATE_TABLES_PARAMETER, createTables);
+
+        
 
         boolean createTestData = false;
         Boolean createTestDataParameter = parseBoolean(parameters, InstallConstants.CREATE_TEST_DATA_PARAMETER);

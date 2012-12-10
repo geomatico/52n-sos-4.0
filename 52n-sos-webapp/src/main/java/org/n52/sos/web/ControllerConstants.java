@@ -40,6 +40,7 @@ public interface ControllerConstants {
         public static final String INSTALL_SETTINGS = "install/settings";
         public static final String INSTALL_FINISH = "install/finish";
         public static final String INSTALL_LOAD_SETTINGS = "install/load";
+        public static final String ADMIN_LOGGING = "admin/logging";
     }
 
     public static interface Paths {
@@ -59,6 +60,7 @@ public interface ControllerConstants {
         public static final String ADMIN_DATABASE_REMOVE_TEST_DATA = "/admin/database/testdata/remove";
         public static final String ADMIN_DATABASE_CREATE_TEST_DATA = "/admin/database/testdata/create";
         public static final String ADMIN_RESET = "/admin/reset";
+        public static final String ADMIN_LOGGING = "/admin/logging";
         public static final String INSTALL_ROOT = "/install";
         public static final String INSTALL_INDEX = "/install/index";
         public static final String INSTALL_DATABASE_CONFIGURATION = "/install/database";
@@ -71,7 +73,7 @@ public interface ControllerConstants {
     public static final String ERROR_MESSAGE_ATTRIBUTE = "error";
     public static final String JDBC_PARAMETER = "jdbc_uri";
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
-
+    
     /* SQL file paths */
     public static final String INSERT_TEST_DATA_SQL_FILE = "/sql/insert_test_data.sql";
     public static final String REMOVE_TEST_DATA_SQL_FILE = "/sql/remove_test_data.sql";

@@ -69,5 +69,4 @@
     });
 </script>
 <br/>
-<!--<div style="height:150px"></div>-->
 <jsp:include page="../common/footer.jsp" />

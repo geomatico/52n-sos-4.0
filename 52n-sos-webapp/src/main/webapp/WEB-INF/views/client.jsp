@@ -228,7 +228,7 @@
 				if (def.request) {
 					$.get(def.request, function(data) {
 						var xml = data.xml ? data.xml : new XMLSerializer().serializeToString(data);
-						editor.setValue(vkbeautify.xml(xml, 2));
+						editor.setValue(xml);
 					});
 				}
 			});

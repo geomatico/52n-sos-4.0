@@ -96,18 +96,4 @@ public abstract class AbstractInstallController extends AbstractController {
         settings.put(InstallConstants.SUCCESS, Boolean.TRUE);
         return settings;
     }
-
-    protected Boolean parseBoolean(Map<String, String> parameters, String name) {
-        String s = parameters.get(name);
-        if (s != null && !s.trim().isEmpty()) {
-            s = s.trim();
-            if (s.equals("true") || s.equals("yes") || s.equals("on")) {
-                return Boolean.TRUE;
-            }
-            if (s.equals("false") || s.equals("no") || s.equals("off")) {
-                return Boolean.FALSE;
-            }
-        }
-        return Boolean.FALSE;
-    }
 }

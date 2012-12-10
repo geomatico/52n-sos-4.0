@@ -87,6 +87,11 @@
 														<span class="menu-title">Settings</span>
 													</a>
 												</li>
+                                                <li>
+													<a href="<c:url value="/admin/logging" />">
+														<span class="menu-title">Logging Settings</span>
+													</a>
+												</li>
 												<li>
 													<a href="<c:url value="/admin/database" />">
 														<span class="menu-title">Database</span>

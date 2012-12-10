@@ -24,6 +24,7 @@
 
 package org.n52.sos.web;
 
+import java.util.Map;
 import org.n52.sos.service.DatabaseSettingsHandler;
 import javax.servlet.ServletContext;
 import org.n52.sos.web.install.AbstractInstallController;
@@ -58,5 +59,21 @@ public class AbstractController {
     
     public DatabaseSettingsHandler getDatabaseSettingsHandler() {
         return DatabaseSettingsHandler.getInstance(getContext());
+    }
+    
+    protected Boolean parseBoolean(Map<String, String> parameters, String name) {
+        return parseBoolean(parameters.get(name));
+    }
+    protected Boolean parseBoolean(String s) {
+        if (s != null && !s.trim().isEmpty()) {
+            s = s.trim();
+            if (s.equals("true") || s.equals("yes") || s.equals("on")) {
+                return Boolean.TRUE;
+            }
+            if (s.equals("false") || s.equals("no") || s.equals("off")) {
+                return Boolean.FALSE;
+            }
+        }
+        return Boolean.FALSE;
     }
 }

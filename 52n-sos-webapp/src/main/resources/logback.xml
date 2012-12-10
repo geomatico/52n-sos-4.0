@@ -1,4 +1,4 @@
-<configuration>
+<configuration scan="true" scanPeriod="30 seconds">
 
 	<!-- refer to http://logback.qos.ch/manual/appenders.html -->
 

@@ -174,6 +174,7 @@ public class AbstractPropertyFileHandler {
     public boolean delete() {
         try {
             cache = null;
+            log.debug("Removing properties file: {}.", getFile(false));
             return exists() ? getFile(false).delete() : true;
         } catch (IOException ex) {
             return false;
