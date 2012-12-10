@@ -31,7 +31,7 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
  * @author Carsten Hollmann
  * @version 1.0.0
  */
-public class SosSweQuantity extends SosSweAbstractSimpleType {
+public class SosSweQuantity extends SosSweAbstractUomType {
 
 	/**
 	 * SWE simple type type
@@ -96,28 +96,6 @@ public class SosSweQuantity extends SosSweAbstractSimpleType {
 	public void setValue(String value)
 	{
 		this.value = value;
-	}
-
-	/**
-	 * Get unit of measurement
-	 * 
-	 * @return the uom
-	 */
-	public String getUom()
-	{
-		return uom;
-	}
-
-	/**
-	 * Set unit of measurement
-	 * 
-	 * @param uom
-	 *            the uom to set
-	 */
-
-	public void setUom(String uom)
-	{
-		this.uom = uom;
 	}
 
 	@Override

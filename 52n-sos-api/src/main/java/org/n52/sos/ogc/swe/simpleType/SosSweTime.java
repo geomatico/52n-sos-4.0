@@ -29,7 +29,7 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
  * SOS internal representation of SWE simpleType time
  * 
  */
-public class SosSweTime extends SosSweAbstractSimpleType {
+public class SosSweTime extends SosSweAbstractUomType {
 
     /**
      * SWE simple type type
@@ -40,11 +40,6 @@ public class SosSweTime extends SosSweAbstractSimpleType {
      * value
      */
     private String value;
-
-    /**
-     * unit of measurement
-     */
-    private String uom;
 
     /**
      * constructor
@@ -68,29 +63,10 @@ public class SosSweTime extends SosSweAbstractSimpleType {
         this.value = value;
     }
 
-    /**
-     * Get unit of measurement
-     * 
-     * @return the uom
-     */
-    public String getUom() {
-        return uom;
-    }
-
-    /**
-     * Set unit of measurement
-     * 
-     * @param uom
-     *            the uom to set
-     */
-    public void setUom(String uom) {
-        this.uom = uom;
-    }
-
 	@Override
 	public String toString()
 	{
-		return String.format("%s [simpleType=%s, value=%s, uom=%s, quality=%s]",this.getClass().getSimpleName(), simpleType, value, uom, getQuality());
+		return String.format("%s [simpleType=%s, value=%s, uom=%s, quality=%s]",this.getClass().getSimpleName(), simpleType, value, getUom(), getQuality());
 	}
     
 }

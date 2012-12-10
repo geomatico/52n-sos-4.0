@@ -61,6 +61,15 @@ public abstract class SosSweAbstractSimpleType extends SosSweAbstractDataCompone
     public void setQuality(SosSweQuality quality) {
     	this.quality = quality;        
     }
+    
+    /**
+     * @return <tt>true</tt>, if the quality field is not <tt>null</tt>,<br>
+     * 			<tt>false</tt> else.
+     */
+    public boolean isSetQuality()
+    {
+    	return quality != null;
+    }
 
     /**
      * Get value
@@ -76,6 +85,14 @@ public abstract class SosSweAbstractSimpleType extends SosSweAbstractDataCompone
      *            value to set
      */
     public abstract void setValue(String value);
+    
+    /**
+     * @return <tt>true</tt>, if the value field is set and not returning an empty string.
+     */
+    public boolean isSetValue()
+    {
+    	return getValue() != null && !getValue().isEmpty();
+    }
 
 	@Override
 	public String toString()
