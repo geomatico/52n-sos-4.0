@@ -470,22 +470,22 @@ public class HibernateCriteriaTransactionalUtilities {
     
     private static void insertObservationSingleValueWithAntiSubSettingId(ObservationConstellation obsConst,
             FeatureOfInterest feature,
-            SosObservation observation,
+            SosObservation sosObservation,
             String antiSubsettingId,
             Session session) {
-        SosSingleObservationValue value = (SosSingleObservationValue) observation.getValue();
+        SosSingleObservationValue value = (SosSingleObservationValue) sosObservation.getValue();
         Observation hObservation = new Observation();
         hObservation.setDeleted(false);
-        if (observation.getIdentifier() != null && !observation.getIdentifier().isSetValue()) {
-            hObservation.setIdentifier(observation.getIdentifier().getValue());
+        if (sosObservation.isSetIdentifier()) {
+            hObservation.setIdentifier(sosObservation.getIdentifier().getValue());
         }
         if (antiSubsettingId != null && !antiSubsettingId.isEmpty()) {
             hObservation.setAntiSubsetting(antiSubsettingId);
         }
         hObservation.setObservationConstellation(obsConst);
         hObservation.setFeatureOfInterest(feature);
-        HibernateUtilities.addPhenomeonTimeAndResultTimeToObservation(hObservation, observation.getPhenomenonTime(),
-                observation.getResultTime());
+        HibernateUtilities.addPhenomeonTimeAndResultTimeToObservation(hObservation, sosObservation.getPhenomenonTime(),
+                sosObservation.getResultTime());
         HibernateUtilities.addValueToObservation(hObservation, value.getValue(), session);
         if (value.getValue().getUnit() != null) {
             hObservation.setUnit(HibernateCriteriaTransactionalUtilities.getOrInsertUnit(value.getValue().getUnit(),
@@ -501,9 +501,10 @@ public class HibernateCriteriaTransactionalUtilities {
             Session session) throws OwsExceptionReport {
         List<SosObservation> unfoldObservations = HibernateObservationUtilities.unfoldObservation(containerObservation);
         int subObservationIndex = 0;
+        String antiSubsettingId = getAntiSubsettingId(containerObservation);
         for (SosObservation sosObservation : unfoldObservations) {
-            String antiSubsettingId = getAntiSubsettingId(containerObservation);
-            setIdentifier(containerObservation, sosObservation, antiSubsettingId, subObservationIndex+"");
+            String idExtension = subObservationIndex+"";
+            setIdentifier(containerObservation, sosObservation, antiSubsettingId, idExtension);
             insertObservationSingleValueWithAntiSubSettingId(obsConst, feature, sosObservation, antiSubsettingId, session);
             subObservationIndex++;
         }
@@ -514,9 +515,11 @@ public class HibernateCriteriaTransactionalUtilities {
             String antiSubsettingId,
             String idExtension)
     {
-        if (containerObservation.getIdentifier() != null && !containerObservation.getIdentifier().isSetValue()) {
+        if (containerObservation.getIdentifier() != null && containerObservation.getIdentifier().isSetValue()) {
             String subObservationIdentifier = String.format("%s-%s", antiSubsettingId, idExtension); 
-            sosObservation.setIdentifier(new CodeWithAuthority(subObservationIdentifier));    
+            CodeWithAuthority subObsIdentifier = containerObservation.getIdentifier();
+            subObsIdentifier.setValue(subObservationIdentifier);
+            sosObservation.setIdentifier(subObsIdentifier);    
         }
     }
 
