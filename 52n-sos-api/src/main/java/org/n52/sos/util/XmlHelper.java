@@ -42,12 +42,14 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlValidationError;
+import org.n52.sos.decode.IDecoder;
 import org.n52.sos.exception.IExceptionCode;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
+import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
@@ -494,4 +496,35 @@ public class XmlHelper {
        Node domNode = substitutionElement.getDomNode();
        elementToSubstitute.substitute(new QName(domNode.getNamespaceURI(), domNode.getLocalName()), substitutionElement.schemaType());
     }
+
+	public static Object decodeGenericXmlObject(String xmlString) throws OwsExceptionReport
+	{
+		try {
+			XmlObject xbResultStructure = XmlObject.Factory.parse(xmlString);
+			String resultStructureNamespace = getNamespace(xbResultStructure);
+			List<IDecoder> decoders = Configurator.getInstance().getDecoder(resultStructureNamespace);
+			if (decoders != null)
+			{
+				for (IDecoder iDecoder : decoders) {
+					Object decodedObject = iDecoder.decode(xbResultStructure);
+					if (decodedObject != null)
+					{
+						return decodedObject;
+					}
+				}
+				String errorMsg = String.format("Decoding of type \"%s\" using namespace \"%s\" failed",
+						xbResultStructure.getClass().getCanonicalName(),
+						resultStructureNamespace);
+				LOGGER.error(errorMsg);
+				throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+			}
+			String errorMsg = String.format("No decoder found for namespace \"%s\".",resultStructureNamespace);
+			LOGGER.error(errorMsg);
+			throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+		} catch (XmlException e) {
+			String errorMsg = String.format("Exception thrown while parsing XML string from database: %s", e.getMessage());
+			LOGGER.error(errorMsg,e);
+			throw Util4Exceptions.createNoApplicableCodeException(e, errorMsg);
+		}
+	}
 }
