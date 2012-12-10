@@ -20,6 +20,12 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-hibernate-common</artifactId>
 		</dependency>
+		<!-- TODO remove after changing from document to type saving in resultTemplate -->
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>52n-sos-coding-sos-v20</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 	
 </project>
