@@ -149,6 +149,14 @@ public class SosObservation implements Serializable {
     public void setIdentifier(CodeWithAuthority identifier) {
         this.identifier = identifier;
     }
+    
+    /**
+     * @return <tt>true</tt>, if identifier is set and value is not an empty string,<br>else <tt>false</tt>
+     */
+    public boolean isSetIdentifier()
+    {
+    	return identifier != null && identifier.isSetValue();
+    }
 
     /**
      * Get phenomenon time
