@@ -73,6 +73,7 @@ import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.SosSweField;
+import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
@@ -90,6 +91,7 @@ import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -236,9 +238,9 @@ public class HibernateObservationUtilities {
                 }
 
                 // TODO: compositePhenomenon
-                if (isSubsetIdAvailable(hObservation) &&
-                        !isSubsettingExtensionSet(request.getExtensions())) {
-                    if (antiSubsettingObservations.containsKey(hObservation.getAntiSubsetting()))
+                if (isSubsetIdAvailable(hObservation)) {
+                    if (antiSubsettingObservations.containsKey(hObservation.getAntiSubsetting()) &&
+                            !isSubsettingExtensionSet(request.getExtensions()))
                     {
                         // observation already create => merge values
                         SosObservation sosObservation =
@@ -252,7 +254,7 @@ public class HibernateObservationUtilities {
                                         value);
                         sweDataArrayValue.addBlock(newBlock);
                     } else {
-                        // observation new => create new one
+                        // observation new or subsetting requested => create new one
                         SosObservation sosObservation = new SosObservation();
                         sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
                         sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
@@ -262,15 +264,20 @@ public class HibernateObservationUtilities {
                         sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
 
                         SosSweDataArray dataArray = new SosSweDataArray();
-                        dataArray.setElementType(createElementType(sosObservation.getObservationConstellation(),
-                                hObservation));
+                        // Get ResultTemplate for this observation
+                        // TODO clarify when there are more than one template?
+                        List<ResultTemplate> templates = template4ObsConst.get(obsConstHash);
+                        if (templates == null || (templates != null && templates.size() == 0) )
+                        {
+                        	String errorMsg = "No result template available for observation.";
+                        	LOGGER.error(errorMsg);
+                        	throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+                        }
+                        ResultTemplate hResultTemplate = templates.get(0);
+                        dataArray.setElementType(createElementType(hResultTemplate.getResultStructure()));
+                        dataArray.setEncoding(createEncoding(hResultTemplate.getResultEncoding()));
 
                         SweDataArrayValue dataArrayValue = new SweDataArrayValue();
-                        // FIXME where to get element type from? ->
-                        // ObservationConstellation -> Annahme: 1 ObsProp.
-                        // phenTime, resultTime?, phenID, value
-                        // MetaPhen -> Not Supported now
-                        //
                         dataArrayValue.setValue(dataArray);
                         List<String> newBlock = createBlock(dataArray.getElementType(), phenomenonTime, phenID, value);
                         dataArrayValue.addBlock(newBlock);
@@ -338,35 +345,61 @@ public class HibernateObservationUtilities {
                     observationCollection.addAll(antiSubsettingObservations.values());
                 }
             }
+            if (templatedObservations.containsValue(null))
+            {
+            	removeNullValuesFromCollection(templatedObservations);
+            }
             observationCollection.addAll(templatedObservations.values());
         }
         return observationCollection;
     }
+
+	private static void removeNullValuesFromCollection(Map<Integer, SosObservation> templatedObservations)
+	{
+		if (templatedObservations != null && templatedObservations.keySet() != null)
+		{
+			for (Integer observationHash : templatedObservations.keySet()) {
+				if (templatedObservations.get(observationHash) == null)
+				{
+					templatedObservations.remove(observationHash);
+				}
+			}
+		}
+	}
+
+	private static SosSweAbstractEncoding createEncoding(String resultEncoding) throws OwsExceptionReport
+	{
+		Object decodedObject = XmlHelper.decodeGenericXmlObject(resultEncoding);
+		if (decodedObject instanceof SosSweTextEncoding)
+		{
+			return (SosSweTextEncoding) decodedObject;
+		}
+		String errorMsg = String.format("Decoding of string \"%s\" failed. Returned type is \"%s\".",
+				resultEncoding,
+				decodedObject.getClass().getName());
+		LOGGER.error(errorMsg);
+		throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+	}
+
+	private static SosSweDataRecord createElementType(String resultStructure) throws OwsExceptionReport
+	{
+		Object decodedObject = XmlHelper.decodeGenericXmlObject(resultStructure);
+		if (decodedObject instanceof SosSweDataRecord)
+		{
+			return (SosSweDataRecord) decodedObject;
+		}
+		String errorMsg = String.format("Decoding of string \"%s\" failed. Returned type is \"%s\".",
+				resultStructure,
+				decodedObject.getClass().getName());
+		LOGGER.error(errorMsg);
+		throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+	}
 
 	private static boolean isSubsetIdAvailable(Observation hObservation)
 	{
 		return hObservation.getAntiSubsetting() != null && 
 		        !hObservation.getAntiSubsetting().isEmpty();
 	}
-
-    private static SosSweAbstractDataComponent createElementType(
-    		SosObservationConstellation observationConstellation,
-            Observation hObservation)
-    {
-        SosSweDataRecord elementType = new SosSweDataRecord();
-        String observationType = observationConstellation.getObservationType();
-        String observedProperty = observationConstellation.getObservableProperty().getIdentifier();
-
-        addObservationResultField(elementType, hObservation, observationType, observedProperty);
-
-        if (hObservation.getResultTime() != null) {
-            addResultTimeField(elementType);
-        }
-
-        addPhenomenonTimeField(hObservation, elementType);
-
-        return elementType;
-    }
 
     private static void addPhenomenonTimeField(Observation hObservation, SosSweDataRecord elementType) {
         SosSweTime timeFieldElement;
