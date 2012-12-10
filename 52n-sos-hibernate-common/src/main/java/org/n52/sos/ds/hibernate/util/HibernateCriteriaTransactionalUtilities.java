@@ -517,8 +517,8 @@ public class HibernateCriteriaTransactionalUtilities {
     {
         if (containerObservation.getIdentifier() != null && containerObservation.getIdentifier().isSetValue()) {
             String subObservationIdentifier = String.format("%s-%s", antiSubsettingId, idExtension); 
-            CodeWithAuthority subObsIdentifier = containerObservation.getIdentifier();
-            subObsIdentifier.setValue(subObservationIdentifier);
+            CodeWithAuthority subObsIdentifier = new CodeWithAuthority(subObservationIdentifier);
+            subObsIdentifier.setCodeSpace(containerObservation.getIdentifier().getCodeSpace());
             sosObservation.setIdentifier(subObsIdentifier);    
         }
     }
