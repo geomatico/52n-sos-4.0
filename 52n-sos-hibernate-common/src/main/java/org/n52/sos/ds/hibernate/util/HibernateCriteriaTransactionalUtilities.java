@@ -502,7 +502,6 @@ public class HibernateCriteriaTransactionalUtilities {
         List<SosObservation> unfoldObservations = HibernateObservationUtilities.unfoldObservation(containerObservation);
         int subObservationIndex = 0;
         for (SosObservation sosObservation : unfoldObservations) {
-        	// TODO Eike: continue here: Save result structure for observation
             String antiSubsettingId = getAntiSubsettingId(containerObservation);
             setIdentifier(containerObservation, sosObservation, antiSubsettingId, subObservationIndex+"");
             insertObservationSingleValueWithAntiSubSettingId(obsConst, feature, sosObservation, antiSubsettingId, session);
