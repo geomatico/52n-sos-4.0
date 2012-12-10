@@ -70,6 +70,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweQuality;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -330,6 +331,8 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
             return parseQuantity((QuantityType) abstractDataComponent);
         } else if (abstractDataComponent instanceof TimeType) {
             return parseTime((TimeType) abstractDataComponent);
+        } else if (abstractDataComponent instanceof TimeRangeType) {
+        	return parseTimeRange((TimeRangeType) abstractDataComponent);
         } else if (abstractDataComponent instanceof DataArrayDocument) {
             return parseDataArray(((DataArrayDocument) abstractDataComponent).getDataArray1());
         } else if (abstractDataComponent instanceof DataRecordType) {
@@ -460,24 +463,40 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
         return sosText;
     }
 
-    private SosSweAbstractSimpleType parseTime(TimeType time) {
+    private SosSweAbstractSimpleType parseTime(TimeType xbTime) {
         SosSweTime sosTime = new SosSweTime();
-        if (time.isSetDefinition()) {
-            sosTime.setDefinition(time.getDefinition());
+        if (xbTime.isSetDefinition()) {
+            sosTime.setDefinition(xbTime.getDefinition());
         }
-        if (time.isSetDescription()) {
-            sosTime.setDescription(time.getDescription());
+        if (xbTime.isSetDescription()) {
+            sosTime.setDescription(xbTime.getDescription());
         }
-        if (time.isSetValue()) {
-            sosTime.setValue(time.getValue().toString());
+        if (xbTime.isSetValue()) {
+            sosTime.setValue(xbTime.getValue().toString());
+        }
+        if (xbTime.getUom() != null)
+        {
+        	sosTime.setUom(xbTime.getUom().getHref());
         }
         return sosTime;
     }
 
-    private SosSweAbstractSimpleType parseTimeRange(TimeRangeType timeRange) throws OwsExceptionReport {
-        String exceptionText = "The TimeRange is not supported";
-        LOGGER.debug(exceptionText);
-        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+    private SosSweAbstractSimpleType parseTimeRange(TimeRangeType xbTime) throws OwsExceptionReport {
+    	SosSweTimeRange sosTimeRange = new SosSweTimeRange();
+        if (xbTime.isSetDefinition()) {
+            sosTimeRange.setDefinition(xbTime.getDefinition());
+        }
+        if (xbTime.isSetDescription()) {
+            sosTimeRange.setDescription(xbTime.getDescription());
+        }
+        if (xbTime.isSetValue()) {
+            sosTimeRange.setValue(xbTime.getValue().toString());
+        }
+        if (xbTime.getUom() != null)
+        {
+        	sosTimeRange.setUom(xbTime.getUom().getHref());
+        }
+        return sosTimeRange;
     }
 
     private SosSweQuality parseQuality(XmlObject[] qualityArray) {
