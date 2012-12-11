@@ -239,68 +239,24 @@ public class HibernateObservationUtilities {
                 }
 
                 // TODO: compositePhenomenon
-        		// FIXME
-        		// FIXME continue implementation here: what if the container observation is requested?
-        		// FIXME
                 if (isSubsetIdAvailable(hObservation))
                 {
                     if (antiSubsettingObservations.containsKey(hObservation.getAntiSubsetting()) &&
-                            (
-                            		!isSubsettingExtensionSet(request.getExtensions()) ||
-                            		isContainerObservationRequested(request,hObservation.getAntiSubsetting())
-                            		)
-                            )
+                            isMergeObservations(request, hObservation))
                     {
                         // observation already create => merge values and reset identifier to anti_subsetting
-                        SosObservation sosObservation =
-                                antiSubsettingObservations.get(hObservation.getAntiSubsetting());
-                        // add value
-                        SosMultiObservationValues sosMultiObservationValues =
-                                (SosMultiObservationValues) sosObservation.getValue();
-                        SweDataArrayValue sweDataArrayValue =
-                                ((SweDataArrayValue) sosMultiObservationValues.getValue());
-                        List<String> newBlock =
-                                createBlock(sweDataArrayValue.getValue().getElementType(), phenomenonTime, phenID,
-                                        value);
-                        sweDataArrayValue.addBlock(newBlock);
-                        // reset identifier if required
-                        if (!sosObservation.getIdentifier().getValue().equalsIgnoreCase(hObservation.getAntiSubsetting()))
-                        {
-                        	sosObservation.getIdentifier().setValue(hObservation.getAntiSubsetting());
-                        }
+                        mergeObservations(antiSubsettingObservations, hObservation, phenID, phenomenonTime, value);
                     } else {
                         // observation new or subsetting requested => create new one
-                        SosObservation sosObservation = new SosObservation();
-                        sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
-                        sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
-                        sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
-                        sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
-                        sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
-                        sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
-
-                        SosSweDataArray dataArray = new SosSweDataArray();
-                        // Get ResultTemplate for this observation
-                        // TODO clarify when there are more than one template?
-                        List<ResultTemplate> templates = template4ObsConst.get(obsConstHash);
-                        if (templates == null || (templates != null && templates.size() == 0) )
+						SosObservation sosObservation = createNewObservation(observationConstellations, template4ObsConst, hObservation, phenID, phenomenonTime, value, obsConstHash);
+                        if (isMergeObservations(request, hObservation))
                         {
-                        	String errorMsg = "No result template available for observation.";
-                        	LOGGER.error(errorMsg);
-                        	throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+                        	antiSubsettingObservations.put(hObservation.getAntiSubsetting(), sosObservation);
                         }
-                        ResultTemplate hResultTemplate = templates.get(0);
-                        dataArray.setElementType(createElementType(hResultTemplate.getResultStructure()));
-                        dataArray.setEncoding(createEncoding(hResultTemplate.getResultEncoding()));
-
-                        SweDataArrayValue dataArrayValue = new SweDataArrayValue();
-                        dataArrayValue.setValue(dataArray);
-                        List<String> newBlock = createBlock(dataArray.getElementType(), phenomenonTime, phenID, value);
-                        dataArrayValue.addBlock(newBlock);
-
-                        SosMultiObservationValues observationValue = new SosMultiObservationValues();
-                        observationValue.setValue(dataArrayValue);
-                        sosObservation.setValue(observationValue);
-                        antiSubsettingObservations.put(hObservation.getAntiSubsetting(), sosObservation);
+                        else
+                        {
+                        	observationCollection.add(sosObservation);
+                        }
                     }
                 } else if (templatedObservations.containsKey(obsConstHash)) {
                     SosObservation o = templatedObservations.get(obsConstHash);
@@ -345,15 +301,7 @@ public class HibernateObservationUtilities {
                     // TODO check for NPE in next statement
                     dataArrayValue.addBlock(createBlock(o.getResultStructure(), phenomenonTime, phenID, value));
                 } else {
-                    SosObservation sosObservation = new SosObservation();
-                    sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
-                    sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
-                    sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
-                    sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
-                    sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
-                    sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
-                    sosObservation.setResultTime(new TimeInstant(new DateTime(hObservation.getResultTime())));
-                    sosObservation.setValue(new SosSingleObservationValue(phenomenonTime, value, qualityList));
+                    SosObservation sosObservation = createNewObservation(observationConstellations, hObservation, phenomenonTime, qualityList, value, obsConstHash);
                     observationCollection.add(sosObservation);
                 }
             }
@@ -371,6 +319,97 @@ public class HibernateObservationUtilities {
         }
         return observationCollection;
     }
+
+	private static SosObservation createNewObservation(Map<Integer, SosObservationConstellation> observationConstellations,
+			Observation hObservation,
+			ITime phenomenonTime,
+			ArrayList<SosQuality> qualityList,
+			IValue value,
+			int obsConstHash)
+	{
+		SosObservation sosObservation = new SosObservation();
+		sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
+		sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
+		sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
+		sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
+		sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
+		sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
+		sosObservation.setResultTime(new TimeInstant(new DateTime(hObservation.getResultTime())));
+		sosObservation.setValue(new SosSingleObservationValue(phenomenonTime, value, qualityList));
+		return sosObservation;
+	}
+
+	private static SosObservation createNewObservation(Map<Integer, SosObservationConstellation> observationConstellations,
+			Map<Integer, List<ResultTemplate>> template4ObsConst,
+			Observation hObservation,
+			String phenID,
+			ITime phenomenonTime,
+			IValue value,
+			int obsConstHash) throws OwsExceptionReport
+	{
+		SosObservation sosObservation = new SosObservation();
+		sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
+		sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
+		sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
+		sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
+		sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
+		sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
+
+		SosSweDataArray dataArray = new SosSweDataArray();
+		// Get ResultTemplate for this observation
+		// TODO clarify when there are more than one template?
+		List<ResultTemplate> templates = template4ObsConst.get(obsConstHash);
+		if (templates == null || (templates != null && templates.size() == 0) )
+		{
+			String errorMsg = "No result template available for observation.";
+			LOGGER.error(errorMsg);
+			throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+		}
+		ResultTemplate hResultTemplate = templates.get(0);
+		dataArray.setElementType(createElementType(hResultTemplate.getResultStructure()));
+		dataArray.setEncoding(createEncoding(hResultTemplate.getResultEncoding()));
+
+		SweDataArrayValue dataArrayValue = new SweDataArrayValue();
+		dataArrayValue.setValue(dataArray);
+		List<String> newBlock = createBlock(dataArray.getElementType(), phenomenonTime, phenID, value);
+		dataArrayValue.addBlock(newBlock);
+
+		SosMultiObservationValues observationValue = new SosMultiObservationValues();
+		observationValue.setValue(dataArrayValue);
+		sosObservation.setValue(observationValue);
+		return sosObservation;
+	}
+
+	private static void mergeObservations(Map<String, SosObservation> antiSubsettingObservations,
+			Observation hObservation,
+			String phenID,
+			ITime phenomenonTime,
+			IValue value)
+	{
+		SosObservation sosObservation =
+		        antiSubsettingObservations.get(hObservation.getAntiSubsetting());
+		// add value
+		SosMultiObservationValues sosMultiObservationValues =
+		        (SosMultiObservationValues) sosObservation.getValue();
+		SweDataArrayValue sweDataArrayValue =
+		        ((SweDataArrayValue) sosMultiObservationValues.getValue());
+		List<String> newBlock =
+		        createBlock(sweDataArrayValue.getValue().getElementType(), phenomenonTime, phenID,
+		                value);
+		sweDataArrayValue.addBlock(newBlock);
+		// reset identifier if required
+		if (!sosObservation.getIdentifier().getValue().equalsIgnoreCase(hObservation.getAntiSubsetting()))
+		{
+			sosObservation.getIdentifier().setValue(hObservation.getAntiSubsetting());
+		}
+	}
+
+	private static boolean isMergeObservations(AbstractServiceRequest request,
+			Observation hObservation)
+	{
+		return !isSubsettingExtensionSet(request.getExtensions()) ||
+				isContainerObservationRequested(request,hObservation.getAntiSubsetting());
+	}
 
 	private static boolean isContainerObservationRequested(AbstractServiceRequest request,
 			String antiSubsetting)
