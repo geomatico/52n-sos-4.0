@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.opengis.gml.x32.AbstractTimeObjectType;
-import net.opengis.gml.x32.CodeWithAuthorityType;
 import net.opengis.gml.x32.FeaturePropertyType;
 import net.opengis.gml.x32.MeasureType;
 import net.opengis.om.x20.OMObservationType;
@@ -77,7 +76,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
-import net.opengis.swe.x20.DataArrayPropertyType;
 
 public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
 
