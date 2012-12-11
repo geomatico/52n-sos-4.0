@@ -31,8 +31,8 @@ public class SosSweTextEncoding extends SosSweAbstractEncoding {
     
     private String decimalSeparator;
     
-    private boolean collapseWhiteSpaces = false;
-
+    private Boolean collapseWhiteSpaces;
+    
     public String getBlockSeparator() {
         return blockSeparator;
     }
@@ -54,7 +54,7 @@ public class SosSweTextEncoding extends SosSweAbstractEncoding {
     }
 
     public void setCollapseWhiteSpaces(boolean collapseWhiteSpaces) {
-        this.collapseWhiteSpaces = collapseWhiteSpaces;
+        this.collapseWhiteSpaces = collapseWhiteSpaces?Boolean.TRUE:Boolean.FALSE;
     }
 
     public String getDecimalSeparator() {
@@ -62,7 +62,11 @@ public class SosSweTextEncoding extends SosSweAbstractEncoding {
     }
 
     public boolean isCollapseWhiteSpaces() {
-        return collapseWhiteSpaces;
+        return collapseWhiteSpaces.booleanValue();
+    }
+    
+    public boolean isSetCollapseWhiteSpaces() {
+    	return collapseWhiteSpaces != null;
     }
 
 }
