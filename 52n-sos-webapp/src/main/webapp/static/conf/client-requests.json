@@ -270,98 +270,271 @@
         },
         "/kvp": {
             "GetCapabilities": {
-                "url": "?service=SOS&REQUEST=GetCapabilities&AcceptVersions=1.0.0"
+                "param": {
+                    "service:": "SOS",
+                    "request": "GetCapabilities",
+                    "AcceptVersions": "1.0.0"    
+                }
             }
         }
     },
     "2.0.0": {
         "/kvp": {
-            "GetCapabilities - GetCapabilities minimal request": {
-                "url": "?service=SOS&request=GetCapabilities"
+            "GetCapabilities (minimal)": {
+                "param": {
+                    "service": "SOS",
+                    "request": "GetCapabilities"
+                }
             },
-            "GetCapabilities - GetCapabilities request with AcceptVersions=2.0.0": {
-                "url": "?service=SOS&request=GetCapabilities&AcceptVersions=2.0.0"
+            "GetCapabilities (with AcceptVersions=2.0.0)": {
+                "param": {
+                    "service": "SOS",
+                    "request": "GetCapabilities",
+                    "AcceptVersions": "2.0.0"
+                }
             },
-            "GetCapabilities - GetCapabilities request with Sections=OperationsMetadata": {
-                "url": "?service=SOS&request=GetCapabilities&Sections=OperationsMetadata"
+            "GetCapabilities (only OperationsMetadata section)": {
+                "param": {
+                    "service": "SOS",
+                    "request": "GetCapabilities",
+                    "Sections": "OperationsMetadata"
+                }
             },
-            "GetCapabilities - GetCapabilities request with Sections=Contents": {
-                "url": "?service=SOS&request=GetCapabilities&Sections=Contents"
+            "GetCapabilities (only Contents section)": {
+                "url": "?service=SOS&request=GetCapabilities&Sections=Contents",
+                "param": {
+                    "service": "SOS",
+                    "request": "GetCapabilities",
+                    "Sections": "Contents"
+                }
             },
-            "DecribeSensor - DescribeSensor minimal": {
-                "url": "?service=SOS&version=2.0.0&request=DescribeSensor&procedure=http://www.my_namespace.org/sensors/100&procedureDescriptionFormat=http://www.opengis.net/sensorML/1.0.1"
+            "DecribeSensor": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "DescribeSensor",
+                    "procedure": "http://www.example.org/sensors/101",
+                    "procedureDescriptionFormat": "http://www.opengis.net/sensorML/1.0.1"
+                }
             },
-            "DecribeSensor - DescribeSensor full": {
-                "url": "?service=SOS&version=2.0.0&request=DescribeSensor&procedure=http://www.my_namespace.org/sensors/100&procedureDescriptionFormat=http://www.opengis.net/sensorML/1.0.1&validTime=2012-08-01T18:31:42Z"
+            "GetObservation (full)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetObservation",
+                    "offering": "test_offering_1",
+                    "observedProperty": "test_observable_property_1",
+                    "procedure": "http://www.example.org/sensors/101",
+                    "namespaces": [
+                        "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
+                        "xmlns(om,http://www.opengis.net/om/2.0)"
+                    ],
+                    "spatialFilter": "om:featureOfInterest/*/sams:shape,0,0,60,60,urn:ogc:def:crs:EPSG::4326",
+                    "temporalFilter": "om:phenomenonTime,2012-11-19T13:00:00+01:00/2012-11-19T13:15:00+01:00"
+                }
             },
-            "GetObservation - GetObservation request minimal": {
-                "url": "?service=SOS&version=2.0.0&request=GetObservation"
+            "GetObservation (offering)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetObservation",
+                    "offering": "test_offering_1"
+                }
             },
-            "GetObservation - GetObservation request with offering": {
-                "url": "?service=SOS&version=2.0.0&request=GetObservation&offering=http://www.my_namespace.org/sensors/100/observations"
+            "GetObservation (offerings)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetObservation",
+                    "offering":  [ 
+                        "test_offering_1", 
+                        "test_offering_3" 
+                    ]
+                }
             },
-            "GetObservation - GetObservation request with offerings": {
-                "url": "?service=SOS&version=2.0.0&request=GetObservation&offering=http://www.my_namespace.org/sensors/100/observations,http://www.my_namespace.org/sensors/101/observations"
+            "GetObservation (procedure)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetObservation",
+                    "procedure": "http://www.example.org/sensors/101"
+                }
             },
-            "GetObservation - GetObservation request with procedure": {
-                "url": "?service=SOS&version=2.0.0&request=GetObservation&procedure=http://www.my_namespace.org/sensors/100"
+            "GetObservation (procedures)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetObservation",
+                    "procedure": [
+                        "http://www.example.org/sensors/101",
+                        "http://www.example.org/sensors/103"
+                    ]
+                }
             },
-            "GetObservation - GetObservation request with procedures": {
-                "url": "?service=SOS&version=2.0.0&request=GetObservation&procedure=http://www.my_namespace.org/sensors/100,http://www.my_namespace.org/sensors/100"
+            "GetObservation (observableProperty)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetObservation",
+                    "observedProperty": "test_observable_property_1"
+                }
             },
-            "GetObservation - GetObservation request with observableProperty": {
-                "url": "?service=SOS&version=2.0.0&request=GetObservation&observedProperty=http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl%23Discharge"
+            "GetObservation (observableProperties)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetObservation",
+                    "observedProperty": [ 
+                        "test_observable_property_1",
+                        "test_observable_property_3"
+                    ]
+                }
             },
-            "GetObservation - GetObservation request with observableProperties": {
-                "url": "?service=SOS&version=2.0.0&request=GetObservation&observedProperty=http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl%23Discharge,http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl%23WaterHeight"
+            "GetObservation (featureOfInterest)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetObservation",
+                    "featureOfInterest": "test_feature_1"
+                }
             },
-            "GetObservation - GetObservation request with featureOfInterest": {
-                "url": "?service=SOS&version=2.0.0&request=GetObservation&featureOfInterest=foi_20"
+            "GetObservation (featureOfInterests)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetObservation",
+                    "featureOfInterest": [ "test_feature_1", "test_feature_3" ]
+                }
             },
-            "GetObservation - GetObservation request with featureOfInterests": {
-                "url": "?service=SOS&version=2.0.0&request=GetObservation&featureOfInterest=foi_20,foi_14"
+            "GetObservation (spatial filter, URN)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetObservation",
+                    "namespaces": [
+                        "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
+                        "xmlns(om,http://www.opengis.net/om/2.0)"
+                     ],
+                     "spatialFilter": "om:featureOfInterest/*/sams:shape,0,0,60,60,urn:ogc:def:crs:EPSG::4326"
+                }
             },
-            "GetObservation - GetObservation request with spatial filter, URN": {
-                "url": "?service=SOS&version=2.0.0&request=GetObservation&namespaces=xmlns(sams,http://www.opengis.net/samplingSpatial/2.0),xmlns(om,http://www.opengis.net/om/2.0)&spatialFilter=om:featureOfInterest/*/sams:shape,1.0,1.0,60.0,60.0,urn:ogc:def:crs:EPSG::4326"
+            "GetObservation (spatial filter, URL)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetObservation",
+                    "namespaces": [
+                        "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
+                        "xmlns(om,http://www.opengis.net/om/2.0)"
+                    ],
+                    "spatialFilter": "om:featureOfInterest/*/sams:shape,0,0,60,60,http://www.opengis.net/def/crs/EPSG/0/4326"
+                }
             },
-            "GetObservation - GetObservation request with spatial filter, URL": {
-                "url": "?service=SOS&version=2.0.0&request=GetObservation&namespaces=xmlns(sams,http://www.opengis.net/samplingSpatial/2.0),xmlns(om,http://www.opengis.net/om/2.0)&spatialFilter=om:featureOfInterest/*/sams:shape,1.0,1.0,60.0,60.0,http://www.opengis.net/def/crs/EPSG/0/4326"
+            "GetObservation (temporal filter equal)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetObservation",
+                    "namespaces": "xmlns(om,http://www.opengis.net/om/2.0)",
+                    "temporalFilter": "om:phenomenonTime,2012-11-19T13:00:00.000+01:00"
+                }
             },
-            "GetObservation - GetObservation request with temporal filter equal": {
-                "url": "?service=SOS&version=2.0.0&request=GetObservation&namespaces=xmlns(om,http://www.opengis.net/om/2.0)&temporalFilter=om:phenomenonTime,2012-07-16T12:41:01.962%2B02:00"
+            "GetObservation (temporal filter during)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetObservation",
+                    "namespaces": "xmlns(om,http://www.opengis.net/om/2.0)",
+                    "temporalFilter": "om:phenomenonTime,2012-11-19T13:00:00+01:00/2012-11-19T13:15:00+01:00"
+                }
             },
-            "GetObservation - GetObservation request with temporal filter during": {
-                "url": "?service=SOS&version=2.0.0&request=GetObservation&namespaces=xmlns(om,http://www.opengis.net/om/2.0)&temporalFilter=om:phenomenonTime,2012-07-16T10:00:00Z/2012-07-16T11:00:00Z"
+            "GetFeatureOfInterest (minimal)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetFeatureOfInterest"
+                }
             },
-            "GetObservation - GetObservation request full": {
-                "url": "?service=SOS&version=2.0.0&request=GetObservation&offering=http://www.my_namespace.org/sensors/100/observations&observedProperty=http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl%23Discharge&procedure=http://www.my_namespace.org/sensors/100&namespaces=xmlns(sams,http://www.opengis.net/samplingSpatial/2.0),xmlns(om,http://www.opengis.net/om/2.0)&spatialFilter=om:featureOfInterest/*/sams:shape,1.0,1.0,60.0,60.0,urn:ogc:def:crs:EPSG::4326&temporalFilter=om:phenomenonTime,2012-07-16T10:00:00Z/2012-07-16T11:00:00Z"
+            "GetFeatureOfInterest (procedure)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetFeatureOfInterest",
+                    "procedure": "http://www.example.org/sensors/101"
+                }
             },
-            "GetFeatureOfInterest - GetFeatureOfInterest request minimal": {
-                "url": "?service=SOS&version=2.0.0&request=GetFeatureOfInterest"
+            "GetFeatureOfInterest (procedures)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetFeatureOfInterest",
+                    "procedure": [
+                        "http://www.example.org/sensors/101", 
+                        "http://www.example.org/sensors/102"
+                    ]
+                }
             },
-            "GetFeatureOfInterest - GetFeatureOfInterest request with procedure": {
-                "url": "?service=SOS&version=2.0.0&request=GetFeatureOfInterest&procedure=http://www.my_namespace.org/sensors/100"
+            "GetFeatureOfInterest (observableProperty)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetFeatureOfInterest",
+                    "observedProperty": "test_observable_property_1"
+                }
             },
-            "GetFeatureOfInterest - GetFeatureOfInterest request with procedures": {
-                "url": "?service=SOS&version=2.0.0&request=GetFeatureOfInterest&procedure=http://www.my_namespace.org/sensors/100,http://www.my_namespace.org/sensors/101"
+            "GetFeatureOfInterest (observableProperties)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetFeatureOfInterest",
+                    "observedProperty": [
+                        "test_observable_property_1",
+                        "test_observable_property_2"
+                    ]
+                }
             },
-            "GetFeatureOfInterest - GetFeatureOfInterest request with observableProperty": {
-                "url": "?service=SOS&version=2.0.0&request=GetFeatureOfInterest&observedProperty=http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl%23Discharge"
+            "GetFeatureOfInterest (featureOfInterest)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetFeatureOfInterest",
+                    "featureOfInterest": "test_feature_1"
+                }
             },
-            "GetFeatureOfInterest - GetFeatureOfInterest request with observableProperties": {
-                "url": "?service=SOS&version=2.0.0&request=GetFeatureOfInterest&observedProperty=http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl%23Discharge,http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl%23WaterHeight"
+            "GetFeatureOfInterest (featureOfInterests)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetFeatureOfInterest",
+                    "featureOfInterest": [
+                        "test_feature_1", 
+                        "test_feature_2"
+                    ]
+                }
             },
-            "GetFeatureOfInterest - GetFeatureOfInterest request with featureOfInterest": {
-                "url": "?service=SOS&version=2.0.0&request=GetFeatureOfInterest&featureOfInterest=foi_20"
+            "GetFeatureOfInterest (spatial filter, URN)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetFeatureOfInterest",
+                    "namespaces": [
+                        "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
+                        "xmlns(om,http://www.opengis.net/om/2.0)"
+                     ],
+                     "spatialFilter": "om:featureOfInterest/*/sams:shape,0,0,60,60,urn:ogc:def:crs:EPSG::4326"
+                }
             },
-            "GetFeatureOfInterest - GetFeatureOfInterest request with featureOfInterests": {
-                "url": "?service=SOS&version=2.0.0&request=GetFeatureOfInterest&featureOfInterest=foi_20,foi_14"
-            },
-            "GetFeatureOfInterest - GetFeatureOfInterest request with spatial filter, URN": {
-                "url": "?service=SOS&version=2.0.0&request=GetFeatureOfInterest&namespaces=xmlns(sams,http://www.opengis.net/samplingSpatial/2.0),xmlns(om,http://www.opengis.net/om/2.0)&spatialFilter=om:featureOfInterest/*/sams:shape,1.0,1.0,60.0,60.0,urn:ogc:def:crs:EPSG::4326"
-            },
-            "GetFeatureOfInterest - GetFeatureOfInterest request with spatial filter, URL": {
-                "url": "?service=SOS&version=2.0.0&request=GetFeatureOfInterest&namespaces=xmlns(sams,http://www.opengis.net/samplingSpatial/2.0),xmlns(om,http://www.opengis.net/om/2.0)&spatialFilter=om:featureOfInterest/*/sams:shape,1.0,1.0,60.0,60.0,http://www.opengis.net/def/crs/EPSG/0/4326"
+            "GetFeatureOfInterest (spatial filter, URL)": {
+                "param": {
+                    "service": "SOS",
+                    "version": "2.0.0",
+                    "request": "GetFeatureOfInterest",
+                    "namespaces": [
+                        "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
+                        "xmlns(om,http://www.opengis.net/om/2.0)"
+                    ],
+                    "spatialFilter": "om:featureOfInterest/*/sams:shape,0,0,60,60,http://www.opengis.net/def/crs/EPSG/0/4326"
+                }
             }
         },
         "/soap": {
@@ -371,68 +544,20 @@
             "DescribeSensor": {
                 "request": "static/examples/sos_v20/requests_soap/DescribeSensor.xml"
             },
-            "GetObservation - Basic": {
-                "request": "static/examples/sos_v20/requests_soap/GetObs/GetObs.xml"
-            },
-            "GetObservation - All Parameters": {
-                "request": "static/examples/sos_v20/requests_soap/GetObs/GetObs_allParams.xml"
-            },
-            "GetObservation - FeatureOfInterestId": {
-                "request": "static/examples/sos_v20/requests_soap/GetObs/GetObs_FoiIds.xml"
-            },
-            "GetObservation - ObservedProperty": {
-                "request": "static/examples/sos_v20/requests_soap/GetObs/GetObs_obsProps.xml"
-            },
-            "GetObservation - Offerings": {
-                "request": "static/examples/sos_v20/requests_soap/GetObs/GetObs_offerings.xml"
-            },
-            "GetObservation - Procedures": {
-                "request": "static/examples/sos_v20/requests_soap/GetObs/GetObs_procedures.xml"
-            },
-            "GetObservation - FeatureOfInterest": {
-                "request": "static/examples/sos_v20/requests_soap/GetObs/GetObs_SP_Foi.xml"
-            },
-            "GetObservation - TimeInstant": {
-                "request": "static/examples/sos_v20/requests_soap/GetObs/GetObs_TI_Equals.xml"
-            },
-            "GetObservation - TimePeriod": {
-                "request": "static/examples/sos_v20/requests_soap/GetObs/GetObs_TP_During.xml"
+            "GetObservation": {
+                "request": "static/examples/sos_v20/requests_soap/GetObservation.xml"
             },
             "GetFeatureOfInterest": {
-                "request": "static/examples/sos_v20/requests_soap/GetFoi/GetFeatureOfInterest.xml"
-            },
-            "GetFeatureOfInterest - All Parameters": {
-                "request": "static/examples/sos_v20/requests_soap/GetFoi/GetFeatureOfInterest_allParams.xml"
-            },
-            "GetFeatureOfInterest - BoundingBox": {
-                "request": "static/examples/sos_v20/requests_soap/GetFoi/GetFeatureOfInterest_bbox.xml"
-            },
-            "GetFeatureOfInterest - FeatureOfInterestId": {
-                "request": "static/examples/sos_v20/requests_soap/GetFoi/GetFeatureOfInterest_foiId.xml"
-            },
-            "GetFeatureOfInterest - ObservedProperty": {
-                "request": "static/examples/sos_v20/requests_soap/GetFoi/GetFeatureOfInterest_obsProp.xml"
-            },
-            "GetFeatureOfInterest - Procedure": {
-                "request": "static/examples/sos_v20/requests_soap/GetFoi/GetFeatureOfInterest_proc.xml"
+                "request": "static/examples/sos_v20/requests_soap/GetFeatureOfInterest.xml"
             },
             "GetObservationById": {
                 "request": "static/examples/sos_v20/requests_soap/GetObservationById.xml"
             },
-            "GetObservationById - Multiple": {
-                "request": "static/examples/sos_v20/requests_soap/GetObservationByIds.xml"
-            },
             "InsertResultTemplate": {
                 "request": "static/examples/sos_v20/requests_soap/ResultHandling/InsertResultTemplate.xml"
             },
-            "InsertResultTemplate - ComplexValue": {
-                "request": "static/examples/sos_v20/requests_soap/ResultHandling/InsertResultTemplate_KomplexValue.xml"
-            },
             "InsertResult": {
                 "request": "static/examples/sos_v20/requests_soap/ResultHandling/InsertResult.xml"
-            },
-            "InsertResult - Complex Value": {
-                "request": "static/examples/sos_v20/requests_soap/ResultHandling/InsertResult_KomplexValue.xml"
             },
             "GetResult": {
                 "request": "static/examples/sos_v20/requests_soap/ResultHandling/GetResult.xml"
@@ -443,32 +568,23 @@
             "DeleteSensor": {
                 "request": "static/examples/sos_v20/requests_soap/Transactional/DeleteSensor.xml"
             },
-            "InsertObservation - Category": {
+            "InsertObservation (Category)": {
                 "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Category.xml"
             },
-            "InsertObservation - Count": {
+            "InsertObservation (Count)": {
                 "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Count.xml"
             },
-            "InsertObservation - Measurement - Two Offerings": {
-                "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Measurement_TwoOfferings.xml"
-            },
-            "InsertObservation - Measurement": {
+            "InsertObservation (Measurement)": {
                 "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Measurement.xml"
             },
-            "InsertObservation - Text": {
+            "InsertObservation (Text)": {
                 "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Text.xml"
             },
-            "InsertObservation - Truth": {
+            "InsertObservation (Truth)": {
                 "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Truth.xml"
             },
             "InsertSensor": {
                 "request": "static/examples/sos_v20/requests_soap/Transactional/InsertSensor.xml"
-            },
-            "InsertSensor - No ID's": {
-                "request": "static/examples/sos_v20/requests_soap/Transactional/InsertSensor_NoIDs.xml"
-            },
-            "InsertSensor - Only Procedure ID": {
-                "request": "static/examples/sos_v20/requests_soap/Transactional/InsertSensor_OnlyProcID.xml"
             },
             "UpdateSensor": {
                 "request": "static/examples/sos_v20/requests_soap/Transactional/UpdateSensor.xml"

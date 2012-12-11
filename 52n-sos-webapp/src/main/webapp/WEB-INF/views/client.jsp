@@ -46,7 +46,7 @@
 	}
 </script>
 
-<form id="form" action="" method="POST">
+<form id="form" action="">
 	<h3 id="top">Service URL</h3>
 	<input id="input-url" class="span12" type="text" placeholder="Service URL" value=""/>
 	<h3>Request</h3>
@@ -110,6 +110,14 @@
 				.appendTo($request);
 		}
 
+		function obj2param(obj) {
+		    var q = [];
+		    for (var key in obj)
+		       q.push(key + "=" + encodeURIComponent((obj[key] instanceof Array) ? 
+		                                obj[key].join(",") : obj[key]));
+		    return q.join("&");
+		}
+
 		var editor = CodeMirror.fromTextArea($("#editor").get(0), { 
             "mode": "xml", "lineNumbers": true, "lineWrapping": true
         });
@@ -131,7 +139,7 @@
 			var request = $.trim(editor.getValue());
 			if (!$("#input-send-inline").attr("checked")) {
 				if (request) {
-					$("#form").submit();
+					$("#form").attr("method", "POST").submit();
 				} else {
 					window.location.href = $url.val();
 				}
@@ -223,12 +231,15 @@
 			$request.change(function() {
 				var def = requests[version][binding][$request.val()];
 				var url = sosUrl + binding;
-				if (def.url) url += def.url;
+				if (def.param) {
+					if (!url.endsWith("?")) url += "?";
+					url += obj2param(def.param);
+				}
 				$url.val(url).trigger("change");
 				if (def.request) {
 					$.get(def.request, function(data) {
 						var xml = data.xml ? data.xml : new XMLSerializer().serializeToString(data);
-						editor.setValue(xml);
+						editor.setValue(vkbeautify.xml(xml));
 					});
 				}
 			});
