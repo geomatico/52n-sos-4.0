@@ -25,7 +25,10 @@
 package org.n52.sos.web;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.Configurator;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,13 +38,23 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @RequestMapping(ControllerConstants.Paths.CLIENT)
 public class ClientController extends AbstractController {
-
+    
+    public static final String BINDINGS = "bindings";
+    public static final String VERSIONS = "versions";
+    public static final String OPERATIONS = "operations";
+    
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView get() {
         if (Configurator.getInstance() != null) {
             Map<String, Object> map = new HashMap<String, Object>(2);
-            map.put("bindings", Configurator.getInstance().getBindingOperators().keySet());
-            map.put("versions", Configurator.getInstance().getSupportedVersions());
+            Set<RequestOperatorKeyType> ops = Configurator.getInstance().getRequestOperator().keySet();
+            Set<String> operations = new HashSet<String>(ops.size());
+            for (RequestOperatorKeyType op : ops) {
+                operations.add(op.getOperationName());
+            }
+            map.put(OPERATIONS, operations);
+            map.put(BINDINGS, Configurator.getInstance().getBindingOperators().keySet());
+            map.put(VERSIONS, Configurator.getInstance().getSupportedVersions());
             return new ModelAndView(ControllerConstants.Views.CLIENT, map);
             
         } else {

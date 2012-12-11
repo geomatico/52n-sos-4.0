@@ -24,6 +24,7 @@
 
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <jsp:include page="common/header.jsp">
     <jsp:param name="activeMenu" value="client" />
 </jsp:include>
@@ -72,16 +73,19 @@
 </form>
 
 <script type="text/javascript">
-	$(function() {
-		var availableBindings = [];
-		var availableVersions = [];
-<c:forEach items="${bindings}" var="b">
-		availableBindings.push("${b}");
-</c:forEach>
-<c:forEach items="${versions}" var="v">
-		availableVersions.push("${v}");
-</c:forEach>
+	var availableBindings = [];
+	var availableVersions = [];
+	var availableOperations = [];
+	<c:forEach items="${bindings}" var="b">
+	availableBindings.push("${b}");</c:forEach>
+	<c:forEach items="${versions}" var="v">
+	availableVersions.push("${v}");</c:forEach>
+	<c:forEach items="${operations}" var="o">
+	availableOperations.push("${o}");</c:forEach>
+</script>
 
+<script type="text/javascript">
+	$(function() {
 		var $version = $("#input-version");
 		var $binding = $("#input-binding");
 		var $request = $("#input-request");
@@ -113,8 +117,8 @@
 		function obj2param(obj) {
 		    var q = [];
 		    for (var key in obj)
-		       q.push(key + "=" + encodeURIComponent((obj[key] instanceof Array) ? 
-		                                obj[key].join(",") : obj[key]));
+		       q.push(key + "=" + encodeURIComponent(
+		       	(obj[key] instanceof Array) ? obj[key].join(",") : obj[key]));
 		    return q.join("&");
 		}
 
@@ -177,19 +181,28 @@
 		});
 
 		$.getJSON("<c:url value="/static/conf/client-requests.json"/>", function(requests) {
+			var filteredRequests = {};
 
 			for (var v in requests) {
-				if (!availableVersions.contains(v)) {
-					delete requests[v];
-				} else {
+				if (availableVersions.contains(v)) {
+					filteredRequests[v] = {};
 					for (var b in requests[v]) {
-						if (!availableBindings.contains(b)) {
-							delete requests[v][b];
+						if (availableBindings.contains(b)) {
+							filteredRequests[v][b] = {};
+							for (var o in requests[v][b]) {
+								if (availableOperations.contains(o)) {
+									for (var r in requests[v][b][o]) {
+										filteredRequests[v][b][r] = requests[v][b][o][r];
+									}
+								}
+							}
 						}
 					}
 				}
-
 			}
+			requests = filteredRequests;
+
+
 			for (var key in requests) {
 				$("<option>").html(key).appendTo($version);
 			}
