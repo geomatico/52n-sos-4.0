@@ -59,6 +59,8 @@ public class SWEConstants {
     public static final String EN_CATEGORY = "Category";
 
     public static final String EN_COUNT = "Count";
+    
+    public static final String EN_DATA_RECORD = "DataRecord";
 
     public static final String EN_QUANTITY = "Quantity";
 

@@ -436,6 +436,15 @@ public class HibernateCriteriaQueryUtilities {
         disjunction.add(Restrictions.in(propertyName, list));
         return disjunction;
     }
+    
+    public static Criterion getDisjunctionFor(List<Criterion> criterions)
+    {
+    	Disjunction disjunction = Restrictions.disjunction();
+    	for (Criterion criterion : criterions) {
+			disjunction.add(criterion);
+		}
+    	return disjunction;
+    }
 
     public static Criterion getConjunction(List<Criterion> criterions) {
         Conjunction conjunction = Restrictions.conjunction();

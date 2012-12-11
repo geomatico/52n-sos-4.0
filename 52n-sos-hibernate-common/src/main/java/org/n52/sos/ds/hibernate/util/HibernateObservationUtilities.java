@@ -86,6 +86,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
 import org.n52.sos.ogc.swes.SwesExtensions;
 import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.request.GetObservationByIdRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.OMHelper;
@@ -238,13 +239,22 @@ public class HibernateObservationUtilities {
                 }
 
                 // TODO: compositePhenomenon
-                if (isSubsetIdAvailable(hObservation)) {
+        		// FIXME
+        		// FIXME continue implementation here: what if the container observation is requested?
+        		// FIXME
+                if (isSubsetIdAvailable(hObservation))
+                {
                     if (antiSubsettingObservations.containsKey(hObservation.getAntiSubsetting()) &&
-                            !isSubsettingExtensionSet(request.getExtensions()))
+                            (
+                            		!isSubsettingExtensionSet(request.getExtensions()) ||
+                            		isContainerObservationRequested(request,hObservation.getAntiSubsetting())
+                            		)
+                            )
                     {
-                        // observation already create => merge values
+                        // observation already create => merge values and reset identifier to anti_subsetting
                         SosObservation sosObservation =
                                 antiSubsettingObservations.get(hObservation.getAntiSubsetting());
+                        // add value
                         SosMultiObservationValues sosMultiObservationValues =
                                 (SosMultiObservationValues) sosObservation.getValue();
                         SweDataArrayValue sweDataArrayValue =
@@ -253,6 +263,11 @@ public class HibernateObservationUtilities {
                                 createBlock(sweDataArrayValue.getValue().getElementType(), phenomenonTime, phenID,
                                         value);
                         sweDataArrayValue.addBlock(newBlock);
+                        // reset identifier if required
+                        if (!sosObservation.getIdentifier().getValue().equalsIgnoreCase(hObservation.getAntiSubsetting()))
+                        {
+                        	sosObservation.getIdentifier().setValue(hObservation.getAntiSubsetting());
+                        }
                     } else {
                         // observation new or subsetting requested => create new one
                         SosObservation sosObservation = new SosObservation();
@@ -341,18 +356,40 @@ public class HibernateObservationUtilities {
                     sosObservation.setValue(new SosSingleObservationValue(phenomenonTime, value, qualityList));
                     observationCollection.add(sosObservation);
                 }
-                if (antiSubsettingObservations.values() != null && !antiSubsettingObservations.values().isEmpty()) {
-                    observationCollection.addAll(antiSubsettingObservations.values());
-                }
             }
-            if (templatedObservations.containsValue(null))
+            if (antiSubsettingObservations.values() != null && !antiSubsettingObservations.values().isEmpty()) {
+                observationCollection.addAll(antiSubsettingObservations.values());
+            }
+            if (templatedObservations.values() != null && !templatedObservations.values().isEmpty())
             {
-            	removeNullValuesFromCollection(templatedObservations);
+            	if (templatedObservations.containsValue(null))
+            	{
+            		removeNullValuesFromCollection(templatedObservations);
+            	}
+            	observationCollection.addAll(templatedObservations.values());
             }
-            observationCollection.addAll(templatedObservations.values());
         }
         return observationCollection;
     }
+
+	private static boolean isContainerObservationRequested(AbstractServiceRequest request,
+			String antiSubsetting)
+	{
+		if (request instanceof GetObservationByIdRequest)
+		{
+			GetObservationByIdRequest getbyId = (GetObservationByIdRequest) request;
+			if (getbyId.getObservationIdentifier() != null && !getbyId.getObservationIdentifier().isEmpty())
+			{
+				for (String requestedObservationId : getbyId.getObservationIdentifier()) {
+					if (requestedObservationId.equalsIgnoreCase(antiSubsetting))
+					{
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
 
 	private static void removeNullValuesFromCollection(Map<Integer, SosObservation> templatedObservations)
 	{
