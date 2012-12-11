@@ -190,7 +190,7 @@ public class FesDecoderv20 implements IDecoder<Object, XmlObject> {
                                 Configurator.getInstance().getDecoder(nodes.item(i).getNamespaceURI());
                         Object timeObject = null;
                         for (IDecoder decoder : decoderList) {
-                            timeObject = decoder.decode(XmlObject.Factory.parse(nodes.item(i).getNamespaceURI()));
+                            timeObject = decoder.decode(XmlObject.Factory.parse(nodes.item(i)));
                             if (timeObject != null) {
                                 break;
                             }
