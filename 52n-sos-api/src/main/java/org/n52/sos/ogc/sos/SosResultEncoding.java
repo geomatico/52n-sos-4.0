@@ -24,6 +24,7 @@
 package org.n52.sos.ogc.sos;
 
 import java.util.List;
+import java.util.logging.Level;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
@@ -105,6 +106,26 @@ public class SosResultEncoding {
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SosResultEncoding other = (SosResultEncoding) obj;
+        try {
+            if (this.getEncoding() != other.getEncoding() && (this.getEncoding() == null 
+                    || !this.getEncoding().equals(other.getEncoding()))) {
+                return false;
+            }
+        } catch (OwsExceptionReport ex) {
+            return false;
+        }
+        return true;
     }
 
 }
