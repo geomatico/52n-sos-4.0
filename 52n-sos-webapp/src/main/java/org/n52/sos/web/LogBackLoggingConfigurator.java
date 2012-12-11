@@ -74,10 +74,10 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
     private static final String NOT_FOUND_ERROR_MESSAGE = "Can't find Logback configuration file.";
     private static final String UNPARSABLE_ERROR_MESSAGE = "Can't parse configuration file.";
     private static final String UNWRITABLE_ERROR_MESSAGE = "Can't write configuration file.";
+    private static final int WRITE_DELAY = 4000;
     private static final ReadWriteLock lock = new ReentrantReadWriteLock();
     private Document cache = null;
     private File configuration = null;
-    private static final int WRITE_DELAY = 4000;
     private DelayedWriteThread delayedWriteThread = null;
 
     private class DelayedWriteThread extends Thread {
@@ -195,6 +195,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
     private void write() {
         lock.writeLock().lock();
         try {
+            /* delay the actual writing to aggregate changes to one IO task */
             if (this.delayedWriteThread != null) {
                 this.delayedWriteThread.cancel();
                 this.delayedWriteThread.interrupt();
@@ -398,15 +399,6 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
         } finally {
             lock.writeLock().unlock();
         }
-    }
-
-    public static void main(String[] args) throws ConfigurationException {
-        AbstractLoggingConfigurator lc = AbstractLoggingConfigurator.getInstance();
-        lc.setLoggerLevel("org.n52", Level.DEBUG);
-        lc.setRootLogLevel(Level.INFO);
-        lc.setMaxHistory(10);
-        lc.enableAppender(Appender.CONSOLE, true);
-        System.out.println(lc.getRootLogLevel());
     }
 
     @Override
