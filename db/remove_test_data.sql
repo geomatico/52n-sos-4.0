@@ -127,6 +127,8 @@ WHERE   o.observation_constellation_id = oc.observation_constellation_id AND
             
         );
 
+DELETE FROM result_template WHERE identifier LIKE 'http://www.example.org/sensors/%';
+
 DELETE FROM observation_constellation AS oc
 USING   procedure AS p,
         observable_property AS op,

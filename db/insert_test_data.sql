@@ -327,7 +327,7 @@ $$
 $$
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION insert_observation(bigint,text, text,timestamp) RETURNS bigint AS
+CREATE OR REPLACE FUNCTION insert_observation(bigint, text, text, timestamp) RETURNS bigint AS
 $$ 
 	INSERT INTO observation(observation_constellation_id, feature_of_interest_id, unit_id, phenomenon_time_start, result_time)
 	SELECT $1, get_feature_of_interest($2), get_unit($3), $4, $4 WHERE $1 NOT IN (
@@ -374,6 +374,40 @@ $$
 $$
 LANGUAGE 'sql';
 
+CREATE OR REPLACE FUNCTION insert_result_template(bigint,bigint,text,text,text) RETURNS bigint AS
+$$ 
+ 	INSERT INTO result_template(observation_constellation_id, feature_of_interest_id, identifier, result_structure, result_encoding)
+ 	SELECT  $1, $2, $3, $4, $5 WHERE $3 NOT IN (
+ 		SELECT identifier FROM result_template 
+ 		WHERE observation_constellation_id = $1 
+	 		AND feature_of_interest_id = $2 
+	 		AND identifier = $3 
+	 		AND result_structure = $4 
+	 		AND result_encoding = $5);
+ 	SELECT result_template_id FROM result_template WHERE identifier = $3;
+$$
+LANGUAGE 'sql';
+
+CREATE OR REPLACE FUNCTION insert_result_template(text,text,text,text,text,text) RETURNS bigint AS
+$$ 
+ 	SELECT insert_result_template(get_observation_constellation($1, $2, $3, $4), get_feature_of_interest($5),
+		$2 || '/template/1'::text,
+		'<swe:DataRecord xmlns:swe="http://www.opengis.net/swe/2.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+			<swe:field name="phenomenonTime">
+				<swe:Time definition="http://www.opengis.net/def/property/OGC/0/PhenomenonTime">
+					<swe:uom xlink:href="http://www.opengis.net/def/uom/ISO-8601/0/Gregorian"/>
+				</swe:Time>
+			</swe:field>
+			<swe:field name="'::text || $4 || '">
+				<swe:Quantity definition="'::text || $4 || '">
+					<swe:uom code="'::text || $6 || '"/>
+				</swe:Quantity>
+			</swe:field>
+		</swe:DataRecord>'::text,
+		'<swe:TextEncoding xmlns:swe="http://www.opengis.net/swe/2.0" tokenSeparator="#" blockSeparator="@"/>'::text);
+$$
+LANGUAGE 'sql';
+
 --
 -- NOTE: in table observation: the column identifier can be null but is in the unique constraint....
 --
@@ -405,6 +439,7 @@ SELECT insert_offering('test_offering_2');
 SELECT insert_offering('test_offering_3');
 SELECT insert_offering('test_offering_4');
 SELECT insert_offering('test_offering_5');
+SELECT insert_offering('test_offering_6');
 
 ---- FEATURE_OF_INTEREST
 SELECT insert_feature_of_interest('test_feature_1', 20.401108, 49.594538);
@@ -412,6 +447,7 @@ SELECT insert_feature_of_interest('test_feature_2',  8.401108, 52.980090);
 SELECT insert_feature_of_interest('test_feature_3', 10.401108, 52.512348);
 SELECT insert_feature_of_interest('test_feature_4',  2.401108, 51.594538);
 SELECT insert_feature_of_interest('test_feature_5', 21.401108, 52.127812);
+SELECT insert_feature_of_interest('test_feature_6', 12.412312, 53.123212);
 
 ---- UNIT
 SELECT insert_unit('test_unit_1');
@@ -419,6 +455,7 @@ SELECT insert_unit('test_unit_2');
 SELECT insert_unit('test_unit_3');
 SELECT insert_unit('test_unit_4');
 SELECT insert_unit('test_unit_5');
+SELECT insert_unit('test_unit_6');
 
 ---- OBSERVABLE_PROPERTY
 SELECT insert_observable_property('test_observable_property_1');
@@ -426,22 +463,26 @@ SELECT insert_observable_property('test_observable_property_2');
 SELECT insert_observable_property('test_observable_property_3');
 SELECT insert_observable_property('test_observable_property_4');
 SELECT insert_observable_property('test_observable_property_5');
+SELECT insert_observable_property('test_observable_property_6');
 
 -- PROCEDURES
 SELECT insert_procedure('http://www.example.org/sensors/101', '2012-11-19 13:00', 
 	'test_observable_property_1', 20.401108, 49.594538, 0.0, 'Measurement', 'Point');
 
 SELECT insert_procedure('http://www.example.org/sensors/102', '2012-11-19 13:00', 
-	'test_observable_property_2', 20.401108, 49.594538, 0.0, 'CountObservation', 'Point');
+	'test_observable_property_2',  8.401108, 52.980090, 0.0, 'CountObservation', 'Point');
 
 SELECT insert_procedure('http://www.example.org/sensors/103', '2012-11-19 13:00', 
-	'test_observable_property_3', 20.401108, 49.594538, 0.0, 'TruthObservation', 'Point');
+	'test_observable_property_3', 10.401108, 52.512348, 0.0, 'TruthObservation', 'Point');
 
 SELECT insert_procedure('http://www.example.org/sensors/104', '2012-11-19 13:00', 
-	'test_observable_property_4', 20.401108, 49.594538, 0.0, 'CategoryObservation', 'Point');
+	'test_observable_property_4',  2.401108, 51.594538, 0.0, 'CategoryObservation', 'Point');
 
 SELECT insert_procedure('http://www.example.org/sensors/105', '2012-11-19 13:00', 
-	'test_observable_property_5', 20.401108, 49.594538, 0.0, 'TextObservation', 'Point');
+	'test_observable_property_5', 21.401108, 52.127812, 0.0, 'TextObservation', 'Point');
+
+SELECT insert_procedure('http://www.example.org/sensors/106', '2012-11-19 13:00', 
+	'test_observable_property_5', 12.412312, 53.123212, 0.0, 'SWEArrayObservation', 'Point');
 
 -- OBSERVATION_CONSTELLATION
 SELECT insert_observation_constellation('Measurement', 'http://www.example.org/sensors/101', 'test_offering_1', 'test_observable_property_1');
@@ -449,6 +490,7 @@ SELECT insert_observation_constellation('CountObservation', 'http://www.example.
 SELECT insert_observation_constellation('TruthObservation', 'http://www.example.org/sensors/103', 'test_offering_3', 'test_observable_property_3');
 SELECT insert_observation_constellation('CategoryObservation', 'http://www.example.org/sensors/104', 'test_offering_4', 'test_observable_property_4');
 SELECT insert_observation_constellation('TextObservation',  'http://www.example.org/sensors/105', 'test_offering_5', 'test_observable_property_5');
+SELECT insert_observation_constellation('SWEArrayObservation',  'http://www.example.org/sensors/106', 'test_offering_6', 'test_observable_property_6');
 
 -- INSERT OBSERVATIONS
 SELECT insert_numeric_observation(insert_observation(get_observation_constellation('Measurement', 'http://www.example.org/sensors/101', 
@@ -556,6 +598,55 @@ SELECT insert_text_observation(insert_observation(get_observation_constellation(
 SELECT insert_text_observation(insert_observation(get_observation_constellation('TextObservation', 'http://www.example.org/sensors/105', 
 	'test_offering_5', 'test_observable_property_5'), 'test_feature_5', 'test_unit_5', '2012-11-19 13:09'), 'test_text_value_10');
 
+
+SELECT insert_result_template('SWEArrayObservation', 'http://www.example.org/sensors/106', 'test_offering_6', 
+								'test_observable_property_6', 'test_feature_6', 'test_unit_6');
+
+SELECT insert_numeric_observation(insert_observation(get_observation_constellation('SWEArrayObservation', 'http://www.example.org/sensors/106', 
+	'test_offering_6', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:00'), 1.2);
+SELECT insert_numeric_observation(insert_observation(get_observation_constellation('SWEArrayObservation', 'http://www.example.org/sensors/106', 
+	'test_offering_6', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:01'), 1.3);
+SELECT insert_numeric_observation(insert_observation(get_observation_constellation('SWEArrayObservation', 'http://www.example.org/sensors/106', 
+	'test_offering_6', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:02'), 1.4);
+SELECT insert_numeric_observation(insert_observation(get_observation_constellation('SWEArrayObservation', 'http://www.example.org/sensors/106', 
+	'test_offering_6', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:03'), 1.5);
+SELECT insert_numeric_observation(insert_observation(get_observation_constellation('SWEArrayObservation', 'http://www.example.org/sensors/106', 
+	'test_offering_6', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:04'), 1.6);
+SELECT insert_numeric_observation(insert_observation(get_observation_constellation('SWEArrayObservation', 'http://www.example.org/sensors/106', 
+	'test_offering_6', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:05'), 1.7);
+SELECT insert_numeric_observation(insert_observation(get_observation_constellation('SWEArrayObservation', 'http://www.example.org/sensors/106', 
+	'test_offering_6', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:06'), 1.8);
+SELECT insert_numeric_observation(insert_observation(get_observation_constellation('SWEArrayObservation', 'http://www.example.org/sensors/106', 
+	'test_offering_6', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:07'), 1.9);
+SELECT insert_numeric_observation(insert_observation(get_observation_constellation('SWEArrayObservation', 'http://www.example.org/sensors/106', 
+	'test_offering_6', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:08'), 2.0);
+SELECT insert_numeric_observation(insert_observation(get_observation_constellation('SWEArrayObservation', 'http://www.example.org/sensors/106', 
+	'test_offering_6', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:09'), 2.1);
+
+INSERT INTO observation(observation_constellation_id, feature_of_interest_id, unit_id, phenomenon_time_start, result_time, identifier)
+	SELECT  get_observation_constellation('Measurement', 'http://www.example.org/sensors/101', 'test_offering_1', 'test_observable_property_1'),
+			get_feature_of_interest('test_feature_1'), get_unit('test_unit_6'), '2012-11-19 13:10', '2012-11-19 13:10', 'test_observation_1'
+	WHERE 'test_observation_1' NOT IN (SELECT identifier FROM observation WHERE identifier = 'test_observation_1');
+
+INSERT INTO observation_has_numeric_value(observation_id, numeric_value_id) 
+		SELECT o.observation_id, insert_numeric_value(3.5) 
+		FROM observation AS o 
+		WHERE o.identifier = 'test_observation_1'
+			AND o.observation_id NOT IN (SELECT observation_id FROM observation_has_numeric_value AS ohnv
+											WHERE ohnv.observation_id = o.observation_id);
+
+INSERT INTO observation(observation_constellation_id, feature_of_interest_id, unit_id, phenomenon_time_start, result_time, identifier)
+	SELECT  get_observation_constellation('Measurement', 'http://www.example.org/sensors/101', 'test_offering_1', 'test_observable_property_1'),
+			get_feature_of_interest('test_feature_1'), get_unit('test_unit_6'), '2012-11-19 13:11', '2012-11-19 13:11', 'test_observation_2'
+	WHERE 'test_observation_2' NOT IN (SELECT identifier FROM observation WHERE identifier = 'test_observation_2');
+
+INSERT INTO observation_has_numeric_value(observation_id, numeric_value_id) 
+		SELECT o.observation_id, insert_numeric_value(4.2) 
+		FROM observation AS o 
+		WHERE o.identifier = 'test_observation_2'
+			AND o.observation_id NOT IN (SELECT observation_id FROM observation_has_numeric_value AS ohnv
+											WHERE ohnv.observation_id = o.observation_id);
+
 DROP FUNCTION create_sensor_description(text, text, numeric, numeric, numeric);
 DROP FUNCTION get_boolean_value(boolean);
 DROP FUNCTION get_feature_of_interest(text);
@@ -591,3 +682,5 @@ DROP FUNCTION insert_procedure(text,timestamp,text,numeric,numeric,numeric,text,
 DROP FUNCTION insert_text_observation(bigint, text);
 DROP FUNCTION insert_text_value(text);
 DROP FUNCTION insert_unit(text);
+DROP FUNCTION insert_result_template(text,text,text,text,text,text);
+DROP FUNCTION insert_result_template(bigint,bigint,text,text,text);
