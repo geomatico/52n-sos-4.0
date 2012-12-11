@@ -59,7 +59,6 @@ public class SosMultiObservationValues<T> implements IObservationValue<T> {
             DateTime start = null;
             DateTime end = null;
             int dateTokenIndex = -1;
-            // TODO Eike: implement
             if (dataArray != null && dataArray.getElementType() != null && dataArray.getEncoding() != null) {
                 // get index of time token from elementtype
                 if (dataArray.getElementType() instanceof SosSweDataRecord) {
