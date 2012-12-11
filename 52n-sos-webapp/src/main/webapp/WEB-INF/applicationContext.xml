@@ -1,32 +1,59 @@
-<beans:beans xmlns:sec="http://www.springframework.org/schema/security"
-			 xmlns:beans="http://www.springframework.org/schema/beans"
-			 xmlns:security="http://www.springframework.org/schema/security"
-			 xmlns:mvc="http://www.springframework.org/schema/mvc"
-			 xmlns:context="http://www.springframework.org/schema/context"
-			 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-			 xsi:schemaLocation="http://www.springframework.org/schema/beans 
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:sec="http://www.springframework.org/schema/security"
+	   xmlns:security="http://www.springframework.org/schema/security"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans 
 								 http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 								 http://www.springframework.org/schema/security 
 								 http://www.springframework.org/schema/security/spring-security-3.1.xsd
 								 http://www.springframework.org/schema/context
 								 http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	
 	<context:annotation-config />
 
-	<beans:bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
-	<beans:bean id="authenticationProvider" class="org.n52.sos.web.admin.auth.UserService"/>
-
+	<bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+	<bean id="authenticationProvider" class="org.n52.sos.web.admin.auth.UserService"/>
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name = "messageConverters">
+			<list>
+				<bean class = "org.springframework.http.converter.StringHttpMessageConverter">
+					<property name = "supportedMediaTypes">
+						<list>
+							<bean class="org.springframework.http.MediaType">
+								<constructor-arg index="0" value="text"/>
+								<constructor-arg index="1" value="plain"/>
+								<constructor-arg index="2" value="UTF-8"/>
+							</bean>
+							<bean class="org.springframework.http.MediaType">
+								<constructor-arg index="0" value="application"/>
+								<constructor-arg index="1" value="json"/>
+								<constructor-arg index="2" value="UTF-8"/>
+							</bean>
+							<bean class="org.springframework.http.MediaType">
+								<constructor-arg index="0" value="*"/>
+								<constructor-arg index="1" value="*"/>
+								<constructor-arg index="2" value="UTF-8"/>
+							</bean>
+						</list>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
 	<sec:authentication-manager alias="authenticationManager">
 		<sec:authentication-provider ref="authenticationProvider" />
 	</sec:authentication-manager>
 
-	<beans:bean id="httpBasicAuthenticationEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
-		<beans:property name="realmName" value="Your realm here" />
-	</beans:bean>
+	<bean id="httpBasicAuthenticationEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
+		<property name="realmName" value="Your realm here" />
+	</bean>
 
-	<beans:bean id="httpBasicAuthenticationFilter" class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
-		<beans:property name="authenticationManager" ref="authenticationManager" />
-		<beans:property name="authenticationEntryPoint" ref="httpBasicAuthenticationEntryPoint" />
-	</beans:bean>
+	<bean id="httpBasicAuthenticationFilter" class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
+		<property name="authenticationManager" ref="authenticationManager" />
+		<property name="authenticationEntryPoint" ref="httpBasicAuthenticationEntryPoint" />
+	</bean>
 
 	<sec:http pattern="/static/**" security="none" />
 	<sec:http pattern="/install/**" security="none" />
@@ -45,4 +72,4 @@
 						login-processing-url="/j_spring_security_check" />
 		<sec:logout logout-success-url="/index" />
 	</sec:http>
-</beans:beans>
+</beans>
