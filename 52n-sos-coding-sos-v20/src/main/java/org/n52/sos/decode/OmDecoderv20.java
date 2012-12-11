@@ -372,9 +372,6 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
                         return (IObservationValue) decodedObject;
                     }
                     else if (decodedObject != null && decodedObject instanceof SosSweDataArray)
-                    /*
-                     * TODO Eike: create SosMultipleObservationValues from SosSweDataArray
-                     */
                     {
                         SosMultiObservationValues result = new SosMultiObservationValues();
                         SweDataArrayValue value = new SweDataArrayValue();
