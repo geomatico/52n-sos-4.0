@@ -158,8 +158,12 @@ public class GetObservationByIdDAO implements IGetObservationByIdDAO {
         List<Projection> projections = new ArrayList<Projection>();
         criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                 HibernateConstants.PARAMETER_IDENTIFIER, request.getObservationIdentifier()));
+        criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+        		HibernateConstants.PARAMETER_ANTI_SUBSETTING, request.getObservationIdentifier()));
+        List<Criterion> disjunctedCriterions = new ArrayList<Criterion>(1);
+        disjunctedCriterions.add(HibernateCriteriaQueryUtilities.getDisjunctionFor(criterions));
         List<Observation> observations =
-                HibernateCriteriaQueryUtilities.getObservations(aliases, criterions, projections, session);
+                HibernateCriteriaQueryUtilities.getObservations(aliases, disjunctedCriterions, projections, session);
         return observations;
     }
 

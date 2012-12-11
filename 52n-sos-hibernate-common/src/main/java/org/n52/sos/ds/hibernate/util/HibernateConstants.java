@@ -45,6 +45,8 @@ public class HibernateConstants {
 
     // table and column names
     // TODO: make this constants configurable
+	public static final String PARAMETER_ANTI_SUBSETTING = "antiSubsetting";
+	
     public static final String PARAMETER_IDENTIFIER = "identifier";
 
     public static final String PARAMETER_GEOMETRY = "geom";
