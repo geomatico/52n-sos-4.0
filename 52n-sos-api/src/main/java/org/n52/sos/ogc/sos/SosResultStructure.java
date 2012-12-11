@@ -24,6 +24,7 @@
 package org.n52.sos.ogc.sos;
 
 import java.util.List;
+import java.util.logging.Level;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
@@ -106,5 +107,21 @@ public class SosResultStructure {
         }
         return null;
     }
-
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o != null && o instanceof SosResultStructure) {
+            SosResultStructure other = (SosResultStructure) o;
+            try {
+                if (getResultStructure() == other.getResultStructure()) {
+                    return true;
+                } else if (getResultStructure() != null) {
+                    return getResultStructure().equals(other.getResultStructure());
+                }
+            } catch (OwsExceptionReport ex) {
+                return false;
+            }
+        }
+        return false;
+    }
 }

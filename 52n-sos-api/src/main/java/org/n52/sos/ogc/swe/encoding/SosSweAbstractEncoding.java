@@ -34,5 +34,11 @@ public abstract class SosSweAbstractEncoding {
     public void setXml(String xml) {
         this.xml = xml;
     }
+
+    @Override
+    public abstract int hashCode();
+
+    @Override
+    public abstract boolean equals(Object obj);
     
 }

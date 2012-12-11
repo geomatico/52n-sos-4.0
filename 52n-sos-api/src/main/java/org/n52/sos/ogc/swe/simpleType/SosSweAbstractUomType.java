@@ -63,4 +63,11 @@ public abstract class SosSweAbstractUomType extends SosSweAbstractSimpleType {
     {
     	return uom != null && !uom.isEmpty();
     }
+    
+    @Override
+	public String toString()
+	{
+		return String.format("%s [simpleType=%s, value=%s, uom=%s, quality=%s]", 
+                getClass().getSimpleName(), getSimpleType(), getValue(), getUom(), getQuality());
+	}
 }

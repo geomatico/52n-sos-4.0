@@ -65,7 +65,30 @@ public class SosSweCategory extends SosSweAbstractSimpleType {
 	@Override
 	public String toString()
 	{
-		return String.format("SosSweCategory [quality=%s, value=%s, codeSpace=%s, simpleType=%s]", getQuality(), value, codeSpace, getSimpleType());
+		return String.format("SosSweCategory [quality=%s, value=%s, codeSpace=%s, simpleType=%s]", getQuality(), getValue(), getCodeSpace(), getSimpleType());
 	}
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 47 * hash + super.hashCode();
+        hash = 47 * hash + (this.getCodeSpace() != null ? this.getCodeSpace().hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SosSweCategory other = (SosSweCategory) obj;
+        if ((this.getCodeSpace() == null) ? (other.getCodeSpace() != null) : !this.getCodeSpace().equals(other.getCodeSpace())) {
+            return false;
+        }
+        return super.equals(obj);
+    }
 	   
 }

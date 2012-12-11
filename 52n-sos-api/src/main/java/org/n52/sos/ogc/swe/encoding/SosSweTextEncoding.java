@@ -69,4 +69,38 @@ public class SosSweTextEncoding extends SosSweAbstractEncoding {
     	return collapseWhiteSpaces != null;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 37 * hash + (this.getBlockSeparator() != null ? this.getBlockSeparator().hashCode() : 0);
+        hash = 37 * hash + (this.getTokenSeparator() != null ? this.getTokenSeparator().hashCode() : 0);
+        hash = 37 * hash + (this.getDecimalSeparator() != null ? this.getDecimalSeparator().hashCode() : 0);
+        hash = 37 * hash + (this.collapseWhiteSpaces != null ? this.collapseWhiteSpaces.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SosSweTextEncoding other = (SosSweTextEncoding) obj;
+        if ((this.getBlockSeparator() == null) ? (other.getBlockSeparator() != null) : !this.getBlockSeparator().equals(other.getBlockSeparator())) {
+            return false;
+        }
+        if ((this.getTokenSeparator() == null) ? (other.getTokenSeparator() != null) : !this.getTokenSeparator().equals(other.getTokenSeparator())) {
+            return false;
+        }
+        if ((this.getDecimalSeparator() == null) ? (other.getDecimalSeparator() != null) : !this.getDecimalSeparator().equals(other.getDecimalSeparator())) {
+            return false;
+        }
+        if (this.collapseWhiteSpaces != other.collapseWhiteSpaces && (this.collapseWhiteSpaces == null || !this.collapseWhiteSpaces.equals(other.collapseWhiteSpaces))) {
+            return false;
+        }
+        return true;
+    }
+
 }

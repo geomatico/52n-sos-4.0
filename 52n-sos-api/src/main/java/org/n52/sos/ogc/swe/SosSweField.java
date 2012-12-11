@@ -84,4 +84,31 @@ public class SosSweField extends SosSweAbstractDataComponent{
         this.element = element;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 67 * hash + super.hashCode();
+        hash = 67 * hash + (this.getName() != null ? this.getName().hashCode() : 0);
+        hash = 67 * hash + (this.getElement() != null ? this.getElement().hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SosSweField other = (SosSweField) obj;
+        if ((this.getName() == null) ? (other.getName() != null) : !this.getName().equals(other.getName())) {
+            return false;
+        }
+        if (this.getElement() != other.getElement() && (this.getElement() == null || !this.getElement().equals(other.getElement()))) {
+            return false;
+        }
+        return super.equals(obj);
+    }
+
 }

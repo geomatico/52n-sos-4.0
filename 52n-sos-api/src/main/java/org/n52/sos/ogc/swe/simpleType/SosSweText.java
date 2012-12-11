@@ -34,11 +34,6 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
 public class SosSweText extends SosSweAbstractSimpleType {
 
     /**
-     * SWE simple type type
-     */
-    private SweSimpleType simpleType = SweSimpleType.Text;
-
-    /**
      * value
      */
     private String value;
@@ -51,7 +46,7 @@ public class SosSweText extends SosSweAbstractSimpleType {
 
     @Override
     public SweSimpleType getSimpleType() {
-        return simpleType;
+        return SweSimpleType.Text;
     }
 
     @Override
@@ -63,5 +58,4 @@ public class SosSweText extends SosSweAbstractSimpleType {
     public void setValue(String value) {
         this.value = value;
     }
-
 }

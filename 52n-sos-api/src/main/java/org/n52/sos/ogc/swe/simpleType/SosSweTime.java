@@ -32,25 +32,13 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
 public class SosSweTime extends SosSweAbstractUomType {
 
     /**
-     * SWE simple type type
-     */
-    private SweSimpleType simpleType = SweSimpleType.Time;
-
-    /**
      * value
      */
     private String value;
 
-    /**
-     * constructor
-     */
-    public SosSweTime() {
-        super();
-    }
-
     @Override
     public SweSimpleType getSimpleType() {
-        return simpleType;
+        return SweSimpleType.Time;
     }
 
     @Override
@@ -62,11 +50,4 @@ public class SosSweTime extends SosSweAbstractUomType {
     public void setValue(String value) {
         this.value = value;
     }
-
-	@Override
-	public String toString()
-	{
-		return String.format("%s [simpleType=%s, value=%s, uom=%s, quality=%s]",this.getClass().getSimpleName(), simpleType, value, getUom(), getQuality());
-	}
-    
 }

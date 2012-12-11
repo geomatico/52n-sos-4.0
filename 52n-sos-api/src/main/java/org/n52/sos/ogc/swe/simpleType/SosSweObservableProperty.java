@@ -32,11 +32,6 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
 public class SosSweObservableProperty extends SosSweAbstractSimpleType {
 
     /**
-     * SWE simple type type
-     */
-    private SweSimpleType simpleType = SweSimpleType.ObservableProperty;
-
-    /**
      * value
      */
     private String value;
@@ -49,7 +44,7 @@ public class SosSweObservableProperty extends SosSweAbstractSimpleType {
 
     @Override
     public SweSimpleType getSimpleType() {
-        return simpleType;
+        return SweSimpleType.ObservableProperty;
     }
 
     @Override
@@ -61,5 +56,4 @@ public class SosSweObservableProperty extends SosSweAbstractSimpleType {
     public void setValue(String value) {
         this.value = value;
     }
-
 }

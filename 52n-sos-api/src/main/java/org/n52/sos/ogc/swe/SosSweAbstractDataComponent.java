@@ -87,4 +87,34 @@ public abstract class SosSweAbstractDataComponent {
         return xml != null && !xml.isEmpty();
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 31 * hash + (getDefinition() != null ? getDefinition().hashCode() : 0);
+        hash = 31 * hash + (getDescription() != null ? getDescription().hashCode() : 0);
+        hash = 31 * hash + (getIdentifier() != null ? getIdentifier().hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SosSweAbstractDataComponent other = (SosSweAbstractDataComponent) obj;
+        if ((this.getDefinition() == null) ? (other.getDefinition() != null) : !this.getDefinition().equals(other.getDefinition())) {
+            return false;
+        }
+        if ((this.getDescription() == null) ? (other.getDescription() != null) : !this.getDescription().equals(other.getDescription())) {
+            return false;
+        }
+        if ((this.getIdentifier() == null) ? (other.getIdentifier() != null) : !this.getIdentifier().equals(other.getIdentifier())) {
+            return false;
+        }
+        return true;
+    }
+    
 }

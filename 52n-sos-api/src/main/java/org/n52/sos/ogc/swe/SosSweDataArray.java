@@ -129,4 +129,35 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
         }
         return values.add(blockOfTokensToAddAtTheEnd);
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 23 * hash + super.hashCode();
+        hash = 23 * hash + (this.getValues() != null ? this.getValues().hashCode() : 0);
+        hash = 23 * hash + (this.getElementType() != null ? this.getElementType().hashCode() : 0);
+        hash = 23 * hash + (this.getEncoding() != null ? this.getEncoding().hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SosSweDataArray other = (SosSweDataArray) obj;
+        if (this.getValues() != other.getValues() && (this.getValues() == null || !this.getValues().equals(other.getValues()))) {
+            return false;
+        }
+        if (this.getElementType() != other.getElementType() && (this.getElementType() == null || !this.getElementType().equals(other.getElementType()))) {
+            return false;
+        }
+        if (this.getEncoding() != other.getEncoding() && (this.getEncoding() == null || !this.getEncoding().equals(other.getEncoding()))) {
+            return false;
+        }
+        return super.equals(obj);
+    }
 }

@@ -66,6 +66,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
+import org.n52.sos.ogc.sos.SosResultStructure;
 
 public class HibernateCriteriaTransactionalUtilities {
 	
@@ -427,9 +428,10 @@ public class HibernateCriteriaTransactionalUtilities {
         if (!resultTemplateListContainsElements(resultTemplates)) {
             createAndSaveResultTemplate(request, observationConstellation, featureOfInterest, session);
         } else {
-        	// TODO Iterate over result templates and throw exception after checking all?!
             ResultTemplate storedResultTemplate = resultTemplates.get(0);
-            if (!storedResultTemplate.getResultStructure().equals(request.getResultStructure().getXml())) {
+            SosResultStructure storedStructure = new SosResultStructure(storedResultTemplate.getResultStructure());
+            SosResultStructure newStructure = new SosResultStructure(request.getResultStructure().getXml());
+            if (!storedStructure.equals(newStructure)) {
                 String exceptionText = String.format(
                 		"The requested resultStructure is different from already inserted result template " +
                 		"for procedure (%s) observedProperty (%s) and offering (%s)!",
@@ -439,8 +441,10 @@ public class HibernateCriteriaTransactionalUtilities {
                 LOGGER.error(exceptionText);
                 throw Util4Exceptions.createInvalidParameterValueException(
                         Sos2Constants.InsertResultTemplateParams.resultStructure.name(), exceptionText);
+            } else if (request.getIdentifier() != null && !request.getIdentifier().equals(storedResultTemplate.getIdentifier())) {
+                /* save it only if the identifier is different */
+                createAndSaveResultTemplate(request, observationConstellation, featureOfInterest, session);
             }
-            createAndSaveResultTemplate(request, observationConstellation, featureOfInterest, session);
         }
     }
 
@@ -531,6 +535,9 @@ public class HibernateCriteriaTransactionalUtilities {
             antiSubsettingId = UUID.randomUUID().toString();
         }
         return antiSubsettingId;
+    }
+
+    private HibernateCriteriaTransactionalUtilities() {
     }
 
 }

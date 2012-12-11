@@ -65,4 +65,29 @@ public class SosSweDataRecord extends SosSweAbstractDataComponent{
         this.fields.add(field);
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + super.hashCode();
+        hash = 53 * hash + (this.getFields() != null ? this.getFields().hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SosSweDataRecord other = (SosSweDataRecord) obj;
+        if (this.getFields() != other.getFields() && (this.getFields() == null || !this.getFields().equals(other.getFields()))) {
+            return false;
+        }
+        return super.equals(obj);
+    }
+    
+    
+
 }

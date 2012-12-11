@@ -27,16 +27,11 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
 
 public class SosSweCount extends SosSweAbstractSimpleType {
     
-    /**
-     * SWE simple type type
-     */
-    private SweSimpleType simpleType = SweSimpleType.Count;
-    
     private int value;
 
     @Override
     public SweSimpleType getSimpleType() {
-        return simpleType;
+        return SweSimpleType.Count;
     }
 
     @Override

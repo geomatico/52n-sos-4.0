@@ -34,11 +34,6 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
 public class SosSweQuantity extends SosSweAbstractUomType {
 
 	/**
-	 * SWE simple type type
-	 */
-	private SweSimpleType simpleType = SweSimpleType.Quantity;
-
-	/**
 	 * axis ID
 	 */
 	private String axisID;
@@ -49,11 +44,6 @@ public class SosSweQuantity extends SosSweAbstractUomType {
 	private String value;
 
 	/**
-	 * unit of measurement
-	 */
-	private String uom;
-
-	/**
 	 * constructor
 	 */
 	public SosSweQuantity() {
@@ -62,7 +52,7 @@ public class SosSweQuantity extends SosSweAbstractUomType {
 	@Override
 	public SweSimpleType getSimpleType()
 	{
-		return simpleType;
+		return SweSimpleType.Quantity;
 	}
 
 	/**
@@ -98,10 +88,27 @@ public class SosSweQuantity extends SosSweAbstractUomType {
 		this.value = value;
 	}
 
-	@Override
-	public String toString()
-	{
-		return String.format("SosSweQuantity [simpleType=%s, axisID=%s, value=%s, uom=%s, quality=%s]", simpleType, axisID, value, uom, getQuality());
-	}
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + super.hashCode();
+        hash = 97 * hash + (this.axisID != null ? this.axisID.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SosSweQuantity other = (SosSweQuantity) obj;
+        if ((this.getAxisID() == null) ? (other.getAxisID() != null) : !this.getAxisID().equals(other.getAxisID())) {
+            return false;
+        }
+        return super.equals(obj);
+    }
 
 }
