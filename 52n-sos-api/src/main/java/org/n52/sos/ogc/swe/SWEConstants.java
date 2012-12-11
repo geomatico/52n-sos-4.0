@@ -96,6 +96,8 @@ public class SWEConstants {
 
     public static final QName QN_TIME_SWE_200 = new QName(NS_SWE_20, EN_TIME, NS_SWE_PREFIX);
 
+    public static final QName QN_TIME_RANGE_SWE_200 = new QName(NS_SWE_20, EN_TIME_RANGE, NS_SWE_PREFIX);
+
     public static final QName QN_TEXT_ENCODING_SWE_200 = new QName(NS_SWE_20, EN_TEXT_ENCODING, NS_SWE_PREFIX);
 
 	public static final QName QN_INSERTION_METADATA = new QName(NS_SWES_20, EN_INSERTION_METADATA, NS_SWES_PREFIX);
@@ -160,6 +162,9 @@ public class SWEConstants {
         public String getSoapFaultReason() {
             return this.soapFaultReason;
         }
+    }
+
+    private SWEConstants() {
     }
 
 }

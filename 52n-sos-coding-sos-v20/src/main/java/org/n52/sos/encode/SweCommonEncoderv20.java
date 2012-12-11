@@ -314,37 +314,37 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 		if (sosElement instanceof SosSweBoolean)
 		{
 			xbDCD.set(createBoolean((SosSweBoolean) sosElement));
-			xbField.getAbstractDataComponent().substitute(new QName(SWEConstants.NS_SWE_20, SWEConstants.EN_BOOLEAN, SWEConstants.NS_SWE_PREFIX), BooleanType.type);
+			xbField.getAbstractDataComponent().substitute(SWEConstants.QN_BOOLEAN_SWE_200, BooleanType.type);
 		}
 		else if (sosElement instanceof SosSweCategory)
 		{
 			xbDCD.set(createCategoy((SosSweCategory) sosElement));
-			xbField.getAbstractDataComponent().substitute(new QName(SWEConstants.NS_SWE_20, SWEConstants.EN_CATEGORY, SWEConstants.NS_SWE_PREFIX), CategoryType.type);
+			xbField.getAbstractDataComponent().substitute(SWEConstants.QN_CATEGORY_SWE_200, CategoryType.type);
 		}
 		else if (sosElement instanceof SosSweCount)
 		{
 			xbDCD.set(createCount((SosSweCount) sosElement));
-			xbField.getAbstractDataComponent().substitute(new QName(SWEConstants.NS_SWE_20, SWEConstants.EN_COUNT, SWEConstants.NS_SWE_PREFIX), CountType.type);
+			xbField.getAbstractDataComponent().substitute(SWEConstants.QN_COUNT_SWE_200, CountType.type);
 		}
 		else if (sosElement instanceof SosSweQuantity)
 		{
 			xbDCD.set(createQuantity((SosSweQuantity) sosElement));
-			xbField.getAbstractDataComponent().substitute(new QName(SWEConstants.NS_SWE_20, SWEConstants.EN_QUANTITY, SWEConstants.NS_SWE_PREFIX), QuantityType.type);
+			xbField.getAbstractDataComponent().substitute(SWEConstants.QN_QUANTITY_SWE_200, QuantityType.type);
 		}
 		else if (sosElement instanceof SosSweText)
 		{
 			xbDCD.set(createText((SosSweText) sosElement));
-			xbField.getAbstractDataComponent().substitute(new QName(SWEConstants.NS_SWE_20, SWEConstants.EN_TEXT, SWEConstants.NS_SWE_PREFIX), TextType.type);
+			xbField.getAbstractDataComponent().substitute(SWEConstants.QN_TEXT_ENCODING_SWE_200, TextType.type);
 		}
 		else if (sosElement instanceof SosSweTimeRange)
 		{
 			xbDCD.set(createTimeRange((SosSweTimeRange)sosElement));
-			xbField.getAbstractDataComponent().substitute(new QName(SWEConstants.NS_SWE_20, SWEConstants.EN_TIME_RANGE, SWEConstants.NS_SWE_PREFIX), TimeRangeType.type);
+			xbField.getAbstractDataComponent().substitute(SWEConstants.QN_TIME_RANGE_SWE_200, TimeRangeType.type);
 		}
 		else if (sosElement instanceof SosSweTime)
 		{
 			xbDCD.set(createTime((SosSweTime)sosElement));
-			xbField.getAbstractDataComponent().substitute(new QName(SWEConstants.NS_SWE_20,SWEConstants.EN_TIME,SWEConstants.NS_SWE_PREFIX), TimeType.type);
+			xbField.getAbstractDataComponent().substitute(SWEConstants.QN_TIME_SWE_200, TimeType.type);
 		}
 		else 
 		{
