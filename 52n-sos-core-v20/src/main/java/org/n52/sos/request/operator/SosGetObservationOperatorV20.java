@@ -253,6 +253,20 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
+        try {
+            SosHelper.checkSpatialFilter(sosRequest.getSpatialFilter(),
+                    SosConstants.GetObservationParams.featureOfInterest.name());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            SosHelper.checkTemporalFilter(sosRequest.getEventTimes(),
+                    Sos2Constants.GetObservationParams.temporalFilter.name());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        
+        
         Util4Exceptions.mergeAndThrowExceptions(exceptions);
     }
 

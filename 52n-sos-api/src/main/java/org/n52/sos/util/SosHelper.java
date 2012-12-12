@@ -23,6 +23,7 @@
  */
 package org.n52.sos.util;
 
+import java.beans.FeatureDescriptor;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -48,6 +49,8 @@ import org.n52.sos.binding.Binding;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.IObservationEncoder;
+import org.n52.sos.ogc.filter.SpatialFilter;
+import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
@@ -135,7 +138,8 @@ public class SosHelper {
         // ?
         url.append("?");
         // request
-        url.append(RequestParams.request.name()).append("=").append(SosConstants.Operations.GetFeatureOfInterest.name());
+        url.append(RequestParams.request.name()).append("=")
+                .append(SosConstants.Operations.GetFeatureOfInterest.name());
         // service
         url.append("&").append(OWSConstants.RequestParams.service.name()).append("=").append(SosConstants.SOS);
         // version
@@ -265,7 +269,7 @@ public class SosHelper {
         // check remaining free memory on heap if too small, throw exception to
         // avoid an OutOfMemoryError
         freeMem = Runtime.getRuntime().freeMemory();
-        LOGGER.debug("Remaining Heap Size: " + (freeMem/1024) + "KB");
+        LOGGER.debug("Remaining Heap Size: " + (freeMem / 1024) + "KB");
         if (Runtime.getRuntime().totalMemory() == Runtime.getRuntime().maxMemory() && freeMem < 256000) { // 256000
             // accords to 256 kB create service exception
             String exceptionText =
@@ -716,8 +720,7 @@ public class SosHelper {
                     "The value of the mandatory parameter '" + parameterName
                             + "' was not found in the request or is incorrect!";
             LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createMissingParameterValueException(SosConstants.DescribeSensorParams.procedure
-                    .toString());
+            throw Util4Exceptions.createMissingParameterValueException(parameterName);
         }
         if (!outputFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
             if (!outputFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
@@ -787,6 +790,13 @@ public class SosHelper {
         if (featuresOfInterest != null) {
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
             for (String featureOfInterest : featuresOfInterest) {
+                if (featureOfInterest == null || featureOfInterest.isEmpty()) {
+                    String exceptionText =
+                            "The value of the parameter '" + parameterName
+                                    + "' was not found in the request or is incorrect!";
+                    LOGGER.debug(exceptionText);
+                    throw Util4Exceptions.createMissingParameterValueException(parameterName);
+                }
                 if (!validFeatureOfInterest.contains(featureOfInterest)) {
                     String exceptionText =
                             "The value '" + featureOfInterest + "' of the parameter '" + parameterName
@@ -816,6 +826,12 @@ public class SosHelper {
 
     public static void checkObservedProperty(String observedProperty, Collection<String> validObservedProperties,
             String parameterName) throws OwsExceptionReport {
+        if (observedProperty == null || observedProperty.isEmpty()) {
+            String exceptionText =
+                    "The value of the parameter '" + parameterName + "' was not found in the request or is not set!";
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createMissingParameterValueException(parameterName);
+        }
         if (!validObservedProperties.contains(observedProperty)) {
             String exceptionText =
                     "The value '" + observedProperty + "' of the parameter '" + parameterName + "' is invalid";
@@ -841,6 +857,12 @@ public class SosHelper {
 
     public static void checkOffering(String offering, Collection<String> validOfferings, String parameterName)
             throws OwsExceptionReport {
+        if (offering == null || offering.isEmpty()) {
+            String exceptionText =
+                    "The value of the parameter '" + parameterName + "' was not found in the request or is not set!";
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createMissingParameterValueException(parameterName);
+        }
         if (!validOfferings.contains(offering)) {
             String exceptionText = "The value '" + offering + "' of the parameter '" + parameterName + "' is invalid";
             LOGGER.debug(exceptionText);
@@ -861,6 +883,51 @@ public class SosHelper {
             throw Util4Exceptions.createInvalidParameterValueException(OWSConstants.RequestParams.request.name(),
                     exceptionText);
         }
+    }
+
+    public static void checkSpatialFilters(List<SpatialFilter> spatialFilters, String name) throws OwsExceptionReport {
+        // TODO make supported ValueReferences dynamic
+        for (SpatialFilter spatialFilter : spatialFilters) {
+            checkSpatialFilter(spatialFilter, name);
+        }
+
+    }
+
+    public static void checkSpatialFilter(SpatialFilter spatialFilter, String name) throws OwsExceptionReport {
+        // TODO make supported ValueReferences dynamic
+        if (spatialFilter != null) {
+            if (!spatialFilter.getValueReference().equals("sams:shape")
+                    || !spatialFilter.getValueReference().equals(
+                            "om:featureOfInterest/sams:SF_SpatialSamplingFeature/sams:shape")
+                    || !spatialFilter.getValueReference().equals("om:featureOfInterest/*/sams:shape")) {
+                String exceptionText =
+                        "The value of the parameter '" + SosConstants.Filter.ValueReference.name()
+                                + "' was not found in the request or is not set!";
+                LOGGER.debug(exceptionText);
+                throw Util4Exceptions.createMissingParameterValueException(SosConstants.Filter.ValueReference.name());
+            }
+        }
+    }
+
+    public static void checkTemporalFilter(List<TemporalFilter> temporalFilters, String name)
+            throws OwsExceptionReport {
+        // TODO make supported ValueReferences dynamic
+        for (TemporalFilter temporalFilter : temporalFilters) {
+            if (!temporalFilter.getValueReference().equals("phenomenonTime")
+                    || !temporalFilter.getValueReference().equals("om:phenomenonTime")
+                    || !temporalFilter.getValueReference().equals("resultTime")
+                    || !temporalFilter.getValueReference().equals("om:resultTime")
+                    || !temporalFilter.getValueReference().equals("validTime")
+                    || !temporalFilter.getValueReference().equals("om:validTime")) {
+                String exceptionText =
+                        "The value of the parameter '" + SosConstants.Filter.ValueReference.name()
+                                + "' was not found in the request or is not set!";
+                LOGGER.debug(exceptionText);
+                throw Util4Exceptions.createInvalidParameterValueException(SosConstants.Filter.ValueReference.name(),
+                        exceptionText);
+            }
+        }
+
     }
 
     /**
@@ -1019,5 +1086,5 @@ public class SosHelper {
             throw Util4Exceptions.createNoApplicableCodeException(cnfe, exceptionText);
         }
     }
-    
+
 }

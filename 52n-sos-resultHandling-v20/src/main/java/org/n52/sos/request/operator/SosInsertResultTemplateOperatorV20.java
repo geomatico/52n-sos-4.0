@@ -162,7 +162,7 @@ public class SosInsertResultTemplateOperatorV20 implements IRequestOperator {
         try {
             SosHelper.checkOfferings(request.getObservationConstellation().getOfferings(), Configurator.getInstance()
                     .getCapabilitiesCacheController().getOfferings(),
-                    Sos2Constants.InsertResultTemplateParams.offering.name());
+                    Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -170,7 +170,7 @@ public class SosInsertResultTemplateOperatorV20 implements IRequestOperator {
         try {
             SosHelper.checkProcedureID(request.getObservationConstellation().getProcedure(), Configurator
                     .getInstance().getCapabilitiesCacheController().getProcedures(),
-                    Sos2Constants.InsertResultTemplateParams.procedure.name());
+                    Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -178,7 +178,7 @@ public class SosInsertResultTemplateOperatorV20 implements IRequestOperator {
         try {
             SosHelper.checkObservedProperty(request.getObservationConstellation().getObservableProperty()
                     .getIdentifier(), Configurator.getInstance().getCapabilitiesCacheController()
-                    .getObservableProperties(), Sos2Constants.InsertResultTemplateParams.observedProperty.name());
+                    .getObservableProperties(), Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }

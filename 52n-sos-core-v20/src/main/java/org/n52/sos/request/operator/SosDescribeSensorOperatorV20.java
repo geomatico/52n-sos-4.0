@@ -48,6 +48,7 @@ import org.n52.sos.response.DescribeSensorResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -208,7 +209,18 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
     }
 
     private void checkRequestedParameters(DescribeSensorRequest sosRequest) throws OwsExceptionReport {
-        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
+        try {
+            SosHelper.checkServiceParameter(sosRequest.getService());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion(), Configurator.getInstance()
+                    .getSupportedVersions());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
         try {
             SosHelper.checkProcedureID(sosRequest.getProcedure(), Configurator.getInstance().getCapabilitiesCacheController()
                     .getProcedures(), SosConstants.DescribeSensorParams.procedure.name());

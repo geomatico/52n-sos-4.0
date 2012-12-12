@@ -203,6 +203,13 @@ public class SosGetFeatureOfInterestOperatorV20 implements IRequestOperator {
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
+        try {
+            SosHelper.checkSpatialFilters(sosRequest.getSpatialFilters(),
+                    Sos2Constants.GetFeatureOfInterestParams.spatialFilter.name());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        
         Util4Exceptions.mergeAndThrowExceptions(exceptions);
     }
 

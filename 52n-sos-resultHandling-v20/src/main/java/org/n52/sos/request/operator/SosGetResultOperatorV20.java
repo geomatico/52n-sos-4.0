@@ -32,7 +32,6 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IGetResultDAO;
-import org.n52.sos.ds.IInsertResultDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
@@ -41,10 +40,7 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetResultRequest;
-import org.n52.sos.request.GetResultTemplateRequest;
-import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.response.GetResultResponse;
-import org.n52.sos.response.GetResultTemplateResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
@@ -170,6 +166,18 @@ public class SosGetResultOperatorV20 implements IRequestOperator {
             SosHelper.checkObservedProperty(request.getObservedProperty(), Configurator.getInstance()
                     .getCapabilitiesCacheController().getObservableProperties(),
                     Sos2Constants.GetResultTemplateParams.observedProperty.name());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            SosHelper.checkSpatialFilter(request.getSpatialFilter(),
+                    SosConstants.GetObservationParams.featureOfInterest.name());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+        try {
+            SosHelper.checkTemporalFilter(request.getTemporalFilter(),
+                    Sos2Constants.GetObservationParams.temporalFilter.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
