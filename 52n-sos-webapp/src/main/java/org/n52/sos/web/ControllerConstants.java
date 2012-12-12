@@ -26,7 +26,6 @@ package org.n52.sos.web;
 public interface ControllerConstants {
 
     public static interface Views {
-
         public static final String INDEX = "index";
         public static final String CLIENT = "client";
         public static final String ADMIN_INDEX = "admin/index";
@@ -44,7 +43,6 @@ public interface ControllerConstants {
     }
 
     public static interface Paths {
-
         public static final String ROOT = "/";
         public static final String INDEX = "/index";
         public static final String CLIENT = "/client";
@@ -71,6 +69,7 @@ public interface ControllerConstants {
         public static final String LOGIN = "/login";
         public static final String LOGOUT = "/j_spring_security_logout";
     }
+    
     public static final String ERROR_MESSAGE_ATTRIBUTE = "error";
     public static final String JDBC_PARAMETER = "jdbc_uri";
     public static final String ROLE_ADMIN = "ROLE_ADMIN";

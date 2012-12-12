@@ -334,7 +334,6 @@
                     }
                 },
                 "GetCapabilities (only Contents section)": {
-                    "url": "?service=SOS&request=GetCapabilities&Sections=Contents",
                     "param": {
                         "service": "SOS",
                         "request": "GetCapabilities",

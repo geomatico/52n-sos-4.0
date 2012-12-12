@@ -27,7 +27,6 @@ package org.n52.sos.web;
 import java.util.Map;
 import org.n52.sos.service.DatabaseSettingsHandler;
 import javax.servlet.ServletContext;
-import org.n52.sos.web.install.AbstractInstallController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

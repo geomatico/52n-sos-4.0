@@ -112,14 +112,8 @@ public class AdminDatabaseSettingsController extends AbstractController {
     
     private ModelAndView onSaveError(String uri, String message, Throwable e) {
         Map<String, String> model = new HashMap<String, String>(2);
-        if (message == null) {
-            if (e == null) {
-                message = "Could not save settings";
-            } else {
-                message = e.getMessage();
-            }
-        }
-        model.put(ControllerConstants.ERROR_MESSAGE_ATTRIBUTE, message);
+        model.put(ControllerConstants.ERROR_MESSAGE_ATTRIBUTE, (message != null) ? 
+                message : (e != null) ? e.getMessage() : "Could not save settings");
         if (uri != null) {
             model.put(ControllerConstants.JDBC_PARAMETER, uri);
         }

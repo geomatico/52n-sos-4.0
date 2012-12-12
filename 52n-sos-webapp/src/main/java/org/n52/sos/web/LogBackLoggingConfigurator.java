@@ -1,9 +1,11 @@
 /**
- * Copyright (C) 2012 by 52 North Initiative for Geospatial Open Source Software
- * GmbH
+ * Copyright (C) 2012
+ * by 52 North Initiative for Geospatial Open Source Software GmbH
  *
- * Contact: Andreas Wytzisk 52 North Initiative for Geospatial Open Source
- * Software GmbH Martin-Luther-King-Weg 24 48155 Muenster, Germany
+ * Contact: Andreas Wytzisk
+ * 52 North Initiative for Geospatial Open Source Software GmbH
+ * Martin-Luther-King-Weg 24
+ * 48155 Muenster, Germany
  * info@52north.org
  *
  * This program is free software; you can redistribute and/or modify it under

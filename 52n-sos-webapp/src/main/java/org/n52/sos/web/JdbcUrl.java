@@ -63,7 +63,7 @@ public class JdbcUrl {
     public JdbcUrl(String uri) throws URISyntaxException {
         this.parse(uri);
     }
-    
+
     public JdbcUrl(Properties p) throws URISyntaxException {
         this(toURI(p));
     }
@@ -75,14 +75,14 @@ public class JdbcUrl {
         properties.put(HibernateConstants.PASS_PROPERTY, getPassword());
         return properties;
     }
-    
+
     private static String toURI(Properties p) {
         StringBuilder sb = new StringBuilder();
         sb.append(p.getProperty(HibernateConstants.CONNECTION_STRING_PROPERTY));
         sb.append("?").append(QUERY_PARAMETER_USER).append("=").append(p.getProperty(HibernateConstants.USER_PROPERTY));
         sb.append("&").append(QUERY_PARAMETER_PASSWORD).append("=").append(p.getProperty(HibernateConstants.PASS_PROPERTY));
         return sb.toString();
-    } 
+    }
 
     protected final void parse(String string) throws URISyntaxException {
         URI uri = new URI(string);

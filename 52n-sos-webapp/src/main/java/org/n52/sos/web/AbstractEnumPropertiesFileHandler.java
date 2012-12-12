@@ -28,15 +28,15 @@ import javax.servlet.ServletContext;
 import org.n52.sos.service.ConfigurationException;
 
 public abstract class AbstractEnumPropertiesFileHandler<E extends Enum<E>> extends AbstractPropertyFileHandler {
-    
+
     protected AbstractEnumPropertiesFileHandler(ServletContext ctx, String name) {
-        super(ctx,name);
+        super(ctx, name);
     }
-    
+
     public String get(E e) throws ConfigurationException {
         return get(e.name());
     }
-    
+
     public void save(E e, String value) throws ConfigurationException {
         save(e.name(), value);
     }
