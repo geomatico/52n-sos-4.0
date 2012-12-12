@@ -523,6 +523,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
                     if (owsException.getLocator() != null && !owsException.getLocator().isEmpty()) {
                         exception.setLocator(owsException.getLocator());
                     }
+                    first = false;
                 }
                 StringBuilder exceptionText = new StringBuilder();
                 for (String text : owsException.getMessages()) {
