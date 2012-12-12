@@ -56,5 +56,9 @@ public class System extends AbstractMultiProcess {
     // public void setInterfaces(List<String> interfaces) {
     // this.interfaces = interfaces;
     // }
+    
+    public boolean isSetPosition() {
+        return position != null;
+    }
 
 }

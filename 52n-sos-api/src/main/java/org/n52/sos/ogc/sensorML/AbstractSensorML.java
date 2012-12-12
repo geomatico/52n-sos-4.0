@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.om.SosOffering;
+import org.n52.sos.ogc.sensorML.elements.AbstractSosSMLDocumentation;
 import org.n52.sos.ogc.sensorML.elements.SosSMLCapabilities;
 import org.n52.sos.ogc.sensorML.elements.SosSMLCharacteristics;
 import org.n52.sos.ogc.sensorML.elements.SosSMLClassifier;
@@ -50,7 +51,7 @@ public class AbstractSensorML extends SosProcedureDescription {
 
     private String contact;
 
-    private String documentation;
+    private List<AbstractSosSMLDocumentation> documentations = new ArrayList<AbstractSosSMLDocumentation>(0);
 
     private String history;
 
@@ -110,12 +111,16 @@ public class AbstractSensorML extends SosProcedureDescription {
         this.contact = contact;
     }
 
-    public String getDocumentation() {
-        return documentation;
+    public List<AbstractSosSMLDocumentation> getDocumentation() {
+        return documentations;
     }
 
-    public void setDocumentation(String documentation) {
-        this.documentation = documentation;
+    public void setDocumentation(List<AbstractSosSMLDocumentation> documentations) {
+        this.documentations.addAll(documentations);
+    }
+    
+    public void addDocumentation(AbstractSosSMLDocumentation documentation) {
+        this.documentations.add(documentation);
     }
 
     public String getHistory() {
@@ -173,4 +178,42 @@ public class AbstractSensorML extends SosProcedureDescription {
     public String getProcedureDescriptionFormat() {
         return SensorMLConstants.NS_SML;
     }
+    
+    public boolean isSetKeywords() {
+        return keywords != null && !keywords.isEmpty();
+    }
+    
+    public boolean isSetIdentifications() {
+        return identifications != null && !identifications.isEmpty();
+    }
+    
+    public boolean isSetClassifications() {
+        return classifications != null && !classifications.isEmpty();
+    }
+    
+    public boolean isSetCharacteristics() {
+        return characteristics != null && !characteristics.isEmpty();
+    }
+    
+    public boolean isSetCapabilities() {
+        return capabilities != null && !capabilities.isEmpty();
+    }
+    
+    public boolean isSetDocumentation() {
+        return documentations != null && !documentations.isEmpty();
+    }
+    
+    public boolean isSetValidTime() {
+        return validTime != null;
+    }
+    
+    public boolean isSetContact() {
+        return contact != null && !contact.isEmpty();
+    }
+    
+    public boolean isSetHistory() {
+        return history != null && !history.isEmpty();
+    }
+    
+    
 }

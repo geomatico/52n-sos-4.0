@@ -23,21 +23,22 @@
  */
 package org.n52.sos.ogc.sensorML;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 
 public class AbstractProcess extends AbstractSensorML {
 
-    private List<String> descriptions;
+    private List<String> descriptions = new ArrayList<String>(0);
 
-    private List<String> names;
+    private List<String> names = new ArrayList<String>(0);
 
-    private List<SosSMLIo> inputs;
+    private List<SosSMLIo> inputs = new ArrayList<SosSMLIo>(0);
 
-    private List<SosSMLIo> outputs;
+    private List<SosSMLIo> outputs = new ArrayList<SosSMLIo>(0);
 
-    private List<String> parameters;
+    private List<String> parameters = new ArrayList<String>(0);
 
     public List<String> getDescriptions() {
         return descriptions;
@@ -77,6 +78,26 @@ public class AbstractProcess extends AbstractSensorML {
 
     public void setParameters(List<String> parameters) {
         this.parameters = parameters;
+    }
+    
+    public boolean isSetDescriptions() {
+        return descriptions != null && !descriptions.isEmpty();
+    }
+    
+    public boolean isSetNames() {
+        return names != null && !names.isEmpty();
+    }
+    
+    public boolean isSetInputs() {
+        return inputs != null && !inputs.isEmpty();
+    }
+    
+    public boolean isSetOutputs() {
+        return outputs != null && !outputs.isEmpty();
+    }
+    
+    public boolean isSetParameters() {
+        return parameters != null && !parameters.isEmpty();
     }
 
 }

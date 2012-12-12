@@ -30,7 +30,7 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLComponent;
 
 public class AbstractMultiProcess extends AbstractProcess {
 
-    private List<SosSMLComponent> components;
+    private List<SosSMLComponent> components = new ArrayList<SosSMLComponent>(0);
 
     public List<SosSMLComponent> getComponents() {
         return components;
@@ -47,10 +47,14 @@ public class AbstractMultiProcess extends AbstractProcess {
         this.components.addAll(components);
     }
 
-    public void addComponents(SosSMLComponent component) {
+    public void addComponent(SosSMLComponent component) {
         if (components == null) {
             components = new ArrayList<SosSMLComponent>();
         }
         components.add(component);
+    }
+    
+    public boolean isSetComponents() {
+        return components != null && !components.isEmpty();
     }
 }
