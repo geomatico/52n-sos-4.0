@@ -24,7 +24,7 @@
 
 --%>
 <fieldset id="database-server-configuration">
-    <legend>Database Server configuration</legend>
+    <legend>Database server configuration</legend>
     <div class="control-group">
         <label class="control-label" for="host-input">Database Host</label>
         <div class="controls">

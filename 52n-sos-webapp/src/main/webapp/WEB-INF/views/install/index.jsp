@@ -32,7 +32,7 @@
 	<jsp:param name="leadParagraph" value="Welcome to installation wizard." />
 </jsp:include>
 
-<p>This software is licensed under the <a target="_blank" href="http://www.gnu.org/licenses/gpl-2.0.html">GNU General Public License v2</a>. This wizard will guide you through the installation, database setup and initial configuration of SOS. Click the "Start" button below to get your SOS up and running.</p>
+<p>This software is licensed under the <a target="_blank" href="http://www.gnu.org/licenses/gpl-2.0.html">GNU General Public License v2</a> and by installing the 52&deg;North SOS you agree to adhere to the license's terms and conditions. This wizard will guide you through the installation, database setup and initial configuration of SOS. Click the "Start" button below to get your SOS up and running.</p>
 
 <h3>Requirements</h3>
 
