@@ -325,7 +325,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
     private OWSOperationsMetadata getOperationsMetadataForOperations(String service, String version,
             List<IExtension> extensions, Session session) throws OwsExceptionReport {
         OWSOperationsMetadata operationsMetadata = new OWSOperationsMetadata();
-        // FIXME: OpsMeata for InsertSensor, InsertObservation SOS 2.0
+        // FIXME: OpsMetadata for InsertSensor, InsertObservation SOS 2.0
         Map<RequestOperatorKeyType, IRequestOperator> requestOperators =
                 Configurator.getInstance().getRequestOperator();
 		List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>(requestOperators.size());
