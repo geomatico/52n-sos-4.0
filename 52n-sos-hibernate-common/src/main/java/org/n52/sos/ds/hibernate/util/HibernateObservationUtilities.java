@@ -239,23 +239,22 @@ public class HibernateObservationUtilities {
                 }
 
                 // TODO: compositePhenomenon
-                if (isSubsetIdAvailable(hObservation))
-                {
-                    if (antiSubsettingObservations.containsKey(hObservation.getAntiSubsetting()) &&
-                            isMergeObservations(request, hObservation))
-                    {
-                        // observation already create => merge values and reset identifier to anti_subsetting
+                if (isSubsetIdAvailable(hObservation)) {
+                    if (antiSubsettingObservations.containsKey(hObservation.getAntiSubsetting())
+                            && isMergeObservations(request, hObservation)) {
+                        // observation already create => merge values and reset
+                        // identifier to anti_subsetting
                         mergeObservations(antiSubsettingObservations, hObservation, phenID, phenomenonTime, value);
                     } else {
-                        // observation new or subsetting requested => create new one
-						SosObservation sosObservation = createNewObservation(observationConstellations, template4ObsConst, hObservation, phenID, phenomenonTime, value, obsConstHash);
-                        if (isMergeObservations(request, hObservation))
-                        {
-                        	antiSubsettingObservations.put(hObservation.getAntiSubsetting(), sosObservation);
-                        }
-                        else
-                        {
-                        	observationCollection.add(sosObservation);
+                        // observation new or subsetting requested => create new
+                        // one
+                        SosObservation sosObservation =
+                                createNewObservation(observationConstellations, template4ObsConst, hObservation,
+                                        phenID, phenomenonTime, value, obsConstHash);
+                        if (isMergeObservations(request, hObservation)) {
+                            antiSubsettingObservations.put(hObservation.getAntiSubsetting(), sosObservation);
+                        } else {
+                            observationCollection.add(sosObservation);
                         }
                     }
                 } else if (templatedObservations.containsKey(obsConstHash)) {
@@ -272,7 +271,9 @@ public class HibernateObservationUtilities {
 
                         o = new SosObservation();
                         o.setObservationID(Long.toString(hObservation.getObservationId()));
-                        o.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
+                        if (hObservation.getIdentifier() != null && !hObservation.getIdentifier().isEmpty()) {
+                            o.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
+                        }
                         o.setNoDataValue(Configurator.getInstance().getNoDataValue());
                         o.setTokenSeparator(sweTextEncoding.getTokenSeparator());
                         o.setTupleSeparator(sweTextEncoding.getBlockSeparator());
@@ -301,196 +302,169 @@ public class HibernateObservationUtilities {
                     // TODO check for NPE in next statement
                     dataArrayValue.addBlock(createBlock(o.getResultStructure(), phenomenonTime, phenID, value));
                 } else {
-                    SosObservation sosObservation = createNewObservation(observationConstellations, hObservation, phenomenonTime, qualityList, value, obsConstHash);
+                    SosObservation sosObservation =
+                            createNewObservation(observationConstellations, hObservation, phenomenonTime, qualityList,
+                                    value, obsConstHash);
                     observationCollection.add(sosObservation);
                 }
             }
             if (antiSubsettingObservations.values() != null && !antiSubsettingObservations.values().isEmpty()) {
                 observationCollection.addAll(antiSubsettingObservations.values());
             }
-            if (templatedObservations.values() != null && !templatedObservations.values().isEmpty())
-            {
-            	if (templatedObservations.containsValue(null))
-            	{
-            		removeNullValuesFromCollection(templatedObservations);
-            	}
-            	observationCollection.addAll(templatedObservations.values());
+            if (templatedObservations.values() != null && !templatedObservations.values().isEmpty()) {
+                if (templatedObservations.containsValue(null)) {
+                    removeNullValuesFromCollection(templatedObservations);
+                }
+                observationCollection.addAll(templatedObservations.values());
             }
         }
         return observationCollection;
     }
 
-	private static SosObservation createNewObservation(Map<Integer, SosObservationConstellation> observationConstellations,
-			Observation hObservation,
-			ITime phenomenonTime,
-			ArrayList<SosQuality> qualityList,
-			IValue value,
-			int obsConstHash)
-	{
-		SosObservation sosObservation = new SosObservation();
-		sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
-		sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
-		sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
-		sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
-		sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
-		sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
-		sosObservation.setResultTime(new TimeInstant(new DateTime(hObservation.getResultTime())));
-		sosObservation.setValue(new SosSingleObservationValue(phenomenonTime, value, qualityList));
-		return sosObservation;
-	}
+    private static SosObservation createNewObservation(
+            Map<Integer, SosObservationConstellation> observationConstellations, Observation hObservation,
+            ITime phenomenonTime, ArrayList<SosQuality> qualityList, IValue value, int obsConstHash) {
+        SosObservation sosObservation = new SosObservation();
+        sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
+        if (hObservation.getIdentifier() != null && !hObservation.getIdentifier().isEmpty()) {
+            sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
+        }
+        sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
+        sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
+        sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
+        sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
+        sosObservation.setResultTime(new TimeInstant(new DateTime(hObservation.getResultTime())));
+        sosObservation.setValue(new SosSingleObservationValue(phenomenonTime, value, qualityList));
+        return sosObservation;
+    }
 
-	private static SosObservation createNewObservation(Map<Integer, SosObservationConstellation> observationConstellations,
-			Map<Integer, List<ResultTemplate>> template4ObsConst,
-			Observation hObservation,
-			String phenID,
-			ITime phenomenonTime,
-			IValue value,
-			int obsConstHash) throws OwsExceptionReport
-	{
-		SosObservation sosObservation = new SosObservation();
-		sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
-		sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
-		sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
-		sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
-		sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
-		sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
+    private static SosObservation createNewObservation(
+            Map<Integer, SosObservationConstellation> observationConstellations,
+            Map<Integer, List<ResultTemplate>> template4ObsConst, Observation hObservation, String phenID,
+            ITime phenomenonTime, IValue value, int obsConstHash) throws OwsExceptionReport {
+        SosObservation sosObservation = new SosObservation();
+        sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
+        if (hObservation.getIdentifier() != null && !hObservation.getIdentifier().isEmpty()) {
+            sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
+        }
+        sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
+        sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
+        sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
+        sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
 
-		SosSweDataArray dataArray = new SosSweDataArray();
-		// Get ResultTemplate for this observation
-		// TODO clarify when there are more than one template?
-		List<ResultTemplate> templates = template4ObsConst.get(obsConstHash);
-		if (templates == null || (templates != null && templates.size() == 0) )
-		{
-			String errorMsg = "No result template available for observation.";
-			LOGGER.error(errorMsg);
-			throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
-		}
-		ResultTemplate hResultTemplate = templates.get(0);
-		dataArray.setElementType(createElementType(hResultTemplate.getResultStructure()));
-		dataArray.setEncoding(createEncoding(hResultTemplate.getResultEncoding()));
+        SosSweDataArray dataArray = new SosSweDataArray();
+        // Get ResultTemplate for this observation
+        // TODO clarify when there are more than one template?
+        List<ResultTemplate> templates = template4ObsConst.get(obsConstHash);
+        if (templates == null || (templates != null && templates.size() == 0)) {
+            String errorMsg = "No result template available for observation.";
+            LOGGER.error(errorMsg);
+            throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+        }
+        ResultTemplate hResultTemplate = templates.get(0);
+        dataArray.setElementType(createElementType(hResultTemplate.getResultStructure()));
+        dataArray.setEncoding(createEncoding(hResultTemplate.getResultEncoding()));
 
-		SweDataArrayValue dataArrayValue = new SweDataArrayValue();
-		dataArrayValue.setValue(dataArray);
-		List<String> newBlock = createBlock(dataArray.getElementType(), phenomenonTime, phenID, value);
-		dataArrayValue.addBlock(newBlock);
+        SweDataArrayValue dataArrayValue = new SweDataArrayValue();
+        dataArrayValue.setValue(dataArray);
+        List<String> newBlock = createBlock(dataArray.getElementType(), phenomenonTime, phenID, value);
+        dataArrayValue.addBlock(newBlock);
 
-		SosMultiObservationValues observationValue = new SosMultiObservationValues();
-		observationValue.setValue(dataArrayValue);
-		sosObservation.setValue(observationValue);
-		return sosObservation;
-	}
+        SosMultiObservationValues observationValue = new SosMultiObservationValues();
+        observationValue.setValue(dataArrayValue);
+        sosObservation.setValue(observationValue);
+        return sosObservation;
+    }
 
-	private static void mergeObservations(Map<String, SosObservation> antiSubsettingObservations,
-			Observation hObservation,
-			String phenID,
-			ITime phenomenonTime,
-			IValue value)
-	{
-		SosObservation sosObservation =
-		        antiSubsettingObservations.get(hObservation.getAntiSubsetting());
-		// add value
-		SosMultiObservationValues sosMultiObservationValues =
-		        (SosMultiObservationValues) sosObservation.getValue();
-		SweDataArrayValue sweDataArrayValue =
-		        ((SweDataArrayValue) sosMultiObservationValues.getValue());
-		List<String> newBlock =
-		        createBlock(sweDataArrayValue.getValue().getElementType(), phenomenonTime, phenID,
-		                value);
-		sweDataArrayValue.addBlock(newBlock);
-		// reset identifier if required
-		if (!sosObservation.getIdentifier().getValue().equalsIgnoreCase(hObservation.getAntiSubsetting()))
-		{
-			sosObservation.getIdentifier().setValue(hObservation.getAntiSubsetting());
-		}
-	}
+    private static void mergeObservations(Map<String, SosObservation> antiSubsettingObservations,
+            Observation hObservation, String phenID, ITime phenomenonTime, IValue value) {
+        SosObservation sosObservation = antiSubsettingObservations.get(hObservation.getAntiSubsetting());
+        // add value
+        SosMultiObservationValues sosMultiObservationValues = (SosMultiObservationValues) sosObservation.getValue();
+        SweDataArrayValue sweDataArrayValue = ((SweDataArrayValue) sosMultiObservationValues.getValue());
+        List<String> newBlock =
+                createBlock(sweDataArrayValue.getValue().getElementType(), phenomenonTime, phenID, value);
+        sweDataArrayValue.addBlock(newBlock);
+        // reset identifier if required
+        if (!sosObservation.getIdentifier().getValue().equalsIgnoreCase(hObservation.getAntiSubsetting())) {
+            sosObservation.getIdentifier().setValue(hObservation.getAntiSubsetting());
+        }
+    }
 
-	private static boolean isMergeObservations(AbstractServiceRequest request,
-			Observation hObservation)
-	{
-		return !isSubsettingExtensionSet(request.getExtensions()) ||
-				isContainerObservationRequested(request,hObservation.getAntiSubsetting());
-	}
+    private static boolean isMergeObservations(AbstractServiceRequest request, Observation hObservation) {
+        return !isSubsettingExtensionSet(request.getExtensions())
+                || isContainerObservationRequested(request, hObservation.getAntiSubsetting());
+    }
 
-	private static boolean isContainerObservationRequested(AbstractServiceRequest request,
-			String antiSubsetting)
-	{
-		if (request instanceof GetObservationByIdRequest)
-		{
-			GetObservationByIdRequest getbyId = (GetObservationByIdRequest) request;
-			if (getbyId.getObservationIdentifier() != null && !getbyId.getObservationIdentifier().isEmpty())
-			{
-				for (String requestedObservationId : getbyId.getObservationIdentifier()) {
-					if (requestedObservationId.equalsIgnoreCase(antiSubsetting))
-					{
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
+    private static boolean isContainerObservationRequested(AbstractServiceRequest request, String antiSubsetting) {
+        if (request instanceof GetObservationByIdRequest) {
+            GetObservationByIdRequest getbyId = (GetObservationByIdRequest) request;
+            if (getbyId.getObservationIdentifier() != null && !getbyId.getObservationIdentifier().isEmpty()) {
+                for (String requestedObservationId : getbyId.getObservationIdentifier()) {
+                    if (requestedObservationId.equalsIgnoreCase(antiSubsetting)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
-	private static void removeNullValuesFromCollection(Map<Integer, SosObservation> templatedObservations)
-	{
-		if (templatedObservations != null && templatedObservations.keySet() != null)
-		{
-			for (Integer observationHash : templatedObservations.keySet()) {
-				if (templatedObservations.get(observationHash) == null)
-				{
-					templatedObservations.remove(observationHash);
-				}
-			}
-		}
-	}
+    private static void removeNullValuesFromCollection(Map<Integer, SosObservation> templatedObservations) {
+        if (templatedObservations != null && templatedObservations.keySet() != null) {
+            for (Integer observationHash : templatedObservations.keySet()) {
+                if (templatedObservations.get(observationHash) == null) {
+                    templatedObservations.remove(observationHash);
+                }
+            }
+        }
+    }
 
-	private static SosSweAbstractEncoding createEncoding(String resultEncoding) throws OwsExceptionReport
-	{
-		Object decodedObject = XmlHelper.decodeGenericXmlObject(resultEncoding);
-		if (decodedObject instanceof SosSweTextEncoding)
-		{
-			return (SosSweTextEncoding) decodedObject;
-		}
-		String errorMsg = String.format("Decoding of string \"%s\" failed. Returned type is \"%s\".",
-				resultEncoding,
-				decodedObject.getClass().getName());
-		LOGGER.error(errorMsg);
-		throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
-	}
+    private static SosSweAbstractEncoding createEncoding(String resultEncoding) throws OwsExceptionReport {
+        Object decodedObject = XmlHelper.decodeGenericXmlObject(resultEncoding);
+        if (decodedObject instanceof SosSweTextEncoding) {
+            return (SosSweTextEncoding) decodedObject;
+        }
+        String errorMsg =
+                String.format("Decoding of string \"%s\" failed. Returned type is \"%s\".", resultEncoding,
+                        decodedObject.getClass().getName());
+        LOGGER.error(errorMsg);
+        throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+    }
 
-	private static SosSweDataRecord createElementType(String resultStructure) throws OwsExceptionReport
-	{
-		Object decodedObject = XmlHelper.decodeGenericXmlObject(resultStructure);
-		if (decodedObject instanceof SosSweDataRecord)
-		{
-			return (SosSweDataRecord) decodedObject;
-		}
-		String errorMsg = String.format("Decoding of string \"%s\" failed. Returned type is \"%s\".",
-				resultStructure,
-				decodedObject.getClass().getName());
-		LOGGER.error(errorMsg);
-		throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
-	}
+    private static SosSweDataRecord createElementType(String resultStructure) throws OwsExceptionReport {
+        Object decodedObject = XmlHelper.decodeGenericXmlObject(resultStructure);
+        if (decodedObject instanceof SosSweDataRecord) {
+            return (SosSweDataRecord) decodedObject;
+        }
+        String errorMsg =
+                String.format("Decoding of string \"%s\" failed. Returned type is \"%s\".", resultStructure,
+                        decodedObject.getClass().getName());
+        LOGGER.error(errorMsg);
+        throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+    }
 
-	private static boolean isSubsetIdAvailable(Observation hObservation)
-	{
-		return hObservation.getAntiSubsetting() != null && 
-		        !hObservation.getAntiSubsetting().isEmpty();
-	}
+    private static boolean isSubsetIdAvailable(Observation hObservation) {
+        return hObservation.getAntiSubsetting() != null && !hObservation.getAntiSubsetting().isEmpty();
+    }
 
     private static void addPhenomenonTimeField(Observation hObservation, SosSweDataRecord elementType) {
-        SosSweTime timeFieldElement;
         if (hObservation.getPhenomenonTimeEnd() != null) {
             // it is a time range -> definition constant, uom constant
             // swe:TimeRange
-            timeFieldElement = new SosSweTimeRange();
+            SosSweTimeRange timeFieldElement = new SosSweTimeRange();
+            timeFieldElement.setDefinition(OMConstants.PHENOMENON_TIME);
+            timeFieldElement.setUom(OMConstants.PHEN_UOM_ISO8601);
+            SosSweField phenTimeField = new SosSweField("phenomenonTime", timeFieldElement);
+            elementType.addField(phenTimeField);
         } else {
             // it is a time instant -> swe:Time
-            timeFieldElement = new SosSweTime();
+            SosSweTime timeFieldElement = new SosSweTime();
+            timeFieldElement.setDefinition(OMConstants.PHENOMENON_TIME);
+            timeFieldElement.setUom(OMConstants.PHEN_UOM_ISO8601);
+            SosSweField phenTimeField = new SosSweField("phenomenonTime", timeFieldElement);
+            elementType.addField(phenTimeField);
         }
-        timeFieldElement.setDefinition(OMConstants.PHENOMENON_TIME);
-        timeFieldElement.setUom(OMConstants.PHEN_UOM_ISO8601);
-        SosSweField phenTimeField = new SosSweField("phenomenonTime", timeFieldElement);
-        elementType.addField(phenTimeField);
     }
 
     private static void addResultTimeField(SosSweDataRecord elementType) {
@@ -510,38 +484,28 @@ public class HibernateObservationUtilities {
         if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_MEASUREMENT)) {
             observedValueFieldElement = new SosSweQuantity();
             ((SosSweQuantity) observedValueFieldElement).setUom(hObservation.getUnit().getUnit());
-        } 
-        else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION)) {
+        } else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION)) {
             observedValueFieldElement = new SosSweCategory();
             ((SosSweCategory) observedValueFieldElement).setCodeSpace(hObservation.getUnit().getUnit());
-        } 
-        else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_COUNT_OBSERVATION)) {
+        } else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_COUNT_OBSERVATION)) {
             observedValueFieldElement = new SosSweCount();
-        } 
-        else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_COMPLEX_OBSERVATION)) {
+        } else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_COMPLEX_OBSERVATION)) {
             // TODO what todo in the case of complex observations?
             String exceptionMsg = String.format("Received observation type is not supported: %s", observationType);
             LOGGER.debug(exceptionMsg);
             throw new IllegalArgumentException(exceptionMsg);
-        } 
-        else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_OBSERVATION)) {
+        } else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_OBSERVATION)) {
             // TODO what todo in the case of a generic observation?
             String exceptionMsg = String.format("Received observation type is not supported: %s", observationType);
             LOGGER.debug(exceptionMsg);
             throw new IllegalArgumentException(exceptionMsg);
-        } 
-        else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_TEXT_OBSERVATION)) {
+        } else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_TEXT_OBSERVATION)) {
             observedValueFieldElement = new SosSweText();
-        } 
-        else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_TRUTH_OBSERVATION)) {
+        } else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_TRUTH_OBSERVATION)) {
             observedValueFieldElement = new SosSweBoolean();
-        }
-        else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION))
-        {
-        	observedValueFieldElement = new SosSweDataArray();
-        }
-        else
-        {
+        } else if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)) {
+            observedValueFieldElement = new SosSweDataArray();
+        } else {
             String exceptionMsg = String.format("Received observation type is not supported: %s", observationType);
             LOGGER.debug(exceptionMsg);
             throw new IllegalArgumentException(exceptionMsg);
@@ -575,11 +539,9 @@ public class HibernateObservationUtilities {
         throw new IllegalArgumentException(exceptionMsg);
     }
 
-    private static boolean isSubsettingExtensionSet(SwesExtensions extensions)
-    {
-        return extensions!=null?
-        		extensions.isBooleanExentsionSet(Sos2Constants.Extensions.Subsetting.name()):
-        			false;
+    private static boolean isSubsettingExtensionSet(SwesExtensions extensions) {
+        return extensions != null ? extensions.isBooleanExentsionSet(Sos2Constants.Extensions.Subsetting.name())
+                : false;
     }
 
     private static void checkOrSetObservablePropertyUnit(AbstractSosPhenomenon abstractSosPhenomenon, String unit) {
@@ -598,32 +560,20 @@ public class HibernateObservationUtilities {
      *            Observation object
      * @return Observation value
      */
-    private static IValue getValueFromAllTable(Observation hObservation)
-    {
-        if (hObservation.getBooleanValues() != null && !hObservation.getBooleanValues().isEmpty())
-        {
+    private static IValue getValueFromAllTable(Observation hObservation) {
+        if (hObservation.getBooleanValues() != null && !hObservation.getBooleanValues().isEmpty()) {
             return new org.n52.sos.ogc.om.values.BooleanValue(
                     getValueFromBooleanValueTable(hObservation.getBooleanValues()));
-        } 
-        else if (hObservation.getCategoryValues() != null && !hObservation.getCategoryValues().isEmpty())
-        {
+        } else if (hObservation.getCategoryValues() != null && !hObservation.getCategoryValues().isEmpty()) {
             return new org.n52.sos.ogc.om.values.CategoryValue(
                     getValueFromCategoryValueTable(hObservation.getCategoryValues()));
-        } 
-        else if (hObservation.getCountValues() != null && !hObservation.getCountValues().isEmpty())
-        {
+        } else if (hObservation.getCountValues() != null && !hObservation.getCountValues().isEmpty()) {
             return new org.n52.sos.ogc.om.values.CountValue(getValueFromCountValueTable(hObservation.getCountValues()));
-        } 
-        else if (hObservation.getNumericValues() != null && !hObservation.getNumericValues().isEmpty())
-        {
+        } else if (hObservation.getNumericValues() != null && !hObservation.getNumericValues().isEmpty()) {
             return new QuantityValue(getValueFromNumericValueTable(hObservation.getNumericValues()));
-        } 
-        else if (hObservation.getTextValues() != null && !hObservation.getTextValues().isEmpty())
-        {
+        } else if (hObservation.getTextValues() != null && !hObservation.getTextValues().isEmpty()) {
             return new org.n52.sos.ogc.om.values.TextValue(getValueFromTextValueTable(hObservation.getTextValues()));
-        } 
-        else if (hObservation.getGeometryValues() != null && !hObservation.getGeometryValues().isEmpty())
-        {
+        } else if (hObservation.getGeometryValues() != null && !hObservation.getGeometryValues().isEmpty()) {
             return new org.n52.sos.ogc.om.values.GeometryValue(
                     getValueFromGeometryValueTable(hObservation.getGeometryValues()));
         }
@@ -714,7 +664,7 @@ public class HibernateObservationUtilities {
             features = new HashSet<String>();
         }
         if (!features.contains(foiID)) {
-        	// TODO do something or remove if-statement
+            // TODO do something or remove if-statement
         }
         features.add(foiID);
         feature4proc.put(procID, features);
@@ -812,7 +762,8 @@ public class HibernateObservationUtilities {
                     tokenIndex++;
                 }
                 for (IValue iValue : observedValues) {
-                    SosObservation newObservation = createSingleValueObservation(multiObservation, phenomenonTime, iValue);
+                    SosObservation newObservation =
+                            createSingleValueObservation(multiObservation, phenomenonTime, iValue);
                     observationCollection.add(newObservation);
                 }
             }
@@ -820,30 +771,44 @@ public class HibernateObservationUtilities {
         }
     }
 
-	private static SosObservation createSingleValueObservation(SosObservation multiObservation,
-			ITime phenomenonTime,
-			IValue iValue)
-	{
-		IObservationValue value = new SosSingleObservationValue(phenomenonTime, iValue);
-		SosObservation newObservation = new SosObservation();
-		newObservation.setNoDataValue(multiObservation.getNoDataValue());
-		/*
-		 * TODO create new ObservationConstellation only with the
-		 * specified observed property and observation type
-		 */
-		SosObservationConstellation obsConst = multiObservation.getObservationConstellation();/*createObservationConstellationForSubObservation(
-				multiObservation.getObservationConstellation(),
-				iValue,
-				definitionsForObservedValues.get(iValue))*/;
-		newObservation.setObservationConstellation(obsConst);
-		newObservation.setValidTime(multiObservation.getValidTime());
-		newObservation.setResultTime(multiObservation.getResultTime());
-		newObservation.setTokenSeparator(multiObservation.getTokenSeparator());
-		newObservation.setTupleSeparator(multiObservation.getTupleSeparator());
-		newObservation.setResultType(multiObservation.getResultType());
-		newObservation.setValue(value);
-		return newObservation;
-	}
+    private static SosObservation createSingleValueObservation(SosObservation multiObservation, ITime phenomenonTime,
+            IValue iValue) {
+        IObservationValue value = new SosSingleObservationValue(phenomenonTime, iValue);
+        SosObservation newObservation = new SosObservation();
+        newObservation.setNoDataValue(multiObservation.getNoDataValue());
+        /*
+         * TODO create new ObservationConstellation only with the specified
+         * observed property and observation type
+         */
+        SosObservationConstellation obsConst = multiObservation.getObservationConstellation();/*
+                                                                                               * createObservationConstellationForSubObservation
+                                                                                               * (
+                                                                                               * multiObservation
+                                                                                               * .
+                                                                                               * getObservationConstellation
+                                                                                               * (
+                                                                                               * )
+                                                                                               * ,
+                                                                                               * iValue
+                                                                                               * ,
+                                                                                               * definitionsForObservedValues
+                                                                                               * .
+                                                                                               * get
+                                                                                               * (
+                                                                                               * iValue
+                                                                                               * )
+                                                                                               * )
+                                                                                               */
+        ;
+        newObservation.setObservationConstellation(obsConst);
+        newObservation.setValidTime(multiObservation.getValidTime());
+        newObservation.setResultTime(multiObservation.getResultTime());
+        newObservation.setTokenSeparator(multiObservation.getTokenSeparator());
+        newObservation.setTupleSeparator(multiObservation.getTupleSeparator());
+        newObservation.setResultType(multiObservation.getResultType());
+        newObservation.setValue(value);
+        return newObservation;
+    }
 
     private static SosObservationConstellation createObservationConstellationForSubObservation(
             SosObservationConstellation observationConstellation, IValue iValue, String phenomenonID) {

@@ -188,7 +188,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
         } else {
             observationID = xbObs.getId().replace("o_", "");
         }
-        if (sosObservation.getIdentifier() != null) {
+        if (sosObservation.getIdentifier() != null && sosObservation.getIdentifier().isSetValue()) {
             IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
             if (encoder != null) {
                 XmlObject xmlObject =
