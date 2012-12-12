@@ -52,9 +52,13 @@ public class KvpHelper {
         while (parameterNames.hasMoreElements()) {
             // all key names to lower case
             String key = (String) parameterNames.nextElement();
-            kvp.put(key.toLowerCase(), req.getParameter(key));
+            kvp.put(checkKeyForPrefix(key), req.getParameter(key));
         }
         return kvp;
+    }
+
+    private static String checkKeyForPrefix(String key) {
+            return key.replace("amp;", "").toLowerCase();
     }
 
     public static String checkParameterSingleValue(String parameterValue, String parameterName)
