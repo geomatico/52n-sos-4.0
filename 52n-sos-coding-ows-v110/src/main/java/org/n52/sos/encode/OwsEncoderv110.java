@@ -29,9 +29,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.print.attribute.ResolutionSyntax;
-import net.opengis.ows.x11.AddressType;
 
+import net.opengis.ows.x11.AddressType;
 import net.opengis.ows.x11.AllowedValuesDocument.AllowedValues;
 import net.opengis.ows.x11.ContactType;
 import net.opengis.ows.x11.DCPDocument.DCP;
@@ -299,7 +298,16 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
             for (OwsException owsException : owsExceptionReport.getExceptions()) {
                 ExceptionType exceptionType =
                         ExceptionType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-                exceptionType.setExceptionCode(owsException.getCode().toString());
+                String exceptionCode = null;
+                if (owsException.getCode() == null)
+                {
+                	exceptionCode = OWSConstants.OwsExceptionCode.NoApplicableCode.toString();
+                }
+                else
+                {
+                	exceptionCode = owsException.getCode().toString();
+                }
+                exceptionType.setExceptionCode(exceptionCode);
                 if (owsException.getLocator() != null) {
                     exceptionType.setLocator(owsException.getLocator());
                 }
