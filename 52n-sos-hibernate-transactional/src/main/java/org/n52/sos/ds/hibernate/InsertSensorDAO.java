@@ -116,13 +116,13 @@ public class InsertSensorDAO implements IInsertSensorDAO {
             dkt = new DecoderKeyType(SWEConstants.NS_SWES_20);
         }
         Map<String, List<String>> dcpMap =
-                SosHelper.getDCP(Sos1Constants.Operations.RegisterSensor.name(), dkt, Configurator.getInstance()
+                SosHelper.getDCP(OPERATION_NAME, dkt, Configurator.getInstance()
                         .getBindingOperators().values(), Configurator.getInstance().getServiceURL());
         if (dcpMap != null && !dcpMap.isEmpty()) {
             OWSOperation opsMeta = new OWSOperation();
             if (version.equals(Sos1Constants.SERVICEVERSION)) {
                 // set operation name
-                opsMeta.setOperationName(Sos1Constants.Operations.RegisterSensor.name());
+                opsMeta.setOperationName(OPERATION_NAME);
                 // set DCP
                 opsMeta.setDcp(dcpMap);
                 // set param sensorDescription
