@@ -42,6 +42,9 @@ import net.opengis.sensorML.x101.ClassificationDocument.Classification.Classifie
 import net.opengis.sensorML.x101.ComponentsDocument.Components;
 import net.opengis.sensorML.x101.ComponentsDocument.Components.ComponentList;
 import net.opengis.sensorML.x101.ComponentsDocument.Components.ComponentList.Component;
+import net.opengis.sensorML.x101.DocumentDocument.Document;
+import net.opengis.sensorML.x101.DocumentListDocument.DocumentList;
+import net.opengis.sensorML.x101.DocumentationDocument.Documentation;
 import net.opengis.sensorML.x101.IdentificationDocument.Identification;
 import net.opengis.sensorML.x101.IdentificationDocument.Identification.IdentifierList;
 import net.opengis.sensorML.x101.IdentificationDocument.Identification.IdentifierList.Identifier;
@@ -77,10 +80,14 @@ import org.n52.sos.ogc.sensorML.ProcessModel;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.System;
+import org.n52.sos.ogc.sensorML.elements.AbstractSosSMLDocumentation;
 import org.n52.sos.ogc.sensorML.elements.SosSMLCapabilities;
 import org.n52.sos.ogc.sensorML.elements.SosSMLCharacteristics;
 import org.n52.sos.ogc.sensorML.elements.SosSMLClassifier;
 import org.n52.sos.ogc.sensorML.elements.SosSMLComponent;
+import org.n52.sos.ogc.sensorML.elements.SosSMLDocumentation;
+import org.n52.sos.ogc.sensorML.elements.SosSMLDocumentationList;
+import org.n52.sos.ogc.sensorML.elements.SosSMLDocumentationList.SosSMLDocumentationListMember;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
@@ -88,6 +95,7 @@ import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SweAggregateType;
 import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
+import org.n52.sos.ogc.swe.SosMetadata;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
 import org.n52.sos.ogc.swe.SosSweDataArray;
@@ -270,7 +278,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
     private void addValuesToSystem(SystemType xbSystem, System system) throws OwsExceptionReport {
         addAbstractMultiProcessValuesToSystem(xbSystem, system);
         // set position
-        if (system.getPosition() != null) {
+        if (system.isSetPosition()) {
             xbSystem.setPosition(createPosition(system.getPosition()));
         }
     }
@@ -278,33 +286,38 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
     private void addAbstractMultiProcessValuesToSystem(SystemType xbSystem, AbstractMultiProcess absProcess)
             throws OwsExceptionReport {
         // set identification
-        if (absProcess.getIdentifications() != null && !absProcess.getIdentifications().isEmpty()) {
+        if (absProcess.isSetIdentifications()) {
             xbSystem.setIdentificationArray(createIdentification(absProcess.getIdentifications()));
         }
         // set classification
-        if (absProcess.getClassifications() != null && !absProcess.getClassifications().isEmpty()) {
+        if (absProcess.isSetClassifications()) {
             xbSystem.setClassificationArray(createClassification(absProcess.getClassifications()));
         }
         // set characteristics
-        if (absProcess.getCharacteristics() != null) {
+        if (absProcess.isSetCharacteristics()) {
             xbSystem.setCharacteristicsArray(createCharacteristics(absProcess.getCharacteristics()));
         }
         // set capabilities
-        if (absProcess.getCapabilities() != null) {
-            xbSystem.setCapabilitiesArray(createCapabilities(xbSystem,absProcess.getCapabilities()));
+        if (absProcess.isSetCapabilities()) {
+            xbSystem.setCapabilitiesArray(createCapabilities(xbSystem, absProcess.getCapabilities()));
         }
         // set inputs
-        if (absProcess.getInputs() != null && !absProcess.getInputs().isEmpty()) {
+        if (absProcess.isSetInputs()) {
             xbSystem.setInputs(createInputs(absProcess.getInputs()));
         }
         // set outputs
-        if (absProcess.getOutputs() != null && !absProcess.getOutputs().isEmpty()) {
+        if (absProcess.isSetOutputs()) {
             xbSystem.setOutputs(createOutputs(absProcess.getOutputs()));
         }
+
+        if (absProcess.isSetDocumentation()) {
+            xbSystem.setDocumentationArray(createDocumentationArray(absProcess.getDocumentation()));
+        }
         // set components
-        if (absProcess.getComponents() != null && !absProcess.getComponents().isEmpty()) {
+        if (absProcess.isSetComponents()) {
             Components components = createComponents(absProcess.getComponents());
-            if (components != null && components.getComponentList() != null && components.getComponentList().sizeOfComponentArray() > 0) {
+            if (components != null && components.getComponentList() != null
+                    && components.getComponentList().sizeOfComponentArray() > 0) {
                 xbSystem.setComponents(createComponents(absProcess.getComponents()));
             }
         }
@@ -403,22 +416,22 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
 
     /**
      * Creates the capabilities section of the SensorML description.
-     *
+     * 
      * @throws OwsExceptionReport
      */
-    private Capabilities[] createCapabilities(SystemType xbSystem, List<SosSMLCapabilities> smlCapabilities) throws OwsExceptionReport {
+    private Capabilities[] createCapabilities(SystemType xbSystem, List<SosSMLCapabilities> smlCapabilities)
+            throws OwsExceptionReport {
         List<Capabilities> capabilitiesList = new ArrayList<Capabilities>();
-        if (xbSystem != null || smlCapabilities != null)
-        {
-            if (isCapabilitiesArrayAlreadyAvailable(xbSystem))
-            {
+        if (xbSystem != null || smlCapabilities != null) {
+            if (isCapabilitiesArrayAlreadyAvailable(xbSystem)) {
                 for (Capabilities capabilities : xbSystem.getCapabilitiesArray()) {
                     capabilitiesList.add(capabilities);
                 }
             }
             for (SosSMLCapabilities capabilities : smlCapabilities) {
                 if (capabilities != null) { // List could contain null elements
-                    Capabilities xbCapabilities = Capabilities.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                    Capabilities xbCapabilities =
+                            Capabilities.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
                     if (capabilities.getName() != null) {
                         xbCapabilities.setName(capabilities.getName());
                     }
@@ -450,13 +463,13 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
                     } else if (capabilities.getCapabilitiesType().equals(SweAggregateType.DataRecord)) {
                         String exceptionText =
                                 "The SWE capabilities type '" + SweAggregateType.DataRecord.name()
-                                + "' is not supported by this SOS for SensorML!";
+                                        + "' is not supported by this SOS for SensorML!";
                         LOGGER.debug(exceptionText);
                         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
                     } else {
                         String exceptionText =
                                 "The SWE capabilities type '" + SweAggregateType.DataRecord.name()
-                                + "' is not supported by this SOS for SensorML!";
+                                        + "' is not supported by this SOS for SensorML!";
                         LOGGER.debug(exceptionText);
                         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
                     }
@@ -467,9 +480,61 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
         return capabilitiesList.toArray(new Capabilities[capabilitiesList.size()]);
     }
 
-    private boolean isCapabilitiesArrayAlreadyAvailable(SystemType xbSystem)
-    {
+    private boolean isCapabilitiesArrayAlreadyAvailable(SystemType xbSystem) {
         return xbSystem.getCapabilitiesArray() != null && xbSystem.getCapabilitiesArray().length > 0;
+    }
+
+    private Documentation[] createDocumentationArray(List<AbstractSosSMLDocumentation> sosDocumentation) {
+        List<Documentation> documentationList = new ArrayList<Documentation>();
+        for (AbstractSosSMLDocumentation abstractSosSMLDocumentation : sosDocumentation) {
+            Documentation documentation = Documentation.Factory.newInstance();
+            if (abstractSosSMLDocumentation instanceof SosSMLDocumentation) {
+                documentation.setDocument(createDocument((SosSMLDocumentation) abstractSosSMLDocumentation));
+            } else if (abstractSosSMLDocumentation instanceof SosSMLDocumentationList) {
+                documentation
+                        .setDocumentList(createDocumentationList((SosSMLDocumentationList) abstractSosSMLDocumentation));
+            }
+            documentationList.add(documentation);
+        }
+        return documentationList.toArray(new Documentation[documentationList.size()]);
+    }
+
+    private Document createDocument(SosSMLDocumentation sosDocumentation) {
+        Document document = Document.Factory.newInstance();
+        if (sosDocumentation.isSetDescription()) {
+            document.addNewDescription().setStringValue(sosDocumentation.getDescription());
+        } else {
+            document.addNewDescription().setStringValue("");
+        }
+        if (sosDocumentation.isSetDate()) {
+            document.setDate(sosDocumentation.getDate().getValue().toDate());
+        }
+        if (sosDocumentation.isSetContact()) {
+            document.addNewContact().addNewResponsibleParty().setIndividualName(sosDocumentation.getContact());
+        }
+        if (sosDocumentation.isSetFormat()) {
+            document.setFormat(sosDocumentation.getFormat());
+        }
+        if (sosDocumentation.isSetVersion()) {
+            document.setVersion(sosDocumentation.getVersion());
+        }
+        return document;
+    }
+
+    private DocumentList createDocumentationList(SosSMLDocumentationList sosDocumentationList) {
+        DocumentList documentList = DocumentList.Factory.newInstance();
+        if (sosDocumentationList.isSetDescription()) {
+            documentList.addNewDescription().setStringValue(sosDocumentationList.getDescription());
+        }
+        if (sosDocumentationList.isSetMembers()) {
+            for (SosSMLDocumentationListMember sosMmember : sosDocumentationList.getMember()) {
+                net.opengis.sensorML.x101.DocumentListDocument.DocumentList.Member member =
+                        documentList.addNewMember();
+                member.setName(sosMmember.getName());
+                member.setDocument(createDocument(sosMmember.getDocumentation()));
+            }
+        }
+        return documentList;
     }
 
     /**
@@ -492,7 +557,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
         VectorType xbVector = xbSwePosition.addNewLocation().addNewVector();
         for (SosSweCoordinate coordinate : position.getPosition()) {
             if (coordinate.getValue().getValue() != null
-                    && (!coordinate.getValue().getValue().isEmpty() || !coordinate.getValue().getValue()
+                    && (!coordinate.getValue().isSetValue() || !coordinate.getValue().getValue()
                             .equals(Double.NaN))) {
                 // FIXME: SWE Common NS
                 IEncoder encoder = Configurator.getInstance().getEncoder(SWEConstants.NS_SWE);

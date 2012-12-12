@@ -23,11 +23,55 @@
  */
 package org.n52.sos.ogc.swe.simpleType;
 
+import org.joda.time.DateTime;
+import org.n52.sos.ogc.swe.RangeValue;
+import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
+
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  *
  */
-public class SosSweTimeRange extends SosSweTime {
+public class SosSweTimeRange extends SosSweAbstractUomType<RangeValue<DateTime>> {
+    
+    private RangeValue<DateTime> value;
+    
+
+    /**
+     * SWE simple type type
+     */
+    private SweSimpleType simpleType = SweSimpleType.TimeRange;
+
+    @Override
+    public SweSimpleType getSimpleType() {
+        return simpleType;
+    }
+
+    @Override
+    public RangeValue<DateTime> getValue() {
+        return value;
+    }
+
+    @Override
+    public String getStringValue() {
+        StringBuilder builder = new StringBuilder();
+        if (value.isSetStartValue()) {
+            builder.append(value.getRangeStart());
+        }
+        if (value.isSetEndValue()) {
+            builder.append(value.getRangeEnd());
+        }
+        return builder.toString();
+    }
+
+    @Override
+    public boolean isSetValue() {
+        return value != null && value.isSetStartValue() && value.isSetEndValue();
+    }
+
+    @Override
+    public void setValue(RangeValue<DateTime> value) {
+        this.value = value;
+    }
 
 }

@@ -29,7 +29,7 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
  * SOS internal representation of SWE simpleType observableProperty
  * 
  */
-public class SosSweObservableProperty extends SosSweAbstractSimpleType {
+public class SosSweObservableProperty extends SosSweAbstractSimpleType<String> {
 
     /**
      * value
@@ -56,4 +56,14 @@ public class SosSweObservableProperty extends SosSweAbstractSimpleType {
     public void setValue(String value) {
         this.value = value;
     }
+    @Override
+    public String getStringValue() {
+        return value;
+    }
+
+    @Override
+    public boolean isSetValue() {
+        return value != null && !value.isEmpty();
+    }
+
 }

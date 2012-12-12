@@ -21,47 +21,52 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ogc.swe.simpleType;
+package org.n52.sos.ogc.swe;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
-import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
-import org.n52.sos.util.DateTimeHelper;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * SOS internal representation of SWE simpleType time
- * 
- */
-public class SosSweTime extends SosSweAbstractUomType<DateTime> {
+public class RangeValue<T> {
+    
+    private T rangeStart;
+    
+    private T rangeEnd;
 
-    /**
-     * value
-     */
-    private DateTime value;
-
-    @Override
-    public SweSimpleType getSimpleType() {
-        return SweSimpleType.Time;
+    public T getRangeStart() {
+        return rangeStart;
     }
 
-    @Override
-    public DateTime getValue() {
-        return value;
+    public T getRangeEnd() {
+        return rangeEnd;
     }
 
-    @Override
-    public void setValue(DateTime value) {
-        this.value = value;
+    public void setRangeStart(T rangeStart) {
+        this.rangeStart = rangeStart;
     }
 
-    @Override
-    public String getStringValue() {
-        return DateTimeHelper.formatDateTime2IsoString(value);
-    }
-
-    @Override
-    public boolean isSetValue() {
-        return value != null;
+    public void setRangeEnd(T rangeEnd) {
+        this.rangeEnd = rangeEnd;
     }
     
+    public boolean isSetStartValue() {
+        return rangeStart != null;
+    }
+    
+    public boolean isSetEndValue() {
+        return rangeEnd != null;
+    }
+
+    public List<T> getRangeAsList() {
+        List<T> list = new ArrayList<T>();
+        list.add(rangeStart);
+        list.add(rangeEnd);
+        return list;
+    }
+    
+    public List<String> getRangeAsStringList() {
+        List<String> list = new ArrayList<String>();
+        list.add(rangeStart.toString());
+        list.add(rangeEnd.toString());
+        return list;
+    }
 }

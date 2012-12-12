@@ -25,9 +25,9 @@ package org.n52.sos.ogc.swe.simpleType;
 
 import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
 
-public class SosSweCount extends SosSweAbstractSimpleType {
+public class SosSweCount extends SosSweAbstractSimpleType<Integer> {
     
-    private int value;
+    private Integer value;
 
     @Override
     public SweSimpleType getSimpleType() {
@@ -35,13 +35,23 @@ public class SosSweCount extends SosSweAbstractSimpleType {
     }
 
     @Override
-    public String getValue() {
-        return Integer.toString(value);
+    public Integer getValue() {
+        return value;
     }
 
     @Override
-    public void setValue(String value) {
-        this.value = Integer.parseInt(value);
+    public void setValue(Integer value) {
+        this.value = value;
+    }
+
+    @Override
+    public boolean isSetValue() {
+        return value != null;
+    }
+
+    @Override
+    public String getStringValue() {
+        return Integer.toString(value.intValue());
     }
 
 }

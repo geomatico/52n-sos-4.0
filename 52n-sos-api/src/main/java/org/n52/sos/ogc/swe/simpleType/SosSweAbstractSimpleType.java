@@ -32,7 +32,7 @@ import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
  * @author Carsten Hollmann
  * @version 1.0.0
  */
-public abstract class SosSweAbstractSimpleType extends SosSweAbstractDataComponent {
+public abstract class SosSweAbstractSimpleType<T> extends SosSweAbstractDataComponent {
 
     private SosSweQuality quality;
 
@@ -76,23 +76,28 @@ public abstract class SosSweAbstractSimpleType extends SosSweAbstractDataCompone
      * 
      * @return value
      */
-    public abstract String getValue();
-
+    public abstract T getValue();
+    
+    public abstract String getStringValue();
+    
+    public abstract boolean isSetValue();
+    
     /**
      * Set value
      * 
      * @param value
      *            value to set
      */
-    public abstract void setValue(String value);
+    public abstract void setValue(T value);
     
-    /**
-     * @return <tt>true</tt>, if the value field is set and not returning an empty string.
-     */
-    public boolean isSetValue()
-    {
-    	return getValue() != null && !getValue().isEmpty();
-    }
+//    /**
+//     * @return <tt>true</tt>, if the value field is set and not returning an empty string.
+//     */
+//    public boolean isSetValue()
+//    {
+//    	return getValue() != null && !getValue().isEmpty();
+//    }
+    
 
 	@Override
 	public String toString()

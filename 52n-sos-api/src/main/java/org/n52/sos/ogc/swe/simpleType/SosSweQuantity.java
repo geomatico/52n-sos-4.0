@@ -31,7 +31,7 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
  * @author Carsten Hollmann
  * @version 1.0.0
  */
-public class SosSweQuantity extends SosSweAbstractUomType {
+public class SosSweQuantity extends SosSweAbstractUomType<String> {
 
 	/**
 	 * axis ID
@@ -88,27 +88,40 @@ public class SosSweQuantity extends SosSweAbstractUomType {
 		this.value = value;
 	}
 
+	    @Override
+	    public int hashCode() {
+	        int hash = 7;
+	        hash = 97 * hash + super.hashCode();
+	        hash = 97 * hash + (this.axisID != null ? this.axisID.hashCode() : 0);
+	        return hash;
+	    }
+
+	    @Override
+	    public boolean equals(Object obj) {
+	        if (obj == null) {
+	            return false;
+	        }
+	        if (getClass() != obj.getClass()) {
+	            return false;
+	        }
+	        final SosSweQuantity other = (SosSweQuantity) obj;
+	        if ((this.getAxisID() == null) ? (other.getAxisID() != null) : !this.getAxisID().equals(other.getAxisID())) {
+	            return false;
+	        }
+	        return super.equals(obj);
+	    }
+	
     @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 97 * hash + super.hashCode();
-        hash = 97 * hash + (this.axisID != null ? this.axisID.hashCode() : 0);
-        return hash;
+    public String getStringValue() {
+        return value;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SosSweQuantity other = (SosSweQuantity) obj;
-        if ((this.getAxisID() == null) ? (other.getAxisID() != null) : !this.getAxisID().equals(other.getAxisID())) {
-            return false;
-        }
-        return super.equals(obj);
+    public boolean isSetValue() {
+        return value != null && !value.isEmpty();
     }
-
+    
+    public boolean isSetAxisID() {
+        return axisID != null && !axisID.isEmpty();
+    }
 }

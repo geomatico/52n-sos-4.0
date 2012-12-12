@@ -88,11 +88,11 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
             SosSweCount elementCount = new SosSweCount();
             if (isSetValues())
             {
-            	elementCount.setValue(values.size()+"");
+            	elementCount.setValue(values.size());
             }
             else
             {
-            	elementCount.setValue("0");
+            	elementCount.setValue(0);
             }
             return elementCount; 
     }

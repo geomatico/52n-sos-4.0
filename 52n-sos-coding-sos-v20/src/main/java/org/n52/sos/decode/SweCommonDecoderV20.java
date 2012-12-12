@@ -53,7 +53,9 @@ import net.opengis.swe.x20.VectorType.Coordinate;
 
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
+import org.joda.time.DateTime;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.swe.RangeValue;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
@@ -72,6 +74,8 @@ import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.DateTimeException;
+import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -400,7 +404,7 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
             sosCount.setQuality(parseQuality(count.getQualityArray()));
         }
         if (count.isSetValue()) {
-            sosCount.setValue(Integer.toString(count.getValue().intValue()));
+            sosCount.setValue(count.getValue().intValue());
         }
         return sosCount;
     }
@@ -462,7 +466,7 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
         return sosText;
     }
 
-    private SosSweAbstractSimpleType parseTime(TimeType xbTime) {
+    private SosSweAbstractSimpleType parseTime(TimeType xbTime) throws OwsExceptionReport {
         SosSweTime sosTime = new SosSweTime();
         if (xbTime.isSetDefinition()) {
             sosTime.setDefinition(xbTime.getDefinition());
@@ -471,11 +475,17 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
             sosTime.setDescription(xbTime.getDescription());
         }
         if (xbTime.isSetValue()) {
-            sosTime.setValue(xbTime.getValue().toString());
+            try {
+                sosTime.setValue(DateTimeHelper.parseIsoString2DateTime(xbTime.getValue().toString()));
+            } catch (DateTimeException e) {
+                String exceptionText = "Error while parsing Time!";
+                LOGGER.debug(exceptionText, e);
+               throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+            }
         }
         if (xbTime.getUom() != null)
         {
-        	sosTime.setUom(xbTime.getUom().getHref());
+                sosTime.setUom(xbTime.getUom().getHref());
         }
         return sosTime;
     }
@@ -489,7 +499,26 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
             sosTimeRange.setDescription(xbTime.getDescription());
         }
         if (xbTime.isSetValue()) {
-            sosTimeRange.setValue(xbTime.getValue().toString());
+            try {
+                List value = xbTime.getValue();
+                if (value != null && !value.isEmpty()) {
+                    RangeValue<DateTime> range = new RangeValue<DateTime>();
+                    boolean first = true;
+                    for (Object object : value) {
+                        if (first) {
+                            range.setRangeStart(DateTimeHelper.parseIsoString2DateTime(xbTime.getValue().toString()));
+                            first = false;
+                        }
+                        range.setRangeEnd(DateTimeHelper.parseIsoString2DateTime(xbTime.getValue().toString()));
+                    }
+                    sosTimeRange.setValue(range);
+                }
+   
+            } catch (DateTimeException e) {
+                String exceptionText = "Error while parsing TimeRange!";
+                LOGGER.debug(exceptionText, e);
+               throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+            }
         }
         if (xbTime.getUom() != null)
         {

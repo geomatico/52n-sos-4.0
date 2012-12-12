@@ -31,7 +31,7 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
  * @author Carsten Hollmann
  * @version 1.0.0
  */
-public class SosSweText extends SosSweAbstractSimpleType {
+public class SosSweText extends SosSweAbstractSimpleType<String> {
 
     /**
      * value
@@ -57,5 +57,14 @@ public class SosSweText extends SosSweAbstractSimpleType {
     @Override
     public void setValue(String value) {
         this.value = value;
+    }
+    @Override
+    public String getStringValue() {
+        return value;
+    }
+
+    @Override
+    public boolean isSetValue() {
+        return value != null && !value.isEmpty();
     }
 }

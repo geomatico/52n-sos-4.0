@@ -25,9 +25,9 @@ package org.n52.sos.ogc.swe.simpleType;
 
 import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
 
-public class SosSweBoolean extends SosSweAbstractSimpleType {
+public class SosSweBoolean extends SosSweAbstractSimpleType<Boolean> {
 	
-    private boolean value;
+    private Boolean value;
 
     @Override
     public SweSimpleType getSimpleType() {
@@ -35,12 +35,22 @@ public class SosSweBoolean extends SosSweAbstractSimpleType {
     }
 
     @Override
-    public String getValue() {
-        return Boolean.toString(value);
+    public Boolean getValue() {
+        return value;
     }
 
     @Override
-    public void setValue(String value) {
-        this.value = Boolean.parseBoolean(value);
+    public void setValue(Boolean value) {
+        this.value = value;
+    }
+
+    @Override
+    public boolean isSetValue() {
+        return value != null;
+    }
+
+    @Override
+    public String getStringValue() {
+        return Boolean.toString(value.booleanValue());
     }
 }

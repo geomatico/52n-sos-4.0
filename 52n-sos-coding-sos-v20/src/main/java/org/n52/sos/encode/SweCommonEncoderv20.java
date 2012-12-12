@@ -404,7 +404,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
     private BooleanType createBoolean(SosSweBoolean sosElement)
 	{
 		BooleanType xbBoolean = BooleanType.Factory.newInstance();
-		xbBoolean.setValue(Boolean.parseBoolean((sosElement).getValue()));
+		xbBoolean.setValue(sosElement.getValue());
 		return xbBoolean;
 	}
 
@@ -428,7 +428,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 		CountType xbCount = CountType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
 		if (sosCount.getValue() != null)
 		{
-			BigInteger bigInt = new BigInteger(sosCount.getValue());
+			BigInteger bigInt = new BigInteger(Integer.toString(sosCount.getValue().intValue()));
 			xbCount.setValue(bigInt);
 		}
 		if (sosCount.isSetDefinition())
@@ -521,7 +521,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 		}
 		if (sosTimeRange.isSetValue())
 		{
-			xbTimeRange.setValue(Arrays.asList(sosTimeRange.getValue().split("/")));
+			xbTimeRange.setValue(sosTimeRange.getValue().getRangeAsStringList());
 		}
 		if (sosTimeRange.isSetQuality())
 		{

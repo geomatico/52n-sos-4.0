@@ -28,7 +28,7 @@ package org.n52.sos.ogc.swe.simpleType;
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  *
  */
-public abstract class SosSweAbstractUomType extends SosSweAbstractSimpleType {
+public abstract class SosSweAbstractUomType<T> extends SosSweAbstractSimpleType<T> {
 	
 	/**
      * unit of measurement

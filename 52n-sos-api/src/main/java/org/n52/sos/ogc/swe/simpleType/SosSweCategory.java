@@ -26,69 +26,53 @@ package org.n52.sos.ogc.swe.simpleType;
 import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
 
 /**
- * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
- *
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk
+ *         J&uuml;rrens</a>
+ * 
  */
-public class SosSweCategory extends SosSweAbstractSimpleType {
+public class SosSweCategory extends SosSweAbstractSimpleType<String> {
 
-	private String value;
-	private String codeSpace;
+    private String value;
 
-	@Override
-    public SweSimpleType getSimpleType()
-    {
+    private String codeSpace;
+
+    @Override
+    public SweSimpleType getSimpleType() {
         return SweSimpleType.Category;
     }
 
     @Override
-    public String getValue()
-    {
+    public String getValue() {
         return value;
     }
 
     @Override
-    public void setValue(String value)
-    {
-    	this.value = value;
+    public void setValue(String value) {
+        this.value = value;
     }
-    
-    public void setCodeSpace(String codeSpace)
-    {
+
+    public void setCodeSpace(String codeSpace) {
         this.codeSpace = codeSpace;
     }
-    
-    public String getCodeSpace()
-    {
+
+    public String getCodeSpace() {
         return codeSpace;
     }
 
-	@Override
-	public String toString()
-	{
-		return String.format("SosSweCategory [quality=%s, value=%s, codeSpace=%s, simpleType=%s]", getQuality(), getValue(), getCodeSpace(), getSimpleType());
-	}
-
     @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 47 * hash + super.hashCode();
-        hash = 47 * hash + (this.getCodeSpace() != null ? this.getCodeSpace().hashCode() : 0);
-        return hash;
+    public String toString() {
+        return String.format("SosSweCategory [quality=%s, value=%s, codeSpace=%s, simpleType=%s]", getQuality(),
+                value, codeSpace, getSimpleType());
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final SosSweCategory other = (SosSweCategory) obj;
-        if ((this.getCodeSpace() == null) ? (other.getCodeSpace() != null) : !this.getCodeSpace().equals(other.getCodeSpace())) {
-            return false;
-        }
-        return super.equals(obj);
+    public boolean isSetValue() {
+        return value != null && !value.isEmpty();
     }
-	   
+
+    @Override
+    public String getStringValue() {
+        return value;
+    }
+
 }
