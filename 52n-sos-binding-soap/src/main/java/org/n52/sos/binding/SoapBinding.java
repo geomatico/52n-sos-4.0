@@ -23,6 +23,7 @@
  */
 package org.n52.sos.binding;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,10 +37,12 @@ import org.n52.sos.decode.IDecoder;
 import org.n52.sos.decode.IXmlRequestDecoder;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
+import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.IServiceOperator;
@@ -117,6 +120,7 @@ public class SoapBinding extends Binding {
                     Object aBodyRequest = bodyDecoder.decode(xmlObject);
                     if (aBodyRequest instanceof AbstractServiceRequest) {
                         AbstractServiceRequest bodyRequest = (AbstractServiceRequest) aBodyRequest;
+                        checkServiceOperatorKeyTypes(bodyRequest);
                         for (ServiceOperatorKeyType serviceVersionIdentifier : bodyRequest.getServiceOperatorKeyType()) {
                             IServiceOperator serviceOperator =
                                     Configurator.getInstance().getServiceOperator(serviceVersionIdentifier);
@@ -194,6 +198,27 @@ public class SoapBinding extends Binding {
             owse.setVersion(Sos1Constants.SERVICEVERSION);
         }
         return owse;
+    }
+
+    private void checkServiceOperatorKeyTypes(AbstractServiceRequest request) throws OwsExceptionReport {
+        if (!(request instanceof GetCapabilitiesRequest)) {
+            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
+            for (ServiceOperatorKeyType serviceVersionIdentifier : request.getServiceOperatorKeyType()) {
+                if (serviceVersionIdentifier.getService() != null) {
+                    if (!Configurator.getInstance().isServiceSupported(serviceVersionIdentifier.getService())) {
+                        String exceptionText = "The requested service is not supported!";
+                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(RequestParams.service.name(), exceptionText));
+                    }
+                }
+                if (serviceVersionIdentifier.getVersion() != null) {
+                    if (!Configurator.getInstance().isVersionSupported(serviceVersionIdentifier.getVersion())) {
+                        String exceptionText = "The requested version is not supported!";
+                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(RequestParams.version.name(), exceptionText));
+                    }
+                }
+            }
+            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        }
     }
 
     @Override
