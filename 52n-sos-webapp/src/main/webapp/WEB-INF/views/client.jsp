@@ -274,7 +274,9 @@
 			$binding.on("change", onBindingChange).trigger("change");
 			$request.on("change", onRequestChange).trigger("change");
 
-			if (availableVersions.length === 0) {
+			if (availableVersions.length === 0
+				|| availableBindings.length === 0
+				|| availableOperations.length === 0) {
 				editor.setOption("readOnly", true);
 				[ $version, $binding, $request, $url, $send ].forEach(function($e) {
 					$e.attr("disabled", true);
