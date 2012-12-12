@@ -41,4 +41,8 @@ public abstract class SosSweAbstractEncoding {
     @Override
     public abstract boolean equals(Object obj);
     
+    public boolean isSetXml() {
+        return xml != null && !xml.isEmpty();
+    }
+    
 }
