@@ -44,3 +44,8 @@ div#footer {
 
 ul.fn_list { margin: 0px !important; }
 #f_bottom { padding-bottom: 0px !important; }
+
+[class^="icon-"], [class*=" icon-"] { 
+    vertical-align: baseline !important;
+    margin-right: 5px;
+}

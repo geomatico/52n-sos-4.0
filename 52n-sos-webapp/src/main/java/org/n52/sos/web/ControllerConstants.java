@@ -61,6 +61,7 @@ public interface ControllerConstants {
         public static final String ADMIN_DATABASE_CREATE_TEST_DATA = "/admin/database/testdata/create";
         public static final String ADMIN_RESET = "/admin/reset";
         public static final String ADMIN_LOGGING = "/admin/logging";
+        public static final String ADMIN_LOGGING_FILE_DOWNLOAD = "/admin/logging/file";
         public static final String INSTALL_ROOT = "/install";
         public static final String INSTALL_INDEX = "/install/index";
         public static final String INSTALL_DATABASE_CONFIGURATION = "/install/database";

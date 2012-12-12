@@ -23,7 +23,9 @@
  */
 package org.n52.sos.service;
 
+import java.io.InputStream;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -63,6 +65,22 @@ public abstract class AbstractLoggingConfigurator {
             return null;
         }
     }
+    
+    private static AbstractLoggingConfigurator instance = null;;
+    
+    public static synchronized AbstractLoggingConfigurator getInstance() {
+        if (instance == null) {
+            ServiceLoader<AbstractLoggingConfigurator> serviceLoader = ServiceLoader.load(AbstractLoggingConfigurator.class);
+            Iterator<AbstractLoggingConfigurator> i = serviceLoader.iterator();
+            if (i.hasNext()) {
+                instance = i.next();
+                log.debug("Using LoggingConfigurator: {}", instance.getClass());
+            } else {
+                log.error("No implementation class found!");
+            }
+        }
+        return instance;
+    }
 
     public abstract Set<Appender> getEnabledAppender();
 
@@ -84,19 +102,7 @@ public abstract class AbstractLoggingConfigurator {
 
     public abstract boolean setMaxHistory(int days);
     
-    private static AbstractLoggingConfigurator instance = null;;
+    public abstract List<String> getLastLogEntries(int maxSize);
     
-    public static synchronized AbstractLoggingConfigurator getInstance() {
-        if (instance == null) {
-            ServiceLoader<AbstractLoggingConfigurator> serviceLoader = ServiceLoader.load(AbstractLoggingConfigurator.class);
-            Iterator<AbstractLoggingConfigurator> i = serviceLoader.iterator();
-            if (i.hasNext()) {
-                instance = i.next();
-                log.debug("Using LoggingConfigurator: {}", instance.getClass());
-            } else {
-                log.error("No implementation class found!");
-            }
-        }
-        return instance;
-    }
+    public abstract InputStream getLogFile();
 }

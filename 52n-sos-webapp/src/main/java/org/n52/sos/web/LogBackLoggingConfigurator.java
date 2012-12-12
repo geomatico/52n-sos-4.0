@@ -1,11 +1,9 @@
 /**
- * Copyright (C) 2012
- * by 52 North Initiative for Geospatial Open Source Software GmbH
+ * Copyright (C) 2012 by 52 North Initiative for Geospatial Open Source Software
+ * GmbH
  *
- * Contact: Andreas Wytzisk
- * 52 North Initiative for Geospatial Open Source Software GmbH
- * Martin-Luther-King-Weg 24
- * 48155 Muenster, Germany
+ * Contact: Andreas Wytzisk 52 North Initiative for Geospatial Open Source
+ * Software GmbH Martin-Luther-King-Weg 24 48155 Muenster, Germany
  * info@52north.org
  *
  * This program is free software; you can redistribute and/or modify it under
@@ -26,6 +24,7 @@ package org.n52.sos.web;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.ArrayList;
@@ -37,6 +36,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -45,10 +46,12 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.AbstractLoggingConfigurator;
 import org.n52.sos.service.AbstractLoggingConfigurator.Appender;
 import org.n52.sos.service.AbstractLoggingConfigurator.Level;
+import org.n52.sos.util.FileIOHelper;
 import org.slf4j.Logger;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -63,18 +66,22 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
     private static final String CONFIGURATION_FILE_NAME = "/logback.xml";
     private static final String AN_LEVEL = "level";
     private static final String AN_NAME = "name";
-    private static final String AN_VALUE = "value";
     private static final String AN_REF = "ref";
+    private static final String AN_VALUE = "value";
     private static final String EN_ROLLING_POLICY = "rollingPolicy";
     private static final String EN_MAX_HISTORY = "maxHistory";
     private static final String EN_APPENDER = "appender";
     private static final String EN_APPENDER_REF = "appender-ref";
     private static final String EN_ROOT = "root";
     private static final String EN_LOGGER = "logger";
+    private static final String EN_FILE = "file";
+    private static final String EN_PROPERTY = "property";
     private static final String NOT_FOUND_ERROR_MESSAGE = "Can't find Logback configuration file.";
     private static final String UNPARSABLE_ERROR_MESSAGE = "Can't parse configuration file.";
     private static final String UNWRITABLE_ERROR_MESSAGE = "Can't write configuration file.";
+    private static final String LOG_FILE_NOT_FOUND_ERROR_MESSAGE = "Log file could not be found";
     private static final int WRITE_DELAY = 4000;
+    private static final Pattern PROPERTY_MATCHER = Pattern.compile("\\$\\{([^}]+)\\}");
     private static final ReadWriteLock lock = new ReentrantReadWriteLock();
     private Document cache = null;
     private File configuration = null;
@@ -205,7 +212,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
         } finally {
             lock.writeLock().unlock();
         }
-        
+
     }
 
     @Override
@@ -478,5 +485,82 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
         } finally {
             lock.readLock().unlock();
         }
+    }
+
+    @Override
+    public List<String> getLastLogEntries(int maxSize) {
+        File f = getLogFile1();
+        if (f != null) {
+            try {
+                return FileIOHelper.tail(f, maxSize);
+            } catch (IOException ex) {
+                log.error("Could not read log file", ex);
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    private File getLogFile1() {
+        String file = null;
+        lock.readLock().lock();
+        try {
+            Element doc = read().getDocumentElement();
+            for (Element a : getChildren(doc, EN_APPENDER)) {
+                if (getAttribute(a, AN_NAME).getValue().equals(Appender.FILE.name)) {
+                    file = getSingleChildren(a, EN_FILE).getTextContent();
+                }
+            }
+
+            Map<String, String> properties = new HashMap<String, String>();
+            for (Element p : getChildren(doc, EN_PROPERTY)) {
+                properties.put(getAttribute(p, AN_NAME).getValue(), getAttribute(p, AN_VALUE).getValue());
+            }
+
+            if (file == null) {
+                log.error(LOG_FILE_NOT_FOUND_ERROR_MESSAGE);
+                return null;
+            }
+
+            Matcher matcher = PROPERTY_MATCHER.matcher(file);
+            while (matcher.find()) {
+                String key = matcher.group(1);
+                String value = properties.get(key);
+                if (value == null) {
+                    value = System.getProperty(key, null);
+                }
+                    
+                if (value == null) {
+                    log.error("Could not replace property {} in file name string {}", key, file);
+                    return null;
+                }
+                file = file.replace(matcher.group(), value);
+                matcher = PROPERTY_MATCHER.matcher(file);
+            }
+            log.debug("Logfile: ", file);
+            File f = new File(file);
+            if (!f.exists()) {
+                log.error("Can not find log file {}", f.getAbsolutePath());
+                return null;
+            }
+            return f;
+        } catch (ConfigurationException ex) {
+            log.error(UNPARSABLE_ERROR_MESSAGE, ex);
+            return null;
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public InputStream getLogFile() {
+        File f = getLogFile1();
+        if (f != null) {
+            try {
+                return FileIOHelper.loadInputStreamFromFile(f);
+            } catch (OwsExceptionReport ex) {
+                log.error("Could not read log file", ex);
+            }
+        }
+        return null;
     }
 }

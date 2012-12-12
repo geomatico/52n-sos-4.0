@@ -24,6 +24,7 @@
 
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ page import="org.n52.sos.service.AbstractLoggingConfigurator.Level" %>
 <jsp:include page="../common/header.jsp">
     <jsp:param name="activeMenu" value="admin" />
@@ -41,7 +42,19 @@
     </script>
 </c:if>
 
-<p>It will take some time till the changes take effect as the logging configuration is read asynchronously.</p>
+<legend id="messages-header">Latest Log Messages</legend>
+<div id="messages-table">
+    <table class="table table-striped table-condensed">
+        <tbody>
+            <c:forEach items="${logMessages}" var="logMessage">
+                <tr>
+                    <td><small>${fn:escapeXml(logMessage)}<small></td>
+                </tr>
+            </c:forEach>
+        </tbody>
+    </table>
+    <p class="pull-right"><small>You can download the complete log file <a href="<c:url value="/admin/logging/file"/>" target="_blank">here</a>.</small></p>
+</div>
     
 <form method="POST" class="form-horizontal">
     <legend>Log Levels</legend>
@@ -122,9 +135,20 @@
         </div>
     </div>
     <div class="form-actions">
+        <p><small>It will take some time till the changes take effect as the logging configuration is read asynchronously.</small></p>
         <button type="submit" class="btn btn-info">Save</button>
     </div>
 </form>
 
+<script type="text/javascript">
+    $("#messages-table").hide();
+    $("#messages-header").wrapInner($("<a>").attr("href", "#"))
+    $("#messages-header").children("a").prepend($("<i>").addClass("icon-chevron-right"));
+    $("#messages-header").click(function(e) {
+        e.preventDefault();
+        $(this).find("i").toggleClass("icon-chevron-right icon-chevron-down")
+        $("#messages-table").slideToggle();
+    });
+</script>
 <br/>
 <jsp:include page="../common/footer.jsp" />

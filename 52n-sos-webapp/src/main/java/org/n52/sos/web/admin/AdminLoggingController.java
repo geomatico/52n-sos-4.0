@@ -1,11 +1,9 @@
 /**
- * Copyright (C) 2012
- * by 52 North Initiative for Geospatial Open Source Software GmbH
+ * Copyright (C) 2012 by 52 North Initiative for Geospatial Open Source Software
+ * GmbH
  *
- * Contact: Andreas Wytzisk
- * 52 North Initiative for Geospatial Open Source Software GmbH
- * Martin-Luther-King-Weg 24
- * 48155 Muenster, Germany
+ * Contact: Andreas Wytzisk 52 North Initiative for Geospatial Open Source
+ * Software GmbH Martin-Luther-King-Weg 24 48155 Muenster, Germany
  * info@52north.org
  *
  * This program is free software; you can redistribute and/or modify it under
@@ -37,34 +35,37 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
-@RequestMapping(ControllerConstants.Paths.ADMIN_LOGGING)
+@RequestMapping(value = ControllerConstants.Paths.ADMIN_LOGGING)
 public class AdminLoggingController extends AbstractController {
 
-    public static final String IS_CONSOLE_ENABLED = "isConsoleEnabled";
-    public static final String IS_FILE_ENABLED = "isFileEnabled";
-    public static final String ROOT_LOG_LEVEL = "rootLogLevel";
-    public static final String DAYS_TO_KEEP = "daysToKeep";
-    public static final String LOGGER_LEVELS = "loggerLevels";
-    public static final String ERROR = "error";
+    private static final int LOG_MESSAGES = 15;
+    private static final String LOG_MESSAGES_MODEL_ATTRIBUTE = "logMessages";
+    private static final String IS_CONSOLE_ENABLED_MODEL_ATTRIBUTE = "isConsoleEnabled";
+    private static final String IS_FILE_ENABLED_MODEL_ATTRIBUTE = "isFileEnabled";
+    private static final String ROOT_LOG_LEVEL_MODEL_ATTRIBUTE = "rootLogLevel";
+    private static final String DAYS_TO_KEEP_MDOEL_ATTRIBUTE = "daysToKeep";
+    private static final String LOGGER_LEVELS_MODEL_ATTRIBUTE = "loggerLevels";
+    private static final String ERROR_MODEL_ATTRIBUTE = "error";
 
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView view() {
         AbstractLoggingConfigurator lc = AbstractLoggingConfigurator.getInstance();
         Map<String, Object> config = new HashMap<String, Object>(5);
-        config.put(IS_FILE_ENABLED, lc.isEnabled(AbstractLoggingConfigurator.Appender.FILE));
-        config.put(IS_CONSOLE_ENABLED, lc.isEnabled(AbstractLoggingConfigurator.Appender.CONSOLE));
-        config.put(ROOT_LOG_LEVEL, lc.getRootLogLevel());
-        config.put(DAYS_TO_KEEP, lc.getMaxHistory());
-        config.put(LOGGER_LEVELS, lc.getLoggerLevels());
+        config.put(IS_FILE_ENABLED_MODEL_ATTRIBUTE, lc.isEnabled(AbstractLoggingConfigurator.Appender.FILE));
+        config.put(IS_CONSOLE_ENABLED_MODEL_ATTRIBUTE, lc.isEnabled(AbstractLoggingConfigurator.Appender.CONSOLE));
+        config.put(ROOT_LOG_LEVEL_MODEL_ATTRIBUTE, lc.getRootLogLevel());
+        config.put(DAYS_TO_KEEP_MDOEL_ATTRIBUTE, lc.getMaxHistory());
+        config.put(LOGGER_LEVELS_MODEL_ATTRIBUTE, lc.getLoggerLevels());
+        config.put(LOG_MESSAGES_MODEL_ATTRIBUTE, lc.getLastLogEntries(LOG_MESSAGES));
         return new ModelAndView(ControllerConstants.Views.ADMIN_LOGGING, config);
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public ModelAndView save(HttpServletRequest req) {
-        int daysToKeep = Integer.parseInt(req.getParameter(DAYS_TO_KEEP));
-        boolean fileEnabled = parseBoolean(req.getParameter(IS_FILE_ENABLED));
-        boolean consoleEnabled = parseBoolean(req.getParameter(IS_CONSOLE_ENABLED));
-        AbstractLoggingConfigurator.Level rootLevel = AbstractLoggingConfigurator.Level.valueOf(req.getParameter(ROOT_LOG_LEVEL));
+        int daysToKeep = Integer.parseInt(req.getParameter(DAYS_TO_KEEP_MDOEL_ATTRIBUTE));
+        boolean fileEnabled = parseBoolean(req.getParameter(IS_FILE_ENABLED_MODEL_ATTRIBUTE));
+        boolean consoleEnabled = parseBoolean(req.getParameter(IS_CONSOLE_ENABLED_MODEL_ATTRIBUTE));
+        AbstractLoggingConfigurator.Level rootLevel = AbstractLoggingConfigurator.Level.valueOf(req.getParameter(ROOT_LOG_LEVEL_MODEL_ATTRIBUTE));
         Map<String, AbstractLoggingConfigurator.Level> levels = new HashMap<String, AbstractLoggingConfigurator.Level>();
         AbstractLoggingConfigurator lc = AbstractLoggingConfigurator.getInstance();
         for (String logger : lc.getLoggerLevels().keySet()) {
@@ -83,7 +84,7 @@ public class AdminLoggingController extends AbstractController {
     @ExceptionHandler(Throwable.class)
     public ModelAndView error(Throwable t) {
         ModelAndView mav = view();
-        mav.addObject(ERROR, t.getMessage());
+        mav.addObject(ERROR_MODEL_ATTRIBUTE, t.getMessage());
         log.error("Error updating the logging configuration.", t);
         return mav;
     }
