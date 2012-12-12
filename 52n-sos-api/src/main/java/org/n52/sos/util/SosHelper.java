@@ -129,7 +129,7 @@ public class SosHelper {
     public static String getFoiGetUrl(String version, String serviceURL, String urlPattern) {
         StringBuilder url = new StringBuilder();
         // service URL
-        url.append(serviceURL).append("?");
+        url.append(serviceURL);
         // URL pattern for KVP
         url.append(urlPattern);
         // ?
