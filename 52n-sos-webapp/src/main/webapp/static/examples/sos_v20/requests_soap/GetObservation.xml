@@ -14,14 +14,17 @@
 			<!-- optional, multiple values possible -->
 			<sos:procedure>http://www.example.org/sensors/101</sos:procedure>
 			<sos:procedure>http://www.example.org/sensors/102</sos:procedure>
+			<sos:procedure>http://www.example.org/sensors/106</sos:procedure>
 
 			<!-- optional, multiple values possible -->
 			<sos:offering>test_offering_1</sos:offering>
 			<sos:offering>test_offering_2</sos:offering>
+			<sos:offering>test_offering_6</sos:offering>
 
 			<!-- optional, multiple values possible -->
 			<sos:observedProperty>test_observable_property_1</sos:observedProperty>
 			<sos:observedProperty>test_observable_property_2</sos:observedProperty>
+			<sos:observedProperty>test_observable_property_6</sos:observedProperty>
 
 			<!-- optional -->
 			<sos:temporalFilter>
@@ -48,6 +51,7 @@
 			<!-- optional, multiple values possible -->
 			<sos:featureOfInterest>test_feature_1</sos:featureOfInterest>
 			<sos:featureOfInterest>test_feature_2</sos:featureOfInterest>
+			<sos:featureOfInterest>test_feature_6</sos:featureOfInterest>
 
 			<!-- optional -->
 			<sos:spatialFilter>
