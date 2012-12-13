@@ -89,15 +89,6 @@ public abstract class SosSweAbstractSimpleType<T> extends SosSweAbstractDataComp
      *            value to set
      */
     public abstract void setValue(T value);
-    
-//    /**
-//     * @return <tt>true</tt>, if the value field is set and not returning an empty string.
-//     */
-//    public boolean isSetValue()
-//    {
-//    	return getValue() != null && !getValue().isEmpty();
-//    }
-    
 
 	@Override
 	public String toString()

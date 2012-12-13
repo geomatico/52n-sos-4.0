@@ -347,8 +347,6 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         schemaLocations.add(N52XmlHelper.getSchemaLocationForSF200());
         schemaLocations.add(N52XmlHelper.getSchemaLocationForSAMS200());
         N52XmlHelper.setSchemaLocationsToDocument(xbGetObsRespDoc, schemaLocations);
-        // TODO for testing
-        XmlHelper.validateDocument(xbGetObsRespDoc);
         return xbGetObsRespDoc;
     }
 
