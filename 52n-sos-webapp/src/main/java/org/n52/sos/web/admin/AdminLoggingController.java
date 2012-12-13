@@ -52,6 +52,7 @@ public class AdminLoggingController extends AbstractController {
     private static final String ROOT_LOG_LEVEL_MODEL_ATTRIBUTE = "rootLogLevel";
     private static final String DAYS_TO_KEEP_MDOEL_ATTRIBUTE = "daysToKeep";
     private static final String LOGGER_LEVELS_MODEL_ATTRIBUTE = "loggerLevels";
+    private static final String MAX_FILE_SIZE_MODEL_ATTRIBUTE = "maxFileSize";
     private static final String ERROR_MODEL_ATTRIBUTE = "error";
 
     @RequestMapping(method = RequestMethod.GET)
@@ -64,6 +65,7 @@ public class AdminLoggingController extends AbstractController {
         config.put(DAYS_TO_KEEP_MDOEL_ATTRIBUTE, lc.getMaxHistory());
         config.put(LOGGER_LEVELS_MODEL_ATTRIBUTE, lc.getLoggerLevels());
         config.put(LOG_MESSAGES_MODEL_ATTRIBUTE, lc.getLastLogEntries(LOG_MESSAGES));
+        config.put(MAX_FILE_SIZE_MODEL_ATTRIBUTE, lc.getMaxFileSize());
         return new ModelAndView(ControllerConstants.Views.ADMIN_LOGGING, config);
     }
     
@@ -84,6 +86,8 @@ public class AdminLoggingController extends AbstractController {
         AbstractLoggingConfigurator.Level rootLevel = AbstractLoggingConfigurator.Level
                 .valueOf(req.getParameter(ROOT_LOG_LEVEL_MODEL_ATTRIBUTE));
         parameters.remove(ROOT_LOG_LEVEL_MODEL_ATTRIBUTE);
+        String maxFileSize = req.getParameter(MAX_FILE_SIZE_MODEL_ATTRIBUTE);
+        parameters.remove(MAX_FILE_SIZE_MODEL_ATTRIBUTE);
         
         Map<String, AbstractLoggingConfigurator.Level> levels 
                 = new HashMap<String, AbstractLoggingConfigurator.Level>(parameters.size());
@@ -99,6 +103,7 @@ public class AdminLoggingController extends AbstractController {
         lc.enableAppender(AbstractLoggingConfigurator.Appender.CONSOLE, consoleEnabled);
         lc.setRootLogLevel(rootLevel);
         lc.setLoggerLevel(levels);
+        lc.setMaxFileSize(maxFileSize);
         
         return new ModelAndView(new RedirectView(ControllerConstants.Paths.ADMIN_LOGGING, true));
     }

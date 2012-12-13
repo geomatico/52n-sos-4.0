@@ -78,6 +78,8 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
     private static final String EN_LOGGER = "logger";
     private static final String EN_FILE = "file";
     private static final String EN_PROPERTY = "property";
+    private static final String EN_MAX_FILE_SIZE = "maxFileSize";
+    private static final String EN_TIME_BASED_FILE_NAME_AND_TRIGGERING_POLICY = "timeBasedFileNamingAndTriggeringPolicy";
     private static final String NOT_FOUND_ERROR_MESSAGE = "Can't find Logback configuration file.";
     private static final String UNPARSABLE_ERROR_MESSAGE = "Can't parse configuration file.";
     private static final String UNWRITABLE_ERROR_MESSAGE = "Can't write configuration file.";
@@ -543,6 +545,63 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
         } finally {
             lock.readLock().unlock();
         }
+    }
+
+    @Override
+    public String getMaxFileSize() {
+        lock.readLock().lock();
+        try {
+            String maxFileSize = null;
+            try {
+                Document doc = read();
+                List<Element> appender = getChildren(doc.getDocumentElement(), EN_APPENDER);
+                for (Element a : appender) {
+                    if (getAttribute(a, AN_NAME).getValue().equals(Appender.FILE.name)) {
+                        maxFileSize = getSingleChildren(getSingleChildren(getSingleChildren(a, 
+                            EN_ROLLING_POLICY), 
+                                EN_TIME_BASED_FILE_NAME_AND_TRIGGERING_POLICY), 
+                                    EN_MAX_FILE_SIZE).getTextContent();
+                    }
+                }
+            } catch (ConfigurationException e) {
+                log.error(UNPARSABLE_ERROR_MESSAGE, e);
+            }
+            return maxFileSize;
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public boolean setMaxFileSize(String size) {
+        if (size == null) {
+            return false;
+        }
+        lock.writeLock().lock();
+        try {
+            Document doc = read();
+            List<Element> appender = getChildren(doc.getDocumentElement(), EN_APPENDER);
+            for (Element a : appender) {
+                if (getAttribute(a, AN_NAME).getValue().equals(Appender.FILE.name)) {
+                    Element maxFileSize = getSingleChildren(getSingleChildren(getSingleChildren(a, 
+                            EN_ROLLING_POLICY), 
+                                EN_TIME_BASED_FILE_NAME_AND_TRIGGERING_POLICY), 
+                                    EN_MAX_FILE_SIZE);
+                    String before = maxFileSize.getTextContent().trim();
+                    if (!before.equals(size.trim())) {
+                        log.debug("Setting max logging file size to {}.", size);
+                        maxFileSize.setTextContent(size.trim());
+                    }
+                }
+            }
+            write();
+        } catch (ConfigurationException e) {
+            log.error(UNPARSABLE_ERROR_MESSAGE, e);
+            return false;
+        } finally {
+            lock.writeLock().unlock();
+        }
+        return true;
     }
 
     @Override

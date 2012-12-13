@@ -4,7 +4,18 @@
 
 	<property name="logFile" value="${config.logger.fileappender.filepath}/${config.logger.fileappender.filename}" />
 
-	<!-- TODO: maxfilesize; to keep this configurable ... -->
+	<!-- 
+		the following assumptions are made by the Adminstrator:
+		* The name of a file appender is FILE
+		* The name of a console appender is STDOUT
+		* The appender named FILE is of type ch.qos.logback.core.rolling.RollingFileAppender
+			and has a maxHistory and a timeBasedFileNamingAndTriggeringPolicy > maxFileSize
+			property
+		* All variables in the file property of the FILE appender are fully resolvable
+			by the properties defined in this file and the Java system properties.
+
+		Additional appenders can be defined freely.
+	-->
 
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${logFile}.log</file>
@@ -13,8 +24,10 @@
 			<fileNamePattern>${logFile}/%d{yyyy-MM-dd}.log</fileNamePattern>
 			<!-- keep ${config.logger.history.max} days' worth of history -->
 			<maxHistory>${config.logger.history.max}</maxHistory>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>${config.logger.maxFileSize}</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
-		
 		<encoder>
 			<pattern>
 				%date %level [%thread] [%file:%line] %msg%n

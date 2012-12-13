@@ -42,6 +42,7 @@
 		<config.logger.fileappender.filename>${conf.sos.name}</config.logger.fileappender.filename>
 		<config.logger.level>INFO</config.logger.level>
 		<config.logger.history.max>30</config.logger.history.max>
+		<config.logger.maxFileSize>10MB</config.logger.maxFileSize>
 		<postgresql.version>9.1-901.jdbc4</postgresql.version>
 		<postgis.version>2.0.1</postgis.version>
 		<logback.version>1.0.0</logback.version>

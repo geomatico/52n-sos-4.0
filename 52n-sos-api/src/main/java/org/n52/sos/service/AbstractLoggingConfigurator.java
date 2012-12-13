@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractLoggingConfigurator {
     protected static final Logger log = LoggerFactory.getLogger(AbstractLoggingConfigurator.class);
-    
+
     public static enum Level {
         TRACE, DEBUG, INFO, WARN, ERROR;
         
@@ -107,4 +107,8 @@ public abstract class AbstractLoggingConfigurator {
     public abstract List<String> getLastLogEntries(int maxSize);
     
     public abstract InputStream getLogFile();
+    
+    public abstract String getMaxFileSize();
+    
+    public abstract boolean setMaxFileSize(String maxFileSize);
 }

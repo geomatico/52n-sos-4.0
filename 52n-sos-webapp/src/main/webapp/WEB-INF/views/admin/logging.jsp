@@ -147,6 +147,13 @@
             <span class="help-block">How many days of log files should be kept?</span>
         </div>
     </div>
+    <div class="control-group">
+        <label class="control-label" for"maxFileSize">Max file size</label>
+        <div class="controls">
+            <input type="text" class="input-xlarge"  name="maxFileSize" value="${maxFileSize}" />
+            <span class="help-block">What should be the maximum size of a log file?</span>
+        </div>
+    </div>
     <div class="form-actions">
         <p><small>It will take some time till the changes take effect as the logging configuration is read asynchronously.</small></p>
         <button type="submit" class="btn btn-info">Save</button>
@@ -226,6 +233,15 @@
 
     $("#add-logger").on("hidden", function() {
         $(this).find("input").val("");
+    });
+
+    var fileSizePattern = /^\s*[0-9]+\s*((k|m|g)b?s?)?\s*$/i;
+    $("input[name=maxFileSize]").on("input keyup", function() {
+        if (fileSizePattern.test($(this).val())) {
+            $(this).parents(".control-group").removeClass("error");
+        } else {
+            $(this).parents(".control-group").addClass("error");
+        }
     });
 
     $("#add-logger-button").on("click", function(e) {
