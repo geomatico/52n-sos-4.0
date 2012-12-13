@@ -58,12 +58,16 @@ import org.n52.sos.ogc.om.values.CountValue;
 import org.n52.sos.ogc.om.values.NilTemplateValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.om.values.TextValue;
+import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
+import org.n52.sos.ogc.ows.OwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.OMHelper;
+import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
@@ -131,16 +135,29 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
         SosObservation sosObservation = new SosObservation();
         sosObservation.setIdentifier(getIdentifier(omObservation));
         SosObservationConstellation observationConstallation = getObservationConstellation(omObservation);
-        SosAbstractFeature featureOfInterest = getFeatureOfInterest(omObservation.getFeatureOfInterest());
-        observationConstallation.setFeatureOfInterest(checkFeatureWithMap(featureOfInterest, featureMap));
         sosObservation.setObservationConstellation(observationConstallation);
         sosObservation.setResultTime(getResultTime(omObservation));
         sosObservation.setValidTime(getValidTime(omObservation));
-
-        // TODO: later for spatial filtering profile
-        // omObservation.getParameterArray();
         sosObservation.setValue(getObservationValue(omObservation));
         checkOrSetObservationType(sosObservation);
+        try {
+            SosAbstractFeature featureOfInterest = getFeatureOfInterest(omObservation.getFeatureOfInterest());
+            observationConstallation.setFeatureOfInterest(checkFeatureWithMap(featureOfInterest, featureMap));
+        } catch (OwsExceptionReport e) {
+            if (sosObservation.getValue().getPhenomenonTime().getIndeterminateValue().equals("template")) {
+                for (OwsException exception : e.getExceptions()) {
+                    if (exception.getCode().equals(OwsExceptionCode.InvalidParameterValue)) {
+                       throw Util4Exceptions.createInvalidParameterValueException(exception.getLocator(), exception.getMessages()[0]);
+                    } else if (exception.getCode().equals(OwsExceptionCode.MissingParameterValue)) {
+                        throw Util4Exceptions.createMissingParameterValueException(exception.getLocator());
+                    }
+                }
+            } 
+            throw e;
+        }
+        // TODO: later for spatial filtering profile
+        // omObservation.getParameterArray();
+
         return sosObservation;
     }
 
@@ -194,15 +211,22 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
     private SosAbstractFeature getFeatureOfInterest(FeaturePropertyType featureOfInterest) throws OwsExceptionReport {
         SosSamplingFeature feature = null;
         // if xlink:href is set
-        if (featureOfInterest.getHref() != null && !featureOfInterest.getHref().isEmpty()) {
-            if (featureOfInterest.getHref().startsWith("#")) {
-                feature = new SosSamplingFeature(null, featureOfInterest.getHref().replace("#", ""));
-            } else {
-                feature = new SosSamplingFeature(featureOfInterest.getHref());
-                if (featureOfInterest.getTitle() != null && !featureOfInterest.getTitle().isEmpty()) {
-                    feature.addName(featureOfInterest.getTitle());
-                }
+        if (featureOfInterest.getHref() != null) {
+            if (featureOfInterest.getHref().isEmpty()) {
+                String exceptionText = "The requested featureOfInterest has a missing xlink:href definition!";
+                LOGGER.debug(exceptionText);
+                throw Util4Exceptions.createMissingParameterValueException(
+                        Sos2Constants.InsertObservationParams.observation.name());
             }
+                if (featureOfInterest.getHref().startsWith("#")) {
+                    feature = new SosSamplingFeature(null, featureOfInterest.getHref().replace("#", ""));
+                } else {
+                    SosHelper.checkHref(featureOfInterest.getHref(), Sos2Constants.InsertObservationParams.observation.name());
+                    feature = new SosSamplingFeature(featureOfInterest.getHref());
+                    if (featureOfInterest.getTitle() != null && !featureOfInterest.getTitle().isEmpty()) {
+                        feature.addName(featureOfInterest.getTitle());
+                    }
+                }
         }
         // if feature is encoded
         else {
