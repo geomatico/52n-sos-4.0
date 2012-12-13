@@ -71,6 +71,7 @@ public class FileIOHelper {
         }
     }
 
+    /* TODO refactor this */
     public static List<String> tail(File file, int lines) throws IOException {
         RandomAccessFile raf = null;
         try {

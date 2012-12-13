@@ -4,6 +4,8 @@
 
 	<property name="logFile" value="${config.logger.fileappender.filepath}/${config.logger.fileappender.filename}" />
 
+	<!-- TODO: maxfilesize; to keep this configurable ... -->
+
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${logFile}.log</file>
 		

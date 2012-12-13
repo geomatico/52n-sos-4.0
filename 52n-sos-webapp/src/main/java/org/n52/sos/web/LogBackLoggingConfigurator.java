@@ -388,7 +388,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
             }
             if (l == null) {
                 log.debug("Setting logging level of {} to {}.", id, level);
-                l = doc.createElement(id);
+                l = doc.createElement(EN_LOGGER);
                 l.setAttribute(AN_NAME, id);
                 l.setAttribute(AN_LEVEL, level.name());
                 conf.appendChild(l);
@@ -400,6 +400,62 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                     l.setAttribute(AN_LEVEL, level.name());
                     write();
                 }
+            }
+            return true;
+        } catch (ConfigurationException e) {
+            log.error(UNPARSABLE_ERROR_MESSAGE, e);
+            return false;
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+    
+    @Override
+    public boolean setLoggerLevel(Map<String, Level> levels) {
+        lock.writeLock().lock();
+        try {
+            Document doc = read();
+            Element conf = doc.getDocumentElement();
+            
+            List<Element> loggers = getChildren(conf, EN_LOGGER);
+            Map<String, Element> currentLoggers = new HashMap<String, Element>(loggers.size());
+            for (Element logger : loggers) {
+                currentLoggers.put(getAttribute(logger, AN_NAME).getValue(), logger);
+            }
+            boolean write = false;
+            /* remove obsolete loggers */
+            for (String logger : currentLoggers.keySet()) {
+                if (levels.get(logger) == null) {
+                    log.debug("Removing logger {}", logger);
+                    conf.removeChild(currentLoggers.get(logger));
+                    write = true;
+                }
+            }
+            
+            for (String logger : levels.keySet()) {
+                if (logger.equals(Logger.ROOT_LOGGER_NAME)) {
+                    setRootLogLevel(levels.get(logger));
+                } else {
+                    Element l = currentLoggers.get(logger);
+                    if (l == null) {
+                        log.debug("Setting logging level of {} to {}.", logger, levels.get(logger));
+                        l = doc.createElement(EN_LOGGER);
+                        l.setAttribute(AN_NAME, logger);
+                        l.setAttribute(AN_LEVEL, levels.get(logger).name());
+                        conf.appendChild(l);
+                        write = true;
+                    } else {
+                        String oldLevel = l.getAttribute(AN_LEVEL);
+                        if (!oldLevel.equals(levels.get(logger).name())) {
+                            log.debug("Setting logging level of {} to {}.", logger, levels.get(logger));
+                            l.setAttribute(AN_LEVEL, levels.get(logger).name());
+                            write = true;
+                        }
+                    }
+                }
+            }
+            if (write) {
+                write();
             }
             return true;
         } catch (ConfigurationException e) {
@@ -538,7 +594,7 @@ public class LogBackLoggingConfigurator extends AbstractLoggingConfigurator {
                 file = file.replace(matcher.group(), value);
                 matcher = PROPERTY_MATCHER.matcher(file);
             }
-            log.debug("Logfile: ", file);
+            log.debug("Logfile: {}", file);
             File f = new File(file);
             if (!f.exists()) {
                 log.error("Can not find log file {}", f.getAbsolutePath());

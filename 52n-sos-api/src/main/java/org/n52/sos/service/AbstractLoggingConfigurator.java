@@ -97,6 +97,8 @@ public abstract class AbstractLoggingConfigurator {
     public abstract Level getLoggerLevel(String id);
 
     public abstract boolean setLoggerLevel(String id, Level level);
+    
+    public abstract boolean setLoggerLevel(Map<String, Level> levels);
 
     public abstract int getMaxHistory();
 

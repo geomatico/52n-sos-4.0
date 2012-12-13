@@ -23,8 +23,13 @@
  */
 package org.n52.sos.web.admin;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.n52.sos.service.AbstractLoggingConfigurator;
 import org.n52.sos.web.AbstractController;
@@ -61,25 +66,40 @@ public class AdminLoggingController extends AbstractController {
         config.put(LOG_MESSAGES_MODEL_ATTRIBUTE, lc.getLastLogEntries(LOG_MESSAGES));
         return new ModelAndView(ControllerConstants.Views.ADMIN_LOGGING, config);
     }
+    
 
     @RequestMapping(method = RequestMethod.POST)
     public ModelAndView save(HttpServletRequest req) {
+        
+        
+        Set<String> parameters = new HashSet<String>(
+                Collections.list((Enumeration<String>)req.getParameterNames()));
+                
         int daysToKeep = Integer.parseInt(req.getParameter(DAYS_TO_KEEP_MDOEL_ATTRIBUTE));
+        parameters.remove(DAYS_TO_KEEP_MDOEL_ATTRIBUTE);
         boolean fileEnabled = parseBoolean(req.getParameter(IS_FILE_ENABLED_MODEL_ATTRIBUTE));
+        parameters.remove(IS_FILE_ENABLED_MODEL_ATTRIBUTE);
         boolean consoleEnabled = parseBoolean(req.getParameter(IS_CONSOLE_ENABLED_MODEL_ATTRIBUTE));
-        AbstractLoggingConfigurator.Level rootLevel = AbstractLoggingConfigurator.Level.valueOf(req.getParameter(ROOT_LOG_LEVEL_MODEL_ATTRIBUTE));
-        Map<String, AbstractLoggingConfigurator.Level> levels = new HashMap<String, AbstractLoggingConfigurator.Level>();
-        AbstractLoggingConfigurator lc = AbstractLoggingConfigurator.getInstance();
-        for (String logger : lc.getLoggerLevels().keySet()) {
+        parameters.remove(IS_CONSOLE_ENABLED_MODEL_ATTRIBUTE);
+        AbstractLoggingConfigurator.Level rootLevel = AbstractLoggingConfigurator.Level
+                .valueOf(req.getParameter(ROOT_LOG_LEVEL_MODEL_ATTRIBUTE));
+        parameters.remove(ROOT_LOG_LEVEL_MODEL_ATTRIBUTE);
+        
+        Map<String, AbstractLoggingConfigurator.Level> levels 
+                = new HashMap<String, AbstractLoggingConfigurator.Level>(parameters.size());
+        
+       
+        for (String logger : parameters) {
             levels.put(logger, AbstractLoggingConfigurator.Level.valueOf(req.getParameter(logger)));
         }
+       
+        AbstractLoggingConfigurator lc = AbstractLoggingConfigurator.getInstance();
         lc.setMaxHistory(daysToKeep);
         lc.enableAppender(AbstractLoggingConfigurator.Appender.FILE, fileEnabled);
         lc.enableAppender(AbstractLoggingConfigurator.Appender.CONSOLE, consoleEnabled);
         lc.setRootLogLevel(rootLevel);
-        for (Map.Entry<String, AbstractLoggingConfigurator.Level> e : levels.entrySet()) {
-            lc.setLoggerLevel(e.getKey(), e.getValue());
-        }
+        lc.setLoggerLevel(levels);
+        
         return new ModelAndView(new RedirectView(ControllerConstants.Paths.ADMIN_LOGGING, true));
     }
 
