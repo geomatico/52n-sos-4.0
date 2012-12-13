@@ -239,19 +239,28 @@ public class SosHelper {
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    public static int parseSrsName(String srsName, String srsNamePrefix) throws OwsExceptionReport {
+    public static int parseSrsName(String srsName) throws OwsExceptionReport {
         int srid = -1;
         if (srsName != null && !srsName.isEmpty() && !srsName.equalsIgnoreCase("NOT_SET")) {
+            String urnSrsPrefix = Configurator.getInstance().getSrsNamePrefix();
+            String urlSrsPrefix = Configurator.getInstance().getSrsNamePrefixSosV2();
             try {
-                srid = Integer.valueOf(srsName.replace(srsNamePrefix, ""));
+                
+                srsName = srsName.replace(urnSrsPrefix, "");
+                srsName = srsName.replace(urlSrsPrefix, "");
+                srid = Integer.valueOf(srsName);
             } catch (NumberFormatException nfe) {
-                String exceptionText =
-                        "Error while parsing srsName parameter! Parameter has to match pattern '" + srsNamePrefix
-                                + "' with appended EPSGcode number";
-                LOGGER.error(exceptionText, nfe);
+                StringBuilder builder = new StringBuilder();
+                builder.append("Error while parsing srsName parameter!");
+                builder.append("Parameter has to match pattern '");
+                builder.append(urnSrsPrefix);
+                builder.append("' or '");
+                builder.append(urlSrsPrefix);
+                builder.append("' with appended EPSGcode number");
+                LOGGER.error(builder.toString(), nfe);
                 OwsExceptionReport owse = new OwsExceptionReport();
                 owse.addCodedException(OwsExceptionCode.NoApplicableCode,
-                        SosConstants.GetObservationParams.srsName.name(), exceptionText, nfe);
+                        SosConstants.GetObservationParams.srsName.name(), builder.toString(), nfe);
                 throw owse;
             }
         }
@@ -897,9 +906,9 @@ public class SosHelper {
         // TODO make supported ValueReferences dynamic
         if (spatialFilter != null) {
             if (!spatialFilter.getValueReference().equals("sams:shape")
-                    || !spatialFilter.getValueReference().equals(
+                    && !spatialFilter.getValueReference().equals(
                             "om:featureOfInterest/sams:SF_SpatialSamplingFeature/sams:shape")
-                    || !spatialFilter.getValueReference().equals("om:featureOfInterest/*/sams:shape")) {
+                    && !spatialFilter.getValueReference().equals("om:featureOfInterest/*/sams:shape")) {
                 String exceptionText =
                         "The value of the parameter '" + SosConstants.Filter.ValueReference.name()
                                 + "' was not found in the request or is not set!";
@@ -914,11 +923,11 @@ public class SosHelper {
         // TODO make supported ValueReferences dynamic
         for (TemporalFilter temporalFilter : temporalFilters) {
             if (!temporalFilter.getValueReference().equals("phenomenonTime")
-                    || !temporalFilter.getValueReference().equals("om:phenomenonTime")
-                    || !temporalFilter.getValueReference().equals("resultTime")
-                    || !temporalFilter.getValueReference().equals("om:resultTime")
-                    || !temporalFilter.getValueReference().equals("validTime")
-                    || !temporalFilter.getValueReference().equals("om:validTime")) {
+                    && !temporalFilter.getValueReference().equals("om:phenomenonTime")
+                    && !temporalFilter.getValueReference().equals("resultTime")
+                    && !temporalFilter.getValueReference().equals("om:resultTime")
+                    && !temporalFilter.getValueReference().equals("validTime")
+                    && !temporalFilter.getValueReference().equals("om:validTime")) {
                 String exceptionText =
                         "The value of the parameter '" + SosConstants.Filter.ValueReference.name()
                                 + "' was not found in the request or is not set!";

@@ -166,7 +166,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
     private Geometry getGeometry4BBOX(EnvelopeDocument envelopeDocument) throws OwsExceptionReport {
         EnvelopeType envelopeType = envelopeDocument.getEnvelope();
         int srid =
-                SosHelper.parseSrsName(envelopeType.getSrsName(), Configurator.getInstance().getSrsNamePrefixSosV2());
+                SosHelper.parseSrsName(envelopeType.getSrsName());
         String lowerCorner = envelopeType.getLowerCorner().getStringValue();
         String upperCorner = envelopeType.getUpperCorner().getStringValue();
         if (Configurator.getInstance().switchCoordinatesForEPSG(srid)) {
@@ -340,14 +340,13 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         int srid = -1;
         if (xbPointType.getSrsName() != null) {
             srid =
-                    SosHelper.parseSrsName(xbPointType.getSrsName(), Configurator.getInstance()
-                            .getSrsNamePrefixSosV2());
+                    SosHelper.parseSrsName(xbPointType.getSrsName());
         }
 
         if (xbPointType.getPos() != null) {
             DirectPositionType xbPos = xbPointType.getPos();
             if (srid == -1 && xbPos.getSrsName() != null) {
-                srid = SosHelper.parseSrsName(xbPos.getSrsName(), Configurator.getInstance().getSrsNamePrefixSosV2());
+                srid = SosHelper.parseSrsName(xbPos.getSrsName());
             }
             String directPosition = getString4Pos(xbPos);
             geomWKT = "POINT(" + directPosition + ")";
@@ -382,8 +381,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         int srid = -1;
         if (xbLineStringType.getSrsName() != null) {
             srid =
-                    SosHelper.parseSrsName(xbLineStringType.getSrsName(), Configurator.getInstance()
-                            .getSrsNamePrefixSosV2());
+                    SosHelper.parseSrsName(xbLineStringType.getSrsName());
         }
 
         DirectPositionType[] xbPositions = xbLineStringType.getPosArray();
@@ -392,8 +390,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         if (xbPositions != null && xbPositions.length > 0) {
             if (srid == -1 && xbPositions[0].getSrsName() != null && !(xbPositions[0].getSrsName().equals(""))) {
                 srid =
-                        SosHelper.parseSrsName(xbPositions[0].getSrsName(), Configurator.getInstance()
-                                .getSrsNamePrefixSosV2());
+                        SosHelper.parseSrsName(xbPositions[0].getSrsName());
             }
             positions.append(getString4PosArray(xbLineStringType.getPosArray()));
         }
@@ -412,8 +409,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         int srid = -1;
         if (xbPolygonType.getSrsName() != null) {
             srid =
-                    SosHelper.parseSrsName(xbPolygonType.getSrsName(), Configurator.getInstance()
-                            .getSrsNamePrefixSosV2());
+                    SosHelper.parseSrsName(xbPolygonType.getSrsName());
         }
         String exteriorCoordString = null;
         StringBuilder geomWKT = new StringBuilder();
@@ -466,15 +462,13 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         ArrayList<Polygon> polygons = new ArrayList<Polygon>(xbCurfaceProperties.length);
         if (xbCompositeSurface.getSrsName() != null) {
             srid =
-                    SosHelper.parseSrsName(xbCompositeSurface.getSrsName(), Configurator.getInstance()
-                            .getSrsNamePrefixSosV2());
+                    SosHelper.parseSrsName(xbCompositeSurface.getSrsName());
         }
         for (SurfacePropertyType xbSurfaceProperty : xbCurfaceProperties) {
             AbstractSurfaceType xbAbstractSurface = xbSurfaceProperty.getAbstractSurface();
             if (srid == -1 && xbAbstractSurface.getSrsName() != null) {
                 srid =
-                        SosHelper.parseSrsName(xbAbstractSurface.getSrsName(), Configurator.getInstance()
-                                .getSrsNamePrefixSosV2());
+                        SosHelper.parseSrsName(xbAbstractSurface.getSrsName());
             }
             if (xbAbstractSurface instanceof PolygonType) {
                 polygons.add((Polygon) parsePolygonType((PolygonType) xbAbstractSurface));

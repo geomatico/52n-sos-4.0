@@ -53,8 +53,6 @@ import org.n52.sos.request.GetFeatureOfInterestRequest;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.request.GetResultRequest;
 import org.n52.sos.request.GetResultTemplateRequest;
-import org.n52.sos.request.SosGetResultRequest;
-import org.n52.sos.request.SosGetResultTemplateRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.DateTimeException;
@@ -794,14 +792,12 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
                     Configurator.getInstance().getSrsNamePrefixSosV2())) {
                 hasSrid = true;
                 srid =
-                        SosHelper.parseSrsName(parameterValues.get(parameterValues.size() - 1), Configurator
-                                .getInstance().getSrsNamePrefixSosV2());
+                        SosHelper.parseSrsName(parameterValues.get(parameterValues.size() - 1));
             } else if (parameterValues.get(parameterValues.size() - 1).startsWith(
                     Configurator.getInstance().getSrsNamePrefix())) {
                 hasSrid = true;
                 srid =
-                        SosHelper.parseSrsName(parameterValues.get(parameterValues.size() - 1), Configurator
-                                .getInstance().getSrsNamePrefix());
+                        SosHelper.parseSrsName(parameterValues.get(parameterValues.size() - 1));
             }
 
             List<String> coordinates;
