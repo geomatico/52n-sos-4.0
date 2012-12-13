@@ -1096,4 +1096,12 @@ public class SosHelper {
         }
     }
 
+    public static void checkHref(String href, String parameterName) throws OwsExceptionReport {
+       if (!href.startsWith("http") && !href.startsWith("urn")) {
+           String exceptionText = "The referance (href) has an invalid style!";
+           throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+       }
+        
+    }
+
 }
