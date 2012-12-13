@@ -921,19 +921,21 @@ public class SosHelper {
     public static void checkTemporalFilter(List<TemporalFilter> temporalFilters, String name)
             throws OwsExceptionReport {
         // TODO make supported ValueReferences dynamic
-        for (TemporalFilter temporalFilter : temporalFilters) {
-            if (!temporalFilter.getValueReference().equals("phenomenonTime")
-                    && !temporalFilter.getValueReference().equals("om:phenomenonTime")
-                    && !temporalFilter.getValueReference().equals("resultTime")
-                    && !temporalFilter.getValueReference().equals("om:resultTime")
-                    && !temporalFilter.getValueReference().equals("validTime")
-                    && !temporalFilter.getValueReference().equals("om:validTime")) {
-                String exceptionText =
-                        "The value of the parameter '" + SosConstants.Filter.ValueReference.name()
-                                + "' was not found in the request or is not set!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(SosConstants.Filter.ValueReference.name(),
-                        exceptionText);
+        if (temporalFilters != null) {
+            for (TemporalFilter temporalFilter : temporalFilters) {
+                if (!temporalFilter.getValueReference().equals("phenomenonTime")
+                        && !temporalFilter.getValueReference().equals("om:phenomenonTime")
+                        && !temporalFilter.getValueReference().equals("resultTime")
+                        && !temporalFilter.getValueReference().equals("om:resultTime")
+                        && !temporalFilter.getValueReference().equals("validTime")
+                        && !temporalFilter.getValueReference().equals("om:validTime")) {
+                    String exceptionText =
+                            "The value of the parameter '" + SosConstants.Filter.ValueReference.name()
+                                    + "' was not found in the request or is not set!";
+                    LOGGER.debug(exceptionText);
+                    throw Util4Exceptions.createInvalidParameterValueException(SosConstants.Filter.ValueReference.name(),
+                            exceptionText);
+                }
             }
         }
 
