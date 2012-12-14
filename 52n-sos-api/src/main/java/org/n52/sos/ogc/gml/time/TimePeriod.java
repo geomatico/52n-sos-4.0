@@ -24,6 +24,7 @@
 package org.n52.sos.ogc.gml.time;
 
 import java.text.ParseException;
+import java.util.Collection;
 
 import org.joda.time.DateTime;
 import org.joda.time.Period;
@@ -254,6 +255,68 @@ public class TimePeriod implements ITime {
     @Override
     public void setIndeterminateValue(String indeterminateValue) {
         this.indeterminateValue = indeterminateValue;
+    }
+    
+    /**
+     * Extend TimePeriod to contain Collection<ISosTime>
+     * 
+     * @param sosTime
+     */
+    public void extendToContain( Collection<ITime> times ){
+        for( ITime time : times ){
+            extendToContain( time );
+        }
+    }
+    
+    /**
+     * Extend TimePeriod to contain ISosTime
+     * 
+     * @param sosTime
+     */
+    public void extendToContain( ITime time ){
+        if( time instanceof TimeInstant ){
+            extendToContain( (TimeInstant) time );
+        } else if( time instanceof TimePeriod ){
+            extendToContain( (TimePeriod) time );
+        } else {
+            //TODO: unknown ISosTime type, throw error?
+        }
+    }
+    
+    /**
+     * Extend TimePeriod to contain another TimePeriod
+     * 
+     * @param period
+     */
+    public void extendToContain( TimePeriod period ){
+        extendToContain( period.getStart() );
+        extendToContain( period.getEnd() );
+    }    
+
+    /**
+     * Extend TimePeriod to contain TimeInstant
+     * @param instant
+     */
+    public void extendToContain( TimeInstant instant ){
+        if( instant != null ){
+            extendToContain( instant.getValue() );
+        }
+    }
+    
+    /**
+     * Extend TimePeriod to contain DateTime. Used by other extendToContain methods.
+     * 
+     * @param time
+     */
+    public void extendToContain( DateTime time ){
+        if( time != null ){
+            if( start == null || time.isBefore( start ) ){
+                start = time;
+            }
+            if( end == null || time.isAfter( end ) ){
+                end = time;
+            }
+        }
     }
 
     /*
