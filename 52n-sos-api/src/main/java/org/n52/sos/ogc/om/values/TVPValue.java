@@ -26,9 +26,13 @@ package org.n52.sos.ogc.om.values;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.TimeValuePair;
 
-public class TVPValue implements IValue<List<TimeValuePair>> {
+public class TVPValue implements IMultiValue<List<TimeValuePair>> {
+
+    private static final long serialVersionUID = -5156098026027119423L;
 
     private List<TimeValuePair> values = new ArrayList<TimeValuePair>(0);
     
@@ -62,6 +66,15 @@ public class TVPValue implements IValue<List<TimeValuePair>> {
         return this.unit;
     }
 
-
+    @Override
+    public ITime getPhenomenonTime() {
+        TimePeriod timePeriod = new TimePeriod();
+        if (values != null && !values.isEmpty()) {
+            for (TimeValuePair value : values) {
+                timePeriod.extendToContain(value.getTime());
+            }
+        }
+        return timePeriod;
+    }
 
 }

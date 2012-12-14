@@ -26,14 +26,27 @@ package org.n52.sos.ogc.om.values;
 import java.util.Collection;
 import java.util.List;
 
+import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.TimeInstant;
+import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.swe.SosSweDataArray;
+import org.n52.sos.ogc.swe.SosSweDataRecord;
+import org.n52.sos.ogc.swe.SosSweField;
+import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.util.DateTimeException;
+import org.n52.sos.util.DateTimeHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class SweDataArrayValue implements IValue<SosSweDataArray> {
-    
+public class SweDataArrayValue implements IMultiValue<SosSweDataArray> {
+
     private static final long serialVersionUID = 52L;
 
+    /** the logger, used to log exceptions and additional information */
+    private static final Logger LOGGER = LoggerFactory.getLogger(SweDataArrayValue.class);
+
     private SosSweDataArray value;
-    
+
     @Override
     public void setValue(SosSweDataArray value) {
         this.value = value;
@@ -53,25 +66,81 @@ public class SweDataArrayValue implements IValue<SosSweDataArray> {
     public String getUnit() {
         return null;
     }
-    
+
     /**
-     * Adds the given block - a {@link List}<{@link String}> - add the end of the current list of blocks
+     * Adds the given block - a {@link List}<{@link String}> - add the end of
+     * the current list of blocks
+     * 
      * @param blockOfTokensToAddAtTheEnd
      * @return <tt>true</tt> (as specified by {@link Collection#add}) <br />
-     *          <tt>false</tt> if block could not be added
+     *         <tt>false</tt> if block could not be added
      */
-    public boolean addBlock(List<String> blockOfTokensToAddAtTheEnd)
-    {
-        if (value != null)
-        {
+    public boolean addBlock(List<String> blockOfTokensToAddAtTheEnd) {
+        if (value != null) {
             return value.add(blockOfTokensToAddAtTheEnd);
         }
         return false;
     }
 
-	@Override
-	public String toString()
-	{
-		return String.format("SweDataArrayValue [value=%s, unit=null]", value);
-	}
+    @Override
+    public String toString() {
+        return String.format("SweDataArrayValue [value=%s, unit=null]", value);
+    }
+
+    @Override
+    public ITime getPhenomenonTime() {
+        TimePeriod timePeriod = new TimePeriod();
+        int dateTokenIndex = -1;
+        if (value != null && value.getElementType() != null && value.getEncoding() != null) {
+            // get index of time token from elementtype
+            if (value.getElementType() instanceof SosSweDataRecord) {
+                SosSweDataRecord elementType = (SosSweDataRecord) value.getElementType();
+                List<SosSweField> fields = elementType.getFields();
+                for (int i = 0; i < fields.size(); i++) {
+                    SosSweField sweField = fields.get(i);
+                    if (sweField.getElement() instanceof SosSweTime) {
+                        dateTokenIndex = i;
+                        break;
+                    }
+                }
+
+            }
+            if (dateTokenIndex > -1) {
+                for (List<String> block : value.getValues()) {
+                    // check for "/" to identify time periods (Is
+                    // conform with ISO8601 (see WP))
+                    // datetimehelper to DateTime from joda time
+                    String token = block.get(dateTokenIndex);
+                    ITime time = null;
+                    try {
+                        if (token.contains("/")) {
+                            String[] subTokens = token.split("/");
+                            time =
+                                    new TimePeriod(DateTimeHelper.parseIsoString2DateTime(subTokens[0]),
+                                            DateTimeHelper.parseIsoString2DateTime(subTokens[1]));
+                        } else {
+                            time = new TimeInstant(DateTimeHelper.parseIsoString2DateTime(token));
+                        }
+                    } catch (DateTimeException dte) {
+                        String exceptionMsg =
+                                String.format(
+                                        "Could not parse ISO8601 string \"%s\". Exception thrown: \"%s\"; Message: \"%s\"",
+                                        token, dte.getClass().getName(), dte.getMessage());
+                        LOGGER.error(exceptionMsg);
+                        // TODO throw exception here?
+                        continue; // try next block;
+                    }
+                    timePeriod.extendToContain(time);
+                }
+            } else {
+                String errorMsg = "PhenomenonTime field could not be found in ElementType";
+                LOGGER.error(errorMsg);
+            }
+        } else {
+            String errorMsg =
+                    String.format("Value of type \"%s\" not set correct.", SweDataArrayValue.class.getName());
+            LOGGER.error(errorMsg);
+        }
+        return timePeriod;
+    }
 }

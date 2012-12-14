@@ -29,8 +29,6 @@ public interface IMultiValue<T> extends IValue<T> {
     
     public ITime getPhenomenonTime();
     
-    public void setPhenomenonTime(ITime phenomenonTime);
-    
     public void setValue(T value);
 
 }
