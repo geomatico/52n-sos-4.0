@@ -39,6 +39,7 @@ import net.opengis.swe.x20.AbstractEncodingType;
 import net.opengis.swe.x20.BooleanType;
 import net.opengis.swe.x20.CategoryType;
 import net.opengis.swe.x20.CountType;
+import net.opengis.swe.x20.DataArrayPropertyType;
 import net.opengis.swe.x20.DataArrayType;
 import net.opengis.swe.x20.DataRecordType;
 import net.opengis.swe.x20.DataRecordType.Field;
@@ -85,6 +86,8 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweCommonEncoderv20.class);
 
     private List<EncoderKeyType> encoderKeyTypes;
+
+    private DataArrayPropertyType newInstance;
 
     public SweCommonEncoderv20() {
         encoderKeyTypes = new ArrayList<EncoderKeyType>();
@@ -155,7 +158,13 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
             return createAbstractDataComponent((SosSweAbstractDataComponent)sosSweType);
         } 
         else if (sosSweType instanceof SosMultiObservationValues) {
-            return createDataArrayResult((SosMultiObservationValues)sosSweType);
+            DataArrayType dataArrayType = createDataArrayResult((SosMultiObservationValues)sosSweType);
+            if (additionalValues.containsKey(HelperValues.FOR_OBSERVATION)) {
+                DataArrayPropertyType dataArrayProperty = DataArrayPropertyType.Factory.newInstance();
+                dataArrayProperty.setDataArray1(dataArrayType);
+                return dataArrayProperty;
+            }
+            return dataArrayType;
         }
         // TODO throw exception that element could not be encoded?
         return null;

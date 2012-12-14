@@ -992,7 +992,9 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
                 LOGGER.debug(exceptionMsg);
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
             }
-            Object encodedObj = encoder.encode(values);
+            Map<HelperValues, String> additionalValues = new HashMap<SosConstants.HelperValues, String>();
+            additionalValues.put(HelperValues.FOR_OBSERVATION, null);
+            Object encodedObj = encoder.encode(values, additionalValues);
             if (encodedObj != null && encodedObj instanceof XmlObject)
             {
                 xbResult.set((XmlObject) encodedObj);
