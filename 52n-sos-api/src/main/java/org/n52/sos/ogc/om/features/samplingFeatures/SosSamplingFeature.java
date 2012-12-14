@@ -149,4 +149,8 @@ public class SosSamplingFeature extends SosAbstractFeature {
         return null;
     }
     
+    public boolean isSetSampledFeatures() {
+        return sampledFeatures != null && !sampledFeatures.isEmpty();
+    }
+    
 }

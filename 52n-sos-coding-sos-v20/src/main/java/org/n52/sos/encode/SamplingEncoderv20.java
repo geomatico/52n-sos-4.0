@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.opengis.gml.x32.AbstractGeometryType;
+import net.opengis.gml.x32.CodeType;
 import net.opengis.gml.x32.CodeWithAuthorityType;
 import net.opengis.gml.x32.FeaturePropertyType;
 import net.opengis.sampling.x20.SFSamplingFeatureCollectionDocument;
@@ -190,6 +191,14 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
 
                 // set type
                 xbSampFeature.addNewType().setHref(sampFeat.getFeatureType());
+                
+                if (sampFeat.isSetNames()) {
+                    for (String sosName : sampFeat.getName()) {
+                       CodeType name = xbSampFeature.addNewName();
+                       name.setCodeSpace("");
+                       name.setStringValue(sosName);
+                    }
+                }
 
                 // set sampledFeatures
                 // TODO: CHECK

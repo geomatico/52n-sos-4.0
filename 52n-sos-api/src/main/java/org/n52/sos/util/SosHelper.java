@@ -33,6 +33,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -1103,7 +1104,25 @@ public class SosHelper {
            String exceptionText = "The referance (href) has an invalid style!";
            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
        }
-        
+    }
+    
+    public static String createCSVFromList(List<String> values) {
+        StringBuilder builder = new StringBuilder();
+        if (values != null && !values.isEmpty()) {
+            for (String value : values) {
+                builder.append(value);
+                builder.append(',');
+            }
+            builder.delete(builder.lastIndexOf(","), builder.length());
+        }
+        return builder.toString();
+    }
+    
+    public static List<String> createListFromCSV(String csv) {
+        if (csv != null && !csv.isEmpty()) {
+            return Arrays.asList(csv.split(","));
+        }
+        return new ArrayList<String>(0);
     }
 
 }

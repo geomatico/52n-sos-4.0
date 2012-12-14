@@ -28,6 +28,7 @@ import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.JTSHelper;
+import org.n52.sos.util.SosHelper;
 
 public class HibernateFeatureCriteriaTransactionalUtilities {
 
@@ -38,6 +39,9 @@ public class HibernateFeatureCriteriaTransactionalUtilities {
             feature = new FeatureOfInterest();
             if (samplingFeature.getIdentifier() != null && !samplingFeature.getIdentifier().isEmpty()) {
                 feature.setIdentifier(samplingFeature.getIdentifier());
+            }
+            if (samplingFeature.isSetNames()) {
+                feature.setName(SosHelper.createCSVFromList(samplingFeature.getName()));
             }
             if (samplingFeature.getGeometry() != null && !samplingFeature.getGeometry().isEmpty()) {
                 // TODO: transform to default EPSG
