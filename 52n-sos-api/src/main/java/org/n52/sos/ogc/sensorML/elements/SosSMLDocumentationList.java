@@ -28,18 +28,22 @@ import java.util.List;
 
 public class SosSMLDocumentationList extends AbstractSosSMLDocumentation {
     
-    private List<SosSMLDocumentationListMember> member = new ArrayList<SosSMLDocumentationListMember>(0);
+    private List<SosSMLDocumentationListMember> members = new ArrayList<SosSMLDocumentationListMember>(0);
 
     public List<SosSMLDocumentationListMember> getMember() {
-        return member;
+        return members;
     }
 
-    public void setMember(List<SosSMLDocumentationListMember> member) {
-        this.member = member;
+    public void setMember(List<SosSMLDocumentationListMember> members) {
+        this.members = members;
+    }
+    
+    public void addMember(SosSMLDocumentationListMember member) {
+        this.members.add(member);
     }
     
     public boolean isSetMembers() {
-        return member != null && !member.isEmpty();
+        return members != null && !members.isEmpty();
     }
     
     public class SosSMLDocumentationListMember {
