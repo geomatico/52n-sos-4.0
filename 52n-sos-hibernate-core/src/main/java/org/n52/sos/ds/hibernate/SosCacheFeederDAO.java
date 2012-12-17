@@ -359,6 +359,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
 	}
 
     private void setRelatedFeatures(CapabilitiesCache cache, Session session) {
+        // TODO Carsten use RelatedFeatures and query...
         List<RelatedFeature> relatedFeatures = HibernateCriteriaQueryUtilities.getRelatedFeatureObjects(session);
         Map<String, Collection<String>> relatedFeatureList = new HashMap<String, Collection<String>>(relatedFeatures.size());
         for (RelatedFeature relatedFeature : relatedFeatures) {

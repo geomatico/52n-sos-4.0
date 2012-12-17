@@ -153,4 +153,8 @@ public class SosSamplingFeature extends SosAbstractFeature {
         return sampledFeatures != null && !sampledFeatures.isEmpty();
     }
     
+    public boolean isSetUrl() {
+        return url != null && !url.isEmpty();
+    }
+    
 }
