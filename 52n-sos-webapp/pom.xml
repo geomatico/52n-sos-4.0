@@ -211,6 +211,43 @@
 	</dependencies>
 	<profiles>
 		<profile>
+			<id>default</id>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-binding-kvp</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-binding-soap</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-enhanced-v20</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-hibernate-enhanced</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-transactional-v20</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-hibernate-transactional</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-resultHandling-v20</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-hibernate-resultHandling</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
 			<id>develope</id>
 			<dependencies>
 				<dependency>
