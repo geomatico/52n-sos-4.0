@@ -857,12 +857,13 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         if (feature.getUrl() != null && !feature.getUrl().isEmpty()) {
             return feature.getUrl();
         } else {
-            String urlPattern =
-                    SosHelper.getUrlPatternForHttpGetMethod(Configurator.getInstance().getBindingOperators().values(),
-                            SosConstants.Operations.GetFeatureOfInterest.name(), new DecoderKeyType(SosConstants.SOS,
-                                    version));
-            return SosHelper.createFoiGetUrl(identifier, version, Configurator.getInstance().getServiceURL(),
-                    urlPattern);
+//            String urlPattern =
+//                    SosHelper.getUrlPatternForHttpGetMethod(Configurator.getInstance().getBindingOperators().values(),
+//                            SosConstants.Operations.GetFeatureOfInterest.name(), new DecoderKeyType(SosConstants.SOS,
+//                                    version));
+//            return SosHelper.createFoiGetUrl(identifier, version, Configurator.getInstance().getServiceURL(),
+//                    urlPattern);
+            return identifier;
         }
     }
 

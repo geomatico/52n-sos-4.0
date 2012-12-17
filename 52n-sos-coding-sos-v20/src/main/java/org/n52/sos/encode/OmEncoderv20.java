@@ -1018,19 +1018,19 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
      * @throws OwsExceptionReport
      */
     private void encodeFeatureOfInterest(OMObservationType observation, SosAbstractFeature feature) throws OwsExceptionReport {
-        String urlPattern =
-                SosHelper.getUrlPatternForHttpGetMethod(Configurator.getInstance().getBindingOperators().values(),
-                        SosConstants.Operations.GetFeatureOfInterest.name(), new DecoderKeyType(SosConstants.SOS,
-                                Sos2Constants.SERVICEVERSION));
+//        String urlPattern =
+//                SosHelper.getUrlPatternForHttpGetMethod(Configurator.getInstance().getBindingOperators().values(),
+//                        SosConstants.Operations.GetFeatureOfInterest.name(), new DecoderKeyType(SosConstants.SOS,
+//                                Sos2Constants.SERVICEVERSION));
         SosSamplingFeature samplingFeature = (SosSamplingFeature) feature;
         FeaturePropertyType featureProperty = observation.addNewFeatureOfInterest();
         if (!Configurator.getInstance().isFoiEncodedInObservation() || !(feature instanceof SosSamplingFeature)) {
-            if (urlPattern != null) {
-                featureProperty.setHref(SosHelper.createFoiGetUrl(feature.getIdentifier(), Sos2Constants.SERVICEVERSION,
-                        Configurator.getInstance().getServiceURL(), urlPattern));
-            } else {
+//            if (urlPattern != null) {
+//                featureProperty.setHref(SosHelper.createFoiGetUrl(feature.getIdentifier(), Sos2Constants.SERVICEVERSION,
+//                        Configurator.getInstance().getServiceURL(), urlPattern));
+//            } else {
                 featureProperty.setHref(feature.getIdentifier());
-            }
+//            }
             if (samplingFeature.isSetNames()) {
                 featureProperty.setTitle(samplingFeature.getFirstName());
             }
