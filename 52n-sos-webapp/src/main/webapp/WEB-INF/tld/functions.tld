@@ -5,7 +5,7 @@
             http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd">
     <tlib-version>2.0</tlib-version>
     <short-name>sos</short-name>
-    <uri>/WEB-INF/tags/functions.tld</uri>
+    <uri>http://52north.org/communities/sensorweb/sos/tags</uri>
     <function>
         <name>configurated</name>
         <function-class>org.n52.sos.web.JstlFunctions</function-class>
