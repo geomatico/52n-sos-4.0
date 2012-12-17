@@ -153,7 +153,10 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
             featureProperty.setHref("#" + absFeature.getGmlId());
             return featureProperty;
         } else {
-            absFeature.setGmlId(SosHelper.generateID(absFeature.getIdentifier()));
+            StringBuilder builder = new StringBuilder();
+            builder.append("foi_");
+            builder.append(SosHelper.generateID(absFeature.getIdentifier()));
+            absFeature.setGmlId(builder.toString());
 
             SFSpatialSamplingFeatureDocument xbSampFeatDoc =
                     SFSpatialSamplingFeatureDocument.Factory.newInstance(XmlOptionsHelper.getInstance()
