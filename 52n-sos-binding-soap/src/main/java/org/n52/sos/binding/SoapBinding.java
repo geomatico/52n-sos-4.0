@@ -214,7 +214,21 @@ public class SoapBinding extends Binding {
                     }
                 }
             }
-            if (!(request instanceof GetCapabilitiesRequest)) {
+            if (request instanceof GetCapabilitiesRequest) {
+                GetCapabilitiesRequest getCapsRequest = (GetCapabilitiesRequest)request;
+                if (getCapsRequest.isSetAcceptVersions()) {
+                    boolean hasSupportedVersion = false;
+                    for (String accaptVersion : getCapsRequest.getAcceptVersions()) {
+                        if (Configurator.getInstance().isVersionSupported(accaptVersion)) {
+                            hasSupportedVersion = true;
+                        }
+                    }
+                    if (!hasSupportedVersion) {
+                        String exceptionText = "The requested acceptedVersions are not supported by this service!"; 
+                        exceptions.add(Util4Exceptions.createVersionNegotiationFailedException(exceptionText));
+                    }
+                }
+            } else {
                 if (serviceVersionIdentifier.getVersion() != null) {
                     if (serviceVersionIdentifier.getVersion().isEmpty()) {
                         exceptions.add(Util4Exceptions.createMissingParameterValueException(RequestParams.version
