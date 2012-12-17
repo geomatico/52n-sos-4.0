@@ -132,8 +132,8 @@ public class SoapBinding extends Binding {
                                     return bodyResponse;
                                 }
                                 soapResponse.setSoapBodyContent(bodyResponse);
+                                break;
                             }
-                            break;
                         }
                     } else {
                         throw Util4Exceptions.createNoApplicableCodeException(null,
@@ -201,24 +201,35 @@ public class SoapBinding extends Binding {
     }
 
     private void checkServiceOperatorKeyTypes(AbstractServiceRequest request) throws OwsExceptionReport {
-        if (!(request instanceof GetCapabilitiesRequest)) {
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
-            for (ServiceOperatorKeyType serviceVersionIdentifier : request.getServiceOperatorKeyType()) {
-                if (serviceVersionIdentifier.getService() != null) {
+        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
+        for (ServiceOperatorKeyType serviceVersionIdentifier : request.getServiceOperatorKeyType()) {
+            if (serviceVersionIdentifier.getService() != null) {
+                if (serviceVersionIdentifier.getService().isEmpty()) {
+                    exceptions.add(Util4Exceptions.createMissingParameterValueException(RequestParams.service.name()));
+                } else {
                     if (!Configurator.getInstance().isServiceSupported(serviceVersionIdentifier.getService())) {
                         String exceptionText = "The requested service is not supported!";
-                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(RequestParams.service.name(), exceptionText));
-                    }
-                }
-                if (serviceVersionIdentifier.getVersion() != null) {
-                    if (!Configurator.getInstance().isVersionSupported(serviceVersionIdentifier.getVersion())) {
-                        String exceptionText = "The requested version is not supported!";
-                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(RequestParams.version.name(), exceptionText));
+                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(
+                                RequestParams.service.name(), exceptionText));
                     }
                 }
             }
-            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+            if (!(request instanceof GetCapabilitiesRequest)) {
+                if (serviceVersionIdentifier.getVersion() != null) {
+                    if (serviceVersionIdentifier.getVersion().isEmpty()) {
+                        exceptions.add(Util4Exceptions.createMissingParameterValueException(RequestParams.version
+                                .name()));
+                    } else {
+                        if (!Configurator.getInstance().isVersionSupported(serviceVersionIdentifier.getVersion())) {
+                            String exceptionText = "The requested version is not supported!";
+                            exceptions.add(Util4Exceptions.createInvalidParameterValueException(
+                                    RequestParams.version.name(), exceptionText));
+                        }
+                    }
+                }
+            }
         }
+        Util4Exceptions.mergeAndThrowExceptions(exceptions);
     }
 
     @Override
