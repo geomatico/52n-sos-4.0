@@ -199,5 +199,13 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
         }
         return serviceOperatorKeyTypes;
     }
+    
+    public boolean isSetAcceptFormats() {
+        return acceptFormats != null && !acceptFormats.isEmpty();
+    }
+    
+    public boolean isSetAcceptVersions() {
+        return acceptVersions != null && acceptVersions.length > 0;
+    }
 
 }
