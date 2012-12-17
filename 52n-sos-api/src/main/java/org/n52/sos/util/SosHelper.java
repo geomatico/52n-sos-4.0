@@ -897,8 +897,10 @@ public class SosHelper {
 
     public static void checkSpatialFilters(List<SpatialFilter> spatialFilters, String name) throws OwsExceptionReport {
         // TODO make supported ValueReferences dynamic
-        for (SpatialFilter spatialFilter : spatialFilters) {
-            checkSpatialFilter(spatialFilter, name);
+        if (spatialFilters != null) {
+            for (SpatialFilter spatialFilter : spatialFilters) {
+                checkSpatialFilter(spatialFilter, name);
+            }
         }
 
     }
@@ -939,7 +941,6 @@ public class SosHelper {
                 }
             }
         }
-
     }
 
     /**
