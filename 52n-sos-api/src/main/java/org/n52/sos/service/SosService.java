@@ -242,11 +242,12 @@ public class SosService extends ConfiguratedHttpServlet {
                 out = resp.getOutputStream();
                 int contentLength = sosResponse.getContentLength();
                 resp.setContentType(contentType);
-                if ((sosResponse.getApplyGzipCompression() || clientAcceptsGzip) 
-						&& contentLength > Configurator.getInstance().getMinimumGzipSize()) {
+                if (sosResponse.getApplyGzipCompression() || (clientAcceptsGzip 
+						&& contentLength > Configurator.getInstance().getMinimumGzipSize())) {
                     if (clientAcceptsGzip) {
                         resp.addHeader(CONTENT_ENCODING, GZIP);
-                    } else {
+                    } 
+                    if (sosResponse.getApplyGzipCompression()) {
                         resp.setContentType(SosConstants.CONTENT_TYPE_ZIP);
                     }
                     gzip = new GZIPOutputStream(out);
