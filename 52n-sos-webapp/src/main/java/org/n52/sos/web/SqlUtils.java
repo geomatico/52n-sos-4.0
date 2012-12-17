@@ -26,6 +26,7 @@ package org.n52.sos.web;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -43,7 +44,7 @@ public class SqlUtils {
     /*
      * TODO find a working library function that can parse and execute a SQL file...
      */
-    public static void executeSQLFile(Connection conn, String path) throws SQLException, IOException {
+    public static void executeSQLFile(Connection conn, File path) throws SQLException, IOException {
         FileInputStream in = null;
         Statement st = null;
         BufferedReader br = null;

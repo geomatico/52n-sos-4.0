@@ -41,7 +41,8 @@
     <jsp:param name="leadParagraph" value="Here you can query the database directly." />
 </jsp:include>
 
-<div class="pull-right">
+<div class="pull-right btn-group">
+    <a href="#confirmDialog" data-toggle="modal" role="button" title="Add new Logger" class="btn btn-danger">Clear Database</a>
     <button id="testdata" type="button" class="btn btn-danger"></button>
 </div>
 
@@ -63,6 +64,21 @@
     </div>
 </form>
 <div id="result"></div>
+
+
+<div class="modal hide fade in" id="confirmDialog">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Are you really sure?</h3>
+  </div>
+  <div class="modal-body">
+     <p><span class="label label-important">Warning!</span> This will remove all contents (except settings) from the database!</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    <button type="button" id="clear" class="btn btn-danger">Do it!</button>
+  </div>
+</div>
 
 <script type="text/javascript">
     $(function() {
@@ -105,9 +121,9 @@
         
         function setButtonLabel() {
             if (testDataInstalled) {
-                $button.text("Remove test data set");
+                $button.text("Remove test data");
             } else {
-                $button.text("Insert test data set");
+                $button.text("Insert test data");
             }
         }
 
@@ -117,6 +133,24 @@
             } else {
                 create();
             }
+        });
+        
+        $("#clear").click(function() {
+            $("#confirmDialog").find("button").add($button).attr("disabled", true);
+            $.ajax({
+                "url": "<c:url value="/admin/database/clear" />",
+                "type": "POST"
+            }).fail(function(error) {
+                showError("Request failed: " + error.status + " " + error.statusText);
+                $("#confirmDialog").find("button").add($button).removeAttr("disabled");
+                $("#confirmDialog").modal("hide");
+            }).done(function() {
+                showSuccess("The database was cleared");
+                testDataInstalled = false;
+                setButtonLabel();
+                $("#confirmDialog").find("button").add($button).removeAttr("disabled");
+                $("#confirmDialog").modal("hide");
+            });
         });
         
         setButtonLabel();

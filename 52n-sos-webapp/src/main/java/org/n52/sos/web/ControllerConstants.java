@@ -57,6 +57,7 @@ public interface ControllerConstants {
         public static final String ADMIN_RELOAD_CAPABILITIES_CACHE = "/admin/cache/reload";
         public static final String ADMIN_DATABASE_REMOVE_TEST_DATA = "/admin/database/testdata/remove";
         public static final String ADMIN_DATABASE_CREATE_TEST_DATA = "/admin/database/testdata/create";
+        public static final String ADMIN_DATABASE_CLEAR = "/admin/database/clear";
         public static final String ADMIN_RESET = "/admin/reset";
         public static final String ADMIN_LOGGING = "/admin/logging";
         public static final String ADMIN_LOGGING_FILE_DOWNLOAD = "/admin/logging/file";
@@ -78,4 +79,5 @@ public interface ControllerConstants {
     public static final String INSERT_TEST_DATA_SQL_FILE = "/sql/insert_test_data.sql";
     public static final String REMOVE_TEST_DATA_SQL_FILE = "/sql/remove_test_data.sql";
     public static final String CREATE_DATAMODEL_SQL_FILE = "/sql/script_20_create.sql";
+    public static final String CLEAR_DATABASE_SQL_FILE = "/sql/clear_database.sql";
 }

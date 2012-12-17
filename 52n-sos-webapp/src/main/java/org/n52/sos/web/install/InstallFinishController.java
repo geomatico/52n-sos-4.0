@@ -24,6 +24,7 @@
 
 package org.n52.sos.web.install;
 
+import java.io.File;
 import org.n52.sos.web.JdbcUrl;
 import java.net.URISyntaxException;
 import java.sql.Connection;
@@ -145,7 +146,7 @@ public class InstallFinishController extends AbstractInstallController {
             if (createTables.booleanValue()) {
                 try {
                     SqlUtils.executeSQLFile(con,
-                                            getContext().getRealPath(ControllerConstants.CREATE_DATAMODEL_SQL_FILE));
+                                            new File(getContext().getRealPath(ControllerConstants.CREATE_DATAMODEL_SQL_FILE)));
                 } catch (Exception e) {
                     return error(settings, "Could not create sos tables: " + e);
                 }
@@ -156,7 +157,7 @@ public class InstallFinishController extends AbstractInstallController {
             if (createTestData.booleanValue()) {
                 try {
                     SqlUtils.executeSQLFile(con,
-                                            getContext().getRealPath(ControllerConstants.INSERT_TEST_DATA_SQL_FILE));
+                                            new File(getContext().getRealPath(ControllerConstants.INSERT_TEST_DATA_SQL_FILE)));
                 } catch (Exception e) {
                     return error(settings, "Could insert test data: " + e);
                 }

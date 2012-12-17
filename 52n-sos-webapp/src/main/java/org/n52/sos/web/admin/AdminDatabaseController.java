@@ -24,29 +24,23 @@
 
 package org.n52.sos.web.admin;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
 import java.util.ServiceLoader;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.jdbc.ReturningWork;
-import org.hibernate.jdbc.Work;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IGeneralQueryDao;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
-import org.n52.sos.web.SqlUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,8 +51,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-public class AdminDatabaseController extends AbstractController {
-
+public class AdminDatabaseController extends AbstractAdminController {
+    
+    private static final String ROWS = "rows";
+    private static final String NAMES = "names";
     private static final String TEST_DATA_SET_INSTALLED = "SELECT CASE WHEN EXISTS (SELECT identifier FROM offering WHERE identifier LIKE 'test_offering%' LIMIT 1) THEN true ELSE false END;";
     private static final String IS_TEST_DATA_SET_INSTALLED_MODEL_ATTRIBUTE = "IS_TEST_DATA_SET_INSTALLED_MODEL_ATTRIBUTE";
     private ServiceLoader<IGeneralQueryDao> daoServiceLoader = ServiceLoader.load(IGeneralQueryDao.class);
@@ -104,6 +100,7 @@ public class AdminDatabaseController extends AbstractController {
                     rs.close();
                 }
                 catch (Exception e) {
+                    log.error("Error closing ResultSet", e);
                 }
             }
             if (st != null) {
@@ -111,14 +108,12 @@ public class AdminDatabaseController extends AbstractController {
                     st.close();
                 }
                 catch (Exception e) {
+                    log.error("Error closing Statement", e);
                 }
             }
         }
     }
 
-    private static final String ROWS = "rows";
-    private static final String NAMES = "names";
-    
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE_EXECUTE, method = RequestMethod.POST)
     public @ResponseBody String processQuery(@RequestBody String querySQL) {
         try {
@@ -153,60 +148,17 @@ public class AdminDatabaseController extends AbstractController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE_REMOVE_TEST_DATA, method = RequestMethod.POST)
-    public void removeTestData() throws SQLException, OwsExceptionReport {
+    public void removeTestData() throws SQLException, OwsExceptionReport, FileNotFoundException {
         log.info("Removing test data set.");
-        execute(getContext().getRealPath(ControllerConstants.REMOVE_TEST_DATA_SQL_FILE));
+        executeSqlFile(ControllerConstants.REMOVE_TEST_DATA_SQL_FILE);
         Configurator.getInstance().getCapabilitiesCacheController().update(false);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE_CREATE_TEST_DATA, method = RequestMethod.POST)
-    public void createTestData() throws SQLException, OwsExceptionReport {
+    public void createTestData() throws SQLException, OwsExceptionReport, FileNotFoundException {
         log.info("Inserting test data set.");
-        execute(getContext().getRealPath(ControllerConstants.INSERT_TEST_DATA_SQL_FILE));
+        executeSqlFile(ControllerConstants.INSERT_TEST_DATA_SQL_FILE);
         Configurator.getInstance().getCapabilitiesCacheController().update(false);
-    }
-
-    private void execute(final String path) throws SQLException {
-        IConnectionProvider p = Configurator.getInstance().getConnectionProvider();
-        Object con = null;
-        try {
-            con = p.getConnection();
-            if (con instanceof Connection) {
-                try {
-                    SqlUtils.executeSQLFile((Connection) con, path);
-                }
-                catch (IOException ex) {
-                    throw new SQLException(ex);
-                }
-            }
-            else if (con instanceof Session) {
-                Session s = (Session) con;
-                Transaction t = s.beginTransaction();
-                try {
-                    s.doWork(new Work() {
-                        @Override
-                        public void execute(Connection connection) throws SQLException {
-                            try {
-                                SqlUtils.executeSQLFile(connection, path);
-                            }
-                            catch (IOException ex) {
-                                throw new SQLException(ex);
-                            }
-                        }
-                    });
-                    t.commit();
-                }
-                catch (HibernateException e) {
-                    t.rollback();
-                }
-            }
-            else {
-                throw new SQLException("Unknown conncetion type: " + con.getClass());
-            }
-        }
-        finally {
-            p.returnConnection(con);
-        }
     }
 }

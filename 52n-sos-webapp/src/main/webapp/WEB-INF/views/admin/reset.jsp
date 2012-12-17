@@ -38,7 +38,7 @@
 <p>If you merely want to remove test data, use the test data removal function on the database admin page. If you want to overwrite the existing database, please select the option to delete existing tables in the installation wizard.</p>
 
 <form id="reset-form" method="POST" action="reset" />
-<div class="modal hide" id="confirmDialog">
+<div class="modal hide fade in" id="confirmDialog">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h3>Are you really sure?</h3>
