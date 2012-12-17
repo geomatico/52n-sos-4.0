@@ -642,6 +642,9 @@
                 },
                 "InsertObservation (Truth)": {
                     "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Truth.xml"
+                },
+                "InsertObservation (SweArray)": {
+                    "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_SweArray.xml"
                 }
             },
             "InsertSensor": {

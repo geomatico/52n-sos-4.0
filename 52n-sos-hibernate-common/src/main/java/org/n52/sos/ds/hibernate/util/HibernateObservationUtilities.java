@@ -386,7 +386,9 @@ public class HibernateObservationUtilities {
                 createBlock(sweDataArrayValue.getValue().getElementType(), phenomenonTime, phenID, value);
         sweDataArrayValue.addBlock(newBlock);
         // reset identifier if required
-        if (!sosObservation.getIdentifier().getValue().equalsIgnoreCase(hObservation.getAntiSubsetting())) {
+        if (sosObservation.getIdentifier() == null) {
+            sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getAntiSubsetting()));
+        } else if (!sosObservation.getIdentifier().getValue().equalsIgnoreCase(hObservation.getAntiSubsetting())) {
             sosObservation.getIdentifier().setValue(hObservation.getAntiSubsetting());
         }
     }

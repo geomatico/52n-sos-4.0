@@ -56,7 +56,7 @@
        <swe:Time definition="urn:ogc:data:time:iso8601" />
       </swe:field>
       <swe:field name="feature">
-       <swe:Text definition="urn:ogc:dahttp://www.opengis.net/def/property/OGC/0/FeatureOfInterestta:feature" />
+       <swe:Text definition="urn:ogc:dahttp://www.opengis.net/def/property/OGC/0/FeatureOfInterest" />
       </swe:field>
       <swe:field name="waterlevel">
        <swe:Quantity definition="urn:ogc:def:phenomenon:OGC:1.0.30:waterlevel">

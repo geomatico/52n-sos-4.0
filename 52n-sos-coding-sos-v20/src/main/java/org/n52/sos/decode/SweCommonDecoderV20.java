@@ -37,6 +37,7 @@ import net.opengis.swe.x20.AnyScalarPropertyType;
 import net.opengis.swe.x20.CountRangeType;
 import net.opengis.swe.x20.CountType;
 import net.opengis.swe.x20.DataArrayDocument;
+import net.opengis.swe.x20.DataArrayPropertyType;
 import net.opengis.swe.x20.DataArrayType;
 import net.opengis.swe.x20.DataRecordDocument;
 import net.opengis.swe.x20.DataRecordType;
@@ -109,7 +110,11 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
 
     @Override
     public Object decode(Object element) throws OwsExceptionReport {
-        if (element instanceof DataArrayDocument) {
+        if (element instanceof DataArrayPropertyType) {
+            DataArrayPropertyType dataArrayPropertyType = (DataArrayPropertyType) element;
+            SosSweDataArray sosDataArray = parseDataArray(dataArrayPropertyType.getDataArray1());
+            return sosDataArray;
+        } else if (element instanceof DataArrayDocument) {
             DataArrayDocument dataArrayDoc = (DataArrayDocument) element;
             SosSweDataArray sosDataArray = parseDataArray(dataArrayDoc.getDataArray1());
             sosDataArray.setXml(dataArrayDoc.xmlText(XmlOptionsHelper.getInstance().getXmlOptions()));

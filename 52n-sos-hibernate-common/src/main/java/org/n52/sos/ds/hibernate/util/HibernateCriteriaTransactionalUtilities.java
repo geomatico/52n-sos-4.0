@@ -547,7 +547,11 @@ public class HibernateCriteriaTransactionalUtilities {
 
     private static String getAntiSubsettingId(SosObservation containerObservation)
     {
-        String antiSubsettingId = containerObservation.getIdentifier().getValue();
+        String antiSubsettingId = null;
+        if (containerObservation.getIdentifier() != null) {
+            antiSubsettingId = containerObservation.getIdentifier().getValue();
+        }
+        
         if (antiSubsettingId == null || antiSubsettingId.isEmpty()) {
             // if identifier of sweArrayObservation is not set, generate UUID for antisubsetting column
             antiSubsettingId = UUID.randomUUID().toString();
