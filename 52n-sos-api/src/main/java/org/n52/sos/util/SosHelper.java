@@ -23,7 +23,6 @@
  */
 package org.n52.sos.util;
 
-import java.beans.FeatureDescriptor;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -908,7 +907,7 @@ public class SosHelper {
     public static void checkSpatialFilter(SpatialFilter spatialFilter, String name) throws OwsExceptionReport {
         // TODO make supported ValueReferences dynamic
         if (spatialFilter != null) {
-            if (spatialFilter.getValueReference().isEmpty()) {
+            if (spatialFilter.getValueReference() == null || (spatialFilter.getValueReference() != null && spatialFilter.getValueReference().isEmpty())) {
                 String exceptionText =
                         "The value of the parameter '" + SosConstants.Filter.ValueReference.name()
                                 + "' was not found in the request or is not set!";
@@ -931,7 +930,7 @@ public class SosHelper {
         // TODO make supported ValueReferences dynamic
         if (temporalFilters != null) {
             for (TemporalFilter temporalFilter : temporalFilters) {
-                if (temporalFilter.getValueReference().isEmpty()) {
+                if (temporalFilter.getValueReference() == null || (temporalFilter.getValueReference() != null && temporalFilter.getValueReference().isEmpty())) {
                     String exceptionText =
                             "The value of the parameter '" + SosConstants.Filter.ValueReference.name()
                                     + "' was not found in the request or is not set!";
