@@ -908,15 +908,20 @@ public class SosHelper {
     public static void checkSpatialFilter(SpatialFilter spatialFilter, String name) throws OwsExceptionReport {
         // TODO make supported ValueReferences dynamic
         if (spatialFilter != null) {
-            if (!spatialFilter.getValueReference().equals("sams:shape")
-                    && !spatialFilter.getValueReference().equals(
-                            "om:featureOfInterest/sams:SF_SpatialSamplingFeature/sams:shape")
-                    && !spatialFilter.getValueReference().equals("om:featureOfInterest/*/sams:shape")) {
+            if (spatialFilter.getValueReference().isEmpty()) {
                 String exceptionText =
                         "The value of the parameter '" + SosConstants.Filter.ValueReference.name()
                                 + "' was not found in the request or is not set!";
                 LOGGER.debug(exceptionText);
                 throw Util4Exceptions.createMissingParameterValueException(SosConstants.Filter.ValueReference.name());
+            } else if (!spatialFilter.getValueReference().equals("sams:shape")
+                    && !spatialFilter.getValueReference().equals(
+                            "om:featureOfInterest/sams:SF_SpatialSamplingFeature/sams:shape")
+                    && !spatialFilter.getValueReference().equals("om:featureOfInterest/*/sams:shape")) {
+                String exceptionText =
+                        "The value of the parameter '" + SosConstants.Filter.ValueReference.name() + "' is invalid!";
+                LOGGER.debug(exceptionText);
+                throw Util4Exceptions.createInvalidParameterValueException(SosConstants.Filter.ValueReference.name(), exceptionText);
             }
         }
     }
@@ -926,7 +931,13 @@ public class SosHelper {
         // TODO make supported ValueReferences dynamic
         if (temporalFilters != null) {
             for (TemporalFilter temporalFilter : temporalFilters) {
-                if (!temporalFilter.getValueReference().equals("phenomenonTime")
+                if (temporalFilter.getValueReference().isEmpty()) {
+                    String exceptionText =
+                            "The value of the parameter '" + SosConstants.Filter.ValueReference.name()
+                                    + "' was not found in the request or is not set!";
+                    LOGGER.debug(exceptionText);
+                    throw Util4Exceptions.createMissingParameterValueException(SosConstants.Filter.ValueReference.name());
+                } else if (!temporalFilter.getValueReference().equals("phenomenonTime")
                         && !temporalFilter.getValueReference().equals("om:phenomenonTime")
                         && !temporalFilter.getValueReference().equals("resultTime")
                         && !temporalFilter.getValueReference().equals("om:resultTime")
