@@ -69,7 +69,7 @@ INSERT INTO global_settings(key,value) VALUES
 	('SERVICE_PROVIDER_STATE', 'North Rhine-Westphalia'),
 	('SERVICE_PROVIDER_ZIP', '48155'),
 	('SHOW_FULL_OPERATIONS_METADATA', 'true'),
-	('SHOW_FULL_OPERATIONS_METADATA_FOR_OBSERVATIONS', 'false'),
+	('SHOW_FULL_OPERATIONS_METADATA_FOR_OBSERVATIONS', 'true'),
 	('SKIP_DUPLICATE_OBSERVATIONS', 'true'),
 	('SOS_URL', 'http://localhost:8080/52n-sos-webapp/sos'),
 	('SRS_NAME_PREFIX_SOS_V1', 'urn:ogc:def:crs:EPSG::'),
