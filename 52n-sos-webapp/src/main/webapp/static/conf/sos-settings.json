@@ -181,7 +181,7 @@
 				},
 				"SHOW_FULL_OPERATIONS_METADATA_FOR_OBSERVATIONS": {
 					"type": "boolean",
-					"default": false,
+					"default": true,
 					"title": "Show full operations metadata for observations",
 					"description": "Include allowed values for featureOfInterest in OperationMetadata of GetObservation."
 				},
