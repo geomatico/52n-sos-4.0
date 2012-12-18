@@ -686,10 +686,11 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
                     request.setObservedProperty(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
                     foundObservedProperty = true;
                 }
-                
+
                 // featureOfInterest (optional)
                 else if (parameterName.equalsIgnoreCase(SosConstants.GetObservationParams.featureOfInterest.name())) {
-                    request.setFeatureIdentifiers(KvpHelper.checkParameterMultipleValues(parameterValues, parameterName));
+                    request.setFeatureIdentifiers(KvpHelper.checkParameterMultipleValues(parameterValues,
+                            parameterName));
                 }
 
                 // eventTime (optional)
@@ -783,21 +784,15 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
 
             boolean hasSrid = false;
 
-            if (parameterValues.get(0).contains(":")) {
-                spatialFilter.setValueReference(parameterValues.get(0));
-            }
+            spatialFilter.setValueReference(parameterValues.get(0));
 
             int srid = 4326;
             if (parameterValues.get(parameterValues.size() - 1).startsWith(
-                    Configurator.getInstance().getSrsNamePrefixSosV2())) {
+                    Configurator.getInstance().getSrsNamePrefixSosV2())
+                    || parameterValues.get(parameterValues.size() - 1).startsWith(
+                            Configurator.getInstance().getSrsNamePrefix())) {
                 hasSrid = true;
-                srid =
-                        SosHelper.parseSrsName(parameterValues.get(parameterValues.size() - 1));
-            } else if (parameterValues.get(parameterValues.size() - 1).startsWith(
-                    Configurator.getInstance().getSrsNamePrefix())) {
-                hasSrid = true;
-                srid =
-                        SosHelper.parseSrsName(parameterValues.get(parameterValues.size() - 1));
+                srid = SosHelper.parseSrsName(parameterValues.get(parameterValues.size() - 1));
             }
 
             List<String> coordinates;
