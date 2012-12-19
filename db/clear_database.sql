@@ -22,16 +22,12 @@
 -- visit the Free Software Foundation web page, http://www.fsf.org.
 --
 
-TRUNCATE result_type,
+TRUNCATE 
  spatial_filtering_profile,
  sensor_system,
  offering,
- procedure_description_format,
  related_feature,
- observation_type,
- swe_type,
  composite_phenomenon,
- feature_of_interest_type,
  geometry_value,
  text_value,
  category_value,
