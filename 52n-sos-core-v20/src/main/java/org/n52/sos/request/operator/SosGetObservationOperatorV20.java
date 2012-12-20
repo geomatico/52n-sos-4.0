@@ -247,7 +247,7 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkFeatureOfInterest(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
+            SosHelper.checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
                     .getCapabilitiesCacheController().getFeatureOfInterest(),
                     SosConstants.GetObservationParams.featureOfInterest.name());
         } catch (OwsExceptionReport owse) {
@@ -289,13 +289,18 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
             Collection<String> validObservedProperties =
                     Configurator.getInstance().getCapabilitiesCacheController().getObservableProperties();
             for (String obsProp : observedProperties) {
-                if (!validObservedProperties.contains(obsProp)) {
-                    String exceptionText =
-                            "The value (" + obsProp + ") of the parameter '"
-                                    + SosConstants.GetObservationParams.observedProperty.toString() + "' is invalid";
-                    LOGGER.error(exceptionText);
-                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(
-                            SosConstants.GetObservationParams.observedProperty.name(), exceptionText));
+                if (obsProp.isEmpty()) {
+                    exceptions.add(Util4Exceptions.createMissingParameterValueException(
+                            SosConstants.GetObservationParams.observedProperty.name()));
+                } else {
+                    if (!validObservedProperties.contains(obsProp)) {
+                        String exceptionText =
+                                "The value (" + obsProp + ") of the parameter '"
+                                        + SosConstants.GetObservationParams.observedProperty.toString() + "' is invalid";
+                        LOGGER.error(exceptionText);
+                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(
+                                SosConstants.GetObservationParams.observedProperty.name(), exceptionText));
+                    }
                 }
             }
             Util4Exceptions.mergeAndThrowExceptions(exceptions);
@@ -317,6 +322,9 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
             Collection<String> offerings = Configurator.getInstance().getCapabilitiesCacheController().getOfferings();
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
             for (String offeringId : offeringIds) {
+                if (offeringId == null || (offeringId != null && offeringId.isEmpty())) {
+                    exceptions.add(Util4Exceptions.createMissingParameterValueException(SosConstants.GetObservationParams.offering.name()));
+                }
                 if (offeringId.contains(SosConstants.SEPARATOR_4_OFFERINGS)) {
                     String[] offArray = offeringId.split(SosConstants.SEPARATOR_4_OFFERINGS);
                     if (!offerings.contains(offArray[0])
@@ -355,9 +363,10 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
 
     private boolean checkResponseFormat(GetObservationRequest request) throws OwsExceptionReport {
         boolean zipCompression = false;
-        if (request.getResponseFormat() == null
-                || (request.getResponseFormat() != null && request.getResponseFormat().isEmpty())) {
+        if (request.getResponseFormat() == null) {
             request.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
+        } else if (request.getResponseFormat() != null && request.getResponseFormat().isEmpty()) {
+            throw Util4Exceptions.createMissingParameterValueException(SosConstants.GetObservationParams.responseFormat.name());
         } else {
             zipCompression = SosHelper.checkResponseFormatForZipCompression(request.getResponseFormat());
             if (zipCompression) {
