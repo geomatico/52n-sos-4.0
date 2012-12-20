@@ -26,6 +26,7 @@ package org.n52.sos.request.operator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -214,7 +215,27 @@ public class SosGetObservationByIdOperatorV20 implements IRequestOperator {
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
+        try {
+            checkObservations(sosRequest.getObservationIdentifier());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
         Util4Exceptions.mergeAndThrowExceptions(exceptions);
+    }
+
+    private void checkObservations(List<String> observationIdentifiers) throws OwsExceptionReport {
+        if (observationIdentifiers != null) {
+            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            Collection<String> validObservationIDs =
+                    Configurator.getInstance().getCapabilitiesCacheController().getObservationIdentifiers();
+            for (String observationIdentifier : observationIdentifiers) {
+                if (observationIdentifier.isEmpty()) {
+                    exceptions.add(Util4Exceptions.createMissingParameterValueException(
+                            Sos2Constants.GetObservationByIdParams.observation.name()));
+                } 
+            }
+            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        }
     }
 
 }
