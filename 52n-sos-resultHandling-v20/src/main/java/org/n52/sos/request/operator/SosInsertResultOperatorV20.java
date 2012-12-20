@@ -158,7 +158,7 @@ public class SosInsertResultOperatorV20 implements IRequestOperator {
             exceptions.add(owse);
         }
         try {
-            checkResultTemplate(request.getTemplateIdentifier());
+            SosHelper.checkResultTemplate(request.getTemplateIdentifier(), Sos2Constants.InsertResult.template.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -168,21 +168,6 @@ public class SosInsertResultOperatorV20 implements IRequestOperator {
             exceptions.add(owse);
         }
         Util4Exceptions.mergeAndThrowExceptions(exceptions);
-    }
-
-    private void checkResultTemplate(String resultTemplate) throws OwsExceptionReport {
-        if (resultTemplate == null || (resultTemplate != null && resultTemplate.isEmpty())) {
-            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertResult.template.name());
-        } else if (resultTemplate != null
-                && !Configurator.getInstance().getCapabilitiesCacheController().getResultTemplates()
-                        .contains(resultTemplate)) {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The requested template identifier (");
-            exceptionText.append(resultTemplate);
-            exceptionText.append(") is not supported by this server!");
-            throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.InsertResult.template.name(),
-                    exceptionText.toString());
-        }
     }
 
     private void checkResultValues(String resultValues) throws OwsExceptionReport {
