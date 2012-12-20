@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.Cache;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
@@ -101,6 +103,8 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             setCompositePhenomenonValues(cache, session);
             setSridValues(cache, session);
             setObservationTypes(cache, session);
+            setFeatureOfInterestTypes(cache, session);
+            setObservationIdentifiers(cache, session);
             setResultTemplateValues(cache, session);
 			setEventTimeValues(cache, session);
         } catch (HibernateException he) {
@@ -413,6 +417,14 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
 
     private void setObservationTypes(CapabilitiesCache cache, Session session) {
         cache.setObservationTypes(HibernateCriteriaQueryUtilities.getObservationTypes(session));
+    }
+    
+    private void setFeatureOfInterestTypes(CapabilitiesCache cache, Session session) {
+        cache.setFeatureOfInterestTypes(HibernateCriteriaQueryUtilities.getFeatureOfInterestTypes(session));
+    }
+    
+    private void setObservationIdentifiers(CapabilitiesCache cache, Session session) {
+        cache.setObservationIdentifiers(HibernateCriteriaQueryUtilities.getObservationIdentifiers(session));
     }
 
     private boolean checkOfferingForDeletedProcedure(Set<ObservationConstellation> observationConstellations) {
