@@ -192,7 +192,8 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                          */
                         if (!Sos1Constants.CapabilitiesSections.contains(section)
                                 && !Sos2Constants.CapabilitiesSections.contains(section)) {
-                            String exceptionText = "The requested section '" + section + "' does not exist or is not supported!";
+                            String exceptionText =
+                                    "The requested section '" + section + "' does not exist or is not supported!";
                             LOGGER.debug(exceptionText);
                             throw Util4Exceptions.createInvalidParameterValueException(
                                     SosConstants.GetCapabilitiesParams.Section.name(), exceptionText);
@@ -285,7 +286,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
     }
 
     private SosServiceIdentification getServiceIdentification(String version) throws OwsExceptionReport {
-		SosServiceIdentification serviceIdentification = Configurator.getInstance().getServiceIdentification();
+        SosServiceIdentification serviceIdentification = Configurator.getInstance().getServiceIdentification();
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
             serviceIdentification.setProfiles(getProfiles());
         }
@@ -328,22 +329,23 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         // FIXME: OpsMetadata for InsertSensor, InsertObservation SOS 2.0
         Map<RequestOperatorKeyType, IRequestOperator> requestOperators =
                 Configurator.getInstance().getRequestOperator();
-		List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>(requestOperators.size());
+        List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>(requestOperators.size());
         opsMetadata.add(getOpsGetCapabilities(service, version, extensions));
         for (RequestOperatorKeyType requestOperatorKeyType : requestOperators.keySet()) {
             if (!requestOperatorKeyType.getOperationName().equals(OPERATION_NAME)
                     && requestOperatorKeyType.getServiceOperatorKeyType().getVersion().equals(version)) {
-                OWSOperation operationMetadata = requestOperators.get(requestOperatorKeyType).getOperationMetadata(service, version,
-                        session);
+                OWSOperation operationMetadata =
+                        requestOperators.get(requestOperatorKeyType).getOperationMetadata(service, version, session);
                 if (operationMetadata != null) {
                     opsMetadata.add(operationMetadata);
                 }
             }
         }
         operationsMetadata.setOperations(opsMetadata);
-        operationsMetadata.addCommonValue(OWSConstants.RequestParams.service.name(), new OWSParameterValuePossibleValues(SosConstants.SOS));
-        operationsMetadata.addCommonValue(OWSConstants.RequestParams.version.name(), new OWSParameterValuePossibleValues(Configurator
-                .getInstance().getSupportedVersions()));
+        operationsMetadata.addCommonValue(OWSConstants.RequestParams.service.name(),
+                new OWSParameterValuePossibleValues(SosConstants.SOS));
+        operationsMetadata.addCommonValue(OWSConstants.RequestParams.version.name(),
+                new OWSParameterValuePossibleValues(Configurator.getInstance().getSupportedVersions()));
         return operationsMetadata;
     }
 
@@ -381,88 +383,99 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
     private List<SosOfferingsForContents> getContents(SosCapabilities sosCapabilities, Session session)
             throws OwsExceptionReport {
         Collection<String> offerings = Configurator.getInstance().getCapabilitiesCacheController().getOfferings();
-		List<SosOfferingsForContents> sosOfferings = new ArrayList<SosOfferingsForContents>(offerings.size());
+        List<SosOfferingsForContents> sosOfferings = new ArrayList<SosOfferingsForContents>(offerings.size());
         for (String offering : offerings) {
-            SosOfferingsForContents sosOffering = new SosOfferingsForContents();
 
-            sosOffering.setOffering(offering);
+            Collection<String> observationTypes = getObservationTypes(offering);
+            if (observationTypes != null && !observationTypes.isEmpty()) {
+                SosOfferingsForContents sosOffering = new SosOfferingsForContents();
+                sosOffering.setOffering(offering);
 
-            // only if fois are contained for the offering set the values of the
-            // envelope
-            sosOffering.setObservedArea(Configurator.getInstance().getCapabilitiesCacheController().getEnvelopeForOffering(offering));
-            // SosEnvelope sosEnvelope = getBBOX4Offering(offering, session);
-            // sosOffering.setBoundeBy(sosEnvelope.getEnvelope());
-            // sosOffering.setSrid(sosEnvelope.getSrid());
+                // insert observationTypes
+                sosOffering.setObservationTypes(observationTypes);
 
-            // TODO: add intended application
-            // xb_oo.addIntendedApplication("");
+                // only if fois are contained for the offering set the values of
+                // the
+                // envelope
+                sosOffering.setObservedArea(Configurator.getInstance().getCapabilitiesCacheController()
+                        .getEnvelopeForOffering(offering));
+                // SosEnvelope sosEnvelope = getBBOX4Offering(offering,
+                // session);
+                // sosOffering.setBoundeBy(sosEnvelope.getEnvelope());
+                // sosOffering.setSrid(sosEnvelope.getSrid());
 
-            // add offering name
-            sosOffering.setOfferingName(Configurator.getInstance().getCapabilitiesCacheController()
-                    .getOfferingName(offering));
+                // TODO: add intended application
+                // xb_oo.addIntendedApplication("");
 
-            // set up phenomena
-            sosOffering.setObservableProperties(Configurator.getInstance().getCapabilitiesCacheController()
-                    .getObservablePropertiesForOffering(offering));
-            sosOffering.setCompositePhenomena(Configurator.getInstance().getCapabilitiesCacheController()
-                    .getKOfferingVCompositePhenomenons().get(offering));
-            Map<String, Collection<String>> phens4CompPhens = new HashMap<String, Collection<String>>();
-            if (Configurator.getInstance().getCapabilitiesCacheController().getKOfferingVCompositePhenomenons()
-                    .get(offering) != null) {
-                for (String compositePhenomenon : Configurator.getInstance().getCapabilitiesCacheController()
-                        .getKOfferingVCompositePhenomenons().get(offering)) {
-                    phens4CompPhens.put(compositePhenomenon,
-                            Configurator.getInstance().getCapabilitiesCacheController()
-                                    .getKCompositePhenomenonVObservableProperty().get(compositePhenomenon));
+                // add offering name
+                sosOffering.setOfferingName(Configurator.getInstance().getCapabilitiesCacheController()
+                        .getOfferingName(offering));
+
+                // set up phenomena
+                sosOffering.setObservableProperties(Configurator.getInstance().getCapabilitiesCacheController()
+                        .getObservablePropertiesForOffering(offering));
+                sosOffering.setCompositePhenomena(Configurator.getInstance().getCapabilitiesCacheController()
+                        .getKOfferingVCompositePhenomenons().get(offering));
+                Map<String, Collection<String>> phens4CompPhens = new HashMap<String, Collection<String>>();
+                if (Configurator.getInstance().getCapabilitiesCacheController().getKOfferingVCompositePhenomenons()
+                        .get(offering) != null) {
+                    for (String compositePhenomenon : Configurator.getInstance().getCapabilitiesCacheController()
+                            .getKOfferingVCompositePhenomenons().get(offering)) {
+                        phens4CompPhens.put(compositePhenomenon,
+                                Configurator.getInstance().getCapabilitiesCacheController()
+                                        .getKCompositePhenomenonVObservableProperty().get(compositePhenomenon));
+                    }
                 }
+                sosOffering.setPhens4CompPhens(phens4CompPhens);
+
+                // set up time
+                DateTime minDate =
+                        Configurator.getInstance().getCapabilitiesCacheController().getMinTimeForOffering(offering);
+                DateTime maxDate =
+                        Configurator.getInstance().getCapabilitiesCacheController().getMaxTimeForOffering(offering);
+                sosOffering.setTime(new TimePeriod(minDate, maxDate));
+
+                // add feature of interests
+                if (Configurator.getInstance().isFoiListedInOfferings()) {
+                    sosOffering.setFeatureOfInterest(getFOI4offering(offering, session));
+                }
+
+                // set procedures
+                Collection<String> procedures =
+                        Configurator.getInstance().getCapabilitiesCacheController().getProcedures4Offering(offering);
+                if (procedures == null || procedures.isEmpty()) {
+                    String exceptionText =
+                            "No procedures are contained in the database for the offering: " + offering
+                                    + "! Please contact the admin of this SOS.";
+                    LOGGER.error(exceptionText);
+                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                }
+                sosOffering.setProcedures(procedures);
+
+                // insert result models
+                Collection<QName> resultModels =
+                        getQNamesForResultModel(Configurator.getInstance().getCapabilitiesCacheController()
+                                .getResultModels4Offering(offering));
+
+                if (resultModels == null || resultModels.isEmpty()) {
+                    String exceptionText =
+                            "No result models are contained in the database for the offering: " + offering
+                                    + "! Please contact the admin of this SOS.";
+                    LOGGER.error(exceptionText);
+                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                }
+                sosOffering.setResultModels(resultModels);
+
+                // set response format
+                Collection<String> responseFormats = SosHelper.getSupportedResponseFormats(SosConstants.SOS, "1.0.0");
+                responseFormats.add(SosConstants.CONTENT_TYPE_ZIP);
+                sosOffering.setResponseFormats(responseFormats);
+
+                // set response Mode
+                sosOffering.setResponseModes(Arrays.asList(SosConstants.getResponseModes()));
+
+                sosOfferings.add(sosOffering);
             }
-            sosOffering.setPhens4CompPhens(phens4CompPhens);
-
-            // set up time
-            DateTime minDate = Configurator.getInstance().getCapabilitiesCacheController().getMinTimeForOffering(offering);
-            DateTime maxDate = Configurator.getInstance().getCapabilitiesCacheController().getMaxTimeForOffering(offering);
-            sosOffering.setTime(new TimePeriod(minDate, maxDate));
-
-            // add feature of interests
-            if (Configurator.getInstance().isFoiListedInOfferings()) {
-                sosOffering.setFeatureOfInterest(getFOI4offering(offering, session));
-            }
-
-            // set procedures
-            Collection<String> procedures =
-                    Configurator.getInstance().getCapabilitiesCacheController().getProcedures4Offering(offering);
-            if (procedures == null || procedures.isEmpty()) {
-                String exceptionText =
-                        "No procedures are contained in the database for the offering: " + offering
-                                + "! Please contact the admin of this SOS.";
-                LOGGER.error(exceptionText);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-            }
-            sosOffering.setProcedures(procedures);
-
-            // insert result models
-            Collection<QName> resultModels =
-                    getQNamesForResultModel(Configurator.getInstance().getCapabilitiesCacheController()
-                            .getResultModels4Offering(offering));
-
-            if (resultModels == null || resultModels.isEmpty()) {
-                String exceptionText =
-                        "No result models are contained in the database for the offering: " + offering
-                                + "! Please contact the admin of this SOS.";
-                LOGGER.error(exceptionText);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-            }
-            sosOffering.setResultModels(resultModels);
-
-            // set response format
-            Collection<String> responseFormats = SosHelper.getSupportedResponseFormats(SosConstants.SOS, "1.0.0");
-            responseFormats.add(SosConstants.CONTENT_TYPE_ZIP);
-            sosOffering.setResponseFormats(responseFormats);
-
-            // set response Mode
-            sosOffering.setResponseModes(Arrays.asList(SosConstants.getResponseModes()));
-
-            sosOfferings.add(sosOffering);
         }
 
         return sosOfferings;
@@ -483,9 +496,9 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
             throws OwsExceptionReport {
         int phenTimeCounter = 1;
         Collection<String> offerings = Configurator.getInstance().getCapabilitiesCacheController().getOfferings();
-		List<SosOfferingsForContents> sosOfferings = new ArrayList<SosOfferingsForContents>(offerings.size());
-        
-		for (String offering : offerings) {
+        List<SosOfferingsForContents> sosOfferings = new ArrayList<SosOfferingsForContents>(offerings.size());
+
+        for (String offering : offerings) {
             Collection<String> procedures =
                     Configurator.getInstance().getCapabilitiesCacheController().getProcedures4Offering(offering);
             if (procedures == null || procedures.isEmpty()) {
@@ -495,120 +508,127 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                 LOGGER.error(exceptionText);
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
             }
+            Collection<String> observationTypes = getObservationTypes(offering);
+            if (observationTypes != null && !observationTypes.isEmpty()) {
+                for (String procedure : procedures) {
 
-            for (String procedure : procedures) {
-                SosOfferingsForContents sosOffering = new SosOfferingsForContents();
-                sosOffering.setOffering(offering);
-                sosOffering.setObservedArea(Configurator.getInstance().getCapabilitiesCacheController().getEnvelopeForOffering(offering));
-                // if (sosEnvelope != null) {
-                // sosOffering.setBoundeBy(sosEnvelope.getEnvelope());
-                // sosOffering.setSrid(sosEnvelope.getSrid());
-                // }
+                    SosOfferingsForContents sosOffering = new SosOfferingsForContents();
+                    sosOffering.setOffering(offering);
 
-                sosOffering.setProcedures(Collections.singletonList(procedure));
+                    // insert observationTypes
+                    sosOffering.setObservationTypes(observationTypes);
 
-                // TODO: add intended application
-                // xb_oo.addIntendedApplication("");
+                    sosOffering.setObservedArea(Configurator.getInstance().getCapabilitiesCacheController()
+                            .getEnvelopeForOffering(offering));
+                    // if (sosEnvelope != null) {
+                    // sosOffering.setBoundeBy(sosEnvelope.getEnvelope());
+                    // sosOffering.setSrid(sosEnvelope.getSrid());
+                    // }
 
-                // add offering name
-                sosOffering.setOfferingName(Configurator.getInstance().getCapabilitiesCacheController()
-                        .getOfferingName(offering));
+                    sosOffering.setProcedures(Collections.singletonList(procedure));
 
-                // set up phenomena
-                Collection<String> phenomenons = new ArrayList<String>();
-                Map<String, Collection<String>> phenProcs =
-                        Configurator.getInstance().getCapabilitiesCacheController()
-                                .getKObservablePropertyVProcedures();
-                Collection<String> phens4Off =
-                        Configurator.getInstance().getCapabilitiesCacheController()
-                                .getObservablePropertiesForOffering(offering);
-                for (String phenID : phens4Off) {
-                    if (phenProcs.get(phenID).contains(procedure)) {
-                        phenomenons.add(phenID);
+                    // TODO: add intended application
+                    // xb_oo.addIntendedApplication("");
+
+                    // add offering name
+                    sosOffering.setOfferingName(Configurator.getInstance().getCapabilitiesCacheController()
+                            .getOfferingName(offering));
+
+                    // set up phenomena
+                    Collection<String> phenomenons = new ArrayList<String>();
+                    Map<String, Collection<String>> phenProcs =
+                            Configurator.getInstance().getCapabilitiesCacheController()
+                                    .getKObservablePropertyVProcedures();
+                    Collection<String> phens4Off =
+                            Configurator.getInstance().getCapabilitiesCacheController()
+                                    .getObservablePropertiesForOffering(offering);
+                    for (String phenID : phens4Off) {
+                        if (phenProcs.get(phenID).contains(procedure)) {
+                            phenomenons.add(phenID);
+                        }
                     }
-                }
-                sosOffering.setObservableProperties(phenomenons);
-                sosOffering.setCompositePhenomena(Configurator.getInstance().getCapabilitiesCacheController()
-                        .getKOfferingVCompositePhenomenons().get(offering));
-                Map<String, Collection<String>> phens4CompPhens = new HashMap<String, Collection<String>>();
-                if (Configurator.getInstance().getCapabilitiesCacheController().getKOfferingVCompositePhenomenons()
-                        .get(offering) != null) {
-                    for (String compositePhenomenon : Configurator.getInstance().getCapabilitiesCacheController()
-                            .getKOfferingVCompositePhenomenons().get(offering)) {
-                        phens4CompPhens.put(compositePhenomenon,
+                    sosOffering.setObservableProperties(phenomenons);
+                    sosOffering.setCompositePhenomena(Configurator.getInstance().getCapabilitiesCacheController()
+                            .getKOfferingVCompositePhenomenons().get(offering));
+                    Map<String, Collection<String>> phens4CompPhens = new HashMap<String, Collection<String>>();
+                    if (Configurator.getInstance().getCapabilitiesCacheController()
+                            .getKOfferingVCompositePhenomenons().get(offering) != null) {
+                        for (String compositePhenomenon : Configurator.getInstance().getCapabilitiesCacheController()
+                                .getKOfferingVCompositePhenomenons().get(offering)) {
+                            phens4CompPhens.put(compositePhenomenon, Configurator.getInstance()
+                                    .getCapabilitiesCacheController().getKCompositePhenomenonVObservableProperty()
+                                    .get(compositePhenomenon));
+                        }
+                    }
+                    sosOffering.setPhens4CompPhens(phens4CompPhens);
+
+                    // set up time
+                    DateTime minDate = HibernateCriteriaQueryUtilities.getMinDate4Offering(offering, session);
+                    DateTime maxDate = HibernateCriteriaQueryUtilities.getMaxDate4Offering(offering, session);
+                    String phenTimeId = Sos2Constants.EN_PHENOMENON_TIME + "_" + phenTimeCounter++;
+                    sosOffering.setTime(new TimePeriod(minDate, maxDate, phenTimeId));
+
+                    // add related feature
+                    Map<String, Collection<String>> relatedFeatures = new HashMap<String, Collection<String>>();
+                    // // related feature
+                    if (Configurator.getInstance().getCapabilitiesCacheController().getKOfferingVRelatedFeatures() != null
+                            && !Configurator.getInstance().getCapabilitiesCacheController()
+                                    .getKOfferingVRelatedFeatures().isEmpty()) {
+                        Collection<String> relatedFeatureMap =
                                 Configurator.getInstance().getCapabilitiesCacheController()
-                                        .getKCompositePhenomenonVObservableProperty().get(compositePhenomenon));
-                    }
-                }
-                sosOffering.setPhens4CompPhens(phens4CompPhens);
-
-                // set up time
-                DateTime minDate = HibernateCriteriaQueryUtilities.getMinDate4Offering(offering, session);
-                DateTime maxDate = HibernateCriteriaQueryUtilities.getMaxDate4Offering(offering, session);
-                String phenTimeId = Sos2Constants.EN_PHENOMENON_TIME + "_" + phenTimeCounter++;
-                sosOffering.setTime(new TimePeriod(minDate, maxDate, phenTimeId));
-
-                // add related feature
-                Map<String, Collection<String>> relatedFeatures = new HashMap<String, Collection<String>>();
-                // // related feature
-                if (Configurator.getInstance().getCapabilitiesCacheController().getKOfferingVRelatedFeatures() != null
-                        && !Configurator.getInstance().getCapabilitiesCacheController().getKOfferingVRelatedFeatures()
-                                .isEmpty()) {
-                    Collection<String> relatedFeatureMap =
-                            Configurator.getInstance().getCapabilitiesCacheController().getKOfferingVRelatedFeatures()
-                                    .get(offering);
-                    for (String relatedFeature : relatedFeatureMap) {
-                        if (relatedFeature.contains("http") || relatedFeature.contains("HTTP")) {
-                            relatedFeatures.put(relatedFeature, Configurator.getInstance()
-                                    .getCapabilitiesCacheController().getKRelatedFeaturesVRole().get(relatedFeature));
-                        } else {
-                            String relatedFeatureID = getRelatedFeatureID(relatedFeature, session, version);
-                            if (relatedFeatureID != null) {
-                                relatedFeatures.put(relatedFeatureID,
+                                        .getKOfferingVRelatedFeatures().get(offering);
+                        for (String relatedFeature : relatedFeatureMap) {
+                            if (relatedFeature.contains("http") || relatedFeature.contains("HTTP")) {
+                                relatedFeatures.put(relatedFeature,
                                         Configurator.getInstance().getCapabilitiesCacheController()
                                                 .getKRelatedFeaturesVRole().get(relatedFeature));
+                            } else {
+                                String relatedFeatureID = getRelatedFeatureID(relatedFeature, session, version);
+                                if (relatedFeatureID != null) {
+                                    relatedFeatures.put(relatedFeatureID,
+                                            Configurator.getInstance().getCapabilitiesCacheController()
+                                                    .getKRelatedFeaturesVRole().get(relatedFeature));
+                                }
                             }
                         }
                     }
-                }
-                // feature of interest
-                else {
-                    List<String> role = new ArrayList<String>();
-                    role.add("featureOfInterestID");
-                    for (String foiID : Configurator.getInstance().getCapabilitiesCacheController()
-                            .getKOfferingVFeatures().get(offering)) {
-                        if (Configurator.getInstance().getCapabilitiesCacheController()
-                                .getProcedures4FeatureOfInterest(foiID).contains(procedure)) {
-                            relatedFeatures.put(foiID, role);
+                    // feature of interest
+                    else {
+                        List<String> role = new ArrayList<String>();
+                        role.add("featureOfInterestID");
+                        for (String foiID : Configurator.getInstance().getCapabilitiesCacheController()
+                                .getKOfferingVFeatures().get(offering)) {
+                            if (Configurator.getInstance().getCapabilitiesCacheController()
+                                    .getProcedures4FeatureOfInterest(foiID).contains(procedure)) {
+                                relatedFeatures.put(foiID, role);
+                            }
                         }
                     }
+                    sosOffering.setRelatedFeatures(relatedFeatures);
+
+                    // TODO: if no foi contained, set allowed foitypes
+                    // insert featureOfInterestTypes
+                    Collection<String> featureTypes = getFeatureOfInterestTypes(offering, session);
+                    if (featureTypes == null || (featureTypes != null && featureTypes.isEmpty())) {
+                        featureTypes = HibernateCriteriaQueryUtilities.getFeatureOfInterestTypes(session);
+                    }
+                    sosOffering.setFeatureOfInterestTypes(featureTypes);
+
+                    // TODO: set procDescFormat
+                    sosOffering.setProcedureDescriptionFormat(HibernateCriteriaQueryUtilities
+                            .getProcedureDescriptionFormatIdentifiers(session));
+
+                    // set response format
+                    Collection<String> responseFormats =
+                            SosHelper.getSupportedResponseFormats(SosConstants.SOS, version);
+                    sosOffering.setResponseFormats(responseFormats);
+                    // TODO set as property
+                    if (true) {
+                        responseFormats.add(SosConstants.CONTENT_TYPE_ZIP);
+                    }
+
+                    sosOfferings.add(sosOffering);
                 }
-                sosOffering.setRelatedFeatures(relatedFeatures);
-
-                // insert observationTypes
-                sosOffering.setObservationTypes(getObservationTypes(offering));
-
-                // TODO: if no foi contained, set allowed foitypes
-                // insert featureOfInterestTypes
-                Collection<String> featureTypes = getFeatureOfInterestTypes(offering, session);
-                if (featureTypes == null || (featureTypes != null && featureTypes.isEmpty())) {
-                    featureTypes = HibernateCriteriaQueryUtilities.getFeatureOfInterestTypes(session);
-                }
-                sosOffering.setFeatureOfInterestTypes(featureTypes);
-                
-                // TODO: set procDescFormat
-                sosOffering.setProcedureDescriptionFormat(HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatIdentifiers(session));
-
-                // set response format
-                Collection<String> responseFormats = SosHelper.getSupportedResponseFormats(SosConstants.SOS, version);
-                sosOffering.setResponseFormats(responseFormats);
-                // TODO set as property
-                if (true) {
-                    responseFormats.add(SosConstants.CONTENT_TYPE_ZIP);
-                }
-                
-
-                sosOfferings.add(sosOffering);
             }
         }
 
@@ -624,7 +644,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
     private List<IExtension> getExtensions(Session session) throws OwsExceptionReport {
         Map<RequestOperatorKeyType, IRequestOperator> requestOperators =
                 Configurator.getInstance().getRequestOperator();
-		List<IExtension> extensions = new ArrayList<IExtension>(requestOperators.size());
+        List<IExtension> extensions = new ArrayList<IExtension>(requestOperators.size());
         for (IRequestOperator requestOperator : requestOperators.values()) {
             IExtension extension = requestOperator.getExtension(session);
             if (extension != null) {
@@ -660,10 +680,11 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         opsMeta.setDcp(SosHelper.getDCP(SosConstants.Operations.GetCapabilities.name(), dkt, Configurator
                 .getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
         // set param updateSequence
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.updateSequence.name(), new OWSParameterValuePossibleValues(Collections.singletonList(SosConstants.PARAMETER_ANY)));
+        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.updateSequence.name(),
+                new OWSParameterValuePossibleValues(Collections.singletonList(SosConstants.PARAMETER_ANY)));
         // set param AcceptVersions
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.AcceptVersions.name(), new OWSParameterValuePossibleValues(Configurator.getInstance()
-                .getSupportedVersions()));
+        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.AcceptVersions.name(),
+                new OWSParameterValuePossibleValues(Configurator.getInstance().getSupportedVersions()));
         // set param Sections
         List<String> sectionsValues = new ArrayList<String>(8);
         sectionsValues.add(SosConstants.CapabilitiesSections.ServiceIdentification.name());
@@ -679,7 +700,8 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         }
         sectionsValues.add(SosConstants.CapabilitiesSections.Contents.name());
         sectionsValues.add(SosConstants.CapabilitiesSections.All.name());
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.Sections.name(), new OWSParameterValuePossibleValues(sectionsValues));
+        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.Sections.name(),
+                new OWSParameterValuePossibleValues(sectionsValues));
         // set param AcceptFormats
         opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.AcceptFormats.name(),
                 new OWSParameterValuePossibleValues(Arrays.asList(SosConstants.getAcceptFormats())));
@@ -710,7 +732,8 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         filterCapabilities.setSpatialOperands(operands);
 
         // set SpatialOperators
-        Map<SpatialOperator, List<QName>> spatialOperators = new EnumMap<SpatialOperator, List<QName>>(SpatialOperator.class);
+        Map<SpatialOperator, List<QName>> spatialOperators =
+                new EnumMap<SpatialOperator, List<QName>>(SpatialOperator.class);
         // set BBOX
         spatialOperators.put(SpatialOperator.BBOX, Collections.singletonList(GMLConstants.QN_ENVELOPE));
 
@@ -798,7 +821,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         comparisonOperators.add(ComparisonOperator.PropertyIsGreaterThanOrEqualTo);
         comparisonOperators.add(ComparisonOperator.PropertyIsLike);
         filterCapabilities.setComparisonOperators(comparisonOperators);
-	}
+    }
 
     /**
      * Get FOIs contained in an offering
@@ -857,12 +880,14 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
         if (feature.getUrl() != null && !feature.getUrl().isEmpty()) {
             return feature.getUrl();
         } else {
-//            String urlPattern =
-//                    SosHelper.getUrlPatternForHttpGetMethod(Configurator.getInstance().getBindingOperators().values(),
-//                            SosConstants.Operations.GetFeatureOfInterest.name(), new DecoderKeyType(SosConstants.SOS,
-//                                    version));
-//            return SosHelper.createFoiGetUrl(identifier, version, Configurator.getInstance().getServiceURL(),
-//                    urlPattern);
+            // String urlPattern =
+            // SosHelper.getUrlPatternForHttpGetMethod(Configurator.getInstance().getBindingOperators().values(),
+            // SosConstants.Operations.GetFeatureOfInterest.name(), new
+            // DecoderKeyType(SosConstants.SOS,
+            // version));
+            // return SosHelper.createFoiGetUrl(identifier, version,
+            // Configurator.getInstance().getServiceURL(),
+            // urlPattern);
             return identifier;
         }
     }
