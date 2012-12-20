@@ -26,6 +26,7 @@ package org.n52.sos.request.operator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -91,7 +92,7 @@ public class SosInsertSensorOperatorV20 implements IRequestOperator {
             throws OwsExceptionReport {
         return dao.getOperationsMetadata(service, version, connection);
     }
-    
+
     @Override
     public IExtension getExtension(Object connection) throws OwsExceptionReport {
         return dao.getExtension(connection);
@@ -102,7 +103,7 @@ public class SosInsertSensorOperatorV20 implements IRequestOperator {
         if (request instanceof InsertSensorRequest) {
             InsertSensorRequest sosRequest = (InsertSensorRequest) request;
             checkRequestedParameter(sosRequest);
-    
+
             InsertSensorResponse response = this.dao.insertSensor(sosRequest);
             // TODO: create update() for after insert sensor
             Configurator.getInstance().getCapabilitiesCacheController().updateAfterSensorInsertion();
@@ -141,7 +142,7 @@ public class SosInsertSensorOperatorV20 implements IRequestOperator {
 
     private void checkRequestedParameter(InsertSensorRequest request) throws OwsExceptionReport {
         List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
-     // check parameters with variable content
+        // check parameters with variable content
         try {
             SosHelper.checkServiceParameter(request.getService());
         } catch (OwsExceptionReport owse) {
@@ -158,45 +159,80 @@ public class SosInsertSensorOperatorV20 implements IRequestOperator {
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
+        try {
+            SosHelper.checkProcedureDescriptionFormat(request.getProcedureDescriptionFormat(),
+                    Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name());
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
         if (request.getMetadata() != null) {
-            try {
-                checkFeatureOfInterestTypes(request.getMetadata().getFeatureOfInterestTypes());
-            } catch (OwsExceptionReport owse) {
-                exceptions.add(owse);
-            }
             try {
                 checkObservationTypes(request.getMetadata().getObservationTypes());
             } catch (OwsExceptionReport owse) {
                 exceptions.add(owse);
             }
+            try {
+                checkFeatureOfInterestTypes(request.getMetadata().getFeatureOfInterestTypes());
+            } catch (OwsExceptionReport owse) {
+                exceptions.add(owse);
+            }
         } else {
-            exceptions.add(Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertSensorParams.featureOfInterestType.name()));
-            exceptions.add(Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertSensorParams.observationType.name()));
+            exceptions.add(Util4Exceptions
+                    .createMissingParameterValueException(Sos2Constants.InsertSensorParams.observationType.name()));
+            exceptions.add(Util4Exceptions
+                    .createMissingParameterValueException(Sos2Constants.InsertSensorParams.featureOfInterestType
+                            .name()));
         }
         Util4Exceptions.mergeAndThrowExceptions(exceptions);
     }
 
     private void checkObservablePropterty(List<String> observableProperty) throws OwsExceptionReport {
         if (observableProperty == null || (observableProperty != null && observableProperty.isEmpty())) {
-            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertSensorParams.observableProperty.name());
+            throw Util4Exceptions
+                    .createMissingParameterValueException(Sos2Constants.InsertSensorParams.observableProperty.name());
         } else {
             // TODO: check with existing and/or defined in outputs
         }
     }
 
     private void checkFeatureOfInterestTypes(List<String> featureOfInterestTypes) throws OwsExceptionReport {
-        if (featureOfInterestTypes == null || (featureOfInterestTypes != null && featureOfInterestTypes.isEmpty())) {
-            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertSensorParams.featureOfInterestType.name());
-        } else {
-            // TODO: check if types are supported here (Caching) or in DAO?
+        if (featureOfInterestTypes != null) {
+            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            Collection<String> validFeatureOfInterestTypes =
+                    Configurator.getInstance().getCapabilitiesCacheController().getFeatureOfInterestTypes();
+            for (String featureOfInterestType : featureOfInterestTypes) {
+                if (featureOfInterestType.isEmpty()) {
+                    exceptions
+                            .add(Util4Exceptions
+                                    .createMissingParameterValueException(Sos2Constants.InsertSensorParams.featureOfInterestType
+                                            .name()));
+                } else {
+                    if (!validFeatureOfInterestTypes.contains(featureOfInterestType)) {
+                        String exceptionText =
+                                "The value (" + featureOfInterestType + ") of the parameter '"
+                                        + Sos2Constants.InsertSensorParams.featureOfInterestType.name()
+                                        + "' is invalid";
+                        LOGGER.error(exceptionText);
+                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(
+                                Sos2Constants.InsertSensorParams.featureOfInterestType.name(), exceptionText));
+                    }
+                }
+            }
+            Util4Exceptions.mergeAndThrowExceptions(exceptions);
         }
     }
 
     private void checkObservationTypes(List<String> observationTypes) throws OwsExceptionReport {
-        if (observationTypes == null || (observationTypes != null && observationTypes.isEmpty())) {
-            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertSensorParams.observationType.name());
-        } else {
-            // TODO: check if types are supported here (Caching) or in DAO?
+        if (observationTypes != null) {
+            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            for (String observationType : observationTypes) {
+                try {
+                    SosHelper.checkObservationType(observationType, Sos2Constants.InsertSensorParams.observationType.name());
+                } catch (OwsExceptionReport e) {
+                   exceptions.add(e);
+                }
+            }
+            Util4Exceptions.mergeAndThrowExceptions(exceptions);
         }
     }
 
