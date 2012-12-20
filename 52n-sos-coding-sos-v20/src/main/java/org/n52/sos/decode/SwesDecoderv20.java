@@ -34,7 +34,6 @@ import java.util.Set;
 import net.opengis.gml.x32.FeaturePropertyType;
 import net.opengis.sos.x20.SosInsertionMetadataPropertyType;
 import net.opengis.sos.x20.SosInsertionMetadataType;
-import net.opengis.sos.x20.impl.SosInsertionMetadataDocumentImpl;
 import net.opengis.swes.x20.DeleteSensorDocument;
 import net.opengis.swes.x20.DescribeSensorDocument;
 import net.opengis.swes.x20.DescribeSensorType;
@@ -49,7 +48,6 @@ import net.opengis.swes.x20.UpdateSensorDescriptionType.Description;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.OGCConstants;
-import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -65,9 +63,9 @@ import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.request.UpdateSensorRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
-import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -176,6 +174,8 @@ public class SwesDecoderv20 implements IXmlRequestDecoder {
         if (xbInsertSensor.getMetadataArray() != null && xbInsertSensor.getMetadataArray().length > 0) {
             request.setMetadata(parseMetadata(xbInsertSensor.getMetadataArray()));
         }
+        SosHelper.checkProcedureDescriptionFormat(xbInsertSensor.getProcedureDescriptionFormat(), Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name());
+        
         // sensor description
         List<IDecoder> decoderList =
                 Configurator.getInstance().getDecoder(
