@@ -228,7 +228,7 @@ public class SosDescribeSensorOperatorV20 implements IRequestOperator {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkProcedureOutputFormat(sosRequest.getProcedureDescriptionFormat(),
+            SosHelper.checkProcedureDescriptionFormat(sosRequest.getProcedureDescriptionFormat(),
                     Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
