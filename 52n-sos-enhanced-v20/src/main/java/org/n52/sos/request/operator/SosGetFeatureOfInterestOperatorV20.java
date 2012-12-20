@@ -197,7 +197,7 @@ public class SosGetFeatureOfInterestOperatorV20 implements IRequestOperator {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkFeatureOfInterest(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
+            SosHelper.checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
                     .getCapabilitiesCacheController().getFeatureOfInterest(),
                     Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name());
         } catch (OwsExceptionReport owse) {
