@@ -452,7 +452,7 @@ public class ITRequestEncoder {
         String lowerStr = lower.getX() + " " + lower.getY();
         String upperStr = upper.getX() + " " + upper.getY();
 
-        if (Configurator.getInstance().switchCoordinatesForEPSG(srid)) {
+        if (Configurator.getInstance().reversedAxisOrderRequired(srid)) {
             JTSHelper.switchCoordinatesInString(lowerStr);
             JTSHelper.switchCoordinatesInString(upperStr);
         }
