@@ -161,7 +161,7 @@ public class InsertResultDAO implements IInsertResultDAO {
             ResultTemplate resultTemplate =
                     HibernateCriteriaQueryUtilities.getResultTemplateObject(request.getTemplateIdentifier(), session);
             transaction = session.beginTransaction();
-			List<SosObservation> observations =
+            List<SosObservation> observations =
                     getSingleObservationsFromResultValues(request.getResultValues(), resultTemplate);
             for (SosObservation observation : observations) {
                 HibernateCriteriaTransactionalUtilities.insertObservationSingleValue(
@@ -187,177 +187,171 @@ public class InsertResultDAO implements IInsertResultDAO {
         SosResultEncoding resultEncoding = new SosResultEncoding(resultTemplate.getResultEncoding());
         SosResultStructure resultStructure = new SosResultStructure(resultTemplate.getResultStructure());
         String[] blockValues = getBlockValues(resultValues, resultEncoding.getEncoding());
-		SosObservation o = getObservation(resultTemplate.getObservationConstellation(),
-				blockValues,
-				resultStructure.getResultStructure(),
-				resultEncoding.getEncoding());
-		return HibernateObservationUtilities.unfoldObservation(o);
+        SosObservation o =
+                getObservation(resultTemplate.getObservationConstellation(), blockValues,
+                        resultStructure.getResultStructure(), resultEncoding.getEncoding());
+        try {
+            return HibernateObservationUtilities.unfoldObservation(o);
+        } catch (Exception e) {
+            String exceptionText = "The resultValues format does not comply to the resultStructure of the resultTemplate!";
+            LOGGER.debug(exceptionText, e);
+            throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.InsertResult.resultValues.name(),
+                    exceptionText);
+        }
     }
-    
+
     private SosObservationConstellation getSosObservationConstellation(ObservationConstellation c) {
         String procedure = c.getProcedure().getIdentifier();
         Set<String> offerings = Collections.singleton(c.getOffering().getIdentifier());
         String observationType = c.getObservationType().getObservationType();
-        AbstractSosPhenomenon observablePropety = new SosObservableProperty(
-                c.getObservableProperty().getIdentifier());
+        AbstractSosPhenomenon observablePropety = new SosObservableProperty(c.getObservableProperty().getIdentifier());
         /* FIXME where is the feature?! */
-        return new SosObservationConstellation(procedure, 
-                observablePropety, offerings, null, observationType);
+        return new SosObservationConstellation(procedure, observablePropety, offerings, null, observationType);
     }
-            
-	
-	private SosObservation getObservation(ObservationConstellation obsConst, String[] blockValues,
+
+    private SosObservation getObservation(ObservationConstellation obsConst, String[] blockValues,
             SosSweAbstractDataComponent resultStructure, SosSweAbstractEncoding encoding) throws OwsExceptionReport {
-		int resultTimeIndex = ResultHandlingHelper.hasResultTime(resultStructure);
-		int phenomenonTimeIndex = ResultHandlingHelper.hasPhenomenonTime(resultStructure);
-		
-		SosSweDataRecord record = setRecordFrom(resultStructure);
-		
-		Map<Integer, String> observedProperties 
-			= new HashMap<Integer, String>(record.getFields().size()-1);
-		Map<Integer, SWEConstants.SweSimpleType> types
-			= new HashMap<Integer, SWEConstants.SweSimpleType>(record.getFields().size()-1);
-		Map<Integer, String> units = new HashMap<Integer, String>(record.getFields().size()-1);
-			
-		int j = 0;
-		for (SosSweField f : record.getFields()) {
-			if (j != resultTimeIndex && j != phenomenonTimeIndex) {
-				Integer index = Integer.valueOf(j);
-				SosSweAbstractSimpleType e = (SosSweAbstractSimpleType) f.getElement();
-				if (e instanceof SosSweQuantity) {
-					/* TODO units for other SosSweSimpleTypes? */
-					units.put(index, ((SosSweQuantity) e).getUom());
-				}
-				types.put(index, e.getSimpleType());
-				observedProperties.put(index, f.getElement().getDefinition());
-			}
-			++j;
-		}
-		
-		if (observedProperties.size() > 1) {
-			// TODO composite phenomenon
-		}
-		
-		SosMultiObservationValues<SosSweDataArray> sosValues = createObservationValueFrom(blockValues,
-		        record,
-		        encoding,
-		        resultTimeIndex,
-		        phenomenonTimeIndex,
-		        types,
-		        units);
-        
-		SosObservation o = new SosObservation();
+        int resultTimeIndex = ResultHandlingHelper.hasResultTime(resultStructure);
+        int phenomenonTimeIndex = ResultHandlingHelper.hasPhenomenonTime(resultStructure);
+
+        SosSweDataRecord record = setRecordFrom(resultStructure);
+
+        Map<Integer, String> observedProperties = new HashMap<Integer, String>(record.getFields().size() - 1);
+        Map<Integer, SWEConstants.SweSimpleType> types =
+                new HashMap<Integer, SWEConstants.SweSimpleType>(record.getFields().size() - 1);
+        Map<Integer, String> units = new HashMap<Integer, String>(record.getFields().size() - 1);
+
+        int j = 0;
+        for (SosSweField f : record.getFields()) {
+            if (j != resultTimeIndex && j != phenomenonTimeIndex) {
+                Integer index = Integer.valueOf(j);
+                SosSweAbstractSimpleType e = (SosSweAbstractSimpleType) f.getElement();
+                if (e instanceof SosSweQuantity) {
+                    /* TODO units for other SosSweSimpleTypes? */
+                    units.put(index, ((SosSweQuantity) e).getUom());
+                }
+                types.put(index, e.getSimpleType());
+                observedProperties.put(index, f.getElement().getDefinition());
+            }
+            ++j;
+        }
+
+        if (observedProperties.size() > 1) {
+            // TODO composite phenomenon
+        }
+
+        SosMultiObservationValues<SosSweDataArray> sosValues =
+                createObservationValueFrom(blockValues, record, encoding, resultTimeIndex, phenomenonTimeIndex, types,
+                        units);
+
+        SosObservation o = new SosObservation();
         o.setObservationConstellation(getSosObservationConstellation(obsConst));
         o.setResultType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
         o.setValue(sosValues);
         return o;
-	}
+    }
 
     private SosMultiObservationValues<SosSweDataArray> createObservationValueFrom(String[] blockValues,
-            SosSweAbstractDataComponent recordFromResultStructure,
-            SosSweAbstractEncoding encoding,
-            int resultTimeIndex,
-            int phenomenonTimeIndex,
-            Map<Integer, SWEConstants.SweSimpleType> types,
-            Map<Integer, String> units) throws OwsExceptionReport
-    {
+            SosSweAbstractDataComponent recordFromResultStructure, SosSweAbstractEncoding encoding,
+            int resultTimeIndex, int phenomenonTimeIndex, Map<Integer, SWEConstants.SweSimpleType> types,
+            Map<Integer, String> units) throws OwsExceptionReport {
         SosSweDataArray dataArray = new SosSweDataArray();
         dataArray.setElementType(recordFromResultStructure);
         dataArray.setEncoding(encoding);
-		
-		SweDataArrayValue dataArrayValue = new SweDataArrayValue();
-		dataArrayValue.setValue(dataArray);
-		
+
+        SweDataArrayValue dataArrayValue = new SweDataArrayValue();
+        dataArrayValue.setValue(dataArray);
+
         for (String block : blockValues) {
             String[] singleValues = getSingleValues(block, encoding);
             if (singleValues != null && singleValues.length > 0) {
                 dataArrayValue.addBlock(Arrays.asList(singleValues));
             }
         }
-		SosMultiObservationValues<SosSweDataArray> sosValues = new SosMultiObservationValues<SosSweDataArray>();
-		sosValues.setValue(dataArrayValue);
+        SosMultiObservationValues<SosSweDataArray> sosValues = new SosMultiObservationValues<SosSweDataArray>();
+        sosValues.setValue(dataArrayValue);
         return sosValues;
     }
 
-    private SosSweDataRecord setRecordFrom(SosSweAbstractDataComponent resultStructure) throws OwsExceptionReport
-    {
+    private SosSweDataRecord setRecordFrom(SosSweAbstractDataComponent resultStructure) throws OwsExceptionReport {
         SosSweDataRecord record = null;
-        if (resultStructure instanceof SosSweDataArray && 
-		        ((SosSweDataArray) resultStructure).getElementType() instanceof SosSweDataRecord) {
-			SosSweDataArray array = (SosSweDataArray) resultStructure;
-			record = (SosSweDataRecord) array.getElementType();
-		} else if (resultStructure instanceof SosSweDataRecord) {
-			record = (SosSweDataRecord) resultStructure;
-		} else {
-			String exceptionText = "Unsupported ResultStructure!";
-			LOGGER.error(exceptionText);
-			throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-		}
+        if (resultStructure instanceof SosSweDataArray
+                && ((SosSweDataArray) resultStructure).getElementType() instanceof SosSweDataRecord) {
+            SosSweDataArray array = (SosSweDataArray) resultStructure;
+            record = (SosSweDataRecord) array.getElementType();
+        } else if (resultStructure instanceof SosSweDataRecord) {
+            record = (SosSweDataRecord) resultStructure;
+        } else {
+            String exceptionText = "Unsupported ResultStructure!";
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        }
         return record;
     }
-	
-	private IValue getValue(SWEConstants.SweSimpleType type, String value) throws OwsExceptionReport {
-		switch(type) {
-			case Boolean:
-				return new BooleanValue(Boolean.valueOf(value));
-			case Category:
-				return new CategoryValue(value);
-			case Text:
-				return new TextValue(value);
-			case Count:
-				try {
-					return new CountValue(Integer.valueOf(value));
-				} catch (NumberFormatException e) {
-					String exceptionText = "Error while parsing count value!";
-					LOGGER.error(exceptionText, e);
-					throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
-				}
-			case Quantity:
-				try {
-					return new QuantityValue(Double.valueOf(value));
-				} catch (NumberFormatException e) {
-					String exceptionText = "Error while parsing quantity value!";
-					LOGGER.error(exceptionText, e);
-					throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
-				}
-			case Time:
-				try {
-					// testing for validity
-					value = value.trim();
-					DateTimeHelper.parseIsoString2DateTime(value);
-					return new TextValue(value);
-				} catch (DateTimeException dte) {
-					String exceptionText = "Error while parsing time value!";
-					LOGGER.error(exceptionText, dte);
-					throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
-				}
-			case TimeRange:
-				try {
-					value = value.trim();
-					String[] times = value.split("/");
-					if (times.length != 2) {
-						String exceptionText = "Error while parsing time range value!";
-						LOGGER.error(exceptionText);
-						throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-					}
-					DateTimeHelper.parseIsoString2DateTime(times[0].trim());
-					DateTimeHelper.parseIsoString2DateTime(times[1].trim());
-					return new TextValue(value);
-				} catch (DateTimeException dte) {
-					String exceptionText = "Error while parsing time range value!";
-					LOGGER.error(exceptionText, dte);
-					throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
-				}
-			// TODO case CountRange: 
-			// TODO case QuantityRange:
-			// TODO case ObservableProperty:
-			default:
-				String exceptionText = new StringBuilder().append("SweSimpleType '")
-						.append(type).append("' currently not supported.").toString();
-				LOGGER.error(exceptionText);
-				throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-		}
-	}
+
+    private IValue getValue(SWEConstants.SweSimpleType type, String value) throws OwsExceptionReport {
+        switch (type) {
+        case Boolean:
+            return new BooleanValue(Boolean.valueOf(value));
+        case Category:
+            return new CategoryValue(value);
+        case Text:
+            return new TextValue(value);
+        case Count:
+            try {
+                return new CountValue(Integer.valueOf(value));
+            } catch (NumberFormatException e) {
+                String exceptionText = "Error while parsing count value!";
+                LOGGER.error(exceptionText, e);
+                throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+            }
+        case Quantity:
+            try {
+                return new QuantityValue(Double.valueOf(value));
+            } catch (NumberFormatException e) {
+                String exceptionText = "Error while parsing quantity value!";
+                LOGGER.error(exceptionText, e);
+                throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+            }
+        case Time:
+            try {
+                // testing for validity
+                value = value.trim();
+                DateTimeHelper.parseIsoString2DateTime(value);
+                return new TextValue(value);
+            } catch (DateTimeException dte) {
+                String exceptionText = "Error while parsing time value!";
+                LOGGER.error(exceptionText, dte);
+                throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+            }
+        case TimeRange:
+            try {
+                value = value.trim();
+                String[] times = value.split("/");
+                if (times.length != 2) {
+                    String exceptionText = "Error while parsing time range value!";
+                    LOGGER.error(exceptionText);
+                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                }
+                DateTimeHelper.parseIsoString2DateTime(times[0].trim());
+                DateTimeHelper.parseIsoString2DateTime(times[1].trim());
+                return new TextValue(value);
+            } catch (DateTimeException dte) {
+                String exceptionText = "Error while parsing time range value!";
+                LOGGER.error(exceptionText, dte);
+                throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+            }
+            // TODO case CountRange:
+            // TODO case QuantityRange:
+            // TODO case ObservableProperty:
+        default:
+            String exceptionText =
+                    new StringBuilder().append("SweSimpleType '").append(type).append("' currently not supported.")
+                            .toString();
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        }
+    }
 
     private IObservationValue getValuesAsSingleStringValue(String[] singleValues,
             SosSweAbstractDataComponent resultStructure, SosSweAbstractEncoding encoding) throws OwsExceptionReport {
@@ -383,6 +377,7 @@ public class InsertResultDAO implements IInsertResultDAO {
         SosSingleObservationValue observation = new SosSingleObservationValue(phenomenonTime, textValue);
         return observation;
     }
+
     // TODO move to helper class
     private ITime getPhenomenonTime(String timeString) throws OwsExceptionReport {
         try {
@@ -404,13 +399,12 @@ public class InsertResultDAO implements IInsertResultDAO {
         }
     }
 
-    private TimeInstant getResultTime(String timeString)
-            throws OwsExceptionReport {
+    private TimeInstant getResultTime(String timeString) throws OwsExceptionReport {
         try {
-			TimeInstant time = new TimeInstant();
-			DateTime dateTime = DateTimeHelper.parseIsoString2DateTime(timeString.trim());
-			time.setValue(dateTime);
-			return time;
+            TimeInstant time = new TimeInstant();
+            DateTime dateTime = DateTimeHelper.parseIsoString2DateTime(timeString.trim());
+            time.setValue(dateTime);
+            return time;
         } catch (DateTimeException dte) {
             String exceptionText = "Error while parsing resultTime!";
             LOGGER.error(exceptionText, dte);
@@ -453,7 +447,5 @@ public class InsertResultDAO implements IInsertResultDAO {
     private String[] separateValues(String values, String separator) {
         return values.split(separator);
     }
-
-
 
 }
