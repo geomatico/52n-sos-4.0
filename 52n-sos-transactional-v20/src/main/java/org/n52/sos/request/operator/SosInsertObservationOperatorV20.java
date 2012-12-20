@@ -27,7 +27,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,6 +48,7 @@ import org.n52.sos.response.InsertObservationResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -165,7 +165,8 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
 
     }
 
-    private void checkAndAddOfferingToObservationConstallation(InsertObservationRequest request) throws OwsExceptionReport {
+    private void checkAndAddOfferingToObservationConstallation(InsertObservationRequest request)
+            throws OwsExceptionReport {
         // TODO: Check requirement for this case in SOS 2.0 specification
         if (request.getOfferings() == null || (request.getOfferings() != null && request.getOfferings().isEmpty())) {
             throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertObservationParams.offering
@@ -173,6 +174,10 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
         } else {
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
             for (String offering : request.getOfferings()) {
+                if (offering == null || (offering != null && offering.isEmpty())) {
+                    throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertObservationParams.offering
+                            .name());
+                }
                 if (!Configurator.getInstance().getCapabilitiesCacheController().getOfferings().contains(offering)) {
                     StringBuilder exceptionText = new StringBuilder();
                     exceptionText.append("The requested offering (");
@@ -199,7 +204,9 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
             for (SosObservation observation : observations) {
                 SosObservationConstellation obsConstallation = observation.getObservationConstellation();
+                checkObservationConstellationParameter(obsConstallation);
                 // Requirement 67
+                checkOrSetObservationType(observation);
                 if (!capsController.getObservationTypes().contains(obsConstallation.getObservationType())) {
                     StringBuilder exceptionText = new StringBuilder();
                     exceptionText.append("The requested observationType (");
@@ -228,6 +235,36 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
                 }
             }
             Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        }
+    }
+
+    private void checkObservationConstellationParameter(SosObservationConstellation obsConstallation) throws OwsExceptionReport {
+        ACapabilitiesCacheController capabilitiesCacheController = Configurator.getInstance().getCapabilitiesCacheController();
+        SosHelper.checkProcedureID(obsConstallation.getProcedure(), capabilitiesCacheController.getProcedures(), Sos2Constants.InsertObservationParams.procedure.name());
+        SosHelper.checkObservedProperty(obsConstallation.getObservableProperty().getIdentifier(), capabilitiesCacheController.getObservableProperties(), Sos2Constants.InsertObservationParams.observedProperty.name());
+        String foiIdentifier = obsConstallation.getFeatureOfInterest().getIdentifier();
+        SosHelper.checkFeatureOfInterstIdentifier(foiIdentifier, capabilitiesCacheController.getFeatureOfInterest(), Sos2Constants.InsertObservationParams.featureOfInterest.name());
+    }
+
+
+    private void checkOrSetObservationType(SosObservation sosObservation) throws OwsExceptionReport {
+        SosObservationConstellation observationConstellation = sosObservation.getObservationConstellation();
+        String obsTypeFromValue = OMHelper.getObservationTypeFromValue(sosObservation.getValue().getValue());
+        if (observationConstellation.getObservationType() != null) {
+            SosHelper.checkObservationType(observationConstellation.getObservationType(), Sos2Constants.InsertObservationParams.observationType
+                    .name());
+            if (obsTypeFromValue != null
+                    && !sosObservation.getObservationConstellation().getObservationType().equals(obsTypeFromValue)) {
+                StringBuilder exceptionText = new StringBuilder();
+                exceptionText.append("The requested observation is invalid!");
+                exceptionText.append(" The result element does not comply with the defined type (");
+                exceptionText.append(sosObservation.getObservationConstellation().getObservationType());
+                exceptionText.append(")!");
+                LOGGER.debug(exceptionText.toString());
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            }
+        } else {
+            sosObservation.getObservationConstellation().setObservationType(obsTypeFromValue);
         }
     }
 
