@@ -663,9 +663,11 @@ public class HibernateCriteriaQueryUtilities {
     }
 
     public static List<String> getObservationIdentifiers(Session session) {
+        List<Criterion> criterions = new ArrayList<Criterion>();
         List<Projection> projections = new ArrayList<Projection>();
+        criterions.add(Restrictions.ne(getIdentifierParameter(null), "null"));
         projections.add(getDistinctProjectionForIdentifier());
-        return (List<String>) getObject(new HashMap<String, String>(), new ArrayList<Criterion>(), projections,
+        return (List<String>) getObject(new HashMap<String, String>(), criterions, projections,
                 session, Observation.class);
     }
 
