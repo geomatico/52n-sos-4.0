@@ -793,7 +793,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         DirectPositionType lowerCorner = envelopeType.addNewLowerCorner();
         DirectPositionType upperCorner = envelopeType.addNewUpperCorner();
         if (srsID > 0) {
-            if (!Configurator.getInstance().switchCoordinatesForEPSG(srsID)) {
+            if (!Configurator.getInstance().reversedAxisOrderRequired(srsID)) {
                 lowerCorner.setStringValue(minx + " " + miny);
             } else {
                 lowerCorner.setStringValue(miny + " " + minx);
@@ -801,7 +801,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
 
             // set upper corner
             // TODO for full 3D support add maxz to parameter in setStringValue
-            if (!Configurator.getInstance().switchCoordinatesForEPSG(srsID)) {
+            if (!Configurator.getInstance().reversedAxisOrderRequired(srsID)) {
                 upperCorner.setStringValue(maxx + " " + maxy);
             } else {
                 upperCorner.setStringValue(maxy + " " + maxx);

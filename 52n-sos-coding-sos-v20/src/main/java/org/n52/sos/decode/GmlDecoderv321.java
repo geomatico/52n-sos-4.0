@@ -169,7 +169,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
                 SosHelper.parseSrsName(envelopeType.getSrsName());
         String lowerCorner = envelopeType.getLowerCorner().getStringValue();
         String upperCorner = envelopeType.getUpperCorner().getStringValue();
-        if (Configurator.getInstance().switchCoordinatesForEPSG(srid)) {
+        if (Configurator.getInstance().reversedAxisOrderRequired(srid)) {
             lowerCorner = switchCoordinatesInString(lowerCorner);
             upperCorner = switchCoordinatesInString(upperCorner);
         }

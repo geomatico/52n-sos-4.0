@@ -306,7 +306,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
         DirectPositionType xbPos = xbPoint.addNewPos();
         xbPos.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + jtsPoint.getSRID());
         String coords;
-        if (Configurator.getInstance().switchCoordinatesForEPSG(jtsPoint.getSRID())) {
+        if (Configurator.getInstance().reversedAxisOrderRequired(jtsPoint.getSRID())) {
             coords = JTSHelper.switchCoordinates4String(jtsPoint);
         } else {
             coords = JTSHelper.getCoordinates4String(jtsPoint);
@@ -329,7 +329,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
         xbPosList.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + jtsLineString.getSRID());
         String coords;
         // switch coordinates
-        if (Configurator.getInstance().switchCoordinatesForEPSG(jtsLineString.getSRID())) {
+        if (Configurator.getInstance().reversedAxisOrderRequired(jtsLineString.getSRID())) {
             coords = JTSHelper.switchCoordinates4String(jtsLineString);
         } else {
             coords = JTSHelper.getCoordinates4String(jtsLineString);
@@ -363,7 +363,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
             DirectPositionListType xbPosList = xbLrt.addNewPosList();
             xbPosList.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + jtsPolygon.getSRID());
             // switch coordinates
-            if (Configurator.getInstance().switchCoordinatesForEPSG(jtsPolygon.getSRID())) {
+            if (Configurator.getInstance().reversedAxisOrderRequired(jtsPolygon.getSRID())) {
                 coords = JTSHelper.switchCoordinates4String(ring);
             } else {
                 coords = JTSHelper.getCoordinates4String(ring);
@@ -391,7 +391,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
                 xbPosList = xbLrt.addNewPosList();
                 xbPosList.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + jtsPolygon.getSRID());
                 // switch coordinates
-                if (Configurator.getInstance().switchCoordinatesForEPSG(jtsPolygon.getSRID())) {
+                if (Configurator.getInstance().reversedAxisOrderRequired(jtsPolygon.getSRID())) {
                     coords = JTSHelper.switchCoordinates4String(ring);
                 } else {
                     coords = JTSHelper.getCoordinates4String(ring);
