@@ -177,7 +177,7 @@ public final class Configurator {
     private File sensorDir;
 
     /** file of service identification information in XML format */
-    private File serviceIdentification;
+    private File serviceIdentificationFile;
 
     /** service identification keyword strings */
     private String[] serviceIdentificationKeywords;
@@ -229,7 +229,7 @@ public final class Configurator {
     private ServiceLoader<ASosTasking> serviceLoaderTasking;
 
     /** file of service provider information in XML format */
-    private File serviceProvider;
+    private File serviceProviderFile;
 
     private String serviceProviderName;
 
@@ -320,7 +320,7 @@ public final class Configurator {
     private Set<String> supportedServices = new HashSet<String>(0);
 
     /** boolean indicates the order of x and y components of coordinates */
-    private List<Range> switchCoordinatesForEPSG;
+    private List<Range> epsgsWithReversedAxisOrder;
 
     private Timer taskingExecutor;
 
@@ -465,19 +465,19 @@ public final class Configurator {
             break;
         case SWITCH_COORDINATES_FOR_EPSG_CODES:
             String[] switchCoordinatesForEPSGStrings = parseString(setting, value, true).split(";");
-            this.switchCoordinatesForEPSG = new ArrayList<Range>(switchCoordinatesForEPSGStrings.length);
+            this.epsgsWithReversedAxisOrder = new ArrayList<Range>(switchCoordinatesForEPSGStrings.length);
             for (String switchCoordinatesForEPSGEntry : switchCoordinatesForEPSGStrings) {
                 String[] splittedSwitchCoordinatesForEPSGEntry = switchCoordinatesForEPSGEntry.split("-");
                 if (splittedSwitchCoordinatesForEPSGEntry.length == 1) {
                     Range r =
                             new Range(Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[0]),
                                     Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[0]));
-                    switchCoordinatesForEPSG.add(r);
+                    epsgsWithReversedAxisOrder.add(r);
                 } else if (splittedSwitchCoordinatesForEPSGEntry.length == 2) {
                     Range r =
                             new Range(Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[0]),
                                     Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[1]));
-                    switchCoordinatesForEPSG.add(r);
+                    epsgsWithReversedAxisOrder.add(r);
                 } else {
                     StringBuilder exceptionText = new StringBuilder();
                     exceptionText.append("Invalid format of entry in 'switchCoordinatesForEPSG': ");
@@ -497,7 +497,7 @@ public final class Configurator {
             this.tupleSeperator = parseString(setting, value, false);
             break;
         case SERVICE_PROVIDER_FILE:
-            this.serviceProvider = parseFile(setting, value, true);
+            this.serviceProviderFile = parseFile(setting, value, true);
             break;
         case SERVICE_PROVIDER_NAME:
             this.serviceProviderName = parseString(setting, value, true);
@@ -533,7 +533,7 @@ public final class Configurator {
             this.serviceProviderMailAddress = parseString(setting, value, true);
             break;
         case SERVICE_IDENTIFICATION_FILE:
-            this.serviceIdentification = parseFile(setting, value, true);
+            this.serviceIdentificationFile = parseFile(setting, value, true);
             break;
         case SERVICE_IDENTIFICATION_KEYWORDS:
             String keywords = parseString(setting, value, true);
@@ -1274,9 +1274,9 @@ public final class Configurator {
      */
     public SosServiceIdentification getServiceIdentification() throws OwsExceptionReport {
         SosServiceIdentification sosServiceIdentification = new SosServiceIdentification();
-        if (this.serviceIdentification != null) {
+        if (this.serviceIdentificationFile != null) {
             sosServiceIdentification.setServiceIdentification(XmlHelper
-                    .loadXmlDocumentFromFile(this.serviceIdentification));
+                    .loadXmlDocumentFromFile(this.serviceIdentificationFile));
         }
         sosServiceIdentification.setAbstract(this.serviceIdentificationAbstract);
         sosServiceIdentification.setAccessConstraints(this.serviceIdentificationAccessConstraints);
@@ -1294,8 +1294,8 @@ public final class Configurator {
      */
     public SosServiceProvider getServiceProvider() throws OwsExceptionReport {
         SosServiceProvider sosServiceProvider = new SosServiceProvider();
-        if (this.serviceProvider != null) {
-            sosServiceProvider.setServiceProvider(XmlHelper.loadXmlDocumentFromFile(this.serviceProvider));
+        if (this.serviceProviderFile != null) {
+            sosServiceProvider.setServiceProvider(XmlHelper.loadXmlDocumentFromFile(this.serviceProviderFile));
         }
         sosServiceProvider.setAdministrativeArea(this.serviceProviderAdministrativeArea);
         sosServiceProvider.setCity(this.serviceProviderCity);
@@ -1348,26 +1348,10 @@ public final class Configurator {
     }
 
     /**
-     * @param maxGetObsResults
-     *            the maxGetObsResults to set
-     */
-    public void setMaxGetObsResults(int maxGetObsResults) {
-        this.maxGetObsResults = maxGetObsResults;
-    }
-
-    /**
      * @return Returns the lease for the getResult template (in minutes).
      */
     public int getLease() {
         return lease;
-    }
-
-    /**
-     * @param lease
-     *            The lease to set.
-     */
-    public void setLease(int lease) {
-        this.lease = lease;
     }
 
     /**
@@ -1420,28 +1404,16 @@ public final class Configurator {
     }
 
     /**
-     * @param supportsQuality
-     *            the supportsQuality to set
-     */
-    public void setSupportsQuality(boolean supportsQuality) {
-        this.supportsQuality = supportsQuality;
-    }
-
-    /**
      * @param crs
      * @return boolean indicating if coordinates have to be switched
      */
-    public boolean switchCoordinatesForEPSG(int crs) {
-
-        boolean switchCoords = false;
-
-        swtch: for (Range r : switchCoordinatesForEPSG) {
-            if (r.contains(crs)) {
-                switchCoords = true;
-                break swtch;
+    public boolean reversedAxisOrderRequired(int epsgCode) {
+        for (Range r : epsgsWithReversedAxisOrder) {
+            if (r.contains(epsgCode)) {
+                return true;
             }
         }
-        return switchCoords;
+        return false;
     }
 
     /**
