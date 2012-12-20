@@ -139,7 +139,6 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
         sosObservation.setResultTime(getResultTime(omObservation));
         sosObservation.setValidTime(getValidTime(omObservation));
         sosObservation.setValue(getObservationValue(omObservation));
-        checkOrSetObservationType(sosObservation);
         try {
             SosAbstractFeature featureOfInterest = getFeatureOfInterest(omObservation.getFeatureOfInterest());
             observationConstallation.setFeatureOfInterest(checkFeatureWithMap(featureOfInterest, featureMap));
@@ -212,16 +211,9 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
         SosSamplingFeature feature = null;
         // if xlink:href is set
         if (featureOfInterest.getHref() != null) {
-            if (featureOfInterest.getHref().isEmpty()) {
-                String exceptionText = "The requested featureOfInterest has a missing xlink:href definition!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createMissingParameterValueException(
-                        Sos2Constants.InsertObservationParams.observation.name());
-            }
                 if (featureOfInterest.getHref().startsWith("#")) {
                     feature = new SosSamplingFeature(null, featureOfInterest.getHref().replace("#", ""));
                 } else {
-                    SosHelper.checkHref(featureOfInterest.getHref(), Sos2Constants.InsertObservationParams.observation.name());
                     feature = new SosSamplingFeature(featureOfInterest.getHref());
                     if (featureOfInterest.getTitle() != null && !featureOfInterest.getTitle().isEmpty()) {
                         feature.addName(featureOfInterest.getTitle());
@@ -409,23 +401,6 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createInvalidParameterValueException(
                     Sos2Constants.InsertObservationParams.observation.name(), exceptionText);
-        }
-    }
-
-    private void checkOrSetObservationType(SosObservation sosObservation) throws OwsExceptionReport {
-        String obsTypeFromValue = OMHelper.getObservationTypeFromValue(sosObservation.getValue().getValue());
-        if (sosObservation.getObservationConstellation().getObservationType() == null) {
-            sosObservation.getObservationConstellation().setObservationType(obsTypeFromValue);
-        } else {
-            if (!sosObservation.getObservationConstellation().getObservationType().equals(obsTypeFromValue)) {
-                StringBuilder exceptionText = new StringBuilder();
-                exceptionText.append("The requested observation is invalid!");
-                exceptionText.append(" The result element does not comply with the defined type (");
-                exceptionText.append(sosObservation.getObservationConstellation().getObservationType());
-                exceptionText.append(")!");
-                LOGGER.debug(exceptionText.toString());
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
-            }
         }
     }
 
