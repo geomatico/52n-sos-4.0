@@ -25,6 +25,8 @@ package org.n52.sos.ogc.om;
 
 import javax.xml.namespace.QName;
 
+import org.n52.sos.ogc.OGCConstants;
+
 /**
  * Class contains element names and namespaces used to encode the O&M responses.
  * 
@@ -178,6 +180,9 @@ public class OMConstants {
 
     public static final String OBS_TYPE_OBSERVATION =
             "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Observation";
+    
+    public static final String OBS_TYPE_UNKNOWN =
+            OGCConstants.UNKNOWN;
 
     public static final String OBS_TYPE_SWE_ARRAY_OBSERVATION =
             "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_SWEArrayObservation";
