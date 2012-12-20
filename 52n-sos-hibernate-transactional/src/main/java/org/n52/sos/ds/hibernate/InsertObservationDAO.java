@@ -162,7 +162,7 @@ public class InsertObservationDAO implements IInsertObservationDAO {
                 for (String offeringID : sosObsConst.getOfferings()) {
                     try {
                         hObsConst =
-                                HibernateUtilities.checkObservationConstellationForObservation(sosObsConst, offeringID, session);
+                                HibernateUtilities.checkObservationConstellationForObservation(sosObsConst, offeringID, session, Sos2Constants.InsertObservationParams.observationType.name());
                     } catch (OwsExceptionReport owse) {
                         exceptions.add(owse);
                     }
