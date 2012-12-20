@@ -64,8 +64,9 @@ public class HibernateUtilities {
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtilities.class);
 
     public static ObservationConstellation checkObservationConstellationForObservation(
-            SosObservationConstellation sosObservationConstellation, String offeringIdentifier, Session session)
+            SosObservationConstellation sosObservationConstellation, String offeringIdentifier, Session session, String parameterName)
             throws OwsExceptionReport, HibernateException {
+        // FIXME parameterName should not be part of the parameters
         // check if multiple offerings.
         List<Criterion> criterions = new ArrayList<Criterion>();
         Map<String, String> aliases = new HashMap<String, String>();
@@ -108,8 +109,7 @@ public class HibernateUtilities {
                     exceptionText.append(obsConst.getObservationType().getObservationType());
                     exceptionText.append("'!");
                     LOGGER.debug(exceptionText.toString());
-                    throw Util4Exceptions.createInvalidParameterValueException(
-                            Sos2Constants.InsertObservationParams.observationType.name(), exceptionText.toString());
+                    throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText.toString());
                 }
             }
         } else {
