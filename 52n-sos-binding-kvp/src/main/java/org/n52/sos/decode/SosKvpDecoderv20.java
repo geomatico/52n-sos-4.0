@@ -809,7 +809,7 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
             String lowerCorner;
             String upperCorner;
 
-            if (Configurator.getInstance().switchCoordinatesForEPSG(srid)) {
+            if (Configurator.getInstance().reversedAxisOrderRequired(srid)) {
                 lowerCorner = coordinates.get(1) + " " + coordinates.get(0);
                 upperCorner = coordinates.get(3) + " " + coordinates.get(2);
             } else {
