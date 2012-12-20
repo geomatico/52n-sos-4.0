@@ -111,8 +111,7 @@ public class GetObservationByIdDAO implements IGetObservationByIdDAO {
             // set identifier
             opsMeta.addParameterValue(
                     Sos2Constants.GetObservationByIdParams.observation.name(),
-                    new OWSParameterValuePossibleValues(HibernateCriteriaQueryUtilities
-                            .getObservationIdentifiers(session)));
+                    new OWSParameterValuePossibleValues(Configurator.getInstance().getCapabilitiesCacheController().getObservationIdentifiers()));
             return opsMeta;
         }
         return null;
