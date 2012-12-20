@@ -420,46 +420,45 @@ public class HibernateCriteriaTransactionalUtilities {
     public static void checkOrInsertResultTemplate(InsertResultTemplateRequest request,
             ObservationConstellation observationConstellation, FeatureOfInterest featureOfInterest, Session session)
             throws OwsExceptionReport {
-        List<String> features = new ArrayList<String>();
-        features.add(featureOfInterest.getIdentifier());
         List<ResultTemplate> resultTemplates =
                 HibernateCriteriaQueryUtilities.getResultTemplateObject(observationConstellation.getOffering()
-                        .getIdentifier(), observationConstellation.getObservableProperty().getIdentifier(), features,
+                        .getIdentifier(), observationConstellation.getObservableProperty().getIdentifier(), null,
                         session);
         if (!resultTemplateListContainsElements(resultTemplates)) {
             createAndSaveResultTemplate(request, observationConstellation, featureOfInterest, session);
         } else {
-            ResultTemplate storedResultTemplate = resultTemplates.get(0);
-            SosResultStructure storedStructure = new SosResultStructure(storedResultTemplate.getResultStructure());
-            SosResultStructure newStructure = new SosResultStructure(request.getResultStructure().getXml());
-            
-            if (!storedStructure.equals(newStructure)) {
-                String exceptionText = String.format(
-                		"The requested resultStructure is different from already inserted result template " +
-                		"for procedure (%s) observedProperty (%s) and offering (%s)!",
-                		observationConstellation.getProcedure().getIdentifier(),
-                		observationConstellation.getObservableProperty().getIdentifier(),
-                		observationConstellation.getOffering().getIdentifier());
-                LOGGER.error(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        Sos2Constants.InsertResultTemplateParams.resultStructure.name(), exceptionText);
+            List<String> storedIdentifiers = new ArrayList<String>(0);
+            for (ResultTemplate storedResultTemplate : resultTemplates) {
+                storedIdentifiers.add(storedResultTemplate.getIdentifier());
+                SosResultStructure storedStructure = new SosResultStructure(storedResultTemplate.getResultStructure());
+                SosResultStructure newStructure = new SosResultStructure(request.getResultStructure().getXml());
+                
+                if (!storedStructure.equals(newStructure)) {
+                    String exceptionText = String.format(
+                                    "The requested resultStructure is different from already inserted result template " +
+                                    "for procedure (%s) observedProperty (%s) and offering (%s)!",
+                                    observationConstellation.getProcedure().getIdentifier(),
+                                    observationConstellation.getObservableProperty().getIdentifier(),
+                                    observationConstellation.getOffering().getIdentifier());
+                    LOGGER.error(exceptionText);
+                    throw Util4Exceptions.createInvalidParameterValueException(
+                            Sos2Constants.InsertResultTemplateParams.proposedTemplate.name(), exceptionText);
+                }
+                SosResultEncoding storedEncoding = new SosResultEncoding(storedResultTemplate.getResultEncoding());
+                SosResultEncoding newEndoding = new SosResultEncoding(request.getResultEncoding().getXml());
+                if (!storedEncoding.equals(newEndoding)) {
+                    String exceptionText = String.format(
+                                    "The requested resultEncoding is different from already inserted result template " +
+                                    "for procedure (%s) observedProperty (%s) and offering (%s)!",
+                                    observationConstellation.getProcedure().getIdentifier(),
+                                    observationConstellation.getObservableProperty().getIdentifier(),
+                                    observationConstellation.getOffering().getIdentifier());
+                    LOGGER.error(exceptionText);
+                    throw Util4Exceptions.createInvalidParameterValueException(
+                            Sos2Constants.InsertResultTemplateParams.proposedTemplate.name(), exceptionText);
+                }
             }
-            
-            SosResultEncoding storedEncoding = new SosResultEncoding(storedResultTemplate.getResultEncoding());
-            SosResultEncoding newEndoding = new SosResultEncoding(request.getResultEncoding().getXml());
-            if (!storedEncoding.equals(newEndoding)) {
-                String exceptionText = String.format(
-                		"The requested resultEncoding is different from already inserted result template " +
-                		"for procedure (%s) observedProperty (%s) and offering (%s)!",
-                		observationConstellation.getProcedure().getIdentifier(),
-                		observationConstellation.getObservableProperty().getIdentifier(),
-                		observationConstellation.getOffering().getIdentifier());
-                LOGGER.error(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        Sos2Constants.InsertResultTemplateParams.resultEncoding.name(), exceptionText);
-            }
-            
-            if (request.getIdentifier() != null && !request.getIdentifier().equals(storedResultTemplate.getIdentifier())) {
+            if (request.getIdentifier() != null && !storedIdentifiers.contains(request.getIdentifier())) {
                 /* save it only if the identifier is different */
                 createAndSaveResultTemplate(request, observationConstellation, featureOfInterest, session);
             }
