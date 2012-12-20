@@ -718,30 +718,30 @@ public class SosHelper {
     /**
      * checks whether the value of outputFormat parameter is valid
      * 
-     * @param outputFormat
+     * @param procedureDecriptionFormat
      *            the outputFormat parameter which should be checked
      * @throws OwsExceptionReport
      *             if the value of the outputFormat parameter is incorrect
      */
-    public static void checkProcedureOutputFormat(String outputFormat, String parameterName) throws OwsExceptionReport {
-        if (outputFormat == null || outputFormat.isEmpty() || outputFormat.equals(SosConstants.PARAMETER_NOT_SET)) {
+    public static void checkProcedureDescriptionFormat(String procedureDecriptionFormat, String parameterName) throws OwsExceptionReport {
+        if (procedureDecriptionFormat == null || procedureDecriptionFormat.isEmpty() || procedureDecriptionFormat.equals(SosConstants.PARAMETER_NOT_SET)) {
             String exceptionText =
                     "The value of the mandatory parameter '" + parameterName
                             + "' was not found in the request or is incorrect!";
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createMissingParameterValueException(parameterName);
         }
-        if (!outputFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
-            if (!outputFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
+        if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
+            if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
                 String exceptionText =
-                        "The value '" + outputFormat + "' of the " + parameterName
+                        "The value '" + procedureDecriptionFormat + "' of the " + parameterName
                                 + " parameter is incorrect and has to be '"
                                 + SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE + "' for the requested sensor!";
                 LOGGER.debug(exceptionText);
                 throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
-            } else if (!outputFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
+            } else if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
                 String exceptionText =
-                        "The value '" + outputFormat + "' of the " + parameterName
+                        "The value '" + procedureDecriptionFormat + "' of the " + parameterName
                                 + " parameter is incorrect and has to be '"
                                 + SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL + "' for the requested sensor!";
                 LOGGER.debug(exceptionText);
@@ -794,27 +794,35 @@ public class SosHelper {
         }
     }
 
-    public static void checkFeatureOfInterest(List<String> featuresOfInterest,
+    public static void checkFeatureOfInterestIdentifiers(List<String> featuresOfInterest,
             Collection<String> validFeatureOfInterest, String parameterName) throws OwsExceptionReport {
         if (featuresOfInterest != null) {
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
             for (String featureOfInterest : featuresOfInterest) {
-                if (featureOfInterest == null || featureOfInterest.isEmpty()) {
-                    String exceptionText =
-                            "The value of the parameter '" + parameterName
-                                    + "' was not found in the request or is incorrect!";
-                    LOGGER.debug(exceptionText);
-                    throw Util4Exceptions.createMissingParameterValueException(parameterName);
-                }
-                if (!validFeatureOfInterest.contains(featureOfInterest)) {
-                    String exceptionText =
-                            "The value '" + featureOfInterest + "' of the parameter '" + parameterName
-                                    + "' is invalid";
-                    LOGGER.debug(exceptionText);
-                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
+                try {
+                checkFeatureOfInterstIdentifier(featureOfInterest, validFeatureOfInterest, parameterName);
+                } catch (OwsExceptionReport e) {
+                    exceptions.add(e);
                 }
             }
             Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        }
+    }
+    
+    public static void checkFeatureOfInterstIdentifier(String featureOfInterest, Collection<String> validFeatureOfInterest, String parameterName) throws OwsExceptionReport {
+        if (featureOfInterest == null || featureOfInterest.isEmpty()) {
+            String exceptionText =
+                    "The value of the parameter '" + parameterName
+                            + "' was not found in the request or is incorrect!";
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createMissingParameterValueException(parameterName);
+        }
+        if (!validFeatureOfInterest.contains(featureOfInterest)) {
+            String exceptionText =
+                    "The value '" + featureOfInterest + "' of the parameter '" + parameterName
+                            + "' is invalid";
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
         }
     }
 
@@ -952,6 +960,21 @@ public class SosHelper {
             }
         }
     }
+    
+    public static void checkResultTemplate(String resultTemplate, String parameterName) throws OwsExceptionReport {
+        if (resultTemplate == null || (resultTemplate != null && resultTemplate.isEmpty())) {
+            throw Util4Exceptions.createMissingParameterValueException(parameterName);
+        } else if (resultTemplate != null
+                && !Configurator.getInstance().getCapabilitiesCacheController().getResultTemplates()
+                        .contains(resultTemplate)) {
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("The requested template identifier (");
+            exceptionText.append(resultTemplate);
+            exceptionText.append(") is not supported by this server!");
+            throw Util4Exceptions.createInvalidParameterValueException(parameterName,
+                    exceptionText.toString());
+        }
+    }
 
     /**
      * Get valid FOI identifiers for SOS 2.0
@@ -976,7 +999,7 @@ public class SosHelper {
     public static Map<MinMax, String> getMinMaxMapFromEnvelope(Envelope envelope) {
         Map<MinMax, String> map = new EnumMap<MinMax, String>(MinMax.class);
         String minValue, maxValue;
-        if (Configurator.getInstance().switchCoordinatesForEPSG(Configurator.getInstance().getDefaultEPSG())) {
+        if (Configurator.getInstance().reversedAxisOrderRequired(Configurator.getInstance().getDefaultEPSG())) {
             minValue = envelope.getMinY() + " " + envelope.getMinX();
             maxValue = envelope.getMaxY() + " " + envelope.getMaxX();
         } else {
@@ -1134,6 +1157,24 @@ public class SosHelper {
             return Arrays.asList(csv.split(","));
         }
         return new ArrayList<String>(0);
+    }
+
+    public static void checkObservationType(String observationType, String parameterName) throws OwsExceptionReport {
+        Collection<String> validObservationTypes =
+                Configurator.getInstance().getCapabilitiesCacheController().getObservationTypes();
+        if (observationType.isEmpty()) {
+            throw Util4Exceptions
+                    .createMissingParameterValueException(parameterName);
+        } else {
+            if (!validObservationTypes.contains(observationType)) {
+                String exceptionText =
+                        "The value (" + observationType + ") of the parameter '"
+                                + Sos2Constants.InsertSensorParams.observationType.name() + "' is invalid";
+                LOGGER.error(exceptionText);
+                throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+            }
+        }
+        
     }
 
 }
