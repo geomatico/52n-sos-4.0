@@ -148,7 +148,7 @@ public final class Sos2Constants {
      * supported by all versions
      */
     public enum InsertObservationParams {
-        offering, observation, observationType;
+        offering, observation, observationType, observedProperty, procedure, featureOfInterest;
 
         /**
          * method checks whether the string parameter is contained in this
@@ -236,7 +236,7 @@ public final class Sos2Constants {
     }
     
     public enum InsertResultTemplateParams {
-        offering, observedProperty, procedure, observationType, resultStructure, resultEncoding, proposedTemplate;
+        offering, observedProperty, procedure, observationType, resultStructure, resultEncoding, proposedTemplate, identifier;
     }
 
     public enum GetResultParams {
