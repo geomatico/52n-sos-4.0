@@ -473,9 +473,9 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @return List<String> containing the observation ids of this SOS
      */
 	@Override
-    public List<String> getObservationIds() {
-        if (this.capabilitiesCache.getObsIds() != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getObsIds());
+    public List<String> getObservationIdentifiers() {
+        if (this.capabilitiesCache.getObservationIdentifiers() != null) {
+            return new ArrayList<String>(this.capabilitiesCache.getObservationIdentifiers());
         }
         return new ArrayList<String>(0);
     }
@@ -1046,6 +1046,14 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     public Collection<String> getObservationTypes() {
         if (this.capabilitiesCache.getObservationTypes() != null) {
             return new ArrayList<String>(this.capabilitiesCache.getObservationTypes());
+        }
+        return new ArrayList<String>(0);
+    }
+
+    @Override
+    public Collection<String> getFeatureOfInterestTypes() {
+        if (this.capabilitiesCache.getFeatureOfInterestTypes() != null) {
+            return new ArrayList<String>(this.capabilitiesCache.getFeatureOfInterestTypes());
         }
         return new ArrayList<String>(0);
     }

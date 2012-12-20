@@ -231,7 +231,7 @@ public abstract class ACapabilitiesCacheController {
      * 
      * @return List<String> containing the observation ids of this SOS
      */
-    public abstract Collection<String> getObservationIds();
+    public abstract Collection<String> getObservationIdentifiers();
 
     /**
      * returns the observedProperties for each offering
@@ -462,6 +462,8 @@ public abstract class ACapabilitiesCacheController {
     public abstract Collection<String> getObservationTypes4Offering(String offering);
 
     public abstract Collection<String> getObservationTypes();
+    
+    public abstract Collection<String> getFeatureOfInterestTypes();
     
     public abstract Map<String, Collection<String>> getAllowedKOfferingVObservationTypes();
 

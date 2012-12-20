@@ -61,7 +61,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     private Collection<String> featuresOfInterest;
 
     /** contains the observation IDs offered in the database */
-    private Collection<String> obsIds;
+    private Collection<String> observationIdentifiers;
 
     /** hash map containing the phenomenons for each offering */
     private Map<String, Collection<String>> kOfferingVObservableProperties;
@@ -132,6 +132,8 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     private Map<String, Collection<String>> allowedKOfferingVObservationType;
 
     private Collection<String> observationTypes;
+    
+    private Collection<String> featureOfInterestTypes;
 
     private Collection<String> resultTemplates;
 	
@@ -260,17 +262,8 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * 
      * @return List<String> containing the observation ids of this SOS
      */
-    protected Collection<String> getObservationIds() {
-        return this.obsIds;
-    }
-
-    /**
-     * returns the observation ids of this SOS
-     * 
-     * @return List<String> containing the observation ids of this SOS
-     */
-    protected Collection<String> getObsIds() {
-        return obsIds;
+    protected Collection<String> getObservationIdentifiers() {
+        return this.observationIdentifiers;
     }
 
     /**
@@ -480,8 +473,8 @@ public class CapabilitiesCache extends ACapabilitiesCache {
      * 
      * @param obsIds
      */
-    public void setObsIds(Collection<String> obsIds) {
-        this.obsIds = obsIds;
+    public void setObservationIdentifiers(Collection<String> observationIdentifiers) {
+        this.observationIdentifiers = observationIdentifiers;
     }
 
     /**
@@ -953,6 +946,14 @@ public class CapabilitiesCache extends ACapabilitiesCache {
 
     public Collection<String> getObservationTypes() {
         return observationTypes;
+    }
+    
+    public void setFeatureOfInterestTypes(Collection<String> featureOfInterestTypes) {
+        this.featureOfInterestTypes = featureOfInterestTypes;
+    }
+
+    public Collection<String> getFeatureOfInterestTypes() {
+        return featureOfInterestTypes;
     }
 
     public void setResultTemplates(Collection<String> resultTemplates) {
