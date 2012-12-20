@@ -76,8 +76,7 @@ public class OMHelper {
         else if (value instanceof SweDataArrayValue) {
             return OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION;
         }
-        // TODO why is this default? What about not supported types?
-        return OMConstants.OBS_TYPE_OBSERVATION;
+        return null;
     }
 
     private OMHelper() {
