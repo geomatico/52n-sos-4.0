@@ -33,6 +33,8 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IInsertResultTemplateDAO;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.ogc.om.OMConstants;
+import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -163,6 +165,11 @@ public class SosInsertResultTemplateOperatorV20 implements IRequestOperator {
             SosHelper.checkOfferings(request.getObservationConstellation().getOfferings(), Configurator.getInstance()
                     .getCapabilitiesCacheController().getOfferings(),
                     Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
+            try {
+                checkObservationType(request);
+            } catch (OwsExceptionReport owse) {
+                exceptions.add(owse);
+            }
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -182,7 +189,13 @@ public class SosInsertResultTemplateOperatorV20 implements IRequestOperator {
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
-        
+        // check identifier
+        try {
+            checkResultTemplateIdentifier(request.getIdentifier());
+        }  catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+
         Util4Exceptions.mergeAndThrowExceptions(exceptions);
         // TODO check parameter as defined in SOS 2.0 spec
 
@@ -231,6 +244,41 @@ public class SosInsertResultTemplateOperatorV20 implements IRequestOperator {
          * ExceptionCode “InvalidParameterValue” and locator value
          * “proposedTemplate”.
          */
+    }
+
+    private void checkResultTemplateIdentifier(String identifier) throws OwsExceptionReport {
+        if (Configurator.getInstance().getCapabilitiesCacheController().getResultTemplates()
+                        .contains(identifier)) {
+            StringBuilder exceptionText = new StringBuilder();
+            exceptionText.append("The requested template identifier (");
+            exceptionText.append(identifier);
+            exceptionText.append(") still contains in this service!");
+            throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.InsertResultTemplateParams.identifier.name(),
+                    exceptionText.toString());
+        }
+        
+    }
+
+    private void checkObservationType(InsertResultTemplateRequest request) throws OwsExceptionReport {
+        SosObservationConstellation observationConstellation = request.getObservationConstellation();
+        if (!observationConstellation.isSetObservationType()) {
+            observationConstellation.setObservationType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
+        }
+        // check if observation type is supported
+        SosHelper.checkObservationType(observationConstellation.getObservationType(),
+                Sos2Constants.InsertResultTemplateParams.observationType.name());
+        Set<String> validObservationTypesForOffering = new HashSet<String>(0);
+        for (String offering : observationConstellation.getOfferings()) {
+            validObservationTypesForOffering.addAll(Configurator.getInstance().getCapabilitiesCacheController()
+                    .getAllowedObservationTypes4Offering(offering));
+        }
+        // check if observation type is valid for offering
+        if (!validObservationTypesForOffering.contains(observationConstellation.getObservationType())) {
+            String exceptionText = "The requested observation type is not valid for the offering!";
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createInvalidParameterValueException(
+                    Sos2Constants.InsertResultTemplateParams.observationType.name(), exceptionText);
+        }
     }
 
 }
