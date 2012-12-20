@@ -23,6 +23,9 @@
  */
 package org.n52.sos.decode;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -137,7 +140,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
     public AbstractServiceCommunicationObject decode(XmlObject xmlObject) throws OwsExceptionReport {
         AbstractServiceCommunicationObject response = null;
         LOGGER.debug("REQUESTTYPE:" + xmlObject.getClass());
-        
+
         // validate document
         XmlHelper.validateDocument(xmlObject);
 
@@ -269,7 +272,14 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
         }
         getObsRequest.setFeatureIdentifiers(Arrays.asList(getObsType.getFeatureOfInterestArray()));
         if (getObsType.isSetResponseFormat()) {
-            getObsRequest.setResponseFormat(getObsType.getResponseFormat());
+            try {
+                String responseFormat = URLDecoder.decode(getObsType.getResponseFormat(), "UTF-8");
+                getObsRequest.setResponseFormat(responseFormat);
+            } catch (UnsupportedEncodingException e) {
+                String exceptionText = "Error while encoding response format!";
+                throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+            }
+
         } else {
             getObsRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
         }
@@ -433,7 +443,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
         GetResultResponse sosGetResultResponse = new GetResultResponse();
         GetResultResponseType getResultResponse = getResultResponseDoc.getGetResultResponse();
         String resultValues = parseResultValues(getResultResponse.getResultValues());
-//        sosGetResultResponse.setResultValues(resultValues);
+        // sosGetResultResponse.setResultValues(resultValues);
         return sosGetResultResponse;
     }
 
@@ -448,8 +458,8 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
      * @throws OwsExceptionReport
      *             if creation of the SpatialFilter failed
      */
-    private SpatialFilter parseSpatialFilter4GetObservation(net.opengis.sos.x20.GetObservationType.SpatialFilter spatialFilter)
-            throws OwsExceptionReport {
+    private SpatialFilter parseSpatialFilter4GetObservation(
+            net.opengis.sos.x20.GetObservationType.SpatialFilter spatialFilter) throws OwsExceptionReport {
         if (spatialFilter != null && spatialFilter.getSpatialOps() != null) {
             Object filter = decodeXmlToObject(spatialFilter.getSpatialOps());
             if (filter != null && filter instanceof SpatialFilter) {
@@ -528,12 +538,13 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
         return sosTemporalFilters;
     }
 
-    private SosObservationConstellation parseObservationTemplate(ObservationTemplate observationTemplate) throws OwsExceptionReport {
-       Object decodedObject = decodeXmlToObject(observationTemplate.getOMObservation());
-       if (decodedObject instanceof SosObservation) {
-           SosObservation observation = (SosObservation)decodedObject;
-           return observation.getObservationConstellation();
-       }
+    private SosObservationConstellation parseObservationTemplate(ObservationTemplate observationTemplate)
+            throws OwsExceptionReport {
+        Object decodedObject = decodeXmlToObject(observationTemplate.getOMObservation());
+        if (decodedObject instanceof SosObservation) {
+            SosObservation observation = (SosObservation) decodedObject;
+            return observation.getObservationConstellation();
+        }
         return null;
     }
 
@@ -587,7 +598,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
                     }
                 }
             }
-            throw Util4Exceptions.createMissingParameterValueException("resultValue");
+            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertResult.resultValues.name());
         } else {
             throw Util4Exceptions.createNoApplicableCodeException(null,
                     "The requested resultValue type is not supported");
@@ -598,7 +609,8 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
         List<IDecoder> decoderList = Configurator.getInstance().getDecoder(XmlHelper.getNamespace(xmlObject));
         if (decoderList != null) {
             for (IDecoder decoder : decoderList) {
-                // TODO: check if decoding returns null or throws exception: in both cases try next decoder in list
+                // TODO: check if decoding returns null or throws exception: in
+                // both cases try next decoder in list
                 return decoder.decode(xmlObject);
             }
         }
