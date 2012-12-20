@@ -45,7 +45,7 @@ public class HibernateFeatureCriteriaTransactionalUtilities {
             }
             if (samplingFeature.getGeometry() != null && !samplingFeature.getGeometry().isEmpty()) {
                 // TODO: transform to default EPSG
-                if (Configurator.getInstance().switchCoordinatesForEPSG(samplingFeature.getGeometry().getSRID())) {
+                if (Configurator.getInstance().reversedAxisOrderRequired(samplingFeature.getGeometry().getSRID())) {
                     feature.setGeom(JTSHelper.switchCoordinate4Geometry(samplingFeature.getGeometry()));
                 } else {
                     feature.setGeom(samplingFeature.getGeometry());
