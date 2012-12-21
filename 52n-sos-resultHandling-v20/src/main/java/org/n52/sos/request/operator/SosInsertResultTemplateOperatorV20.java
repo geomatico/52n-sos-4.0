@@ -189,10 +189,21 @@ public class SosInsertResultTemplateOperatorV20 implements IRequestOperator {
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
+        try {
+            String identifier = request.getObservationConstellation().getFeatureOfInterest().getIdentifier();
+            if (identifier.isEmpty()) {
+                throw Util4Exceptions
+                        .createMissingParameterValueException(Sos2Constants.InsertResultTemplateParams.proposedTemplate
+                                .name());
+            }
+
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
         // check identifier
         try {
             checkResultTemplateIdentifier(request.getIdentifier());
-        }  catch (OwsExceptionReport owse) {
+        } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
 
@@ -247,16 +258,15 @@ public class SosInsertResultTemplateOperatorV20 implements IRequestOperator {
     }
 
     private void checkResultTemplateIdentifier(String identifier) throws OwsExceptionReport {
-        if (Configurator.getInstance().getCapabilitiesCacheController().getResultTemplates()
-                        .contains(identifier)) {
+        if (Configurator.getInstance().getCapabilitiesCacheController().getResultTemplates().contains(identifier)) {
             StringBuilder exceptionText = new StringBuilder();
             exceptionText.append("The requested template identifier (");
             exceptionText.append(identifier);
             exceptionText.append(") still contains in this service!");
-            throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.InsertResultTemplateParams.identifier.name(),
-                    exceptionText.toString());
+            throw Util4Exceptions.createInvalidParameterValueException(
+                    Sos2Constants.InsertResultTemplateParams.identifier.name(), exceptionText.toString());
         }
-        
+
     }
 
     private void checkObservationType(InsertResultTemplateRequest request) throws OwsExceptionReport {

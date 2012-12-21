@@ -1053,11 +1053,12 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
                             LOGGER.error(exceptionText, xmle);
                             throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
                         }
-                    } 
-                    String exceptionText =
-                            "Error while encoding geometry for featureOfInterest, needed encoder is missing!";
-                    LOGGER.debug(exceptionText);
-                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                    }  else {
+                        featureProperty.setHref(samplingFeature.getIdentifier());
+                        if (samplingFeature.isSetNames()) {
+                            featureProperty.setTitle(samplingFeature.getFirstName());
+                        }
+                    }
                 }
             }
         }

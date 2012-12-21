@@ -257,7 +257,7 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
         } else if (geometry instanceof Polygon) {
             return SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_SURFACE;
         }
-        return null;
+        return OGCConstants.UNKNOWN;
     }
 
 }

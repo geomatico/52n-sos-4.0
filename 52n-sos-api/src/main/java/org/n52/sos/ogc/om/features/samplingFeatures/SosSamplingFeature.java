@@ -26,6 +26,7 @@ package org.n52.sos.ogc.om.features.samplingFeatures;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -47,7 +48,7 @@ public class SosSamplingFeature extends SosAbstractFeature {
 
     private int epsgCode;
 
-    private String featureType;
+    private String featureType = OGCConstants.UNKNOWN;
 
     private String url;
 
@@ -155,6 +156,10 @@ public class SosSamplingFeature extends SosAbstractFeature {
     
     public boolean isSetUrl() {
         return url != null && !url.isEmpty();
+    }
+
+    public boolean isSetGeometry() {
+        return geometry != null && !geometry.isEmpty();
     }
     
 }

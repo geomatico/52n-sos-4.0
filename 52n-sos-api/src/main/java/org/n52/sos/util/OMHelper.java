@@ -23,6 +23,7 @@
  */
 package org.n52.sos.util;
 
+import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.values.BooleanValue;

@@ -153,6 +153,14 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
             featureProperty.setHref("#" + absFeature.getGmlId());
             return featureProperty;
         } else {
+            if (!sampFeat.isSetGeometry()) {
+                FeaturePropertyType featureProperty = FeaturePropertyType.Factory.newInstance();
+                featureProperty.setHref(absFeature.getIdentifier());
+                if (sampFeat.isSetNames()) {
+                    featureProperty.setTitle(sampFeat.getFirstName());
+                }
+                return featureProperty;
+            }
             StringBuilder builder = new StringBuilder();
             builder.append("foi_");
             builder.append(SosHelper.generateID(absFeature.getIdentifier()));
@@ -194,12 +202,12 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
 
                 // set type
                 xbSampFeature.addNewType().setHref(sampFeat.getFeatureType());
-                
+
                 if (sampFeat.isSetNames()) {
                     for (String sosName : sampFeat.getName()) {
-                       CodeType name = xbSampFeature.addNewName();
-                       name.setCodeSpace("");
-                       name.setStringValue(sosName);
+                        CodeType name = xbSampFeature.addNewName();
+                        name.setCodeSpace("");
+                        name.setStringValue(sosName);
                     }
                 }
 
