@@ -216,6 +216,7 @@ public class GetFeatureOfInterestDAO implements IGetFeatureOfInterestDAO {
 
     private List<String> queryFeatureIdentifiersForParameter(GetFeatureOfInterestRequest sosRequest, Session session)
             throws OwsExceptionReport {
+        // TODO get foi ids from foi table. Else only fois returned which relates to observations.
         Map<String, String> aliases = new HashMap<String, String>();
         List<Criterion> criterions = new ArrayList<Criterion>();
         List<Projection> projections = new ArrayList<Projection>();
