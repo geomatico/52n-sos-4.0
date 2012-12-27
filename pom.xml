@@ -115,6 +115,11 @@
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
+				<artifactId>52n-sos-binding-pox</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-enhanced-v20</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -847,7 +852,7 @@
 		<profile>
 			<id>pox</id>
 			<modules>
-				<module>52n-sos-binding-xml</module>
+				<module>52n-sos-binding-pox</module>
 			</modules>
 		</profile>
 		<profile>

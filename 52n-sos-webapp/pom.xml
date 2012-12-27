@@ -359,7 +359,7 @@
 			<dependencies>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
-					<artifactId>52n-sos-binding-xml</artifactId>
+					<artifactId>52n-sos-binding-pox</artifactId>
 				</dependency>
 			</dependencies>
 		</profile>
