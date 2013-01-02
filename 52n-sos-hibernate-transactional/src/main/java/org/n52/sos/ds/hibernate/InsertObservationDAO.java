@@ -24,6 +24,7 @@
 package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -84,32 +85,18 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
     public String getOperationName() {
         return OPERATION_NAME;
     }
+    
+    @Override
+    public DecoderKeyType getKeyTypeForDcp(String version) {
+        return new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? 
+                            Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20);
+    }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Session session)
-            throws OwsExceptionReport {
-        // get DCP
-        Map<String, List<String>> dcp = getDCP(new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? 
-                                                    Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20));
-        
-        if (dcp != null && !dcp.isEmpty()) {
-            OWSOperation opsMeta = new OWSOperation();
-            // set operation name
-            opsMeta.setOperationName(OPERATION_NAME);
-    
-            // set DCP
-            opsMeta.setDcp(dcp);
-            // set offering
-            opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.offering.name(),
-                    new OWSParameterValuePossibleValues(getCache().getOfferings()));
-            // set observation
-            opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.observation.name(),
-                    new OWSParameterValuePossibleValues(new ArrayList<String>(0)));
-            opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.observation.name(), new OWSParameterDataType(
-                    "http://schemas.opengis.net/om/2.0/observation.xsd#OM_Observation"));
-            return opsMeta;
-        }
-        return null;
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
+        opsMeta.addPossibleValuesParameter(Sos2Constants.InsertObservationParams.offering, getCache().getOfferings());
+        opsMeta.addAnyParameterValue(Sos2Constants.InsertObservationParams.observation);
+        opsMeta.addDataTypeParameter(Sos2Constants.InsertObservationParams.observation, OMConstants.SCHEMA_LOCATION_OM_2_OM_OBSERVATION);
     }
 
     @Override

@@ -101,8 +101,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
     private static final int FILTER_CAPABILITIES    = 0x08;
     private static final int CONTENTS               = 0x10;
     private static final int ALL = 0x20 | SERVICE_IDENTIFICATION | SERVICE_PROVIDER 
-                                        | OPERATIONS_METADATA    | FILTER_CAPABILITIES 
-                                        | CONTENTS;
+                  | OPERATIONS_METADATA | FILTER_CAPABILITIES    | CONTENTS;
 
     /*
      * (non-Javadoc)
@@ -114,19 +113,18 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         return OPERATION_NAME;
     }
     
+    @Override
+    public DecoderKeyType getKeyTypeForDcp(String version) {
+        return new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20);
+    }
+    
     /*
      * (non-Javadoc)
      * @see org.n52.sos.ds.hibernate.AbstractHibernateOperationDao#getOperationsMetadata(java.lang.String, org.hibernate.Session)
      */
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Session session)
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session)
             throws OwsExceptionReport {
-                OWSOperation opsMeta = new OWSOperation();
-        // set operation name
-        opsMeta.setOperationName(getOperationName());
-        // set DCP
-        opsMeta.setDcp(getDCP(new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20)));
-        
         // set param Sections
         List<String> sectionsValues = new LinkedList<String>();
         /* common sections */
@@ -146,11 +144,10 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
             }
         }
        
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.Sections, new OWSParameterValuePossibleValues(sectionsValues));
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.AcceptFormats, new OWSParameterValuePossibleValues(Arrays.asList(SosConstants.getAcceptFormats())));
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.AcceptVersions, new OWSParameterValuePossibleValues(getConfigurator().getSupportedVersions()));
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.updateSequence, new OWSParameterValuePossibleValues(Collections.singletonList(SosConstants.PARAMETER_ANY)));
-        return opsMeta;
+        opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.Sections, sectionsValues);
+        opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptFormats, Arrays.asList(SosConstants.getAcceptFormats()));
+        opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptVersions, getConfigurator().getSupportedVersions());
+        opsMeta.addAnyParameterListValue(SosConstants.GetCapabilitiesParams.updateSequence);
     }
 
     /*
@@ -203,32 +200,34 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 sections = ALL;
             } else {
                 for (String section : request.getSections()) {
-                    if (!section.isEmpty()) {
-                        if (section.equals(SosConstants.CapabilitiesSections.All.name())) {
-                            sections = ALL;
-                            break;
-                        } else if (section.equals(SosConstants.CapabilitiesSections.ServiceIdentification.name())) {
-                            sections |= SERVICE_IDENTIFICATION;
-                        } else if (section.equals(SosConstants.CapabilitiesSections.ServiceProvider.name())) {
-                            sections |= SERVICE_PROVIDER;
-                        } else if (section.equals(SosConstants.CapabilitiesSections.OperationsMetadata.name())) {
-                            sections |= OPERATIONS_METADATA;
-                        } else if ((section.equals(Sos1Constants.CapabilitiesSections.Filter_Capabilities.name()) 
-                                        && response.getVersion().equals(Sos1Constants.SERVICEVERSION)) 
-                                || (section.equals(Sos2Constants.CapabilitiesSections.FilterCapabilities.name()) 
-                                        && response.getVersion().equals(Sos2Constants.SERVICEVERSION)))  {
-                            sections |= FILTER_CAPABILITIES;
-                        } else if (section.equals(SosConstants.CapabilitiesSections.Contents.name())) {
-                            sections |= CONTENTS;
-                        } else if (availableExtensionSections.contains(section) 
-                                && response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
-                            requestedExtensionSections.add(section);
-                        } else {
-                            String exceptionText = String.format("The requested section '%s' does not exist or is not supported!", section);
-                            LOGGER.debug(exceptionText);
-                            throw Util4Exceptions.createInvalidParameterValueException(
-                                    SosConstants.GetCapabilitiesParams.Section.name(), exceptionText);
-                        }
+                    if (section.isEmpty()) {
+                        // TODO empty section does not result in an exception report?
+                        continue;
+                    }
+                    if (section.equals(SosConstants.CapabilitiesSections.All.name())) {
+                        sections = ALL;
+                        break;
+                    } else if (section.equals(SosConstants.CapabilitiesSections.ServiceIdentification.name())) {
+                        sections |= SERVICE_IDENTIFICATION;
+                    } else if (section.equals(SosConstants.CapabilitiesSections.ServiceProvider.name())) {
+                        sections |= SERVICE_PROVIDER;
+                    } else if (section.equals(SosConstants.CapabilitiesSections.OperationsMetadata.name())) {
+                        sections |= OPERATIONS_METADATA;
+                    } else if ((section.equals(Sos1Constants.CapabilitiesSections.Filter_Capabilities.name()) 
+                                    && response.getVersion().equals(Sos1Constants.SERVICEVERSION)) 
+                            || (section.equals(Sos2Constants.CapabilitiesSections.FilterCapabilities.name()) 
+                                    && response.getVersion().equals(Sos2Constants.SERVICEVERSION)))  {
+                        sections |= FILTER_CAPABILITIES;
+                    } else if (section.equals(SosConstants.CapabilitiesSections.Contents.name())) {
+                        sections |= CONTENTS;
+                    } else if (availableExtensionSections.contains(section) 
+                            && response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
+                        requestedExtensionSections.add(section);
+                    } else {
+                        String exceptionText = String.format("The requested section '%s' does not exist or is not supported!", section);
+                        LOGGER.debug(exceptionText);
+                        throw Util4Exceptions.createInvalidParameterValueException(
+                                SosConstants.GetCapabilitiesParams.Section.name(), exceptionText);
                     }
                 }
             }

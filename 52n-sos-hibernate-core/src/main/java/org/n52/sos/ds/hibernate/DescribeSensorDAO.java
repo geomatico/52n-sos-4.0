@@ -93,44 +93,20 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
         return OPERATION_NAME;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.n52.sos.ds.hibernate.AbstractHibernateOperationDao#getOperationsMetadata(java.lang.String, org.hibernate.Session)
-     */
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Session connection)
-            throws OwsExceptionReport {
-        // get DCP
-        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION)
-                                                        ? Sos1Constants.NS_SOS : SWEConstants.NS_SWES_20));
-        if (dcpMap != null && !dcpMap.isEmpty()) {
-            OWSOperation opsMeta = new OWSOperation();
-            // set operation name
-            opsMeta.setOperationName(OPERATION_NAME);
-            // set DCP
-            opsMeta.setDcp(dcpMap);
-            // set param procedure
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(),
-                    new OWSParameterValuePossibleValues(getCache().getProcedures()));
-            // set param output format
-            List<String> outputFormatValues = new ArrayList<String>(1);
-            String parameterName = null;
-            // FIXME: getTypes from Decoder
-            if (version.equals(Sos1Constants.SERVICEVERSION)) {
-                outputFormatValues.add(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE);
-                parameterName = Sos1Constants.DescribeSensorParams.outputFormat.name();
-            } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
-                outputFormatValues.add(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
-                parameterName = Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name();
-            }
-            if (parameterName != null) {
-                opsMeta.addParameterValue(parameterName, new OWSParameterValuePossibleValues(outputFormatValues));
-            }
-
-            return opsMeta;
+    protected DecoderKeyType getKeyTypeForDcp(String version) {
+        return new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? Sos1Constants.NS_SOS : SWEConstants.NS_SWES_20);
+    }
+    
+    @Override
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session connection) throws OwsExceptionReport {
+        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());
+        // FIXME: getTypes from Decoder
+        if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            opsMeta.addPossibleValuesParameter(Sos1Constants.DescribeSensorParams.outputFormat, SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE);
+        } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
+            opsMeta.addPossibleValuesParameter(Sos2Constants.DescribeSensorParams.procedureDescriptionFormat, SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
         }
-        return null;
-
     }
 
     /*

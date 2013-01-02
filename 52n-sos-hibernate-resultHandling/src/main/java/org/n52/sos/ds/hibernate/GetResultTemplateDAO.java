@@ -63,41 +63,30 @@ public class GetResultTemplateDAO extends AbstractHibernateOperationDao implemen
     public String getOperationName() {
         return OPERATION_NAME;
     }
+    
+    @Override
+    protected DecoderKeyType getKeyTypeForDcp(String version) {
+        return new DecoderKeyType(Sos2Constants.NS_SOS_20);
+    }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Session session)
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session)
             throws OwsExceptionReport {
-        // get DCP
-        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(Sos2Constants.NS_SOS_20));
-        if (dcpMap != null && !dcpMap.isEmpty()) {
-            OWSOperation opsMeta = new OWSOperation();
-            // set operation name
-            opsMeta.setOperationName(OPERATION_NAME);
-            // set DCP
-            opsMeta.setDcp(dcpMap);
-
-            // Get data from data source
-            List<ResultTemplate> resultTemplates = HibernateCriteriaQueryUtilities.getResultTemplateObjects(session);
-            Set<String> offerings = null;
-            Set<String> observableProperties = null;
-            if (resultTemplates != null && !resultTemplates.isEmpty()) {
-                offerings = new HashSet<String>(0);
-                observableProperties = new HashSet<String>(0);
-                for (ResultTemplate resultTemplate : resultTemplates) {
-                    ObservationConstellation observationConstellation = resultTemplate.getObservationConstellation();
-                    offerings.add(observationConstellation.getOffering().getIdentifier());
-                    observableProperties.add(observationConstellation.getObservableProperty().getIdentifier());
-                }
+        // Get data from data source
+        List<ResultTemplate> resultTemplates = HibernateCriteriaQueryUtilities.getResultTemplateObjects(session);
+        Set<String> offerings = null;
+        Set<String> observableProperties = null;
+        if (resultTemplates != null && !resultTemplates.isEmpty()) {
+            offerings = new HashSet<String>(0);
+            observableProperties = new HashSet<String>(0);
+            for (ResultTemplate rt : resultTemplates) {
+                ObservationConstellation oc = rt.getObservationConstellation();
+                offerings.add(oc.getOffering().getIdentifier());
+                observableProperties.add(oc.getObservableProperty().getIdentifier());
             }
-            // set param offering
-            opsMeta.addParameterValue(Sos2Constants.GetResultTemplateParams.offering.name(),
-                    new OWSParameterValuePossibleValues(offerings));
-            // set param observedProperty
-            opsMeta.addParameterValue(Sos2Constants.GetResultTemplateParams.observedProperty.name(),
-                    new OWSParameterValuePossibleValues(observableProperties));
-            return opsMeta;
         }
-        return null;
+        opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultTemplateParams.offering, offerings);
+        opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultTemplateParams.observedProperty, observableProperties);
     }
 
     @Override

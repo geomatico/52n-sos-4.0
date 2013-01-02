@@ -138,12 +138,9 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
     }
 
     @Override
-    public XmlObject encode(SosAbstractFeature response, Map<HelperValues, String> additionalValues)
+    public XmlObject encode(SosAbstractFeature abstractFeature, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
-        if (response instanceof SosAbstractFeature) {
-            return createFeature((SosAbstractFeature) response);
-        }
-        return null;
+        return createFeature( abstractFeature);
     }
 
     private XmlObject createFeature(SosAbstractFeature absFeature) throws OwsExceptionReport {

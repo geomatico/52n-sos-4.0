@@ -24,6 +24,7 @@
 package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +47,7 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.ows.IExtension;
+import org.n52.sos.ogc.ows.IOWSParameterValue;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSParameterDataType;
 import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
@@ -81,53 +83,28 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
     public String getOperationName() {
         return OPERATION_NAME;
     }
+    
+    @Override
+    public DecoderKeyType getKeyTypeForDcp(String version) {
+        return new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? 
+                        Sos1Constants.NS_SOS : SWEConstants.NS_SWES_20);
+    }    
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Session session)
-            throws OwsExceptionReport {
-
-        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? 
-                                                        Sos1Constants.NS_SOS : SWEConstants.NS_SWES_20));
-        if (dcpMap != null && !dcpMap.isEmpty()) {
-            OWSOperation opsMeta = new OWSOperation();
-            if (version.equals(Sos1Constants.SERVICEVERSION)) {
-                // set operation name
-                opsMeta.setOperationName(OPERATION_NAME);
-                // set DCP
-                opsMeta.setDcp(dcpMap);
-                // set param sensorDescription
-                opsMeta.addParameterValue(Sos1Constants.RegisterSensorParams.SensorDescription.name(),
-                        new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
-                // set observationTemplate
-                opsMeta.addParameterValue(Sos1Constants.RegisterSensorParams.ObservationTemplate.name(),
-                        new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
-            } else {
-                // set operation name
-                opsMeta.setOperationName(OPERATION_NAME);
-                // set DCP
-                opsMeta.setDcp(dcpMap);
-                // set param procedureDescription
-                opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.procedureDescription.name(),
-                        new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
-                // set param procedureDescriptionFormat
-                opsMeta.addParameterValue(
-                        Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name(),
-                        new OWSParameterValuePossibleValues(HibernateCriteriaQueryUtilities
-                                .getProcedureDescriptionFormatIdentifiers(session)));
-                // set param observableProperty
-                opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.observableProperty.name(),
-                        new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
-                // set param metadata
-                opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.metadata.name(),
-                        new OWSParameterValuePossibleValues(new ArrayList<String>(0)));
-                opsMeta.addParameterValue(Sos2Constants.InsertSensorParams.metadata.name(), new OWSParameterDataType(
-                        "http://schemas.opengis.net/sos/2.0/sosInsertionCapabilities.xsd#InsertionCapabilities"));
-            }
-            return opsMeta;
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
+        if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            opsMeta.addAnyParameterValue(Sos1Constants.RegisterSensorParams.SensorDescription);
+            opsMeta.addAnyParameterValue(Sos1Constants.RegisterSensorParams.ObservationTemplate);
+        } else {
+            opsMeta.addAnyParameterValue(Sos2Constants.InsertSensorParams.procedureDescription);
+            opsMeta.addPossibleValuesParameter(Sos2Constants.InsertSensorParams.procedureDescriptionFormat, 
+                    HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatIdentifiers(session));
+            opsMeta.addAnyParameterValue(Sos2Constants.InsertSensorParams.observableProperty);
+            opsMeta.addAnyParameterValue(Sos2Constants.InsertSensorParams.metadata);
+            opsMeta.addDataTypeParameter(Sos2Constants.InsertSensorParams.metadata, Sos2Constants.SCHEMA_LOCATION_INSERTION_CAPABILITIES);
         }
-        return null;
     }
-
+    
     @Override
     public synchronized InsertSensorResponse insertSensor(InsertSensorRequest request) throws OwsExceptionReport {
         InsertSensorResponse response = new InsertSensorResponse();

@@ -68,25 +68,15 @@ public class GetObservationByIdDAO extends AbstractHibernateOperationDao impleme
     public String getOperationName() {
         return OPERATION_NAME;
     }
+    
+    @Override
+    public void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
+        opsMeta.addPossibleValuesParameter(Sos2Constants.GetObservationByIdParams.observation, getCache().getObservationIdentifiers());
+    }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Session session)
-            throws OwsExceptionReport {
-        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) 
-                                                    ? Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20));
-        if (dcpMap != null && !dcpMap.isEmpty()) {
-            OWSOperation opsMeta = new OWSOperation();
-            // set operation name
-            opsMeta.setOperationName(OPERATION_NAME);
-            // set DCP
-            opsMeta.setDcp(dcpMap);
-            // set identifier
-            opsMeta.addParameterValue(
-                    Sos2Constants.GetObservationByIdParams.observation.name(),
-                    new OWSParameterValuePossibleValues(getCache().getObservationIdentifiers()));
-            return opsMeta;
-        }
-        return null;
+    protected DecoderKeyType getKeyTypeForDcp(String version) {
+        return new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20);
     }
 
     @Override
@@ -96,16 +86,15 @@ public class GetObservationByIdDAO extends AbstractHibernateOperationDao impleme
             try {
                 session = getSession();
                 if (request.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
-                    throw Util4Exceptions.createMissingParameterValueException(GetObservationParams.observedProperty
-                            .name());
+                    throw Util4Exceptions.createMissingParameterValueException(GetObservationParams.observedProperty.name());
                 } else {
                     List<Observation> observations = queryObservation(request, session);
                     GetObservationByIdResponse response = new GetObservationByIdResponse();
                     response.setService(request.getService());
                     response.setVersion(request.getVersion());
                     response.setResponseFormat(request.getResponseFormat());
-                    response.setObservationCollection(HibernateObservationUtilities.createSosObservationsFromObservations(
-                            observations, request, session));
+                    response.setObservationCollection(HibernateObservationUtilities.
+                            createSosObservationsFromObservations(observations, request, session));
                     return response;
                 }
             } catch (HibernateException he) {

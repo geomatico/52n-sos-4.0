@@ -44,6 +44,8 @@ public class OMConstants {
             "http://schemas.opengis.net/om/1.0.0/extensions/observationSpecialization_constraint.xsd";
 
     public static final String SCHEMA_LOCATION_OM_2 = "http://schemas.opengis.net/om/2.0/observation.xsd";
+    
+    public static final String SCHEMA_LOCATION_OM_2_OM_OBSERVATION = SCHEMA_LOCATION_OM_2 + "#OM_Observation";
 
     public static final String NS_OM = "http://www.opengis.net/om/1.0";
 

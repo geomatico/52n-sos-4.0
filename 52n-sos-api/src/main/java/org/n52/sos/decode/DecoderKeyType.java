@@ -51,9 +51,8 @@ public class DecoderKeyType implements Comparable<DecoderKeyType> {
     @Override
     public int compareTo(DecoderKeyType o) {
         if (o instanceof DecoderKeyType) {
-            DecoderKeyType toCheck = (DecoderKeyType) o;
-            if (checkParameter(service, toCheck.service) && checkParameter(version, toCheck.version)
-                    && checkParameter(namespace, toCheck.namespace)) {
+            if (checkParameter(service, o.service) && checkParameter(version, o.version)
+                    && checkParameter(namespace, o.namespace)) {
                 return 0;
             }
             return 1;

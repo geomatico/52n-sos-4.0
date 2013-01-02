@@ -58,8 +58,7 @@ public class ServiceOperatorKeyType implements Comparable<ServiceOperatorKeyType
     @Override
     public int compareTo(ServiceOperatorKeyType o) {
         if (o instanceof ServiceOperatorKeyType) {
-            ServiceOperatorKeyType toCheck = (ServiceOperatorKeyType) o;
-            if (service.equals(toCheck.service) && version.equals(toCheck.version)) {
+            if (service.equals(o.service) && version.equals(o.version)) {
                 return 0;
             }
             return 1;

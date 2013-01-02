@@ -32,10 +32,17 @@ import org.n52.sos.ds.IOperationDAO;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.Sos1Constants;
+import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.SosHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao implements IOperationDAO {
+
+    private static final Logger log = LoggerFactory.getLogger(AbstractHibernateOperationDao.class);
 
     @Override
     public final OWSOperation getOperationsMetadata(String service, String version, Object connection) throws OwsExceptionReport {
@@ -54,16 +61,30 @@ public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao
     protected Configurator getConfigurator() {
         return Configurator.getInstance();
     }
-    
-    
+
     /* provide a default implemenation for extension-less DAO's */
     protected IExtension getExtension(Session session) throws OwsExceptionReport {
         return null;
     }
 
-    public abstract OWSOperation getOperationsMetadata(String service, String version, Session connection) throws OwsExceptionReport;
-
     protected Map<String, List<String>> getDCP(DecoderKeyType dkt) throws OwsExceptionReport {
         return SosHelper.getDCP(getOperationName(), dkt, getConfigurator().getBindingOperators().values(), getConfigurator().getServiceURL());
     }
+
+    protected OWSOperation getOperationsMetadata(String service, String version, Session session) throws OwsExceptionReport {
+        Map<String, List<String>> dcp = getDCP(getKeyTypeForDcp(version));
+        if (dcp == null || dcp.isEmpty()) {
+            log.debug("Operation {} not available due to empty DCP map.", getOperationName());
+            return null;
+        }
+        OWSOperation operation = new OWSOperation();
+        operation.setDcp(dcp);
+        operation.setOperationName(getOperationName());
+        setOperationsMetadata(operation, service, version, session);
+        return operation;
+    }
+
+    protected abstract void setOperationsMetadata(OWSOperation operation, String service, String version, Session session) throws OwsExceptionReport;
+
+    protected abstract DecoderKeyType getKeyTypeForDcp(String version);
 }

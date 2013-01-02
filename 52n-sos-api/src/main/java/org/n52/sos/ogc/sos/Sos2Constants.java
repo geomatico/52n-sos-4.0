@@ -39,6 +39,8 @@ public final class Sos2Constants {
     public static final String NS_SOS_20 = "http://www.opengis.net/sos/2.0";
 
     public static final String SCHEMA_LOCATION_SOS = "http://schemas.opengis.net/sos/2.0/sos.xsd";
+    
+    public static final String SCHEMA_LOCATION_INSERTION_CAPABILITIES = "http://schemas.opengis.net/sos/2.0/sosInsertionCapabilities.xsd#InsertionCapabilities";
 
     /** Constant for the content types of the response formats */
     private static String[] RESPONSE_FORMATS = { OMConstants.RESPONSE_FORMAT_OM_2, SosConstants.CONTENT_TYPE_ZIP };

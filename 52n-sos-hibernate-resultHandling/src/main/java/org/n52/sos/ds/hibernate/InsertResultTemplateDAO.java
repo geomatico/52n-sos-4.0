@@ -23,9 +23,6 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import java.util.List;
-import java.util.Map;
-
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -41,7 +38,6 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.response.InsertResultTemplateResponse;
-import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,22 +58,15 @@ public class InsertResultTemplateDAO extends AbstractHibernateOperationDao imple
     public String getOperationName() {
         return OPERATION_NAME;
     }
+    
+    @Override
+    protected DecoderKeyType getKeyTypeForDcp(String version) {
+        return new DecoderKeyType(Sos2Constants.NS_SOS_20);
+    }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Session session)
-            throws OwsExceptionReport {
-        // get DCP
-        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(Sos2Constants.NS_SOS_20));
-        if (dcpMap != null && !dcpMap.isEmpty()) {
-            OWSOperation opsMeta = new OWSOperation();
-            // set operation name
-            opsMeta.setOperationName(OPERATION_NAME);
-            // set DCP
-            opsMeta.setDcp(dcpMap);
-            // TODO set parameter
-            return opsMeta;
-        }
-        return null;
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
+        /* nothing to add here */
     }
 
     @Override

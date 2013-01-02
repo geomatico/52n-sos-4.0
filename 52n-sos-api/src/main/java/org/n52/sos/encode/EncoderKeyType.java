@@ -38,9 +38,8 @@ public class EncoderKeyType implements Comparable<EncoderKeyType> {
     @Override
     public int compareTo(EncoderKeyType o) {
         if (o instanceof EncoderKeyType) {
-            EncoderKeyType toCheck = (EncoderKeyType) o;
-            if (checkParameter(service, toCheck.service) && checkParameter(version, toCheck.version)
-                    && checkParameter(namespace, toCheck.namespace)) {
+            if (checkParameter(service, o.service) && checkParameter(version, o.version)
+                    && checkParameter(namespace, o.namespace)) {
                 return 0;
             }
             return 1;

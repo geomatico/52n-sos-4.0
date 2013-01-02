@@ -218,7 +218,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 			Field[] xbFields = new Field[sosFields.size()];
 			int xbFieldIndex = 0;
 			for (SosSweField sosSweField : sosFields) {
-				Field xbField = (DataRecordType.Field) createField(sosSweField);
+				Field xbField = createField(sosSweField);
 				xbFields[xbFieldIndex] = xbField;
 				xbFieldIndex++;
 			}

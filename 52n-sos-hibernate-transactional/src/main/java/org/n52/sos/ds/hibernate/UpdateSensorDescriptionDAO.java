@@ -23,10 +23,7 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.Collections;
 import java.util.Set;
 
 import org.hibernate.HibernateException;
@@ -51,7 +48,6 @@ import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.UpdateSensorRequest;
 import org.n52.sos.response.UpdateSensorResponse;
-import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,33 +68,20 @@ public class UpdateSensorDescriptionDAO extends AbstractHibernateOperationDao im
     public String getOperationName() {
         return OPERATION_NAME;
     }
+    
+    @Override
+    public DecoderKeyType getKeyTypeForDcp(String version) {
+        return new DecoderKeyType(SWEConstants.NS_SWES_20);
+    }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Session session)
-            throws OwsExceptionReport {
-        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(SWEConstants.NS_SWES_20));
-        if (dcpMap != null && !dcpMap.isEmpty()) {
-            OWSOperation opsMeta = new OWSOperation();
-            // set operation name
-            opsMeta.setOperationName(OPERATION_NAME);
-            // set DCP
-            opsMeta.setDcp(dcpMap);
-            // set param procedure
-            opsMeta.addParameterValue(Sos2Constants.UpdateSensorDescriptionParams.procedure.name(),
-                    new OWSParameterValuePossibleValues(getCache().getProcedures()));
-            // set param procedureDescriptionFormat
-            if (version.equals(Sos2Constants.SERVICEVERSION)) {
-                opsMeta.addParameterValue(
-                        Sos2Constants.UpdateSensorDescriptionParams.procedureDescriptionFormat.name(),
-                        new OWSParameterValuePossibleValues(HibernateCriteriaQueryUtilities
-                                .getProcedureDescriptionFormatIdentifiers(session)));
-            }
-            // set param description
-            opsMeta.addParameterValue(Sos2Constants.UpdateSensorDescriptionParams.description.name(),
-                    new OWSParameterValuePossibleValues(new ArrayList<String>(1)));
-            return opsMeta;
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
+        opsMeta.addPossibleValuesParameter(Sos2Constants.UpdateSensorDescriptionParams.procedure, getCache().getProcedures());
+        if (version.equals(Sos2Constants.SERVICEVERSION)) {
+            opsMeta.addPossibleValuesParameter(Sos2Constants.UpdateSensorDescriptionParams.procedureDescriptionFormat,
+                    HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatIdentifiers(session));
         }
-        return null;
+        opsMeta.addAnyParameterValue(Sos2Constants.UpdateSensorDescriptionParams.description);
     }
 
     @Override

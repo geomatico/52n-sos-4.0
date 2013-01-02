@@ -66,7 +66,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
+import java.util.Collections;
 import java.util.EnumMap;
+import org.n52.sos.ogc.ows.IOWSParameterValue;
 
 /**
  * Implementation of the interface IGetObservationDAO
@@ -98,100 +100,61 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
     public String getOperationName() {
         return OPERATION_NAME;
     }
+    
+    @Override
+    public DecoderKeyType getKeyTypeForDcp(String version) {
+        return new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20);
+    }
 
     /*
      * (non-Javadoc)
      * @see org.n52.sos.ds.hibernate.AbstractHibernateOperationDao#getOperationsMetadata(java.lang.String, org.hibernate.Session)
      */
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Session session)
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session)
             throws OwsExceptionReport {
-        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION)
-                                                        ? Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20));
-        if (dcpMap == null || dcpMap.isEmpty()) {
-            return null;
-        }
-        OWSOperation opsMeta = new OWSOperation();
-        // set operation name
-        opsMeta.setOperationName(OPERATION_NAME);
-        // set DCP
-        opsMeta.setDcp(dcpMap);
-        // set parameter for both versions
-        // set param offering
-        opsMeta.addParameterValue(SosConstants.GetObservationParams.offering.name(),
-                new OWSParameterValuePossibleValues(getCache().getOfferings()));
-        // set param procedure
-        opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(),
-                new OWSParameterValuePossibleValues(getCache().getProcedures()));
         
-        // set param observedProperty
-        if (getConfigurator().isShowFullOperationsMetadata4Observations()) {
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(),
-                    new OWSParameterValuePossibleValues(getCache().getObservableProperties()));
-        } else {
-            List<String> phenomenonValues = new ArrayList<String>(1);
-            phenomenonValues.add(SosConstants.PARAMETER_ANY);
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(),
-                    new OWSParameterValuePossibleValues(phenomenonValues));
-        }
-        // set param foi
         Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeatureOfInterest(), version);
-        if (getConfigurator().isShowFullOperationsMetadata4Observations()) {
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(),
-                    new OWSParameterValuePossibleValues(featureIDs));
-        } else {
-            List<String> foiValues = new ArrayList<String>(1);
-            foiValues.add(SosConstants.PARAMETER_ANY);
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(),
-                    new OWSParameterValuePossibleValues(foiValues));
-        }
-        // responseFormat
-        opsMeta.addParameterValue(SosConstants.GetObservationParams.responseFormat.name(),
-                new OWSParameterValuePossibleValues(SosHelper.getSupportedResponseFormats(SosConstants.SOS, version)));
 
-        // SOS 2.0 parameter
+        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.offering, getCache().getOfferings());
+        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());
+        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.responseFormat, SosHelper.getSupportedResponseFormats(SosConstants.SOS, version));
+        
+        if (getConfigurator().isShowFullOperationsMetadata4Observations()) {
+            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCache().getObservableProperties());
+            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.featureOfInterest, featureIDs);
+        } else {
+            opsMeta.addAnyParameterListValue(SosConstants.GetObservationParams.observedProperty);
+            opsMeta.addAnyParameterListValue(SosConstants.GetObservationParams.featureOfInterest);
+        }
+        
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
-            // set param temporal filter
-            opsMeta.addParameterValue(Sos2Constants.GetObservationParams.temporalFilter.name(),
-                    new OWSParameterValueRange(getEventTime(session)));
-            // set param spatial filter
+            // SOS 2.0 parameter
+            opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.temporalFilter, getEventTime(session));
             Envelope envelope = null;
             if (featureIDs != null && !featureIDs.isEmpty()) {
                 envelope = getCache().getEnvelopeForFeatures();
             }
             if (envelope != null) {
-                opsMeta.addParameterValue(Sos2Constants.GetObservationParams.spatialFilter.name(),
-                        new OWSParameterValueRange(SosHelper.getMinMaxMapFromEnvelope(envelope)));
+                opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.spatialFilter, SosHelper.getMinMaxMapFromEnvelope(envelope));
             }
+        } else if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            // SOS 1.0.0 parameter
+            opsMeta.addRangeParameterValue(Sos1Constants.GetObservationParams.eventTime, getEventTime(session));
+            opsMeta.addAnyParameterListValue(SosConstants.GetObservationParams.srsName);
+            opsMeta.addAnyParameterListValue(SosConstants.GetObservationParams.result);
+            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.resultModel, getResultModels());
+            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.responseMode, Arrays.asList(SosConstants.getResponseModes()));
         }
-        // SOS 1.0.0 parameter
-        else if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            // set param srsName
-            List<String> srsNameValues = new ArrayList<String>(1);
-            srsNameValues.add(SosConstants.PARAMETER_ANY);
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.srsName.name(),
-                    new OWSParameterValuePossibleValues(srsNameValues));
-            // set param eventTime
-            opsMeta.addParameterValue(Sos1Constants.GetObservationParams.eventTime.name(),
-                    new OWSParameterValueRange(getEventTime(session)));
-            // set param result
-            List<String> resultValues = new ArrayList<String>(1);
-            resultValues.add(SosConstants.PARAMETER_ANY);
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.result.name(),
-                    new OWSParameterValuePossibleValues(resultValues));
-            // set param resultModel
-            QName[] resultModels = OMConstants.getResultModels();
-            List<String> resultModelsList = new ArrayList<String>(resultModels.length);
-            for (QName qname : resultModels) {
-                resultModelsList.add(qname.getPrefix() + ":" + qname.getLocalPart());
-            }
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.resultModel.name(),
-                    new OWSParameterValuePossibleValues(resultModelsList));
-            // set param reponseMode
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.responseMode.name(),
-                    new OWSParameterValuePossibleValues(Arrays.asList(SosConstants.getResponseModes())));
+    }
+    
+    private List<String> getResultModels() {
+        QName[] resultModels = OMConstants.getResultModels();
+        List<String> resultModelsList = new ArrayList<String>(resultModels.length);
+        for (QName qname : resultModels) {
+            resultModelsList.add(qname.getPrefix() + ":" + qname.getLocalPart());
         }
-        return opsMeta;
+        return resultModelsList;
     }
 
     /*

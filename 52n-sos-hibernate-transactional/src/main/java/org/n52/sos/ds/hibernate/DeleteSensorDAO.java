@@ -59,24 +59,15 @@ public class DeleteSensorDAO extends AbstractHibernateOperationDao implements ID
     public String getOperationName() {
         return OPERATION_NAME;
     }
+    
+    @Override
+    protected DecoderKeyType getKeyTypeForDcp(String version) {
+        return new DecoderKeyType(SWEConstants.NS_SWES_20);
+    }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Session session)
-            throws OwsExceptionReport {
-        // get DCP
-        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(SWEConstants.NS_SWES_20));
-        if (dcpMap != null && !dcpMap.isEmpty()) {
-            OWSOperation opsMeta = new OWSOperation();
-            // set operation name
-            opsMeta.setOperationName(OPERATION_NAME);
-           // set DCP
-            opsMeta.setDcp(dcpMap);
-            // set param procedure
-            opsMeta.addParameterValue(Sos2Constants.DeleteSensorParams.procedure.name(), new OWSParameterValuePossibleValues(getCache().getProcedures()));
-            return opsMeta;
-        }
-        return null;
-
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
+        opsMeta.addPossibleValuesParameter(Sos2Constants.DeleteSensorParams.procedure, getCache().getProcedures());
     }
 
     @Override

@@ -57,4 +57,7 @@ public class SensorMLConstants {
     public static final QName ABSTRACT_PROCESS_QNAME = new QName(NS_SML, EN_ABSTRACT_PROCESS, NS_SML_PREFIX);
 
     public static final String VERSION_V101 = "1.0.1";
+
+    private SensorMLConstants() {
+    }
 }

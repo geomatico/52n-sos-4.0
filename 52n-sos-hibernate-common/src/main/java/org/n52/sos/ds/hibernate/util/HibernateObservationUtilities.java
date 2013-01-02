@@ -178,7 +178,7 @@ public class HibernateObservationUtilities {
                 ArrayList<SosQuality> qualityList = null;
                 if (Configurator.getInstance().isSupportsQuality()) {
                     hObservation.getQualities();
-                    for (Quality hQuality : (Set<Quality>) hObservation.getQualities()) {
+                    for (Quality hQuality : hObservation.getQualities()) {
                         String qualityTypeString = hQuality.getSweType().getSweType();
                         String qualityUnit = hQuality.getUnit().getUnit();
                         String qualityName = hQuality.getName();
@@ -652,7 +652,7 @@ public class HibernateObservationUtilities {
      */
     private static Geometry getValueFromGeometryValueTable(Set<GeometryValue> geometryValues) {
         for (GeometryValue geometryValue : geometryValues) {
-            return (Geometry) geometryValue.getValue();
+            return geometryValue.getValue();
         }
         return null;
     }

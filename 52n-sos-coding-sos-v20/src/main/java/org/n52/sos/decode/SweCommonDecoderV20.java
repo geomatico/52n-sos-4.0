@@ -582,7 +582,7 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
     private List<SosSweField> parseSimpleDataRecordFieldArray(AnyScalarPropertyType[] fieldArray)
             throws OwsExceptionReport {
         List<SosSweField> sosFields = new ArrayList<SosSweField>();
-        for (AnyScalarPropertyType xbField : (AnyScalarPropertyType[]) fieldArray) {
+        for (AnyScalarPropertyType xbField : fieldArray) {
             // if (xbField.isSetBoolean()) {
             // sosFields.add(new SosSweField(xbField.getName(),
             // parseBoolean(xbField.getBoolean())));

@@ -54,6 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
+import java.util.Collections;
 
 public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao implements IGetFeatureOfInterestDAO {
 
@@ -71,72 +72,44 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
     public String getOperationName() {
         return OPERATION_NAME;
     }
+    
+     @Override
+    protected DecoderKeyType getKeyTypeForDcp(String version) {
+        return new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20);
+    }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Session connection)
+    public void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session connection)
             throws OwsExceptionReport {
-        // get DCP
-        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) 
-                                                    ? Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20));
-        if (dcpMap != null && !dcpMap.isEmpty()) {
-            OWSOperation opsMeta = new OWSOperation();
-            // set operation name
-            opsMeta.setOperationName(OPERATION_NAME);
-            // set DCP
-            opsMeta.setDcp(dcpMap);
-            // set param procedure
-            if (getConfigurator().isShowFullOperationsMetadata4Observations()) {
-
-                opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(),
-                        new OWSParameterValuePossibleValues(getCache().getProcedures()));
-            } else {
-                List<String> phenomenonValues = new ArrayList<String>(1);
-                phenomenonValues.add(SosConstants.PARAMETER_ANY);
-                opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(),
-                        new OWSParameterValuePossibleValues(phenomenonValues));
-            }
-            // set param observedProperty
-            if (getConfigurator().isShowFullOperationsMetadata4Observations()) {
-                opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(),
-                        new OWSParameterValuePossibleValues(getCache().getObservableProperties()));
-            } else {
-                List<String> phenomenonValues = new ArrayList<String>(1);
-                phenomenonValues.add(SosConstants.PARAMETER_ANY);
-                opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(),
-                        new OWSParameterValuePossibleValues(phenomenonValues));
-            }
-            // set param foi
-            Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeatureOfInterest(), version);
-            if (getConfigurator().isShowFullOperationsMetadata4Observations()) {
-                opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(),
-                        new OWSParameterValuePossibleValues(featureIDs));
-            } else {
-                List<String> foiValues = new ArrayList<String>(1);
-                foiValues.add(SosConstants.PARAMETER_ANY);
-                opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(),
-                        new OWSParameterValuePossibleValues(foiValues));
-            }
-
-            // set param spatial filter
-            String parameterName = Sos2Constants.GetFeatureOfInterestParams.spatialFilter.name();
-            if (version.equals(Sos1Constants.SERVICEVERSION)) {
-                parameterName = Sos1Constants.GetFeatureOfInterestParams.location.name();
-            }
-            Envelope envelope = null;
-            if (featureIDs != null && !featureIDs.isEmpty()) {
-                envelope = getCache().getEnvelopeForFeatures();
-            }
-            if (envelope != null) {
-                opsMeta.addParameterValue(parameterName,
-                        new OWSParameterValueRange(SosHelper.getMinMaxMapFromEnvelope(envelope)));
-            } else {
-                List<String> locationValues = new ArrayList<String>(1);
-                locationValues.add(SosConstants.PARAMETER_ANY);
-                opsMeta.addParameterValue(parameterName, new OWSParameterValuePossibleValues(locationValues));
-            }
-            return opsMeta;
+        
+        Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeatureOfInterest(), version);
+        
+        if (getConfigurator().isShowFullOperationsMetadata4Observations()) {
+            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());
+            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCache().getObservableProperties());
+            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.featureOfInterest, featureIDs);
+        } else {
+            opsMeta.addAnyParameterListValue(SosConstants.GetObservationParams.procedure);
+            opsMeta.addAnyParameterListValue(SosConstants.GetObservationParams.observedProperty);
+            opsMeta.addAnyParameterListValue(SosConstants.GetObservationParams.featureOfInterest);
         }
-        return null;
+        
+        
+        String parameterName = Sos2Constants.GetFeatureOfInterestParams.spatialFilter.name();
+        if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            parameterName = Sos1Constants.GetFeatureOfInterestParams.location.name();
+        }
+
+        Envelope envelope = null;
+        if (featureIDs != null && !featureIDs.isEmpty()) {
+            envelope = getCache().getEnvelopeForFeatures();
+        }
+        
+        if (envelope != null) {
+            opsMeta.addRangeParameterValue(parameterName, SosHelper.getMinMaxMapFromEnvelope(envelope));
+        } else {
+            opsMeta.addAnyParameterListValue(parameterName);
+        }
     }
 
     @Override

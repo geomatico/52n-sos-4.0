@@ -46,9 +46,8 @@ public class ConverterKeyType implements Comparable<ConverterKeyType> {
     @Override
     public int compareTo(ConverterKeyType o) {
         if (o instanceof ConverterKeyType) {
-            ConverterKeyType toCheck = (ConverterKeyType) o;
-            if (checkParameter(fromNamespace, toCheck.fromNamespace)
-                    && checkParameter(toNamespace, toCheck.toNamespace)) {
+            if (checkParameter(fromNamespace, o.getFromNamespace())
+                    && checkParameter(toNamespace, o.getFromNamespace())) {
                 return 0;
             }
             return 1;

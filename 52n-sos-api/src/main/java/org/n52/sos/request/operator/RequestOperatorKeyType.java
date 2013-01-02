@@ -60,9 +60,8 @@ public class RequestOperatorKeyType implements Comparable<RequestOperatorKeyType
     @Override
     public int compareTo(RequestOperatorKeyType o) {
         if (o instanceof RequestOperatorKeyType) {
-            RequestOperatorKeyType toCheck = (RequestOperatorKeyType) o;
-            if (serviceOperatorKeyType.equals(toCheck.serviceOperatorKeyType)
-                    && operationName.equals(toCheck.operationName)) {
+            if (serviceOperatorKeyType.equals(o.serviceOperatorKeyType)
+                    && operationName.equals(o.operationName)) {
                 return 0;
             }
             return 1;

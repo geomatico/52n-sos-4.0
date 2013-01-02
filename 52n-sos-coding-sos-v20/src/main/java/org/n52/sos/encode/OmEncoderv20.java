@@ -971,7 +971,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
                     Map<HelperValues, String> additionalValue = new HashMap<HelperValues, String>();
                     additionalValue.put(HelperValues.GMLID, SosConstants.OBS_ID_PREFIX + observationID);
                     XmlObject xmlObject =
-                            (XmlObject) geomEncoder.encode((Geometry) geometryValue.getValue(), additionalValue);
+                            (XmlObject) geomEncoder.encode(geometryValue.getValue(), additionalValue);
                     xbResult.set(xmlObject);
                 } else {
                     String exceptionText = "Error while encoding geometry value, needed encoder is missing!";

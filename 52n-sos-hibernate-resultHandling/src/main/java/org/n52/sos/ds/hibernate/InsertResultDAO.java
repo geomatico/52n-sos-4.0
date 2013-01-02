@@ -99,21 +99,15 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
     public String getOperationName() {
         return OPERATION_NAME;
     }
+    
+    @Override
+    protected DecoderKeyType getKeyTypeForDcp(String version) {
+        return new DecoderKeyType(Sos2Constants.NS_SOS_20);
+    }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Session session)
-            throws OwsExceptionReport {
-        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(Sos2Constants.NS_SOS_20));
-        if (dcpMap != null && !dcpMap.isEmpty()) {
-            OWSOperation opsMeta = new OWSOperation();
-            // set operation name
-            opsMeta.setOperationName(OPERATION_NAME);
-            // set DCP
-            opsMeta.setDcp(dcpMap);
-            // TODO set parameter
-            return opsMeta;
-        }
-        return null;
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
+        /* nothing to add here */
     }
 
     @Override

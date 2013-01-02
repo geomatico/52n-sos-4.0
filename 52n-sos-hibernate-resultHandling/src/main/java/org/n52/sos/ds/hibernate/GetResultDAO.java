@@ -74,59 +74,46 @@ public class GetResultDAO extends AbstractHibernateOperationDao implements IGetR
     public String getOperationName() {
         return OPERATION_NAME;
     }
+    
+    @Override
+    protected DecoderKeyType getKeyTypeForDcp(String version) {
+        return new DecoderKeyType(Sos2Constants.NS_SOS_20);
+    }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Session session)
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session)
             throws OwsExceptionReport {
-        // get DCP
-        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(Sos2Constants.NS_SOS_20));
-        if (dcpMap != null && !dcpMap.isEmpty()) {
-            OWSOperation opsMeta = new OWSOperation();
-            // set operation name
-            opsMeta.setOperationName(OPERATION_NAME);
-            // set DCP
-            opsMeta.setDcp(dcpMap);
-            // Get data from data source
-            List<ResultTemplate> resultTemplates = HibernateCriteriaQueryUtilities.getResultTemplateObjects(session);
-            Set<String> offerings = null;
-            Set<String> observableProperties = null;
-            Set<String> featureOfInterest = null;
-            Set<String> templateIdentifiers = null;
-            if (resultTemplates != null && !resultTemplates.isEmpty()) {
-                offerings = new HashSet<String>(0);
-                observableProperties = new HashSet<String>(0);
-                featureOfInterest = new HashSet<String>(0);
-                templateIdentifiers = new HashSet<String>(0);
-                for (ResultTemplate resultTemplate : resultTemplates) {
-                    templateIdentifiers.add(resultTemplate.getIdentifier());
-                    ObservationConstellation observationConstellation = resultTemplate.getObservationConstellation();
-                    offerings.add(observationConstellation.getOffering().getIdentifier());
-                    observableProperties.add(observationConstellation.getObservableProperty().getIdentifier());
-                }
+        List<ResultTemplate> resultTemplates = HibernateCriteriaQueryUtilities.getResultTemplateObjects(session);
+        Set<String> offerings = null;
+        Set<String> observableProperties = null;
+        Set<String> featureOfInterest = null;
+        Set<String> templateIdentifiers = null;
+        if (resultTemplates != null && !resultTemplates.isEmpty()) {
+            offerings = new HashSet<String>(0);
+            observableProperties = new HashSet<String>(0);
+            featureOfInterest = new HashSet<String>(0);
+            templateIdentifiers = new HashSet<String>(0);
+            for (ResultTemplate resultTemplate : resultTemplates) {
+                templateIdentifiers.add(resultTemplate.getIdentifier());
+                ObservationConstellation observationConstellation = resultTemplate.getObservationConstellation();
+                offerings.add(observationConstellation.getOffering().getIdentifier());
+                observableProperties.add(observationConstellation.getObservableProperty().getIdentifier());
             }
-            if (version.equals(Sos1Constants.SERVICEVERSION)) {
-                // TODO set parameter for SOS 1.0
-            } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
-                // set param offering
-                opsMeta.addParameterValue(Sos2Constants.GetResultParams.offering.name(),
-                        new OWSParameterValuePossibleValues(offerings));
-                // set param observedProperty
-                opsMeta.addParameterValue(Sos2Constants.GetResultParams.observedProperty.name(),
-                        new OWSParameterValuePossibleValues(observableProperties));
-                // set param featureOfInterest
-                opsMeta.addParameterValue(Sos2Constants.GetResultParams.featureOfInterest.name(),
-                        new OWSParameterValuePossibleValues(featureOfInterest));
-                // TODO get the values for temporal and spatial filtering
-                // set param temporalFilter
-                // opsMeta.addParameterValue(Sos2Constants.GetResultParams.temporalFilter.name(),
-                // new OWSParameterValuePossibleValues(null));
-                // // set param spatialFilter
-                // opsMeta.addParameterValue(Sos2Constants.GetResultParams.spatialFilter.name(),
-                // new OWSParameterValuePossibleValues(null));
-            }
-            return opsMeta;
         }
-        return null;
+        if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            // TODO set parameter for SOS 1.0
+        } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
+            opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultParams.offering, offerings);
+            opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultParams.observedProperty, observableProperties);
+            opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultParams.featureOfInterest, featureOfInterest);
+            // TODO get the values for temporal and spatial filtering
+            // set param temporalFilter
+            // opsMeta.addParameterValue(Sos2Constants.GetResultParams.temporalFilter.name(),
+            // new OWSParameterValuePossibleValues(null));
+            // // set param spatialFilter
+            // opsMeta.addParameterValue(Sos2Constants.GetResultParams.spatialFilter.name(),
+            // new OWSParameterValuePossibleValues(null));
+        }
     }
 
     @Override
@@ -216,5 +203,4 @@ public class GetResultDAO extends AbstractHibernateOperationDao implements IGetR
         return observations;
 
     }
-
 }
