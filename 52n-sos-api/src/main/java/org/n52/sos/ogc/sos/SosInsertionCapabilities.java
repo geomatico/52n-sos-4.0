@@ -26,10 +26,13 @@ package org.n52.sos.ogc.sos;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
+import org.n52.sos.ogc.ows.ICapabilitiesExtension;
 import org.n52.sos.ogc.ows.IExtension;
+import org.n52.sos.ogc.ows.IMergableExtension;
 
-public class SosInsertionCapabilities implements IExtension {
+public class SosInsertionCapabilities implements IExtension, ICapabilitiesExtension, IMergableExtension<SosInsertionCapabilities> {
+    
+    private static final String SECTION_NAME = Sos2Constants.CapabilitiesSections.InsertionCapabilities.name();
 
     private Set<String> featureOfInterestTypes;
 
@@ -83,7 +86,13 @@ public class SosInsertionCapabilities implements IExtension {
         this.supportedEncodings.addAll(supportedEncodings);
     }
 
-    public void addInsertionCapabilities(SosInsertionCapabilities insertionCapabilities) {
+    @Override
+    public String getSectionName() {
+        return SECTION_NAME;
+    }
+
+    @Override
+    public void merge(SosInsertionCapabilities insertionCapabilities) {
         if (insertionCapabilities.getFeatureOfInterestTypes() != null) {
             addFeatureOfInterestTypes(insertionCapabilities.getFeatureOfInterestTypes());
         }
@@ -96,7 +105,5 @@ public class SosInsertionCapabilities implements IExtension {
         if (insertionCapabilities.getSupportedEncodings() != null) {
             addSupportedEncodings(insertionCapabilities.getSupportedEncodings());
         }
-
     }
-
 }

@@ -77,15 +77,11 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
     private List<DecoderKeyType> decoderKeyTypes;
 
     public SosKvpDecoderv20() {
-        decoderKeyTypes = new ArrayList<DecoderKeyType>();
-        DecoderKeyType serviceVersionDKT = new DecoderKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION);
-        decoderKeyTypes.add(serviceVersionDKT);
-        DecoderKeyType serviceDKT = new DecoderKeyType(SosConstants.SOS, null);
-        decoderKeyTypes.add(serviceDKT);
-        DecoderKeyType namespaceSosDKT = new DecoderKeyType(Sos2Constants.NS_SOS_20);
-        decoderKeyTypes.add(namespaceSosDKT);
-        DecoderKeyType namespaceSwesDKT = new DecoderKeyType(SWEConstants.NS_SWES_20);
-        decoderKeyTypes.add(namespaceSwesDKT);
+        decoderKeyTypes = new ArrayList<DecoderKeyType>(4);
+        decoderKeyTypes.add(new DecoderKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION));
+        decoderKeyTypes.add(new DecoderKeyType(SosConstants.SOS, null));
+        decoderKeyTypes.add(new DecoderKeyType(Sos2Constants.NS_SOS_20));
+        decoderKeyTypes.add(new DecoderKeyType(SWEConstants.NS_SWES_20));
         StringBuilder logMsgBuilder = new StringBuilder();
         logMsgBuilder.append("Decoder for the following namespaces initialized successfully: ");
         for (DecoderKeyType decoderKeyType : decoderKeyTypes) {

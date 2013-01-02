@@ -30,24 +30,20 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.n52.sos.decode.DecoderKeyType;
-import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IDeleteSensorDAO;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.response.DeleteSensorResponse;
-import org.n52.sos.service.Configurator;
-import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DeleteSensorDAO implements IDeleteSensorDAO {
+public class DeleteSensorDAO extends AbstractHibernateOperationDao implements IDeleteSensorDAO {
 
     /**
      * logger
@@ -59,39 +55,16 @@ public class DeleteSensorDAO implements IDeleteSensorDAO {
      */
     private static final String OPERATION_NAME = Sos2Constants.Operations.DeleteSensor.name();
 
-    /**
-     * Instance of the IConnectionProvider
-     */
-    private IConnectionProvider connectionProvider;
-    
-    /**
-     * constructor
-     */
-    public DeleteSensorDAO() {
-        this.connectionProvider = Configurator.getInstance().getConnectionProvider();
-    }
-
     @Override
     public String getOperationName() {
         return OPERATION_NAME;
     }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Object connection)
+    public OWSOperation getOperationsMetadata(String service, String version, Session session)
             throws OwsExceptionReport {
-        Session session = null;
-        if (connection instanceof Session) {
-            session = (Session) connection;
-        } else {
-            String exceptionText = "The parameter connection is not an Hibernate Session!";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        }
-
         // get DCP
-        DecoderKeyType dkt = new DecoderKeyType(SWEConstants.NS_SWES_20);
-        Map<String, List<String>> dcpMap = SosHelper.getDCP(OPERATION_NAME, dkt,
-                Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL());
+        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(SWEConstants.NS_SWES_20));
         if (dcpMap != null && !dcpMap.isEmpty()) {
             OWSOperation opsMeta = new OWSOperation();
             // set operation name
@@ -99,8 +72,7 @@ public class DeleteSensorDAO implements IDeleteSensorDAO {
            // set DCP
             opsMeta.setDcp(dcpMap);
             // set param procedure
-            opsMeta.addParameterValue(Sos2Constants.DeleteSensorParams.procedure.name(), new OWSParameterValuePossibleValues(Configurator.getInstance()
-                    .getCapabilitiesCacheController().getProcedures()));
+            opsMeta.addParameterValue(Sos2Constants.DeleteSensorParams.procedure.name(), new OWSParameterValuePossibleValues(getCache().getProcedures()));
             return opsMeta;
         }
         return null;
@@ -115,7 +87,7 @@ public class DeleteSensorDAO implements IDeleteSensorDAO {
         Session session = null;
         Transaction transaction = null;
         try {
-            session = (Session) connectionProvider.getConnection();
+            session = getSession();
             transaction = session.beginTransaction();
             HibernateCriteriaTransactionalUtilities.setDeleteSensorFlag(request.getProcedureIdentifier(), true, session);
             transaction.commit();
@@ -128,15 +100,8 @@ public class DeleteSensorDAO implements IDeleteSensorDAO {
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            connectionProvider.returnConnection(session);
+            returnSession(session);
         }
         return response;
     }
-
-    @Override
-    public IExtension getExtension(Object connection) throws OwsExceptionReport {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

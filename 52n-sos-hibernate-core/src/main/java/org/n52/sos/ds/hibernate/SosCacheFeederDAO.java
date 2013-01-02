@@ -31,15 +31,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.Cache;
-
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
 import org.n52.sos.cache.ACapabilitiesCache;
 import org.n52.sos.cache.CapabilitiesCache;
 import org.n52.sos.ds.ICacheFeederDAO;
-import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.hibernate.entities.CompositePhenomenon;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
@@ -64,24 +61,12 @@ import com.vividsolutions.jts.geom.Envelope;
  * Implementation of the interface ICacheFeederDAO
  * 
  */
-public class SosCacheFeederDAO implements ICacheFeederDAO {
+public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFeederDAO {
 
     /**
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosCacheFeederDAO.class);
-
-    /**
-     * Instance of the IConnectionProvider
-     */
-    private IConnectionProvider connectionProvider;
-
-    /**
-     * constructor
-     */
-    public SosCacheFeederDAO() {
-        connectionProvider = Configurator.getInstance().getConnectionProvider();
-    }
 
     /*
      * (non-Javadoc)
@@ -94,7 +79,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         CapabilitiesCache cache = (CapabilitiesCache) capabilitiesCache;
         Session session = null;
         try {
-            session = (Session) connectionProvider.getConnection();
+            session = getSession();
             setOfferingValues(cache, session);
             setProcedureValues(cache, session);
             setObservablePropertyValues(cache, session);
@@ -111,7 +96,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             String exceptionText = "Error while initializing CapabilitiesCache!";
             LOGGER.error(exceptionText, he);
         } finally {
-            connectionProvider.returnConnection(session);
+            returnSession(session);
         }
     }
 
@@ -120,7 +105,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         Session session = null;
         try {
             // TODO: check which setter are necessary
-            session = (Session) connectionProvider.getConnection();
+            session = getSession();
             setOfferingValues(capabilitiesCache, session);
             setProcedureValues(capabilitiesCache, session);
             setObservablePropertyValues(capabilitiesCache, session);
@@ -132,7 +117,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             String exceptionText = "Error while updating CapabilitiesCache after sensor insertion!";
             LOGGER.error(exceptionText, he);
         } finally {
-            connectionProvider.returnConnection(session);
+            returnSession(session);
         }
     }
 
@@ -141,7 +126,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         Session session = null;
         try {
             // TODO: check which setter are necessary
-            session = (Session) connectionProvider.getConnection();
+            session = getSession();
             setOfferingValues(capabilitiesCache, session);
             setProcedureValues(capabilitiesCache, session);
             session.close();
@@ -149,7 +134,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             String exceptionText = "Error while updating CapabilitiesCache after sensor deletion!";
             LOGGER.error(exceptionText, he);
         } finally {
-            connectionProvider.returnConnection(session);
+            returnSession(session);
         }
     }
 
@@ -158,7 +143,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         Session session = null;
         try {
             // TODO: check which setter are necessary
-            session = (Session) connectionProvider.getConnection();
+            session = getSession();
             setFeatureOfInterestValues(capabilitiesCache, session);
 			setOfferingValues(capabilitiesCache, session);
 			setEventTimeValues(capabilitiesCache, session);
@@ -167,7 +152,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             String exceptionText = "Error while updating CapabilitiesCache after observation insertion!";
             LOGGER.error(exceptionText, he);
         } finally {
-            connectionProvider.returnConnection(session);
+            returnSession(session);
         }
     }
 
@@ -177,7 +162,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         Session session = null;
         try {
             // TODO: check which setter are necessary (see updateAfterObservationInsertion)
-            session = (Session) connectionProvider.getConnection();
+            session = getSession();
             setFeatureOfInterestValues(capabilitiesCache, session);
             setOfferingValues(capabilitiesCache, session);
 			setEventTimeValues(capabilitiesCache, session);
@@ -186,7 +171,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             String exceptionText = "Error while updating CapabilitiesCache after observation deletion!";
             LOGGER.error(exceptionText, he);
         } finally {
-            connectionProvider.returnConnection(session);
+            returnSession(session);
         }
     }
 
@@ -195,7 +180,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
         Session session = null;
         try {
             // TODO: check which setter are necessary
-            session = (Session) connectionProvider.getConnection();
+            session = getSession();
             setOfferingValues(capabilitiesCache, session);
             setProcedureValues(capabilitiesCache, session);
             setObservablePropertyValues(capabilitiesCache, session);
@@ -208,7 +193,7 @@ public class SosCacheFeederDAO implements ICacheFeederDAO {
             String exceptionText = "Error while updating CapabilitiesCache after resultTemplate insertion!";
             LOGGER.error(exceptionText, he);
         } finally {
-            connectionProvider.returnConnection(session);
+            returnSession(session);
         }
     }
 

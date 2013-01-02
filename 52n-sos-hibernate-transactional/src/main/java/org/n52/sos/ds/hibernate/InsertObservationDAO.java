@@ -38,7 +38,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.n52.sos.decode.DecoderKeyType;
-import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IInsertObservationDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
@@ -53,7 +52,6 @@ import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
-import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSParameterDataType;
 import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
@@ -65,14 +63,12 @@ import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.response.InsertObservationResponse;
-import org.n52.sos.service.Configurator;
-import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InsertObservationDAO implements IInsertObservationDAO {
+public class InsertObservationDAO extends AbstractHibernateOperationDao implements IInsertObservationDAO {
 
     /**
      * logger
@@ -84,55 +80,28 @@ public class InsertObservationDAO implements IInsertObservationDAO {
      */
     private static final String OPERATION_NAME = SosConstants.Operations.InsertObservation.name();
 
-    /**
-     * Instance of the IConnectionProvider
-     */
-    private IConnectionProvider connectionProvider;
-
-    /**
-     * constructor
-     */
-    public InsertObservationDAO() {
-        this.connectionProvider = Configurator.getInstance().getConnectionProvider();
-    }
-
     @Override
     public String getOperationName() {
         return OPERATION_NAME;
     }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Object connection)
+    public OWSOperation getOperationsMetadata(String service, String version, Session session)
             throws OwsExceptionReport {
-        Session session = null;
-        if (connection instanceof Session) {
-            session = (Session) connection;
-        } else {
-            String exceptionText = "The parameter connection is not an Hibernate Session!";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        }
-        
         // get DCP
-        DecoderKeyType dkt = null;
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
-        } else {
-            dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
-        }
-        Map<String, List<String>> dcpMap = SosHelper.getDCP(OPERATION_NAME, dkt,
-                Configurator.getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL());
-        if (dcpMap != null && !dcpMap.isEmpty()) {
+        Map<String, List<String>> dcp = getDCP(new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? 
+                                                    Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20));
+        
+        if (dcp != null && !dcp.isEmpty()) {
             OWSOperation opsMeta = new OWSOperation();
             // set operation name
             opsMeta.setOperationName(OPERATION_NAME);
     
             // set DCP
-            opsMeta.setDcp(dcpMap);
+            opsMeta.setDcp(dcp);
             // set offering
             opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.offering.name(),
-                    new OWSParameterValuePossibleValues(Configurator.getInstance().getCapabilitiesCacheController()
-                            .getOfferings()));
+                    new OWSParameterValuePossibleValues(getCache().getOfferings()));
             // set observation
             opsMeta.addParameterValue(Sos2Constants.InsertObservationParams.observation.name(),
                     new OWSParameterValuePossibleValues(new ArrayList<String>(0)));
@@ -153,7 +122,7 @@ public class InsertObservationDAO implements IInsertObservationDAO {
         Transaction transaction = null;
         // TODO: check unit and set if available and not defined in DB
         try {
-            session = (Session) connectionProvider.getConnection();
+            session = getSession();
             transaction = session.beginTransaction();
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
             for (SosObservation sosObservation : request.getObservation()) {
@@ -199,7 +168,7 @@ public class InsertObservationDAO implements IInsertObservationDAO {
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            connectionProvider.returnConnection(session);
+            returnSession(session);
         }
         // TODO: ... all the DS insertion stuff
         // Requirement 68
@@ -234,7 +203,7 @@ public class InsertObservationDAO implements IInsertObservationDAO {
 		SweCommonEncoderv20 sweEncoder = null;
 		if (isEncoderRequired(dataArray))
 		{
-			IEncoder encoder = Configurator.getInstance().getEncoder(SWEConstants.NS_SWE_20);
+			IEncoder encoder = getConfigurator().getEncoder(SWEConstants.NS_SWE_20);
 			if (encoder instanceof SweCommonEncoderv20)
 			{
 				sweEncoder = (SweCommonEncoderv20) encoder;
@@ -283,10 +252,4 @@ public class InsertObservationDAO implements IInsertObservationDAO {
 	{
 		return dataArray.getElementType().getXml() == null || dataArray.getEncoding().getXml() == null;
 	}
-
-    @Override
-    public IExtension getExtension(Object connection) throws OwsExceptionReport {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

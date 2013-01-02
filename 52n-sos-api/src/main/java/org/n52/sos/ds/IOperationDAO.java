@@ -44,6 +44,8 @@ public interface IOperationDAO {
      * Get the OperationsMetadata of the supported SOS operation for the
      * capabilities
      * 
+     * @param service 
+     *            OGC service identfier
      * @param version
      *            SOS version
      * @param connection

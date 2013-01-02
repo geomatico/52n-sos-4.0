@@ -40,7 +40,6 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projection;
 import org.n52.sos.decode.DecoderKeyType;
-import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IDescribeSensorDAO;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
@@ -49,7 +48,6 @@ import org.n52.sos.ogc.gml.SosGmlMetaDataProperty;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sensorML.AbstractMultiProcess;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
@@ -64,7 +62,6 @@ import org.n52.sos.ogc.swe.SosSweField;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.response.DescribeSensorResponse;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
@@ -74,7 +71,7 @@ import org.slf4j.LoggerFactory;
  * Implementation of the interface IDescribeSensorDAO
  * 
  */
-public class DescribeSensorDAO implements IDescribeSensorDAO {
+public class DescribeSensorDAO extends AbstractHibernateOperationDao implements IDescribeSensorDAO {
 
     /**
      * logger
@@ -85,18 +82,6 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
      * supported SOS operation
      */
     private static final String OPERATION_NAME = SosConstants.Operations.DescribeSensor.name();
-
-    /**
-     * Instance of the IConnectionProvider
-     */
-    private IConnectionProvider connectionProvider;
-
-    /**
-     * constructor
-     */
-    public DescribeSensorDAO() {
-        this.connectionProvider = Configurator.getInstance().getConnectionProvider();
-    }
 
     /*
      * (non-Javadoc)
@@ -110,24 +95,14 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.sos.ds.ISosOperationDAO#getOperationsMetadata(java.lang.String,
-     * java.lang.Object)
+     * @see org.n52.sos.ds.hibernate.AbstractHibernateOperationDao#getOperationsMetadata(java.lang.String, org.hibernate.Session)
      */
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Object connection)
+    public OWSOperation getOperationsMetadata(String service, String version, Session connection)
             throws OwsExceptionReport {
         // get DCP
-        DecoderKeyType dkt = null;
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
-        } else {
-            dkt = new DecoderKeyType(SWEConstants.NS_SWES_20);
-        }
-        Map<String, List<String>> dcpMap =
-                SosHelper.getDCP(OPERATION_NAME, dkt, Configurator.getInstance().getBindingOperators().values(),
-                        Configurator.getInstance().getServiceURL());
+        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION)
+                                                        ? Sos1Constants.NS_SOS : SWEConstants.NS_SWES_20));
         if (dcpMap != null && !dcpMap.isEmpty()) {
             OWSOperation opsMeta = new OWSOperation();
             // set operation name
@@ -136,8 +111,7 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
             opsMeta.setDcp(dcpMap);
             // set param procedure
             opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(),
-                    new OWSParameterValuePossibleValues(Configurator.getInstance().getCapabilitiesCacheController()
-                            .getProcedures()));
+                    new OWSParameterValuePossibleValues(getCache().getProcedures()));
             // set param output format
             List<String> outputFormatValues = new ArrayList<String>(1);
             String parameterName = null;
@@ -171,7 +145,7 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
         // sensorDocument which should be returned
         Session session = null;
         try {
-            session = (Session) connectionProvider.getConnection();
+            session = getSession();
             SensorML result = queryProcedure(request.getProcedure(), request.getProcedureDescriptionFormat(), session);
             AbstractMultiProcess member = new AbstractMultiProcess();
             // fois
@@ -203,7 +177,7 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            connectionProvider.returnConnection(session);
+            returnSession(session);
         }
     }
 
@@ -251,7 +225,7 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
                     // read in the description file
                     if (filename.startsWith("standard/")) {
                         filename = filename.replace("standard/", "");
-                        sensorFile = new File(Configurator.getInstance().getSensorDir(), filename);
+                        sensorFile = new File(getConfigurator().getSensorDir(), filename);
                     } else {
                         sensorFile = new File(filename);
                     }
@@ -336,21 +310,20 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
      * @throws OwsExceptionReport
      */
     private SosSMLCapabilities getParentProcedures(String procID, String version) throws OwsExceptionReport {
-        Collection<String> parentProcedureIds =
-                Configurator.getInstance().getCapabilitiesCacheController().getParentProcedures(procID, false, false);
+        Collection<String> parentProcedureIds = getCache().getParentProcedures(procID, false, false);
         if (parentProcedureIds != null && !parentProcedureIds.isEmpty()) {
             SosSMLCapabilities capabilities = new SosSMLCapabilities();
             capabilities.setName(SosConstants.SYS_CAP_PARENT_PROCEDURES_NAME);
             capabilities.setCapabilitiesType(SweAggregateType.SimpleDataRecord);
             String urlPattern =
-                    SosHelper.getUrlPatternForHttpGetMethod(Configurator.getInstance().getBindingOperators().values(),
+                    SosHelper.getUrlPatternForHttpGetMethod(getConfigurator().getBindingOperators().values(),
                             SosConstants.Operations.DescribeSensor.name(), new DecoderKeyType(SosConstants.SOS,
                                     version));
             for (String parentProcID : parentProcedureIds) {
                 SosGmlMetaDataProperty metadata = new SosGmlMetaDataProperty();
                 metadata.setTitle(parentProcID);
                 try {
-                    metadata.setHref(SosHelper.getDescribeSensorUrl(version, Configurator.getInstance()
+                    metadata.setHref(SosHelper.getDescribeSensorUrl(version, getConfigurator()
                             .getServiceURL(), parentProcID, urlPattern));
                 } catch (UnsupportedEncodingException uee) {
                     String exceptionText = "Error while encoding DescribeSensor URL";
@@ -376,24 +349,23 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
     private List<SosSMLComponent> getChildProcedures(String procID, String outputFormat, String version,
             Session session) throws OwsExceptionReport {
         List<SosSMLComponent> smlComponsents = new ArrayList<SosSMLComponent>();
-        Collection<String> childProcedureIds =
-                Configurator.getInstance().getCapabilitiesCacheController().getChildProcedures(procID, false, false);
+        Collection<String> childProcedureIds = getCache().getChildProcedures(procID, false, false);
         int childCount = 0;
         if (childProcedureIds != null && !childProcedureIds.isEmpty()) {
             String urlPattern =
-                    SosHelper.getUrlPatternForHttpGetMethod(Configurator.getInstance().getBindingOperators().values(),
+                    SosHelper.getUrlPatternForHttpGetMethod(getConfigurator().getBindingOperators().values(),
                             SosConstants.Operations.DescribeSensor.name(), new DecoderKeyType(SosConstants.SOS,
                                     version));
             for (String childProcID : childProcedureIds) {
                 childCount++;
                 SosSMLComponent component = new SosSMLComponent("component" + childCount);
                 component.setTitle(childProcID);
-                if (Configurator.getInstance().isChildProceduresEncodedInParentsDescribeSensor()) {
+                if (getConfigurator().isChildProceduresEncodedInParentsDescribeSensor()) {
                     component.setProcess(queryProcedure(childProcID, outputFormat, session));
                 } else {
                     try {
-                        component.setHref(SosHelper.getDescribeSensorUrl(Sos2Constants.SERVICEVERSION, Configurator
-                                .getInstance().getServiceURL(), childProcID, urlPattern));
+                        component.setHref(SosHelper.getDescribeSensorUrl(Sos2Constants.SERVICEVERSION, 
+                                getConfigurator().getServiceURL(), childProcID, urlPattern));
                     } catch (UnsupportedEncodingException uee) {
                         String exceptionText = "Error while encoding DescribeSensor URL";
                         LOGGER.debug(exceptionText);
@@ -405,11 +377,4 @@ public class DescribeSensorDAO implements IDescribeSensorDAO {
         }
         return smlComponsents;
     }
-
-    @Override
-    public IExtension getExtension(Object connection) throws OwsExceptionReport {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

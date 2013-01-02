@@ -30,29 +30,23 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.n52.sos.decode.DecoderKeyType;
-import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IInsertResultTemplateDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateUtilities;
-import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosObservationConstellation;
-import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.swe.SosSweDataArray;
-import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.response.InsertResultTemplateResponse;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InsertResultTemplateDAO implements IInsertResultTemplateDAO {
+public class InsertResultTemplateDAO extends AbstractHibernateOperationDao implements IInsertResultTemplateDAO {
 
     /**
      * logger
@@ -64,39 +58,16 @@ public class InsertResultTemplateDAO implements IInsertResultTemplateDAO {
      */
     private static final String OPERATION_NAME = Sos2Constants.Operations.InsertResultTemplate.name();
 
-    /**
-     * Instance of the IConnectionProvider
-     */
-    private IConnectionProvider connectionProvider;
-
-    /**
-     * constructor
-     */
-    public InsertResultTemplateDAO() {
-        this.connectionProvider = Configurator.getInstance().getConnectionProvider();
-    }
-
     @Override
     public String getOperationName() {
         return OPERATION_NAME;
     }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Object connection)
+    public OWSOperation getOperationsMetadata(String service, String version, Session session)
             throws OwsExceptionReport {
-        Session session = null;
-        if (connection instanceof Session) {
-            session = (Session) connection;
-        } else {
-            String exceptionText = "The parameter connection is not an Hibernate Session!";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        }
         // get DCP
-        DecoderKeyType dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
-        Map<String, List<String>> dcpMap =
-                SosHelper.getDCP(OPERATION_NAME, dkt, Configurator.getInstance().getBindingOperators().values(),
-                        Configurator.getInstance().getServiceURL());
+        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(Sos2Constants.NS_SOS_20));
         if (dcpMap != null && !dcpMap.isEmpty()) {
             OWSOperation opsMeta = new OWSOperation();
             // set operation name
@@ -110,12 +81,6 @@ public class InsertResultTemplateDAO implements IInsertResultTemplateDAO {
     }
 
     @Override
-    public IExtension getExtension(Object connection) throws OwsExceptionReport {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public InsertResultTemplateResponse insertResultTemplate(InsertResultTemplateRequest request)
             throws OwsExceptionReport {
         InsertResultTemplateResponse response = new InsertResultTemplateResponse();
@@ -125,7 +90,7 @@ public class InsertResultTemplateDAO implements IInsertResultTemplateDAO {
         Session session = null;
         Transaction transaction = null;
         try {
-            session = (Session) connectionProvider.getConnection();
+            session = getSession();
             transaction = session.beginTransaction();
             SosObservationConstellation sosObsConst = request.getObservationConstellation();
 //            if (request.getResultStructure().getResultStructure() instanceof SosSweDataArray
@@ -166,7 +131,7 @@ public class InsertResultTemplateDAO implements IInsertResultTemplateDAO {
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            connectionProvider.returnConnection(session);
+            returnSession(session);
         }
         return response;
     }

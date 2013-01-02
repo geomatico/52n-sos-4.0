@@ -40,7 +40,6 @@ import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.n52.sos.decode.DecoderKeyType;
-import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IGetObservationDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
@@ -48,7 +47,6 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
 import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSConstants.MinMax;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
@@ -60,7 +58,6 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.GetObservationParams;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.SosHelper;
@@ -69,12 +66,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
+import java.util.EnumMap;
 
 /**
  * Implementation of the interface IGetObservationDAO
  * 
  */
-public class GetObservationDAO implements IGetObservationDAO {
+public class GetObservationDAO extends AbstractHibernateOperationDao implements IGetObservationDAO {
 
     /**
      * logger
@@ -91,19 +89,6 @@ public class GetObservationDAO implements IGetObservationDAO {
      */
     private DateTime now = null;
 
-    /**
-     * Instance of the IConnectionProvider
-     */
-    private IConnectionProvider connectionProvider;
-
-    /**
-     * constructor
-     */
-    public GetObservationDAO() {
-        this.connectionProvider = Configurator.getInstance().getConnectionProvider();
-
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -116,120 +101,97 @@ public class GetObservationDAO implements IGetObservationDAO {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.sos.ds.ISosOperationDAO#getOperationsMetadata(java.lang.String,
-     * java.lang.Object)
+     * @see org.n52.sos.ds.hibernate.AbstractHibernateOperationDao#getOperationsMetadata(java.lang.String, org.hibernate.Session)
      */
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Object connection)
+    public OWSOperation getOperationsMetadata(String service, String version, Session session)
             throws OwsExceptionReport {
-        Session session = null;
-        if (connection instanceof Session) {
-            session = (Session) connection;
+        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION)
+                                                        ? Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20));
+        if (dcpMap == null || dcpMap.isEmpty()) {
+            return null;
+        }
+        OWSOperation opsMeta = new OWSOperation();
+        // set operation name
+        opsMeta.setOperationName(OPERATION_NAME);
+        // set DCP
+        opsMeta.setDcp(dcpMap);
+        // set parameter for both versions
+        // set param offering
+        opsMeta.addParameterValue(SosConstants.GetObservationParams.offering.name(),
+                new OWSParameterValuePossibleValues(getCache().getOfferings()));
+        // set param procedure
+        opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(),
+                new OWSParameterValuePossibleValues(getCache().getProcedures()));
+        
+        // set param observedProperty
+        if (getConfigurator().isShowFullOperationsMetadata4Observations()) {
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(),
+                    new OWSParameterValuePossibleValues(getCache().getObservableProperties()));
         } else {
-            String exceptionText = "The parameter connection is not an Hibernate Session!";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            List<String> phenomenonValues = new ArrayList<String>(1);
+            phenomenonValues.add(SosConstants.PARAMETER_ANY);
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(),
+                    new OWSParameterValuePossibleValues(phenomenonValues));
         }
-
-        // get DCP
-        DecoderKeyType dkt = null;
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
+        // set param foi
+        Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeatureOfInterest(), version);
+        if (getConfigurator().isShowFullOperationsMetadata4Observations()) {
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(),
+                    new OWSParameterValuePossibleValues(featureIDs));
         } else {
-            dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
+            List<String> foiValues = new ArrayList<String>(1);
+            foiValues.add(SosConstants.PARAMETER_ANY);
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(),
+                    new OWSParameterValuePossibleValues(foiValues));
         }
-        Map<String, List<String>> dcpMap =
-                SosHelper.getDCP(OPERATION_NAME, dkt, Configurator.getInstance().getBindingOperators().values(),
-                        Configurator.getInstance().getServiceURL());
-        if (dcpMap != null && !dcpMap.isEmpty()) {
-            OWSOperation opsMeta = new OWSOperation();
-            // set operation name
-            opsMeta.setOperationName(OPERATION_NAME);
-            // set DCP
-            opsMeta.setDcp(dcpMap);
-            // set parameter for both versions
-            // set param offering
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.offering.name(),
-                    new OWSParameterValuePossibleValues(Configurator.getInstance().getCapabilitiesCacheController()
-                            .getOfferings()));
-            // set param procedure
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.procedure.name(),
-                    new OWSParameterValuePossibleValues(Configurator.getInstance().getCapabilitiesCacheController()
-                            .getProcedures()));
-            // set param observedProperty
-            if (Configurator.getInstance().isShowFullOperationsMetadata4Observations()) {
-                opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(),
-                        new OWSParameterValuePossibleValues(Configurator.getInstance()
-                                .getCapabilitiesCacheController().getObservableProperties()));
-            } else {
-                List<String> phenomenonValues = new ArrayList<String>(1);
-                phenomenonValues.add(SosConstants.PARAMETER_ANY);
-                opsMeta.addParameterValue(SosConstants.GetObservationParams.observedProperty.name(),
-                        new OWSParameterValuePossibleValues(phenomenonValues));
-            }
-            // set param foi
-            Collection<String> featureIDs =
-                    SosHelper.getFeatureIDs(Configurator.getInstance().getCapabilitiesCacheController()
-                            .getFeatureOfInterest(), version);
-            if (Configurator.getInstance().isShowFullOperationsMetadata4Observations()) {
-                opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(),
-                        new OWSParameterValuePossibleValues(featureIDs));
-            } else {
-                List<String> foiValues = new ArrayList<String>(1);
-                foiValues.add(SosConstants.PARAMETER_ANY);
-                opsMeta.addParameterValue(SosConstants.GetObservationParams.featureOfInterest.name(),
-                        new OWSParameterValuePossibleValues(foiValues));
-            }
-            // responseFormat
-            opsMeta.addParameterValue(SosConstants.GetObservationParams.responseFormat.name(),
-                    new OWSParameterValuePossibleValues(SosHelper.getSupportedResponseFormats("SOS", version)));
+        // responseFormat
+        opsMeta.addParameterValue(SosConstants.GetObservationParams.responseFormat.name(),
+                new OWSParameterValuePossibleValues(SosHelper.getSupportedResponseFormats(SosConstants.SOS, version)));
 
-            // SOS 2.0 parameter
-            if (version.equals(Sos2Constants.SERVICEVERSION)) {
-                // set param temporal filter
-                opsMeta.addParameterValue(Sos2Constants.GetObservationParams.temporalFilter.name(),
-                        new OWSParameterValueRange(getEventTime(session)));
-                // set param spatial filter
-                Envelope envelope = null;
-                if (featureIDs != null && !featureIDs.isEmpty()) {
-                    envelope = Configurator.getInstance().getCapabilitiesCacheController().getEnvelopeForFeatures();
-                }
-                if (envelope != null) {
-                    opsMeta.addParameterValue(Sos2Constants.GetObservationParams.spatialFilter.name(),
-                            new OWSParameterValueRange(SosHelper.getMinMaxMapFromEnvelope(envelope)));
-                }
+        // SOS 2.0 parameter
+        if (version.equals(Sos2Constants.SERVICEVERSION)) {
+            // set param temporal filter
+            opsMeta.addParameterValue(Sos2Constants.GetObservationParams.temporalFilter.name(),
+                    new OWSParameterValueRange(getEventTime(session)));
+            // set param spatial filter
+            Envelope envelope = null;
+            if (featureIDs != null && !featureIDs.isEmpty()) {
+                envelope = getCache().getEnvelopeForFeatures();
             }
-            // SOS 1.0.0 parameter
-            else if (version.equals(Sos1Constants.SERVICEVERSION)) {
-                // set param srsName
-                List<String> srsNameValues = new ArrayList<String>(1);
-                srsNameValues.add(SosConstants.PARAMETER_ANY);
-                opsMeta.addParameterValue(SosConstants.GetObservationParams.srsName.name(),
-                        new OWSParameterValuePossibleValues(srsNameValues));
-                // set param eventTime
-                opsMeta.addParameterValue(Sos1Constants.GetObservationParams.eventTime.name(),
-                        new OWSParameterValueRange(getEventTime(session)));
-                // set param result
-                List<String> resultValues = new ArrayList<String>(1);
-                resultValues.add(SosConstants.PARAMETER_ANY);
-                opsMeta.addParameterValue(SosConstants.GetObservationParams.result.name(),
-                        new OWSParameterValuePossibleValues(resultValues));
-                // set param resultModel
-                List<String> resultModelsList = new ArrayList<String>();
-                for (QName qname : Arrays.asList(OMConstants.getResultModels())) {
-                    resultModelsList.add(qname.getPrefix() + ":" + qname.getLocalPart());
-                }
-                opsMeta.addParameterValue(SosConstants.GetObservationParams.resultModel.name(),
-                        new OWSParameterValuePossibleValues(resultModelsList));
-                // set param reponseMode
-                opsMeta.addParameterValue(SosConstants.GetObservationParams.responseMode.name(),
-                        new OWSParameterValuePossibleValues(Arrays.asList(SosConstants.getResponseModes())));
+            if (envelope != null) {
+                opsMeta.addParameterValue(Sos2Constants.GetObservationParams.spatialFilter.name(),
+                        new OWSParameterValueRange(SosHelper.getMinMaxMapFromEnvelope(envelope)));
             }
-            return opsMeta;
         }
-        return null;
+        // SOS 1.0.0 parameter
+        else if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            // set param srsName
+            List<String> srsNameValues = new ArrayList<String>(1);
+            srsNameValues.add(SosConstants.PARAMETER_ANY);
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.srsName.name(),
+                    new OWSParameterValuePossibleValues(srsNameValues));
+            // set param eventTime
+            opsMeta.addParameterValue(Sos1Constants.GetObservationParams.eventTime.name(),
+                    new OWSParameterValueRange(getEventTime(session)));
+            // set param result
+            List<String> resultValues = new ArrayList<String>(1);
+            resultValues.add(SosConstants.PARAMETER_ANY);
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.result.name(),
+                    new OWSParameterValuePossibleValues(resultValues));
+            // set param resultModel
+            QName[] resultModels = OMConstants.getResultModels();
+            List<String> resultModelsList = new ArrayList<String>(resultModels.length);
+            for (QName qname : resultModels) {
+                resultModelsList.add(qname.getPrefix() + ":" + qname.getLocalPart());
+            }
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.resultModel.name(),
+                    new OWSParameterValuePossibleValues(resultModelsList));
+            // set param reponseMode
+            opsMeta.addParameterValue(SosConstants.GetObservationParams.responseMode.name(),
+                    new OWSParameterValuePossibleValues(Arrays.asList(SosConstants.getResponseModes())));
+        }
+        return opsMeta;
     }
 
     /*
@@ -246,7 +208,7 @@ public class GetObservationDAO implements IGetObservationDAO {
         now = new DateTime();
         Session session = null;
         try {
-            session = (Session) connectionProvider.getConnection();
+            session = getSession();
             if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION)
                     && sosRequest.getObservedProperties().isEmpty()) {
                 throw Util4Exceptions.createMissingParameterValueException(GetObservationParams.observedProperty
@@ -266,7 +228,7 @@ public class GetObservationDAO implements IGetObservationDAO {
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            connectionProvider.returnConnection(session);
+            returnSession(session);
         }
     }
 
@@ -653,9 +615,9 @@ public class GetObservationDAO implements IGetObservationDAO {
      */
     private Map<MinMax, String> getEventTime(Session session) throws OwsExceptionReport {
         try {
-            Map<MinMax, String> eventTime = new HashMap<MinMax, String>(2);
-            DateTime minDate = Configurator.getInstance().getCapabilitiesCacheController().getMinEventTime();
-            DateTime maxDate = Configurator.getInstance().getCapabilitiesCacheController().getMaxEventTime();
+            Map<MinMax, String> eventTime = new EnumMap<MinMax, String>(MinMax.class);
+            DateTime minDate = getCache().getMinEventTime();
+            DateTime maxDate = getCache().getMaxEventTime();
             if (minDate != null && maxDate != null) {
                 eventTime.put(MinMax.MIN, DateTimeHelper.formatDateTime2ResponseString(minDate));
                 eventTime.put(MinMax.MAX, DateTimeHelper.formatDateTime2ResponseString(maxDate));
@@ -667,11 +629,4 @@ public class GetObservationDAO implements IGetObservationDAO {
             throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
         }
     }
-
-    @Override
-    public IExtension getExtension(Object connection) throws OwsExceptionReport {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

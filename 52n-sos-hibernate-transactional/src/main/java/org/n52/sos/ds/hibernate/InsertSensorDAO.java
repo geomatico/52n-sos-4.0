@@ -32,7 +32,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.joda.time.DateTime;
 import org.n52.sos.decode.DecoderKeyType;
-import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IInsertSensorDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
@@ -61,13 +60,12 @@ import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosFeatureRelationship;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.InsertSensorResponse;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InsertSensorDAO implements IInsertSensorDAO {
+public class InsertSensorDAO extends AbstractHibernateOperationDao implements IInsertSensorDAO {
 
     /**
      * logger
@@ -79,45 +77,17 @@ public class InsertSensorDAO implements IInsertSensorDAO {
      */
     private static final String OPERATION_NAME = Sos2Constants.Operations.InsertSensor.name();
 
-    /**
-     * Instance of the IConnectionProvider
-     */
-    private IConnectionProvider connectionProvider;
-
-    /**
-     * constructor
-     */
-    public InsertSensorDAO() {
-        this.connectionProvider = Configurator.getInstance().getConnectionProvider();
-    }
-
     @Override
     public String getOperationName() {
         return OPERATION_NAME;
     }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Object connection)
+    public OWSOperation getOperationsMetadata(String service, String version, Session session)
             throws OwsExceptionReport {
-        Session session = null;
-        if (connection instanceof Session) {
-            session = (Session) connection;
-        } else {
-            String exceptionText = "The parameter connection is not an Hibernate Session!";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        }
 
-        // get data depending on SOS version
-        DecoderKeyType dkt = null;
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
-        } else {
-            dkt = new DecoderKeyType(SWEConstants.NS_SWES_20);
-        }
-        Map<String, List<String>> dcpMap =
-                SosHelper.getDCP(OPERATION_NAME, dkt, Configurator.getInstance()
-                        .getBindingOperators().values(), Configurator.getInstance().getServiceURL());
+        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? 
+                                                        Sos1Constants.NS_SOS : SWEConstants.NS_SWES_20));
         if (dcpMap != null && !dcpMap.isEmpty()) {
             OWSOperation opsMeta = new OWSOperation();
             if (version.equals(Sos1Constants.SERVICEVERSION)) {
@@ -168,7 +138,7 @@ public class InsertSensorDAO implements IInsertSensorDAO {
         Session session = null;
         Transaction transaction = null;
         try {
-            session = (Session) connectionProvider.getConnection();
+            session = getSession();
             transaction = session.beginTransaction();
             ProcedureDescriptionFormat procedureDescriptionFormat =
                     HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatObject(
@@ -213,7 +183,7 @@ public class InsertSensorDAO implements IInsertSensorDAO {
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            connectionProvider.returnConnection(session);
+            returnSession(session);
         }
         return response;
     }
@@ -236,7 +206,7 @@ public class InsertSensorDAO implements IInsertSensorDAO {
                     return process.getProcedureIdentifier();
                 }
             }
-            return Configurator.getInstance().getDefaultProcedurePrefix()
+            return getConfigurator().getDefaultProcedurePrefix()
                     + SosHelper.generateID(sensorML.getSensorDescriptionXmlString());
         }
         // if procedureDescription not SensorML
@@ -245,7 +215,7 @@ public class InsertSensorDAO implements IInsertSensorDAO {
                     && !request.getProcedureDescription().getProcedureIdentifier().isEmpty()) {
                 return request.getProcedureDescription().getProcedureIdentifier();
             } else {
-                return Configurator.getInstance().getDefaultProcedurePrefix()
+                return getConfigurator().getDefaultProcedurePrefix()
                         + SosHelper.generateID(request.getProcedureDescription().toString());
             }
         }
@@ -280,13 +250,11 @@ public class InsertSensorDAO implements IInsertSensorDAO {
         // check if offering is valid
         if (sosOffering != null && sosOffering.getOfferingIdentifier() != null
                 && !sosOffering.getOfferingIdentifier().isEmpty()) {
-            if (!Configurator.getInstance().getCapabilitiesCacheController().getKOfferingVProcedures()
-                    .containsKey(sosOffering.getOfferingIdentifier())) {
+            if (!getCache().getKOfferingVProcedures().containsKey(sosOffering.getOfferingIdentifier())) {
                 return sosOffering;
             } else {
-                String exceptionText =
-                        "The requested offering identifier (" + sosOffering.getOfferingIdentifier()
-                                + ") is already provided by this server!";
+                String exceptionText = String.format(
+                        "The requested offering identifier (%s) is already provided by this server!", sosOffering.getOfferingIdentifier());
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
             }
         } else {
@@ -342,15 +310,7 @@ public class InsertSensorDAO implements IInsertSensorDAO {
     }
 
     @Override
-    public IExtension getExtension(Object connection) throws OwsExceptionReport {
-        Session session = null;
-        if (connection instanceof Session) {
-            session = (Session) connection;
-        } else {
-            String exceptionText = "The parameter connection is not an Hibernate Session!";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        }
+    public IExtension getExtension(Session session) throws OwsExceptionReport {
         SosInsertionCapabilities insertionCapabilities = new SosInsertionCapabilities();
         try {
             insertionCapabilities.addFeatureOfInterestTypes(HibernateCriteriaQueryUtilities

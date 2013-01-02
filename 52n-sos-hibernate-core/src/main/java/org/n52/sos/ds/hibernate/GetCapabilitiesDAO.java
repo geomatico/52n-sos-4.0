@@ -30,9 +30,11 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 import javax.xml.namespace.QName;
 
@@ -42,7 +44,6 @@ import org.joda.time.DateTime;
 import org.n52.sos.binding.Binding;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.IDecoder;
-import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IGetCapabilitiesDAO;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.encode.IEncoder;
@@ -54,7 +55,9 @@ import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.ows.ICapabilitiesExtension;
 import org.n52.sos.ogc.ows.IExtension;
+import org.n52.sos.ogc.ows.IMergableExtension;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSOperationsMetadata;
@@ -65,13 +68,11 @@ import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.sos.SosInsertionCapabilities;
 import org.n52.sos.ogc.sos.SosOfferingsForContents;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.request.operator.IRequestOperator;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.response.GetCapabilitiesResponse;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
@@ -81,7 +82,7 @@ import org.slf4j.LoggerFactory;
  * Implementation of the interface IGetCapabilitiesDAO
  * 
  */
-public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
+public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements IGetCapabilitiesDAO {
 
     /**
      * logger
@@ -92,21 +93,16 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
      * supported SOS operation
      */
     private static final String OPERATION_NAME = SosConstants.Operations.GetCapabilities.name();
-
-    /**
-     * Instance of the IConnectionProvider
-     */
-    private IConnectionProvider connectionProvider;
-
-    /**
-     * constructor
-     * 
-     * @throws OwsExceptionReport
-     *             If an error occurs If a file could not be loaded
-     */
-    public GetCapabilitiesDAO() throws OwsExceptionReport {
-        this.connectionProvider = Configurator.getInstance().getConnectionProvider();
-    }
+    
+    /* section flags (values are powers of 2)*/
+    private static final int SERVICE_IDENTIFICATION = 0x01;
+    private static final int SERVICE_PROVIDER       = 0x02;
+    private static final int OPERATIONS_METADATA    = 0x04;
+    private static final int FILTER_CAPABILITIES    = 0x08;
+    private static final int CONTENTS               = 0x10;
+    private static final int ALL = 0x20 | SERVICE_IDENTIFICATION | SERVICE_PROVIDER 
+                                        | OPERATIONS_METADATA    | FILTER_CAPABILITIES 
+                                        | CONTENTS;
 
     /*
      * (non-Javadoc)
@@ -117,18 +113,44 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
     public String getOperationName() {
         return OPERATION_NAME;
     }
-
+    
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.sos.ds.ISosOperationDAO#getOperationsMetadata(java.lang.String,
-     * java.lang.Object)
+     * @see org.n52.sos.ds.hibernate.AbstractHibernateOperationDao#getOperationsMetadata(java.lang.String, org.hibernate.Session)
      */
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Object connection)
+    public OWSOperation getOperationsMetadata(String service, String version, Session session)
             throws OwsExceptionReport {
-        return null;
+                OWSOperation opsMeta = new OWSOperation();
+        // set operation name
+        opsMeta.setOperationName(getOperationName());
+        // set DCP
+        opsMeta.setDcp(getDCP(new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20)));
+        
+        // set param Sections
+        List<String> sectionsValues = new LinkedList<String>();
+        /* common sections */
+        sectionsValues.add(SosConstants.CapabilitiesSections.ServiceIdentification.name());
+        sectionsValues.add(SosConstants.CapabilitiesSections.ServiceProvider.name());
+        sectionsValues.add(SosConstants.CapabilitiesSections.OperationsMetadata.name());
+        sectionsValues.add(SosConstants.CapabilitiesSections.Contents.name());
+        sectionsValues.add(SosConstants.CapabilitiesSections.All.name());
+        
+        if (version.equals(Sos1Constants.SERVICEVERSION)) {
+            sectionsValues.add(Sos1Constants.CapabilitiesSections.Filter_Capabilities.name());
+        } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
+            sectionsValues.add(Sos2Constants.CapabilitiesSections.FilterCapabilities.name());
+            /* sections of extension points */
+            for (String section : getExtensionSections(session)) {
+                sectionsValues.add(section);
+            }
+        }
+       
+        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.Sections, new OWSParameterValuePossibleValues(sectionsValues));
+        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.AcceptFormats, new OWSParameterValuePossibleValues(Arrays.asList(SosConstants.getAcceptFormats())));
+        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.AcceptVersions, new OWSParameterValuePossibleValues(getConfigurator().getSupportedVersions()));
+        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.updateSequence, new OWSParameterValuePossibleValues(Collections.singletonList(SosConstants.PARAMETER_ANY)));
+        return opsMeta;
     }
 
     /*
@@ -142,20 +164,20 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
     public GetCapabilitiesResponse getCapabilities(GetCapabilitiesRequest request) throws OwsExceptionReport {
         Session session = null;
         try {
-            session = (Session) connectionProvider.getConnection();
+            session = getSession();
             GetCapabilitiesResponse response = new GetCapabilitiesResponse();
             response.setService(SosConstants.SOS);
             if (request.getVersion() == null) {
                 if (request.getAcceptVersions() != null) {
                     String[] acceptedVersion = request.getAcceptVersions();
                     for (int i = 0; i < acceptedVersion.length; i++) {
-                        if (Configurator.getInstance().isVersionSupported(acceptedVersion[i])) {
+                        if (getConfigurator().isVersionSupported(acceptedVersion[i])) {
                             response.setVersion(acceptedVersion[i]);
                             break;
                         }
                     }
                 } else {
-                    for (String supportedVersion : Configurator.getInstance().getSupportedVersions()) {
+                    for (String supportedVersion : getConfigurator().getSupportedVersions()) {
                         response.setVersion(supportedVersion);
                         break;
                     }
@@ -164,109 +186,81 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                 response.setVersion(request.getVersion());
             }
             if (response.getVersion() == null) {
-                String exceptionText =
-                        "The requested '" + SosConstants.GetCapabilitiesParams.AcceptVersions.name()
-                                + "' values are not supported by this service!";
+                String exceptionText = String.format(
+                        "The requested '%s' values are not supported by this service!", 
+                        SosConstants.GetCapabilitiesParams.AcceptVersions.name());
                 LOGGER.error(exceptionText);
                 throw Util4Exceptions.createVersionNegotiationFailedException(exceptionText);
             }
 
-            // booleans for sections (true if section is selected
-            // explicitly)
-            boolean serviceIdentificationSection = false;
-            boolean serviceProviderSection = false;
-            boolean operationsMetadataSection = false;
-            boolean filter_CapabilitiesSection = false;
-            boolean contentsSection = false;
-            boolean insertionCapabilities = false;
-            boolean all = false;
-
-            // handle sections array and set requested sections 'true'
-            if (request.getSections() != null) {
+            Set<String> availableExtensionSections = getExtensionSections(session);
+            Set<String> requestedExtensionSections = new HashSet<String>(availableExtensionSections.size());
+            // section flags
+            int sections = 0;
+            
+            // handle sections array and set requested sections flag
+            if (request.getSections() == null) {
+                sections = ALL;
+            } else {
                 for (String section : request.getSections()) {
-
                     if (!section.isEmpty()) {
-                        /*
-                         * if name of requested section is incorrect (e.g.
-                         * conten), throw Exception! (Case sensitive!!)
-                         */
-                        if (!Sos1Constants.CapabilitiesSections.contains(section)
-                                && !Sos2Constants.CapabilitiesSections.contains(section)) {
-                            String exceptionText =
-                                    "The requested section '" + section + "' does not exist or is not supported!";
+                        if (section.equals(SosConstants.CapabilitiesSections.All.name())) {
+                            sections = ALL;
+                            break;
+                        } else if (section.equals(SosConstants.CapabilitiesSections.ServiceIdentification.name())) {
+                            sections |= SERVICE_IDENTIFICATION;
+                        } else if (section.equals(SosConstants.CapabilitiesSections.ServiceProvider.name())) {
+                            sections |= SERVICE_PROVIDER;
+                        } else if (section.equals(SosConstants.CapabilitiesSections.OperationsMetadata.name())) {
+                            sections |= OPERATIONS_METADATA;
+                        } else if ((section.equals(Sos1Constants.CapabilitiesSections.Filter_Capabilities.name()) 
+                                        && response.getVersion().equals(Sos1Constants.SERVICEVERSION)) 
+                                || (section.equals(Sos2Constants.CapabilitiesSections.FilterCapabilities.name()) 
+                                        && response.getVersion().equals(Sos2Constants.SERVICEVERSION)))  {
+                            sections |= FILTER_CAPABILITIES;
+                        } else if (section.equals(SosConstants.CapabilitiesSections.Contents.name())) {
+                            sections |= CONTENTS;
+                        } else if (availableExtensionSections.contains(section) 
+                                && response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
+                            requestedExtensionSections.add(section);
+                        } else {
+                            String exceptionText = String.format("The requested section '%s' does not exist or is not supported!", section);
                             LOGGER.debug(exceptionText);
                             throw Util4Exceptions.createInvalidParameterValueException(
                                     SosConstants.GetCapabilitiesParams.Section.name(), exceptionText);
                         }
-
-                        // if name is correct, check which section is requested
-                        // and
-                        // set boolean on true
-                        if (section.equals(SosConstants.CapabilitiesSections.All.name())) {
-                            all = true;
-                            break;
-                        } else if (section.equals(SosConstants.CapabilitiesSections.ServiceIdentification.name())) {
-                            serviceIdentificationSection = true;
-                        } else if (section.equals(SosConstants.CapabilitiesSections.ServiceProvider.name())) {
-                            serviceProviderSection = true;
-                        } else if (section.equals(SosConstants.CapabilitiesSections.OperationsMetadata.name())) {
-                            operationsMetadataSection = true;
-                        } else if (section.equals(Sos1Constants.CapabilitiesSections.Filter_Capabilities.name())
-                                || section.equals(Sos2Constants.CapabilitiesSections.FilterCapabilities.name())) {
-                            filter_CapabilitiesSection = true;
-                        } else if (section.equals(SosConstants.CapabilitiesSections.Contents.name())) {
-                            contentsSection = true;
-                        } else if (section.equals(Sos2Constants.CapabilitiesSections.InsertionCapabilities.name())) {
-                            insertionCapabilities = true;
-                        }
                     }
                 }
-            } else {
-                all = true;
             }
 
-            List<IExtension> extensions = null;
-            if (response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
-                extensions = getExtensions(session);
-            }
-
-            // response with all sections should be created
             SosCapabilities sosCapabilities = new SosCapabilities();
-            if (all) {
-                sosCapabilities.setServiceIdentification(getServiceIdentification(response.getVersion()));
-                sosCapabilities.setServiceProvider(Configurator.getInstance().getServiceProvider());
-                sosCapabilities.setFilterCapabilities(getFilterCapabilities(response.getVersion()));
-                sosCapabilities.setOperationsMetadata(getOperationsMetadataForOperations(response.getService(),
-                        response.getVersion(), extensions, session));
-                if (response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
-                    sosCapabilities.setContents(getContentsForSosV2(response.getVersion(), session));
-                    sosCapabilities.setExensions(extensions);
-                } else {
-                    sosCapabilities.setContents(getContents(sosCapabilities, session));
-                }
-            }
-            if (serviceIdentificationSection) {
+            
+            if ((sections & SERVICE_IDENTIFICATION) != 0) {
                 sosCapabilities.setServiceIdentification(getServiceIdentification(response.getVersion()));
             }
-            if (serviceProviderSection) {
-                sosCapabilities.setServiceProvider(Configurator.getInstance().getServiceProvider());
+            if ((sections & SERVICE_PROVIDER) != 0) {
+                sosCapabilities.setServiceProvider(getConfigurator().getServiceProvider());
             }
-            if (operationsMetadataSection) {
-                sosCapabilities.setOperationsMetadata(getOperationsMetadataForOperations(response.getService(),
-                        response.getVersion(), extensions, session));
+            if ((sections & OPERATIONS_METADATA) != 0) {
+                sosCapabilities.setOperationsMetadata(getOperationsMetadataForOperations(response.getService(), response.getVersion(), session));
             }
-            if (filter_CapabilitiesSection) {
+            if ((sections & FILTER_CAPABILITIES) != 0) {
                 sosCapabilities.setFilterCapabilities(getFilterCapabilities(response.getVersion()));
             }
-            if (contentsSection) {
+            if ((sections & CONTENTS) != 0) {
                 if (response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
                     sosCapabilities.setContents(getContentsForSosV2(response.getVersion(), session));
                 } else {
-                    sosCapabilities.setContents(getContents(sosCapabilities, session));
+                    sosCapabilities.setContents(getContents(session));
                 }
             }
-            if (response.getVersion().equals(Sos2Constants.SERVICEVERSION) && insertionCapabilities) {
-                sosCapabilities.setExensions(extensions);
+            
+            if (response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
+                if (sections == ALL) {
+                    sosCapabilities.setExensions(getAndMergeExtensions(session));
+                } else if (!requestedExtensionSections.isEmpty()) {
+                    sosCapabilities.setExensions(getExtensions(session, requestedExtensionSections));
+                }
             }
             response.setCapabilities(sosCapabilities);
             return response;
@@ -275,18 +269,12 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            connectionProvider.returnConnection(session);
+            returnSession(session);
         }
     }
 
-    @Override
-    public IExtension getExtension(Object connection) throws OwsExceptionReport {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     private SosServiceIdentification getServiceIdentification(String version) throws OwsExceptionReport {
-        SosServiceIdentification serviceIdentification = Configurator.getInstance().getServiceIdentification();
+        SosServiceIdentification serviceIdentification = getConfigurator().getServiceIdentification();
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
             serviceIdentification.setProfiles(getProfiles());
         }
@@ -295,18 +283,18 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
 
     private List<String> getProfiles() {
         Set<String> profiles = new HashSet<String>();
-        for (Binding bindig : Configurator.getInstance().getBindingOperators().values()) {
+        for (Binding bindig : getConfigurator().getBindingOperators().values()) {
             profiles.addAll(bindig.getConformanceClasses());
         }
-        for (IRequestOperator requestOperator : Configurator.getInstance().getRequestOperator().values()) {
+        for (IRequestOperator requestOperator : getConfigurator().getRequestOperator().values()) {
             profiles.addAll(requestOperator.getConformanceClasses());
         }
-        for (List<IDecoder> decoderList : Configurator.getInstance().getDecoderMap().values()) {
+        for (List<IDecoder> decoderList : getConfigurator().getDecoderMap().values()) {
             for (IDecoder decoder : decoderList) {
                 profiles.addAll(decoder.getConformanceClasses());
             }
         }
-        for (IEncoder encoder : Configurator.getInstance().getEncoderMap().values()) {
+        for (IEncoder encoder : getConfigurator().getEncoderMap().values()) {
             profiles.addAll(encoder.getConformanceClasses());
         }
         return new ArrayList<String>(profiles);
@@ -323,29 +311,25 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    private OWSOperationsMetadata getOperationsMetadataForOperations(String service, String version,
-            List<IExtension> extensions, Session session) throws OwsExceptionReport {
+    private OWSOperationsMetadata getOperationsMetadataForOperations(String service, String version, Session session) throws OwsExceptionReport {
+       
         OWSOperationsMetadata operationsMetadata = new OWSOperationsMetadata();
+        operationsMetadata.addCommonValue(OWSConstants.RequestParams.service.name(), new OWSParameterValuePossibleValues(SosConstants.SOS));
+        operationsMetadata.addCommonValue(OWSConstants.RequestParams.version.name(), new OWSParameterValuePossibleValues(getConfigurator().getSupportedVersions()));
+        
         // FIXME: OpsMetadata for InsertSensor, InsertObservation SOS 2.0
-        Map<RequestOperatorKeyType, IRequestOperator> requestOperators =
-                Configurator.getInstance().getRequestOperator();
+        Map<RequestOperatorKeyType, IRequestOperator> requestOperators = getConfigurator().getRequestOperator();
         List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>(requestOperators.size());
-        opsMetadata.add(getOpsGetCapabilities(service, version, extensions));
         for (RequestOperatorKeyType requestOperatorKeyType : requestOperators.keySet()) {
-            if (!requestOperatorKeyType.getOperationName().equals(OPERATION_NAME)
-                    && requestOperatorKeyType.getServiceOperatorKeyType().getVersion().equals(version)) {
-                OWSOperation operationMetadata =
-                        requestOperators.get(requestOperatorKeyType).getOperationMetadata(service, version, session);
+            if (requestOperatorKeyType.getServiceOperatorKeyType().getVersion().equals(version)) {
+                OWSOperation operationMetadata = requestOperators.get(requestOperatorKeyType).getOperationMetadata(service, version, session);
                 if (operationMetadata != null) {
                     opsMetadata.add(operationMetadata);
                 }
             }
         }
         operationsMetadata.setOperations(opsMetadata);
-        operationsMetadata.addCommonValue(OWSConstants.RequestParams.service.name(),
-                new OWSParameterValuePossibleValues(SosConstants.SOS));
-        operationsMetadata.addCommonValue(OWSConstants.RequestParams.version.name(),
-                new OWSParameterValuePossibleValues(Configurator.getInstance().getSupportedVersions()));
+        
         return operationsMetadata;
     }
 
@@ -380,9 +364,9 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    private List<SosOfferingsForContents> getContents(SosCapabilities sosCapabilities, Session session)
+    private List<SosOfferingsForContents> getContents(Session session)
             throws OwsExceptionReport {
-        Collection<String> offerings = Configurator.getInstance().getCapabilitiesCacheController().getOfferings();
+        Collection<String> offerings = getCache().getOfferings();
         List<SosOfferingsForContents> sosOfferings = new ArrayList<SosOfferingsForContents>(offerings.size());
         for (String offering : offerings) {
 
@@ -397,8 +381,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                 // only if fois are contained for the offering set the values of
                 // the
                 // envelope
-                sosOffering.setObservedArea(Configurator.getInstance().getCapabilitiesCacheController()
-                        .getEnvelopeForOffering(offering));
+                sosOffering.setObservedArea(getCache().getEnvelopeForOffering(offering));
                 // SosEnvelope sosEnvelope = getBBOX4Offering(offering,
                 // session);
                 // sosOffering.setBoundeBy(sosEnvelope.getEnvelope());
@@ -408,41 +391,33 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                 // xb_oo.addIntendedApplication("");
 
                 // add offering name
-                sosOffering.setOfferingName(Configurator.getInstance().getCapabilitiesCacheController()
-                        .getOfferingName(offering));
+                sosOffering.setOfferingName(getCache().getOfferingName(offering));
 
                 // set up phenomena
-                sosOffering.setObservableProperties(Configurator.getInstance().getCapabilitiesCacheController()
-                        .getObservablePropertiesForOffering(offering));
-                sosOffering.setCompositePhenomena(Configurator.getInstance().getCapabilitiesCacheController()
-                        .getKOfferingVCompositePhenomenons().get(offering));
+                sosOffering.setObservableProperties(getCache().getObservablePropertiesForOffering(offering));
+                sosOffering.setCompositePhenomena(getCache().getKOfferingVCompositePhenomenons().get(offering));
                 Map<String, Collection<String>> phens4CompPhens = new HashMap<String, Collection<String>>();
-                if (Configurator.getInstance().getCapabilitiesCacheController().getKOfferingVCompositePhenomenons()
+                if (getCache().getKOfferingVCompositePhenomenons()
                         .get(offering) != null) {
-                    for (String compositePhenomenon : Configurator.getInstance().getCapabilitiesCacheController()
-                            .getKOfferingVCompositePhenomenons().get(offering)) {
+                    for (String compositePhenomenon :getCache().getKOfferingVCompositePhenomenons().get(offering)) {
                         phens4CompPhens.put(compositePhenomenon,
-                                Configurator.getInstance().getCapabilitiesCacheController()
-                                        .getKCompositePhenomenonVObservableProperty().get(compositePhenomenon));
+                                getCache().getKCompositePhenomenonVObservableProperty().get(compositePhenomenon));
                     }
                 }
                 sosOffering.setPhens4CompPhens(phens4CompPhens);
 
                 // set up time
-                DateTime minDate =
-                        Configurator.getInstance().getCapabilitiesCacheController().getMinTimeForOffering(offering);
-                DateTime maxDate =
-                        Configurator.getInstance().getCapabilitiesCacheController().getMaxTimeForOffering(offering);
+                DateTime minDate = getCache().getMinTimeForOffering(offering);
+                DateTime maxDate = getCache().getMaxTimeForOffering(offering);
                 sosOffering.setTime(new TimePeriod(minDate, maxDate));
 
                 // add feature of interests
-                if (Configurator.getInstance().isFoiListedInOfferings()) {
+                if (getConfigurator().isFoiListedInOfferings()) {
                     sosOffering.setFeatureOfInterest(getFOI4offering(offering, session));
                 }
 
                 // set procedures
-                Collection<String> procedures =
-                        Configurator.getInstance().getCapabilitiesCacheController().getProcedures4Offering(offering);
+                Collection<String> procedures = getCache().getProcedures4Offering(offering);
                 if (procedures == null || procedures.isEmpty()) {
                     String exceptionText =
                             "No procedures are contained in the database for the offering: " + offering
@@ -453,9 +428,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                 sosOffering.setProcedures(procedures);
 
                 // insert result models
-                Collection<QName> resultModels =
-                        getQNamesForResultModel(Configurator.getInstance().getCapabilitiesCacheController()
-                                .getResultModels4Offering(offering));
+                Collection<QName> resultModels = getQNamesForResultModel(getCache().getResultModels4Offering(offering));
 
                 if (resultModels == null || resultModels.isEmpty()) {
                     String exceptionText =
@@ -494,20 +467,13 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
      */
     private List<SosOfferingsForContents> getContentsForSosV2(String version, Session session)
             throws OwsExceptionReport {
-        int phenTimeCounter = 1;
-        Collection<String> offerings = Configurator.getInstance().getCapabilitiesCacheController().getOfferings();
+        // TODO shouldn't this be part of the encoder?
+        int phenTimeCounter = 0;
+        Collection<String> offerings = getCache().getOfferings();
         List<SosOfferingsForContents> sosOfferings = new ArrayList<SosOfferingsForContents>(offerings.size());
 
         for (String offering : offerings) {
-            Collection<String> procedures =
-                    Configurator.getInstance().getCapabilitiesCacheController().getProcedures4Offering(offering);
-            if (procedures == null || procedures.isEmpty()) {
-                String exceptionText =
-                        "No procedures are contained in the database for the offering: " + offering
-                                + "! Please contact the admin of this SOS.";
-                LOGGER.error(exceptionText);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-            }
+            Collection<String> procedures = getProceduresForOffering(offering);
             Collection<String> observationTypes = getObservationTypes(offering);
             if (observationTypes != null && !observationTypes.isEmpty()) {
                 for (String procedure : procedures) {
@@ -518,114 +484,22 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
                     // insert observationTypes
                     sosOffering.setObservationTypes(observationTypes);
 
-                    sosOffering.setObservedArea(Configurator.getInstance().getCapabilitiesCacheController()
-                            .getEnvelopeForOffering(offering));
-                    // if (sosEnvelope != null) {
-                    // sosOffering.setBoundeBy(sosEnvelope.getEnvelope());
-                    // sosOffering.setSrid(sosEnvelope.getSrid());
-                    // }
+                    sosOffering.setObservedArea(getCache().getEnvelopeForOffering(offering));
 
                     sosOffering.setProcedures(Collections.singletonList(procedure));
 
                     // TODO: add intended application
-                    // xb_oo.addIntendedApplication("");
 
                     // add offering name
-                    sosOffering.setOfferingName(Configurator.getInstance().getCapabilitiesCacheController()
+                    sosOffering.setOfferingName(getCache()
                             .getOfferingName(offering));
-
-                    // set up phenomena
-                    Collection<String> phenomenons = new ArrayList<String>();
-                    Map<String, Collection<String>> phenProcs =
-                            Configurator.getInstance().getCapabilitiesCacheController()
-                                    .getKObservablePropertyVProcedures();
-                    Collection<String> phens4Off =
-                            Configurator.getInstance().getCapabilitiesCacheController()
-                                    .getObservablePropertiesForOffering(offering);
-                    for (String phenID : phens4Off) {
-                        if (phenProcs.get(phenID).contains(procedure)) {
-                            phenomenons.add(phenID);
-                        }
-                    }
-                    sosOffering.setObservableProperties(phenomenons);
-                    sosOffering.setCompositePhenomena(Configurator.getInstance().getCapabilitiesCacheController()
-                            .getKOfferingVCompositePhenomenons().get(offering));
-                    Map<String, Collection<String>> phens4CompPhens = new HashMap<String, Collection<String>>();
-                    if (Configurator.getInstance().getCapabilitiesCacheController()
-                            .getKOfferingVCompositePhenomenons().get(offering) != null) {
-                        for (String compositePhenomenon : Configurator.getInstance().getCapabilitiesCacheController()
-                                .getKOfferingVCompositePhenomenons().get(offering)) {
-                            phens4CompPhens.put(compositePhenomenon, Configurator.getInstance()
-                                    .getCapabilitiesCacheController().getKCompositePhenomenonVObservableProperty()
-                                    .get(compositePhenomenon));
-                        }
-                    }
-                    sosOffering.setPhens4CompPhens(phens4CompPhens);
-
-                    // set up time
-                    DateTime minDate = HibernateCriteriaQueryUtilities.getMinDate4Offering(offering, session);
-                    DateTime maxDate = HibernateCriteriaQueryUtilities.getMaxDate4Offering(offering, session);
-                    String phenTimeId = Sos2Constants.EN_PHENOMENON_TIME + "_" + phenTimeCounter++;
-                    sosOffering.setTime(new TimePeriod(minDate, maxDate, phenTimeId));
-
-                    // add related feature
-                    Map<String, Collection<String>> relatedFeatures = new HashMap<String, Collection<String>>();
-                    // // related feature
-                    if (Configurator.getInstance().getCapabilitiesCacheController().getKOfferingVRelatedFeatures() != null
-                            && !Configurator.getInstance().getCapabilitiesCacheController()
-                                    .getKOfferingVRelatedFeatures().isEmpty()) {
-                        Collection<String> relatedFeatureMap =
-                                Configurator.getInstance().getCapabilitiesCacheController()
-                                        .getKOfferingVRelatedFeatures().get(offering);
-                        for (String relatedFeature : relatedFeatureMap) {
-                            if (relatedFeature.contains("http") || relatedFeature.contains("HTTP")) {
-                                relatedFeatures.put(relatedFeature,
-                                        Configurator.getInstance().getCapabilitiesCacheController()
-                                                .getKRelatedFeaturesVRole().get(relatedFeature));
-                            } else {
-                                String relatedFeatureID = getRelatedFeatureID(relatedFeature, session, version);
-                                if (relatedFeatureID != null) {
-                                    relatedFeatures.put(relatedFeatureID,
-                                            Configurator.getInstance().getCapabilitiesCacheController()
-                                                    .getKRelatedFeaturesVRole().get(relatedFeature));
-                                }
-                            }
-                        }
-                    }
-                    // feature of interest
-                    else {
-                        List<String> role = new ArrayList<String>();
-                        role.add("featureOfInterestID");
-                        for (String foiID : Configurator.getInstance().getCapabilitiesCacheController()
-                                .getKOfferingVFeatures().get(offering)) {
-                            if (Configurator.getInstance().getCapabilitiesCacheController()
-                                    .getProcedures4FeatureOfInterest(foiID).contains(procedure)) {
-                                relatedFeatures.put(foiID, role);
-                            }
-                        }
-                    }
-                    sosOffering.setRelatedFeatures(relatedFeatures);
-
-                    // TODO: if no foi contained, set allowed foitypes
-                    // insert featureOfInterestTypes
-                    Collection<String> featureTypes = getFeatureOfInterestTypes(offering, session);
-                    if (featureTypes == null || (featureTypes != null && featureTypes.isEmpty())) {
-                        featureTypes = HibernateCriteriaQueryUtilities.getFeatureOfInterestTypes(session);
-                    }
-                    sosOffering.setFeatureOfInterestTypes(featureTypes);
-
-                    // TODO: set procDescFormat
-                    sosOffering.setProcedureDescriptionFormat(HibernateCriteriaQueryUtilities
-                            .getProcedureDescriptionFormatIdentifiers(session));
-
-                    // set response format
-                    Collection<String> responseFormats =
-                            SosHelper.getSupportedResponseFormats(SosConstants.SOS, version);
-                    sosOffering.setResponseFormats(responseFormats);
-                    // TODO set as property
-                    if (true) {
-                        responseFormats.add(SosConstants.CONTENT_TYPE_ZIP);
-                    }
+                    
+                    setUpPhenomenaForOffering(offering, procedure, sosOffering);
+                    setUpTimeForOffering(offering, session, ++phenTimeCounter, sosOffering);
+                    setUpFeaturesForOffering(offering, session, version, procedure, sosOffering);
+                    setUpFeatureOfInterestTypesForOffering(offering, session, sosOffering);
+                    setUpProcedureDescriptionFormatForOffering(sosOffering, session);
+                    setUpResponseFormatForOffering(version, sosOffering);
 
                     sosOfferings.add(sosOffering);
                 }
@@ -634,81 +508,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
 
         return sosOfferings;
     }
-
-    /**
-     * Get extensions
-     * 
-     * @return Extensions
-     * @throws OwsExceptionReport
-     */
-    private List<IExtension> getExtensions(Session session) throws OwsExceptionReport {
-        Map<RequestOperatorKeyType, IRequestOperator> requestOperators =
-                Configurator.getInstance().getRequestOperator();
-        List<IExtension> extensions = new ArrayList<IExtension>(requestOperators.size());
-        for (IRequestOperator requestOperator : requestOperators.values()) {
-            IExtension extension = requestOperator.getExtension(session);
-            if (extension != null) {
-                extensions.add(extension);
-            }
-        }
-        return extensions;
-    }
-
-    /**
-     * Get OperationsMetadata for the GetCapabilities operation
-     * 
-     * @param sosCapabilities
-     *            SOS internal capabilities
-     * @param version
-     *            SOS version
-     * @param string
-     * @return OperationsMetadata for GetCapabilities
-     * @throws OwsExceptionReport
-     */
-    private OWSOperation getOpsGetCapabilities(String service, String version, List<IExtension> extensions)
-            throws OwsExceptionReport {
-        OWSOperation opsMeta = new OWSOperation();
-        // set operation name
-        opsMeta.setOperationName(SosConstants.Operations.GetCapabilities.name());
-        // set DCP
-        DecoderKeyType dkt;
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            dkt = new DecoderKeyType(Sos1Constants.NS_SOS);
-        } else {
-            dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
-        }
-        opsMeta.setDcp(SosHelper.getDCP(SosConstants.Operations.GetCapabilities.name(), dkt, Configurator
-                .getInstance().getBindingOperators().values(), Configurator.getInstance().getServiceURL()));
-        // set param updateSequence
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.updateSequence.name(),
-                new OWSParameterValuePossibleValues(Collections.singletonList(SosConstants.PARAMETER_ANY)));
-        // set param AcceptVersions
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.AcceptVersions.name(),
-                new OWSParameterValuePossibleValues(Configurator.getInstance().getSupportedVersions()));
-        // set param Sections
-        List<String> sectionsValues = new ArrayList<String>(8);
-        sectionsValues.add(SosConstants.CapabilitiesSections.ServiceIdentification.name());
-        sectionsValues.add(SosConstants.CapabilitiesSections.ServiceProvider.name());
-        sectionsValues.add(SosConstants.CapabilitiesSections.OperationsMetadata.name());
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            sectionsValues.add(Sos1Constants.CapabilitiesSections.Filter_Capabilities.name());
-        } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
-            sectionsValues.add(Sos2Constants.CapabilitiesSections.FilterCapabilities.name());
-            if (checkAndMergeInsertionCapabilities(extensions)) {
-                sectionsValues.add(Sos2Constants.CapabilitiesSections.InsertionCapabilities.name());
-            }
-        }
-        sectionsValues.add(SosConstants.CapabilitiesSections.Contents.name());
-        sectionsValues.add(SosConstants.CapabilitiesSections.All.name());
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.Sections.name(),
-                new OWSParameterValuePossibleValues(sectionsValues));
-        // set param AcceptFormats
-        opsMeta.addParameterValue(SosConstants.GetCapabilitiesParams.AcceptFormats.name(),
-                new OWSParameterValuePossibleValues(Arrays.asList(SosConstants.getAcceptFormats())));
-
-        return opsMeta;
-    }
-
+    
     /**
      * Set SpatialFilterCapabilities to FilterCapabilities
      * 
@@ -811,6 +611,8 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
      *            FilterCapabilities
      */
     private void getScalarFilterCapabilities(FilterCapabilities filterCapabilities) {
+        // TODO PropertyIsNil, PropertyIsNull? better:
+        // filterCapabilities.setComparisonOperators(Arrays.asList(ComparisonOperator.values()));
         List<ComparisonOperator> comparisonOperators = new ArrayList<ComparisonOperator>(8);
         comparisonOperators.add(ComparisonOperator.PropertyIsBetween);
         comparisonOperators.add(ComparisonOperator.PropertyIsEqualTo);
@@ -875,7 +677,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
 
     private String getRelatedFeatureID(String identifier, Session session, String version) throws OwsExceptionReport {
         SosSamplingFeature feature =
-                (SosSamplingFeature) Configurator.getInstance().getFeatureQueryHandler()
+                (SosSamplingFeature) getConfigurator().getFeatureQueryHandler()
                         .getFeatureByID(identifier, session, version);
         if (feature.getUrl() != null && !feature.getUrl().isEmpty()) {
             return feature.getUrl();
@@ -893,15 +695,16 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
     }
 
     private Collection<String> getObservationTypes(String offering) {
-        List<String> observationTypes = new ArrayList<String>();
-        for (String observationType : Configurator.getInstance().getCapabilitiesCacheController()
-                .getObservationTypes4Offering(offering)) {
+        Collection<String> allObservationTypes = getCache().getObservationTypes4Offering(offering);
+        List<String> observationTypes = new ArrayList<String>(allObservationTypes.size());
+        
+        for (String observationType : allObservationTypes) {
             if (!observationType.equals(SosConstants.NOT_DEFINED)) {
                 observationTypes.add(observationType);
             }
         }
         if (observationTypes.isEmpty()) {
-            for (String observationType : Configurator.getInstance().getCapabilitiesCacheController()
+            for (String observationType : getCache()
                     .getAllowedObservationTypes4Offering(offering)) {
                 if (!observationType.equals(SosConstants.NOT_DEFINED)) {
                     observationTypes.add(observationType);
@@ -913,7 +716,7 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
 
     private Collection<String> getFeatureOfInterestTypes(String offering, Session session) {
         Collection<String> featureIDs =
-                Configurator.getInstance().getCapabilitiesCacheController().getKOfferingVFeatures().get(offering);
+                getCache().getKOfferingVFeatures().get(offering);
         if (featureIDs == null || (featureIDs != null && featureIDs.isEmpty())) {
             return HibernateCriteriaQueryUtilities.getFeatureOfInterestTypesForFeatureOfInterest(featureIDs, session);
         }
@@ -921,21 +724,155 @@ public class GetCapabilitiesDAO implements IGetCapabilitiesDAO {
 
     }
 
-    private boolean checkAndMergeInsertionCapabilities(List<IExtension> extensions) {
-        SosInsertionCapabilities insertionCapabilities = null;
-        for (IExtension iExtension : extensions) {
-            if (iExtension instanceof SosInsertionCapabilities) {
-                if (insertionCapabilities == null) {
-                    insertionCapabilities = (SosInsertionCapabilities) iExtension;
+    private Set<String> getExtensionSections(Session session) throws OwsExceptionReport {
+        Collection<IExtension> extensions = getAndMergeExtensions(session);
+        HashSet<String> sections = new HashSet<String>(extensions.size());
+        for (IExtension e : extensions) {
+            if (e instanceof ICapabilitiesExtension) {
+                sections.add(((ICapabilitiesExtension) e).getSectionName());
+            }
+        }
+        return sections;
+    }
+    
+    /**
+     * Get extensions and merge IMergableExtension of the same class.
+     * 
+     * @return Extensions
+     * @throws OwsExceptionReport
+     */
+    @SuppressWarnings("rawtypes")
+    private List<IExtension> getAndMergeExtensions(Session session) throws OwsExceptionReport {
+        Map<RequestOperatorKeyType, IRequestOperator> requestOperators = getConfigurator().getRequestOperator();
+        List<IExtension> extensions = new ArrayList<IExtension>(requestOperators.size());
+        HashMap<String, IMergableExtension> map = new HashMap<String, IMergableExtension>(requestOperators.size());
+        for (IRequestOperator requestOperator : requestOperators.values()) {
+            IExtension extension = requestOperator.getExtension(session);
+            if (extension != null) {
+                if (extension instanceof IMergableExtension) {
+                    IMergableExtension me = (IMergableExtension) extension;
+                    IMergableExtension previous = map.get(me.getSectionName());
+                    if (previous == null) {
+                        map.put(me.getSectionName(), me);
+                    } else {
+                        previous.merge(me);
+                    }
                 } else {
-                    insertionCapabilities.addInsertionCapabilities((SosInsertionCapabilities) iExtension);
+                    extensions.add(extension);
                 }
             }
         }
-        if (insertionCapabilities != null) {
-            return true;
+        extensions.addAll(map.values());
+        return extensions;
+    }
+    
+    private Collection<IExtension> getExtensions(Session session, Set<String> requestedExtensionSections) throws OwsExceptionReport {
+        List<IExtension> extensions = getAndMergeExtensions(session);
+        List<IExtension> filtered = new ArrayList<IExtension>(requestedExtensionSections.size());
+        for (IExtension e : extensions) {
+            if (e instanceof ICapabilitiesExtension) {
+                if (requestedExtensionSections.contains(((ICapabilitiesExtension) e).getSectionName())) {
+                    filtered.add(e);
+                }
+            }
+        } 
+        return filtered;
+    }
+    
+    protected void setUpPhenomenaForOffering(String offering, String procedure, SosOfferingsForContents sosOffering) {
+        Collection<String> phenomenons = new LinkedList<String>();
+        Map<String, Collection<String>> phenProcs = getCache().getKObservablePropertyVProcedures();
+        Collection<String> phens4Off = getCache().getObservablePropertiesForOffering(offering);
+        for (String phenID : phens4Off) {
+            if (phenProcs.get(phenID).contains(procedure)) {
+                phenomenons.add(phenID);
+            }
         }
-        return false;
+        sosOffering.setObservableProperties(phenomenons);
+        sosOffering.setCompositePhenomena(getCache().getKOfferingVCompositePhenomenons().get(offering));
+        
+        Collection<String> compositePhenomenonsForOffering = getCache().getKOfferingVCompositePhenomenons().get(offering);
+        
+        if (compositePhenomenonsForOffering != null) {
+            Map<String, Collection<String>> phens4CompPhens = new HashMap<String, Collection<String>>(compositePhenomenonsForOffering.size());    
+            for (String compositePhenomenon : compositePhenomenonsForOffering) {
+                Collection<String> phenomenonsForComposite = getCache().getKCompositePhenomenonVObservableProperty().get(compositePhenomenon);
+                phens4CompPhens.put(compositePhenomenon, phenomenonsForComposite);
+            }
+            sosOffering.setPhens4CompPhens(phens4CompPhens);
+        } else {
+            sosOffering.setPhens4CompPhens(Collections.<String, Collection<String>>emptyMap());
+        }
+        
     }
 
+    protected void setUpFeaturesForOffering(String offering, Session session, String version, String procedure, SosOfferingsForContents sosOffering) throws OwsExceptionReport {
+        Map<String, Collection<String>> relatedFeatures = new HashMap<String, Collection<String>>();
+        Map<String,Collection<String>> relatedFeaturesForOffering = getCache().getKOfferingVRelatedFeatures();
+        if (relatedFeaturesForOffering != null && !relatedFeaturesForOffering.isEmpty()) {
+            Collection<String> relatedFeatureMap = relatedFeaturesForOffering.get(offering);
+            for (String relatedFeature : relatedFeatureMap) {
+                if (relatedFeature.toLowerCase().contains("http")) {
+                    relatedFeatures.put(relatedFeature, getCache().getKRelatedFeaturesVRole().get(relatedFeature));
+                } else {
+                    String relatedFeatureID = getRelatedFeatureID(relatedFeature, session, version);
+                    if (relatedFeatureID != null) {
+                        relatedFeatures.put(relatedFeatureID, getCache().getKRelatedFeaturesVRole().get(relatedFeature));
+                    }
+                }
+            }
+        } else {
+            List<String> role = Collections.singletonList("featureOfInterestID");
+            for (String foiID : getCache().getKOfferingVFeatures().get(offering)) {
+                if (getCache().getProcedures4FeatureOfInterest(foiID).contains(procedure)) {
+                    relatedFeatures.put(foiID, role);
+                }
+            }
+        }
+        sosOffering.setRelatedFeatures(relatedFeatures);
+    }
+
+    protected void setUpTimeForOffering(String offering, Session session, int id, SosOfferingsForContents sosOffering) {
+        DateTime minDate = HibernateCriteriaQueryUtilities.getMinDate4Offering(offering, session);
+        DateTime maxDate = HibernateCriteriaQueryUtilities.getMaxDate4Offering(offering, session);
+        String phenTimeId = Sos2Constants.EN_PHENOMENON_TIME + "_" + id;
+        sosOffering.setTime(new TimePeriod(minDate, maxDate, phenTimeId));
+    }
+
+    protected void setUpFeatureOfInterestTypesForOffering(String offering, Session session, SosOfferingsForContents sosOffering) {
+        // TODO: if no foi contained, set allowed foitypes
+        // insert featureOfInterestTypes
+        Collection<String> featureTypes = getFeatureOfInterestTypes(offering, session);
+        if (featureTypes == null || featureTypes.isEmpty()) {
+            featureTypes = HibernateCriteriaQueryUtilities.getFeatureOfInterestTypes(session);
+        }
+        sosOffering.setFeatureOfInterestTypes(featureTypes);
+    }
+
+    protected void setUpResponseFormatForOffering(String version, SosOfferingsForContents sosOffering) {
+        Collection<String> responseFormats =
+                SosHelper.getSupportedResponseFormats(SosConstants.SOS, version);
+        sosOffering.setResponseFormats(responseFormats);
+        // TODO set as property
+        if (true) {
+            responseFormats.add(SosConstants.CONTENT_TYPE_ZIP);
+        }
+    }
+
+    protected void setUpProcedureDescriptionFormatForOffering(SosOfferingsForContents sosOffering, Session session) {
+        // TODO: set procDescFormat
+        sosOffering.setProcedureDescriptionFormat(HibernateCriteriaQueryUtilities
+                .getProcedureDescriptionFormatIdentifiers(session));
+    }
+
+    private Collection<String> getProceduresForOffering(String offering) throws OwsExceptionReport {
+        Collection<String> procedures = getCache().getProcedures4Offering(offering);
+        if (procedures == null || procedures.isEmpty()) {
+            String exceptionText = String.format(
+                    "No procedures are contained in the database for the offering '%s'! Please contact the admin of this SOS.", offering);
+            LOGGER.error(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        }
+        return procedures;
+    }
 }

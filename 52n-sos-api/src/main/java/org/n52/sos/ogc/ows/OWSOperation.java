@@ -149,4 +149,8 @@ public class OWSOperation {
             parameterValues.get(parameterName).add(value);
         }
     }
+    
+    public <E extends Enum<E>> void addParameterValue(E parameterName, IOWSParameterValue value) {
+        addParameterValue(parameterName.name(), value);
+    }
 }

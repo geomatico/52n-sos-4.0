@@ -51,7 +51,6 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeHelper;
 
 public class ResultHandlingHelper {
-    
 
     private static final String RESULT_TIME = "http://www.opengis.net/def/property/OGC/0/ResultTime";
 
@@ -108,7 +107,7 @@ public class ResultHandlingHelper {
         StringBuilder builder = new StringBuilder();
         if (phenomenonTimeStart != null && phenomenonTimeEnd != null) {
             builder.append(DateTimeHelper.formatDateTime2IsoString(new DateTime(phenomenonTimeStart)));
-            builder.append("/");
+            builder.append('/');
             builder.append(DateTimeHelper.formatDateTime2IsoString(new DateTime(phenomenonTimeStart)));
         } else if (phenomenonTimeStart != null && phenomenonTimeEnd == null) {
             builder.append(DateTimeHelper.formatDateTime2IsoString(new DateTime(phenomenonTimeStart)));
@@ -237,6 +236,9 @@ public class ResultHandlingHelper {
 			++i;
 		}
         return -1;
+    }
+
+    private ResultHandlingHelper() {
     }
 
 }

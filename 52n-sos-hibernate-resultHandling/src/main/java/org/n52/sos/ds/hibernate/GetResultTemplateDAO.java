@@ -31,28 +31,23 @@ import java.util.Set;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.n52.sos.decode.DecoderKeyType;
-import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IGetResultTemplateDAO;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
-import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosResultEncoding;
-import org.n52.sos.ogc.sos.SosResultStructure;
 import org.n52.sos.request.GetResultTemplateRequest;
 import org.n52.sos.response.GetResultTemplateResponse;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GetResultTemplateDAO implements IGetResultTemplateDAO {
+public class GetResultTemplateDAO extends AbstractHibernateOperationDao implements IGetResultTemplateDAO {
 
     /**
      * logger
@@ -64,36 +59,16 @@ public class GetResultTemplateDAO implements IGetResultTemplateDAO {
      */
     private static final String OPERATION_NAME = Sos2Constants.Operations.GetResultTemplate.name();
 
-    /**
-     * Instance of the IConnectionProvider
-     */
-    private IConnectionProvider connectionProvider;
-    
-    public GetResultTemplateDAO() {
-        this.connectionProvider = Configurator.getInstance().getConnectionProvider();
-    }
-
     @Override
     public String getOperationName() {
         return OPERATION_NAME;
     }
 
     @Override
-    public OWSOperation getOperationsMetadata(String service, String version, Object connection)
+    public OWSOperation getOperationsMetadata(String service, String version, Session session)
             throws OwsExceptionReport {
-        Session session = null;
-        if (connection instanceof Session) {
-            session = (Session) connection;
-        } else {
-            String exceptionText = "The parameter connection is not an Hibernate Session!";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        }
         // get DCP
-        DecoderKeyType dkt = new DecoderKeyType(Sos2Constants.NS_SOS_20);
-        Map<String, List<String>> dcpMap =
-                SosHelper.getDCP(OPERATION_NAME, dkt, Configurator.getInstance().getBindingOperators().values(),
-                        Configurator.getInstance().getServiceURL());
+        Map<String, List<String>> dcpMap = getDCP(new DecoderKeyType(Sos2Constants.NS_SOS_20));
         if (dcpMap != null && !dcpMap.isEmpty()) {
             OWSOperation opsMeta = new OWSOperation();
             // set operation name
@@ -126,16 +101,10 @@ public class GetResultTemplateDAO implements IGetResultTemplateDAO {
     }
 
     @Override
-    public IExtension getExtension(Object connection) throws OwsExceptionReport {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public GetResultTemplateResponse getResultTemplate(GetResultTemplateRequest request) throws OwsExceptionReport {
         Session session = null;
         try {
-            session = (Session) connectionProvider.getConnection();
+            session = getSession();
             ResultTemplate resultTemplate =
                     HibernateCriteriaQueryUtilities.getResultTemplateObject(request.getOffering(),
                             request.getObservedProperty(), session);
@@ -159,7 +128,7 @@ public class GetResultTemplateDAO implements IGetResultTemplateDAO {
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            connectionProvider.returnConnection(session);
+            returnSession(session);
         }
     }
 

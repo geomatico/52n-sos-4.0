@@ -41,6 +41,10 @@ public class OWSParameterValuePossibleValues implements IOWSParameterValue {
         }
         values.add(valueString);
     }
+    
+    public OWSParameterValuePossibleValues(Enum<?> value) {
+        this(value.name());
+    }
 
     public Collection<String> getValues() {
         return values;
