@@ -78,7 +78,6 @@ import org.n52.sos.request.InsertResultRequest;
 import org.n52.sos.response.InsertResultResponse;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
-import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

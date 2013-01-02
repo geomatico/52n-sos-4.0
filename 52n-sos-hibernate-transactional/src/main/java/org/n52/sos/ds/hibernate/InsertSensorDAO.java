@@ -24,9 +24,7 @@
 package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -47,10 +45,7 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.ows.IExtension;
-import org.n52.sos.ogc.ows.IOWSParameterValue;
 import org.n52.sos.ogc.ows.OWSOperation;
-import org.n52.sos.ogc.ows.OWSParameterDataType;
-import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
 import org.n52.sos.ogc.sensorML.SensorML;

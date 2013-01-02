@@ -23,7 +23,6 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import java.util.Collections;
 import java.util.Set;
 
 import org.hibernate.HibernateException;
@@ -39,7 +38,6 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OWSOperation;
-import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractSensorML;
 import org.n52.sos.ogc.sensorML.SensorML;

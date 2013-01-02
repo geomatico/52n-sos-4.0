@@ -24,9 +24,7 @@
 package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import net.opengis.swe.x20.DataRecordDocument;
@@ -54,8 +52,6 @@ import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.ows.OWSOperation;
-import org.n52.sos.ogc.ows.OWSParameterDataType;
-import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;

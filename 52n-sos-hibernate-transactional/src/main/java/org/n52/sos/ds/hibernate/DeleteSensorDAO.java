@@ -23,8 +23,6 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import java.util.List;
-import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -33,7 +31,6 @@ import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IDeleteSensorDAO;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ogc.ows.OWSOperation;
-import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.swe.SWEConstants;
