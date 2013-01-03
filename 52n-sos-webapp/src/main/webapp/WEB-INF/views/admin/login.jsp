@@ -65,6 +65,7 @@
 			});
 			$("button[type=submit]").attr("disabled", empty);	
 		}).trigger("input");
+		$("input[name=j_username]").focus();
 	});
 </script>
 <jsp:include page="../common/footer.jsp" />
