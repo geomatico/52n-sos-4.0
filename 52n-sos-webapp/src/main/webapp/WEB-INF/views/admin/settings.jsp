@@ -40,6 +40,7 @@
             setSetting("${setting}","${requestScope[setting]}", settings);
         </c:if>
     </c:forEach>
+            setSetting("admin_username","${requestScope["admin_username"]}", settings);
     }
 </script>
 <script type="text/javascript">

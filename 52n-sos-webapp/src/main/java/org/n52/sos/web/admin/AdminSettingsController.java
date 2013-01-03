@@ -76,8 +76,7 @@ public class AdminSettingsController extends AbstractController {
         try {
             ISettingsDao setting = daoServiceLoader.iterator().next();
             return setting.get();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             /* TODO error handling */
             log.error("Error", ex);
             throw new RuntimeException(ex);
