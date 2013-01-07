@@ -146,7 +146,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.Sections, sectionsValues);
         opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptFormats, Arrays.asList(SosConstants.getAcceptFormats()));
         opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptVersions, getConfigurator().getSupportedVersions());
-        opsMeta.addAnyParameterListValue(SosConstants.GetCapabilitiesParams.updateSequence);
+        opsMeta.addAnyParameterValue(SosConstants.GetCapabilitiesParams.updateSequence);
     }
 
     /*

@@ -120,8 +120,8 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCache().getObservableProperties());
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.featureOfInterest, featureIDs);
         } else {
-            opsMeta.addAnyParameterListValue(SosConstants.GetObservationParams.observedProperty);
-            opsMeta.addAnyParameterListValue(SosConstants.GetObservationParams.featureOfInterest);
+            opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.observedProperty);
+            opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.featureOfInterest);
         }
         
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
@@ -137,8 +137,8 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
         } else if (version.equals(Sos1Constants.SERVICEVERSION)) {
             // SOS 1.0.0 parameter
             opsMeta.addRangeParameterValue(Sos1Constants.GetObservationParams.eventTime, getEventTime(session));
-            opsMeta.addAnyParameterListValue(SosConstants.GetObservationParams.srsName);
-            opsMeta.addAnyParameterListValue(SosConstants.GetObservationParams.result);
+            opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.srsName);
+            opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.result);
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.resultModel, getResultModels());
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.responseMode, Arrays.asList(SosConstants.getResponseModes()));
         }

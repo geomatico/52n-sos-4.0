@@ -86,9 +86,9 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCache().getObservableProperties());
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.featureOfInterest, featureIDs);
         } else {
-            opsMeta.addAnyParameterListValue(SosConstants.GetObservationParams.procedure);
-            opsMeta.addAnyParameterListValue(SosConstants.GetObservationParams.observedProperty);
-            opsMeta.addAnyParameterListValue(SosConstants.GetObservationParams.featureOfInterest);
+            opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.procedure);
+            opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.observedProperty);
+            opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.featureOfInterest);
         }
         
         
@@ -105,7 +105,7 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
         if (envelope != null) {
             opsMeta.addRangeParameterValue(parameterName, SosHelper.getMinMaxMapFromEnvelope(envelope));
         } else {
-            opsMeta.addAnyParameterListValue(parameterName);
+            opsMeta.addAnyParameterValue(parameterName);
         }
     }
 

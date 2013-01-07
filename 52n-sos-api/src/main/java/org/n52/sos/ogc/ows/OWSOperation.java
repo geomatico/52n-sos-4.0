@@ -171,14 +171,6 @@ public class OWSOperation {
         addAnyParameterValue(parameterName.name());
     }
     
-    public void addAnyParameterListValue(String paramterName) {
-        addPossibleValuesParameter(paramterName, Collections.singletonList(SosConstants.PARAMETER_ANY));
-    }
-    
-    public <E extends Enum<E>> void addAnyParameterListValue(E parameterName) {
-        addAnyParameterListValue(parameterName.name());
-    }
-
     public void addRangeParameterValue(String parameterName, String min, String max) {
         addParameterValue(parameterName, new OWSParameterValueRange(min, max));
     }
