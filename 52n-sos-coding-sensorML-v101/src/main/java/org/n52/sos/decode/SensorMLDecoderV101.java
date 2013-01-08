@@ -57,7 +57,6 @@ import net.opengis.swe.x101.DataRecordPropertyType;
 import net.opengis.swe.x101.SimpleDataRecordType;
 
 import org.apache.xmlbeans.SchemaType;
-import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
@@ -314,7 +313,7 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         List<SosSMLClassifier> sosClassifiers = new ArrayList<SosSMLClassifier>();
         for (Classification xbClassification : classificationArray) {
             for (Classifier xbClassifier : xbClassification.getClassifierList().getClassifierArray()) {
-                sosClassifiers.add(new SosSMLClassifier(xbClassifier.getName(), xbClassifier.getTerm().getValue()));
+                sosClassifiers.add(new SosSMLClassifier(xbClassifier.getName(), xbClassifier.getTerm().getDefinition(), xbClassifier.getTerm().getValue()));
             }
         }
         return sosClassifiers;

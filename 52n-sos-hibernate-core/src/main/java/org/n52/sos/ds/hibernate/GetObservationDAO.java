@@ -26,6 +26,7 @@ package org.n52.sos.ds.hibernate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +65,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
-import java.util.EnumMap;
 
 /**
  * Implementation of the interface IGetObservationDAO
@@ -237,8 +237,8 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
             criterions.add(Restrictions.eq(HibernateConstants.DELETED, false));
         }
         // temporal filters
-        if (request.getEventTimes() != null && !request.getEventTimes().isEmpty()) {
-            criterions.add(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(request.getEventTimes()));
+        if (request.getTemporalFilters() != null && !request.getTemporalFilters().isEmpty()) {
+            criterions.add(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(request.getTemporalFilters()));
         }
         Set<String> featureIdentifier = QueryHelper.getFeatureIdentifier(request.getSpatialFilter(), request.getFeatureIdentifiers(), session);
         if (featureIdentifier != null && featureIdentifier.isEmpty()) {

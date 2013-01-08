@@ -24,15 +24,11 @@
 package org.n52.sos.service.admin;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.GZIPOutputStream;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.UnavailableException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,9 +40,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.ConfiguratedHttpServlet;
-import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.admin.operator.IAdminServiceOperator;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

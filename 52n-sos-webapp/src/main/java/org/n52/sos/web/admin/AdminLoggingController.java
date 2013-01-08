@@ -23,14 +23,15 @@
  */
 package org.n52.sos.web.admin;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
+
 import org.n52.sos.service.AbstractLoggingConfigurator;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;

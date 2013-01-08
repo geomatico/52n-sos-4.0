@@ -23,9 +23,9 @@
  */
 package org.n52.sos.request.operator;
 
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.IConformanceClass;

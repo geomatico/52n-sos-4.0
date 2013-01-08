@@ -24,21 +24,26 @@
 package org.n52.sos.ogc.sos;
 
 import org.n52.sos.ogc.gml.CodeWithAuthority;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
+import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
+import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
+import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlHelper;
 
 public class ResultTemplate {
-    
+
     private CodeWithAuthority identifier;
-    
+
     private String xmlResultStructure;
-    
+
     private String xmResultEncoding;
-    
+
     private SosSweAbstractDataComponent resultStructure;
-    
+
     private SosSweAbstractEncoding resultEncoding;
-    
+
     public CodeWithAuthority getIdentifier() {
         return identifier;
     }
@@ -51,14 +56,20 @@ public class ResultTemplate {
         return xmResultEncoding;
     }
 
-    public SosSweAbstractDataComponent getResultStructure() {
+    public SosSweAbstractDataComponent getResultStructure() throws OwsExceptionReport {
+        if (resultStructure == null) {
+            this.resultStructure = parseResultStructure();
+        }
         return resultStructure;
     }
 
-    public SosSweAbstractEncoding getResultEncoding() {
+    public SosSweAbstractEncoding getResultEncoding() throws OwsExceptionReport {
+        if (resultEncoding == null) {
+            this.resultEncoding = parseResultEncoding();
+        }
         return resultEncoding;
     }
-    
+
     public void setIdentifier(CodeWithAuthority identifier) {
         this.identifier = identifier;
     }
@@ -77,5 +88,27 @@ public class ResultTemplate {
 
     public void setResultEncoding(SosSweAbstractEncoding resultEncoding) {
         this.resultEncoding = resultEncoding;
+    }
+
+    private SosSweAbstractDataComponent parseResultStructure() throws OwsExceptionReport {
+        Object decodedObject = XmlHelper.decodeGenericXmlObject(xmlResultStructure);
+        if (decodedObject instanceof SosSweDataRecord) {
+            return (SosSweDataRecord) decodedObject;
+        }
+        String errorMsg =
+                String.format("Decoding of string \"%s\" failed. Returned type is \"%s\".", resultStructure,
+                        decodedObject.getClass().getName());
+        throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+    }
+
+    private SosSweAbstractEncoding parseResultEncoding() throws OwsExceptionReport {
+        Object decodedObject = XmlHelper.decodeGenericXmlObject(xmResultEncoding);
+        if (decodedObject instanceof SosSweTextEncoding) {
+            return (SosSweTextEncoding) decodedObject;
+        }
+        String errorMsg =
+                String.format("Decoding of string \"%s\" failed. Returned type is \"%s\".", resultEncoding,
+                        decodedObject.getClass().getName());
+        throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
     }
 }

@@ -64,7 +64,7 @@ public class GetObservationRequest extends AbstractServiceRequest {
     /**
      * Temporal filters list
      */
-    private List<TemporalFilter> eventTimes;
+    private List<TemporalFilter> temporalFilters;
 
     /**
      * Procedures list
@@ -119,7 +119,7 @@ public class GetObservationRequest extends AbstractServiceRequest {
          * Integer.MIN_VALUE;
          */
         offerings = new ArrayList<String>(1);
-        eventTimes = new ArrayList<TemporalFilter>(1);
+        temporalFilters = new ArrayList<TemporalFilter>(1);
         procedures = new ArrayList<String>(1);
         observedProperties = new ArrayList<String>(1);
         featureIdentifiers = new ArrayList<String>(1);
@@ -135,8 +135,8 @@ public class GetObservationRequest extends AbstractServiceRequest {
      * 
      * @return temporal filters
      */
-    public List<TemporalFilter> getEventTimes() {
-        return eventTimes;
+    public List<TemporalFilter> getTemporalFilters() {
+        return temporalFilters;
     }
 
     /**
@@ -145,8 +145,8 @@ public class GetObservationRequest extends AbstractServiceRequest {
      * @param eventTime
      *            temporal filters
      */
-    public void setEventTimes(List<TemporalFilter> eventTimes) {
-        this.eventTimes = eventTimes;
+    public void setTemporalFilters(List<TemporalFilter> temporalFilters) {
+        this.temporalFilters = temporalFilters;
     }
 
     /**
@@ -386,7 +386,7 @@ public class GetObservationRequest extends AbstractServiceRequest {
      */
     public GetObservationRequest copyOf(List<String> obsProps) {
         GetObservationRequest res = new GetObservationRequest();
-        res.setEventTimes(this.eventTimes);
+        res.setTemporalFilters(this.temporalFilters);
         res.setObservedProperties(obsProps);
         res.setOfferings(this.offerings);
         res.setProcedures(this.procedures);
@@ -450,7 +450,7 @@ public class GetObservationRequest extends AbstractServiceRequest {
     }
 
     public boolean isSetTemporalFilter() {
-        if (eventTimes != null && !eventTimes.isEmpty()) {
+        if (temporalFilters != null && !temporalFilters.isEmpty()) {
             return true;
         }
         return false;

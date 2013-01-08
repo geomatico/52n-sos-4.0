@@ -25,7 +25,6 @@ package org.n52.sos.service.admin.request.operator;
 
 import org.n52.sos.exception.AdministratorException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.response.AbstractServiceResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.admin.request.AdminRequest;
 

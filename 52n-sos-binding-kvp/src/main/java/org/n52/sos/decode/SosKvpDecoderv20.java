@@ -45,6 +45,7 @@ import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.DescribeSensorRequest;
@@ -388,7 +389,7 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
                 // eventTime (optional)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.temporalFilter.name())) {
                     try {
-                        request.setEventTimes(parseTemporalFilter(KvpHelper.checkParameterMultipleValues(
+                        request.setTemporalFilters(parseTemporalFilter(KvpHelper.checkParameterMultipleValues(
                                 parameterValues, Sos2Constants.GetObservationParams.temporalFilter.name()),
                                 parameterName));
                     } catch (DecoderException e) {
@@ -855,19 +856,23 @@ public class SosKvpDecoderv20 implements IKvpDecoder {
         String[] times = value.split("/");
 
         if (times.length == 1) {
-            DateTime instant = DateTimeHelper.parseIsoString2DateTime(times[0]);
             TimeInstant ti = new TimeInstant();
-            ti.setValue(instant);
-            String valueSplit = null;
-            if (times[0].contains("Z")) {
-                valueSplit = times[0].substring(0, times[0].indexOf("Z"));
-            } else if (times[0].contains("+")) {
-                valueSplit = times[0].substring(0, times[0].indexOf("+"));
-            }
-            if (valueSplit != null) {
-                ti.setRequestedTimeLength(valueSplit.length());
+            if (FirstLatest.contains(times[0])) {
+                ti.setIndeterminateValue(times[0]);
             } else {
-                ti.setRequestedTimeLength(times[0].length());
+                DateTime instant = DateTimeHelper.parseIsoString2DateTime(times[0]);
+                ti.setValue(instant);
+                String valueSplit = null;
+                if (times[0].contains("Z")) {
+                    valueSplit = times[0].substring(0, times[0].indexOf("Z"));
+                } else if (times[0].contains("+")) {
+                    valueSplit = times[0].substring(0, times[0].indexOf("+"));
+                }
+                if (valueSplit != null) {
+                    ti.setRequestedTimeLength(valueSplit.length());
+                } else {
+                    ti.setRequestedTimeLength(times[0].length());
+                }  
             }
             temporalFilter.setOperator(TimeOperator.TM_Equals);
             temporalFilter.setTime(ti);

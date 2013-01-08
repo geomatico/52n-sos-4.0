@@ -176,6 +176,8 @@ public final class Configurator {
     /** directory of sensor descriptions in SensorML format */
     private File sensorDir;
 
+    private SosServiceIdentification serviceIdentification = new SosServiceIdentification();
+    
     /** file of service identification information in XML format */
     private File serviceIdentificationFile;
 
@@ -228,6 +230,8 @@ public final class Configurator {
 
     private ServiceLoader<ASosTasking> serviceLoaderTasking;
 
+    private SosServiceProvider serviceProvider;
+    
     /** file of service provider information in XML format */
     private File serviceProviderFile;
 
@@ -551,7 +555,7 @@ public final class Configurator {
             }
             break;
         case SERVICE_IDENTIFICATION_SERVICE_TYPE:
-            this.serviceIdentificationServiceType = parseString(setting, value, true);
+            this.serviceIdentification.setServiceType(parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_TITLE:
             this.serviceIdentificationTitle = parseString(setting, value, true);
@@ -666,10 +670,6 @@ public final class Configurator {
          */
     }
 
-    public Properties getConnectionProviderProperties() throws ConfigurationException {
-        return this.connectionProviderProperties;
-    }
-
     /**
      * Initialize this class. Since this initialization is not done in the
      * constructor, dependent classes can use the SosConfigurator already when
@@ -717,7 +717,6 @@ public final class Configurator {
         initializeAdminRequestOperator();
         initializeDataSource();
         initializeCapabilitiesCacheController();
-        // TODO: what?
         initializeTasking();
     }
 
@@ -907,7 +906,7 @@ public final class Configurator {
             LOGGER.error(exceptionText);
             throw new ConfigurationException(exceptionText);
         }
-        this.connectionProvider.initialize(getConnectionProviderProperties());
+        this.connectionProvider.initialize(this.connectionProviderProperties);
         LOGGER.info("\n******\n ConnectionProvider loaded successfully!\n******\n");
     }
 
@@ -1404,7 +1403,7 @@ public final class Configurator {
     }
 
     /**
-     * @param crs
+     * @param epsgCode
      * @return boolean indicating if coordinates have to be switched
      */
     public boolean reversedAxisOrderRequired(int epsgCode) {

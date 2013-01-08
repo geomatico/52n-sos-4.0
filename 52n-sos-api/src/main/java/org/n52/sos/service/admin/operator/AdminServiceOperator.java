@@ -23,20 +23,13 @@
  */
 package org.n52.sos.service.admin.operator;
 
-import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.encode.IEncoder;
 import org.n52.sos.exception.AdministratorException;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.admin.AdministratorConstants.AdministratorParams;

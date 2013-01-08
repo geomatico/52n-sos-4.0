@@ -35,7 +35,6 @@ import javax.xml.namespace.QName;
 
 import net.opengis.fes.x20.FilterCapabilitiesDocument;
 import net.opengis.fes.x20.FilterCapabilitiesDocument.FilterCapabilities;
-import net.opengis.gml.x32.AbstractFeatureType;
 import net.opengis.gml.x32.DirectPositionType;
 import net.opengis.gml.x32.EnvelopeType;
 import net.opengis.gml.x32.FeaturePropertyType;
@@ -81,7 +80,6 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
-import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.filter.FilterConstants;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.GMLConstants;
@@ -120,7 +118,6 @@ import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.N52XmlHelper;
-import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3CConstants;
 import org.n52.sos.util.XmlHelper;
@@ -301,16 +298,10 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         } else if (encoder instanceof IObservationEncoder) {
             IObservationEncoder iObservationEncoder = (IObservationEncoder) encoder;
-            /* TODO uncomment when WaterML support is activated
-             * if (iObservationEncoder.shouldObservationsWithSameXBeMerged()) {
-                // TODO get List of markable ObsTyps, ...
-                observationCollection =
-                        response.mergeObservations(
-                                iObservationEncoder.shouldObservationsWithSameXBeMerged()
-                                );
-            } else {*/
-                observationCollection = response.getObservationCollection();
-            /*}*/
+            if (iObservationEncoder.shouldObservationsWithSameXBeMerged()) {
+                response.mergeObservationsWithSameX();
+            }
+            observationCollection = response.getObservationCollection();
         } else {
             String exceptionText =
                     "Error while encoding GetObservation response, encoder is not of type IObservationEncoder!";
@@ -377,9 +368,12 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                         featureProperty.setTitle(sampFeat.getFirstName());
                     }
                 } else {
+                    // TODO HYDRO-PROFILE check for profile
+//                    IEncoder encoder =
+//                            Configurator.getInstance().getEncoder(
+//                                    OMHelper.getNamespaceForFeatureType(sampFeat.getFeatureType()));
                     IEncoder encoder =
-                            Configurator.getInstance().getEncoder(
-                                    OMHelper.getNamespaceForFeatureType(sampFeat.getFeatureType()));
+                            Configurator.getInstance().getEncoder("http://www.opengis.net/waterml/2.0");
                     if (encoder != null) {
                         featureProperty.set((XmlObject) encoder.encode(sampFeat));
                     } else {

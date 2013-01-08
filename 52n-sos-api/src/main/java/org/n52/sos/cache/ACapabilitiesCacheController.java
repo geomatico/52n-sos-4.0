@@ -23,21 +23,22 @@
  */
 package org.n52.sos.cache;
 
-import com.vividsolutions.jts.geom.Envelope;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-import org.joda.time.DateTime;
 
+import org.joda.time.DateTime;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Abstract class for capabilities cache controller implementations.

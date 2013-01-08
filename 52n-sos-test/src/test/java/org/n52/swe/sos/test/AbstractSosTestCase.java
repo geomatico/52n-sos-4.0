@@ -26,6 +26,7 @@ package org.n52.swe.sos.test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.n52.sos.service.ConfigurationException;

@@ -24,6 +24,7 @@
 package org.n52.sos.ds;
 
 import java.sql.SQLException;
+
 import org.n52.sos.service.AdminUser;
 
 public interface IAdminUserDao extends IInitializableDao {

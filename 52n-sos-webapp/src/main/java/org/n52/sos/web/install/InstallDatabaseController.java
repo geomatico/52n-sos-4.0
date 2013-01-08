@@ -28,7 +28,6 @@
 
 package org.n52.sos.web.install;
 
-import org.n52.sos.web.JdbcUrl;
 import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -40,9 +39,10 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.n52.sos.service.ConfigurationException;
 
+import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.web.ControllerConstants;
+import org.n52.sos.web.JdbcUrl;
 import org.n52.sos.web.MetaDataHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

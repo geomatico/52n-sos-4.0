@@ -70,6 +70,8 @@ public class SosObservation implements Serializable {
      * Map with observation values for each obsservableProeprty
      */
     private IObservationValue value;
+    
+    private String antiSubsetting;
 
     /**
      * token separator for the value tuples contained in the result element of
@@ -341,24 +343,6 @@ public class SosObservation implements Serializable {
     }
     */
 
-	/**
-	 * Get a predefined result structure.
-	 * 
-	 * @return the result structure
-	 */
-	public SosSweDataRecord getResultStructure() {
-		return this.resultStructure;
-	}
-	
-	/**
-	 * Set a predefined result structure.
-	 * 
-	 * @param resultStructure the result structure
-	 */
-	public void setResultStructure(SosSweDataRecord resultStructure) {
-		this.resultStructure = resultStructure;
-	}
-
     public void mergeWithObservation(SosObservation sosObservation) {
         TVPValue tvpValue = null;
         if (this.value instanceof SosSingleObservationValue) {
@@ -380,10 +364,23 @@ public class SosObservation implements Serializable {
     private TVPValue convertSingleValueToMultiValue(SosSingleObservationValue singleValue) {
         SosMultiObservationValues multiValue = new SosMultiObservationValues();
         TVPValue tvpValue = new TVPValue();
+        tvpValue.setUnit(singleValue.getValue().getUnit());
         TimeValuePair timeValuePair = new TimeValuePair(singleValue.getPhenomenonTime(), singleValue.getValue());
         tvpValue.addValue(timeValuePair);
         multiValue.setValue(tvpValue);
         this.value = multiValue;
         return tvpValue;
+    }
+
+    public void setAntiSubsetting(String antiSubsetting) {
+        this.antiSubsetting = antiSubsetting;
+    }
+    
+    public String getAntiSubsetting() {
+        return antiSubsetting;
+    }
+
+    public boolean isSetAntiSubsetting() {
+        return antiSubsetting != null && !antiSubsetting.isEmpty();
     }
 }

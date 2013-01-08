@@ -24,8 +24,9 @@
 package org.n52.sos.response;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.n52.sos.ogc.om.SosObservation;
 
@@ -51,13 +52,27 @@ public class GetObservationResponse extends AbstractServiceResponse {
         this.observationCollection = observationCollection;
     }
 
-    public void mergeObservationsWithResultTemplate() {
+    public void mergeObservationsWithSameAntiSubsettingIdentifier() {
         List<SosObservation> mergedObservations = new ArrayList<SosObservation>(0);
-        // TODO merge observations with the same antiSubsetting identifier.
+        Map<String, SosObservation> antiSubsettingObservations = new HashMap<String, SosObservation>(0);
+        for (SosObservation sosObservation : observationCollection) {
+         // TODO merge observations with the same antiSubsetting identifier.
+            if (sosObservation.isSetAntiSubsetting()) {
+                if (antiSubsettingObservations.containsKey(sosObservation.getAntiSubsetting())) {
+                    SosObservation antiSubsettingObservation = antiSubsettingObservations.get(sosObservation.getAntiSubsetting());
+                    antiSubsettingObservation.mergeWithObservation(sosObservation);
+                } else {
+                    antiSubsettingObservations.put(sosObservation.getAntiSubsetting(), sosObservation);
+                }
+            } else {
+                mergedObservations.add(sosObservation);
+            }
+        }
+        mergedObservations.addAll(antiSubsettingObservations.values());
         this.observationCollection = mergedObservations;
     }
 
-    public Collection<SosObservation> mergeObservations() {
+    public void mergeObservationsWithSameX() {
         // TODO merge all observations with the same observationContellation (proc, obsProp, foi)
         List<SosObservation> mergedObservations = new ArrayList<SosObservation>(0);
         int obsIdCounter = 1;
@@ -70,6 +85,7 @@ public class GetObservationResponse extends AbstractServiceResponse {
                 for (SosObservation combinedSosObs : mergedObservations) {
                     if (combinedSosObs.getObservationConstellation().equals(
                         sosObservation.getObservationConstellation())) {
+                        combinedSosObs.setResultTime(null);
                         combinedSosObs.mergeWithObservation(sosObservation);
                         combined = true;
                         break;
@@ -80,7 +96,7 @@ public class GetObservationResponse extends AbstractServiceResponse {
                 }
             }
         }
-        return mergedObservations;
+        this.observationCollection = mergedObservations;
     }
 
     public boolean hasObservationsWithResultTemplate() {

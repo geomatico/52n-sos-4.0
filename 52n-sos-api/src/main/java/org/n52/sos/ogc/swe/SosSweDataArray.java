@@ -160,4 +160,8 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
         }
         return super.equals(obj);
     }
+
+    public boolean isSetElementTyp() {
+        return elementType != null;
+    }
 }

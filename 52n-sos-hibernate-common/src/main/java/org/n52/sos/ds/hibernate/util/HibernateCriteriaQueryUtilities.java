@@ -71,6 +71,7 @@ import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.Util4Exceptions;
 
@@ -342,18 +343,28 @@ public class HibernateCriteriaQueryUtilities {
                 DateTime endTime =
                         DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(ti.getValue(),
                                 ti.getRequestedTimeLength());
-                if (ti.getValue().equals(endTime)) {
-                    return getEqualRestriction(HibernateConstants.PARAMETER_PHENOMENON_TIME_START, ti.getValue()
-                            .toDate());
+                if (ti.isSetIndeterminateValue()) {
+                    if (ti.getIndeterminateValue().equals(FirstLatest.first.name())) {
+                        // TODO add query for first observation
+                    } else if (ti.getIndeterminateValue().equals(FirstLatest.latest.name())) {
+                        // TODO add query for latest observation
+                    } else {
+                        // TODO exception
+                    }
                 } else {
-                    Criterion gele =
-                            Restrictions.and(Restrictions.ge(HibernateConstants.PARAMETER_PHENOMENON_TIME_START, ti
-                                    .getValue().toDate()), Restrictions.le(
-                                    HibernateConstants.PARAMETER_PHENOMENON_TIME_END, endTime.toDate()));
-                    Criterion btw =
-                            Restrictions.between(HibernateConstants.PARAMETER_PHENOMENON_TIME_START, ti.getValue()
-                                    .toDate(), endTime.toDate());
-                    return Restrictions.or(gele, btw);
+                    if (ti.getValue().equals(endTime)) {
+                        return getEqualRestriction(HibernateConstants.PARAMETER_PHENOMENON_TIME_START, ti.getValue()
+                                .toDate());
+                    } else {
+                        Criterion gele =
+                                Restrictions.and(Restrictions.ge(HibernateConstants.PARAMETER_PHENOMENON_TIME_START, ti
+                                        .getValue().toDate()), Restrictions.le(
+                                        HibernateConstants.PARAMETER_PHENOMENON_TIME_END, endTime.toDate()));
+                        Criterion btw =
+                                Restrictions.between(HibernateConstants.PARAMETER_PHENOMENON_TIME_START, ti.getValue()
+                                        .toDate(), endTime.toDate());
+                        return Restrictions.or(gele, btw);
+                    }
                 }
             } else {
                 throw Util4Exceptions.createNoApplicableCodeException(null,

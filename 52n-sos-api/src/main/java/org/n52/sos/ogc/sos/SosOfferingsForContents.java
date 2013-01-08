@@ -30,8 +30,6 @@ import javax.xml.namespace.QName;
 
 import org.n52.sos.ogc.gml.time.ITime;
 
-import com.vividsolutions.jts.geom.Envelope;
-
 /**
  * Class which represents a ObservationOffering. Used in the SosCapabilities.
  * 

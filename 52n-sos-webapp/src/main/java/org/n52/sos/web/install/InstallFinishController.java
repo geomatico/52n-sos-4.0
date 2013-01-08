@@ -25,7 +25,6 @@
 package org.n52.sos.web.install;
 
 import java.io.File;
-import org.n52.sos.web.JdbcUrl;
 import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -38,10 +37,10 @@ import java.util.ServiceLoader;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-
 import org.n52.sos.ds.ISettingsDao;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.service.AdminUser;
@@ -49,6 +48,7 @@ import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.Setting;
 import org.n52.sos.web.ControllerConstants;
+import org.n52.sos.web.JdbcUrl;
 import org.n52.sos.web.MetaDataHandler;
 import org.n52.sos.web.SqlUtils;
 import org.n52.sos.web.admin.auth.UserService;

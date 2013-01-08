@@ -23,8 +23,9 @@
  */
 package org.n52.sos.web;
 
-import org.n52.sos.service.DatabaseSettingsHandler;
 import javax.servlet.ServletContext;
+
+import org.n52.sos.service.DatabaseSettingsHandler;
 
 public class JstlFunctions {
     

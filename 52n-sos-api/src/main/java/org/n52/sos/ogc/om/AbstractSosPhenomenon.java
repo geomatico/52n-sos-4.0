@@ -24,7 +24,6 @@
 package org.n52.sos.ogc.om;
 
 import java.io.Serializable;
-import java.util.Collection;
 
 /**
  * Abstract class for phenomena

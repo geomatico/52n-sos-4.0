@@ -23,15 +23,13 @@
  */
 package org.n52.sos.ds.hibernate.admin;
 
-import org.n52.sos.ds.IInitializableDao;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+
 import org.hibernate.Session;
+import org.n52.sos.ds.IInitializableDao;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;

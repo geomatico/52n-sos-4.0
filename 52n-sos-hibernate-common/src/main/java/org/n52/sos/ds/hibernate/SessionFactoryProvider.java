@@ -24,6 +24,7 @@
 package org.n52.sos.ds.hibernate;
 
 import java.util.Properties;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

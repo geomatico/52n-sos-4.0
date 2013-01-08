@@ -29,8 +29,10 @@ import java.util.EnumMap;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.ServiceLoader;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.codehaus.jettison.json.JSONObject;
 import org.n52.sos.ds.ISettingsDao;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;

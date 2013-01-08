@@ -29,8 +29,8 @@ import org.n52.sos.ogc.om.values.IValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosMultiObservationValues<T> implements IObservationValue<T> {
-
+public class SosMultiObservationValues<T> implements IObservationValue<IValue<T>> {
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(SosMultiObservationValues.class);
 
     private static final long serialVersionUID = 1L;
@@ -49,6 +49,7 @@ public class SosMultiObservationValues<T> implements IObservationValue<T> {
 
     @Override
     public IValue<T> getValue() {
+
         return values;
     }
 
@@ -61,5 +62,6 @@ public class SosMultiObservationValues<T> implements IObservationValue<T> {
     public void setPhenomenonTime(ITime phenomenonTime) {
         this.phenomenonTime = phenomenonTime;
     }
+
 
 }

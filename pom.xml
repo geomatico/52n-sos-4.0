@@ -33,10 +33,10 @@
 			<comments>See also http://52north.org/about/licensing/ for all information about 52°North licenses.</comments>
 		</license>
 	</licenses>
-	
+
 	<properties>
 		<!-- sos name -->
-		<conf.sos.name>52n-sos-webapp-${project.version}</conf.sos.name>
+		<conf.sos.name>52nSOSv${project.version}</conf.sos.name>
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<!-- Source encoding during build process ** !!! DO NOT CHANGE !!! ** -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -362,6 +362,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.n52.sensorweb</groupId>
+				<artifactId>52n-xml-gml-v311</artifactId>
+				<version>${n52.common.xml.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.n52.sensorweb</groupId>
 				<artifactId>52n-xml-gml-v321</artifactId>
 				<version>${n52.common.xml.version}</version>
 			</dependency>
@@ -546,6 +551,16 @@
 						<artifactId>commons-logging</artifactId>
 					</exclusion>
 				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>52n-sos-coding-wml-v20</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>52n-sos-gda</artifactId>
+				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -859,6 +874,7 @@
 			<id>wml</id>
 			<modules>
 				<module>../52n-sos-coding-wml-v20</module>
+				<module>../52n-sos-gda</module>
 			</modules>
 		</profile>
 		<profile>

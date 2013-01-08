@@ -26,6 +26,7 @@ package org.n52.sos.ogc.sos;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.n52.sos.ogc.ows.ICapabilitiesExtension;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.IMergableExtension;

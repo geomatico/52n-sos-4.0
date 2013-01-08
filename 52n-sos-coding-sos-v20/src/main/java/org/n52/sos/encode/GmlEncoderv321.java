@@ -448,5 +448,4 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
         }
         return null;
     }
-
 }

@@ -34,26 +34,26 @@ public class TVPValue implements IMultiValue<List<TimeValuePair>> {
 
     private static final long serialVersionUID = -5156098026027119423L;
 
-    private List<TimeValuePair> values = new ArrayList<TimeValuePair>(0);
+    private List<TimeValuePair> value = new ArrayList<TimeValuePair>(0);
     
     private String unit;
-
+    
     @Override
     public void setValue(List<TimeValuePair> value) {
-        this.values = value;
+        this.value = value;
     }
 
     @Override
     public List<TimeValuePair> getValue() {
-        return values;
+        return value;
     }
     
     public void addValue(TimeValuePair value) {
-        this.values.add(value);
+        this.value.add(value);
     }
     
     public void addValues(List<TimeValuePair> values) {
-        this.values.addAll(values);
+        this.value.addAll(values);
     }
 
     @Override
@@ -69,9 +69,9 @@ public class TVPValue implements IMultiValue<List<TimeValuePair>> {
     @Override
     public ITime getPhenomenonTime() {
         TimePeriod timePeriod = new TimePeriod();
-        if (values != null && !values.isEmpty()) {
-            for (TimeValuePair value : values) {
-                timePeriod.extendToContain(value.getTime());
+        if (value != null && !value.isEmpty()) {
+            for (TimeValuePair timeValuePair : value) {
+                timePeriod.extendToContain(timeValuePair.getTime());
             }
         }
         return timePeriod;

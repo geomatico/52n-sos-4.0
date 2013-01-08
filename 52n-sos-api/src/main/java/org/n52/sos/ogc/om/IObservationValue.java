@@ -26,7 +26,6 @@ package org.n52.sos.ogc.om;
 import java.io.Serializable;
 
 import org.n52.sos.ogc.gml.time.ITime;
-import org.n52.sos.ogc.om.values.IValue;
 
 public interface IObservationValue<T> extends Serializable {
     
@@ -35,8 +34,8 @@ public interface IObservationValue<T> extends Serializable {
     
     public void setPhenomenonTime(ITime phenomenonTime);
 
-    public IValue<T> getValue();
+    public T getValue();
 
-    public void setValue(IValue<T> value);
+    public void setValue(T value);
 
 }

@@ -201,5 +201,9 @@ public class TimeInstant implements ITime {
         hash = 31 * hash + value.hashCode();
         return hash;
     }
+    
+    public boolean isSetIndeterminateValue() {
+        return indeterminateValue != null && !indeterminateValue.isEmpty();
+    }
 
 }

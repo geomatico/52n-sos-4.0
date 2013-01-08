@@ -61,13 +61,13 @@ import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sensorML.SensorML;
+import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.util.OMHelper;
-import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
@@ -180,11 +180,11 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
             throws OwsExceptionReport {
         SosObservationConstellation observationConstellation = new SosObservationConstellation();
         observationConstellation.setObservationType(getObservationType(omObservation));
-        observationConstellation.setProcedure(getProcedure(omObservation));
+        observationConstellation.setProcedure(createProcedure(getProcedure(omObservation)));
         observationConstellation.setObservableProperty(getObservableProperty(omObservation));
         return observationConstellation;
     }
-
+    
     private String getObservationType(OMObservationType omObservation) {
         if (omObservation.getType() != null) {
             return omObservation.getType().getHref();
@@ -414,6 +414,15 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
             }
         }
         return featureOfInterest;
+    }
+
+    private SosProcedureDescription createProcedure(String procedureIdentifier) {
+        SensorML procedure = new SensorML();
+        SosSMLIdentifier identifier = new SosSMLIdentifier("uniqueID", "urn:ogc:def:identifier:OGC:uniqueID", procedureIdentifier);
+        List<SosSMLIdentifier> identifiers = new ArrayList<SosSMLIdentifier>(1);
+        identifiers.add(identifier);
+        procedure.setIdentifications(identifiers);
+        return procedure;
     }
 
 }

@@ -23,11 +23,18 @@
  */
 package org.n52.sos.ogc.sensorML;
 
+import org.n52.sos.ogc.gml.EngineeringCRS;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
 
 public class System extends AbstractMultiProcess {
 
+    private EngineeringCRS spatialReferenceFrame;
+    
+//    private SosSMLTemporalReferenceFrame spatialReferenceFrame;
+    
     private SosSMLPosition position;
+    
+//    private SosSMLLocation location;
 
     // private List<ITime> timePositions;
     //

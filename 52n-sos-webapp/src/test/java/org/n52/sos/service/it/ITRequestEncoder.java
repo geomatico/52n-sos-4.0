@@ -155,8 +155,8 @@ public class ITRequestEncoder {
                 xb_getObs.setOffering(req.getOfferings().get(0));
             }
 
-            if (req.getEventTimes() != null && !req.getEventTimes().isEmpty()) {
-                for (TemporalFilter tf : req.getEventTimes()) {
+            if (req.getTemporalFilters() != null && !req.getTemporalFilters().isEmpty()) {
+                for (TemporalFilter tf : req.getTemporalFilters()) {
                     EventTime xb_eventTime = xb_getObs.addNewEventTime();
                     encodeTemporalFilter(tf, xb_eventTime);
                 }

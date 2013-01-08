@@ -25,7 +25,9 @@ package org.n52.sos.web.admin;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import javax.servlet.http.HttpServletResponse;
+
 import org.n52.sos.service.AbstractLoggingConfigurator;
 import org.n52.sos.web.ControllerConstants;
 import org.springframework.http.MediaType;

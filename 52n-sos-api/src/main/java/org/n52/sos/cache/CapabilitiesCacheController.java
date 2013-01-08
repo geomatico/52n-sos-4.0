@@ -23,7 +23,6 @@
  */
 package org.n52.sos.cache;
 
-import com.vividsolutions.jts.geom.Envelope;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,8 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
-import org.joda.time.DateTime;
 
+import org.joda.time.DateTime;
 import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -41,6 +40,8 @@ import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * CapabilitiesCacheController implements all methods to request all objects and

@@ -24,7 +24,6 @@
 package org.n52.sos.ogc.sos;
 
 import java.util.List;
-import java.util.logging.Level;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;

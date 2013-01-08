@@ -21,46 +21,37 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ogc.swe.simpleType;
+package org.n52.sos.ogc.om;
 
-import org.joda.time.DateTime;
-import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
-import org.n52.sos.util.DateTimeHelper;
+import org.n52.sos.ogc.gml.ReferenceType;
 
-/**
- * SOS internal representation of SWE simpleType time
- * 
- */
-public class SosSweTime extends SosSweAbstractUomType<DateTime> {
+public class NamedValuePair {
+    
+    private ReferenceType name;
+    
+    private String value;
 
-    /**
-     * value
-     */
-    private DateTime value;
-
-    @Override
-    public SweSimpleType getSimpleType() {
-        return SweSimpleType.Time;
+    public ReferenceType getName() {
+        return name;
     }
 
-    @Override
-    public DateTime getValue() {
+    public void setName(ReferenceType name) {
+        this.name = name;
+    }
+
+    public String getValue() {
         return value;
     }
 
-    @Override
-    public void setValue(DateTime value) {
+    public void setValue(String value) {
         this.value = value;
     }
 
-    @Override
-    public String getStringValue() {
-        return DateTimeHelper.formatDateTime2IsoString(value);
-    }
-
-    @Override
-    public boolean isSetValue() {
-        return value != null;
+    public boolean isSetName() {
+        return name != null && name.isSetHref();
     }
     
+    public boolean isSetValue() {
+        return value != null && !value.isEmpty();
+    }
 }

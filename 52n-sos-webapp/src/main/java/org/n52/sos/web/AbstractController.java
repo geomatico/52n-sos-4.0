@@ -24,20 +24,11 @@
 
 package org.n52.sos.web;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Map;
-import org.n52.sos.service.DatabaseSettingsHandler;
+
 import javax.servlet.ServletContext;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.jdbc.Work;
-import org.n52.sos.ds.IConnectionProvider;
-import org.n52.sos.service.Configurator;
+
+import org.n52.sos.service.DatabaseSettingsHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

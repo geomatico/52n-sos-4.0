@@ -30,6 +30,8 @@ package org.n52.sos.ogc.sensorML.elements;
 public class SosSMLClassifier {
 
     private String name;
+    
+    private String definition;
 
     private String value;
 
@@ -41,9 +43,10 @@ public class SosSMLClassifier {
      * @param value
      *            Classifier value
      */
-    public SosSMLClassifier(String name, String value) {
+    public SosSMLClassifier(String name, String definition, String value) {
         super();
         this.name = name;
+        this.definition = definition;
         this.value = value;
     }
 
@@ -60,6 +63,21 @@ public class SosSMLClassifier {
      */
     public void setName(String name) {
         this.name = name;
+    }
+    
+    /**
+     * @return the Identifier definition
+     */
+    public String getDefinition() {
+        return definition;
+    }
+
+    /**
+     * @param definition
+     *            Identifier definition
+     */
+    public void setDefinition(String definition) {
+        this.definition = definition;
     }
 
     /**

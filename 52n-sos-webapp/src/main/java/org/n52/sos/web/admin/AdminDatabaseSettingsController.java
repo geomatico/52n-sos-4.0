@@ -30,6 +30,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;

@@ -30,7 +30,7 @@ import java.util.Set;
 
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.sos.ResultTemplate;
-import org.n52.sos.ogc.sos.SosResultEncoding;
+import org.n52.sos.ogc.sos.SosProcedureDescription;
 
 /**
  * @author c_hollmann
@@ -41,7 +41,7 @@ public class SosObservationConstellation implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** Identifier of the procedure by which the observation is made */
-    private String procedure;
+    private SosProcedureDescription procedure;
 
     /** Identifier of the observableProperty to which the observation accords to */
     private AbstractSosPhenomenon observableProperty;
@@ -78,7 +78,7 @@ public class SosObservationConstellation implements Serializable {
      * @param observationType
      *            Observation type
      */
-    public SosObservationConstellation(String procedure, AbstractSosPhenomenon observableProperty, Set<String> offerings,
+    public SosObservationConstellation(SosProcedureDescription procedure, AbstractSosPhenomenon observableProperty, Set<String> offerings,
             SosAbstractFeature featureOfInterest, String observationType) {
         super();
         this.procedure = procedure;
@@ -93,7 +93,7 @@ public class SosObservationConstellation implements Serializable {
      * 
      * @return the procedure
      */
-    public String getProcedure() {
+    public SosProcedureDescription getProcedure() {
         return procedure;
     }
 
@@ -103,7 +103,7 @@ public class SosObservationConstellation implements Serializable {
      * @param procedure
      *            the procedure to set
      */
-    public void setProcedure(String procedure) {
+    public void setProcedure(SosProcedureDescription procedure) {
         this.procedure = procedure;
     }
 

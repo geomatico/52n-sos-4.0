@@ -23,7 +23,6 @@
  */
 package org.n52.sos.cache;
 
-import com.vividsolutions.jts.geom.Envelope;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,12 +30,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.joda.time.DateTime;
 
+import org.joda.time.DateTime;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.util.SosHelper;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * This singleton class encapsulates HashMaps, which store relationships between
@@ -723,7 +724,7 @@ public class CapabilitiesCache extends ACapabilitiesCache {
     protected void refreshMetadata4newObservation(SosObservation observation) {
 
         // create local variables for better readable code
-        String procID = observation.getObservationConstellation().getProcedure();
+        String procID = observation.getObservationConstellation().getProcedure().getProcedureIdentifier();
         ArrayList<String> procs = new ArrayList<String>(1);
         procs.add(procID);
 

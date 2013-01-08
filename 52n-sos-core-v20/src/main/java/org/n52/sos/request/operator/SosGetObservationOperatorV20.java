@@ -35,12 +35,16 @@ import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IGetObservationDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.IObservationEncoder;
+import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
+import org.n52.sos.ogc.filter.TemporalFilter;
+import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.swes.SwesExtensions;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
@@ -128,12 +132,18 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
                         && checkForObservationAndMeasurementV20Type(responseFormat)) {
                     namespace = Sos2Constants.NS_SOS_20;
                 }
-                // } else {
-                // namespace.append(responseFormat);
-                // }
+
                 IEncoder encoder = Configurator.getInstance().getEncoder(namespace.toString());
                 if (encoder != null) {
                     GetObservationResponse response = this.dao.getObservation(sosRequest);
+                    if (responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2)) {
+                        if (!isSubsettingExtensionSet(request.getExtensions())) {
+                            response.mergeObservationsWithSameAntiSubsettingIdentifier();
+                        } else {
+                            response.mergeObservationsWithSameX();
+                        }
+                    }
+                    
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     Object encodedObject = encoder.encode(response);
                     contentType = encoder.getContentType();
@@ -260,13 +270,25 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkTemporalFilter(sosRequest.getEventTimes(),
-                    Sos2Constants.GetObservationParams.temporalFilter.name());
+            // TODO check this for pofile
+            if (sosRequest.getTemporalFilters() != null && !sosRequest.getTemporalFilters().isEmpty()) {
+                SosHelper.checkTemporalFilter(sosRequest.getTemporalFilters(),
+                        Sos2Constants.GetObservationParams.temporalFilter.name());
+//            } else {
+//                List<TemporalFilter> filters = new ArrayList<TemporalFilter>();
+//                TemporalFilter filter = new TemporalFilter();
+//                filter.setOperator(TimeOperator.TM_Equals);
+//                filter.setValueReference("phenomenonTime");
+//                TimeInstant timeInstant = new TimeInstant();
+//                timeInstant.setIndeterminateValue(SosConstants.FirstLatest.latest.name());
+//                filter.setTime(timeInstant);
+//                filters.add(filter);
+//                sosRequest.setTemporalFilters(filters);
+            }
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
-        
-        
+
         Util4Exceptions.mergeAndThrowExceptions(exceptions);
     }
 
@@ -290,13 +312,15 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
                     Configurator.getInstance().getCapabilitiesCacheController().getObservableProperties();
             for (String obsProp : observedProperties) {
                 if (obsProp.isEmpty()) {
-                    exceptions.add(Util4Exceptions.createMissingParameterValueException(
-                            SosConstants.GetObservationParams.observedProperty.name()));
+                    exceptions.add(Util4Exceptions
+                            .createMissingParameterValueException(SosConstants.GetObservationParams.observedProperty
+                                    .name()));
                 } else {
                     if (!validObservedProperties.contains(obsProp)) {
                         String exceptionText =
                                 "The value (" + obsProp + ") of the parameter '"
-                                        + SosConstants.GetObservationParams.observedProperty.toString() + "' is invalid";
+                                        + SosConstants.GetObservationParams.observedProperty.toString()
+                                        + "' is invalid";
                         LOGGER.error(exceptionText);
                         exceptions.add(Util4Exceptions.createInvalidParameterValueException(
                                 SosConstants.GetObservationParams.observedProperty.name(), exceptionText));
@@ -323,7 +347,8 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
             for (String offeringId : offeringIds) {
                 if (offeringId == null || (offeringId != null && offeringId.isEmpty())) {
-                    exceptions.add(Util4Exceptions.createMissingParameterValueException(SosConstants.GetObservationParams.offering.name()));
+                    exceptions.add(Util4Exceptions
+                            .createMissingParameterValueException(SosConstants.GetObservationParams.offering.name()));
                 }
                 if (offeringId.contains(SosConstants.SEPARATOR_4_OFFERINGS)) {
                     String[] offArray = offeringId.split(SosConstants.SEPARATOR_4_OFFERINGS);
@@ -366,7 +391,8 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
         if (request.getResponseFormat() == null) {
             request.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
         } else if (request.getResponseFormat() != null && request.getResponseFormat().isEmpty()) {
-            throw Util4Exceptions.createMissingParameterValueException(SosConstants.GetObservationParams.responseFormat.name());
+            throw Util4Exceptions
+                    .createMissingParameterValueException(SosConstants.GetObservationParams.responseFormat.name());
         } else {
             zipCompression = SosHelper.checkResponseFormatForZipCompression(request.getResponseFormat());
             if (zipCompression) {
@@ -390,10 +416,16 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
 
     private void checkQueryParametersIfAllEmpty(GetObservationRequest request) throws OwsExceptionReport {
         if (!request.isSetOffering() && !request.isSetObservableProperty() && !request.isSetProcedure()
-                && !request.isSetFeatureOfInterest() && !request.isSetTemporalFilter() && !request.isSetSpatialFilter()) {
+                && !request.isSetFeatureOfInterest() && !request.isSetTemporalFilter()
+                && !request.isSetSpatialFilter()) {
             String exceptionText = "The response exceeds the size limit! Please define some filtering parameters.";
             throw Util4Exceptions.createResponseExceedsSizeLimitException(exceptionText);
         }
 
+    }
+
+    private boolean isSubsettingExtensionSet(SwesExtensions extensions) {
+        return extensions != null ? extensions.isBooleanExentsionSet(Sos2Constants.Extensions.Subsetting.name())
+                : false;
     }
 }

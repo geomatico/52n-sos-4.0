@@ -40,6 +40,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -48,11 +49,10 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.AbstractLoggingConfigurator;
-import org.n52.sos.service.AbstractLoggingConfigurator.Appender;
-import org.n52.sos.service.AbstractLoggingConfigurator.Level;
+import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.util.FileIOHelper;
 import org.slf4j.Logger;
 import org.w3c.dom.Attr;

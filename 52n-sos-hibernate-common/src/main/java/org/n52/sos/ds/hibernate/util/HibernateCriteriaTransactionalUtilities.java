@@ -59,6 +59,8 @@ import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosResultEncoding;
+import org.n52.sos.ogc.sos.SosResultStructure;
 import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.Util4Exceptions;
@@ -66,8 +68,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
-import org.n52.sos.ogc.sos.SosResultEncoding;
-import org.n52.sos.ogc.sos.SosResultStructure;
 
 public class HibernateCriteriaTransactionalUtilities {
 	

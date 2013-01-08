@@ -23,9 +23,9 @@
  */
 package org.n52.sos.ds;
 
+import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.ows.IExtension;
 
 /**
  * Interface for all SOS operation DAOs

@@ -45,29 +45,4 @@ public class SosSMLDocumentationList extends AbstractSosSMLDocumentation {
     public boolean isSetMembers() {
         return members != null && !members.isEmpty();
     }
-    
-    public class SosSMLDocumentationListMember {
-        
-        private String name;
-        
-        private SosSMLDocumentation documentation;
-        
-        public String getName() {
-            return name;
-        }
-
-        public SosSMLDocumentation getDocumentation() {
-            return documentation;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public void setDocumentation(SosSMLDocumentation documentation) {
-            this.documentation = documentation;
-        }
-
-    }
-
 }

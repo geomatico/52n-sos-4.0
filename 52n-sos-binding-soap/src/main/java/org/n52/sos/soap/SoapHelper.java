@@ -41,7 +41,6 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.Operations;
 import org.n52.sos.ogc.sos.SosConstants.SosExceptionCode;
 import org.n52.sos.ogc.sos.SosSoapConstants;
-import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;

@@ -80,7 +80,7 @@ public class HibernateUtilities {
         String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, null);
         criterions.add(HibernateCriteriaQueryUtilities.getEqualRestriction(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias),
-                sosObservationConstellation.getProcedure()));
+                sosObservationConstellation.getProcedure().getProcedureIdentifier()));
         ObservationConstellation obsConst =
                 HibernateCriteriaQueryUtilities.getObservationConstallation(aliases, criterions, session);
         if (obsConst != null) {
@@ -115,11 +115,11 @@ public class HibernateUtilities {
         } else {
             StringBuilder exceptionText = new StringBuilder();
             exceptionText.append("The requested observation constellation (");
-            exceptionText.append("procedure = ");
+            exceptionText.append("procedure=");
             exceptionText.append(sosObservationConstellation.getProcedure());
-            exceptionText.append(", observedProperty = ");
+            exceptionText.append(", observedProperty=");
             exceptionText.append(sosObservationConstellation.getObservableProperty().getIdentifier());
-            exceptionText.append("and offering = ");
+            exceptionText.append(" and offering=");
             exceptionText.append(sosObservationConstellation.getOfferings());
             exceptionText.append(")");
             exceptionText.append(" is invalid!");

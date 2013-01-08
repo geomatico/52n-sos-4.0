@@ -51,7 +51,6 @@
 
 package org.n52.sos.ds.hibernate.admin;
 
-import org.n52.sos.ds.ISettingsDao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -59,11 +58,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.jdbc.ReturningWork;
 import org.hibernate.jdbc.Work;
+import org.n52.sos.ds.ISettingsDao;
 import org.n52.sos.service.Setting;
 
 /**

@@ -240,7 +240,7 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
 
     private void checkObservationConstellationParameter(SosObservationConstellation obsConstallation) throws OwsExceptionReport {
         ACapabilitiesCacheController capabilitiesCacheController = Configurator.getInstance().getCapabilitiesCacheController();
-        SosHelper.checkProcedureID(obsConstallation.getProcedure(), capabilitiesCacheController.getProcedures(), Sos2Constants.InsertObservationParams.procedure.name());
+        SosHelper.checkProcedureID(obsConstallation.getProcedure().getProcedureIdentifier(), capabilitiesCacheController.getProcedures(), Sos2Constants.InsertObservationParams.procedure.name());
         SosHelper.checkObservedProperty(obsConstallation.getObservableProperty().getIdentifier(), capabilitiesCacheController.getObservableProperties(), Sos2Constants.InsertObservationParams.observedProperty.name());
         String foiIdentifier = obsConstallation.getFeatureOfInterest().getIdentifier();
         SosHelper.checkFeatureOfInterstIdentifier(foiIdentifier, capabilitiesCacheController.getFeatureOfInterest(), Sos2Constants.InsertObservationParams.featureOfInterest.name());

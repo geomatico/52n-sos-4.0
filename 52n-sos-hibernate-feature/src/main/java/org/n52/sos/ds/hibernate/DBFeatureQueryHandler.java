@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -190,43 +191,6 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
         return null;
     }
 
-    /**
-     * Creates an SosAbstractFeature from the given parameters.
-     * 
-     * @param id
-     *            Feature identifier
-     * @param xmlDesc
-     *            Feature description
-     * @param name
-     *            Feature name
-     * @param geom
-     *            Geometry
-     * @param srid
-     *            SRID of the geometry
-     * @param featureType
-     *            Feature type
-     * @param schemaLink
-     *            Link to schema
-     * @return SosAbstractFeature A feature
-     * @throws OwsExceptionReport
-     *             If WKT geometry string is invalid.
-     */
-    public static SosAbstractFeature getAbstractFeatureFromValues(String id, String description,
-            String xmlDescription, List<String> name, Geometry geometry, String featureType, String url) throws OwsExceptionReport {
-
-        SosSamplingFeature sampFeat = new SosSamplingFeature(id);
-        sampFeat.setName(name);
-        sampFeat.setDescription(description);
-        sampFeat.setGeometry(geometry);
-        if (geometry != null) {
-            sampFeat.setEpsgCode(geometry.getSRID());
-        }
-        sampFeat.setFeatureType(featureType);
-        sampFeat.setUrl(url);
-        sampFeat.setXmlDescription(xmlDescription);
-        return sampFeat;
-    }
-
     @Override
     public String insertFeature(SosSamplingFeature samplingFeature, Object connection) throws OwsExceptionReport {
         if (samplingFeature.getUrl() != null && !samplingFeature.getUrl().isEmpty()) {
@@ -262,7 +226,7 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
         for (FeatureOfInterest feature : features) {
             sosAbstractFois.put(feature.getIdentifier(), createSosAbstractFeatureFromResult(feature, version));
         }
-
+        // TODO if sampledFeatures are also in sosAbstractFois, reference them.
         return sosAbstractFois;
     }
 
@@ -283,8 +247,27 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
         if (SosHelper.checkFeatureOfInterestIdentifierForSosV2(feature.getIdentifier(), version)) {
             checkedFoiID = feature.getIdentifier();
         }
-        return getAbstractFeatureFromValues(checkedFoiID, null, feature.getDescriptionXml(), null, feature.getGeom(), feature.getFeatureOfInterestType().getFeatureOfInterestType(),
-                feature.getUrl());
+        SosSamplingFeature sampFeat = new SosSamplingFeature(checkedFoiID);
+        if (feature.getName() != null && !feature.getName().isEmpty()) {
+            sampFeat.setName(SosHelper.createListFromCSV(feature.getName()));
+        }
+        sampFeat.setDescription(null);
+        sampFeat.setGeometry(feature.getGeom());
+        if (feature.getGeom() != null) {
+            sampFeat.setEpsgCode(feature.getGeom().getSRID());
+        }
+        sampFeat.setFeatureType(feature.getFeatureOfInterestType().getFeatureOfInterestType());
+        sampFeat.setUrl(feature.getUrl());
+        sampFeat.setXmlDescription(feature.getDescriptionXml());
+        Set<FeatureOfInterest> parentFeatures = feature.getFeatureOfInterestsForParentFeatureId();
+        if (parentFeatures != null && !parentFeatures.isEmpty()) {
+            List<SosAbstractFeature> sampledFeatures = new ArrayList<SosAbstractFeature>(parentFeatures.size());
+            for (FeatureOfInterest parentFeature : parentFeatures) {
+                sampledFeatures.add(createSosAbstractFeatureFromResult(parentFeature, version));
+            }
+            sampFeat.setSampledFeatures(sampledFeatures);
+        }
+        return sampFeat;
     }
 
     /**

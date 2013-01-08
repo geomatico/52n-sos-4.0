@@ -108,10 +108,10 @@ public class HibernateObservationUtilitiesTest extends AbstractSosTestCase{
 		// TEST RESULTS
 		assertNotNull("result is null",resultList);
 		assertEquals("elements in list",1,resultList.size());
-		assertEquals("result value is ",SosSweDataArray.class.getName(),resultList.get(0).getValue().getValue().getValue().getClass().getName());
+		assertEquals("result value is ",SosSweDataArray.class.getName(),resultList.get(0).getValue().getValue().getClass().getName());
 		assertEquals("result value is 1.0",
 				1.0,
-				Double.parseDouble(((SosSweDataArray)resultList.get(0).getValue().getValue().getValue()).getValues().get(0).get(1)),
+				Double.parseDouble(((SosSweDataArray)resultList.get(0).getValue().getValue()).getValues().get(0).get(1)),
 				0.00001);
 		fail("not finished");
 	}

@@ -23,11 +23,12 @@
  */
 package org.n52.sos.ds.hibernate.admin;
 
-import org.n52.sos.ds.IAdminUserDao;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.n52.sos.ds.IAdminUserDao;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.service.AdminUser;
 

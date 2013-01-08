@@ -29,6 +29,8 @@ public abstract class SosProcedureDescription {
     
     private String sensorDescriptionXmlString;
     
+    private String descriptionFormat;
+    
     public abstract String getProcedureIdentifier();
 
     public abstract SosOffering getOfferingIdentifier();
@@ -41,5 +43,25 @@ public abstract class SosProcedureDescription {
 
     public void setSensorDescriptionXmlString(String sensorDescriptionXmlString) {
         this.sensorDescriptionXmlString = sensorDescriptionXmlString;
+    }
+    
+    public String getDescriptionFormat() {
+        return descriptionFormat;
+    }
+
+    public void setDescriptionFormat(String descriptionFormat) {
+        this.descriptionFormat = descriptionFormat;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = (getProcedureIdentifier() == null) ? 0 : 31 * hash + getProcedureIdentifier().hashCode();
+        return hash;
     }
 }

@@ -81,18 +81,20 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
     public String getOperationName() {
         return OPERATION_NAME;
     }
-    
+
     @Override
     public DecoderKeyType getKeyTypeForDcp(String version) {
-        return new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? 
-                            Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20);
+        return new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? Sos1Constants.NS_SOS
+                : Sos2Constants.NS_SOS_20);
     }
 
     @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session)
+            throws OwsExceptionReport {
         opsMeta.addPossibleValuesParameter(Sos2Constants.InsertObservationParams.offering, getCache().getOfferings());
         opsMeta.addAnyParameterValue(Sos2Constants.InsertObservationParams.observation);
-        opsMeta.addDataTypeParameter(Sos2Constants.InsertObservationParams.observation, OMConstants.SCHEMA_LOCATION_OM_2_OM_OBSERVATION);
+        opsMeta.addDataTypeParameter(Sos2Constants.InsertObservationParams.observation,
+                OMConstants.SCHEMA_LOCATION_OM_2_OM_OBSERVATION);
     }
 
     @Override
@@ -114,25 +116,29 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
                 for (String offeringID : sosObsConst.getOfferings()) {
                     try {
                         hObsConst =
-                                HibernateUtilities.checkObservationConstellationForObservation(sosObsConst, offeringID, session, Sos2Constants.InsertObservationParams.observationType.name());
+                                HibernateUtilities.checkObservationConstellationForObservation(sosObsConst,
+                                        offeringID, session,
+                                        Sos2Constants.InsertObservationParams.observationType.name());
                     } catch (OwsExceptionReport owse) {
                         exceptions.add(owse);
                     }
                     if (hObsConst != null) {
-                    	FeatureOfInterest hFeature =
-                                HibernateUtilities.checkOrInsertFeatureOfInterest(sosObservation.getObservationConstellation()
-                                        .getFeatureOfInterest(), session);
-                        HibernateUtilities.checkOrInsertFeatureOfInterestRelatedFeatureRelation(hFeature, hObsConst.getOffering(), session);
-                    	if (isSweArrayObservation(hObsConst))
-                    	{
-                    		ResultTemplate resultTemplate = createResultTemplate(sosObservation, hObsConst, hFeature);
-                    		session.save(resultTemplate);
-                    		session.flush();
-                    	}
+                        FeatureOfInterest hFeature =
+                                HibernateUtilities.checkOrInsertFeatureOfInterest(sosObservation
+                                        .getObservationConstellation().getFeatureOfInterest(), session);
+                        HibernateUtilities.checkOrInsertFeatureOfInterestRelatedFeatureRelation(hFeature,
+                                hObsConst.getOffering(), session);
+                        if (isSweArrayObservation(hObsConst)) {
+                            ResultTemplate resultTemplate = createResultTemplate(sosObservation, hObsConst, hFeature);
+                            session.save(resultTemplate);
+                            session.flush();
+                        }
                         if (sosObservation.getValue() instanceof SosSingleObservationValue) {
-                            HibernateCriteriaTransactionalUtilities.insertObservationSingleValue(hObsConst, hFeature, sosObservation, session);
+                            HibernateCriteriaTransactionalUtilities.insertObservationSingleValue(hObsConst, hFeature,
+                                    sosObservation, session);
                         } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
-                            HibernateCriteriaTransactionalUtilities.insertObservationMutliValue(hObsConst, hFeature, sosObservation, session);
+                            HibernateCriteriaTransactionalUtilities.insertObservationMutliValue(hObsConst, hFeature,
+                                    sosObservation, session);
                         }
                     }
                 }
@@ -160,79 +166,65 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
         return response;
     }
 
-	private boolean isSweArrayObservation(ObservationConstellation obsConst)
-	{
-		return obsConst.getObservationType().getObservationType().equalsIgnoreCase(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
-	}
+    private boolean isSweArrayObservation(ObservationConstellation obsConst) {
+        return obsConst.getObservationType().getObservationType()
+                .equalsIgnoreCase(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
+    }
 
-	private ResultTemplate createResultTemplate(SosObservation observation,
-			ObservationConstellation obsConst,
-			FeatureOfInterest feature) throws OwsExceptionReport
-	{
-		ResultTemplate resultTemplate = new ResultTemplate();
-		// TODO identifier handling: ignoring code space now
-		String identifier = null;
-		if (observation.getIdentifier() != null && observation.getIdentifier().getValue() != null && !observation.getIdentifier().getValue().isEmpty())
-		{
-			identifier = observation.getIdentifier().getValue();
-		}
-		else {
-			identifier = UUID.randomUUID().toString();
-		}
-		resultTemplate.setIdentifier(identifier);
-		resultTemplate.setObservationConstellation(obsConst);
-		resultTemplate.setFeatureOfInterest(feature);
-		SosSweDataArray dataArray = ((SweDataArrayValue)observation.getValue().getValue()).getValue();
-		SweCommonEncoderv20 sweEncoder = null;
-		if (isEncoderRequired(dataArray))
-		{
-			IEncoder encoder = getConfigurator().getEncoder(SWEConstants.NS_SWE_20);
-			if (encoder instanceof SweCommonEncoderv20)
-			{
-				sweEncoder = (SweCommonEncoderv20) encoder;
-			}
-			else
-			{
-				String errorMsg = String.format("Could not find encoder for namespace \"%s\".", SWEConstants.NS_SWE_20);
-				LOGGER.error(errorMsg);
-				throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
-			}
-		}
-		if (dataArray.getElementType().getXml() == null)
-		{
-			XmlObject encodedXMLObject = sweEncoder.encode(dataArray.getElementType());
-			if (encodedXMLObject instanceof DataRecordType)
-			{
-				DataRecordDocument xbDataRecord = DataRecordDocument.Factory.newInstance();
-				xbDataRecord.setDataRecord((DataRecordType) encodedXMLObject);
-				encodedXMLObject = xbDataRecord;
-			}
-			resultTemplate.setResultStructure(encodedXMLObject.xmlText(XmlOptionsHelper.getInstance().getXmlOptions()));
-		}
-		else
-		{
-			resultTemplate.setResultStructure(dataArray.getElementType().getXml());
-		}
-		if (dataArray.getEncoding().getXml() == null)
-		{
-			XmlObject encodedXmlObject = sweEncoder.encode(dataArray.getEncoding());
-			if (encodedXmlObject instanceof TextEncodingType)
-			{
-				TextEncodingDocument xbTextEncodingDoc = TextEncodingDocument.Factory.newInstance();
-				xbTextEncodingDoc.setTextEncoding((TextEncodingType) encodedXmlObject);
-				encodedXmlObject = xbTextEncodingDoc;
-			}
-			resultTemplate.setResultEncoding(encodedXmlObject.xmlText(XmlOptionsHelper.getInstance().getXmlOptions()));
-		}
-		else
-		{
-			resultTemplate.setResultEncoding(dataArray.getEncoding().getXml());
-		}
-		return resultTemplate;
-	}
+    private ResultTemplate createResultTemplate(SosObservation observation, ObservationConstellation obsConst,
+            FeatureOfInterest feature) throws OwsExceptionReport {
+        ResultTemplate resultTemplate = new ResultTemplate();
+        // TODO identifier handling: ignoring code space now
+        String identifier = null;
+        if (observation.getIdentifier() != null && observation.getIdentifier().getValue() != null
+                && !observation.getIdentifier().getValue().isEmpty()) {
+            identifier = observation.getIdentifier().getValue();
+        } else {
+            identifier = UUID.randomUUID().toString();
+        }
+        resultTemplate.setIdentifier(identifier);
+        resultTemplate.setObservationConstellation(obsConst);
+        resultTemplate.setFeatureOfInterest(feature);
+        SosSweDataArray dataArray = ((SweDataArrayValue) observation.getValue().getValue()).getValue();
+        SweCommonEncoderv20 sweEncoder = null;
+        if (isEncoderRequired(dataArray)) {
+            IEncoder encoder = getConfigurator().getEncoder(SWEConstants.NS_SWE_20);
+            if (encoder instanceof SweCommonEncoderv20) {
+                sweEncoder = (SweCommonEncoderv20) encoder;
+            } else {
+                String errorMsg =
+                        String.format("Could not find encoder for namespace \"%s\".", SWEConstants.NS_SWE_20);
+                LOGGER.error(errorMsg);
+                throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+            }
+        }
+        if (dataArray.getElementType().getXml() == null) {
+            XmlObject encodedXMLObject = sweEncoder.encode(dataArray.getElementType());
+            if (encodedXMLObject instanceof DataRecordType) {
+                DataRecordDocument xbDataRecord = DataRecordDocument.Factory.newInstance();
+                xbDataRecord.setDataRecord((DataRecordType) encodedXMLObject);
+                encodedXMLObject = xbDataRecord;
+            }
+            resultTemplate
+                    .setResultStructure(encodedXMLObject.xmlText(XmlOptionsHelper.getInstance().getXmlOptions()));
+        } else {
+            resultTemplate.setResultStructure(dataArray.getElementType().getXml());
+        }
+        if (dataArray.getEncoding().getXml() == null) {
+            XmlObject encodedXmlObject = sweEncoder.encode(dataArray.getEncoding());
+            if (encodedXmlObject instanceof TextEncodingType) {
+                TextEncodingDocument xbTextEncodingDoc = TextEncodingDocument.Factory.newInstance();
+                xbTextEncodingDoc.setTextEncoding((TextEncodingType) encodedXmlObject);
+                encodedXmlObject = xbTextEncodingDoc;
+            }
+            resultTemplate.setResultEncoding(encodedXmlObject.xmlText(XmlOptionsHelper.getInstance().getXmlOptions()));
+        } else {
+            resultTemplate.setResultEncoding(dataArray.getEncoding().getXml());
+        }
+        return resultTemplate;
+    }
 
-	private boolean isEncoderRequired(SosSweDataArray dataArray)
-	{
-		return dataArray.getElementType().getXml() == null || dataArray.getEncoding().getXml() == null;
-	}
+    private boolean isEncoderRequired(SosSweDataArray dataArray) {
+        return dataArray.getElementType().getXml() == null || dataArray.getEncoding().getXml() == null;
+    }
 }

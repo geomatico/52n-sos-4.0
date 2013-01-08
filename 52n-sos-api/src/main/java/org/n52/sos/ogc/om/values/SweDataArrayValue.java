@@ -39,14 +39,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SweDataArrayValue implements IMultiValue<SosSweDataArray> {
-
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(SweDataArrayValue.class);
+    
     private static final long serialVersionUID = 52L;
 
-    /** the logger, used to log exceptions and additional information */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SweDataArrayValue.class);
-
     private SosSweDataArray value;
-
+    
     @Override
     public void setValue(SosSweDataArray value) {
         this.value = value;
@@ -143,4 +142,6 @@ public class SweDataArrayValue implements IMultiValue<SosSweDataArray> {
         }
         return timePeriod;
     }
+
+
 }

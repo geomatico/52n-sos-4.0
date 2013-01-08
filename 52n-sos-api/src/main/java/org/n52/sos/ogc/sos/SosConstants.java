@@ -382,7 +382,11 @@ public final class SosConstants {
     }
 
     public enum FirstLatest {
-        getFirst, latest
+        first, latest;
+
+        public static boolean contains(String timeString) {
+            return timeString.equals(first.name()) || timeString.equals(latest.name());
+        }
     }
 
     /**

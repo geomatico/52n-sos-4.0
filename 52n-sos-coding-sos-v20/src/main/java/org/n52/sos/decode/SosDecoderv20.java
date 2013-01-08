@@ -25,7 +25,6 @@ package org.n52.sos.decode;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -266,7 +265,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
         getObsRequest.setOfferings(Arrays.asList(getObsType.getOfferingArray()));
         getObsRequest.setObservedProperties(Arrays.asList(getObsType.getObservedPropertyArray()));
         getObsRequest.setProcedures(Arrays.asList(getObsType.getProcedureArray()));
-        getObsRequest.setEventTimes(parseTemporalFilters4GetObservation(getObsType.getTemporalFilterArray()));
+        getObsRequest.setTemporalFilters(parseTemporalFilters4GetObservation(getObsType.getTemporalFilterArray()));
         if (getObsType.isSetSpatialFilter()) {
             getObsRequest.setSpatialFilter(parseSpatialFilter4GetObservation(getObsType.getSpatialFilter()));
         }

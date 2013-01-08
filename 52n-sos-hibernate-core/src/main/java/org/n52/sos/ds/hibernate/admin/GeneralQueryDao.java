@@ -23,17 +23,18 @@
  */
 package org.n52.sos.ds.hibernate.admin;
 
-import org.n52.sos.ds.IGeneralQueryDao;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.jdbc.ReturningWork;
+import org.n52.sos.ds.IGeneralQueryDao;
 
 /**
  * class that deals with crud operations related to SOS DB.

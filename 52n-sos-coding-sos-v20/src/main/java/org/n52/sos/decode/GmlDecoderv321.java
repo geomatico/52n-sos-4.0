@@ -63,6 +63,7 @@ import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.DateTimeException;
@@ -254,24 +255,30 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
      * @throws OwsExceptionReport
      */
     private TimeInstant parseTimeInstant(TimeInstantType xbTimeIntant) throws OwsExceptionReport {
-        try {
+        
             TimeInstant ti = new TimeInstant();
             TimePositionType xbTimePositionType = xbTimeIntant.getTimePosition();
             String timeString = xbTimePositionType.getStringValue();
             if (timeString != null && !timeString.equals("")) {
-                ti.setValue(DateTimeHelper.parseIsoString2DateTime(timeString));
-                ti.setRequestedTimeLength(timeString.length());
+                if ((FirstLatest.contains(timeString))) {
+                    ti.setIndeterminateValue(timeString);
+                } else {
+                    try {
+                        ti.setValue(DateTimeHelper.parseIsoString2DateTime(timeString));
+                        
+                    } catch (DateTimeException dte) {
+                        String exceptionText = "Error while parsing TimeInstant!";
+                        LOGGER.error(exceptionText, dte);
+                        throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+                    }
+                    ti.setRequestedTimeLength(timeString.length());
+                }
             }
             if (xbTimePositionType.getIndeterminatePosition() != null) {
                 ti.setIndeterminateValue(xbTimePositionType.getIndeterminatePosition().toString());
-                ti.setRequestedTimeLength(xbTimePositionType.getIndeterminatePosition().toString().length());
             }
             return ti;
-        } catch (DateTimeException dte) {
-            String exceptionText = "Error while parsing TimeInstant!";
-            LOGGER.error(exceptionText, dte);
-            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
-        }
+       
     }
 
     /**

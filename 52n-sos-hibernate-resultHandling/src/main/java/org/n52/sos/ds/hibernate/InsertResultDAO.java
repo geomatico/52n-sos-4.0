@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ds.hibernate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,6 +38,7 @@ import org.joda.time.DateTime;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IInsertResultDAO;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
+import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
@@ -62,7 +64,10 @@ import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sensorML.SensorML;
+import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.sos.SosResultEncoding;
 import org.n52.sos.ogc.sos.SosResultStructure;
 import org.n52.sos.ogc.swe.SWEConstants;
@@ -148,11 +153,11 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
         SosResultEncoding resultEncoding = new SosResultEncoding(resultTemplate.getResultEncoding());
         SosResultStructure resultStructure = new SosResultStructure(resultTemplate.getResultStructure());
         String[] blockValues = getBlockValues(resultValues, resultEncoding.getEncoding());
-        SosObservation o =
+        SosObservation observation =
                 getObservation(resultTemplate.getObservationConstellation(), blockValues,
                         resultStructure.getResultStructure(), resultEncoding.getEncoding());
         try {
-            return HibernateObservationUtilities.unfoldObservation(o);
+            return HibernateObservationUtilities.unfoldObservation(observation);
         } catch (Exception e) {
             String exceptionText = "The resultValues format does not comply to the resultStructure of the resultTemplate!";
             LOGGER.debug(exceptionText, e);
@@ -162,12 +167,21 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
     }
 
     private SosObservationConstellation getSosObservationConstellation(ObservationConstellation c) {
-        String procedure = c.getProcedure().getIdentifier();
+        SosProcedureDescription procedure = createProcedure(c.getProcedure());
         Set<String> offerings = Collections.singleton(c.getOffering().getIdentifier());
         String observationType = c.getObservationType().getObservationType();
         AbstractSosPhenomenon observablePropety = new SosObservableProperty(c.getObservableProperty().getIdentifier());
         /* FIXME where is the feature?! */
         return new SosObservationConstellation(procedure, observablePropety, offerings, null, observationType);
+    }
+    
+    private SosProcedureDescription createProcedure(Procedure hProcedure) {
+        SensorML procedure = new SensorML();
+        SosSMLIdentifier identifier = new SosSMLIdentifier("uniqueID", "urn:ogc:def:identifier:OGC:uniqueID", hProcedure.getIdentifier());
+        List<SosSMLIdentifier> identifiers = new ArrayList<SosSMLIdentifier>(1);
+        identifiers.add(identifier);
+        procedure.setIdentifications(identifiers);
+        return procedure;
     }
 
     private SosObservation getObservation(ObservationConstellation obsConst, String[] blockValues,
@@ -183,16 +197,16 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
         Map<Integer, String> units = new HashMap<Integer, String>(record.getFields().size() - 1);
 
         int j = 0;
-        for (SosSweField f : record.getFields()) {
+        for (SosSweField swefield : record.getFields()) {
             if (j != resultTimeIndex && j != phenomenonTimeIndex) {
                 Integer index = Integer.valueOf(j);
-                SosSweAbstractSimpleType e = (SosSweAbstractSimpleType) f.getElement();
-                if (e instanceof SosSweQuantity) {
+                SosSweAbstractSimpleType sweAbstractSimpleType = (SosSweAbstractSimpleType) swefield.getElement();
+                if (sweAbstractSimpleType instanceof SosSweQuantity) {
                     /* TODO units for other SosSweSimpleTypes? */
-                    units.put(index, ((SosSweQuantity) e).getUom());
+                    units.put(index, ((SosSweQuantity) sweAbstractSimpleType).getUom());
                 }
-                types.put(index, e.getSimpleType());
-                observedProperties.put(index, f.getElement().getDefinition());
+                types.put(index, sweAbstractSimpleType.getSimpleType());
+                observedProperties.put(index, swefield.getElement().getDefinition());
             }
             ++j;
         }
@@ -205,11 +219,11 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
                 createObservationValueFrom(blockValues, record, encoding, resultTimeIndex, phenomenonTimeIndex, types,
                         units);
 
-        SosObservation o = new SosObservation();
-        o.setObservationConstellation(getSosObservationConstellation(obsConst));
-        o.setResultType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
-        o.setValue(sosValues);
-        return o;
+        SosObservation observation = new SosObservation();
+        observation.setObservationConstellation(getSosObservationConstellation(obsConst));
+        observation.setResultType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
+        observation.setValue(sosValues);
+        return observation;
     }
 
     private SosMultiObservationValues<SosSweDataArray> createObservationValueFrom(String[] blockValues,

@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.n52.sos.exception.IExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

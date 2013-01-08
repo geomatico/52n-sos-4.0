@@ -26,9 +26,11 @@ package org.n52.sos.service;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.util.Enumeration;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
