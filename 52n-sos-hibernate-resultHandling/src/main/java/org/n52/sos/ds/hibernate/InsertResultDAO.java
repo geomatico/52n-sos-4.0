@@ -105,11 +105,6 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
     }
     
     @Override
-    protected DecoderKeyType getKeyTypeForDcp(String version) {
-        return new DecoderKeyType(Sos2Constants.NS_SOS_20);
-    }
-
-    @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
         /* nothing to add here */
     }

@@ -112,11 +112,6 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         return OPERATION_NAME;
     }
     
-    @Override
-    public DecoderKeyType getKeyTypeForDcp(String version) {
-        return new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20);
-    }
-    
     /*
      * (non-Javadoc)
      * @see org.n52.sos.ds.hibernate.AbstractHibernateOperationDao#getOperationsMetadata(java.lang.String, org.hibernate.Session)

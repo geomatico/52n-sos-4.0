@@ -29,6 +29,7 @@ import java.util.Map;
 import org.hibernate.Session;
 import org.n52.sos.cache.ACapabilitiesCacheController;
 import org.n52.sos.decode.DecoderKeyType;
+import org.n52.sos.decode.RequestDecoderKey;
 import org.n52.sos.ds.IOperationDAO;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
@@ -65,12 +66,9 @@ public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao
         return null;
     }
 
-    protected Map<String, List<String>> getDCP(DecoderKeyType dkt) throws OwsExceptionReport {
-        return SosHelper.getDCP(getOperationName(), dkt, getConfigurator().getBindingOperators().values(), getConfigurator().getServiceURL());
-    }
-
     protected OWSOperation getOperationsMetadata(String service, String version, Session session) throws OwsExceptionReport {
-        Map<String, List<String>> dcp = getDCP(getKeyTypeForDcp(version));
+       
+        Map<String, List<String>> dcp =  SosHelper.getDCP(new RequestDecoderKey(service, version, getOperationName()));
         if (dcp == null || dcp.isEmpty()) {
             log.debug("Operation {} not available due to empty DCP map.", getOperationName());
             return null;
@@ -83,6 +81,4 @@ public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao
     }
 
     protected abstract void setOperationsMetadata(OWSOperation operation, String service, String version, Session session) throws OwsExceptionReport;
-
-    protected abstract DecoderKeyType getKeyTypeForDcp(String version);
 }

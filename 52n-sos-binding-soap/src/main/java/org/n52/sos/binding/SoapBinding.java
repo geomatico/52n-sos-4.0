@@ -24,6 +24,7 @@
 package org.n52.sos.binding;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,7 +35,9 @@ import javax.xml.soap.SOAPConstants;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.IDecoder;
+import org.n52.sos.decode.IRequestDecoder;
 import org.n52.sos.decode.IXmlRequestDecoder;
+import org.n52.sos.decode.RequestDecoderKey;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
@@ -99,7 +102,7 @@ public class SoapBinding extends Binding {
             XmlObject doc = XmlHelper.parseXmlSosRequest(request);
             LOGGER.debug("SOAP-REQUEST: {}", doc.xmlText());
             String reqNamespaceURI = XmlHelper.getNamespace(doc);
-            IDecoder decoder = getDecoder(new DecoderKeyType(reqNamespaceURI));
+            IDecoder decoder = getSoapDecoder(new DecoderKeyType(reqNamespaceURI));
             // decode SOAP message
             Object abstractRequest = decoder.decode(doc);
             if (abstractRequest instanceof SoapRequest) {
@@ -114,8 +117,7 @@ public class SoapBinding extends Binding {
                 soapResponse.setHeader(soapRequest.getSoapHeader());
                 if (soapRequest.getSoapFault() == null) {
                     XmlObject xmlObject = soapRequest.getSoapBodyContent();
-                    IXmlRequestDecoder bodyDecoder =
-                            getIXmlRequestDecoder(new DecoderKeyType(XmlHelper.getNamespace(xmlObject)));
+                    IXmlRequestDecoder bodyDecoder = getDecoder(new DecoderKeyType(XmlHelper.getNamespace(xmlObject)));
                     // Decode SOAPBody content
                     Object aBodyRequest = bodyDecoder.decode(xmlObject);
                     if (aBodyRequest instanceof AbstractServiceRequest) {
@@ -252,26 +254,32 @@ public class SoapBinding extends Binding {
     }
 
     @Override
-    public boolean checkOperationHttpPostSupported(String operationName, DecoderKeyType decoderKey)
+    public boolean checkOperationHttpPostSupported(RequestDecoderKey decoderKey)
             throws OwsExceptionReport {
-        IXmlRequestDecoder decoder = getIXmlRequestDecoder(decoderKey);
-        if (decoder != null) {
-            return SosHelper.checkMethodeImplementation4DCP(decoder.getClass().getDeclaredMethods(), operationName);
-        }
-        return false;
+        return getDecoder(decoderKey) != null;
     }
 
-    private IDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
+    private IDecoder getSoapDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
         List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
-        for (IDecoder iDecoder : decoder) {
-            return iDecoder;
+        for (IDecoder<?,?> iDecoder : decoder) {
+                return iDecoder;
+        }
+        return null;
+    }
+    
+    private IXmlRequestDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
+        List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
+        for (IDecoder<?,?> iDecoder : decoder) {
+            if (iDecoder instanceof IXmlRequestDecoder) {
+                return (IXmlRequestDecoder) iDecoder;
+            }
         }
         return null;
     }
 
-    private IXmlRequestDecoder getIXmlRequestDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
-        List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
-        for (IDecoder iDecoder : decoder) {
+    private IXmlRequestDecoder getDecoder(RequestDecoderKey decoderKey) throws OwsExceptionReport {
+        Set<IRequestDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
+        for (IRequestDecoder<?,?> iDecoder : decoder) {
             if (iDecoder instanceof IXmlRequestDecoder) {
                 return (IXmlRequestDecoder) iDecoder;
             }
@@ -281,8 +289,6 @@ public class SoapBinding extends Binding {
 
     @Override
     public Set<String> getConformanceClasses() {
-        Set<String> conformanceClasses = new HashSet<String>(0);
-        conformanceClasses.add("http://www.opengis.net/spec/SOS/2.0/conf/soap");
-        return conformanceClasses;
+        return Collections.singleton("http://www.opengis.net/spec/SOS/2.0/conf/soap");
     }
 }

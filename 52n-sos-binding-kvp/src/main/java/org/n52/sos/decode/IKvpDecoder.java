@@ -24,9 +24,10 @@
 package org.n52.sos.decode;
 
 import java.util.Map;
+import org.n52.sos.decode.IDecoder;
 
 import org.n52.sos.request.AbstractServiceRequest;
 
-public interface IKvpDecoder extends IDecoder<AbstractServiceRequest, Map<String, String>> {
-
+public interface IKvpDecoder extends IRequestDecoder<AbstractServiceRequest, Map<String, String>> {
+    public boolean isSupported(RequestDecoderKey key);
 }

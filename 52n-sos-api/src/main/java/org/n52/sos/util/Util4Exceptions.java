@@ -24,6 +24,7 @@
 package org.n52.sos.util;
 
 import java.util.List;
+import org.n52.sos.ogc.ows.OWSConstants;
 
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
@@ -37,6 +38,13 @@ import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
  * 
  */
 public class Util4Exceptions {
+
+    public static OwsExceptionReport createMissingMandatoryParameterException(String parameterName) {
+        OwsExceptionReport owse = new OwsExceptionReport(OWSConstants.ExceptionLevel.DetailedExceptions);
+        owse.addCodedException(OWSConstants.OwsExceptionCode.MissingParameterValue, parameterName, 
+            String.format("Your request was invalid! The mandatory parameter %s must be contained in your request!", parameterName));
+        return owse;
+    }
 
     /**
      * Hide utility constructor

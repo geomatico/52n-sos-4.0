@@ -73,11 +73,6 @@ public class GetObservationByIdDAO extends AbstractHibernateOperationDao impleme
     }
 
     @Override
-    protected DecoderKeyType getKeyTypeForDcp(String version) {
-        return new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20);
-    }
-
-    @Override
     public GetObservationByIdResponse getObservationById(GetObservationByIdRequest request) throws OwsExceptionReport {
         if (request instanceof GetObservationByIdRequest) {
             Session session = null;

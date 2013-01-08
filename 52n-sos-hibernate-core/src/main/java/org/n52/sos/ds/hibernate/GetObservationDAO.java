@@ -82,11 +82,6 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
      */
     private static final String OPERATION_NAME = SosConstants.Operations.GetObservation.name();
 
-    /**
-     * actual time
-     */
-    private DateTime now = null;
-
     /*
      * (non-Javadoc)
      * 
@@ -97,11 +92,6 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
         return OPERATION_NAME;
     }
     
-    @Override
-    public DecoderKeyType getKeyTypeForDcp(String version) {
-        return new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20);
-    }
-
     /*
      * (non-Javadoc)
      * @see org.n52.sos.ds.hibernate.AbstractHibernateOperationDao#getOperationsMetadata(java.lang.String, org.hibernate.Session)
@@ -163,8 +153,6 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
     @Override
     public GetObservationResponse getObservation(GetObservationRequest request) throws OwsExceptionReport {
         GetObservationRequest sosRequest = request;
-        // setting a global "now" for this request
-        now = new DateTime();
         Session session = null;
         try {
             session = getSession();

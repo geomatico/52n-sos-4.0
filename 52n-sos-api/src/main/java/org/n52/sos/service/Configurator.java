@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -48,6 +49,8 @@ import org.n52.sos.convert.ConverterKeyType;
 import org.n52.sos.convert.IConverter;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.IDecoder;
+import org.n52.sos.decode.IRequestDecoder;
+import org.n52.sos.decode.RequestDecoderKey;
 import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IDataSourceInitializator;
@@ -117,7 +120,9 @@ public final class Configurator {
     private IDataSourceInitializator dataSourceInitializator;
 
     private Map<DecoderKeyType, List<IDecoder>> decoder = new HashMap<DecoderKeyType, List<IDecoder>>(0);
-
+    
+    private Map<RequestDecoderKey, List<IRequestDecoder>> requestDecoders = new HashMap<RequestDecoderKey, List<IRequestDecoder>>(0);
+    
     /**
      * default EPSG code of stored geometries
      */
@@ -215,7 +220,7 @@ public final class Configurator {
     private ServiceLoader<IDecoder> serviceLoaderDecoder;
 
     private ServiceLoader<IEncoder> serviceLoaderEncoder;
-
+    
     /** ServiceLoader for IFeatureQueryHandler */
     private ServiceLoader<IFeatureQueryHandler> serviceLoaderFeatureQueryHandler;
 
@@ -930,13 +935,13 @@ public final class Configurator {
             throw new ConfigurationException(owse);
         }
     }
-
+    
     private void initalizeDecoder() throws ConfigurationException {
         serviceLoaderDecoder = ServiceLoader.load(IDecoder.class);
         setDecoder();
         LOGGER.info("\n******\n Decoder(s) loaded successfully!\n******\n");
     }
-
+    
     private void initalizeEncoder() throws ConfigurationException {
         serviceLoaderEncoder = ServiceLoader.load(IEncoder.class);
         setEncoder();
@@ -1078,21 +1083,36 @@ public final class Configurator {
         for (IDecoder<?, ?> aDecoder : serviceLoaderDecoder) {
             try {
                 for (DecoderKeyType decoderKeyType : aDecoder.getDecoderKeyTypes()) {
-                    if (decoder.containsKey(decoderKeyType)) {
-                        decoder.get(decoderKeyType).add(aDecoder);
-                    } else {
-                        List<IDecoder> decoderList = new ArrayList<IDecoder>();
-                        decoderList.add(aDecoder);
-                        decoder.put(decoderKeyType, decoderList);
+                    List<IDecoder> list = decoder.get(decoderKeyType);
+                    if (list == null) {
+                        decoder.put(decoderKeyType, list = new LinkedList<IDecoder>());
                     }
+                    list.add(aDecoder);
                 }
             } catch (ServiceConfigurationError sce) {
                 LOGGER.warn("An IDecoder implementation could not be loaded!", sce);
+            }
+            
+            if (aDecoder instanceof IRequestDecoder) {
+                IRequestDecoder<?,?> dec = (IRequestDecoder) aDecoder;
+                for (RequestDecoderKey encoderKeyType : dec.getRequestDecoderKeys()) {
+                    List<IRequestDecoder> list = requestDecoders.get(encoderKeyType);
+                    if (list == null) {
+                        requestDecoders.put(encoderKeyType, list = new LinkedList<IRequestDecoder>());
+                    }
+                    list.add(dec);
+                }
             }
         }
 
         if (this.decoder.isEmpty()) {
             String exceptionText = "No IDecoder implementations is loaded!";
+            LOGGER.error(exceptionText);
+            throw new ConfigurationException(exceptionText);
+        }
+        
+        if (this.requestDecoders.isEmpty()) {
+            String exceptionText = "No IRequestDecoder implementations is loaded!";
             LOGGER.error(exceptionText);
             throw new ConfigurationException(exceptionText);
         }
@@ -1637,8 +1657,8 @@ public final class Configurator {
      * @return the decoder
      * @throws OwsExceptionReport
      */
-    public List<IDecoder> getDecoder(String service, String version) throws OwsExceptionReport {
-        return getDecoder(new DecoderKeyType(service, version));
+    public Set<IRequestDecoder> getDecoder(String service, String version) throws OwsExceptionReport {
+        return getDecoder(new RequestDecoderKey(service, version));
     }
 
     /**
@@ -1649,7 +1669,18 @@ public final class Configurator {
     public List<IDecoder> getDecoder(DecoderKeyType decoderKeyType) throws OwsExceptionReport {
         return decoder.get(decoderKeyType);
     }
-
+    
+    public Set<IRequestDecoder> getDecoder(RequestDecoderKey decoderKeyType) throws OwsExceptionReport {
+        HashSet<IRequestDecoder> decoders = new HashSet<IRequestDecoder>();
+        /* test for compatible decoders */
+        for (RequestDecoderKey k : requestDecoders.keySet()) {
+            if (k.isCompatible(decoderKeyType)) {
+                decoders.addAll(requestDecoders.get(k));
+            }
+        }
+        return decoders.isEmpty() ? null : decoders;
+    }
+    
     /**
      * @param namespace
      * @return the encoder

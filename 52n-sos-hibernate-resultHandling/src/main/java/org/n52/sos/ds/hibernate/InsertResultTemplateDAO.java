@@ -58,11 +58,6 @@ public class InsertResultTemplateDAO extends AbstractHibernateOperationDao imple
     public String getOperationName() {
         return OPERATION_NAME;
     }
-    
-    @Override
-    protected DecoderKeyType getKeyTypeForDcp(String version) {
-        return new DecoderKeyType(Sos2Constants.NS_SOS_20);
-    }
 
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {

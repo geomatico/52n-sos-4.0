@@ -68,11 +68,6 @@ public class UpdateSensorDescriptionDAO extends AbstractHibernateOperationDao im
     }
     
     @Override
-    public DecoderKeyType getKeyTypeForDcp(String version) {
-        return new DecoderKeyType(SWEConstants.NS_SWES_20);
-    }
-
-    @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
         opsMeta.addPossibleValuesParameter(Sos2Constants.UpdateSensorDescriptionParams.procedure, getCache().getProcedures());
         if (version.equals(Sos2Constants.SERVICEVERSION)) {

@@ -73,6 +73,8 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import java.util.LinkedList;
+import org.n52.sos.decode.RequestDecoderKey;
 
 /**
  * Utility class for SOS
@@ -281,11 +283,9 @@ public class SosHelper {
         LOGGER.debug("Remaining Heap Size: " + (freeMem / 1024) + "KB");
         if (Runtime.getRuntime().totalMemory() == Runtime.getRuntime().maxMemory() && freeMem < 256000) { // 256000
             // accords to 256 kB create service exception
-            String exceptionText =
-                    "The observation response is to big for the maximal heap size = "
-                            + Runtime.getRuntime().maxMemory()
-                            + " Byte of the virtual machine! "
-                            + "Please either refine your getObservation request to reduce the number of observations in the response or ask the administrator of this SOS to increase the maximum heap size of the virtual machine!";
+            String exceptionText = String.format(
+                    "The observation response is to big for the maximal heap size of %d Byte of the virtual machine! Please either refine your getObservation request to reduce the number of observations in the response or ask the administrator of this SOS to increase the maximum heap size of the virtual machine!"
+                    , Runtime.getRuntime().maxMemory());
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createResponseExceedsSizeLimitException(exceptionText);
         }
@@ -330,17 +330,16 @@ public class SosHelper {
                 if (paramValues.length == 1) {
                     return paramValues[0];
                 } else {
-                    String exceptionText =
-                            "The parameter '" + paramName
-                                    + "' has more than one value or is empty for HTTP-Post requests by this SOS!";
+                    String exceptionText = String.format(
+                            "The parameter '%s' has more than one value or is empty for HTTP-Post requests by this SOS!", paramName);
                     LOGGER.error(exceptionText);
                     OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
                     owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText);
                     throw owse;
                 }
             } else {
-                String exceptionText =
-                        "The parameter '" + paramName + "' is not supportted for HTTP-Post requests by this SOS!";
+                String exceptionText = String.format(
+                        "The parameter '%s' is not supportted for HTTP-Post requests by this SOS!", paramName);
                 LOGGER.error(exceptionText);
                 OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
                 owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText);
@@ -391,61 +390,34 @@ public class SosHelper {
     }
 
     /**
-     * Checks if the Decoder methods contain the operation
-     * 
-     * @param methods
-     *            Decoder methods
-     * @param operation
-     *            SOS operation to check
-     * @return True if Decoder method exists.
-     */
-    public static boolean checkMethodeImplementation4DCP(Method[] methods, String operation) {
-        boolean implemented = false;
-        String formattedOperation = HTTP_DECODER_METHODE_PREFIX + operation;
-        for (Method method : methods) {
-            if (method.getName().equals(formattedOperation)) {
-                return true;
-            }
-        }
-        return implemented;
-    }
-
-    /**
      * Get the HTTP DCPs for a operation
      * 
-     * @param operation
-     *            SOS operation
-     * @param version
-     *            SOS version
-     * @param requestOperators
-     *            All request operators
-     * @param serviceURL
-     *            SOS service URL
+     * @param decoderKey the decoderKey
      * @return Map with DCPs for the SOS operation
      * @throws OwsExceptionReport
      */
-    public static Map<String, List<String>> getDCP(String operation, DecoderKeyType decoderKey,
-            Collection<Binding> bindings, String serviceURL) throws OwsExceptionReport {
-        List<String> httpGetUrls = new ArrayList<String>();
-        List<String> httpPostUrls = new ArrayList<String>();
-        List<String> httpPutUrls = new ArrayList<String>();
-        List<String> httpDeleteUrls = new ArrayList<String>();
+    public static Map<String, List<String>> getDCP(RequestDecoderKey decoderKey) throws OwsExceptionReport {
+        List<String> httpGetUrls = new LinkedList<String>();
+        List<String> httpPostUrls = new LinkedList<String>();
+        List<String> httpPutUrls = new LinkedList<String>();
+        List<String> httpDeleteUrls = new LinkedList<String>();
+        String serviceURL = Configurator.getInstance().getServiceURL();
         try {
-            for (Binding binding : bindings) {
+            for (Binding binding : Configurator.getInstance().getBindingOperators().values()) {
                 // HTTP-Get
-                if (binding.checkOperationHttpGetSupported(operation, decoderKey)) {
+                if (binding.checkOperationHttpGetSupported( decoderKey)) {
                     httpGetUrls.add(serviceURL + binding.getUrlPattern() + "?");
                 }
                 // HTTP-Post
-                if (binding.checkOperationHttpPostSupported(operation, decoderKey)) {
+                if (binding.checkOperationHttpPostSupported(decoderKey)) {
                     httpPostUrls.add(serviceURL + binding.getUrlPattern());
                 }
                 // HTTP-PUT
-                if (binding.checkOperationHttpPutSupported(operation, decoderKey)) {
+                if (binding.checkOperationHttpPutSupported(decoderKey)) {
                     httpPutUrls.add(serviceURL + binding.getUrlPattern());
                 }
                 // HTTP-DELETE
-                if (binding.checkOperationHttpDeleteSupported(operation, decoderKey)) {
+                if (binding.checkOperationHttpDeleteSupported(decoderKey)) {
                     httpDeleteUrls.add(serviceURL + binding.getUrlPattern());
                 }
 
@@ -461,7 +433,7 @@ public class SosHelper {
             throw owse;
         }
 
-        Map<String, List<String>> dcp = new HashMap<String, List<String>>();
+        Map<String, List<String>> dcp = new HashMap<String, List<String>>(4);
         if (!httpGetUrls.isEmpty()) {
             dcp.put(SosConstants.HTTP_GET, httpGetUrls);
         }
@@ -477,38 +449,10 @@ public class SosHelper {
         return dcp;
     }
 
-    private static String getKvpNamespaceForVersionAndOperation(String operation, DecoderKeyType decoderKey) {
-        if (decoderKey.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
-            return Sos1Constants.NS_SOS;
-        } else if (decoderKey.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
-            return Sos2Constants.NS_SOS_20;
-        }
-        return "";
-    }
-
-    //
-    // private static String getPostNamespaceForVersionAndOperation(String
-    // operation, String version) {
-    // if (version.equals(Sos1Constants.SERVICEVERSION)) {
-    // return Sos1Constants.NS_SOS;
-    // } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
-    // if (operation.equals(SosConstants.Operations.DescribeSensor.name())
-    // || operation.equals(Sos2Constants.Operations.InsertSensor.name())
-    // || operation.equals(Sos2Constants.Operations.DeleteSensor.name())) {
-    // return SWEConstants.NS_SWES_20;
-    // } else {
-    // return Sos2Constants.NS_SOS_20;
-    // }
-    // }
-    // return "";
-    // }
-
-    public static String getUrlPatternForHttpGetMethod(Collection<Binding> bindings, String operationName,
-            DecoderKeyType decoderKey) throws OwsExceptionReport {
+    public static String getUrlPatternForHttpGetMethod(RequestDecoderKey decoderKey) throws OwsExceptionReport {
         try {
-            for (Binding binding : bindings) {
-                if (binding.checkOperationHttpGetSupported(operationName, new DecoderKeyType(
-                        getKvpNamespaceForVersionAndOperation(operationName, decoderKey)))) {
+            for (Binding binding : Configurator.getInstance().getBindingOperators().values()) {
+                if (binding.checkOperationHttpGetSupported(decoderKey)) {
                     return binding.getUrlPattern();
                 }
             }

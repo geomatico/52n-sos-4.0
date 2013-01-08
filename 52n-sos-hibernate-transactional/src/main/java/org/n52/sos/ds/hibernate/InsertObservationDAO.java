@@ -83,12 +83,6 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
     }
 
     @Override
-    public DecoderKeyType getKeyTypeForDcp(String version) {
-        return new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? Sos1Constants.NS_SOS
-                : Sos2Constants.NS_SOS_20);
-    }
-
-    @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session)
             throws OwsExceptionReport {
         opsMeta.addPossibleValuesParameter(Sos2Constants.InsertObservationParams.offering, getCache().getOfferings());

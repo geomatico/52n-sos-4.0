@@ -76,6 +76,10 @@ import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.Util4Exceptions;
 
 import com.vividsolutions.jts.geom.Geometry;
+import javax.persistence.criteria.JoinType;
+import org.hibernate.FetchMode;
+import org.hibernate.criterion.CriteriaSpecification;
+import org.hibernate.criterion.Order;
 
 /**
  * Utility class for Hiberntate Criteria queries.

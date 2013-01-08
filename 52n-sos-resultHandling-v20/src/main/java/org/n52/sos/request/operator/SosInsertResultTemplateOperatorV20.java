@@ -174,13 +174,9 @@ public class SosInsertResultTemplateOperatorV20 implements IRequestOperator {
             exceptions.add(owse);
         }
         // check procedure
-        try {
             SosHelper.checkProcedureID(request.getObservationConstellation().getProcedure().getProcedureIdentifier(), Configurator
                     .getInstance().getCapabilitiesCacheController().getProcedures(),
                     Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
-        } catch (OwsExceptionReport owse) {
-            exceptions.add(owse);
-        }
         // check observedProperty
         try {
             SosHelper.checkObservedProperty(request.getObservationConstellation().getObservableProperty()

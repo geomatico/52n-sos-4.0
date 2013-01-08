@@ -33,6 +33,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.IDecoder;
 import org.n52.sos.decode.IKvpDecoder;
+import org.n52.sos.decode.IRequestDecoder;
+import org.n52.sos.decode.RequestDecoderKey;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -74,14 +76,14 @@ public class KvpBinding extends Binding {
         AbstractServiceRequest request = null;
         try {
             if (req.getParameterMap() == null || (req.getParameterMap() != null && req.getParameterMap().isEmpty())) {
-                LOGGER.debug("The mandatory parameter '" + RequestParams.request.name() + "' is missing!");
+                LOGGER.debug("The mandatory parameter '{}' is missing!", RequestParams.request.name());
                 throw Util4Exceptions.createMissingParameterValueException(RequestParams.request.name());
             }
             Map<String, String> parameterValueMap = KvpHelper.getKvpParameterValueMap(req);
             // check if request contains request parameter
             checkParameterValue(getRequestParameterValue(parameterValueMap), RequestParams.request.name());
             String service = getServiceParameterValue(parameterValueMap);
-            String version = getVersionParameterValue(RequestParams.version.name(), parameterValueMap);
+            String version = getVersionParameterValue(parameterValueMap);
             IDecoder<AbstractServiceRequest, Map<String, String>> decoder =
                     getDecoder(new DecoderKeyType(service, version));
             if (decoder != null) {
@@ -97,7 +99,7 @@ public class KvpBinding extends Binding {
                         Configurator.getInstance().getServiceOperator(serviceVersionIdentifier);
                 if (serviceOperator != null) {
                     response = serviceOperator.receiveRequest(request);
-                    LOGGER.debug(request.getOperationName() + " operation executed successfully!");
+                    LOGGER.debug("{} operation executed successfully!", request.getOperationName());
                     break;
                 }
             }
@@ -115,15 +117,13 @@ public class KvpBinding extends Binding {
                     exceptionText.append(") are not supported by this server!");
                     throw Util4Exceptions.createVersionNegotiationFailedException(exceptionText.toString());
                 } else {
-                    StringBuilder exceptionText = new StringBuilder();
-                    exceptionText.append("The requested service (");
-                    exceptionText.append(request.getService());
-                    exceptionText.append(") and/or version (");
-                    exceptionText.append(request.getVersion());
-                    exceptionText.append(") is not supported by this server!");
-                    LOGGER.debug(exceptionText.toString());
+                    String exceptionText = String.format(
+                            "The requested service (%s) and/or version (%s) is not supported by this server!", 
+                            request.getService(), request.getVersion());
+                    
+                    LOGGER.debug(exceptionText);
                     throw Util4Exceptions.createInvalidParameterValueException(
-                            OWSConstants.RequestParams.service.name(), exceptionText.toString());
+                            OWSConstants.RequestParams.service.name(), exceptionText);
                 }
             }
         } catch (OwsExceptionReport owse) {
@@ -163,7 +163,7 @@ public class KvpBinding extends Binding {
     public String getUrlPattern() {
         return urlPattern;
     }
-
+    
     private String getServiceParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
         String service = getParameterValue(RequestParams.service.name(), parameterValueMap);
         boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
@@ -184,7 +184,7 @@ public class KvpBinding extends Binding {
         return service;
     }
 
-    private String getVersionParameterValue(String name, Map<String, String> parameterValueMap) throws OwsExceptionReport {
+    private String getVersionParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
         String version = getParameterValue(RequestParams.version.name(), parameterValueMap);
         boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
         if (!isGetCapabilities) {
@@ -227,38 +227,55 @@ public class KvpBinding extends Binding {
 
     private void checkParameterValue(String parameterValue, String parameterName) throws OwsExceptionReport {
         if (parameterValue == null || (parameterValue != null && parameterValue.isEmpty())) {
-            LOGGER.debug("The value for parameter '" + parameterName + "' is missing!");
+            LOGGER.debug("The value for parameter '{}' is missing!", parameterName);
             throw Util4Exceptions.createMissingParameterValueException(parameterName);
         }
     }
 
     @Override
-    public boolean checkOperationHttpGetSupported(String operationName, DecoderKeyType decoderKey)
+    public boolean checkOperationHttpGetSupported(RequestDecoderKey decoderKey)
             throws OwsExceptionReport {
-        IDecoder decoder = getDecoder(decoderKey);
+        IKvpDecoder decoder = getDecoder(decoderKey);
         if (decoder != null) {
-            return SosHelper.checkMethodeImplementation4DCP(decoder.getClass().getDeclaredMethods(), operationName);
+            return decoder.isSupported(decoderKey);
         }
         return false;
     }
 
-    private IKvpDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
-        Configurator configurator = Configurator.getInstance();
-        List<IDecoder> decoder = configurator.getDecoder(decoderKey);
+    private IKvpDecoder getDecoder(RequestDecoderKey decoderKey) throws OwsExceptionReport {
+        Set<IRequestDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
         if (decoder != null) {
-            for (IDecoder iDecoder : decoder) {
+            for (IRequestDecoder<?,?> iDecoder : decoder) {
                 if (iDecoder instanceof IKvpDecoder) {
                     return (IKvpDecoder) iDecoder;
                 }
             }
         }
-        if (!configurator.isVersionSupported(decoderKey.getVersion())) {
-            String exceptionText = "The requested version is not supported!";
-            throw Util4Exceptions.createInvalidParameterValueException(RequestParams.version.name(), exceptionText);
+        if (!Configurator.getInstance().isVersionSupported(decoderKey.getVersion())) {
+            throw Util4Exceptions.createInvalidParameterValueException(
+                    RequestParams.version.name(), "The requested version is not supported!");
         } 
         return null;
     }
-
+    
+        private IKvpDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
+        List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
+        if (decoder != null) {
+            for (IDecoder<?,?> iDecoder : decoder) {
+                if (iDecoder instanceof IKvpDecoder) {
+                    return (IKvpDecoder) iDecoder;
+                }
+            }
+        }
+        if (!Configurator.getInstance().isVersionSupported(decoderKey.getVersion())) {
+            throw Util4Exceptions.createInvalidParameterValueException(
+                    RequestParams.version.name(), "The requested version is not supported!");
+        } 
+        return null;
+    }
+    
+    
+    
     @Override
     public Set<String> getConformanceClasses() {
         Set<String> conformanceClasses = new HashSet<String>(0);

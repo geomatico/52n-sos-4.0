@@ -80,12 +80,6 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
     }
     
     @Override
-    public DecoderKeyType getKeyTypeForDcp(String version) {
-        return new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? 
-                        Sos1Constants.NS_SOS : SWEConstants.NS_SWES_20);
-    }    
-
-    @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             opsMeta.addAnyParameterValue(Sos1Constants.RegisterSensorParams.SensorDescription);

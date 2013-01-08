@@ -70,11 +70,6 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
         return OPERATION_NAME;
     }
     
-     @Override
-    protected DecoderKeyType getKeyTypeForDcp(String version) {
-        return new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? Sos1Constants.NS_SOS : Sos2Constants.NS_SOS_20);
-    }
-
     @Override
     public void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session connection)
             throws OwsExceptionReport {

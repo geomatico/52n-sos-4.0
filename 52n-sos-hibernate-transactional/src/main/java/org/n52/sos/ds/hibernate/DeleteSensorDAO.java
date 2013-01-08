@@ -58,11 +58,6 @@ public class DeleteSensorDAO extends AbstractHibernateOperationDao implements ID
     }
     
     @Override
-    protected DecoderKeyType getKeyTypeForDcp(String version) {
-        return new DecoderKeyType(SWEConstants.NS_SWES_20);
-    }
-
-    @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
         opsMeta.addPossibleValuesParameter(Sos2Constants.DeleteSensorParams.procedure, getCache().getProcedures());
     }

@@ -93,7 +93,8 @@
 			}).bind("keyup input", function() {
 				$("input[name=admin_password]").val($(this).val());
 			});
-			$('button').click(function() {
+			$('button[type=submit]').click(function() {
+				$(this).attr("disabled", true);
 				$(this).parents("form").submit();
 			});
 		});

@@ -58,7 +58,7 @@ public class KvpHelper {
     }
 
     private static String checkKeyForPrefix(String key) {
-            return key.replace("amp;", "").toLowerCase();
+        return key.replace("amp;", "").toLowerCase();
     }
 
     public static String checkParameterSingleValue(String parameterValue, String parameterName)
@@ -66,32 +66,21 @@ public class KvpHelper {
         if (checkParameterMultipleValues(parameterValue, parameterName).size() == 1) {
             return parameterValue;
         } else {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The value of parameter '");
-            exceptionText.append(parameterName);
-            exceptionText.append("' (");
-            exceptionText.append(parameterValue);
-            exceptionText.append(") is invalid!");
-            LOGGER.debug(exceptionText.toString());
-            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText.toString());
+            String exceptionText = String.format("Value(s) of parameter '%s' (%s) is invalid!", parameterName, parameterValue);
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
         }
     }
 
     public static List<String> checkParameterMultipleValues(String parameterValues, String parameterName)
             throws OwsExceptionReport {
         if (parameterValues.isEmpty()) {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("Value(s) of parameter '");
-            exceptionText.append(parameterName);
-            exceptionText.append("' (");
-            exceptionText.append(parameterValues);
-            exceptionText.append(") is/are missing!");
-            LOGGER.debug(exceptionText.toString());
+            LOGGER.debug("Value(s) of parameter '{}' ({}) is/are missing!", parameterName, parameterValues);
             throw Util4Exceptions.createMissingParameterValueException(parameterName);
         }
         return Arrays.asList(parameterValues.split(","));
     }
-
+    
     private KvpHelper() {
     }
 }

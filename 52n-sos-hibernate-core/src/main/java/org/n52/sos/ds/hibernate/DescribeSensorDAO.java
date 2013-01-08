@@ -40,6 +40,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projection;
 import org.n52.sos.decode.DecoderKeyType;
+import org.n52.sos.decode.RequestDecoderKey;
 import org.n52.sos.ds.IDescribeSensorDAO;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
@@ -92,11 +93,6 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
         return OPERATION_NAME;
     }
 
-    @Override
-    protected DecoderKeyType getKeyTypeForDcp(String version) {
-        return new DecoderKeyType(version.equals(Sos1Constants.SERVICEVERSION) ? Sos1Constants.NS_SOS : SWEConstants.NS_SWES_20);
-    }
-    
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session connection) throws OwsExceptionReport {
         opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());
@@ -290,10 +286,8 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
             SosSMLCapabilities capabilities = new SosSMLCapabilities();
             capabilities.setName(SosConstants.SYS_CAP_PARENT_PROCEDURES_NAME);
             capabilities.setCapabilitiesType(SweAggregateType.SimpleDataRecord);
-            String urlPattern =
-                    SosHelper.getUrlPatternForHttpGetMethod(getConfigurator().getBindingOperators().values(),
-                            SosConstants.Operations.DescribeSensor.name(), new DecoderKeyType(SosConstants.SOS,
-                                    version));
+            String urlPattern = SosHelper.getUrlPatternForHttpGetMethod(
+                    new RequestDecoderKey(version, SosConstants.Operations.DescribeSensor.name()));
             for (String parentProcID : parentProcedureIds) {
                 SosGmlMetaDataProperty metadata = new SosGmlMetaDataProperty();
                 metadata.setTitle(parentProcID);
@@ -327,10 +321,8 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
         Collection<String> childProcedureIds = getCache().getChildProcedures(procID, false, false);
         int childCount = 0;
         if (childProcedureIds != null && !childProcedureIds.isEmpty()) {
-            String urlPattern =
-                    SosHelper.getUrlPatternForHttpGetMethod(getConfigurator().getBindingOperators().values(),
-                            SosConstants.Operations.DescribeSensor.name(), new DecoderKeyType(SosConstants.SOS,
-                                    version));
+            String urlPattern = SosHelper.getUrlPatternForHttpGetMethod(
+                    new RequestDecoderKey(version, SosConstants.Operations.DescribeSensor.name()));
             for (String childProcID : childProcedureIds) {
                 childCount++;
                 SosSMLComponent component = new SosSMLComponent("component" + childCount);

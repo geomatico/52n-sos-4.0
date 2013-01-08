@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.n52.sos.decode.DecoderKeyType;
+import org.n52.sos.decode.RequestDecoderKey;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.IConformanceClass;
@@ -140,7 +141,7 @@ public abstract class Binding implements IConformanceClass {
      * 				true, if the decoder <code>decoderKey</code> supports HTTP-Delete for operation <code>operationName</code>
      * @throws OwsExceptionReport
      */
-    public boolean checkOperationHttpDeleteSupported(String operationName, DecoderKeyType decoderKey) throws OwsExceptionReport
+    public boolean checkOperationHttpDeleteSupported(RequestDecoderKey decoderKey) throws OwsExceptionReport
     {
         return false;
     }
@@ -156,7 +157,7 @@ public abstract class Binding implements IConformanceClass {
      * 				true, if the decoder <code>decoderKey</code> supports HTTP-Get for operation <code>operationName</code>
      * @throws OwsExceptionReport
      */
-    public boolean checkOperationHttpGetSupported(String operationName, DecoderKeyType decoderKey) throws OwsExceptionReport
+    public boolean checkOperationHttpGetSupported(RequestDecoderKey decoderKey) throws OwsExceptionReport
     {
         return false;
     }
@@ -172,7 +173,7 @@ public abstract class Binding implements IConformanceClass {
      * 				true, if the decoder <code>decoderKey</code> supports HTTP-Post for operation <code>operationName</code>
      * @throws OwsExceptionReport
      */
-    public boolean checkOperationHttpPostSupported(String operationName, DecoderKeyType decoderKey) throws OwsExceptionReport
+    public boolean checkOperationHttpPostSupported(RequestDecoderKey decoderKey) throws OwsExceptionReport
     {
         return false;
     }
@@ -188,7 +189,7 @@ public abstract class Binding implements IConformanceClass {
      *              true, if the decoder <code>decoderKey</code> supports HTTP-Post for operation <code>operationName</code>
      * @throws OwsExceptionReport
      */
-    public boolean checkOperationHttpOptionsSupported(String operationName, DecoderKeyType decoderKey) throws OwsExceptionReport
+    public boolean checkOperationHttpOptionsSupported(RequestDecoderKey decoderKey) throws OwsExceptionReport
     {
         return false;
     }
@@ -204,7 +205,7 @@ public abstract class Binding implements IConformanceClass {
      * 				true, if the decoder <code>decoderKey</code> supports HTTP-Put for operation <code>operationName</code>
      * @throws OwsExceptionReport
      */
-    public boolean checkOperationHttpPutSupported(String operationName, DecoderKeyType decoderKey) throws OwsExceptionReport
+    public boolean checkOperationHttpPutSupported(RequestDecoderKey decoderKey) throws OwsExceptionReport
     {
         return false;
     }

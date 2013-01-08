@@ -27,7 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +69,7 @@ import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosResultEncoding;
 import org.n52.sos.ogc.sos.SosResultStructure;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
@@ -105,12 +106,23 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosDecoderv20.class);
 
-    private List<DecoderKeyType> decoderKeyTypes;
+    private List<DecoderKeyType> decoderKeyTypes = Collections.unmodifiableList(new ArrayList<DecoderKeyType>(1) {{
+        add(new DecoderKeyType(Sos2Constants.NS_SOS_20));
+    }});
+    
+    private Set<RequestDecoderKey> requestDecoderKeys = Collections.unmodifiableSet(new HashSet<RequestDecoderKey>(9) {{
+        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetCapabilities.name()));
+        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetObservation.name()));
+        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetFeatureOfInterest.name()));
+        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetObservationById.name()));
+        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.InsertObservation.name()));
+        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, Sos2Constants.Operations.InsertResultTemplate.name()));
+        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, Sos2Constants.Operations.InsertResult.name()));
+        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, Sos2Constants.Operations.GetResultTemplate.name()));
+        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetResult.name()));
+    }});
 
     public SosDecoderv20() {
-        decoderKeyTypes = new ArrayList<DecoderKeyType>();
-        DecoderKeyType namespaceDKT = new DecoderKeyType(Sos2Constants.NS_SOS_20);
-        decoderKeyTypes.add(namespaceDKT);
         StringBuilder builder = new StringBuilder();
         for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
             builder.append(decoderKeyType.toString());
@@ -124,15 +136,20 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
     public List<DecoderKeyType> getDecoderKeyTypes() {
         return decoderKeyTypes;
     }
+    
+    @Override
+    public Set<RequestDecoderKey> getRequestDecoderKeys() {
+        return requestDecoderKeys;
+    }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
+        return Collections.emptyMap();
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
+        return Collections.emptySet();
     }
 
     @Override

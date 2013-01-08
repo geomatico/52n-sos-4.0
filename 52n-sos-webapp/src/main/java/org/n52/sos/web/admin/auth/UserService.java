@@ -24,6 +24,7 @@
 
 package org.n52.sos.web.admin.auth;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Properties;
@@ -43,13 +44,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /* TODO make this serializable */
-public class UserService implements AuthenticationProvider {
+public class UserService implements AuthenticationProvider, Serializable {
 
-    private static final Logger log = LoggerFactory.getLogger(UserDetailsService.class);
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private ServletContext context;

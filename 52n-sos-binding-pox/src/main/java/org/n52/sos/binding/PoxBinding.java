@@ -33,7 +33,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.IDecoder;
+import org.n52.sos.decode.IRequestDecoder;
 import org.n52.sos.decode.IXmlRequestDecoder;
+import org.n52.sos.decode.RequestDecoderKey;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
@@ -83,7 +85,7 @@ public class PoxBinding extends Binding {
         try {
             XmlObject doc = XmlHelper.parseXmlSosRequest(request);
             String reqNamespaceURI = XmlHelper.getNamespace(doc);
-            IDecoder decoder = getDecoder(new DecoderKeyType(reqNamespaceURI));
+            IXmlRequestDecoder decoder = getDecoder(new DecoderKeyType(reqNamespaceURI));
             // decode SOAP message
             Object abstractRequest = decoder.decode(doc);
             if (abstractRequest instanceof AbstractServiceRequest) {
@@ -202,26 +204,24 @@ public class PoxBinding extends Binding {
     }
 
     @Override
-    public boolean checkOperationHttpPostSupported(String operationName, DecoderKeyType decoderKey)
+    public boolean checkOperationHttpPostSupported(RequestDecoderKey decoderKey)
             throws OwsExceptionReport {
-        IXmlRequestDecoder decoder = getIXmlRequestDecoder(decoderKey);
-        if (decoder != null) {
-            return SosHelper.checkMethodeImplementation4DCP(decoder.getClass().getDeclaredMethods(), operationName);
-        }
-        return false;
+        return getDecoder(decoderKey) != null;
     }
 
-    private IDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
+    private IXmlRequestDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
         List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
-        for (IDecoder iDecoder : decoder) {
-            return iDecoder;
+        for (IDecoder<?,?> iDecoder : decoder) {
+            if (iDecoder instanceof  IXmlRequestDecoder) {
+                return (IXmlRequestDecoder) iDecoder;
+            }
         }
         return null;
     }
 
-    private IXmlRequestDecoder getIXmlRequestDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
-        List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
-        for (IDecoder iDecoder : decoder) {
+    private IXmlRequestDecoder getDecoder(RequestDecoderKey decoderKey) throws OwsExceptionReport {
+        Set<IRequestDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
+        for (IRequestDecoder<?,?> iDecoder : decoder) {
             if (iDecoder instanceof IXmlRequestDecoder) {
                 return (IXmlRequestDecoder) iDecoder;
             }

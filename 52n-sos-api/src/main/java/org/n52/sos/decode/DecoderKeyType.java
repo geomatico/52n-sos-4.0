@@ -47,12 +47,16 @@ public class DecoderKeyType implements Comparable<DecoderKeyType> {
     public String getVersion() {
         return version;
     }
+    
+    public String getNamespace() {
+        return namespace;
+    }
 
     @Override
     public int compareTo(DecoderKeyType o) {
         if (o instanceof DecoderKeyType) {
-            if (checkParameter(service, o.service) && checkParameter(version, o.version)
-                    && checkParameter(namespace, o.namespace)) {
+            if (checkParameter(service, o.getService()) && checkParameter(version, o.getVersion())
+                    && checkParameter(namespace, o.getNamespace())) {
                 return 0;
             }
             return 1;
@@ -69,8 +73,9 @@ public class DecoderKeyType implements Comparable<DecoderKeyType> {
     public boolean equals(Object paramObject) {
         if (paramObject instanceof DecoderKeyType) {
             DecoderKeyType toCheck = (DecoderKeyType) paramObject;
-            return (checkParameter(service, toCheck.service) && checkParameter(version, toCheck.version) && checkParameter(
-                    namespace, toCheck.namespace));
+            return (checkParameter(service, toCheck.getService()) 
+                    && checkParameter(version, toCheck.getVersion()) 
+                    && checkParameter(namespace, toCheck.getNamespace()));
         }
         return false;
     }
@@ -105,12 +110,7 @@ public class DecoderKeyType implements Comparable<DecoderKeyType> {
 
     @Override
     public String toString() {
-        StringBuilder string = new StringBuilder();
-        string.append("DecoderKey(");
-        string.append(service + ",");
-        string.append(version + ",");
-        string.append(namespace);
-        string.append(")");
-        return string.toString();
+        return String.format("%s[service=%s,version=%s,namespace=%s]", 
+                getClass().getSimpleName(), getService(), getVersion(),getNamespace());
     }
 }

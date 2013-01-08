@@ -25,7 +25,7 @@ package org.n52.sos.decode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -79,12 +79,20 @@ public class SwesDecoderv20 implements IXmlRequestDecoder {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SwesDecoderv20.class);
 
-    private List<DecoderKeyType> decoderKeyTypes;
+    private List<DecoderKeyType> decoderKeyTypes = Collections.unmodifiableList(new ArrayList<DecoderKeyType>(1) {{
+        add(new DecoderKeyType(SWEConstants.NS_SWES_20));
+    }});
+    
+    private Set<RequestDecoderKey> requestDecoderKeys = Collections.unmodifiableSet(new HashSet<RequestDecoderKey>(4) {{
+        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.DescribeSensor.name()));
+        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, Sos2Constants.Operations.InsertSensor.name()));
+        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, Sos2Constants.Operations.UpdateSensorDescription.name()));
+        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, Sos2Constants.Operations.DeleteSensor.name()));
+    }});
+    
+ 
 
     public SwesDecoderv20() {
-        decoderKeyTypes = new ArrayList<DecoderKeyType>();
-        DecoderKeyType namespaceDKT = new DecoderKeyType(SWEConstants.NS_SWES_20);
-        decoderKeyTypes.add(namespaceDKT);
         StringBuilder builder = new StringBuilder();
         for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
             builder.append(decoderKeyType.toString());
@@ -98,15 +106,20 @@ public class SwesDecoderv20 implements IXmlRequestDecoder {
     public List<DecoderKeyType> getDecoderKeyTypes() {
         return decoderKeyTypes;
     }
-
+    
     @Override
-    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
+    public Set<RequestDecoderKey> getRequestDecoderKeys() {
+        return requestDecoderKeys;
     }
 
     @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return Collections.emptyMap();
+    }
+    
+    @Override
     public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
+        return Collections.emptySet();
     }
 
     @Override
@@ -357,5 +370,4 @@ public class SwesDecoderv20 implements IXmlRequestDecoder {
         }
         return null;
     }
-
 }
