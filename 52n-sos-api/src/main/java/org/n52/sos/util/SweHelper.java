@@ -36,6 +36,7 @@ import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.CountValue;
 import org.n52.sos.ogc.om.values.IValue;
+import org.n52.sos.ogc.om.values.NilTemplateValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.om.values.TVPValue;
@@ -63,7 +64,8 @@ public class SweHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SweHelper.class);
 
-    public static SosSweDataArray createSosSweDataArrayFromObservationValue(SosObservation sosObservation) throws OwsExceptionReport {
+    public static SosSweDataArray createSosSweDataArrayFromObservationValue(SosObservation sosObservation)
+            throws OwsExceptionReport {
         if (sosObservation.getObservationConstellation().isSetResultTemplate()) {
             return createSosSweDataArrayWithResultTemplate(sosObservation);
         } else {
@@ -71,7 +73,8 @@ public class SweHelper {
         }
     }
 
-    private static SosSweDataArray createSosSweDataArrayWithResultTemplate(SosObservation sosObservation) throws OwsExceptionReport {
+    private static SosSweDataArray createSosSweDataArrayWithResultTemplate(SosObservation sosObservation)
+            throws OwsExceptionReport {
         ResultTemplate resultTemplate = sosObservation.getObservationConstellation().getResultTemplate();
         String observablePropertyIdentifier =
                 sosObservation.getObservationConstellation().getObservableProperty().getIdentifier();
@@ -121,7 +124,8 @@ public class SweHelper {
                 TVPValue tvpValues = (TVPValue) multiValue.getValue();
                 for (TimeValuePair timeValuePair : tvpValues.getValue()) {
                     if (!dataArray.isSetElementTyp()) {
-                        dataArray.setElementType(createElementType(timeValuePair.getValue(), observablePropertyIdentifier));
+                        dataArray.setElementType(createElementType(timeValuePair.getValue(),
+                                observablePropertyIdentifier));
                     }
                     List<String> newBlock =
                             createBlock(dataArray.getElementType(), timeValuePair.getTime(),
@@ -158,15 +162,17 @@ public class SweHelper {
             return new SosSweBoolean();
         } else if (iValue instanceof CategoryValue) {
             SosSweCategory sosSweCategory = new SosSweCategory();
-            sosSweCategory.setCodeSpace(((CategoryValue)iValue).getUnit());
+            sosSweCategory.setCodeSpace(((CategoryValue) iValue).getUnit());
             return sosSweCategory;
         } else if (iValue instanceof CountValue) {
             return new SosSweCount();
         } else if (iValue instanceof QuantityValue) {
             SosSweQuantity sosSweQuantity = new SosSweQuantity();
-            sosSweQuantity.setUom(((QuantityValue)iValue).getUnit());
+            sosSweQuantity.setUom(((QuantityValue) iValue).getUnit());
             return sosSweQuantity;
         } else if (iValue instanceof TextValue) {
+            return new SosSweText();
+        } else if (iValue instanceof NilTemplateValue) {
             return new SosSweText();
         }
         return null;
@@ -185,13 +191,15 @@ public class SweHelper {
             SosSweDataRecord elementTypeRecord = (SosSweDataRecord) elementType;
             List<String> block = new ArrayList<String>();
             for (SosSweField sweField : elementTypeRecord.getFields()) {
-                if (sweField.getElement() instanceof SosSweTime) {
-                    block.add(DateTimeHelper.format(phenomenonTime));
-                } else if (sweField.getElement() instanceof SosSweAbstractSimpleType
-                        && sweField.getElement().getDefinition().equals(phenID)) {
-                    block.add(value.getValue().toString());
-                } else if (sweField.getElement() instanceof SosSweObservableProperty) {
-                    block.add(phenID);
+                if (!(value instanceof NilTemplateValue)) {
+                    if (sweField.getElement() instanceof SosSweTime) {
+                        block.add(DateTimeHelper.format(phenomenonTime));
+                    } else if (sweField.getElement() instanceof SosSweAbstractSimpleType
+                            && sweField.getElement().getDefinition().equals(phenID)) {
+                        block.add(value.getValue().toString());
+                    } else if (sweField.getElement() instanceof SosSweObservableProperty) {
+                        block.add(phenID);
+                    }
                 }
             }
             return block;

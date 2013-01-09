@@ -29,18 +29,37 @@ import java.io.Serializable;
  * Interface for time objects
  * 
  */
-public interface ITime extends Comparable<ITime>, Serializable {
+public abstract class ITime implements Comparable<ITime>, Serializable {
     
-    public void setId(String id);
+    private static final long serialVersionUID = 1366100818431254519L;
+
+    private String id;
     
-    public String getId();
+    private String indeterminateValue;
+    
+    public ITime() {
+    }
+
+    public ITime(String id) {
+        this.id = id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return this.id;
+    }
 
     /**
      * Get indeterminate value
      * 
      * @return Returns the indeterminateValue.
      */
-    public String getIndeterminateValue();
+    public String getIndeterminateValue() {
+        return indeterminateValue;
+    }
 
     /**
      * Set indeterminate value
@@ -48,5 +67,15 @@ public interface ITime extends Comparable<ITime>, Serializable {
      * @param indeterminateValue
      *            The indeterminateValue to set.
      */
-    public void setIndeterminateValue(String indeterminateValue);
+    public void setIndeterminateValue(String indeterminateValue) {
+        this.indeterminateValue = indeterminateValue;
+    }
+    
+    public boolean isSetId() {
+        return id != null && !id.isEmpty();
+    }
+    
+    public boolean isSetIndeterminateValue(){
+        return indeterminateValue != null && !indeterminateValue.isEmpty();
+    }
 }

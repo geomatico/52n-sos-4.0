@@ -29,11 +29,9 @@ import org.joda.time.DateTime;
  * Class represents a GML conform timeInstant element
  * 
  */
-public class TimeInstant implements ITime {
+public class TimeInstant extends ITime {
     
     private static final long serialVersionUID = 1L;
-
-    private String id;
 
     /** date for this timeInstant */
     private DateTime value;
@@ -43,18 +41,6 @@ public class TimeInstant implements ITime {
 
     /** length of timeInstant date */
     private int requestedTimeLength;
-
-    /**
-     * constructor with date and indeterminateValue
-     * 
-     * @param value
-     *            date of the timeInstante
-     * @param indeterminateValue
-     */
-    public TimeInstant(DateTime dateValue, String indeterminateValue) {
-        this.value = dateValue;
-        this.indeterminateValue = indeterminateValue;
-    }
 
     /**
      * default constructor
@@ -67,34 +53,15 @@ public class TimeInstant implements ITime {
         this.value = dateTime;
     }
 
-    @Override
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @Override
-    public String getId() {
-        return this.id;
-    }
-
-    /*
-     * (non-Javadoc)
+    /**
+     * constructor with date and indeterminateValue
      * 
-     * @see org.n52.ogc.gml.time.ISosTime#getIndeterminateValue()
+     * @param value
+     *            date of the timeInstante
+     * @param indeterminateValue
      */
-    @Override
-    public String getIndeterminateValue() {
-        return indeterminateValue;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.ogc.gml.time.ISosTime#setIndeterminateValue(java.lang.String)
-     */
-    @Override
-    public void setIndeterminateValue(String indeterminateValue) {
+    public TimeInstant(DateTime dateValue, String indeterminateValue) {
+        this.value = dateValue;
         this.indeterminateValue = indeterminateValue;
     }
 
@@ -202,8 +169,9 @@ public class TimeInstant implements ITime {
         return hash;
     }
     
-    public boolean isSetIndeterminateValue() {
-        return indeterminateValue != null && !indeterminateValue.isEmpty();
+    public boolean isSetValue() {
+        return value != null;
     }
+    
 
 }

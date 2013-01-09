@@ -383,4 +383,8 @@ public class SosObservation implements Serializable {
     public boolean isSetAntiSubsetting() {
         return antiSubsetting != null && !antiSubsetting.isEmpty();
     }
+    
+    public boolean isSetObservationID() {
+        return observationID != null && !observationID.isEmpty();
+    }
 }

@@ -49,12 +49,15 @@ import net.opengis.gml.x32.TimePositionType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
+import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
+import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.values.CategoryValue;
+import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.Configurator;
@@ -245,20 +248,24 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
             if (timeInstantType == null) {
                 timeInstantType = TimeInstantType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             }
-            if (timeInstant.getId() != null && !timeInstant.getId().isEmpty()) {
+            if (timeInstant.isSetId()) {
                 timeInstantType.setId(timeInstant.getId());
             }
             TimePositionType xb_posType = timeInstantType.addNewTimePosition();
 
-            // parse db date string and format into GML format
-            DateTime date = timeInstant.getValue();
-            String timeString = DateTimeHelper.formatDateTime2ResponseString(date);
-
-            // concat minutes for timeZone offset, because gml requires
-            // xs:dateTime,
-            // which needs minutes in
-            // timezone offset
-            // TODO enable really
+            String timeString = OGCConstants.UNKNOWN;
+            if(timeInstant.isSetValue()) {
+                // parse db date string and format into GML format
+                DateTime date = timeInstant.getValue();
+                timeString = DateTimeHelper.formatDateTime2ResponseString(date);
+                // concat minutes for timeZone offset, because gml requires
+                // xs:dateTime,
+                // which needs minutes in
+                // timezone offset
+                // TODO enable really
+            } else if (timeInstant.isSetIndeterminateValue()) {
+                timeString = timeInstant.getIndeterminateValue();
+            }
             xb_posType.setStringValue(timeString);
             return timeInstantType;
         } catch (DateTimeException dte) {

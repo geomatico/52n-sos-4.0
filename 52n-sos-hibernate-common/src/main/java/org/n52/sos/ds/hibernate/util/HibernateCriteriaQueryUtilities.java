@@ -767,6 +767,17 @@ public class HibernateCriteriaQueryUtilities {
         queryObject.addProjection(Projections.distinct(Projections.property(getIdentifierParameter(foiAlias))));
         return (List<String>) getObject(queryObject, session, Observation.class);
     }
+    
+    public static List<String> getFeatureOfInterestIdentifiersForObservationConstellation(ObservationConstellation observationConstellation, Session session) {
+        HibernateQueryObject queryObject = new HibernateQueryObject();
+        Map<String, String> aliases = new HashMap<String, String>();
+        String foiAlias = addFeatureOfInterestAliasToMap(aliases, null);
+        queryObject.setAliases(aliases);
+        queryObject.addCriterion(getEqualRestriction(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION, observationConstellation));
+        queryObject.addCriterion(getEqualRestriction(HibernateConstants.DELETED, false));
+        queryObject.addProjection(Projections.distinct(Projections.property(getIdentifierParameter(foiAlias))));
+        return (List<String>) getObject(queryObject, session, Observation.class);
+    }
 
     public static List<FeatureOfInterestType> getFeatureOfInterestTypeObjects(List<String> featureOfInterestType,
             Session session) {

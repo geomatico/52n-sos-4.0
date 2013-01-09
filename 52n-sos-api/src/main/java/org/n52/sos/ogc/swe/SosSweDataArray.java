@@ -112,7 +112,14 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
      */
     public boolean isSetValues()
     {
-    	return values != null && values.size() >= 0;
+        if (values != null && !values.isEmpty()) {
+            if (values.size() == 1) {
+                List<String> list = values.get(0);
+                return list != null && !list.isEmpty();
+            }
+            return true;
+        }
+    	return false;
     }
 
     /**

@@ -52,6 +52,7 @@ import net.opengis.swe.x20.VectorType.Coordinate;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlString;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
@@ -177,7 +178,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
             DataArrayType dataArrayType =
                     createDataArray((SosSweDataArray) sosSweType);
             if (additionalValues.containsKey(HelperValues.FOR_OBSERVATION)) {
-                DataArrayPropertyType dataArrayProperty = DataArrayPropertyType.Factory.newInstance();
+                DataArrayPropertyType dataArrayProperty = DataArrayPropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
                 dataArrayProperty.setDataArray1(dataArrayType);
                 return dataArrayProperty;
             }

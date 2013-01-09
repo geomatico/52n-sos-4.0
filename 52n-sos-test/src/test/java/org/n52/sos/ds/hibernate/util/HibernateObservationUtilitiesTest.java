@@ -104,7 +104,7 @@ public class HibernateObservationUtilitiesTest extends AbstractSosTestCase{
 		List<Observation> observationsFromDataBase = new ArrayList<Observation>();
 		observationsFromDataBase.add(dbObservation);
 		// CALL
-		List<SosObservation> resultList = HibernateObservationUtilities.createSosObservationsFromObservations(observationsFromDataBase, request, session);
+		List<SosObservation> resultList = HibernateObservationUtilities.createSosObservationsFromObservations(observationsFromDataBase, request.getVersion(), session);
 		// TEST RESULTS
 		assertNotNull("result is null",resultList);
 		assertEquals("elements in list",1,resultList.size());

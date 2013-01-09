@@ -24,6 +24,7 @@
 package org.n52.sos.ds.hibernate.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,6 +61,7 @@ import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.quality.SosQuality;
 import org.n52.sos.ogc.om.quality.SosQuality.QualityType;
 import org.n52.sos.ogc.om.values.IValue;
+import org.n52.sos.ogc.om.values.NilTemplateValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.ows.OWSConstants;
@@ -107,7 +109,7 @@ public class HibernateObservationUtilities {
      *             If an error occurs
      */
     public static List<SosObservation> createSosObservationsFromObservations(List<Observation> observations,
-            AbstractServiceRequest request, Session session) throws OwsExceptionReport {
+            String version, Session session) throws OwsExceptionReport {
         List<SosObservation> observationCollection = new ArrayList<SosObservation>(0);
 
         Map<String, SosAbstractFeature> features = new HashMap<String, SosAbstractFeature>(0);
@@ -148,7 +150,7 @@ public class HibernateObservationUtilities {
                 if (!features.containsKey(foiID)) {
                     SosAbstractFeature featureByID =
                             Configurator.getInstance().getFeatureQueryHandler()
-                                    .getFeatureByID(foiID, session, request.getVersion());
+                                    .getFeatureByID(foiID, session, version);
                     features.put(foiID, featureByID);
                 }
 
@@ -242,6 +244,57 @@ public class HibernateObservationUtilities {
             }
         }
         return observationCollection;
+    }
+
+    public static Collection<? extends SosObservation> createSosObservationFromObservationConstellation(
+            ObservationConstellation observationConstellation, List<String> featureOfInterestIdentifiers, String version,
+            Session session) throws OwsExceptionReport {
+        String procID = observationConstellation.getProcedure().getIdentifier();
+        SensorML procedure = new SensorML();
+        SosSMLIdentifier identifier =
+                new SosSMLIdentifier("uniqueID", "urn:ogc:def:identifier:OGC:uniqueID", procID);
+        List<SosSMLIdentifier> identifiers = new ArrayList<SosSMLIdentifier>(1);
+        identifiers.add(identifier);
+        procedure.setIdentifications(identifiers);
+
+        String observationType = observationConstellation.getObservationType().getObservationType();
+        
+
+        // phenomenon
+        String phenID = observationConstellation.getObservableProperty().getIdentifier();
+        String description = observationConstellation.getObservableProperty().getDescription();
+        SosObservableProperty obsProp = new SosObservableProperty(phenID, description, null, null);
+        
+        List<SosObservation> observations = new ArrayList<SosObservation>(0);
+        for (String featureIdentifier : featureOfInterestIdentifiers) {
+            SosAbstractFeature feature =
+                    Configurator.getInstance().getFeatureQueryHandler()
+                            .getFeatureByID(featureIdentifier, session, version);
+            
+            
+            final SosObservationConstellation obsConst =
+                    new SosObservationConstellation(procedure, obsProp, null, feature,
+                            observationType);
+            /* get the offerings to find the templates */
+            if (obsConst.getOfferings() == null) {
+                Set<String> offerings =
+                        new HashSet<String>(Configurator.getInstance().getCapabilitiesCacheController()
+                                .getOfferings4Procedure(obsConst.getProcedure().getProcedureIdentifier()));
+                offerings.retainAll(new HashSet<String>(Configurator.getInstance()
+                        .getCapabilitiesCacheController()
+                        .getOfferings4Procedure(obsConst.getProcedure().getProcedureIdentifier())));
+                obsConst.setOfferings(offerings);
+            }
+            SosObservation sosObservation = new SosObservation();
+            sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
+            sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
+            sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
+            sosObservation.setObservationConstellation(obsConst);
+            NilTemplateValue value = new NilTemplateValue();
+            sosObservation.setValue(new SosSingleObservationValue(new TimeInstant(), value, new ArrayList<SosQuality>(0)));
+            observations.add(sosObservation);
+        }
+        return observations;
     }
 
     private static SosObservation createNewObservation(

@@ -34,11 +34,9 @@ import org.joda.time.format.ISOPeriodFormat;
  * Class represents a GML conform timePeriod element.
  * 
  */
-public class TimePeriod implements ITime {
+public class TimePeriod extends ITime {
     
     private static final long serialVersionUID = 1L;
-
-    private String id;
 
     /** start Date of timePeriod */
     private DateTime start;
@@ -58,8 +56,6 @@ public class TimePeriod implements ITime {
     /** intervall value */
     private String intervall = null; // ISO8601 format
 
-    /** indeterminate position of timeInstant */
-    private String indeterminateValue;
 
     /**
      * default constructor
@@ -82,9 +78,9 @@ public class TimePeriod implements ITime {
     }
 
     public TimePeriod(DateTime start, DateTime end, String id) {
+        super(id);
         this.start = start;
         this.end = end;
-        this.id = id;
     }
 
     /**
@@ -106,23 +102,14 @@ public class TimePeriod implements ITime {
      */
     public TimePeriod(DateTime start, String startIndet, DateTime end, String endIndet, String duration, String id)
             throws ParseException {
+        super(id);
         this.start = start;
         this.startIndet = startIndet;
         this.end = end;
         this.endIndet = endIndet;
         this.duration = ISOPeriodFormat.standard().parsePeriod(duration);
-        this.id = id;
     }
 
-    @Override
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @Override
-    public String getId() {
-        return this.id;
-    }
     /**
      * Get duration
      * 
@@ -236,27 +223,6 @@ public class TimePeriod implements ITime {
         this.intervall = intervall;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.ogc.gml.time.ISosTime#getIndeterminateValue()
-     */
-    @Override
-    public String getIndeterminateValue() {
-        return indeterminateValue;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.ogc.gml.time.ISosTime#setIndeterminateValue(java.lang.String)
-     */
-    @Override
-    public void setIndeterminateValue(String indeterminateValue) {
-        this.indeterminateValue = indeterminateValue;
-    }
-    
     /**
      * Extend TimePeriod to contain Collection<ISosTime>
      * 

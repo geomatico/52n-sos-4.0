@@ -59,6 +59,7 @@ import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.ogc.sos.SosConstants.GetObservationParams;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
+import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.SosHelper;
@@ -266,7 +267,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
                     List<Observation> observations =
                             HibernateCriteriaQueryUtilities.getObservations(firstLatestQueryObject, session);
                     sosObservations.addAll(HibernateObservationUtilities.createSosObservationsFromObservations(
-                            observations, request, session));
+                            observations, request.getVersion(), session));
 
                     nonFirstLatestTemporalFilter =
                             SosHelper.getNonFirstLatestTemporalFilter(request.getTemporalFilters());
@@ -292,10 +293,12 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
                 List<Observation> observations = HibernateCriteriaQueryUtilities.getObservations(queryObject, session);
                 if (observations != null && !observations.isEmpty()) {
                     sosObservations.addAll(HibernateObservationUtilities.createSosObservationsFromObservations(
-                            observations, request, session));
-                } else {
-                    // TODO Hydro-Profile add empty observation metadata as
-                    // SosObservation (add FOI)
+                            observations, request.getVersion(), session));
+//                } else {
+//                 // TODO Hydro-Profile add empty observation metadata as
+//                    // SosObservation (add FOI)
+//                    List<String> featureOfInterestIdentifiers = HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForObservationConstellation(observationConstellation, session);
+//                    sosObservations.addAll(HibernateObservationUtilities.createSosObservationFromObservationConstellation(observationConstellation, featureOfInterestIdentifiers, request.getVersion(), session));
                 }
 
             }
