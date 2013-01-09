@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projection;
@@ -113,7 +112,8 @@ public class HibernateQueryObject {
         return maxResult > 0;
     }
 
-    public HibernateQueryObject copy() {
+    @Override
+    public HibernateQueryObject clone() {
         HibernateQueryObject copy = new HibernateQueryObject();
         copy.setAliases(new HashMap<String, String>(this.aliases));
         copy.setCriterions(new ArrayList<Criterion>(this.criterions));

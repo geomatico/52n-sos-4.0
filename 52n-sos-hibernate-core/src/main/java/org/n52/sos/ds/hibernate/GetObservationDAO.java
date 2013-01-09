@@ -59,7 +59,6 @@ import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.ogc.sos.SosConstants.GetObservationParams;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.SosHelper;
@@ -260,7 +259,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
                 List<FirstLatest> firstLatestTemporalFilter =
                         SosHelper.getFirstLatestTemporalFilter(request.getTemporalFilters());
                 for (FirstLatest firstLatest : firstLatestTemporalFilter) {
-                    HibernateQueryObject firstLatestQueryObject = queryObject.copy();
+                    HibernateQueryObject firstLatestQueryObject = queryObject.clone();
                     firstLatestQueryObject.addCriterion(Restrictions.in(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION, observationConstallations));
                     firstLatestQueryObject.setOrder(HibernateCriteriaQueryUtilities.getOrderForEnum(firstLatest));
                     firstLatestQueryObject.setMaxResult(1);
