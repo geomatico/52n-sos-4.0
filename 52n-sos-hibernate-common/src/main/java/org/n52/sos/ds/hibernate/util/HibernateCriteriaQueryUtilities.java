@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projection;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
@@ -78,6 +80,8 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.Util4Exceptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 import javax.persistence.criteria.JoinType;
@@ -90,6 +94,8 @@ import org.hibernate.criterion.Order;
  * 
  */
 public class HibernateCriteriaQueryUtilities {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(HibernateCriteriaQueryUtilities.class);
 
     /**
      * Get min time from observations
@@ -280,9 +286,12 @@ public class HibernateCriteriaQueryUtilities {
             criteria.add(conjunction);
         }
         if (queryObject.isSetProjections()) {
-            for (Projection projection : queryObject.getProjections()) {
-                criteria.setProjection(projection);
-            }
+        	ProjectionList projectionList = Projections.projectionList();
+        	for (Projection projection : projections)
+        	{
+        		projectionList.add(projection);
+        	}
+        	criteria.setProjection(projectionList);
         }
         if (queryObject.isSetOrder()) {
             criteria.addOrder(queryObject.getOrder());
