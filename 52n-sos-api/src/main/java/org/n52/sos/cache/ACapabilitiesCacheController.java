@@ -70,7 +70,7 @@ public abstract class ACapabilitiesCacheController {
 
 	protected final void schedule() {
 		/* timers can not be rescheduled. to make the 
-		 * interval changable schedule a anonymous timer */
+		 * interval changeable schedule a anonymous timer */
 		this.current = new TimerTask() {
 			@Override
 			public void run() {
@@ -123,7 +123,7 @@ public abstract class ACapabilitiesCacheController {
     /**
      * queries the service offerings, the observedProperties for each offering,
      * and the offering names from the DB and sets these values in this
-     * configurator
+     * Configurator instance
      * 
      * @param checkLastUpdateTime
      *            Indicator, if some other methods should be started
@@ -472,12 +472,16 @@ public abstract class ACapabilitiesCacheController {
     
     public abstract Collection<String> getResultTemplates();
 	
-	
 	public abstract SosEnvelope getEnvelopeForOffering(String offering);
+	
 	public abstract DateTime getMinTimeForOffering(String offering);
+	
 	public abstract DateTime getMaxTimeForOffering(String offering);
+	
 	public abstract Envelope getEnvelopeForFeatures();
+	
 	public abstract DateTime getMinEventTime();
+	
 	public abstract DateTime getMaxEventTime();
 
 }
