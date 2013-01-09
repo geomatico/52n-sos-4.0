@@ -37,23 +37,25 @@ import javax.xml.namespace.QName;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
-import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IGetObservationDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
+import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
 import org.n52.sos.ds.hibernate.util.QueryHelper;
+import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.om.OMConstants;
+import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OWSConstants.MinMax;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.ogc.sos.SosConstants.GetObservationParams;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
@@ -91,29 +93,34 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
     public String getOperationName() {
         return OPERATION_NAME;
     }
-    
+
     /*
      * (non-Javadoc)
-     * @see org.n52.sos.ds.hibernate.AbstractHibernateOperationDao#getOperationsMetadata(java.lang.String, org.hibernate.Session)
+     * 
+     * @see
+     * org.n52.sos.ds.hibernate.AbstractHibernateOperationDao#getOperationsMetadata
+     * (java.lang.String, org.hibernate.Session)
      */
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session)
             throws OwsExceptionReport {
-        
+
         Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeatureOfInterest(), version);
 
         opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.offering, getCache().getOfferings());
         opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());
-        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.responseFormat, SosHelper.getSupportedResponseFormats(SosConstants.SOS, version));
-        
+        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.responseFormat,
+                SosHelper.getSupportedResponseFormats(SosConstants.SOS, version));
+
         if (getConfigurator().isShowFullOperationsMetadata4Observations()) {
-            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCache().getObservableProperties());
+            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCache()
+                    .getObservableProperties());
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.featureOfInterest, featureIDs);
         } else {
             opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.observedProperty);
             opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.featureOfInterest);
         }
-        
+
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
             // SOS 2.0 parameter
             opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.temporalFilter, getEventTime(session));
@@ -122,7 +129,8 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
                 envelope = getCache().getEnvelopeForFeatures();
             }
             if (envelope != null) {
-                opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.spatialFilter, SosHelper.getMinMaxMapFromEnvelope(envelope));
+                opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.spatialFilter,
+                        SosHelper.getMinMaxMapFromEnvelope(envelope));
             }
         } else if (version.equals(Sos1Constants.SERVICEVERSION)) {
             // SOS 1.0.0 parameter
@@ -130,10 +138,11 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
             opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.srsName);
             opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.result);
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.resultModel, getResultModels());
-            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.responseMode, Arrays.asList(SosConstants.getResponseModes()));
+            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.responseMode,
+                    Arrays.asList(SosConstants.getResponseModes()));
         }
     }
-    
+
     private List<String> getResultModels() {
         QName[] resultModels = OMConstants.getResultModels();
         List<String> resultModelsList = new ArrayList<String>(resultModels.length);
@@ -161,13 +170,11 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
                 throw Util4Exceptions.createMissingParameterValueException(GetObservationParams.observedProperty
                         .name());
             } else {
-                List<Observation> observations = queryObservation(sosRequest, session);
                 GetObservationResponse response = new GetObservationResponse();
                 response.setService(request.getService());
                 response.setVersion(request.getVersion());
                 response.setResponseFormat(request.getResponseFormat());
-                response.setObservationCollection(HibernateObservationUtilities.createSosObservationsFromObservations(
-                        observations, sosRequest, session));
+                response.setObservationCollection(queryObservation(sosRequest, session));
                 return response;
             }
         } catch (HibernateException he) {
@@ -190,366 +197,111 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
      * @throws OwsExceptionReport
      *             If an error occurs.
      */
-    protected List<Observation> queryObservation(GetObservationRequest request, Session session)
+    protected List<SosObservation> queryObservation(GetObservationRequest request, Session session)
             throws OwsExceptionReport {
-        Map<String, String> aliases = new HashMap<String, String>();
-        List<Criterion> criterions = new ArrayList<Criterion>();
-        List<Projection> projections = new ArrayList<Projection>();
-        if ((request.getOfferings() != null && !request.getOfferings().isEmpty())
-                || (request.getObservedProperties() != null && !request.getObservedProperties().isEmpty())
-                || (request.getProcedures() != null && !request.getProcedures().isEmpty())) {
-            String obsConstAlias =
-                    HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
-            // offering
-            if (request.getOfferings() != null && !request.getOfferings().isEmpty()) {
-                String offAlias = HibernateCriteriaQueryUtilities.addOfferingAliasToMap(aliases, obsConstAlias);
-                criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
-                        HibernateCriteriaQueryUtilities.getIdentifierParameter(offAlias), request.getOfferings()));
-            }
-            // observableProperties
-            if (request.getObservedProperties() != null && !request.getObservedProperties().isEmpty()) {
-                String obsPropAlias =
-                        HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, obsConstAlias);
-                criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
-                        HibernateCriteriaQueryUtilities.getIdentifierParameter(obsPropAlias),
-                        request.getObservedProperties()));
-            }
-            // procedures
-            if (request.getProcedures() != null && !request.getProcedures().isEmpty()) {
-                String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, obsConstAlias);
-                criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
-                        HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), request.getProcedures()));
-            }
-            // deleted
-            // XXX DeleteObservation Extension
-            criterions.add(Restrictions.eq(HibernateConstants.DELETED, false));
+
+        Map<String, String> observationConstellationAliases = new HashMap<String, String>();
+        List<Criterion> observationConstellationCriterions = new ArrayList<Criterion>();
+        // offering
+        if (request.getOfferings() != null && !request.getOfferings().isEmpty()) {
+            String offAlias =
+                    HibernateCriteriaQueryUtilities.addOfferingAliasToMap(observationConstellationAliases, null);
+            observationConstellationCriterions.add(HibernateCriteriaQueryUtilities
+                    .getDisjunctionCriterionForStringList(
+                            HibernateCriteriaQueryUtilities.getIdentifierParameter(offAlias), request.getOfferings()));
         }
-        // temporal filters
-        if (request.getTemporalFilters() != null && !request.getTemporalFilters().isEmpty()) {
-            criterions.add(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(request.getTemporalFilters()));
+        // observableProperties
+        if (request.getObservedProperties() != null && !request.getObservedProperties().isEmpty()) {
+            String obsPropAlias =
+                    HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(observationConstellationAliases,
+                            null);
+            observationConstellationCriterions.add(HibernateCriteriaQueryUtilities
+                    .getDisjunctionCriterionForStringList(
+                            HibernateCriteriaQueryUtilities.getIdentifierParameter(obsPropAlias),
+                            request.getObservedProperties()));
         }
-        Set<String> featureIdentifier = QueryHelper.getFeatureIdentifier(request.getSpatialFilter(), request.getFeatureIdentifiers(), session);
+        // procedures
+        if (request.getProcedures() != null && !request.getProcedures().isEmpty()) {
+            String procAlias =
+                    HibernateCriteriaQueryUtilities.addProcedureAliasToMap(observationConstellationAliases, null);
+            observationConstellationCriterions
+                    .add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+                            HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), request.getProcedures()));
+        }
+        observationConstellationCriterions.add(Restrictions.isNotNull(HibernateConstants.PARAMETER_OBSERVATION_TYPE));
+
+        List<ObservationConstellation> observationConstallations =
+                HibernateCriteriaQueryUtilities.getObservationConstallations(observationConstellationAliases,
+                        observationConstellationCriterions, session);
+
+        HibernateQueryObject queryObject = new HibernateQueryObject();
+        Map<String, String> observationAliases = new HashMap<String, String>();
+
+        // feature identifier
+        Set<String> featureIdentifier =
+                QueryHelper.getFeatureIdentifier(request.getSpatialFilter(), request.getFeatureIdentifiers(), session);
         if (featureIdentifier != null && featureIdentifier.isEmpty()) {
             return null;
         } else if (featureIdentifier != null && !featureIdentifier.isEmpty()) {
-            String foiAlias = HibernateCriteriaQueryUtilities.addFeatureOfInterestAliasToMap(aliases, null);
-            criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+            String foiAlias = HibernateCriteriaQueryUtilities.addFeatureOfInterestAliasToMap(observationAliases, null);
+            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                     HibernateCriteriaQueryUtilities.getIdentifierParameter(foiAlias), new ArrayList<String>(
                             featureIdentifier)));
         }
-        // ...
-        List<Observation> observations =
-                HibernateCriteriaQueryUtilities.getObservations(aliases, criterions, projections, session);
-        return observations;
 
+        queryObject.setAliases(observationAliases);
+        List<SosObservation> sosObservations = new ArrayList<SosObservation>();
+
+        // temporal filters
+        List<TemporalFilter> nonFirstLatestTemporalFilter = null;
+        if (request.hasTemporalFilterst()) {
+            if (SosHelper.hasFirstLatestTemporalFilter(request.getTemporalFilters())) {
+                List<FirstLatest> firstLatestTemporalFilter =
+                        SosHelper.getFirstLatestTemporalFilter(request.getTemporalFilters());
+                for (FirstLatest firstLatest : firstLatestTemporalFilter) {
+                    HibernateQueryObject firstLatestQueryObject = queryObject.copy();
+                    firstLatestQueryObject.addCriterion(Restrictions.in(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION, observationConstallations));
+                    firstLatestQueryObject.setOrder(HibernateCriteriaQueryUtilities.getOrderForEnum(firstLatest));
+                    firstLatestQueryObject.setMaxResult(1);
+                    List<Observation> observations =
+                            HibernateCriteriaQueryUtilities.getObservations(firstLatestQueryObject, session);
+                    sosObservations.addAll(HibernateObservationUtilities.createSosObservationsFromObservations(
+                            observations, request, session));
+
+                    nonFirstLatestTemporalFilter =
+                            SosHelper.getNonFirstLatestTemporalFilter(request.getTemporalFilters());
+                }
+            } else {
+                nonFirstLatestTemporalFilter = request.getTemporalFilters();
+            }
+        }
+        if (nonFirstLatestTemporalFilter == null
+                || (nonFirstLatestTemporalFilter != null && !nonFirstLatestTemporalFilter.isEmpty())) {
+            if (nonFirstLatestTemporalFilter != null && !nonFirstLatestTemporalFilter.isEmpty()) {
+                queryObject.addCriterion(HibernateCriteriaQueryUtilities
+                        .getCriterionForTemporalFilters(nonFirstLatestTemporalFilter));
+            }
+
+            // TODO Threadable !?!
+            // TODO How to ensure no duplicated observations ?!
+            // TODO How to ensure that anti subsetting observation are also
+            // included ?!
+            for (ObservationConstellation observationConstellation : observationConstallations) {
+                queryObject.addCriterion(Restrictions.eq(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION,
+                        observationConstellation));
+                List<Observation> observations = HibernateCriteriaQueryUtilities.getObservations(queryObject, session);
+                if (observations != null && !observations.isEmpty()) {
+                    sosObservations.addAll(HibernateObservationUtilities.createSosObservationsFromObservations(
+                            observations, request, session));
+                } else {
+                    // TODO Hydro-Profile add empty observation metadata as
+                    // SosObservation (add FOI)
+                }
+
+            }
+        }
+        return sosObservations;
     }
-
-    // /**
-    // * Create SOS internal observation from Observation objects
-    // *
-    // * @param responseFormat
-    // *
-    // * @param observations
-    // * List of Observation objects
-    // * @param version
-    // * SOS version
-    // * @param session
-    // * Hibernate session
-    // * @return SOS internal observation
-    // * @throws OwsExceptionReport
-    // * If an error occurs
-    // */
-    // private SosObservationCollection
-    // createSosObservationCollectionFromObservations(String responseFormat,
-    // List<Observation> observations, String version, Session session) throws
-    // OwsExceptionReport {
-    // SosObservationCollection sosObservationCollection = new
-    // SosObservationCollection(responseFormat);
-    //
-    // Map<SosObservationConstellation, SosObservation> obsConstObsMap =
-    // new HashMap<SosObservationConstellation, SosObservation>();
-    // List<String> features = new ArrayList<String>();
-    // Map<String, Set<String>> feature4proc = new HashMap<String,
-    // Set<String>>();
-    // Map<String, DateTime> featureTimeForDynamicPosition = new HashMap<String,
-    // DateTime>();
-    //
-    // // QName observationType = null;
-    // // if (request.getResultModel() != null) {
-    // // observationType = request.getResultModel();
-    // // } else {
-    // // if (request.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
-    // // observationType = SosConstants.RESULT_MODEL_OBSERVATION;
-    // // } else if (request.getVersion().equals(Sos2Constants.SERVICEVERSION))
-    // // {
-    // // observationType =
-    // // new QName(OMConstants.NS_OM_2,
-    // // OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION,
-    // // OMConstants.NS_OM_PREFIX);
-    // // }
-    // //
-    // // }
-    // String observationType = OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION;
-    // Envelope boundedBy = null;
-    // int srid = 0;
-    // if (observations != null) {
-    // // now iterate over resultset and create Measurement for each
-    // // row
-    // for (Observation hObservation : observations) {
-    // ObservationConstellation hObservationConstellation =
-    // hObservation.getObservationConstellation();
-    // FeatureOfInterest hFeatureOfInterest =
-    // hObservation.getFeatureOfInterest();
-    //
-    // // check remaining heap size
-    // SosHelper.checkFreeMemory();
-    //
-    // long obsID = hObservation.getObservationId();
-    //
-    // String phenID =
-    // hObservationConstellation.getObservableProperty().getIdentifier();
-    // String procID = hObservationConstellation.getProcedure().getIdentifier();
-    // observationType =
-    // hObservationConstellation.getObservationType().getObservationType();
-    //
-    // DateTime timeDateTime = new
-    // DateTime(hObservation.getPhenomenonTimeStart());
-    //
-    // // feature of interest
-    // String foiID = hFeatureOfInterest.getIdentifier();
-    // if (!features.contains(foiID)) {
-    // features.add(foiID);
-    // }
-    // if (!version.equals(Sos2Constants.SERVICEVERSION)
-    // && Configurator.getInstance().isSetFoiLocationDynamically()
-    // &&
-    // phenID.equals(Configurator.getInstance().getSpatialObsProp4DynymicLocation()))
-    // {
-    // featureTimeForDynamicPosition.put(foiID, timeDateTime);
-    // }
-    // feature4proc = setFeatureForProcedure(feature4proc, procID, foiID);
-    // String offeringID =
-    // hObservationConstellation.getOffering().getIdentifier();
-    // String mimeType = SosConstants.PARAMETER_NOT_SET;
-    // String valueType =
-    // hObservationConstellation.getObservableProperty().getValueType().getValueType();
-    //
-    // // create time element
-    // ISosTime phenomenonTime = null;
-    // if (hObservation.getPhenomenonTimeEnd() == null) {
-    // phenomenonTime = new TimeInstant(timeDateTime, "");
-    // } else {
-    // phenomenonTime = new TimePeriod(timeDateTime, new
-    // DateTime(hObservation.getPhenomenonTimeEnd()));
-    // }
-    //
-    // String unit =
-    // hObservationConstellation.getObservableProperty().getUnit().getUnit();
-    //
-    // // create quality
-    // ArrayList<SosQuality> qualityList = null;
-    // if (supportsQuality) {
-    // hObservation.getQualities();
-    // for (Quality hQuality : (Set<Quality>) hObservation.getQualities()) {
-    // String qualityTypeString = hQuality.getSweType().getSweType();
-    // String qualityUnit = hQuality.getUnit().getUnit();
-    // String qualityName = hQuality.getName();
-    // String qualityValue = hQuality.getValue();
-    // qualityList = new ArrayList<SosQuality>();
-    // if (qualityValue != null) {
-    // QualityType qualityType = QualityType.valueOf(qualityTypeString);
-    // SosQuality quality = new SosQuality(qualityName, qualityUnit,
-    // qualityValue, qualityType);
-    // qualityList.add(quality);
-    // }
-    // }
-    // }
-    //
-    // // if (request.getResponseMode() != null
-    // // && !request.getResponseMode().equals(
-    // // SosConstants.PARAMETER_NOT_SET)) {
-    // // // if responseMode is resultTemplate, then create
-    // // // observation template and return it
-    // // if (request.getResponseMode() ==
-    // // SosConstants.RESPONSE_RESULT_TEMPLATE) {
-    // // return getResultTemplate(resultSet, request, features);
-    // // } else {
-    // // checkResponseModeInline(request.getResponseMode());
-    // // }
-    // // }
-    // Object value;
-    // if
-    // (valueType.equalsIgnoreCase(SosConstants.ValueTypes.booleanType.name()))
-    // {
-    // value =
-    // Boolean.parseBoolean(getValueFromTextValueTable(hObservation.getTextValues()));
-    // } else if
-    // (valueType.equalsIgnoreCase(SosConstants.ValueTypes.countType.name())) {
-    // value = (Integer)
-    // getValueFromNumericValueTable(hObservation.getNumericValues()).intValue();
-    // } else if
-    // (valueType.equalsIgnoreCase(SosConstants.ValueTypes.numericType.name()))
-    // {
-    // value = getValueFromNumericValueTable(hObservation.getNumericValues());
-    // // } else if (valueType
-    // // .equalsIgnoreCase(SosConstants.ValueTypes.isoTimeType
-    // // .name())) {
-    // // value = new DateTime(resultSet.getLong(PGDAOConstants
-    // // .getNumericValueCn()));
-    // } else if
-    // (valueType.equalsIgnoreCase(SosConstants.ValueTypes.textType.name())) {
-    // value = getValueFromTextValueTable(hObservation.getTextValues());
-    // } else if
-    // (valueType.equalsIgnoreCase(SosConstants.ValueTypes.categoryType.name()))
-    // {
-    // value = getValueFromTextValueTable(hObservation.getTextValues());
-    // } else if
-    // (valueType.equalsIgnoreCase(SosConstants.ValueTypes.spatialType.name()))
-    // {
-    // value = getValueFromGeometryValueTable(hObservation.getGeometryValues());
-    // } else {
-    // value = getValueFromAllTable(hObservation);
-    // }
-    // SosObservationValue sosObsValue =
-    // new SosObservationValue(Long.toString(obsID), phenomenonTime, null,
-    // value);
-    // if (qualityList != null) {
-    // sosObsValue.setQuality(qualityList);
-    // }
-    // SosObservableProperty phen = new SosObservableProperty(phenID, null,
-    // unit, null, valueType);
-    // SosObservationConstellation obsConst =
-    // new SosObservationConstellation(procID, phen, null, foiID,
-    // observationType);
-    // if (obsConstObsMap.containsKey(obsConst)) {
-    // SosObservation sosObs = obsConstObsMap.get(obsConst);
-    // if (supportsQuality && qualityList != null
-    // && sosObs.containsObservationValues(phenID, sosObsValue)) {
-    // sosObs.addQualityToSosObservationValue(phenID, sosObsValue, qualityList);
-    // } else {
-    // sosObs.addValue(phenID, sosObsValue);
-    // }
-    // } else {
-    // SosObservation sosObs = new SosObservation();
-    // sosObs.setObservationConstellation(obsConst);
-    // sosObs.setNoDataValue(noDataValue);
-    // sosObs.setTokenSeparator(tokenSeparator);
-    // sosObs.setTupleSeparator(tupleSeparator);
-    // sosObs.addValue(phenID, sosObsValue);
-    // obsConstObsMap.put(obsConst, sosObs);
-    // }
-    // }
-    // }
-    // if (!obsConstObsMap.isEmpty()) {
-    // Map<String, SosAbstractFeature> sosAbstractFeatures =
-    // Configurator.getInstance().getFeatureQueryHandler()
-    // .getFeatures(features, null, session, version);
-    // for (SosAbstractFeature feat : sosAbstractFeatures.values()) {
-    // SosSamplingFeature feature = (SosSamplingFeature) feat;
-    // boundedBy = SosHelper.checkEnvelope(boundedBy, feature.getGeometry());
-    // }
-    // sosObservationCollection.setObservationMembers(obsConstObsMap.values());
-    // sosObservationCollection.setFeatures(sosAbstractFeatures);
-    // sosObservationCollection.setBoundedBy(boundedBy);
-    // sosObservationCollection.setSrid(srid);
-    //
-    // }
-    // return sosObservationCollection;
-    // }
-    //
-    // /**
-    // * Get observation value from all value tables for an Observation object
-    // *
-    // * @param hObservation
-    // * Observation object
-    // * @return Observation value
-    // */
-    // private Object getValueFromAllTable(Observation hObservation) {
-    // if (hObservation.getNumericValues() != null &&
-    // !hObservation.getNumericValues().isEmpty()) {
-    // return getValueFromNumericValueTable(hObservation.getNumericValues());
-    // } else if (hObservation.getTextValues() != null &&
-    // !hObservation.getTextValues().isEmpty()) {
-    // return getValueFromTextValueTable(hObservation.getTextValues());
-    // } else if (hObservation.getGeometryValues() != null &&
-    // !hObservation.getGeometryValues().isEmpty()) {
-    // return getValueFromGeometryValueTable(hObservation.getGeometryValues());
-    // }
-    // return null;
-    // }
-    //
-    // /**
-    // * Get observation value from numeric table
-    // *
-    // * @param numericValues
-    // * Numeric values
-    // * @return Numeric value
-    // */
-    // private Double getValueFromNumericValueTable(Set<NumericValue>
-    // numericValues) {
-    // for (NumericValue numericValue : numericValues) {
-    // return (Double) numericValue.getValue();
-    // }
-    // return Double.NaN;
-    // }
-    //
-    // /**
-    // * Get observation value from text table
-    // *
-    // * @param textValues
-    // * Text values
-    // * @return Text value
-    // */
-    // private String getValueFromTextValueTable(Set<TextValue> textValues) {
-    // for (TextValue textValue : textValues) {
-    // return (String) textValue.getValue();
-    // }
-    // return "";
-    // }
-    //
-    // /**
-    // * Get observation value from spatial table
-    // *
-    // * @param geometryValues
-    // * Spatial values
-    // * @return Spatial value
-    // */
-    // private Geometry getValueFromGeometryValueTable(Set<GeometryValue>
-    // geometryValues) {
-    // for (GeometryValue geometryValue : geometryValues) {
-    // return (Geometry) geometryValue.getValue();
-    // }
-    // return null;
-    // }
-    //
-    // /**
-    // * Adds a FOI to the map with FOIs for procedures
-    // *
-    // * @param feature4proc
-    // * FOIs for procedure map
-    // * @param procID
-    // * procedure identifier
-    // * @param foiID
-    // * FOI identifier
-    // * @return updated map
-    // */
-    // private Map<String, Set<String>> setFeatureForProcedure(Map<String,
-    // Set<String>> feature4proc, String procID,
-    // String foiID) {
-    // Set<String> features;
-    // if (feature4proc.containsKey(procID)) {
-    // features = feature4proc.get(procID);
-    //
-    // } else {
-    // features = new HashSet<String>();
-    // }
-    // if (!features.contains(foiID)) {
-    //
-    // }
-    // features.add(foiID);
-    // feature4proc.put(procID, features);
-    // return feature4proc;
-    // }
 
     /**
      * Get the min/max time of contained observations

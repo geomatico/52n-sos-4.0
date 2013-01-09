@@ -33,8 +33,6 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Projection;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IGetFeatureOfInterestDAO;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
@@ -153,16 +151,15 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
     private List<String> queryFeatureIdentifiersForParameter(GetFeatureOfInterestRequest sosRequest, Session session)
             throws OwsExceptionReport {
         // TODO get foi ids from foi table. Else only fois returned which relates to observations.
+        HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
-        List<Criterion> criterions = new ArrayList<Criterion>();
-        List<Projection> projections = new ArrayList<Projection>();
         String obsAlias = HibernateCriteriaQueryUtilities.addObservationAliasToMap(aliases, null);
         String obsConstAlias =
                 HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, obsAlias);
         // featureOfInterest identifiers
         if (sosRequest.getFeatureIdentifiers() != null && !sosRequest.getFeatureIdentifiers().isEmpty()) {
             String foiAlias = HibernateCriteriaQueryUtilities.addFeatureOfInterestAliasToMap(aliases, obsAlias);
-            criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                     HibernateCriteriaQueryUtilities.getIdentifierParameter(foiAlias),
                     sosRequest.getFeatureIdentifiers()));
         }
@@ -170,21 +167,22 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
         if (sosRequest.getObservedProperties() != null && !sosRequest.getObservedProperties().isEmpty()) {
             String obsPropAlias =
                     HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, obsConstAlias);
-            criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                     HibernateCriteriaQueryUtilities.getIdentifierParameter(obsPropAlias),
                     sosRequest.getObservedProperties()));
         }
         // procedures
         if (sosRequest.getProcedures() != null && !sosRequest.getProcedures().isEmpty()) {
             String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, obsConstAlias);
-            criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                     HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), sosRequest.getProcedures()));
         }
         // temporal filters
         if (sosRequest.getEventTimes() != null && !sosRequest.getEventTimes().isEmpty()) {
-            criterions.add(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(sosRequest.getEventTimes()));
+            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(sosRequest.getEventTimes()));
         }
-        return HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(aliases, criterions, projections,
+        queryObject.setAliases(aliases);
+        return HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(queryObject,
                 session);
     }
 }

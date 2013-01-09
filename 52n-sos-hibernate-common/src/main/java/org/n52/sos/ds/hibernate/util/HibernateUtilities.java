@@ -165,6 +165,7 @@ public class HibernateUtilities {
         if (phenomenonTime instanceof TimeInstant) {
             TimeInstant time = (TimeInstant) phenomenonTime;
             hObservation.setPhenomenonTimeStart(time.getValue().toDate());
+            hObservation.setPhenomenonTimeEnd(time.getValue().toDate());
         } else if (phenomenonTime instanceof TimePeriod) {
             TimePeriod time = (TimePeriod) phenomenonTime;
             hObservation.setPhenomenonTimeStart(time.getStart().toDate());

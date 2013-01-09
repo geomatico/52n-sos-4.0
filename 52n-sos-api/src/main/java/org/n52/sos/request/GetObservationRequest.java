@@ -33,7 +33,9 @@ import javax.xml.namespace.QName;
 import org.n52.sos.ogc.filter.ComparisonFilter;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
+import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 
 /**
  * SOS GetObservation request
@@ -461,5 +463,31 @@ public class GetObservationRequest extends AbstractServiceRequest {
             return true;
         }
         return false;
+    }
+
+    public boolean hasFirstLatestTemporalFilter() {
+        for (TemporalFilter temporalFilter : temporalFilters) {
+            if (temporalFilter.getTime() instanceof TimeInstant) {
+                TimeInstant ti = (TimeInstant)temporalFilter.getTime();
+                if (ti.isSetIndeterminateValue() && FirstLatest.contains(ti.getIndeterminateValue())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public List<TemporalFilter> getFirstLatestTemporalFilter() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public List<TemporalFilter> getNotFirstLatestTemporalFilter() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public boolean hasTemporalFilterst() {
+        return temporalFilters != null && !temporalFilters.isEmpty();
     }
 }

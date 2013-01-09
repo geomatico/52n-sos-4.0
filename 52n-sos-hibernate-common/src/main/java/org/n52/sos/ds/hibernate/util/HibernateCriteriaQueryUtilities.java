@@ -35,13 +35,17 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
 import org.hibernate.spatial.criterion.SpatialRestrictions;
 import org.joda.time.DateTime;
+import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.CategoryValue;
 import org.n52.sos.ds.hibernate.entities.CompositePhenomenon;
@@ -98,8 +102,7 @@ public class HibernateCriteriaQueryUtilities {
         Object min =
                 session.createCriteria(Observation.class)
                         .setProjection(Projections.min(HibernateConstants.PARAMETER_PHENOMENON_TIME_START))
-						.add(getEqualRestriction(HibernateConstants.DELETED, false))
-                        .uniqueResult();
+                        .add(getEqualRestriction(HibernateConstants.DELETED, false)).uniqueResult();
         if (min != null) {
             return new DateTime(min);
         }
@@ -117,13 +120,11 @@ public class HibernateCriteriaQueryUtilities {
         Object maxStart =
                 session.createCriteria(Observation.class)
                         .setProjection(Projections.max(HibernateConstants.PARAMETER_PHENOMENON_TIME_START))
-						.add(getEqualRestriction(HibernateConstants.DELETED, false))
-                        .uniqueResult();
+                        .add(getEqualRestriction(HibernateConstants.DELETED, false)).uniqueResult();
         Object maxEnd =
                 session.createCriteria(Observation.class)
                         .setProjection(Projections.max(HibernateConstants.PARAMETER_PHENOMENON_TIME_END))
-						.add(getEqualRestriction(HibernateConstants.DELETED, false))
-                        .uniqueResult();
+                        .add(getEqualRestriction(HibernateConstants.DELETED, false)).uniqueResult();
         if (maxStart == null && maxEnd == null) {
             return null;
         } else {
@@ -153,8 +154,8 @@ public class HibernateCriteriaQueryUtilities {
         String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
         String offeringAlias = addOfferingAliasToMap(aliases, obsConstAlias);
         addAliasesToCriteria(criteria, aliases);
-        criteria.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering))
-				.add(getEqualRestriction(HibernateConstants.DELETED, false));
+        criteria.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering)).add(
+                getEqualRestriction(HibernateConstants.DELETED, false));
         Object min =
                 criteria.setProjection(Projections.min(HibernateConstants.PARAMETER_PHENOMENON_TIME_START))
                         .uniqueResult();
@@ -179,15 +180,15 @@ public class HibernateCriteriaQueryUtilities {
         String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
         String offeringAlias = addOfferingAliasToMap(aliases, obsConstAlias);
         addAliasesToCriteria(criteriaStart, aliases);
-        criteriaStart.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering))
-				.add(getEqualRestriction(HibernateConstants.DELETED, false));
+        criteriaStart.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering)).add(
+                getEqualRestriction(HibernateConstants.DELETED, false));
         Object maxStart =
                 criteriaStart.setProjection(Projections.max(HibernateConstants.PARAMETER_PHENOMENON_TIME_START))
                         .uniqueResult();
         Criteria criteriaEnd = session.createCriteria(Observation.class);
         addAliasesToCriteria(criteriaEnd, aliases);
-        criteriaEnd.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering))
-				.add(getEqualRestriction(HibernateConstants.DELETED, false));
+        criteriaEnd.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering)).add(
+                getEqualRestriction(HibernateConstants.DELETED, false));
         Object maxEnd =
                 criteriaEnd.setProjection(Projections.max(HibernateConstants.PARAMETER_PHENOMENON_TIME_END))
                         .uniqueResult();
@@ -234,7 +235,8 @@ public class HibernateCriteriaQueryUtilities {
     }
 
     /**
-     * Get Observation objects for the defined restrictions which are marked as not deleted
+     * Get Observation objects for the defined restrictions which are marked as
+     * not deleted
      * 
      * @param aliases
      *            Aliases for query between tables
@@ -246,10 +248,9 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return Observation objects
      */
-    public static List<Observation> getObservations(Map<String, String> aliases, List<Criterion> criterions,
-            List<Projection> projections, Session session) {
-        criterions.add(getEqualRestriction(HibernateConstants.DELETED, false));
-        return (List<Observation>) getObject(aliases, criterions, projections, session, Observation.class);
+    public static List<Observation> getObservations(HibernateQueryObject queryObject, Session session) {
+        queryObject.addCriterion(getEqualRestriction(HibernateConstants.DELETED, false));
+        return (List<Observation>) getObject(queryObject, session, Observation.class);
     }
 
     /**
@@ -266,17 +267,28 @@ public class HibernateCriteriaQueryUtilities {
      * @param objectClass
      * @return Result objects
      */
-    protected static List<?> getObject(Map<String, String> aliases, List<Criterion> criterions,
-            List<Projection> projections, Session session, Class objectClass) {
+    protected static List<?> getObject(HibernateQueryObject queryObject, Session session, Class objectClass) {
         Criteria criteria = session.createCriteria(objectClass);
-        addAliasesToCriteria(criteria, aliases);
-        Conjunction conjunction = Restrictions.conjunction();
-        for (Criterion criterion : criterions) {
-            conjunction.add(criterion);
+        if (queryObject.isSetAliases()) {
+            addAliasesToCriteria(criteria, queryObject.getAliases());
         }
-        criteria.add(conjunction);
-        for (Projection projection : projections) {
-            criteria.setProjection(projection);
+        if (queryObject.isSetCriterions()) {
+            Conjunction conjunction = Restrictions.conjunction();
+            for (Criterion criterion : queryObject.getCriterions()) {
+                conjunction.add(criterion);
+            }
+            criteria.add(conjunction);
+        }
+        if (queryObject.isSetProjections()) {
+            for (Projection projection : queryObject.getProjections()) {
+                criteria.setProjection(projection);
+            }
+        }
+        if (queryObject.isSetOrder()) {
+            criteria.addOrder(queryObject.getOrder());
+        }
+        if (queryObject.isSetMaxResults()) {
+            criteria.setMaxResults(queryObject.getMaxResult());
         }
         criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         return criteria.list();
@@ -287,6 +299,7 @@ public class HibernateCriteriaQueryUtilities {
      * 
      * @param eventTime
      *            Temporal filters
+     * @param criterions
      * @return filter restrictions
      * @throws OwsExceptionReport
      *             If the temporal filter is not supported
@@ -304,6 +317,7 @@ public class HibernateCriteriaQueryUtilities {
      * 
      * @param temporalFilter
      *            Temporal filer
+     * @param criterions
      * @return filter restriction
      * @throws OwsExceptionReport
      *             If the temporal filter is not supported
@@ -347,28 +361,18 @@ public class HibernateCriteriaQueryUtilities {
                 DateTime endTime =
                         DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(ti.getValue(),
                                 ti.getRequestedTimeLength());
-                if (ti.isSetIndeterminateValue()) {
-                    if (ti.getIndeterminateValue().equals(FirstLatest.first.name())) {
-                        // TODO add query for first observation
-                    } else if (ti.getIndeterminateValue().equals(FirstLatest.latest.name())) {
-                        // TODO add query for latest observation
-                    } else {
-                        // TODO exception
-                    }
+                if (ti.getValue().equals(endTime)) {
+                    return getEqualRestriction(HibernateConstants.PARAMETER_PHENOMENON_TIME_START, ti.getValue()
+                            .toDate());
                 } else {
-                    if (ti.getValue().equals(endTime)) {
-                        return getEqualRestriction(HibernateConstants.PARAMETER_PHENOMENON_TIME_START, ti.getValue()
-                                .toDate());
-                    } else {
-                        Criterion gele =
-                                Restrictions.and(Restrictions.ge(HibernateConstants.PARAMETER_PHENOMENON_TIME_START, ti
-                                        .getValue().toDate()), Restrictions.le(
-                                        HibernateConstants.PARAMETER_PHENOMENON_TIME_END, endTime.toDate()));
-                        Criterion btw =
-                                Restrictions.between(HibernateConstants.PARAMETER_PHENOMENON_TIME_START, ti.getValue()
-                                        .toDate(), endTime.toDate());
-                        return Restrictions.or(gele, btw);
-                    }
+                    Criterion gele =
+                            Restrictions.and(Restrictions.ge(HibernateConstants.PARAMETER_PHENOMENON_TIME_START, ti
+                                    .getValue().toDate()), Restrictions.le(
+                                    HibernateConstants.PARAMETER_PHENOMENON_TIME_END, endTime.toDate()));
+                    Criterion btw =
+                            Restrictions.between(HibernateConstants.PARAMETER_PHENOMENON_TIME_START, ti.getValue()
+                                    .toDate(), endTime.toDate());
+                    return Restrictions.or(gele, btw);
                 }
             } else {
                 throw Util4Exceptions.createNoApplicableCodeException(null,
@@ -451,16 +455,17 @@ public class HibernateCriteriaQueryUtilities {
         disjunction.add(Restrictions.in(propertyName, list));
         return disjunction;
     }
-    
-    public static Criterion getDisjunctionFor(List<Criterion> criterions)
-    {
-    	Disjunction disjunction = Restrictions.disjunction();
-    	for (Criterion criterion : criterions) {
-			disjunction.add(criterion);
-		}
-    	return disjunction;
+
+    // OR
+    public static Criterion getDisjunctionFor(List<Criterion> criterions) {
+        Disjunction disjunction = Restrictions.disjunction();
+        for (Criterion criterion : criterions) {
+            disjunction.add(criterion);
+        }
+        return disjunction;
     }
 
+    // AND
     public static Criterion getConjunction(List<Criterion> criterions) {
         Conjunction conjunction = Restrictions.conjunction();
         for (Criterion criterion : criterions) {
@@ -665,25 +670,24 @@ public class HibernateCriteriaQueryUtilities {
      * @return Related procedure identifiers
      */
     public static List<String> getProceduresForFeatureOfInterest(Session session, FeatureOfInterest featureOfInterest) {
+        HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
         String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
         String procedureAlias = addProcedureAliasToMap(aliases, obsConstAlias);
         String foiAlias = addFeatureOfInterestAliasToMap(aliases, null);
-        List<Projection> projections = new ArrayList<Projection>();
-        projections.add(getDistinctProjection(HibernateConstants.PARAMETER_FEATURE_OF_INTEREST));
-        projections.add(getDistinctProjection(getIdentifierParameter(procedureAlias)));
-        List<Criterion> criterions = new ArrayList<Criterion>();
-        criterions.add(getEqualRestriction(getIdentifierParameter(foiAlias), featureOfInterest.getIdentifier()));
-        return (List<String>) getObject(aliases, criterions, projections, session, Observation.class);
+        queryObject.setAliases(aliases);
+        queryObject.addCriterion(getEqualRestriction(getIdentifierParameter(foiAlias),
+                featureOfInterest.getIdentifier()));
+        queryObject.addProjection(getDistinctProjection(HibernateConstants.PARAMETER_FEATURE_OF_INTEREST));
+        queryObject.addProjection(getDistinctProjection(getIdentifierParameter(procedureAlias)));
+        return (List<String>) getObject(queryObject, session, Observation.class);
     }
 
     public static List<String> getObservationIdentifiers(Session session) {
-        List<Criterion> criterions = new ArrayList<Criterion>();
-        List<Projection> projections = new ArrayList<Projection>();
-        criterions.add(Restrictions.ne(getIdentifierParameter(null), "null"));
-        projections.add(getDistinctProjectionForIdentifier());
-        return (List<String>) getObject(new HashMap<String, String>(), criterions, projections,
-                session, Observation.class);
+        HibernateQueryObject queryObject = new HibernateQueryObject();
+        queryObject.addCriterion(Restrictions.ne(getIdentifierParameter(null), "null"));
+        queryObject.addProjection(getDistinctProjectionForIdentifier());
+        return (List<String>) getObject(queryObject, session, Observation.class);
     }
 
     public static ProcedureDescriptionFormat getProcedureDescriptionFormatObject(String procDescFormat, Session session) {
@@ -717,10 +721,9 @@ public class HibernateCriteriaQueryUtilities {
      *            Hibernate session
      * @return FOI identifiers
      */
-    public static List<String> getFeatureOfInterestIdentifier(Map<String, String> aliases, List<Criterion> criterions,
-            List<Projection> projections, Session session) {
-        projections.add(getDistinctProjectionForIdentifier());
-        return (List<String>) getObject(aliases, criterions, projections, session, FeatureOfInterest.class);
+    public static List<String> getFeatureOfInterestIdentifier(HibernateQueryObject queryObject, Session session) {
+        queryObject.addProjection(getDistinctProjectionForIdentifier());
+        return (List<String>) getObject(queryObject, session, FeatureOfInterest.class);
     }
 
     public static List<FeatureOfInterest> getFeatureOfInterestObject(Collection<String> featureOfInterestIDs,
@@ -734,13 +737,13 @@ public class HibernateCriteriaQueryUtilities {
     }
 
     public static List<FeatureOfInterest> getFeatureOfInterestObjectsForOffering(String offeringID, Session session) {
+        HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
         String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
         String offeringAlias = addOfferingAliasToMap(aliases, obsConstAlias);
-        List<Criterion> criterions = new ArrayList<Criterion>();
-        List<Projection> projections = new ArrayList<Projection>();
-        criterions.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offeringID));
-        return (List<FeatureOfInterest>) getObject(aliases, criterions, projections, session, Observation.class);
+        queryObject.setAliases(aliases);
+        queryObject.addCriterion(getEqualRestriction(getIdentifierParameter(offeringAlias), offeringID));
+        return (List<FeatureOfInterest>) getObject(queryObject, session, Observation.class);
     }
 
     /**
@@ -753,16 +756,16 @@ public class HibernateCriteriaQueryUtilities {
      * @return FOI identifiers for offering
      */
     public static List<String> getFeatureOfInterestIdentifiersForOffering(String offeringID, Session session) {
+        HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
         String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
         String offeringAlias = addOfferingAliasToMap(aliases, obsConstAlias);
         String foiAlias = addFeatureOfInterestAliasToMap(aliases, null);
-        List<Criterion> criterions = new ArrayList<Criterion>();
-        List<Projection> projections = new ArrayList<Projection>();
-        criterions.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offeringID));
-		criterions.add(getEqualRestriction(HibernateConstants.DELETED, false));
-        projections.add(Projections.distinct(Projections.property(getIdentifierParameter(foiAlias))));
-        return (List<String>) getObject(aliases, criterions, projections, session, Observation.class);
+        queryObject.setAliases(aliases);
+        queryObject.addCriterion(getEqualRestriction(getIdentifierParameter(offeringAlias), offeringID));
+        queryObject.addCriterion(getEqualRestriction(HibernateConstants.DELETED, false));
+        queryObject.addProjection(Projections.distinct(Projections.property(getIdentifierParameter(foiAlias))));
+        return (List<String>) getObject(queryObject, session, Observation.class);
     }
 
     public static List<FeatureOfInterestType> getFeatureOfInterestTypeObjects(List<String> featureOfInterestType,
@@ -940,9 +943,9 @@ public class HibernateCriteriaQueryUtilities {
     }
 
     public static List<Procedure> getProcedureObjects(Session session) {
-        return(List<Procedure>) getDistinctObjects(session, Procedure.class);
+        return (List<Procedure>) getDistinctObjects(session, Procedure.class);
     }
-    
+
     public static List<FeatureOfInterest> getFeatureOfInterestObjects(Session session) {
         return (List<FeatureOfInterest>) getDistinctObjects(session, FeatureOfInterest.class);
     }
@@ -983,7 +986,7 @@ public class HibernateCriteriaQueryUtilities {
     public static List<ResultTemplate> getResultTemplateObjects(Session session) {
         Criteria criteria = session.createCriteria(ResultTemplate.class);
         criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        return (List<ResultTemplate>)criteria.list();
+        return (List<ResultTemplate>) criteria.list();
     }
 
     public static ResultTemplate getResultTemplateObject(String offering, String observedProperty, Session session) {
@@ -996,8 +999,8 @@ public class HibernateCriteriaQueryUtilities {
         criteria.add(getEqualRestriction(getIdentifierParameter(obsPropAlias), observedProperty));
         addAliasesToCriteria(criteria, aliases);
         criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		/* there can be multiple but equal result templates... */
-		List<ResultTemplate> templates = (List<ResultTemplate>) criteria.list();
+        /* there can be multiple but equal result templates... */
+        List<ResultTemplate> templates = (List<ResultTemplate>) criteria.list();
         return (templates.isEmpty()) ? null : templates.iterator().next();
     }
 
@@ -1016,5 +1019,23 @@ public class HibernateCriteriaQueryUtilities {
         }
         addAliasesToCriteria(criteria, aliases);
         return criteria.list();
+    }
+
+    public static List<ObservationConstellation> getObservationConstallations(Map<String, String> aliases,
+            List<Criterion> restrictions, Session session) {
+        Criteria criteria = session.createCriteria(ObservationConstellation.class);
+        addAliasesToCriteria(criteria, aliases);
+        criteria.add(getConjunction(restrictions));
+        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        return criteria.list();
+    }
+
+    public static Order getOrderForEnum(FirstLatest firstLatest) {
+        if (firstLatest.equals(FirstLatest.first)) {
+            return Order.asc(HibernateConstants.PARAMETER_PHENOMENON_TIME_START);
+        } else if (firstLatest.equals(FirstLatest.latest)) {
+            return Order.desc(HibernateConstants.PARAMETER_PHENOMENON_TIME_END);
+        }
+        return null;
     }
 }

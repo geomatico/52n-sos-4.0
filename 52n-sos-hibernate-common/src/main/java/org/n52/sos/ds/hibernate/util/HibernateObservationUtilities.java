@@ -141,7 +141,7 @@ public class HibernateObservationUtilities {
 
                 String observationType = hObservationConstellation.getObservationType().getObservationType();
 
-                DateTime timeDateTime = new DateTime(hObservation.getPhenomenonTimeStart());
+                
 
                 // feature of interest
                 String foiID = hFeatureOfInterest.getIdentifier();
@@ -172,13 +172,6 @@ public class HibernateObservationUtilities {
                 // hObservationConstellation.getOffering().getIdentifier();
                 // String mimeType = SosConstants.PARAMETER_NOT_SET;
 
-                // create time element
-                ITime phenomenonTime;
-                if (hObservation.getPhenomenonTimeEnd() == null) {
-                    phenomenonTime = new TimeInstant(timeDateTime, "");
-                } else {
-                    phenomenonTime = new TimePeriod(timeDateTime, new DateTime(hObservation.getPhenomenonTimeEnd()));
-                }
                 // create quality
                 ArrayList<SosQuality> qualityList = null;
                 if (Configurator.getInstance().isSupportsQuality()) {
@@ -240,7 +233,7 @@ public class HibernateObservationUtilities {
                     observationConstellations.put(obsConstHash, obsConst);
                 }
                 SosObservation sosObservation =
-                        createNewObservation(observationConstellations, hObservation, phenomenonTime, qualityList,
+                        createNewObservation(observationConstellations, hObservation, qualityList,
                                 value, obsConstHash);
                 if (hObservation.getAntiSubsetting() != null && !hObservation.getAntiSubsetting().isEmpty()) {
                     sosObservation.setAntiSubsetting(hObservation.getAntiSubsetting());
@@ -252,8 +245,7 @@ public class HibernateObservationUtilities {
     }
 
     private static SosObservation createNewObservation(
-            Map<Integer, SosObservationConstellation> observationConstellations, Observation hObservation,
-            ITime phenomenonTime, ArrayList<SosQuality> qualityList, IValue value, int obsConstHash) {
+            Map<Integer, SosObservationConstellation> observationConstellations, Observation hObservation, ArrayList<SosQuality> qualityList, IValue value, int obsConstHash) {
         SosObservation sosObservation = new SosObservation();
         sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
         if (hObservation.getIdentifier() != null && !hObservation.getIdentifier().isEmpty()) {
@@ -264,8 +256,21 @@ public class HibernateObservationUtilities {
         sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
         sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
         sosObservation.setResultTime(new TimeInstant(new DateTime(hObservation.getResultTime())));
-        sosObservation.setValue(new SosSingleObservationValue(phenomenonTime, value, qualityList));
+        sosObservation.setValue(new SosSingleObservationValue(getPhenomenonTime(hObservation), value, qualityList));
         return sosObservation;
+    }
+
+    private static ITime getPhenomenonTime(Observation hObservation) {
+        // create time element
+        DateTime phenStartTime = new DateTime(hObservation.getPhenomenonTimeStart());
+        DateTime phenEndTime = new DateTime(hObservation.getPhenomenonTimeEnd());
+        ITime phenomenonTime;
+        if (phenStartTime.equals(phenEndTime)) {
+            phenomenonTime = new TimeInstant(phenStartTime, "");
+        } else {
+            phenomenonTime = new TimePeriod(phenStartTime, phenEndTime);
+        }
+        return phenomenonTime;
     }
 
     private static void checkOrSetObservablePropertyUnit(AbstractSosPhenomenon abstractSosPhenomenon, String unit) {

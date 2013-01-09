@@ -37,8 +37,6 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Projection;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.RequestDecoderKey;
 import org.n52.sos.ds.IDescribeSensorDAO;
@@ -240,20 +238,19 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
 
     private SosSMLCapabilities getFeatureOfInterestIDsForProcedure(List<String> proceedures, String version,
             Session session) throws OwsExceptionReport {
+        HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
-        List<Criterion> criterions = new ArrayList<Criterion>();
-        List<Projection> projections = new ArrayList<Projection>();
         String obsAlias = HibernateCriteriaQueryUtilities.addObservationAliasToMap(aliases, null);
         String obsConstAlias =
                 HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, obsAlias);
         // procedures
         String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, obsConstAlias);
-        criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+        queryObject.setAliases(aliases);
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), proceedures));
         // FIXME: checks for generated IDs and remove them for SOS 2.0
         Collection<String> foiIDs =
-                SosHelper.getFeatureIDs(HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(aliases,
-                        criterions, projections, session), version);
+                SosHelper.getFeatureIDs(HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(queryObject, session), version);
         if (foiIDs != null && !foiIDs.isEmpty()) {
             SosSMLCapabilities capabilities = new SosSMLCapabilities();
             capabilities.setName("featureOfInterest");

@@ -235,10 +235,6 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
             exceptions.add(owse);
         }
 
-        // check if parameters are set, if not throw ResponseExceedsSizeLimit
-        // exception
-        checkQueryParametersIfAllEmpty(sosRequest);
-
         try {
             checkOfferingId(sosRequest.getOfferings());
         } catch (OwsExceptionReport owse) {
@@ -270,11 +266,12 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
             exceptions.add(owse);
         }
         try {
-            // TODO check this for pofile
-            if (sosRequest.getTemporalFilters() != null && !sosRequest.getTemporalFilters().isEmpty()) {
+            
+            if (sosRequest.isSetTemporalFilter()) {
                 SosHelper.checkTemporalFilter(sosRequest.getTemporalFilters(),
                         Sos2Constants.GetObservationParams.temporalFilter.name());
 //            } else {
+//                // TODO check this for pofile
 //                List<TemporalFilter> filters = new ArrayList<TemporalFilter>();
 //                TemporalFilter filter = new TemporalFilter();
 //                filter.setOperator(TimeOperator.TM_Equals);
@@ -290,6 +287,10 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
         }
 
         Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        
+        // check if parameters are set, if not throw ResponseExceedsSizeLimit
+        // exception
+        checkQueryParametersIfAllEmpty(sosRequest);
     }
 
     /**

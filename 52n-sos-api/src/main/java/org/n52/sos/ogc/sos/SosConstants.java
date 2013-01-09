@@ -28,6 +28,7 @@ import java.security.NoSuchAlgorithmException;
 
 import org.n52.sos.exception.IExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants;
+import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -385,7 +386,16 @@ public final class SosConstants {
         first, latest;
 
         public static boolean contains(String timeString) {
-            return timeString.equals(first.name()) || timeString.equals(latest.name());
+            return timeString.equalsIgnoreCase(first.name()) || timeString.equalsIgnoreCase(latest.name());
+        }
+
+        public static FirstLatest getEnumForString(String value) {
+           if (value.equalsIgnoreCase(first.name())){
+               return first;
+           } else if (value.equalsIgnoreCase(latest.name())){
+               return latest;
+           }
+            return null;
         }
     }
 

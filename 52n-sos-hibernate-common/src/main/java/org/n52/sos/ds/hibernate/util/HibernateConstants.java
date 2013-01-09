@@ -114,4 +114,6 @@ public class HibernateConstants {
 	public static final String CONNECTION_STRING_PROPERTY = "hibernate.connection.url";
     public static final String CONNECTION_POOL_PROPERTY = "hibernate.connection.provider_class";
     public static final String DIALECT_PROPERTY = "hibernate.dialect";
+
+    public static final String CLAZZ = "clazz";
 }

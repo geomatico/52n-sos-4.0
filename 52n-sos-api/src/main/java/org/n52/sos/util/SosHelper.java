@@ -51,6 +51,7 @@ import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.IObservationEncoder;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
+import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
@@ -63,6 +64,7 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
@@ -247,7 +249,7 @@ public class SosHelper {
             String urnSrsPrefix = Configurator.getInstance().getSrsNamePrefix();
             String urlSrsPrefix = Configurator.getInstance().getSrsNamePrefixSosV2();
             try {
-                
+
                 srsName = srsName.replace(urnSrsPrefix, "");
                 srsName = srsName.replace(urlSrsPrefix, "");
                 srid = Integer.valueOf(srsName);
@@ -667,8 +669,10 @@ public class SosHelper {
      * @throws OwsExceptionReport
      *             if the value of the outputFormat parameter is incorrect
      */
-    public static void checkProcedureDescriptionFormat(String procedureDecriptionFormat, String parameterName) throws OwsExceptionReport {
-        if (procedureDecriptionFormat == null || procedureDecriptionFormat.isEmpty() || procedureDecriptionFormat.equals(SosConstants.PARAMETER_NOT_SET)) {
+    public static void checkProcedureDescriptionFormat(String procedureDecriptionFormat, String parameterName)
+            throws OwsExceptionReport {
+        if (procedureDecriptionFormat == null || procedureDecriptionFormat.isEmpty()
+                || procedureDecriptionFormat.equals(SosConstants.PARAMETER_NOT_SET)) {
             String exceptionText =
                     "The value of the mandatory parameter '" + parameterName
                             + "' was not found in the request or is incorrect!";
@@ -744,7 +748,7 @@ public class SosHelper {
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
             for (String featureOfInterest : featuresOfInterest) {
                 try {
-                checkFeatureOfInterstIdentifier(featureOfInterest, validFeatureOfInterest, parameterName);
+                    checkFeatureOfInterstIdentifier(featureOfInterest, validFeatureOfInterest, parameterName);
                 } catch (OwsExceptionReport e) {
                     exceptions.add(e);
                 }
@@ -752,19 +756,18 @@ public class SosHelper {
             Util4Exceptions.mergeAndThrowExceptions(exceptions);
         }
     }
-    
-    public static void checkFeatureOfInterstIdentifier(String featureOfInterest, Collection<String> validFeatureOfInterest, String parameterName) throws OwsExceptionReport {
+
+    public static void checkFeatureOfInterstIdentifier(String featureOfInterest,
+            Collection<String> validFeatureOfInterest, String parameterName) throws OwsExceptionReport {
         if (featureOfInterest == null || featureOfInterest.isEmpty()) {
             String exceptionText =
-                    "The value of the parameter '" + parameterName
-                            + "' was not found in the request or is incorrect!";
+                    "The value of the parameter '" + parameterName + "' was not found in the request or is incorrect!";
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createMissingParameterValueException(parameterName);
         }
         if (!validFeatureOfInterest.contains(featureOfInterest)) {
             String exceptionText =
-                    "The value '" + featureOfInterest + "' of the parameter '" + parameterName
-                            + "' is invalid";
+                    "The value '" + featureOfInterest + "' of the parameter '" + parameterName + "' is invalid";
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
         }
@@ -859,7 +862,8 @@ public class SosHelper {
     public static void checkSpatialFilter(SpatialFilter spatialFilter, String name) throws OwsExceptionReport {
         // TODO make supported ValueReferences dynamic
         if (spatialFilter != null) {
-            if (spatialFilter.getValueReference() == null || (spatialFilter.getValueReference() != null && spatialFilter.getValueReference().isEmpty())) {
+            if (spatialFilter.getValueReference() == null
+                    || (spatialFilter.getValueReference() != null && spatialFilter.getValueReference().isEmpty())) {
                 String exceptionText =
                         "The value of the parameter '" + SosConstants.Filter.ValueReference.name()
                                 + "' was not found in the request or is not set!";
@@ -872,7 +876,8 @@ public class SosHelper {
                 String exceptionText =
                         "The value of the parameter '" + SosConstants.Filter.ValueReference.name() + "' is invalid!";
                 LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(SosConstants.Filter.ValueReference.name(), exceptionText);
+                throw Util4Exceptions.createInvalidParameterValueException(SosConstants.Filter.ValueReference.name(),
+                        exceptionText);
             }
         }
     }
@@ -882,12 +887,14 @@ public class SosHelper {
         // TODO make supported ValueReferences dynamic
         if (temporalFilters != null) {
             for (TemporalFilter temporalFilter : temporalFilters) {
-                if (temporalFilter.getValueReference() == null || (temporalFilter.getValueReference() != null && temporalFilter.getValueReference().isEmpty())) {
+                if (temporalFilter.getValueReference() == null
+                        || (temporalFilter.getValueReference() != null && temporalFilter.getValueReference().isEmpty())) {
                     String exceptionText =
                             "The value of the parameter '" + SosConstants.Filter.ValueReference.name()
                                     + "' was not found in the request or is not set!";
                     LOGGER.debug(exceptionText);
-                    throw Util4Exceptions.createMissingParameterValueException(SosConstants.Filter.ValueReference.name());
+                    throw Util4Exceptions.createMissingParameterValueException(SosConstants.Filter.ValueReference
+                            .name());
                 } else if (!temporalFilter.getValueReference().equals("phenomenonTime")
                         && !temporalFilter.getValueReference().equals("om:phenomenonTime")
                         && !temporalFilter.getValueReference().equals("resultTime")
@@ -898,13 +905,13 @@ public class SosHelper {
                             "The value of the parameter '" + SosConstants.Filter.ValueReference.name()
                                     + "' was not found in the request or is not set!";
                     LOGGER.debug(exceptionText);
-                    throw Util4Exceptions.createInvalidParameterValueException(SosConstants.Filter.ValueReference.name(),
-                            exceptionText);
+                    throw Util4Exceptions.createInvalidParameterValueException(
+                            SosConstants.Filter.ValueReference.name(), exceptionText);
                 }
             }
         }
     }
-    
+
     public static void checkResultTemplate(String resultTemplate, String parameterName) throws OwsExceptionReport {
         if (resultTemplate == null || (resultTemplate != null && resultTemplate.isEmpty())) {
             throw Util4Exceptions.createMissingParameterValueException(parameterName);
@@ -915,8 +922,7 @@ public class SosHelper {
             exceptionText.append("The requested template identifier (");
             exceptionText.append(resultTemplate);
             exceptionText.append(") is not supported by this server!");
-            throw Util4Exceptions.createInvalidParameterValueException(parameterName,
-                    exceptionText.toString());
+            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText.toString());
         }
     }
 
@@ -1078,12 +1084,12 @@ public class SosHelper {
     }
 
     public static void checkHref(String href, String parameterName) throws OwsExceptionReport {
-       if (!href.startsWith("http") && !href.startsWith("urn")) {
-           String exceptionText = "The referance (href) has an invalid style!";
-           throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
-       }
+        if (!href.startsWith("http") && !href.startsWith("urn")) {
+            String exceptionText = "The referance (href) has an invalid style!";
+            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+        }
     }
-    
+
     public static String createCSVFromList(List<String> values) {
         StringBuilder builder = new StringBuilder();
         if (values != null && !values.isEmpty()) {
@@ -1095,7 +1101,7 @@ public class SosHelper {
         }
         return builder.toString();
     }
-    
+
     public static List<String> createListFromCSV(String csv) {
         if (csv != null && !csv.isEmpty()) {
             return Arrays.asList(csv.split(","));
@@ -1107,8 +1113,7 @@ public class SosHelper {
         Collection<String> validObservationTypes =
                 Configurator.getInstance().getCapabilitiesCacheController().getObservationTypes();
         if (observationType.isEmpty()) {
-            throw Util4Exceptions
-                    .createMissingParameterValueException(parameterName);
+            throw Util4Exceptions.createMissingParameterValueException(parameterName);
         } else {
             if (!validObservationTypes.contains(observationType)) {
                 String exceptionText =
@@ -1118,7 +1123,49 @@ public class SosHelper {
                 throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
             }
         }
-        
+
     }
 
+    public static boolean hasFirstLatestTemporalFilter(List<TemporalFilter> temporalFilters) {
+        for (TemporalFilter temporalFilter : temporalFilters) {
+            if (temporalFilter.getTime() != null && temporalFilter.getTime() instanceof TimeInstant) {
+                TimeInstant ti = (TimeInstant) temporalFilter.getTime();
+                if (ti.isSetIndeterminateValue()) {
+                    if (FirstLatest.contains(ti.getIndeterminateValue())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static List<FirstLatest> getFirstLatestTemporalFilter(List<TemporalFilter> temporalFilters) {
+        List<FirstLatest> filters = new ArrayList<FirstLatest>(0);
+        for (TemporalFilter temporalFilter : temporalFilters) {
+            if (temporalFilter.getTime() != null && temporalFilter.getTime() instanceof TimeInstant) {
+                TimeInstant ti = (TimeInstant) temporalFilter.getTime();
+                if (ti.isSetIndeterminateValue()) {
+                    if (FirstLatest.contains(ti.getIndeterminateValue())) {
+                        filters.add(FirstLatest.getEnumForString(ti.getIndeterminateValue()));
+                    }
+                }
+            }
+        }
+        return filters;
+    }
+
+    public static List<TemporalFilter> getNonFirstLatestTemporalFilter(List<TemporalFilter> temporalFilters) {
+        List<TemporalFilter> filters = new ArrayList<TemporalFilter>(0);
+        for (TemporalFilter temporalFilter : temporalFilters) {
+            if (temporalFilter.getTime() != null && temporalFilter.getTime() instanceof TimeInstant) {
+                TimeInstant ti = (TimeInstant) temporalFilter.getTime();
+                if (!ti.isSetIndeterminateValue()
+                        || (ti.isSetIndeterminateValue() && !FirstLatest.contains(ti.getIndeterminateValue()))) {
+                    filters.add(temporalFilter);
+                }
+            }
+        }
+        return filters;
+    }
 }

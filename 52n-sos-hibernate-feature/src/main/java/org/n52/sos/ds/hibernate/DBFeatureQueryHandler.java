@@ -33,9 +33,7 @@ import java.util.Set;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
-import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.spatial.criterion.SpatialProjections;
 import org.n52.sos.ds.IFeatureQueryHandler;
@@ -97,16 +95,14 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
     @Override
     public Collection<String> getFeatureIDs(SpatialFilter filter, Object connection) throws OwsExceptionReport {
         Session session = getSessionFromConnection(connection);
-        Map<String, String> aliases = new HashMap<String, String>();
-        List<Criterion> criterions = new ArrayList<Criterion>();
-        List<Projection> projections = new ArrayList<Projection>();
+        HibernateQueryObject queryObject = new HibernateQueryObject();
         try {
             if (filter != null) {
                 String propertyName = HibernateConstants.PARAMETER_GEOMETRY;
-                criterions.add(HibernateCriteriaQueryUtilities.getCriterionForSpatialFilter(propertyName, filter));
+                queryObject.addCriterion(HibernateCriteriaQueryUtilities.getCriterionForSpatialFilter(propertyName,
+                        filter));
             }
-            return HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(aliases, criterions, projections,
-                    session);
+            return HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(queryObject, session);
         } catch (HibernateException he) {
             String exceptionText =
                     "An error occurs while querying feature identifiers for a featureOfInterest identifier!";
@@ -125,12 +121,10 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
     public Map<String, SosAbstractFeature> getFeatures(List<String> featureIDs, List<SpatialFilter> spatialFilters,
             Object connection, String version) throws OwsExceptionReport {
         Session session = getSessionFromConnection(connection);
-        Map<String, String> aliases = new HashMap<String, String>();
-        List<Criterion> criterions = new ArrayList<Criterion>();
-        List<Projection> projections = new ArrayList<Projection>();
+        HibernateQueryObject queryObject = new HibernateQueryObject();
         try {
             if (featureIDs != null && !featureIDs.isEmpty()) {
-                criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+                queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                         HibernateConstants.PARAMETER_IDENTIFIER, featureIDs));
             }
             if (spatialFilters != null && !spatialFilters.isEmpty()) {
@@ -144,15 +138,12 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
                     disjunction
                             .add(HibernateCriteriaQueryUtilities.getCriterionForSpatialFilter(propertyName, filter));
                 }
-                criterions.add(disjunction);
+                queryObject.addCriterion(disjunction);
             }
-            if (!criterions.isEmpty())
-            {
-                return createSosAbstractFeaturesFromResult(HibernateFeatureCriteriaQueryUtilities.getFeatureOfInterests(
-                        aliases, criterions, projections, session), version);                
-            }
-            else
-            {
+            if (queryObject.isSetCriterions()) {
+                return createSosAbstractFeaturesFromResult(
+                        HibernateFeatureCriteriaQueryUtilities.getFeatureOfInterests(queryObject, session), version);
+            } else {
                 return new HashMap<String, SosAbstractFeature>(0);
             }
 
@@ -204,8 +195,8 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
                 featureIdentifier = "generated_" + SosHelper.generateID(samplingFeature.getXmlDescription());
                 samplingFeature.setIdentifier(featureIdentifier);
             }
-           HibernateFeatureCriteriaTransactionalUtilities.insertFeatureOfInterest(samplingFeature, session);
-           return featureIdentifier;
+            HibernateFeatureCriteriaTransactionalUtilities.insertFeatureOfInterest(samplingFeature, session);
+            return featureIdentifier;
         }
     }
 

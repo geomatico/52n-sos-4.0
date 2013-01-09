@@ -24,14 +24,11 @@
 package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Projection;
 import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IGetObservationByIdDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
@@ -105,17 +102,15 @@ public class GetObservationByIdDAO extends AbstractHibernateOperationDao impleme
     }
 
     private List<Observation> queryObservation(GetObservationByIdRequest request, Session session) {
-        Map<String, String> aliases = new HashMap<String, String>();
+        HibernateQueryObject queryObject = new HibernateQueryObject();
         List<Criterion> criterions = new ArrayList<Criterion>();
-        List<Projection> projections = new ArrayList<Projection>();
         criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                 HibernateConstants.PARAMETER_IDENTIFIER, request.getObservationIdentifier()));
         criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
         		HibernateConstants.PARAMETER_ANTI_SUBSETTING, request.getObservationIdentifier()));
-        List<Criterion> disjunctedCriterions = new ArrayList<Criterion>(1);
-        disjunctedCriterions.add(HibernateCriteriaQueryUtilities.getDisjunctionFor(criterions));
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionFor(criterions));
         List<Observation> observations =
-                HibernateCriteriaQueryUtilities.getObservations(aliases, disjunctedCriterions, projections, session);
+                HibernateCriteriaQueryUtilities.getObservations(queryObject, session);
         return observations;
     }
 }

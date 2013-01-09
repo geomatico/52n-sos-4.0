@@ -40,6 +40,7 @@ import org.n52.sos.ds.IGetResultDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
+import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
@@ -162,37 +163,37 @@ public class GetResultDAO extends AbstractHibernateOperationDao implements IGetR
      */
     protected List<Observation> queryObservation(GetResultRequest request, Set<String> featureIdentifier,
             Session session) throws OwsExceptionReport {
+        HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
-        List<Criterion> criterions = new ArrayList<Criterion>();
-        List<Projection> projections = new ArrayList<Projection>();
         String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
         // offering
         String offAlias = HibernateCriteriaQueryUtilities.addOfferingAliasToMap(aliases, obsConstAlias);
-        criterions.add(HibernateCriteriaQueryUtilities.getEqualRestriction(
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(offAlias), request.getOffering()));
         // observableProperties
         String obsPropAlias = HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, obsConstAlias);
-        criterions.add(HibernateCriteriaQueryUtilities.getEqualRestriction(
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(obsPropAlias), request.getObservedProperty()));
         // deleted
         // XXX DeleteObservation Extension
-        criterions.add(Restrictions.eq("deleted", false));
-        // temporal filters
-        if (request.hasTemporalFilter()) {
-            criterions
-                    .add(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(request.getTemporalFilter()));
-        }
+        queryObject.addCriterion(Restrictions.eq(HibernateConstants.DELETED, false));
+        // feature identifier
         if (featureIdentifier != null && featureIdentifier.isEmpty()) {
             return null;
         } else if (featureIdentifier != null && !featureIdentifier.isEmpty()) {
             String foiAlias = HibernateCriteriaQueryUtilities.addFeatureOfInterestAliasToMap(aliases, null);
-            criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                     HibernateCriteriaQueryUtilities.getIdentifierParameter(foiAlias), new ArrayList<String>(
                             featureIdentifier)));
         }
+        // temporal filters
+        if (request.hasTemporalFilter()) {
+            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(request.getTemporalFilter()));
+        }
+        queryObject.setAliases(aliases);
         // ...
         List<Observation> observations =
-                HibernateCriteriaQueryUtilities.getObservations(aliases, criterions, projections, session);
+                HibernateCriteriaQueryUtilities.getObservations(queryObject, session);
         return observations;
 
     }

@@ -34,6 +34,7 @@ import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.spatial.criterion.SpatialProjections;
 import org.hibernate.spatial.criterion.SpatialRestrictions;
+import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -57,9 +58,8 @@ public class HibernateFeatureCriteriaQueryUtilities {
      *            Hibernate session
      * @return FeatureOfInterest objects
      */
-    public static List<FeatureOfInterest> getFeatureOfInterests(Map<String, String> aliases,
-            List<Criterion> criterions, List<Projection> projections, Session session) {
-        return (List<FeatureOfInterest>) HibernateCriteriaQueryUtilities.getObject(aliases, criterions, projections,
+    public static List<FeatureOfInterest> getFeatureOfInterests(HibernateQueryObject queryObject, Session session) {
+        return (List<FeatureOfInterest>) HibernateCriteriaQueryUtilities.getObject(queryObject,
                 session, FeatureOfInterest.class);
     }
 
