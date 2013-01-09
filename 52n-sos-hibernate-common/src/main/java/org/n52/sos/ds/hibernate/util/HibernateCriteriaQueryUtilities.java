@@ -36,13 +36,11 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
 import org.hibernate.spatial.criterion.SpatialRestrictions;
@@ -84,10 +82,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
-import javax.persistence.criteria.JoinType;
-import org.hibernate.FetchMode;
-import org.hibernate.criterion.CriteriaSpecification;
-import org.hibernate.criterion.Order;
 
 /**
  * Utility class for Hiberntate Criteria queries.
@@ -287,7 +281,7 @@ public class HibernateCriteriaQueryUtilities {
         }
         if (queryObject.isSetProjections()) {
         	ProjectionList projectionList = Projections.projectionList();
-        	for (Projection projection : projections)
+        	for (Projection projection : queryObject.getProjections())
         	{
         		projectionList.add(projection);
         	}
