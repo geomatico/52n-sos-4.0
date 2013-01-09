@@ -399,7 +399,7 @@ CREATE TABLE observation (
   observation_constellation_id INTEGER NOT NULL,
   identifier TEXT NULL,
   phenomenon_time_start TIMESTAMP NOT NULL,
-  phenomenon_time_end TIMESTAMP NULL,
+  phenomenon_time_end TIMESTAMP NOT NULL,
   result_time TIMESTAMP NULL,
   valid_time_start TIMESTAMP NULL,
   valid_time_end TIMESTAMP NULL,

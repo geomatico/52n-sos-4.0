@@ -329,11 +329,11 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insert_observation(bigint, text, text, timestamp) RETURNS bigint AS
 $$ 
-	INSERT INTO observation(observation_constellation_id, feature_of_interest_id, unit_id, phenomenon_time_start, result_time)
-	SELECT $1, get_feature_of_interest($2), get_unit($3), $4, $4 WHERE $1 NOT IN (
+	INSERT INTO observation(observation_constellation_id, feature_of_interest_id, unit_id, phenomenon_time_start, phenomenon_time_end, result_time)
+	SELECT $1, get_feature_of_interest($2), get_unit($3), $4, $4, $4 WHERE $1 NOT IN (
 		SELECT observation_constellation_id FROM observation
 		WHERE observation_constellation_id = $1 AND feature_of_interest_id = get_feature_of_interest($2) 
-				AND unit_id = get_unit($3) AND phenomenon_time_start = $4 AND result_time = $4);
+				AND unit_id = get_unit($3) AND phenomenon_time_start = $4 AND phenomenon_time_end = $4 AND result_time = $4);
 
 	SELECT observation_id FROM observation 
 	WHERE feature_of_interest_id = get_feature_of_interest($2)
@@ -623,9 +623,9 @@ SELECT insert_numeric_observation(insert_observation(get_observation_constellati
 SELECT insert_numeric_observation(insert_observation(get_observation_constellation('SWEArrayObservation', 'http://www.example.org/sensors/106', 
 	'test_offering_6', 'test_observable_property_6'), 'test_feature_6', 'test_unit_6', '2012-11-19 13:09'), 2.1);
 
-INSERT INTO observation(observation_constellation_id, feature_of_interest_id, unit_id, phenomenon_time_start, result_time, identifier)
+INSERT INTO observation(observation_constellation_id, feature_of_interest_id, unit_id, phenomenon_time_start, phenomenon_time_end, result_time, identifier)
 	SELECT  get_observation_constellation('Measurement', 'http://www.example.org/sensors/101', 'test_offering_1', 'test_observable_property_1'),
-			get_feature_of_interest('test_feature_1'), get_unit('test_unit_6'), '2012-11-19 13:10', '2012-11-19 13:10', 'test_observation_1'
+			get_feature_of_interest('test_feature_1'), get_unit('test_unit_6'), '2012-11-19 13:10', '2012-11-19 13:15', '2012-11-19 13:16', 'test_observation_1'
 	WHERE 'test_observation_1' NOT IN (SELECT identifier FROM observation WHERE identifier = 'test_observation_1');
 
 INSERT INTO observation_has_numeric_value(observation_id, numeric_value_id) 
@@ -635,9 +635,9 @@ INSERT INTO observation_has_numeric_value(observation_id, numeric_value_id)
 			AND o.observation_id NOT IN (SELECT observation_id FROM observation_has_numeric_value AS ohnv
 											WHERE ohnv.observation_id = o.observation_id);
 
-INSERT INTO observation(observation_constellation_id, feature_of_interest_id, unit_id, phenomenon_time_start, result_time, identifier)
+INSERT INTO observation(observation_constellation_id, feature_of_interest_id, unit_id, phenomenon_time_start, phenomenon_time_end, result_time, identifier)
 	SELECT  get_observation_constellation('Measurement', 'http://www.example.org/sensors/101', 'test_offering_1', 'test_observable_property_1'),
-			get_feature_of_interest('test_feature_1'), get_unit('test_unit_6'), '2012-11-19 13:11', '2012-11-19 13:11', 'test_observation_2'
+			get_feature_of_interest('test_feature_1'), get_unit('test_unit_6'), '2012-11-19 13:15', '2012-11-19 13:20', '2012-11-19 13:21', 'test_observation_2'
 	WHERE 'test_observation_2' NOT IN (SELECT identifier FROM observation WHERE identifier = 'test_observation_2');
 
 INSERT INTO observation_has_numeric_value(observation_id, numeric_value_id) 
