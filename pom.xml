@@ -18,6 +18,7 @@
 		<module>52n-sos-hibernate-dialect</module>
 		<module>52n-sos-hibernate-feature</module>
 		<module>52n-sos-hibernate-core</module>
+		<module>52n-sos-core-v100</module>
 		<module>52n-sos-core-v20</module>
 		<module>52n-sos-coding-ows-v110</module>
 		<module>52n-sos-coding-sensorML-v101</module>
@@ -76,6 +77,11 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-coding-sos-v20</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>52n-sos-core-v100</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

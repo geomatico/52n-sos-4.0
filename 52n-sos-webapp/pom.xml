@@ -87,6 +87,10 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
+			<artifactId>52n-sos-core-v100</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-core-v20</artifactId>
 		</dependency>
 		<dependency>
