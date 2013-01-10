@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractSosTestCase extends Assert {
 
     protected static final Logger log = LoggerFactory.getLogger(AbstractSosTestCase.class);
-    private static final String DATASOURCE_PROEPERTIES = "/datasource.properties";
+    private static final String DATASOURCE_PROPERTIES = "/datasource.properties";
 
     @BeforeClass
     public static void beforeClass() throws ConfigurationException, IOException {
@@ -45,11 +45,11 @@ public abstract class AbstractSosTestCase extends Assert {
             Properties p = new Properties();
             InputStream in = null;
             try {
-                in = AbstractSosTestCase.class.getResourceAsStream(DATASOURCE_PROEPERTIES);
+                in = AbstractSosTestCase.class.getResourceAsStream(DATASOURCE_PROPERTIES);
                 if (in == null) {
-                    throw new ConfigurationException("No datasource.properties found.");
+                    throw new ConfigurationException("No \"" + DATASOURCE_PROPERTIES + "\" found in src/test/resources.");
                 }
-                p.load(AbstractSosTestCase.class.getResourceAsStream(DATASOURCE_PROEPERTIES));
+                p.load(AbstractSosTestCase.class.getResourceAsStream(DATASOURCE_PROPERTIES));
             } finally {
                 if (in != null) {
                     try {
