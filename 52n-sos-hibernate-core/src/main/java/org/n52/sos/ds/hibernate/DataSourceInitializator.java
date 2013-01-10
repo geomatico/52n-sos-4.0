@@ -64,6 +64,7 @@ public class DataSourceInitializator implements IDataSourceInitializator {
     public void initializeDataSource() throws OwsExceptionReport {
         Session session = null;
         Transaction transaction = null;
+        LOGGER.debug("DataSource initialization started");
         try {
             Map<SupportedTypeKey, Set<String>> typeMap = getTypeMap();
             session = (Session) connectionProvider.getConnection();
