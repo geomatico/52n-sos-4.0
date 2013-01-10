@@ -49,6 +49,7 @@ import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.entities.SpatialRefSys;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
+import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.Configurator;
@@ -216,25 +217,39 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
 		Map<String, DateTime> kOfferingVMinTime = new HashMap<String, DateTime>(hOfferings.size());
 		Map<String, DateTime> kOfferingVMaxTime = new HashMap<String, DateTime>(hOfferings.size());
 		Map<String, SosEnvelope> kOfferingVEnvelope = new HashMap<String, SosEnvelope>(hOfferings.size());
+		// TODO Eike: use new one-time request
+//		Map<String, TimePeriod> temporalBoundingBoxesOfOfferings = HibernateCriteriaQueryUtilities.getTemporalBoundingBoxesForOfferings(session);
+//		TimePeriod temporalBoundingBox = HibernateCriteriaQueryUtilities.getGlobalTemporalBoundingBox(session);
+		// TODO Eike: add multi threading here
+		// create new executor service with fixed thread pool size (size from configuration) this size limits the number of connections to;
+		// constructor should support parameter 'buffer' which limits the number of connections taken; 'buffer' defines the left over connections
         for (Offering offering : hOfferings) {
             if (!checkOfferingForDeletedProcedure(offering.getObservationConstellations())) {
-                kOfferingVName.put(offering.getIdentifier(), offering.getName());
-                kOfferingVProcedures.put(offering.getIdentifier(),
-                        getProceduresFromObservationConstellation(offering.getObservationConstellations()));
-                kOfferingVObservableProperties.put(offering.getIdentifier(),
-                        getObservablePropertiesFromObservationConstellation(offering.getObservationConstellations()));
-                kOfferingVRelatedFeatures.put(offering.getIdentifier(),
-                        getRelatedFeatureIDsFromOffering(offering.getRelatedFeatures()));
-                kOfferingVObservationTypes.put(offering.getIdentifier(),
-                        getObservationTypesFromObservationConstellation(offering.getObservationConstellations()));
-                allowedkOfferingVObservationTypes.put(offering.getIdentifier(),
-                        getObservationTypesFromObservationType(offering.getObservationTypes()));
-				kOfferingVMinTime.put(offering.getIdentifier(),
-						HibernateCriteriaQueryUtilities.getMinDate4Offering(offering.getIdentifier(), session));
-				kOfferingVMaxTime.put(offering.getIdentifier(),
-						HibernateCriteriaQueryUtilities.getMaxDate4Offering(offering.getIdentifier(), session));
-				kOfferingVEnvelope.put(offering.getIdentifier(),
-						getEnvelopeForOffering(offering.getIdentifier(), session));
+            	// TODO add new runnable for this offering
+            	String offeringId = offering.getIdentifier();
+            	kOfferingVName.put(offeringId, offering.getName());
+            	// Procedures
+            	kOfferingVProcedures.put(offeringId,
+            			getProceduresFromObservationConstellation(offering.getObservationConstellations()));
+            	// Observable properties
+            	kOfferingVObservableProperties.put(offeringId,
+            			getObservablePropertiesFromObservationConstellation(offering.getObservationConstellations()));
+            	// Related features
+            	kOfferingVRelatedFeatures.put(offeringId,
+            			getRelatedFeatureIDsFromOffering(offering.getRelatedFeatures()));
+            	// Observation types
+            	kOfferingVObservationTypes.put(offeringId,
+            			getObservationTypesFromObservationConstellation(offering.getObservationConstellations()));
+            	allowedkOfferingVObservationTypes.put(offeringId,
+            			getObservationTypesFromObservationType(offering.getObservationTypes()));
+            	// Temporal Envelope
+            	kOfferingVMinTime.put(offeringId,
+            			HibernateCriteriaQueryUtilities.getMinDate4Offering(offeringId, session));
+            	kOfferingVMaxTime.put(offeringId,
+            			HibernateCriteriaQueryUtilities.getMaxDate4Offering(offeringId, session));
+            	// Spatial Envelope
+            	kOfferingVEnvelope.put(offeringId,
+            			getEnvelopeForOffering(offeringId, session));
             }
         }
         cache.setKOfferingVName(kOfferingVName);
