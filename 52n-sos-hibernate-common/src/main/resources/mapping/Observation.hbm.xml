@@ -26,10 +26,10 @@
             <column name="phenomenon_time_start" length="29" not-null="true" />
         </property>
         <property name="phenomenonTimeEnd" type="timestamp">
-            <column name="phenomenon_time_end" length="29" />
+            <column name="phenomenon_time_end" length="29" not-null="true" />
         </property>
         <property name="resultTime" type="timestamp">
-            <column name="result_time" length="29" />
+            <column name="result_time" length="29" not-null="true" />
         </property>
         <property name="validTimeStart" type="timestamp">
             <column name="valid_time_start" length="29" />

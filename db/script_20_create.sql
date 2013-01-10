@@ -400,7 +400,7 @@ CREATE TABLE observation (
   identifier TEXT NULL,
   phenomenon_time_start TIMESTAMP NOT NULL,
   phenomenon_time_end TIMESTAMP NOT NULL,
-  result_time TIMESTAMP NULL,
+  result_time TIMESTAMP NOT NULL,
   valid_time_start TIMESTAMP NULL,
   valid_time_end TIMESTAMP NULL,
   unit_id INTEGER NULL,
@@ -525,6 +525,11 @@ CREATE INDEX observation_has_spatial_filtering_profile_FKIndex1 ON observation_h
 CREATE INDEX observation_has_spatial_filtering_profile_FKIndex2 ON observation_has_spatial_filtering_profile(spatial_filtering_profile_id);
 CREATE INDEX observation_has_geometry_value_FKIndex1 ON observation_has_geometry_value(observation_id);
 CREATE INDEX observation_has_geometry_value_FKIndex2 ON observation_has_geometry_value(geometry_value_id);
+
+-- indexes for table columns
+CREATE INDEX observation_phenTimeStart_idx ON observation(phenomenon_time_start);
+CREATE INDEX observation_phenTimeEnd_idx ON observation(phenomenon_time_end);
+CREATE INDEX observation_resultTime_idx ON observation(resultTime);
 
 -----------------------------------------------------------
 
