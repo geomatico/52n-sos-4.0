@@ -125,6 +125,9 @@ public class SosKvpDecoder implements IKvpDecoder {
                 version = KvpHelper.checkParameterSingleValue(element.get(parameterName), parameterName);
             }
         }
+        if (service == null && KvpHelper.checkForGetCapabilities(element)) {
+            service = SosConstants.SOS;
+        }
         
         RequestDecoderKey key = new RequestDecoderKey(service, version, operation);
         ISosKvpDecoderOperationDelegate decoder = getDecoder(key);

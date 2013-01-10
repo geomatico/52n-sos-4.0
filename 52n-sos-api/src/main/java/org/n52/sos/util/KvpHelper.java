@@ -32,6 +32,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,5 +84,35 @@ public class KvpHelper {
     }
     
     private KvpHelper() {
+    }
+
+    public static boolean checkForGetCapabilities(Map<String, String> parameterValueMap) throws OwsExceptionReport {
+        String requestValue = getRequestParameterValue(parameterValueMap);
+        if (requestValue != null && requestValue.equals(SosConstants.Operations.GetCapabilities.name())) {
+            return true;
+        }
+        return false;
+    }
+    
+    public static String getRequestParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
+        String requestParameterValue = getParameterValue(RequestParams.request.name(), parameterValueMap);
+        checkParameterValue(requestParameterValue, RequestParams.request.name());
+        return requestParameterValue;
+    }
+
+    public static String getParameterValue(String parameterName, Map<String, String> parameterMap) throws OwsExceptionReport {
+        for (String key : parameterMap.keySet()) {
+            if (key.equalsIgnoreCase(parameterName)) {
+                 return parameterMap.get(key);
+            }
+        }
+        return null;
+    }
+    
+    public static void checkParameterValue(String parameterValue, String parameterName) throws OwsExceptionReport {
+        if (parameterValue == null || (parameterValue != null && parameterValue.isEmpty())) {
+            LOGGER.debug("The value for parameter '{}' is missing!", parameterName);
+            throw Util4Exceptions.createMissingParameterValueException(parameterName);
+        }
     }
 }
