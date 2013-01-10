@@ -114,7 +114,7 @@ public class SosGetCapabilitiesOperatorV100 implements IRequestOperator {
             // XmlOptions xmlOptions;
             try {
             	// TODO check for SOS 1.0.0
-                IEncoder encoder = Configurator.getInstance().getEncoder(Sos2Constants.NS_SOS_20);
+                IEncoder encoder = Configurator.getInstance().getEncoder(Sos1Constants.NS_SOS);
                 if (encoder != null) {
                     Object encodedObject = encoder.encode(response);
                     if (encodedObject instanceof XmlObject) {
