@@ -108,6 +108,117 @@ public class HibernateCriteriaQueryUtilities {
         }
         return null;
     }
+    
+    /**
+     * @return the global temporal bounding box over all observations, or <tt>null</tt>
+     */
+    public static TimePeriod getGlobalTemporalBoundingBox(Session session)
+    {
+    	if (session != null)
+    	{
+            Map<String, String> aliases = new HashMap<String, String>();
+            String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
+            addOfferingAliasToMap(aliases, obsConstAlias);
+            
+            ProjectionList projections = Projections.projectionList();
+            projections.add(Projections.min(HibernateConstants.PARAMETER_PHENOMENON_TIME_START));
+            projections.add(Projections.max(HibernateConstants.PARAMETER_PHENOMENON_TIME_START));
+            projections.add(Projections.max(HibernateConstants.PARAMETER_PHENOMENON_TIME_END));
+            
+            Criteria criteria = session.createCriteria(Observation.class);
+            addAliasesToCriteria(criteria, aliases);
+            criteria.add(getEqualRestriction(HibernateConstants.DELETED, false));
+            criteria.setProjection(projections);
+            
+            Object temporalBoundingBox = criteria.uniqueResult();
+            if (temporalBoundingBox != null && temporalBoundingBox instanceof Object[])
+            {
+            			Object[] record = (Object[]) temporalBoundingBox;
+            			TimePeriod bBox = createTimePeriod((Timestamp)record[0],
+            					(Timestamp)record[1],
+            					(Timestamp)record[2]);
+            	return bBox;
+            }
+    	}
+    	return null;
+    }
+    
+    
+    /*
+     * Request Temporal Bounding box for each offering:
+     **************************************************
+     * SELECT observation_constellation.offering_id AS offering_id,
+     * 	MIN(observation.phenomenon_time_start) AS min,
+     * 	MAX(observation.phenomenon_time_end) AS max_end ,
+     * 	MAX(observation.phenomenon_time_start) AS max_start 
+     * FROM observation INNER JOIN observation_constellation ON (observation.observation_constellation_id = observation_constellation.observation_constellation_id)
+     * GROUP BY observation_constellation.offering_id
+     * ORDER BY observation_constellation.offering_id ASC;
+     * 
+     * Select max of max_end and max_start for final result
+     */
+    /**
+     * @return a Map containing the temporal bounding box for each offering
+     */
+    public static Map<String,TimePeriod> getTemporalBoundingBoxesForOfferings(Session session)
+    {
+    	if (session != null)
+    	{
+    		// 
+            Map<String, String> aliases = new HashMap<String, String>();
+            String obsConstAlias = addObservationConstallationAliasToMap(aliases, null);
+            addOfferingAliasToMap(aliases, obsConstAlias);
+            
+            ProjectionList projections = Projections.projectionList();
+            projections.add(Projections.min(HibernateConstants.PARAMETER_PHENOMENON_TIME_START));
+            projections.add(Projections.max(HibernateConstants.PARAMETER_PHENOMENON_TIME_START));
+            projections.add(Projections.max(HibernateConstants.PARAMETER_PHENOMENON_TIME_END));
+            projections.add(Projections.groupProperty(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION));
+            
+            Criteria criteria = session.createCriteria(Observation.class);
+            addAliasesToCriteria(criteria, aliases);
+            criteria.add(getEqualRestriction(HibernateConstants.DELETED, false));
+            criteria.setProjection(projections);
+            criteria.addOrder( Order.asc(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION));
+            
+            List<?> temporalBoundingBoxes = criteria.list();
+            if (!temporalBoundingBoxes.isEmpty())
+            {
+            	HashMap<String, TimePeriod> temporalBBoxMap = new HashMap<String, TimePeriod>(temporalBoundingBoxes.size());
+            	for (Object recordObj : temporalBoundingBoxes) {
+            		if (recordObj instanceof Object[])
+            		{
+            			Object[] record = (Object[]) recordObj;
+            			String key = Long.toString(((ObservationConstellation)record[3]).getOffering().getOfferingId());
+            			TimePeriod value = createTimePeriod((Timestamp)record[0],
+            					(Timestamp)record[1],
+            					(Timestamp)record[2]);
+            			temporalBBoxMap.put(key, value);
+            		}
+            	}
+            	LOGGER.debug(temporalBoundingBoxes.toString());
+            	return temporalBBoxMap;
+            }
+    	}
+    	return new HashMap<String, TimePeriod>(0);
+    }
+
+	private static TimePeriod createTimePeriod(Timestamp minStart,
+			Timestamp maxStart,
+			Timestamp maxEnd)
+	{
+		DateTime start = new DateTime(minStart);
+		DateTime end = new DateTime(maxStart);
+		if (maxEnd != null)
+		{
+			DateTime endTmp = new DateTime(maxEnd);
+            if (endTmp.isAfter(end))
+            {
+                end = endTmp;
+            }
+		}
+		return new TimePeriod(start, end);
+	}
 
     /**
      * Get max time from observations
