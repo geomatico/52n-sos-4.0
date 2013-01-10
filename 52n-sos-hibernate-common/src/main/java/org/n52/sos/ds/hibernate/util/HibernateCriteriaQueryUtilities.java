@@ -681,7 +681,6 @@ public class HibernateCriteriaQueryUtilities {
         queryObject.setAliases(aliases);
         queryObject.addCriterion(getEqualRestriction(getIdentifierParameter(foiAlias),
                 featureOfInterest.getIdentifier()));
-        queryObject.addProjection(getDistinctProjection(HibernateConstants.PARAMETER_FEATURE_OF_INTEREST));
         queryObject.addProjection(getDistinctProjection(getIdentifierParameter(procedureAlias)));
         return (List<String>) getObject(queryObject, session, Observation.class);
     }
