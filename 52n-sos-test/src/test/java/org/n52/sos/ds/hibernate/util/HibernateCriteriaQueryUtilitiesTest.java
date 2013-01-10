@@ -84,5 +84,21 @@ public class HibernateCriteriaQueryUtilitiesTest extends AbstractSosTestCase {
 			timePeriodStartIsBeforeEndOrEqual(offeringBBox);
 		}
 	}
+	
+	@Test
+	public void runtimeComparisonGetGlobalTemporalBoundingBoxes()
+	{
+		long startOldWay, startNewWay, endOldWay, endNewWay;
+		Session session = (Session)Configurator.getInstance().getConnectionProvider().getConnection();
+		startOldWay = System.currentTimeMillis();
+		HibernateCriteriaQueryUtilities.getMinObservationTime(session);
+		HibernateCriteriaQueryUtilities.getMaxObservationTime(session);
+		endOldWay = System.currentTimeMillis();
+		startNewWay = System.currentTimeMillis();
+		HibernateCriteriaQueryUtilities.getGlobalTemporalBoundingBox(session);
+		endNewWay = System.currentTimeMillis();
+		long oldTime = endOldWay - startOldWay, newTime = endNewWay - startNewWay;
+		assertTrue(String.format("new way is faster? Old way: %sms\\nNew Way: %sms",oldTime,newTime), newTime < oldTime);
+	}
 
 }
