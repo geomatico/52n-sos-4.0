@@ -83,11 +83,13 @@ public class Observation implements java.io.Serializable {
     }
 
     public Observation(long observationId, FeatureOfInterest featureOfInterest,
-            ObservationConstellation observationConstellation, Date phenomenonTimeStart, boolean deleted) {
+            ObservationConstellation observationConstellation, Date phenomenonTimeStart, Date phenomenonTimeEnd, Date resultTime, boolean deleted) {
         this.observationId = observationId;
         this.featureOfInterest = featureOfInterest;
         this.observationConstellation = observationConstellation;
         this.phenomenonTimeStart = phenomenonTimeStart;
+        this.phenomenonTimeEnd = phenomenonTimeEnd;
+        this.resultTime = resultTime;
         this.deleted = deleted;
     }
 
