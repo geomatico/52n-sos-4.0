@@ -286,6 +286,10 @@
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-hibernate-resultHandling</artifactId>
 				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-core-v100</artifactId>
+				</dependency>
 			</dependencies>
 		</profile>
 		<profile>
@@ -316,6 +320,15 @@
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-binding-soap</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>sosV100</id>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-core-v100</artifactId>
 				</dependency>
 			</dependencies>
 		</profile>

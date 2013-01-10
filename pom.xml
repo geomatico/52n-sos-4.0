@@ -18,7 +18,6 @@
 		<module>52n-sos-hibernate-dialect</module>
 		<module>52n-sos-hibernate-feature</module>
 		<module>52n-sos-hibernate-core</module>
-		<module>52n-sos-core-v100</module>
 		<module>52n-sos-core-v20</module>
 		<module>52n-sos-coding-ows-v110</module>
 		<module>52n-sos-coding-sensorML-v101</module>
@@ -847,6 +846,13 @@
 				<module>52n-sos-hibernate-transactional</module>
 				<module>52n-sos-resultHandling-v20</module>
 				<module>52n-sos-hibernate-resultHandling</module>
+				<module>52n-sos-core-v100</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>sosV100</id>
+			<modules>
+				<module>52n-sos-core-v100</module>
 			</modules>
 		</profile>
 		<profile>
