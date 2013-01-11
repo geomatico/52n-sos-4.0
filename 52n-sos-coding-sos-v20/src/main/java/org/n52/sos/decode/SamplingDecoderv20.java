@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.opengis.gml.x32.CodeType;
 import net.opengis.gml.x32.FeaturePropertyType;
 import net.opengis.gml.x32.ReferenceType;
 import net.opengis.samplingSpatial.x20.SFSpatialSamplingFeatureDocument;
@@ -40,12 +39,12 @@ import net.opengis.samplingSpatial.x20.ShapeType;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.OGCConstants;
+import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.DecoderHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -132,7 +131,9 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
                 && !spatialSamplingFeature.getIdentifier().getStringValue().isEmpty()) {
             sosFeat.setIdentifier(spatialSamplingFeature.getIdentifier().getStringValue());
         }
-        sosFeat.setName(getNames(spatialSamplingFeature.getNameArray()));
+        if (spatialSamplingFeature.getNameArray() != null) {
+              sosFeat.setName(getNames(spatialSamplingFeature));
+        }
         sosFeat.setFeatureType(getFeatureType(spatialSamplingFeature.getType()));
         sosFeat.setSampledFeatures(getSampledFeatures(spatialSamplingFeature.getSampledFeature()));
         sosFeat.setXmlDescription(getXmlDescription(spatialSamplingFeature));
@@ -148,14 +149,16 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
         return featureDoc.xmlText(XmlOptionsHelper.getInstance().getXmlOptions());
     }
 
-    private List<String> getNames(CodeType[] nameArray) {
-        if (nameArray != null) {
-            List<String> names = new ArrayList<String>();
-            for (CodeType codeType : nameArray) {
-                names.add(codeType.getStringValue());
+    private List<CodeType> getNames(SFSpatialSamplingFeatureType spatialSamplingFeature) throws OwsExceptionReport {
+        List<CodeType> names = new ArrayList<CodeType>();
+        int length = spatialSamplingFeature.getNameArray().length;
+        for (int i = 0; i < length; i++) {
+            Object decodedElement = DecoderHelper.decodeXmlElement(spatialSamplingFeature.getNameArray(i));
+            if (decodedElement != null && decodedElement instanceof CodeType) {
+                names.add((CodeType)decodedElement);
             }
         }
-        return null;
+        return names;
     }
 
     private String getFeatureType(ReferenceType type) {
@@ -175,7 +178,8 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
                 } else {
                     SosSamplingFeature sampFeat = new SosSamplingFeature(sampledFeature.getHref());
                     if (sampledFeature.getTitle() != null && !sampledFeature.getTitle().isEmpty()) {
-                        sampFeat.addName(sampledFeature.getTitle());
+                        
+                        sampFeat.addName(new CodeType(sampledFeature.getTitle()));
                     }
                     sampledFeatures.add(sampFeat);
                 }

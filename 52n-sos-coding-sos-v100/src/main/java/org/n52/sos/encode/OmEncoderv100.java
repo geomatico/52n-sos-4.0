@@ -1038,7 +1038,7 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
             featureProperty.setHref(feature.getIdentifier());
             // }
             if (samplingFeature.isSetNames()) {
-                featureProperty.setTitle(samplingFeature.getFirstName());
+                featureProperty.setTitle(samplingFeature.getFirstName().getValue());
             }
         } else {
             if (samplingFeature.getUrl() != null) {
@@ -1063,7 +1063,7 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
                     } else {
                         featureProperty.setHref(samplingFeature.getIdentifier());
                         if (samplingFeature.isSetNames()) {
-                            featureProperty.setTitle(samplingFeature.getFirstName());
+                            featureProperty.setTitle(samplingFeature.getFirstName().getValue());
                         }
                     }
                 }

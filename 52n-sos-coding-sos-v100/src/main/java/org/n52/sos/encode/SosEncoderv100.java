@@ -69,25 +69,14 @@ import net.opengis.sos.x10.ResponseModeType;
 import net.opengis.swe.x101.PhenomenonPropertyType;
 import net.opengis.swe.x101.TimeGeometricPrimitivePropertyType;
 
+import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlCursor;
-import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
-import org.apache.xmlbeans.XmlQName;
-import org.apache.xmlbeans.XmlString;
-import org.n52.sos.ogc.filter.FilterConstants;
 import org.n52.sos.ogc.filter.FilterConstants.ComparisonOperator;
-import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
-import org.n52.sos.ogc.filter.FilterConstants.TimeOperator2;
 import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
-import org.n52.sos.ogc.filter.TemporalFilter;
+import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.SosFeatureCollection;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
-import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
@@ -95,33 +84,16 @@ import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosInsertionCapabilities;
 import org.n52.sos.ogc.sos.SosOfferingsForContents;
-import org.n52.sos.ogc.sos.SosResultEncoding;
-import org.n52.sos.ogc.sos.SosResultStructure;
-import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.GetCapabilitiesRequest;
-import org.n52.sos.request.GetResultRequest;
-import org.n52.sos.request.GetResultTemplateRequest;
 import org.n52.sos.response.AbstractServiceResponse;
 import org.n52.sos.response.DescribeSensorResponse;
 import org.n52.sos.response.GetCapabilitiesResponse;
-import org.n52.sos.response.GetFeatureOfInterestResponse;
-import org.n52.sos.response.GetObservationByIdResponse;
-import org.n52.sos.response.GetObservationResponse;
-import org.n52.sos.response.GetResultResponse;
-import org.n52.sos.response.GetResultTemplateResponse;
-import org.n52.sos.response.InsertObservationResponse;
-import org.n52.sos.response.InsertResultResponse;
-import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.W3CConstants;
 import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -757,6 +729,5 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
 
         return envelopeType;
     }
-
 
 }

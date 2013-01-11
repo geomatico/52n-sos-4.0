@@ -60,7 +60,6 @@ import org.n52.sos.request.GetFeatureOfInterestRequest;
 import org.n52.sos.request.GetObservationByIdRequest;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.DecoderHelper;
 import org.n52.sos.util.Util4Exceptions;

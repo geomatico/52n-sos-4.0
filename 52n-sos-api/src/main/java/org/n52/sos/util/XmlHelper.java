@@ -42,14 +42,12 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlValidationError;
-import org.n52.sos.decode.IDecoder;
 import org.n52.sos.exception.IExceptionCode;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
-import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
@@ -512,9 +510,9 @@ public class XmlHelper {
     private XmlHelper() {
     }
 
-    public static void substituteElement(XmlObject elementToSubstitute, XmlObject substitutionElement) {
+    public static XmlObject substituteElement(XmlObject elementToSubstitute, XmlObject substitutionElement) {
         Node domNode = substitutionElement.getDomNode();
-        elementToSubstitute.substitute(new QName(domNode.getNamespaceURI(), domNode.getLocalName()),
+        return elementToSubstitute.substitute(new QName(domNode.getNamespaceURI(), domNode.getLocalName()),
                 substitutionElement.schemaType());
     }
 

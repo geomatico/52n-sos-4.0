@@ -240,7 +240,7 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
         }
         SosSamplingFeature sampFeat = new SosSamplingFeature(checkedFoiID);
         if (feature.getName() != null && !feature.getName().isEmpty()) {
-            sampFeat.setName(SosHelper.createListFromCSV(feature.getName()));
+            sampFeat.setName(SosHelper.createCodeTypeListFromCSV(feature.getName()));
         }
         sampFeat.setDescription(null);
         sampFeat.setGeometry(feature.getGeom());

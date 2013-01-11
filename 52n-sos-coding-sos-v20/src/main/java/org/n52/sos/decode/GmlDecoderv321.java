@@ -33,6 +33,7 @@ import java.util.Set;
 import net.opengis.gml.x32.AbstractRingPropertyType;
 import net.opengis.gml.x32.AbstractRingType;
 import net.opengis.gml.x32.AbstractSurfaceType;
+import net.opengis.gml.x32.CodeType;
 import net.opengis.gml.x32.CodeWithAuthorityType;
 import net.opengis.gml.x32.CompositeSurfaceType;
 import net.opengis.gml.x32.CoordinatesType;
@@ -148,6 +149,8 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
             return parseCompositeSurfaceType((CompositeSurfaceType) xmlObject);
         } else if (xmlObject instanceof CodeWithAuthorityType) {
             return parseCodeWithAuthorityTye((CodeWithAuthorityType) xmlObject);
+        } else if (xmlObject instanceof CodeType) {
+            return parseCodeType((CodeType)xmlObject);
         }
         return null;
     }
@@ -510,6 +513,14 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
             return sosCodeWithAuthority;
         }
         return null;
+    }
+    
+    private org.n52.sos.ogc.gml.CodeType parseCodeType(CodeType element) {
+        org.n52.sos.ogc.gml.CodeType codeType = new org.n52.sos.ogc.gml.CodeType(element.getStringValue());
+        if (element.isSetCodeSpace()) {
+            codeType.setCodeSpace(element.getCodeSpace());
+        }
+        return codeType;
     }
 
     /**

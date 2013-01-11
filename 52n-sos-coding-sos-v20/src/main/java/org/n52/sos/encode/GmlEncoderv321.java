@@ -32,11 +32,13 @@ import java.util.Set;
 
 import net.opengis.gml.x32.AbstractRingPropertyType;
 import net.opengis.gml.x32.AbstractRingType;
+import net.opengis.gml.x32.CodeType;
 import net.opengis.gml.x32.CodeWithAuthorityType;
 import net.opengis.gml.x32.DirectPositionListType;
 import net.opengis.gml.x32.DirectPositionType;
 import net.opengis.gml.x32.LineStringType;
 import net.opengis.gml.x32.LinearRingType;
+import net.opengis.gml.x32.MeasureType;
 import net.opengis.gml.x32.PointType;
 import net.opengis.gml.x32.PolygonType;
 import net.opengis.gml.x32.ReferenceType;
@@ -55,9 +57,8 @@ import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.values.CategoryValue;
-import org.n52.sos.ogc.ows.OWSConstants;
+import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.Configurator;
@@ -143,6 +144,9 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
         }
         if (element instanceof CodeWithAuthority) {
             return createCodeWithAuthorityType((CodeWithAuthority) element);
+        }
+        if (element instanceof QuantityValue) {
+            return createMeasureType((QuantityValue)element);
         }
         return null;
     }
@@ -455,4 +459,28 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
         }
         return null;
     }
+    
+    private XmlObject createCodeType(org.n52.sos.ogc.gml.CodeType sosCodeType) {
+        CodeType codeType = CodeType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        codeType.setCodeSpace(sosCodeType.getCodeSpace());
+        codeType.setStringValue(sosCodeType.getValue());
+        return codeType;
+    }
+
+    private XmlObject createMeasureType(QuantityValue quantityValue) {
+        MeasureType measureType =
+                MeasureType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        if (quantityValue.getUnit() != null) {
+            measureType.setUom(quantityValue.getUnit());
+        } else {
+            measureType.setUom("");
+        }
+        if (!quantityValue.getValue().equals(Double.NaN)) {
+            measureType.setDoubleValue(quantityValue.getValue());
+        } else {
+            measureType.setNil();
+        }
+        return measureType;
+    }
+
 }

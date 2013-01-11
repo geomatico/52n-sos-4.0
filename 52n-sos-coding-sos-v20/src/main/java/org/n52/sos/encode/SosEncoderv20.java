@@ -118,6 +118,7 @@ import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.N52XmlHelper;
+import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3CConstants;
 import org.n52.sos.util.XmlHelper;
@@ -365,15 +366,16 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                 if (sampFeat.getUrl() != null) {
                     featureProperty.setHref(sampFeat.getUrl());
                     if (sampFeat.isSetNames()) {
-                        featureProperty.setTitle(sampFeat.getFirstName());
+                        featureProperty.setTitle(sampFeat.getFirstName().getValue());
                     }
                 } else {
                     // TODO HYDRO-PROFILE check for profile
-//                    IEncoder encoder =
-//                            Configurator.getInstance().getEncoder(
-//                                    OMHelper.getNamespaceForFeatureType(sampFeat.getFeatureType()));
+//                  IEncoder encoder =
+//                  Configurator.getInstance().getEncoder("http://www.opengis.net/waterml/2.0");
                     IEncoder encoder =
-                            Configurator.getInstance().getEncoder("http://www.opengis.net/waterml/2.0");
+                            Configurator.getInstance().getEncoder(
+                                    OMHelper.getNamespaceForFeatureType(sampFeat.getFeatureType()));
+
                     if (encoder != null) {
                         featureProperty.set((XmlObject) encoder.encode(sampFeat));
                     } else {
@@ -388,7 +390,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                         } else {
                             featureProperty.setHref(identifier);
                             if (sampFeat.isSetNames()) {
-                                featureProperty.setTitle(sampFeat.getFirstName());
+                                featureProperty.setTitle(sampFeat.getFirstName().getValue());
                             }
                         }
                     }

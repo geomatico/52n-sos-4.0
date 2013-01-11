@@ -51,6 +51,7 @@ import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.IObservationEncoder;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
+import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.ows.OWSConstants;
@@ -1090,11 +1091,11 @@ public class SosHelper {
         }
     }
 
-    public static String createCSVFromList(List<String> values) {
+    public static String createCSVFromCodeTypeList(List<CodeType> values) {
         StringBuilder builder = new StringBuilder();
         if (values != null && !values.isEmpty()) {
-            for (String value : values) {
-                builder.append(value);
+            for (CodeType value : values) {
+                builder.append(value.getValue());
                 builder.append(',');
             }
             builder.delete(builder.lastIndexOf(","), builder.length());
@@ -1102,11 +1103,14 @@ public class SosHelper {
         return builder.toString();
     }
 
-    public static List<String> createListFromCSV(String csv) {
+    public static List<CodeType> createCodeTypeListFromCSV(String csv) {
+        List<CodeType> names = new ArrayList<CodeType>(0);
         if (csv != null && !csv.isEmpty()) {
-            return Arrays.asList(csv.split(","));
+            for (String name : csv.split(",")) {
+                names.add(new CodeType(name));
+            }
         }
-        return new ArrayList<String>(0);
+        return names;
     }
 
     public static void checkObservationType(String observationType, String parameterName) throws OwsExceptionReport {

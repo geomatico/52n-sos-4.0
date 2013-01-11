@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.n52.sos.ogc.OGCConstants;
+import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -38,7 +39,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class SosSamplingFeature extends SosAbstractFeature {
     
-    private List<String> name;
+    private List<CodeType> name = new ArrayList<CodeType>(0);
 
     private String description;
 
@@ -68,18 +69,15 @@ public class SosSamplingFeature extends SosAbstractFeature {
        super(featureIdentifier, gmlId);
     }
 
-    public List<String> getName() {
+    public List<CodeType> getName() {
         return name;
     }
 
-    public void setName(List<String> name) {
+    public void setName(List<CodeType> name) {
         this.name = name;
     }
     
-    public void addName(String name) {
-        if (this.name == null) {
-            this.name = new ArrayList<String>();
-        }
+    public void addName(CodeType name) {
         this.name.add(name);
     }
 
@@ -143,7 +141,7 @@ public class SosSamplingFeature extends SosAbstractFeature {
         return name != null && !name.isEmpty();
     }
     
-    public String getFirstName() {
+    public CodeType getFirstName() {
         if (isSetNames()) {
             return name.get(0);
         }

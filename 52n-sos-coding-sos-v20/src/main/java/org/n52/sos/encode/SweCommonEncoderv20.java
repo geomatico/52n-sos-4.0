@@ -52,7 +52,6 @@ import net.opengis.swe.x20.VectorType.Coordinate;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
-import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlString;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;

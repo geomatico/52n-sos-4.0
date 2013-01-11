@@ -86,7 +86,6 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
 import org.n52.sos.ogc.swe.AbstractDataRecord;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.DecoderHelper;
 import org.n52.sos.util.Util4Exceptions;

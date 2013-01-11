@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.opengis.gml.x32.FeaturePropertyType;
-import net.opengis.gml.x32.MeasureType;
 import net.opengis.om.x20.OMObservationType;
 import net.opengis.om.x20.TimeObjectPropertyType;
 
@@ -72,7 +71,6 @@ import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-//import net.opengis.gml.x32.CodeWithAuthorityType;
 
 public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
 
@@ -891,19 +889,11 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
         if ((observationType.equals(OMConstants.OBS_TYPE_MEASUREMENT) || observationType
                 .equals(OMConstants.RESULT_MODEL_MEASUREMENT)) && observationValue.getValue() instanceof QuantityValue) {
             QuantityValue quantityValue = (QuantityValue) observationValue.getValue();
-            MeasureType xbMeasureType =
-                    MeasureType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-            if (quantityValue.getUnit() != null) {
-                xbMeasureType.setUom(quantityValue.getUnit());
-            } else {
-                xbMeasureType.setUom("");
+            IEncoder encoder = getEncoderForNamespace(GMLConstants.NS_GML_32);
+            Object encodedObject = encoder.encode(quantityValue);
+            if (encodedObject instanceof XmlObject) {
+                xbResult.set((XmlObject)encodedObject);
             }
-            if (!quantityValue.getValue().equals(Double.NaN)) {
-                xbMeasureType.setDoubleValue(quantityValue.getValue());
-            } else {
-                xbMeasureType.setNil();
-            }
-            xbResult.set(xbMeasureType);
         } else if ((observationType.equals(OMConstants.OBS_TYPE_COUNT_OBSERVATION) || observationType
                 .equals(OMConstants.RESULT_MODEL_COUNT_OBSERVATION))
                 && observationValue.getValue() instanceof CountValue) {
@@ -1035,7 +1025,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
             featureProperty.setHref(feature.getIdentifier());
             // }
             if (samplingFeature.isSetNames()) {
-                featureProperty.setTitle(samplingFeature.getFirstName());
+                featureProperty.setTitle(samplingFeature.getFirstName().getValue());
             }
         } else {
             if (samplingFeature.getUrl() != null) {
@@ -1060,7 +1050,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
                     } else {
                         featureProperty.setHref(samplingFeature.getIdentifier());
                         if (samplingFeature.isSetNames()) {
-                            featureProperty.setTitle(samplingFeature.getFirstName());
+                            featureProperty.setTitle(samplingFeature.getFirstName().getValue());
                         }
                     }
                 }

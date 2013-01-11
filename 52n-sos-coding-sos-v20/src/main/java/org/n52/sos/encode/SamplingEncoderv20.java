@@ -30,9 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.opengis.gml.x32.AbstractGeometryType;
-import net.opengis.gml.x32.CodeType;
-import net.opengis.gml.x32.CodeWithAuthorityType;
 import net.opengis.gml.x32.FeaturePropertyType;
 import net.opengis.sampling.x20.SFSamplingFeatureCollectionDocument;
 import net.opengis.sampling.x20.SFSamplingFeatureCollectionType;
@@ -54,7 +51,6 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.util.GmlHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
@@ -148,7 +144,7 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
                 FeaturePropertyType featureProperty = FeaturePropertyType.Factory.newInstance();
                 featureProperty.setHref(absFeature.getIdentifier());
                 if (sampFeat.isSetNames()) {
-                    featureProperty.setTitle(sampFeat.getFirstName());
+                    featureProperty.setTitle(sampFeat.getFirstName().getValue());
                 }
                 return featureProperty;
             }
@@ -181,24 +177,39 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
                 // set gml:id
                 xbSampFeature.setId(absFeature.getGmlId());
 
-                if (sampFeat.getIdentifier() != null
-                        && !sampFeat.getIdentifier().isEmpty()
+                if (sampFeat.isSetIdentifier()
                         && SosHelper.checkFeatureOfInterestIdentifierForSosV2(sampFeat.getIdentifier(),
                                 Sos2Constants.SERVICEVERSION)) {
                     // set identifier
-                    CodeWithAuthorityType identifier = xbSampFeature.addNewIdentifier();
-                    identifier.setCodeSpace("");
-                    identifier.setStringValue(sampFeat.getIdentifier());
+                    IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
+                    if (encoder != null) {
+                        XmlObject xmlObject = (XmlObject) encoder.encode(sampFeat.getIdentifier());
+                        if (xmlObject != null) {
+                            xbSampFeature.addNewIdentifier().set(xmlObject);
+                        }
+                    } else {
+                        String exceptionText = "Error while encoding identifier for feature, needed encoder is missing!";
+                        LOGGER.debug(exceptionText);
+                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                    }
                 }
 
                 // set type
                 xbSampFeature.addNewType().setHref(sampFeat.getFeatureType());
 
                 if (sampFeat.isSetNames()) {
-                    for (String sosName : sampFeat.getName()) {
-                        CodeType name = xbSampFeature.addNewName();
-                        name.setCodeSpace("");
-                        name.setStringValue(sosName);
+                    IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
+                    if (encoder != null) {
+                        for (org.n52.sos.ogc.gml.CodeType sosName : sampFeat.getName()) {
+                        XmlObject xmlObject = (XmlObject) encoder.encode(sampFeat.getIdentifier());
+                            if (xmlObject != null) {
+                                xbSampFeature.addNewName().set(xmlObject);
+                            }
+                        }
+                    } else {
+                        String exceptionText = "Error while encoding identifier for feature, needed encoder is missing!";
+                        LOGGER.debug(exceptionText);
+                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
                     }
                 }
 
@@ -221,14 +232,9 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
                     Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
                     additionalValues.put(HelperValues.GMLID, absFeature.getGmlId());
                     XmlObject xmlObject = (XmlObject) encoder.encode(sampFeat.getGeometry(), additionalValues);
-                    if (xmlObject instanceof AbstractGeometryType) {
-                        XmlObject substitution =
-                                xbShape.addNewAbstractGeometry().substitute(
-                                        GmlHelper.getQnameForGeometry(sampFeat.getGeometry()), xmlObject.schemaType());
-                        substitution.set((AbstractGeometryType) xmlObject);
-                    } else {
-                        // TODO: Exception
-                    }
+                    xbShape.addNewAbstractGeometry().set(xmlObject);
+                    XmlHelper.substituteElement(xbShape.getAbstractGeometry(), xmlObject);
+//                    encoder.substitute(xbShape.getAbstractGeometry(), xmlObject);
                 } else {
                     String exceptionText = "Error while encoding geometry for feature, needed encoder is missing!";
                     LOGGER.debug(exceptionText);
@@ -252,5 +258,4 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
         }
         return xbSampFeatCollDoc;
     }
-
 }

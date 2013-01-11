@@ -88,7 +88,6 @@ import org.n52.sos.response.AbstractServiceResponse;
 import org.n52.sos.response.GetResultResponse;
 import org.n52.sos.response.GetResultTemplateResponse;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.DecoderHelper;
 import org.n52.sos.util.Util4Exceptions;

@@ -39,6 +39,7 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlInteger;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
+import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -66,7 +67,6 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SosSweDataArray;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.DecoderHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -211,7 +211,7 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
                 } else {
                     feature = new SosSamplingFeature(featureOfInterest.getHref());
                     if (featureOfInterest.getTitle() != null && !featureOfInterest.getTitle().isEmpty()) {
-                        feature.addName(featureOfInterest.getTitle());
+                        feature.addName(new CodeType(featureOfInterest.getTitle()));
                     }
                 }
         }

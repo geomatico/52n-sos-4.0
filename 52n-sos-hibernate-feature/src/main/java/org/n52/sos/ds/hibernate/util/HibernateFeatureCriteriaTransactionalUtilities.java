@@ -41,7 +41,7 @@ public class HibernateFeatureCriteriaTransactionalUtilities {
                 feature.setIdentifier(samplingFeature.getIdentifier());
             }
             if (samplingFeature.isSetNames()) {
-                feature.setName(SosHelper.createCSVFromList(samplingFeature.getName()));
+                feature.setName(SosHelper.createCSVFromCodeTypeList(samplingFeature.getName()));
             }
             if (samplingFeature.getGeometry() != null && !samplingFeature.getGeometry().isEmpty()) {
                 // TODO: transform to default EPSG
