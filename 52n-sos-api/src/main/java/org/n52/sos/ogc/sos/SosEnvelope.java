@@ -92,5 +92,9 @@ public class SosEnvelope {
     public void setSrid(int srid) {
         this.srid = srid;
     }
+    
+    public boolean isSetEnvelope() {
+        return envelope != null && !envelope.isNull();
+    }
 
 }
