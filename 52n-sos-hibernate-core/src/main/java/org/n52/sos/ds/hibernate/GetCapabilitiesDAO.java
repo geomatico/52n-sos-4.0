@@ -46,6 +46,7 @@ import org.n52.sos.decode.IDecoder;
 import org.n52.sos.ds.IGetCapabilitiesDAO;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.filter.FilterCapabilities;
 import org.n52.sos.ogc.filter.FilterConstants.ComparisonOperator;
 import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
@@ -67,6 +68,7 @@ import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.ogc.sos.SosOfferingsForContents;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.request.operator.IRequestOperator;
@@ -92,15 +94,20 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
      * supported SOS operation
      */
     private static final String OPERATION_NAME = SosConstants.Operations.GetCapabilities.name();
-    
-    /* section flags (values are powers of 2)*/
+
+    /* section flags (values are powers of 2) */
     private static final int SERVICE_IDENTIFICATION = 0x01;
-    private static final int SERVICE_PROVIDER       = 0x02;
-    private static final int OPERATIONS_METADATA    = 0x04;
-    private static final int FILTER_CAPABILITIES    = 0x08;
-    private static final int CONTENTS               = 0x10;
-    private static final int ALL = 0x20 | SERVICE_IDENTIFICATION | SERVICE_PROVIDER 
-                  | OPERATIONS_METADATA | FILTER_CAPABILITIES    | CONTENTS;
+
+    private static final int SERVICE_PROVIDER = 0x02;
+
+    private static final int OPERATIONS_METADATA = 0x04;
+
+    private static final int FILTER_CAPABILITIES = 0x08;
+
+    private static final int CONTENTS = 0x10;
+
+    private static final int ALL = 0x20 | SERVICE_IDENTIFICATION | SERVICE_PROVIDER | OPERATIONS_METADATA
+            | FILTER_CAPABILITIES | CONTENTS;
 
     /*
      * (non-Javadoc)
@@ -111,10 +118,13 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
     public String getOperationName() {
         return OPERATION_NAME;
     }
-    
+
     /*
      * (non-Javadoc)
-     * @see org.n52.sos.ds.hibernate.AbstractHibernateOperationDao#getOperationsMetadata(java.lang.String, org.hibernate.Session)
+     * 
+     * @see
+     * org.n52.sos.ds.hibernate.AbstractHibernateOperationDao#getOperationsMetadata
+     * (java.lang.String, org.hibernate.Session)
      */
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session)
@@ -127,7 +137,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         sectionsValues.add(SosConstants.CapabilitiesSections.OperationsMetadata.name());
         sectionsValues.add(SosConstants.CapabilitiesSections.Contents.name());
         sectionsValues.add(SosConstants.CapabilitiesSections.All.name());
-        
+
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             sectionsValues.add(Sos1Constants.CapabilitiesSections.Filter_Capabilities.name());
         } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
@@ -137,10 +147,12 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 sectionsValues.add(section);
             }
         }
-       
+
         opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.Sections, sectionsValues);
-        opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptFormats, Arrays.asList(SosConstants.getAcceptFormats()));
-        opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptVersions, getConfigurator().getSupportedVersions());
+        opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptFormats,
+                Arrays.asList(SosConstants.getAcceptFormats()));
+        opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptVersions, getConfigurator()
+                .getSupportedVersions());
         opsMeta.addAnyParameterValue(SosConstants.GetCapabilitiesParams.updateSequence);
     }
 
@@ -177,9 +189,9 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 response.setVersion(request.getVersion());
             }
             if (response.getVersion() == null) {
-                String exceptionText = String.format(
-                        "The requested '%s' values are not supported by this service!", 
-                        SosConstants.GetCapabilitiesParams.AcceptVersions.name());
+                String exceptionText =
+                        String.format("The requested '%s' values are not supported by this service!",
+                                SosConstants.GetCapabilitiesParams.AcceptVersions.name());
                 LOGGER.error(exceptionText);
                 throw Util4Exceptions.createVersionNegotiationFailedException(exceptionText);
             }
@@ -188,14 +200,15 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
             Set<String> requestedExtensionSections = new HashSet<String>(availableExtensionSections.size());
             // section flags
             int sections = 0;
-            
+
             // handle sections array and set requested sections flag
             if (request.getSections() == null) {
                 sections = ALL;
             } else {
                 for (String section : request.getSections()) {
                     if (section.isEmpty()) {
-                        // TODO empty section does not result in an exception report?
+                        // TODO empty section does not result in an exception
+                        // report?
                         continue;
                     }
                     if (section.equals(SosConstants.CapabilitiesSections.All.name())) {
@@ -207,18 +220,20 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                         sections |= SERVICE_PROVIDER;
                     } else if (section.equals(SosConstants.CapabilitiesSections.OperationsMetadata.name())) {
                         sections |= OPERATIONS_METADATA;
-                    } else if ((section.equals(Sos1Constants.CapabilitiesSections.Filter_Capabilities.name()) 
-                                    && response.getVersion().equals(Sos1Constants.SERVICEVERSION)) 
-                            || (section.equals(Sos2Constants.CapabilitiesSections.FilterCapabilities.name()) 
-                                    && response.getVersion().equals(Sos2Constants.SERVICEVERSION)))  {
+                    } else if ((section.equals(Sos1Constants.CapabilitiesSections.Filter_Capabilities.name()) && response
+                            .getVersion().equals(Sos1Constants.SERVICEVERSION))
+                            || (section.equals(Sos2Constants.CapabilitiesSections.FilterCapabilities.name()) && response
+                                    .getVersion().equals(Sos2Constants.SERVICEVERSION))) {
                         sections |= FILTER_CAPABILITIES;
                     } else if (section.equals(SosConstants.CapabilitiesSections.Contents.name())) {
                         sections |= CONTENTS;
-                    } else if (availableExtensionSections.contains(section) 
+                    } else if (availableExtensionSections.contains(section)
                             && response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
                         requestedExtensionSections.add(section);
                     } else {
-                        String exceptionText = String.format("The requested section '%s' does not exist or is not supported!", section);
+                        String exceptionText =
+                                String.format("The requested section '%s' does not exist or is not supported!",
+                                        section);
                         LOGGER.debug(exceptionText);
                         throw Util4Exceptions.createInvalidParameterValueException(
                                 SosConstants.GetCapabilitiesParams.Section.name(), exceptionText);
@@ -227,7 +242,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
             }
 
             SosCapabilities sosCapabilities = new SosCapabilities();
-            
+
             if ((sections & SERVICE_IDENTIFICATION) != 0) {
                 sosCapabilities.setServiceIdentification(getServiceIdentification(response.getVersion()));
             }
@@ -235,7 +250,8 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 sosCapabilities.setServiceProvider(getConfigurator().getServiceProvider());
             }
             if ((sections & OPERATIONS_METADATA) != 0) {
-                sosCapabilities.setOperationsMetadata(getOperationsMetadataForOperations(response.getService(), response.getVersion(), session));
+                sosCapabilities.setOperationsMetadata(getOperationsMetadataForOperations(response.getService(),
+                        response.getVersion(), session));
             }
             if ((sections & FILTER_CAPABILITIES) != 0) {
                 sosCapabilities.setFilterCapabilities(getFilterCapabilities(response.getVersion()));
@@ -244,10 +260,10 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 if (response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
                     sosCapabilities.setContents(getContentsForSosV2(response.getVersion(), session));
                 } else {
-                    sosCapabilities.setContents(getContents(session));
+                    sosCapabilities.setContents(getContents());
                 }
             }
-            
+
             if (response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
                 if (sections == ALL) {
                     sosCapabilities.setExensions(getAndMergeExtensions(session));
@@ -304,25 +320,29 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    private OWSOperationsMetadata getOperationsMetadataForOperations(String service, String version, Session session) throws OwsExceptionReport {
-       
+    private OWSOperationsMetadata getOperationsMetadataForOperations(String service, String version, Session session)
+            throws OwsExceptionReport {
+
         OWSOperationsMetadata operationsMetadata = new OWSOperationsMetadata();
-        operationsMetadata.addCommonValue(OWSConstants.RequestParams.service.name(), new OWSParameterValuePossibleValues(SosConstants.SOS));
-        operationsMetadata.addCommonValue(OWSConstants.RequestParams.version.name(), new OWSParameterValuePossibleValues(getConfigurator().getSupportedVersions()));
-        
+        operationsMetadata.addCommonValue(OWSConstants.RequestParams.service.name(),
+                new OWSParameterValuePossibleValues(SosConstants.SOS));
+        operationsMetadata.addCommonValue(OWSConstants.RequestParams.version.name(),
+                new OWSParameterValuePossibleValues(getConfigurator().getSupportedVersions()));
+
         // FIXME: OpsMetadata for InsertSensor, InsertObservation SOS 2.0
         Map<RequestOperatorKeyType, IRequestOperator> requestOperators = getConfigurator().getRequestOperator();
         List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>(requestOperators.size());
         for (RequestOperatorKeyType requestOperatorKeyType : requestOperators.keySet()) {
             if (requestOperatorKeyType.getServiceOperatorKeyType().getVersion().equals(version)) {
-                OWSOperation operationMetadata = requestOperators.get(requestOperatorKeyType).getOperationMetadata(service, version, session);
+                OWSOperation operationMetadata =
+                        requestOperators.get(requestOperatorKeyType).getOperationMetadata(service, version, session);
                 if (operationMetadata != null) {
                     opsMetadata.add(operationMetadata);
                 }
             }
         }
         operationsMetadata.setOperations(opsMetadata);
-        
+
         return operationsMetadata;
     }
 
@@ -351,25 +371,24 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
      * 
      * @param sosCapabilities
      *            SOS internal capabilities
-     * @param session
-     *            Hibernate session
      * @return Offerings for contents
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    private List<SosOfferingsForContents> getContents(Session session)
-            throws OwsExceptionReport {
+    private List<SosOfferingsForContents> getContents() throws OwsExceptionReport {
         Collection<String> offerings = getCache().getOfferings();
         List<SosOfferingsForContents> sosOfferings = new ArrayList<SosOfferingsForContents>(offerings.size());
         for (String offering : offerings) {
 
-            Collection<String> observationTypes = getObservationTypes(offering);
-            if (observationTypes != null && !observationTypes.isEmpty()) {
+            SosEnvelope envelopeForOffering = getCache().getEnvelopeForOffering(offering);
+            List<String> featuresForoffering = getFOI4offering(offering);
+            Collection<String> responseFormats = SosHelper.getSupportedResponseFormats(SosConstants.SOS, "1.0.0");
+            if (checkOfferingValues(envelopeForOffering, featuresForoffering, responseFormats)) {
                 SosOfferingsForContents sosOffering = new SosOfferingsForContents();
                 sosOffering.setOffering(offering);
 
                 // insert observationTypes
-                sosOffering.setObservationTypes(observationTypes);
+                sosOffering.setObservationTypes(getObservationTypes(offering));
 
                 // only if fois are contained for the offering set the values of
                 // the
@@ -390,11 +409,10 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 sosOffering.setObservableProperties(getCache().getObservablePropertiesForOffering(offering));
                 sosOffering.setCompositePhenomena(getCache().getKOfferingVCompositePhenomenons().get(offering));
                 Map<String, Collection<String>> phens4CompPhens = new HashMap<String, Collection<String>>();
-                if (getCache().getKOfferingVCompositePhenomenons()
-                        .get(offering) != null) {
-                    for (String compositePhenomenon :getCache().getKOfferingVCompositePhenomenons().get(offering)) {
-                        phens4CompPhens.put(compositePhenomenon,
-                                getCache().getKCompositePhenomenonVObservableProperty().get(compositePhenomenon));
+                if (getCache().getKOfferingVCompositePhenomenons().get(offering) != null) {
+                    for (String compositePhenomenon : getCache().getKOfferingVCompositePhenomenons().get(offering)) {
+                        phens4CompPhens.put(compositePhenomenon, getCache()
+                                .getKCompositePhenomenonVObservableProperty().get(compositePhenomenon));
                     }
                 }
                 sosOffering.setPhens4CompPhens(phens4CompPhens);
@@ -406,7 +424,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
                 // add feature of interests
                 if (getConfigurator().isFoiListedInOfferings()) {
-                    sosOffering.setFeatureOfInterest(getFOI4offering(offering, session));
+                    sosOffering.setFeatureOfInterest(getFOI4offering(offering));
                 }
 
                 // set procedures
@@ -421,19 +439,11 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 sosOffering.setProcedures(procedures);
 
                 // insert result models
-                Collection<QName> resultModels = getQNamesForResultModel(getCache().getResultModels4Offering(offering));
-
-                if (resultModels == null || resultModels.isEmpty()) {
-                    String exceptionText =
-                            "No result models are contained in the database for the offering: " + offering
-                                    + "! Please contact the admin of this SOS.";
-                    LOGGER.error(exceptionText);
-                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-                }
+                Collection<QName> resultModels =
+                        getQNamesForResultModel(getCache().getResultModels4Offering(offering));
                 sosOffering.setResultModels(resultModels);
 
                 // set response format
-                Collection<String> responseFormats = SosHelper.getSupportedResponseFormats(SosConstants.SOS, "1.0.0");
                 responseFormats.add(SosConstants.CONTENT_TYPE_ZIP);
                 sosOffering.setResponseFormats(responseFormats);
 
@@ -445,6 +455,12 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         }
 
         return sosOfferings;
+    }
+
+    private boolean checkOfferingValues(SosEnvelope envelopeForOffering, List<String> featuresForoffering,
+            Collection<String> responseFormats) {
+        return envelopeForOffering != null && envelopeForOffering.isSetEnvelope() && featuresForoffering != null
+                && !featuresForoffering.isEmpty() && responseFormats != null && !responseFormats.isEmpty();
     }
 
     /**
@@ -484,9 +500,8 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                     // TODO: add intended application
 
                     // add offering name
-                    sosOffering.setOfferingName(getCache()
-                            .getOfferingName(offering));
-                    
+                    sosOffering.setOfferingName(getCache().getOfferingName(offering));
+
                     setUpPhenomenaForOffering(offering, procedure, sosOffering);
                     setUpTimeForOffering(offering, session, ++phenTimeCounter, sosOffering);
                     setUpFeaturesForOffering(offering, session, version, procedure, sosOffering);
@@ -501,7 +516,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
         return sosOfferings;
     }
-    
+
     /**
      * Set SpatialFilterCapabilities to FilterCapabilities
      * 
@@ -623,15 +638,19 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
      * 
      * @param offering
      *            Offering identifier
-     * @param session
-     *            Hibernate session
      * @return FOI identifiers
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    private List<String> getFOI4offering(String offering, Session session) throws OwsExceptionReport {
-        List<String> featureIDs =
-                HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(offering, session);
+    private List<String> getFOI4offering(String offering) throws OwsExceptionReport {
+        List<String> featureIDs = new ArrayList<String>(0);
+        Collection<String> features =
+                getConfigurator().getCapabilitiesCacheController().getKOfferingVFeatures().get(offering);
+        if (!getConfigurator().isFoiListedInOfferings() || features == null) {
+            featureIDs.add(OGCConstants.UNKNOWN);
+        } else {
+            featureIDs.addAll(features);
+        }
         return featureIDs;
     }
 
@@ -670,8 +689,8 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     private String getRelatedFeatureID(String identifier, Session session, String version) throws OwsExceptionReport {
         SosSamplingFeature feature =
-                (SosSamplingFeature) getConfigurator().getFeatureQueryHandler()
-                        .getFeatureByID(identifier, session, version);
+                (SosSamplingFeature) getConfigurator().getFeatureQueryHandler().getFeatureByID(identifier, session,
+                        version);
         if (feature.getUrl() != null && !feature.getUrl().isEmpty()) {
             return feature.getUrl();
         } else {
@@ -690,26 +709,24 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
     private Collection<String> getObservationTypes(String offering) {
         Collection<String> allObservationTypes = getCache().getObservationTypes4Offering(offering);
         List<String> observationTypes = new ArrayList<String>(allObservationTypes.size());
-        
+
         for (String observationType : allObservationTypes) {
             if (!observationType.equals(SosConstants.NOT_DEFINED)) {
                 observationTypes.add(observationType);
             }
         }
         if (observationTypes.isEmpty()) {
-            for (String observationType : getCache()
-                    .getAllowedObservationTypes4Offering(offering)) {
+            for (String observationType : getCache().getAllowedObservationTypes4Offering(offering)) {
                 if (!observationType.equals(SosConstants.NOT_DEFINED)) {
                     observationTypes.add(observationType);
                 }
-            } 
+            }
         }
         return observationTypes;
     }
 
     private Collection<String> getFeatureOfInterestTypes(String offering, Session session) {
-        Collection<String> featureIDs =
-                getCache().getKOfferingVFeatures().get(offering);
+        Collection<String> featureIDs = getCache().getKOfferingVFeatures().get(offering);
         if (featureIDs == null || (featureIDs != null && featureIDs.isEmpty())) {
             return HibernateCriteriaQueryUtilities.getFeatureOfInterestTypesForFeatureOfInterest(featureIDs, session);
         }
@@ -727,7 +744,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         }
         return sections;
     }
-    
+
     /**
      * Get extensions and merge IMergableExtension of the same class.
      * 
@@ -758,8 +775,9 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         extensions.addAll(map.values());
         return extensions;
     }
-    
-    private Collection<IExtension> getExtensions(Session session, Set<String> requestedExtensionSections) throws OwsExceptionReport {
+
+    private Collection<IExtension> getExtensions(Session session, Set<String> requestedExtensionSections)
+            throws OwsExceptionReport {
         List<IExtension> extensions = getAndMergeExtensions(session);
         List<IExtension> filtered = new ArrayList<IExtension>(requestedExtensionSections.size());
         for (IExtension e : extensions) {
@@ -768,10 +786,10 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                     filtered.add(e);
                 }
             }
-        } 
+        }
         return filtered;
     }
-    
+
     protected void setUpPhenomenaForOffering(String offering, String procedure, SosOfferingsForContents sosOffering) {
         Collection<String> phenomenons = new LinkedList<String>();
         Map<String, Collection<String>> phenProcs = getCache().getKObservablePropertyVProcedures();
@@ -783,36 +801,45 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         }
         sosOffering.setObservableProperties(phenomenons);
         sosOffering.setCompositePhenomena(getCache().getKOfferingVCompositePhenomenons().get(offering));
-        
-        Collection<String> compositePhenomenonsForOffering = getCache().getKOfferingVCompositePhenomenons().get(offering);
-        
+
+        Collection<String> compositePhenomenonsForOffering =
+                getCache().getKOfferingVCompositePhenomenons().get(offering);
+
         if (compositePhenomenonsForOffering != null) {
-            Map<String, Collection<String>> phens4CompPhens = new HashMap<String, Collection<String>>(compositePhenomenonsForOffering.size());    
+            Map<String, Collection<String>> phens4CompPhens =
+                    new HashMap<String, Collection<String>>(compositePhenomenonsForOffering.size());
             for (String compositePhenomenon : compositePhenomenonsForOffering) {
-                Collection<String> phenomenonsForComposite = getCache().getKCompositePhenomenonVObservableProperty().get(compositePhenomenon);
+                Collection<String> phenomenonsForComposite =
+                        getCache().getKCompositePhenomenonVObservableProperty().get(compositePhenomenon);
                 phens4CompPhens.put(compositePhenomenon, phenomenonsForComposite);
             }
             sosOffering.setPhens4CompPhens(phens4CompPhens);
         } else {
-            sosOffering.setPhens4CompPhens(Collections.<String, Collection<String>>emptyMap());
+            sosOffering.setPhens4CompPhens(Collections.<String, Collection<String>> emptyMap());
         }
-        
+
     }
 
-    protected void setUpFeaturesForOffering(String offering, Session session, String version, String procedure, SosOfferingsForContents sosOffering) throws OwsExceptionReport {
+    protected void setUpFeaturesForOffering(String offering, Session session, String version, String procedure,
+            SosOfferingsForContents sosOffering) throws OwsExceptionReport {
         Map<String, Collection<String>> relatedFeatures = new HashMap<String, Collection<String>>();
-        Map<String,Collection<String>> relatedFeaturesForOffering = getCache().getKOfferingVRelatedFeatures();
+        Map<String, Collection<String>> relatedFeaturesForOffering = getCache().getKOfferingVRelatedFeatures();
         if (relatedFeaturesForOffering != null && !relatedFeaturesForOffering.isEmpty()) {
             Collection<String> relatedFeatureMap = relatedFeaturesForOffering.get(offering);
             for (String relatedFeature : relatedFeatureMap) {
-                if (relatedFeature.toLowerCase().contains("http")) {
-                    relatedFeatures.put(relatedFeature, getCache().getKRelatedFeaturesVRole().get(relatedFeature));
-                } else {
-                    String relatedFeatureID = getRelatedFeatureID(relatedFeature, session, version);
-                    if (relatedFeatureID != null) {
-                        relatedFeatures.put(relatedFeatureID, getCache().getKRelatedFeaturesVRole().get(relatedFeature));
-                    }
-                }
+                relatedFeatures.put(relatedFeature, getCache().getKRelatedFeaturesVRole().get(relatedFeature));
+                // if (relatedFeature.toLowerCase().contains("http")) {
+                // relatedFeatures.put(relatedFeature,
+                // getCache().getKRelatedFeaturesVRole().get(relatedFeature));
+                // } else {
+                //
+                // String relatedFeatureID = getRelatedFeatureID(relatedFeature,
+                // session, version);
+                // if (relatedFeatureID != null) {
+                // relatedFeatures.put(relatedFeatureID,
+                // getCache().getKRelatedFeaturesVRole().get(relatedFeature));
+                // }
+                // }
             }
         } else {
             List<String> role = Collections.singletonList("featureOfInterestID");
@@ -832,7 +859,8 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         sosOffering.setTime(new TimePeriod(minDate, maxDate, phenTimeId));
     }
 
-    protected void setUpFeatureOfInterestTypesForOffering(String offering, Session session, SosOfferingsForContents sosOffering) {
+    protected void setUpFeatureOfInterestTypesForOffering(String offering, Session session,
+            SosOfferingsForContents sosOffering) {
         // TODO: if no foi contained, set allowed foitypes
         // insert featureOfInterestTypes
         Collection<String> featureTypes = getFeatureOfInterestTypes(offering, session);
@@ -843,8 +871,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
     }
 
     protected void setUpResponseFormatForOffering(String version, SosOfferingsForContents sosOffering) {
-        Collection<String> responseFormats =
-                SosHelper.getSupportedResponseFormats(SosConstants.SOS, version);
+        Collection<String> responseFormats = SosHelper.getSupportedResponseFormats(SosConstants.SOS, version);
         sosOffering.setResponseFormats(responseFormats);
         // TODO set as property
         if (true) {
@@ -861,8 +888,10 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
     private Collection<String> getProceduresForOffering(String offering) throws OwsExceptionReport {
         Collection<String> procedures = getCache().getProcedures4Offering(offering);
         if (procedures == null || procedures.isEmpty()) {
-            String exceptionText = String.format(
-                    "No procedures are contained in the database for the offering '%s'! Please contact the admin of this SOS.", offering);
+            String exceptionText =
+                    String.format(
+                            "No procedures are contained in the database for the offering '%s'! Please contact the admin of this SOS.",
+                            offering);
             LOGGER.error(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
