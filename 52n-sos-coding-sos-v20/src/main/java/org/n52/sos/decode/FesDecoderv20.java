@@ -53,6 +53,7 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.NodeList;
@@ -123,7 +124,7 @@ public class FesDecoderv20 implements IDecoder<Object, XmlObject> {
             if (xbSpatialOpsType instanceof BBOXType) {
                 spatialFilter.setOperator(FilterConstants.SpatialOperator.BBOX);
                 BBOXType xbBBOX = (BBOXType) xbSpatialOpsType;
-                if (xbBBOX.getExpression().getDomNode().getLocalName().equals(FilterConstants.EN_VALUE_REFERENCE)) {
+                if (XmlHelper.getLocalName(xbBBOX.getExpression()).equals(FilterConstants.EN_VALUE_REFERENCE)) {
                     ValueReferenceDocument valueRefernece =
                             ValueReferenceDocument.Factory.parse(xbBBOX.getExpression().getDomNode());
                     spatialFilter.setValueReference(valueRefernece.getValueReference().trim());
@@ -198,7 +199,7 @@ public class FesDecoderv20 implements IDecoder<Object, XmlObject> {
                         if (timeObject != null && timeObject instanceof ITime) {
                             TimeOperator operator;
                             ITime time = (ITime) timeObject;
-                            String localName = xbTemporalOpsType.getDomNode().getLocalName();
+                            String localName = XmlHelper.getLocalName(xbTemporalOpsType);
                             if (localName.equals(TimeOperator2.During.name()) && time instanceof TimePeriod) {
                                 operator = TimeOperator.TM_During;
                             } else if (localName.equals(TimeOperator2.TEquals.name()) && time instanceof TimeInstant) {

@@ -78,6 +78,7 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,7 +165,7 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
             exceptionText.append("The requested element");
             if (element instanceof XmlObject) {
                 exceptionText.append(" '");
-                exceptionText.append(((XmlObject) element).getDomNode().getLocalName());
+                exceptionText.append(XmlHelper.getLocalName(((XmlObject) element)));
                 exceptionText.append("' ");
             }
             exceptionText.append("is not supported by this server!");
