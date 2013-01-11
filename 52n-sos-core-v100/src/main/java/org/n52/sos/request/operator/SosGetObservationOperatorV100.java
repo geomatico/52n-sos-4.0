@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.decode.IDecoder;
 import org.n52.sos.ds.IGetObservationDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.IObservationEncoder;
@@ -51,6 +52,7 @@ import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -263,9 +265,8 @@ public class SosGetObservationOperatorV100 implements IRequestOperator {
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
-        // TODO check for SOS 1.0.0
+        // TODO check for SOS 1.0.0 EventTime
         try {
-            // TODO check this for pofile
             if (sosRequest.getTemporalFilters() != null && !sosRequest.getTemporalFilters().isEmpty()) {
                 SosHelper.checkTemporalFilter(sosRequest.getTemporalFilters(),
                         Sos2Constants.GetObservationParams.temporalFilter.name());
@@ -304,6 +305,16 @@ public class SosGetObservationOperatorV100 implements IRequestOperator {
     private void checkObservedProperties(List<String> observedProperties) throws OwsExceptionReport {
         if (observedProperties != null) {
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            
+            if (observedProperties.size() != 1) {
+            	String exceptionText =
+                        "For SOS v1.0.0 at least one '"
+                                + SosConstants.GetObservationParams.observedProperty.name() + "' is required";
+                LOGGER.error(exceptionText);
+                exceptions.add(Util4Exceptions.createMissingParameterValueException(
+                        SosConstants.GetObservationParams.observedProperty.name()));
+        	}
+            
             Collection<String> validObservedProperties =
                     Configurator.getInstance().getCapabilitiesCacheController().getObservableProperties();
             for (String obsProp : observedProperties) {
@@ -338,8 +349,19 @@ public class SosGetObservationOperatorV100 implements IRequestOperator {
     // one / mandatory
     private void checkOfferingId(List<String> offeringIds) throws OwsExceptionReport {
         if (offeringIds != null) {
+        	
             Collection<String> offerings = Configurator.getInstance().getCapabilitiesCacheController().getOfferings();
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            
+            if (offeringIds.size() != 1) {
+            	String exceptionText =
+                        "For SOS v1.0.0 one  '"
+                                + SosConstants.GetObservationParams.offering.name() + "' is required";
+                LOGGER.error(exceptionText);
+                exceptions.add(Util4Exceptions.createInvalidParameterValueException(
+                        SosConstants.GetObservationParams.offering.name(), exceptionText));
+        	}
+
             for (String offeringId : offeringIds) {
                 if (offeringId == null || (offeringId != null && offeringId.isEmpty())) {
                     exceptions.add(Util4Exceptions.createMissingParameterValueException(SosConstants.GetObservationParams.offering.name()));
@@ -416,5 +438,17 @@ public class SosGetObservationOperatorV100 implements IRequestOperator {
             throw Util4Exceptions.createResponseExceedsSizeLimitException(exceptionText);
         }
 
+    }
+    
+    private Object decodeXmlToObject(XmlObject xmlObject) throws OwsExceptionReport {
+        List<IDecoder> decoderList = Configurator.getInstance().getDecoder(XmlHelper.getNamespace(xmlObject));
+        if (decoderList != null) {
+            for (IDecoder decoder : decoderList) {
+                // TODO: check if decoding returns null or throws exception: in
+                // both cases try next decoder in list
+                return decoder.decode(xmlObject);
+            }
+        }
+        return null;
     }
 }

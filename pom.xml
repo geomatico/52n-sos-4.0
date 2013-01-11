@@ -75,6 +75,11 @@
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
+				<artifactId>52n-sos-coding-sos-v100</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-coding-sos-v20</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -397,7 +402,17 @@
 			</dependency>
 			<dependency>
 				<groupId>org.n52.sensorweb</groupId>
+				<artifactId>52n-xml-om-v100</artifactId>
+				<version>${n52.common.xml.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.n52.sensorweb</groupId>
 				<artifactId>52n-xml-om-v20</artifactId>
+				<version>${n52.common.xml.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.n52.sensorweb</groupId>
+				<artifactId>52n-xml-sampling-v100</artifactId>
 				<version>${n52.common.xml.version}</version>
 			</dependency>
 			<dependency>
@@ -847,12 +862,14 @@
 				<module>52n-sos-resultHandling-v20</module>
 				<module>52n-sos-hibernate-resultHandling</module>
 				<module>52n-sos-core-v100</module>
+				<module>52n-sos-coding-sos-v100</module>
 			</modules>
 		</profile>
 		<profile>
 			<id>sosV100</id>
 			<modules>
 				<module>52n-sos-core-v100</module>
+				<module>52n-sos-coding-sos-v100</module>
 			</modules>
 		</profile>
 		<profile>

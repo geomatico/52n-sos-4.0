@@ -113,10 +113,11 @@ public class SosDescribeSensorOperatorV100 implements IRequestOperator {
                 if (response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
                     namespace = SWEConstants.NS_SWES_20;
                 } else if (response.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
-                    namespace = SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL;
+                	// FIXME workaround to find the by-way through the sweencoder100 before going to the actual sensorml encoder
+                    namespace = Sos1Constants.NS_SOS;
                     if (sosRequest.getProcedureDescriptionFormat().equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)
-                            || sosRequest.getProcedureDescriptionFormat().equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
-                        contentType = SensorMLConstants.SENSORML_CONTENT_TYPE;
+                            || sosRequest.getProcedureDescriptionFormat().equals(SensorMLConstants.NS_SML)) {
+                    	contentType = SensorMLConstants.SENSORML_CONTENT_TYPE;
                     }
                 } else {
                     String exceptionText = "Received version in request is not supported!";
@@ -186,6 +187,7 @@ public class SosDescribeSensorOperatorV100 implements IRequestOperator {
     @Override
     public OWSOperation getOperationMetadata(String service, String version, Object connection)
             throws OwsExceptionReport {
+    	LOGGER.info("trying dao.getOperationsMetadata(" + service + ", " + version + ", connection);");
         return dao.getOperationsMetadata(service, version, connection);
     }
     
@@ -204,7 +206,7 @@ public class SosDescribeSensorOperatorV100 implements IRequestOperator {
     public Set<String> getConformanceClasses() {
         Set<String> conformanceClasses = new HashSet<String>(0);
         if (hasImplementedDAO()) {
-            conformanceClasses.add("http://www.opengis.net/spec/SOS/2.0/conf/core");
+            conformanceClasses.add("http://www.opengis.net/spec/SOS/1.0/conf/core");
         }
         return conformanceClasses;
     }

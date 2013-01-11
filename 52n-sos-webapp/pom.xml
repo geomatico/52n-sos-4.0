@@ -83,6 +83,10 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
+			<artifactId>52n-sos-coding-sos-v100</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-coding-sos-v20</artifactId>
 		</dependency>
 		<dependency>
@@ -326,6 +330,10 @@
 		<profile>
 			<id>sosV100</id>
 			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-coding-sos-v100</artifactId>
+				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-core-v100</artifactId>

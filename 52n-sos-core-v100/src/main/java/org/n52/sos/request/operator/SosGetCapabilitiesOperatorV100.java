@@ -109,6 +109,7 @@ public class SosGetCapabilitiesOperatorV100 implements IRequestOperator {
             }
 
             GetCapabilitiesResponse response = this.dao.getCapabilities(sosRequest);
+            
             String contentType = SosConstants.CONTENT_TYPE_XML;
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             // XmlOptions xmlOptions;
