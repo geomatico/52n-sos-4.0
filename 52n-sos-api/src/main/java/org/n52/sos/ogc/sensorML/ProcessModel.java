@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.sensorML;
 
-public class ProcessModel extends AbstractSingleProcess {
+public class ProcessModel extends AbstractProcess {
     
     private ProcessMethod method;
 

@@ -26,14 +26,9 @@ package org.n52.sos.ogc.swe;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * SOS internal representation of SWE dataRecord
- * 
- */
-public class SosSweDataRecord extends SosSweAbstractDataComponent implements AbstractDataRecord {
-
+public class SosSweSimpleDataRecord extends SosSweAbstractDataComponent implements AbstractDataRecord {
     /**
-     * DataRecord fields
+     * SimpleDataRecord fields
      */
     private List<SosSweField> fields;
 
@@ -82,7 +77,4 @@ public class SosSweDataRecord extends SosSweAbstractDataComponent implements Abs
     public boolean isSetFields() {
         return fields != null && !fields.isEmpty();
     }
-    
-    
-
 }

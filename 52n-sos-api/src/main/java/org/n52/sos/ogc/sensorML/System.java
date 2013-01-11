@@ -23,30 +23,53 @@
  */
 package org.n52.sos.ogc.sensorML;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.n52.sos.ogc.gml.EngineeringCRS;
+import org.n52.sos.ogc.sensorML.elements.SosSMLComponent;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
 
-public class System extends AbstractMultiProcess {
+public class System extends AbstractComponent {
 
     private EngineeringCRS spatialReferenceFrame;
     
+    private List<SosSMLComponent> components = new ArrayList<SosSMLComponent>(0);
+
+    public List<SosSMLComponent> getComponents() {
+        return components;
+    }
+
+    public void setComponents(List<SosSMLComponent> components) {
+        this.components = components;
+    }
+
+    public void addComponents(List<SosSMLComponent> components) {
+        if (this.components == null) {
+            this.components = new ArrayList<SosSMLComponent>();
+        }
+        this.components.addAll(components);
+    }
+
+    public void addComponent(SosSMLComponent component) {
+        if (components == null) {
+            components = new ArrayList<SosSMLComponent>();
+        }
+        components.add(component);
+    }
+    
+    public boolean isSetComponents() {
+        return components != null && !components.isEmpty();
+    }
+    
 //    private SosSMLTemporalReferenceFrame spatialReferenceFrame;
     
-    private SosSMLPosition position;
     
 //    private SosSMLLocation location;
 
     // private List<ITime> timePositions;
     //
     // private List<String> interfaces;
-
-    public SosSMLPosition getPosition() {
-        return position;
-    }
-
-    public void setPosition(SosSMLPosition position) {
-        this.position = position;
-    }
 
     // public List<ITime> getTimePositions() {
     // return timePositions;
@@ -63,9 +86,5 @@ public class System extends AbstractMultiProcess {
     // public void setInterfaces(List<String> interfaces) {
     // this.interfaces = interfaces;
     // }
-    
-    public boolean isSetPosition() {
-        return position != null;
-    }
 
 }

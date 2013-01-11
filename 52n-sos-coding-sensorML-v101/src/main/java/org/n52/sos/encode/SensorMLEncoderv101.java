@@ -73,7 +73,6 @@ import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.SosGmlMetaDataProperty;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sensorML.AbstractMultiProcess;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
 import org.n52.sos.ogc.sensorML.AbstractSensorML;
 import org.n52.sos.ogc.sensorML.ProcessModel;
@@ -100,6 +99,7 @@ import org.n52.sos.ogc.swe.SosSweCoordinate;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.SosSweField;
+import org.n52.sos.ogc.swe.SosSweSimpleDataRecord;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweObservableProperty;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
@@ -210,13 +210,13 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
                     if (sensorDesc instanceof SensorML) {
                         for (AbstractProcess absProcess : ((SensorML) sensorDesc).getMembers()) {
                             if (member.getProcess() instanceof SystemType
-                                    && absProcess instanceof AbstractMultiProcess) {
+                                    && absProcess instanceof System) {
                                 addAbstractMultiProcessValuesToSystem((SystemType) member.getProcess(),
-                                        (AbstractMultiProcess) absProcess);
+                                        (System) absProcess);
                             }
                         }
                     } else if (sensorDesc instanceof AbstractProcess) {
-                        if (member.getProcess() instanceof SystemType && sensorDesc instanceof AbstractMultiProcess) {
+                        if (member.getProcess() instanceof SystemType && sensorDesc instanceof System) {
                             addValuesToSystem((SystemType) member.getProcess(), (System) sensorDesc);
                         }
                     }
@@ -282,7 +282,8 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
         }
     }
 
-    private void addAbstractMultiProcessValuesToSystem(SystemType xbSystem, AbstractMultiProcess absProcess)
+    // TODO refactor/rename
+    private void addAbstractMultiProcessValuesToSystem(SystemType xbSystem, System absProcess)
             throws OwsExceptionReport {
         // set identification
         if (absProcess.isSetIdentifications()) {
@@ -380,35 +381,39 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
             throws OwsExceptionReport {
         List<Characteristics> characteristicsList = new ArrayList<Characteristics>();
         for (SosSMLCharacteristics sosSMLCharacteristics : smlCharacteristics) {
-            Characteristics xbCharacteristics =
-                    Characteristics.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-            if (sosSMLCharacteristics.getCharacteristicsType().equals(SweAggregateType.SimpleDataRecord)) {
-                SimpleDataRecordType xbSimpleDataRecord =
-                        (SimpleDataRecordType) xbCharacteristics.addNewAbstractDataRecord().substitute(
-                                SWEConstants.QN_SIMPLEDATARECORD_SWE_101, SimpleDataRecordType.type);
-                if (sosSMLCharacteristics.getTypeDefinition() != null
-                        && !sosSMLCharacteristics.getTypeDefinition().isEmpty()) {
-                    xbSimpleDataRecord.setDefinition(sosSMLCharacteristics.getTypeDefinition());
+            if (sosSMLCharacteristics.isSetAbstractDataRecord()) {
+                Characteristics xbCharacteristics =
+                        Characteristics.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                if (sosSMLCharacteristics.getDataRecord() instanceof SosSweSimpleDataRecord) {
+                    SimpleDataRecordType xbSimpleDataRecord =
+                            (SimpleDataRecordType) xbCharacteristics.addNewAbstractDataRecord().substitute(
+                                    SWEConstants.QN_SIMPLEDATARECORD_SWE_101, SimpleDataRecordType.type);
+                    if (sosSMLCharacteristics.isSetTypeDefinition()) {
+                        xbSimpleDataRecord.setDefinition(sosSMLCharacteristics.getTypeDefinition());
+                    }
+                    if (sosSMLCharacteristics.getDataRecord().isSetFields()) {
+                        for (SosSweField field : sosSMLCharacteristics.getDataRecord().getFields()) {
+                            AnyScalarPropertyType xbField = xbSimpleDataRecord.addNewField();
+                            xbField.setName(field.getName());
+                            addSweSimpleTypeToField(xbField, field.getElement());
+                        }
+                    }
+                } else if (sosSMLCharacteristics.getDataRecord() instanceof SosSweDataRecord) {
+                    String exceptionText =
+                            "The SWE characteristics type '" + SweAggregateType.DataRecord.name()
+                                    + "' is not supported by this SOS for SensorML characteristics!";
+                    LOGGER.debug(exceptionText);
+                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                } else {
+                    String exceptionText =
+                            "The SWE characteristics type '"
+                                    + sosSMLCharacteristics.getDataRecord().getClass().getName()
+                                    + "' is not supported by this SOS for SensorML characteristics!";
+                    LOGGER.debug(exceptionText);
+                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
                 }
-                for (SosSweField field : sosSMLCharacteristics.getFields()) {
-                    AnyScalarPropertyType xbField = xbSimpleDataRecord.addNewField();
-                    xbField.setName(field.getName());
-                    addSweSimpleTypeToField(xbField, field.getElement());
-                }
-            } else if (sosSMLCharacteristics.getCharacteristicsType().equals(SweAggregateType.DataRecord)) {
-                String exceptionText =
-                        "The SWE characteristics type '" + SweAggregateType.DataRecord.name()
-                                + "' is not supported by this SOS for SensorML characteristics!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-            } else {
-                String exceptionText =
-                        "The SWE characteristics type '" + sosSMLCharacteristics.getCharacteristicsType().name()
-                                + "' is not supported by this SOS for SensorML characteristics!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                characteristicsList.add(xbCharacteristics);
             }
-            characteristicsList.add(xbCharacteristics);
         }
         return characteristicsList.toArray(new Characteristics[0]);
     }
@@ -434,12 +439,12 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
                     if (capabilities.getName() != null) {
                         xbCapabilities.setName(capabilities.getName());
                     }
-                    if (capabilities.getCapabilitiesType().equals(SweAggregateType.SimpleDataRecord)) {
+                    if (capabilities.getDataRecord() instanceof SosSweSimpleDataRecord) {
                         SimpleDataRecordType xbSimpleDataRecord =
                                 (SimpleDataRecordType) xbCapabilities.addNewAbstractDataRecord().substitute(
                                         SWEConstants.QN_SIMPLEDATARECORD_SWE_101, SimpleDataRecordType.type);
-                        if (capabilities.getFields() != null) {
-                            for (SosSweField field : capabilities.getFields()) {
+                        if (capabilities.getDataRecord().isSetFields()) {
+                            for (SosSweField field : capabilities.getDataRecord().getFields()) {
                                 AnyScalarPropertyType xbField = xbSimpleDataRecord.addNewField();
                                 xbField.setName(field.getName());
                                 addSweSimpleTypeToField(xbField, field.getElement());
@@ -459,7 +464,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
                                 }
                             }
                         }
-                    } else if (capabilities.getCapabilitiesType().equals(SweAggregateType.DataRecord)) {
+                    } else if (capabilities.getDataRecord() instanceof SosSweDataRecord) {
                         String exceptionText =
                                 "The SWE capabilities type '" + SweAggregateType.DataRecord.name()
                                         + "' is not supported by this SOS for SensorML!";
@@ -556,8 +561,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
         VectorType xbVector = xbSwePosition.addNewLocation().addNewVector();
         for (SosSweCoordinate coordinate : position.getPosition()) {
             if (coordinate.getValue().getValue() != null
-                    && (!coordinate.getValue().isSetValue() || !coordinate.getValue().getValue()
-                            .equals(Double.NaN))) {
+                    && (!coordinate.getValue().isSetValue() || !coordinate.getValue().getValue().equals(Double.NaN))) {
                 // FIXME: SWE Common NS
                 IEncoder encoder = Configurator.getInstance().getEncoder(SWEConstants.NS_SWE);
                 if (encoder != null) {

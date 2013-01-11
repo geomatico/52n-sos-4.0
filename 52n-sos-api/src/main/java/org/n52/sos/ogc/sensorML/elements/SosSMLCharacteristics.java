@@ -23,10 +23,8 @@
  */
 package org.n52.sos.ogc.sensorML.elements;
 
-import java.util.List;
-
+import org.n52.sos.ogc.swe.AbstractDataRecord;
 import org.n52.sos.ogc.swe.SWEConstants.SweAggregateType;
-import org.n52.sos.ogc.swe.SosSweField;
 
 /**
  * SOS internal representation of SensorML characteristics
@@ -34,11 +32,9 @@ import org.n52.sos.ogc.swe.SosSweField;
  */
 public class SosSMLCharacteristics {
 
-    private SweAggregateType characteristicsType;
-
     private String typeDefinition;
 
-    private List<SosSweField> fields;
+    private AbstractDataRecord abstractDataRecord;
 
     /**
      * default constructor
@@ -52,28 +48,12 @@ public class SosSMLCharacteristics {
      * 
      * @param characteristicsType
      *            type
-     * @param fields
-     *            fields
+     * @param abstractDataRecord
+     *            abstractDataRecord
      */
-    public SosSMLCharacteristics(SweAggregateType characteristicsType, List<SosSweField> fields) {
+    public SosSMLCharacteristics( AbstractDataRecord abstractDataRecord) {
         super();
-        this.characteristicsType = characteristicsType;
-        this.fields = fields;
-    }
-
-    /**
-     * @return the characteristicsType
-     */
-    public SweAggregateType getCharacteristicsType() {
-        return characteristicsType;
-    }
-
-    /**
-     * @param characteristicsType
-     *            the characteristicsType to set
-     */
-    public void setCharacteristicsType(SweAggregateType characteristicsType) {
-        this.characteristicsType = characteristicsType;
+        this.abstractDataRecord = abstractDataRecord;
     }
 
     /**
@@ -92,18 +72,26 @@ public class SosSMLCharacteristics {
     }
 
     /**
-     * @return the fields
+     * @return the abstractDataRecord
      */
-    public List<SosSweField> getFields() {
-        return fields;
+    public AbstractDataRecord getDataRecord() {
+        return abstractDataRecord;
     }
 
     /**
-     * @param fields
-     *            the fields to set
+     * @param abstractDataRecord
+     *            the abstractDataRecord to set
      */
-    public void setFields(List<SosSweField> fields) {
-        this.fields = fields;
+    public void setDataRecord(AbstractDataRecord abstractDataRecord) {
+        this.abstractDataRecord = abstractDataRecord;
+    }
+
+    public boolean isSetAbstractDataRecord() {
+        return abstractDataRecord != null;
+    }
+    
+    public boolean isSetTypeDefinition() {
+        return typeDefinition != null && !typeDefinition.isEmpty();
     }
 
 }

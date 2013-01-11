@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.n52.sos.ogc.gml.SosGmlMetaDataProperty;
+import org.n52.sos.ogc.swe.AbstractDataRecord;
 import org.n52.sos.ogc.swe.SWEConstants.SweAggregateType;
-import org.n52.sos.ogc.swe.SosSweField;
 
 /**
  * SOS internal representation of SensorML capabilities
@@ -38,9 +38,7 @@ public class SosSMLCapabilities {
 
     private String name;
 
-    private SweAggregateType capabilitiesType;
-
-    private List<SosSweField> fields;
+    private AbstractDataRecord abstractDataRecord;
 
     private List<SosGmlMetaDataProperty> metaDataProperties;
 
@@ -56,14 +54,13 @@ public class SosSMLCapabilities {
      * 
      * @param characteristicsType
      *            Type
-     * @param fields
-     *            Fields
+     * @param abstractDataRecord
+     *            AbstractDataRecord
      */
-    public SosSMLCapabilities(String name, SweAggregateType capabilitiesType, List<SosSweField> fields) {
+    public SosSMLCapabilities(String name, AbstractDataRecord abstractDataRecord) {
         super();
         this.setName(name);
-        this.capabilitiesType = capabilitiesType;
-        this.fields = fields;
+        this.abstractDataRecord = abstractDataRecord;
     }
 
     public String getName() {
@@ -75,33 +72,18 @@ public class SosSMLCapabilities {
     }
 
     /**
-     * @return the capabilitiesType
+     * @return the abstractDataRecord
      */
-    public SweAggregateType getCapabilitiesType() {
-        return capabilitiesType;
+    public AbstractDataRecord getDataRecord() {
+        return abstractDataRecord;
     }
 
     /**
-     * @param capabilitiesType
-     *            the capabilitiesType to set
+     * @param abstractDataRecord
+     *            the abstractDataRecord to set
      */
-    public void setCapabilitiesType(SweAggregateType capabilitiesType) {
-        this.capabilitiesType = capabilitiesType;
-    }
-
-    /**
-     * @return the fields
-     */
-    public List<SosSweField> getFields() {
-        return fields;
-    }
-
-    /**
-     * @param fields
-     *            the fields to set
-     */
-    public void setFields(List<SosSweField> fields) {
-        this.fields = fields;
+    public void setDataRecord(AbstractDataRecord abstractDataRecord) {
+        this.abstractDataRecord = abstractDataRecord;
     }
 
     public List<SosGmlMetaDataProperty> getMetaDataProperties() {
@@ -117,6 +99,10 @@ public class SosSMLCapabilities {
             metaDataProperties = new ArrayList<SosGmlMetaDataProperty>();
         }
         metaDataProperties.add(metaDataProperty);
+    }
+    
+    public boolean isSetAbstractDataRecord() {
+        return abstractDataRecord != null;
     }
 
 }

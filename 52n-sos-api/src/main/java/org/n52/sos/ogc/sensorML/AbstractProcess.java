@@ -48,6 +48,10 @@ public class AbstractProcess extends AbstractSensorML {
         this.descriptions = descriptions;
     }
 
+    public void addDescription(String description) {
+        this.descriptions.add(description);
+    }
+
     public List<String> getNames() {
         return names;
     }

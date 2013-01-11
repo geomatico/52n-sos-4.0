@@ -33,7 +33,11 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import net.opengis.gml.CodeType;
+import net.opengis.sensorML.x101.AbstractComponentType;
+import net.opengis.sensorML.x101.AbstractDerivableComponentType;
 import net.opengis.sensorML.x101.AbstractProcessType;
+import net.opengis.sensorML.x101.AbstractPureProcessType;
 import net.opengis.sensorML.x101.CapabilitiesDocument.Capabilities;
 import net.opengis.sensorML.x101.CharacteristicsDocument.Characteristics;
 import net.opengis.sensorML.x101.ClassificationDocument.Classification;
@@ -42,29 +46,37 @@ import net.opengis.sensorML.x101.ComponentType;
 import net.opengis.sensorML.x101.ComponentsDocument.Components;
 import net.opengis.sensorML.x101.ComponentsDocument.Components.ComponentList;
 import net.opengis.sensorML.x101.ComponentsDocument.Components.ComponentList.Component;
+import net.opengis.sensorML.x101.ContactDocument.Contact;
+import net.opengis.sensorML.x101.DocumentationDocument.Documentation;
+import net.opengis.sensorML.x101.HistoryDocument.History;
 import net.opengis.sensorML.x101.IdentificationDocument.Identification;
 import net.opengis.sensorML.x101.IdentificationDocument.Identification.IdentifierList.Identifier;
 import net.opengis.sensorML.x101.InputsDocument.Inputs;
 import net.opengis.sensorML.x101.IoComponentPropertyType;
+import net.opengis.sensorML.x101.KeywordsDocument.Keywords;
+import net.opengis.sensorML.x101.MethodPropertyType;
 import net.opengis.sensorML.x101.OutputsDocument.Outputs;
+import net.opengis.sensorML.x101.ParametersDocument.Parameters;
 import net.opengis.sensorML.x101.PositionDocument.Position;
 import net.opengis.sensorML.x101.ProcessModelType;
 import net.opengis.sensorML.x101.SensorMLDocument;
 import net.opengis.sensorML.x101.SensorMLDocument.SensorML.Member;
 import net.opengis.sensorML.x101.SystemType;
-import net.opengis.swe.x101.DataComponentPropertyType;
-import net.opengis.swe.x101.DataRecordPropertyType;
-import net.opengis.swe.x101.SimpleDataRecordType;
+import net.opengis.sensorML.x101.ValidTimeDocument.ValidTime;
 
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sensorML.AbstractComponent;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
 import org.n52.sos.ogc.sensorML.AbstractSensorML;
+import org.n52.sos.ogc.sensorML.ProcessMethod;
 import org.n52.sos.ogc.sensorML.ProcessModel;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sensorML.System;
+import org.n52.sos.ogc.sensorML.elements.AbstractSosSMLDocumentation;
 import org.n52.sos.ogc.sensorML.elements.SosSMLCapabilities;
 import org.n52.sos.ogc.sensorML.elements.SosSMLCharacteristics;
 import org.n52.sos.ogc.sensorML.elements.SosSMLClassifier;
@@ -72,8 +84,7 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLComponent;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
-import org.n52.sos.ogc.swe.SWEConstants.SweAggregateType;
-import org.n52.sos.ogc.swe.SosSweField;
+import org.n52.sos.ogc.swe.AbstractDataRecord;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
@@ -165,20 +176,31 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         // get member process
         for (Member xbMember : xbSensorML.getSensorML().getMemberArray()) {
             if (xbMember.getProcess() != null) {
-                if (xbMember.getProcess() instanceof SystemType) {
-                    sensorML.addMember(parseSystem((SystemType) xbMember.getProcess()));
-                } else if (xbMember.getProcess() instanceof ProcessModelType) {
-                    sensorML.addMember(parseProcessModel((ProcessModelType) xbMember.getProcess()));
-                } else if (xbMember.getProcess() instanceof ComponentType) {
-                    sensorML.addMember(parseComponent((ComponentType)xbMember.getProcess()));
-                }
-                else {
+                if (xbMember.getProcess() instanceof AbstractProcessType) {
+                    AbstractProcessType xbAbstractProcess = xbMember.getProcess();
+                    AbstractProcess abstractProcess = null;
+                    if (xbAbstractProcess.schemaType() == SystemType.type) {
+                        abstractProcess = parseSystem((SystemType) xbAbstractProcess);
+                    } else if (xbAbstractProcess.schemaType() == ProcessModelType.type) {
+                        abstractProcess = parseProcessModel((ProcessModelType) xbAbstractProcess);
+                    } else if (xbAbstractProcess.schemaType() == ComponentType.type) {
+                        abstractProcess = parseComponent((ComponentType) xbAbstractProcess);
+                    } else {
+                        StringBuilder exceptionText = new StringBuilder();
+                        exceptionText.append("The process of a member of the SensorML Document (");
+                        exceptionText.append(xbMember.getProcess().getDomNode().getNodeName());
+                        exceptionText.append(") is not supported!");
+                        LOGGER.debug(exceptionText.toString());
+                        throw Util4Exceptions.createInvalidParameterValueException(XmlHelper.getLocalName(xbMember), exceptionText.toString());
+                    }
+                    sensorML.addMember(abstractProcess);
+                } else {
                     StringBuilder exceptionText = new StringBuilder();
                     exceptionText.append("The process of a member of the SensorML Document (");
                     exceptionText.append(xbMember.getProcess().getDomNode().getNodeName());
                     exceptionText.append(") is not supported!");
                     LOGGER.debug(exceptionText.toString());
-                    throw Util4Exceptions.createInvalidParameterValueException(xbMember.getDomNode().getLocalName(),
+                    throw Util4Exceptions.createInvalidParameterValueException(XmlHelper.getLocalName(xbMember),
                             exceptionText.toString());
                 }
             } else {
@@ -187,7 +209,7 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
                 exceptionText.append(xbMember.getProcess());
                 exceptionText.append(")!");
                 LOGGER.debug(exceptionText.toString());
-                throw Util4Exceptions.createInvalidParameterValueException(xbMember.getDomNode().getLocalName(),
+                throw Util4Exceptions.createInvalidParameterValueException(XmlHelper.getLocalName(xbMember),
                         exceptionText.toString());
             }
         }
@@ -195,38 +217,88 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         return sensorML;
     }
 
+    private void parseAbstractProcess(AbstractProcessType xbAbstractProcess, AbstractProcess abstractProcess) throws OwsExceptionReport {
+        if (xbAbstractProcess.getIdentificationArray() != null) {
+            abstractProcess.setIdentifications(parseIdentification(xbAbstractProcess.getIdentificationArray()));
+            List<Integer> identificationsToRemove =
+                    checkIdentificationsForRemoval(xbAbstractProcess.getIdentificationArray());
+            for (Integer integer : identificationsToRemove) {
+                xbAbstractProcess.removeIdentification(integer);
+            }
+        }
+        if (xbAbstractProcess.getClassificationArray() != null) {
+            abstractProcess.setClassifications(parseClassification(xbAbstractProcess.getClassificationArray()));
+        }
+        if (xbAbstractProcess.getCharacteristicsArray() != null) {
+            abstractProcess.setCharacteristics(parseCharacteristics(xbAbstractProcess.getCharacteristicsArray()));
+        }
+        if (xbAbstractProcess.getCapabilitiesArray() != null) {
+            abstractProcess.setCapabilities(parseCapabilities(xbAbstractProcess.getCapabilitiesArray()));
+            List<Integer> capsToRemove = checkCapabilitiesForRemoval(xbAbstractProcess.getCapabilitiesArray());
+            for (Integer integer : capsToRemove) {
+                xbAbstractProcess.removeCapabilities(integer);
+            }
+        }
+        if (xbAbstractProcess.isSetDescription()) {
+            abstractProcess.addDescription(xbAbstractProcess.getDescription().getStringValue());
+        }
+        if (xbAbstractProcess.isSetValidTime()) {
+            abstractProcess.setValidTime(parseValidTime(xbAbstractProcess.getValidTime()));
+        }
+        if (xbAbstractProcess.getContactArray() != null) {
+            abstractProcess.setContact(parseContact(xbAbstractProcess.getContactArray()));
+        }
+        if (xbAbstractProcess.getDocumentationArray() != null) {
+            abstractProcess.setDocumentation(parseDocumentation(xbAbstractProcess.getDocumentationArray()));
+        }
+        if (xbAbstractProcess.getHistoryArray() != null) {
+            abstractProcess.setHistory(parseHistory(xbAbstractProcess.getHistoryArray()));
+        }
+        if (xbAbstractProcess.getKeywordsArray() != null) {
+            abstractProcess.setKeywords(parseKeywords(xbAbstractProcess.getKeywordsArray()));
+        }
+        if (xbAbstractProcess.getNameArray() != null) {
+            abstractProcess.setNames(parseNames(xbAbstractProcess.getNameArray()));
+        }
+    }
+
+    private void parseAbstractDerivableComponent(AbstractDerivableComponentType xbAbstractDerivableComponent, AbstractComponent abstractComponent) throws OwsExceptionReport {
+        if (xbAbstractDerivableComponent.isSetPosition()) {
+            abstractComponent.setPosition(parsePosition(xbAbstractDerivableComponent.getPosition()));
+        }
+        // TODO ...
+    }
+
+    private void parseAbstractComponent(AbstractComponentType xbAbstractComponent, AbstractProcess abstractProcess) throws OwsExceptionReport {
+        if (xbAbstractComponent.isSetInputs()) {
+            abstractProcess.setInputs(parseInputs(xbAbstractComponent.getInputs()));
+        }
+        if (xbAbstractComponent.isSetOutputs()) {
+            abstractProcess.setOutputs(parseOutputs(xbAbstractComponent.getOutputs()));
+        }
+        if (xbAbstractComponent.isSetParameters()) {
+            abstractProcess.setParameters(parseParameters(xbAbstractComponent.getParameters()));
+        }
+    }
+
+    private void parseAbstractPureProcess(AbstractPureProcessType xbAbstractPureProcess, ProcessModel processModel) throws OwsExceptionReport {
+        if (xbAbstractPureProcess.isSetInputs()) {
+            processModel.setInputs(parseInputs(xbAbstractPureProcess.getInputs()));
+        }
+        if (xbAbstractPureProcess.isSetOutputs()) {
+            processModel.setOutputs(parseOutputs(xbAbstractPureProcess.getOutputs()));
+        }
+        if (xbAbstractPureProcess.isSetParameters()) {
+            processModel.setParameters(parseParameters(xbAbstractPureProcess.getParameters()));
+        }
+        
+    }
+
     private System parseSystem(SystemType xbSystemType) throws OwsExceptionReport {
         System system = new System();
-        if (xbSystemType.getIdentificationArray() != null) {
-            system.setIdentifications(parseIdentification(xbSystemType.getIdentificationArray()));
-            List<Integer> identificationsToRemove =
-                    checkIdentificationsForRemoval(xbSystemType.getIdentificationArray());
-            for (Integer integer : identificationsToRemove) {
-                xbSystemType.removeIdentification(integer);
-            }
-        }
-        if (xbSystemType.getClassificationArray() != null) {
-            system.setClassifications(parseClassification(xbSystemType.getClassificationArray()));
-        }
-        if (xbSystemType.getCharacteristicsArray() != null) {
-            system.setCharacteristics(parseCharacteristics(xbSystemType.getCharacteristicsArray()));
-        }
-        if (xbSystemType.getCapabilitiesArray() != null) {
-            system.setCapabilities(parseCapabilities(xbSystemType.getCapabilitiesArray()));
-            List<Integer> capsToRemove = checkCapabilitiesForRemoval(xbSystemType.getCapabilitiesArray());
-            for (Integer integer : capsToRemove) {
-                xbSystemType.removeCapabilities(integer);
-            }
-        }
-        if (xbSystemType.isSetPosition()) {
-            system.setPosition(parsePosition(xbSystemType.getPosition()));
-        }
-        if (xbSystemType.isSetInputs()) {
-            system.setInputs(parseInputs(xbSystemType.getInputs()));
-        }
-        if (xbSystemType.isSetOutputs()) {
-            system.setOutputs(parseOutputs(xbSystemType.getOutputs()));
-        }
+        parseAbstractProcess(xbSystemType, system);
+        parseAbstractComponent(xbSystemType, system);
+        parseAbstractDerivableComponent(xbSystemType, system);
         if (xbSystemType.isSetComponents()) {
             system.setComponents(parseComponents(xbSystemType.getComponents()));
             List<Integer> compsToRemove = checkComponentsForRemoval(xbSystemType.getComponents().getComponentList());
@@ -236,52 +308,37 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
             checkAndRemoveEmptyComponents(xbSystemType);
         }
         String xmlDescription = addSensorMLWrapperForXmlDescription(xbSystemType);
-        // TODO find a better solution to remove components element
-        system.setSensorDescriptionXmlString(xmlDescription.replace("<sml:components xsi:nil=\"true\"/>", ""));
+        system.setSensorDescriptionXmlString(xmlDescription);
         return system;
     }
 
     private AbstractProcess parseComponent(ComponentType componentType) throws OwsExceptionReport {
         org.n52.sos.ogc.sensorML.Component component = new org.n52.sos.ogc.sensorML.Component();
-        if (componentType.getIdentificationArray() != null) {
-            component.setIdentifications(parseIdentification(componentType.getIdentificationArray()));
-            List<Integer> identificationsToRemove =
-                    checkIdentificationsForRemoval(componentType.getIdentificationArray());
-            for (Integer integer : identificationsToRemove) {
-                componentType.removeIdentification(integer);
-            }
-        }
-        if (componentType.getClassificationArray() != null) {
-            component.setClassifications(parseClassification(componentType.getClassificationArray()));
-        }
-        if (componentType.getCharacteristicsArray() != null) {
-            component.setCharacteristics(parseCharacteristics(componentType.getCharacteristicsArray()));
-        }
-        if (componentType.getCapabilitiesArray() != null) {
-            component.setCapabilities(parseCapabilities(componentType.getCapabilitiesArray()));
-            List<Integer> capsToRemove = checkCapabilitiesForRemoval(componentType.getCapabilitiesArray());
-            for (Integer integer : capsToRemove) {
-                componentType.removeCapabilities(integer);
-            }
-        }
+        parseAbstractProcess(componentType, component);
+        parseAbstractDerivableComponent(componentType, component);
+        parseAbstractComponent(componentType, component);
         if (componentType.isSetPosition()) {
             component.setPosition(parsePosition(componentType.getPosition()));
-        }
-        if (componentType.isSetInputs()) {
-            component.setInputs(parseInputs(componentType.getInputs()));
-        }
-        if (componentType.isSetOutputs()) {
-            component.setOutputs(parseOutputs(componentType.getOutputs()));
         }
         component.setSensorDescriptionXmlString(addSensorMLWrapperForXmlDescription(componentType));
         return component;
     }
 
-    private ProcessModel parseProcessModel(ProcessModelType xbProcessModel) {
+    private ProcessModel parseProcessModel(ProcessModelType xbProcessModel) throws OwsExceptionReport {
         ProcessModel processModel = new ProcessModel();
-        // TODO Auto-generated method stub
+        parseAbstractProcess(xbProcessModel, processModel);
+        parseAbstractPureProcess(xbProcessModel, processModel);
+        if (xbProcessModel.getMethod() != null) {
+            processModel.setMethod(parseProcessMethod(xbProcessModel.getMethod()));
+        }
         processModel.setSensorDescriptionXmlString(addSensorMLWrapperForXmlDescription(xbProcessModel));
         return processModel;
+    }
+
+    private ProcessMethod parseProcessMethod(MethodPropertyType method) {
+        ProcessMethod processMethod = new ProcessMethod();
+        // TODO
+        return processMethod;
     }
 
     /**
@@ -313,7 +370,8 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         List<SosSMLClassifier> sosClassifiers = new ArrayList<SosSMLClassifier>();
         for (Classification xbClassification : classificationArray) {
             for (Classifier xbClassifier : xbClassification.getClassifierList().getClassifierArray()) {
-                sosClassifiers.add(new SosSMLClassifier(xbClassifier.getName(), xbClassifier.getTerm().getDefinition(), xbClassifier.getTerm().getValue()));
+                sosClassifiers.add(new SosSMLClassifier(xbClassifier.getName(),
+                        xbClassifier.getTerm().getDefinition(), xbClassifier.getTerm().getValue()));
             }
         }
         return sosClassifiers;
@@ -333,25 +391,21 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         List<SosSMLCharacteristics> sosCharacteristicsList = new ArrayList<SosSMLCharacteristics>();
         SosSMLCharacteristics sosCharacteristics = new SosSMLCharacteristics();
         for (Characteristics xbCharacteristics : characteristicsArray) {
-            if (xbCharacteristics.getAbstractDataRecord() instanceof DataRecordPropertyType) {
-                DataRecordPropertyType xbDataRecordc =
-                        (DataRecordPropertyType) xbCharacteristics.getAbstractDataRecord();
-                for (DataComponentPropertyType xbField : xbDataRecordc.getDataRecord().getFieldArray()) {
-                    // not supported yet
-                    LOGGER.warn("The characteristics are not paresed from SensorML sensor description!");
-                }
-                sosCharacteristics.setCharacteristicsType(SweAggregateType.DataRecord);
+            Object decodedObject = decodeElement(xbCharacteristics.getAbstractDataRecord());
+            if (decodedObject != null && decodedObject instanceof AbstractDataRecord) {
+                sosCharacteristics.setDataRecord((AbstractDataRecord)decodedObject);
             } else {
                 String exceptionText =
                         "Error while parsing the characteristics of the SensorML (the characteristics' data record is not of type DataRecordPropertyType)!";
                 LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(xbCharacteristics.getDomNode()
-                        .getLocalName(), exceptionText);
+                throw Util4Exceptions.createInvalidParameterValueException(XmlHelper.getLocalName(xbCharacteristics), exceptionText);
             }
         }
         sosCharacteristicsList.add(sosCharacteristics);
         return sosCharacteristicsList;
     }
+    
+    
 
     /**
      * Parses the capabilities
@@ -366,43 +420,14 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         List<SosSMLCapabilities> sosCapabilitiesList = new ArrayList<SosSMLCapabilities>();
         SosSMLCapabilities sosCapabilities = new SosSMLCapabilities();
         for (Capabilities xbCpabilities : capabilitiesArray) {
-            if (xbCpabilities.getAbstractDataRecord() instanceof DataRecordPropertyType) {
-                DataRecordPropertyType xbDataRecord = (DataRecordPropertyType) xbCpabilities.getAbstractDataRecord();
-                sosCapabilities.setCapabilitiesType(SweAggregateType.DataRecord);
-                List<IDecoder> decoderList =
-                        Configurator.getInstance().getDecoder(
-                                xbDataRecord.getDataRecord().getDomNode().getNamespaceURI());
-                Object fieldArray = null;
-                for (IDecoder decoder : decoderList) {
-                    fieldArray = decoder.decode(xbDataRecord.getDataRecord().getFieldArray());
-                    if (fieldArray != null) {
-                        break;
-                    }
-                }
-                if (fieldArray != null && fieldArray instanceof List<?>) {
-                    sosCapabilities.setFields((List<SosSweField>) fieldArray);
-                }
-            } else if (xbCpabilities.getAbstractDataRecord() instanceof SimpleDataRecordType) {
-                SimpleDataRecordType xbSimpleDataRecord = (SimpleDataRecordType) xbCpabilities.getAbstractDataRecord();
-                sosCapabilities.setCapabilitiesType(SweAggregateType.SimpleDataRecord);
-                List<IDecoder> decoderList =
-                        Configurator.getInstance().getDecoder(xbSimpleDataRecord.getDomNode().getNamespaceURI());
-                Object fieldArray = null;
-                for (IDecoder decoder : decoderList) {
-                    fieldArray = decoder.decode(xbSimpleDataRecord.getFieldArray());
-                    if (fieldArray != null) {
-                        break;
-                    }
-                }
-                if (fieldArray != null && fieldArray instanceof List<?>) {
-                    sosCapabilities.setFields((List<SosSweField>) fieldArray);
-                }
-
+            Object decodedObject = decodeElement(xbCpabilities.getAbstractDataRecord());
+            if (decodedObject != null && decodedObject instanceof AbstractDataRecord) {
+                sosCapabilities.setDataRecord((AbstractDataRecord)decodedObject);
             } else {
                 String exceptionText =
                         "Error while parsing the capabilities of the SensorML (the capabilities data record is not of type DataRecordPropertyType)!";
                 LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(xbCpabilities.getDomNode().getLocalName(),
+                throw Util4Exceptions.createInvalidParameterValueException(XmlHelper.getLocalName(xbCpabilities),
                         exceptionText);
             }
         }
@@ -425,25 +450,56 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
             sosSMLPosition.setName(position.getName());
         }
         if (position.isSetPosition()) {
-            List<IDecoder> decoderList =
-                    Configurator.getInstance().getDecoder(XmlHelper.getNamespace(position.getPosition()));
-            Object pos = null;
-            for (IDecoder decoder : decoderList) {
-                pos = decoder.decode(position.getPosition());
-                if (pos != null) {
-                    break;
-                }
-            }
+            Object pos = decodeElement(position.getPosition());
             if (pos != null && pos instanceof SosSMLPosition) {
                 return (SosSMLPosition) pos;
             }
         } else {
             String exceptionText = "Error while parsing the position of the SensorML (the position is not set)!";
             LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(position.getDomNode().getLocalName(),
+            throw Util4Exceptions.createInvalidParameterValueException(XmlHelper.getLocalName(position),
                     exceptionText);
         }
         return sosSMLPosition;
+    }
+
+    private ITime parseValidTime(ValidTime validTime) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private List<String> parseParameters(Parameters parameters) {
+        List<String> sosParameters = new ArrayList<String>(0);
+        // TODO Auto-generated method stub
+        return sosParameters;
+    }
+
+    private String parseContact(Contact[] contactArray) {
+        // TODO Auto-generated method stub
+        return "";
+    }
+
+    private List<AbstractSosSMLDocumentation> parseDocumentation(Documentation[] documentationArray) {
+        List<AbstractSosSMLDocumentation> abstractDocumentation = new ArrayList<AbstractSosSMLDocumentation>(0);
+        // TODO Auto-generated method stub
+        return abstractDocumentation;
+    }
+
+    private List<String> parseNames(CodeType[] nameArray) {
+        List<String> names = new ArrayList<String>(0);
+        // TODO Auto-generated method stub
+        return names;
+    }
+
+    private List<String> parseKeywords(Keywords[] keywordsArray) {
+        List<String> keywords = new ArrayList<String>(0);
+        // TODO Auto-generated method stub
+        return keywords;
+    }
+
+    private String parseHistory(History[] historyArray) {
+        // TODO Auto-generated method stub
+        return "";
     }
 
     /**
@@ -497,48 +553,41 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
     private SosSMLIo parseIoComponentPropertyType(IoComponentPropertyType xbIoCompPropType) throws OwsExceptionReport {
         SosSMLIo sosIo = new SosSMLIo();
         sosIo.setIoName(xbIoCompPropType.getName());
-        XmlObject toEncode = null;
+        XmlObject toDecode = null;
         if (xbIoCompPropType.isSetBoolean()) {
-            toEncode = xbIoCompPropType.getBoolean();
+            toDecode = xbIoCompPropType.getBoolean();
         } else if (xbIoCompPropType.isSetCategory()) {
-            toEncode = xbIoCompPropType.getCategory();
+            toDecode = xbIoCompPropType.getCategory();
         } else if (xbIoCompPropType.isSetCount()) {
-            toEncode = xbIoCompPropType.getCount();
+            toDecode = xbIoCompPropType.getCount();
         } else if (xbIoCompPropType.isSetCountRange()) {
-            toEncode = xbIoCompPropType.getCountRange();
+            toDecode = xbIoCompPropType.getCountRange();
         } else if (xbIoCompPropType.isSetObservableProperty()) {
-            toEncode = xbIoCompPropType.getObservableProperty();
+            toDecode = xbIoCompPropType.getObservableProperty();
         } else if (xbIoCompPropType.isSetQuantity()) {
-            toEncode = xbIoCompPropType.getQuantity();
+            toDecode = xbIoCompPropType.getQuantity();
         } else if (xbIoCompPropType.isSetQuantityRange()) {
-            toEncode = xbIoCompPropType.getQuantityRange();
+            toDecode = xbIoCompPropType.getQuantityRange();
         } else if (xbIoCompPropType.isSetText()) {
-            toEncode = xbIoCompPropType.getText();
+            toDecode = xbIoCompPropType.getText();
         } else if (xbIoCompPropType.isSetTime()) {
-            toEncode = xbIoCompPropType.getTime();
+            toDecode = xbIoCompPropType.getTime();
         } else if (xbIoCompPropType.isSetTimeRange()) {
-            toEncode = xbIoCompPropType.getTimeRange();
+            toDecode = xbIoCompPropType.getTimeRange();
         } else if (xbIoCompPropType.isSetAbstractDataArray1()) {
-            toEncode = xbIoCompPropType.getAbstractDataArray1();
+            toDecode = xbIoCompPropType.getAbstractDataArray1();
         } else if (xbIoCompPropType.isSetAbstractDataRecord()) {
-            toEncode = xbIoCompPropType.getAbstractDataRecord();
+            toDecode = xbIoCompPropType.getAbstractDataRecord();
         } else {
             String exceptionText = "An \"IoComponentProperty\" is not supported";
             LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(xbIoCompPropType.getDomNode().getLocalName(),
+            throw Util4Exceptions.createInvalidParameterValueException(XmlHelper.getLocalName(xbIoCompPropType),
                     exceptionText);
         }
 
-        List<IDecoder> decoderList = Configurator.getInstance().getDecoder(toEncode.getDomNode().getNamespaceURI());
-        Object encodedObject = null;
-        for (IDecoder decoder : decoderList) {
-            encodedObject = decoder.decode(toEncode);
-            if (encodedObject != null) {
-                break;
-            }
-        }
-        if (encodedObject != null && encodedObject instanceof SosSweAbstractSimpleType) {
-            sosIo.setIoValue((SosSweAbstractSimpleType) encodedObject);
+        Object decodedObject = decodeElement(toDecode);
+        if (decodedObject != null && decodedObject instanceof SosSweAbstractSimpleType) {
+            sosIo.setIoValue((SosSweAbstractSimpleType) decodedObject);
         }
         return sosIo;
     }
@@ -613,7 +662,20 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
             }
         }
         if (removeComponents) {
-            system.setComponents(null);
+            system.unsetComponents();
         }
+    }
+    
+    private Object decodeElement(XmlObject element) throws OwsExceptionReport {
+        List<IDecoder> decoderList =
+                Configurator.getInstance().getDecoder(XmlHelper.getNamespace(element));
+        Object decodedObject = null;
+        for (IDecoder decoder : decoderList) {
+            decodedObject = decoder.decode(element);
+            if (decodedObject != null) {
+                break;
+            }
+        }
+        return decodedObject;
     }
 }

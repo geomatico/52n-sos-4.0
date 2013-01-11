@@ -23,9 +23,22 @@
  */
 package org.n52.sos.ogc.sensorML;
 
-@Deprecated
-public class AbstractSingleProcess extends AbstractProcess {
+import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
 
+public class AbstractComponent extends AbstractProcess {
+    
+    private SosSMLPosition position;
+    
+    public SosSMLPosition getPosition() {
+        return position;
+    }
 
+    public void setPosition(SosSMLPosition position) {
+        this.position = position;
+    }
+    
+    public boolean isSetPosition() {
+        return position != null;
+    }
 
 }

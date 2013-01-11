@@ -21,11 +21,36 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ogc.sensorML;
+package org.n52.sos.ogc.swe;
 
-@Deprecated
-public class AbstractSingleProcess extends AbstractProcess {
+import java.util.List;
 
+public interface AbstractDataRecord {
 
+    /**
+     * @return the fields
+     */
+    public List<SosSweField> getFields();
+
+    /**
+     * @param fields
+     *            the fields to set
+     */
+    public void setFields(List<SosSweField> fields);
+
+    /**
+     * Adds field to field list
+     * 
+     * @param field
+     *            Field to add
+     */
+    public void addField(SosSweField field);
+
+    /**
+     * Check if there are field elements
+     * 
+     * @return Fields not empty
+     */
+    public boolean isSetFields();
 
 }

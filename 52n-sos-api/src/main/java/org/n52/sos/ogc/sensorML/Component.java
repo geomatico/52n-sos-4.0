@@ -23,17 +23,7 @@
  */
 package org.n52.sos.ogc.sensorML;
 
-import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
 
-public class Component extends AbstractSingleProcess {
+public class Component extends AbstractComponent {
     
-    private SosSMLPosition position;
-
-    public SosSMLPosition getPosition() {
-        return position;
-    }
-
-    public void setPosition(SosSMLPosition position) {
-        this.position = position;
-    }
 }

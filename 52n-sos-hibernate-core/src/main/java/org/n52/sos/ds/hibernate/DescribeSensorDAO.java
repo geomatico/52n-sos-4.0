@@ -55,6 +55,7 @@ import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.swe.SWEConstants;
+import org.n52.sos.ogc.swe.SosSweSimpleDataRecord;
 import org.n52.sos.ogc.swe.SWEConstants.SweAggregateType;
 import org.n52.sos.ogc.swe.SosSweField;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
@@ -254,7 +255,7 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
         if (foiIDs != null && !foiIDs.isEmpty()) {
             SosSMLCapabilities capabilities = new SosSMLCapabilities();
             capabilities.setName("featureOfInterest");
-            capabilities.setCapabilitiesType(SweAggregateType.SimpleDataRecord);
+            SosSweSimpleDataRecord simpleDataRecord = new SosSweSimpleDataRecord();
             List<SosSweField> fields = new ArrayList<SosSweField>();
             for (String foiID : foiIDs) {
                 SosSweText text = new SosSweText();
@@ -262,7 +263,8 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
                 text.setValue(foiID);
                 fields.add(new SosSweField("FeatureOfInterestID", text));
             }
-            capabilities.setFields(fields);
+            simpleDataRecord.setFields(fields);
+            capabilities.setDataRecord(simpleDataRecord);
             return capabilities;
         }
         return null;
@@ -282,7 +284,6 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
         if (parentProcedureIds != null && !parentProcedureIds.isEmpty()) {
             SosSMLCapabilities capabilities = new SosSMLCapabilities();
             capabilities.setName(SosConstants.SYS_CAP_PARENT_PROCEDURES_NAME);
-            capabilities.setCapabilitiesType(SweAggregateType.SimpleDataRecord);
             String urlPattern = SosHelper.getUrlPatternForHttpGetMethod(
                     new RequestDecoderKey(version, SosConstants.Operations.DescribeSensor.name()));
             for (String parentProcID : parentProcedureIds) {
@@ -298,6 +299,7 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
                 }
                 capabilities.addMetaDataProperties(metadata);
             }
+            capabilities.setDataRecord(new SosSweSimpleDataRecord());
             return capabilities;
         }
         return null;

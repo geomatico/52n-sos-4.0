@@ -30,16 +30,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.opengis.swe.x101.AbstractDataRecordDocument;
+import net.opengis.swe.x101.AbstractDataRecordType;
 import net.opengis.swe.x101.AnyScalarPropertyType;
 import net.opengis.swe.x101.CountDocument.Count;
 import net.opengis.swe.x101.CountRangeDocument.CountRange;
 import net.opengis.swe.x101.DataArrayDocument;
 import net.opengis.swe.x101.DataArrayType;
 import net.opengis.swe.x101.DataComponentPropertyType;
+import net.opengis.swe.x101.DataRecordPropertyType;
+import net.opengis.swe.x101.DataRecordType;
 import net.opengis.swe.x101.ObservablePropertyDocument.ObservableProperty;
 import net.opengis.swe.x101.PositionType;
 import net.opengis.swe.x101.QuantityDocument.Quantity;
 import net.opengis.swe.x101.QuantityRangeDocument.QuantityRange;
+import net.opengis.swe.x101.SimpleDataRecordType;
 import net.opengis.swe.x101.TextDocument.Text;
 import net.opengis.swe.x101.TimeDocument.Time;
 import net.opengis.swe.x101.TimeRangeDocument.TimeRange;
@@ -52,13 +57,16 @@ import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
 import org.n52.sos.ogc.swe.SosSweDataArray;
+import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.SosSweField;
+import org.n52.sos.ogc.swe.SosSweSimpleDataRecord;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuality;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +104,7 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         } else if (element instanceof DataArrayType) {
             return parseSweDataArrayType((DataArrayType) element);
         } else if (element instanceof DataComponentPropertyType[]) {
-            return parseDataRecordFieldArray((DataComponentPropertyType[]) element);
+            return parseDataComponentPropertyArray((DataComponentPropertyType[]) element);
         } else if (element instanceof Count) {
             return parseCount((Count) element);
         } else if (element instanceof Quantity) {
@@ -110,13 +118,17 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         } else if (element instanceof Coordinate[]) {
             return parseCoordinates((Coordinate[]) element);
         } else if (element instanceof AnyScalarPropertyType[]) {
-            return parseSimpleDataRecordFieldArray((AnyScalarPropertyType[]) element);
+            return parseAnyScalarPropertyArray((AnyScalarPropertyType[]) element);
+        } else if (element instanceof AbstractDataRecordDocument) {
+            return parseAbstractDataRecord(((AbstractDataRecordDocument) element).getAbstractDataRecord());
+        } else if (element instanceof AbstractDataRecordType) {
+            return parseAbstractDataRecord((AbstractDataRecordType) element);
         } else {
             StringBuilder exceptionText = new StringBuilder();
             exceptionText.append("The requested element");
             if (element instanceof XmlObject) {
                 exceptionText.append(" '");
-                exceptionText.append(((XmlObject) element).getDomNode().getLocalName());
+                exceptionText.append(XmlHelper.getLocalName(((XmlObject) element)));
                 exceptionText.append("' ");
             }
             exceptionText.append("is not supported by this server!");
@@ -130,6 +142,48 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return new HashMap<SupportedTypeKey, Set<String>>(0);
     }
 
+    private Object parseAbstractDataRecord(AbstractDataRecordType abstractDataRecord) throws OwsExceptionReport {
+        if (abstractDataRecord instanceof DataRecordPropertyType) {
+            return parseDataRecordProperty((DataRecordPropertyType) abstractDataRecord);
+        } else if (abstractDataRecord instanceof SimpleDataRecordType) {
+            return parseSimpleDataRecord((SimpleDataRecordType) abstractDataRecord);
+        }
+        return null;
+    }
+
+    private SosSweDataRecord parseDataRecordProperty(DataRecordPropertyType dataRecordProperty) throws OwsExceptionReport {
+        DataRecordType dataRecord = dataRecordProperty.getDataRecord();
+        return parseDataRecord(dataRecord);
+    }
+
+    private SosSweDataRecord parseDataRecord(DataRecordType dataRecord) throws OwsExceptionReport {
+        SosSweDataRecord sosDataRecord = new SosSweDataRecord();
+        if (dataRecord.isSetDefinition()) {
+            sosDataRecord.setDefinition(dataRecord.getDefinition());
+        }
+        if (dataRecord.isSetDescription()) {
+            sosDataRecord.setDescription(dataRecord.getDescription().getStringValue());
+        }
+        if (dataRecord.getFieldArray() != null) {
+            sosDataRecord.setFields(parseDataComponentPropertyArray(dataRecord.getFieldArray()));
+        }
+        return sosDataRecord;
+    }
+
+    private Object parseSimpleDataRecord(SimpleDataRecordType simpleDataRecord) throws OwsExceptionReport {
+        SosSweSimpleDataRecord sosSimpleDataRecord = new SosSweSimpleDataRecord();
+        if (simpleDataRecord.isSetDefinition()) {
+            sosSimpleDataRecord.setDefinition(simpleDataRecord.getDefinition());
+        }
+        if (simpleDataRecord.isSetDescription()) {
+            sosSimpleDataRecord.setDescription(simpleDataRecord.getDescription().getStringValue());
+        }
+        if (simpleDataRecord.getFieldArray() != null) {
+            sosSimpleDataRecord.setFields(parseAnyScalarPropertyArray(simpleDataRecord.getFieldArray()));
+        }
+        return sosSimpleDataRecord;
+    }
+
     private SosSweDataArray parseSweDataArray(DataArrayDocument xbDataArray) throws OwsExceptionReport {
         return parseSweDataArrayType(xbDataArray.getDataArray1());
     }
@@ -140,7 +194,7 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return dataArray;
     }
 
-    private List<SosSweField> parseDataRecordFieldArray(DataComponentPropertyType[] fieldArray)
+    private List<SosSweField> parseDataComponentPropertyArray(DataComponentPropertyType[] fieldArray)
             throws OwsExceptionReport {
         List<SosSweField> sosFields = new ArrayList<SosSweField>();
         for (DataComponentPropertyType xbField : fieldArray) {
@@ -301,7 +355,7 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         }
     }
 
-    private List<SosSweField> parseSimpleDataRecordFieldArray(AnyScalarPropertyType[] fieldArray)
+    private List<SosSweField> parseAnyScalarPropertyArray(AnyScalarPropertyType[] fieldArray)
             throws OwsExceptionReport {
         List<SosSweField> sosFields = new ArrayList<SosSweField>();
         for (AnyScalarPropertyType xbField : (AnyScalarPropertyType[]) fieldArray) {

@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.n52.sos.ogc.sensorML.elements.SosSMLComponent;
 
+@Deprecated
 public class AbstractMultiProcess extends AbstractProcess {
 
     private List<SosSMLComponent> components = new ArrayList<SosSMLComponent>(0);
