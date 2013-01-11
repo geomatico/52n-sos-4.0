@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<!--
+	<parent>
+		<groupId>org.n52</groupId>
+		<artifactId>52-North</artifactId>
+		<version>5.6.4</version>
+	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.n52.sensorweb.sos</groupId>
 	<artifactId>52n-sos</artifactId>
-	<version>4.0.0-Beta2</version>
+	<version>4.0.0-SNAPSHOT</version>
 	<name>52North Sensor Observation Service</name>
 	<description>52North Sensor Observation Service - Parent POM for defining dependency versions</description>
 	<inceptionYear>2012</inceptionYear>
@@ -23,7 +29,7 @@
 		<module>52n-sos-coding-sensorML-v101</module>
 		<module>52n-sos-coding-sos-v20</module>
 		<module>52n-sos-webapp</module>
-  </modules>
+	</modules>
 
 	<licenses>
 		<license>
@@ -600,7 +606,6 @@
 				<!-- execute "install" goal during release:prepare (instead of "integration-test") -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.0</version>
 				<configuration>
 					<preparationGoals>clean install</preparationGoals>
 				</configuration>
@@ -864,6 +869,9 @@
 				<module>52n-sos-core-v100</module>
 				<module>52n-sos-coding-sos-v100</module>
 			</modules>
+			<properties>
+				<config.logger.level>TRACE</config.logger.level>
+			</properties>
 		</profile>
 		<profile>
 			<id>sosV100</id>
@@ -871,6 +879,9 @@
 				<module>52n-sos-core-v100</module>
 				<module>52n-sos-coding-sos-v100</module>
 			</modules>
+			<properties>
+				<settingsSqlFile>../db/insert-settings.sql</settingsSqlFile>
+			</properties>
 		</profile>
 		<profile>
 			<id>enhancedV20</id>
@@ -917,6 +928,35 @@
 			<modules>
 				<module>../52n-sos-getResultTasking</module>
 			</modules>
+		</profile>
+		<profile>
+			<id>restful</id>
+			<properties>
+				<sos-ext-do.version>0.1.0-SNAPSHOT</sos-ext-do.version>
+				<rest-binding.version>0.1.0-SNAPSHOT</rest-binding.version>
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-ext-do-code</artifactId>
+					<version>${sos-ext-do.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-ext-do-xml</artifactId>
+					<version>${sos-ext-do.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-binding-rest-core</artifactId>
+					<version>${rest-binding.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-binding-rest-xml-binding</artifactId>
+					<version>${rest-binding.version}</version>
+				</dependency>
+			</dependencies>
 		</profile>
 		<profile>
 			<id>release</id>
