@@ -62,6 +62,7 @@ import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.DecoderHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
@@ -416,7 +417,7 @@ public class SosDecoderv100 implements IXmlRequestDecoder {
     private SpatialFilter parseSpatialFilter4GetObservation(
             GetObservation.FeatureOfInterest spatialFilter) throws OwsExceptionReport {
         if (spatialFilter != null && spatialFilter.getSpatialOps() != null) {
-            Object filter = decodeXmlToObject(spatialFilter.getSpatialOps());
+            Object filter = DecoderHelper.decodeXmlElement(spatialFilter.getSpatialOps());
             if (filter != null && filter instanceof SpatialFilter) {
                 return (SpatialFilter) filter;
             }
@@ -440,7 +441,7 @@ public class SosDecoderv100 implements IXmlRequestDecoder {
     	// TODO I am not sure if that works here :-p
     	List<SpatialFilter> sosSpatialFilters = new ArrayList<SpatialFilter>();
         if (location.getSpatialOps() != null) {
-            Object filter = decodeXmlToObject(location.getSpatialOps());
+            Object filter = DecoderHelper.decodeXmlElement(location.getSpatialOps());
             if (filter != null && filter instanceof SpatialFilter) {
                 sosSpatialFilters.add((SpatialFilter) filter);
             }
@@ -466,7 +467,7 @@ public class SosDecoderv100 implements IXmlRequestDecoder {
         List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>();
         // TODO I am not sure if that works :-p
         for (GetObservation.EventTime temporalFilter : temporalFilters) {
-            Object filter = decodeXmlToObject(temporalFilter.getTemporalOps());
+            Object filter = DecoderHelper.decodeXmlElement(temporalFilter.getTemporalOps());
             if (filter != null && filter instanceof TemporalFilter) {
                 sosTemporalFilters.add((TemporalFilter) filter);
             }
@@ -552,18 +553,18 @@ public class SosDecoderv100 implements IXmlRequestDecoder {
 //                    "The requested resultValue type is not supported");
 //        }
 //    }
-
-    private Object decodeXmlToObject(XmlObject xmlObject) throws OwsExceptionReport {
-        List<IDecoder> decoderList = Configurator.getInstance().getDecoder(XmlHelper.getNamespace(xmlObject));
-        if (decoderList != null) {
-            for (IDecoder decoder : decoderList) {
-                // TODO: check if decoding returns null or throws exception: in
-                // both cases try next decoder in list
-                return decoder.decode(xmlObject);
-            }
-        }
-        return null;
-    }
+//
+//    private Object decodeXmlToObject(XmlObject xmlObject) throws OwsExceptionReport {
+//        List<IDecoder> decoderList = Configurator.getInstance().getDecoder(XmlHelper.getNamespace(xmlObject));
+//        if (decoderList != null) {
+//            for (IDecoder decoder : decoderList) {
+//                // TODO: check if decoding returns null or throws exception: in
+//                // both cases try next decoder in list
+//                return decoder.decode(xmlObject);
+//            }
+//        }
+//        return null;
+//    }
     
     private int parseSridV100(String srsName) throws OwsExceptionReport {
 		// TODO need to parse SRID ID fron that

@@ -52,6 +52,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.DecoderHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
@@ -131,15 +132,7 @@ public class FesDecoderv20 implements IDecoder<Object, XmlObject> {
                 }
                 XmlCursor geometryCursor = xbSpatialOpsType.newCursor();
                 if (geometryCursor.toChild(GMLConstants.QN_ENVELOPE_32)) {
-                    List<IDecoder> decoderList =
-                            Configurator.getInstance().getDecoder(geometryCursor.getDomNode().getNamespaceURI());
-                    Object sosGeometry = null;
-                    for (IDecoder decoder : decoderList) {
-                        sosGeometry = decoder.decode(XmlObject.Factory.parse(geometryCursor.getDomNode()));
-                        if (sosGeometry != null) {
-                            break;
-                        }
-                    }
+                    Object sosGeometry = DecoderHelper.decodeXmlElement(XmlObject.Factory.parse(geometryCursor.getDomNode()));
                     if (sosGeometry != null && sosGeometry instanceof Geometry) {
                         spatialFilter.setGeometry((Geometry) sosGeometry);
                     }
@@ -187,15 +180,7 @@ public class FesDecoderv20 implements IDecoder<Object, XmlObject> {
                 for (int i = 0; i < nodes.getLength(); i++) {
                     if (nodes.item(i).getNamespaceURI() != null
                             && !nodes.item(i).getLocalName().equals(FilterConstants.EN_VALUE_REFERENCE)) {
-                        List<IDecoder> decoderList =
-                                Configurator.getInstance().getDecoder(nodes.item(i).getNamespaceURI());
-                        Object timeObject = null;
-                        for (IDecoder decoder : decoderList) {
-                            timeObject = decoder.decode(XmlObject.Factory.parse(nodes.item(i)));
-                            if (timeObject != null) {
-                                break;
-                            }
-                        }
+                        Object timeObject = DecoderHelper.decodeXmlElement(XmlObject.Factory.parse(nodes.item(i)));
                         if (timeObject != null && timeObject instanceof ITime) {
                             TimeOperator operator;
                             ITime time = (ITime) timeObject;

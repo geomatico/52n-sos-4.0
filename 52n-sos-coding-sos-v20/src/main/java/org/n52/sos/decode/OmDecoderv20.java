@@ -68,6 +68,7 @@ import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.DecoderHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
@@ -162,15 +163,9 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
 
     private CodeWithAuthority getIdentifier(OMObservationType omObservation) throws OwsExceptionReport {
         if (omObservation.getIdentifier() != null) {
-            String namespace = XmlHelper.getNamespace(omObservation.getPhenomenonTime().getAbstractTimeObject());
-            List<IDecoder> decoderList = Configurator.getInstance().getDecoder(XmlHelper.getNamespace(omObservation.getIdentifier()));
-            if (decoderList != null) {
-                for (IDecoder decoder : decoderList) {
-                    Object decodedObject = decoder.decode(omObservation.getIdentifier());
-                    if (decodedObject != null && decodedObject instanceof CodeWithAuthority) {
-                        return (CodeWithAuthority) decodedObject;
-                    }
-                }
+            Object decodedObject = DecoderHelper.decodeXmlElement(omObservation.getIdentifier());
+            if (decodedObject != null && decodedObject instanceof CodeWithAuthority) {
+                return (CodeWithAuthority) decodedObject;
             }
         }
         return null;
@@ -237,15 +232,9 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
                 }
             }
             if (abstractFeature != null) {
-                String namespace = XmlHelper.getNamespace(abstractFeature);
-                List<IDecoder> decoderList = Configurator.getInstance().getDecoder(namespace);
-                if (decoderList != null) {
-                    for (IDecoder decoder : decoderList) {
-                        Object decodedObject = decoder.decode(abstractFeature);
-                        if (decodedObject != null && decodedObject instanceof SosSamplingFeature) {
-                            feature = (SosSamplingFeature) decodedObject;
-                        }
-                    }
+                Object decodedObject = DecoderHelper.decodeXmlElement(abstractFeature);
+                if (decodedObject != null && decodedObject instanceof SosSamplingFeature) {
+                    feature = (SosSamplingFeature) decodedObject;
                 } else {
                     String exceptionText = "The requested featureOfInterest type is not supported by this service!";
                     LOGGER.debug(exceptionText);
@@ -271,15 +260,9 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
             timeInstant.setIndeterminateValue((String) omObservation.getPhenomenonTime().getNilReason());
             return timeInstant;
         } else {
-            String namespace = XmlHelper.getNamespace(omObservation.getPhenomenonTime().getAbstractTimeObject());
-            List<IDecoder> decoderList = Configurator.getInstance().getDecoder(namespace);
-            if (decoderList != null) {
-                for (IDecoder decoder : decoderList) {
-                    Object decodedObject = decoder.decode(omObservation.getPhenomenonTime().getAbstractTimeObject());
-                    if (decodedObject != null && decodedObject instanceof ITime) {
-                        return (ITime) decodedObject;
-                    }
-                }
+            Object decodedObject = DecoderHelper.decodeXmlElement(omObservation.getPhenomenonTime().getAbstractTimeObject());
+            if (decodedObject != null && decodedObject instanceof ITime) {
+                return (ITime) decodedObject;
             }
         }
         String exceptionText = "The requested phenomenonTime type is not supported by this service!";
@@ -307,15 +290,9 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
             timeInstant.setIndeterminateValue((String) omObservation.getResultTime().getNilReason());
             return timeInstant;
         } else {
-            String namespace = XmlHelper.getNamespace(omObservation.getResultTime().getTimeInstant());
-            List<IDecoder> decoderList = Configurator.getInstance().getDecoder(namespace);
-            if (decoderList != null) {
-                for (IDecoder decoder : decoderList) {
-                    Object decodedObject = decoder.decode(omObservation.getResultTime().getTimeInstant());
-                    if (decodedObject != null && decodedObject instanceof TimeInstant) {
-                        return (TimeInstant) decodedObject;
-                    }
-                }
+            Object decodedObject = DecoderHelper.decodeXmlElement(omObservation.getResultTime().getTimeInstant());
+            if (decodedObject != null && decodedObject instanceof TimeInstant) {
+                return (TimeInstant) decodedObject;
             }
             String exceptionText = "The requested resultTime type is not supported by this service!";
             LOGGER.debug(exceptionText);
@@ -326,15 +303,9 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
 
     private TimePeriod getValidTime(OMObservationType omObservation) throws OwsExceptionReport {
         if (omObservation.isSetValidTime()) {
-            String namespace = XmlHelper.getNamespace(omObservation.getValidTime().getTimePeriod());
-            List<IDecoder> decoderList = Configurator.getInstance().getDecoder(namespace);
-            if (decoderList != null) {
-                for (IDecoder decoder : decoderList) {
-                    Object decodedObject = decoder.decode(omObservation.getValidTime().getTimePeriod());
-                    if (decodedObject != null && decodedObject instanceof TimePeriod) {
-                        return (TimePeriod) decodedObject;
-                    }
-                }
+            Object decodedObject = DecoderHelper.decodeXmlElement(omObservation.getValidTime().getTimePeriod());
+            if (decodedObject != null && decodedObject instanceof TimePeriod) {
+                return (TimePeriod) decodedObject;
             }
             String exceptionText = "The requested validTime type is not supported by this service!";
             LOGGER.debug(exceptionText);
@@ -379,23 +350,17 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
         }
         // result elements with other encoding like SWE_ARRAY_OBSERVATION
         else {
-            String namespace = omObservation.getResult().schemaType().getName().getNamespaceURI();
-            List<IDecoder> decoderList = Configurator.getInstance().getDecoder(namespace);
-            if (decoderList != null) {
-                for (IDecoder decoder : decoderList) {
-                    Object decodedObject = decoder.decode(omObservation.getResult());
-                    if (decodedObject != null && decodedObject instanceof IObservationValue){
-                        return (IObservationValue) decodedObject;
-                    }
-                    else if (decodedObject != null && decodedObject instanceof SosSweDataArray)
-                    {
-                        SosMultiObservationValues result = new SosMultiObservationValues();
-                        SweDataArrayValue value = new SweDataArrayValue();
-                        value.setValue((SosSweDataArray) decodedObject);
-                        result.setValue(value);
-                        return result;
-                    }
-                }
+            Object decodedObject = DecoderHelper.decodeXmlElement(omObservation.getResult());
+            if (decodedObject != null && decodedObject instanceof IObservationValue){
+                return (IObservationValue) decodedObject;
+            }
+            else if (decodedObject != null && decodedObject instanceof SosSweDataArray)
+            {
+                SosMultiObservationValues result = new SosMultiObservationValues();
+                SweDataArrayValue value = new SweDataArrayValue();
+                value.setValue((SosSweDataArray) decodedObject);
+                result.setValue(value);
+                return result;
             }
             String exceptionText = "The requested result type is not supported by this service!";
             LOGGER.debug(exceptionText);

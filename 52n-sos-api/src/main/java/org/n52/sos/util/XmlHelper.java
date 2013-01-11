@@ -58,8 +58,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * XML utility class
- * TODO add javadoc to public methods
+ * XML utility class TODO add javadoc to public methods
  */
 public class XmlHelper {
 
@@ -82,7 +81,7 @@ public class XmlHelper {
         try {
             if (request.getParameterMap().isEmpty()) {
                 String requestContent = convertStreamToString(request.getInputStream());
-                doc = XmlObject.Factory.parse( requestContent );
+                doc = XmlObject.Factory.parse(requestContent);
             } else {
                 doc =
                         XmlObject.Factory.parse(SosHelper.parseHttpPostBodyWithParameter(request.getParameterNames(),
@@ -95,10 +94,10 @@ public class XmlHelper {
             throw Util4Exceptions.createNoApplicableCodeException(ioe,
                     "Error while reading request! Message: " + ioe.getMessage());
         }
-//        validateDocument(doc);
+        // validateDocument(doc);
         return doc;
     }
-    
+
     private static String convertStreamToString(InputStream is) throws OwsExceptionReport {
         try {
             Scanner scanner = new Scanner(is).useDelimiter("\\A");
@@ -107,12 +106,11 @@ public class XmlHelper {
             }
         } catch (NoSuchElementException nSEE) {
             String msg = String.format("Error while reading content of HTTP request: %s", nSEE.getMessage());
-            LOGGER.debug(msg,nSEE);
-            throw Util4Exceptions.createNoApplicableCodeException(nSEE,msg);
+            LOGGER.debug(msg, nSEE);
+            throw Util4Exceptions.createNoApplicableCodeException(nSEE, msg);
         }
         return "";
     }
-
 
     /**
      * Get element Node from NodeList.
@@ -186,114 +184,118 @@ public class XmlHelper {
                 // get name of the missing or invalid parameter
                 message = error.getMessage();
                 if (message != null) {
-                    
+
                     OwsExceptionReport se = new OwsExceptionReport();
-                    se.addCodedException(SwesExceptionCode.InvalidRequest, message,
-                            "[XmlBeans validation error:] " + message);
+                    se.addCodedException(SwesExceptionCode.InvalidRequest, message, "[XmlBeans validation error:] "
+                            + message);
                     LOGGER.error("The request is invalid!", se);
                     exceptions.add(se);
 
-                    // TODO check if code can be used for validation of SOS 1.0.0 requests
-//                    // check, if parameter is missing or value of parameter
-//                    // is
-//                    // invalid to ensure, that correct
-//                    // exceptioncode in exception response is used
-//
-//                    // invalid parameter value
-//                    if (message.startsWith("The value")) {
-//                        exCode = OwsExceptionCode.InvalidParameterValue;
-//
-//                        // split message string to get attribute name
-//                        String[] messAndAttribute = message.split("attribute '");
-//                        if (messAndAttribute.length == 2) {
-//                            parameterName = messAndAttribute[1].replace("'", "");
-//                        }
-//                    }
-//
-//                    // invalid enumeration value --> InvalidParameterValue
-//                    else if (message.contains("not a valid enumeration value")) {
-//                        exCode = OwsExceptionCode.InvalidParameterValue;
-//
-//                        // get attribute name
-//                        String[] messAndAttribute = message.split(" ");
-//                        parameterName = messAndAttribute[10];
-//                    }
-//
-//                    // mandatory attribute is missing -->
-//                    // missingParameterValue
-//                    else if (message.startsWith("Expected attribute")) {
-//                        exCode = OwsExceptionCode.MissingParameterValue;
-//
-//                        // get attribute name
-//                        String[] messAndAttribute = message.split("attribute: ");
-//                        if (messAndAttribute.length == 2) {
-//                            String[] attrAndRest = messAndAttribute[1].split(" in");
-//                            if (attrAndRest.length == 2) {
-//                                parameterName = attrAndRest[0];
-//                            }
-//                        }
-//                    }
-//
-//                    // mandatory element is missing -->
-//                    // missingParameterValue
-//                    else if (message.startsWith("Expected element")) {
-//                        exCode = SwesExceptionCode.InvalidRequest;
-//
-//                        // get element name
-//                        String[] messAndElements = message.split(" '");
-//                        if (messAndElements.length >= 2) {
-//                            String elements = messAndElements[1];
-//                            if (elements.contains("offering")) {
-//                                parameterName = "offering";
-//                            } else if (elements.contains("observedProperty")) {
-//                                parameterName = "observedProperty";
-//                            } else if (elements.contains("responseFormat")) {
-//                                parameterName = "responseFormat";
-//                            } else if (elements.contains("procedure")) {
-//                                parameterName = "procedure";
-//                            } else if (elements.contains("featureOfInterest")) {
-//                                parameterName = "featureOfInterest";
-//                            } else {
-//                                // TODO check if other elements are invalid
-//                            }
-//                        }
-//                    }
-//                    // invalidParameterValue
-//                    else if (message.startsWith("Element")) {
-//                        exCode = OwsExceptionCode.InvalidParameterValue;
-//
-//                        // get element name
-//                        String[] messAndElements = message.split(" '");
-//                        if (messAndElements.length >= 2) {
-//                            String elements = messAndElements[1];
-//                            if (elements.contains("offering")) {
-//                                parameterName = "offering";
-//                            } else if (elements.contains("observedProperty")) {
-//                                parameterName = "observedProperty";
-//                            } else if (elements.contains("responseFormat")) {
-//                                parameterName = "responseFormat";
-//                            } else if (elements.contains("procedure")) {
-//                                parameterName = "procedure";
-//                            } else if (elements.contains("featureOfInterest")) {
-//                                parameterName = "featureOfInterest";
-//                            } else {
-//                                // TODO check if other elements are invalid
-//                            }
-//                        }
-//                    } else {
-//                        // create service exception
-//                        OwsExceptionReport se = new OwsExceptionReport();
-//                        se.addCodedException(SwesExceptionCode.InvalidRequest, message,
-//                                "[XmlBeans validation error:] " + message);
-//                        LOGGER.error("The request is invalid!", se);
-//                        throw se;
-//                    }
-//
-//                    // create service exception
-//                    OwsExceptionReport se = new OwsExceptionReport();
-//                    se.addCodedException(exCode, message, "[XmlBeans validation error:] " + message);
-//                    LOGGER.error("The request is invalid!", se);
-//                    throw se;
+                    // TODO check if code can be used for validation of SOS
+                    // 1.0.0 requests
+                    // // check, if parameter is missing or value of parameter
+                    // // is
+                    // // invalid to ensure, that correct
+                    // // exceptioncode in exception response is used
+                    //
+                    // // invalid parameter value
+                    // if (message.startsWith("The value")) {
+                    // exCode = OwsExceptionCode.InvalidParameterValue;
+                    //
+                    // // split message string to get attribute name
+                    // String[] messAndAttribute = message.split("attribute '");
+                    // if (messAndAttribute.length == 2) {
+                    // parameterName = messAndAttribute[1].replace("'", "");
+                    // }
+                    // }
+                    //
+                    // // invalid enumeration value --> InvalidParameterValue
+                    // else if
+                    // (message.contains("not a valid enumeration value")) {
+                    // exCode = OwsExceptionCode.InvalidParameterValue;
+                    //
+                    // // get attribute name
+                    // String[] messAndAttribute = message.split(" ");
+                    // parameterName = messAndAttribute[10];
+                    // }
+                    //
+                    // // mandatory attribute is missing -->
+                    // // missingParameterValue
+                    // else if (message.startsWith("Expected attribute")) {
+                    // exCode = OwsExceptionCode.MissingParameterValue;
+                    //
+                    // // get attribute name
+                    // String[] messAndAttribute = message.split("attribute: ");
+                    // if (messAndAttribute.length == 2) {
+                    // String[] attrAndRest = messAndAttribute[1].split(" in");
+                    // if (attrAndRest.length == 2) {
+                    // parameterName = attrAndRest[0];
+                    // }
+                    // }
+                    // }
+                    //
+                    // // mandatory element is missing -->
+                    // // missingParameterValue
+                    // else if (message.startsWith("Expected element")) {
+                    // exCode = SwesExceptionCode.InvalidRequest;
+                    //
+                    // // get element name
+                    // String[] messAndElements = message.split(" '");
+                    // if (messAndElements.length >= 2) {
+                    // String elements = messAndElements[1];
+                    // if (elements.contains("offering")) {
+                    // parameterName = "offering";
+                    // } else if (elements.contains("observedProperty")) {
+                    // parameterName = "observedProperty";
+                    // } else if (elements.contains("responseFormat")) {
+                    // parameterName = "responseFormat";
+                    // } else if (elements.contains("procedure")) {
+                    // parameterName = "procedure";
+                    // } else if (elements.contains("featureOfInterest")) {
+                    // parameterName = "featureOfInterest";
+                    // } else {
+                    // // TODO check if other elements are invalid
+                    // }
+                    // }
+                    // }
+                    // // invalidParameterValue
+                    // else if (message.startsWith("Element")) {
+                    // exCode = OwsExceptionCode.InvalidParameterValue;
+                    //
+                    // // get element name
+                    // String[] messAndElements = message.split(" '");
+                    // if (messAndElements.length >= 2) {
+                    // String elements = messAndElements[1];
+                    // if (elements.contains("offering")) {
+                    // parameterName = "offering";
+                    // } else if (elements.contains("observedProperty")) {
+                    // parameterName = "observedProperty";
+                    // } else if (elements.contains("responseFormat")) {
+                    // parameterName = "responseFormat";
+                    // } else if (elements.contains("procedure")) {
+                    // parameterName = "procedure";
+                    // } else if (elements.contains("featureOfInterest")) {
+                    // parameterName = "featureOfInterest";
+                    // } else {
+                    // // TODO check if other elements are invalid
+                    // }
+                    // }
+                    // } else {
+                    // // create service exception
+                    // OwsExceptionReport se = new OwsExceptionReport();
+                    // se.addCodedException(SwesExceptionCode.InvalidRequest,
+                    // message,
+                    // "[XmlBeans validation error:] " + message);
+                    // LOGGER.error("The request is invalid!", se);
+                    // throw se;
+                    // }
+                    //
+                    // // create service exception
+                    // OwsExceptionReport se = new OwsExceptionReport();
+                    // se.addCodedException(exCode, message,
+                    // "[XmlBeans validation error:] " + message);
+                    // LOGGER.error("The request is invalid!", se);
+                    // throw se;
                 }
             }
             Util4Exceptions.mergeAndThrowExceptions(exceptions);
@@ -308,11 +310,12 @@ public class XmlHelper {
         ABSTRACT_OFFERING {
             @Override
             public boolean shouldPass(XmlValidationError xve) {
-                return xve.getFieldQName() != null && xve.getExpectedQNames() != null
-                    && xve.getFieldQName().equals(SWEConstants.QN_OFFERING)
-                    && xve.getExpectedQNames().contains(SWEConstants.QN_ABSTRACT_OFFERING) 
-                    && (xve.getMessage().contains(BEFORE_END_CONTENT_ELEMENT) || (xve.getOffendingQName() != null 
-                            && xve.getOffendingQName().equals(Sos2Constants.QN_OBSERVATION_OFFERING)));
+                return xve.getFieldQName() != null
+                        && xve.getExpectedQNames() != null
+                        && xve.getFieldQName().equals(SWEConstants.QN_OFFERING)
+                        && xve.getExpectedQNames().contains(SWEConstants.QN_ABSTRACT_OFFERING)
+                        && (xve.getMessage().contains(BEFORE_END_CONTENT_ELEMENT) || (xve.getOffendingQName() != null && xve
+                                .getOffendingQName().equals(Sos2Constants.QN_OBSERVATION_OFFERING)));
             }
         },
         /**
@@ -323,26 +326,27 @@ public class XmlHelper {
         ABSTRACT_FEATURE_GML {
             @Override
             public boolean shouldPass(XmlValidationError xve) {
-                return xve.getExpectedQNames() != null 
-                        && (xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_FEATURE_GML)
-                            || xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_FEATURE_GML_32));
+                return xve.getExpectedQNames() != null
+                        && (xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_FEATURE_GML) || xve
+                                .getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_FEATURE_GML_32));
             }
         },
         ABSTRACT_TIME_GML_3_2_1 {
             @Override
             public boolean shouldPass(XmlValidationError xve) {
-                return xve.getExpectedQNames() != null 
+                return xve.getExpectedQNames() != null
                         && xve.getExpectedQNames().contains(GMLConstants.QN_ABSTRACT_TIME_32);
             }
         },
         SOS_INSERTION_META_DATA {
             @Override
             public boolean shouldPass(XmlValidationError xve) {
-                return xve.getFieldQName() != null && xve.getExpectedQNames() != null
-                    && xve.getFieldQName().equals(SWEConstants.QN_METADATA)
-                    && xve.getExpectedQNames().contains(SWEConstants.QN_INSERTION_METADATA) 
-                    && (xve.getMessage().contains(BEFORE_END_CONTENT_ELEMENT) || (xve.getOffendingQName() != null 
-                        && xve.getOffendingQName().equals(Sos2Constants.QN_SOS_INSERTION_METADATA)));
+                return xve.getFieldQName() != null
+                        && xve.getExpectedQNames() != null
+                        && xve.getFieldQName().equals(SWEConstants.QN_METADATA)
+                        && xve.getExpectedQNames().contains(SWEConstants.QN_INSERTION_METADATA)
+                        && (xve.getMessage().contains(BEFORE_END_CONTENT_ELEMENT) || (xve.getOffendingQName() != null && xve
+                                .getOffendingQName().equals(Sos2Constants.QN_SOS_INSERTION_METADATA)));
             }
         };
 
@@ -407,16 +411,15 @@ public class XmlHelper {
                 Attr attr = (Attr) attributes.item(i);
                 if (attr.getLocalName().equals(GMLConstants.AN_ID)) {
                     String attrNamespace = attr.getNamespaceURI();
-                    if ((attrNamespace != null
-                            && GMLConstants.NS_GML.equals(attrNamespace)
-                            || GMLConstants.NS_GML_32.equals(attrNamespace))
-                        || (attrNamespace == null && nodeNamespace != null
-                            && GMLConstants.NS_GML.equals(nodeNamespace)
-                            || GMLConstants.NS_GML_32.equals(nodeNamespace))
-                        || (attr.getName().equals("gml:id"))) {
+                    if ((attrNamespace != null && GMLConstants.NS_GML.equals(attrNamespace) || GMLConstants.NS_GML_32
+                            .equals(attrNamespace))
+                            || (attrNamespace == null && nodeNamespace != null
+                                    && GMLConstants.NS_GML.equals(nodeNamespace) || GMLConstants.NS_GML_32
+                                        .equals(nodeNamespace)) || (attr.getName().equals("gml:id"))) {
                         String gmlId = attr.getValue();
                         if (foundIds.containsKey(gmlId)) {
-                            // id has already been found, suffix this one with the
+                            // id has already been found, suffix this one with
+                            // the
                             // found count for this id
                             attr.setValue(gmlId + foundIds.get(gmlId));
                             // increment the found count for this id
@@ -449,7 +452,26 @@ public class XmlHelper {
         if (namespaceURI == null) {
             namespaceURI = doc.getDomNode().getFirstChild().getNextSibling().getNamespaceURI();
         }
-        return namespaceURI;
+        // check with schemaType namespace, necessary for anyType elements
+        String schemaTypeNamespace = getSchemaTypeNamespace(doc);
+        if (schemaTypeNamespace == null) {
+            return namespaceURI;
+        } else {
+            if (schemaTypeNamespace.equals(namespaceURI)) {
+                return namespaceURI;
+            } else {
+                return schemaTypeNamespace;
+            }
+        }
+        
+    }
+
+    private static String getSchemaTypeNamespace(XmlObject doc) {
+        QName name = doc.schemaType().getName();
+        if (name != null) {
+            return name.getNamespaceURI();
+        }
+        return null;
     }
 
     public static void updateGmlIDs(Node node, String gmlID, String oldGmlID) {
@@ -461,13 +483,11 @@ public class XmlHelper {
                 Attr attr = (Attr) attributes.item(i);
                 if (attr.getLocalName().equals(GMLConstants.AN_ID)) {
                     String attrNamespace = attr.getNamespaceURI();
-                    if ((attrNamespace != null
-                            && GMLConstants.NS_GML.equals(attrNamespace)
-                            || GMLConstants.NS_GML_32.equals(attrNamespace))
+                    if ((attrNamespace != null && GMLConstants.NS_GML.equals(attrNamespace) || GMLConstants.NS_GML_32
+                            .equals(attrNamespace))
                             || (attrNamespace == null && nodeNamespace != null
-                            && GMLConstants.NS_GML.equals(nodeNamespace)
-                            || GMLConstants.NS_GML_32.equals(nodeNamespace))
-                            || (attr.getName().equals("gml:id"))) {
+                                    && GMLConstants.NS_GML.equals(nodeNamespace) || GMLConstants.NS_GML_32
+                                        .equals(nodeNamespace)) || (attr.getName().equals("gml:id"))) {
                         if (oldGmlID == null) {
                             oldGmlID = attr.getValue();
                             attr.setValue((gmlID));
@@ -493,40 +513,31 @@ public class XmlHelper {
     }
 
     public static void substituteElement(XmlObject elementToSubstitute, XmlObject substitutionElement) {
-       Node domNode = substitutionElement.getDomNode();
-       elementToSubstitute.substitute(new QName(domNode.getNamespaceURI(), domNode.getLocalName()), substitutionElement.schemaType());
+        Node domNode = substitutionElement.getDomNode();
+        elementToSubstitute.substitute(new QName(domNode.getNamespaceURI(), domNode.getLocalName()),
+                substitutionElement.schemaType());
     }
 
-	public static Object decodeGenericXmlObject(String xmlString) throws OwsExceptionReport
-	{
-		try {
-			XmlObject xbResultStructure = XmlObject.Factory.parse(xmlString);
-			String resultStructureNamespace = getNamespace(xbResultStructure);
-			List<IDecoder> decoders = Configurator.getInstance().getDecoder(resultStructureNamespace);
-			if (decoders != null)
-			{
-				for (IDecoder iDecoder : decoders) {
-					Object decodedObject = iDecoder.decode(xbResultStructure);
-					if (decodedObject != null)
-					{
-						return decodedObject;
-					}
-				}
-				String errorMsg = String.format("Decoding of type \"%s\" using namespace \"%s\" failed",
-						xbResultStructure.getClass().getCanonicalName(),
-						resultStructureNamespace);
-				LOGGER.error(errorMsg);
-				throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
-			}
-			String errorMsg = String.format("No decoder found for namespace \"%s\".",resultStructureNamespace);
-			LOGGER.error(errorMsg);
-			throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
-		} catch (XmlException e) {
-			String errorMsg = String.format("Exception thrown while parsing XML string from database: %s", e.getMessage());
-			LOGGER.error(errorMsg,e);
-			throw Util4Exceptions.createNoApplicableCodeException(e, errorMsg);
-		}
-	}
+    public static Object decodeGenericXmlObject(String xmlString) throws OwsExceptionReport {
+        try {
+            XmlObject xbResultStructure = XmlObject.Factory.parse(xmlString);
+            Object decodedObject = DecoderHelper.decodeXmlElement(xbResultStructure);
+            if (decodedObject != null) {
+                return decodedObject;
+            }
+            String errorMsg =
+                    String.format("Decoding of type \"%s\" using namespace \"%s\" failed", xbResultStructure
+                            .getClass().getCanonicalName(), XmlHelper.getNamespace(xbResultStructure));
+            LOGGER.error(errorMsg);
+            throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+
+        } catch (XmlException e) {
+            String errorMsg =
+                    String.format("Exception thrown while parsing XML string from database: %s", e.getMessage());
+            LOGGER.error(errorMsg, e);
+            throw Util4Exceptions.createNoApplicableCodeException(e, errorMsg);
+        }
+    }
 
     public static String getLocalName(XmlObject element) {
         return element.getDomNode().getLocalName();

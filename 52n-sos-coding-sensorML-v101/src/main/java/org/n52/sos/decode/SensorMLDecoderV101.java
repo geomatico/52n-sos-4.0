@@ -88,6 +88,7 @@ import org.n52.sos.ogc.swe.AbstractDataRecord;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.DecoderHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -260,7 +261,7 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         if (xbAbstractProcess.getNameArray() != null) {
             int length = xbAbstractProcess.getNameArray().length;
             for (int i = 0; i < length; i++) {
-                Object decodedElement = decodeElement(xbAbstractProcess.getNameArray(i));
+                Object decodedElement = DecoderHelper.decodeXmlElement(xbAbstractProcess.getNameArray(i));
                 if (decodedElement != null && decodedElement instanceof CodeType) {
                     abstractProcess.addName((CodeType)decodedElement);
                 }
@@ -397,7 +398,7 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         List<SosSMLCharacteristics> sosCharacteristicsList = new ArrayList<SosSMLCharacteristics>();
         SosSMLCharacteristics sosCharacteristics = new SosSMLCharacteristics();
         for (Characteristics xbCharacteristics : characteristicsArray) {
-            Object decodedObject = decodeElement(xbCharacteristics.getAbstractDataRecord());
+            Object decodedObject = DecoderHelper.decodeXmlElement(xbCharacteristics.getAbstractDataRecord());
             if (decodedObject != null && decodedObject instanceof AbstractDataRecord) {
                 sosCharacteristics.setDataRecord((AbstractDataRecord)decodedObject);
             } else {
@@ -426,7 +427,7 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         List<SosSMLCapabilities> sosCapabilitiesList = new ArrayList<SosSMLCapabilities>();
         SosSMLCapabilities sosCapabilities = new SosSMLCapabilities();
         for (Capabilities xbCpabilities : capabilitiesArray) {
-            Object decodedObject = decodeElement(xbCpabilities.getAbstractDataRecord());
+            Object decodedObject = DecoderHelper.decodeXmlElement(xbCpabilities.getAbstractDataRecord());
             if (decodedObject != null && decodedObject instanceof AbstractDataRecord) {
                 sosCapabilities.setDataRecord((AbstractDataRecord)decodedObject);
             } else {
@@ -456,7 +457,7 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
             sosSMLPosition.setName(position.getName());
         }
         if (position.isSetPosition()) {
-            Object pos = decodeElement(position.getPosition());
+            Object pos = DecoderHelper.decodeXmlElement(position.getPosition());
             if (pos != null && pos instanceof SosSMLPosition) {
                 return (SosSMLPosition) pos;
             }
@@ -585,7 +586,7 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
                     exceptionText);
         }
 
-        Object decodedObject = decodeElement(toDecode);
+        Object decodedObject = DecoderHelper.decodeXmlElement(toDecode);
         if (decodedObject != null && decodedObject instanceof SosSweAbstractSimpleType) {
             sosIo.setIoValue((SosSweAbstractSimpleType) decodedObject);
         }
@@ -664,18 +665,5 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         if (removeComponents) {
             system.unsetComponents();
         }
-    }
-    
-    private Object decodeElement(XmlObject element) throws OwsExceptionReport {
-        List<IDecoder> decoderList =
-                Configurator.getInstance().getDecoder(XmlHelper.getNamespace(element));
-        Object decodedObject = null;
-        for (IDecoder decoder : decoderList) {
-            decodedObject = decoder.decode(element);
-            if (decodedObject != null) {
-                break;
-            }
-        }
-        return decodedObject;
     }
 }

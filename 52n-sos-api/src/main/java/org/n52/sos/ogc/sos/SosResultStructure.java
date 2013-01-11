@@ -31,6 +31,7 @@ import org.n52.sos.decode.IDecoder;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.DecoderHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
@@ -79,7 +80,7 @@ public class SosResultStructure {
     
     private SosSweAbstractDataComponent parseResultStructure() throws OwsExceptionReport {
         try {
-            Object decodedObject = decodeXmlToObject(XmlObject.Factory.parse(xml));
+            Object decodedObject = DecoderHelper.decodeXmlElement(XmlObject.Factory.parse(xml));
             if (decodedObject != null && decodedObject instanceof SosSweAbstractDataComponent) {
                 SosSweAbstractDataComponent sosSweData = (SosSweAbstractDataComponent) decodedObject;
                 return sosSweData;
@@ -97,16 +98,6 @@ public class SosResultStructure {
         }
     }
 
-    private Object decodeXmlToObject(XmlObject xmlObject) throws OwsExceptionReport {
-        List<IDecoder> decoderList = Configurator.getInstance().getDecoder(XmlHelper.getNamespace(xmlObject));
-        if (decoderList != null) {
-            for (IDecoder decoder : decoderList) {
-                return decoder.decode(xmlObject);
-            }
-        }
-        return null;
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (o != null && o instanceof SosResultStructure) {

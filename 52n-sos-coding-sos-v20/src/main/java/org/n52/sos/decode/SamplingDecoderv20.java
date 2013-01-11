@@ -47,6 +47,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.DecoderHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -194,15 +195,9 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
                     }
                 }
                 if (abstractFeature != null) {
-                    String namespace = XmlHelper.getNamespace(abstractFeature);
-                    List<IDecoder> decoderList = Configurator.getInstance().getDecoder(namespace);
-                    if (decoderList != null) {
-                        for (IDecoder decoder : decoderList) {
-                            Object decodedObject = decoder.decode(abstractFeature);
-                            if (decodedObject != null && decodedObject instanceof SosAbstractFeature) {
-                                sampledFeatures.add((SosAbstractFeature) decodedObject);
-                            }
-                        }
+                    Object decodedObject = DecoderHelper.decodeXmlElement(abstractFeature);
+                    if (decodedObject != null && decodedObject instanceof SosAbstractFeature) {
+                        sampledFeatures.add((SosAbstractFeature) decodedObject);
                     }
                 }
                 String exceptionText = "The requested sampledFeature type is not supported by this service!";
@@ -215,15 +210,9 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
     }
 
     private Geometry getGeometry(ShapeType shape) throws OwsExceptionReport {
-        String namespace = XmlHelper.getNamespace(shape.getAbstractGeometry());
-        List<IDecoder> decoderList = Configurator.getInstance().getDecoder(namespace);
-        if (decoderList != null) {
-            for (IDecoder decoder : decoderList) {
-                Object decodedObject = decoder.decode(shape.getAbstractGeometry());
-                if (decodedObject != null && decodedObject instanceof Geometry) {
-                    return (Geometry) decodedObject;
-                }
-            }
+        Object decodedObject = DecoderHelper.decodeXmlElement(shape.getAbstractGeometry());
+        if (decodedObject != null && decodedObject instanceof Geometry) {
+            return (Geometry) decodedObject;
         }
         String exceptionText = "The requested geometry type of featureOfInterest is not supported by this service!";
         LOGGER.debug(exceptionText);

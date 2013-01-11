@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.decode.IDecoder;
 import org.n52.sos.ds.IGetObservationDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.IObservationEncoder;
@@ -52,7 +51,6 @@ import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -440,15 +438,4 @@ public class SosGetObservationOperatorV100 implements IRequestOperator {
 
     }
     
-    private Object decodeXmlToObject(XmlObject xmlObject) throws OwsExceptionReport {
-        List<IDecoder> decoderList = Configurator.getInstance().getDecoder(XmlHelper.getNamespace(xmlObject));
-        if (decoderList != null) {
-            for (IDecoder decoder : decoderList) {
-                // TODO: check if decoding returns null or throws exception: in
-                // both cases try next decoder in list
-                return decoder.decode(xmlObject);
-            }
-        }
-        return null;
-    }
 }
