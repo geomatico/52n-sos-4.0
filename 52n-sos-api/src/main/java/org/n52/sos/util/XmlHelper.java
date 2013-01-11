@@ -527,4 +527,8 @@ public class XmlHelper {
 			throw Util4Exceptions.createNoApplicableCodeException(e, errorMsg);
 		}
 	}
+
+    public static String getLocalName(XmlObject element) {
+        return element.getDomNode().getLocalName();
+    }
 }
