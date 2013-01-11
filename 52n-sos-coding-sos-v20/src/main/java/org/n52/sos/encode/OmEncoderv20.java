@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.opengis.gml.x32.FeaturePropertyType;
+import net.opengis.gml.x32.TimeInstantPropertyType;
 import net.opengis.om.x20.OMObservationType;
 import net.opengis.om.x20.TimeObjectPropertyType;
 
@@ -43,6 +44,8 @@ import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.TimeInstant;
+import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosCompositePhenomenon;
 import org.n52.sos.ogc.om.SosMultiObservationValues;
@@ -204,7 +207,8 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
         }
         addPhenomenonTime(xbObs.addNewPhenomenonTime(), phenomenonTime);
         // set resultTime
-        xbObs.addNewResultTime().setHref("#" + phenomenonTime.getId());
+        addResultTime(xbObs, sosObservation);
+        
         // set procedure
         xbObs.addNewProcedure().setHref(
                 sosObservation.getObservationConstellation().getProcedure().getProcedureIdentifier());
@@ -476,6 +480,42 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
                     timeObjectPropertyType.addNewAbstractTimeObject().substitute(GmlHelper.getQnameForITime(iTime),
                             xmlObject.schemaType());
             substitution.set(xmlObject);
+        } else {
+            String exceptionText = "Error while encoding phenomenon time, needed encoder is missing!";
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        }
+    }
+    
+    private void addResultTime(OMObservationType xbObs, SosObservation sosObservation)
+            throws OwsExceptionReport {
+        TimeInstant resultTime = sosObservation.getResultTime();
+        ITime phenomenonTime = sosObservation.getPhenomenonTime();
+        if (sosObservation.getResultTime() != null) {
+            if (resultTime.equals(phenomenonTime)) {
+                xbObs.addNewResultTime().setHref("#" + phenomenonTime.getId());
+            } else {
+                addResultTime(xbObs, resultTime);
+            }
+        } else { 
+            if (phenomenonTime instanceof TimeInstant) {
+                xbObs.addNewResultTime().setHref("#" + phenomenonTime.getId());
+            } else if (phenomenonTime instanceof TimePeriod) {
+                TimeInstant rsTime = new TimeInstant(((TimePeriod) sosObservation.getPhenomenonTime()).getEnd());
+                addResultTime(xbObs, rsTime);
+            }
+        }
+    }
+    
+    private void addResultTime(OMObservationType xbObs,TimeInstant iTime)
+            throws OwsExceptionReport {
+        IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
+        if (encoder != null) {
+            XmlObject xmlObject = (XmlObject) encoder.encode(iTime);
+            xbObs.addNewResultTime().addNewTimeInstant().set(xmlObject);
+                XmlObject substitution =
+                        xbObs.getResultTime().getTimeInstant().substitute(GmlHelper.getQnameForITime(iTime),
+                                xmlObject.schemaType());
+                substitution.set(xmlObject);
         } else {
             String exceptionText = "Error while encoding phenomenon time, needed encoder is missing!";
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
