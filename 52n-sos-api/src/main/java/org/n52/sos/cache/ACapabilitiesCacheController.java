@@ -82,7 +82,8 @@ public abstract class ACapabilitiesCacheController {
 					}
 					schedule();
 				} catch (OwsExceptionReport e) {
-					LOGGER.error("Fatal error: Timertask couldn't update capabilities cache!");
+					LOGGER.error("Fatal error: Timertask couldn't update capabilities cache! Switch log level to DEBUG to get more details.");
+					LOGGER.debug("Exception thrown",e);
 				}
 			}
 		};
@@ -105,11 +106,6 @@ public abstract class ACapabilitiesCacheController {
 		this.timer.cancel();
 	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#finalize()
-     */
     @Override
     protected void finalize() {
         try {
