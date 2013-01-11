@@ -108,7 +108,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
             }
             setUpdateIsFree(false);
 
-            this.cacheFeederDAO.initalizeCache(capabilitiesCache);
+            this.cacheFeederDAO.updateCache(capabilitiesCache);
 
         } catch (InterruptedException ie) {
             LOGGER.error("Problem while threadsafe capabilities cache update", ie);

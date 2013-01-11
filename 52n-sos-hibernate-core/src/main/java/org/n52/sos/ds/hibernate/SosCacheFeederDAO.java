@@ -68,16 +68,21 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosCacheFeederDAO.class);
+    
+    public enum CacheCreationStrategy {
+    	SINGLE_THREAD, MULTI_THREAD, COMPLEX_DB_QUERIES
+    }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.ds.ICacheFeederDAO#initalizeCache(org.n52.sos.cache.
-     * ACapabilitiesCache)
-     */
+	private CacheCreationStrategy strategy;
+
     @Override
-    public void initalizeCache(ACapabilitiesCache capabilitiesCache) throws OwsExceptionReport {
-        CapabilitiesCache cache = (CapabilitiesCache) capabilitiesCache;
+    public void updateCache(ACapabilitiesCache capabilitiesCache) throws OwsExceptionReport {
+        updateCache(capabilitiesCache, CacheCreationStrategy.SINGLE_THREAD);
+    }
+    
+    protected void updateCache(ACapabilitiesCache capabilitiesCache, CacheCreationStrategy strategy) throws OwsExceptionReport {
+    	CapabilitiesCache cache = (CapabilitiesCache) capabilitiesCache;
+    	this.strategy = strategy;
         Session session = null;
         try {
             session = getSession();
@@ -207,6 +212,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
      *            Hibernate session
      */
     private void setOfferingValues(CapabilitiesCache cache, Session session) throws OwsExceptionReport {
+    	// TODO Eike: use strategy
         List<Offering> hOfferings = HibernateCriteriaQueryUtilities.getOfferingObjects(session);
         Map<String, String> kOfferingVName = new HashMap<String, String>(hOfferings.size());
         Map<String, Collection<String>> kOfferingVProcedures = new HashMap<String, Collection<String>>(hOfferings.size());
@@ -217,15 +223,24 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
 		Map<String, DateTime> kOfferingVMinTime = new HashMap<String, DateTime>(hOfferings.size());
 		Map<String, DateTime> kOfferingVMaxTime = new HashMap<String, DateTime>(hOfferings.size());
 		Map<String, SosEnvelope> kOfferingVEnvelope = new HashMap<String, SosEnvelope>(hOfferings.size());
-		// TODO Eike: use new one-time request
-//		Map<String, TimePeriod> temporalBoundingBoxesOfOfferings = HibernateCriteriaQueryUtilities.getTemporalBoundingBoxesForOfferings(session);
-//		TimePeriod temporalBoundingBox = HibernateCriteriaQueryUtilities.getGlobalTemporalBoundingBox(session);
 		// TODO Eike: add multi threading here
 		// create new executor service with fixed thread pool size (size from configuration) this size limits the number of connections to;
 		// constructor should support parameter 'buffer' which limits the number of connections taken; 'buffer' defines the left over connections
+		if (this.strategy.equals(CacheCreationStrategy.COMPLEX_DB_QUERIES))
+		{
+			Map<String, TimePeriod> temporalBoundingBoxesOfOfferings = HibernateCriteriaQueryUtilities.getTemporalBoundingBoxesForOfferings(session);
+			for (String offeringId : temporalBoundingBoxesOfOfferings.keySet()) {
+				TimePeriod temporalBBox = temporalBoundingBoxesOfOfferings.get(offeringId);
+				if (temporalBBox != null && temporalBBox.getStart() != null && temporalBBox.getEnd() != null)
+				{
+					kOfferingVMinTime.put(offeringId,temporalBBox.getStart());
+            		kOfferingVMaxTime.put(offeringId,temporalBBox.getEnd());
+				}
+			}
+		}
         for (Offering offering : hOfferings) {
             if (!checkOfferingForDeletedProcedure(offering.getObservationConstellations())) {
-            	// TODO add new runnable for this offering
+            	// TODO Eike: add new runnable for this offering
             	String offeringId = offering.getIdentifier();
             	kOfferingVName.put(offeringId, offering.getName());
             	// Procedures
@@ -243,10 +258,13 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
             	allowedkOfferingVObservationTypes.put(offeringId,
             			getObservationTypesFromObservationType(offering.getObservationTypes()));
             	// Temporal Envelope
-            	kOfferingVMinTime.put(offeringId,
-            			HibernateCriteriaQueryUtilities.getMinDate4Offering(offeringId, session));
-            	kOfferingVMaxTime.put(offeringId,
-            			HibernateCriteriaQueryUtilities.getMaxDate4Offering(offeringId, session));
+            	if  (this.strategy.equals(CacheCreationStrategy.SINGLE_THREAD))
+            	{
+            		kOfferingVMinTime.put(offeringId,
+            				HibernateCriteriaQueryUtilities.getMinDate4Offering(offeringId, session));
+            		kOfferingVMaxTime.put(offeringId,
+            				HibernateCriteriaQueryUtilities.getMaxDate4Offering(offeringId, session));
+            	}
             	// Spatial Envelope
             	kOfferingVEnvelope.put(offeringId,
             			getEnvelopeForOffering(offeringId, session));
@@ -358,6 +376,23 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
     }
 	
 	private void setEventTimeValues(CapabilitiesCache cache, Session session) {
+		switch (this.strategy) {
+		case SINGLE_THREAD:
+			setEventTimesSingleThread(cache, session);
+			break;
+		case COMPLEX_DB_QUERIES:
+			TimePeriod globalTemporalBBox = HibernateCriteriaQueryUtilities.getGlobalTemporalBoundingBox(session);
+			cache.setMinEventTime(globalTemporalBBox.getStart());
+			cache.setMaxEventTime(globalTemporalBBox.getEnd());
+		default:
+			setEventTimesSingleThread(cache, session);
+			break;
+		}
+	}
+
+	private void setEventTimesSingleThread(CapabilitiesCache cache,
+			Session session)
+	{
 		cache.setMinEventTime(HibernateCriteriaQueryUtilities.getMinObservationTime(session));
 		cache.setMaxEventTime(HibernateCriteriaQueryUtilities.getMaxObservationTime(session));
 	}

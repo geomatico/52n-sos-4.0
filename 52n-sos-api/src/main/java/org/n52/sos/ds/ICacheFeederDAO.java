@@ -42,7 +42,7 @@ public interface ICacheFeederDAO {
      * @throws OwsExceptionReport
      *             If an error occurs during feeding
      */
-    public void initalizeCache(ACapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
+    public void updateCache(ACapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
 
     public void updateAfterSensorInsertion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
 
