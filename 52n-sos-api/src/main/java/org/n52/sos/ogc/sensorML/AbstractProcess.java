@@ -26,13 +26,14 @@ package org.n52.sos.ogc.sensorML;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 
 public class AbstractProcess extends AbstractSensorML {
 
     private List<String> descriptions = new ArrayList<String>(0);
 
-    private List<String> names = new ArrayList<String>(0);
+    private List<CodeType> names = new ArrayList<CodeType>(0);
 
     private List<SosSMLIo> inputs = new ArrayList<SosSMLIo>(0);
 
@@ -52,11 +53,11 @@ public class AbstractProcess extends AbstractSensorML {
         this.descriptions.add(description);
     }
 
-    public List<String> getNames() {
+    public List<CodeType> getNames() {
         return names;
     }
 
-    public void setNames(List<String> names) {
+    public void setNames(List<CodeType> names) {
         this.names = names;
     }
 
@@ -102,6 +103,10 @@ public class AbstractProcess extends AbstractSensorML {
     
     public boolean isSetParameters() {
         return parameters != null && !parameters.isEmpty();
+    }
+
+    public void addName(CodeType name) {
+       names.add(name);
     }
 
 }

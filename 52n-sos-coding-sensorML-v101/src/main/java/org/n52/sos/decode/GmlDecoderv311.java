@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.opengis.gml.CodeType;
+
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -81,8 +83,19 @@ public class GmlDecoderv311 implements IDecoder<Object, XmlObject> {
     }
 
     @Override
-    public Object decode(XmlObject xmlObject) throws OwsExceptionReport {
+    public Object decode(XmlObject element) throws OwsExceptionReport {
+        if (element instanceof CodeType) {
+            return parseCodeType((CodeType)element);
+        }
         return null;
+    }
+
+    private org.n52.sos.ogc.gml.CodeType parseCodeType(CodeType element) {
+        org.n52.sos.ogc.gml.CodeType codeType = new org.n52.sos.ogc.gml.CodeType(element.getStringValue());
+        if (element.isSetCodeSpace()) {
+            codeType.setCodeSpace(element.getCodeSpace());
+        }
+        return codeType;
     }
 
 }

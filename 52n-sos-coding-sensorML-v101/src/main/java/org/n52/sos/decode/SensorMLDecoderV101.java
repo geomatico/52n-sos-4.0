@@ -33,7 +33,6 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import net.opengis.gml.CodeType;
 import net.opengis.sensorML.x101.AbstractComponentType;
 import net.opengis.sensorML.x101.AbstractDerivableComponentType;
 import net.opengis.sensorML.x101.AbstractProcessType;
@@ -66,6 +65,7 @@ import net.opengis.sensorML.x101.ValidTimeDocument.ValidTime;
 
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractComponent;
@@ -258,7 +258,13 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
             abstractProcess.setKeywords(parseKeywords(xbAbstractProcess.getKeywordsArray()));
         }
         if (xbAbstractProcess.getNameArray() != null) {
-            abstractProcess.setNames(parseNames(xbAbstractProcess.getNameArray()));
+            int length = xbAbstractProcess.getNameArray().length;
+            for (int i = 0; i < length; i++) {
+                Object decodedElement = decodeElement(xbAbstractProcess.getNameArray(i));
+                if (decodedElement != null && decodedElement instanceof CodeType) {
+                    abstractProcess.addName((CodeType)decodedElement);
+                }
+            }
         }
     }
 
@@ -483,12 +489,6 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         List<AbstractSosSMLDocumentation> abstractDocumentation = new ArrayList<AbstractSosSMLDocumentation>(0);
         // TODO Auto-generated method stub
         return abstractDocumentation;
-    }
-
-    private List<String> parseNames(CodeType[] nameArray) {
-        List<String> names = new ArrayList<String>(0);
-        // TODO Auto-generated method stub
-        return names;
     }
 
     private List<String> parseKeywords(Keywords[] keywordsArray) {
