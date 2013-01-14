@@ -23,10 +23,7 @@
  */
 package org.n52.sos.encode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,12 +33,16 @@ import net.opengis.swe.x101.VectorType.Coordinate;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,48 +58,37 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SweCommonEncoderv101.class);
 
-    private List<EncoderKeyType> encoderKeyTypes;
+    private Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(SWEConstants.NS_SWE,
+            SosSweQuantity.class, SosSweText.class, SosSweCoordinate.class);
     
-    private Map<SupportedTypeKey, Set<String>> supportedTypes;
-    
-    private Set<String> conformanceClasses;
     
     public SweCommonEncoderv101() {
-        encoderKeyTypes = new ArrayList<EncoderKeyType>();
-        encoderKeyTypes.add(new EncoderKeyType(SWEConstants.NS_SWE));
-        StringBuilder builder = new StringBuilder();
-        for (EncoderKeyType encoderKeyType : encoderKeyTypes) {
-            builder.append(encoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        supportedTypes = new HashMap<SupportedTypeKey, Set<String>>(0);
-        conformanceClasses = new HashSet<String>(0);
-        LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
-    public List<EncoderKeyType> getEncoderKeyType() {
-        return encoderKeyTypes;
+    public Set<EncoderKey> getEncoderKeyType() {
+        return Collections.unmodifiableSet(ENCODER_KEYS);
     }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return supportedTypes;
+        return Collections.emptyMap();
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        return conformanceClasses;
+        return Collections.emptySet();
     }
     
+    @Override
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(SWEConstants.NS_SWE, SWEConstants.NS_SWE_PREFIX);
     }
     
     @Override
     public String getContentType() {
-        return "text/xml";
+        return SosConstants.CONTENT_TYPE_XML;
     }
     
     @Override

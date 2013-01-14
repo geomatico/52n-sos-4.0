@@ -28,24 +28,30 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.n52.sos.decode.RequestDecoderKey;
-import org.n52.sos.decode.kvp.AbstractKvpDecoderOperationDelegate;
+import org.n52.sos.decode.DecoderKey;
+import org.n52.sos.decode.KvpOperationDecoderKey;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetCapabilitiesRequest;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.KvpHelper;
 import org.n52.sos.util.Util4Exceptions;
 
-public class GetCapabilitiesKvpDecoderOperationDelegate extends AbstractKvpDecoderOperationDelegate {
+public class GetCapabilitiesKvpDecoder extends AbstractKvpDecoder {
 
-    private static final RequestDecoderKey KVP_DECODER_KEY_TYPE 
-            = new RequestDecoderKey(SosConstants.Operations.GetCapabilities.name());
+    private static final Set<DecoderKey> KVP_DECODER_KEY_TYPE = CollectionHelper.<DecoderKey>set(
+        new KvpOperationDecoderKey(SosConstants.SOS, null,                         SosConstants.Operations.GetCapabilities.name()),
+        new KvpOperationDecoderKey(SosConstants.SOS, Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetCapabilities.name()),
+        new KvpOperationDecoderKey(null            , Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetCapabilities.name()),
+        new KvpOperationDecoderKey(null            , null,                         SosConstants.Operations.GetCapabilities.name())
+    );
 
     @Override
-    public Set<RequestDecoderKey> getRequestDecoderKeys() {
-        return Collections.singleton(KVP_DECODER_KEY_TYPE);
+    public Set<DecoderKey> getDecoderKeyTypes() {
+        return Collections.unmodifiableSet(KVP_DECODER_KEY_TYPE);
     }
 
     /**
@@ -60,7 +66,7 @@ public class GetCapabilitiesKvpDecoderOperationDelegate extends AbstractKvpDecod
      * @throws OwsExceptionReport If parsing the String failed
      */
     @Override
-    public GetCapabilitiesRequest decode(RequestDecoderKey decoderKeyType, Map<String, String> element) throws OwsExceptionReport {
+    public GetCapabilitiesRequest decode(Map<String, String> element) throws OwsExceptionReport {
 
         GetCapabilitiesRequest request = new GetCapabilitiesRequest();
         List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();

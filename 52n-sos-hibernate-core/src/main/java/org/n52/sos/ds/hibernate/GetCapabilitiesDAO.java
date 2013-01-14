@@ -41,7 +41,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
 import org.n52.sos.binding.Binding;
-import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.IDecoder;
 import org.n52.sos.ds.IGetCapabilitiesDAO;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
@@ -298,12 +297,10 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         for (IRequestOperator requestOperator : getConfigurator().getRequestOperator().values()) {
             profiles.addAll(requestOperator.getConformanceClasses());
         }
-        for (List<IDecoder> decoderList : getConfigurator().getDecoderMap().values()) {
-            for (IDecoder decoder : decoderList) {
-                profiles.addAll(decoder.getConformanceClasses());
-            }
+        for (IDecoder<?,?> decoder : getConfigurator().getCodingRepository().getDecoders()) {
+            profiles.addAll(decoder.getConformanceClasses());
         }
-        for (IEncoder encoder : getConfigurator().getEncoderMap().values()) {
+        for (IEncoder<?,?> encoder : getConfigurator().getCodingRepository().getEncoders()) {
             profiles.addAll(encoder.getConformanceClasses());
         }
         return new ArrayList<String>(profiles);
@@ -411,8 +408,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 Map<String, Collection<String>> phens4CompPhens = new HashMap<String, Collection<String>>();
                 if (getCache().getKOfferingVCompositePhenomenons().get(offering) != null) {
                     for (String compositePhenomenon : getCache().getKOfferingVCompositePhenomenons().get(offering)) {
-                        phens4CompPhens.put(compositePhenomenon, getCache()
-                                .getKCompositePhenomenonVObservableProperty().get(compositePhenomenon));
+                        phens4CompPhens.put(compositePhenomenon, getCache().getKCompositePhenomenonVObservableProperty().get(compositePhenomenon));
                     }
                 }
                 sosOffering.setPhens4CompPhens(phens4CompPhens);
@@ -430,17 +426,15 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 // set procedures
                 Collection<String> procedures = getCache().getProcedures4Offering(offering);
                 if (procedures == null || procedures.isEmpty()) {
-                    String exceptionText =
-                            "No procedures are contained in the database for the offering: " + offering
-                                    + "! Please contact the admin of this SOS.";
+                    String exceptionText = String.format(
+                            "No procedures are contained in the database for the offering: %s! Please contact the admin of this SOS.", offering);
                     LOGGER.error(exceptionText);
                     throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
                 }
                 sosOffering.setProcedures(procedures);
 
                 // insert result models
-                Collection<QName> resultModels =
-                        getQNamesForResultModel(getCache().getResultModels4Offering(offering));
+                Collection<QName> resultModels = getQNamesForResultModel(getCache().getResultModels4Offering(offering));
                 sosOffering.setResultModels(resultModels);
 
                 // set response format

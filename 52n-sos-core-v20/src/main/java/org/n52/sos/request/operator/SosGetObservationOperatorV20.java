@@ -25,9 +25,9 @@ package org.n52.sos.request.operator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -35,22 +35,18 @@ import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IGetObservationDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.IObservationEncoder;
-import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
-import org.n52.sos.ogc.filter.TemporalFilter;
-import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.ows.IExtension;
-import org.n52.sos.ogc.ows.OWSOperation;
+import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.swes.SwesExtensions;
-import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -63,166 +59,85 @@ import org.slf4j.LoggerFactory;
  * Database, class encodes the ObservationResponse (thru using the IOMEncoder)
  * 
  */
-public class SosGetObservationOperatorV20 implements IRequestOperator {
+public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGetObservationDAO, GetObservationRequest> {
 
-    /** logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosGetObservationOperatorV20.class.getName());
-
-    /** the data access object for the GetObservation operation */
-    private IGetObservationDAO dao;
-
-    /** Name of the operation the listener implements */
     private static final String OPERATION_NAME = SosConstants.Operations.GetObservation.name();
+    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_CORE_PROFILE);
 
-    private static final String VERSION = Sos2Constants.SERVICEVERSION;
-
-    private static final String SERVICE = SosConstants.SOS;
-
-    private RequestOperatorKeyType requestOperatorKeyType;
-
-    /**
-     * Constructor
-     * 
-     */
     public SosGetObservationOperatorV20() {
-        requestOperatorKeyType =
-                new RequestOperatorKeyType(new ServiceOperatorKeyType(SERVICE, VERSION), OPERATION_NAME);
-        this.dao = (IGetObservationDAO) Configurator.getInstance().getOperationDAOs().get(OPERATION_NAME);
-        LOGGER.info("{} initialized successfully!", this.getClass().getSimpleName());
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.sos.listener.ISosRequestListener#receiveRequest(org.n52.sos.request
-     * .AbstractSosRequest)
-     */
-    @Override
-    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
-        if (request instanceof GetObservationRequest) {
-
-            GetObservationRequest sosRequest = (GetObservationRequest) request;
-            checkRequestedParameters(sosRequest);
-            boolean zipCompression = checkResponseFormat(sosRequest);
-            String responseFormat = sosRequest.getResponseFormat();
-            String contentType = SosConstants.CONTENT_TYPE_XML;
-            try {
-                // check SOS version for response encoding
-                String namespace = responseFormat;
-                // // O&M 1.0.0
-                // if (responseFormat.equals(OMConstants.CONTENT_TYPE_OM)
-                // || responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM)) {
-                // namespace = responseFormat;
-                // contentType = OMConstants.CONTENT_TYPE_OM;
-                // }
-                // // O&M 2.0 non SOS 2.0
-                // else if
-                // (!request.getVersion().equals(Sos2Constants.SERVICEVERSION)
-                // && (responseFormat.equals(OMConstants.CONTENT_TYPE_OM_2) ||
-                // responseFormat
-                // .equals(OMConstants.RESPONSE_FORMAT_OM_2))) {
-                // namespace.append(responseFormat);
-                // contentType = OMConstants.CONTENT_TYPE_OM_2;
-                // }
-                // O&M 2.0 for SOS 2.0
-                // TODO: check if responseFormat is OM-Subtype
-                // else
-                if (request.getVersion().equals(Sos2Constants.SERVICEVERSION)
-                        && checkForObservationAndMeasurementV20Type(responseFormat)) {
-                    namespace = Sos2Constants.NS_SOS_20;
-                }
-
-                IEncoder encoder = Configurator.getInstance().getEncoder(namespace.toString());
-                if (encoder != null) {
-                    GetObservationResponse response = this.dao.getObservation(sosRequest);
-                    if (responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2)) {
-                        if (!isSubsettingExtensionSet(request.getExtensions())) {
-                            response.mergeObservationsWithSameAntiSubsettingIdentifier();
-                        } else {
-                            response.mergeObservationsWithSameX();
-                        }
-                    }
-                    
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    Object encodedObject = encoder.encode(response);
-                    contentType = encoder.getContentType();
-                    if (encodedObject instanceof XmlObject) {
-                        ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
-                        return new ServiceResponse(baos, contentType, zipCompression, true);
-                    } else if (encodedObject instanceof ServiceResponse) {
-                        return (ServiceResponse) encodedObject;
-                    } else {
-                        String exceptionText = "The encoder response is not supported!";
-                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-                    }
-                } else {
-                    String exceptionText =
-                            "The value '" + responseFormat
-                                    + "' of the responseFormat parameter is not supported by this server!";
-                    throw Util4Exceptions.createInvalidParameterValueException(
-                            SosConstants.GetObservationParams.responseFormat.name(), exceptionText);
-                }
-            } catch (IOException ioe) {
-                String exceptionText = "Error occurs while saving response to output stream!";
-                LOGGER.error(exceptionText, ioe);
-                throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
-            }
-
-        } else {
-            String exceptionText = "Received request is not a SosGetObservationRequest!";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.listener.ISosRequestListener#hasImplementedDAO()
-     */
-    @Override
-    public boolean hasImplementedDAO() {
-        if (this.dao != null) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public RequestOperatorKeyType getRequestOperatorKeyType() {
-        return requestOperatorKeyType;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.sos.listener.ISosRequestListener#getOperationMetadata(java.lang
-     * .String, java.lang.Object)
-     */
-    @Override
-    public OWSOperation getOperationMetadata(String service, String version, Object connection)
-            throws OwsExceptionReport {
-        return dao.getOperationsMetadata(service, version, connection);
-    }
-
-    @Override
-    public IExtension getExtension(Object connection) throws OwsExceptionReport {
-        return dao.getExtension(connection);
+        super(OPERATION_NAME, GetObservationRequest.class);
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        Set<String> conformanceClasses = new HashSet<String>(0);
-        if (hasImplementedDAO()) {
-            conformanceClasses.add("http://www.opengis.net/spec/SOS/2.0/conf/core");
+        return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
+    }
+
+    @Override
+    public ServiceResponse receive(GetObservationRequest sosRequest) throws OwsExceptionReport {
+        checkRequestedParameters(sosRequest);
+        boolean zipCompression = checkResponseFormat(sosRequest);
+        String responseFormat = sosRequest.getResponseFormat();
+        try {
+            // check SOS version for response encoding
+            String namespace = responseFormat;
+            // // O&M 1.0.0
+            // if (responseFormat.equals(OMConstants.CONTENT_TYPE_OM)
+            // || responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM)) {
+            // namespace = responseFormat;
+            // contentType = OMConstants.CONTENT_TYPE_OM;
+            // }
+            // // O&M 2.0 non SOS 2.0
+            // else if
+            // (!request.getVersion().equals(Sos2Constants.SERVICEVERSION)
+            // && (responseFormat.equals(OMConstants.CONTENT_TYPE_OM_2) ||
+            // responseFormat
+            // .equals(OMConstants.RESPONSE_FORMAT_OM_2))) {
+            // namespace.append(responseFormat);
+            // contentType = OMConstants.CONTENT_TYPE_OM_2;
+            // }
+            // O&M 2.0 for SOS 2.0
+            // TODO: check if responseFormat is OM-Subtype
+            // else
+            if (sosRequest.getVersion().equals(Sos2Constants.SERVICEVERSION)
+                    && checkForObservationAndMeasurementV20Type(responseFormat)) {
+                namespace = Sos2Constants.NS_SOS_20;
+            }
+            
+            GetObservationResponse response = getDao().getObservation(sosRequest);
+            if (responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2)) {
+                if (!isSubsettingExtensionSet(sosRequest.getExtensions())) {
+                    response.mergeObservationsWithSameAntiSubsettingIdentifier();
+                } else {
+                    response.mergeObservationsWithSameX();
+                }
+            }
+
+            IEncoder<XmlObject, GetObservationResponse> encoder;
+            try {
+                encoder = CodingHelper.getEncoder(namespace, response);
+            }catch (OwsExceptionReport e) {
+                String exceptionText = String.format("The value '%s' of the responseFormat parameter is not supported by this server!", responseFormat);
+                LOGGER.error(exceptionText, e);
+                throw Util4Exceptions.createInvalidParameterValueException(SosConstants.GetObservationParams.responseFormat.name(), exceptionText);
+            }
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            XmlObject encodedObject = encoder.encode(response);
+            String contentType = encoder.getContentType();
+            encodedObject.save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
+            return new ServiceResponse(baos, contentType, zipCompression, true);
+        } catch (IOException ioe) {
+            String exceptionText = "Error occurs while saving response to output stream!";
+            LOGGER.error(exceptionText, ioe);
+            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
         }
-        return conformanceClasses;
+
     }
 
     private void checkRequestedParameters(GetObservationRequest sosRequest) throws OwsExceptionReport {
-        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+        List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
         try {
             SosHelper.checkServiceParameter(sosRequest.getService());
         } catch (OwsExceptionReport owse) {
@@ -290,7 +205,10 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
         
         // check if parameters are set, if not throw ResponseExceedsSizeLimit
         // exception
-        checkQueryParametersIfAllEmpty(sosRequest);
+        if (sosRequest.isEmpty()) {
+            String exceptionText = "The response exceeds the size limit! Please define some filtering parameters.";
+            throw Util4Exceptions.createResponseExceedsSizeLimitException(exceptionText);
+        }
     }
 
     /**
@@ -308,7 +226,7 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
      */
     private void checkObservedProperties(List<String> observedProperties) throws OwsExceptionReport {
         if (observedProperties != null) {
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             Collection<String> validObservedProperties =
                     Configurator.getInstance().getCapabilitiesCacheController().getObservableProperties();
             for (String obsProp : observedProperties) {
@@ -318,10 +236,8 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
                                     .name()));
                 } else {
                     if (!validObservedProperties.contains(obsProp)) {
-                        String exceptionText =
-                                "The value (" + obsProp + ") of the parameter '"
-                                        + SosConstants.GetObservationParams.observedProperty.toString()
-                                        + "' is invalid";
+                        String exceptionText = String.format("The value (%s) of the parameter '%s' is invalid", 
+                                obsProp, SosConstants.GetObservationParams.observedProperty.toString());
                         LOGGER.error(exceptionText);
                         exceptions.add(Util4Exceptions.createInvalidParameterValueException(
                                 SosConstants.GetObservationParams.observedProperty.name(), exceptionText));
@@ -345,7 +261,7 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
     private void checkOfferingId(List<String> offeringIds) throws OwsExceptionReport {
         if (offeringIds != null) {
             Collection<String> offerings = Configurator.getInstance().getCapabilitiesCacheController().getOfferings();
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             for (String offeringId : offeringIds) {
                 if (offeringId == null || (offeringId != null && offeringId.isEmpty())) {
                     exceptions.add(Util4Exceptions
@@ -356,9 +272,8 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
                     if (!offerings.contains(offArray[0])
                             || !Configurator.getInstance().getCapabilitiesCacheController()
                                     .getProcedures4Offering(offArray[0]).contains(offArray[1])) {
-                        String exceptionText =
-                                "The value (" + offeringId + ") of the parameter '"
-                                        + SosConstants.GetObservationParams.offering.toString() + "' is invalid";
+                        String exceptionText = String.format("The value (%s) of the parameter '%s' is invalid", 
+                                offeringId, SosConstants.GetObservationParams.offering.toString());
                         LOGGER.error(exceptionText);
                         exceptions.add(Util4Exceptions.createInvalidParameterValueException(
                                 SosConstants.GetObservationParams.offering.name(), exceptionText));
@@ -366,9 +281,9 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
 
                 } else {
                     if (!offerings.contains(offeringId)) {
-                        String exceptionText =
-                                "The value (" + offeringId + ") of the parameter '"
-                                        + SosConstants.GetObservationParams.offering.toString() + "' is invalid";
+                        String exceptionText = String.format(
+                                "The value (%s) of the parameter '%s' is invalid", offeringId, 
+                                SosConstants.GetObservationParams.offering.toString());
                         LOGGER.error(exceptionText);
                         exceptions.add(Util4Exceptions.createInvalidParameterValueException(
                                 SosConstants.GetObservationParams.offering.name(), exceptionText));
@@ -380,7 +295,7 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
     }
 
     private boolean checkForObservationAndMeasurementV20Type(String responseFormat) throws OwsExceptionReport {
-        IEncoder encoder = Configurator.getInstance().getEncoder(responseFormat);
+        IEncoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(responseFormat, new SosObservation());
         if (encoder != null && encoder instanceof IObservationEncoder) {
             return ((IObservationEncoder) encoder).isObservationAndMeasurmentV20Type();
         }
@@ -402,31 +317,18 @@ public class SosGetObservationOperatorV20 implements IRequestOperator {
                 Collection<String> supportedResponseFormats =
                         SosHelper.getSupportedResponseFormats(request.getService(), request.getVersion());
                 if (!supportedResponseFormats.contains(request.getResponseFormat())) {
-                    StringBuilder exceptionText = new StringBuilder();
-                    exceptionText.append("The requested responseFormat (");
-                    exceptionText.append(request.getResponseFormat());
-                    exceptionText.append(") is not supported by this server!");
-                    LOGGER.debug(exceptionText.toString());
+                    String exceptionText = String.format("The requested responseFormat (%s) is not supported by this server!",
+                            request.getResponseFormat());
+                    LOGGER.debug(exceptionText);
                     throw Util4Exceptions.createInvalidParameterValueException(
-                            SosConstants.GetObservationParams.responseFormat.name(), exceptionText.toString());
+                            SosConstants.GetObservationParams.responseFormat.name(), exceptionText);
                 }
             }
         }
         return zipCompression;
     }
 
-    private void checkQueryParametersIfAllEmpty(GetObservationRequest request) throws OwsExceptionReport {
-        if (!request.isSetOffering() && !request.isSetObservableProperty() && !request.isSetProcedure()
-                && !request.isSetFeatureOfInterest() && !request.isSetTemporalFilter()
-                && !request.isSetSpatialFilter()) {
-            String exceptionText = "The response exceeds the size limit! Please define some filtering parameters.";
-            throw Util4Exceptions.createResponseExceedsSizeLimitException(exceptionText);
-        }
-
-    }
-
     private boolean isSubsettingExtensionSet(SwesExtensions extensions) {
-        return extensions != null ? extensions.isBooleanExentsionSet(Sos2Constants.Extensions.Subsetting.name())
-                : false;
+        return extensions != null ? extensions.isBooleanExentsionSet(Sos2Constants.Extensions.Subsetting.name()) : false;
     }
 }

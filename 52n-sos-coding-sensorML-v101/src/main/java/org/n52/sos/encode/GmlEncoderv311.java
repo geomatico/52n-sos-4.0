@@ -23,69 +23,59 @@
  */
 package org.n52.sos.encode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(GmlEncoderv311.class);
-
-    private List<EncoderKeyType> encoderKeyTypes;
+    private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(GMLConstants.NS_GML);
 
     public GmlEncoderv311() {
-        encoderKeyTypes = new ArrayList<EncoderKeyType>();
-        encoderKeyTypes.add(new EncoderKeyType(GMLConstants.NS_GML));
-        StringBuilder builder = new StringBuilder();
-        for (EncoderKeyType encoderKeyType : encoderKeyTypes) {
-            builder.append(encoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
-    public List<EncoderKeyType> getEncoderKeyType() {
-        return encoderKeyTypes;
+    public Set<EncoderKey> getEncoderKeyType() {
+        return Collections.unmodifiableSet(ENCODER_KEYS);
     }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
+        return Collections.emptyMap();
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
+        return Collections.emptySet();
     }
 
+    @Override
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(GMLConstants.NS_GML, GMLConstants.NS_GML_PREFIX);
     }
 
     @Override
     public String getContentType() {
-        return "text/xml";
+        return SosConstants.CONTENT_TYPE_XML;
     }
 
     @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
-        return encode(element, new HashMap<HelperValues, String>());
+        return encode(element, null);
     }
 
     @Override

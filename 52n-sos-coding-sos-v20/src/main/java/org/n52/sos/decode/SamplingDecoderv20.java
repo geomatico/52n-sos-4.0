@@ -24,8 +24,6 @@
 package org.n52.sos.decode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,7 +44,6 @@ import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.util.DecoderHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -57,59 +54,60 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import java.util.Collections;
+import org.n52.sos.ogc.sos.ConformanceClasses;
+import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.StringHelper;
 
 public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObject> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SamplingDecoderv20.class);
 
-    private List<DecoderKeyType> decoderKeyTypes;
-
-    private Set<String> supportedFeatureTypes;
-
+    private static final Map<SupportedTypeKey, Set<String>> SUPPORTED_TYPES = Collections.singletonMap(
+        SupportedTypeKey.FeatureType,
+        CollectionHelper.set(
+            OGCConstants.UNKNOWN,
+            SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_POINT,
+            SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_CURVE,
+            SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_SURFACE
+        )
+    );
+    
+    private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(
+        ConformanceClasses.OM_V2_SPATIAL_SAMPLING, 
+        ConformanceClasses.OM_V2_SAMPLING_POINT, 
+        ConformanceClasses.OM_V2_SAMPLING_CURVE, 
+        ConformanceClasses.OM_V2_SAMPLING_SURFACE);
+    
+    private static final Set<DecoderKey> DECODER_KEYS = CollectionHelper.union(
+            CodingHelper.decoderKeysForElements(SFConstants.NS_SF,
+                SFSpatialSamplingFeatureDocument.class,
+                SFSpatialSamplingFeatureType.class),
+            CodingHelper.decoderKeysForElements(SFConstants.NS_SAMS,
+                SFSpatialSamplingFeatureDocument.class,
+                SFSpatialSamplingFeatureType.class)
+    );
+    
+    
     public SamplingDecoderv20() {
-        decoderKeyTypes = new ArrayList<DecoderKeyType>();
-        decoderKeyTypes.add(new DecoderKeyType(SFConstants.NS_SAMS));
-        decoderKeyTypes.add(new DecoderKeyType(SFConstants.NS_SF));
-        StringBuilder builder = new StringBuilder();
-        for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
-            builder.append(decoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-
-        supportedFeatureTypes = new HashSet<String>(0);
-        supportedFeatureTypes.add(OGCConstants.UNKNOWN);
-        supportedFeatureTypes.add(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_POINT);
-        supportedFeatureTypes.add(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_CURVE);
-        supportedFeatureTypes.add(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_SURFACE);
-
-        LOGGER.info("Decoder for the following namespaces initialized successfully: " + builder.toString() + "!");
+        LOGGER.debug("Decoder for the following keys initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));
     }
 
     @Override
-    public List<DecoderKeyType> getDecoderKeyTypes() {
-        return decoderKeyTypes;
+    public Set<DecoderKey> getDecoderKeyTypes() {
+        return Collections.unmodifiableSet(DECODER_KEYS);
     }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        Map<SupportedTypeKey, Set<String>> map = new HashMap<SupportedTypeKey, Set<String>>();
-        map.put(SupportedTypeKey.FeatureType, supportedFeatureTypes);
-        return map;
+        return Collections.unmodifiableMap(SUPPORTED_TYPES);
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        Set<String> conformanceClasses = new HashSet<String>(0);
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/spatialSampling");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/samplingPoint");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/samplingCurve");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/samplingSurface");
-        return conformanceClasses;
+        return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
+                
     }
 
     @Override
@@ -148,15 +146,15 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
         featureDoc.setSFSpatialSamplingFeature(spatialSamplingFeature);
         return featureDoc.xmlText(XmlOptionsHelper.getInstance().getXmlOptions());
     }
-
     private List<CodeType> getNames(SFSpatialSamplingFeatureType spatialSamplingFeature) throws OwsExceptionReport {
-        List<CodeType> names = new ArrayList<CodeType>();
-        int length = spatialSamplingFeature.getNameArray().length;
+        final int length = spatialSamplingFeature.getNameArray().length;
+        List<CodeType> names = new ArrayList<CodeType>(length);
         for (int i = 0; i < length; i++) {
-            Object decodedElement = DecoderHelper.decodeXmlElement(spatialSamplingFeature.getNameArray(i));
+            Object decodedElement = CodingHelper.decodeXmlObject(spatialSamplingFeature.getNameArray(i));
             if (decodedElement != null && decodedElement instanceof CodeType) {
                 names.add((CodeType)decodedElement);
             }
+            return names;
         }
         return names;
     }
@@ -199,7 +197,7 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
                     }
                 }
                 if (abstractFeature != null) {
-                    Object decodedObject = DecoderHelper.decodeXmlElement(abstractFeature);
+                    Object decodedObject = CodingHelper.decodeXmlObject(abstractFeature);
                     if (decodedObject != null && decodedObject instanceof SosAbstractFeature) {
                         sampledFeatures.add((SosAbstractFeature) decodedObject);
                     }
@@ -214,7 +212,7 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
     }
 
     private Geometry getGeometry(ShapeType shape) throws OwsExceptionReport {
-        Object decodedObject = DecoderHelper.decodeXmlElement(shape.getAbstractGeometry());
+        Object decodedObject = CodingHelper.decodeXmlElement(shape.getAbstractGeometry());
         if (decodedObject != null && decodedObject instanceof Geometry) {
             return (Geometry) decodedObject;
         }

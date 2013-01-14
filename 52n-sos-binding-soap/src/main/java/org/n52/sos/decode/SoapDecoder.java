@@ -24,10 +24,10 @@
 package org.n52.sos.decode;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -50,13 +50,18 @@ import org.n52.sos.soap.SoapFault;
 import org.n52.sos.soap.SoapHeader;
 import org.n52.sos.soap.SoapHelper;
 import org.n52.sos.soap.SoapRequest;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3cHelper;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsa.WsaConstants;
 import org.n52.sos.wsa.WsaHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3.x2003.x05.soapEnvelope.EnvelopeDocument;
 import org.w3c.dom.Document;
 
 /**
@@ -66,33 +71,30 @@ import org.w3c.dom.Document;
  */
 public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
 
-    /** the logger, used to log exceptions and additonaly information */
     private static Logger LOGGER = LoggerFactory.getLogger(SoapDecoder.class);
 
-    private List<DecoderKeyType> decoderKeyTypes;
+    private static final Set<DecoderKey> DECODER_KEYS = CollectionHelper.union(
+        CodingHelper.decoderKeysForElements(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE, XmlObject.class),
+        CodingHelper.decoderKeysForElements(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE, XmlObject.class)
+    );
 
-    /**
-     * constructor
-     */
     public SoapDecoder() {
-        super();
-        decoderKeyTypes = new ArrayList<DecoderKeyType>();
-        decoderKeyTypes.add(new DecoderKeyType(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE));
-        decoderKeyTypes.add(new DecoderKeyType(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE));
-        StringBuilder logMsgBuilder = new StringBuilder();
-        logMsgBuilder.append("Decoder for the following namespaces initialized successfully: ");
-        for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
-            logMsgBuilder.append(decoderKeyType.toString());
-            logMsgBuilder.append(", ");
-        }
-        logMsgBuilder.delete(logMsgBuilder.lastIndexOf(", "), logMsgBuilder.length());
-        logMsgBuilder.append("!");
-        LOGGER.info(logMsgBuilder.toString());
+        LOGGER.debug("Decoder for the following keys initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));
     }
 
     @Override
-    public List<DecoderKeyType> getDecoderKeyTypes() {
-        return decoderKeyTypes;
+    public Set<DecoderKey> getDecoderKeyTypes() {
+        return Collections.unmodifiableSet(DECODER_KEYS);
+    }
+    
+    @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Set<String> getConformanceClasses() {
+        return Collections.emptySet();
     }
 
     @Override
@@ -139,7 +141,7 @@ public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
                 StringBuilder faultString = new StringBuilder();
                 for (OwsException owsException : owse.getExceptions()) {
                     for (String exceptionText : owsException.getMessages()) {
-                        faultString.append(exceptionText + "\n");
+                        faultString.append(exceptionText).append("\n");
                     }
                     faultString.append("\n");
                 }
@@ -231,7 +233,7 @@ public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
                 throw Util4Exceptions.createNoApplicableCodeException(soape, exceptionText);
             }
             // if SOAPAction is not spec conform, create SOAPFault
-            if (soapAction.equals("") || !soapAction.startsWith("SOAPAction:")) {
+            if (soapAction.isEmpty() || !soapAction.startsWith("SOAPAction:")) {
                 SoapFault fault = new SoapFault();
                 fault.setFaultCode(new QName(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE, "Client"));
                 fault.setFaultReason("The SOAPAction parameter in the HTTP-Header is missing or not valid!");
@@ -291,30 +293,25 @@ public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
     }
 
     private Map<String, SoapHeader> getSoapHeader(SOAPHeader soapHeader) {
-        Map<String, SoapHeader> soapHeaders = new HashMap<String, SoapHeader>();
         Map<String, List<SOAPHeaderElement>> headerElementsMap = new HashMap<String, List<SOAPHeaderElement>>();
-        Iterator<SOAPHeaderElement> headerElements = soapHeader.extractAllHeaderElements();
+        Iterator<?> headerElements = soapHeader.extractAllHeaderElements();
         while (headerElements.hasNext()) {
             SOAPHeaderElement element = (SOAPHeaderElement) headerElements.next();
             if (headerElementsMap.containsKey(element.getNamespaceURI())) {
                 headerElementsMap.get(element.getNamespaceURI()).add(element);
             } else {
-                List<SOAPHeaderElement> list = new ArrayList<SOAPHeaderElement>();
+                List<SOAPHeaderElement> list = new LinkedList<SOAPHeaderElement>();
                 list.add(element);
                 headerElementsMap.put(element.getNamespaceURI(), list);
             }
         }
+        Map<String, SoapHeader> soapHeaders = new HashMap<String, SoapHeader>();
         for (String headerElementsNamespace : headerElementsMap.keySet()) {
             try {
-                List<IDecoder> decoderList = Configurator.getInstance().getDecoder(headerElementsNamespace);
-                if (decoderList != null) {
-                    SoapHeader headerElement = null;
-                    for (IDecoder decoder : decoderList) {
-                        headerElement = (SoapHeader) decoder.decode(headerElementsMap.get(headerElementsNamespace));
-                        if (headerElement != null) {
-                            break;
-                        }
-                    }
+                IDecoder<?, List<SOAPHeaderElement>> decoder = Configurator.getInstance().getCodingRepository()
+                        .getDecoder(new NamespaceDecoderKey(headerElementsNamespace, SOAPHeaderElement.class));
+                if (decoder != null) {
+                    Object headerElement = decoder.decode(headerElementsMap.get(headerElementsNamespace));
                     if (headerElement != null && headerElement instanceof SoapHeader) {
                         soapHeaders.put(headerElementsNamespace, (SoapHeader) headerElement);
                     }
@@ -337,15 +334,4 @@ public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
         }
         return null;
     }
-
-    @Override
-    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
-    }
-
-    @Override
-    public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
-    }
-
 }

@@ -24,13 +24,13 @@
 package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.joda.time.DateTime;
-import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IInsertSensorDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
@@ -53,7 +53,6 @@ import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosInsertionCapabilities;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
-import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosFeatureRelationship;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.InsertSensorResponse;
@@ -231,7 +230,7 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
 
     private Offering insertNewOffering(SosOffering assignedOffering, List<SosFeatureRelationship> relatedFeatures,
             List<ObservationType> observationTypes, Session session) throws OwsExceptionReport {
-        List<RelatedFeature> hRelatedFeatures = new ArrayList<RelatedFeature>();
+        List<RelatedFeature> hRelatedFeatures = new LinkedList<RelatedFeature>();
         if (relatedFeatures != null && !relatedFeatures.isEmpty()) {
             for (SosFeatureRelationship relatedFeature : relatedFeatures) {
                 List<RelatedFeatureRole> relatedFeatureRoles =
@@ -246,7 +245,7 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
     }
 
     private List<ObservableProperty> getOrInsertNewObservableProperties(List<String> obsProps, Session session) {
-        List<SosObservableProperty> observableProperties = new ArrayList<SosObservableProperty>();
+        List<SosObservableProperty> observableProperties = new ArrayList<SosObservableProperty>(obsProps.size());
         for (String observableProperty : obsProps) {
             observableProperties.add(new SosObservableProperty(observableProperty));
         }

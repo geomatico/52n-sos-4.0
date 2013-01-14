@@ -69,7 +69,7 @@ public class SosObservation implements Serializable {
     /**
      * Map with observation values for each obsservableProeprty
      */
-    private IObservationValue value;
+    private IObservationValue<?> value;
     
     private String antiSubsetting;
 
@@ -288,17 +288,17 @@ public class SosObservation implements Serializable {
      * 
      * @return the values
      */
-    public IObservationValue getValue() {
+    public IObservationValue<?> getValue() {
         return value;
     }
 
     /**
      * Set observation values
      * 
-     * @param values
+     * @param value 
      *            the values to set
      */
-    public void setValue(IObservationValue value) {
+    public void setValue(IObservationValue<?> value) {
         this.value = value;
     }
 
@@ -344,25 +344,25 @@ public class SosObservation implements Serializable {
     */
 
     public void mergeWithObservation(SosObservation sosObservation) {
-        TVPValue tvpValue = null;
-        if (this.value instanceof SosSingleObservationValue) {
-            tvpValue = convertSingleValueToMultiValue((SosSingleObservationValue)this.value); // 
+        TVPValue tvpValue;
+        if (this.value instanceof SosSingleObservationValue) { 
+            tvpValue = convertSingleValueToMultiValue((SosSingleObservationValue) this.value); 
         } else {
-            tvpValue = (TVPValue)((SosMultiObservationValues)this.value).getValue();
+            tvpValue = (TVPValue) ((SosMultiObservationValues) this.value).getValue();
         }
         if (sosObservation.getValue() instanceof SosSingleObservationValue) {
-            SosSingleObservationValue singleValue = (SosSingleObservationValue)sosObservation.getValue();
+            SosSingleObservationValue<?> singleValue = (SosSingleObservationValue)sosObservation.getValue();
             TimeValuePair timeValuePair = new TimeValuePair(singleValue.getPhenomenonTime(), singleValue.getValue());
             tvpValue.addValue(timeValuePair);
         } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
-            SosMultiObservationValues multiValue = (SosMultiObservationValues)sosObservation.getValue();
-            tvpValue.addValues((List<TimeValuePair>)(TVPValue)multiValue.getValue().getValue());
+            SosMultiObservationValues<?> multiValue = (SosMultiObservationValues) sosObservation.getValue();
+            tvpValue.addValues(((TVPValue) multiValue.getValue()).getValue());
         }
         
     }
     
-    private TVPValue convertSingleValueToMultiValue(SosSingleObservationValue singleValue) {
-        SosMultiObservationValues multiValue = new SosMultiObservationValues();
+    private TVPValue convertSingleValueToMultiValue(SosSingleObservationValue<?> singleValue) {
+        SosMultiObservationValues<List<TimeValuePair>> multiValue = new SosMultiObservationValues<List<TimeValuePair>>();
         TVPValue tvpValue = new TVPValue();
         tvpValue.setUnit(singleValue.getValue().getUnit());
         TimeValuePair timeValuePair = new TimeValuePair(singleValue.getPhenomenonTime(), singleValue.getValue());

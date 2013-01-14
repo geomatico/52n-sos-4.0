@@ -43,5 +43,10 @@ public class SoapConstants {
      * SOAP body locator
      */
     public static final String LOCATOR_SOAP_BODY = "SOAPBody";
+    
+    public static final String CONTENT_TYPE = "application/soap+xml";
+
+    private SoapConstants() {
+    }
 
 }

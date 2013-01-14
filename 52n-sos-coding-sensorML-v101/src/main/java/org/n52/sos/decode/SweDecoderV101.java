@@ -24,8 +24,7 @@
 package org.n52.sos.decode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,6 +64,8 @@ import org.n52.sos.ogc.swe.simpleType.SosSweQuality;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
@@ -78,25 +79,39 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SweDecoderV101.class);
 
-    private List<DecoderKeyType> decoderKeyTypes;
+    private static final Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(SWEConstants.NS_SWE,
+            DataArrayType.class,
+            DataComponentPropertyType[].class,
+            Count.class,
+            Quantity.class,
+            Text.class,
+            PositionType.class,
+            ObservableProperty.class,
+            Coordinate[].class,
+            AnyScalarPropertyType[].class,
+            AbstractDataRecordDocument.class,
+            AbstractDataRecordType.class,
+            DataArrayDocument.class);
 
     public SweDecoderV101() {
-        decoderKeyTypes = new ArrayList<DecoderKeyType>();
-        decoderKeyTypes.add(new DecoderKeyType(SWEConstants.NS_SWE));
-        StringBuilder builder = new StringBuilder();
-        for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
-            builder.append(decoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        LOGGER.debug("Decoder for the following keys initialized successfully: " + builder.toString() + "!");
+        LOGGER.debug("Decoder for the following keys initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));
     }
 
     @Override
-    public List<DecoderKeyType> getDecoderKeyTypes() {
-        return decoderKeyTypes;
+    public Set<DecoderKey> getDecoderKeyTypes() {
+        return Collections.unmodifiableSet(DECODER_KEYS);
     }
-
+    
+    @Override
+    public Set<String> getConformanceClasses() {
+        return Collections.emptySet();
+    }
+    
+    @Override
+    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return Collections.emptyMap();
+    }
+                
     @Override
     public Object decode(Object element) throws OwsExceptionReport {
         if (element instanceof DataArrayDocument) {
@@ -135,11 +150,6 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
             LOGGER.debug(exceptionText.toString());
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
         }
-    }
-
-    @Override
-    public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
     }
 
     private Object parseAbstractDataRecord(AbstractDataRecordType abstractDataRecord) throws OwsExceptionReport {
@@ -196,7 +206,7 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
 
     private List<SosSweField> parseDataComponentPropertyArray(DataComponentPropertyType[] fieldArray)
             throws OwsExceptionReport {
-        List<SosSweField> sosFields = new ArrayList<SosSweField>();
+        List<SosSweField> sosFields = new ArrayList<SosSweField>(fieldArray.length);
         for (DataComponentPropertyType xbField : fieldArray) {
             if (xbField.isSetBoolean()) {
                 sosFields.add(new SosSweField(xbField.getName(), parseBoolean(xbField.getBoolean())));
@@ -221,32 +231,32 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return sosFields;
     }
 
-    private SosSweAbstractSimpleType parseBoolean(XmlObject xbBoolean) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<?> parseBoolean(XmlObject xbBoolean) throws OwsExceptionReport {
         String exceptionText = "The Boolean is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private SosSweAbstractSimpleType parseCategory(XmlObject xbCategory) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<?> parseCategory(XmlObject xbCategory) throws OwsExceptionReport {
         String exceptionText = "The Category is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private SosSweAbstractSimpleType parseCount(XmlObject xbCount) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<?> parseCount(XmlObject xbCount) throws OwsExceptionReport {
         String exceptionText = "The Count is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private SosSweAbstractSimpleType parseCountRange(CountRange countRange) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<?> parseCountRange(CountRange countRange) throws OwsExceptionReport {
         String exceptionText = "The CountRange is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private SosSweAbstractSimpleType parseObservableProperty(ObservableProperty observableProperty) {
-        ObservableProperty xbObsProp = (ObservableProperty) observableProperty;
+    private SosSweAbstractSimpleType<?> parseObservableProperty(ObservableProperty observableProperty) {
+        ObservableProperty xbObsProp = observableProperty;
         SosSweText sosObservableProperty = new SosSweText();
         if (xbObsProp.isSetDefinition()) {
             sosObservableProperty.setDefinition(xbObsProp.getDefinition());
@@ -254,7 +264,7 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return sosObservableProperty;
     }
 
-    private SosSweAbstractSimpleType parseQuantity(Quantity xbQuantity) {
+    private SosSweAbstractSimpleType<String> parseQuantity(Quantity xbQuantity) {
         SosSweQuantity sosQuantity = new SosSweQuantity();
         if (xbQuantity.isSetAxisID()) {
             sosQuantity.setAxisID(xbQuantity.getAxisID());
@@ -277,13 +287,13 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return sosQuantity;
     }
 
-    private SosSweAbstractSimpleType parseQuantityRange(QuantityRange quantityRange) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<?> parseQuantityRange(QuantityRange quantityRange) throws OwsExceptionReport {
         String exceptionText = "The QuantityRange is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private SosSweAbstractSimpleType parseText(Text xbText) {
+    private SosSweAbstractSimpleType<?> parseText(Text xbText) {
         SosSweText sosText = new SosSweText();
         if (xbText.isSetDefinition()) {
             sosText.setDefinition(xbText.getDefinition());
@@ -297,13 +307,13 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return sosText;
     }
 
-    private SosSweAbstractSimpleType parseTime(Time time) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<?> parseTime(Time time) throws OwsExceptionReport {
         String exceptionText = "The Time is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private SosSweAbstractSimpleType parseTimeRange(TimeRange timeRange) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<?> parseTimeRange(TimeRange timeRange) throws OwsExceptionReport {
         String exceptionText = "The TimeRange is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
@@ -326,11 +336,11 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return sosSMLPosition;
     }
 
-    private List<SosSweCoordinate> parseCoordinates(Coordinate[] coordinateArray) throws OwsExceptionReport {
-        List<SosSweCoordinate> sosCoordinates = new ArrayList<SosSweCoordinate>();
+    private List<SosSweCoordinate<?>> parseCoordinates(Coordinate[] coordinateArray) throws OwsExceptionReport {
+        List<SosSweCoordinate<?>> sosCoordinates = new ArrayList<SosSweCoordinate<?>>(coordinateArray.length);
         for (Coordinate xbCoordinate : coordinateArray) {
             if (xbCoordinate.isSetQuantity()) {
-                sosCoordinates.add(new SosSweCoordinate(checkCoordinateName(xbCoordinate.getName()),
+                sosCoordinates.add(new SosSweCoordinate<String>(checkCoordinateName(xbCoordinate.getName()),
                         parseQuantity(xbCoordinate.getQuantity())));
             } else {
                 String exceptionText = "Error when parsing the Coordinates of Position: It must be of type Quantity!";
@@ -338,7 +348,7 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
                 throw Util4Exceptions.createInvalidParameterValueException("Position", exceptionText);
             }
         }
-        return null;
+        return sosCoordinates;
     }
 
     private SweCoordinateName checkCoordinateName(String name) throws OwsExceptionReport {
@@ -357,8 +367,8 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
 
     private List<SosSweField> parseAnyScalarPropertyArray(AnyScalarPropertyType[] fieldArray)
             throws OwsExceptionReport {
-        List<SosSweField> sosFields = new ArrayList<SosSweField>();
-        for (AnyScalarPropertyType xbField : (AnyScalarPropertyType[]) fieldArray) {
+        List<SosSweField> sosFields = new ArrayList<SosSweField>(fieldArray.length);
+        for (AnyScalarPropertyType xbField : fieldArray) {
             if (xbField.isSetBoolean()) {
                 sosFields.add(new SosSweField(xbField.getName(), parseBoolean(xbField.getBoolean())));
             } else if (xbField.isSetCategory()) {
@@ -375,10 +385,4 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         }
         return sosFields;
     }
-
-    @Override
-    public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
-    }
-
 }

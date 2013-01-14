@@ -24,8 +24,7 @@
 package org.n52.sos.encode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,69 +64,57 @@ import org.n52.sos.ogc.ows.SosServiceProvider;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.N52XmlHelper;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(OwsEncoderv110.class);
 
-    private List<EncoderKeyType> encoderKeyTypes;
-    
-    private Map<SupportedTypeKey, Set<String>> supportedTypes;
-    
-    private Set<String> conformanceClasses;
+    private Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(OWSConstants.NS_OWS,
+        SosServiceIdentification.class, SosServiceProvider.class, OWSOperationsMetadata.class,
+        OwsExceptionReport.class);
     
     public OwsEncoderv110() {
-        encoderKeyTypes = new ArrayList<EncoderKeyType>();
-        encoderKeyTypes.add(new EncoderKeyType(OWSConstants.NS_OWS));
-        StringBuilder builder = new StringBuilder();
-        for (EncoderKeyType encoderKeyType : encoderKeyTypes) {
-            builder.append(encoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        supportedTypes = new HashMap<SupportedTypeKey, Set<String>>(0);
-        conformanceClasses = new HashSet<String>(0);
-        LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
-    public List<EncoderKeyType> getEncoderKeyType() {
-        return encoderKeyTypes;
+    public Set<EncoderKey> getEncoderKeyType() {
+        return Collections.unmodifiableSet(ENCODER_KEYS);
     }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return supportedTypes;
+        return Collections.emptyMap();
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        return conformanceClasses;
+        return Collections.emptySet();
     }
 
+    @Override
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(OWSConstants.NS_OWS, OWSConstants.NS_OWS_PREFIX);
     }
     
     @Override
     public String getContentType() {
-        return "text/xml";
+        return SosConstants.CONTENT_TYPE_XML;
     }
 
     @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
         return encode(element, null);
     }
-
+    
     @Override
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         if (element instanceof SosServiceIdentification) {

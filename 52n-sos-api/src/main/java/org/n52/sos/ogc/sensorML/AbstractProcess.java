@@ -35,9 +35,9 @@ public class AbstractProcess extends AbstractSensorML {
 
     private List<CodeType> names = new ArrayList<CodeType>(0);
 
-    private List<SosSMLIo> inputs = new ArrayList<SosSMLIo>(0);
+    private List<SosSMLIo<?>> inputs = new ArrayList<SosSMLIo<?>>(0);
 
-    private List<SosSMLIo> outputs = new ArrayList<SosSMLIo>(0);
+    private List<SosSMLIo<?>> outputs = new ArrayList<SosSMLIo<?>>(0);
 
     private List<String> parameters = new ArrayList<String>(0);
 
@@ -61,19 +61,19 @@ public class AbstractProcess extends AbstractSensorML {
         this.names = names;
     }
 
-    public List<SosSMLIo> getInputs() {
+    public List<SosSMLIo<?>> getInputs() {
         return inputs;
     }
 
-    public void setInputs(List<SosSMLIo> inputs) {
+    public void setInputs(List<SosSMLIo<?>> inputs) {
         this.inputs = inputs;
     }
 
-    public List<SosSMLIo> getOutputs() {
+    public List<SosSMLIo<?>> getOutputs() {
         return outputs;
     }
 
-    public void setOutputs(List<SosSMLIo> outputs) {
+    public void setOutputs(List<SosSMLIo<?>> outputs) {
         this.outputs = outputs;
     }
 

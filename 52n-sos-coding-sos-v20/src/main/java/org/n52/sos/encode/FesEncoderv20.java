@@ -23,10 +23,8 @@
  */
 package org.n52.sos.encode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -65,6 +63,7 @@ import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.GMLConstants;
+import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -72,55 +71,50 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(FesEncoderv20.class);
-
-    private List<EncoderKeyType> encoderKeyTypes;
-
+    private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(
+            FilterConstants.NS_FES_2, 
+            TemporalFilter.class, 
+            org.n52.sos.ogc.filter.FilterCapabilities.class,
+            SpatialFilter.class);
+    
     public FesEncoderv20() {
-        encoderKeyTypes = new ArrayList<EncoderKeyType>();
-        encoderKeyTypes.add(new EncoderKeyType(FilterConstants.NS_FES_2));
-        StringBuilder builder = new StringBuilder();
-        for (EncoderKeyType encoderKeyType : encoderKeyTypes) {
-            builder.append(encoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
+        LOGGER.info("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
-    public List<EncoderKeyType> getEncoderKeyType() {
-        return encoderKeyTypes;
+    public Set<EncoderKey> getEncoderKeyType() {
+        return Collections.unmodifiableSet(ENCODER_KEYS);
     }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
+        return Collections.emptyMap();
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
+        return Collections.emptySet();
     }
 
+    @Override
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(FilterConstants.NS_FES_2, FilterConstants.NS_FES_2_PREFIX);
     }
 
     @Override
     public String getContentType() {
-        return "text/xml";
+        return SosConstants.CONTENT_TYPE_XML;
     }
 
     @Override
@@ -146,11 +140,9 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
         } else if (temporalFilter.getOperator().equals(TimeOperator.TM_Equals)) {
             return encodeTemporalFilterEquals(temporalFilter);
         } else {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The temporal filter operand '");
-            exceptionText.append(temporalFilter.getOperator().name());
-            exceptionText.append("' is not supported!");
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            String exceptionText = String.format("The temporal filter operand '%s' is not supported!", 
+                    temporalFilter.getOperator().name());
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
     }
 
@@ -158,16 +150,9 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
         DuringDocument duringDoc = DuringDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         BinaryTemporalOpType during = duringDoc.addNewDuring();
         if (temporalFilter.getTime() instanceof TimePeriod) {
-            IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
-            if (encoder != null) {
-                Map<HelperValues, String> additionalValues = new HashMap<SosConstants.HelperValues, String>();
-                additionalValues.put(HelperValues.DOCUMENT, "");
-                during.set((XmlObject) encoder.encode(temporalFilter.getTime(), additionalValues));
-            } else {
-                StringBuilder exceptionText = new StringBuilder();
-                exceptionText.append("The encoder is not supported!");
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
-            }
+            Map<HelperValues, String> additionalValues = new EnumMap<HelperValues, String>(HelperValues.class);
+            additionalValues.put(HelperValues.DOCUMENT, "");
+            during.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, temporalFilter.getTime(), additionalValues));
         } else {
             StringBuilder exceptionText = new StringBuilder();
             exceptionText.append("The temporal filter value is not a TimePeriod!");
@@ -182,17 +167,9 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
                 TEqualsDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         BinaryTemporalOpType equals = equalsDoc.addNewTEquals();
         if (temporalFilter.getTime() instanceof TimeInstant) {
-            IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
-            if (encoder != null) {
-                XmlObject expression = equals.addNewExpression();
-                Map<HelperValues, String> additionalValues = new HashMap<SosConstants.HelperValues, String>();
-                additionalValues.put(HelperValues.DOCUMENT, "");
-                equals.set((XmlObject) encoder.encode(temporalFilter.getTime(), additionalValues));
-            } else {
-                StringBuilder exceptionText = new StringBuilder();
-                exceptionText.append("The encoder is not supported!");
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
-            }
+            Map<HelperValues, String> additionalValues = new EnumMap<HelperValues, String>(HelperValues.class);
+            additionalValues.put(HelperValues.DOCUMENT, "");
+            equals.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, temporalFilter.getTime(), additionalValues));
         } else {
             StringBuilder exceptionText = new StringBuilder();
             exceptionText.append("The temporal filter value is not a TimeInstant!");
@@ -203,14 +180,7 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
     }
 
     private XmlObject encodeExpression(Object object) throws OwsExceptionReport {
-        IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
-        if (encoder != null) {
-            return (XmlObject) encoder.encode(object);
-        } else {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The encoder is not supported!");
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
-        }
+        return CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, object);
     }
 
     private void checkAndAddValueReference(BinaryTemporalOpType binaryTemporalOp, TemporalFilter temporalFilter) {

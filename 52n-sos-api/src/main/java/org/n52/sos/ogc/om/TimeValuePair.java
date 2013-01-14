@@ -30,9 +30,9 @@ public class TimeValuePair {
     
     private ITime time;
     
-    private IValue value;
+    private IValue<?> value;
 
-    public TimeValuePair(ITime time, IValue value) {
+    public TimeValuePair(ITime time, IValue<?> value) {
         this.time = time;
         this.value = value;
     }
@@ -41,7 +41,7 @@ public class TimeValuePair {
         return time;
     }
 
-    public IValue getValue() {
+    public IValue<?> getValue() {
         return value;
     }
 
@@ -49,7 +49,7 @@ public class TimeValuePair {
         this.time = time;
     }
 
-    public void setValue(IValue value) {
+    public void setValue(IValue<?> value) {
         this.value = value;
     }
 

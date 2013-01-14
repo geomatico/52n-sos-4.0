@@ -26,9 +26,9 @@ package org.n52.sos.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -139,7 +139,7 @@ public class XmlHelper {
      */
     public static void validateDocument(XmlObject xb_doc) throws OwsExceptionReport {
         // Create an XmlOptions instance and set the error listener.
-        ArrayList<XmlError> validationErrors = new ArrayList<XmlError>();
+        LinkedList<XmlError> validationErrors = new LinkedList<XmlError>();
         XmlOptions validationOptions = new XmlOptions();
         validationOptions.setErrorListener(validationErrors);
 
@@ -154,8 +154,8 @@ public class XmlHelper {
             // getValidation error and throw service exception for the first
             // error
             Iterator<XmlError> iter = validationErrors.iterator();
-            List<XmlError> shouldPassErrors = new ArrayList<XmlError>();
-            List<XmlError> errors = new ArrayList<XmlError>();
+            List<XmlError> shouldPassErrors = new LinkedList<XmlError>();
+            List<XmlError> errors = new LinkedList<XmlError>();
             while (iter.hasNext()) {
                 XmlError error = iter.next();
                 boolean shouldPass = false;
@@ -173,7 +173,7 @@ public class XmlHelper {
                     errors.add(error);
                 }
             }
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             for (XmlError error : errors) {
 
                 // ExceptionCode for Exception
@@ -463,6 +463,8 @@ public class XmlHelper {
         }
         
     }
+    
+    
 
     private static String getSchemaTypeNamespace(XmlObject doc) {
         QName name = doc.schemaType().getName();
@@ -515,29 +517,9 @@ public class XmlHelper {
         return elementToSubstitute.substitute(new QName(domNode.getNamespaceURI(), domNode.getLocalName()),
                 substitutionElement.schemaType());
     }
-
-    public static Object decodeGenericXmlObject(String xmlString) throws OwsExceptionReport {
-        try {
-            XmlObject xbResultStructure = XmlObject.Factory.parse(xmlString);
-            Object decodedObject = DecoderHelper.decodeXmlElement(xbResultStructure);
-            if (decodedObject != null) {
-                return decodedObject;
-            }
-            String errorMsg =
-                    String.format("Decoding of type \"%s\" using namespace \"%s\" failed", xbResultStructure
-                            .getClass().getCanonicalName(), XmlHelper.getNamespace(xbResultStructure));
-            LOGGER.error(errorMsg);
-            throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
-
-        } catch (XmlException e) {
-            String errorMsg =
-                    String.format("Exception thrown while parsing XML string from database: %s", e.getMessage());
-            LOGGER.error(errorMsg, e);
-            throw Util4Exceptions.createNoApplicableCodeException(e, errorMsg);
-        }
-    }
-
+    
     public static String getLocalName(XmlObject element) {
         return element.getDomNode().getLocalName();
     }
+    
 }

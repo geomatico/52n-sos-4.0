@@ -1,1 +1,7 @@
-org.n52.sos.decode.SosKvpDecoder
+org.n52.sos.decode.kvp.v2.DescribeSensorKvpDecoder
+org.n52.sos.decode.kvp.v2.GetCapabilitiesKvpDecoder
+org.n52.sos.decode.kvp.v2.GetFeatureOfInterestKvpDecoder
+org.n52.sos.decode.kvp.v2.GetObservationKvpDecoder
+org.n52.sos.decode.kvp.v2.GetResultKvpDecoder
+org.n52.sos.decode.kvp.v2.GetResultTemplateKvpDecoder
+

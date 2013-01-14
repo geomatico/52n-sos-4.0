@@ -23,11 +23,7 @@
  */
 package org.n52.sos.encode;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -62,14 +58,12 @@ import net.opengis.sos.x10.CapabilitiesDocument;
 import net.opengis.sos.x10.CapabilitiesDocument.Capabilities;
 import net.opengis.sos.x10.ContentsDocument.Contents;
 import net.opengis.sos.x10.ContentsDocument.Contents.ObservationOfferingList;
-import net.opengis.sos.x10.FilterCapabilitiesDocument;
 import net.opengis.sos.x10.FilterCapabilitiesDocument.FilterCapabilities;
 import net.opengis.sos.x10.ObservationOfferingType;
 import net.opengis.sos.x10.ResponseModeType;
 import net.opengis.swe.x101.PhenomenonPropertyType;
 import net.opengis.swe.x101.TimeGeometricPrimitivePropertyType;
 
-import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.filter.FilterConstants.ComparisonOperator;
@@ -94,12 +88,16 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
+import java.util.Collections;
+import java.util.EnumMap;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.StringHelper;
 
 public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommunicationObject> {
 
@@ -109,47 +107,48 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosEncoderv100.class);
 
-    private List<EncoderKeyType> encoderKeyTypes;
+    private static final Set<EncoderKey> ENCODER_KEYS = CollectionHelper.union(
+        CodingHelper.encoderKeysForElements(Sos1Constants.NS_SOS, 
+            AbstractServiceRequest.class, 
+            AbstractServiceResponse.class,
+            GetCapabilitiesResponse.class, 
+            DescribeSensorResponse.class
+        )
+    );
+            
 
     public SosEncoderv100() {
-        encoderKeyTypes = new ArrayList<EncoderKeyType>();
-        encoderKeyTypes.add(new EncoderKeyType(Sos1Constants.NS_SOS));
-        StringBuilder builder = new StringBuilder();
-        for (EncoderKeyType encoderKeyType : encoderKeyTypes) {
-            builder.append(encoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
+        LOGGER.info("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
-    public List<EncoderKeyType> getEncoderKeyType() {
-        return encoderKeyTypes;
+    public Set<EncoderKey> getEncoderKeyType() {
+        return Collections.unmodifiableSet(ENCODER_KEYS);
     }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
+        return Collections.emptyMap();
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
+        return Collections.emptySet();
     }
 
+    @Override
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(Sos1Constants.NS_SOS, SosConstants.NS_SOS_PREFIX);
     }
 
     @Override
     public String getContentType() {
-        return "text/xml";
+        return SosConstants.CONTENT_TYPE_XML;
     }
 
     @Override
     public XmlObject encode(AbstractServiceCommunicationObject communicationObject) throws OwsExceptionReport {
-        Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
+        Map<HelperValues, String> additionalValues = new EnumMap<HelperValues, String>(HelperValues.class);
         additionalValues.put(HelperValues.VERSION, Sos1Constants.SERVICEVERSION);
         return encode(communicationObject, additionalValues);
     }
@@ -214,39 +213,19 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
 
         SosCapabilities sosCapabilities = response.getCapabilities();
 
-        IEncoder owsEncoder = Configurator.getInstance().getEncoder(OWSConstants.NS_OWS);
-        if (owsEncoder == null) {
-            String exceptionText = "Error while encoding GetCapabilities response, missing encoder!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        }
-
         if (sosCapabilities.getServiceIdentification() != null) {
-            xbCaps.setServiceIdentification((ServiceIdentification) owsEncoder.encode(sosCapabilities
-                    .getServiceIdentification()));
+            xbCaps.setServiceIdentification((ServiceIdentification) CodingHelper.encodeObjectToXml(OWSConstants.NS_OWS, sosCapabilities.getServiceIdentification()));
         }
         if (sosCapabilities.getServiceProvider() != null) {
-            xbCaps.setServiceProvider((ServiceProvider) owsEncoder.encode(sosCapabilities.getServiceProvider()));
+            xbCaps.setServiceProvider((ServiceProvider) CodingHelper.encodeObjectToXml(OWSConstants.NS_OWS, sosCapabilities.getServiceProvider()));
 
         }
         if (sosCapabilities.getOperationsMetadata() != null
                 && sosCapabilities.getOperationsMetadata().getOperations() != null
                 && !sosCapabilities.getOperationsMetadata().getOperations().isEmpty()) {
-            xbCaps.setOperationsMetadata((OperationsMetadata) owsEncoder.encode(sosCapabilities
-                    .getOperationsMetadata()));
+            xbCaps.setOperationsMetadata((OperationsMetadata) CodingHelper.encodeObjectToXml(OWSConstants.NS_OWS, sosCapabilities.getOperationsMetadata()));
         }
         if (sosCapabilities.getFilterCapabilities() != null) {
-            IEncoder filterEncoder =
-                    Configurator.getInstance().getEncoder(
-                            XmlHelper.getNamespace(FilterCapabilitiesDocument.Factory.newInstance()
-                                    .addNewFilterCapabilities()));
-            if (filterEncoder == null) {
-                String exceptionText = "Error while encoding GetCapabilities response, missing encoder!";
-                LOGGER.error(exceptionText);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-            }
-//            xbCaps.addNewFilterCapabilities(). setIdCapabilities(
-//                    (FilterCapabilities) filterEncoder.encode(sosCapabilities.getFilterCapabilities()));
             setFilterCapabilities(xbCaps.addNewFilterCapabilities(), sosCapabilities.getFilterCapabilities());
         }
         if (sosCapabilities.getContents() != null && !sosCapabilities.getContents().isEmpty()) {
@@ -268,26 +247,21 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
     
     private XmlObject createDescribeSensorResponse(DescribeSensorResponse response) throws OwsExceptionReport {
        
-    	String outputFormat = null;
+    	String outputFormat;
         if (response.getOutputFormat().equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
             outputFormat = SensorMLConstants.NS_SML;
         } else {
             outputFormat = response.getOutputFormat();
         }
-        IEncoder encoder = Configurator.getInstance().getEncoder(outputFormat);
-        if (encoder != null) {
-            XmlObject xmlObject = (XmlObject) encoder.encode(response.getSensorDescription());
-            // describeSensorResponse.addNewDescription().addNewSensorDescription().addNewData().set(xmlObject);
-            
-            // set schema location
-            List<String> schemaLocations = new ArrayList<String>();
-            schemaLocations.add(N52XmlHelper.getSchemaLocationForSWE101());
-            N52XmlHelper.setSchemaLocationsToDocument(xmlObject, schemaLocations);
-            return xmlObject;
-        }
-        String exceptionText = "Error while encoding SensorML/DescribeSensor response, missing encoder!";
-        LOGGER.debug(exceptionText);
-        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        
+        
+        XmlObject xmlObject = CodingHelper.encodeObjectToXml(outputFormat, response.getSensorDescription());
+        // describeSensorResponse.addNewDescription().addNewSensorDescription().addNewData().set(xmlObject);
+
+        // set schema location
+        N52XmlHelper.setSchemaLocationsToDocument(xmlObject, Collections
+                .singletonList(N52XmlHelper.getSchemaLocationForSWE101()));
+        return xmlObject;
     }
 
     /**
@@ -377,17 +351,8 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
                 TimeGeometricPrimitivePropertyType xb_time = xb_oo.addNewTime();
                 TimePeriod tp = (TimePeriod) offering.getTime();
                 if (tp.getStart() != null && tp.getEnd() != null) {
-                    IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
-                    if (encoder != null) {
-                        Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
-                        XmlObject xmlObject = (XmlObject) encoder.encode(offering.getTime());
-                        if (xmlObject instanceof TimePeriodType) {
-                        	
-                        	AbstractTimeGeometricPrimitiveType xb_gp = xb_time.addNewTimeGeometricPrimitive();
-                        	xb_gp.set((TimePeriodType) xmlObject);
-                        }
-                    }
- 
+                        AbstractTimeGeometricPrimitiveType xb_gp = xb_time.addNewTimeGeometricPrimitive();
+                        xb_gp.set((TimePeriodType) CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, offering.getTime()));
                 }
                 // TODO check GML 311 or 32 and rename nodename of geometric primitive to gml:timePeriod
                 XmlCursor timeCursor = xb_time.newCursor();

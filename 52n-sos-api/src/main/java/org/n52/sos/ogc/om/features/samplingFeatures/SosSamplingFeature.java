@@ -23,7 +23,6 @@
  */
 package org.n52.sos.ogc.om.features.samplingFeatures;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.n52.sos.ogc.OGCConstants;
@@ -31,6 +30,8 @@ import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
+import java.util.Collections;
+import java.util.LinkedList;
 
 /**
  * Abstract super class for all sampling features
@@ -39,7 +40,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class SosSamplingFeature extends SosAbstractFeature {
     
-    private List<CodeType> name = new ArrayList<CodeType>(0);
+    private List<CodeType> name = new LinkedList<CodeType>();
 
     private String description;
 
@@ -58,7 +59,7 @@ public class SosSamplingFeature extends SosAbstractFeature {
     /**
      * constructor
      * 
-     * @param identifier
+     * @param featureIdentifier
      *            identifier of sampling feature
      */
     public SosSamplingFeature(String featureIdentifier) {
@@ -70,7 +71,7 @@ public class SosSamplingFeature extends SosAbstractFeature {
     }
 
     public List<CodeType> getName() {
-        return name;
+        return Collections.unmodifiableList(name);
     }
 
     public void setName(List<CodeType> name) {
@@ -78,6 +79,9 @@ public class SosSamplingFeature extends SosAbstractFeature {
     }
     
     public void addName(CodeType name) {
+        if (this.name == null) {
+            this.name = new LinkedList<CodeType>();
+        }
         this.name.add(name);
     }
 
@@ -134,7 +138,7 @@ public class SosSamplingFeature extends SosAbstractFeature {
     }
 
     public List<SosAbstractFeature> getSampledFeatures() {
-        return sampledFeatures;
+        return Collections.unmodifiableList(sampledFeatures);
     }
 
     public boolean isSetNames() {

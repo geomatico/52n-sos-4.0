@@ -21,19 +21,33 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.decode.kvp;
+package org.n52.sos.encode;
 
-import java.util.Map;
-import java.util.Set;
-import org.n52.sos.decode.RequestDecoderKey;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.service.IConformanceClass;
-
-public interface ISosKvpDecoderOperationDelegate extends IConformanceClass {
+/**
+ * @author Christian Autermann <c.autermann@52north.org>
+ */
+public abstract class EncoderKey {
     
-    public Set<RequestDecoderKey> getRequestDecoderKeys();
-
-    public AbstractServiceRequest decode(RequestDecoderKey decoderKeyType, Map<String, String> p) throws OwsExceptionReport;
-
+    protected static boolean eq(Object a, Object b) {
+        return a == null ? b == null : a.equals(b);
+    }
+    
+    protected static int hash(int initial, int increment, Object... a) {
+        int hashCode = initial;
+        for (Object o : a) {
+            hashCode = increment * hashCode + (o == null ? 0 : o.hashCode());
+        }
+        return hashCode;
+    }
+    
+    @Override
+    public abstract boolean equals(Object obj);
+    
+    @Override
+    public abstract String toString();
+    
+    @Override
+    public abstract int hashCode();
+    
+    public abstract int getSimilarity(EncoderKey key);
 }

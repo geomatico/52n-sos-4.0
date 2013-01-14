@@ -490,4 +490,13 @@ public class GetObservationRequest extends AbstractServiceRequest {
     public boolean hasTemporalFilterst() {
         return temporalFilters != null && !temporalFilters.isEmpty();
     }
+    
+    public boolean isEmpty() {
+        return !isSetOffering() 
+                && !isSetObservableProperty() 
+                && !isSetProcedure()
+                && !isSetFeatureOfInterest() 
+                && !isSetTemporalFilter()
+                && !isSetSpatialFilter();
+    }
 }

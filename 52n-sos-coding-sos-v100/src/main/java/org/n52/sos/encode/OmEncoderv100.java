@@ -26,7 +26,8 @@ package org.n52.sos.encode;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import net.opengis.gml.FeaturePropertyType;
 import net.opengis.gml.MeasureType;
 import net.opengis.om.x10.ObservationType;
 import net.opengis.swe.x101.TimeObjectPropertyType;
+import org.apache.xerces.util.XML11Char;
 
 import org.apache.xmlbeans.XmlBoolean;
 import org.apache.xmlbeans.XmlException;
@@ -59,70 +61,82 @@ import org.n52.sos.ogc.om.values.GeometryValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.GmlHelper;
 import org.n52.sos.util.OMHelper;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.SweHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-//import net.opengis.gml.x32.CodeWithAuthorityType;
 
 public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(OmEncoderv100.class);
 
-    private List<EncoderKeyType> encoderKeyTypes;
-
-    private Map<SupportedTypeKey, Set<String>> supportedObservationTypes;
-
-    private Set<String> conformanceClasses;
-
-    private Map<String, Map<String, Set<String>>> supportedResponseFormats;
-
+    private static final Map<SupportedTypeKey, Set<String>> SUPPORTED_TYPES = Collections.singletonMap(
+        SupportedTypeKey.ObservationType, CollectionHelper.set(
+            OMConstants.OBS_TYPE_CATEGORY_OBSERVATION,
+            OMConstants.OBS_TYPE_COUNT_OBSERVATION,
+            // OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION,
+            OMConstants.OBS_TYPE_MEASUREMENT,
+            OMConstants.OBS_TYPE_TEXT_OBSERVATION,
+            OMConstants.OBS_TYPE_TRUTH_OBSERVATION,
+            OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION
+        )
+    );
+    
+    // TODO: change to correct conformance class
+    private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(
+        "http://www.opengis.net/spec/OMXML/1.0/conf/measurement",
+        "http://www.opengis.net/spec/OMXML/1.0/conf/categoryObservation",
+        "http://www.opengis.net/spec/OMXML/1.0/conf/countObservation",
+        "http://www.opengis.net/spec/OMXML/1.0/conf/truthObservation",
+        "http://www.opengis.net/spec/OMXML/1.0/conf/geometryObservation",
+        "http://www.opengis.net/spec/OMXML/1.0/conf/textObservation"
+    );
+    
+    private static final Map<String, Map<String, Set<String>>> supportedResponseFormats
+        = Collections.singletonMap(SosConstants.SOS, 
+            Collections.singletonMap(Sos1Constants.SERVICEVERSION, 
+                CollectionHelper.set(OMConstants.NS_OM,OMConstants.CONTENT_TYPE_OM)));
+    
+    private static final Set<EncoderKey> ENCODER_KEYS = CollectionHelper.union(
+        CodingHelper.encoderKeysForElements(OMConstants.NS_OM, SosObservation.class),
+        CodingHelper.encoderKeysForElements(OMConstants.CONTENT_TYPE_OM, SosObservation.class)
+    );
+    
     private boolean supported = true;
 
     public OmEncoderv100() {
-        encoderKeyTypes = new ArrayList<EncoderKeyType>();
-        encoderKeyTypes.add(new EncoderKeyType(OMConstants.NS_OM));
-        encoderKeyTypes.add(new EncoderKeyType(OMConstants.CONTENT_TYPE_OM));
-        StringBuilder builder = new StringBuilder();
-        for (EncoderKeyType encoderKeyType : encoderKeyTypes) {
-            builder.append(encoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        setSupportedObservationTypes();
-        setConformaceClasses();
-        setSupportedResponseFormats();
-        LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
+        LOGGER.info("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
-    public List<EncoderKeyType> getEncoderKeyType() {
-        return encoderKeyTypes;
+    public Set<EncoderKey> getEncoderKeyType() {
+        return Collections.unmodifiableSet(ENCODER_KEYS);
     }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return supportedObservationTypes;
+        return Collections.unmodifiableMap(SUPPORTED_TYPES);
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        return conformanceClasses;
+        return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
     }
 
+    @Override
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(OMConstants.NS_OM, OMConstants.NS_OM_PREFIX);
     }
@@ -164,7 +178,7 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
 
     @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
-        return encode(element, new HashMap<HelperValues, String>());
+        return encode(element, new EnumMap<HelperValues, String>(HelperValues.class));
     }
 
     @Override
@@ -180,22 +194,14 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
         ObservationType xbObs =
                 ObservationType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         xbObs.setId("o_" + Long.toString(System.currentTimeMillis()));
-        String observationID = "";
+        String observationID;
         if (sosObservation.getObservationID() != null) {
             observationID = sosObservation.getObservationID();
         } else {
             observationID = xbObs.getId().replace("o_", "");
         }
         if (sosObservation.getIdentifier() != null && sosObservation.getIdentifier().isSetValue()) {
-            IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
-            if (encoder != null) {
-                XmlObject xmlObject = (XmlObject) encoder.encode(sosObservation.getIdentifier());
-                // FIXME was set something etc :-p
-                xbObs.set(xmlObject);
-            } else {
-                String exceptionText = "Error while encoding geometry value, needed encoder is missing!";
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-            }
+            xbObs.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, sosObservation.getIdentifier()));
         }
 
         String observationType = sosObservation.getObservationConstellation().getObservationType();
@@ -218,7 +224,7 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
         if (sosObservation.getObservationConstellation().getObservableProperty() instanceof SosObservableProperty) {
             xbObs.addNewObservedProperty().setHref(
                     sosObservation.getObservationConstellation().getObservableProperty().getIdentifier());
-            phenComponents = new ArrayList<SosObservableProperty>();
+            phenComponents = new ArrayList<SosObservableProperty>(1);
             phenComponents.add((SosObservableProperty) sosObservation.getObservationConstellation()
                     .getObservableProperty());
         } else if (sosObservation.getObservationConstellation().getObservableProperty() instanceof SosCompositePhenomenon) {
@@ -473,18 +479,11 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
 
     private void addPhenomenonTime(TimeObjectPropertyType timeObjectPropertyType, ITime iTime)
             throws OwsExceptionReport {
-        IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
-        if (encoder != null) {
-            Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
-            XmlObject xmlObject = (XmlObject) encoder.encode(iTime);
-            XmlObject substitution =
-                    timeObjectPropertyType.addNewTimeObject().substitute(GmlHelper.getQnameForITime(iTime),
-                            xmlObject.schemaType());
-            substitution.set(xmlObject);
-        } else {
-            String exceptionText = "Error while encoding phenomenon time, needed encoder is missing!";
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        }
+        XmlObject xmlObject = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, iTime);
+        XmlObject substitution =
+                timeObjectPropertyType.addNewTimeObject().substitute(
+                GmlHelper.getQnameForITime(iTime), xmlObject.schemaType());
+        substitution.set(xmlObject);
     }
 
     private XmlObject createCompositePhenomenon(String compPhenId, Collection<String> phenComponents) {
@@ -887,10 +886,11 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
 
     }
 
+    // FIXME String.equals(QName) !?
     private void addSingleObservationToResult(XmlObject xbResult, SosObservation sosObservation, String observationID)
             throws OwsExceptionReport {
         String observationType = sosObservation.getObservationConstellation().getObservationType();
-        SosSingleObservationValue observationValue = (SosSingleObservationValue) sosObservation.getValue();
+        SosSingleObservationValue<?> observationValue = (SosSingleObservationValue) sosObservation.getValue();
         if ((observationType.equals(OMConstants.OBS_TYPE_MEASUREMENT) || observationType
                 .equals(OMConstants.RESULT_MODEL_MEASUREMENT)) && observationValue.getValue() instanceof QuantityValue) {
             QuantityValue quantityValue = (QuantityValue) observationValue.getValue();
@@ -945,11 +945,9 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
                 && observationValue.getValue() instanceof CategoryValue) {
             CategoryValue categoryValue = (CategoryValue) observationValue.getValue();
             if (categoryValue.getValue() != null && !categoryValue.getValue().isEmpty()) {
-                IEncoder encoder = getEncoderForNamespace(GMLConstants.NS_GML_32);
-                Map<HelperValues, String> additionalValue = new HashMap<HelperValues, String>();
+                Map<HelperValues, String> additionalValue = new EnumMap<HelperValues, String>(HelperValues.class);
                 additionalValue.put(HelperValues.GMLID, SosConstants.OBS_ID_PREFIX + observationID);
-                XmlObject xmlObject = (XmlObject) encoder.encode(categoryValue, additionalValue);
-                xbResult.set(xmlObject);
+                xbResult.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, categoryValue, additionalValue));
             } else {
                 xbResult.setNil();
             }
@@ -959,11 +957,9 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
 
             GeometryValue geometryValue = (GeometryValue) observationValue.getValue();
             if (geometryValue.getValue() != null) {
-                IEncoder geomEncoder = getEncoderForNamespace(GMLConstants.NS_GML_32);
-                Map<HelperValues, String> additionalValue = new HashMap<HelperValues, String>();
+                Map<HelperValues, String> additionalValue = new EnumMap<HelperValues, String>(HelperValues.class);
                 additionalValue.put(HelperValues.GMLID, SosConstants.OBS_ID_PREFIX + observationID);
-                XmlObject xmlObject = (XmlObject) geomEncoder.encode(geometryValue.getValue(), additionalValue);
-                xbResult.set(xmlObject);
+                xbResult.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, geometryValue.getValue(), additionalValue));
             } else {
                 xbResult.setNil();
             }
@@ -971,43 +967,20 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
                 || observationType.equals(OMConstants.RESULT_MODEL_OBSERVATION)) {
             // TODO create SosSweDataArray
             SosSweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
-            IEncoder encoder = getEncoderForNamespace(SWEConstants.NS_SWE_20);
-            Map<HelperValues, String> additionalValues = new HashMap<SosConstants.HelperValues, String>();
+            Map<HelperValues, String> additionalValues = new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
             additionalValues.put(HelperValues.FOR_OBSERVATION, null);
             // TODO create SosSweDataArray
-            Object encodedObj = encoder.encode(dataArray, additionalValues);
-            if (encodedObj != null && encodedObj instanceof XmlObject) {
-                xbResult.set((XmlObject) encodedObj);
-            } else {
-                String exceptionMsg =
-                        String.format("Encoding of observation value of type \"%s\" failed. Result: %s",
-                                observationValue.getValue() != null ? observationValue.getValue().getClass().getName()
-                                        : observationValue.getValue(), encodedObj != null ? encodedObj.getClass()
-                                        .getName() : encodedObj);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
-            }
+            xbResult.set(CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE_20, dataArray, additionalValues));
         }
     }
 
     private void addMultiObservationValueToResult(XmlObject xbResult, SosObservation sosObservation)
             throws OwsExceptionReport {
-        SosMultiObservationValues observationValue = (SosMultiObservationValues) sosObservation.getValue();
-        IEncoder encoder = getEncoderForNamespace(SWEConstants.NS_SWE_20);
-        Map<HelperValues, String> additionalValues = new HashMap<SosConstants.HelperValues, String>();
+        SosMultiObservationValues<?> observationValue = (SosMultiObservationValues) sosObservation.getValue();
+        Map<HelperValues, String> additionalValues = new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
         additionalValues.put(HelperValues.FOR_OBSERVATION, null);
-        // TODO create SosSweDataArray
         SosSweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
-        Object encodedObj = encoder.encode(dataArray, additionalValues);
-        if (encodedObj != null && encodedObj instanceof XmlObject) {
-            xbResult.set((XmlObject) encodedObj);
-        } else {
-            String exceptionMsg =
-                    String.format("Encoding of observation value of type \"%s\" failed. Result: %s",
-                            observationValue.getValue() != null ? observationValue.getValue().getClass().getName()
-                                    : observationValue.getValue(), encodedObj != null ? encodedObj.getClass()
-                                    .getName() : encodedObj);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
-        }
+        xbResult.set(CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE_20, dataArray, additionalValues));
     }
 
     /**
@@ -1044,12 +1017,9 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
             if (samplingFeature.getUrl() != null) {
                 featureProperty.setHref(samplingFeature.getUrl());
             } else {
-                IEncoder encoder =
-                        Configurator.getInstance().getEncoder(
-                                OMHelper.getNamespaceForFeatureType(samplingFeature.getFeatureType()));
-                if (encoder != null) {
-                    featureProperty.set((XmlObject) encoder.encode(samplingFeature));
-                } else {
+                try {
+                    featureProperty.set(CodingHelper.encodeObjectToXml(OMHelper.getNamespaceForFeatureType(samplingFeature.getFeatureType()), samplingFeature));
+                } catch (OwsExceptionReport e) {
                     if (samplingFeature.getXmlDescription() != null) {
                         try {
                             // TODO how set gml:id in already existing
@@ -1070,51 +1040,6 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
             }
         }
     }
-
-    private void setSupportedObservationTypes() {
-        Map<SupportedTypeKey, Set<String>> supportedObservationTypes = new HashMap<SupportedTypeKey, Set<String>>();
-        Set<String> observationTypes = new HashSet<String>(0);
-        observationTypes.add(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION);
-        observationTypes.add(OMConstants.OBS_TYPE_COUNT_OBSERVATION);
-        // observationTypes.add(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION);
-        observationTypes.add(OMConstants.OBS_TYPE_MEASUREMENT);
-        observationTypes.add(OMConstants.OBS_TYPE_TEXT_OBSERVATION);
-        observationTypes.add(OMConstants.OBS_TYPE_TRUTH_OBSERVATION);
-        observationTypes.add(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
-        supportedObservationTypes.put(SupportedTypeKey.ObservationType, observationTypes);
-    }
-
-    private void setSupportedResponseFormats() {
-        supportedResponseFormats = new HashMap<String, Map<String, Set<String>>>(0);
-        Set<String> format = new HashSet<String>(0);
-        format.add(OMConstants.NS_OM);
-        format.add(OMConstants.CONTENT_TYPE_OM);
-        Map<String, Set<String>> versionMap = new HashMap<String, Set<String>>(0);
-        versionMap.put("1.0.0", format);
-        supportedResponseFormats.put("SOS", versionMap);
-    }
-
-    private void setConformaceClasses() {
-        conformanceClasses = new HashSet<String>(0);
-        // TODO: change to correct conformance class
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/1.0/conf/measurement");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/1.0/conf/categoryObservation");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/1.0/conf/countObservation");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/1.0/conf/truthObservation");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/1.0/conf/geometryObservation");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/1.0/conf/textObservation");
-    }
-
-    private IEncoder getEncoderForNamespace(String namespace) throws OwsExceptionReport {
-        IEncoder encoder = Configurator.getInstance().getEncoder(namespace);
-        if (encoder == null) {
-            String exceptionMsg = String.format("Encoder for \"%s\" not found.", SWEConstants.NS_SWE);
-            LOGGER.debug(exceptionMsg);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
-        }
-        return encoder;
-    }
-
     // /**
     // * Creates XML representation of OM 2.0 observation type from SOS
     // * observation.

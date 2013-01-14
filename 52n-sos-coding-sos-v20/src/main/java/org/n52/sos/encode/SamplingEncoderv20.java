@@ -23,9 +23,9 @@
  */
 package org.n52.sos.encode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import com.vividsolutions.jts.geom.Geometry;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,16 +42,22 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
 import org.n52.sos.ogc.OGCConstants;
+import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.SosHelper;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -60,58 +66,47 @@ import org.slf4j.LoggerFactory;
 
 public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeature> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SamplingEncoderv20.class);
 
-    private List<EncoderKeyType> encoderKeyTypes;
+    private static final Set<EncoderKey> ENCODER_KEYS = CollectionHelper.union(
+        CodingHelper.encoderKeysForElements(SFConstants.NS_SAMS, SosAbstractFeature.class),
+        CodingHelper.encoderKeysForElements(SFConstants.NS_SF, SosAbstractFeature.class)
+    );
 
-    private Set<String> supportedFeatureTypes;
+    private Map<SupportedTypeKey, Set<String>> SUPPORTED_TYPES = Collections.singletonMap(
+        SupportedTypeKey.FeatureType,
+        CollectionHelper.set(
+            OGCConstants.UNKNOWN,
+            SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_POINT,
+            SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_CURVE,
+            SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_SURFACE
+        )
+    );
+    
+    private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(
+            ConformanceClasses.OM_V2_SPATIAL_SAMPLING, ConformanceClasses.OM_V2_SAMPLING_POINT,
+            ConformanceClasses.OM_V2_SAMPLING_CURVE, ConformanceClasses.OM_V2_SAMPLING_SURFACE);
 
     public SamplingEncoderv20() {
-        encoderKeyTypes = new ArrayList<EncoderKeyType>();
-        encoderKeyTypes.add(new EncoderKeyType(SFConstants.NS_SAMS));
-        encoderKeyTypes.add(new EncoderKeyType(SFConstants.NS_SF));
-        StringBuilder builder = new StringBuilder();
-        for (EncoderKeyType encoderKeyType : encoderKeyTypes) {
-            builder.append(encoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-
-        supportedFeatureTypes = new HashSet<String>(0);
-        supportedFeatureTypes.add(OGCConstants.UNKNOWN);
-        supportedFeatureTypes.add(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_POINT);
-        supportedFeatureTypes.add(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_CURVE);
-        supportedFeatureTypes.add(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_SURFACE);
-
-        LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
+        LOGGER.info("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
-    public List<EncoderKeyType> getEncoderKeyType() {
-        return encoderKeyTypes;
+    public Set<EncoderKey> getEncoderKeyType() {
+        return Collections.unmodifiableSet(ENCODER_KEYS);
     }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        Map<SupportedTypeKey, Set<String>> map = new HashMap<SupportedTypeKey, Set<String>>();
-        map.put(SupportedTypeKey.FeatureType, supportedFeatureTypes);
-        return map;
+        return Collections.unmodifiableMap(SUPPORTED_TYPES);
+    }
+    
+    @Override
+    public Set<String> getConformanceClasses() {
+        return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
     }
 
     @Override
-    public Set<String> getConformanceClasses() {
-        Set<String> conformanceClasses = new HashSet<String>(0);
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/spatialSampling");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/samplingPoint");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/samplingCurve");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/samplingSurface");
-        return conformanceClasses;
-    }
-
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(SFConstants.NS_SAMS, SFConstants.NS_SAMS_PREFIX);
         nameSpacePrefixMap.put(SFConstants.NS_SF, SFConstants.NS_SF_PREFIX);
@@ -119,7 +114,7 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
 
     @Override
     public String getContentType() {
-        return "text/xml";
+        return SosConstants.CONTENT_TYPE_XML;
     }
 
     @Override
@@ -180,36 +175,15 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
                 if (sampFeat.isSetIdentifier()
                         && SosHelper.checkFeatureOfInterestIdentifierForSosV2(sampFeat.getIdentifier(),
                                 Sos2Constants.SERVICEVERSION)) {
-                    // set identifier
-                    IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
-                    if (encoder != null) {
-                        XmlObject xmlObject = (XmlObject) encoder.encode(sampFeat.getIdentifier());
-                        if (xmlObject != null) {
-                            xbSampFeature.addNewIdentifier().set(xmlObject);
-                        }
-                    } else {
-                        String exceptionText = "Error while encoding identifier for feature, needed encoder is missing!";
-                        LOGGER.debug(exceptionText);
-                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-                    }
+                    xbSampFeature.addNewIdentifier().set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, sampFeat.getIdentifier()));
                 }
 
                 // set type
                 xbSampFeature.addNewType().setHref(sampFeat.getFeatureType());
 
                 if (sampFeat.isSetNames()) {
-                    IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
-                    if (encoder != null) {
-                        for (org.n52.sos.ogc.gml.CodeType sosName : sampFeat.getName()) {
-                        XmlObject xmlObject = (XmlObject) encoder.encode(sampFeat.getIdentifier());
-                            if (xmlObject != null) {
-                                xbSampFeature.addNewName().set(xmlObject);
-                            }
-                        }
-                    } else {
-                        String exceptionText = "Error while encoding identifier for feature, needed encoder is missing!";
-                        LOGGER.debug(exceptionText);
-                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                    for (CodeType sosName : sampFeat.getName()) {
+                        xbSampFeature.addNewName().set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, sosName));
                     }
                 }
 
@@ -227,11 +201,12 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
 
                 // set position
                 ShapeType xbShape = xbSampFeature.addNewShape();
-                IEncoder encoder = Configurator.getInstance().getEncoder(GMLConstants.NS_GML_32);
+                IEncoder<XmlObject, Geometry> encoder = Configurator.getInstance().getCodingRepository()
+                        .getEncoder(CodingHelper.getEncoderKey(GMLConstants.NS_GML_32, sampFeat.getGeometry()));
                 if (encoder != null) {
-                    Map<HelperValues, String> additionalValues = new HashMap<HelperValues, String>();
+                    Map<HelperValues, String> additionalValues = new EnumMap<HelperValues, String>(HelperValues.class);
                     additionalValues.put(HelperValues.GMLID, absFeature.getGmlId());
-                    XmlObject xmlObject = (XmlObject) encoder.encode(sampFeat.getGeometry(), additionalValues);
+                    XmlObject xmlObject = encoder.encode(sampFeat.getGeometry(), additionalValues);
                     xbShape.addNewAbstractGeometry().set(xmlObject);
                     XmlHelper.substituteElement(xbShape.getAbstractGeometry(), xmlObject);
 //                    encoder.substitute(xbShape.getAbstractGeometry(), xmlObject);

@@ -23,9 +23,6 @@
  */
 package org.n52.sos.encode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,7 +55,6 @@ import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.values.CategoryValue;
-import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.Configurator;
@@ -76,56 +72,58 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.util.PolygonExtracter;
+import java.util.Collections;
+import java.util.EnumMap;
+import org.n52.sos.ogc.om.values.QuantityValue;
+import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.StringHelper;
 
 public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(GmlEncoderv321.class);
 
-    private List<EncoderKeyType> encoderKeyTypes;
+    private static final Set<EncoderKey> ENCODER_KEY_TYPES = CodingHelper.encoderKeysForElements(
+            GMLConstants.NS_GML_32, 
+            org.n52.sos.ogc.gml.time.ITime.class,
+            com.vividsolutions.jts.geom.Geometry.class,
+            org.n52.sos.ogc.om.values.CategoryValue.class, 
+            org.n52.sos.ogc.gml.ReferenceType.class,
+            org.n52.sos.ogc.om.values.QuantityValue.class,
+            org.n52.sos.ogc.gml.CodeWithAuthority.class);
 
     public GmlEncoderv321() {
-        encoderKeyTypes = new ArrayList<EncoderKeyType>();
-        encoderKeyTypes.add(new EncoderKeyType(GMLConstants.NS_GML_32));
-        StringBuilder builder = new StringBuilder();
-        for (EncoderKeyType encoderKeyType : encoderKeyTypes) {
-            builder.append(encoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
+        LOGGER.info("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEY_TYPES));
     }
 
     @Override
-    public List<EncoderKeyType> getEncoderKeyType() {
-        return encoderKeyTypes;
+    public Set<EncoderKey> getEncoderKeyType() {
+        return Collections.unmodifiableSet(ENCODER_KEY_TYPES);
     }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
+        return Collections.emptyMap();
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
+        return Collections.emptySet();
     }
 
+    @Override
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(GMLConstants.NS_GML_32, GMLConstants.NS_GML_PREFIX);
     }
 
     @Override
     public String getContentType() {
-        return "text/xml";
+        return SosConstants.CONTENT_TYPE_XML;
     }
 
     @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
-        return encode(element, new HashMap<HelperValues, String>());
+        return encode(element, new EnumMap<HelperValues, String>(HelperValues.class));
     }
 
     @Override

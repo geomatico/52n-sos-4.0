@@ -32,10 +32,7 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Restrictions;
-import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IGetResultDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
@@ -81,7 +78,7 @@ public class GetResultDAO extends AbstractHibernateOperationDao implements IGetR
         Set<String> offerings = null;
         Set<String> observableProperties = null;
         Set<String> featureOfInterest = null;
-        Set<String> templateIdentifiers = null;
+        Set<String> templateIdentifiers;
         if (resultTemplates != null && !resultTemplates.isEmpty()) {
             offerings = new HashSet<String>(0);
             observableProperties = new HashSet<String>(0);

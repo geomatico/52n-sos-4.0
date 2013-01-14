@@ -24,8 +24,8 @@
 package org.n52.sos.encode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -103,9 +103,10 @@ import org.n52.sos.ogc.swe.SosSweSimpleDataRecord;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweObservableProperty;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
-import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -114,45 +115,31 @@ import org.slf4j.LoggerFactory;
 public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SensorMLEncoderv101.class);
-
-    private List<EncoderKeyType> encoderKeyTypes;
-
-    private Map<SupportedTypeKey, Set<String>> supportedTypes;
-
-    private Set<String> conformanceClasses;
+    
+    private Map<SupportedTypeKey, Set<String>> SUPPORTED_TYPES = Collections.singletonMap(
+            SupportedTypeKey.ProcedureDescriptionFormat, Collections.singleton(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL));
+    private Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(SensorMLConstants.NS_SML, AbstractSensorML.class);
 
     public SensorMLEncoderv101() {
-        encoderKeyTypes = new ArrayList<EncoderKeyType>();
-        encoderKeyTypes.add(new EncoderKeyType(SensorMLConstants.NS_SML));
-        StringBuilder builder = new StringBuilder();
-        for (EncoderKeyType encoderKeyType : encoderKeyTypes) {
-            builder.append(encoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        Set<String> outputFormatSet = new HashSet<String>(0);
-        outputFormatSet.add(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
-        Map<SupportedTypeKey, Set<String>> map = new HashMap<SupportedTypeKey, Set<String>>();
-        map.put(SupportedTypeKey.ProcedureDescriptionFormat, outputFormatSet);
-        conformanceClasses = new HashSet<String>(0);
-        LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
-    public List<EncoderKeyType> getEncoderKeyType() {
-        return encoderKeyTypes;
+    public Set<EncoderKey> getEncoderKeyType() {
+        return Collections.unmodifiableSet(ENCODER_KEYS);
     }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return supportedTypes;
+        return Collections.unmodifiableMap(SUPPORTED_TYPES);
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        return conformanceClasses;
+        return Collections.emptySet();
     }
 
+    @Override
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(SensorMLConstants.NS_SML, SensorMLConstants.NS_SML_PREFIX);
         // remove if GML 3.1.1 encoder is available
@@ -379,7 +366,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
      */
     private Characteristics[] createCharacteristics(List<SosSMLCharacteristics> smlCharacteristics)
             throws OwsExceptionReport {
-        List<Characteristics> characteristicsList = new ArrayList<Characteristics>();
+        List<Characteristics> characteristicsList = new ArrayList<Characteristics>(smlCharacteristics.size());
         for (SosSMLCharacteristics sosSMLCharacteristics : smlCharacteristics) {
             if (sosSMLCharacteristics.isSetAbstractDataRecord()) {
                 Characteristics xbCharacteristics =
@@ -415,7 +402,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
                 characteristicsList.add(xbCharacteristics);
             }
         }
-        return characteristicsList.toArray(new Characteristics[0]);
+        return characteristicsList.toArray(new Characteristics[characteristicsList.size()]);
     }
 
     /**
@@ -425,12 +412,10 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
      */
     private Capabilities[] createCapabilities(SystemType xbSystem, List<SosSMLCapabilities> smlCapabilities)
             throws OwsExceptionReport {
-        List<Capabilities> capabilitiesList = new ArrayList<Capabilities>();
+        List<Capabilities> capabilitiesList = new ArrayList<Capabilities>(smlCapabilities.size());
         if (xbSystem != null || smlCapabilities != null) {
             if (isCapabilitiesArrayAlreadyAvailable(xbSystem)) {
-                for (Capabilities capabilities : xbSystem.getCapabilitiesArray()) {
-                    capabilitiesList.add(capabilities);
-                }
+                capabilitiesList.addAll(Arrays.asList(xbSystem.getCapabilitiesArray()));
             }
             for (SosSMLCapabilities capabilities : smlCapabilities) {
                 if (capabilities != null) { // List could contain null elements
@@ -489,7 +474,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
     }
 
     private Documentation[] createDocumentationArray(List<AbstractSosSMLDocumentation> sosDocumentation) {
-        List<Documentation> documentationList = new ArrayList<Documentation>();
+        List<Documentation> documentationList = new ArrayList<Documentation>(sosDocumentation.size());
         for (AbstractSosSMLDocumentation abstractSosSMLDocumentation : sosDocumentation) {
             Documentation documentation = Documentation.Factory.newInstance();
             if (abstractSosSMLDocumentation instanceof SosSMLDocumentation) {
@@ -559,19 +544,11 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
         xbSwePosition.setFixed(position.isFixed());
         xbSwePosition.setReferenceFrame(position.getReferenceFrame());
         VectorType xbVector = xbSwePosition.addNewLocation().addNewVector();
-        for (SosSweCoordinate coordinate : position.getPosition()) {
+        for (SosSweCoordinate<?> coordinate : position.getPosition()) {
             if (coordinate.getValue().getValue() != null
                     && (!coordinate.getValue().isSetValue() || !coordinate.getValue().getValue().equals(Double.NaN))) {
                 // FIXME: SWE Common NS
-                IEncoder encoder = Configurator.getInstance().getEncoder(SWEConstants.NS_SWE);
-                if (encoder != null) {
-                    xbVector.addNewCoordinate().set((XmlObject) encoder.encode(coordinate));
-                } else {
-                    String exceptionText =
-                            "Error while encoding position for sensor description, needed encoder is missing!";
-                    LOGGER.debug(exceptionText);
-                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-                }
+                xbVector.addNewCoordinate().set(CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, coordinate));
             }
         }
         return xbPosition;
@@ -586,10 +563,10 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
      *            SOS SWE representation.
      * @throws OwsExceptionReport
      */
-    private Inputs createInputs(List<SosSMLIo> inputs) throws OwsExceptionReport {
+    private Inputs createInputs(List<SosSMLIo<?>> inputs) throws OwsExceptionReport {
         Inputs xbInputs = Inputs.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         InputList xbInputList = xbInputs.addNewInputList();
-        for (SosSMLIo sosSMLIo : inputs) {
+        for (SosSMLIo<?> sosSMLIo : inputs) {
             addIoComponentPropertyType(xbInputList.addNewInput(), sosSMLIo);
         }
         return xbInputs;
@@ -604,10 +581,10 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
      *            SOS SWE representation.
      * @throws OwsExceptionReport
      */
-    private Outputs createOutputs(List<SosSMLIo> sosOutputs) throws OwsExceptionReport {
+    private Outputs createOutputs(List<SosSMLIo<?>> sosOutputs) throws OwsExceptionReport {
         Outputs outputs = Outputs.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         OutputList outputList = outputs.addNewOutputList();
-        for (SosSMLIo sosSMLIo : sosOutputs) {
+        for (SosSMLIo<?> sosSMLIo : sosOutputs) {
             addIoComponentPropertyType(outputList.addNewOutput(), sosSMLIo);
         }
         return outputs;
@@ -697,7 +674,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
     private void addSweSimpleTypeToField(AnyScalarPropertyType xbField, SosSweAbstractDataComponent sosSweData)
             throws OwsExceptionReport {
         if (sosSweData instanceof SosSweAbstractSimpleType) {
-            SosSweAbstractSimpleType sosSweSimpleType = (SosSweAbstractSimpleType) sosSweData;
+            SosSweAbstractSimpleType<?> sosSweSimpleType = (SosSweAbstractSimpleType) sosSweData;
             switch (sosSweSimpleType.getSimpleType()) {
             case Boolean:
                 String exceptionTextBool =
@@ -738,9 +715,10 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextQuantityRange);
             case Text:
                 // FIXME: SWE Common NS
-                IEncoder encoder = Configurator.getInstance().getEncoder(SWEConstants.NS_SWE);
+                IEncoder<?, SosSweAbstractDataComponent> encoder = Configurator.getInstance().getCodingRepository()
+                        .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE, sosSweData.getClass()));
                 if (encoder != null) {
-                    xbField.setText((Text) encoder.encode((SosSweText) sosSweData));
+                    xbField.setText((Text) encoder.encode(sosSweData));
                 } else {
                     String exceptionTextText =
                             "The SWE simpleType '" + SweSimpleType.Text.name()
@@ -769,18 +747,20 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextDefault);
             }
         } else if (sosSweData instanceof SosSweDataArray) {
-            IEncoder encoder = Configurator.getInstance().getEncoder(SWEConstants.NS_SWE);
+            IEncoder<?, SosSweAbstractDataComponent>  encoder = Configurator.getInstance().getCodingRepository()
+                    .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE, SosSweDataArray.class));
             if (encoder != null) {
-                xbField.set((XmlObject) encoder.encode((SosSweDataArray) sosSweData));
+                xbField.set((XmlObject) encoder.encode(sosSweData));
             } else {
                 String exceptionTextText = "The SweDataArray is not supported by this SOS for SWE fields!";
                 LOGGER.debug(exceptionTextText);
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextText);
             }
         } else if (sosSweData instanceof SosSweDataRecord) {
-            IEncoder encoder = Configurator.getInstance().getEncoder(SWEConstants.NS_SWE);
+            IEncoder<?, SosSweAbstractDataComponent> encoder = Configurator.getInstance().getCodingRepository()
+                    .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE, SosSweDataRecord.class));
             if (encoder != null) {
-                xbField.set((XmlObject) encoder.encode((SosSweDataRecord) sosSweData));
+                xbField.set((XmlObject) encoder.encode(sosSweData));
             } else {
                 String exceptionTextText = "The SosSweDataRecord is not supported by this SOS for SWE fields!";
                 LOGGER.debug(exceptionTextText);
@@ -802,7 +782,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
      *            SOS SWE simple type.
      * @throws OwsExceptionReport
      */
-    private void addIoComponentPropertyType(IoComponentPropertyType ioComponentPopertyType, SosSMLIo sosSMLIO)
+    private void addIoComponentPropertyType(IoComponentPropertyType ioComponentPopertyType, SosSMLIo<?> sosSMLIO)
             throws OwsExceptionReport {
         ioComponentPopertyType.setName(sosSMLIO.getIoName());
         switch (sosSMLIO.getIoValue().getSimpleType()) {
@@ -836,7 +816,8 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
             break;
         case Quantity:
             // FIXME: SWE Common NS
-            IEncoder encoder = Configurator.getInstance().getEncoder(SWEConstants.NS_SWE);
+            IEncoder<?, SosSweAbstractDataComponent> encoder = Configurator.getInstance().getCodingRepository()
+                    .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE, SosSweQuantity.class));
             if (encoder != null) {
                 ioComponentPopertyType.addNewQuantity().set(
                         (XmlObject) encoder.encode((SosSweQuantity) sosSMLIO.getIoValue()));

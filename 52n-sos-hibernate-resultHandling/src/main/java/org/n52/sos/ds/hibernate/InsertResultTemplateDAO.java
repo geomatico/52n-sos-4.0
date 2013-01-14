@@ -26,7 +26,6 @@ package org.n52.sos.ds.hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IInsertResultTemplateDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;

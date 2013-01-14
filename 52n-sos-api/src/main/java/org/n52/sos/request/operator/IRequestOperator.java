@@ -32,29 +32,8 @@ import org.n52.sos.service.IConformanceClass;
 
 /**
  * Interface for SOS request operator implementations
- * 
  */
 public interface IRequestOperator extends IConformanceClass {
-
-    // /**
-    // * HTTP-Post request handling method
-    // *
-    // * @param request
-    // * HTTP-Post request
-    // * @return SOS response
-    // */
-    // public IServiceResponse doGetOperation(HttpServletRequest request);
-    //
-    // /**
-    // * HTTP-Post request handling method
-    // *
-    // * @param request
-    // * HTTP-Post request
-    // * @return SOS response
-    // * @throws ServletException
-    // */
-    // public IServiceResponse doPostOperation(HttpServletRequest request)
-    // throws ServletException;
 
     public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
 

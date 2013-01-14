@@ -84,11 +84,11 @@ public class SweHelper {
         dataArray.setEncoding(resultTemplate.getResultEncoding());
         dataArrayValue.setValue(dataArray);
         if (sosObservation.getValue() instanceof SosSingleObservationValue) {
-            SosSingleObservationValue singleValue = (SosSingleObservationValue) sosObservation.getValue();
+            SosSingleObservationValue<?> singleValue = (SosSingleObservationValue) sosObservation.getValue();
             dataArrayValue.addBlock(createBlock(dataArray.getElementType(), sosObservation.getPhenomenonTime(),
                     observablePropertyIdentifier, singleValue.getValue()));
         } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
-            SosMultiObservationValues multiValue = (SosMultiObservationValues) sosObservation.getValue();
+            SosMultiObservationValues<?> multiValue = (SosMultiObservationValues) sosObservation.getValue();
             if (multiValue.getValue() instanceof SweDataArrayValue) {
                 return ((SweDataArrayValue) multiValue.getValue()).getValue();
             } else if (multiValue.getValue() instanceof TVPValue) {
@@ -112,12 +112,12 @@ public class SweHelper {
         dataArray.setEncoding(createTextEncoding(sosObservation));
         dataArrayValue.setValue(dataArray);
         if (sosObservation.getValue() instanceof SosSingleObservationValue) {
-            SosSingleObservationValue singleValue = (SosSingleObservationValue) sosObservation.getValue();
+            SosSingleObservationValue<?> singleValue = (SosSingleObservationValue) sosObservation.getValue();
             dataArray.setElementType(createElementType(singleValue.getValue(), observablePropertyIdentifier));
             dataArrayValue.addBlock(createBlock(dataArray.getElementType(), sosObservation.getPhenomenonTime(),
                     observablePropertyIdentifier, singleValue.getValue()));
         } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
-            SosMultiObservationValues multiValue = (SosMultiObservationValues) sosObservation.getValue();
+            SosMultiObservationValues<?> multiValue = (SosMultiObservationValues) sosObservation.getValue();
             if (multiValue.getValue() instanceof SweDataArrayValue) {
                 return ((SweDataArrayValue) multiValue.getValue()).getValue();
             } else if (multiValue.getValue() instanceof TVPValue) {
@@ -137,7 +137,7 @@ public class SweHelper {
         return dataArray;
     }
 
-    private static SosSweAbstractDataComponent createElementType(IValue iValue, String name) {
+    private static SosSweAbstractDataComponent createElementType(IValue<?> iValue, String name) {
         SosSweDataRecord dataRecord = new SosSweDataRecord();
         dataRecord.addField(getPhenomenonTimeField());
         dataRecord.addField(getFieldForValue(iValue, name));
@@ -151,13 +151,13 @@ public class SweHelper {
         return new SosSweField(OMConstants.PHENOMENON_TIME_NAME, time);
     }
 
-    private static SosSweField getFieldForValue(IValue iValue, String name) {
+    private static SosSweField getFieldForValue(IValue<?> iValue, String name) {
         SosSweAbstractDataComponent value = getValue(iValue);
         value.setDefinition(name);
         return new SosSweField(name, value);
     }
 
-    private static SosSweAbstractDataComponent getValue(IValue iValue) {
+    private static SosSweAbstractDataComponent getValue(IValue<?> iValue) {
         if (iValue instanceof BooleanValue) {
             return new SosSweBoolean();
         } else if (iValue instanceof CategoryValue) {
@@ -186,10 +186,10 @@ public class SweHelper {
     }
 
     private static List<String> createBlock(SosSweAbstractDataComponent elementType, ITime phenomenonTime,
-            String phenID, IValue value) {
+            String phenID, IValue<?> value) {
         if (elementType != null && elementType instanceof SosSweDataRecord) {
             SosSweDataRecord elementTypeRecord = (SosSweDataRecord) elementType;
-            List<String> block = new ArrayList<String>();
+            List<String> block = new ArrayList<String>(elementTypeRecord.getFields().size());
             for (SosSweField sweField : elementTypeRecord.getFields()) {
                 if (!(value instanceof NilTemplateValue)) {
                     if (sweField.getElement() instanceof SosSweTime) {
@@ -209,6 +209,9 @@ public class SweHelper {
                         .getName() : "null");
         LOGGER.debug(exceptionMsg);
         throw new IllegalArgumentException(exceptionMsg);
+    }
+
+    private SweHelper() {
     }
 
 }

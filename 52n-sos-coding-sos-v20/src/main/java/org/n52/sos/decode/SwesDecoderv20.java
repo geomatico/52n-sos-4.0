@@ -26,7 +26,6 @@ package org.n52.sos.decode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,9 +60,13 @@ import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.request.UpdateSensorRequest;
+import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.SosHelper;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
@@ -71,45 +74,33 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class SwesDecoderv20 implements IXmlRequestDecoder {
+public class SwesDecoderv20 implements IDecoder<AbstractServiceCommunicationObject, XmlObject> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SwesDecoderv20.class);
-
-    private List<DecoderKeyType> decoderKeyTypes = Collections.unmodifiableList(new ArrayList<DecoderKeyType>(1) {{
-        add(new DecoderKeyType(SWEConstants.NS_SWES_20));
-    }});
     
-    private Set<RequestDecoderKey> requestDecoderKeys = Collections.unmodifiableSet(new HashSet<RequestDecoderKey>(4) {{
-        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.DescribeSensor.name()));
-        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, Sos2Constants.Operations.InsertSensor.name()));
-        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, Sos2Constants.Operations.UpdateSensorDescription.name()));
-        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, Sos2Constants.Operations.DeleteSensor.name()));
-    }});
+    private Set<DecoderKey> DECODER_KEYS = CollectionHelper.union(
+        CodingHelper.decoderKeysForElements(SWEConstants.NS_SWES_20,
+            DescribeSensorDocument.class,
+            InsertSensorDocument.class,
+            UpdateSensorDescriptionDocument.class,
+            DeleteSensorDocument.class
+        ),
+        CodingHelper.xmlDecoderKeysForOperation(
+            SosConstants.SOS, Sos2Constants.SERVICEVERSION,
+            SosConstants.Operations.DescribeSensor,
+            Sos2Constants.Operations.InsertSensor,
+            Sos2Constants.Operations.UpdateSensorDescription,
+            Sos2Constants.Operations.DeleteSensor
+        )
+    );
     
- 
-
     public SwesDecoderv20() {
-        StringBuilder builder = new StringBuilder();
-        for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
-            builder.append(decoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        LOGGER.info("Decoder for the following namespaces initialized successfully: " + builder.toString() + "!");
+       LOGGER.debug("Decoder for the following keys initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));
     }
 
     @Override
-    public List<DecoderKeyType> getDecoderKeyTypes() {
-        return decoderKeyTypes;
-    }
-    
-    @Override
-    public Set<RequestDecoderKey> getRequestDecoderKeys() {
-        return requestDecoderKeys;
+    public Set<DecoderKey> getDecoderKeyTypes() {
+        return Collections.unmodifiableSet(DECODER_KEYS);
     }
 
     @Override
@@ -161,7 +152,7 @@ public class SwesDecoderv20 implements IXmlRequestDecoder {
         descSensorRequest.setVersion(xbDescSensor.getVersion());
         descSensorRequest.setProcedures(xbDescSensor.getProcedure());
         if (xbDescSensor.getProcedureDescriptionFormat() != null
-                && !xbDescSensor.getProcedureDescriptionFormat().equals("")) {
+                && !xbDescSensor.getProcedureDescriptionFormat().isEmpty()) {
             descSensorRequest.setProcedureDescriptionFormat(xbDescSensor.getProcedureDescriptionFormat());
         } else {
             descSensorRequest.setProcedureDescriptionFormat(SosConstants.PARAMETER_NOT_SET);
@@ -187,35 +178,30 @@ public class SwesDecoderv20 implements IXmlRequestDecoder {
         if (xbInsertSensor.getMetadataArray() != null && xbInsertSensor.getMetadataArray().length > 0) {
             request.setMetadata(parseMetadata(xbInsertSensor.getMetadataArray()));
         }
-        SosHelper.checkProcedureDescriptionFormat(xbInsertSensor.getProcedureDescriptionFormat(), Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name());
+        SosHelper.checkProcedureDescriptionFormat(xbInsertSensor.getProcedureDescriptionFormat(), 
+                Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name());
         
-        // sensor description
-        List<IDecoder> decoderList =
-                Configurator.getInstance().getDecoder(
-                        new DecoderKeyType(xbInsertSensor.getProcedureDescriptionFormat()));
-        if (decoderList != null) {
-            for (IDecoder decoder : decoderList) {
-                try {
-                    XmlObject xmlObject =
-                            XmlObject.Factory.parse(getNodeFromNodeList(xbInsertSensor.getProcedureDescription()
-                                    .getDomNode().getChildNodes()));
-
-                    Object decodedObject = decoder.decode(xmlObject);
-                    if (decodedObject != null && decodedObject instanceof SosProcedureDescription) {
-                        request.setProcedureDescription((SosProcedureDescription) decodedObject);
-                        break;
-                    }
-                } catch (XmlException xmle) {
-                    String exceptionText = "Error while parsing procedure description of InsertSensor request!";
-                    LOGGER.error(exceptionText, xmle);
-                    throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
-                }
+        try {
+            XmlObject xmlObject =
+                    XmlObject.Factory.parse(getNodeFromNodeList(xbInsertSensor.getProcedureDescription()
+                            .getDomNode().getChildNodes()));
+            
+            IDecoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository()
+                    .getDecoder(CodingHelper.getDecoderKey(xmlObject));
+            if (decoder == null) {
+                 String exceptionText = "The requested procedureDescritpionFormat is not supported!";
+                LOGGER.error(exceptionText);
+                throw Util4Exceptions.createInvalidParameterValueException(
+                        Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name(), exceptionText);
             }
-        } else {
-            String exceptionText = "The requested procedureDescritpionFormat is not supported!";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name(), exceptionText);
+            Object decodedObject = decoder.decode(xmlObject);
+            if (decodedObject != null && decodedObject instanceof SosProcedureDescription) {
+                request.setProcedureDescription((SosProcedureDescription) decodedObject);
+            }
+        } catch (XmlException xmle) {
+            String exceptionText = "Error while parsing procedure description of InsertSensor request!";
+            LOGGER.error(exceptionText, xmle);
+            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
         }
         return request;
     }
@@ -245,48 +231,32 @@ public class SwesDecoderv20 implements IXmlRequestDecoder {
         request.setVersion(xbUpdateSensor.getVersion());
         request.setProcedureIdentifier(xbUpdateSensor.getProcedure());
         request.setProcedureDescriptionFormat(xbUpdateSensor.getProcedureDescriptionFormat());
-        List<IDecoder> decoderList =
-                Configurator.getInstance().getDecoder(
-                        new DecoderKeyType(xbUpdateSensor.getProcedureDescriptionFormat()));
-        if (decoderList != null) {
-            for (IDecoder decoder : decoderList) {
-                for (Description description : xbUpdateSensor.getDescriptionArray()) {
-                    try {
-                        XmlObject xmlObject =
-                                XmlObject.Factory.parse(getNodeFromNodeList(description.getSensorDescription()
-                                        .getData().getDomNode().getChildNodes()));
-                        Object decodedObject = decoder.decode(xmlObject);
-                        if (decodedObject != null && decodedObject instanceof SosProcedureDescription) {
-                            request.addProcedureDescriptionString((SosProcedureDescription) decodedObject);
-                            break;
-                        }
-                    } catch (XmlException xmle) {
-                        String exceptionText = "Error while parsing procedure description of UpdateSensor request!";
-                        LOGGER.error(exceptionText, xmle);
-                        throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
-                    }
+        
+        
+        for (Description description : xbUpdateSensor.getDescriptionArray()) {
+            try {
+                XmlObject xmlObject =
+                        XmlObject.Factory.parse(getNodeFromNodeList(description.getSensorDescription()
+                                .getData().getDomNode().getChildNodes()));
+                IDecoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository()
+                        .getDecoder(CodingHelper.getDecoderKey(xmlObject));
+                if (decoder == null) {
+                    String exceptionText = "The requested procedureDescritpionFormat is not supported!";
+                    LOGGER.error(exceptionText);
+                    throw Util4Exceptions.createInvalidParameterValueException(
+                            Sos2Constants.UpdateSensorDescriptionParams.procedureDescriptionFormat.name(), exceptionText);
                 }
+                
+                Object decodedObject = decoder.decode(xmlObject);
+                if (decodedObject != null && decodedObject instanceof SosProcedureDescription) {
+                    request.addProcedureDescriptionString((SosProcedureDescription) decodedObject);
+                }
+            } catch (XmlException xmle) {
+                String exceptionText = "Error while parsing procedure description of UpdateSensor request!";
+                LOGGER.error(exceptionText, xmle);
+                throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
             }
-        } else {
-            String exceptionText = "The requested procedureDescritpionFormat is not supported!";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    Sos2Constants.UpdateSensorDescriptionParams.procedureDescriptionFormat.name(), exceptionText);
         }
-        // for (Description description : xbUpdateSensor.getDescriptionArray())
-        // {
-        // try {
-        //
-        // request.setProcedureXmlDescription(xmlObject.xmlText(XmlOptionsHelper.getInstance().getXmlOptions()));
-        //
-        // } catch (XmlException xmle) {
-        // String exceptionText =
-        // "Error while parsing procedure description of UpdateSensor request!";
-        // LOGGER.error(exceptionText, xmle);
-        // throw Util4Exceptions.createNoApplicableCodeException(xmle,
-        // exceptionText);
-        // }
-        // }
         return request;
     }
 
@@ -329,13 +299,13 @@ public class SwesDecoderv20 implements IXmlRequestDecoder {
     }
 
     private List<SosFeatureRelationship> parseRelatedFeature(RelatedFeature[] relatedFeatureArray) {
-        List<SosFeatureRelationship> sosRelatedFeatures = new ArrayList<SosFeatureRelationship>();
+        List<SosFeatureRelationship> sosRelatedFeatures = new ArrayList<SosFeatureRelationship>(relatedFeatureArray.length);
         for (RelatedFeature relatedFeature : relatedFeatureArray) {
             SosFeatureRelationship sosFeatureRelationship = new SosFeatureRelationship();
 
             FeaturePropertyType fpt = relatedFeature.getFeatureRelationship().getTarget();
             if (fpt.getHref() != null && !fpt.getHref().isEmpty()) {
-                String identifier = null;
+                String identifier;
                 if (fpt.getTitle() != null && !fpt.getTitle().isEmpty()) {
                     identifier = fpt.getTitle();
                 } else {

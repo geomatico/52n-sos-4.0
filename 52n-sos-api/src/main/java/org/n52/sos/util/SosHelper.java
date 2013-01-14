@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +45,6 @@ import java.util.Stack;
 
 import org.joda.time.DateTime;
 import org.n52.sos.binding.Binding;
-import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.IObservationEncoder;
 import org.n52.sos.ogc.filter.SpatialFilter;
@@ -77,7 +75,8 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import java.util.LinkedList;
-import org.n52.sos.decode.RequestDecoderKey;
+import org.n52.sos.decode.DecoderKey;
+import org.n52.sos.decode.OperationDecoderKey;
 
 /**
  * Utility class for SOS
@@ -89,11 +88,6 @@ public class SosHelper {
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosHelper.class);
-
-    /**
-     * Prefix for decoder methods
-     */
-    private static final String HTTP_DECODER_METHODE_PREFIX = "parse";
 
     private static final String generatedFoiPrefix = "generated_";
 
@@ -250,10 +244,7 @@ public class SosHelper {
             String urnSrsPrefix = Configurator.getInstance().getSrsNamePrefix();
             String urlSrsPrefix = Configurator.getInstance().getSrsNamePrefixSosV2();
             try {
-
-                srsName = srsName.replace(urnSrsPrefix, "");
-                srsName = srsName.replace(urlSrsPrefix, "");
-                srid = Integer.valueOf(srsName);
+                srid = Integer.valueOf(srsName.replace(urnSrsPrefix, "").replace(urlSrsPrefix, ""));
             } catch (NumberFormatException nfe) {
                 StringBuilder builder = new StringBuilder();
                 builder.append("Error while parsing srsName parameter!");
@@ -399,7 +390,7 @@ public class SosHelper {
      * @return Map with DCPs for the SOS operation
      * @throws OwsExceptionReport
      */
-    public static Map<String, List<String>> getDCP(RequestDecoderKey decoderKey) throws OwsExceptionReport {
+    public static Map<String, List<String>> getDCP(OperationDecoderKey decoderKey) throws OwsExceptionReport {
         List<String> httpGetUrls = new LinkedList<String>();
         List<String> httpPostUrls = new LinkedList<String>();
         List<String> httpPutUrls = new LinkedList<String>();
@@ -452,7 +443,7 @@ public class SosHelper {
         return dcp;
     }
 
-    public static String getUrlPatternForHttpGetMethod(RequestDecoderKey decoderKey) throws OwsExceptionReport {
+    public static String getUrlPatternForHttpGetMethod(OperationDecoderKey decoderKey) throws OwsExceptionReport {
         try {
             for (Binding binding : Configurator.getInstance().getBindingOperators().values()) {
                 if (binding.checkOperationHttpGetSupported(decoderKey)) {
@@ -499,6 +490,8 @@ public class SosHelper {
      *            map to example
      * @param key
      *            start key
+     * @param fullHierarchy 
+     *            whether to traverse down the full hierarchy
      * @param includeStartKey
      *            whether to include the passed key in the result collection
      * @return collection of the full hierarchy
@@ -532,9 +525,12 @@ public class SosHelper {
     /**
      * creates a HTTP-GET string for DescribeSensor.
      * 
+     * @param version the version of the request
+     * @param serviceURL the service url
      * @param procedureId
      *            The procedureId for the DescribeSensor request
      * 
+     * @param urlPattern the url pattern (e.g. /kvp)
      * @return Get-URL as String
      * @throws UnsupportedEncodingException
      */
@@ -572,6 +568,7 @@ public class SosHelper {
      * 
      * @param version
      *            requested version
+     * @param validVersions valid versions
      * @throws OwsExceptionReport
      *             If version is not 2.0.0.
      */
@@ -637,9 +634,9 @@ public class SosHelper {
         }
         // if not null, but incorrect, throw also exception
         else if (!service.equals(SosConstants.SOS)) {
-            String exceptionText =
-                    "The value of the mandatory parameter '" + SosConstants.GetCapabilitiesParams.service.toString()
-                            + "' " + "must be '" + SosConstants.SOS + "'. Delivered value was: " + service;
+            String exceptionText = String.format(
+                    "The value of the mandatory parameter '%s' must be '%s'. Delivered value was: %s", 
+                    SosConstants.GetCapabilitiesParams.service.toString(),  SosConstants.SOS, service);
             LOGGER.error(exceptionText);
             OwsExceptionReport se = new OwsExceptionReport();
             se.addCodedException(OwsExceptionCode.InvalidParameterValue,
@@ -656,10 +653,7 @@ public class SosHelper {
      * @return boolean true if application/zip
      */
     public static boolean checkResponseFormatForZipCompression(String responseFormat) {
-        if (responseFormat.equalsIgnoreCase(SosConstants.CONTENT_TYPE_ZIP)) {
-            return true;
-        }
-        return false;
+        return responseFormat.equalsIgnoreCase(SosConstants.CONTENT_TYPE_ZIP);
     }
 
     /**
@@ -667,6 +661,7 @@ public class SosHelper {
      * 
      * @param procedureDecriptionFormat
      *            the outputFormat parameter which should be checked
+     * @param parameterName the parameter name
      * @throws OwsExceptionReport
      *             if the value of the outputFormat parameter is incorrect
      */
@@ -674,25 +669,22 @@ public class SosHelper {
             throws OwsExceptionReport {
         if (procedureDecriptionFormat == null || procedureDecriptionFormat.isEmpty()
                 || procedureDecriptionFormat.equals(SosConstants.PARAMETER_NOT_SET)) {
-            String exceptionText =
-                    "The value of the mandatory parameter '" + parameterName
-                            + "' was not found in the request or is incorrect!";
+            String exceptionText = String.format(
+                    "The value of the mandatory parameter '%s' was not found in the request or is incorrect!", parameterName);
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createMissingParameterValueException(parameterName);
         }
         if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
             if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
-                String exceptionText =
-                        "The value '" + procedureDecriptionFormat + "' of the " + parameterName
-                                + " parameter is incorrect and has to be '"
-                                + SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE + "' for the requested sensor!";
+                String exceptionText = String.format(
+                        "The value '%s' of the %s parameter is incorrect and has to be '%s' for the requested sensor!", 
+                        procedureDecriptionFormat, parameterName, SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE);
                 LOGGER.debug(exceptionText);
                 throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
             } else if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
-                String exceptionText =
-                        "The value '" + procedureDecriptionFormat + "' of the " + parameterName
-                                + " parameter is incorrect and has to be '"
-                                + SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL + "' for the requested sensor!";
+                String exceptionText = String.format(
+                        "The value '%s' of the %s parameter is incorrect and has to be '%s' for the requested sensor!", 
+                        procedureDecriptionFormat, parameterName, SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
                 LOGGER.debug(exceptionText);
                 throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
             }
@@ -704,6 +696,8 @@ public class SosHelper {
      * 
      * @param procedureID
      *            the sensor ID which should be checked
+     * @param validProcedures the valid procedure identifiers
+     * @param parameterName the parameter name
      * @throws OwsExceptionReport
      *             if the value of the sensor ID parameter is incorrect
      */
@@ -711,30 +705,54 @@ public class SosHelper {
             throws OwsExceptionReport {
         // null or an empty String
         if (procedureID == null || procedureID.isEmpty()) {
-            String exceptionText =
-                    "The value of the mandatory parameter '" + parameterName
-                            + "' was not found in the request or is incorrect!";
+            String exceptionText = String.format(
+                    "The value of the mandatory parameter '%s' was not found in the request or is incorrect!", parameterName);
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createMissingParameterValueException(parameterName);
         }
         if (!validProcedures.contains(procedureID)) {
-            String exceptionText =
-                    "The value of the '"
-                            + parameterName
-                            + "' parameter is incorrect. Please check the capabilities response document for valid values!";
+            String exceptionText = String.format(
+                    "The value of the '%s' parameter is incorrect. Please check the capabilities response document for valid values!", parameterName);
             LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    SosConstants.DescribeSensorParams.procedure.name(), exceptionText);
+            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
         }
     }
 
     public static void checkProcedureIDs(Collection<String> procedureIDs, Collection<String> validProcedures,
             String parameterName) throws OwsExceptionReport {
         if (procedureIDs != null) {
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             for (String procedureID : procedureIDs) {
                 try {
                     checkProcedureID(procedureID, validProcedures, parameterName);
+                } catch (OwsExceptionReport owse) {
+                    exceptions.add(owse);
+                }
+            }
+            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        }
+    }
+    
+    public static void checkObservationID(String observationID, Collection<String> validObservations, String parameterName) throws OwsExceptionReport {
+        if (observationID == null || observationID.isEmpty()) {
+            String exceptionText = String.format("The value of the mandatory parameter '%s' was not found in the request or is incorrect!",parameterName);
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createMissingParameterValueException(parameterName);
+        }
+        if (!validObservations.contains(observationID)) {
+            String exceptionText = String.format("The value of the '%s' parameter is incorrect. Please check the capabilities response document for valid values!", parameterName);
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+        }
+    }
+    
+    public static void checkObservationIDs(Collection<String> observationIDs, Collection<String> validObservations,
+            String parameterName) throws OwsExceptionReport {
+        if (observationIDs != null) {
+            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+            for (String procedureID : observationIDs) {
+                try {
+                    checkObservationID(procedureID, validObservations, parameterName);
                 } catch (OwsExceptionReport owse) {
                     exceptions.add(owse);
                 }
@@ -746,7 +764,7 @@ public class SosHelper {
     public static void checkFeatureOfInterestIdentifiers(List<String> featuresOfInterest,
             Collection<String> validFeatureOfInterest, String parameterName) throws OwsExceptionReport {
         if (featuresOfInterest != null) {
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             for (String featureOfInterest : featuresOfInterest) {
                 try {
                     checkFeatureOfInterstIdentifier(featureOfInterest, validFeatureOfInterest, parameterName);
@@ -761,14 +779,14 @@ public class SosHelper {
     public static void checkFeatureOfInterstIdentifier(String featureOfInterest,
             Collection<String> validFeatureOfInterest, String parameterName) throws OwsExceptionReport {
         if (featureOfInterest == null || featureOfInterest.isEmpty()) {
-            String exceptionText =
-                    "The value of the parameter '" + parameterName + "' was not found in the request or is incorrect!";
+            String exceptionText = String.format(
+                    "The value of the parameter '%s' was not found in the request or is incorrect!", parameterName);
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createMissingParameterValueException(parameterName);
         }
         if (!validFeatureOfInterest.contains(featureOfInterest)) {
-            String exceptionText =
-                    "The value '" + featureOfInterest + "' of the parameter '" + parameterName + "' is invalid";
+            String exceptionText = String.format(
+                    "The value '%s' of the parameter '%s' is invalid", featureOfInterest, parameterName);
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
         }
@@ -777,7 +795,7 @@ public class SosHelper {
     public static void checkObservedProperties(List<String> observedProperties,
             Collection<String> validObservedProperties, String parameterName) throws OwsExceptionReport {
         if (observedProperties != null) {
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             for (String observedProperty : observedProperties) {
                 try {
                     checkObservedProperty(observedProperty, validObservedProperties, parameterName);
@@ -808,7 +826,7 @@ public class SosHelper {
     public static void checkOfferings(Set<String> offerings, Collection<String> validOfferings, String parameterName)
             throws OwsExceptionReport {
         if (offerings != null) {
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             for (String offering : offerings) {
                 try {
                     checkObservedProperty(offering, validOfferings, parameterName);
@@ -930,13 +948,14 @@ public class SosHelper {
     /**
      * Get valid FOI identifiers for SOS 2.0
      * 
+     * @param featureIDs FOI identifiers to test
      * @param version
      *            SOS version
      * @return valid FOI identifiers
      */
     public static Collection<String> getFeatureIDs(Collection<String> featureIDs, String version) {
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
-            Collection<String> validFeatureIDs = new ArrayList<String>();
+            Collection<String> validFeatureIDs = new ArrayList<String>(featureIDs.size());
             for (String featureID : featureIDs) {
                 if (checkFeatureOfInterestIdentifierForSosV2(featureID, version)) {
                     validFeatureIDs.add(featureID);
@@ -992,7 +1011,7 @@ public class SosHelper {
     }
 
     public static SosObservableProperty createSosOberavablePropertyFromSosSMLIo(SosSMLIo output) {
-        SosSweAbstractSimpleType ioValue = output.getIoValue();
+        SosSweAbstractSimpleType<?> ioValue = output.getIoValue();
         String identifier = ioValue.getDefinition();
         String description = ioValue.getDescription();
         String unit = null;
@@ -1040,6 +1059,7 @@ public class SosHelper {
     }
 
     /**
+     * @param toNormalize the string to normalize
      * @return a normalized String for use in a file path, i.e. all
      *         [\,/,:,*,?,",<,>,;] characters are replaced by '_'.
      */
@@ -1056,7 +1076,7 @@ public class SosHelper {
 
     public static Collection<String> getSupportedResponseFormats(String service, String version) {
         Set<String> responseFormats = new HashSet<String>();
-        for (IEncoder iEncoder : Configurator.getInstance().getEncoderMap().values()) {
+        for (IEncoder<?,?> iEncoder : Configurator.getInstance().getCodingRepository().getEncoders()) {
             if (iEncoder instanceof IObservationEncoder) {
                 responseFormats.addAll(((IObservationEncoder) iEncoder).getSupportedResponseFormats(service, version));
             }

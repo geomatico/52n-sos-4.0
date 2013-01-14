@@ -23,8 +23,9 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,18 +47,11 @@ import org.slf4j.LoggerFactory;
 
 public class DataSourceInitializator implements IDataSourceInitializator {
 
-    /**
-     * logger
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSourceInitializator.class);
-
-    /**
-     * Instance of the IConnectionProvider
-     */
     private IConnectionProvider connectionProvider;
 
     public DataSourceInitializator() {
-        connectionProvider = Configurator.getInstance().getConnectionProvider();
+        this.connectionProvider = Configurator.getInstance().getConnectionProvider();
     }
 
 	@Override
@@ -71,8 +65,7 @@ public class DataSourceInitializator implements IDataSourceInitializator {
             transaction = session.beginTransaction();
             initializeSupportedFeatureOfInterestTypes(typeMap.get(SupportedTypeKey.FeatureType), session);
             initializeSupportedObservationTypes(typeMap.get(SupportedTypeKey.ObservationType), session);
-            initializeSupportedProcedureDescriptionFormats(typeMap.get(SupportedTypeKey.ProcedureDescriptionFormat),
-                    session);
+            initializeSupportedProcedureDescriptionFormats(typeMap.get(SupportedTypeKey.ProcedureDescriptionFormat), session);
             initializeSupportedSweTypes(typeMap.get(SupportedTypeKey.SweType), session);
             // initializeSupportedResultStructureTypes(session);
             session.flush();
@@ -93,31 +86,29 @@ public class DataSourceInitializator implements IDataSourceInitializator {
     }
 
     private Map<SupportedTypeKey, Set<String>> getTypeMap() {
-        List<Map<SupportedTypeKey, Set<String>>> list = new ArrayList<Map<SupportedTypeKey, Set<String>>>();
-        for (List<IDecoder> decoders : Configurator.getInstance().getDecoderMap().values()) {
-            for (IDecoder decoder : decoders) {
-                list.add(decoder.getSupportedTypes());
-            }
+        List<Map<SupportedTypeKey, Set<String>>> list = new LinkedList<Map<SupportedTypeKey, Set<String>>>();
+        for (IDecoder<?,?> decoder : Configurator.getInstance().getCodingRepository().getDecoders()) {
+            list.add(decoder.getSupportedTypes());
         }
-        for (IEncoder encoder : Configurator.getInstance().getEncoderMap().values()) {
+        for (IEncoder<?,?> encoder : Configurator.getInstance().getCodingRepository().getEncoders()) {
             list.add(encoder.getSupportedTypes());
         }
-		
-        Map<SupportedTypeKey, Set<String>> typeMap = new EnumMap<SupportedTypeKey, Set<String>>(SupportedTypeKey.class);
+        
+        Map<SupportedTypeKey, Set<String>> resultMap = new EnumMap<SupportedTypeKey, Set<String>>(SupportedTypeKey.class);
         for (Map<SupportedTypeKey, Set<String>> map : list) {
             if (map != null && !map.isEmpty()) {
-                for (SupportedTypeKey typeKey : map.keySet()) {
-                    if (map.get(typeKey) != null && !map.get(typeKey).isEmpty()) {
-                        if (typeMap.containsKey(typeKey)) {
-                            typeMap.get(typeKey).addAll(map.get(typeKey));
-                        } else {
-                            typeMap.put(typeKey, map.get(typeKey));
+                for (SupportedTypeKey type : map.keySet()) {
+                    if (map.get(type) != null && !map.get(type).isEmpty()) {
+                        Set<String> values = resultMap.get(type);
+                        if (values == null) {
+                            resultMap.put(type, values = new HashSet<String>());
                         }
+                        values.addAll(map.get(type));
                     }
                 }
             }
         }
-        return typeMap;
+        return resultMap;
     }
 
     private void initializeSupportedFeatureOfInterestTypes(Set<String> featureTypes, Session session) {

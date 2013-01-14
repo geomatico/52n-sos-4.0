@@ -47,17 +47,15 @@ import org.n52.sos.binding.Binding;
 import org.n52.sos.cache.ACapabilitiesCacheController;
 import org.n52.sos.convert.ConverterKeyType;
 import org.n52.sos.convert.IConverter;
-import org.n52.sos.decode.DecoderKeyType;
+import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.IDecoder;
-import org.n52.sos.decode.IRequestDecoder;
-import org.n52.sos.decode.RequestDecoderKey;
 import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IDataSourceInitializator;
 import org.n52.sos.ds.IFeatureQueryHandler;
 import org.n52.sos.ds.IOperationDAO;
 import org.n52.sos.ds.ISettingsDao;
-import org.n52.sos.encode.EncoderKeyType;
+import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
@@ -70,6 +68,7 @@ import org.n52.sos.service.admin.request.operator.IAdminRequestOperator;
 import org.n52.sos.service.operator.IServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.tasking.ASosTasking;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -119,10 +118,6 @@ public final class Configurator {
 
     private IDataSourceInitializator dataSourceInitializator;
 
-    private Map<DecoderKeyType, List<IDecoder>> decoder = new HashMap<DecoderKeyType, List<IDecoder>>(0);
-    
-    private Map<RequestDecoderKey, List<IRequestDecoder>> requestDecoders = new HashMap<RequestDecoderKey, List<IRequestDecoder>>(0);
-    
     /**
      * default EPSG code of stored geometries
      */
@@ -140,8 +135,6 @@ public final class Configurator {
 
     /** decimal separator for result element */
     private String decimalSeparator;
-
-    private Map<EncoderKeyType, IEncoder> encoder = new HashMap<EncoderKeyType, IEncoder>(0);
 
     /**
      * Implementation of IFeatureQueryHandler
@@ -211,16 +204,14 @@ public final class Configurator {
 
     /** ServiceLoader for IConverter */
     private ServiceLoader<IConverter> serviceLoaderConverter;
+    private ServiceLoader<IDecoder> serviceLoaderDecoder;
+    private ServiceLoader<IEncoder> serviceLoaderEncoder;
 
     /** ServiceLoader for ISosRequestOperator */
     private ServiceLoader<Binding> serviceLoaderBindingOperator;
 
     private ServiceLoader<IDataSourceInitializator> serviceLoaderDataSourceInitializator;
 
-    private ServiceLoader<IDecoder> serviceLoaderDecoder;
-
-    private ServiceLoader<IEncoder> serviceLoaderEncoder;
-    
     /** ServiceLoader for IFeatureQueryHandler */
     private ServiceLoader<IFeatureQueryHandler> serviceLoaderFeatureQueryHandler;
 
@@ -306,6 +297,8 @@ public final class Configurator {
 
     private Map<String, IAdminRequestOperator> adminRequestOperators = new HashMap<String, IAdminRequestOperator>(0);
 
+    private CodingRepository codingRepository;
+    
     /**
      * prefix URN for the spatial reference system
      */
@@ -684,7 +677,8 @@ public final class Configurator {
 
         /* do this first as we need access to the database */
         initializeConnectionProvider();
-
+        initializeCodingRepository();
+        
         Iterator<ISettingsDao> i = ServiceLoader.load(ISettingsDao.class).iterator();
         if (!i.hasNext()) {
             throw new ConfigurationException("No ISettingsDao implementation is present");
@@ -713,8 +707,6 @@ public final class Configurator {
         initializeServiceOperators();
         initalizeFeatureQueryHandler();
         initalizeCacheFeederDAO();
-        initalizeDecoder();
-        initalizeEncoder();
         initalizeConverter();
         initializeRequestOperators();
         initializeBindingOperator();
@@ -935,18 +927,15 @@ public final class Configurator {
             throw new ConfigurationException(owse);
         }
     }
+   
     
-    private void initalizeDecoder() throws ConfigurationException {
-        serviceLoaderDecoder = ServiceLoader.load(IDecoder.class);
-        setDecoder();
-        LOGGER.info("\n******\n Decoder(s) loaded successfully!\n******\n");
+    public void updateConverter() throws ConfigurationException {
+        converter.clear();
+        serviceLoaderConverter.reload();
+        setConverter();
+        LOGGER.info("\n******\n Converter(s) re-initialized successfully!\n******\n");
     }
-    
-    private void initalizeEncoder() throws ConfigurationException {
-        serviceLoaderEncoder = ServiceLoader.load(IEncoder.class);
-        setEncoder();
-        LOGGER.info("\n******\n Encoder(s) loaded successfully!\n******\n");
-    }
+
 
     /**
      * Load implemented feature query handler
@@ -1079,65 +1068,7 @@ public final class Configurator {
         // TODO check for encoder/decoder used by converter 
     }
 
-    private void setDecoder() throws ConfigurationException {
-        for (IDecoder<?, ?> aDecoder : serviceLoaderDecoder) {
-            try {
-                for (DecoderKeyType decoderKeyType : aDecoder.getDecoderKeyTypes()) {
-                    List<IDecoder> list = decoder.get(decoderKeyType);
-                    if (list == null) {
-                        decoder.put(decoderKeyType, list = new LinkedList<IDecoder>());
-                    }
-                    list.add(aDecoder);
-                }
-            } catch (ServiceConfigurationError sce) {
-                LOGGER.warn("An IDecoder implementation could not be loaded!", sce);
-            }
-            
-            if (aDecoder instanceof IRequestDecoder) {
-                IRequestDecoder<?,?> dec = (IRequestDecoder) aDecoder;
-                for (RequestDecoderKey encoderKeyType : dec.getRequestDecoderKeys()) {
-                    List<IRequestDecoder> list = requestDecoders.get(encoderKeyType);
-                    if (list == null) {
-                        requestDecoders.put(encoderKeyType, list = new LinkedList<IRequestDecoder>());
-                    }
-                    list.add(dec);
-                }
-            }
-        }
-
-        if (this.decoder.isEmpty()) {
-            String exceptionText = "No IDecoder implementations is loaded!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
-        
-        if (this.requestDecoders.isEmpty()) {
-            String exceptionText = "No IRequestDecoder implementations is loaded!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
-    }
-
-    private void setEncoder() throws ConfigurationException {
-        for (IEncoder<?, ?> aEncoder : serviceLoaderEncoder) {
-            try {
-                for (EncoderKeyType encoderKeyType : aEncoder.getEncoderKeyType()) {
-                    encoder.put(encoderKeyType, aEncoder);
-                }
-            } catch (ServiceConfigurationError sce) {
-                LOGGER.warn("An IEncoder implementation could not be loaded!", sce);
-            }
-        }
-        if (this.encoder.isEmpty()) {
-            String exceptionText = "No IEncoder implementations is loaded!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
-        /* reinitialize XmlOptionHelper to get the correct prefixes */
-        if (getCharacterEncoding() != null) {
-            XmlOptionsHelper.getInstance(getCharacterEncoding(), true);
-        }
-    }
+   
 
     /**
      * Load the implemented feature query handler and add them to a map with
@@ -1192,13 +1123,15 @@ public final class Configurator {
                 LOGGER.warn("An IRequestOperator implementation could not be loaded!", sce);
             }
         }
-        if (this.encoder.isEmpty()) {
+        if (this.requestOperators.isEmpty()) {
             String exceptionText = "No IRequestOperator implementation is loaded!";
             LOGGER.error(exceptionText);
             throw new ConfigurationException(exceptionText);
         }
 
     }
+    
+    
 
     /**
      * Load the implemented request listener and add them to a map with
@@ -1229,27 +1162,6 @@ public final class Configurator {
         serviceLoaderBindingOperator.reload();
         setBindings();
         LOGGER.info("\n******\n Binding(s) re-initialized successfully!\n******\n");
-    }
-    
-    public void updateConverter() throws ConfigurationException {
-        converter.clear();
-        serviceLoaderConverter.reload();
-        setConverter();
-        LOGGER.info("\n******\n Converter(s) re-initialized successfully!\n******\n");
-    }
-
-    public void updateDecoder() throws ConfigurationException {
-        decoder.clear();
-        serviceLoaderDecoder.reload();
-        setDecoder();
-        LOGGER.info("\n******\n Decoder(s) re-initialized successfully!\n******\n");
-    }
-
-    public void updateEncoder() throws ConfigurationException {
-        encoder.clear();
-        serviceLoaderEncoder.reload();
-        setEncoder();
-        LOGGER.info("\n******\n Encoder(s) re-initialized successfully!\n******\n");
     }
 
     /**
@@ -1352,7 +1264,7 @@ public final class Configurator {
      * @return the supportedVersions
      */
     public Set<String> getSupportedServices() {
-        return supportedServices;
+        return Collections.unmodifiableSet(supportedServices);
     }
 
     public boolean isServiceSupported(String service) {
@@ -1634,71 +1546,14 @@ public final class Configurator {
         return defaultEPSG;
     }
     
-    public IConverter getConverter(String fromNamespace, String toNamespace) {
-        return getConverter(new ConverterKeyType(fromNamespace, toNamespace));
+    public <T,F> IConverter<T,F> getConverter(String fromNamespace, String toNamespace) {
+        return (IConverter<T,F>) getConverter(new ConverterKeyType(fromNamespace, toNamespace));
     }
     
     public IConverter getConverter(ConverterKeyType key) {
         return converter.get(key);
     }
-
-    /**
-     * @param namespace
-     * @return the decoder
-     * @throws OwsExceptionReport
-     */
-    public List<IDecoder> getDecoder(String namespace) throws OwsExceptionReport {
-        return getDecoder(new DecoderKeyType(namespace));
-    }
-
-    /**
-     * @param service
-     * @param version
-     * @return the decoder
-     * @throws OwsExceptionReport
-     */
-    public Set<IRequestDecoder> getDecoder(String service, String version) throws OwsExceptionReport {
-        return getDecoder(new RequestDecoderKey(service, version));
-    }
-
-    /**
-     * @param decoderKeyType
-     * @return the decoder
-     * @throws OwsExceptionReport
-     */
-    public List<IDecoder> getDecoder(DecoderKeyType decoderKeyType) throws OwsExceptionReport {
-        return decoder.get(decoderKeyType);
-    }
     
-    public Set<IRequestDecoder> getDecoder(RequestDecoderKey decoderKeyType) throws OwsExceptionReport {
-        HashSet<IRequestDecoder> decoders = new HashSet<IRequestDecoder>();
-        /* test for compatible decoders */
-        for (RequestDecoderKey k : requestDecoders.keySet()) {
-            if (k.isCompatible(decoderKeyType)) {
-                decoders.addAll(requestDecoders.get(k));
-            }
-        }
-        return decoders.isEmpty() ? null : decoders;
-    }
-    
-    /**
-     * @param namespace
-     * @return the encoder
-     * @throws OwsExceptionReport
-     */
-    public IEncoder getEncoder(String namespace) throws OwsExceptionReport {
-        return encoder.get(new EncoderKeyType(namespace));
-        // if (iEncoder == null) {
-        // String exceptionText =
-        // "No encoder implementation is available for the namespace '" +
-        // namespace + "'!";
-        // LOGGER.debug(exceptionText);
-        // throw Util4Exceptions.createNoApplicableCodeException(null,
-        // exceptionText);
-        // }
-        // return iEncoder;
-    }
-
     public Binding getBindingOperator(String urlPattern) {
         return bindingOperators.get(urlPattern);
     }
@@ -1715,14 +1570,6 @@ public final class Configurator {
         return Collections.unmodifiableMap(bindingOperators);
     }
 
-    public Map<DecoderKeyType, List<IDecoder>> getDecoderMap() {
-        return Collections.unmodifiableMap(decoder);
-    }
-
-    public Map<EncoderKeyType, IEncoder> getEncoderMap() {
-        return Collections.unmodifiableMap(encoder);
-    }
-
     public IAdminRequestOperator getAdminRequestOperator(String key) {
         return adminRequestOperators.get(key);
     }
@@ -1734,5 +1581,63 @@ public final class Configurator {
         updateEncoder();
         updateServiceOperators();
         updateRequestOperator();
+    }
+
+    private void initializeCodingRepository() throws ConfigurationException {
+        if (serviceLoaderDecoder == null) {
+            serviceLoaderDecoder = ServiceLoader.load(IDecoder.class);
+        }
+        if (serviceLoaderEncoder == null) {
+            serviceLoaderEncoder = ServiceLoader.load(IEncoder.class);
+        }
+
+        List<IDecoder<?,?>> decoders = new LinkedList<IDecoder<?, ?>>();
+        try {
+            for (IDecoder<?,?> decoder : serviceLoaderDecoder) {
+                decoders.add(decoder);
+            }
+        } catch (ServiceConfigurationError sce) {
+            String text = "An IDecoder implementation could not be loaded!";
+            LOGGER.warn(text, sce);
+            throw new ConfigurationException(text, sce);
+        }
+        
+        List<IEncoder<?,?>> encoders = new LinkedList<IEncoder<?, ?>>();
+        try {
+            for (IEncoder<?,?> encoder : serviceLoaderEncoder) {
+                encoders.add(encoder);
+            }
+        } catch (ServiceConfigurationError sce) {
+            String text = "An IEncoder implementation could not be loaded!";
+            LOGGER.warn(text, sce);
+            throw new ConfigurationException(text, sce);
+        }
+        
+        /* reinitialize XmlOptionHelper to get the correct prefixes */
+        if (getCharacterEncoding() != null) {
+            XmlOptionsHelper.getInstance(getCharacterEncoding(), true);
+        }
+        
+        codingRepository = new CodingRepository(decoders, encoders);
+    }
+    
+    public CodingRepository getCodingRepository() {
+        return codingRepository;
+    }
+    
+    public void updateDecoder() throws ConfigurationException {
+        if (serviceLoaderDecoder != null) {
+            serviceLoaderDecoder.reload();
+        }
+        initializeCodingRepository();
+        LOGGER.info("\n******\n Decoder(s) re-initialized successfully!\n******\n");
+    }
+
+    public void updateEncoder() throws ConfigurationException {
+        if (serviceLoaderEncoder != null) {
+            serviceLoaderEncoder.reload();
+        }
+        initializeCodingRepository();
+        LOGGER.info("\n******\n Encoder(s) re-initialized successfully!\n******\n");
     }
 }

@@ -28,8 +28,7 @@ import java.util.Map;
 
 import org.hibernate.Session;
 import org.n52.sos.cache.ACapabilitiesCacheController;
-import org.n52.sos.decode.DecoderKeyType;
-import org.n52.sos.decode.RequestDecoderKey;
+import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.ds.IOperationDAO;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
@@ -68,7 +67,7 @@ public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao
 
     protected OWSOperation getOperationsMetadata(String service, String version, Session session) throws OwsExceptionReport {
        
-        Map<String, List<String>> dcp =  SosHelper.getDCP(new RequestDecoderKey(service, version, getOperationName()));
+        Map<String, List<String>> dcp =  SosHelper.getDCP(new OperationDecoderKey(service, version, getOperationName()));
         if (dcp == null || dcp.isEmpty()) {
             log.debug("Operation {} not available due to empty DCP map.", getOperationName());
             return null;

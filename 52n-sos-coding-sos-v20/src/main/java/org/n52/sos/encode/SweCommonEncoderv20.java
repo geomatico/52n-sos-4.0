@@ -24,9 +24,7 @@
 package org.n52.sos.encode;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +52,8 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.ConformanceClasses;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
@@ -73,6 +73,9 @@ import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -82,56 +85,55 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SweCommonEncoderv20.class);
 
-    private List<EncoderKeyType> encoderKeyTypes;
-
-    private DataArrayPropertyType newInstance;
-
+    private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(
+            SWEConstants.NS_SWE_20,
+            SosSweCoordinate.class, 
+            SosSweAbstractSimpleType.class, 
+            SosSweAbstractEncoding.class, 
+            SosSweAbstractDataComponent.class, 
+            SosSweDataArray.class);
+    
+    private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(
+        ConformanceClasses.SWE_V2_CORE,
+        ConformanceClasses.SWE_V2_UML_SIMPLE_COMPONENTS,
+        ConformanceClasses.SWE_V2_UML_RECORD_COMPONENTS,
+        ConformanceClasses.SWE_V2_UML_BLOCK_ENCODINGS,
+        ConformanceClasses.SWE_V2_UML_SIMPLE_ENCODINGS,
+        ConformanceClasses.SWE_V2_XSD_SIMPLE_COMPONENTS,
+        ConformanceClasses.SWE_V2_XSD_RECORD_COMPONENTS,
+        ConformanceClasses.SWE_V2_XSD_BLOCK_COMPONENTS,
+        ConformanceClasses.SWE_V2_XSD_SIMPLE_ENCODINGS,
+        ConformanceClasses.SWE_V2_GENERAL_ENCODING_RULES,
+        ConformanceClasses.SWE_V2_TEXT_ENCODING_RULES
+    );
+    
     public SweCommonEncoderv20() {
-        encoderKeyTypes = new ArrayList<EncoderKeyType>();
-        encoderKeyTypes.add(new EncoderKeyType(SWEConstants.NS_SWE_20));
-        StringBuilder builder = new StringBuilder();
-        for (EncoderKeyType encoderKeyType : encoderKeyTypes) {
-            builder.append(encoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
+        LOGGER.info("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
-    public List<EncoderKeyType> getEncoderKeyType() {
-        return encoderKeyTypes;
+    public Set<EncoderKey> getEncoderKeyType() {
+        return Collections.unmodifiableSet(ENCODER_KEYS);
+    }
+    
+    @Override
+    public Set<String> getConformanceClasses() {
+        return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
     }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
+        return Collections.emptyMap();
     }
-
+    
     @Override
-    public Set<String> getConformanceClasses() {
-        Set<String> conformanceClasses = new HashSet<String>(0);
-        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/core");
-        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/uml-simple-components");
-        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/uml-record-components");
-        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/uml-block-components");
-        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/uml-simple-encodings");
-        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/xsd-simple-components");
-        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/xsd-record-components");
-        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/xsd-block-components");
-        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/xsd-simple-encodings");
-        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/general-encoding-rules");
-        conformanceClasses.add("http://www.opengis.net/spec/SWE/2.0/conf/text-encoding-rules");
-        return conformanceClasses;
-    }
-
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(SWEConstants.NS_SWE_20, SWEConstants.NS_SWE_PREFIX);
     }
 
     @Override
     public String getContentType() {
-        return "text/xml";
+        return SosConstants.CONTENT_TYPE_XML;
     }
 
     @Override
@@ -343,9 +345,9 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         } else {
             String errorMsg =
                     String.format(
-                            "The element type \"%s\" of the received %s is not supported by this encoder \"%s\".",
-                            sosElement != null ? sosElement.getClass().getName() : "null", sweField != null ? sweField
-                                    .getClass().getName() : "null", this.getClass().getName());
+                            "The element type '%s' of the received %s is not supported by this encoder '%s'.",
+                            sosElement != null ? sosElement.getClass().getName() : null, sweField != null ? sweField
+                                    .getClass().getName() : null, getClass().getName());
             LOGGER.error(errorMsg);
             throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
         }
@@ -356,7 +358,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
      * 
      * SIMPLE TYPES
      */
-    private AbstractDataComponentType createSimpleType(SosSweAbstractSimpleType sosSimpleType)
+    private AbstractDataComponentType createSimpleType(SosSweAbstractSimpleType<?> sosSimpleType)
             throws OwsExceptionReport {
 
         if (sosSimpleType instanceof SosSweBoolean) {
@@ -494,7 +496,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         return xbTimeRange;
     }
 
-    private Coordinate createCoordinate(SosSweCoordinate coordinate) {
+    private Coordinate createCoordinate(SosSweCoordinate<?> coordinate) {
         Coordinate xbCoordinate = Coordinate.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         xbCoordinate.setName(coordinate.getName().name());
         xbCoordinate.setQuantity(createQuantity((SosSweQuantity) coordinate.getValue()));

@@ -33,7 +33,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.XmlEncoderKey;
 import org.n52.sos.exception.AdministratorException;
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -77,6 +79,7 @@ public class SosAdminService extends ConfiguratedHttpServlet {
      *            the response for the incomming request
      * 
      */
+    @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
 
         LOGGER.debug("\n**********\n(GET) Connected from: " + req.getRemoteAddr() + " " + req.getRemoteHost());
@@ -164,7 +167,9 @@ public class SosAdminService extends ConfiguratedHttpServlet {
     
     private ServiceResponse handleException(OwsExceptionReport owsExceptionReport) throws ServletException {
         try {
-            IEncoder encoder = Configurator.getInstance().getEncoder(owsExceptionReport.getNamespace());
+            
+            EncoderKey key = new XmlEncoderKey(owsExceptionReport.getNamespace(), owsExceptionReport.getClass());
+            IEncoder<?, OwsExceptionReport> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
             if (encoder != null) {
                 Object encodedObject = encoder.encode(owsExceptionReport);
                 if (encodedObject instanceof XmlObject) {

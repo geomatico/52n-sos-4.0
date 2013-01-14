@@ -36,15 +36,14 @@ import org.apache.xmlbeans.XmlObject;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IInsertObservationDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateUtilities;
+import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.IEncoder;
-import org.n52.sos.encode.SweCommonEncoderv20;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosMultiObservationValues;
 import org.n52.sos.ogc.om.SosObservation;
@@ -53,14 +52,17 @@ import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.swe.SWEConstants;
+import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweDataArray;
+import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.response.InsertObservationResponse;
+import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,7 +171,7 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
             FeatureOfInterest feature) throws OwsExceptionReport {
         ResultTemplate resultTemplate = new ResultTemplate();
         // TODO identifier handling: ignoring code space now
-        String identifier = null;
+        String identifier;
         if (observation.getIdentifier() != null && observation.getIdentifier().getValue() != null
                 && !observation.getIdentifier().getValue().isEmpty()) {
             identifier = observation.getIdentifier().getValue();
@@ -180,20 +182,18 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
         resultTemplate.setObservationConstellation(obsConst);
         resultTemplate.setFeatureOfInterest(feature);
         SosSweDataArray dataArray = ((SweDataArrayValue) observation.getValue().getValue()).getValue();
-        SweCommonEncoderv20 sweEncoder = null;
-        if (isEncoderRequired(dataArray)) {
-            IEncoder encoder = getConfigurator().getEncoder(SWEConstants.NS_SWE_20);
-            if (encoder instanceof SweCommonEncoderv20) {
-                sweEncoder = (SweCommonEncoderv20) encoder;
-            } else {
-                String errorMsg =
-                        String.format("Could not find encoder for namespace \"%s\".", SWEConstants.NS_SWE_20);
+        
+        
+            
+        if (dataArray.getElementType().getXml() == null) {
+            EncoderKey key = CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, dataArray.getElementType());
+            IEncoder<XmlObject, SosSweAbstractDataComponent> encoder = getConfigurator().getCodingRepository().getEncoder(key);
+            if (encoder == null) {
+                String errorMsg = String.format("Could not find encoder for key \"%s\".", key.toString());
                 LOGGER.error(errorMsg);
                 throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
             }
-        }
-        if (dataArray.getElementType().getXml() == null) {
-            XmlObject encodedXMLObject = sweEncoder.encode(dataArray.getElementType());
+            XmlObject encodedXMLObject = encoder.encode(dataArray.getElementType());
             if (encodedXMLObject instanceof DataRecordType) {
                 DataRecordDocument xbDataRecord = DataRecordDocument.Factory.newInstance();
                 xbDataRecord.setDataRecord((DataRecordType) encodedXMLObject);
@@ -205,7 +205,14 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
             resultTemplate.setResultStructure(dataArray.getElementType().getXml());
         }
         if (dataArray.getEncoding().getXml() == null) {
-            XmlObject encodedXmlObject = sweEncoder.encode(dataArray.getEncoding());
+            EncoderKey key = CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, dataArray.getEncoding());
+            IEncoder<XmlObject, SosSweAbstractEncoding> encoder = getConfigurator().getCodingRepository().getEncoder(key);
+            if (encoder == null) {
+                String errorMsg = String.format("Could not find encoder for key \"%s\".", key.toString());
+                LOGGER.error(errorMsg);
+                throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+            }
+            XmlObject encodedXmlObject = encoder.encode(dataArray.getEncoding());
             if (encodedXmlObject instanceof TextEncodingType) {
                 TextEncodingDocument xbTextEncodingDoc = TextEncodingDocument.Factory.newInstance();
                 xbTextEncodingDoc.setTextEncoding((TextEncodingType) encodedXmlObject);
@@ -215,10 +222,7 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
         } else {
             resultTemplate.setResultEncoding(dataArray.getEncoding().getXml());
         }
+        
         return resultTemplate;
-    }
-
-    private boolean isEncoderRequired(SosSweDataArray dataArray) {
-        return dataArray.getElementType().getXml() == null || dataArray.getEncoding().getXml() == null;
     }
 }

@@ -23,10 +23,7 @@
  */
 package org.n52.sos.encode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,6 +39,7 @@ import net.opengis.swes.x20.UpdateSensorDescriptionResponseType;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.response.AbstractServiceResponse;
@@ -49,58 +47,50 @@ import org.n52.sos.response.DeleteSensorResponse;
 import org.n52.sos.response.DescribeSensorResponse;
 import org.n52.sos.response.InsertSensorResponse;
 import org.n52.sos.response.UpdateSensorResponse;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.N52XmlHelper;
-import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SwesEncoderv20 implements IEncoder<XmlObject, AbstractServiceResponse> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SwesEncoderv20.class);
-
-    private List<EncoderKeyType> encoderKeyTypes;
+    private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper
+            .encoderKeysForElements(SWEConstants.NS_SWES_20,
+        DescribeSensorResponse.class, InsertSensorResponse.class, 
+        UpdateSensorResponse.class, DeleteSensorResponse.class
+    );
 
     public SwesEncoderv20() {
-        encoderKeyTypes = new ArrayList<EncoderKeyType>();
-        encoderKeyTypes.add(new EncoderKeyType(SWEConstants.NS_SWES_20));
-        StringBuilder builder = new StringBuilder();
-        for (EncoderKeyType encoderKeyType : encoderKeyTypes) {
-            builder.append(encoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        LOGGER.info("Encoder for the following keys initialized successfully: " + builder.toString() + "!");
+        LOGGER.info("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
-    public List<EncoderKeyType> getEncoderKeyType() {
-        return encoderKeyTypes;
+    public Set<EncoderKey> getEncoderKeyType() {
+        return Collections.unmodifiableSet(ENCODER_KEYS);
     }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
+        return Collections.emptyMap();
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
+        return Collections.emptySet();
     }
     
+    @Override
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(SWEConstants.NS_SWES_20, SWEConstants.NS_SWES_PREFIX);
     }
     
     @Override
     public String getContentType() {
-        return "text/xml";
+        return SosConstants.CONTENT_TYPE_XML;
     }
 
     @Override
@@ -128,25 +118,18 @@ public class SwesEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespon
                 DescribeSensorResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         DescribeSensorResponseType describeSensorResponse = xbDescSensorRespDoc.addNewDescribeSensorResponse();
         describeSensorResponse.setProcedureDescriptionFormat(response.getOutputFormat());
-        String outputFormat = null;
+        String outputFormat;
         if (response.getOutputFormat().equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
             outputFormat = SensorMLConstants.NS_SML;
         } else {
             outputFormat = response.getOutputFormat();
         }
-        IEncoder encoder = Configurator.getInstance().getEncoder(outputFormat);
-        if (encoder != null) {
-            XmlObject xmlObject = (XmlObject) encoder.encode(response.getSensorDescription());
-            describeSensorResponse.addNewDescription().addNewSensorDescription().addNewData().set(xmlObject);
-            // set schema location
-            List<String> schemaLocations = new ArrayList<String>();
-            schemaLocations.add(N52XmlHelper.getSchemaLocationForSWES200());
-            N52XmlHelper.setSchemaLocationsToDocument(xbDescSensorRespDoc, schemaLocations);
-            return xbDescSensorRespDoc;
-        }
-        String exceptionText = "Error while encoding DescribeSensor response, missing encoder!";
-        LOGGER.debug(exceptionText);
-        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        XmlObject xmlObject = CodingHelper.encodeObjectToXml(outputFormat, response.getSensorDescription());
+        describeSensorResponse.addNewDescription().addNewSensorDescription().addNewData().set(xmlObject);
+        // set schema location
+        N52XmlHelper.setSchemaLocationsToDocument(xbDescSensorRespDoc, 
+                Collections.singletonList(N52XmlHelper.getSchemaLocationForSWES200()));
+        return xbDescSensorRespDoc;
     }
 
     private XmlObject createInsertSensorResponse(InsertSensorResponse response) {
@@ -156,9 +139,8 @@ public class SwesEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespon
         xbInsSenResp.setAssignedProcedure(response.getAssignedProcedure());
         xbInsSenResp.setAssignedOffering(response.getAssignedOffering());
         // set schema location
-        List<String> schemaLocations = new ArrayList<String>();
-        schemaLocations.add(N52XmlHelper.getSchemaLocationForSWES200());
-        N52XmlHelper.setSchemaLocationsToDocument(xbInsSenRespDoc, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(xbInsSenRespDoc, Collections
+                .singletonList(N52XmlHelper.getSchemaLocationForSWES200()));
         return xbInsSenRespDoc;
     }
 
@@ -169,9 +151,8 @@ public class SwesEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespon
         UpdateSensorDescriptionResponseType xbUpSenResp = xbUpSenRespDoc.addNewUpdateSensorDescriptionResponse();
         xbUpSenResp.setUpdatedProcedure(response.getUpdatedProcedure());
         // set schema location
-        List<String> schemaLocations = new ArrayList<String>();
-        schemaLocations.add(N52XmlHelper.getSchemaLocationForSWES200());
-        N52XmlHelper.setSchemaLocationsToDocument(xbUpSenRespDoc, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(xbUpSenRespDoc, Collections
+                .singletonList(N52XmlHelper.getSchemaLocationForSWES200()));
         return xbUpSenRespDoc;
     }
 
@@ -181,9 +162,8 @@ public class SwesEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespon
         DeleteSensorResponseType xbDelSenResp = xbDelSenRespDoc.addNewDeleteSensorResponse();
         xbDelSenResp.setDeletedProcedure(response.getDeletedProcedure());
         // set schema location
-        List<String> schemaLocations = new ArrayList<String>();
-        schemaLocations.add(N52XmlHelper.getSchemaLocationForSWES200());
-        N52XmlHelper.setSchemaLocationsToDocument(xbDelSenRespDoc, schemaLocations);
+        N52XmlHelper.setSchemaLocationsToDocument(xbDelSenRespDoc, Collections
+                .singletonList(N52XmlHelper.getSchemaLocationForSWES200()));
         return xbDelSenRespDoc;
     }
 

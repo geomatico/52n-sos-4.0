@@ -23,6 +23,7 @@
  */
 package org.n52.sos.response;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.n52.sos.ogc.om.SosObservation;
@@ -42,7 +43,7 @@ public class GetObservationByIdResponse extends AbstractServiceResponse {
     }
 
     public List<SosObservation> getObservationCollection() {
-        return observationCollection;
+        return Collections.unmodifiableList(observationCollection);
     }
 
     public void setObservationCollection(List<SosObservation> observationCollection) {

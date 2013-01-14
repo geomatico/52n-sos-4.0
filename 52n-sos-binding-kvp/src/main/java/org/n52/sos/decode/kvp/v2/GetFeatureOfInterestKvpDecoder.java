@@ -29,8 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.n52.sos.decode.RequestDecoderKey;
-import org.n52.sos.decode.kvp.AbstractKvpDecoderOperationDelegate;
+import org.n52.sos.decode.DecoderKey;
+import org.n52.sos.decode.KvpOperationDecoderKey;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
@@ -41,18 +41,18 @@ import org.n52.sos.request.GetFeatureOfInterestRequest;
 import org.n52.sos.util.KvpHelper;
 import org.n52.sos.util.Util4Exceptions;
 
-public class GetFeatureOfInterestKvpDecoderOperationDelegate extends AbstractKvpDecoderOperationDelegate {
+public class GetFeatureOfInterestKvpDecoder extends AbstractKvpDecoder {
 
-    private static final RequestDecoderKey KVP_DECODER_KEY_TYPE 
-            = new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetFeatureOfInterest.name());
+    private static final DecoderKey KVP_DECODER_KEY_TYPE 
+            = new KvpOperationDecoderKey(SosConstants.SOS, Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetFeatureOfInterest.name());
     
     @Override
-    public Set<RequestDecoderKey> getRequestDecoderKeys() {
+    public Set<DecoderKey> getDecoderKeyTypes() {
         return Collections.singleton(KVP_DECODER_KEY_TYPE);
     }
 
     @Override
-    public GetFeatureOfInterestRequest decode(RequestDecoderKey decoderKeyType, Map<String, String> element) throws OwsExceptionReport {
+    public GetFeatureOfInterestRequest decode(Map<String, String> element) throws OwsExceptionReport {
         
         GetFeatureOfInterestRequest request = new GetFeatureOfInterestRequest();
         List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();

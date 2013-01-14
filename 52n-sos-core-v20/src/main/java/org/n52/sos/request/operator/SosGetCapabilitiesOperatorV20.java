@@ -25,162 +25,86 @@ package org.n52.sos.request.operator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IGetCapabilitiesDAO;
 import org.n52.sos.encode.IEncoder;
-import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosGetCapabilitiesOperatorV20 implements IRequestOperator {
+public class SosGetCapabilitiesOperatorV20 extends AbstractV2RequestOperator<IGetCapabilitiesDAO, GetCapabilitiesRequest> {
 
-    /**
-     * logger
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosGetCapabilitiesOperatorV20.class);
-
-    /**
-     * the data access object for the GetObservation operation
-     */
-    private IGetCapabilitiesDAO dao;
-
-    /**
-     * Name of the operation the listener implements
-     */
     private static final String OPERATION_NAME = SosConstants.Operations.GetCapabilities.name();
+    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_CORE_PROFILE);
 
-    private RequestOperatorKeyType requestOperatorKeyType;
-
-    /**
-     * constructor
-     * 
-     */
     public SosGetCapabilitiesOperatorV20() {
-        requestOperatorKeyType =
-                new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION),
-                        OPERATION_NAME);
-        this.dao = (IGetCapabilitiesDAO) Configurator.getInstance().getOperationDAOs().get(OPERATION_NAME);
-        LOGGER.info("{} initialized successfully!", this.getClass().getSimpleName());
-    }
-
-    @Override
-    public RequestOperatorKeyType getRequestOperatorKeyType() {
-        return requestOperatorKeyType;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.sos.listener.ISosRequestListener#receiveRequest(org.n52.sos.request
-     * .AbstractSosRequest)
-     */
-    @Override
-    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
-        GetCapabilitiesRequest sosRequest;
-        if (request instanceof GetCapabilitiesRequest) {
-            sosRequest = (GetCapabilitiesRequest) request;
-            /*
-             * getting parameter acceptFormats (optional) boolean zipCompr shows
-             * whether the response format should be zip (true) or xml (false)
-             */
-            boolean zipCompr = false;
-            List<String> acceptFormats = sosRequest.getAcceptFormats();
-            if (acceptFormats != null) {
-                zipCompr = checkAcceptFormats(acceptFormats);
-            }
-
-            GetCapabilitiesResponse response = this.dao.getCapabilities(sosRequest);
-            String contentType = SosConstants.CONTENT_TYPE_XML;
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            // XmlOptions xmlOptions;
-            try {
-                IEncoder encoder = Configurator.getInstance().getEncoder(Sos2Constants.NS_SOS_20);
-                if (encoder != null) {
-                    Object encodedObject = encoder.encode(response);
-                    if (encodedObject instanceof XmlObject) {
-                        ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
-                        return new ServiceResponse(baos, contentType, zipCompr, true);
-                    } else if (encodedObject instanceof ServiceResponse) {
-                        return (ServiceResponse) encodedObject;
-                    } else {
-                        String exceptionText = "The encoder response is not supported!";
-                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-                    }
-                } else {
-                    String exceptionText = "Received version in request is not supported!";
-                    LOGGER.debug(exceptionText);
-                    throw Util4Exceptions.createInvalidParameterValueException(
-                            OWSConstants.RequestParams.version.name(), exceptionText);
-                }
-
-            } catch (IOException ioe) {
-                String exceptionText = "Error occurs while saving response to output stream!";
-                LOGGER.error(exceptionText, ioe);
-                throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
-            }
-        } else {
-            String exceptionText = "Received request is not a SosGetCapabilitiesRequest!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
-        }
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.listener.ISosRequestListener#hasImplementedDAO()
-     */
-    @Override
-    public boolean hasImplementedDAO() {
-        if (this.dao != null) {
-            return true;
-        }
-        return false;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.sos.listener.ISosRequestListener#getOperationMetadata(java.lang
-     * .String, java.lang.Object)
-     */
-    @Override
-    public OWSOperation getOperationMetadata(String service, String version, Object connection) throws OwsExceptionReport {
-        return dao.getOperationsMetadata(service, version, connection);
-    }
-    
-    @Override
-    public IExtension getExtension(Object connection) throws OwsExceptionReport {
-        return dao.getExtension(connection);
+        super(OPERATION_NAME, GetCapabilitiesRequest.class);
     }
     
     @Override
     public Set<String> getConformanceClasses() {
-        Set<String> conformanceClasses = new HashSet<String>(0);
-        if (hasImplementedDAO()) {
-            conformanceClasses.add("http://www.opengis.net/spec/SOS/2.0/conf/core");
+        return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
+    }
+
+    @Override
+    public ServiceResponse receive(GetCapabilitiesRequest sosRequest) throws OwsExceptionReport {
+        /*
+         * getting parameter acceptFormats (optional) boolean zipCompr shows
+         * whether the response format should be zip (true) or xml (false)
+         */
+        boolean zipCompr = false;
+        List<String> acceptFormats = sosRequest.getAcceptFormats();
+        if (acceptFormats != null) {
+            zipCompr = checkAcceptFormats(acceptFormats);
         }
-        return conformanceClasses;
+
+        GetCapabilitiesResponse response = getDao().getCapabilities(sosRequest);
+        String contentType = SosConstants.CONTENT_TYPE_XML;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // XmlOptions xmlOptions;
+        try {
+            IEncoder<?,GetCapabilitiesResponse> encoder = Configurator.getInstance().getCodingRepository()
+                    .getEncoder(CodingHelper.getEncoderKey(Sos2Constants.NS_SOS_20, response));
+            if (encoder != null) {
+                Object encodedObject = encoder.encode(response);
+                if (encodedObject instanceof XmlObject) {
+                    ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
+                    return new ServiceResponse(baos, contentType, zipCompr, true);
+                } else if (encodedObject instanceof ServiceResponse) {
+                    return (ServiceResponse) encodedObject;
+                } else {
+                    String exceptionText = "The encoder response is not supported!";
+                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                }
+            } else {
+                String exceptionText = "Received version in request is not supported!";
+                LOGGER.debug(exceptionText);
+                throw Util4Exceptions.createInvalidParameterValueException(
+                        OWSConstants.RequestParams.version.name(), exceptionText);
+            }
+
+        } catch (IOException ioe) {
+            String exceptionText = "Error occurs while saving response to output stream!";
+            LOGGER.error(exceptionText, ioe);
+            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+        }
     }
 
     private boolean checkAcceptFormats(List<String> formats) throws OwsExceptionReport {

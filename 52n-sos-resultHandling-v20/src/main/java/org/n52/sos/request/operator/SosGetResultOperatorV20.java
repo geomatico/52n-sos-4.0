@@ -25,126 +25,80 @@ package org.n52.sos.request.operator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IGetResultDAO;
 import org.n52.sos.encode.IEncoder;
-import org.n52.sos.ogc.ows.IExtension;
-import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetResultRequest;
 import org.n52.sos.response.GetResultResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosGetResultOperatorV20 implements IRequestOperator {
+public class SosGetResultOperatorV20 extends AbstractV2RequestOperator<IGetResultDAO, GetResultRequest> {
 
-    /** the data access object for the DescribeSensor operation */
-    private IGetResultDAO dao;
-
-    /** Name of the operation the listener implements */
     private static final String OPERATION_NAME = SosConstants.Operations.GetResult.name();
+    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_RESULT_RETRIEVAL);
 
-    private RequestOperatorKeyType requestOperatorKeyType;
-
-    /** logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosInsertResultOperatorV20.class);
 
     public SosGetResultOperatorV20() {
-        requestOperatorKeyType =
-                new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION),
-                        OPERATION_NAME);
-        this.dao = (IGetResultDAO) Configurator.getInstance().getOperationDAOs().get(OPERATION_NAME);
-        LOGGER.info("{} initialized successfully!", this.getClass().getSimpleName());
+        super(OPERATION_NAME, GetResultRequest.class);
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        Set<String> conformanceClasses = new HashSet<String>(0);
-        if (hasImplementedDAO()) {
-            conformanceClasses.add("http://www.opengis.net/spec/SOS/2.0/conf/resultRetrieval");
-        }
-        return conformanceClasses;
+        return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
     }
 
     @Override
-    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
-        if (request instanceof GetResultRequest) {
-            GetResultRequest sosRequest = (GetResultRequest) request;
-            checkRequestedParameter(sosRequest);
-
-            GetResultResponse response = this.dao.getResult(sosRequest);
-            String contentType = SosConstants.CONTENT_TYPE_XML;
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try {
-                String namespace = Sos2Constants.NS_SOS_20;
-                IEncoder encoder = Configurator.getInstance().getEncoder(namespace);
-                if (encoder != null) {
-                    Object encodedObject = encoder.encode(response);
-                    if (encodedObject instanceof XmlObject) {
-                        ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
-                        return new ServiceResponse(baos, contentType, false, true);
-                    } else if (encodedObject instanceof ServiceResponse) {
-                        return (ServiceResponse) encodedObject;
-                    } else {
-                        String exceptionText = "The encoder response is not supported!";
-                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-                    }
+    public ServiceResponse receive(GetResultRequest sosRequest) throws OwsExceptionReport {
+        checkRequestedParameter(sosRequest);
+        GetResultResponse response = getDao().getResult(sosRequest);
+        String contentType = SosConstants.CONTENT_TYPE_XML;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            IEncoder<?, GetResultResponse> encoder = Configurator.getInstance().getCodingRepository()
+                    .getEncoder(CodingHelper.getEncoderKey(Sos2Constants.NS_SOS_20, response));
+            if (encoder != null) {
+                Object encodedObject = encoder.encode(response);
+                if (encodedObject instanceof XmlObject) {
+                    ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
+                    return new ServiceResponse(baos, contentType, false, true);
+                } else if (encodedObject instanceof ServiceResponse) {
+                    return (ServiceResponse) encodedObject;
                 } else {
-                    String exceptionText = "Error while getting encoder for response!";
+                    String exceptionText = "The encoder response is not supported!";
                     throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
                 }
-            } catch (IOException ioe) {
-                String exceptionText = "Error occurs while saving response to output stream!";
-                LOGGER.error(exceptionText, ioe);
-                throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            } else {
+                String exceptionText = "Error while getting encoder for response!";
+                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
             }
+        } catch (IOException ioe) {
+            String exceptionText = "Error occurs while saving response to output stream!";
+            LOGGER.error(exceptionText, ioe);
+            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
         }
-        String exceptionText = "Received request is not a GetResultRequest!";
-        LOGGER.debug(exceptionText);
-        throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
-    }
-
-    @Override
-    public boolean hasImplementedDAO() {
-        if (this.dao != null) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public RequestOperatorKeyType getRequestOperatorKeyType() {
-        return requestOperatorKeyType;
-    }
-
-    @Override
-    public OWSOperation getOperationMetadata(String service, String version, Object connection)
-            throws OwsExceptionReport {
-        return dao.getOperationsMetadata(service, version, connection);
-    }
-
-    @Override
-    public IExtension getExtension(Object connection) throws OwsExceptionReport {
-        return dao.getExtension(connection);
     }
 
     private void checkRequestedParameter(GetResultRequest request) throws OwsExceptionReport {
-        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+        List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
         try {
             SosHelper.checkServiceParameter(request.getService());
         } catch (OwsExceptionReport owse) {

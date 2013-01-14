@@ -1,7 +1,0 @@
-org.n52.sos.decode.kvp.v2.DescribeSensorKvpDecoderOperationDelegate
-org.n52.sos.decode.kvp.v2.GetCapabilitiesKvpDecoderOperationDelegate
-org.n52.sos.decode.kvp.v2.GetFeatureOfInterestKvpDecoderOperationDelegate
-org.n52.sos.decode.kvp.v2.GetObservationKvpDecoderOperationDelegate
-org.n52.sos.decode.kvp.v2.GetResultKvpDecoderOperationDelegate
-org.n52.sos.decode.kvp.v2.GetResultTemplateKvpDecoderOperationDelegate
-

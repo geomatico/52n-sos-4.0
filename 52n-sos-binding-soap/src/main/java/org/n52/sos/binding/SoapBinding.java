@@ -25,7 +25,6 @@ package org.n52.sos.binding;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -33,15 +32,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.soap.SOAPConstants;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.IDecoder;
-import org.n52.sos.decode.IRequestDecoder;
-import org.n52.sos.decode.IXmlRequestDecoder;
-import org.n52.sos.decode.RequestDecoderKey;
+import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.request.AbstractServiceRequest;
@@ -53,7 +50,7 @@ import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.soap.SoapHelper;
 import org.n52.sos.soap.SoapRequest;
 import org.n52.sos.soap.SoapResponse;
-import org.n52.sos.util.SosHelper;
+import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
@@ -61,13 +58,9 @@ import org.slf4j.LoggerFactory;
 
 public class SoapBinding extends Binding {
 
-    /** the logger, used to log exceptions and additional information */
     private static final Logger LOGGER = LoggerFactory.getLogger(SoapBinding.class);
-
+    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_SOAP_BINDING);
     private static final String urlPattern = "/soap";
-
-    public SoapBinding() {
-    }
 
     @Override
     public ServiceResponse doGetOperation(HttpServletRequest request) throws OwsExceptionReport {
@@ -82,13 +75,8 @@ public class SoapBinding extends Binding {
         soapResponse.setException(owse);
         soapResponse.setSoapVersion(SOAPConstants.SOAP_1_2_PROTOCOL);
         soapResponse.setSoapNamespace(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE);
-        IEncoder encoder = Configurator.getInstance().getEncoder(soapResponse.getSoapNamespace());
-        if (encoder != null) {
-            return (ServiceResponse) encoder.encode(soapResponse);
-        } else {
-            throw Util4Exceptions.createNoApplicableCodeException(null,
-                    "Error while encoding exception with SOAP envelope!");
-        }
+        
+        return (ServiceResponse) CodingHelper.encodeObjectToXml(soapResponse.getSoapNamespace(), soapResponse);
     }
 
     @Override
@@ -101,8 +89,8 @@ public class SoapBinding extends Binding {
             String soapAction = SoapHelper.checkSoapHeader(request);
             XmlObject doc = XmlHelper.parseXmlSosRequest(request);
             LOGGER.debug("SOAP-REQUEST: {}", doc.xmlText());
-            String reqNamespaceURI = XmlHelper.getNamespace(doc);
-            IDecoder decoder = getSoapDecoder(new DecoderKeyType(reqNamespaceURI));
+            IDecoder<?,XmlObject> decoder = Configurator.getInstance().getCodingRepository()
+                    .getDecoder(CodingHelper.getDecoderKey(doc));
             // decode SOAP message
             Object abstractRequest = decoder.decode(doc);
             if (abstractRequest instanceof SoapRequest) {
@@ -117,7 +105,8 @@ public class SoapBinding extends Binding {
                 soapResponse.setHeader(soapRequest.getSoapHeader());
                 if (soapRequest.getSoapFault() == null) {
                     XmlObject xmlObject = soapRequest.getSoapBodyContent();
-                    IXmlRequestDecoder bodyDecoder = getDecoder(new DecoderKeyType(XmlHelper.getNamespace(xmlObject)));
+                    IDecoder<?, XmlObject> bodyDecoder = Configurator.getInstance().getCodingRepository()
+                            .getDecoder(CodingHelper.getDecoderKey(xmlObject));
                     // Decode SOAPBody content
                     Object aBodyRequest = bodyDecoder.decode(xmlObject);
                     if (aBodyRequest instanceof AbstractServiceRequest) {
@@ -145,7 +134,8 @@ public class SoapBinding extends Binding {
                     soapResponse.setSoapFault(soapRequest.getSoapFault());
                 }
                 // Encode SOAP response
-                IEncoder encoder = Configurator.getInstance().getEncoder(soapResponse.getSoapNamespace());
+                IEncoder<?, SoapResponse> encoder = Configurator.getInstance().getCodingRepository()
+                        .getEncoder(CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse));
                 if (encoder != null) {
                     return (ServiceResponse) encoder.encode(soapResponse);
                 } else {
@@ -181,7 +171,8 @@ public class SoapBinding extends Binding {
             } else {
                 soapResponse.setSoapNamespace(soapNamespace);
             }
-            IEncoder encoder = Configurator.getInstance().getEncoder(soapResponse.getSoapNamespace());
+            IEncoder<?, SoapResponse> encoder = Configurator.getInstance().getCodingRepository().getEncoder(
+                    CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse));
             if (encoder != null) {
                 return (ServiceResponse) encoder.encode(soapResponse);
             } else {
@@ -254,41 +245,12 @@ public class SoapBinding extends Binding {
     }
 
     @Override
-    public boolean checkOperationHttpPostSupported(RequestDecoderKey decoderKey)
-            throws OwsExceptionReport {
-        return getDecoder(decoderKey) != null;
-    }
-
-    private IDecoder getSoapDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
-        List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
-        for (IDecoder<?,?> iDecoder : decoder) {
-                return iDecoder;
-        }
-        return null;
-    }
-    
-    private IXmlRequestDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
-        List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
-        for (IDecoder<?,?> iDecoder : decoder) {
-            if (iDecoder instanceof IXmlRequestDecoder) {
-                return (IXmlRequestDecoder) iDecoder;
-            }
-        }
-        return null;
-    }
-
-    private IXmlRequestDecoder getDecoder(RequestDecoderKey decoderKey) throws OwsExceptionReport {
-        Set<IRequestDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
-        for (IRequestDecoder<?,?> iDecoder : decoder) {
-            if (iDecoder instanceof IXmlRequestDecoder) {
-                return (IXmlRequestDecoder) iDecoder;
-            }
-        }
-        return null;
+    public boolean checkOperationHttpPostSupported(OperationDecoderKey decoderKey) throws OwsExceptionReport {
+        return CodingHelper.hasXmlEncoderForOperation(decoderKey);
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        return Collections.singleton("http://www.opengis.net/spec/SOS/2.0/conf/soap");
+        return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
     }
 }

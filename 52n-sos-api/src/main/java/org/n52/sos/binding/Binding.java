@@ -23,12 +23,10 @@
  */
 package org.n52.sos.binding;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.n52.sos.decode.OperationDecoderKey;
 
-import org.n52.sos.decode.DecoderKeyType;
-import org.n52.sos.decode.RequestDecoderKey;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.IConformanceClass;
@@ -48,6 +46,7 @@ public abstract class Binding implements IConformanceClass {
     /**
      * The default response for each binding not overriding one of the doHTTP-Method methods.
      * 
+     * @return SOS response
      */
     protected ServiceResponse createNotImplementedContentLessServiceResponse()
     {
@@ -60,7 +59,7 @@ public abstract class Binding implements IConformanceClass {
      * @param request
      *            HTTP-Delete request
      * @return SOS response
-     * @throws ServletException
+     * @throws OwsExceptionReport 
      */
     public ServiceResponse doDeleteperation(HttpServletRequest request) throws OwsExceptionReport
     {
@@ -99,7 +98,7 @@ public abstract class Binding implements IConformanceClass {
      * @param request
      *            HTTP-Post request
      * @return SOS response
-     * @throws ServletException
+     * @throws OwsExceptionReport 
      */
     public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport
     {
@@ -133,15 +132,13 @@ public abstract class Binding implements IConformanceClass {
     /**
      * Check, if the operation is supported by the decoder by the HTTP-Delete method.
      * 
-     * @param operationName
-     * 				name of the OGC::SOS operation like "GetCapabilities"
      * @param decoderKey
      * 				identifier of the decoder
      * @return
      * 				true, if the decoder <code>decoderKey</code> supports HTTP-Delete for operation <code>operationName</code>
      * @throws OwsExceptionReport
      */
-    public boolean checkOperationHttpDeleteSupported(RequestDecoderKey decoderKey) throws OwsExceptionReport
+    public boolean checkOperationHttpDeleteSupported(OperationDecoderKey decoderKey) throws OwsExceptionReport
     {
         return false;
     }
@@ -149,15 +146,13 @@ public abstract class Binding implements IConformanceClass {
     /**
      * Check, if the operation is supported by the decoder by the HTTP-Get method.
      * 
-     * @param operationName
-     * 				name of the OGC::SOS operation like "GetCapabilities"
      * @param decoderKey
      * 				identifier of the decoder
      * @return
      * 				true, if the decoder <code>decoderKey</code> supports HTTP-Get for operation <code>operationName</code>
      * @throws OwsExceptionReport
      */
-    public boolean checkOperationHttpGetSupported(RequestDecoderKey decoderKey) throws OwsExceptionReport
+    public boolean checkOperationHttpGetSupported(OperationDecoderKey decoderKey) throws OwsExceptionReport
     {
         return false;
     }
@@ -165,15 +160,13 @@ public abstract class Binding implements IConformanceClass {
     /**
      * Check, if the operation is supported by the decoder by the HTTP-Post method.
      * 
-     * @param operationName
-     * 				name of the OGC::SOS operation like "GetCapabilities"
      * @param decoderKey
      * 				identifier of the decoder
      * @return
      * 				true, if the decoder <code>decoderKey</code> supports HTTP-Post for operation <code>operationName</code>
      * @throws OwsExceptionReport
      */
-    public boolean checkOperationHttpPostSupported(RequestDecoderKey decoderKey) throws OwsExceptionReport
+    public boolean checkOperationHttpPostSupported(OperationDecoderKey decoderKey) throws OwsExceptionReport
     {
         return false;
     }
@@ -181,15 +174,13 @@ public abstract class Binding implements IConformanceClass {
     /**
      * Check, if the operation is supported by the decoder by the HTTP-Options method.
      * 
-     * @param operationName
-     *              name of the OGC::SOS operation like "GetCapabilities"
      * @param decoderKey
      *              identifier of the decoder
      * @return
      *              true, if the decoder <code>decoderKey</code> supports HTTP-Post for operation <code>operationName</code>
      * @throws OwsExceptionReport
      */
-    public boolean checkOperationHttpOptionsSupported(RequestDecoderKey decoderKey) throws OwsExceptionReport
+    public boolean checkOperationHttpOptionsSupported(OperationDecoderKey decoderKey) throws OwsExceptionReport
     {
         return false;
     }
@@ -197,15 +188,13 @@ public abstract class Binding implements IConformanceClass {
     /**
      * Check, if the operation is supported by the decoder by the HTTP-Put method.
      * 
-     * @param operationName
-     * 				name of the OGC::SOS operation like "GetCapabilities"
      * @param decoderKey
      * 				identifier of the decoder
      * @return
      * 				true, if the decoder <code>decoderKey</code> supports HTTP-Put for operation <code>operationName</code>
      * @throws OwsExceptionReport
      */
-    public boolean checkOperationHttpPutSupported(RequestDecoderKey decoderKey) throws OwsExceptionReport
+    public boolean checkOperationHttpPutSupported(OperationDecoderKey decoderKey) throws OwsExceptionReport
     {
         return false;
     }

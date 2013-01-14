@@ -39,7 +39,7 @@ public class SosSMLPosition {
 
     private String referenceFrame;
 
-    private List<SosSweCoordinate> position;
+    private List<SosSweCoordinate<?>> position;
 
     /**
      * default constructor
@@ -60,7 +60,7 @@ public class SosSMLPosition {
      * @param position
      *            Position coordinates
      */
-    public SosSMLPosition(String name, boolean fixed, String referenceFrame, List<SosSweCoordinate> position) {
+    public SosSMLPosition(String name, boolean fixed, String referenceFrame, List<SosSweCoordinate<?>> position) {
         super();
         this.name = name;
         this.fixed = fixed;
@@ -116,7 +116,7 @@ public class SosSMLPosition {
     /**
      * @return the position
      */
-    public List<SosSweCoordinate> getPosition() {
+    public List<SosSweCoordinate<?>> getPosition() {
         return position;
     }
 
@@ -124,7 +124,7 @@ public class SosSMLPosition {
      * @param position
      *            the position to set
      */
-    public void setPosition(List<SosSweCoordinate> position) {
+    public void setPosition(List<SosSweCoordinate<?>> position) {
         this.position = position;
     }
 

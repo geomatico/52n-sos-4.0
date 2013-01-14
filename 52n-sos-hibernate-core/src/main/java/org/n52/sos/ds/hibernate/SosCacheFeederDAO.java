@@ -68,7 +68,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosCacheFeederDAO.class);
-    
+
     public enum CacheCreationStrategy {
     	SINGLE_THREAD, MULTI_THREAD, COMPLEX_DB_QUERIES
     }

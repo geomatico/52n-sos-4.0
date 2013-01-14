@@ -24,8 +24,6 @@
 package org.n52.sos.decode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -78,49 +76,55 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
+import java.util.Collections;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.StringHelper;
 
 public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(GmlDecoderv321.class);
 
-    private List<DecoderKeyType> decoderKeyTypes;
+    private static final Set<DecoderKey> DECODER_KEYS = CollectionHelper.union(
+        CodingHelper.decoderKeysForElements(GMLConstants.NS_GML_32,
+            EnvelopeDocument.class,
+            TimeInstantType.class,
+            TimePeriodType.class,
+            TimeInstantDocument.class,
+            TimePeriodDocument.class,
+            ReferenceType.class,
+            MeasureType.class,
+            PointType.class,
+            LineStringType.class,
+            PolygonType.class,
+            CompositeSurfaceType.class,
+            CodeWithAuthorityType.class,
+            CodeType.class
+        ),
+        CodingHelper.decoderKeysForElements(MeasureType.type.toString(), MeasureType.class)
+    );
 
     private static final String CS = ",";
-
     private static final String DECIMAL = ".";
-
     private static final String TS = " ";
 
     public GmlDecoderv321() {
-        decoderKeyTypes = new ArrayList<DecoderKeyType>();
-        decoderKeyTypes.add(new DecoderKeyType(GMLConstants.NS_GML_32));
-        decoderKeyTypes.add(new DecoderKeyType(MeasureType.type.toString()));
-        StringBuilder builder = new StringBuilder();
-        for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
-            builder.append(decoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        LOGGER.info("Decoder for the following namespaces initialized successfully: " + builder.toString() + "!");
+        LOGGER.debug("Decoder for the following keys initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));
     }
 
     @Override
-    public List<DecoderKeyType> getDecoderKeyTypes() {
-        return decoderKeyTypes;
+    public Set<DecoderKey> getDecoderKeyTypes() {
+        return Collections.unmodifiableSet(DECODER_KEYS);
     }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
+        return Collections.emptyMap();
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
+        return Collections.emptySet();
     }
 
     @Override
@@ -262,7 +266,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
             TimeInstant ti = new TimeInstant();
             TimePositionType xbTimePositionType = xbTimeIntant.getTimePosition();
             String timeString = xbTimePositionType.getStringValue();
-            if (timeString != null && !timeString.equals("")) {
+            if (timeString != null && !timeString.isEmpty()) {
                 if ((FirstLatest.contains(timeString))) {
                     ti.setIndeterminateValue(timeString);
                 } else {
@@ -329,28 +333,27 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         }
     }
 
-    private SosSingleObservationValue parseReferenceType(ReferenceType referenceType) {
+    private SosSingleObservationValue<String> parseReferenceType(ReferenceType referenceType) {
+        SosSingleObservationValue<String> value = new SosSingleObservationValue<String>();
         if (referenceType.getHref() != null && !referenceType.getHref().isEmpty()) {
-            return new SosSingleObservationValue(new CategoryValue(referenceType.getHref()));
+            value.setValue(new CategoryValue(referenceType.getHref()));
         } else if (referenceType.getTitle() != null && !referenceType.getTitle().isEmpty()) {
-            return new SosSingleObservationValue(new CategoryValue(referenceType.getTitle()));
+            value.setValue(new CategoryValue(referenceType.getTitle()));
         }
-        return new SosSingleObservationValue();
+        return value;
     }
 
-    private SosSingleObservationValue parseMeasureType(MeasureType measureType) {
+    private SosSingleObservationValue<Double> parseMeasureType(MeasureType measureType) {
         QuantityValue quantityValue = new QuantityValue(measureType.getDoubleValue());
         quantityValue.setUnit(measureType.getUom());
-        return new SosSingleObservationValue(quantityValue);
+        return new SosSingleObservationValue<Double>(quantityValue);
     }
 
     private Object parsePointType(PointType xbPointType) throws OwsExceptionReport {
-        Geometry geom = null;
         String geomWKT = null;
         int srid = -1;
         if (xbPointType.getSrsName() != null) {
-            srid =
-                    SosHelper.parseSrsName(xbPointType.getSrsName());
+            srid = SosHelper.parseSrsName(xbPointType.getSrsName());
         }
 
         if (xbPointType.getPos() != null) {
@@ -379,43 +382,39 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
             LOGGER.debug(exceptionText.toString());
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
         }
-        geom = JTSHelper.createGeometryFromWKT(geomWKT);
+        
+        Geometry geom = JTSHelper.createGeometryFromWKT(geomWKT);
         geom.setSRID(srid);
 
         return geom;
     }
 
     private Object parseLineStringType(LineStringType xbLineStringType) throws OwsExceptionReport {
-        Geometry geom = null;
-        String geomWKT = null;
         int srid = -1;
         if (xbLineStringType.getSrsName() != null) {
-            srid =
-                    SosHelper.parseSrsName(xbLineStringType.getSrsName());
+            srid = SosHelper.parseSrsName(xbLineStringType.getSrsName());
         }
 
         DirectPositionType[] xbPositions = xbLineStringType.getPosArray();
 
-        StringBuffer positions = new StringBuffer();
+        StringBuilder positions = new StringBuilder();
         if (xbPositions != null && xbPositions.length > 0) {
-            if (srid == -1 && xbPositions[0].getSrsName() != null && !(xbPositions[0].getSrsName().equals(""))) {
-                srid =
-                        SosHelper.parseSrsName(xbPositions[0].getSrsName());
+            if (srid == -1 && xbPositions[0].getSrsName() != null && !(xbPositions[0].getSrsName().isEmpty())) {
+                srid = SosHelper.parseSrsName(xbPositions[0].getSrsName());
             }
             positions.append(getString4PosArray(xbLineStringType.getPosArray()));
         }
-        geomWKT = "LINESTRING" + positions.toString() + "";
+        String geomWKT = "LINESTRING" + positions.toString() + "";
 
         checkSrid(srid);
 
-        geom = JTSHelper.createGeometryFromWKT(geomWKT);
+        Geometry geom = JTSHelper.createGeometryFromWKT(geomWKT);
         geom.setSRID(srid);
 
         return geom;
     }
 
     private Object parsePolygonType(PolygonType xbPolygonType) throws OwsExceptionReport {
-        Geometry geom = null;
         int srid = -1;
         if (xbPolygonType.getSrsName() != null) {
             srid =
@@ -447,7 +446,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
             for (int i = 0; i < xbInterior.length; i++) {
                 xbInteriorRing = xbInterior[i];
                 if (xbInteriorRing instanceof LinearRingType) {
-                    interiorCoordString.append(", " + getCoordString4LinearRing((LinearRingType) xbInteriorRing));
+                    interiorCoordString.append(", ").append(getCoordString4LinearRing((LinearRingType) xbInteriorRing));
                 }
             }
         }
@@ -460,9 +459,8 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         geomWKT.append(")");
 
         checkSrid(srid);
-        geom = JTSHelper.createGeometryFromWKT(geomWKT.toString());
+        Geometry geom = JTSHelper.createGeometryFromWKT(geomWKT.toString());
         geom.setSRID(srid);
-
         return geom;
     }
 
@@ -540,9 +538,9 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         DirectPositionListType xbPosList = xbLinearRing.getPosList();
         CoordinatesType xbCoordinates = xbLinearRing.getCoordinates();
         DirectPositionType[] xbPosArray = xbLinearRing.getPosArray();
-        if (xbPosList != null && !(xbPosList.getStringValue().equals(""))) {
+        if (xbPosList != null && !(xbPosList.getStringValue().isEmpty())) {
             result = getString4PosList(xbPosList);
-        } else if (xbCoordinates != null && !(xbCoordinates.getStringValue().equals(""))) {
+        } else if (xbCoordinates != null && !(xbCoordinates.getStringValue().isEmpty())) {
             result = getString4Coordinates(xbCoordinates);
         } else if (xbPosArray != null && xbPosArray.length > 0) {
             result = getString4PosArray(xbPosArray);
@@ -567,11 +565,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
      * @return Returns String with coordinates for WKT.
      */
     private String getString4Pos(DirectPositionType xbPos) {
-        StringBuffer coordinateString = new StringBuffer();
-
-        coordinateString.append(xbPos.getStringValue());
-
-        return coordinateString.toString();
+        return xbPos.getStringValue();
     }
 
     /**
@@ -582,7 +576,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
      * @return Returns String with coordinates for WKT.
      */
     private String getString4PosArray(DirectPositionType[] xbPosArray) {
-        StringBuffer coordinateString = new StringBuffer();
+        StringBuilder coordinateString = new StringBuilder();
         coordinateString.append("(");
         for (DirectPositionType directPositionType : xbPosArray) {
             coordinateString.append(directPositionType.getStringValue());
@@ -603,7 +597,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
      * @throws OwsExceptionReport
      */
     private String getString4PosList(DirectPositionListType xbPosList) throws OwsExceptionReport {
-        StringBuffer coordinateString = new StringBuffer("(");
+        StringBuilder coordinateString = new StringBuilder("(");
         List<?> values = xbPosList.getListValue();
         if ((values.size() % 2) != 0) {
             String exceptionText = "The Polygons posList must contain pairs of coordinates!";
@@ -635,9 +629,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
      * @return Returns String with coordinates for WKT.
      */
     private String getString4Coordinates(CoordinatesType xbCoordinates) {
-        String coordinateString = "";
-
-        coordinateString = "(" + xbCoordinates.getStringValue() + ")";
+        String coordinateString = "(" + xbCoordinates.getStringValue() + ")";
 
         // replace cs, decimal and ts if different from default.
         if (!xbCoordinates.getCs().equals(CS)) {

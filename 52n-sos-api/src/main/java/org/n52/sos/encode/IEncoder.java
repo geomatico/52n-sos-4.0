@@ -23,7 +23,6 @@
  */
 package org.n52.sos.encode;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,13 +43,12 @@ public interface IEncoder<T, S> extends IConformanceClass {
      * @return List of supported encodings of this implementation (identified by
      *         {@link EncoderKeyType})
      */
-    public List<EncoderKeyType> getEncoderKeyType();
+    public Set<EncoderKey> getEncoderKeyType();
 
     public T encode(S objectToEncode) throws OwsExceptionReport;
 
     public T encode(S objectToEncode, Map<HelperValues, String> additionalValues) throws OwsExceptionReport;
 
-    // TODO add javadoc
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
 
     /**

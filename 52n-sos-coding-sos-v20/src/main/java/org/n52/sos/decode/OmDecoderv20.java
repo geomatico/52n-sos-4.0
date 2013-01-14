@@ -24,9 +24,8 @@
 package org.n52.sos.decode;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,11 +63,14 @@ import org.n52.sos.ogc.ows.OwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
+import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.util.DecoderHelper;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
@@ -76,58 +78,47 @@ import org.slf4j.LoggerFactory;
 
 public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(OmDecoderv20.class);
+    
+    private static final Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(OMConstants.NS_OM_2, OMObservationType.class);
 
-    private List<DecoderKeyType> decoderKeyTypes;
-
-    private Set<String> supportedObservationTypes;
+    private static final Map<SupportedTypeKey, Set<String>> SUPPORTED_TYPES = Collections.singletonMap(
+        SupportedTypeKey.ObservationType, 
+        CollectionHelper.set(
+            //OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION,
+            OMConstants.OBS_TYPE_CATEGORY_OBSERVATION,
+            OMConstants.OBS_TYPE_COUNT_OBSERVATION,
+            OMConstants.OBS_TYPE_MEASUREMENT,
+            OMConstants.OBS_TYPE_TEXT_OBSERVATION,
+            OMConstants.OBS_TYPE_TRUTH_OBSERVATION,
+            OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION
+        )
+    );
+    private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(
+        ConformanceClasses.OM_V2_MEASUREMENT, 
+        ConformanceClasses.OM_V2_CATEGORY_OBSERVATION, 
+        ConformanceClasses.OM_V2_COUNT_OBSERVATION, 
+        ConformanceClasses.OM_V2_TRUTH_OBSERVATION, 
+        ConformanceClasses.OM_V2_GEOMETRY_OBSERVATION, 
+        ConformanceClasses.OM_V2_TEXT_OBSERVATION);
 
     public OmDecoderv20() {
-        decoderKeyTypes = new ArrayList<DecoderKeyType>(1);
-        decoderKeyTypes.add(new DecoderKeyType(OMConstants.NS_OM_2));
-        StringBuilder builder = new StringBuilder();
-        for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
-            builder.append(decoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        supportedObservationTypes = new HashSet<String>(0);
-        supportedObservationTypes.add(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION);
-        supportedObservationTypes.add(OMConstants.OBS_TYPE_COUNT_OBSERVATION);
-        // supportedObservationTypes.add(OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION);
-        supportedObservationTypes.add(OMConstants.OBS_TYPE_MEASUREMENT);
-        supportedObservationTypes.add(OMConstants.OBS_TYPE_TEXT_OBSERVATION);
-        supportedObservationTypes.add(OMConstants.OBS_TYPE_TRUTH_OBSERVATION);
-        supportedObservationTypes.add(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
-        LOGGER.info("Decoder for the following namespaces initialized successfully: " + builder.toString() + "!");
+        LOGGER.debug("Decoder for the following keys initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));
     }
 
     @Override
-    public List<DecoderKeyType> getDecoderKeyTypes() {
-        return decoderKeyTypes;
+    public Set<DecoderKey> getDecoderKeyTypes() {
+        return Collections.unmodifiableSet(DECODER_KEYS);
     }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        Map<SupportedTypeKey, Set<String>> map = new EnumMap<SupportedTypeKey, Set<String>>(SupportedTypeKey.class);
-        map.put(SupportedTypeKey.ObservationType, supportedObservationTypes);
-        return map;
+        return Collections.unmodifiableMap(SUPPORTED_TYPES);
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        Set<String> conformanceClasses = new HashSet<String>(0);
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/measurement");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/categoryObservation");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/countObservation");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/truthObservation");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/geometryObservation");
-        conformanceClasses.add("http://www.opengis.net/spec/OMXML/2.0/conf/textObservation");
-        return conformanceClasses;
+        return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
     }
 
     @Override
@@ -163,7 +154,7 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
 
     private CodeWithAuthority getIdentifier(OMObservationType omObservation) throws OwsExceptionReport {
         if (omObservation.getIdentifier() != null) {
-            Object decodedObject = DecoderHelper.decodeXmlElement(omObservation.getIdentifier());
+            Object decodedObject = CodingHelper.decodeXmlObject(omObservation.getIdentifier());
             if (decodedObject != null && decodedObject instanceof CodeWithAuthority) {
                 return (CodeWithAuthority) decodedObject;
             }
@@ -185,7 +176,6 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
             return omObservation.getType().getHref();
         }
         return null;
-
     }
 
     private String getProcedure(OMObservationType omObservation) {
@@ -232,7 +222,7 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
                 }
             }
             if (abstractFeature != null) {
-                Object decodedObject = DecoderHelper.decodeXmlElement(abstractFeature);
+                Object decodedObject = CodingHelper.decodeXmlObject(abstractFeature);
                 if (decodedObject != null && decodedObject instanceof SosSamplingFeature) {
                     feature = (SosSamplingFeature) decodedObject;
                 } else {
@@ -260,7 +250,7 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
             timeInstant.setIndeterminateValue((String) omObservation.getPhenomenonTime().getNilReason());
             return timeInstant;
         } else {
-            Object decodedObject = DecoderHelper.decodeXmlElement(omObservation.getPhenomenonTime().getAbstractTimeObject());
+            Object decodedObject = CodingHelper.decodeXmlObject(omObservation.getPhenomenonTime().getAbstractTimeObject());
             if (decodedObject != null && decodedObject instanceof ITime) {
                 return (ITime) decodedObject;
             }
@@ -290,7 +280,7 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
             timeInstant.setIndeterminateValue((String) omObservation.getResultTime().getNilReason());
             return timeInstant;
         } else {
-            Object decodedObject = DecoderHelper.decodeXmlElement(omObservation.getResultTime().getTimeInstant());
+            Object decodedObject = CodingHelper.decodeXmlObject(omObservation.getResultTime().getTimeInstant());
             if (decodedObject != null && decodedObject instanceof TimeInstant) {
                 return (TimeInstant) decodedObject;
             }
@@ -303,7 +293,7 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
 
     private TimePeriod getValidTime(OMObservationType omObservation) throws OwsExceptionReport {
         if (omObservation.isSetValidTime()) {
-            Object decodedObject = DecoderHelper.decodeXmlElement(omObservation.getValidTime().getTimePeriod());
+            Object decodedObject = CodingHelper.decodeXmlObject(omObservation.getValidTime().getTimePeriod());
             if (decodedObject != null && decodedObject instanceof TimePeriod) {
                 return (TimePeriod) decodedObject;
             }
@@ -315,48 +305,51 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
         return null;
     }
 
-    private IObservationValue getObservationValue(OMObservationType omObservation) throws OwsExceptionReport {
+    private IObservationValue<?> getObservationValue(OMObservationType omObservation) throws OwsExceptionReport {
         ITime phenomenonTime = getPhenomenonTime(omObservation);
-        IObservationValue observationValue = null;
-        if (phenomenonTime.getIndeterminateValue() != null && phenomenonTime.getIndeterminateValue().equals("template")) {
-            observationValue = new SosSingleObservationValue();
-            observationValue.setPhenomenonTime(phenomenonTime);
-            observationValue.setValue(new NilTemplateValue());
+        IObservationValue<?> observationValue;
+        if (phenomenonTime.getIndeterminateValue() != null 
+                && phenomenonTime.getIndeterminateValue().equals("template")) {
+            observationValue = new SosSingleObservationValue<String>(new NilTemplateValue());
         } else {
             observationValue = getResult(omObservation);
-            observationValue.setPhenomenonTime(phenomenonTime);
         }
+        observationValue.setPhenomenonTime(phenomenonTime);
         return observationValue;
     }
 
-    private IObservationValue getResult(OMObservationType omObservation) throws OwsExceptionReport {
+    private IObservationValue<?> getResult(OMObservationType omObservation) throws OwsExceptionReport {
         // TruthObservation
         if (omObservation.getResult().schemaType() == XmlBoolean.type) {
             XmlBoolean xbBoolean = (XmlBoolean) omObservation.getResult();
             BooleanValue booleanValue = new BooleanValue(xbBoolean.getBooleanValue());
-            return new SosSingleObservationValue(booleanValue);
+            return new SosSingleObservationValue<Boolean>(booleanValue);
         }
         // CountObservation
         else if (omObservation.getResult().schemaType() == XmlInteger.type) {
             XmlInteger xbInteger = (XmlInteger) omObservation.getResult();
             CountValue countValue = new CountValue(Integer.parseInt(xbInteger.getBigIntegerValue().toString()));
-            return new SosSingleObservationValue(countValue);
+            return new SosSingleObservationValue<Integer>(countValue);
         }
         // TextObservation
         else if (omObservation.getResult().schemaType() == XmlString.type) {
             XmlString xbString = (XmlString) omObservation.getResult();
-            TextValue StringValue = new TextValue(xbString.getStringValue());
-            return new SosSingleObservationValue(StringValue);
+            TextValue stringValue = new TextValue(xbString.getStringValue());
+            return new SosSingleObservationValue<String>(stringValue);
         }
         // result elements with other encoding like SWE_ARRAY_OBSERVATION
         else {
-            Object decodedObject = DecoderHelper.decodeXmlElement(omObservation.getResult());
-            if (decodedObject != null && decodedObject instanceof IObservationValue){
+            Object decodedObject = CodingHelper.decodeXmlObject(omObservation.getResult());
+            if (decodedObject != null && decodedObject instanceof IObservationValue) {
                 return (IObservationValue) decodedObject;
-            }
-            else if (decodedObject != null && decodedObject instanceof SosSweDataArray)
-            {
-                SosMultiObservationValues result = new SosMultiObservationValues();
+            } else if (decodedObject != null && decodedObject instanceof SosSweDataArray) {
+                    SosMultiObservationValues<SosSweDataArray> result = new SosMultiObservationValues<SosSweDataArray>();
+                    SweDataArrayValue value = new SweDataArrayValue();
+                    value.setValue((SosSweDataArray) decodedObject);
+                    result.setValue(value);
+                    return result;
+            } else if (decodedObject != null && decodedObject instanceof SosSweDataArray) {
+                SosMultiObservationValues<SosSweDataArray> result = new SosMultiObservationValues<SosSweDataArray>();
                 SweDataArrayValue value = new SweDataArrayValue();
                 value.setValue((SosSweDataArray) decodedObject);
                 result.setValue(value);

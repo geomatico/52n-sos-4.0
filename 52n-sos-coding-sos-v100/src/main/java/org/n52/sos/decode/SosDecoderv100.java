@@ -28,7 +28,6 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,13 +60,15 @@ import org.n52.sos.request.GetObservationByIdRequest;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.util.DecoderHelper;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosDecoderv100 implements IXmlRequestDecoder {
+public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObject, XmlObject> {
 
     /**
      * logger, used for logging while initializing the constants from config
@@ -75,43 +76,32 @@ public class SosDecoderv100 implements IXmlRequestDecoder {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosDecoderv100.class);
 
-    private List<DecoderKeyType> decoderKeyTypes = Collections.unmodifiableList(new ArrayList<DecoderKeyType>(1) {{
-        add(new DecoderKeyType(Sos1Constants.NS_SOS));
-    }});
-    
-    private Set<RequestDecoderKey> requestDecoderKeys = Collections.unmodifiableSet(new HashSet<RequestDecoderKey>(4) {{
-        add(new RequestDecoderKey(Sos1Constants.SERVICEVERSION, SosConstants.Operations.GetCapabilities.name()));
-        add(new RequestDecoderKey(Sos1Constants.SERVICEVERSION, SosConstants.Operations.GetObservation.name()));
-        add(new RequestDecoderKey(Sos1Constants.SERVICEVERSION, SosConstants.Operations.GetFeatureOfInterest.name()));
-        add(new RequestDecoderKey(Sos1Constants.SERVICEVERSION, SosConstants.Operations.GetObservationById.name()));
-        add(new RequestDecoderKey(Sos1Constants.SERVICEVERSION, SosConstants.Operations.DescribeSensor.name()));
-//        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.InsertObservation.name()));
-//        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, Sos2Constants.Operations.InsertResultTemplate.name()));
-//        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, Sos2Constants.Operations.InsertResult.name()));
-//        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, Sos2Constants.Operations.GetResultTemplate.name()));
-//        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetResult.name()));
-    }});
+    private static final  Set<DecoderKey> DECODER_KEYS = CollectionHelper.union(
+        CodingHelper.decoderKeysForElements(Sos1Constants.NS_SOS,
+            GetCapabilitiesDocument.class,
+            DescribeSensorDocument.class,
+            GetObservationDocument.class,
+            GetFeatureOfInterestDocument.class,
+            GetObservationByIdDocument.class),
+        CodingHelper.xmlDecoderKeysForOperation(
+            SosConstants.SOS, Sos1Constants.SERVICEVERSION, 
+            SosConstants.Operations.GetCapabilities,
+            SosConstants.Operations.GetObservation,
+            SosConstants.Operations.GetFeatureOfInterest,
+            SosConstants.Operations.GetObservationById,
+            SosConstants.Operations.DescribeSensor
+        )
+    );
 
     public SosDecoderv100() {
-        StringBuilder builder = new StringBuilder();
-        for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
-            builder.append(decoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        LOGGER.info("Decoder for the following namespaces initialized successfully: " + builder.toString() + "!");
+        LOGGER.info("Decoder for the following namespaces initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));
     }
 
     @Override
-    public List<DecoderKeyType> getDecoderKeyTypes() {
-        return decoderKeyTypes;
+    public Set<DecoderKey> getDecoderKeyTypes() {
+        return Collections.unmodifiableSet(DECODER_KEYS);
     }
     
-    @Override
-    public Set<RequestDecoderKey> getRequestDecoderKeys() {
-        return requestDecoderKeys;
-    }
-
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
         return Collections.emptyMap();
@@ -416,7 +406,7 @@ public class SosDecoderv100 implements IXmlRequestDecoder {
     private SpatialFilter parseSpatialFilter4GetObservation(
             GetObservation.FeatureOfInterest spatialFilter) throws OwsExceptionReport {
         if (spatialFilter != null && spatialFilter.getSpatialOps() != null) {
-            Object filter = DecoderHelper.decodeXmlElement(spatialFilter.getSpatialOps());
+            Object filter = CodingHelper.decodeXmlElement(spatialFilter.getSpatialOps());
             if (filter != null && filter instanceof SpatialFilter) {
                 return (SpatialFilter) filter;
             }
@@ -440,7 +430,7 @@ public class SosDecoderv100 implements IXmlRequestDecoder {
     	// TODO I am not sure if that works here :-p
     	List<SpatialFilter> sosSpatialFilters = new ArrayList<SpatialFilter>();
         if (location.getSpatialOps() != null) {
-            Object filter = DecoderHelper.decodeXmlElement(location.getSpatialOps());
+            Object filter = CodingHelper.decodeXmlElement(location.getSpatialOps());
             if (filter != null && filter instanceof SpatialFilter) {
                 sosSpatialFilters.add((SpatialFilter) filter);
             }
@@ -466,7 +456,7 @@ public class SosDecoderv100 implements IXmlRequestDecoder {
         List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>();
         // TODO I am not sure if that works :-p
         for (GetObservation.EventTime temporalFilter : temporalFilters) {
-            Object filter = DecoderHelper.decodeXmlElement(temporalFilter.getTemporalOps());
+            Object filter = CodingHelper.decodeXmlElement(temporalFilter.getTemporalOps());
             if (filter != null && filter instanceof TemporalFilter) {
                 sosTemporalFilters.add((TemporalFilter) filter);
             }

@@ -74,14 +74,16 @@ public class Util4Exceptions {
      * 
      * @param responseSize
      *            Number of observations matching request
+     * @param responseLimit 
      * @return Returns ServiceException with ExceptionCode =
      *         ResponseExceedsSizeLimit and corresponding message
      * 
      */
     public static OwsExceptionReport createResponseExceedsSizeLimitException(int responseSize, int responseLimit) {
         OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-        owse.addCodedException(SosExceptionCode.ResponseExceedsSizeLimit, null, "The request matched " + responseSize
-                + " observations, which exceeds this " + " server's limit of " + responseLimit);
+        owse.addCodedException(SosExceptionCode.ResponseExceedsSizeLimit, null, String.format(
+                "The request matched %d observations, which exceeds this server's limit of %d", 
+                responseSize, responseLimit));
         return owse;
     }
     

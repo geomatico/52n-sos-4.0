@@ -574,6 +574,35 @@
                         "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,http://www.opengis.net/def/crs/EPSG/0/4326"
                     }
                 }  
+            },
+            "GetDataAvailability": {
+                "GetDataAvailability (minimal)": {
+                    "param": {
+                        "service": "SOS",
+                        "version": "2.0.0", 
+                        "request": "GetDataAvailability"
+                    }
+                },
+                "GetDataAvailability": {
+                    "param": {
+                        "service": "SOS",
+                        "version": "2.0.0", 
+                        "request": "GetDataAvailability",
+                        "observedProperty": [
+                            "test_observable_property_1",
+                            "test_observable_property_3"
+                        ],
+                        "procedure": [
+                            "http://www.example.org/sensors/101", 
+                            "http://www.example.org/sensors/103"
+                        ],
+                        "featureOfInterest": [
+                            "test_feature_1",
+                            "test_feature_3",
+                            "test_feature_4"
+                        ]
+                    }
+                }
             }
         },
         "/soap": {
@@ -656,6 +685,11 @@
                 "UpdateSensor": {
                     "request": "static/examples/sos_v20/requests_soap/Transactional/UpdateSensor.xml"
                 }
+            },
+            "GetDataAvailability": {
+                "GetDataAvailability": {
+                    "request": "static/examples/sos_v20/requests_soap/GetDataAvailability.xml"
+                }
             }
         },
         "/pox": {
@@ -734,6 +768,11 @@
             "UpdateSensor": {
                 "UpdateSensor": {
                     "request": "static/examples/sos_v20/requests_xml/Transactional/UpdateSensor.xml"
+                }
+            },
+            "GetDataAvailability": {
+                "GetDataAvailability": {
+                    "request": "static/examples/sos_v20/requests_xml/GetDataAvailability.xml"
                 }
             }
         }

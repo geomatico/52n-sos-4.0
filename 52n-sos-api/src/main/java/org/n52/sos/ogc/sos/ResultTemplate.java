@@ -29,6 +29,7 @@ import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
+import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 
@@ -91,7 +92,7 @@ public class ResultTemplate {
     }
 
     private SosSweAbstractDataComponent parseResultStructure() throws OwsExceptionReport {
-        Object decodedObject = XmlHelper.decodeGenericXmlObject(xmlResultStructure);
+        Object decodedObject = CodingHelper.decodeXmlObject(xmlResultStructure);
         if (decodedObject instanceof SosSweDataRecord) {
             return (SosSweDataRecord) decodedObject;
         }
@@ -102,7 +103,7 @@ public class ResultTemplate {
     }
 
     private SosSweAbstractEncoding parseResultEncoding() throws OwsExceptionReport {
-        Object decodedObject = XmlHelper.decodeGenericXmlObject(xmResultEncoding);
+        Object decodedObject = CodingHelper.decodeXmlObject(xmResultEncoding);
         if (decodedObject instanceof SosSweTextEncoding) {
             return (SosSweTextEncoding) decodedObject;
         }

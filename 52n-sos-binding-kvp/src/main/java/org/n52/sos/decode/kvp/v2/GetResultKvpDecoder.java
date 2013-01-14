@@ -28,30 +28,33 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.n52.sos.decode.RequestDecoderKey;
-import org.n52.sos.decode.kvp.AbstractKvpDecoderOperationDelegate;
+import org.n52.sos.decode.DecoderException;
+import org.n52.sos.decode.DecoderKey;
+import org.n52.sos.decode.KvpOperationDecoderKey;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.Sos2Constants.GetResultTemplateParams;
-import org.n52.sos.request.GetResultTemplateRequest;
+import org.n52.sos.ogc.sos.Sos2Constants.GetResultParams;
+import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.request.GetResultRequest;
+import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.KvpHelper;
 import org.n52.sos.util.Util4Exceptions;
 
-public class GetResultTemplateKvpDecoderOperationDelegate extends AbstractKvpDecoderOperationDelegate {
+public class GetResultKvpDecoder extends AbstractKvpDecoder {
 
-     private static final RequestDecoderKey KVP_DECODER_KEY_TYPE 
-            = new RequestDecoderKey(Sos2Constants.SERVICEVERSION, Sos2Constants.Operations.GetResultTemplate.name());
+    private static final DecoderKey KVP_DECODER_KEY_TYPE 
+            = new KvpOperationDecoderKey(SosConstants.SOS, Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetResult.name());
     
     @Override
-    public Set<RequestDecoderKey> getRequestDecoderKeys() {
+    public Set<DecoderKey> getDecoderKeyTypes() {
         return Collections.singleton(KVP_DECODER_KEY_TYPE);
     }
 
     @Override
-    public GetResultTemplateRequest decode(RequestDecoderKey decoderKeyType, Map<String, String> element) throws OwsExceptionReport {
-        GetResultTemplateRequest request = new GetResultTemplateRequest();
+    public GetResultRequest decode(Map<String, String> element) throws OwsExceptionReport {
+        GetResultRequest request = new GetResultRequest();
         List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
 
         boolean foundService = false;
@@ -81,8 +84,33 @@ public class GetResultTemplateKvpDecoderOperationDelegate extends AbstractKvpDec
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetResultTemplateParams.observedProperty.name())) {
                     request.setObservedProperty(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
                     foundObservedProperty = true;
+                } // featureOfInterest (optional)
+                else if (parameterName.equalsIgnoreCase(SosConstants.GetObservationParams.featureOfInterest.name())) {
+                    request.setFeatureIdentifiers(KvpHelper.checkParameterMultipleValues(parameterValues, parameterName));
+                } // eventTime (optional)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.temporalFilter.name())) {
+                    try {
+                        request.setTemporalFilter(parseTemporalFilter(KvpHelper.checkParameterMultipleValues(
+                                parameterValues, parameterName), parameterName));
+                    } catch (DecoderException e) {
+                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(
+                                parameterName, "The parameter value is not valid!"));
+                    } catch (DateTimeException e) {
+                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(
+                                parameterName, "The parameter value is not valid!"));
+                    }
+
+                } // spatialFilter (optional)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.spatialFilter.name())) {
+                    request.setSpatialFilter(parseSpatialFilter(KvpHelper.checkParameterMultipleValues(
+                            parameterValues, parameterName), parameterName));
+                } // xmlWrapper (default = false) (optional)
+                // namespaces (conditional)
+                else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.namespaces.name())) {
+                    request.setNamespaces(parseNamespaces(parameterValues));
                 } else {
-                    String exceptionText = String.format("The parameter '%s' is invalid for the GetResultTemplate request!", parameterName);
+                    String exceptionText = String.format(
+                            "The parameter '%s' is invalid for the GetResult request!", parameterName);
                     LOGGER.debug(exceptionText);
                     exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
                 }
@@ -100,14 +128,13 @@ public class GetResultTemplateKvpDecoderOperationDelegate extends AbstractKvpDec
         }
 
         if (!foundOffering) {
-            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(GetResultTemplateParams.offering.name()));
+            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(GetResultParams.offering.name()));
         }
 
         if (!foundObservedProperty) {
-            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(GetResultTemplateParams.observedProperty.name()));
+            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(GetResultParams.observedProperty.name()));
         }
         Util4Exceptions.mergeAndThrowExceptions(exceptions);
-
         return request;
     }
 }

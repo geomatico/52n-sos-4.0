@@ -24,21 +24,19 @@
 package org.n52.sos.binding;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.decode.IDecoder;
-import org.n52.sos.decode.IRequestDecoder;
-import org.n52.sos.decode.IXmlRequestDecoder;
-import org.n52.sos.decode.RequestDecoderKey;
+import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
+import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -48,7 +46,7 @@ import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.IServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
-import org.n52.sos.util.SosHelper;
+import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
@@ -56,15 +54,12 @@ import org.slf4j.LoggerFactory;
 
 public class PoxBinding extends Binding {
 
-    /**
-     * logger
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(PoxBinding.class);
-
+    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_POX_BINDING);
     /**
      * URL pattern for KVP requests
      */
-    private static final String urlPattern = "/pox";
+    private static final String URL_PATTERN = "/pox";
 
     @Override
     public ServiceResponse doGetOperation(HttpServletRequest request) throws OwsExceptionReport {
@@ -84,8 +79,8 @@ public class PoxBinding extends Binding {
         String version = null;
         try {
             XmlObject doc = XmlHelper.parseXmlSosRequest(request);
-            String reqNamespaceURI = XmlHelper.getNamespace(doc);
-            IXmlRequestDecoder decoder = getDecoder(new DecoderKeyType(reqNamespaceURI));
+            IDecoder<AbstractServiceRequest, XmlObject> decoder = Configurator.getInstance()
+                    .getCodingRepository().getDecoder(CodingHelper.getDecoderKey(doc));
             // decode SOAP message
             Object abstractRequest = decoder.decode(doc);
             if (abstractRequest instanceof AbstractServiceRequest) {
@@ -193,39 +188,16 @@ public class PoxBinding extends Binding {
 
     @Override
     public Set<String> getConformanceClasses() {
-        Set<String> conformanceClasses = new HashSet<String>(0);
-        conformanceClasses.add("http://www.opengis.net/spec/SOS/2.0/conf/pox");
-        return conformanceClasses;
+        return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
     }
 
     @Override
     public String getUrlPattern() {
-        return urlPattern;
+        return URL_PATTERN;
     }
 
     @Override
-    public boolean checkOperationHttpPostSupported(RequestDecoderKey decoderKey)
-            throws OwsExceptionReport {
-        return getDecoder(decoderKey) != null;
-    }
-
-    private IXmlRequestDecoder getDecoder(DecoderKeyType decoderKey) throws OwsExceptionReport {
-        List<IDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
-        for (IDecoder<?,?> iDecoder : decoder) {
-            if (iDecoder instanceof  IXmlRequestDecoder) {
-                return (IXmlRequestDecoder) iDecoder;
-            }
-        }
-        return null;
-    }
-
-    private IXmlRequestDecoder getDecoder(RequestDecoderKey decoderKey) throws OwsExceptionReport {
-        Set<IRequestDecoder> decoder = Configurator.getInstance().getDecoder(decoderKey);
-        for (IRequestDecoder<?,?> iDecoder : decoder) {
-            if (iDecoder instanceof IXmlRequestDecoder) {
-                return (IXmlRequestDecoder) iDecoder;
-            }
-        }
-        return null;
+    public boolean checkOperationHttpPostSupported(OperationDecoderKey k) throws OwsExceptionReport {
+        return CodingHelper.hasXmlEncoderForOperation(k);
     }
 }

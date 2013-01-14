@@ -23,40 +23,12 @@
  */
 package org.n52.sos.service.operator;
 
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.operator.IRequestOperator;
-import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.Configurator;
-import org.n52.sos.util.Util4Exceptions;
 
-public class SosServiceOperatorV100 implements IServiceOperator {
-
-    private ServiceOperatorKeyType serviceOperatorKeyType;
+public class SosServiceOperatorV100 extends AbstractServiceOperator {
 
     public SosServiceOperatorV100() {
-        serviceOperatorKeyType = new ServiceOperatorKeyType(SosConstants.SOS, Sos1Constants.SERVICEVERSION);
+        super(SosConstants.SOS, Sos1Constants.SERVICEVERSION);
     }
-
-    @Override
-    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
-        ServiceResponse response = null;
-        IRequestOperator requestOperator =
-                Configurator.getInstance().getRequestOperator(serviceOperatorKeyType, request.getOperationName());
-        if (requestOperator != null) {
-            response = requestOperator.receiveRequest(request);
-        }
-        if (response != null) {
-            return response;
-        }
-        throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
-    }
-
-    @Override
-    public ServiceOperatorKeyType getServiceOperatorKeyType() {
-        return serviceOperatorKeyType;
-    }
-
 }

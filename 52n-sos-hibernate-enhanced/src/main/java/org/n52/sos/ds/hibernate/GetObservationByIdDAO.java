@@ -23,13 +23,12 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
-import org.n52.sos.decode.DecoderKeyType;
 import org.n52.sos.ds.IGetObservationByIdDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
@@ -103,7 +102,7 @@ public class GetObservationByIdDAO extends AbstractHibernateOperationDao impleme
 
     private List<Observation> queryObservation(GetObservationByIdRequest request, Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
-        List<Criterion> criterions = new ArrayList<Criterion>();
+        List<Criterion> criterions = new LinkedList<Criterion>();
         criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                 HibernateConstants.PARAMETER_IDENTIFIER, request.getObservationIdentifier()));
         criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(

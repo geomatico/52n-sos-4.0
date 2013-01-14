@@ -26,12 +26,14 @@ package org.n52.sos.service.admin.request.operator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.XmlEncoderKey;
 import org.n52.sos.exception.AdministratorException;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
@@ -47,6 +49,7 @@ import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.admin.AdministratorConstants.AdministratorParams;
 import org.n52.sos.service.admin.request.AdminRequest;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -86,6 +89,9 @@ public class SosAdminRequestOperator implements IAdminRequestOperator {
 
     public static final String UPDATE_CONFIGURATION = "Configuration";
 
+    private static final List<String> PARAMETERS = CollectionHelper.list(UPDATE_BINDINGS,
+        UPDATE_CONFIGURATION, UPDATE_DECODER, UPDATE_ENCODER, UPDATE_OPERATIONS, UPDATE_SERVICES);
+    
     @Override
     public String getKey() {
         return KEY;
@@ -154,7 +160,7 @@ public class SosAdminRequestOperator implements IAdminRequestOperator {
         response.setService(SosConstants.SOS);
         SosCapabilities sosCapabilities = new SosCapabilities();
         OWSOperationsMetadata operationsMetadata = new OWSOperationsMetadata();
-        List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>();
+        List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>(2);
         opsMetadata.add(getOpsMetadataForCapabilities());
         opsMetadata.add(getOpsMetadataForUpdate());
         operationsMetadata.setOperations(opsMetadata);
@@ -166,43 +172,23 @@ public class SosAdminRequestOperator implements IAdminRequestOperator {
 
     private OWSOperation getOpsMetadataForCapabilities() {
         OWSOperation opsMeta = new OWSOperation();
-        // set operation name
         opsMeta.setOperationName(REQUEST_GET_CAPABILITIES);
-        // set DCP
         opsMeta.setDcp(getDCP());
-        // set parameter
-        opsMeta.addParameterValue(AdministratorParams.parameter.name(), new OWSParameterValuePossibleValues(
-                new ArrayList<String>(0)));
+        opsMeta.addAnyParameterValue(AdministratorParams.parameter);
         return opsMeta;
     }
-
+    
     private OWSOperation getOpsMetadataForUpdate() {
         OWSOperation opsMeta = new OWSOperation();
-        // set operation name
         opsMeta.setOperationName(REQUEST_UPDATE);
-        // set DCP
         opsMeta.setDcp(getDCP());
-        // set parameter
-        List<String> parameterValues = new ArrayList<String>();
-        parameterValues.add(UPDATE_BINDINGS);
-        parameterValues.add(UPDATE_CONFIGURATION);
-        parameterValues.add(UPDATE_DECODER);
-        parameterValues.add(UPDATE_ENCODER);
-        parameterValues.add(UPDATE_OPERATIONS);
-        parameterValues.add(UPDATE_SERVICES);
-        opsMeta.addParameterValue(AdministratorParams.parameter.name(), new OWSParameterValuePossibleValues(
-                parameterValues));
+        opsMeta.addPossibleValuesParameter(AdministratorParams.parameter, PARAMETERS);
         return opsMeta;
     }
 
     private Map<String, List<String>> getDCP() {
-        List<String> httpGetUrls = new ArrayList<String>();
-        httpGetUrls.add(Configurator.getInstance().getServiceURL() + "/admin?");
-        Map<String, List<String>> dcp = new HashMap<String, List<String>>();
-        if (!httpGetUrls.isEmpty()) {
-            dcp.put(SosConstants.HTTP_GET, httpGetUrls);
-        }
-        return dcp;
+        return Collections.singletonMap(SosConstants.HTTP_GET, 
+                Collections.singletonList(Configurator.getInstance().getServiceURL() + "/admin?"));
     }
 
     private ServiceResponse createServiceResponse(String string) throws OwsExceptionReport {
@@ -222,7 +208,8 @@ public class SosAdminRequestOperator implements IAdminRequestOperator {
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            IEncoder encoder = Configurator.getInstance().getEncoder(Sos2Constants.NS_SOS_20);
+            EncoderKey key = new XmlEncoderKey(Sos2Constants.NS_SOS_20, GetCapabilitiesResponse.class);
+            IEncoder<?, GetCapabilitiesResponse>  encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
             if (encoder != null) {
                 Object encodedObject = encoder.encode(response);
                 if (encodedObject instanceof XmlObject) {

@@ -23,10 +23,6 @@
  */
 package org.n52.sos.decode;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,14 +47,16 @@ import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.util.DecoderHelper;
 import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.NodeList;
 
 import com.vividsolutions.jts.geom.Geometry;
+import java.util.Collections;
+import org.apache.xmlbeans.XmlObject.Factory;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.XmlHelper;
 
 public class FesDecoderv20 implements IDecoder<Object, XmlObject> {
 
@@ -68,13 +66,12 @@ public class FesDecoderv20 implements IDecoder<Object, XmlObject> {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(FesDecoderv20.class);
 
-    private List<DecoderKeyType> decoderKeyTypes;
+    private Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(
+            FilterConstants.NS_FES_2, SpatialOpsType.class, TemporalOpsType.class);
 
     public FesDecoderv20() {
-        decoderKeyTypes = new ArrayList<DecoderKeyType>();
-        decoderKeyTypes.add(new DecoderKeyType(FilterConstants.NS_FES_2));
         StringBuilder builder = new StringBuilder();
-        for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
+        for (DecoderKey decoderKeyType : DECODER_KEYS) {
             builder.append(decoderKeyType.toString());
             builder.append(", ");
         }
@@ -83,18 +80,18 @@ public class FesDecoderv20 implements IDecoder<Object, XmlObject> {
     }
 
     @Override
-    public List<DecoderKeyType> getDecoderKeyTypes() {
-        return decoderKeyTypes;
+    public Set<DecoderKey> getDecoderKeyTypes() {
+        return Collections.unmodifiableSet(DECODER_KEYS);
     }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return new HashMap<SupportedTypeKey, Set<String>>(0);
+        return Collections.emptyMap();
     }
     
     @Override
     public Set<String> getConformanceClasses() {
-        return new HashSet<String>(0);
+        return Collections.emptySet();
     }
 
     @Override
@@ -131,11 +128,13 @@ public class FesDecoderv20 implements IDecoder<Object, XmlObject> {
                 }
                 XmlCursor geometryCursor = xbSpatialOpsType.newCursor();
                 if (geometryCursor.toChild(GMLConstants.QN_ENVELOPE_32)) {
-                    Object sosGeometry = DecoderHelper.decodeXmlElement(XmlObject.Factory.parse(geometryCursor.getDomNode()));
+                    Object sosGeometry = CodingHelper.decodeXmlObject(Factory.parse(geometryCursor.getDomNode()));
                     if (sosGeometry != null && sosGeometry instanceof Geometry) {
                         spatialFilter.setGeometry((Geometry) sosGeometry);
+                    } else {
+                        //TODO throw exception
                     }
-
+                    
                 } else {
                     String exceptionText = "The requested spatial filter operand is not supported by this SOS!";
                     LOGGER.debug(exceptionText);
@@ -177,9 +176,8 @@ public class FesDecoderv20 implements IDecoder<Object, XmlObject> {
                 }
                 NodeList nodes = btot.getDomNode().getChildNodes();
                 for (int i = 0; i < nodes.getLength(); i++) {
-                    if (nodes.item(i).getNamespaceURI() != null
-                            && !nodes.item(i).getLocalName().equals(FilterConstants.EN_VALUE_REFERENCE)) {
-                        Object timeObject = DecoderHelper.decodeXmlElement(XmlObject.Factory.parse(nodes.item(i)));
+                    if (nodes.item(i).getNamespaceURI() != null && !nodes.item(i).getLocalName().equals(FilterConstants.EN_VALUE_REFERENCE)) {
+                        Object timeObject = CodingHelper.decodeXmlObject(Factory.parse(nodes.item(i)));
                         if (timeObject != null && timeObject instanceof ITime) {
                             TimeOperator operator;
                             ITime time = (ITime) timeObject;
@@ -198,6 +196,8 @@ public class FesDecoderv20 implements IDecoder<Object, XmlObject> {
                             temporalFilter.setOperator(operator);
                             temporalFilter.setTime(time);
                             break;
+                        } else {
+                            //TODO throw exception
                         }
                     }
                 }

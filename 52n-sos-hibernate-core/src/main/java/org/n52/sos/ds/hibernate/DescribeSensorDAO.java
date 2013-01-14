@@ -31,14 +31,14 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.n52.sos.decode.DecoderKeyType;
-import org.n52.sos.decode.RequestDecoderKey;
+import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.ds.IDescribeSensorDAO;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
@@ -54,7 +54,6 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLComponent;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosSweSimpleDataRecord;
 import org.n52.sos.ogc.swe.SWEConstants.SweAggregateType;
 import org.n52.sos.ogc.swe.SosSweField;
@@ -154,7 +153,7 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
     private SensorML queryProcedure(String procID, String outputFormat, Session session) throws OwsExceptionReport {
         String filename = null;
         String smlFile = null;
-        String descriptionFormat = null;
+        String descriptionFormat;
         // TODO: check and query for validTime parameter
         Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(procID, session);
         Set<ValidProcedureTime> validProcedureTimes = procedure.getValidProcedureTimes();
@@ -189,7 +188,7 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
                 FileInputStream fis = null;
                 try {
 
-                    File sensorFile = null;
+                    File sensorFile;
                     LOGGER.info(filename);
 
                     // read in the description file
@@ -240,7 +239,7 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
     private SosSMLCapabilities getFeatureOfInterestIDsForProcedure(List<String> proceedures, String version,
             Session session) throws OwsExceptionReport {
         HibernateQueryObject queryObject = new HibernateQueryObject();
-        Map<String, String> aliases = new HashMap<String, String>();
+        Map<String, String> aliases = new HashMap<String, String>(3);
         String obsAlias = HibernateCriteriaQueryUtilities.addObservationAliasToMap(aliases, null);
         String obsConstAlias =
                 HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, obsAlias);
@@ -256,7 +255,7 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
             SosSMLCapabilities capabilities = new SosSMLCapabilities();
             capabilities.setName("featureOfInterest");
             SosSweSimpleDataRecord simpleDataRecord = new SosSweSimpleDataRecord();
-            List<SosSweField> fields = new ArrayList<SosSweField>();
+            List<SosSweField> fields = new ArrayList<SosSweField>(foiIDs.size());
             for (String foiID : foiIDs) {
                 SosSweText text = new SosSweText();
                 text.setDefinition("FeatureOfInterest identifier");
@@ -285,7 +284,7 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
             SosSMLCapabilities capabilities = new SosSMLCapabilities();
             capabilities.setName(SosConstants.SYS_CAP_PARENT_PROCEDURES_NAME);
             String urlPattern = SosHelper.getUrlPatternForHttpGetMethod(
-                    new RequestDecoderKey(version, SosConstants.Operations.DescribeSensor.name()));
+                    new OperationDecoderKey(SosConstants.SOS, version, SosConstants.Operations.DescribeSensor.name()));
             for (String parentProcID : parentProcedureIds) {
                 SosGmlMetaDataProperty metadata = new SosGmlMetaDataProperty();
                 metadata.setTitle(parentProcID);
@@ -316,12 +315,12 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
      */
     private List<SosSMLComponent> getChildProcedures(String procID, String outputFormat, String version,
             Session session) throws OwsExceptionReport {
-        List<SosSMLComponent> smlComponsents = new ArrayList<SosSMLComponent>();
+        List<SosSMLComponent> smlComponsents = new LinkedList<SosSMLComponent>();
         Collection<String> childProcedureIds = getCache().getChildProcedures(procID, false, false);
         int childCount = 0;
         if (childProcedureIds != null && !childProcedureIds.isEmpty()) {
             String urlPattern = SosHelper.getUrlPatternForHttpGetMethod(
-                    new RequestDecoderKey(version, SosConstants.Operations.DescribeSensor.name()));
+                    new OperationDecoderKey(SosConstants.SOS, version, SosConstants.Operations.DescribeSensor.name()));
             for (String childProcID : childProcedureIds) {
                 childCount++;
                 SosSMLComponent component = new SosSMLComponent("component" + childCount);

@@ -21,11 +21,36 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.decode;
+package org.n52.sos.util;
 
-import java.util.Set;
-import org.n52.sos.service.IConformanceClass;
+import java.util.Arrays;
+import java.util.Iterator;
 
-public interface IRequestDecoder<T,S> extends IDecoder<T,S> {
-    public Set<RequestDecoderKey> getRequestDecoderKeys();
+public class StringHelper {
+
+    public static StringBuffer join(CharSequence sep, StringBuffer buff, Iterable<?> src) {
+        Iterator<?> it = src.iterator();
+        if (it.hasNext()) {
+            buff.append(it.next());
+        }
+        while (it.hasNext()) {
+            buff.append(sep).append(it.next());
+        }
+        return buff;
+    }
+
+    public static String join(CharSequence sep, Iterable<?> src) {
+        return join(sep, new StringBuffer(), src).toString();
+    }
+
+    public static StringBuffer join(CharSequence sep, StringBuffer buff, Object... src) {
+        return join(sep, buff, Arrays.asList(src));
+    }
+
+    public static String join(CharSequence sep, Object... src) {
+        return join(sep, Arrays.asList(src));
+    }
+
+    private StringHelper() {
+    }
 }

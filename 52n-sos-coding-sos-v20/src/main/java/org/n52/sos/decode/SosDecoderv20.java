@@ -28,7 +28,6 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -89,7 +88,9 @@ import org.n52.sos.response.GetResultResponse;
 import org.n52.sos.response.GetResultTemplateResponse;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.util.DecoderHelper;
+import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3CConstants;
 import org.n52.sos.util.XmlHelper;
@@ -98,48 +99,46 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class SosDecoderv20 implements IXmlRequestDecoder {
+public class SosDecoderv20 implements IDecoder<AbstractServiceCommunicationObject, XmlObject> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosDecoderv20.class);
 
-    private List<DecoderKeyType> decoderKeyTypes = Collections.unmodifiableList(new ArrayList<DecoderKeyType>(1) {{
-        add(new DecoderKeyType(Sos2Constants.NS_SOS_20));
-    }});
-    
-    private Set<RequestDecoderKey> requestDecoderKeys = Collections.unmodifiableSet(new HashSet<RequestDecoderKey>(9) {{
-        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetCapabilities.name()));
-        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetObservation.name()));
-        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetFeatureOfInterest.name()));
-        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetObservationById.name()));
-        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.InsertObservation.name()));
-        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, Sos2Constants.Operations.InsertResultTemplate.name()));
-        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, Sos2Constants.Operations.InsertResult.name()));
-        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, Sos2Constants.Operations.GetResultTemplate.name()));
-        add(new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetResult.name()));
-    }});
+    private Set<DecoderKey> DECODER_KEYS = CollectionHelper.union(
+        CodingHelper.decoderKeysForElements(Sos2Constants.NS_SOS_20,
+            GetCapabilitiesDocument.class,
+            GetObservationDocument.class,
+            GetFeatureOfInterestDocument.class,
+            GetObservationByIdDocument.class,
+            InsertObservationDocument.class,
+            InsertResultTemplateDocument.class,
+            InsertResultDocument.class,
+            GetResultTemplateDocument.class,
+            GetResultDocument.class,
+            GetResultTemplateResponseDocument.class,
+            GetResultResponseDocument.class
+        ),
+       CodingHelper.xmlDecoderKeysForOperation(
+            SosConstants.SOS, 
+            Sos2Constants.SERVICEVERSION,
+            SosConstants.Operations.GetCapabilities,
+            SosConstants.Operations.GetObservation,
+            SosConstants.Operations.GetFeatureOfInterest,
+            SosConstants.Operations.GetObservationById,
+            SosConstants.Operations.InsertObservation,
+            Sos2Constants.Operations.InsertResultTemplate,
+            Sos2Constants.Operations.InsertResult,
+            Sos2Constants.Operations.GetResultTemplate,
+            SosConstants.Operations.GetResult
+        )
+    );
 
     public SosDecoderv20() {
-        StringBuilder builder = new StringBuilder();
-        for (DecoderKeyType decoderKeyType : decoderKeyTypes) {
-            builder.append(decoderKeyType.toString());
-            builder.append(", ");
-        }
-        builder.delete(builder.lastIndexOf(", "), builder.length());
-        LOGGER.info("Decoder for the following namespaces initialized successfully: " + builder.toString() + "!");
+        LOGGER.debug("Decoder for the following keys initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));
     }
 
     @Override
-    public List<DecoderKeyType> getDecoderKeyTypes() {
-        return decoderKeyTypes;
-    }
-    
-    @Override
-    public Set<RequestDecoderKey> getRequestDecoderKeys() {
-        return requestDecoderKeys;
+    public Set<DecoderKey> getDecoderKeyTypes() {
+        return Collections.unmodifiableSet(DECODER_KEYS);
     }
 
     @Override
@@ -361,9 +360,9 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
         }
 
         if (insertObservationType.getObservationArray() != null) {
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(insertObservationType.getObservationArray().length);
             for (Observation observation : insertObservationType.getObservationArray()) {
-                Object decodedObject = DecoderHelper.decodeXmlElement(observation.getOMObservation());
+                Object decodedObject = CodingHelper.decodeXmlElement(observation.getOMObservation());
                 if (decodedObject != null && decodedObject instanceof SosObservation) {
                     insertObservationRequest.addObservation((SosObservation) decodedObject);
                     break;
@@ -477,7 +476,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
     private SpatialFilter parseSpatialFilter4GetObservation(
             net.opengis.sos.x20.GetObservationType.SpatialFilter spatialFilter) throws OwsExceptionReport {
         if (spatialFilter != null && spatialFilter.getSpatialOps() != null) {
-            Object filter = DecoderHelper.decodeXmlElement(spatialFilter.getSpatialOps());
+            Object filter = CodingHelper.decodeXmlElement(spatialFilter.getSpatialOps());
             if (filter != null && filter instanceof SpatialFilter) {
                 return (SpatialFilter) filter;
             }
@@ -500,7 +499,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
             net.opengis.sos.x20.GetFeatureOfInterestType.SpatialFilter[] spatialFilters) throws OwsExceptionReport {
         List<SpatialFilter> sosSpatialFilters = new ArrayList<SpatialFilter>(spatialFilters.length);
         for (net.opengis.sos.x20.GetFeatureOfInterestType.SpatialFilter spatialFilter : spatialFilters) {
-            Object filter = DecoderHelper.decodeXmlElement(spatialFilter.getSpatialOps());
+            Object filter = CodingHelper.decodeXmlElement(spatialFilter.getSpatialOps());
             if (filter != null && filter instanceof SpatialFilter) {
                 sosSpatialFilters.add((SpatialFilter) filter);
             }
@@ -511,7 +510,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
     private SpatialFilter parseSpatialFilter4GetResult(net.opengis.sos.x20.GetResultType.SpatialFilter spatialFilter)
             throws OwsExceptionReport {
         if (spatialFilter != null && spatialFilter.getSpatialOps() != null) {
-            Object filter = DecoderHelper.decodeXmlElement(spatialFilter.getSpatialOps());
+            Object filter = CodingHelper.decodeXmlElement(spatialFilter.getSpatialOps());
             if (filter != null && filter instanceof SpatialFilter) {
                 return (SpatialFilter) filter;
             }
@@ -532,9 +531,9 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
      */
     private List<TemporalFilter> parseTemporalFilters4GetObservation(
             net.opengis.sos.x20.GetObservationType.TemporalFilter[] temporalFilters) throws OwsExceptionReport {
-        List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>();
+        List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>(temporalFilters.length);
         for (net.opengis.sos.x20.GetObservationType.TemporalFilter temporalFilter : temporalFilters) {
-            Object filter = DecoderHelper.decodeXmlElement(temporalFilter.getTemporalOps());
+            Object filter = CodingHelper.decodeXmlElement(temporalFilter.getTemporalOps());
             if (filter != null && filter instanceof TemporalFilter) {
                 sosTemporalFilters.add((TemporalFilter) filter);
             }
@@ -544,9 +543,9 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
 
     private List<TemporalFilter> parseTemporalFilters4GetResult(
             net.opengis.sos.x20.GetResultType.TemporalFilter[] temporalFilters) throws OwsExceptionReport {
-        List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>();
+        List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>(temporalFilters.length);
         for (net.opengis.sos.x20.GetResultType.TemporalFilter temporalFilter : temporalFilters) {
-            Object filter = DecoderHelper.decodeXmlElement(temporalFilter.getTemporalOps());
+            Object filter = CodingHelper.decodeXmlElement(temporalFilter.getTemporalOps());
             if (filter != null && filter instanceof TemporalFilter) {
                 sosTemporalFilters.add((TemporalFilter) filter);
             }
@@ -556,7 +555,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
 
     private SosObservationConstellation parseObservationTemplate(ObservationTemplate observationTemplate)
             throws OwsExceptionReport {
-        Object decodedObject = DecoderHelper.decodeXmlElement(observationTemplate.getOMObservation());
+        Object decodedObject = CodingHelper.decodeXmlElement(observationTemplate.getOMObservation());
         if (decodedObject instanceof SosObservation) {
             SosObservation observation = (SosObservation) decodedObject;
             return observation.getObservationConstellation();
@@ -565,7 +564,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
     }
 
     private SosResultStructure parseResultStructure(XmlObject resultStructure) throws OwsExceptionReport {
-        Object decodedObject = DecoderHelper.decodeXmlElement(resultStructure);
+        Object decodedObject = CodingHelper.decodeXmlElement(resultStructure);
         if (decodedObject != null && decodedObject instanceof SosSweAbstractDataComponent) {
             SosSweAbstractDataComponent sosSweData = (SosSweAbstractDataComponent) decodedObject;
             SosResultStructure sosResultStructure = new SosResultStructure();
@@ -583,7 +582,7 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
     }
 
     private SosResultEncoding parseResultEncoding(XmlObject resultEncoding) throws OwsExceptionReport {
-        Object decodedObject = DecoderHelper.decodeXmlElement(resultEncoding);
+        Object decodedObject = CodingHelper.decodeXmlElement(resultEncoding);
         if (decodedObject != null && decodedObject instanceof SosSweAbstractEncoding) {
             SosSweAbstractEncoding sosSweEncoding = (SosSweAbstractEncoding) decodedObject;
             SosResultEncoding encoding = new SosResultEncoding();
@@ -620,5 +619,4 @@ public class SosDecoderv20 implements IXmlRequestDecoder {
                     "The requested resultValue type is not supported");
         }
     }
-
 }

@@ -29,6 +29,7 @@ import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 /**
  * Interface for the SOS internal representation of SWE simpleTypes
  * 
+ * @param <T> 
  * @author Carsten Hollmann
  * @version 1.0.0
  */

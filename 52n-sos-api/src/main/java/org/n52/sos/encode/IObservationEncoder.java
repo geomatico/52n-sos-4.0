@@ -25,7 +25,7 @@ package org.n52.sos.encode;
 
 import java.util.Set;
 
-public interface IObservationEncoder<S, T> extends IEncoder<Object, Object> {
+public interface IObservationEncoder<S, T> extends IEncoder<S, T> {
     
     public boolean isObservationAndMeasurmentV20Type();
     

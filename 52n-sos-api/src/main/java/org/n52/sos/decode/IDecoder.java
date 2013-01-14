@@ -23,7 +23,6 @@
  */
 package org.n52.sos.decode;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,7 +42,7 @@ public interface IDecoder<T, S> extends IConformanceClass {
 	 * @return List encodings this implementation (identified by
 	 *         {@link DecoderKeyType}) is able to decode
 	 */
-	public List<DecoderKeyType> getDecoderKeyTypes();
+	public Set<DecoderKey> getDecoderKeyTypes();
 
 	public T decode(S objectToDecode) throws OwsExceptionReport;
 

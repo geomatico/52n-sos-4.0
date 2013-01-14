@@ -26,8 +26,7 @@ package org.n52.sos.encode;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -58,11 +57,15 @@ import org.n52.sos.ogc.sos.SosSoapConstants;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.soap.SoapConstants;
 import org.n52.sos.soap.SoapFault;
 import org.n52.sos.soap.SoapHeader;
 import org.n52.sos.soap.SoapHelper;
 import org.n52.sos.soap.SoapResponse;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3CConstants;
 import org.n52.sos.util.XmlHelper;
@@ -85,57 +88,42 @@ import org.w3c.dom.Node;
 
 public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
 
-    /** the logger, used to log exceptions and additonaly information */
     private static Logger LOGGER = LoggerFactory.getLogger(SoapEncoder.class);
 
-    private List<EncoderKeyType> encoderKeyTypes;
-
-    private Map<SupportedTypeKey, Set<String>> supportedTypes;
-
-    private Set<String> conformanceClasses;
+    private static final Set<EncoderKey> ENCODER_KEYS = CollectionHelper.union(
+        CodingHelper.encoderKeysForElements(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE, SoapResponse.class),
+        CodingHelper.encoderKeysForElements(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE, SoapResponse.class)
+    );
 
     /**
      * constructor
      */
     public SoapEncoder() {
-        super();
-        supportedTypes = new HashMap<SupportedTypeKey, Set<String>>(0);
-        conformanceClasses = new HashSet<String>(0);
-        encoderKeyTypes = new ArrayList<EncoderKeyType>();
-        encoderKeyTypes.add(new EncoderKeyType(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE));
-        encoderKeyTypes.add(new EncoderKeyType(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE));
-        StringBuilder logMsgBuilder = new StringBuilder();
-        logMsgBuilder.append("Encoder for the following keys initialized successfully: ");
-        for (EncoderKeyType encoderKeyType : encoderKeyTypes) {
-            logMsgBuilder.append(encoderKeyType.toString());
-            logMsgBuilder.append(", ");
-        }
-        logMsgBuilder.delete(logMsgBuilder.lastIndexOf(", "), logMsgBuilder.length());
-        logMsgBuilder.append("!");
-        LOGGER.info(logMsgBuilder.toString());
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
-    public List<EncoderKeyType> getEncoderKeyType() {
-        return encoderKeyTypes;
+    public Set<EncoderKey> getEncoderKeyType() {
+        return Collections.unmodifiableSet(ENCODER_KEYS);
     }
 
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-        return supportedTypes;
+        return Collections.emptyMap();
     }
 
     @Override
     public Set<String> getConformanceClasses() {
-        return conformanceClasses;
+        return Collections.emptySet();
     }
 
+    @Override
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
     }
 
     @Override
     public String getContentType() {
-        return "application/soap+xml";
+        return SoapConstants.CONTENT_TYPE;
     }
 
     @Override
@@ -156,7 +144,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
 
     private ServiceResponse encodeSoap11Response(SoapResponse soapResponse) throws OwsExceptionReport {
         String soapVersion = soapResponse.getSoapVersion();
-        SOAPMessage soapResponseMessage = null;
+        SOAPMessage soapResponseMessage;
         String action = null;
         try {
             soapResponseMessage = SoapHelper.getSoapMessageForProtocol(soapVersion);
@@ -183,9 +171,10 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
                         wsa.setActionValue(action);
                     }
                     try {
-                        IEncoder encoder = Configurator.getInstance().getEncoder(namespace);
+                        IEncoder<Map<QName, String>, SoapHeader> encoder = Configurator.getInstance()
+                                .getCodingRepository().getEncoder(CodingHelper.getEncoderKey(namespace, header));
                         if (encoder != null) {
-                            Map<QName, String> headerElements = (Map<QName, String>) encoder.encode(header);
+                            Map<QName, String> headerElements = encoder.encode(header);
                             for (QName qName : headerElements.keySet()) {
                                 soapResponseMessage.getSOAPHeader().addChildElement(qName)
                                         .setTextContent(headerElements.get(qName));
@@ -199,7 +188,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
             } else {
                 soapResponseMessage.getSOAPHeader().detachNode();
             }
-            soapResponseMessage.setProperty(SOAPMessage.WRITE_XML_DECLARATION, "true");
+            soapResponseMessage.setProperty(SOAPMessage.WRITE_XML_DECLARATION, String.valueOf(true));
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             soapResponseMessage.writeTo(baos);
             boolean applicationZip = false;
@@ -362,7 +351,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
         // OWSConstants.EN_EXCEPTION_CODE, OWSConstants.NS_OWS_PREFIX),
         // code);
         exRep.addAttribute(new QName(OWSConstants.EN_EXCEPTION_CODE), code);
-        if (locator != null && !locator.equals("")) {
+        if (locator != null && !locator.isEmpty()) {
             // exRep.addAttribute(new QName(OWSConstants.NS_OWS,
             // OWSConstants.EN_LOCATOR, OWSConstants.NS_OWS_PREFIX),
             // locator);
@@ -391,7 +380,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
                     action = SoapHelper.getExceptionActionURI(firstException.getCode());
                 }
                 body.set(createSOAP12FaultFromExceptionResponse(response.getException()));
-                List<String> schemaLocations = new ArrayList<String>();
+                List<String> schemaLocations = new ArrayList<String>(2);
                 schemaLocations.add(N52XmlHelper.getSchemaLocationForSOAP12());
                 schemaLocations.add(N52XmlHelper.getSchemaLocationForOWS110Exception());
                 N52XmlHelper.setSchemaLocationsToDocument(envelopeDoc, schemaLocations);
@@ -411,7 +400,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
                 if (nodeToRemove != null) {
                     attributeMap.removeNamedItem(nodeToRemove.getNodeName());
                 }
-                List<String> schemaLocations = new ArrayList<String>();
+                List<String> schemaLocations = new ArrayList<String>(2);
                 schemaLocations.add(N52XmlHelper.getSchemaLocationForSOAP12());
                 if (value != null && !value.isEmpty()) {
                     schemaLocations.add(value);
@@ -501,7 +490,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
         if (owsExceptionReport.getExceptions() != null && !owsExceptionReport.getExceptions().isEmpty()) {
             OwsException firstException = owsExceptionReport.getExceptions().get(0);
             Subcode subcode = code.addNewSubcode();
-            QName qName = null;
+            QName qName;
             if (firstException.getCode() != null) {
                 qName =
                         new QName(OWSConstants.NS_OWS, firstException.getCode().toString(), OWSConstants.NS_OWS_PREFIX);

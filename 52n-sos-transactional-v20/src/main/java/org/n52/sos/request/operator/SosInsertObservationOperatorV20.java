@@ -25,9 +25,9 @@ package org.n52.sos.request.operator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -40,6 +40,7 @@ import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
@@ -48,96 +49,65 @@ import org.n52.sos.response.InsertObservationResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosInsertObservationOperatorV20 implements IRequestOperator {
-
-    /** the data access object for the DescribeSensor operation */
-    private IInsertObservationDAO dao;
-
-    /** Name of the operation the listener implements */
-    private static final String OPERATION_NAME = SosConstants.Operations.InsertObservation.name();
-
-    private RequestOperatorKeyType requestOperatorKeyType;
-
-    /** logger */
+public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<IInsertObservationDAO, InsertObservationRequest> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SosInsertObservationOperatorV20.class);
-
+    private static final String OPERATION_NAME = SosConstants.Operations.InsertObservation.name();
+    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_OBSERVATION_INSERTION);
+    
     public SosInsertObservationOperatorV20() {
-        requestOperatorKeyType =
-                new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS, Sos2Constants.SERVICEVERSION),
-                        OPERATION_NAME);
-        this.dao = (IInsertObservationDAO) Configurator.getInstance().getOperationDAOs().get(OPERATION_NAME);
-        LOGGER.info("{} initialized successfully!", this.getClass().getSimpleName());
+        super(OPERATION_NAME, InsertObservationRequest.class);
+    }
+    
+    @Override
+    public Set<String> getConformanceClasses() {
+        return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
     }
 
     @Override
-    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
-        if (request instanceof InsertObservationRequest) {
-            InsertObservationRequest sosRequest = (InsertObservationRequest) request;
-            checkRequestedParameter(sosRequest);
-            InsertObservationResponse response = this.dao.insertObservation(sosRequest);
-            Configurator.getInstance().getCapabilitiesCacheController().updateAfterObservationInsertion();
-            String contentType = SosConstants.CONTENT_TYPE_XML;
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try {
-                String namespace = Sos2Constants.NS_SOS_20;
-                IEncoder encoder = Configurator.getInstance().getEncoder(namespace);
-                if (encoder != null) {
-                    // TODO valid response object
-                    Object encodedObject = encoder.encode(response);
-                    if (encodedObject instanceof XmlObject) {
-                        ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
-                        return new ServiceResponse(baos, contentType, false, true);
-                    } else if (encodedObject instanceof ServiceResponse) {
-                        return (ServiceResponse) encodedObject;
-                    } else {
-                        String exceptionText = "The encoder response is not supported!";
-                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-                    }
+    public ServiceResponse receive(InsertObservationRequest sosRequest) throws OwsExceptionReport {
+        checkRequestedParameter(sosRequest);
+        InsertObservationResponse response = getDao().insertObservation(sosRequest);
+        Configurator.getInstance().getCapabilitiesCacheController().updateAfterObservationInsertion();
+        String contentType = SosConstants.CONTENT_TYPE_XML;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            IEncoder<?, InsertObservationResponse> encoder = Configurator.getInstance().getCodingRepository()
+                    .getEncoder(CodingHelper.getEncoderKey(Sos2Constants.NS_SOS_20, response));
+            if (encoder != null) {
+                // TODO valid response object
+                Object encodedObject = encoder.encode(response);
+                if (encodedObject instanceof XmlObject) {
+                    ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
+                    return new ServiceResponse(baos, contentType, false, true);
+                } else if (encodedObject instanceof ServiceResponse) {
+                    return (ServiceResponse) encodedObject;
                 } else {
-                    String exceptionText = "Error while getting encoder for response!";
-                    throw Util4Exceptions.createInvalidParameterValueException("", exceptionText);
+                    String exceptionText = "The encoder response is not supported!";
+                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
                 }
-            } catch (IOException ioe) {
-                String exceptionText = "Error occurs while saving response to output stream!";
-                LOGGER.error(exceptionText, ioe);
-                throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            } else {
+                String exceptionText = "Error while getting encoder for response!";
+                throw Util4Exceptions.createInvalidParameterValueException("", exceptionText);
             }
-        } else {
-            String exceptionText = "Received request is not a SosInsertObservationRequest!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
+        } catch (IOException ioe) {
+            String exceptionText = "Error occurs while saving response to output stream!";
+            LOGGER.error(exceptionText, ioe);
+            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
         }
-    }
-
-    @Override
-    public boolean hasImplementedDAO() {
-        if (this.dao != null) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public RequestOperatorKeyType getRequestOperatorKeyType() {
-        return requestOperatorKeyType;
-    }
-
-    @Override
-    public OWSOperation getOperationMetadata(String service, String version, Object connection)
-            throws OwsExceptionReport {
-        return dao.getOperationsMetadata(service, version, connection);
     }
 
     private void checkRequestedParameter(InsertObservationRequest request) throws OwsExceptionReport {
-        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+        List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
         try {
             SosHelper.checkServiceParameter(request.getService());
         } catch (OwsExceptionReport owse) {
@@ -172,7 +142,7 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
             throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertObservationParams.offering
                     .name());
         } else {
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             for (String offering : request.getOfferings()) {
                 if (offering == null || (offering != null && offering.isEmpty())) {
                     throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertObservationParams.offering
@@ -201,7 +171,7 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
             throw Util4Exceptions
                     .createMissingParameterValueException(Sos2Constants.InsertObservationParams.observation.name());
         } else {
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             for (SosObservation observation : observations) {
                 SosObservationConstellation obsConstallation = observation.getObservationConstellation();
                 checkObservationConstellationParameter(obsConstallation);
@@ -267,19 +237,4 @@ public class SosInsertObservationOperatorV20 implements IRequestOperator {
             sosObservation.getObservationConstellation().setObservationType(obsTypeFromValue);
         }
     }
-
-    @Override
-    public IExtension getExtension(Object connection) throws OwsExceptionReport {
-        return dao.getExtension(connection);
-    }
-
-    @Override
-    public Set<String> getConformanceClasses() {
-        Set<String> conformanceClasses = new HashSet<String>(0);
-        if (hasImplementedDAO()) {
-            conformanceClasses.add("http://www.opengis.net/spec/SOS/2.0/conf/obsInsertion");
-        }
-        return conformanceClasses;
-    }
-
 }

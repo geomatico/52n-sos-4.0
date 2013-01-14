@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.decode.kvp;
+package org.n52.sos.decode.kvp.v2;
 
 import com.vividsolutions.jts.geom.Geometry;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import org.joda.time.DateTime;
 import org.n52.sos.decode.DecoderException;
-import org.n52.sos.decode.kvp.v2.GetCapabilitiesKvpDecoderOperationDelegate;
+import org.n52.sos.decode.IDecoder;
 import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.filter.SpatialFilter;
@@ -42,7 +42,9 @@ import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
+import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.ServiceConstants;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
@@ -51,13 +53,18 @@ import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractKvpDecoderOperationDelegate implements ISosKvpDecoderOperationDelegate {
+public abstract class AbstractKvpDecoder implements IDecoder<AbstractServiceRequest, Map<String, String>> {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(GetCapabilitiesKvpDecoderOperationDelegate.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(GetCapabilitiesKvpDecoder.class);
 
     @Override
     public Set<String> getConformanceClasses() {
         return Collections.emptySet();
+    }
+    
+    @Override
+    public Map<ServiceConstants.SupportedTypeKey, Set<String>> getSupportedTypes() {
+        return Collections.emptyMap();
     }
 
     protected List<TemporalFilter> parseValidTime(String parameterValue, String parameterName) throws DecoderException,
@@ -157,9 +164,9 @@ public abstract class AbstractKvpDecoderOperationDelegate implements ISosKvpDeco
                 ti.setValue(instant);
                 String valueSplit = null;
                 if (times[0].contains("Z")) {
-                    valueSplit = times[0].substring(0, times[0].indexOf("Z"));
+                    valueSplit = times[0].substring(0, times[0].indexOf('Z'));
                 } else if (times[0].contains("+")) {
-                    valueSplit = times[0].substring(0, times[0].indexOf("+"));
+                    valueSplit = times[0].substring(0, times[0].indexOf('+'));
                 }
                 if (valueSplit != null) {
                     ti.setRequestedTimeLength(valueSplit.length());

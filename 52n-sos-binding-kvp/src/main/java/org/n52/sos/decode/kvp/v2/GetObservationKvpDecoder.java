@@ -28,9 +28,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.n52.sos.decode.kvp.AbstractKvpDecoderOperationDelegate;
 import org.n52.sos.decode.DecoderException;
-import org.n52.sos.decode.RequestDecoderKey;
+import org.n52.sos.decode.DecoderKey;
+import org.n52.sos.decode.KvpOperationDecoderKey;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
@@ -42,18 +42,18 @@ import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.KvpHelper;
 import org.n52.sos.util.Util4Exceptions;
 
-public class GetObservationKvpDecoderOperationDelegate extends AbstractKvpDecoderOperationDelegate {
+public class GetObservationKvpDecoder extends AbstractKvpDecoder {
 
-    private static final RequestDecoderKey KVP_DECODER_KEY_TYPE 
-            = new RequestDecoderKey(Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetObservation.name());
+    private static final DecoderKey KVP_DECODER_KEY_TYPE 
+            = new KvpOperationDecoderKey(SosConstants.SOS, Sos2Constants.SERVICEVERSION, SosConstants.Operations.GetObservation.name());
 
     @Override
-    public Set<RequestDecoderKey> getRequestDecoderKeys() {
+    public Set<DecoderKey> getDecoderKeyTypes() {
         return Collections.singleton(KVP_DECODER_KEY_TYPE);
     }
 
     @Override
-    public GetObservationRequest decode(RequestDecoderKey decoderKeyType, Map<String, String> element) throws OwsExceptionReport {
+    public GetObservationRequest decode(Map<String, String> element) throws OwsExceptionReport {
 
         GetObservationRequest request = new GetObservationRequest();
         List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
