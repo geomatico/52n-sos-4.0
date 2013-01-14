@@ -189,7 +189,7 @@ public class HibernateCriteriaQueryUtilities {
             		if (recordObj instanceof Object[])
             		{
             			Object[] record = (Object[]) recordObj;
-            			String key = Long.toString(((ObservationConstellation)record[3]).getOffering().getOfferingId());
+            			String key = ((ObservationConstellation)record[3]).getOffering().getIdentifier();
             			TimePeriod value = createTimePeriod((Timestamp)record[0],
             					(Timestamp)record[1],
             					(Timestamp)record[2]);

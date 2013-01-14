@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013
+ * Copyright (C) 2012
  * by 52 North Initiative for Geospatial Open Source Software GmbH
  *
  * Contact: Andreas Wytzisk
@@ -55,6 +55,24 @@ public class CapabilitiesCacheTest{
 	{
 		CapabilitiesCache instance2 = new CapabilitiesCache();
 		assertEquals("equals failed",instance,instance2);
+	}
+	
+	@Test
+	public void equalsWithSelf()
+	{
+		assertEquals("I am not equal with me",instance,instance);
+	}
+	
+	@Test
+	public void equalsWithNull()
+	{
+		assertNotEquals("equal with null", instance, null);
+	}
+	
+	@Test
+	public void equalWithOtherClass()
+	{
+		assertNotEquals("equal with Object", instance, new Object());
 	}
 
 }
