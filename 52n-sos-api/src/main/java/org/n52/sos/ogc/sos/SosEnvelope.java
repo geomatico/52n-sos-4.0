@@ -97,4 +97,34 @@ public class SosEnvelope {
         return envelope != null && !envelope.isNull();
     }
 
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((envelope == null) ? 0 : envelope.hashCode());
+		result = prime * result + srid;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof SosEnvelope))
+			return false;
+		SosEnvelope other = (SosEnvelope) obj;
+		if (envelope == null) {
+			if (other.envelope != null)
+				return false;
+		} else if (!envelope.equals(other.envelope))
+			return false;
+		if (srid != other.srid)
+			return false;
+		return true;
+	}
+
 }
