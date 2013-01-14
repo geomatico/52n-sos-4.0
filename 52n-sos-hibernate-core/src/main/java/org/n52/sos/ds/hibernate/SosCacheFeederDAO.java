@@ -73,10 +73,10 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
     	SINGLE_THREAD, MULTI_THREAD, COMPLEX_DB_QUERIES
     }
 
-	private CacheCreationStrategy strategy;
+    private final CacheCreationStrategy DEFAULT_STRATEGY = CacheCreationStrategy.SINGLE_THREAD;
+    
+	private CacheCreationStrategy strategy = DEFAULT_STRATEGY;
 	
-	private final CacheCreationStrategy DEFAULT_STRATEGY = CacheCreationStrategy.SINGLE_THREAD;
-
     @Override
     public void updateCache(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport {
     	if (capabilitiesCache == null)
@@ -89,13 +89,14 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
     		
     		throw Util4Exceptions.createNoApplicableCodeException(e,errorMsg);
     	}
-        updateCache(capabilitiesCache, DEFAULT_STRATEGY);
+        updateCache(capabilitiesCache,null);
     }
     
     protected void updateCache(CapabilitiesCache cache, CacheCreationStrategy strategy) throws OwsExceptionReport {
-    	this.strategy = strategy!= null?
-    			strategy:
-    				DEFAULT_STRATEGY;
+    	if (strategy != null)
+    	{
+    		this.strategy = strategy;
+    	}
         Session session = null;
         try {
             session = getSession();
@@ -271,7 +272,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
             	allowedkOfferingVObservationTypes.put(offeringId,
             			getObservationTypesFromObservationType(offering.getObservationTypes()));
             	// Temporal Envelope
-            	if  (this.strategy.equals(CacheCreationStrategy.SINGLE_THREAD))
+            	if  (!this.strategy.equals(CacheCreationStrategy.COMPLEX_DB_QUERIES))
             	{
             		kOfferingVMinTime.put(offeringId,
             				HibernateCriteriaQueryUtilities.getMinDate4Offering(offeringId, session));

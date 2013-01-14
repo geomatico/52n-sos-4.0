@@ -1057,4 +1057,228 @@ public class CapabilitiesCache{
 		this.maxEventTime = maxEventTime;
 	}
 
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((KOfferingVProcedures == null) ? 0 : KOfferingVProcedures.hashCode());
+		result = prime * result + ((allowedKOfferingVObservationType == null) ? 0 : allowedKOfferingVObservationType.hashCode());
+		result = prime * result + ((childFeatures == null) ? 0 : childFeatures.hashCode());
+		result = prime * result + ((childProcs == null) ? 0 : childProcs.hashCode());
+		result = prime * result + ((envelopeForFeatureOfInterest == null) ? 0 : envelopeForFeatureOfInterest.hashCode());
+		result = prime * result + ((featureOfInterestTypes == null) ? 0 : featureOfInterestTypes.hashCode());
+		result = prime * result + ((featuresOfInterest == null) ? 0 : featuresOfInterest.hashCode());
+		result = prime * result + ((kFeatureOfInterestVProcedures == null) ? 0 : kFeatureOfInterestVProcedures.hashCode());
+		result = prime * result + ((kObservablePropertiesVProcedures == null) ? 0 : kObservablePropertiesVProcedures.hashCode());
+		result = prime * result + ((kObservablePropertyVOfferings == null) ? 0 : kObservablePropertyVOfferings.hashCode());
+		result = prime * result + ((kOfferingVCompositePhenomenon == null) ? 0 : kOfferingVCompositePhenomenon.hashCode());
+		result = prime * result + ((kOfferingVEnvelope == null) ? 0 : kOfferingVEnvelope.hashCode());
+		result = prime * result + ((kOfferingVFeaturesOfInterest == null) ? 0 : kOfferingVFeaturesOfInterest.hashCode());
+		result = prime * result + ((kOfferingVMaxTime == null) ? 0 : kOfferingVMaxTime.hashCode());
+		result = prime * result + ((kOfferingVMinTime == null) ? 0 : kOfferingVMinTime.hashCode());
+		result = prime * result + ((kOfferingVObservableProperties == null) ? 0 : kOfferingVObservableProperties.hashCode());
+		result = prime * result + ((kOfferingVRelatedFEatures == null) ? 0 : kOfferingVRelatedFEatures.hashCode());
+		result = prime * result + ((kOffferingVObservationTypes == null) ? 0 : kOffferingVObservationTypes.hashCode());
+		result = prime * result + ((kProcedureVObservableProperties == null) ? 0 : kProcedureVObservableProperties.hashCode());
+		result = prime * result + ((kProcedureVOfferings == null) ? 0 : kProcedureVOfferings.hashCode());
+		result = prime * result + ((kRelatedFeatureVRole == null) ? 0 : kRelatedFeatureVRole.hashCode());
+		result = prime * result + ((maxEventTime == null) ? 0 : maxEventTime.hashCode());
+		result = prime * result + ((minEventTime == null) ? 0 : minEventTime.hashCode());
+		result = prime * result + ((observationIdentifiers == null) ? 0 : observationIdentifiers.hashCode());
+		result = prime * result + ((observationTypes == null) ? 0 : observationTypes.hashCode());
+		result = prime * result + ((offName == null) ? 0 : offName.hashCode());
+		result = prime * result + ((parentFeatures == null) ? 0 : parentFeatures.hashCode());
+		result = prime * result + ((parentProcs == null) ? 0 : parentProcs.hashCode());
+		result = prime * result + ((phens4CompPhens == null) ? 0 : phens4CompPhens.hashCode());
+		result = prime * result + ((procedures == null) ? 0 : procedures.hashCode());
+		result = prime * result + ((resultTemplates == null) ? 0 : resultTemplates.hashCode());
+		result = prime * result + srid;
+		result = prime * result + ((srids == null) ? 0 : srids.hashCode());
+		result = prime * result + ((unit4Phen == null) ? 0 : unit4Phen.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof CapabilitiesCache))
+			return false;
+		CapabilitiesCache other = (CapabilitiesCache) obj;
+		if (KOfferingVProcedures == null) {
+			if (other.KOfferingVProcedures != null)
+				return false;
+		} else if (!KOfferingVProcedures.equals(other.KOfferingVProcedures))
+			return false;
+		if (allowedKOfferingVObservationType == null) {
+			if (other.allowedKOfferingVObservationType != null)
+				return false;
+		} else if (!allowedKOfferingVObservationType.equals(other.allowedKOfferingVObservationType))
+			return false;
+		if (childFeatures == null) {
+			if (other.childFeatures != null)
+				return false;
+		} else if (!childFeatures.equals(other.childFeatures))
+			return false;
+		if (childProcs == null) {
+			if (other.childProcs != null)
+				return false;
+		} else if (!childProcs.equals(other.childProcs))
+			return false;
+		if (envelopeForFeatureOfInterest == null) {
+			if (other.envelopeForFeatureOfInterest != null)
+				return false;
+		} else if (!envelopeForFeatureOfInterest.equals(other.envelopeForFeatureOfInterest))
+			return false;
+		if (featureOfInterestTypes == null) {
+			if (other.featureOfInterestTypes != null)
+				return false;
+		} else if (!featureOfInterestTypes.equals(other.featureOfInterestTypes))
+			return false;
+		if (featuresOfInterest == null) {
+			if (other.featuresOfInterest != null)
+				return false;
+		} else if (!featuresOfInterest.equals(other.featuresOfInterest))
+			return false;
+		if (kFeatureOfInterestVProcedures == null) {
+			if (other.kFeatureOfInterestVProcedures != null)
+				return false;
+		} else if (!kFeatureOfInterestVProcedures.equals(other.kFeatureOfInterestVProcedures))
+			return false;
+		if (kObservablePropertiesVProcedures == null) {
+			if (other.kObservablePropertiesVProcedures != null)
+				return false;
+		} else if (!kObservablePropertiesVProcedures.equals(other.kObservablePropertiesVProcedures))
+			return false;
+		if (kObservablePropertyVOfferings == null) {
+			if (other.kObservablePropertyVOfferings != null)
+				return false;
+		} else if (!kObservablePropertyVOfferings.equals(other.kObservablePropertyVOfferings))
+			return false;
+		if (kOfferingVCompositePhenomenon == null) {
+			if (other.kOfferingVCompositePhenomenon != null)
+				return false;
+		} else if (!kOfferingVCompositePhenomenon.equals(other.kOfferingVCompositePhenomenon))
+			return false;
+		if (kOfferingVEnvelope == null) {
+			if (other.kOfferingVEnvelope != null)
+				return false;
+		} else if (!kOfferingVEnvelope.equals(other.kOfferingVEnvelope))
+			return false;
+		if (kOfferingVFeaturesOfInterest == null) {
+			if (other.kOfferingVFeaturesOfInterest != null)
+				return false;
+		} else if (!kOfferingVFeaturesOfInterest.equals(other.kOfferingVFeaturesOfInterest))
+			return false;
+		if (kOfferingVMaxTime == null) {
+			if (other.kOfferingVMaxTime != null)
+				return false;
+		} else if (!kOfferingVMaxTime.equals(other.kOfferingVMaxTime))
+			return false;
+		if (kOfferingVMinTime == null) {
+			if (other.kOfferingVMinTime != null)
+				return false;
+		} else if (!kOfferingVMinTime.equals(other.kOfferingVMinTime))
+			return false;
+		if (kOfferingVObservableProperties == null) {
+			if (other.kOfferingVObservableProperties != null)
+				return false;
+		} else if (!kOfferingVObservableProperties.equals(other.kOfferingVObservableProperties))
+			return false;
+		if (kOfferingVRelatedFEatures == null) {
+			if (other.kOfferingVRelatedFEatures != null)
+				return false;
+		} else if (!kOfferingVRelatedFEatures.equals(other.kOfferingVRelatedFEatures))
+			return false;
+		if (kOffferingVObservationTypes == null) {
+			if (other.kOffferingVObservationTypes != null)
+				return false;
+		} else if (!kOffferingVObservationTypes.equals(other.kOffferingVObservationTypes))
+			return false;
+		if (kProcedureVObservableProperties == null) {
+			if (other.kProcedureVObservableProperties != null)
+				return false;
+		} else if (!kProcedureVObservableProperties.equals(other.kProcedureVObservableProperties))
+			return false;
+		if (kProcedureVOfferings == null) {
+			if (other.kProcedureVOfferings != null)
+				return false;
+		} else if (!kProcedureVOfferings.equals(other.kProcedureVOfferings))
+			return false;
+		if (kRelatedFeatureVRole == null) {
+			if (other.kRelatedFeatureVRole != null)
+				return false;
+		} else if (!kRelatedFeatureVRole.equals(other.kRelatedFeatureVRole))
+			return false;
+		if (maxEventTime == null) {
+			if (other.maxEventTime != null)
+				return false;
+		} else if (!maxEventTime.equals(other.maxEventTime))
+			return false;
+		if (minEventTime == null) {
+			if (other.minEventTime != null)
+				return false;
+		} else if (!minEventTime.equals(other.minEventTime))
+			return false;
+		if (observationIdentifiers == null) {
+			if (other.observationIdentifiers != null)
+				return false;
+		} else if (!observationIdentifiers.equals(other.observationIdentifiers))
+			return false;
+		if (observationTypes == null) {
+			if (other.observationTypes != null)
+				return false;
+		} else if (!observationTypes.equals(other.observationTypes))
+			return false;
+		if (offName == null) {
+			if (other.offName != null)
+				return false;
+		} else if (!offName.equals(other.offName))
+			return false;
+		if (parentFeatures == null) {
+			if (other.parentFeatures != null)
+				return false;
+		} else if (!parentFeatures.equals(other.parentFeatures))
+			return false;
+		if (parentProcs == null) {
+			if (other.parentProcs != null)
+				return false;
+		} else if (!parentProcs.equals(other.parentProcs))
+			return false;
+		if (phens4CompPhens == null) {
+			if (other.phens4CompPhens != null)
+				return false;
+		} else if (!phens4CompPhens.equals(other.phens4CompPhens))
+			return false;
+		if (procedures == null) {
+			if (other.procedures != null)
+				return false;
+		} else if (!procedures.equals(other.procedures))
+			return false;
+		if (resultTemplates == null) {
+			if (other.resultTemplates != null)
+				return false;
+		} else if (!resultTemplates.equals(other.resultTemplates))
+			return false;
+		if (srid != other.srid)
+			return false;
+		if (srids == null) {
+			if (other.srids != null)
+				return false;
+		} else if (!srids.equals(other.srids))
+			return false;
+		if (unit4Phen == null) {
+			if (other.unit4Phen != null)
+				return false;
+		} else if (!unit4Phen.equals(other.unit4Phen))
+			return false;
+		return true;
+	}
+
+	
+
 }

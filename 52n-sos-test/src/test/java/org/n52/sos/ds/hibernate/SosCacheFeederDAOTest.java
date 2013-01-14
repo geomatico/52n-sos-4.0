@@ -95,4 +95,46 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 		instance.updateCache(cache, CacheCreationStrategy.COMPLEX_DB_QUERIES);
 		testCacheResult(cache);
 	}
+	
+	@Test
+	public void updateCacheUsingMultiThreadingFillsCapabilitiesCache() throws OwsExceptionReport
+	{
+		CapabilitiesCache cache = new CapabilitiesCache();
+		instance.updateCache(cache, CacheCreationStrategy.MULTI_THREAD);
+		testCacheResult(cache);
+	}
+	
+	@Test
+	public void allStrategiesReturnTheSameResult() throws OwsExceptionReport
+	{
+		CapabilitiesCache cacheSingleThread = new CapabilitiesCache(),
+				cacheComplexDBQueries = new CapabilitiesCache(),
+				cacheMultithread = new CapabilitiesCache();
+		instance.updateCache(cacheSingleThread, CacheCreationStrategy.SINGLE_THREAD);
+		instance.updateCache(cacheMultithread, CacheCreationStrategy.MULTI_THREAD);
+		instance.updateCache(cacheComplexDBQueries, CacheCreationStrategy.COMPLEX_DB_QUERIES);
+		assertEquals("multi threaded != complex db queries",cacheMultithread,cacheComplexDBQueries);
+		assertEquals("single != complex db queries",cacheSingleThread, cacheComplexDBQueries);
+		assertEquals("single != multi threaded",cacheSingleThread, cacheMultithread);
+	}
+	
+	@Test 
+	public void strategyMultiEqualsSingle() throws OwsExceptionReport
+	{
+		CapabilitiesCache cacheSingleThread = new CapabilitiesCache(),
+				cacheMultithread = new CapabilitiesCache();
+		instance.updateCache(cacheSingleThread, CacheCreationStrategy.SINGLE_THREAD);
+		instance.updateCache(cacheMultithread, CacheCreationStrategy.MULTI_THREAD);
+		assertEquals("single != multi threaded",cacheSingleThread, cacheMultithread);
+	}
+	
+	@Test 
+	public void strategyComplexDBQueriesEqualsSingle() throws OwsExceptionReport
+	{
+		CapabilitiesCache cacheSingleThread = new CapabilitiesCache(),
+				cacheComplexDBQueries = new CapabilitiesCache();
+		instance.updateCache(cacheSingleThread, CacheCreationStrategy.SINGLE_THREAD);
+		instance.updateCache(cacheComplexDBQueries, CacheCreationStrategy.COMPLEX_DB_QUERIES);
+		assertEquals("single != complex db queries",cacheSingleThread, cacheComplexDBQueries);
+	}
 }
