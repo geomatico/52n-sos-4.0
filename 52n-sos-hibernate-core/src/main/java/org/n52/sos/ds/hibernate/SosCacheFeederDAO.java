@@ -390,16 +390,14 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
 	
 	private void setEventTimeValues(CapabilitiesCache cache, Session session) {
 		switch (this.strategy) {
-		case SINGLE_THREAD:
-			setEventTimesSingleThread(cache, session);
-			break;
 		case COMPLEX_DB_QUERIES:
 			TimePeriod globalTemporalBBox = HibernateCriteriaQueryUtilities.getGlobalTemporalBoundingBox(session);
 			cache.setMinEventTime(globalTemporalBBox.getStart());
 			cache.setMaxEventTime(globalTemporalBBox.getEnd());
+			break;
+		case SINGLE_THREAD:
 		default:
 			setEventTimesSingleThread(cache, session);
-			break;
 		}
 	}
 
