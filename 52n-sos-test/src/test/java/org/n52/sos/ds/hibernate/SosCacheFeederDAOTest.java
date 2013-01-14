@@ -26,6 +26,7 @@ package org.n52.sos.ds.hibernate;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.n52.sos.cache.CapabilitiesCache;
+import org.n52.sos.ds.hibernate.SosCacheFeederDAO.CacheCreationStrategy;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.swe.sos.test.AbstractSosTestCase;
 
@@ -54,6 +55,11 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 	{
 		CapabilitiesCache cache = new CapabilitiesCache();
 		instance.updateCache(cache);
+		testCacheResult(cache);
+	}
+
+	private void testCacheResult(CapabilitiesCache cache)
+	{
 		assertNotNull("cache is null", cache);
 		assertNotNull("envelope of features is null",cache.getEnvelopeForFeatureOfInterest());
 		assertNotNull("feature types is null",cache.getFeatureOfInterestTypes());
@@ -68,9 +74,25 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 		assertNotNull("result templates is null",cache.getResultTemplates());
 	}
 	
-	@Test(expected=NullPointerException.class)
-	public void updateNull() throws OwsExceptionReport
+	@Test(expected=OwsExceptionReport.class) 
+	public void updateNullThrowsOwsExceptionReport() throws OwsExceptionReport
 	{
 		instance.updateCache(null);
+	}
+	
+	@Test
+	public void updateCacheWithStrategyNullReturnsSameAsNormal() throws OwsExceptionReport
+	{
+		CapabilitiesCache cache = new CapabilitiesCache();
+		instance.updateCache(cache, null);
+		testCacheResult(cache);
+	}
+	
+	@Test
+	public void updateCacheUsingComplexDBQueriesFillsCapabilitiesCache() throws OwsExceptionReport
+	{
+		CapabilitiesCache cache = new CapabilitiesCache();
+		instance.updateCache(cache, CacheCreationStrategy.COMPLEX_DB_QUERIES);
+		testCacheResult(cache);
 	}
 }

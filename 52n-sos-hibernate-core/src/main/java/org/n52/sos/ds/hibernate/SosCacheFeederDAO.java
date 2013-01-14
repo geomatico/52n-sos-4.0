@@ -34,7 +34,6 @@ import java.util.Set;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
-import org.n52.sos.cache.ACapabilitiesCache;
 import org.n52.sos.cache.CapabilitiesCache;
 import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ds.hibernate.entities.CompositePhenomenon;
@@ -53,6 +52,7 @@ import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,15 +74,28 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
     }
 
 	private CacheCreationStrategy strategy;
+	
+	private final CacheCreationStrategy DEFAULT_STRATEGY = CacheCreationStrategy.SINGLE_THREAD;
 
     @Override
-    public void updateCache(ACapabilitiesCache capabilitiesCache) throws OwsExceptionReport {
-        updateCache(capabilitiesCache, CacheCreationStrategy.SINGLE_THREAD);
+    public void updateCache(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport {
+    	if (capabilitiesCache == null)
+    	{
+    		String errorMsg = "CapabilitiesCache object is null";
+    		IllegalArgumentException e = new IllegalArgumentException(errorMsg);
+    		
+    		LOGGER.debug("Exception thrown:",e);
+    		LOGGER.error(errorMsg);
+    		
+    		throw Util4Exceptions.createNoApplicableCodeException(e,errorMsg);
+    	}
+        updateCache(capabilitiesCache, DEFAULT_STRATEGY);
     }
     
-    protected void updateCache(ACapabilitiesCache capabilitiesCache, CacheCreationStrategy strategy) throws OwsExceptionReport {
-    	CapabilitiesCache cache = (CapabilitiesCache) capabilitiesCache;
-    	this.strategy = strategy;
+    protected void updateCache(CapabilitiesCache cache, CacheCreationStrategy strategy) throws OwsExceptionReport {
+    	this.strategy = strategy!= null?
+    			strategy:
+    				DEFAULT_STRATEGY;
         Session session = null;
         try {
             session = getSession();

@@ -23,7 +23,6 @@
  */
 package org.n52.sos.ds;
 
-import org.n52.sos.cache.ACapabilitiesCache;
 import org.n52.sos.cache.CapabilitiesCache;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
@@ -34,15 +33,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
  */
 public interface ICacheFeederDAO {
 
-    /**
-     * Method to start the feeding of the CapabilitiesCache
-     * 
-     * @param capabilitiesCache
-     *            CapabilitiesCache instance
-     * @throws OwsExceptionReport
-     *             If an error occurs during feeding
-     */
-    public void updateCache(ACapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
+    public void updateCache(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
 
     public void updateAfterSensorInsertion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
 

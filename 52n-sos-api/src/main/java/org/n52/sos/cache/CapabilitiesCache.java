@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * informations stored here do not often change)
  * 
  */
-public class CapabilitiesCache extends ACapabilitiesCache {
+public class CapabilitiesCache{
 
     /**
      * contains the supported ids of SRS, which are supported by this SOS
