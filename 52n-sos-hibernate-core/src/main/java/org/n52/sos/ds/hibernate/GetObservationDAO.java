@@ -287,9 +287,10 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
             // TODO How to ensure that anti subsetting observation are also
             // included ?!
             for (ObservationConstellation observationConstellation : observationConstallations) {
-                queryObject.addCriterion(Restrictions.eq(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION,
+                HibernateQueryObject clonedQueryObject = queryObject.clone();
+                clonedQueryObject.addCriterion(Restrictions.eq(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION,
                         observationConstellation));
-                List<Observation> observations = HibernateCriteriaQueryUtilities.getObservations(queryObject, session);
+                List<Observation> observations = HibernateCriteriaQueryUtilities.getObservations(clonedQueryObject, session);
                 if (observations != null && !observations.isEmpty()) {
                     sosObservations.addAll(HibernateObservationUtilities.createSosObservationsFromObservations(
                             observations, request.getVersion(), session));
