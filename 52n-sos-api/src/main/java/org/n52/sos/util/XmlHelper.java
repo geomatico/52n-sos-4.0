@@ -37,6 +37,7 @@ import java.util.Scanner;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
 
+import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
@@ -514,8 +515,19 @@ public class XmlHelper {
 
     public static XmlObject substituteElement(XmlObject elementToSubstitute, XmlObject substitutionElement) {
         Node domNode = substitutionElement.getDomNode();
-        return elementToSubstitute.substitute(new QName(domNode.getNamespaceURI(), domNode.getLocalName()),
-                substitutionElement.schemaType());
+        QName name = null;
+        if (domNode.getNamespaceURI() != null && domNode.getLocalName() != null) {
+            name = new QName(domNode.getNamespaceURI(), domNode.getLocalName());
+        } else {
+            QName nameOfElement = substitutionElement.schemaType().getName();
+            String localPart = nameOfElement.getLocalPart().replace("Type", "");
+            name = new QName(nameOfElement.getNamespaceURI(), localPart, nameOfElement.getPrefix());
+        }
+        return substituteElement(elementToSubstitute, substitutionElement.schemaType(), name);
+    }
+    
+    public static XmlObject substituteElement(XmlObject elementToSubstitute, SchemaType schemaType, QName name) {
+        return elementToSubstitute.substitute(name, schemaType);
     }
     
     public static String getLocalName(XmlObject element) {

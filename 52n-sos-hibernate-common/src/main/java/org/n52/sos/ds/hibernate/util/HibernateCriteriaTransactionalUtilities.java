@@ -136,10 +136,10 @@ public class HibernateCriteriaTransactionalUtilities {
             List<RelatedFeatureRole> roles, Session session) throws OwsExceptionReport {
         // TODO: create featureOfInterest and link to relatedFeature
         List<RelatedFeature> relFeats =
-                HibernateCriteriaQueryUtilities.getRelatedFeatures(feature.getIdentifier(), session);
+                HibernateCriteriaQueryUtilities.getRelatedFeatures(feature.getIdentifier().getValue(), session);
         if (relFeats == null || (relFeats != null && relFeats.isEmpty())) {
             RelatedFeature relFeat = new RelatedFeature();
-            String identifier = feature.getIdentifier();
+            String identifier = feature.getIdentifier().getValue();
             String url = null;
             if (feature instanceof SosSamplingFeature) {
                 identifier =

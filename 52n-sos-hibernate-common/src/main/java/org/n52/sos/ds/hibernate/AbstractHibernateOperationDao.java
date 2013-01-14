@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao implements IOperationDAO {
 
-    private static final Logger log = LoggerFactory.getLogger(AbstractHibernateOperationDao.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractHibernateOperationDao.class);
 
     @Override
     public final OWSOperation getOperationsMetadata(String service, String version, Object connection) throws OwsExceptionReport {
@@ -69,7 +69,7 @@ public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao
        
         Map<String, List<String>> dcp =  SosHelper.getDCP(new OperationDecoderKey(service, version, getOperationName()));
         if (dcp == null || dcp.isEmpty()) {
-            log.debug("Operation {} not available due to empty DCP map.", getOperationName());
+            LOGGER.debug("Operation {} not available due to empty DCP map.", getOperationName());
             return null;
         }
         OWSOperation operation = new OWSOperation();

@@ -38,6 +38,7 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeType;
+import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
@@ -127,7 +128,8 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
         if (spatialSamplingFeature.getIdentifier() != null
                 && spatialSamplingFeature.getIdentifier().getStringValue() != null
                 && !spatialSamplingFeature.getIdentifier().getStringValue().isEmpty()) {
-            sosFeat.setIdentifier(spatialSamplingFeature.getIdentifier().getStringValue());
+            CodeWithAuthority identifier = (CodeWithAuthority)CodingHelper.decodeXmlElement(spatialSamplingFeature.getIdentifier());
+            sosFeat.setIdentifier(identifier);
         }
         if (spatialSamplingFeature.getNameArray() != null) {
               sosFeat.setName(getNames(spatialSamplingFeature));
@@ -174,7 +176,7 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
                 if (sampledFeature.getHref().startsWith("#")) {
                     sampledFeatures.add(new SosSamplingFeature(null, sampledFeature.getHref().replace("#", "")));
                 } else {
-                    SosSamplingFeature sampFeat = new SosSamplingFeature(sampledFeature.getHref());
+                    SosSamplingFeature sampFeat = new SosSamplingFeature(new CodeWithAuthority(sampledFeature.getHref()));
                     if (sampledFeature.getTitle() != null && !sampledFeature.getTitle().isEmpty()) {
                         
                         sampFeat.addName(new CodeType(sampledFeature.getTitle()));

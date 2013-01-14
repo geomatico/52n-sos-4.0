@@ -141,7 +141,7 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
             exceptions.add(owse);
         }
         try {
-            String identifier = request.getObservationConstellation().getFeatureOfInterest().getIdentifier();
+            String identifier = request.getObservationConstellation().getFeatureOfInterest().getIdentifier().getValue();
             if (identifier.isEmpty()) {
                 throw Util4Exceptions
                         .createMissingParameterValueException(Sos2Constants.InsertResultTemplateParams.proposedTemplate

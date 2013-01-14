@@ -137,7 +137,7 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
         } else {
             if (!sampFeat.isSetGeometry()) {
                 FeaturePropertyType featureProperty = FeaturePropertyType.Factory.newInstance();
-                featureProperty.setHref(absFeature.getIdentifier());
+                featureProperty.setHref(absFeature.getIdentifier().getValue());
                 if (sampFeat.isSetNames()) {
                     featureProperty.setTitle(sampFeat.getFirstName().getValue());
                 }
@@ -145,7 +145,7 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
             }
             StringBuilder builder = new StringBuilder();
             builder.append("foi_");
-            builder.append(SosHelper.generateID(absFeature.getIdentifier()));
+            builder.append(SosHelper.generateID(absFeature.getIdentifier().getValue()));
             absFeature.setGmlId(builder.toString());
 
             SFSpatialSamplingFeatureDocument xbSampFeatDoc =
@@ -173,7 +173,7 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
                 xbSampFeature.setId(absFeature.getGmlId());
 
                 if (sampFeat.isSetIdentifier()
-                        && SosHelper.checkFeatureOfInterestIdentifierForSosV2(sampFeat.getIdentifier(),
+                        && SosHelper.checkFeatureOfInterestIdentifierForSosV2(sampFeat.getIdentifier().getValue(),
                                 Sos2Constants.SERVICEVERSION)) {
                     xbSampFeature.addNewIdentifier().set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, sampFeat.getIdentifier()));
                 }

@@ -44,6 +44,7 @@ import net.opengis.gml.x32.TimeInstantType;
 import net.opengis.gml.x32.TimePeriodDocument;
 import net.opengis.gml.x32.TimePeriodType;
 import net.opengis.gml.x32.TimePositionType;
+import net.opengis.swe.x20.QuantityType;
 
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
@@ -90,7 +91,9 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
             org.n52.sos.ogc.om.values.CategoryValue.class, 
             org.n52.sos.ogc.gml.ReferenceType.class,
             org.n52.sos.ogc.om.values.QuantityValue.class,
-            org.n52.sos.ogc.gml.CodeWithAuthority.class);
+            org.n52.sos.ogc.gml.CodeWithAuthority.class,
+            org.n52.sos.ogc.gml.CodeType.class
+            );
 
     public GmlEncoderv321() {
         LOGGER.info("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEY_TYPES));
@@ -130,21 +133,18 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         if (element instanceof ITime) {
             return createTime((ITime) element, additionalValues);
-        }
-        if (element instanceof Geometry) {
+        } else if (element instanceof Geometry) {
             return createPosition((Geometry) element, additionalValues.get(HelperValues.GMLID));
-        }
-        if (element instanceof CategoryValue) {
+        } else if (element instanceof CategoryValue) {
             return createReferenceTypeForCategroyValue((CategoryValue) element);
-        }
-        if (element instanceof org.n52.sos.ogc.gml.ReferenceType) {
+        } else if (element instanceof org.n52.sos.ogc.gml.ReferenceType) {
             return createReferencType((org.n52.sos.ogc.gml.ReferenceType) element);
-        }
-        if (element instanceof CodeWithAuthority) {
+        } else if (element instanceof CodeWithAuthority) {
             return createCodeWithAuthorityType((CodeWithAuthority) element);
-        }
-        if (element instanceof QuantityValue) {
+        } else if (element instanceof QuantityValue) {
             return createMeasureType((QuantityValue)element);
+        } else if (element instanceof org.n52.sos.ogc.gml.CodeType) {
+            return createCodeType((org.n52.sos.ogc.gml.CodeType) element);
         }
         return null;
     }

@@ -27,9 +27,12 @@ import java.util.List;
 
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeType;
+import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 
@@ -40,6 +43,8 @@ import java.util.LinkedList;
  */
 public class SosSamplingFeature extends SosAbstractFeature {
     
+    private static final long serialVersionUID = 4660755526492323288L;
+
     private List<CodeType> name = new LinkedList<CodeType>();
 
     private String description;
@@ -62,11 +67,11 @@ public class SosSamplingFeature extends SosAbstractFeature {
      * @param featureIdentifier
      *            identifier of sampling feature
      */
-    public SosSamplingFeature(String featureIdentifier) {
+    public SosSamplingFeature(CodeWithAuthority featureIdentifier) {
         super(featureIdentifier);
     }
 
-    public SosSamplingFeature(String featureIdentifier, String gmlId) {
+    public SosSamplingFeature(CodeWithAuthority featureIdentifier, String gmlId) {
        super(featureIdentifier, gmlId);
     }
 
@@ -138,7 +143,10 @@ public class SosSamplingFeature extends SosAbstractFeature {
     }
 
     public List<SosAbstractFeature> getSampledFeatures() {
-        return Collections.unmodifiableList(sampledFeatures);
+        if (isSetSampledFeatures()) {
+            return Collections.unmodifiableList(sampledFeatures);
+        }
+        return new ArrayList<SosAbstractFeature>(0);
     }
 
     public boolean isSetNames() {

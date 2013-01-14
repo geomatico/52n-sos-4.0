@@ -43,6 +43,7 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateFeatureCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateFeatureCriteriaTransactionalUtilities;
 import org.n52.sos.ogc.filter.SpatialFilter;
+import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -189,11 +190,11 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
         } else {
             Session session = getSessionFromConnection(connection);
             String featureIdentifier = null;
-            if (samplingFeature.getIdentifier() != null && !samplingFeature.getIdentifier().isEmpty()) {
-                featureIdentifier = samplingFeature.getIdentifier();
+            if (samplingFeature.isSetIdentifier()) {
+                featureIdentifier = samplingFeature.getIdentifier().getValue();
             } else {
                 featureIdentifier = "generated_" + SosHelper.generateID(samplingFeature.getXmlDescription());
-                samplingFeature.setIdentifier(featureIdentifier);
+                samplingFeature.setIdentifier(new CodeWithAuthority(featureIdentifier));
             }
             HibernateFeatureCriteriaTransactionalUtilities.insertFeatureOfInterest(samplingFeature, session);
             return featureIdentifier;
@@ -238,7 +239,7 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
         if (SosHelper.checkFeatureOfInterestIdentifierForSosV2(feature.getIdentifier(), version)) {
             checkedFoiID = feature.getIdentifier();
         }
-        SosSamplingFeature sampFeat = new SosSamplingFeature(checkedFoiID);
+        SosSamplingFeature sampFeat = new SosSamplingFeature(new CodeWithAuthority(checkedFoiID));
         if (feature.getName() != null && !feature.getName().isEmpty()) {
             sampFeat.setName(SosHelper.createCodeTypeListFromCSV(feature.getName()));
         }

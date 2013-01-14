@@ -25,6 +25,8 @@ package org.n52.sos.ogc.om.features;
 
 import java.io.Serializable;
 
+import org.n52.sos.ogc.gml.CodeWithAuthority;
+
 /**
  * Abstract class for encoding the feature of interest. Necessary because
  * different feature types should be supported. The SOS database or another
@@ -37,7 +39,7 @@ public abstract class SosAbstractFeature implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** identifier */
-    private String identifier;
+    private CodeWithAuthority identifier;
 
     private String gmlId;
 
@@ -47,11 +49,11 @@ public abstract class SosAbstractFeature implements Serializable {
      * @param featureIdentifier
      *            Feature identifier
      */
-    public SosAbstractFeature(String featureIdentifier) {
+    public SosAbstractFeature(CodeWithAuthority featureIdentifier) {
         this.identifier = featureIdentifier;
     }
 
-    public SosAbstractFeature(String featureIdentifier, String gmlId) {
+    public SosAbstractFeature(CodeWithAuthority featureIdentifier, String gmlId) {
         this.identifier = featureIdentifier;
         this.gmlId = gmlId;
     }
@@ -98,7 +100,7 @@ public abstract class SosAbstractFeature implements Serializable {
      * 
      * @return Returns the identifier.
      */
-    public String getIdentifier() {
+    public CodeWithAuthority getIdentifier() {
         return identifier;
     }
 
@@ -108,13 +110,13 @@ public abstract class SosAbstractFeature implements Serializable {
      * @param identifier
      *            The identifier to set.
      */
-    public void setIdentifier(String identifier) {
+    public void setIdentifier(CodeWithAuthority identifier) {
         this.identifier = identifier;
     }
     
     public boolean isSetIdentifier() {
         return identifier != null
-                && !identifier.isEmpty();
+                && !identifier.isSetValue();
     }
 
     public String getGmlId() {

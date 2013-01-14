@@ -47,6 +47,7 @@ import net.opengis.swes.x20.UpdateSensorDescriptionType.Description;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.OGCConstants;
+import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -311,7 +312,7 @@ public class SwesDecoderv20 implements IDecoder<AbstractServiceCommunicationObje
                 } else {
                     identifier = fpt.getHref();
                 }
-                SosSamplingFeature feature = new SosSamplingFeature(identifier);
+                SosSamplingFeature feature = new SosSamplingFeature(new CodeWithAuthority(identifier));
                 if (checkForRequestUrl(fpt.getHref())) {
                     feature.setUrl(fpt.getHref());
                 }

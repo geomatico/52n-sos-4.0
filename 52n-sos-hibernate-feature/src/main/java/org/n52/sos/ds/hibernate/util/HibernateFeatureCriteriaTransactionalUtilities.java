@@ -34,11 +34,11 @@ public class HibernateFeatureCriteriaTransactionalUtilities {
 
     public static void insertFeatureOfInterest(SosSamplingFeature samplingFeature, Session session) {
         FeatureOfInterest feature =
-                HibernateFeatureCriteriaQueryUtilities.getFeatureOfInterest(samplingFeature.getIdentifier(), samplingFeature.getGeometry(), session);
+                HibernateFeatureCriteriaQueryUtilities.getFeatureOfInterest(samplingFeature.getIdentifier().getValue(), samplingFeature.getGeometry(), session);
         if (feature == null) {
             feature = new FeatureOfInterest();
-            if (samplingFeature.getIdentifier() != null && !samplingFeature.getIdentifier().isEmpty()) {
-                feature.setIdentifier(samplingFeature.getIdentifier());
+            if (samplingFeature.isSetIdentifier()) {
+                feature.setIdentifier(samplingFeature.getIdentifier().getValue());
             }
             if (samplingFeature.isSetNames()) {
                 feature.setName(SosHelper.createCSVFromCodeTypeList(samplingFeature.getName()));

@@ -25,6 +25,8 @@ package org.n52.sos.ogc.om.features;
 
 import java.util.Map;
 
+import org.n52.sos.ogc.gml.CodeWithAuthority;
+
 /**
  * class represents a feature collection
  * 
@@ -41,7 +43,7 @@ public class SosFeatureCollection extends SosAbstractFeature {
      *            collection with feature members of this collection
      */
     public SosFeatureCollection(Map<String, SosAbstractFeature> members) {
-        super("gml:FeatureCollection");
+        super(new CodeWithAuthority("gml:FeatureCollection"));
         this.members = members;
     }
 

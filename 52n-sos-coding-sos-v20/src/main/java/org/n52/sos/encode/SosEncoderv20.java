@@ -317,8 +317,8 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                 FeaturePropertyType featureProperty = xbGetFoiResponse.addNewFeatureMember();
                 SosAbstractFeature feature = sosFeatColMap.get(sosFeatID);
                 String identifier;
-                if (feature.getIdentifier() != null && !feature.getIdentifier().isEmpty()) {
-                    identifier = feature.getIdentifier();
+                if (feature.isSetIdentifier()) {
+                    identifier = feature.getIdentifier().getValue();
                 } else {
                     identifier = sosFeatID;
                 }
@@ -378,7 +378,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                 foiHelper.put(HelperValues.EXIST_FOI_IN_DOC, Boolean.toString(true));
             } else {
                 gmlId = "sf_" + sfIdCounter;
-                gmlID4sfIdentifier.put(sosObservation.getObservationConstellation().getFeatureOfInterest().getIdentifier(), gmlId);
+                gmlID4sfIdentifier.put(sosObservation.getObservationConstellation().getFeatureOfInterest().getIdentifier().getValue(), gmlId);
                 foiHelper.put(HelperValues.EXIST_FOI_IN_DOC, Boolean.toString(false));
             }
             foiHelper.put(HelperValues.GMLID, gmlId);

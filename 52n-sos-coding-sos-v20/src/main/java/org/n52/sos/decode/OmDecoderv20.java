@@ -199,7 +199,7 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
                 if (featureOfInterest.getHref().startsWith("#")) {
                     feature = new SosSamplingFeature(null, featureOfInterest.getHref().replace("#", ""));
                 } else {
-                    feature = new SosSamplingFeature(featureOfInterest.getHref());
+                    feature = new SosSamplingFeature(new CodeWithAuthority(featureOfInterest.getHref()));
                     if (featureOfInterest.getTitle() != null && !featureOfInterest.getTitle().isEmpty()) {
                         feature.addName(new CodeType(featureOfInterest.getTitle()));
                     }

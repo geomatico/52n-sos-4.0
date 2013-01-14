@@ -116,4 +116,5 @@ public class XmlOptionsHelper {
     public static synchronized XmlOptionsHelper getInstance() {
         return getInstance("UTF-8", false);
     }
+
 }

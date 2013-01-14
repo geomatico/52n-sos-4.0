@@ -728,7 +728,7 @@ public class CapabilitiesCache{
         ArrayList<String> procs = new ArrayList<String>(1);
         procs.add(procID);
 
-        String foiID = observation.getObservationConstellation().getFeatureOfInterest().getIdentifier();
+        String foiID = observation.getObservationConstellation().getFeatureOfInterest().getIdentifier().getValue();
         ArrayList<String> features = new ArrayList<String>(1);
         features.add(foiID);
 
