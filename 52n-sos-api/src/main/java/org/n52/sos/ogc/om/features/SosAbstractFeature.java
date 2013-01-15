@@ -116,7 +116,7 @@ public abstract class SosAbstractFeature implements Serializable {
     
     public boolean isSetIdentifier() {
         return identifier != null
-                && !identifier.isSetValue();
+                && identifier.isSetValue();
     }
 
     public String getGmlId() {
