@@ -108,7 +108,10 @@ public class SosSweQuantity extends SosSweAbstractUomType<Double> {
 
     @Override
     public String getStringValue() {
-        return Double.toString(value.intValue());
+        if (isSetValue()) {
+            return Double.toString(value.intValue());
+        }
+        return null;
     }
 
     @Override

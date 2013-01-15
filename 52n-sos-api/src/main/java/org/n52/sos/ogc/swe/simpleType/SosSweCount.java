@@ -51,7 +51,10 @@ public class SosSweCount extends SosSweAbstractSimpleType<Integer> {
 
     @Override
     public String getStringValue() {
-        return Integer.toString(value.intValue());
+        if (isSetValue()) {
+            return Integer.toString(value.intValue());
+        }
+        return null;
     }
 
 }

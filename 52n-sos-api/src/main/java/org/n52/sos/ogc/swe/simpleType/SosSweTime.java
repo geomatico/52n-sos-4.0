@@ -55,7 +55,10 @@ public class SosSweTime extends SosSweAbstractUomType<DateTime> {
 
     @Override
     public String getStringValue() {
-        return DateTimeHelper.formatDateTime2IsoString(value);
+        if (isSetValue()) {
+            return DateTimeHelper.formatDateTime2IsoString(value);
+        }
+        return null;
     }
 
     @Override
