@@ -23,6 +23,8 @@
  */
 package org.n52.sos.ds.hibernate;
 
+import static org.n52.sos.service.ServiceConstants.SupportedTypeKey.*;
+
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -63,11 +65,11 @@ public class DataSourceInitializator implements IDataSourceInitializator {
             Map<SupportedTypeKey, Set<String>> typeMap = getTypeMap();
             session = (Session) connectionProvider.getConnection();
             transaction = session.beginTransaction();
-            initializeSupportedFeatureOfInterestTypes(typeMap.get(SupportedTypeKey.FeatureType), session);
-            initializeSupportedObservationTypes(typeMap.get(SupportedTypeKey.ObservationType), session);
-            initializeSupportedProcedureDescriptionFormats(typeMap.get(SupportedTypeKey.ProcedureDescriptionFormat), session);
-            initializeSupportedSweTypes(typeMap.get(SupportedTypeKey.SweType), session);
-            // initializeSupportedResultStructureTypes(session);
+            initializeSupportedFeatureOfInterestTypes(typeMap.get(FeatureType), session);
+            initializeSupportedObservationTypes(typeMap.get(ObservationType), session);
+            initializeSupportedProcedureDescriptionFormats(typeMap.get(ProcedureDescriptionFormat), session);
+            initializeSupportedSweTypes(typeMap.get(SweType), session);
+//            initializeSupportedResultStructureTypes(session);
             session.flush();
             session.clear();
             transaction.commit();
@@ -75,7 +77,7 @@ public class DataSourceInitializator implements IDataSourceInitializator {
             if (transaction != null) {
                 transaction.rollback();
             }
-            String exceptionText = "Error while initializing CapabilitiesCache!";
+            String exceptionText = "Error while initializing DataSource!";
             LOGGER.debug(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
