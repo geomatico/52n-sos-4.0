@@ -44,7 +44,6 @@ import net.opengis.gml.x32.TimeInstantType;
 import net.opengis.gml.x32.TimePeriodDocument;
 import net.opengis.gml.x32.TimePeriodType;
 import net.opengis.gml.x32.TimePositionType;
-import net.opengis.swe.x20.QuantityType;
 
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
