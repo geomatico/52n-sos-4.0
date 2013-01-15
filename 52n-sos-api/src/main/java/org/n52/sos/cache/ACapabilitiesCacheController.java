@@ -56,6 +56,8 @@ public abstract class ACapabilitiesCacheController {
     private final ReentrantLock updateLock = new ReentrantLock(true);
 
     private final Condition updateFree = updateLock.newCondition();
+    
+    private boolean initialized = false;
 
     private boolean updateIsFree = true;
 	private Timer timer = new Timer("52n-sos-capabilities-cache-controller");
@@ -68,9 +70,14 @@ public abstract class ACapabilitiesCacheController {
 		schedule();
     }
 
+	/**
+	 * Starts a new timer task
+	 */
 	protected final void schedule() {
-		/* timers can not be rescheduled. to make the 
-		 * interval changeable schedule a anonymous timer */
+		/* 
+		 * Timers can not be rescheduled.
+		 * To make the interval changeable schedule a anonymous timer.
+		 */
 		this.current = new TimerTask() {
 			@Override
 			public void run() {
@@ -88,6 +95,10 @@ public abstract class ACapabilitiesCacheController {
 			}
 		};
 		long delay = Configurator.getInstance().getUpdateIntervallInMillis();
+		if (!initialized) {
+			delay = 1;
+			initialized = true;
+		}
 		if (delay > 0) {
 			LOGGER.info("Next CapabilitiesCacheUpdate in {}ms", delay);
 			this.timer.schedule(this.current, delay);
@@ -95,6 +106,10 @@ public abstract class ACapabilitiesCacheController {
 	}
 	
 	
+	/**
+	 * Stops the current task, if available and starts a new {@link TimerTask}.
+	 * @see {@link #schedule()}
+	 */
 	public void reschedule() {
 		if (this.current != null) {
 			this.current.cancel();
