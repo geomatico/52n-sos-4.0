@@ -71,7 +71,6 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInser
         checkRequestedParameter(sosRequest);
 
         InsertSensorResponse response = getDao().insertSensor(sosRequest);
-        // TODO: create update() for after insert sensor
         Configurator.getInstance().getCapabilitiesCacheController().updateAfterSensorInsertion();
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
