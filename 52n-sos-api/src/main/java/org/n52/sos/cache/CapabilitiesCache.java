@@ -513,7 +513,7 @@ public class CapabilitiesCache{
      * 
      * @param offFeatures
      */
-    public void setKOffrtingVFeatures(Map<String, Collection<String>> offFeatures) {
+    public void setKOfferingVFeatures(Map<String, Collection<String>> offFeatures) {
         this.kOfferingVFeaturesOfInterest = offFeatures;
     }
 
