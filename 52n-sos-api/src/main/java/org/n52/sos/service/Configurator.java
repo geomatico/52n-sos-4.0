@@ -47,7 +47,6 @@ import org.n52.sos.binding.Binding;
 import org.n52.sos.cache.ACapabilitiesCacheController;
 import org.n52.sos.convert.ConverterKeyType;
 import org.n52.sos.convert.IConverter;
-import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.IDecoder;
 import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ds.IConnectionProvider;
@@ -55,7 +54,6 @@ import org.n52.sos.ds.IDataSourceInitializator;
 import org.n52.sos.ds.IFeatureQueryHandler;
 import org.n52.sos.ds.IOperationDAO;
 import org.n52.sos.ds.ISettingsDao;
-import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
@@ -68,7 +66,6 @@ import org.n52.sos.service.admin.request.operator.IAdminRequestOperator;
 import org.n52.sos.service.operator.IServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.tasking.ASosTasking;
-import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -674,6 +671,8 @@ public final class Configurator {
      * called from here.
      */
     private void initialize() throws ConfigurationException {
+    	
+    	LOGGER.info("\n******\n Configurator initialization started\n******\n");
 
         /* do this first as we need access to the database */
         initializeConnectionProvider();
@@ -715,6 +714,8 @@ public final class Configurator {
         initializeDataSource();
         initializeCapabilitiesCacheController();
         initializeTasking();
+        
+        LOGGER.info("\n******\n Configurator initialization finished\n******\n");
     }
 
     /**
@@ -871,12 +872,6 @@ public final class Configurator {
             throw new ConfigurationException(exceptionText);
         }
         LOGGER.info("\n******\n ACapabilitiesCacheController loaded successfully!\n******\n");
-        try {
-            this.capabilitiesCacheController.update(false);
-        } catch (OwsExceptionReport owse) {
-            LOGGER.error("Fatal error: Couldn't initialize capabilities cache!");
-            throw new ConfigurationException(owse);
-        }
     }
 
     private void initalizeConverter() throws ConfigurationException {
