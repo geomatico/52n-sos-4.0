@@ -212,8 +212,8 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<I
         ACapabilitiesCacheController capabilitiesCacheController = Configurator.getInstance().getCapabilitiesCacheController();
         SosHelper.checkProcedureID(obsConstallation.getProcedure().getProcedureIdentifier(), capabilitiesCacheController.getProcedures(), Sos2Constants.InsertObservationParams.procedure.name());
         SosHelper.checkObservedProperty(obsConstallation.getObservableProperty().getIdentifier(), capabilitiesCacheController.getObservableProperties(), Sos2Constants.InsertObservationParams.observedProperty.name());
-        String foiIdentifier = obsConstallation.getFeatureOfInterest().getIdentifier().getValue();
-        SosHelper.checkFeatureOfInterstIdentifier(foiIdentifier, capabilitiesCacheController.getFeatureOfInterest(), Sos2Constants.InsertObservationParams.featureOfInterest.name());
+//        String foiIdentifier = obsConstallation.getFeatureOfInterest().getIdentifier().getValue();
+//        SosHelper.checkFeatureOfInterstIdentifier(foiIdentifier, capabilitiesCacheController.getFeatureOfInterest(), Sos2Constants.InsertObservationParams.featureOfInterest.name());
     }
 
 
