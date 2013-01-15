@@ -50,7 +50,7 @@ public class SosGetCapabilitiesOperatorV100 extends AbstractV1RequestOperator<IG
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SosGetCapabilitiesOperatorV100.class);
     // TODO check for SOS 1.0.0
-    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton("http://www.opengis.net/spec/SOS/2.0/conf/core");
+    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton("http://www.opengis.net/spec/SOS/1.0/conf/core");
     private static final String OPERATION_NAME = SosConstants.Operations.GetCapabilities.name();
 
     public SosGetCapabilitiesOperatorV100() {

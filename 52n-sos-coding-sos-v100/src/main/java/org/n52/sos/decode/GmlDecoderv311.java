@@ -64,7 +64,13 @@ public class GmlDecoderv311 implements IDecoder<Object, XmlObject> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(GmlDecoderv311.class);
 
-    private Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(GMLConstants.NS_GML);
+    private Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(
+    		GMLConstants.NS_GML,
+    		EnvelopeDocument.class,
+            TimeInstantType.class,
+            TimePeriodType.class,
+            TimeInstantDocument.class,
+            TimePeriodDocument.class);
 
     private static final String CS = ",";
     private static final String DECIMAL = ".";

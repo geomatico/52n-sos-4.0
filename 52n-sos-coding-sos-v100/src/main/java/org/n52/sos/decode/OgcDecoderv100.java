@@ -36,6 +36,8 @@ import net.opengis.ogc.BinarySpatialOpType;
 import net.opengis.ogc.BinaryTemporalOpType;
 import net.opengis.ogc.PropertyNameDocument;
 import net.opengis.ogc.PropertyNameType;
+import net.opengis.ogc.SpatialOperatorType;
+import net.opengis.ogc.SpatialOperatorsType;
 import net.opengis.ogc.TemporalOperatorType;
 import net.opengis.ogc.impl.BBOXTypeImpl;
 
@@ -69,7 +71,13 @@ public class OgcDecoderv100 implements IDecoder<Object, XmlObject> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(OgcDecoderv100.class);
 
-    private Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(OGCConstants.NS_OGC);
+    private Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(
+    		OGCConstants.NS_OGC,
+            SpatialOperatorType.class,
+            TemporalOperatorType.class,
+            BinarySpatialOpType.class,
+            BinaryTemporalOpType.class,
+            BBOXType.class);
 
     public OgcDecoderv100() {
         LOGGER.debug("Decoder for the following keys initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));

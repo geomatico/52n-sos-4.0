@@ -51,7 +51,7 @@ http://schemas.opengis.net/sos/1.0.0/sosRegisterSensor.xsd http://www.opengis.ne
           <sml:inputs>
                <sml:InputList>
                     <sml:input name="Waterlevel">
-                         <swe:ObservableProperty definition="urn:ogc:def:phenomenon:OGC:1.0.30:waterlevel"/>
+                         <swe:ObservableProperty definition="test_observable_property_6"/>
                     </sml:input>
                     <sml:input name="Temperature">
                          <swe:ObservableProperty definition="urn:ogc:def:phenomenon:OGC:1.0.30:temperature"/>
@@ -63,7 +63,7 @@ http://schemas.opengis.net/sos/1.0.0/sosRegisterSensor.xsd http://www.opengis.ne
           <sml:outputs>
                <sml:OutputList>
                     <sml:output name="waterlevel">
-                         <swe:Quantity definition="urn:ogc:def:phenomenon:OGC:1.0.30:waterlevel">
+                         <swe:Quantity definition="test_observable_property_6">
                                 <gml:metaDataProperty>
 										<offering>
 											<id>HOBART</id>

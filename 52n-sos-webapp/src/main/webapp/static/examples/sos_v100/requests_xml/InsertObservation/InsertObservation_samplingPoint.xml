@@ -27,10 +27,10 @@
 	     </om:samplingTime>
 	     
 	     <om:procedure xlink:href="urn:ogc:object:feature:Sensor:IFGI:ifgi-sensor-1"/>
-	     <om:observedProperty xlink:href="urn:ogc:def:phenomenon:OGC:1.0.30:waterlevel"/>
+	     <om:observedProperty xlink:href="test_observable_property_6"/>
 	     
 	     <om:featureOfInterest>
-	          <sa:SamplingPoint gml:id="foi_1001">
+	          <sa:SamplingPoint gml:id="test_feature_6">
 	              <gml:name>SamplingPoint 1</gml:name>
 	              <sa:sampledFeature xlink:href=""/>
 	              <sa:position>

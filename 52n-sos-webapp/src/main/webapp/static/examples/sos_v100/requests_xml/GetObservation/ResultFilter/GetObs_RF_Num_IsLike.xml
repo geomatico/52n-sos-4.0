@@ -9,12 +9,12 @@
 	http://schemas.opengis.net/sos/1.0.0/sosGetObservation.xsd"
 	service="SOS" version="1.0.0" srsName="urn:ogc:def:crs:EPSG::4326">
 	
-	<offering>GAUGE_HEIGHT</offering>
-	<observedProperty>urn:ogc:def:phenomenon:OGC:1.0.30:waterlevel</observedProperty>
+	<offering>test_offering_6</offering>
+	<observedProperty>test_observable_property_6</observedProperty>
 	
 	<result>
 		<ogc:PropertyIsLike wildCard="*" singleChar="?" escapeChar="\">
-			<ogc:PropertyName>urn:ogc:def:phenomenon:OGC:1.0.30:waterlevel</ogc:PropertyName>
+			<ogc:PropertyName>test_observable_property_6</ogc:PropertyName>
 			<ogc:Literal>?0.*</ogc:Literal>
 		</ogc:PropertyIsLike>
 	</result>

@@ -56,7 +56,10 @@ import org.slf4j.LoggerFactory;
 public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(GmlEncoderv311.class);
-    private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(GMLConstants.NS_GML);
+	
+    private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(
+    		GMLConstants.NS_GML, 
+            org.n52.sos.ogc.gml.time.ITime.class);
 
     public GmlEncoderv311() {
         LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));

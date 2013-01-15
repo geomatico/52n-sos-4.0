@@ -8,6 +8,6 @@
 	xsi:schemaLocation="http://www.opengis.net/sos/1.0
 	http://schemas.opengis.net/sos/1.0.0/sosGetFeatureOfInterest.xsd">
 	
-	<FeatureOfInterestId>foi_1001</FeatureOfInterestId>
+	<FeatureOfInterestId>test_feature_6</FeatureOfInterestId>
 	
 </GetFeatureOfInterest>

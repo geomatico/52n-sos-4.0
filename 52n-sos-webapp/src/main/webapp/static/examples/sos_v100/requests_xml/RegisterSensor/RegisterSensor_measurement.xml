@@ -64,7 +64,7 @@
 	          <sml:inputs>
 	               <sml:InputList>
 	                    <sml:input name="waterlevel">
-	                         <swe:ObservableProperty definition="urn:ogc:def:phenomenon:OGC:1.0.30:waterlevel"/>
+	                         <swe:ObservableProperty definition="test_observable_property_6"/>
 	                    </sml:input>
 	               </sml:InputList>
 	          </sml:inputs>
@@ -73,10 +73,10 @@
 	          <sml:outputs>
 	               <sml:OutputList>
 	                    <sml:output name="waterlevel">
-	                         <swe:Quantity definition="urn:ogc:def:phenomenon:OGC:1.0.30:waterlevel">
+	                         <swe:Quantity definition="test_observable_property_6">
 	                                <gml:metaDataProperty>
 											<offering>
-												<id>GAUGE_HEIGHT</id>
+												<id>test_offering_6</id>
 												<name>gauge height in Muenster</name>
 											</offering>
 									</gml:metaDataProperty>
@@ -103,14 +103,14 @@
 	                              <sml:inputs>
 	                                   <sml:InputList>
 	                                        <sml:input name="gaugeHeight">
-	                                             <swe:ObservableProperty definition="urn:ogc:def:phenomenon:OGC:1.0.30:waterlevel"/>
+	                                             <swe:ObservableProperty definition="test_observable_property_6"/>
 	                                        </sml:input>
 	                                   </sml:InputList>
 	                              </sml:inputs>
 	                              <sml:outputs>
 	                                   <sml:OutputList>
 	                                        <sml:output name="gaugeHeight">
-	                                             <swe:Quantity definition="urn:ogc:def:phenomenon:OGC:1.0.30:waterlevel">
+	                                             <swe:Quantity definition="test_observable_property_6">
 	                                                  <swe:uom code="cm"/>
 	                                             </swe:Quantity>
 	                                        </sml:output>

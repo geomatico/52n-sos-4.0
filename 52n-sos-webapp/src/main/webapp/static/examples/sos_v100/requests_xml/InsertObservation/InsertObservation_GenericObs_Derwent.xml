@@ -24,7 +24,7 @@
    <swe:CompositePhenomenon gml:id="cpid0" dimension="1">
     <gml:name>resultComponents</gml:name>
     <swe:component xlink:href="urn:ogc:data:time:iso8601" />
-    <swe:component xlink:href="urn:ogc:def:phenomenon:OGC:1.0.30:waterlevel" />
+    <swe:component xlink:href="test_observable_property_6" />
     <swe:component xlink:href="urn:ogc:def:phenomenon:OGC:1.0.30:temperature" />
    </swe:CompositePhenomenon>
   </om:observedProperty>
@@ -59,7 +59,7 @@
        <swe:Text definition="urn:ogc:dahttp://www.opengis.net/def/property/OGC/0/FeatureOfInterest" />
       </swe:field>
       <swe:field name="waterlevel">
-       <swe:Quantity definition="urn:ogc:def:phenomenon:OGC:1.0.30:waterlevel">
+       <swe:Quantity definition="test_observable_property_6">
         <swe:uom code="cm" />
        </swe:Quantity>
       </swe:field>

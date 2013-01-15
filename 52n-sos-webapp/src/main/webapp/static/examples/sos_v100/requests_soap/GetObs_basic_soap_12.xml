@@ -11,8 +11,8 @@ xmlns:ows="http://www.opengis.net/ows/1.1">
 			xsi:schemaLocation="http://www.opengis.net/sos/1.0
 	http://schemas.opengis.net/sos/1.0.0/sosGetObservation.xsd"
 			service="SOS" version="1.0.0" srsName="urn:ogc:def:crs:EPSG::4326">
-			<sos:offering>GAUGE_HEIGHT</sos:offering>
-			<sos:observedProperty>urn:ogc:def:phenomenon:OGC:1.0.30:waterlevel</sos:observedProperty>
+			<sos:offering>test_offering_6</sos:offering>
+			<sos:observedProperty>test_observable_property_6</sos:observedProperty>
 			<sos:responseFormat>text/xml;subtype=&quot;om/1.0.0&quot;</sos:responseFormat>
 		</sos:GetObservation>
 	</env:Body>

@@ -47,7 +47,7 @@ public abstract class AbstractV1RequestOperator<T extends IOperationDAO, R exten
                                                             extends AbstractRequestOperator<T, R> {
     
     public AbstractV1RequestOperator(String operationName, Class<R> requestType) {
-        super(SosConstants.SOS, Sos2Constants.SERVICEVERSION, operationName, requestType);
+        super(SosConstants.SOS, Sos1Constants.SERVICEVERSION, operationName, requestType);
     }
     
     
