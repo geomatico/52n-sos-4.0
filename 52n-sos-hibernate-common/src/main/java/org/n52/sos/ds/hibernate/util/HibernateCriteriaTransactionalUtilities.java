@@ -96,7 +96,7 @@ public class HibernateCriteriaTransactionalUtilities {
             result.setDeleted(false);
             result.setObservationTypes(new HashSet<ObservationType>(observationTypes));
             result.setFeatureOfInterestTypes(new HashSet<FeatureOfInterestType>(featureOfInterestTypes));
-            result.setProcedureId((Long) session.save(result));
+            session.save(result);
             session.flush();
         }
         return result;
@@ -149,7 +149,7 @@ public class HibernateCriteriaTransactionalUtilities {
             }
             relFeat.setFeatureOfInterest(getOrInsertFeatureOfInterest(identifier, url, session));
             relFeat.setRelatedFeatureRoles(new HashSet<RelatedFeatureRole>(roles));
-            relFeat.setRelatedFeatureId((Long) session.save(relFeat));
+            session.save(relFeat);
             session.flush();
             relFeats.add(relFeat);
         }
@@ -161,7 +161,7 @@ public class HibernateCriteriaTransactionalUtilities {
         if (relFeatRoles == null || (relFeatRoles != null && relFeatRoles.isEmpty())) {
             RelatedFeatureRole relFeatRole = new RelatedFeatureRole();
             relFeatRole.setRelatedFeatureRole(role);
-            relFeatRole.setRelatedFeatureRoleId((Long) session.save(relFeatRole));
+            session.save(relFeatRole);
             session.flush();
             relFeatRoles.add(relFeatRole);
         }
@@ -170,7 +170,7 @@ public class HibernateCriteriaTransactionalUtilities {
 
     public static List<ObservableProperty> getOrInsertObservableProperty(
             List<SosObservableProperty> observableProperty, Session session) {
-        List<String> identifiers = new ArrayList<String>();
+        List<String> identifiers = new ArrayList<String>(observableProperty.size());
         for (SosObservableProperty sosObservableProperty : observableProperty) {
             identifiers.add(sosObservableProperty.getIdentifier());
         }
@@ -188,11 +188,11 @@ public class HibernateCriteriaTransactionalUtilities {
                 ObservableProperty obsProp = new ObservableProperty();
                 obsProp.setIdentifier(sosObsProp.getIdentifier());
                 obsProp.setDescription(sosObsProp.getDescription());
-                obsProp.setObservablePropertyId((Long) session.save(obsProp));
-                session.flush();
+                session.save(obsProp);
                 obsProps.add(obsProp);
             }
         }
+        session.flush();
         return obsProps;
     }
 
@@ -201,7 +201,7 @@ public class HibernateCriteriaTransactionalUtilities {
         if (result == null) {
             result = new Unit();
             result.setUnit(unit);
-            result.setUnitId((Long) session.save(result));
+            session.save(result);
             session.flush();
         }
         return result;
@@ -239,10 +239,7 @@ public class HibernateCriteriaTransactionalUtilities {
             if (url != null && !url.isEmpty()) {
                 feature.setUrl(url);
             }
-            Long id = (Long) session.save(feature);
-            session.flush();
-            feature.setFeatureOfInterestId(id);
-            session.saveOrUpdate(feature);
+            session.save(feature);
             session.flush();
         } else if (feature.getUrl() != null && !feature.getUrl().isEmpty() && url != null && !url.isEmpty()) {
             if (url != null && !url.isEmpty()) {
@@ -259,10 +256,7 @@ public class HibernateCriteriaTransactionalUtilities {
         if (booleanValue == null) {
             booleanValue = new BooleanValue();
             booleanValue.setValue(value);
-            Long id = (Long) session.save(booleanValue);
-            session.flush();
-            booleanValue.setBooleanValueId(id);
-            session.update(booleanValue);
+            session.save(booleanValue);
             session.flush();
         }
         Set<BooleanValue> values = new HashSet<BooleanValue>(1);
@@ -275,10 +269,7 @@ public class HibernateCriteriaTransactionalUtilities {
         if (categoryValue == null) {
             categoryValue = new CategoryValue();
             categoryValue.setValue(value);
-            Long id = (Long) session.save(categoryValue);
-            session.flush();
-            categoryValue.setCategoryValueId(id);
-            session.update(categoryValue);
+            session.save(categoryValue);
             session.flush();
         }
         Set<CategoryValue> values = new HashSet<CategoryValue>(1);
@@ -291,10 +282,7 @@ public class HibernateCriteriaTransactionalUtilities {
         if (countValue == null) {
             countValue = new CountValue();
             countValue.setValue(value);
-            Long id = (Long) session.save(countValue);
-            session.flush();
-            countValue.setCountValueId(id);
-            session.update(countValue);
+            session.save(countValue);
             session.flush();
         }
         Set<CountValue> values = new HashSet<CountValue>(1);
@@ -307,10 +295,7 @@ public class HibernateCriteriaTransactionalUtilities {
         if (geomtryValue == null) {
             geomtryValue = new GeometryValue();
             geomtryValue.setValue(value);
-            Long id = (Long) session.save(geomtryValue);
-            session.flush();
-            geomtryValue.setGeometryValueId(id);
-            session.update(geomtryValue);
+            session.save(geomtryValue);
             session.flush();
         }
         Set<GeometryValue> values = new HashSet<GeometryValue>(1);
@@ -323,10 +308,7 @@ public class HibernateCriteriaTransactionalUtilities {
         if (numericValue == null) {
             numericValue = new NumericValue();
             numericValue.setValue(value);
-            Long id = (Long) session.save(numericValue);
-            session.flush();
-            numericValue.setNumericValueId(id);
-            session.update(numericValue);
+            session.save(numericValue);
             session.flush();
         }
         Set<NumericValue> values = new HashSet<NumericValue>(1);
@@ -339,10 +321,7 @@ public class HibernateCriteriaTransactionalUtilities {
         if (textValue == null) {
             textValue = new TextValue();
             textValue.setValue(value);
-            Long id = (Long) session.save(textValue);
-            session.flush();
-            textValue.setTextValueId(id);
-            session.update(textValue);
+            session.save(textValue);
             session.flush();
         }
         Set<TextValue> values = new HashSet<TextValue>(1);
@@ -351,10 +330,7 @@ public class HibernateCriteriaTransactionalUtilities {
     }
 
     public static Observation insertObservation(Observation observation, Session session) {
-        Long id = (Long) session.save(observation);
-        session.flush();
-        observation.setObservationId(id);
-        session.update(observation);
+        session.save(observation);
         session.flush();
         return observation;
     }
@@ -366,13 +342,10 @@ public class HibernateCriteriaTransactionalUtilities {
             if (featureOfInterestType == null) {
                 featureOfInterestType = new FeatureOfInterestType();
                 featureOfInterestType.setFeatureOfInterestType(featureType);
-                Long id = (Long) session.save(featureOfInterestType);
-                session.flush();
-                featureOfInterestType.setFeatureOfInterestTypeId(id);
-                session.update(featureOfInterestType);
-                session.flush();
+                session.save(featureOfInterestType);
             }
         }
+        session.flush();
     }
 
     public static void insertObservationTypes(Set<String> obsTypes, Session session) {
@@ -382,13 +355,10 @@ public class HibernateCriteriaTransactionalUtilities {
             if (observationType == null) {
                 observationType = new ObservationType();
                 observationType.setObservationType(obsType);
-                Long id = (Long) session.save(observationType);
-                session.flush();
-                observationType.setObservationTypeId(id);
-                session.update(observationType);
-                session.flush();
+                session.save(observationType);
             }
         }
+        session.flush();
     }
 
     public static void insertProcedureDescriptionsFormats(Set<String> procDescFormats, Session session) {
@@ -398,13 +368,11 @@ public class HibernateCriteriaTransactionalUtilities {
             if (procedureDescriptionFormat == null) {
                 procedureDescriptionFormat = new ProcedureDescriptionFormat();
                 procedureDescriptionFormat.setProcedureDescriptionFormat(procDescFormat);
-                Long id = (Long) session.save(procedureDescriptionFormat);
-                session.flush();
-                procedureDescriptionFormat.setProcedureDescriptionFormatId(id);
-                session.update(procedureDescriptionFormat);
-                session.flush();
+                session.save(procedureDescriptionFormat);
+                
             }
         }
+        session.flush();
     }
 
     public static void insertFeatureOfInterestRelationShip(FeatureOfInterest parentFeature,
@@ -494,7 +462,7 @@ public class HibernateCriteriaTransactionalUtilities {
             SosObservation sosObservation,
             String antiSubsettingId,
             Session session) {
-        SosSingleObservationValue value = (SosSingleObservationValue) sosObservation.getValue();
+        SosSingleObservationValue<?> value = (SosSingleObservationValue) sosObservation.getValue();
         Observation hObservation = new Observation();
         hObservation.setDeleted(false);
         if (sosObservation.isSetIdentifier()) {
