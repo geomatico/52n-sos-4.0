@@ -24,17 +24,16 @@
 package org.n52.sos.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.IDecoder;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.IEncoder;
-import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;
