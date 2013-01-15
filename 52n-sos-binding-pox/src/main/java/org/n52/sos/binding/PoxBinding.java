@@ -57,7 +57,7 @@ public class PoxBinding extends Binding {
     private static final Logger LOGGER = LoggerFactory.getLogger(PoxBinding.class);
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_POX_BINDING);
     /**
-     * URL pattern for KVP requests
+     * URL pattern for POX requests
      */
     private static final String URL_PATTERN = "/pox";
 
@@ -79,9 +79,10 @@ public class PoxBinding extends Binding {
         String version = null;
         try {
             XmlObject doc = XmlHelper.parseXmlSosRequest(request);
+            LOGGER.debug("XML-REQUEST: {}", doc.xmlText());
             IDecoder<AbstractServiceRequest, XmlObject> decoder = Configurator.getInstance()
                     .getCodingRepository().getDecoder(CodingHelper.getDecoderKey(doc));
-            // decode SOAP message
+            // decode XML message
             Object abstractRequest = decoder.decode(doc);
             if (abstractRequest instanceof AbstractServiceRequest) {
                 AbstractServiceRequest sosRequest = (AbstractServiceRequest) abstractRequest;

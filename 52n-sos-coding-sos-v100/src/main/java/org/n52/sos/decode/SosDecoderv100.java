@@ -62,6 +62,7 @@ import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
@@ -283,7 +284,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
         getObsRequest.setObservedProperties(Arrays.asList(getObs.getObservedPropertyArray()));
         getObsRequest.setProcedures(Arrays.asList(getObs.getProcedureArray()));
         getObsRequest.setTemporalFilters(parseTemporalFilters4GetObservation(getObs.getEventTimeArray()));
-        getObsRequest.setSrid(parseSridV100(getObs.getSrsName()));
+        getObsRequest.setSrid(SosHelper.parseSrsName(getObs.getSrsName()));
         
         getObsRequest.setSpatialFilter(parseSpatialFilter4GetObservation(getObs.getFeatureOfInterest()));
         // TODO maybe obsolete through spatial filter above
@@ -454,7 +455,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
             GetObservation.EventTime[] temporalFilters) throws OwsExceptionReport {
     	
         List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>();
-        // TODO I am not sure if that works :-p
+        // TODO extend temporal filtering
         for (GetObservation.EventTime temporalFilter : temporalFilters) {
             Object filter = CodingHelper.decodeXmlElement(temporalFilter.getTemporalOps());
             if (filter != null && filter instanceof TemporalFilter) {
@@ -554,19 +555,14 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
 //        }
 //        return null;
 //    }
-    
-    private int parseSridV100(String srsName) throws OwsExceptionReport {
-		// TODO need to parse SRID ID fron that
-    	
-		return -1;
-	}
+
 
 	private List<String> parseFeatureofInterestV100(FeatureOfInterest featureOfInterest)
             throws OwsExceptionReport {
 		
 		List<String> features = new ArrayList<String>();
 		
-		// TODO we need a featureDecoderV100
+		// TODO we need a featureDecoderV100 or in the GmlDecoderv311
 		
 		return features;
 	}

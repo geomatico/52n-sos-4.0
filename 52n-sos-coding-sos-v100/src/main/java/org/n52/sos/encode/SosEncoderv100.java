@@ -23,7 +23,9 @@
  */
 package org.n52.sos.encode;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,6 +52,9 @@ import net.opengis.ogc.TemporalOperandsType;
 import net.opengis.ogc.TemporalOperatorNameType;
 import net.opengis.ogc.TemporalOperatorType;
 import net.opengis.ogc.TemporalOperatorsType;
+import net.opengis.om.x10.ObservationCollectionDocument;
+import net.opengis.om.x10.ObservationCollectionType;
+import net.opengis.om.x10.ObservationPropertyType;
 import net.opengis.ows.x11.MimeType;
 import net.opengis.ows.x11.OperationsMetadataDocument.OperationsMetadata;
 import net.opengis.ows.x11.ServiceIdentificationDocument.ServiceIdentification;
@@ -66,11 +71,13 @@ import net.opengis.swe.x101.TimeGeometricPrimitivePropertyType;
 
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
+import org.joda.time.DateTime;
 import org.n52.sos.ogc.filter.FilterConstants.ComparisonOperator;
 import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
+import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
@@ -83,11 +90,13 @@ import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.AbstractServiceResponse;
 import org.n52.sos.response.DescribeSensorResponse;
 import org.n52.sos.response.GetCapabilitiesResponse;
+import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,6 +121,7 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
             AbstractServiceRequest.class, 
             AbstractServiceResponse.class,
             GetCapabilitiesResponse.class, 
+            GetObservationResponse.class,
             DescribeSensorResponse.class
         )
     );
@@ -179,10 +189,10 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
         if (response instanceof GetCapabilitiesResponse) {
             return createCapabilitiesDocument((GetCapabilitiesResponse) response);
         } else if (response instanceof DescribeSensorResponse) {
-          return createDescribeSensorResponse((DescribeSensorResponse) response);
-      }
-//        else if (response instanceof GetObservationResponse) {
-//            return createGetObservationResponseDocument((GetObservationResponse) response);
+        	return createDescribeSensorResponse((DescribeSensorResponse) response);
+        } else if (response instanceof GetObservationResponse) {
+        	return createGetObservationResponseDocument((GetObservationResponse) response);
+        }
 //        } else if (response instanceof GetFeatureOfInterestResponse) {
 //            return createGetFeatureOfInterestResponse((GetFeatureOfInterestResponse) response);
 //        } else if (response instanceof GetObservationByIdResponse) {
@@ -262,6 +272,46 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
         N52XmlHelper.setSchemaLocationsToDocument(xmlObject, Collections
                 .singletonList(N52XmlHelper.getSchemaLocationForSWE101()));
         return xmlObject;
+    }
+    
+    private XmlObject createGetObservationResponseDocument(GetObservationResponse response) throws OwsExceptionReport {
+
+    	// create ObservationCollectionDocument and add Collection
+        ObservationCollectionDocument xb_obsColDoc = ObservationCollectionDocument.Factory.newInstance();
+        ObservationCollectionType xb_obsCol = xb_obsColDoc.addNewObservationCollection();
+        xb_obsCol.setId(SosConstants.OBS_COL_ID_PREFIX + new DateTime().getMillis());
+        
+        Collection<SosObservation> observationCollection = null;
+
+//        HashMap<String, String> gmlID4sfIdentifier = new HashMap<String, String>();
+//        int sfIdCounter = 1;
+//        if (iObservationEncoder.shouldObservationsWithSameXBeMerged()) {
+//            response.mergeObservationsWithSameX();
+//        }
+        // TODO how to check merge or not?
+        observationCollection = response.getObservationCollection();
+        
+        if (observationCollection.size() > 0) {
+            // TODO setBoundedBy (not necessary apparently?)            
+            
+	        for (SosObservation sosObservation : observationCollection) {
+	        	XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getResponseFormat(), sosObservation);
+	        	xb_obsCol.addNewMember().set(xmlObject);
+	        }
+        } else {
+            ObservationPropertyType xb_obs = xb_obsCol.addNewMember();
+            xb_obs.setHref( GMLConstants.NIL_INAPPLICABLE );
+        }
+        
+        // set schema location
+        XmlHelper.makeGmlIdsUnique(xb_obsColDoc.getDomNode());
+        List<String> schemaLocations = new ArrayList<String>();
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS100());
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForOM100());
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSA100());
+        // schemaLocations.add(N52XmlHelper.getSchemaLocationForSWE101());
+        N52XmlHelper.setSchemaLocationsToDocument(xb_obsColDoc, schemaLocations);
+        return xb_obsColDoc;
     }
 
     /**

@@ -1,2 +1,3 @@
 org.n52.sos.encode.OmEncoderv100
 org.n52.sos.encode.SosEncoderv100
+org.n52.sos.encode.GmlEncoderv311

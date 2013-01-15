@@ -201,7 +201,7 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
             observationID = xbObs.getId().replace("o_", "");
         }
         if (sosObservation.getIdentifier() != null && sosObservation.getIdentifier().isSetValue()) {
-            xbObs.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, sosObservation.getIdentifier()));
+            xbObs.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML, sosObservation.getIdentifier()));
         }
 
         String observationType = sosObservation.getObservationConstellation().getObservationType();
@@ -479,7 +479,7 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
 
     private void addPhenomenonTime(TimeObjectPropertyType timeObjectPropertyType, ITime iTime)
             throws OwsExceptionReport {
-        XmlObject xmlObject = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, iTime);
+        XmlObject xmlObject = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML, iTime);
         XmlObject substitution =
                 timeObjectPropertyType.addNewTimeObject().substitute(
                 GmlHelper.getQnameForITime(iTime), xmlObject.schemaType());
