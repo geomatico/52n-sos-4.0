@@ -71,11 +71,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         super();
         this.capabilitiesCache = new CapabilitiesCache();
         this.cacheFeederDAO = Configurator.getInstance().getCacheFeederDAO();
-        // try {
-        // update(false);
-        // } catch (OwsExceptionReport e) {
-        // log.fatal("Fatal error: Couldn't initialize capabilities cache!");
-        // }
     }
 
     /**
@@ -89,6 +84,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      */
 	@Override
     public boolean update(boolean checkLastUpdateTime) throws OwsExceptionReport {
+		LOGGER.info("Capabilities Cache Update started");
         boolean timeNotElapsed = true;
         try {
             // thread safe updating of the cache map
@@ -119,10 +115,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
                 setUpdateIsFree(true);
             }
         }
-
         return true;
-
-        // queryObservationIds();
     }
 
     @Override
@@ -219,9 +212,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.n52.sos.cache.ACapabilitiesCacheController#updateAfterObservationDeletion()
-     */
     @Override
     public void updateAfterObservationDeletion() throws OwsExceptionReport
     {
@@ -284,6 +274,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     }
 
     /**
+     * FIXME Update or remove, the method is doing nothing but wait
      * method for refreshing the metadata of fois in the capabilities cache; is
      * invoked when a new feature of interest is inserted into the SOS database
      * 
@@ -326,6 +317,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     }
 
     /**
+     * FIXME Update or remove, the method is doing nothing but wait
      * refreshes sensor metadata; used after registration of new sensor at SOS
      * 
      * @throws OwsExceptionReport
@@ -367,6 +359,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     }
 
     /**
+     * FIXME Update or remove, the method is doing nothing but wait
      * methods for adding relationships in Cache for recently received new
      * observation
      * 
@@ -417,6 +410,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     }
 
     /**
+     * FIXME Update or remove, the method is doing nothing but wait
      * Returns the observedProperties (phenomenons) for the requested offering
      * 
      * @param offering
