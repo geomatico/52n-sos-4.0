@@ -69,4 +69,20 @@ public class RangeValue<T> {
         list.add(rangeEnd.toString());
         return list;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        if (isSetStartValue()) {
+            builder.append(rangeStart);
+        } else {
+            builder.append("null");
+        }
+        if (isSetEndValue()) {
+            builder.append(rangeEnd);
+        } else {
+            builder.append("null");
+        }
+        return builder.toString();
+    }
 }
