@@ -43,6 +43,7 @@ import org.n52.sos.ds.IDescribeSensorDAO;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
+import org.n52.sos.ds.hibernate.util.HibernateProcedureUtilities;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
@@ -112,8 +113,7 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
         Session session = null;
         try {
             session = getSession();
-            SosProcedureDescription result =
-                    queryProcedure(request.getProcedure(), request.getProcedureDescriptionFormat(), session);
+            SosProcedureDescription result = queryProcedure(request, session);
             
             Collection<String> features = getFeatureOfInterestIDsForProcedure(request.getProcedure(), request.getVersion(), session);
             if (features != null && !features.isEmpty()) {
@@ -148,82 +148,12 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
         }
     }
 
-    private SosProcedureDescription queryProcedure(String procID, String outputFormat, Session session)
+    private SosProcedureDescription queryProcedure(DescribeSensorRequest request, Session session)
             throws OwsExceptionReport {
-        String filename = null;
-        String smlFile = null;
-        String descriptionFormat;
-        // TODO: check and query for validTime parameter
-        Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(procID, session);
-        Set<ValidProcedureTime> validProcedureTimes = procedure.getValidProcedureTimes();
-        for (ValidProcedureTime validProcedureTime : validProcedureTimes) {
-            if (validProcedureTime.getEndTime() == null) {
-                filename = validProcedureTime.getDescriptionUrl();
-                smlFile = validProcedureTime.getDescriptionXml();
-            }
-        }
-        descriptionFormat = procedure.getProcedureDescriptionFormat().getProcedureDescriptionFormat();
-        // check whether SMLFile or Url is set
-        if (filename == null && smlFile == null) {
-            String exceptionText = "No sensorML file was found for the requested procedure " + procID;
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    SosConstants.DescribeSensorParams.procedure.toString(), exceptionText);
-
-        } else {
-            try {
-                if (filename != null && descriptionFormat != null && smlFile == null) {
-                    // return sensorML from folder
-
-                    if (!descriptionFormat.equalsIgnoreCase(outputFormat)
-                            && !descriptionFormat.equalsIgnoreCase(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
-                        String exceptionText =
-                                "The value of the output format is wrong and has to be " + descriptionFormat
-                                        + " for procedure " + procID;
-                        LOGGER.error(exceptionText);
-                        throw Util4Exceptions.createInvalidParameterValueException(
-                                SosConstants.DescribeSensorParams.procedure.toString(), exceptionText);
-                    }
-                    File sensorFile;
-                    LOGGER.info(filename);
-                    // read in the description file
-                    if (filename.startsWith("standard/")) {
-                        filename = filename.replace("standard/", "");
-                        sensorFile = new File(getConfigurator().getSensorDir(), filename);
-                    } else {
-                        sensorFile = new File(filename);
-                    }
-                    XmlObject procedureDescription = XmlObject.Factory.parse(sensorFile);
-                    try {
-                        return (SosProcedureDescription) CodingHelper.decodeXmlElement(procedureDescription);
-                    } catch (OwsExceptionReport owse) {
-                        return new SosProcedureDescriptionUnknowType(procID, outputFormat,
-                                procedureDescription.xmlText());
-                    }
-                } else {
-                    XmlObject procedureDescription = XmlObject.Factory.parse(smlFile);
-                    try {
-                        return (SosProcedureDescription) CodingHelper.decodeXmlElement(procedureDescription);
-                    } catch (OwsExceptionReport owse) {
-                        return new SosProcedureDescriptionUnknowType(procID, outputFormat,
-                                procedureDescription.xmlText());
-                    }
-                }
-            } catch (FileNotFoundException fnfe) {
-                String exceptionText = "No sensorML file was found for the requested procedure " + procID;
-                LOGGER.error(exceptionText, fnfe);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        SosConstants.DescribeSensorParams.procedure.toString(), exceptionText);
-            } catch (IOException ioe) {
-                String exceptionText = "An error occured while parsing the sensor description document!";
-                LOGGER.error(exceptionText, ioe);
-                throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
-            } catch (XmlException xmle) {
-                String exceptionText = "An error occured while parsing the sensor description document!";
-                LOGGER.error(exceptionText, xmle);
-                throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
-            }
-        }
+        Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(request.getProcedure(), session);
+        return HibernateProcedureUtilities.createSosProcedureDescription(procedure, request.getProcedure(), request.getProcedureDescriptionFormat());
+        
+       
     }
 
     private Collection<String> getFeatureOfInterestIDsForProcedure(String procedureIdentifier, String version,
@@ -304,7 +234,8 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
                     SosHelper.getUrlPatternForHttpGetMethod(new OperationDecoderKey(SosConstants.SOS, version,
                             SosConstants.Operations.DescribeSensor.name()));
             for (String childProcID : childProcedureIds) {
-                childProcedures.add(queryProcedure(childProcID, outputFormat, session));
+                Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(childProcID, session);
+                childProcedures.add(HibernateProcedureUtilities.createSosProcedureDescription(procedure, childProcID, outputFormat));
 
                 // int childCount = 0;
                 // childCount++;
