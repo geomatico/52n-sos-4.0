@@ -63,18 +63,15 @@ import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.GMLConstants;
-import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,13 +80,13 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FesEncoderv20.class);
     private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(
-            FilterConstants.NS_FES_2, 
-            TemporalFilter.class, 
+            FilterConstants.NS_FES_2,
+            TemporalFilter.class,
             org.n52.sos.ogc.filter.FilterCapabilities.class,
             SpatialFilter.class);
-    
+
     public FesEncoderv20() {
-        LOGGER.info("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
@@ -140,7 +137,7 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
         } else if (temporalFilter.getOperator().equals(TimeOperator.TM_Equals)) {
             return encodeTemporalFilterEquals(temporalFilter);
         } else {
-            String exceptionText = String.format("The temporal filter operand '%s' is not supported!", 
+            String exceptionText = String.format("The temporal filter operand '%s' is not supported!",
                     temporalFilter.getOperator().name());
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
@@ -209,7 +206,7 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
 
     /**
      * Sets the filter capabilities section to capabilities
-     * 
+     *
      * @param filterCapabilities
      *            FES filter capabilities
      * @param sosFilterCaps
@@ -235,7 +232,7 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
 
     /**
      * Sets the FES conformance classes in the filter capabilities section.
-     * 
+     *
      * @param conformance
      *            FES conformence
      */
@@ -320,9 +317,9 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
 
     /**
      * Sets the SpatialFilterCapabilities.
-     * 
+     *
      * !!! Modify method addicted to your implementation !!!
-     * 
+     *
      * @param spatialCapabilitiesType
      *            FES SpatialCapabilities.
      * @param sosFilterCaps
@@ -356,9 +353,9 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
 
     /**
      * Sets the TemporalFilterCapabilities.
-     * 
+     *
      * !!! Modify method addicted to your implementation !!!
-     * 
+     *
      * @param temporalCapabilitiesType
      *            FES TemporalCapabilities.
      * @param sosFilterCaps
@@ -392,9 +389,9 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
 
     /**
      * Sets the ScalarFilterCapabilities.
-     * 
+     *
      * !!! Modify method addicted to your implementation !!!
-     * 
+     *
      * @param scalarCapabilitiesType
      *            FES ScalarCapabilities.
      * @param sosFilterCaps
@@ -413,9 +410,9 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
 
     /**
      * Set the IdFilterCapabilities.
-     * 
+     *
      * !!! Modify method addicted to your implementation !!!
-     * 
+     *
      * @param idCapabilitiesType
      *            FES IdCapabilities.
      */
@@ -425,7 +422,7 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
 
     /**
      * Get the FES spatial operator name for SOS spatial operator
-     * 
+     *
      * @param spatialOperator
      *            SOS spatial operator
      * @return FES spatial operator name
@@ -462,7 +459,7 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
 
     /**
      * Get the FES temporal operator name for SOS temporal operator
-     * 
+     *
      * @param temporalOperator
      *            SOS temporal operator
      * @return FES temporal operator name
@@ -503,7 +500,7 @@ public class FesEncoderv20 implements IEncoder<XmlObject, Object> {
 
     /**
      * Get the FES comparison operator name for SOS comparison operator
-     * 
+     *
      * @param comparisonOperator
      *            SOS comparison operator
      * @return FES comparison operator name

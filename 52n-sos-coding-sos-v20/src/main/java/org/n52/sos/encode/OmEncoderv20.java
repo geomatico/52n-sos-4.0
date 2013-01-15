@@ -112,7 +112,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
     private boolean supported = true;
 
     public OmEncoderv20() {
-        LOGGER.info("Encoder for the following keys initialized successfully: {}!",
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!",
                 StringHelper.join(", ", ENCODER_KEYS));
     }
 
@@ -1045,7 +1045,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
     /**
      * Encodes a SosAbstractFeature to an SpatialSamplingFeature under
      * consideration of duplicated SpatialSamplingFeature in the XML document.
-     * 
+     *
      * @param observation
      *            XmlObject O&M observation
      * @param absObs

@@ -82,13 +82,13 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
             SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_SURFACE
         )
     );
-    
+
     private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(
             ConformanceClasses.OM_V2_SPATIAL_SAMPLING, ConformanceClasses.OM_V2_SAMPLING_POINT,
             ConformanceClasses.OM_V2_SAMPLING_CURVE, ConformanceClasses.OM_V2_SAMPLING_SURFACE);
 
     public SamplingEncoderv20() {
-        LOGGER.info("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
@@ -100,7 +100,7 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
         return Collections.unmodifiableMap(SUPPORTED_TYPES);
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);

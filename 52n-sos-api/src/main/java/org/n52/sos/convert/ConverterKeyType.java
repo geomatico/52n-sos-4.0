@@ -26,11 +26,9 @@ package org.n52.sos.convert;
 public class ConverterKeyType implements Comparable<ConverterKeyType> {
 
     private String fromNamespace;
-
     private String toNamespace;
 
     public ConverterKeyType(String fromNamespace, String toNamespace) {
-        super();
         this.fromNamespace = fromNamespace;
         this.toNamespace = toNamespace;
     }
@@ -55,11 +53,6 @@ public class ConverterKeyType implements Comparable<ConverterKeyType> {
         return -1;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object paramObject) {
         if (paramObject instanceof ConverterKeyType) {
@@ -70,11 +63,6 @@ public class ConverterKeyType implements Comparable<ConverterKeyType> {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         int hash = 7;
@@ -97,12 +85,8 @@ public class ConverterKeyType implements Comparable<ConverterKeyType> {
 
     @Override
     public String toString() {
-        StringBuilder string = new StringBuilder();
-        string.append("DecoderKey(");
-        string.append(fromNamespace + ",");
-        string.append(toNamespace);
-        string.append(")");
-        return string.toString();
+        return String.format("%s[from=%s, to=%s]", getClass().getSimpleName(),
+                fromNamespace, toNamespace);
     }
 
 }

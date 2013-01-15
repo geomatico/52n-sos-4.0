@@ -145,14 +145,14 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             GetFeatureOfInterestResponse.class,
             GetObservationResponse.class,
             GetCapabilitiesResponse.class,
-            AbstractServiceRequest.class, 
+            AbstractServiceRequest.class,
             GetCapabilitiesRequest.class,
             GetResultTemplateRequest.class,
             GetResultRequest.class
     );
 
     public SosEncoderv20() {
-        LOGGER.info("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
@@ -253,7 +253,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         if (sosCapabilities.getOperationsMetadata() != null
                 && sosCapabilities.getOperationsMetadata().getOperations() != null
                 && !sosCapabilities.getOperationsMetadata().getOperations().isEmpty()) {
-            
+
             xbCaps.setOperationsMetadata((OperationsMetadata) CodingHelper.encodeObjectToXml(OWSConstants.NS_OWS, sosCapabilities.getOperationsMetadata()));
         }
         if (sosCapabilities.getFilterCapabilities() != null) {
@@ -285,7 +285,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
-        IObservationEncoder<XmlObject, SosObservation> iObservationEncoder 
+        IObservationEncoder<XmlObject, SosObservation> iObservationEncoder
                 = (IObservationEncoder<XmlObject, SosObservation>) encoder;
         if (iObservationEncoder.shouldObservationsWithSameXBeMerged()) {
             response.mergeObservationsWithSameX();
@@ -297,7 +297,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         // set schema location
         XmlHelper.makeGmlIdsUnique(xbGetObsRespDoc.getDomNode());
         N52XmlHelper.setSchemaLocationsToDocument(xbGetObsRespDoc, CollectionHelper.list(
-            N52XmlHelper.getSchemaLocationForSOS200(), N52XmlHelper.getSchemaLocationForOM200(), 
+            N52XmlHelper.getSchemaLocationForSOS200(), N52XmlHelper.getSchemaLocationForOM200(),
             N52XmlHelper.getSchemaLocationForSF200(), N52XmlHelper.getSchemaLocationForSAMS200()));
         return xbGetObsRespDoc;
     }
@@ -399,9 +399,9 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                 InsertObservationResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         xbInsObsRespDoc.addNewInsertObservationResponse();
         // set schema location
-        N52XmlHelper.setSchemaLocationsToDocument(xbInsObsRespDoc, 
+        N52XmlHelper.setSchemaLocationsToDocument(xbInsObsRespDoc,
                 Collections.singletonList(N52XmlHelper.getSchemaLocationForSOS200()));
-        
+
         return xbInsObsRespDoc;
     }
 
@@ -414,7 +414,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                 insertResultTemplateResponseDoc.addNewInsertResultTemplateResponse();
         insertResultTemplateResponse.setAcceptedTemplate(response.getAcceptedTemplate());
         // set schema location
-        N52XmlHelper.setSchemaLocationsToDocument(insertResultTemplateResponseDoc, 
+        N52XmlHelper.setSchemaLocationsToDocument(insertResultTemplateResponseDoc,
                 Collections.singletonList(N52XmlHelper.getSchemaLocationForSOS200()));
         return insertResultTemplateResponseDoc;
     }
@@ -424,7 +424,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                 InsertResultResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         insertResultTemplateResponseDoc.addNewInsertResultResponse();
         // set schema location
-        N52XmlHelper.setSchemaLocationsToDocument(insertResultTemplateResponseDoc, 
+        N52XmlHelper.setSchemaLocationsToDocument(insertResultTemplateResponseDoc,
                 Collections.singletonList(N52XmlHelper.getSchemaLocationForSOS200()));
         return insertResultTemplateResponseDoc;
     }
@@ -440,7 +440,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             resultValues.set(xmlString);
         }
         // set schema location
-        N52XmlHelper.setSchemaLocationsToDocument(getResultResponseDoc, 
+        N52XmlHelper.setSchemaLocationsToDocument(getResultResponseDoc,
                 Collections.singletonList(N52XmlHelper.getSchemaLocationForSOS200()));
         return getResultResponseDoc;
     }
@@ -453,7 +453,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         getResultTemplateResponse.setResultEncoding(createResultEncoding(response.getResultEncoding()));
         getResultTemplateResponse.setResultStructure(createResultStructure(response.getResultStructure()));
         // set schema location
-        N52XmlHelper.setSchemaLocationsToDocument(getResultTemplateResponseDoc, 
+        N52XmlHelper.setSchemaLocationsToDocument(getResultTemplateResponseDoc,
                 Collections.singletonList(N52XmlHelper.getSchemaLocationForSOS200()));
         return getResultTemplateResponseDoc;
     }
@@ -501,7 +501,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
 
     /**
      * Sets the content section to the Capabilities document.
-     * 
+     *
      * @param xbContents
      *            SOS 2.0 contents section
      * @param offerings
@@ -623,7 +623,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
 
     /**
      * Creates a XML FeatureRelationship for the relatedFeature
-     * 
+     *
      * @param relatedFeature
      *            XML feature relationship
      * @param map
@@ -682,9 +682,9 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
 
     /**
      * queries the bounding box of all requested feature of interest IDs
-     * 
+     *
      * @param envelope
-     * 
+     *
      * @param foiIDs
      *            ArrayList with String[]s containing the ids of the feature of
      *            interests for which the BBOX should be returned

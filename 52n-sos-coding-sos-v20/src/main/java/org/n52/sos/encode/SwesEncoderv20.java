@@ -60,12 +60,12 @@ public class SwesEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespon
     private static final Logger LOGGER = LoggerFactory.getLogger(SwesEncoderv20.class);
     private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper
             .encoderKeysForElements(SWEConstants.NS_SWES_20,
-        DescribeSensorResponse.class, InsertSensorResponse.class, 
+        DescribeSensorResponse.class, InsertSensorResponse.class,
         UpdateSensorResponse.class, DeleteSensorResponse.class
     );
 
     public SwesEncoderv20() {
-        LOGGER.info("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
@@ -82,12 +82,12 @@ public class SwesEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespon
     public Set<String> getConformanceClasses() {
         return Collections.emptySet();
     }
-    
+
     @Override
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(SWEConstants.NS_SWES_20, SWEConstants.NS_SWES_PREFIX);
     }
-    
+
     @Override
     public String getContentType() {
         return SosConstants.CONTENT_TYPE_XML;
@@ -112,7 +112,7 @@ public class SwesEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespon
         }
         return null;
     }
-    
+
     private XmlObject createDescribeSensorResponse(DescribeSensorResponse response) throws OwsExceptionReport {
         DescribeSensorResponseDocument xbDescSensorRespDoc =
                 DescribeSensorResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
@@ -127,7 +127,7 @@ public class SwesEncoderv20 implements IEncoder<XmlObject, AbstractServiceRespon
         XmlObject xmlObject = CodingHelper.encodeObjectToXml(outputFormat, response.getSensorDescription());
         describeSensorResponse.addNewDescription().addNewSensorDescription().addNewData().set(xmlObject);
         // set schema location
-        N52XmlHelper.setSchemaLocationsToDocument(xbDescSensorRespDoc, 
+        N52XmlHelper.setSchemaLocationsToDocument(xbDescSensorRespDoc,
                 Collections.singletonList(N52XmlHelper.getSchemaLocationForSWES200()));
         return xbDescSensorRespDoc;
     }

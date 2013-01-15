@@ -84,10 +84,10 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GmlEncoderv321.class);
 
     private static final Set<EncoderKey> ENCODER_KEY_TYPES = CodingHelper.encoderKeysForElements(
-            GMLConstants.NS_GML_32, 
+            GMLConstants.NS_GML_32,
             org.n52.sos.ogc.gml.time.ITime.class,
             com.vividsolutions.jts.geom.Geometry.class,
-            org.n52.sos.ogc.om.values.CategoryValue.class, 
+            org.n52.sos.ogc.om.values.CategoryValue.class,
             org.n52.sos.ogc.gml.ReferenceType.class,
             org.n52.sos.ogc.om.values.QuantityValue.class,
             org.n52.sos.ogc.gml.CodeWithAuthority.class,
@@ -95,7 +95,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
             );
 
     public GmlEncoderv321() {
-        LOGGER.info("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEY_TYPES));
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEY_TYPES));
     }
 
     @Override
@@ -176,7 +176,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
 
     /**
      * Creates a XML TimePeriod from the SOS time object.
-     * 
+     *
      * @param timePeriod
      *            SOS time object
      * @param timePeriodType
@@ -233,7 +233,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
 
     /**
      * Creates a XML TimeInstant from the SOS time object.
-     * 
+     *
      * @param timeInstant
      *            SOS time object
      * @param timeInstantType
@@ -304,7 +304,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
 
     /**
      * Creates a XML Point from a SOS Point.
-     * 
+     *
      * @param jtsPoint
      *            SOS Point
      * @param xbPoint
@@ -324,7 +324,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
 
     /**
      * Creates a XML LineString from a SOS LineString.
-     * 
+     *
      * @param jtsLineString
      *            SOS LineString
      * @param xbLst
@@ -348,7 +348,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
 
     /**
      * Creates a XML Polygon from a SOS Polygon.
-     * 
+     *
      * @param jtsPolygon
      *            SOS Polygon
      * @param xbPolType
@@ -430,7 +430,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
         }
         return xbRef;
     }
-    
+
     private XmlObject createReferencType(org.n52.sos.ogc.gml.ReferenceType sosReferenceType) {
         if (sosReferenceType.isSetHref()) {
             ReferenceType referenceType = ReferenceType.Factory.newInstance();
@@ -444,9 +444,9 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
             return referenceType;
         }
         return null;
-        
+
     }
-    
+
     private XmlObject createCodeWithAuthorityType(CodeWithAuthority sosCodeWithAuthority) {
         if (sosCodeWithAuthority.isSetValue()) {
             CodeWithAuthorityType codeWithAuthority = CodeWithAuthorityType.Factory.newInstance();
@@ -456,7 +456,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
         }
         return null;
     }
-    
+
     private XmlObject createCodeType(org.n52.sos.ogc.gml.CodeType sosCodeType) {
         CodeType codeType = CodeType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         codeType.setCodeSpace(sosCodeType.getCodeSpace());

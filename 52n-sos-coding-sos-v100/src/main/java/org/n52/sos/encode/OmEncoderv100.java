@@ -93,7 +93,7 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
             OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION
         )
     );
-    
+
     // TODO: change to correct conformance class
     private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(
         "http://www.opengis.net/spec/OMXML/1.0/conf/measurement",
@@ -103,21 +103,21 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
         "http://www.opengis.net/spec/OMXML/1.0/conf/geometryObservation",
         "http://www.opengis.net/spec/OMXML/1.0/conf/textObservation"
     );
-    
+
     private static final Map<String, Map<String, Set<String>>> supportedResponseFormats
-        = Collections.singletonMap(SosConstants.SOS, 
-            Collections.singletonMap(Sos1Constants.SERVICEVERSION, 
+        = Collections.singletonMap(SosConstants.SOS,
+            Collections.singletonMap(Sos1Constants.SERVICEVERSION,
                 CollectionHelper.set(OMConstants.NS_OM,OMConstants.CONTENT_TYPE_OM)));
-    
+
     private static final Set<EncoderKey> ENCODER_KEYS = CollectionHelper.union(
         CodingHelper.encoderKeysForElements(OMConstants.NS_OM, SosObservation.class),
         CodingHelper.encoderKeysForElements(OMConstants.CONTENT_TYPE_OM, SosObservation.class)
     );
-    
+
     private boolean supported = true;
 
     public OmEncoderv100() {
-        LOGGER.info("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
@@ -985,7 +985,7 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
     /**
      * Encodes a SosAbstractFeature to an SpatialSamplingFeature under
      * consideration of duplicated SpatialSamplingFeature in the XML document.
-     * 
+     *
      * @param observation
      *            XmlObject O&M observation
      * @param absObs
@@ -1222,7 +1222,7 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
     // // add resultDefinition
     // XmlObject xbRresult = xbObs.addNewResult();
     // DataArrayDocument xb_dataArrayDoc = createDataArrayResult(phenComponents,
-    
+
     // sosObs);
     // xbRresult.set(xb_dataArrayDoc);
     // XmlCursor cursor = xbRresult.newCursor();

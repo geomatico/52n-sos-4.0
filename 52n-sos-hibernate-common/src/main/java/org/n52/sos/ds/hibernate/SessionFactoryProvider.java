@@ -40,9 +40,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
+ *
  * Implementation of the SessionFactory.
- * 
+ *
  */
 public class SessionFactoryProvider implements IConnectionProvider {
 
@@ -58,15 +58,15 @@ public class SessionFactoryProvider implements IConnectionProvider {
 
     /**
      * constructor. Opens a new Hibernate SessionFactory
-     * 
+     *
      */
     public SessionFactoryProvider() {
-        
+
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.n52.sos.ds.IConnectionProvider#getConnection()
      */
     @Override
@@ -79,7 +79,7 @@ public class SessionFactoryProvider implements IConnectionProvider {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.n52.sos.ds.IConnectionProvider#returnConnection(java.lang.Object)
      */
@@ -98,7 +98,7 @@ public class SessionFactoryProvider implements IConnectionProvider {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.n52.sos.ds.IConnectionProvider#cleanup()
      */
     @Override
@@ -123,7 +123,7 @@ public class SessionFactoryProvider implements IConnectionProvider {
 	@Override
 	public void initialize(Properties properties) throws ConfigurationException {
 		try {
-			LOGGER.debug("Instantiating session factory with {}", properties);
+			LOGGER.debug("Instantiating session factory");
             Configuration configuration = new Configuration()
 					.configure("/sos-hibernate.cfg.xml")
 					.mergeProperties(properties);

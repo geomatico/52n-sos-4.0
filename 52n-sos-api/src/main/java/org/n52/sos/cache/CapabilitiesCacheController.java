@@ -46,11 +46,10 @@ import com.vividsolutions.jts.geom.Envelope;
 /**
  * CapabilitiesCacheController implements all methods to request all objects and
  * relationships from a standard datasource
- * 
+ *
  */
 public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
-    /** logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(CapabilitiesCacheController.class);
 
     /**
@@ -63,24 +62,23 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      */
     private ICacheFeederDAO cacheFeederDAO;
 
-    /**
-     * constructor
-     * 
-     */
     public CapabilitiesCacheController() {
         super();
         this.capabilitiesCache = new CapabilitiesCache();
         this.cacheFeederDAO = Configurator.getInstance().getCacheFeederDAO();
+        if (this.cacheFeederDAO == null) {
+            throw new NullPointerException("No ICacheFeederDAO found!");
+        }
     }
 
     /**
      * queries the service offerings, the observedProperties for each offering,
      * and the offering names from the DB and sets these values in this
      * configurator
-     * 
+     *
      * @throws OwsExceptionReport
      *             if the query of one of the values described upside failed
-     * 
+     *
      */
 	@Override
     public boolean update(boolean checkLastUpdateTime) throws OwsExceptionReport {
@@ -155,7 +153,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         try {
             // thread safe updating of the cache map
             timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
-    
+
             // has waiting for lock got a time out?
             if (!timeNotElapsed) {
                 LOGGER.warn("\n******\nupdateAfterSensorDeletion() not successful "
@@ -164,12 +162,12 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
                 return;
             }
             while (!isUpdateIsFree()) {
-    
+
                 getUpdateFree().await();
             }
             setUpdateIsFree(false);
             this.cacheFeederDAO.updateAfterSensorDeletion(capabilitiesCache);
-    
+
         } catch (InterruptedException e) {
             LOGGER.error("Problem while threadsafe capabilities cache update", e);
         } finally {
@@ -178,7 +176,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
                 setUpdateIsFree(true);
             }
         }
-        
+
     }
 
     @Override
@@ -277,7 +275,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * FIXME Update or remove, the method is doing nothing but wait
      * method for refreshing the metadata of fois in the capabilities cache; is
      * invoked when a new feature of interest is inserted into the SOS database
-     * 
+     *
      * @throws OwsExceptionReport
      *             if refreshing failed
      */
@@ -319,9 +317,9 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     /**
      * FIXME Update or remove, the method is doing nothing but wait
      * refreshes sensor metadata; used after registration of new sensor at SOS
-     * 
+     *
      * @throws OwsExceptionReport
-     * 
+     *
      */
 	@Override
     public void updateSensorMetadata() throws OwsExceptionReport {
@@ -362,7 +360,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * FIXME Update or remove, the method is doing nothing but wait
      * methods for adding relationships in Cache for recently received new
      * observation
-     * 
+     *
      * @param observation
      *            recently received observation which has been inserted into SOS
      *            db and whose relationships have to be maintained in cache
@@ -412,7 +410,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     /**
      * FIXME Update or remove, the method is doing nothing but wait
      * Returns the observedProperties (phenomenons) for the requested offering
-     * 
+     *
      * @param offering
      *            the offering for which observedProperties should be returned
      * @return Returns String[] containing the phenomenons of the requested
@@ -429,7 +427,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * methods returns all phenomena (single or components of composite
      * phenomena) which belong to the requested offering; necessary for database
      * queries
-     * 
+     *
      * @param offering
      *            the id of the offering for which all phenomena should be
      *            returned
@@ -442,7 +440,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * Returns copy of the phenomenons of all offerings
-     * 
+     *
      * @return List<String> containing the phenomenons of all offerings
      */
     public List<String> getAllPhenomenons() {
@@ -451,7 +449,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * returns the offerings of this SOS
-     * 
+     *
      * @return List<String> containing the offerings of this SOS
      */
 	@Override
@@ -464,7 +462,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * returns the observation ids of this SOS
-     * 
+     *
      * @return List<String> containing the observation ids of this SOS
      */
 	@Override
@@ -477,7 +475,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * returns the observedProperties for each offering
-     * 
+     *
      * @return Map<String, String[]> containing the offerings with its
      *         observedProperties
      */
@@ -490,7 +488,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * returns the name of the requested offering
-     * 
+     *
      * @param offering
      *            the offering for which the name should be returned
      * @return String containing the name of the offering
@@ -503,7 +501,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     /**
      * Returns TreeMap containing all procedures which are used by the Offerings
      * offered in this SOS
-     * 
+     *
      * @return TreeMap<String, SensorSystem> TreeMap containing all procedures
      *         which are used by the Offerings offered in this SOS
      */
@@ -518,7 +516,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     /**
      * Returns collection containing parent procedures for the passed procedure,
      * optionally navigating the full hierarchy and including itself
-     * 
+     *
      * @param procId
      *            the procedure id to find parents for
      * @param fullHierarchy
@@ -526,7 +524,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @param includeSelf
      *            whether or not to include the passed procedure id in the
      *            result
-     * 
+     *
      * @return Collection<String> containing the passed procedure id's parents
      *         (and optionally itself)
      */
@@ -539,7 +537,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * Returns collection containing parent procedures for the passed
      * procedures, optionally navigating the full hierarchy and including
      * themselves
-     * 
+     *
      * @param procIds
      *            collection of the procedure ids to find parents for
      * @param fullHierarchy
@@ -547,7 +545,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @param includeSelves
      *            whether or not to include the passed procedure ids in the
      *            result
-     * 
+     *
      * @return Collection<String> containing the passed procedure id's parents
      *         (and optionally themselves)
      */
@@ -560,7 +558,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     /**
      * Returns collection containing child procedures for the passed procedure,
      * optionally navigating the full hierarchy and including itself
-     * 
+     *
      * @param procId
      *            procedure id to find children for
      * @param fullHierarchy
@@ -568,7 +566,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @param includeSelf
      *            whether or not to include the passed procedure id in the
      *            result
-     * 
+     *
      * @return Collection<String> containing the passed procedure id's children
      *         (and optionally itself)
      */
@@ -580,7 +578,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     /**
      * Returns collection containing child procedures for the passed procedures,
      * optionally navigating the full hierarchy and including themselves
-     * 
+     *
      * @param procIds
      *            collection of procedure ids to find children for
      * @param fullHierarchy
@@ -588,7 +586,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @param includeSelves
      *            whether or not to include the passed procedure ids in the
      *            result
-     * 
+     *
      * @return Collection<String> containing the passed procedure id's children
      *         (and optionally itself)
      */
@@ -618,7 +616,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * return the result models for the requested offering
-     * 
+     *
      * @param offering
      *            the offering for which the result models should be returned
      * @return String[] containing the result models for the requested offering
@@ -633,7 +631,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * returns the procedures for the requested offering
-     * 
+     *
      * @param offering
      *            the offering for which the procedures should be returned
      * @return String[] containing the procedures for the requested offering
@@ -648,7 +646,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * returns the procedureID for the feature of interest (station)
-     * 
+     *
      * @param foiID
      *            the foiID for which the procedureID should returned
      * @return String representing the procedureID
@@ -662,7 +660,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * return the unit of the values for the observedProperty
-     * 
+     *
      * @param observedProperty
      *            String observedProperty for which the type of the values
      *            should be returned
@@ -675,7 +673,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * returns the phens4CompPhens
-     * 
+     *
      * @return HashMap<String, List<String>> the phens4CompPhens
      */
     public Map<String, Collection<String>> getPhens4CompPhens() {
@@ -687,7 +685,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * Returns the offCompPhens
-     * 
+     *
      * @return HashMap<String, List<String>> the offCompPhens
      */
     public Map<String, Collection<String>> getOffCompPhens() {
@@ -699,7 +697,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * returns the procedures for phenomena
-     * 
+     *
      * @return HashMap<String, List<String>> the procedures for phenomena
      */
     public Map<String, Collection<String>> getPhenProcs() {
@@ -711,7 +709,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * returns the phenomena for procedures
-     * 
+     *
      * @return HashMap<String, List<String>> the phenomena for procedures
      */
     public Map<String, Collection<String>> getProcPhens() {
@@ -723,7 +721,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * Returns Srid of coordinates stored in SOS database
-     * 
+     *
      * @return int Srid of coordinates stored in SOS database
      */
     public int getSrid() {
@@ -731,7 +729,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     }
 
     /**
-     * 
+     *
      * @return Returns Map containing offeringIDs as keys and list of
      *         corresponding features as values
      */
@@ -744,7 +742,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * returns the offerings for the passed procedure id
-     * 
+     *
      * @param procID
      *            id of procedure, for which related offerings should be
      *            returned
@@ -757,7 +755,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * returns the offerings for the passed phenomenon
-     * 
+     *
      * @param phenID
      *            id of procedure, for which related offerings should be
      *            returned
@@ -769,7 +767,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * Returns srids, which are supported by this SOS
-     * 
+     *
      * @return Returns srids, which are supported by this SOS
      */
 	@Override
@@ -782,7 +780,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * returns procedures for offerings
-     * 
+     *
      * @return Map<String, List<String>> procedures for offerings
      */
     public Map<String, Collection<String>> getOffProcedures() {
@@ -794,7 +792,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /**
      * returns related features for offerings
-     * 
+     *
      * @return Map<String, List<String>> related features for offerings
      */
     public Map<String, Collection<String>> getOffRelatedFeatures() {
@@ -806,7 +804,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.n52.sos.cache.ACapabilitiesCacheController#
      * getObservablePropertiesForOffering(java.lang.String)
      */
@@ -820,7 +818,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.n52.sos.cache.ACapabilitiesCacheController#getObservableProperties()
      */
@@ -834,7 +832,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.n52.sos.cache.ACapabilitiesCacheController#
      * getKOfferingsVObservableProperties()
      */
@@ -848,7 +846,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.n52.sos.cache.ACapabilitiesCacheController#
      * getProcedures4FeatureOfInterest(java.lang.String)
      */
@@ -862,7 +860,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.n52.sos.cache.ACapabilitiesCacheController#getUnit4ObservableProperty
      * (java.lang.String)
@@ -874,7 +872,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.n52.sos.cache.ACapabilitiesCacheController#getFeatureOfInterest()
      */
@@ -888,7 +886,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.n52.sos.cache.ACapabilitiesCacheController#
      * getObservableProperties4CompositePhenomenons()
      */
@@ -902,7 +900,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.n52.sos.cache.ACapabilitiesCacheController#
      * getKOfferingVCompositePhenomenons()
      */
@@ -916,7 +914,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.n52.sos.cache.ACapabilitiesCacheController#
      * getKObservablePropertyVProcedures()
      */
@@ -930,7 +928,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.n52.sos.cache.ACapabilitiesCacheController#
      * getKProcedureVObservableProperties()
      */
@@ -944,7 +942,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.n52.sos.cache.ACapabilitiesCacheController#getKOfferingVFeatures()
      */
@@ -958,7 +956,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.n52.sos.cache.ACapabilitiesCacheController#
      * getOfferings4ObservableProperty(java.lang.String)
      */
@@ -972,7 +970,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.n52.sos.cache.ACapabilitiesCacheController#getKOfferingVProcedures()
      */
@@ -986,7 +984,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.n52.sos.cache.ACapabilitiesCacheController#getKOfferingVRelatedFeatures
      * ()
@@ -1001,7 +999,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.n52.sos.cache.ACapabilitiesCacheController#
      * getKCompositePhenomenonVObservableProperty()
      */
@@ -1076,7 +1074,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         }
         return new ArrayList<String>(0);
     }
-	
+
 	@Override
 	public SosEnvelope getEnvelopeForOffering(String offering) {
 		if (this.capabilitiesCache.getKOfferingVEnvelope() != null) {
@@ -1084,7 +1082,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public DateTime getMinTimeForOffering(String offering) {
 		if (this.capabilitiesCache.getKOfferingVMinTime() != null) {
@@ -1092,7 +1090,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public DateTime getMaxTimeForOffering(String offering) {
 		if (this.capabilitiesCache.getKOfferingVMaxTime() != null) {
@@ -1105,12 +1103,12 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 	public Envelope getEnvelopeForFeatures() {
 		return this.capabilitiesCache.getEnvelopeForFeatureOfInterest();
 	}
-	
+
 	@Override
 	public DateTime getMinEventTime() {
 		return this.capabilitiesCache.getMinEventTime();
 	}
-	
+
 	@Override
 	public DateTime getMaxEventTime() {
 		return this.capabilitiesCache.getMaxEventTime();

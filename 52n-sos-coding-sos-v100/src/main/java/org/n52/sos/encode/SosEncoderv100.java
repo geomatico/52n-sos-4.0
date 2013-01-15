@@ -117,18 +117,18 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
     private static final Logger LOGGER = LoggerFactory.getLogger(SosEncoderv100.class);
 
     private static final Set<EncoderKey> ENCODER_KEYS = CollectionHelper.union(
-        CodingHelper.encoderKeysForElements(Sos1Constants.NS_SOS, 
-            AbstractServiceRequest.class, 
+        CodingHelper.encoderKeysForElements(Sos1Constants.NS_SOS,
+            AbstractServiceRequest.class,
             AbstractServiceResponse.class,
-            GetCapabilitiesResponse.class, 
+            GetCapabilitiesResponse.class,
             GetObservationResponse.class,
             DescribeSensorResponse.class
         )
     );
-            
+
 
     public SosEncoderv100() {
-        LOGGER.info("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
@@ -197,7 +197,7 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
 //            return createGetFeatureOfInterestResponse((GetFeatureOfInterestResponse) response);
 //        } else if (response instanceof GetObservationByIdResponse) {
 //            return createGetObservationByIdResponse((GetObservationByIdResponse) response);
-//        } 
+//        }
 //        else if (response instanceof InsertObservationResponse) {
 //            return createInsertObservationResponse((InsertObservationResponse) response);
 //        } else if (response instanceof InsertResultTemplateResponse) {
@@ -240,7 +240,7 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
         }
         if (sosCapabilities.getContents() != null && !sosCapabilities.getContents().isEmpty()) {
             setContents(xbCaps.addNewContents(), sosCapabilities.getContents(), response.getVersion());
-            
+
         }
 
 //        if (sosCapabilities.getExtensions() != null && !sosCapabilities.getExtensions().isEmpty()) {
@@ -254,17 +254,17 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
 
         return xbCapsDoc;
     }
-    
+
     private XmlObject createDescribeSensorResponse(DescribeSensorResponse response) throws OwsExceptionReport {
-       
+
     	String outputFormat;
         if (response.getOutputFormat().equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
             outputFormat = SensorMLConstants.NS_SML;
         } else {
             outputFormat = response.getOutputFormat();
         }
-        
-        
+
+
         XmlObject xmlObject = CodingHelper.encodeObjectToXml(outputFormat, response.getSensorDescription());
         // describeSensorResponse.addNewDescription().addNewSensorDescription().addNewData().set(xmlObject);
 
@@ -273,14 +273,14 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
                 .singletonList(N52XmlHelper.getSchemaLocationForSWE101()));
         return xmlObject;
     }
-    
+
     private XmlObject createGetObservationResponseDocument(GetObservationResponse response) throws OwsExceptionReport {
 
     	// create ObservationCollectionDocument and add Collection
         ObservationCollectionDocument xb_obsColDoc = ObservationCollectionDocument.Factory.newInstance();
         ObservationCollectionType xb_obsCol = xb_obsColDoc.addNewObservationCollection();
         xb_obsCol.setId(SosConstants.OBS_COL_ID_PREFIX + new DateTime().getMillis());
-        
+
         Collection<SosObservation> observationCollection = null;
 
 //        HashMap<String, String> gmlID4sfIdentifier = new HashMap<String, String>();
@@ -290,10 +290,10 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
 //        }
         // TODO how to check merge or not?
         observationCollection = response.getObservationCollection();
-        
+
         if (observationCollection.size() > 0) {
-            // TODO setBoundedBy (not necessary apparently?)            
-            
+            // TODO setBoundedBy (not necessary apparently?)
+
 	        for (SosObservation sosObservation : observationCollection) {
 	        	XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getResponseFormat(), sosObservation);
 	        	xb_obsCol.addNewMember().set(xmlObject);
@@ -302,7 +302,7 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
             ObservationPropertyType xb_obs = xb_obsCol.addNewMember();
             xb_obs.setHref( GMLConstants.NIL_INAPPLICABLE );
         }
-        
+
         // set schema location
         XmlHelper.makeGmlIdsUnique(xb_obsColDoc.getDomNode());
         List<String> schemaLocations = new ArrayList<String>();
@@ -316,9 +316,9 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
 
     /**
      * Sets the FilterCapabilities section to the capabilities document.
-     * 
+     *
      * @param filterCapabilities
-     * 
+     *
      * @param sosFilterCaps
      *            FilterCapabilities.
      */
@@ -330,10 +330,10 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
         setIdFilterCapabilities(filterCapabilities.addNewIdCapabilities());
 
     }
-    
+
     /**
      * Sets the content section to the Capabilities document.
-     * 
+     *
      * @param xbContents
      *            SOS 2.0 contents section
      * @param offerings
@@ -439,7 +439,7 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
             Collection<QName> resultModels = offering.getResultModels();
 
             if (resultModels == null || resultModels.isEmpty()) {
-                
+
                 String exceptionText = "No result models are contained in the database for the offering: " + offering
                         + "! Please contact the admin of this SOS.";
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
@@ -461,7 +461,7 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
 //            }
 
             // set response format
-            
+
             // set responseFormat [0..*]
             if (offering.getResponseFormats() != null) {
                 for (String responseFormat : offering.getResponseFormats()) {
@@ -477,12 +477,12 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
             }
         }
     }
-    
+
     /**
      * Set the IdFilterCapabilities.
-     * 
+     *
      * !!! Modify method addicted to your implementation !!!
-     * 
+     *
      * @param idCapabilities
      *            IdCapabilities.
      */
@@ -491,12 +491,12 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
         idCapabilities.addNewFID();
         idCapabilities.addNewEID();
     }
-    
+
     /**
      * Sets the SpatialFilterCapabilities.
-     * 
+     *
      * !!! Modify method addicted to your implementation !!!
-     * 
+     *
      * @param spatialCapabilities
      *            SpatialCapabilities.
      * @param sosFilterCaps
@@ -529,9 +529,9 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
 
     /**
      * Sets the TemporalFilterCapabilities.
-     * 
+     *
      * !!! Modify method addicted to your implementation !!!
-     * 
+     *
      * @param temporalCapabilities
      *            TemporalCapabilities.
      * @param sosFilterCaps
@@ -561,12 +561,12 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
             }
         }
     }
-    
+
     /**
      * Sets the ScalarFilterCapabilities.
-     * 
+     *
      * !!! Modify method addicted to your implementation !!!
-     * 
+     *
      * @param scalarCapabilities
      *            ScalarCapabilities.
      * @param sosFilterCaps
@@ -581,10 +581,10 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
             }
         }
     }
-    
+
     /**
      * Get the Enum for the spatial operator.
-     * 
+     *
      * @param spatialOperator
      *            Supported spatial operator
      * @return Enum
@@ -621,7 +621,7 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
 
     /**
      * Get the Enum for the temporal operator.
-     * 
+     *
      * @param temporalOperator
      *            Supported temporal operator
      * @return Enum
@@ -662,7 +662,7 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
 
     /**
      * Get the Enum for the comparison operator.
-     * 
+     *
      * @param comparisonOperator
      *            Supported comparison operator
      * @return Enum
@@ -693,12 +693,12 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
         }
         return null;
     }
-    
+
     /**
      * queries the bounding box of all requested feature of interest IDs
-     * 
+     *
      * @param envelope
-     * 
+     *
      * @param foiIDs
      *            ArrayList with String[]s containing the ids of the feature of
      *            interests for which the BBOX should be returned

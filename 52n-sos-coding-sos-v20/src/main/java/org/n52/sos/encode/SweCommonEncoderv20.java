@@ -87,12 +87,12 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 
     private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(
             SWEConstants.NS_SWE_20,
-            SosSweCoordinate.class, 
-            SosSweAbstractSimpleType.class, 
-            SosSweAbstractEncoding.class, 
-            SosSweAbstractDataComponent.class, 
+            SosSweCoordinate.class,
+            SosSweAbstractSimpleType.class,
+            SosSweAbstractEncoding.class,
+            SosSweAbstractDataComponent.class,
             SosSweDataArray.class);
-    
+
     private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(
         ConformanceClasses.SWE_V2_CORE,
         ConformanceClasses.SWE_V2_UML_SIMPLE_COMPONENTS,
@@ -106,16 +106,16 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         ConformanceClasses.SWE_V2_GENERAL_ENCODING_RULES,
         ConformanceClasses.SWE_V2_TEXT_ENCODING_RULES
     );
-    
+
     public SweCommonEncoderv20() {
-        LOGGER.info("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
     public Set<EncoderKey> getEncoderKeyType() {
         return Collections.unmodifiableSet(ENCODER_KEYS);
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
@@ -125,7 +125,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
         return Collections.emptyMap();
     }
-    
+
     @Override
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap) {
         nameSpacePrefixMap.put(SWEConstants.NS_SWE_20, SWEConstants.NS_SWE_PREFIX);
@@ -350,7 +350,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
     }
 
     /*
-     * 
+     *
      * SIMPLE TYPES
      */
     private AbstractDataComponentType createSimpleType(SosSweAbstractSimpleType<?> sosSimpleType)
@@ -514,20 +514,20 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
     }
 
     /**************************************************************************
-     * 
+     *
      * FIXME Clarify: Are these methods still required?
-     * 
+     *
      * private String createResultString(List<SosObservableProperty>
      * phenComponents, SosObservation sosObservation, Map<ITime, Map<String,
      * IValue>> valueMap) throws OwsExceptionReport {
-     * 
+     *
      * if (!(phenComponents instanceof ArrayList)) { phenComponents = new
      * ArrayList<SosObservableProperty>(phenComponents); } String noDataValue =
      * sosObservation.getNoDataValue(); String tokenSeperator =
      * sosObservation.getTokenSeparator(); String tupleSeperator =
      * sosObservation.getTupleSeparator(); SosSweDataRecord r =
      * sosObservation.getResultStructure();
-     * 
+     *
      * String[] phens = new String[phenComponents.size() + 1]; int timeIndex =
      * -1; if (r == null) { phens[timeIndex = 0] = OMConstants.PHENOMENON_TIME;
      * for (int i = 0; i < phenComponents.size(); ++i) { phens[i+1] =
@@ -540,7 +540,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
      * ArrayList<ITime>(valueMap.keySet()) .toArray(new
      * ITime[valueMap.keySet().size()]); Arrays.sort(times); StringBuilder b =
      * new StringBuilder();
-     * 
+     *
      * // dimensions will always be greater than (1,1).. // so partly roll out
      * the loop to gain some performance b.append(getValue(0, 0, times, phens,
      * timeIndex, noDataValue, valueMap)); for (int j = 1; j < phens.length;
@@ -551,16 +551,16 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
      * ++j) { b.append(tokenSeperator); b.append(getValue(i, j, times, phens,
      * timeIndex, noDataValue, valueMap)); } } b.append(tupleSeperator); return
      * b.toString(); }
-     * 
-     * 
+     *
+     *
      * private String getValue(int i, int j, ITime[] times, String[] phens, int
      * phenTimeIndex, String noDataValue, Map<ITime, Map<String, IValue>>
      * valueMap) throws OwsExceptionReport { if (j == phenTimeIndex) { return
      * DateTimeHelper.format(times[i]); } else { Map<String, IValue> value =
      * valueMap.get(times[i]); return (value == null) ? noDataValue :
      * getStringValue(value.get(phens[j]), noDataValue); } }
-     * 
-     * 
+     *
+     *
      * private String getStringValue(IValue value, String noDataValue) { if
      * (value == null) { return noDataValue; } if (value instanceof
      * BooleanValue) { BooleanValue booleanValue = (BooleanValue) value; if
@@ -593,7 +593,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
      * return categoryValue.getValue().toString(); } } else { if
      * (value.getValue() == null) { return noDataValue; } else { return
      * value.getValue().toString(); } } }
-     * 
+     *
      * private void addDataComponentToField(Field field, SosObservableProperty
      * observableProperty, Collection<Map<String, IValue>> values) { IValue
      * value = getValueForObservableProperty(values,
@@ -640,9 +640,9 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
      * field.addNewAbstractDataComponent
      * ().substitute(SWEConstants.QN_TEXT_SWE_200, TextType.type);
      * xbText.setDefinition(observableProperty.getIdentifier()); }
-     * 
+     *
      * }
-     * 
+     *
      * private IValue getValueForObservableProperty(Collection<Map<String,
      * IValue>> values, String identifier) { for (Map<String, IValue> map :
      * values) { if (map.get(identifier) != null) { return map.get(identifier);

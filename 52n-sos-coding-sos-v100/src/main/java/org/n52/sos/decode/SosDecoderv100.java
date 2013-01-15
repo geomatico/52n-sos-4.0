@@ -85,7 +85,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
             GetFeatureOfInterestDocument.class,
             GetObservationByIdDocument.class),
         CodingHelper.xmlDecoderKeysForOperation(
-            SosConstants.SOS, Sos1Constants.SERVICEVERSION, 
+            SosConstants.SOS, Sos1Constants.SERVICEVERSION,
             SosConstants.Operations.GetCapabilities,
             SosConstants.Operations.GetObservation,
             SosConstants.Operations.GetFeatureOfInterest,
@@ -95,14 +95,14 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
     );
 
     public SosDecoderv100() {
-        LOGGER.info("Decoder for the following namespaces initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));
+        LOGGER.debug("Decoder for the following namespaces initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));
     }
 
     @Override
     public Set<DecoderKey> getDecoderKeyTypes() {
         return Collections.unmodifiableSet(DECODER_KEYS);
     }
-    
+
     @Override
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
         return Collections.emptyMap();
@@ -132,7 +132,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
         	DescribeSensorDocument descSensorDoc = (DescribeSensorDocument) xmlObject;
             response = parseDescribeSensor(descSensorDoc);
         }
-        
+
         // getObservation request
         else if (xmlObject instanceof GetObservationDocument) {
             GetObservationDocument getObsDoc = (GetObservationDocument) xmlObject;
@@ -194,12 +194,12 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
         return response;
     }
 
-    
+
 
 	/**
      * parses the XmlBean representing the getCapabilities request and creates a
      * SosGetCapabilities request
-     * 
+     *
      * @param getCapsDoc
      *            XmlBean created from the incoming request stream
      * @return Returns SosGetCapabilitiesRequest representing the request
@@ -208,7 +208,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
      */
     private AbstractServiceRequest parseGetCapabilities(GetCapabilitiesDocument getCapsDoc) throws OwsExceptionReport {
     	GetCapabilitiesRequest request = new GetCapabilitiesRequest();
-    	
+
     	GetCapabilities getCaps = getCapsDoc.getGetCapabilities();
 
     	request.setService(getCaps.getService());
@@ -224,18 +224,18 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
         if (getCaps.getSections() != null && getCaps.getSections().getSectionArray().length != 0) {
             request.setSections(Arrays.asList(getCaps.getSections().getSectionArray()));
         }
-        
+
 //        if (getCaps.getUpdateSequence() != null && getCaps.getUpdateSequence().length() != 0) {
 //        	request.setUpdateSequence(getCaps.getUpdateSequence());
 //        }
 
         return request;
     }
-    
+
     /**
      * parses the XmlBean representing the describeSensor request and creates a
      * DescribeSensor request
-     * 
+     *
      * @param descSensorDoc
      *            XmlBean created from the incoming request stream
      * @return Returns SosDescribeSensorRequest representing the request
@@ -245,7 +245,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
     private AbstractServiceCommunicationObject parseDescribeSensor(
 			DescribeSensorDocument descSensorDoc) {
 
-    	DescribeSensorRequest request = new DescribeSensorRequest();	
+    	DescribeSensorRequest request = new DescribeSensorRequest();
     	DescribeSensor descSensor = descSensorDoc.getDescribeSensor();
     	request.setService(descSensor.getService());
     	request.setVersion(descSensor.getVersion());
@@ -255,7 +255,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
         } else {
         	request.setProcedureDescriptionFormat(SosConstants.PARAMETER_NOT_SET);
         }
-        
+
         if (descSensor.getProcedure() != null && descSensor.getProcedure().length() != 0) {
             request.setProcedures(descSensor.getProcedure());
         }
@@ -266,7 +266,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
     /**
      * parses the XmlBean representing the getObservation request and creates a
      * SoSGetObservation request
-     * 
+     *
      * @param getObsDoc
      *            XmlBean created from the incoming request stream
      * @return Returns SosGetObservationRequest representing the request
@@ -275,7 +275,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
      */
     private AbstractServiceRequest parseGetObservation(GetObservationDocument getObsDoc) throws OwsExceptionReport {
         GetObservationRequest getObsRequest = new GetObservationRequest();
-        
+
         GetObservation getObs = getObsDoc.getGetObservation();
         // TODO: check
         getObsRequest.setService(getObs.getService());
@@ -285,11 +285,11 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
         getObsRequest.setProcedures(Arrays.asList(getObs.getProcedureArray()));
         getObsRequest.setTemporalFilters(parseTemporalFilters4GetObservation(getObs.getEventTimeArray()));
         getObsRequest.setSrid(SosHelper.parseSrsName(getObs.getSrsName()));
-        
+
         getObsRequest.setSpatialFilter(parseSpatialFilter4GetObservation(getObs.getFeatureOfInterest()));
         // TODO maybe obsolete through spatial filter above
         getObsRequest.setFeatureIdentifiers(parseFeatureofInterestV100(getObs.getFeatureOfInterest()));
-        
+
         if (getObs.isSetResponseFormat()) {
             try {
                 String responseFormat = URLDecoder.decode(getObs.getResponseFormat(), "UTF-8");
@@ -309,7 +309,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
 	/**
      * parses the passes XmlBeans document and creates a SOS
      * getFeatureOfInterest request
-     * 
+     *
      * @param getFoiDoc
      *            XmlBeans document representing the getFeatureOfInterest
      *            request
@@ -330,7 +330,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
         return getFoiRequest;
     }
 
-    
+
 
 	private AbstractServiceRequest parseGetObservationById(GetObservationByIdDocument getObsByIdDoc)
             throws OwsExceptionReport {
@@ -395,7 +395,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
 
     /**
      * Parses the spatial filter of a GetObservation request.
-     * 
+     *
      * @param xbFilter
      *            XmlBean representing the spatial filter parameter of the
      *            request
@@ -417,7 +417,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
 
     /**
      * Parses the spatial filters of a GetFeatureOfInterest request.
-     * 
+     *
      * @param location
      *            XmlBean representing the spatial filter parameter of the
      *            request
@@ -426,7 +426,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
      * @throws OwsExceptionReport
      *             if creation of the SpatialFilter failed
      */
-    private List<SpatialFilter> parseSpatialFilters4GetFeatureOfInterest(		
+    private List<SpatialFilter> parseSpatialFilters4GetFeatureOfInterest(
             Location location) throws OwsExceptionReport {
     	// TODO I am not sure if that works here :-p
     	List<SpatialFilter> sosSpatialFilters = new ArrayList<SpatialFilter>();
@@ -443,7 +443,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
     /**
      * parses the Time of the requests and returns an array representing the
      * temporal filters
-     * 
+     *
      * @param xbTemporalFilters
      *            array of XmlObjects representing the Time element in the
      *            request
@@ -453,7 +453,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
      */
     private List<TemporalFilter> parseTemporalFilters4GetObservation(
             GetObservation.EventTime[] temporalFilters) throws OwsExceptionReport {
-    	
+
         List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>();
         // TODO extend temporal filtering
         for (GetObservation.EventTime temporalFilter : temporalFilters) {
@@ -559,11 +559,11 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
 
 	private List<String> parseFeatureofInterestV100(FeatureOfInterest featureOfInterest)
             throws OwsExceptionReport {
-		
+
 		List<String> features = new ArrayList<String>();
-		
+
 		// TODO we need a featureDecoderV100 or in the GmlDecoderv311
-		
+
 		return features;
 	}
 
