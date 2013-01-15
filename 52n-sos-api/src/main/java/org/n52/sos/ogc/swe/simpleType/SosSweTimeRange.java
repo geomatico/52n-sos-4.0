@@ -54,14 +54,7 @@ public class SosSweTimeRange extends SosSweAbstractUomType<RangeValue<DateTime>>
 
     @Override
     public String getStringValue() {
-        StringBuilder builder = new StringBuilder();
-        if (value.isSetStartValue()) {
-            builder.append(value.getRangeStart());
-        }
-        if (value.isSetEndValue()) {
-            builder.append(value.getRangeEnd());
-        }
-        return builder.toString();
+        return value.toString();
     }
 
     @Override

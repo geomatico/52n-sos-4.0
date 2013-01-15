@@ -31,96 +31,91 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
  * @author Carsten Hollmann
  * @version 1.0.0
  */
-public class SosSweQuantity extends SosSweAbstractUomType<String> {
+public class SosSweQuantity extends SosSweAbstractUomType<Double> {
 
-	/**
-	 * axis ID
-	 */
-	private String axisID;
+    /**
+     * axis ID
+     */
+    private String axisID;
 
-	/**
-	 * value
-	 */
-	private String value;
+    /**
+     * value
+     */
+    private Double value;
 
-	/**
-	 * constructor
-	 */
-	public SosSweQuantity() {
-	}
+    /**
+     * constructor
+     */
+    public SosSweQuantity() {
+    }
 
-	@Override
-	public SweSimpleType getSimpleType()
-	{
-		return SweSimpleType.Quantity;
-	}
-
-	/**
-	 * Get axis ID
-	 * 
-	 * @return the axisID
-	 */
-	public String getAxisID()
-	{
-		return axisID;
-	}
-
-	/**
-	 * set axis ID
-	 * 
-	 * @param axisID
-	 *            the axisID to set
-	 */
-	public void setAxisID(String axisID)
-	{
-		this.axisID = axisID;
-	}
-
-	@Override
-	public String getValue()
-	{
-		return value;
-	}
-
-	@Override
-	public void setValue(String value)
-	{
-		this.value = value;
-	}
-
-	    @Override
-	    public int hashCode() {
-	        int hash = 7;
-	        hash = 97 * hash + super.hashCode();
-	        hash = 97 * hash + (this.axisID != null ? this.axisID.hashCode() : 0);
-	        return hash;
-	    }
-
-	    @Override
-	    public boolean equals(Object obj) {
-	        if (obj == null) {
-	            return false;
-	        }
-	        if (getClass() != obj.getClass()) {
-	            return false;
-	        }
-	        final SosSweQuantity other = (SosSweQuantity) obj;
-	        if ((this.getAxisID() == null) ? (other.getAxisID() != null) : !this.getAxisID().equals(other.getAxisID())) {
-	            return false;
-	        }
-	        return super.equals(obj);
-	    }
-	
     @Override
-    public String getStringValue() {
+    public SweSimpleType getSimpleType() {
+        return SweSimpleType.Quantity;
+    }
+
+    /**
+     * Get axis ID
+     * 
+     * @return the axisID
+     */
+    public String getAxisID() {
+        return axisID;
+    }
+
+    /**
+     * set axis ID
+     * 
+     * @param axisID
+     *            the axisID to set
+     */
+    public void setAxisID(String axisID) {
+        this.axisID = axisID;
+    }
+
+    @Override
+    public Double getValue() {
         return value;
     }
 
     @Override
-    public boolean isSetValue() {
-        return value != null && !value.isEmpty();
+    public void setValue(Double value) {
+        this.value = value;
     }
-    
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + super.hashCode();
+        hash = 97 * hash + (this.axisID != null ? this.axisID.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SosSweQuantity other = (SosSweQuantity) obj;
+        if ((this.getAxisID() == null) ? (other.getAxisID() != null) : !this.getAxisID().equals(other.getAxisID())) {
+            return false;
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public String getStringValue() {
+        return Double.toString(value.intValue());
+    }
+
+    @Override
+    public boolean isSetValue() {
+        return value != null;
+    }
+
     public boolean isSetAxisID() {
         return axisID != null && !axisID.isEmpty();
     }

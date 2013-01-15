@@ -30,7 +30,7 @@ import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
  *         J&uuml;rrens</a>
  * 
  */
-public class SosSweCategory extends SosSweAbstractSimpleType<String> {
+public class SosSweCategory extends SosSweAbstractUomType<String> {
 
     private String value;
 
