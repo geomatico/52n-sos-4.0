@@ -78,7 +78,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInser
             IEncoder<?, InsertSensorResponse> encoder = Configurator.getInstance().getCodingRepository()
                     .getEncoder(CodingHelper.getEncoderKey(SWEConstants.NS_SWES_20, response));
             if (encoder != null) {
-                // TODO valid response object
+                // TODO valid or validate (?) response object
                 Object encodedObject = encoder.encode(response);
                 if (encodedObject instanceof XmlObject) {
                     ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
