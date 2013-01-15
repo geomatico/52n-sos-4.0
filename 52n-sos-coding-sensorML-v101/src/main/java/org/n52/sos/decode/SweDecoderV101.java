@@ -50,8 +50,10 @@ import net.opengis.swe.x101.TimeRangeDocument.TimeRange;
 import net.opengis.swe.x101.VectorType.Coordinate;
 
 import org.apache.xmlbeans.XmlObject;
+import org.joda.time.DateTime;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
+import org.n52.sos.ogc.swe.RangeValue;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
@@ -231,31 +233,31 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return sosFields;
     }
 
-    private SosSweAbstractSimpleType<?> parseBoolean(XmlObject xbBoolean) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<Boolean> parseBoolean(XmlObject xbBoolean) throws OwsExceptionReport {
         String exceptionText = "The Boolean is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private SosSweAbstractSimpleType<?> parseCategory(XmlObject xbCategory) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<String> parseCategory(XmlObject xbCategory) throws OwsExceptionReport {
         String exceptionText = "The Category is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private SosSweAbstractSimpleType<?> parseCount(XmlObject xbCount) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<Integer> parseCount(XmlObject xbCount) throws OwsExceptionReport {
         String exceptionText = "The Count is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private SosSweAbstractSimpleType<?> parseCountRange(CountRange countRange) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<RangeValue<Integer>> parseCountRange(CountRange countRange) throws OwsExceptionReport {
         String exceptionText = "The CountRange is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private SosSweAbstractSimpleType<?> parseObservableProperty(ObservableProperty observableProperty) {
+    private SosSweAbstractSimpleType<String> parseObservableProperty(ObservableProperty observableProperty) {
         ObservableProperty xbObsProp = observableProperty;
         SosSweText sosObservableProperty = new SosSweText();
         if (xbObsProp.isSetDefinition()) {
@@ -264,7 +266,7 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return sosObservableProperty;
     }
 
-    private SosSweAbstractSimpleType<String> parseQuantity(Quantity xbQuantity) {
+    private SosSweAbstractSimpleType<Double> parseQuantity(Quantity xbQuantity) {
         SosSweQuantity sosQuantity = new SosSweQuantity();
         if (xbQuantity.isSetAxisID()) {
             sosQuantity.setAxisID(xbQuantity.getAxisID());
@@ -282,12 +284,12 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
             sosQuantity.setUom(xbQuantity.getUom().getCode());
         }
         if (xbQuantity.isSetValue()) {
-            sosQuantity.setValue(Double.toString(xbQuantity.getValue()));
+            sosQuantity.setValue(Double.valueOf(xbQuantity.getValue()));
         }
         return sosQuantity;
     }
 
-    private SosSweAbstractSimpleType<?> parseQuantityRange(QuantityRange quantityRange) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<RangeValue<Double>> parseQuantityRange(QuantityRange quantityRange) throws OwsExceptionReport {
         String exceptionText = "The QuantityRange is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
@@ -307,13 +309,13 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return sosText;
     }
 
-    private SosSweAbstractSimpleType<?> parseTime(Time time) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<DateTime> parseTime(Time time) throws OwsExceptionReport {
         String exceptionText = "The Time is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private SosSweAbstractSimpleType<?> parseTimeRange(TimeRange timeRange) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<RangeValue<DateTime>> parseTimeRange(TimeRange timeRange) throws OwsExceptionReport {
         String exceptionText = "The TimeRange is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
@@ -340,7 +342,7 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         List<SosSweCoordinate<?>> sosCoordinates = new ArrayList<SosSweCoordinate<?>>(coordinateArray.length);
         for (Coordinate xbCoordinate : coordinateArray) {
             if (xbCoordinate.isSetQuantity()) {
-                sosCoordinates.add(new SosSweCoordinate<String>(checkCoordinateName(xbCoordinate.getName()),
+                sosCoordinates.add(new SosSweCoordinate<Double>(checkCoordinateName(xbCoordinate.getName()),
                         parseQuantity(xbCoordinate.getQuantity())));
             } else {
                 String exceptionText = "Error when parsing the Coordinates of Position: It must be of type Quantity!";

@@ -70,7 +70,9 @@ public class GmlDecoderv311 implements IDecoder<Object, XmlObject> {
             TimeInstantType.class,
             TimePeriodType.class,
             TimeInstantDocument.class,
-            TimePeriodDocument.class);
+            TimePeriodDocument.class,
+            CodeType.class
+            );
 
     private static final String CS = ",";
     private static final String DECIMAL = ".";

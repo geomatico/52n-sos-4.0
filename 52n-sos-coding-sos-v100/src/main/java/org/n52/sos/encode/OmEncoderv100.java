@@ -37,7 +37,6 @@ import net.opengis.gml.FeaturePropertyType;
 import net.opengis.gml.MeasureType;
 import net.opengis.om.x10.ObservationType;
 import net.opengis.swe.x101.TimeObjectPropertyType;
-import org.apache.xerces.util.XML11Char;
 
 import org.apache.xmlbeans.XmlBoolean;
 import org.apache.xmlbeans.XmlException;

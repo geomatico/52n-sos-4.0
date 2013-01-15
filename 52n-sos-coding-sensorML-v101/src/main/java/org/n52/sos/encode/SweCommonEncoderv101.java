@@ -23,12 +23,20 @@
  */
 package org.n52.sos.encode;
 
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import net.opengis.swe.x101.AbstractDataComponentType;
+import net.opengis.swe.x101.CategoryDocument.Category;
+import net.opengis.swe.x101.CountDocument.Count;
+import net.opengis.swe.x101.ObservablePropertyDocument.ObservableProperty;
 import net.opengis.swe.x101.QuantityDocument.Quantity;
+import net.opengis.swe.x101.QuantityRangeDocument.QuantityRange;
 import net.opengis.swe.x101.TextDocument.Text;
+import net.opengis.swe.x101.TimeDocument.Time;
+import net.opengis.swe.x101.TimeRangeDocument.TimeRange;
 import net.opengis.swe.x101.VectorType.Coordinate;
 
 import org.apache.xmlbeans.XmlObject;
@@ -36,13 +44,20 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.swe.SWEConstants;
+import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
+import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
+import org.n52.sos.ogc.swe.simpleType.SosSweCategory;
+import org.n52.sos.ogc.swe.simpleType.SosSweCount;
+import org.n52.sos.ogc.swe.simpleType.SosSweObservableProperty;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
+import org.n52.sos.ogc.swe.simpleType.SosSweQuantityRange;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
+import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,34 +113,76 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
 
     @Override
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
-        if (element instanceof SosSweQuantity) {
-            return addValuesToSimpleTypeQuantity((SosSweQuantity) element);
+        if (element instanceof SosSweBoolean) {
+            return createBoolean((SosSweBoolean) element);
+        } else if (element instanceof SosSweCategory) {
+            return createCategory((SosSweCategory) element);
+        } else if (element instanceof SosSweCount) {
+            return createCount((SosSweCount) element);
+        } else if (element instanceof SosSweObservableProperty) {
+            return createObservableProperty((SosSweObservableProperty) element);
+        } else if (element instanceof SosSweQuantity) {
+            return createQuantity((SosSweQuantity) element);
+        } else if (element instanceof SosSweQuantityRange) {
+            return createQuantityRange((SosSweQuantityRange) element);
         } else if (element instanceof SosSweText) {
-            return addValuesToSimpleTypeText((SosSweText) element);
+            return createText((SosSweText) element);
+        } else if (element instanceof SosSweTime) {
+            return createTime((SosSweTime) element);
+        } else if (element instanceof SosSweTimeRange) {
+            return createTimeRange((SosSweTimeRange) element);
         } else if (element instanceof SosSweCoordinate) {
             return addValuesToCoordinate((SosSweCoordinate) element);
         }
         return null;
     }
     
-    /**
-     * Adds values to SWE text
-     * 
-     * @param text
-     *            SOS internal representation
-     */
-    private Text addValuesToSimpleTypeText(SosSweText text) {
-        Text xbText = Text.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        if (text.getDefinition() != null && !text.getDefinition().isEmpty()) {
-            xbText.setDefinition(text.getDefinition());
+    private net.opengis.swe.x101.BooleanDocument.Boolean createBoolean(SosSweBoolean bool) {
+        net.opengis.swe.x101.BooleanDocument.Boolean xbBoolean = net.opengis.swe.x101.BooleanDocument.Boolean.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        addAbstractDataComponentValues(xbBoolean, bool);
+        if (bool.isSetValue()) {
+            xbBoolean.setValue(bool.getValue().booleanValue());
         }
-        if (text.getDescription() != null && !text.getDescription().isEmpty()) {
-            xbText.addNewDescription().setStringValue(text.getDescription());
+        if (xbBoolean.isSetQuality()) {
+            // TODO
         }
-        if (text.getValue() != null && !text.getValue().isEmpty()) {
-            xbText.setValue(text.getValue());
+        return xbBoolean;
+    }
+    
+    private Category createCategory(SosSweCategory category) {
+        Category xbCategory = Category.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        addAbstractDataComponentValues(xbCategory, category);
+        if (category.isSetValue()) {
+            xbCategory.setValue(category.getValue());
         }
-        return xbText;
+        if (category.isSetUom()) {
+            xbCategory.addNewCodeSpace().setHref(category.getUom());
+        }
+        if (category.isSetQuality()) {
+            // TODO
+        }
+        return xbCategory;
+    }
+
+    private Count createCount(SosSweCount count) {
+        Count xbCount = Count.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        addAbstractDataComponentValues(xbCount, count);
+        if (count.isSetValue()) {
+            xbCount.setValue(new BigInteger(Integer.toString(count.getValue().intValue())));
+        }
+        if (count.isSetQuality()) {
+            // TODO
+        }
+        return xbCount;
+    }
+
+    private ObservableProperty createObservableProperty(SosSweObservableProperty observableProperty) {
+        ObservableProperty xbObservableProperty = ObservableProperty.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        addAbstractDataComponentValues(xbObservableProperty, observableProperty);
+        if (observableProperty.isSetQuality()) {
+            // TODO
+        }
+        return xbObservableProperty;
     }
 
     /**
@@ -134,28 +191,99 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
      * @param quantity
      *            SOS internal representation
      */
-    private Quantity addValuesToSimpleTypeQuantity(SosSweQuantity quantity) {
+    private Quantity createQuantity(SosSweQuantity quantity) {
         Quantity xbQuantity = Quantity.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        if (quantity.getDefinition() != null && !quantity.getDefinition().isEmpty()) {
-            xbQuantity.setDefinition(quantity.getDefinition());
-        }
-        if (quantity.getDescription() != null && !quantity.getDescription().isEmpty()) {
-            xbQuantity.addNewDescription().setStringValue(quantity.getDescription());
-        }
-        if (quantity.getAxisID() != null && !quantity.getAxisID().isEmpty()) {
+        addAbstractDataComponentValues(xbQuantity, quantity);
+        if (quantity.isSetAxisID()) {
             xbQuantity.setAxisID(quantity.getDescription());
         }
-        if (quantity.getValue() != null && !quantity.getValue().isEmpty()) {
+        if (quantity.isSetValue()) {
             xbQuantity.setValue(Double.valueOf(quantity.getValue()));
         }
-        if (quantity.getUom() != null && !quantity.getUom().isEmpty()) {
+        if (quantity.isSetUom()) {
             xbQuantity.addNewUom().setCode(quantity.getUom());
         }
-        if (quantity.getQuality() != null) {
+        if (quantity.isSetQuality()) {
             // TODO
         }
         return xbQuantity;
     }
+
+    private QuantityRange createQuantityRange(SosSweQuantityRange quantityRange) {
+        QuantityRange xbQuantityRange = QuantityRange.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        addAbstractDataComponentValues(xbQuantityRange, quantityRange);
+        if (quantityRange.isSetAxisID()) {
+            xbQuantityRange.setAxisID(quantityRange.getDescription());
+        }
+        if (quantityRange.isSetValue()) {
+            xbQuantityRange.setValue(quantityRange.getValue().getRangeAsList());
+        }
+        if (quantityRange.isSetUom()) {
+            xbQuantityRange.addNewUom().setCode(quantityRange.getUom());
+        }
+        if (quantityRange.isSetQuality()) {
+            // TODO
+        }
+        return xbQuantityRange;
+    }
+
+    /**
+     * Adds values to SWE text
+     * 
+     * @param text
+     *            SOS internal representation
+     */
+    private Text createText(SosSweText text) {
+        Text xbText = Text.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        addAbstractDataComponentValues(xbText, text);
+        if (text.isSetValue()) {
+            xbText.setValue(text.getValue());
+        }
+        if (text.isSetQuality()) {
+            // TODO
+        }
+        return xbText;
+    }
+    
+    private Time createTime(SosSweTime time) {
+        Time xbTime = Time.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        addAbstractDataComponentValues(xbTime, time);
+        if (time.isSetValue()) {
+            xbTime.setValue(time.getValue());
+        }
+        if (time.isSetUom()) {
+            xbTime.addNewUom().setCode(time.getUom());
+        }
+        if (time.isSetQuality()) {
+            // TODO
+        }
+        return xbTime;
+    }
+    
+    private TimeRange createTimeRange(SosSweTimeRange timeRange) {
+        TimeRange xbTimeRange = TimeRange.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        addAbstractDataComponentValues(xbTimeRange, timeRange);
+        if (timeRange.isSetValue()) {
+            xbTimeRange.setValue(timeRange.getValue().getRangeAsStringList());
+        }
+        if (timeRange.isSetUom()) {
+            xbTimeRange.addNewUom().setCode(timeRange.getUom());
+        }
+        if (timeRange.isSetQuality()) {
+            // TODO
+        }
+        return xbTimeRange;
+    }
+    
+    private void addAbstractDataComponentValues(AbstractDataComponentType xbComponent, SosSweAbstractDataComponent component) {
+        if (component.isSetDefinition()) {
+            xbComponent.setDefinition(component.getDefinition());
+        }
+        if (component.isSetDescription()) {
+            xbComponent.addNewDescription().setStringValue(component.getDescription());
+        }
+    }
+    
 
     /**
      * Adds values to SWE coordinates
@@ -166,7 +294,7 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
     private Coordinate addValuesToCoordinate(SosSweCoordinate coordinate) {
         Coordinate xbCoordinate = Coordinate.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         xbCoordinate.setName(coordinate.getName().name());
-        xbCoordinate.setQuantity(addValuesToSimpleTypeQuantity((SosSweQuantity) coordinate.getValue()));
+        xbCoordinate.setQuantity(createQuantity((SosSweQuantity) coordinate.getValue()));
         return xbCoordinate;
     }
 
