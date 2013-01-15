@@ -219,7 +219,9 @@ public class CapabilitiesCache{
      */
     protected Collection<String> getObservableProperties() {
         Set<String> observableProperties = new HashSet<String>(0);
-        observableProperties.addAll(kObservablePropertyVOfferings.keySet());
+        if (kObservablePropertyVOfferings != null && kObservablePropertyVOfferings.keySet() != null) {
+            observableProperties.addAll(kObservablePropertyVOfferings.keySet());
+        }
             // // get composite phenomena
             // if (this.offCompPhens.containsKey(s)) {
             // Collection<String> phen = this.offCompPhens.get(s);
