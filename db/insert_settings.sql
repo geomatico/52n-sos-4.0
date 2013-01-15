@@ -33,6 +33,7 @@ CREATE TABLE global_settings (
 INSERT INTO global_settings(key,value) VALUES
 	('admin_password', '$2a$10$vbp9aXCDMP/fXwEsqe/1.eon44mMdUyC4ub2JfOrkPfaer5ciLOly'),
 	('admin_username', 'admin'),
+	('CACHE_THREAD_COUNT', '5'),
 	('CAPABILITIES_CACHE_UPDATE_INTERVAL', '5'),
 	('CHARACTER_ENCODING', 'UTF-8'),
 	('CHILD_PROCEDURES_ENCODED_IN_PARENTS_DESCRIBE_SENSOR', 'false'),

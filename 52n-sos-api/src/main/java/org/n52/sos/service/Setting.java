@@ -27,9 +27,10 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
-/* TODO modularize it to enable submodules to supply settings. Include 
+/* TODO modularize it to enable submodules to supply settings. Include
  * title,type,description,etc to let the client generate the UI dynamically */
 public enum Setting {
+
 	CAPABILITIES_CACHE_UPDATE_INTERVAL(Type.INTEGER),
 	CHARACTER_ENCODING(Type.STRING),
 	MINIMUM_GZIP_SIZE(Type.INTEGER),
@@ -52,8 +53,11 @@ public enum Setting {
 	SHOW_FULL_OPERATIONS_METADATA_FOR_OBSERVATIONS(Type.BOOLEAN),
 	SENSOR_DIRECTORY(Type.FILE),
 	SKIP_DUPLICATE_OBSERVATIONS(Type.BOOLEAN),
-	SOS_URL(Type.STRING) { 
-		@Override public boolean isAllowedValue(String s) { return isUrl(s); }
+	SOS_URL(Type.STRING) {
+		@Override
+		public boolean isAllowedValue(String s) {
+			return isUrl(s);
+		}
 	},
 	CONFIGURATION_FILES(Type.STRING),
 	SUPPORTS_QUALITY(Type.BOOLEAN),
@@ -76,16 +80,17 @@ public enum Setting {
 	SERVICE_IDENTIFICATION_TITLE(Type.STRING),
 	SERVICE_IDENTIFICATION_ABSTRACT(Type.STRING),
 	SERVICE_IDENTIFICATION_FEES(Type.STRING),
-	SERVICE_IDENTIFICATION_ACCESS_CONSTRAINTS(Type.STRING);
-	
+	SERVICE_IDENTIFICATION_ACCESS_CONSTRAINTS(Type.STRING),
+	CACHE_THREAD_COUNT(Type.INTEGER);
+
 	public static enum Type {
+
 		FILE, STRING, INTEGER, BOOLEAN;
-        
-        public String getName() {
-            return name();
-        }
+
+		public String getName() {
+			return name();
+		}
 	}
-	
 	private final Type type;
 
 	private Setting(Type type) {
@@ -95,7 +100,7 @@ public enum Setting {
 	public Type type() {
 		return this.type;
 	}
-	
+
 	public String parse(String value) {
 		Object result = null;
 		switch (type()) {
@@ -116,12 +121,16 @@ public enum Setting {
 	}
 
 	protected static boolean isTrue(String s) {
-		if (s != null) { s = s.trim().toLowerCase(); }
+		if (s != null) {
+			s = s.trim().toLowerCase();
+		}
 		return s != null && (s.equals("true") || s.equals("yes") || s.equals("on"));
 	}
 
 	protected static boolean isFalse(String s) {
-		if (s != null) { s = s.trim().toLowerCase(); }
+		if (s != null) {
+			s = s.trim().toLowerCase();
+		}
 		return s == null || s.equals("false") || s.equals("no") || s.equals("off");
 	}
 
@@ -153,41 +162,40 @@ public enum Setting {
 			return null;
 		}
 	}
-	
+
 	public boolean isAllowedValue(String s) {
 		return (s == null) ? this.type() == Type.BOOLEAN : true;
 	}
 
-	
 	protected boolean isUrl(String s) {
 		if (s == null) {
 			return false;
 		}
 		try {
 			URL url = new URL(s);
-			if (url.getProtocol()== null || url.getProtocol().isEmpty()) {
+			if (url.getProtocol() == null || url.getProtocol().isEmpty()) {
 				return false;
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			return false;
 		}
 		return true;
 	}
-    
-    public String getName() {
-        return name();
-    }
-    
-    public Type getType() {
-        return type();
-    }
-    
-    public static Set<String> getNames() {
-        Setting[] settings = values();
-        HashSet<String> names = new HashSet<String>(settings.length);
-        for (Setting s : settings) {
-            names.add(s.name());
-        }
-        return names;
-    }
+
+	public String getName() {
+		return name();
+	}
+
+	public Type getType() {
+		return type();
+	}
+
+	public static Set<String> getNames() {
+		Setting[] settings = values();
+		HashSet<String> names = new HashSet<String>(settings.length);
+		for (Setting s : settings) {
+			names.add(s.name());
+		}
+		return names;
+	}
 }

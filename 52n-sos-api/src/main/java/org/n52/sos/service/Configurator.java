@@ -42,9 +42,6 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import javax.servlet.UnavailableException;
-
 import org.n52.sos.binding.Binding;
 import org.n52.sos.cache.ACapabilitiesCacheController;
 import org.n52.sos.convert.ConverterKeyType;
@@ -174,7 +171,7 @@ public final class Configurator {
     private File sensorDir;
 
     private SosServiceIdentification serviceIdentification = new SosServiceIdentification();
-    
+
     /** file of service identification information in XML format */
     private File serviceIdentificationFile;
 
@@ -226,7 +223,7 @@ public final class Configurator {
     private ServiceLoader<ASosTasking> serviceLoaderTasking;
 
     private SosServiceProvider serviceProvider;
-    
+
     /** file of service provider information in XML format */
     private File serviceProviderFile;
 
@@ -297,7 +294,7 @@ public final class Configurator {
     private Map<String, IAdminRequestOperator> adminRequestOperators = new HashMap<String, IAdminRequestOperator>(0);
 
     private CodingRepository codingRepository;
-    
+
     /**
      * prefix URN for the spatial reference system
      */
@@ -338,15 +335,13 @@ public final class Configurator {
 
     /**
      * private constructor due to the singelton pattern.
-     * 
+     *
      * @param configis
      *            InputStream of the configfile
      * @param dbconfigis
      *            InputStream of the dbconfigfile
      * @param basepath
      *            base path for configuration files
-     * @throws UnavailableException
-     *             if the configFile could not be loaded
      * @throws OwsExceptionReport
      *             if the
      * @throws IOException
@@ -365,7 +360,8 @@ public final class Configurator {
 
         this.basepath = basepath;
         this.connectionProviderProperties = config;
-        LOGGER.info("\n******\nConfig File loaded successfully!\n******\n");
+        LOGGER.info("Configurator initialized: [basepath={}]",
+                this.basepath, this.connectionProviderProperties);
     }
 
     public void changeSetting(Setting setting, String newValue) throws ConfigurationException {
@@ -578,6 +574,9 @@ public final class Configurator {
         case MINIMUM_GZIP_SIZE:
             this.minimumGzipSize = parseInteger(setting, value);
             break;
+        case CACHE_THREAD_COUNT:
+            this.cacheThreadCount = parseInteger(setting, value);
+            break;
         default:
             String message = "Can not decode setting '" + setting.name() + "'!";
             LOGGER.error(message);
@@ -673,13 +672,13 @@ public final class Configurator {
      * called from here.
      */
     private void initialize() throws ConfigurationException {
-    	
+
     	LOGGER.info("\n******\n Configurator initialization started\n******\n");
 
         /* do this first as we need access to the database */
         initializeConnectionProvider();
         initializeCodingRepository();
-        
+
         Iterator<ISettingsDao> i = ServiceLoader.load(ISettingsDao.class).iterator();
         if (!i.hasNext()) {
             throw new ConfigurationException("No ISettingsDao implementation is present");
@@ -716,7 +715,7 @@ public final class Configurator {
         initializeDataSource();
         initializeCapabilitiesCacheController();
         initializeTasking();
-        
+
         LOGGER.info("\n******\n Configurator initialization finished\n******\n");
     }
 
@@ -743,7 +742,7 @@ public final class Configurator {
      * @param basepath
      * @return Returns an instance of the SosConfigurator. This method is used
      *         to implement the singelton pattern
-     * 
+     *
      * @throws ConfigurationException
      *             if the initialization failed
      */
@@ -798,7 +797,7 @@ public final class Configurator {
 	}
 
     private static final Lock INITIALIZE_LOCK = new ReentrantLock();
-    
+
     /**
      * @return Returns the instance of the SosConfigurator. Null will be
      *         returned if the parameterized getInstance method was not invoked
@@ -816,7 +815,7 @@ public final class Configurator {
     /**
      * reads the requestListeners from the configFile and returns a
      * RequestOperator containing the requestListeners
-     * 
+     *
      * @return RequestOperators with requestListeners
      * @throws OwsExceptionReport
      *             if initialization of a RequestListener failed
@@ -865,7 +864,7 @@ public final class Configurator {
     /**
      * reads the requestListeners from the configFile and returns a
      * RequestOperator containing the requestListeners
-     * 
+     *
      * @return RequestOperators with requestListeners
      * @throws OwsExceptionReport
      *             if initialization of a RequestListener failed
@@ -878,7 +877,7 @@ public final class Configurator {
 
     /**
      * Load implemented cache feeder dao
-     * 
+     *
      * @throws OwsExceptionReport
      *             If no cache feeder dao is implemented
      */
@@ -890,7 +889,7 @@ public final class Configurator {
 
     /**
      * intializes the CapabilitiesCache
-     * 
+     *
      * @throws OwsExceptionReport
      *             if initializing the CapabilitiesCache failed
      */
@@ -918,7 +917,7 @@ public final class Configurator {
 
     /**
      * Load the connection provider implementation
-     * 
+     *
      * @throws OwsExceptionReport
      *             If no connection provider is implemented
      */
@@ -958,8 +957,8 @@ public final class Configurator {
             throw new ConfigurationException(owse);
         }
     }
-   
-    
+
+
     public void updateConverter() throws ConfigurationException {
         converter.clear();
         serviceLoaderConverter.reload();
@@ -970,7 +969,7 @@ public final class Configurator {
 
     /**
      * Load implemented feature query handler
-     * 
+     *
      * @throws OwsExceptionReport
      *             If no feature query handler is implemented
      */
@@ -982,7 +981,7 @@ public final class Configurator {
 
     /**
      * Load implemented operation dao
-     * 
+     *
      * @throws OwsExceptionReport
      *             If no operation dao is implemented
      */
@@ -994,7 +993,7 @@ public final class Configurator {
 
     /**
      * Load implemented request listener
-     * 
+     *
      * @throws OwsExceptionReport
      *             If no request listener is implemented
      */
@@ -1047,7 +1046,7 @@ public final class Configurator {
     /**
      * Load the implemented cache feeder dao and add them to a map with
      * operation name as key
-     * 
+     *
      * @throws OwsExceptionReport
      *             If no cache feeder dao is implemented
      */
@@ -1096,15 +1095,15 @@ public final class Configurator {
                 LOGGER.warn("An IConverter implementation could not be loaded!", sce);
             }
         }
-        // TODO check for encoder/decoder used by converter 
+        // TODO check for encoder/decoder used by converter
     }
 
-   
+
 
     /**
      * Load the implemented feature query handler and add them to a map with
      * operation name as key
-     * 
+     *
      * @throws OwsExceptionReport
      *             If no feature query handler is implemented
      */
@@ -1125,7 +1124,7 @@ public final class Configurator {
     /**
      * Load the implemented operation dao and add them to a map with operation
      * name as key
-     * 
+     *
      * @throws OwsExceptionReport
      *             If no operation dao is implemented
      */
@@ -1161,13 +1160,13 @@ public final class Configurator {
         }
 
     }
-    
-    
+
+
 
     /**
      * Load the implemented request listener and add them to a map with
      * operation name as key
-     * 
+     *
      * @throws OwsExceptionReport
      *             If no request listener is implemented
      */
@@ -1197,7 +1196,7 @@ public final class Configurator {
 
     /**
      * Update/reload the implemented operation dao
-     * 
+     *
      * @throws ConfigurationException
      *             If no operation dao is implemented
      */
@@ -1218,7 +1217,7 @@ public final class Configurator {
 
     /**
      * Update/reload the implemented request listener
-     * 
+     *
      * @throws ConfigurationException
      *             If no request listener is implemented
      */
@@ -1466,7 +1465,7 @@ public final class Configurator {
 
     /**
      * Get service URL.
-     * 
+     *
      * @return
      */
     public String getServiceURL() {
@@ -1475,7 +1474,7 @@ public final class Configurator {
 
     /**
      * Set service URL.
-     * 
+     *
      * @param serviceURL
      */
     public void setServiceURL(String serviceURL) {
@@ -1576,15 +1575,25 @@ public final class Configurator {
     public int getDefaultEPSG() {
         return defaultEPSG;
     }
-    
+
+    /**
+	 * Defines the number of threads available in the thread pool of the cache
+	 * update executor service.
+	 */
+    private int cacheThreadCount = 5;
+
+    public int getCacheThreadCount() {
+        return cacheThreadCount;
+    }
+
     public <T,F> IConverter<T,F> getConverter(String fromNamespace, String toNamespace) {
         return (IConverter<T,F>) getConverter(new ConverterKeyType(fromNamespace, toNamespace));
     }
-    
+
     public IConverter getConverter(ConverterKeyType key) {
         return converter.get(key);
     }
-    
+
     public Binding getBindingOperator(String urlPattern) {
         return bindingOperators.get(urlPattern);
     }
@@ -1632,7 +1641,7 @@ public final class Configurator {
             LOGGER.warn(text, sce);
             throw new ConfigurationException(text, sce);
         }
-        
+
         List<IEncoder<?,?>> encoders = new LinkedList<IEncoder<?, ?>>();
         try {
             for (IEncoder<?,?> encoder : serviceLoaderEncoder) {
@@ -1643,19 +1652,19 @@ public final class Configurator {
             LOGGER.warn(text, sce);
             throw new ConfigurationException(text, sce);
         }
-        
+
         /* reinitialize XmlOptionHelper to get the correct prefixes */
         if (getCharacterEncoding() != null) {
             XmlOptionsHelper.getInstance(getCharacterEncoding(), true);
         }
-        
+
         codingRepository = new CodingRepository(decoders, encoders);
     }
-    
+
     public CodingRepository getCodingRepository() {
         return codingRepository;
     }
-    
+
     public void updateDecoder() throws ConfigurationException {
         if (serviceLoaderDecoder != null) {
             serviceLoaderDecoder.reload();

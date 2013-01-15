@@ -239,6 +239,13 @@
 					"required": false,
 					"title": "Configuration Files",
 					"description": "Configuration files and their file identifier (List: IDENTIFIER FILENAME;IDENTIFIER2 FILENAME2; ...)."
+				},
+				"CACHE_THREAD_COUNT": {
+					"type": "integer",
+					"required": true,
+					"default": "5",
+					"title": "Cache Feeder Threads",
+					"description": "The number of threads used to fill the capabilities cache."
 				}
 			}
 		},
