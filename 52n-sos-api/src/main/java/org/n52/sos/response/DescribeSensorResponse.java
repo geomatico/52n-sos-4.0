@@ -23,13 +23,13 @@
  */
 package org.n52.sos.response;
 
-import org.n52.sos.ogc.sensorML.AbstractSensorML;
+import org.n52.sos.ogc.sos.SosProcedureDescription;
 
 public class DescribeSensorResponse extends AbstractServiceResponse {
 
     private String outputFormat;
 
-    private AbstractSensorML sensorML;
+    private SosProcedureDescription procedureDescription;
 
     public String getOutputFormat() {
         return outputFormat;
@@ -39,12 +39,12 @@ public class DescribeSensorResponse extends AbstractServiceResponse {
         this.outputFormat = outputFormat;
     }
 
-    public AbstractSensorML getSensorDescription() {
-        return sensorML;
+    public SosProcedureDescription getSensorDescription() {
+        return procedureDescription;
     }
 
-    public void setSensorDescription(AbstractSensorML sensorML) {
-        this.sensorML = sensorML;
+    public void setSensorDescription(SosProcedureDescription procedureDescription) {
+        this.procedureDescription = procedureDescription;
     }
 
 }

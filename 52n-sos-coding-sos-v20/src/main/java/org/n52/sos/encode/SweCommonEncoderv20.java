@@ -192,21 +192,34 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
     private XmlObject createAbstractDataComponent(SosSweAbstractDataComponent sosSweAbstractDataComponent)
             throws OwsExceptionReport {
         try {
+            AbstractDataComponentType abstractDataComponentType = null;
             if (sosSweAbstractDataComponent instanceof SosSweAbstractSimpleType) {
-                return createSimpleType((SosSweAbstractSimpleType) sosSweAbstractDataComponent);
+                abstractDataComponentType = createSimpleType((SosSweAbstractSimpleType) sosSweAbstractDataComponent);
             }
             if (sosSweAbstractDataComponent instanceof SosSweDataRecord) {
-                return createDataRecord((SosSweDataRecord) sosSweAbstractDataComponent);
+                abstractDataComponentType = createDataRecord((SosSweDataRecord) sosSweAbstractDataComponent);
             } else if (sosSweAbstractDataComponent instanceof SosSweDataArray) {
-                return createDataArray((SosSweDataArray) sosSweAbstractDataComponent);
+                abstractDataComponentType = createDataArray((SosSweDataArray) sosSweAbstractDataComponent);
             } else if (sosSweAbstractDataComponent.getXml() != null && !sosSweAbstractDataComponent.getXml().isEmpty()) {
-                XmlObject xmlObject = XmlObject.Factory.parse(sosSweAbstractDataComponent.getXml());
-                return xmlObject;
+                return XmlObject.Factory.parse(sosSweAbstractDataComponent.getXml());
             } else {
                 String exceptionText = "AbstractDataComponent can not be encoded!";
                 LOGGER.debug(exceptionText);
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
             }
+            // add AbstractDataComponentType information
+            if (abstractDataComponentType != null) {
+                if (sosSweAbstractDataComponent.isSetDefinition()) {
+                    abstractDataComponentType.setDefinition(sosSweAbstractDataComponent.getDefinition());
+                }
+                if (sosSweAbstractDataComponent.isSetDescription()) {
+                    abstractDataComponentType.setDescription(sosSweAbstractDataComponent.getDescription());
+                }
+                if (sosSweAbstractDataComponent.isSetIdentifier()) {
+                    abstractDataComponentType.setIdentifier(sosSweAbstractDataComponent.getIdentifier());
+                }
+            }
+            return abstractDataComponentType;
         } catch (XmlException e) {
             String exceptionText = "Error while encoding AbstractDataComponent!";
             LOGGER.debug(exceptionText);
@@ -217,15 +230,6 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
     private DataRecordType createDataRecord(SosSweDataRecord sosDataRecord) throws OwsExceptionReport {
         List<SosSweField> sosFields = sosDataRecord.getFields();
         DataRecordType xbDataRecord = DataRecordType.Factory.newInstance();
-        if (sosDataRecord.isSetDefinition()) {
-            xbDataRecord.setDefinition(sosDataRecord.getDefinition());
-        }
-        if (sosDataRecord.isSetDescription()) {
-            xbDataRecord.setDescription(sosDataRecord.getDescription());
-        }
-        if (sosDataRecord.isSetIdentifier()) {
-            xbDataRecord.setIdentifier(sosDataRecord.getIdentifier());
-        }
         if (sosFields != null) {
             Field[] xbFields = new Field[sosFields.size()];
             int xbFieldIndex = 0;
@@ -244,15 +248,6 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 
             DataArrayType xbDataArray =
                     DataArrayType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-            if (sosDataArray.isSetDefinition()) {
-                xbDataArray.setDefinition(sosDataArray.getDefinition());
-            }
-            if (sosDataArray.isSetDescription()) {
-                xbDataArray.setDescription(sosDataArray.getDescription());
-            }
-            if (sosDataArray.isSetIdentifier()) {
-                xbDataArray.setIdentifier(sosDataArray.getIdentifier());
-            }
             if (sosDataArray.getElementCount() != null) {
                 xbDataArray.addNewElementCount().set(createCount(sosDataArray.getElementCount()));
             }
@@ -418,19 +413,13 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 
     private QuantityType createQuantity(SosSweQuantity quantity) {
         QuantityType xbQuantity = QuantityType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        if (quantity.getDefinition() != null && !quantity.getDefinition().isEmpty()) {
-            xbQuantity.setDefinition(quantity.getDefinition());
-        }
-        if (quantity.getDescription() != null && !quantity.getDescription().isEmpty()) {
-            xbQuantity.setDescription(quantity.getDescription());
-        }
         if (quantity.getAxisID() != null && !quantity.getAxisID().isEmpty()) {
             xbQuantity.setAxisID(quantity.getDescription());
         }
-        if (quantity.getValue() != null && !quantity.getValue().isEmpty()) {
+        if (quantity.isSetValue()) {
             xbQuantity.setValue(Double.valueOf(quantity.getValue()));
         }
-        if (quantity.getUom() != null && !quantity.getUom().isEmpty()) {
+        if (quantity.isSetUom()) {
             xbQuantity.addNewUom().setCode(quantity.getUom());
         }
         if (quantity.getQuality() != null) {
@@ -441,13 +430,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 
     private TextType createText(SosSweText text) {
         TextType xbText = TextType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        if (text.getDefinition() != null && !text.getDefinition().isEmpty()) {
-            xbText.setDefinition(text.getDefinition());
-        }
-        if (text.getDescription() != null && !text.getDescription().isEmpty()) {
-            xbText.setDescription(text.getDescription());
-        }
-        if (text.getValue() != null && !text.getValue().isEmpty()) {
+        if (text.isSetValue()) {
             xbText.setValue(text.getValue());
         }
         return xbText;
@@ -455,12 +438,6 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 
     private TimeType createTime(SosSweTime sosTime) {
         TimeType xbTime = TimeType.Factory.newInstance();
-        if (sosTime.isSetDefinition()) {
-            xbTime.setDefinition(sosTime.getDefinition());
-        }
-        if (sosTime.isSetDescription()) {
-            xbTime.setDescription(sosTime.getDescription());
-        }
         if (sosTime.isSetValue()) {
             xbTime.setValue(sosTime.getValue());
         }
@@ -475,15 +452,6 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 
     private TimeRangeType createTimeRange(SosSweTimeRange sosTimeRange) {
         TimeRangeType xbTimeRange = TimeRangeType.Factory.newInstance();
-        if (sosTimeRange.isSetDefinition()) {
-            xbTimeRange.setDefinition(sosTimeRange.getDefinition());
-        }
-        if (sosTimeRange.isSetDescription()) {
-            xbTimeRange.setDescription(sosTimeRange.getDescription());
-        }
-        if (sosTimeRange.isSetIdentifier()) {
-            xbTimeRange.setIdentifier(sosTimeRange.getIdentifier());
-        }
         if (sosTimeRange.isSetUom()) {
             xbTimeRange.addNewUom().setHref(sosTimeRange.getUom());
         }

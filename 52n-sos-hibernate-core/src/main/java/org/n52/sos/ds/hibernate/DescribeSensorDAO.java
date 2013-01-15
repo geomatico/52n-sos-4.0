@@ -24,18 +24,18 @@
 package org.n52.sos.ds.hibernate;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.n52.sos.decode.OperationDecoderKey;
@@ -43,23 +43,17 @@ import org.n52.sos.ds.IDescribeSensorDAO;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
-import org.n52.sos.ogc.gml.SosGmlMetaDataProperty;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sensorML.AbstractMultiProcess;
-import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
-import org.n52.sos.ogc.sensorML.elements.SosSMLCapabilities;
-import org.n52.sos.ogc.sensorML.elements.SosSMLComponent;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.swe.SosSweSimpleDataRecord;
-import org.n52.sos.ogc.swe.SWEConstants.SweAggregateType;
-import org.n52.sos.ogc.swe.SosSweField;
-import org.n52.sos.ogc.swe.simpleType.SosSweText;
+import org.n52.sos.ogc.sos.SosProcedureDescription;
+import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.response.DescribeSensorResponse;
+import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
@@ -92,13 +86,16 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
     }
 
     @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session connection) throws OwsExceptionReport {
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session connection)
+            throws OwsExceptionReport {
         opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());
         // FIXME: getTypes from Decoder
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            opsMeta.addPossibleValuesParameter(Sos1Constants.DescribeSensorParams.outputFormat, SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE);
+            opsMeta.addPossibleValuesParameter(Sos1Constants.DescribeSensorParams.outputFormat,
+                    SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE);
         } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
-            opsMeta.addPossibleValuesParameter(Sos2Constants.DescribeSensorParams.procedureDescriptionFormat, SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
+            opsMeta.addPossibleValuesParameter(Sos2Constants.DescribeSensorParams.procedureDescriptionFormat,
+                    SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
         }
     }
 
@@ -115,26 +112,27 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
         Session session = null;
         try {
             session = getSession();
-            SensorML result = queryProcedure(request.getProcedure(), request.getProcedureDescriptionFormat(), session);
-            AbstractMultiProcess member = new AbstractMultiProcess();
-            // fois
-            List<String> procedures = new ArrayList<String>(1);
-            procedures.add(request.getProcedure());
-            SosSMLCapabilities featureCapabilities =
-                    getFeatureOfInterestIDsForProcedure(procedures, request.getVersion(), session);
-            if (featureCapabilities != null) {
-                member.addCapabilities(featureCapabilities);
+            SosProcedureDescription result =
+                    queryProcedure(request.getProcedure(), request.getProcedureDescriptionFormat(), session);
+            
+            Collection<String> features = getFeatureOfInterestIDsForProcedure(request.getProcedure(), request.getVersion(), session);
+            if (features != null && !features.isEmpty()) {
+                result.addFeatureOfInterst(new HashSet<String>(features), request.getProcedure());
             }
+
             // parent procs
-            SosSMLCapabilities parentProcCapabilities =
-                    getParentProcedures(request.getProcedure(), request.getVersion());
-            if (parentProcCapabilities != null) {
-                member.addCapabilities(parentProcCapabilities);
+            Collection<String> parentProcedures = getParentProcedures(request.getProcedure(), request.getVersion());
+            if (parentProcedures != null && !parentProcedures.isEmpty()) {
+                result.addParentProcedures(new HashSet<String>(parentProcedures), request.getProcedure());
             }
+
             // child procs
-            member.addComponents(getChildProcedures(request.getProcedure(), request.getProcedureDescriptionFormat(),
-                    request.getVersion(), session));
-            result.addMember(member);
+            Set<SosProcedureDescription> childProcedures =
+                    getChildProcedures(request.getProcedure(), request.getProcedureDescriptionFormat(),
+                            request.getVersion(), session);
+            if (childProcedures != null && !childProcedures.isEmpty()) {
+                result.addChildProcedures(childProcedures, request.getProcedure());
+            }
             DescribeSensorResponse response = new DescribeSensorResponse();
             response.setService(request.getService());
             response.setVersion(request.getVersion());
@@ -150,7 +148,8 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
         }
     }
 
-    private SensorML queryProcedure(String procID, String outputFormat, Session session) throws OwsExceptionReport {
+    private SosProcedureDescription queryProcedure(String procID, String outputFormat, Session session)
+            throws OwsExceptionReport {
         String filename = null;
         String smlFile = null;
         String descriptionFormat;
@@ -172,25 +171,21 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
                     SosConstants.DescribeSensorParams.procedure.toString(), exceptionText);
 
         } else {
+            try {
+                if (filename != null && descriptionFormat != null && smlFile == null) {
+                    // return sensorML from folder
 
-            if (filename != null && descriptionFormat != null && smlFile == null) {
-                // return sensorML from folder
-
-                if (!descriptionFormat.equalsIgnoreCase(outputFormat)
-                        && !descriptionFormat.equalsIgnoreCase(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
-                    String exceptionText =
-                            "The value of the output format is wrong and has to be " + descriptionFormat
-                                    + " for procedure " + procID;
-                    LOGGER.error(exceptionText);
-                    throw Util4Exceptions.createInvalidParameterValueException(
-                            SosConstants.DescribeSensorParams.procedure.toString(), exceptionText);
-                }
-                FileInputStream fis = null;
-                try {
-
+                    if (!descriptionFormat.equalsIgnoreCase(outputFormat)
+                            && !descriptionFormat.equalsIgnoreCase(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
+                        String exceptionText =
+                                "The value of the output format is wrong and has to be " + descriptionFormat
+                                        + " for procedure " + procID;
+                        LOGGER.error(exceptionText);
+                        throw Util4Exceptions.createInvalidParameterValueException(
+                                SosConstants.DescribeSensorParams.procedure.toString(), exceptionText);
+                    }
                     File sensorFile;
                     LOGGER.info(filename);
-
                     // read in the description file
                     if (filename.startsWith("standard/")) {
                         filename = filename.replace("standard/", "");
@@ -198,45 +193,40 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
                     } else {
                         sensorFile = new File(filename);
                     }
-
-                    fis = new FileInputStream(sensorFile);
-
-                    byte[] b = new byte[fis.available()];
-                    fis.read(b);
-                    fis.close();
-
-                    // set result
-                    SensorML sensorML = new SensorML();
-                    sensorML.setSensorDescriptionXmlString(new String(b));
-                    return sensorML;
-
-                } catch (FileNotFoundException fnfe) {
-                    String exceptionText = "No sensorML file was found for the requested procedure " + procID;
-                    LOGGER.error(exceptionText, fnfe);
-                    throw Util4Exceptions.createInvalidParameterValueException(
-                            SosConstants.DescribeSensorParams.procedure.toString(), exceptionText);
-                } catch (IOException ioe) {
-                    String exceptionText = "An error occured while parsing the sensor description document!";
-                    LOGGER.error(exceptionText, ioe);
-                    throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
-                } finally {
-                    if (fis != null) {
-                        try {
-                            fis.close();
-                        } catch (IOException ioe) {
-                            LOGGER.error("Error while closing the sensor description file input stream!", ioe);
-                        }
+                    XmlObject procedureDescription = XmlObject.Factory.parse(sensorFile);
+                    try {
+                        return (SosProcedureDescription) CodingHelper.decodeXmlElement(procedureDescription);
+                    } catch (OwsExceptionReport owse) {
+                        return new SosProcedureDescriptionUnknowType(procID, outputFormat,
+                                procedureDescription.xmlText());
+                    }
+                } else {
+                    XmlObject procedureDescription = XmlObject.Factory.parse(smlFile);
+                    try {
+                        return (SosProcedureDescription) CodingHelper.decodeXmlElement(procedureDescription);
+                    } catch (OwsExceptionReport owse) {
+                        return new SosProcedureDescriptionUnknowType(procID, outputFormat,
+                                procedureDescription.xmlText());
                     }
                 }
-            } else {
-                SensorML sensorML = new SensorML();
-                sensorML.setSensorDescriptionXmlString(smlFile);
-                return sensorML;
+            } catch (FileNotFoundException fnfe) {
+                String exceptionText = "No sensorML file was found for the requested procedure " + procID;
+                LOGGER.error(exceptionText, fnfe);
+                throw Util4Exceptions.createInvalidParameterValueException(
+                        SosConstants.DescribeSensorParams.procedure.toString(), exceptionText);
+            } catch (IOException ioe) {
+                String exceptionText = "An error occured while parsing the sensor description document!";
+                LOGGER.error(exceptionText, ioe);
+                throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            } catch (XmlException xmle) {
+                String exceptionText = "An error occured while parsing the sensor description document!";
+                LOGGER.error(exceptionText, xmle);
+                throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
             }
         }
     }
 
-    private SosSMLCapabilities getFeatureOfInterestIDsForProcedure(List<String> proceedures, String version,
+    private Collection<String> getFeatureOfInterestIDsForProcedure(String procedureIdentifier, String version,
             Session session) throws OwsExceptionReport {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>(3);
@@ -246,27 +236,14 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
         // procedures
         String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, obsConstAlias);
         queryObject.setAliases(aliases);
+        List<String> list = new ArrayList<String>(1);
+        list.add(procedureIdentifier);
         queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
-                HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), proceedures));
+                HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), list));
         // FIXME: checks for generated IDs and remove them for SOS 2.0
-        Collection<String> foiIDs =
-                SosHelper.getFeatureIDs(HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(queryObject, session), version);
-        if (foiIDs != null && !foiIDs.isEmpty()) {
-            SosSMLCapabilities capabilities = new SosSMLCapabilities();
-            capabilities.setName("featureOfInterest");
-            SosSweSimpleDataRecord simpleDataRecord = new SosSweSimpleDataRecord();
-            List<SosSweField> fields = new ArrayList<SosSweField>(foiIDs.size());
-            for (String foiID : foiIDs) {
-                SosSweText text = new SosSweText();
-                text.setDefinition("FeatureOfInterest identifier");
-                text.setValue(foiID);
-                fields.add(new SosSweField("FeatureOfInterestID", text));
-            }
-            simpleDataRecord.setFields(fields);
-            capabilities.setDataRecord(simpleDataRecord);
-            return capabilities;
-        }
-        return null;
+        return
+                SosHelper.getFeatureIDs(
+                        HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(queryObject, session), version);
     }
 
     /**
@@ -278,30 +255,34 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
      *            The parent procedures to add
      * @throws OwsExceptionReport
      */
-    private SosSMLCapabilities getParentProcedures(String procID, String version) throws OwsExceptionReport {
-        Collection<String> parentProcedureIds = getCache().getParentProcedures(procID, false, false);
-        if (parentProcedureIds != null && !parentProcedureIds.isEmpty()) {
-            SosSMLCapabilities capabilities = new SosSMLCapabilities();
-            capabilities.setName(SosConstants.SYS_CAP_PARENT_PROCEDURES_NAME);
-            String urlPattern = SosHelper.getUrlPatternForHttpGetMethod(
-                    new OperationDecoderKey(SosConstants.SOS, version, SosConstants.Operations.DescribeSensor.name()));
-            for (String parentProcID : parentProcedureIds) {
-                SosGmlMetaDataProperty metadata = new SosGmlMetaDataProperty();
-                metadata.setTitle(parentProcID);
-                try {
-                    metadata.setHref(SosHelper.getDescribeSensorUrl(version, getConfigurator()
-                            .getServiceURL(), parentProcID, urlPattern));
-                } catch (UnsupportedEncodingException uee) {
-                    String exceptionText = "Error while encoding DescribeSensor URL";
-                    LOGGER.debug(exceptionText);
-                    throw Util4Exceptions.createNoApplicableCodeException(uee, exceptionText);
-                }
-                capabilities.addMetaDataProperties(metadata);
-            }
-            capabilities.setDataRecord(new SosSweSimpleDataRecord());
-            return capabilities;
-        }
-        return null;
+    private Collection<String> getParentProcedures(String procID, String version) throws OwsExceptionReport {
+        return getCache().getParentProcedures(procID, false, false);
+        // if (parentProcedureIds != null && !parentProcedureIds.isEmpty()) {
+        // SosSMLCapabilities capabilities = new SosSMLCapabilities();
+        // capabilities.setName(SosConstants.SYS_CAP_PARENT_PROCEDURES_NAME);
+        // String urlPattern =
+        // SosHelper.getUrlPatternForHttpGetMethod(new
+        // OperationDecoderKey(SosConstants.SOS, version,
+        // SosConstants.Operations.DescribeSensor.name()));
+        // for (String parentProcID : parentProcedureIds) {
+        // SosGmlMetaDataProperty metadata = new SosGmlMetaDataProperty();
+        // metadata.setTitle(parentProcID);
+        // try {
+        // metadata.setHref(SosHelper.getDescribeSensorUrl(version,
+        // getConfigurator().getServiceURL(),
+        // parentProcID, urlPattern));
+        // } catch (UnsupportedEncodingException uee) {
+        // String exceptionText = "Error while encoding DescribeSensor URL";
+        // LOGGER.debug(exceptionText);
+        // throw Util4Exceptions.createNoApplicableCodeException(uee,
+        // exceptionText);
+        // }
+        // capabilities.addMetaDataProperties(metadata);
+        // }
+        // capabilities.setDataRecord(new SosSweSimpleDataRecord());
+        // return capabilities;
+        // }
+        // return null;
     }
 
     /**
@@ -313,33 +294,42 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
      *            The child procedures to add
      * @throws OwsExceptionReport
      */
-    private List<SosSMLComponent> getChildProcedures(String procID, String outputFormat, String version,
+    private Set<SosProcedureDescription> getChildProcedures(String procID, String outputFormat, String version,
             Session session) throws OwsExceptionReport {
-        List<SosSMLComponent> smlComponsents = new LinkedList<SosSMLComponent>();
+        Set<SosProcedureDescription> childProcedures = new HashSet<SosProcedureDescription>(0);
         Collection<String> childProcedureIds = getCache().getChildProcedures(procID, false, false);
-        int childCount = 0;
+
         if (childProcedureIds != null && !childProcedureIds.isEmpty()) {
-            String urlPattern = SosHelper.getUrlPatternForHttpGetMethod(
-                    new OperationDecoderKey(SosConstants.SOS, version, SosConstants.Operations.DescribeSensor.name()));
+            String urlPattern =
+                    SosHelper.getUrlPatternForHttpGetMethod(new OperationDecoderKey(SosConstants.SOS, version,
+                            SosConstants.Operations.DescribeSensor.name()));
             for (String childProcID : childProcedureIds) {
-                childCount++;
-                SosSMLComponent component = new SosSMLComponent("component" + childCount);
-                component.setTitle(childProcID);
-                if (getConfigurator().isChildProceduresEncodedInParentsDescribeSensor()) {
-                    component.setProcess(queryProcedure(childProcID, outputFormat, session));
-                } else {
-                    try {
-                        component.setHref(SosHelper.getDescribeSensorUrl(Sos2Constants.SERVICEVERSION, 
-                                getConfigurator().getServiceURL(), childProcID, urlPattern));
-                    } catch (UnsupportedEncodingException uee) {
-                        String exceptionText = "Error while encoding DescribeSensor URL";
-                        LOGGER.debug(exceptionText);
-                        throw Util4Exceptions.createNoApplicableCodeException(uee, exceptionText);
-                    }
-                }
-                smlComponsents.add(component);
+                childProcedures.add(queryProcedure(childProcID, outputFormat, session));
+
+                // int childCount = 0;
+                // childCount++;
+                // SosSMLComponent component = new SosSMLComponent("component" +
+                // childCount);
+                // component.setTitle(childProcID);
+                // if
+                // (getConfigurator().isChildProceduresEncodedInParentsDescribeSensor())
+                // {
+                //
+                // } else {
+                // try {
+                // component.setHref(SosHelper.getDescribeSensorUrl(Sos2Constants.SERVICEVERSION,
+                // getConfigurator().getServiceURL(), childProcID, urlPattern));
+                // } catch (UnsupportedEncodingException uee) {
+                // String exceptionText =
+                // "Error while encoding DescribeSensor URL";
+                // LOGGER.debug(exceptionText);
+                // throw Util4Exceptions.createNoApplicableCodeException(uee,
+                // exceptionText);
+                // }
+                // }
+                // smlComponsents.add(component);
             }
         }
-        return smlComponsents;
+        return childProcedures;
     }
 }

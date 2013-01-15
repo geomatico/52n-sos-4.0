@@ -54,7 +54,7 @@ public class AbstractSensorML extends SosProcedureDescription {
     private List<AbstractSosSMLDocumentation> documentations = new ArrayList<AbstractSosSMLDocumentation>(0);
 
     private String history;
-
+    
     public List<String> getKeywords() {
         return keywords;
     }
@@ -92,7 +92,15 @@ public class AbstractSensorML extends SosProcedureDescription {
     }
 
     public void setCharacteristics(List<SosSMLCharacteristics> characteristics) {
-        this.characteristics = characteristics;
+        if (isSetCharacteristics()) {
+            this.characteristics.addAll(characteristics);
+        } else {
+            this.characteristics = characteristics;
+        }
+    }
+    
+    public void addCharacteristic(SosSMLCharacteristics characteristic) {
+        this.characteristics.add(characteristic);
     }
 
     public List<SosSMLCapabilities> getCapabilities() {
@@ -100,7 +108,15 @@ public class AbstractSensorML extends SosProcedureDescription {
     }
 
     public void setCapabilities(List<SosSMLCapabilities> capabilities) {
-        this.capabilities = capabilities;
+        if (isSetCapabilities()) {
+            this.capabilities.addAll(capabilities);
+        } else {
+            this.capabilities = capabilities;
+        }
+    }
+
+    public void addCapabilities(SosSMLCapabilities capabilities) {
+        this.capabilities.add(capabilities);
     }
 
     public String getContact() {
@@ -129,13 +145,6 @@ public class AbstractSensorML extends SosProcedureDescription {
 
     public void setHistory(String history) {
         this.history = history;
-    }
-
-    public void addCapabilities(SosSMLCapabilities capability) {
-        if (capabilities == null) {
-            capabilities = new ArrayList<SosSMLCapabilities>();
-        }
-        capabilities.add(capability);
     }
 
     @Override
@@ -174,11 +183,6 @@ public class AbstractSensorML extends SosProcedureDescription {
         return null;
     }
 
-    @Override
-    public String getProcedureDescriptionFormat() {
-        return SensorMLConstants.NS_SML;
-    }
-    
     public boolean isSetKeywords() {
         return keywords != null && !keywords.isEmpty();
     }

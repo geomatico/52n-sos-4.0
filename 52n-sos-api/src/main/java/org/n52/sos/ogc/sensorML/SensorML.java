@@ -65,19 +65,19 @@ public class SensorML extends AbstractSensorML {
     }
     
     public boolean isWrapper() {
-        return (getKeywords() == null || (getKeywords() != null && getKeywords().isEmpty()))
-                && (getIdentifications() == null || (getIdentifications() != null && getIdentifications().isEmpty()))
-                && (getClassifications() == null || (getClassifications() != null && getClassifications().isEmpty()))
-                && (getCapabilities() == null || (getCapabilities() != null && getCapabilities().isEmpty()))
-                && (getCharacteristics() == null || (getCharacteristics() != null && getCharacteristics().isEmpty()))
-                && (getValidTime() == null) && (getContact() == null || (getContact() != null && getContact().isEmpty()))
-                && (getDocumentation() == null || (getDocumentation() != null && getDocumentation().isEmpty()))
-                && (getHistory() == null || (getHistory() != null && getHistory().isEmpty()))
-                && (members != null && !members.isEmpty());
+        return !isSetKeywords()
+                && !isSetIdentifications()
+                && !isSetClassifications()
+                && !isSetCapabilities()
+                && !isSetCharacteristics()
+                && !isSetValidTime() && !isSetContact()
+                && !isSetDocumentation()
+                && !isSetHistory()
+                && isSetMembers();
     }
 
     public boolean isSetMembers() {
-        return members != null && members.isEmpty();
+        return members != null && !members.isEmpty();
     }
 
 }
