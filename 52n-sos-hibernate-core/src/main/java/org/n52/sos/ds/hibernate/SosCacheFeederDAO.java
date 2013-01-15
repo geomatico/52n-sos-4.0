@@ -27,15 +27,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
 import org.n52.sos.cache.CapabilitiesCache;
 import org.n52.sos.ds.ICacheFeederDAO;
+import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.hibernate.entities.CompositePhenomenon;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
@@ -64,16 +70,23 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFeederDAO {
 
-    /**
+	/**
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosCacheFeederDAO.class);
+
+	/**
+	 * Defines the number of threads available in the thread pool of the cache
+	 * update executor service.
+	 */
+    // TODO read from configuration
+	private static final int CACHE_THREAD_COUNT = 5;
 
     public enum CacheCreationStrategy {
     	SINGLE_THREAD, MULTI_THREAD, COMPLEX_DB_QUERIES
     }
 
-    private final CacheCreationStrategy DEFAULT_STRATEGY = CacheCreationStrategy.SINGLE_THREAD;
+    private final CacheCreationStrategy DEFAULT_STRATEGY = CacheCreationStrategy.MULTI_THREAD;
     
 	private CacheCreationStrategy strategy = DEFAULT_STRATEGY;
 	
@@ -217,84 +230,146 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         }
     }
 
-    /**
-     * Set cache values related to offering
-     * 
-     * @param cache
-     *            CapabilitiesCache instance CapabilitiesCache instance
-     * @param session
-     *            Hibernate session
-     */
     private void setOfferingValues(CapabilitiesCache cache, Session session) throws OwsExceptionReport {
-    	// TODO Eike: use strategy
         List<Offering> hOfferings = HibernateCriteriaQueryUtilities.getOfferingObjects(session);
-        Map<String, String> kOfferingVName = new HashMap<String, String>(hOfferings.size());
-        Map<String, Collection<String>> kOfferingVProcedures = new HashMap<String, Collection<String>>(hOfferings.size());
-        Map<String, Collection<String>> kOfferingVObservableProperties = new HashMap<String, Collection<String>>(hOfferings.size());
-        Map<String, Collection<String>> kOfferingVRelatedFeatures = new HashMap<String, Collection<String>>(hOfferings.size());
-        Map<String, Collection<String>> kOfferingVObservationTypes = new HashMap<String, Collection<String>>(hOfferings.size());
-        Map<String, Collection<String>> allowedkOfferingVObservationTypes = new HashMap<String, Collection<String>>(hOfferings.size());
-		Map<String, DateTime> kOfferingVMinTime = new HashMap<String, DateTime>(hOfferings.size());
-		Map<String, DateTime> kOfferingVMaxTime = new HashMap<String, DateTime>(hOfferings.size());
-		Map<String, SosEnvelope> kOfferingVEnvelope = new HashMap<String, SosEnvelope>(hOfferings.size());
-		// TODO Eike: add multi threading here
-		// create new executor service with fixed thread pool size (size from configuration) this size limits the number of connections to;
-		// constructor should support parameter 'buffer' which limits the number of connections taken; 'buffer' defines the left over connections
-		if (this.strategy.equals(CacheCreationStrategy.COMPLEX_DB_QUERIES))
+        
+        Map<String, String> 			kOfferingVName 						= new Hashtable<String, String>(hOfferings.size(),1.0f);
+        Map<String, Collection<String>> kOfferingVProcedures 				= new Hashtable<String, Collection<String>>(hOfferings.size(),1.0f);
+        Map<String, Collection<String>> kOfferingVObservableProperties 		= new Hashtable<String, Collection<String>>(hOfferings.size(),1.0f);
+        Map<String, Collection<String>> kOfferingVRelatedFeatures 			= new Hashtable<String, Collection<String>>(hOfferings.size(),1.0f);
+        Map<String, Collection<String>> kOfferingVObservationTypes			= new Hashtable<String, Collection<String>>(hOfferings.size(),1.0f);
+        Map<String, Collection<String>> allowedkOfferingVObservationTypes 	= new Hashtable<String, Collection<String>>(hOfferings.size(),1.0f);
+		Map<String, DateTime> 			kOfferingVMinTime 					= new Hashtable<String, DateTime>(hOfferings.size(),1.0f);
+		Map<String, DateTime> 			kOfferingVMaxTime 					= new Hashtable<String, DateTime>(hOfferings.size(),1.0f);
+		Map<String, SosEnvelope> 		kOfferingVEnvelope	 				= new Hashtable<String, SosEnvelope>(hOfferings.size(),1.0f);
+		Map<String, Collection<String>>	kOfferingVFeaturesOfInterest		= new Hashtable<String, Collection<String>>(hOfferings.size(),1.0f);
+		
+		// fields required for multithreading
+		ExecutorService executor = null;
+		CountDownLatch offeringThreadsRunning = null;
+		IConnectionProvider connectionProvider = null;
+		Vector<OwsExceptionReport> owsReportsThrownByOfferingThreads = null;
+		
+		if (strategy == CacheCreationStrategy.COMPLEX_DB_QUERIES)
 		{
-			Map<String, TimePeriod> temporalBoundingBoxesOfOfferings = HibernateCriteriaQueryUtilities.getTemporalBoundingBoxesForOfferings(session);
-			for (String offeringId : temporalBoundingBoxesOfOfferings.keySet()) {
-				TimePeriod temporalBBox = temporalBoundingBoxesOfOfferings.get(offeringId);
-				if (temporalBBox != null && temporalBBox.getStart() != null && temporalBBox.getEnd() != null)
+			getTemporalBBoxesOfOfferingsAndSaveInMap(session, kOfferingVMinTime, kOfferingVMaxTime);
+		}
+		else if (strategy == CacheCreationStrategy.MULTI_THREAD)
+		{
+			LOGGER.debug("multithreading init");
+			executor = Executors.newFixedThreadPool(CACHE_THREAD_COUNT);
+			offeringThreadsRunning = new CountDownLatch(hOfferings.size());
+			connectionProvider = Configurator.getInstance().getConnectionProvider();
+			owsReportsThrownByOfferingThreads = new Vector<OwsExceptionReport>(hOfferings.size());
+		}
+		for (Offering offering : hOfferings) {
+			if (!checkOfferingForDeletedProcedure(offering.getObservationConstellations())) {
+				if (strategy == CacheCreationStrategy.MULTI_THREAD)
 				{
-					kOfferingVMinTime.put(offeringId,temporalBBox.getStart());
-            		kOfferingVMaxTime.put(offeringId,temporalBBox.getEnd());
+					// create runnable for offeringId
+					Runnable task = new OfferingTask(offeringThreadsRunning,connectionProvider, kOfferingVName,
+							kOfferingVProcedures, kOfferingVObservableProperties, kOfferingVRelatedFeatures,
+							kOfferingVObservationTypes,	allowedkOfferingVObservationTypes, kOfferingVMinTime,
+							kOfferingVMaxTime, kOfferingVEnvelope, kOfferingVFeaturesOfInterest, offering, owsReportsThrownByOfferingThreads);
+					// put runnable in executor service
+					executor.submit(task);
+				} 
+				else
+				{
+				getOfferingInformationFromDbAndAddItToCacheMaps(session,
+						kOfferingVName, kOfferingVProcedures, kOfferingVObservableProperties,
+						kOfferingVRelatedFeatures, kOfferingVObservationTypes, allowedkOfferingVObservationTypes,
+						kOfferingVMinTime, kOfferingVMaxTime, kOfferingVEnvelope, kOfferingVFeaturesOfInterest, offering);
 				}
 			}
 		}
-        for (Offering offering : hOfferings) {
-            if (!checkOfferingForDeletedProcedure(offering.getObservationConstellations())) {
-            	// TODO Eike: add new runnable for this offering
-            	String offeringId = offering.getIdentifier();
-            	kOfferingVName.put(offeringId, offering.getName());
-            	// Procedures
-            	kOfferingVProcedures.put(offeringId,
-            			getProceduresFromObservationConstellation(offering.getObservationConstellations()));
-            	// Observable properties
-            	kOfferingVObservableProperties.put(offeringId,
-            			getObservablePropertiesFromObservationConstellation(offering.getObservationConstellations()));
-            	// Related features
-            	kOfferingVRelatedFeatures.put(offeringId,
-            			getRelatedFeatureIDsFromOffering(offering.getRelatedFeatures()));
-            	// Observation types
-            	kOfferingVObservationTypes.put(offeringId,
-            			getObservationTypesFromObservationConstellation(offering.getObservationConstellations()));
-            	allowedkOfferingVObservationTypes.put(offeringId,
-            			getObservationTypesFromObservationType(offering.getObservationTypes()));
-            	// Temporal Envelope
-            	if  (!this.strategy.equals(CacheCreationStrategy.COMPLEX_DB_QUERIES))
-            	{
-            		kOfferingVMinTime.put(offeringId,
-            				HibernateCriteriaQueryUtilities.getMinDate4Offering(offeringId, session));
-            		kOfferingVMaxTime.put(offeringId,
-            				HibernateCriteriaQueryUtilities.getMaxDate4Offering(offeringId, session));
-            	}
-            	// Spatial Envelope
-            	kOfferingVEnvelope.put(offeringId,
-            			getEnvelopeForOffering(offeringId, session));
-            }
-        }
+		if (strategy == CacheCreationStrategy.MULTI_THREAD)
+		{
+			executor.shutdown(); // <-- will finish all submitted tasks
+			// wait for all threads to finish
+			try 
+			{
+				LOGGER.debug("Waiting for {} threads to finish",hOfferings.size());
+				offeringThreadsRunning.await();
+			}
+			catch (InterruptedException e) {}
+			LOGGER.debug("Finished waiting for other threads");
+			if (!owsReportsThrownByOfferingThreads.isEmpty())
+			{
+				Util4Exceptions.mergeAndThrowExceptions(owsReportsThrownByOfferingThreads);
+			}
+		}
+		// save all information in cache
         cache.setKOfferingVName(kOfferingVName);
         cache.setKOfferingVObservableProperties(kOfferingVObservableProperties);
         cache.setKOfferingVProcedures(kOfferingVProcedures);
         cache.setKOfferingVRelatedFeatures(kOfferingVRelatedFeatures);
         cache.setKOfferingVObservationTypes(kOfferingVObservationTypes);
-        cache.setKOffrtingVFeatures(getFeaturesFromObservationForOfferings(kOfferingVName.keySet(), session));
+        cache.setKOfferingVFeatures(kOfferingVFeaturesOfInterest);
         cache.setAllowedKOfferingVObservationType(allowedkOfferingVObservationTypes);
 		cache.setKOfferingVEnvelope(kOfferingVEnvelope);
 		cache.setKOfferingVMinTime(kOfferingVMinTime);
 		cache.setKOfferingVMaxTime(kOfferingVMaxTime);
     }
+    
+    private void getOfferingInformationFromDbAndAddItToCacheMaps(Session session,
+			Map<String, String> kOfferingVName,
+			Map<String, Collection<String>> kOfferingVProcedures,
+			Map<String, Collection<String>> kOfferingVObservableProperties,
+			Map<String, Collection<String>> kOfferingVRelatedFeatures,
+			Map<String, Collection<String>> kOfferingVObservationTypes,
+			Map<String, Collection<String>> allowedkOfferingVObservationTypes,
+			Map<String, DateTime> kOfferingVMinTime,
+			Map<String, DateTime> kOfferingVMaxTime,
+			Map<String, SosEnvelope> kOfferingVEnvelope,
+			Map<String, Collection<String>> kOfferingVFeaturesOfInterest, Offering offering) throws OwsExceptionReport
+	{
+		String offeringId = offering.getIdentifier();
+		kOfferingVName.put(offeringId, offering.getName());
+		// Procedures
+		kOfferingVProcedures.put(offeringId,
+				getProcedureIdentifierFrom(offering.getObservationConstellations()));
+		// Observable properties
+		kOfferingVObservableProperties.put(offeringId,
+				getObservablePropertyIdentifierFrom(offering.getObservationConstellations()));
+		// Related features
+		kOfferingVRelatedFeatures.put(offeringId,
+				getRelatedFeatureIdentifiersFrom(offering));
+		// Observation types
+		kOfferingVObservationTypes.put(offeringId,
+				getObservationTypesFrom(offering.getObservationConstellations()));
+		allowedkOfferingVObservationTypes.put(offeringId,
+				getObservationTypesFromObservationType(offering.getObservationTypes()));
+		// Spatial Envelope
+		kOfferingVEnvelope.put(offeringId,
+				getEnvelopeForOffering(offeringId, session));
+		// Features of Interest
+		List<String> featureOfInterestIdentifiers = HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(offering.getName(), session);
+        kOfferingVFeaturesOfInterest.put(offering.getName(), featureOfInterestIdentifiers);
+		// Temporal Envelope
+		if  (!this.strategy.equals(CacheCreationStrategy.COMPLEX_DB_QUERIES))
+		{
+			kOfferingVMinTime.put(offeringId,
+					HibernateCriteriaQueryUtilities.getMinDate4Offering(offeringId, session));
+			kOfferingVMaxTime.put(offeringId,
+					HibernateCriteriaQueryUtilities.getMaxDate4Offering(offeringId, session));
+		}
+	}
+
+	private void getTemporalBBoxesOfOfferingsAndSaveInMap(Session session,
+			Map<String, DateTime> kOfferingVMinTime,
+			Map<String, DateTime> kOfferingVMaxTime)
+	{
+		Map<String, TimePeriod> temporalBoundingBoxesOfOfferings = HibernateCriteriaQueryUtilities.getTemporalBoundingBoxesForOfferings(session);
+		for (String offeringId : temporalBoundingBoxesOfOfferings.keySet()) {
+			TimePeriod temporalBBox = temporalBoundingBoxesOfOfferings.get(offeringId);
+			if (temporalBBox != null && temporalBBox.getStart() != null && temporalBBox.getEnd() != null)
+			{
+				kOfferingVMinTime.put(offeringId,temporalBBox.getStart());
+				kOfferingVMaxTime.put(offeringId,temporalBBox.getEnd());
+			}
+		}
+	}
 	
 	private SosEnvelope getEnvelopeForOffering(String offeringID, Session session) throws OwsExceptionReport {
 		List<String> featureIDs =
@@ -308,14 +383,6 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         return null;
 	}
 
-    /**
-     * Set cache values related to procedure
-     * 
-     * @param cache
-     *            CapabilitiesCache instance
-     * @param session
-     *            Hibernate session
-     */
     private void setProcedureValues(CapabilitiesCache cache, Session session) {
         List<Procedure> hProcedures = HibernateCriteriaQueryUtilities.getProcedureObjects(session);
         Set<String> procedures = new HashSet<String>(hProcedures.size());
@@ -326,9 +393,9 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
             if (!procedure.isDeleted()) {
                 procedures.add(procedure.getIdentifier());
                 kProcedureVOffering.put(procedure.getIdentifier(),
-                        getOfferingsFromObservationCollection(procedure.getObservationConstellations()));
+                        getAllOfferingIdentifiersFrom(procedure.getObservationConstellations()));
                 kProcedureVObservableProperties.put(procedure.getIdentifier(),
-                        getObservablePropertiesFromObservationConstellation(procedure.getObservationConstellations()));
+                        getObservablePropertyIdentifierFrom(procedure.getObservationConstellations()));
                 parentProcs.put(procedure.getIdentifier(),
                         getProcedureIDsFromProcedures(procedure.getProceduresForChildSensorId()));
             }
@@ -339,14 +406,6 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         cache.setProcedureHierarchies(parentProcs);
     }
 
-    /**
-     * Set cache values related to observableProperty
-     * 
-     * @param cache
-     *            CapabilitiesCache instance
-     * @param session
-     *            Hibernate session
-     */
     private void setObservablePropertyValues(CapabilitiesCache cache, Session session) {
         //List<String> observableProperties = new ArrayList<String>();
         List<ObservableProperty> hObservableProperties = HibernateCriteriaQueryUtilities.getObservablePropertyObjects(session);
@@ -355,22 +414,14 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         for (ObservableProperty observableProperty : hObservableProperties) {
 			//observableProperties.add(observableProperty.getIdentifier());
             kObservablePropertyVOffering.put(observableProperty.getIdentifier(),
-                    getOfferingsFromObservationCollection(observableProperty.getObservationConstellations()));
+                    getAllOfferingIdentifiersFrom(observableProperty.getObservationConstellations()));
             kObservablePropertyVProcedures.put(observableProperty.getIdentifier(),
-                    getProceduresFromObservationConstellation(observableProperty.getObservationConstellations()));
+                    getProcedureIdentifierFrom(observableProperty.getObservationConstellations()));
         }
         cache.setKObservablePropertyVOfferings(kObservablePropertyVOffering);
         cache.setKObservablePropertyKProcedures(kObservablePropertyVProcedures);
     }
 
-    /**
-     * Set cache values related to featureOfInterest
-     * 
-     * @param cache
-     *            CapabilitiesCache instance
-     * @param session
-     *            Hibernate session
-     */
     private void setFeatureOfInterestValues(CapabilitiesCache cache, Session session) throws OwsExceptionReport {
         List<FeatureOfInterest> hFeaturesOfInterest = HibernateCriteriaQueryUtilities.getFeatureOfInterestObjects(session);
         Map<String, Collection<String>> kFeatureOfInterestVProcedure = new HashMap<String, Collection<String>>(hFeaturesOfInterest.size());
@@ -423,14 +474,6 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         cache.setKRelatedFeaturesVRole(relatedFeatureList);
     }
 
-    /**
-     * Set cache values related to compositePhenomenon
-     * 
-     * @param cache
-     *            CapabilitiesCache instance
-     * @param session
-     *            Hibernate session
-     */
     private void setCompositePhenomenonValues(CapabilitiesCache cache, Session session) {
         List<CompositePhenomenon> compositePhenomenons = HibernateCriteriaQueryUtilities.getCompositePhenomenonObjects(session);
         Map<String, Collection<String>> kCompositePhenomenonVObservableProperty =
@@ -445,14 +488,6 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         cache.setKCompositePhenomenonVObservableProperties(kCompositePhenomenonVObservableProperty);
     }
 
-    /**
-     * Set cache values for SRID
-     * 
-     * @param cache
-     *            CapabilitiesCache instance
-     * @param session
-     *            Hibernate session
-     */
     private void setSridValues(CapabilitiesCache cache, Session session) {
         List<SpatialRefSys> spatialRefSyss = HibernateCriteriaQueryUtilities.getSpatialReySysObjects(session);
         List<Integer> srids = new ArrayList<Integer>(spatialRefSyss.size());
@@ -481,33 +516,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         return true;
     }
 
-    /**
-     * Get all FOIs related to an offering
-     * 
-     * @param offerings
-     *            Offering list
-     * @param session
-     *            Hibernate session
-     * @return Map with FOIs for each offering
-     */
-    private Map<String, Collection<String>> getFeaturesFromObservationForOfferings(Set<String> offerings,
-            Session session) {
-        Map<String, Collection<String>> kOfferingVFeatureOfInterest = new HashMap<String, Collection<String>>(offerings.size());
-        for (String offering : offerings) {
-            List<String> featureOfInterestIdentifiers = HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(offering, session);
-            kOfferingVFeatureOfInterest.put(offering, featureOfInterestIdentifiers);
-        }
-        return kOfferingVFeatureOfInterest;
-    }
-
-    /**
-     * Get all offering identifiers from ObservationConstellation objects
-     * 
-     * @param observationConstellations
-     *            ObservationConstellation objects
-     * @return List with offering identifiers
-     */
-    private List<String> getOfferingsFromObservationCollection(Set<ObservationConstellation> observationConstellations) {
+    private List<String> getAllOfferingIdentifiersFrom(Set<ObservationConstellation> observationConstellations) {
         Set<String> offerings = new HashSet<String>(observationConstellations.size());
         for (ObservationConstellation oc : observationConstellations) {
             offerings.add(oc.getOffering().getIdentifier());
@@ -515,15 +524,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         return new ArrayList<String>(offerings);
     }
 
-    /**
-     * Get all procedure identifiers from ObservationConstellation objects
-     * 
-     * @param observationConstellations
-     *            ObservationConstellation objects
-     * @return List with procedure identifiers
-     */
-    private List<String> getProceduresFromObservationConstellation(
-            Set<ObservationConstellation> observationConstellations) {
+    private List<String> getProcedureIdentifierFrom(Set<ObservationConstellation> observationConstellations) {
         Set<String> procedures = new HashSet<String>(observationConstellations.size());
         for (ObservationConstellation observationConstellation : observationConstellations) {
             procedures.add(observationConstellation.getProcedure().getIdentifier());
@@ -531,16 +532,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         return new ArrayList<String>(procedures);
     }
 
-    /**
-     * Get all observableProperty identifiers from ObservationConstellation
-     * objects
-     * 
-     * @param observationConstellations
-     *            ObservationConstellation objects
-     * @return List with observableProperty identifiers
-     */
-    private List<String> getObservablePropertiesFromObservationConstellation(
-            Set<ObservationConstellation> observationConstellations) {
+    private List<String> getObservablePropertyIdentifierFrom(Set<ObservationConstellation> observationConstellations) {
         Set<String> observableProperties = new HashSet<String>(observationConstellations.size());
         for (ObservationConstellation observationConstellation : observationConstellations) {
             if (observationConstellation.getObservableProperty() != null) {
@@ -550,13 +542,6 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         return new ArrayList<String>(observableProperties);
     }
 
-    /**
-     * Get all observableProperty identifiers from ObservableProperty objects
-     * 
-     * @param observableProperties
-     *            ObservableProperty objects
-     * @return List with observableProperty identifiers
-     */
     private List<String> getObservablePropertyIdentifierFromObservableProperties(
             Set<ObservableProperty> observableProperties) {
         List<String> observablePropertyIdentifiers = new ArrayList<String>(observableProperties.size());
@@ -566,14 +551,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         return observablePropertyIdentifiers;
     }
 
-    /**
-     * Get all observationTypes from ObservationConstellation objects
-     * 
-     * @param observationConstellations
-     *            ObservationConstellation objects
-     * @return List with observationTypes
-     */
-    private List<String> getObservationTypesFromObservationConstellation(
+    private List<String> getObservationTypesFrom(
             Set<ObservationConstellation> observationConstellations) {
         Set<String> observationTypes = new HashSet<String>(observationConstellations.size());
         for (ObservationConstellation observationConstellation : observationConstellations) {
@@ -592,16 +570,9 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         return new ArrayList<String>(obsTypes);
     }
 
-    /**
-     * Get relatedFeature identifiers
-     * 
-     * @param relatedFeatures
-     *            RelatedFeature objects
-     * @return List with relatedFeature identifiers
-     */
-    private Collection<String> getRelatedFeatureIDsFromOffering(Set<RelatedFeature> relatedFeatures) {
-        List<String> relatedFeatureList = new ArrayList<String>(relatedFeatures.size());
-        for (RelatedFeature relatedFeature : relatedFeatures) {
+    private Collection<String> getRelatedFeatureIdentifiersFrom(Offering offering) {
+        List<String> relatedFeatureList = new ArrayList<String>(offering.getRelatedFeatures().size());
+        for (RelatedFeature relatedFeature : offering.getRelatedFeatures()) {
             relatedFeatureList.add(relatedFeature.getFeatureOfInterest().getIdentifier());
         }
         return relatedFeatureList;
@@ -639,6 +610,73 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         }
         cache.setResultTemplates(resultTemplates);
     }
+
+	private class OfferingTask implements Runnable
+	{
+		private Map<String, String> kOfferingVName;
+		private Map<String, Collection<String>> kOfferingVObservableProperties;
+		private Map<String, Collection<String>> kOfferingVObservationTypes;
+		private Map<String, Collection<String>> kOfferingVProcedures;
+		private Map<String, Collection<String>> kOfferingVRelatedFeatures;
+		private CountDownLatch countDownLatch;
+		private IConnectionProvider connectionProvider;
+		private Map<String, Collection<String>> allowedkOfferingVObservationTypes;
+		private Offering offering;
+		private Map<String, SosEnvelope> kOfferingVEnvelope;
+		private Map<String, DateTime> kOfferingVMaxTime;
+		private Map<String, DateTime> kOfferingVMinTime;
+		private Vector<OwsExceptionReport> owsReports;
+		private Map<String, Collection<String>> kOfferingVFeaturesOfInterest;
+	
+		public OfferingTask(CountDownLatch countDownLatch, IConnectionProvider connectionProvider, Map<String, String> kOfferingVName, Map<String, Collection<String>> kOfferingVProcedures,
+				Map<String, Collection<String>> kOfferingVObservableProperties, Map<String, Collection<String>> kOfferingVRelatedFeatures,
+				Map<String, Collection<String>> kOfferingVObservationTypes, Map<String, Collection<String>> allowedkOfferingVObservationTypes, Map<String, DateTime> kOfferingVMinTime,
+				Map<String, DateTime> kOfferingVMaxTime, Map<String, SosEnvelope> kOfferingVEnvelope, Map<String, Collection<String>> kOfferingVFeaturesOfInterest, Offering offering, Vector<OwsExceptionReport> owsReports) {
+			this.countDownLatch = countDownLatch;
+			this.connectionProvider = connectionProvider;
+			this.kOfferingVName = kOfferingVName;
+			this.kOfferingVObservableProperties = kOfferingVObservableProperties;
+			this.kOfferingVObservationTypes = kOfferingVObservationTypes;
+			this.kOfferingVProcedures = kOfferingVProcedures;
+			this.kOfferingVRelatedFeatures = kOfferingVRelatedFeatures;
+			this.allowedkOfferingVObservationTypes = allowedkOfferingVObservationTypes;
+			this.kOfferingVMinTime = kOfferingVMinTime;
+			this.kOfferingVMaxTime = kOfferingVMaxTime;
+			this.kOfferingVEnvelope = kOfferingVEnvelope;
+			this.offering = offering;
+			this.owsReports = owsReports;
+			this.kOfferingVFeaturesOfInterest = kOfferingVFeaturesOfInterest;
+		}
+	
+		@Override
+		public void run()
+		{
+			Session session = null;
+			try
+			{
+				session = (Session) connectionProvider.getConnection();
+				getOfferingInformationFromDbAndAddItToCacheMaps(session, kOfferingVName, kOfferingVProcedures,
+						kOfferingVObservableProperties, kOfferingVRelatedFeatures, kOfferingVObservationTypes,
+						allowedkOfferingVObservationTypes, kOfferingVMinTime, kOfferingVMaxTime, kOfferingVEnvelope,
+						kOfferingVFeaturesOfInterest, offering);
+			} catch (OwsExceptionReport e) {
+				LOGGER.error(String.format("Exception thrown: %s",
+						e.getMessage()),
+						e);
+				owsReports.add(e);
+			}
+			finally
+			{
+				if (session != null)
+				{
+					connectionProvider.returnConnection(session);
+				}
+				LOGGER.debug("OfferingTask finished, latch.countDown().");
+				countDownLatch.countDown();
+			}
+		}
+		
+	}
 
 	
 }
