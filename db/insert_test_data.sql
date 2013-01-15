@@ -237,7 +237,6 @@ $$
           </sml:output>
         </sml:OutputList>
       </sml:outputs>
-      <sml:components xsi:nil="true"/>
     </sml:System>
   </sml:member>
 </sml:SensorML>'::text;
