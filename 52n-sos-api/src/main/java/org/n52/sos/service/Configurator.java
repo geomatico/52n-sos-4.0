@@ -40,6 +40,8 @@ import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.Timer;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.UnavailableException;
 
@@ -745,36 +747,70 @@ public final class Configurator {
      * @throws ConfigurationException
      *             if the initialization failed
      */
-    public static synchronized Configurator getInstance(Properties config, String basepath)
+    public static Configurator getInstance(Properties config, String basepath)
             throws ConfigurationException {
-        if (instance == null) {
-            try {
-                instance = new Configurator(config, basepath);
-                instance.initialize();
-            } catch (RuntimeException t) {
-                if (instance != null) {
-                    instance.cleanup();
-                    instance = null;
+    	if (instance == null) {
+    		boolean initialize = false;
+        	INITIALIZE_LOCK.lock();
+        	try {
+        		if (instance == null) {
+            		try {
+            			instance = new Configurator(config, basepath);
+            			initialize = true;
+            		} catch (RuntimeException t) {
+                        cleanUpAndThrow(t);
+                    } catch (ConfigurationException t) {
+                        cleanUpAndThrow(t);
+                    }
+        		}
+        	} finally {
+        		INITIALIZE_LOCK.unlock();
+        	}
+        	if (initialize) {
+        		try {
+                    instance.initialize();
+                } catch (RuntimeException t) {
+                    cleanUpAndThrow(t);
+                } catch (ConfigurationException t) {
+                    cleanUpAndThrow(t);
                 }
-                throw t;
-            } catch (ConfigurationException t) {
-                if (instance != null) {
-                    instance.cleanup();
-                    instance = null;
-                }
-                throw t;
-            }
-        }
+    		}
+    	}
         return instance;
     }
 
+	private static void cleanUpAndThrow(ConfigurationException t) throws ConfigurationException
+	{
+		if (instance != null) {
+		    instance.cleanup();
+		    instance = null;
+		}
+		throw t;
+	}
+
+	private static void cleanUpAndThrow(RuntimeException t)
+	{
+		if (instance != null) {
+		    instance.cleanup();
+		    instance = null;
+		}
+		throw t;
+	}
+
+    private static final Lock INITIALIZE_LOCK = new ReentrantLock();
+    
     /**
      * @return Returns the instance of the SosConfigurator. Null will be
      *         returned if the parameterized getInstance method was not invoked
      *         before. Usually this will be done in the SOS.
      */
-    public static synchronized Configurator getInstance() {
-        return instance;
+    public static Configurator getInstance() {
+    	INITIALIZE_LOCK.lock();
+    	try {
+    		return instance;
+    	} finally {
+    		INITIALIZE_LOCK.unlock();
+    	}
     }
 
     /**
