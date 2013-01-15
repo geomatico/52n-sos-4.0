@@ -42,6 +42,7 @@ import org.n52.sos.ds.hibernate.entities.GeometryValue;
 import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
+import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.Quality;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.entities.TextValue;
@@ -79,7 +80,6 @@ import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
-import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.SosHelper;
@@ -130,15 +130,10 @@ public class HibernateObservationUtilities {
                 FeatureOfInterest hFeatureOfInterest = hObservation.getFeatureOfInterest();
 
                 // TODO get full description
-                String procID = hObservationConstellation.getProcedure().getIdentifier();
-                SensorML procedure = new SensorML();
-                SosSMLIdentifier identifier =
-                        new SosSMLIdentifier("uniqueID", "urn:ogc:def:identifier:OGC:uniqueID", procID);
-                List<SosSMLIdentifier> identifiers = new ArrayList<SosSMLIdentifier>(1);
-                identifiers.add(identifier);
-                procedure.setIdentifications(identifiers);
-                if (!procedures.containsKey(procID)) {
-                    procedures.put(procID, procedure);
+                Procedure hProcedure = hObservationConstellation.getProcedure();
+                SosProcedureDescription procedure = HibernateProcedureUtilities.createSosProcedureDescription(hProcedure, hProcedure.getIdentifier(), hProcedure.getProcedureDescriptionFormat().getProcedureDescriptionFormat());
+                if (!procedures.containsKey(procedure.getProcedureIdentifier())) {
+                    procedures.put(procedure.getProcedureIdentifier(), procedure);
                 }
 
                 String observationType = hObservationConstellation.getObservationType().getObservationType();
