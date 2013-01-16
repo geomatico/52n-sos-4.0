@@ -98,7 +98,7 @@ public class HibernateCriteriaQueryUtilitiesTest extends AbstractSosTestCase {
 		HibernateCriteriaQueryUtilities.getGlobalTemporalBoundingBox(session);
 		endNewWay = System.currentTimeMillis();
 		long oldTime = endOldWay - startOldWay, newTime = endNewWay - startNewWay;
-		assertTrue(String.format("old way is faster? Old way: %sms\\nNew Way: %sms",oldTime,newTime), newTime > oldTime);
+		assertTrue(String.format("old way is faster! Old way: %sms\\nNew Way: %sms",oldTime,newTime), newTime < oldTime);
 	}
 
 }
