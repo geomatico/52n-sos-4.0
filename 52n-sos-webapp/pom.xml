@@ -16,6 +16,30 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>52n-sos-hibernate-mappings</artifactId>
+									<overWrite>false</overWrite>
+								</artifactItem>
+							</artifactItems>
+							<includes>**/*.xml</includes>
+							<outputDirectory>${project.build.outputDirectory}</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
