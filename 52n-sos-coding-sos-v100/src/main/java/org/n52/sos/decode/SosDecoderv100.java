@@ -287,7 +287,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
         getObsRequest.setSrid(SosHelper.parseSrsName(getObs.getSrsName()));
 
         getObsRequest.setSpatialFilter(parseSpatialFilter4GetObservation(getObs.getFeatureOfInterest()));
-        // TODO maybe obsolete through spatial filter above
+        
         getObsRequest.setFeatureIdentifiers(parseFeatureofInterestV100(getObs.getFeatureOfInterest()));
 
         if (getObs.isSetResponseFormat()) {

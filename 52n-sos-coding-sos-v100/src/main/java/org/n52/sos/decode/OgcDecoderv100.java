@@ -77,7 +77,8 @@ public class OgcDecoderv100 implements IDecoder<Object, XmlObject> {
             TemporalOperatorType.class,
             BinarySpatialOpType.class,
             BinaryTemporalOpType.class,
-            BBOXType.class);
+            BBOXType.class,
+            PropertyNameDocument.class);
 
     public OgcDecoderv100() {
         LOGGER.debug("Decoder for the following keys initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));

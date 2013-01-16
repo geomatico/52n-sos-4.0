@@ -291,13 +291,18 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
         // TODO how to check merge or not?
         observationCollection = response.getObservationCollection();
 
-        if (observationCollection.size() > 0) {
-            // TODO setBoundedBy (not necessary apparently?)
-
-	        for (SosObservation sosObservation : observationCollection) {
-	        	XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getResponseFormat(), sosObservation);
-	        	xb_obsCol.addNewMember().set(xmlObject);
-	        }
+        if (observationCollection != null) {
+        	if ( observationCollection.size() > 0) {
+	            // TODO setBoundedBy (not necessary apparently?)
+	
+		        for (SosObservation sosObservation : observationCollection) {
+		        	XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getResponseFormat(), sosObservation);
+		        	xb_obsCol.addNewMember().addNewObservation().set(xmlObject);
+		        }
+        	} else {
+                ObservationPropertyType xb_obs = xb_obsCol.addNewMember();
+                xb_obs.setHref( GMLConstants.NIL_INAPPLICABLE );
+            }
         } else {
             ObservationPropertyType xb_obs = xb_obsCol.addNewMember();
             xb_obs.setHref( GMLConstants.NIL_INAPPLICABLE );

@@ -46,6 +46,7 @@ import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
+import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.DateTimeException;
@@ -134,11 +135,11 @@ public class GmlDecoderv311 implements IDecoder<Object, XmlObject> {
         String geomWKT = null;
 
         // FIXME dont know how to handle
-        // if (SosConfigurator.getInstance().switchCoordinatesForEPSG(srid)) {
+        if (Configurator.getInstance().reversedAxisOrderRequired(srid)) {
             lower = JTSHelper.switchCoordinatesInString(lower);
             upper = JTSHelper.switchCoordinatesInString(upper);
+        }
         
-
         geomWKT = "MULTIPOINT(" + lower + ", " + upper + ")";
 
         result = JTSHelper.createGeometryFromWKT(geomWKT).getEnvelope();
