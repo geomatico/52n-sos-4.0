@@ -45,7 +45,7 @@ public abstract class LazyThreadSafeFactory<T> {
 	}
 
 	private boolean shouldRecreate() {
-		return this.object == null || recreate;
+		return this.object == null || this.recreate;
 	}
 
 	protected void setRecreate() {
@@ -57,7 +57,7 @@ public abstract class LazyThreadSafeFactory<T> {
 		}
 	}
 
-	protected T get() throws OwsExceptionReport {
+	public T get() throws OwsExceptionReport {
 		lock.readLock().lock();
 		try {
 			if (!shouldRecreate()) {
