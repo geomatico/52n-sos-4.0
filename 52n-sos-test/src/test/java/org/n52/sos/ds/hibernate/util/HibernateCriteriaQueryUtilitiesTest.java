@@ -30,12 +30,16 @@ import org.junit.Test;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.service.Configurator;
 import org.n52.swe.sos.test.AbstractSosTestCase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  *
  */
 public class HibernateCriteriaQueryUtilitiesTest extends AbstractSosTestCase {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(HibernateCriteriaQueryUtilitiesTest.class);
 	
 	@Test
 	public void getGlobalTemporalBoundingBoxWithNullReturnsNull()
@@ -98,7 +102,8 @@ public class HibernateCriteriaQueryUtilitiesTest extends AbstractSosTestCase {
 		HibernateCriteriaQueryUtilities.getGlobalTemporalBoundingBox(session);
 		endNewWay = System.currentTimeMillis();
 		long oldTime = endOldWay - startOldWay, newTime = endNewWay - startNewWay;
-		assertTrue(String.format("old way is faster! Old way: %sms\\nNew Way: %sms",oldTime,newTime), newTime < oldTime);
+		assertTrue(String.format("old way is faster? Old way: %sms\\nNew Way: %sms",oldTime,newTime), newTime < oldTime);
+		LOGGER.debug("old way is faster? Old way: {}ms\\nNew Way: {}ms",oldTime,newTime);
 	}
 
 }

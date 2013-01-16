@@ -24,11 +24,14 @@
 package org.n52.sos.ds.hibernate;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.n52.sos.cache.CapabilitiesCache;
 import org.n52.sos.ds.hibernate.SosCacheFeederDAO.CacheCreationStrategy;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.swe.sos.test.AbstractSosTestCase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
@@ -36,6 +39,7 @@ import org.n52.swe.sos.test.AbstractSosTestCase;
  */
 public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 	
+	private static final Logger LOGGER = LoggerFactory.getLogger(SosCacheFeederDAOTest.class);
 	private static SosCacheFeederDAO instance;
 	
 	@BeforeClass
@@ -132,5 +136,38 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 		instance.updateCache(cacheComplexDBQueries, CacheCreationStrategy.COMPLEX_DB_QUERIES);
 		instance.updateCache(cacheMultithread, CacheCreationStrategy.MULTI_THREAD);
 		assertEquals("multi threaded != complex db queries",cacheMultithread,cacheComplexDBQueries);
+	}
+	
+	@Test
+	public void runTimeComparisonBetweenSingleAndMultiThread() throws OwsExceptionReport
+	{
+		int times = 10;
+		long[] singleThreadTimes = new long[10], multiThreadTimes = new long[10];
+		for (int i = 0; i < times; i++) {
+			long singleThreadStart, multiThreadStart, singleThreadEnd, multiThreadEnd;
+			singleThreadStart = System.currentTimeMillis();
+			CapabilitiesCache cache = new CapabilitiesCache();
+			instance.updateCache(cache, CacheCreationStrategy.SINGLE_THREAD);
+			singleThreadEnd = System.currentTimeMillis();
+			cache = new CapabilitiesCache();
+			multiThreadStart = System.currentTimeMillis();
+			instance.updateCache(cache, CacheCreationStrategy.MULTI_THREAD);
+			multiThreadEnd = System.currentTimeMillis();
+			long singleThreadTime = singleThreadEnd - singleThreadStart, multiThreadTime = multiThreadEnd - multiThreadStart;
+			singleThreadTimes[i] = singleThreadTime;
+			multiThreadTimes[i] = multiThreadTime;
+			assertTrue(String.format("single thread is faster? single thread: %sms; multi thread: %sms",singleThreadTime,multiThreadTime), multiThreadTime < singleThreadTime);
+			LOGGER.debug("single thread is faster?\n\t\tsingle thread: {}ms\n\t\tmulti thread: {}ms",singleThreadTime,multiThreadTime);
+		}
+		LOGGER.debug("Average time results of {} runs:\n\t\tsingleThread: {}ms\n\t\tmulti thread: {}ms",times,average(singleThreadTimes),average(multiThreadTimes));
+	}
+
+	private long average(long[] singleThreadTimes)
+	{
+		long sum = 0;
+		for (long l : singleThreadTimes) {
+			sum += l;
+		}
+		return sum / singleThreadTimes.length;
 	}
 }
