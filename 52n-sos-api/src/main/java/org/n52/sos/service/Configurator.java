@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,7 +66,6 @@ import org.n52.sos.service.operator.IServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.tasking.ASosTasking;
 import org.n52.sos.util.DateTimeHelper;
-import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,23 +169,8 @@ public final class Configurator {
     /** directory of sensor descriptions in SensorML format */
     private File sensorDir;
 
-    private SosServiceIdentification serviceIdentification = new SosServiceIdentification();
-
-    /** file of service identification information in XML format */
-    private File serviceIdentificationFile;
-
-    /** service identification keyword strings */
-    private String[] serviceIdentificationKeywords;
-
-    private String serviceIdentificationTitle;
-
-    private String serviceIdentificationAbstract;
-
-    private String serviceIdentificationServiceType;
-
-    private String serviceIdentificationFees;
-
-    private String serviceIdentificationAccessConstraints;
+    private final SosServiceIdentificationFactory serviceIdentification = new SosServiceIdentificationFactory();
+    private final SosServiceProviderFactory serviceProvider = new SosServiceProviderFactory();
 
     private ServiceLoader<IAdminServiceOperator> serviceLoaderAdminServiceOperator;
 
@@ -222,33 +205,6 @@ public final class Configurator {
     private ServiceLoader<IServiceOperator> serviceLoaderServiceOperators;
 
     private ServiceLoader<ASosTasking> serviceLoaderTasking;
-
-    private SosServiceProvider serviceProvider;
-
-    /** file of service provider information in XML format */
-    private File serviceProviderFile;
-
-    private String serviceProviderName;
-
-    private String serviceProviderSite;
-
-    private String serviceProviderIndividualName;
-
-    private String serviceProviderPositionName;
-
-    private String serviceProviderPhone;
-
-    private String serviceProviderDeliveryPoint;
-
-    private String serviceProviderCity;
-
-    private String serviceProviderPostalCode;
-
-    private String serviceProviderCountry;
-
-    private String serviceProviderMailAddress;
-
-    private String serviceProviderAdministrativeArea;
 
     private int minimumGzipSize;
 
@@ -507,73 +463,61 @@ public final class Configurator {
             this.tupleSeperator = parseString(setting, value, false);
             break;
         case SERVICE_PROVIDER_FILE:
-            this.serviceProviderFile = parseFile(setting, value, true);
+			this.serviceProvider.setFile(parseFile(setting, value, true));
             break;
         case SERVICE_PROVIDER_NAME:
-            this.serviceProviderName = parseString(setting, value, true);
+            this.serviceProvider.setName(parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_SITE:
-            this.serviceProviderSite = parseString(setting, value, true);
+            this.serviceProvider.setSite(parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_INDIVIDUAL_NAME:
-            this.serviceProviderIndividualName = parseString(setting, value, true);
+            this.serviceProvider.setIndividualName(parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_POSITION_NAME:
-            this.serviceProviderPositionName = parseString(setting, value, true);
+            this.serviceProvider.setPositionName(parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_PHONE:
-            this.serviceProviderPhone = parseString(setting, value, true);
+            this.serviceProvider.setPhone(parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_ADDRESS:
-            this.serviceProviderDeliveryPoint = parseString(setting, value, true);
+            this.serviceProvider.setDeliveryPoint(parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_CITY:
-            this.serviceProviderCity = parseString(setting, value, true);
+            this.serviceProvider.setCity(parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_ZIP:
-            this.serviceProviderPostalCode = parseString(setting, value, true);
+            this.serviceProvider.setPostalCode(parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_STATE:
-            this.serviceProviderAdministrativeArea = parseString(setting, value, true);
+            this.serviceProvider.setAdministrativeArea(parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_COUNTRY:
-            this.serviceProviderCountry = parseString(setting, value, true);
+            this.serviceProvider.setCountry(parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_EMAIL:
-            this.serviceProviderMailAddress = parseString(setting, value, true);
+            this.serviceProvider.setMailAddress(parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_FILE:
-            this.serviceIdentificationFile = parseFile(setting, value, true);
+            this.serviceIdentification.setFile(parseFile(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_KEYWORDS:
-            String keywords = parseString(setting, value, true);
-            if (keywords != null) {
-                String[] keywordArray = keywords.split(",");
-                ArrayList<String> keywordList = new ArrayList<String>(keywordArray.length);
-                for (String s : keywordArray) {
-                    if (s != null && !s.trim().isEmpty()) {
-                        keywordList.add(s.trim());
-                    }
-                }
-                this.serviceIdentificationKeywords = keywordList.toArray(new String[keywordList.size()]);
-            } else {
-                this.serviceIdentificationKeywords = new String[0];
-            }
+            this.serviceIdentification.setKeywords(parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_SERVICE_TYPE:
             this.serviceIdentification.setServiceType(parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_TITLE:
-            this.serviceIdentificationTitle = parseString(setting, value, true);
+            this.serviceIdentification.setTitle(parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_ABSTRACT:
-            this.serviceIdentificationAbstract = parseString(setting, value, true);
+            this.serviceIdentification.setAbstract(parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_FEES:
-            this.serviceIdentificationFees = parseString(setting, value, true);
+            this.serviceIdentification.setFees(parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_ACCESS_CONSTRAINTS:
-            this.serviceIdentificationAccessConstraints = parseString(setting, value, true);
+            this.serviceIdentification.setConstraints(parseString(setting, value, true));
             break;
         case MINIMUM_GZIP_SIZE:
             this.minimumGzipSize = parseInteger(setting, value);
@@ -1237,19 +1181,7 @@ public final class Configurator {
      * @throws OwsExceptionReport
      */
     public SosServiceIdentification getServiceIdentification() throws OwsExceptionReport {
-        SosServiceIdentification sosServiceIdentification = new SosServiceIdentification();
-        if (this.serviceIdentificationFile != null) {
-            sosServiceIdentification.setServiceIdentification(XmlHelper
-                    .loadXmlDocumentFromFile(this.serviceIdentificationFile));
-        }
-        sosServiceIdentification.setAbstract(this.serviceIdentificationAbstract);
-        sosServiceIdentification.setAccessConstraints(this.serviceIdentificationAccessConstraints);
-        sosServiceIdentification.setFees(this.serviceIdentificationFees);
-        sosServiceIdentification.setServiceType(this.serviceIdentificationServiceType);
-        sosServiceIdentification.setTitle(this.serviceIdentificationTitle);
-        sosServiceIdentification.setVersions(this.getSupportedVersions());
-        sosServiceIdentification.setKeywords(Arrays.asList(this.serviceIdentificationKeywords));
-        return sosServiceIdentification;
+		return this.serviceIdentification.get();
     }
 
     /**
@@ -1257,22 +1189,7 @@ public final class Configurator {
      * @throws OwsExceptionReport
      */
     public SosServiceProvider getServiceProvider() throws OwsExceptionReport {
-        SosServiceProvider sosServiceProvider = new SosServiceProvider();
-        if (this.serviceProviderFile != null) {
-            sosServiceProvider.setServiceProvider(XmlHelper.loadXmlDocumentFromFile(this.serviceProviderFile));
-        }
-        sosServiceProvider.setAdministrativeArea(this.serviceProviderAdministrativeArea);
-        sosServiceProvider.setCity(this.serviceProviderCity);
-        sosServiceProvider.setCountry(this.serviceProviderCountry);
-        sosServiceProvider.setDeliveryPoint(this.serviceProviderDeliveryPoint);
-        sosServiceProvider.setIndividualName(this.serviceProviderIndividualName);
-        sosServiceProvider.setMailAddress(this.serviceProviderMailAddress);
-        sosServiceProvider.setName(this.serviceProviderName);
-        sosServiceProvider.setPhone(this.serviceProviderPhone);
-        sosServiceProvider.setPositionName(this.serviceProviderPositionName);
-        sosServiceProvider.setPostalCode(this.serviceProviderPostalCode);
-        sosServiceProvider.setSite(this.serviceProviderSite);
-        return sosServiceProvider;
+        return this.serviceProvider.get();
     }
 
     /**
