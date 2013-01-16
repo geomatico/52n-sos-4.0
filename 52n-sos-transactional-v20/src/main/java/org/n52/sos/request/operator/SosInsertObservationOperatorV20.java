@@ -37,24 +37,19 @@ import org.n52.sos.ds.IInsertObservationDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
-import org.n52.sos.ogc.ows.IExtension;
-import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.response.InsertObservationResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,11 +58,11 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<I
     private static final Logger LOGGER = LoggerFactory.getLogger(SosInsertObservationOperatorV20.class);
     private static final String OPERATION_NAME = SosConstants.Operations.InsertObservation.name();
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_OBSERVATION_INSERTION);
-    
+
     public SosInsertObservationOperatorV20() {
         super(OPERATION_NAME, InsertObservationRequest.class);
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
@@ -114,8 +109,7 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<I
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(request.getVersion(), Configurator.getInstance()
-                    .getSupportedVersions());
+            OwsHelper.checkSingleVersionParameter(request.getVersion());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }

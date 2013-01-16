@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
 /**
  * class and forwards requests to the GetObservationDAO; after query of
  * Database, class encodes the ObservationResponse (thru using the IOMEncoder)
- * 
+ *
  */
 public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<IGetObservationDAO, GetObservationRequest> {
 
@@ -67,20 +67,20 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<IGe
 
     /**
      * Constructor
-     * 
+     *
      */
     public SosGetObservationOperatorV100() {
-        super(OPERATION_NAME, GetObservationRequest.class); 
+        super(OPERATION_NAME, GetObservationRequest.class);
     }
 
     @Override
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
     }
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.n52.sos.listener.ISosRequestListener#receiveRequest(org.n52.sos.request
      * .AbstractSosRequest)
@@ -157,8 +157,7 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<IGe
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion(), Configurator.getInstance()
-                    .getSupportedVersions());
+            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -218,14 +217,14 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<IGe
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
-        
-        
+
+
         Util4Exceptions.mergeAndThrowExceptions(exceptions);
     }
 
     /**
      * checks if mandatory parameter observed property is correct
-     * 
+     *
      * @param properties
      *            String[] containing the observed properties of the request
      * @param cacheController
@@ -239,15 +238,15 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<IGe
     private void checkObservedProperties(List<String> observedProperties) throws OwsExceptionReport {
         if (observedProperties != null) {
             List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
-            
+
             if (observedProperties.size() != 1) {
-            	String exceptionText = String.format("For SOS v1.0.0 at least one '%s' is required", 
+            	String exceptionText = String.format("For SOS v1.0.0 at least one '%s' is required",
                         SosConstants.GetObservationParams.observedProperty.name());
                 LOGGER.error(exceptionText);
                 exceptions.add(Util4Exceptions.createMissingParameterValueException(
                         SosConstants.GetObservationParams.observedProperty.name()));
         	}
-            
+
             Collection<String> validObservedProperties =
                     Configurator.getInstance().getCapabilitiesCacheController().getObservableProperties();
             for (String obsProp : observedProperties) {
@@ -270,9 +269,9 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<IGe
 
     /**
      * checks if the passed offeringId is supported
-     * 
+     *
      * @param strings
-     * 
+     *
      * @param offeringId
      *            the offeringId to be checked
      * @throws OwsExceptionReport
@@ -281,12 +280,12 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<IGe
     // one / mandatory
     private void checkOfferingId(List<String> offeringIds) throws OwsExceptionReport {
         if (offeringIds != null) {
-        	
+
             Collection<String> offerings = Configurator.getInstance().getCapabilitiesCacheController().getOfferings();
             List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
-            
+
             if (offeringIds.size() != 1) {
-            	String exceptionText = String.format("For SOS v1.0.0 one  '%s' is required", 
+            	String exceptionText = String.format("For SOS v1.0.0 one  '%s' is required",
                         SosConstants.GetObservationParams.offering.name());
                 LOGGER.error(exceptionText);
                 exceptions.add(Util4Exceptions.createInvalidParameterValueException(
@@ -302,7 +301,7 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<IGe
                     if (!offerings.contains(offArray[0])
                             || !Configurator.getInstance().getCapabilitiesCacheController()
                                     .getProcedures4Offering(offArray[0]).contains(offArray[1])) {
-                        String exceptionText = String.format("The value (%s) of the parameter '%s' is invalid", 
+                        String exceptionText = String.format("The value (%s) of the parameter '%s' is invalid",
                                 offeringId, SosConstants.GetObservationParams.offering.toString());
                         LOGGER.error(exceptionText);
                         exceptions.add(Util4Exceptions.createInvalidParameterValueException(
@@ -311,7 +310,7 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<IGe
 
                 } else {
                     if (!offerings.contains(offeringId)) {
-                        String exceptionText = String.format("The value (%s) of the parameter '%s' is invalid", 
+                        String exceptionText = String.format("The value (%s) of the parameter '%s' is invalid",
                                 offeringId, SosConstants.GetObservationParams.offering.toString());
                         LOGGER.error(exceptionText);
                         exceptions.add(Util4Exceptions.createInvalidParameterValueException(
@@ -366,5 +365,5 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<IGe
         }
 
     }
-    
+
 }

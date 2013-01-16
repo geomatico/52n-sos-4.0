@@ -44,29 +44,17 @@ import org.slf4j.LoggerFactory;
  * This class contains the different Listeners which are registered through the
  * config file. After parsing the request through the doOperation() method, the
  * request is send up to the specific Listener (e.g. GetCapabilitiesListener)
- * 
+ *
  */
 public class AdminServiceOperator extends IAdminServiceOperator {
 
-    /** the logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminServiceOperator.class);
 
-    /**
-     * constructor
-     * 
-     */
     public AdminServiceOperator() {
         super();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.sos.IAdminRequestOperator#doGetOperation(javax.servlet.http
-     * .HttpServletRequest)
-     */
-    @Override
+	@Override
     public ServiceResponse doGetOperation(HttpServletRequest req) throws AdministratorException, OwsExceptionReport {
 
         AdminRequest request = null;
@@ -76,7 +64,8 @@ public class AdminServiceOperator extends IAdminServiceOperator {
         }
         Map<String, String> parameterValueMap = KvpHelper.getKvpParameterValueMap(req);
         request = getRequestFromValues(parameterValueMap);
-        IAdminRequestOperator requestOperator = Configurator.getInstance().getAdminRequestOperator(request.getService());
+        IAdminRequestOperator requestOperator = Configurator.getInstance().getAdminRequestOperatorRepository()
+				.getAdminRequestOperator(request.getService());
         if (requestOperator != null) {
             return requestOperator.receiveRequest(request);
         }

@@ -39,29 +39,29 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @RequestMapping(ControllerConstants.Paths.CLIENT)
 public class ClientController extends AbstractController {
-    
+
     public static final String BINDINGS = "bindings";
     public static final String VERSIONS = "versions";
     public static final String OPERATIONS = "operations";
-    
+
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView get() {
         if (Configurator.getInstance() != null) {
             Map<String, Object> map = new HashMap<String, Object>(2);
-            Set<RequestOperatorKeyType> ops = Configurator.getInstance().getRequestOperator().keySet();
+            Set<RequestOperatorKeyType> ops = Configurator.getInstance().getRequestOperatorRepository().getRequestOperator().keySet();
             Set<String> operations = new HashSet<String>(ops.size());
             for (RequestOperatorKeyType op : ops) {
                 operations.add(op.getOperationName());
             }
             map.put(OPERATIONS, operations);
-            map.put(BINDINGS, Configurator.getInstance().getBindingOperators().keySet());
-            map.put(VERSIONS, Configurator.getInstance().getSupportedVersions());
+            map.put(BINDINGS, Configurator.getInstance().getBindingRepository().getBindings().keySet());
+            map.put(VERSIONS, Configurator.getInstance().getServiceOperatorRepository().getSupportedVersions());
             return new ModelAndView(ControllerConstants.Views.CLIENT, map);
-            
+
         } else {
             return new ModelAndView(ControllerConstants.Views.CLIENT);
         }
-        
-        
+
+
     }
 }

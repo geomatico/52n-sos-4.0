@@ -51,9 +51,9 @@ public abstract class AbstractRequestOperator<T extends IOperationDAO, R extends
         this.operationName = operatioName;
         this.requestOperatorKeyType = new RequestOperatorKeyType(new ServiceOperatorKeyType(service, version), operationName);
         this.requestType = requestType;
-        this.dao = (T) Configurator.getInstance().getOperationDAOs().get(operationName);
+        this.dao = (T) Configurator.getInstance().getOperationDaoRepository().getOperationDAO(operationName);
         log.info("{} initialized successfully!", getClass().getSimpleName());
-        
+
     }
 
     protected final T getDao() {
@@ -78,7 +78,7 @@ public abstract class AbstractRequestOperator<T extends IOperationDAO, R extends
     public final boolean hasImplementedDAO() {
         return getDao() != null;
     }
-    
+
     @Override
     public final RequestOperatorKeyType getRequestOperatorKeyType() {
         return requestOperatorKeyType;
@@ -96,5 +96,5 @@ public abstract class AbstractRequestOperator<T extends IOperationDAO, R extends
             throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
         }
     }
-    
+
 }

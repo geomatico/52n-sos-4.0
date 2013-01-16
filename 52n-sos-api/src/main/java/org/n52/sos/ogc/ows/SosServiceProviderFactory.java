@@ -21,11 +21,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.service;
+package org.n52.sos.ogc.ows;
 
 import java.io.File;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.ows.SosServiceProvider;
+import org.n52.sos.util.LazyThreadSafeFactory;
 import org.n52.sos.util.XmlHelper;
 
 /**

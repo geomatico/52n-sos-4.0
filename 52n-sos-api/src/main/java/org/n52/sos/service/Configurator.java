@@ -23,50 +23,44 @@
  */
 package org.n52.sos.service;
 
+import org.n52.sos.tasking.Tasking;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.Timer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.n52.sos.binding.Binding;
 import org.n52.sos.cache.ACapabilitiesCacheController;
-import org.n52.sos.convert.ConverterKeyType;
-import org.n52.sos.convert.IConverter;
-import org.n52.sos.decode.IDecoder;
 import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IDataSourceInitializator;
 import org.n52.sos.ds.IFeatureQueryHandler;
-import org.n52.sos.ds.IOperationDAO;
 import org.n52.sos.ds.ISettingsDao;
-import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.ows.SosServiceProvider;
 import org.n52.sos.ogc.sos.Range;
-import org.n52.sos.request.operator.IRequestOperator;
-import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.admin.operator.IAdminServiceOperator;
-import org.n52.sos.service.admin.request.operator.IAdminRequestOperator;
-import org.n52.sos.service.operator.IServiceOperator;
-import org.n52.sos.service.operator.ServiceOperatorKeyType;
-import org.n52.sos.tasking.ASosTasking;
 import org.n52.sos.util.DateTimeHelper;
+import org.n52.sos.util.SettingsHelper;
 import org.n52.sos.util.XmlOptionsHelper;
+import org.n52.sos.ogc.ows.SosServiceIdentificationFactory;
+import org.n52.sos.ogc.ows.SosServiceProviderFactory;
+import org.n52.sos.service.admin.request.operator.AdminRequestOperatorRepository;
+import org.n52.sos.request.operator.RequestOperatorRepository;
+import org.n52.sos.service.operator.ServiceOperatorRepository;
+import org.n52.sos.ds.OperationDaoRepository;
+import org.n52.sos.convert.ConverterRepository;
+import org.n52.sos.binding.BindingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,8 +103,6 @@ public final class Configurator {
      */
     private IConnectionProvider connectionProvider;
 
-    private Map<ConverterKeyType, IConverter> converter = new HashMap<ConverterKeyType, IConverter>(0);
-
     private IDataSourceInitializator dataSourceInitializator;
 
     /**
@@ -118,7 +110,7 @@ public final class Configurator {
      */
     private int defaultEPSG;
 
-    /**
+    /**ad
      * default offering identifier prefix, used for auto generation
      */
     private String defaultOfferingPrefix;
@@ -162,19 +154,10 @@ public final class Configurator {
     /** tuple seperator for result element */
     private String noDataValue;
 
-    /** Implemented ISosRequestListener */
-    private Map<ServiceOperatorKeyType, IServiceOperator> serviceOperators =
-            new HashMap<ServiceOperatorKeyType, IServiceOperator>(0);
-
     /** directory of sensor descriptions in SensorML format */
     private File sensorDir;
 
-    private final SosServiceIdentificationFactory serviceIdentification = new SosServiceIdentificationFactory();
-    private final SosServiceProviderFactory serviceProvider = new SosServiceProviderFactory();
-
     private ServiceLoader<IAdminServiceOperator> serviceLoaderAdminServiceOperator;
-
-    private ServiceLoader<IAdminRequestOperator> serviceLoaderAdminRequesteOperator;
 
     /** ServiceLoader for ICacheFeederDAO */
     private ServiceLoader<ICacheFeederDAO> serviceLoaderCacheFeederDAO;
@@ -182,29 +165,10 @@ public final class Configurator {
     /** ServiceLoader for ACapabilitiesCacheController */
     private ServiceLoader<ACapabilitiesCacheController> serviceLoaderCapabilitiesCacheController;
 
-    /** ServiceLoader for IConverter */
-    private ServiceLoader<IConverter> serviceLoaderConverter;
-    private ServiceLoader<IDecoder> serviceLoaderDecoder;
-    private ServiceLoader<IEncoder> serviceLoaderEncoder;
-
-    /** ServiceLoader for ISosRequestOperator */
-    private ServiceLoader<Binding> serviceLoaderBindingOperator;
-
     private ServiceLoader<IDataSourceInitializator> serviceLoaderDataSourceInitializator;
 
     /** ServiceLoader for IFeatureQueryHandler */
     private ServiceLoader<IFeatureQueryHandler> serviceLoaderFeatureQueryHandler;
-
-    /** ServiceLoader for ISosOperationDAO */
-    private ServiceLoader<IOperationDAO> serviceLoaderOperationDAOs;
-
-    /** ServiceLoader for ISosOperationDAO */
-    private ServiceLoader<IRequestOperator> serviceLoaderRequestOperators;
-
-    /** ServiceLoader for ISosRequestListener */
-    private ServiceLoader<IServiceOperator> serviceLoaderServiceOperators;
-
-    private ServiceLoader<ASosTasking> serviceLoaderTasking;
 
     private int minimumGzipSize;
 
@@ -231,26 +195,27 @@ public final class Configurator {
     private boolean skipDuplicateObservations = false;
 
     /**
-     * Implemented ISosOperationDAO
-     */
-    private Map<String, IOperationDAO> operationDAOs = new HashMap<String, IOperationDAO>(0);
-
-    /**
-     * Implemented ISosRequestOperator
-     */
-    private Map<String, Binding> bindingOperators = new HashMap<String, Binding>(0);
-
-    private Map<RequestOperatorKeyType, IRequestOperator> requestOperators =
-            new HashMap<RequestOperatorKeyType, IRequestOperator>(0);
-
-    /**
      * Implementation of ASosAdminRequestOperator
      */
     private IAdminServiceOperator adminServiceOperator;
 
-    private Map<String, IAdminRequestOperator> adminRequestOperators = new HashMap<String, IAdminRequestOperator>(0);
-
     private CodingRepository codingRepository;
+	private ServiceOperatorRepository serviceOperatorRepository;
+	private OperationDaoRepository operationDaoRepository;
+	private RequestOperatorRepository requestOperatorRepository;
+	private BindingRepository bindingRepository;
+	private ConverterRepository converterRepository;
+	private AdminRequestOperatorRepository adminRequestOperatorRepository;
+	private SosServiceIdentificationFactory serviceIdentificationFactory;
+    private SosServiceProviderFactory serviceProviderFactory;
+	private Tasking tasking;
+
+    /**
+	 * Defines the number of threads available in the thread pool of the cache
+	 * update executor service.
+	 */
+    private int cacheThreadCount = 5;
+
 
     /**
      * prefix URN for the spatial reference system
@@ -268,16 +233,8 @@ public final class Configurator {
      */
     private boolean supportsQuality = true;
 
-    /** supported SOS versions */
-    private Set<String> supportedVersions = new HashSet<String>(0);
-
-    /** supported services */
-    private Set<String> supportedServices = new HashSet<String>(0);
-
     /** boolean indicates the order of x and y components of coordinates */
     private List<Range> epsgsWithReversedAxisOrder;
-
-    private Timer taskingExecutor;
 
     /** token seperator for result element */
     private String tokenSeperator;
@@ -329,7 +286,7 @@ public final class Configurator {
         /* TODO check what has to be re-initialized when settings change */
         switch (setting) {
         case CAPABILITIES_CACHE_UPDATE_INTERVAL:
-            int capCacheUpdateIntervall = parseInteger(setting, value);
+            int capCacheUpdateIntervall = SettingsHelper.parseInteger(setting, value);
             if (this.updateIntervall != capCacheUpdateIntervall) {
                 this.updateIntervall = capCacheUpdateIntervall;
             }
@@ -347,10 +304,10 @@ public final class Configurator {
             XmlOptionsHelper.getInstance(this.characterEncoding, true);
             break;
         case CACHE_THREAD_COUNT:
-            this.cacheThreadCount = parseInteger(setting, value);
+            this.cacheThreadCount = SettingsHelper.parseInteger(setting, value);
             break;
         case CONFIGURATION_FILES:
-            String configFileMapString = parseString(setting, value, true);
+            String configFileMapString = SettingsHelper.parseString(setting, value, true);
             if (configFileMapString != null && !configFileMapString.isEmpty()) {
                 for (String kvp : configFileMapString.split(";")) {
                     String[] keyValue = kvp.split(" ");
@@ -359,22 +316,22 @@ public final class Configurator {
             }
             break;
         case CHILD_PROCEDURES_ENCODED_IN_PARENTS_DESCRIBE_SENSOR:
-            this.childProceduresEncodedInParentsDescribeSensor = parseBoolean(setting, value);
+            this.childProceduresEncodedInParentsDescribeSensor = SettingsHelper.parseBoolean(setting, value);
             break;
         case DEFAULT_OFFERING_PREFIX:
-            this.defaultOfferingPrefix = parseString(setting, value, true);
+            this.defaultOfferingPrefix = SettingsHelper.parseString(setting, value, true);
             break;
         case DEFAULT_PROCEDURE_PREFIX:
-            this.defaultProcedurePrefix = parseString(setting, value, true);
+            this.defaultProcedurePrefix = SettingsHelper.parseString(setting, value, true);
             break;
         case FOI_ENCODED_IN_OBSERVATION:
-            this.foiEncodedInObservation = parseBoolean(setting, value);
+            this.foiEncodedInObservation = SettingsHelper.parseBoolean(setting, value);
             break;
         case FOI_LISTED_IN_OFFERINGS:
-            this.foiListedInOfferings = parseBoolean(setting, value);
+            this.foiListedInOfferings = SettingsHelper.parseBoolean(setting, value);
             break;
         case GML_DATE_FORMAT:
-            this.gmlDateFormat = parseString(setting, value, true);
+            this.gmlDateFormat = SettingsHelper.parseString(setting, value, true);
             if (this.gmlDateFormat != null && !this.gmlDateFormat.isEmpty()) {
                 DateTimeHelper.setResponseFormat(this.gmlDateFormat);
             }
@@ -389,48 +346,48 @@ public final class Configurator {
             this.lease = Integer.valueOf(value).intValue();
             break;
         case MAX_GET_OBSERVATION_RESULTS:
-            this.maxGetObsResults = parseInteger(setting, value);
+            this.maxGetObsResults = SettingsHelper.parseInteger(setting, value);
             break;
         case NO_DATA_VALUE:
-            this.noDataValue = parseString(setting, value, false);
+            this.noDataValue = SettingsHelper.parseString(setting, value, false);
             break;
         case SENSOR_DIRECTORY:
-            this.sensorDir = parseFile(setting, value, true);
+            this.sensorDir = SettingsHelper.parseFile(setting, value, true);
             break;
         case SHOW_FULL_OPERATIONS_METADATA:
-            this.showFullOperationsMetadata = parseBoolean(setting, value);
+            this.showFullOperationsMetadata = SettingsHelper.parseBoolean(setting, value);
             break;
         case SHOW_FULL_OPERATIONS_METADATA_FOR_OBSERVATIONS:
-            this.showFullOperationsMetadata4Observations = parseBoolean(setting, value);
+            this.showFullOperationsMetadata4Observations = SettingsHelper.parseBoolean(setting, value);
             break;
         case SKIP_DUPLICATE_OBSERVATIONS:
-            this.skipDuplicateObservations = parseBoolean(setting, value);
+            this.skipDuplicateObservations = SettingsHelper.parseBoolean(setting, value);
             break;
         case SOS_URL:
-            setServiceURL(parseString(setting, value, false));
+            setServiceURL(SettingsHelper.parseString(setting, value, false));
             break;
         case SUPPORTS_QUALITY:
-            this.supportsQuality = parseBoolean(setting, value);
+            this.supportsQuality = SettingsHelper.parseBoolean(setting, value);
             break;
         case DEFAULT_EPSG:
-            this.defaultEPSG = parseInteger(setting, value);
+            this.defaultEPSG = SettingsHelper.parseInteger(setting, value);
             break;
         case SRS_NAME_PREFIX_SOS_V1:
-            String srsPrefixV1 = parseString(setting, value, true);
+            String srsPrefixV1 = SettingsHelper.parseString(setting, value, true);
             if (!srsPrefixV1.endsWith(":") && srsPrefixV1.length() != 0) {
                 srsPrefixV1 += ":";
             }
             this.srsNamePrefix = srsPrefixV1;
             break;
         case SRS_NAME_PREFIX_SOS_V2:
-            String srsPrefixV2 = parseString(setting, value, true);
+            String srsPrefixV2 = SettingsHelper.parseString(setting, value, true);
             if (!srsPrefixV2.endsWith("/") && srsPrefixV2.length() != 0) {
                 srsPrefixV2 += "/";
             }
             this.srsNamePrefixSosV2 = srsPrefixV2;
             break;
         case SWITCH_COORDINATES_FOR_EPSG_CODES:
-            String[] switchCoordinatesForEPSGStrings = parseString(setting, value, true).split(";");
+            String[] switchCoordinatesForEPSGStrings = SettingsHelper.parseString(setting, value, true).split(";");
             this.epsgsWithReversedAxisOrder = new ArrayList<Range>(switchCoordinatesForEPSGStrings.length);
             for (String switchCoordinatesForEPSGEntry : switchCoordinatesForEPSGStrings) {
                 String[] splittedSwitchCoordinatesForEPSGEntry = switchCoordinatesForEPSGEntry.split("-");
@@ -454,163 +411,78 @@ public final class Configurator {
             }
             break;
         case TOKEN_SEPERATOR:
-            this.tokenSeperator = parseString(setting, value, false);
+            this.tokenSeperator = SettingsHelper.parseString(setting, value, false);
             break;
         case DECIMAL_SEPARATOR:
-            this.decimalSeparator = parseString(setting, value, false);
+            this.decimalSeparator = SettingsHelper.parseString(setting, value, false);
             break;
         case TUPLE_SEPERATOR:
-            this.tupleSeperator = parseString(setting, value, false);
+            this.tupleSeperator = SettingsHelper.parseString(setting, value, false);
             break;
         case SERVICE_PROVIDER_FILE:
-			this.serviceProvider.setFile(parseFile(setting, value, true));
+			this.serviceProviderFactory.setFile(SettingsHelper.parseFile(setting, value, true));
             break;
         case SERVICE_PROVIDER_NAME:
-            this.serviceProvider.setName(parseString(setting, value, true));
+            this.serviceProviderFactory.setName(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_SITE:
-            this.serviceProvider.setSite(parseString(setting, value, true));
+            this.serviceProviderFactory.setSite(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_INDIVIDUAL_NAME:
-            this.serviceProvider.setIndividualName(parseString(setting, value, true));
+            this.serviceProviderFactory.setIndividualName(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_POSITION_NAME:
-            this.serviceProvider.setPositionName(parseString(setting, value, true));
+            this.serviceProviderFactory.setPositionName(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_PHONE:
-            this.serviceProvider.setPhone(parseString(setting, value, true));
+            this.serviceProviderFactory.setPhone(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_ADDRESS:
-            this.serviceProvider.setDeliveryPoint(parseString(setting, value, true));
+            this.serviceProviderFactory.setDeliveryPoint(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_CITY:
-            this.serviceProvider.setCity(parseString(setting, value, true));
+            this.serviceProviderFactory.setCity(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_ZIP:
-            this.serviceProvider.setPostalCode(parseString(setting, value, true));
+            this.serviceProviderFactory.setPostalCode(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_STATE:
-            this.serviceProvider.setAdministrativeArea(parseString(setting, value, true));
+            this.serviceProviderFactory.setAdministrativeArea(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_COUNTRY:
-            this.serviceProvider.setCountry(parseString(setting, value, true));
+            this.serviceProviderFactory.setCountry(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_EMAIL:
-            this.serviceProvider.setMailAddress(parseString(setting, value, true));
+            this.serviceProviderFactory.setMailAddress(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_FILE:
-            this.serviceIdentification.setFile(parseFile(setting, value, true));
+            this.serviceIdentificationFactory.setFile(SettingsHelper.parseFile(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_KEYWORDS:
-            this.serviceIdentification.setKeywords(parseString(setting, value, true));
+            this.serviceIdentificationFactory.setKeywords(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_SERVICE_TYPE:
-            this.serviceIdentification.setServiceType(parseString(setting, value, true));
+            this.serviceIdentificationFactory.setServiceType(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_TITLE:
-            this.serviceIdentification.setTitle(parseString(setting, value, true));
+            this.serviceIdentificationFactory.setTitle(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_ABSTRACT:
-            this.serviceIdentification.setAbstract(parseString(setting, value, true));
+            this.serviceIdentificationFactory.setAbstract(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_FEES:
-            this.serviceIdentification.setFees(parseString(setting, value, true));
+            this.serviceIdentificationFactory.setFees(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_ACCESS_CONSTRAINTS:
-            this.serviceIdentification.setConstraints(parseString(setting, value, true));
+            this.serviceIdentificationFactory.setConstraints(SettingsHelper.parseString(setting, value, true));
             break;
         case MINIMUM_GZIP_SIZE:
-            this.minimumGzipSize = parseInteger(setting, value);
+            this.minimumGzipSize = SettingsHelper.parseInteger(setting, value);
             break;
         default:
             String message = "Can not decode setting '" + setting.name() + "'!";
             LOGGER.error(message);
         }
-    }
-
-    private File parseFile(Setting setting, String value, boolean canBeNull) throws ConfigurationException {
-        if (value == null || value.isEmpty()) {
-            return null;
-        }
-        String fileName = parseString(setting, value, canBeNull);
-        if (fileName == null) {
-            return null;
-        }
-        File f = new File(fileName);
-        if (f.exists()) {
-            return f;
-        } else {
-            f = new File(getBasePath() + fileName);
-            if (f.exists()) {
-                return f;
-            } else {
-                StringBuilder exceptionText = new StringBuilder();
-                exceptionText.append("Can not find file '(").append(getBasePath()).append(")").append(fileName)
-                        .append("'!");
-                LOGGER.error(exceptionText.toString());
-                throw new ConfigurationException(exceptionText.toString());
-            }
-        }
-    }
-
-    private int parseInteger(Setting setting, String value) throws ConfigurationException {
-        Integer val = null;
-        try {
-            if (value != null && !value.isEmpty()) {
-                val = Integer.valueOf(value);
-            }
-        } catch (NumberFormatException e) {
-        	LOGGER.error("Value \"{}\" expected to be an integer could not be parsed!",value);
-        	LOGGER.debug("Exception thrown",e);
-        }
-
-        if (val == null) {
-            String exceptionText =
-                    "'" + setting.name() + "' is not properly defined! Please set '" + setting.name()
-                            + "' property to an integer value!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        } else {
-            return val.intValue();
-        }
-    }
-
-    private boolean parseBoolean(Setting setting, String value) throws ConfigurationException {
-        Boolean val = null;
-        if (value != null && !value.isEmpty()) {
-            val =
-                    value.equalsIgnoreCase("true") ? Boolean.TRUE : value.equalsIgnoreCase("false") ? Boolean.FALSE
-                            : null;
-        }
-        if (val == null) {
-            String exceptionText =
-                    "'" + setting.name() + "' is not properly defined! Please set '" + setting.name()
-                            + "' property to an boolean value!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        } else {
-            return val.booleanValue();
-        }
-    }
-
-    private String parseString(Setting setting, String value, boolean canBeEmpty) throws ConfigurationException {
-        if (value == null || (value.isEmpty() && !canBeEmpty)) {
-            String exceptionText = "String property '" + setting.name() + "' is not defined!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
-        return value;
-    }
-
-    private void validate() throws ConfigurationException {
-        /*
-         * TODO assert that required fields or xml of service identification are
-         * present
-         */
-        /*
-         * TODO assert that required fields or xml of service provider are
-         * present
-         */
     }
 
     /**
@@ -624,7 +496,10 @@ public final class Configurator {
 
         /* do this first as we need access to the database */
         initializeConnectionProvider();
-        initializeCodingRepository();
+		this.codingRepository = new CodingRepository();
+		this.serviceIdentificationFactory = new SosServiceIdentificationFactory();
+		this.serviceProviderFactory = new SosServiceProviderFactory();
+
 
         Iterator<ISettingsDao> i = ServiceLoader.load(ISettingsDao.class).iterator();
         if (!i.hasNext()) {
@@ -648,20 +523,18 @@ public final class Configurator {
             setSetting(setting, value, true);
         }
 
-        validate();
-
-        initializeOperationDAOs();
-        initializeServiceOperators();
+        this.operationDaoRepository = new OperationDaoRepository();
+        this.serviceOperatorRepository = new ServiceOperatorRepository();
         initalizeFeatureQueryHandler();
         initalizeCacheFeederDAO();
-        initalizeConverter();
-        initializeRequestOperators();
-        initializeBindingOperator();
+        this.converterRepository = new ConverterRepository();
+        this.requestOperatorRepository = new RequestOperatorRepository();
+		this.bindingRepository = new BindingRepository();
         initializeAdminServiceOperator();
-        initializeAdminRequestOperator();
+		this.adminRequestOperatorRepository = new AdminRequestOperatorRepository();
         initializeDataSource();
         initializeCapabilitiesCacheController();
-        initializeTasking();
+        this.tasking = new Tasking();
 
         LOGGER.info("\n******\n Configurator initialization finished\n******\n");
     }
@@ -677,10 +550,9 @@ public final class Configurator {
             capabilitiesCacheController.cancel();
             capabilitiesCacheController = null;
         }
-        if (taskingExecutor != null) {
-            taskingExecutor.cancel();
-            taskingExecutor = null;
-        }
+		if (this.tasking != null) {
+			this.tasking.cancel();
+		}
         instance = null;
     }
 
@@ -725,20 +597,18 @@ public final class Configurator {
         return instance;
     }
 
-	private static void cleanUpAndThrow(ConfigurationException t) throws ConfigurationException
-	{
+	private static void cleanUpAndThrow(ConfigurationException t) throws ConfigurationException {
 		if (instance != null) {
-		    instance.cleanup();
-		    instance = null;
+			instance.cleanup();
+			instance = null;
 		}
 		throw t;
 	}
 
-	private static void cleanUpAndThrow(RuntimeException t)
-	{
+	private static void cleanUpAndThrow(RuntimeException t) {
 		if (instance != null) {
-		    instance.cleanup();
-		    instance = null;
+			instance.cleanup();
+			instance = null;
 		}
 		throw t;
 	}
@@ -783,45 +653,6 @@ public final class Configurator {
         LOGGER.info("\n******\n IAdminServiceOperator loaded successfully!\n******\n");
     }
 
-    private void initializeAdminRequestOperator() throws ConfigurationException {
-        serviceLoaderAdminRequesteOperator = ServiceLoader.load(IAdminRequestOperator.class);
-        Iterator<IAdminRequestOperator> iter = serviceLoaderAdminRequesteOperator.iterator();
-        while (iter.hasNext()) {
-            try {
-                IAdminRequestOperator adminRequestOperator = iter.next();
-                adminRequestOperators.put(adminRequestOperator.getKey(), adminRequestOperator);
-            } catch (ServiceConfigurationError sce) {
-                // TODO add more details like which class with qualified name
-                // failed to load
-                LOGGER.warn(
-                        "An IAdminRequestOperator implementation could not be loaded! Exception message: "
-                                + sce.getLocalizedMessage(), sce);
-            }
-        }
-        if (this.bindingOperators.isEmpty()) {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("No IAdminRequestOperator implementation could be loaded!");
-            exceptionText.append(" If the SOS is not used as webapp, this has no effect!");
-            exceptionText.append(" Else add a IAdminRequestOperator implementation!");
-            LOGGER.warn(exceptionText.toString());
-        }
-        LOGGER.info("\n******\n IAdminRequestOperator(s) loaded successfully!\n******\n");
-    }
-
-    /**
-     * reads the requestListeners from the configFile and returns a
-     * RequestOperator containing the requestListeners
-     *
-     * @return RequestOperators with requestListeners
-     * @throws OwsExceptionReport
-     *             if initialization of a RequestListener failed
-     */
-    private void initializeBindingOperator() throws ConfigurationException {
-        serviceLoaderBindingOperator = ServiceLoader.load(Binding.class);
-        setBindings();
-        LOGGER.info("\n******\n Binding(s) loaded successfully!\n******\n");
-    }
-
     /**
      * Load implemented cache feeder dao
      *
@@ -854,12 +685,6 @@ public final class Configurator {
             throw new ConfigurationException(exceptionText);
         }
         LOGGER.info("\n******\n ACapabilitiesCacheController loaded successfully!\n******\n");
-    }
-
-    private void initalizeConverter() throws ConfigurationException {
-        serviceLoaderConverter = ServiceLoader.load(IConverter.class);
-        setConverter();
-        LOGGER.info("\n******\n Converter(s) loaded successfully!\n******\n");
     }
 
     /**
@@ -905,15 +730,6 @@ public final class Configurator {
         }
     }
 
-
-    public void updateConverter() throws ConfigurationException {
-        converter.clear();
-        serviceLoaderConverter.reload();
-        setConverter();
-        LOGGER.info("\n******\n Converter(s) re-initialized successfully!\n******\n");
-    }
-
-
     /**
      * Load implemented feature query handler
      *
@@ -924,70 +740,6 @@ public final class Configurator {
         serviceLoaderFeatureQueryHandler = ServiceLoader.load(IFeatureQueryHandler.class);
         setFeatureQueryHandler();
         LOGGER.info("\n******\n FeatureQueryHandler loaded successfully!\n******\n");
-    }
-
-    /**
-     * Load implemented operation dao
-     *
-     * @throws OwsExceptionReport
-     *             If no operation dao is implemented
-     */
-    private void initializeOperationDAOs() throws ConfigurationException {
-        serviceLoaderOperationDAOs = ServiceLoader.load(IOperationDAO.class);
-        setOperationDAOs();
-        LOGGER.info("\n******\n OperationDAO(s) loaded successfully!\n******\n");
-    }
-
-    /**
-     * Load implemented request listener
-     *
-     * @throws OwsExceptionReport
-     *             If no request listener is implemented
-     */
-    private void initializeServiceOperators() throws ConfigurationException {
-        serviceLoaderServiceOperators = ServiceLoader.load(IServiceOperator.class);
-        setServiceOperatorMap();
-        LOGGER.info("\n******\n ServiceOperator(s) loaded successfully!\n******\n");
-    }
-
-    private void initializeRequestOperators() throws ConfigurationException {
-        serviceLoaderRequestOperators = ServiceLoader.load(IRequestOperator.class);
-        setRequestOperatorMap();
-        LOGGER.info("\n******\n RequestOperator(s) loaded successfully!\n******\n");
-    }
-
-    private void initializeTasking() {
-        serviceLoaderTasking = ServiceLoader.load(ASosTasking.class);
-        Iterator<ASosTasking> iterator = serviceLoaderTasking.iterator();
-        if (iterator.hasNext()) {
-            taskingExecutor = new Timer("TaskingTimer");
-            long delayCounter = 0;
-            // List<ASosTasking> tasks = new ArrayList<ASosTasking>();
-            while (iterator.hasNext()) {
-                try {
-                    ASosTasking aSosTasking = iterator.next();
-                    taskingExecutor.scheduleAtFixedRate(aSosTasking, delayCounter,
-                            (aSosTasking.getExecutionIntervall() * 60000));
-                    delayCounter += 60000;
-                    LOGGER.debug("The task '{}' is started!", aSosTasking.getName());
-                } catch (Exception e) {
-                    LOGGER.error("Error while starting task", e);
-                }
-                // tasks.add((ASosTasking) iterator.next());
-
-            }
-            // taskingExecutor = new Timer("TaskingTimer");
-            // LOGGER.debug("TaskingExecutor initialized with size {}!",
-            // tasks.size());
-            // long delayCounter = 0;
-            // for (ASosTasking aSosTasking : tasks) {
-            // taskingExecutor.scheduleAtFixedRate(aSosTasking,
-            // (delayCounter+60000),
-            // (aSosTasking.getExecutionIntervall()*60000));
-            // LOGGER.debug("The task '{}' is started!", aSosTasking.getName());
-            // }
-            LOGGER.info("\n******\n Task(s) loaded and started successfully!\n******\n");
-        }
     }
 
     /**
@@ -1011,42 +763,6 @@ public final class Configurator {
         }
     }
 
-    private void setBindings() throws ConfigurationException {
-        for (Binding iBindingOperator : serviceLoaderBindingOperator) {
-            try {
-                bindingOperators.put(iBindingOperator.getUrlPattern(), iBindingOperator);
-            } catch (ServiceConfigurationError sce) {
-                // TODO add more details like which class with qualified name
-                // failed to load
-                LOGGER.warn(
-                        "An Binding implementation could not be loaded! Exception message: "
-                                + sce.getLocalizedMessage(), sce);
-            }
-        }
-        if (this.bindingOperators.isEmpty()) {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("No Binding implementation could be loaded!");
-            exceptionText.append(" If the SOS is not used as webapp, this has no effect!");
-            exceptionText.append(" Else add a Binding implementation!");
-            LOGGER.warn(exceptionText.toString());
-        }
-    }
-
-    private void setConverter() throws ConfigurationException {
-        for (IConverter<?, ?> aConverter : serviceLoaderConverter) {
-            try {
-                for (ConverterKeyType converterKeyType : aConverter.getConverterKeyTypes()) {
-                    converter.put(converterKeyType, aConverter);
-                }
-            } catch (ServiceConfigurationError sce) {
-                LOGGER.warn("An IConverter implementation could not be loaded!", sce);
-            }
-        }
-        // TODO check for encoder/decoder used by converter
-    }
-
-
-
     /**
      * Load the implemented feature query handler and add them to a map with
      * operation name as key
@@ -1069,119 +785,11 @@ public final class Configurator {
     }
 
     /**
-     * Load the implemented operation dao and add them to a map with operation
-     * name as key
-     *
-     * @throws OwsExceptionReport
-     *             If no operation dao is implemented
-     */
-    private void setOperationDAOs() throws ConfigurationException {
-        Iterator<IOperationDAO> iter = serviceLoaderOperationDAOs.iterator();
-        while (iter.hasNext()) {
-            try {
-                IOperationDAO aOperationDAO = iter.next();
-                operationDAOs.put(aOperationDAO.getOperationName(), aOperationDAO);
-            } catch (ServiceConfigurationError sce) {
-                LOGGER.warn("An IOperationDAO implementation could not be loaded!", sce);
-            }
-        }
-        if (this.operationDAOs.isEmpty()) {
-            String exceptionText = "No IOperationDAO implementations is loaded!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
-    }
-
-    private void setRequestOperatorMap() throws ConfigurationException {
-        for (IRequestOperator aRequestOperator : serviceLoaderRequestOperators) {
-            try {
-                requestOperators.put(aRequestOperator.getRequestOperatorKeyType(), aRequestOperator);
-            } catch (ServiceConfigurationError sce) {
-                LOGGER.warn("An IRequestOperator implementation could not be loaded!", sce);
-            }
-        }
-        if (this.requestOperators.isEmpty()) {
-            String exceptionText = "No IRequestOperator implementation is loaded!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
-
-    }
-
-
-
-    /**
-     * Load the implemented request listener and add them to a map with
-     * operation name as key
-     *
-     * @throws OwsExceptionReport
-     *             If no request listener is implemented
-     */
-    private void setServiceOperatorMap() throws ConfigurationException {
-        for (IServiceOperator iServiceOperator : serviceLoaderServiceOperators) {
-            try {
-                serviceOperators.put(iServiceOperator.getServiceOperatorKeyType(), iServiceOperator);
-                supportedVersions.add(iServiceOperator.getServiceOperatorKeyType().getVersion());
-                supportedServices.add(iServiceOperator.getServiceOperatorKeyType().getService());
-            } catch (ServiceConfigurationError sce) {
-                LOGGER.warn("An IServiceOperator implementation could not be loaded!", sce);
-            }
-        }
-        if (this.serviceOperators.isEmpty()) {
-            String exceptionText = "No IServiceOperator implementations is loaded!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
-    }
-
-    public void updateBindigs() throws ConfigurationException {
-        bindingOperators.clear();
-        serviceLoaderBindingOperator.reload();
-        setBindings();
-        LOGGER.info("\n******\n Binding(s) re-initialized successfully!\n******\n");
-    }
-
-    /**
-     * Update/reload the implemented operation dao
-     *
-     * @throws ConfigurationException
-     *             If no operation dao is implemented
-     */
-    public void updateOperationDAOs() throws ConfigurationException {
-        operationDAOs.clear();
-        serviceLoaderOperationDAOs.reload();
-        setOperationDAOs();
-        LOGGER.info("\n******\n OperationDAO(s) re-initialized successfully!\n******\n");
-    }
-
-    public void updateRequestOperator() throws ConfigurationException {
-        updateOperationDAOs();
-        requestOperators.clear();
-        serviceLoaderRequestOperators.reload();
-        setRequestOperatorMap();
-        LOGGER.info("\n******\n RequestOperator(s) re-initialized successfully!\n******\n");
-    }
-
-    /**
-     * Update/reload the implemented request listener
-     *
-     * @throws ConfigurationException
-     *             If no request listener is implemented
-     */
-    public void updateServiceOperators() throws ConfigurationException {
-        updateRequestOperator();
-        serviceOperators.clear();
-        serviceLoaderServiceOperators.reload();
-        setServiceOperatorMap();
-        LOGGER.info("\n******\n ServiceOperator(s) re-initialized successfully!\n******\n");
-    }
-
-    /**
      * @return Returns the service identification
      * @throws OwsExceptionReport
      */
     public SosServiceIdentification getServiceIdentification() throws OwsExceptionReport {
-		return this.serviceIdentification.get();
+		return this.serviceIdentificationFactory.get();
     }
 
     /**
@@ -1189,7 +797,7 @@ public final class Configurator {
      * @throws OwsExceptionReport
      */
     public SosServiceProvider getServiceProvider() throws OwsExceptionReport {
-        return this.serviceProvider.get();
+        return this.serviceProviderFactory.get();
     }
 
     /**
@@ -1197,28 +805,6 @@ public final class Configurator {
      */
     public File getSensorDir() {
         return sensorDir;
-    }
-
-    /**
-     * @return the supportedVersions
-     */
-    public Set<String> getSupportedVersions() {
-        return Collections.unmodifiableSet(supportedVersions);
-    }
-
-    public boolean isVersionSupported(String version) {
-        return supportedVersions.contains(version);
-    }
-
-    /**
-     * @return the supportedVersions
-     */
-    public Set<String> getSupportedServices() {
-        return Collections.unmodifiableSet(supportedServices);
-    }
-
-    public boolean isServiceSupported(String service) {
-        return supportedServices.contains(service);
     }
 
     /**
@@ -1424,47 +1010,6 @@ public final class Configurator {
     }
 
     /**
-     * @param service
-     * @param version
-     * @return the implemented request listener
-     * @throws OwsExceptionReport
-     */
-    public IServiceOperator getServiceOperator(String service, String version) throws OwsExceptionReport {
-        return getServiceOperator(new ServiceOperatorKeyType(service, version));
-    }
-
-    public IServiceOperator getServiceOperator(ServiceOperatorKeyType serviceOperatorIdentifier)
-            throws OwsExceptionReport {
-        return serviceOperators.get(serviceOperatorIdentifier);
-        // if (serviceOperator != null) {
-        // return serviceOperator;
-        // }
-        // String exceptionText =
-        // "The service (" + serviceOperatorIdentifier.getService() +
-        // ") and/or version ("
-        // + serviceOperatorIdentifier.getVersion() +
-        // ") is not supported by this server!";
-        // LOGGER.debug(exceptionText);
-        // throw Util4Exceptions.createNoApplicableCodeException(null,
-        // exceptionText);
-    }
-
-    /**
-     * @return the implemented request listener
-     * @throws OwsExceptionReport
-     */
-    public Map<ServiceOperatorKeyType, IServiceOperator> getServiceOperators() throws OwsExceptionReport {
-        return Collections.unmodifiableMap(serviceOperators);
-    }
-
-    /**
-     * @return the implemented operation DAOs
-     */
-    public Map<String, IOperationDAO> getOperationDAOs() {
-        return Collections.unmodifiableMap(operationDAOs);
-    }
-
-    /**
      * @return the implemented cache feeder DAO
      */
     public ICacheFeederDAO getCacheFeederDAO() {
@@ -1496,108 +1041,74 @@ public final class Configurator {
         return defaultEPSG;
     }
 
-    /**
-	 * Defines the number of threads available in the thread pool of the cache
-	 * update executor service.
-	 */
-    private int cacheThreadCount = 5;
-
     public int getCacheThreadCount() {
         return cacheThreadCount;
     }
 
-    public <T,F> IConverter<T,F> getConverter(String fromNamespace, String toNamespace) {
-        return (IConverter<T,F>) getConverter(new ConverterKeyType(fromNamespace, toNamespace));
-    }
-
-    public IConverter getConverter(ConverterKeyType key) {
-        return converter.get(key);
-    }
-
-    public Binding getBindingOperator(String urlPattern) {
-        return bindingOperators.get(urlPattern);
-    }
-
-    public IRequestOperator getRequestOperator(ServiceOperatorKeyType serviceOperatorKeyType, String operationName) {
-        return requestOperators.get(new RequestOperatorKeyType(serviceOperatorKeyType, operationName));
-    }
-
-    public Map<RequestOperatorKeyType, IRequestOperator> getRequestOperator() {
-        return Collections.unmodifiableMap(requestOperators);
-    }
-
-    public Map<String, Binding> getBindingOperators() {
-        return Collections.unmodifiableMap(bindingOperators);
-    }
-
-    public IAdminRequestOperator getAdminRequestOperator(String key) {
-        return adminRequestOperators.get(key);
-    }
-
     public void updateConfiguration() throws ConfigurationException {
-        updateBindigs();
-        updateOperationDAOs();
+		// TODO update converters
+        updateBindings();
+		updateOperationDaos();
         updateDecoder();
         updateEncoder();
-        updateServiceOperators();
+		updateServiceOperators();
         updateRequestOperator();
     }
+	public RequestOperatorRepository getRequestOperatorRepository() {
+		return this.requestOperatorRepository;
+	}
 
-    private void initializeCodingRepository() throws ConfigurationException {
-        if (serviceLoaderDecoder == null) {
-            serviceLoaderDecoder = ServiceLoader.load(IDecoder.class);
-        }
-        if (serviceLoaderEncoder == null) {
-            serviceLoaderEncoder = ServiceLoader.load(IEncoder.class);
-        }
+	public CodingRepository getCodingRepository() {
+		return this.codingRepository;
+	}
 
-        List<IDecoder<?,?>> decoders = new LinkedList<IDecoder<?, ?>>();
-        try {
-            for (IDecoder<?,?> decoder : serviceLoaderDecoder) {
-                decoders.add(decoder);
-            }
-        } catch (ServiceConfigurationError sce) {
-            String text = "An IDecoder implementation could not be loaded!";
-            LOGGER.warn(text, sce);
-            throw new ConfigurationException(text, sce);
-        }
+	public OperationDaoRepository getOperationDaoRepository() {
+		return this.operationDaoRepository;
+	}
 
-        List<IEncoder<?,?>> encoders = new LinkedList<IEncoder<?, ?>>();
-        try {
-            for (IEncoder<?,?> encoder : serviceLoaderEncoder) {
-                encoders.add(encoder);
-            }
-        } catch (ServiceConfigurationError sce) {
-            String text = "An IEncoder implementation could not be loaded!";
-            LOGGER.warn(text, sce);
-            throw new ConfigurationException(text, sce);
-        }
+	public ServiceOperatorRepository getServiceOperatorRepository() {
+		return this.serviceOperatorRepository;
+	}
 
-        /* reinitialize XmlOptionHelper to get the correct prefixes */
-        if (getCharacterEncoding() != null) {
-            XmlOptionsHelper.getInstance(getCharacterEncoding(), true);
-        }
+	public BindingRepository getBindingRepository() {
+		return this.bindingRepository;
+	}
 
-        codingRepository = new CodingRepository(decoders, encoders);
-    }
+	public ConverterRepository getConverterRepository() {
+		return this.converterRepository;
+	}
 
-    public CodingRepository getCodingRepository() {
-        return codingRepository;
-    }
+	public AdminRequestOperatorRepository getAdminRequestOperatorRepository() {
+		return this.adminRequestOperatorRepository;
+	}
 
-    public void updateDecoder() throws ConfigurationException {
-        if (serviceLoaderDecoder != null) {
-            serviceLoaderDecoder.reload();
-        }
-        initializeCodingRepository();
-        LOGGER.info("\n******\n Decoder(s) re-initialized successfully!\n******\n");
-    }
+	public void updateDecoder() throws ConfigurationException {
+		getCodingRepository().updateDecoders();
+	}
 
-    public void updateEncoder() throws ConfigurationException {
-        if (serviceLoaderEncoder != null) {
-            serviceLoaderEncoder.reload();
-        }
-        initializeCodingRepository();
-        LOGGER.info("\n******\n Encoder(s) re-initialized successfully!\n******\n");
-    }
+	public void updateEncoder() throws ConfigurationException {
+		getCodingRepository().updateEncoders();
+	}
+
+	public void updateOperationDaos() throws ConfigurationException {
+		getOperationDaoRepository().update();
+	}
+
+	public void updateServiceOperators() throws ConfigurationException {
+		getServiceOperatorRepository().update();
+	}
+
+	public void updateBindings() throws ConfigurationException {
+		getBindingRepository().update();
+	}
+
+	public void updateConverter() throws ConfigurationException {
+		getConverterRepository().update();
+	}
+
+	public void updateRequestOperator() throws ConfigurationException {
+		getRequestOperatorRepository().update();
+	}
+
+
 }

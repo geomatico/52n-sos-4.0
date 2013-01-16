@@ -27,7 +27,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -35,20 +34,16 @@ import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IDescribeSensorDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.swe.SWEConstants;
-import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.response.DescribeSensorResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.SosHelper;
@@ -59,7 +54,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * class handles the DescribeSensor request
- * 
+ *
  */
 public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<IDescribeSensorDAO, DescribeSensorRequest> {
 
@@ -70,7 +65,7 @@ public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<IDe
     public SosDescribeSensorOperatorV100() {
         super(OPERATION_NAME, DescribeSensorRequest.class);
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
@@ -79,7 +74,7 @@ public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<IDe
     @Override
     public ServiceResponse receive(DescribeSensorRequest sosRequest) throws OwsExceptionReport {
         boolean applyZIPcomp = false;
-                
+
         checkRequestedParameters(sosRequest);
         if (sosRequest.getProcedureDescriptionFormat().equals(SosConstants.CONTENT_TYPE_ZIP)) {
             applyZIPcomp = true;
@@ -107,7 +102,7 @@ public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<IDe
                 throw Util4Exceptions.createInvalidParameterValueException(
                         OWSConstants.RequestParams.version.name(), exceptionText);
             }
-            
+
             IEncoder<XmlObject, DescribeSensorResponse> encoder = CodingHelper.getEncoder(namespace, response);
             if (encoder != null) {
                 encoder.encode(response).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
@@ -129,7 +124,7 @@ public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<IDe
             throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
         }
     }
-    
+
     private void checkRequestedParameters(DescribeSensorRequest sosRequest) throws OwsExceptionReport {
         List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
         try {
@@ -138,8 +133,7 @@ public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<IDe
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion(), Configurator.getInstance()
-                    .getSupportedVersions());
+            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -163,11 +157,11 @@ public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<IDe
 //        }
         Util4Exceptions.mergeAndThrowExceptions(exceptions);
     }
-    
+
     /**
      * from SosHelper, I think there was a bug,
      * checks whether the value of outputFormat parameter is valid
-     * 
+     *
      * @param procedureDecriptionFormat
      *            the outputFormat parameter which should be checked
      * @throws OwsExceptionReport
@@ -178,10 +172,10 @@ public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<IDe
             String exceptionText = String.format("The value of the mandatory parameter '%s' was not found in the request or is incorrect!", parameterName);
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createMissingParameterValueException(parameterName);
-        }        
+        }
         if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
             String exceptionText = String.format(
-                    "The value '%s' of the %s parameter is incorrect and has to be '%s' for the requested sensor!", 
+                    "The value '%s' of the %s parameter is incorrect and has to be '%s' for the requested sensor!",
                     procedureDecriptionFormat, parameterName, SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE);
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);

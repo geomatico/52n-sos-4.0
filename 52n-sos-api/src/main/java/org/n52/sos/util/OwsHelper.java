@@ -32,6 +32,7 @@ import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,7 @@ public class OwsHelper {
 
     /**
      * Sets the first character to UpperCase.
-     * 
+     *
      * @param name
      *            String to be modified.
      * @return Modified string.
@@ -56,10 +57,10 @@ public class OwsHelper {
 
     /**
      * method checks whether this SOS supports the requested versions
-     * 
+     *
      * @param versions
      *            the requested versions of the SOS
-     * 
+     *
      * @throws OwsExceptionReport
      *             if this SOS does not support the requested versions
      */
@@ -97,23 +98,23 @@ public class OwsHelper {
 
     /**
      * method checks whether this SOS supports the single requested version
-     * 
+     *
      * @param version
      *            the requested version of the SOS
      * @throws OwsExceptionReport
      *             if this SOS does not support the requested versions
      */
-    public static void checkSingleVersionParameter(String version, Set<String> supportedVersions)
+    public static void checkSingleVersionParameter(String version)
             throws OwsExceptionReport {
 
         // if version is incorrect, throw exception
-        if (version == null || !supportedVersions.contains(version)) {
+        if (version == null || !Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(version)) {
 
             StringBuilder exceptionText = new StringBuilder();
             exceptionText.append("The parameter '");
             exceptionText.append(OWSConstants.RequestParams.version.name());
             exceptionText.append("'  does not contain version(s) supported by this Service: '");
-            for (String supportedVersion : supportedVersions) {
+            for (String supportedVersion : Configurator.getInstance().getServiceOperatorRepository().getSupportedVersions()) {
                 exceptionText.append(supportedVersion);
                 exceptionText.append("', '");
             }
@@ -131,7 +132,7 @@ public class OwsHelper {
     /**
      * method checks, whether the passed string containing the requested
      * versions of the SOS contains the versions, the 52n SOS supports
-     * 
+     *
      * @param versionsString
      *            comma seperated list of requested service versions
      * @throws OwsExceptionReport

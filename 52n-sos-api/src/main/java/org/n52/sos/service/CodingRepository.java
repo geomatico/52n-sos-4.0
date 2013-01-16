@@ -26,8 +26,11 @@ package org.n52.sos.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.n52.sos.decode.DecoderKey;
@@ -225,27 +228,75 @@ public class CodingRepository {
     }
 
     private static final Logger log = LoggerFactory.getLogger(CodingRepository.class);
+	private final ServiceLoader<IDecoder> serviceLoaderDecoder;
+    private final ServiceLoader<IEncoder> serviceLoaderEncoder;
     private final Set<IDecoder<?, ?>> decoders;
     private final Set<IEncoder<?, ?>> encoders;
     private final Map<DecoderKey, Set<IDecoder<?, ?>>> decoderByKey = CollectionHelper.map();
     private final Map<EncoderKey, Set<IEncoder<?, ?>>> encoderByKey = CollectionHelper.map();
 
-    public CodingRepository(Iterable<IDecoder<?, ?>> decoders, Iterable<IEncoder<?, ?>> encoders) throws ConfigurationException {
-        this.decoders = CollectionHelper.asSet(decoders);
-        this.encoders = CollectionHelper.asSet(encoders);
-        if (this.decoders.isEmpty()) {
+    public CodingRepository() throws ConfigurationException {
+		this.serviceLoaderDecoder = ServiceLoader.load(IDecoder.class);
+		this.serviceLoaderEncoder = ServiceLoader.load(IEncoder.class);
+        this.decoders = CollectionHelper.asSet(loadDecoders());
+        this.encoders = CollectionHelper.asSet(loadEncoders());
+        initDecoderMap();
+        initEncoderMap();
+    }
+
+	public void updateDecoders() throws ConfigurationException {
+		log.debug("Reloading Decoder implementations");
+		this.decoders.clear();
+		this.decoders.addAll(loadDecoders());
+		initDecoderMap();
+		log.debug("Reloaded Decoder implementations");
+	}
+
+	public void updateEncoders() throws ConfigurationException {
+		log.debug("Reloading Encoder implementations");
+		this.encoders.clear();
+		this.encoders.addAll(loadEncoders());
+		initEncoderMap();
+		log.debug("Reloaded Encoder implementations");
+	}
+
+	private List<IDecoder<?,?>> loadDecoders() throws ConfigurationException {
+		List<IDecoder<?,?>> loadedDecoders = new LinkedList<IDecoder<?, ?>>();
+        try {
+            for (IDecoder<?,?> decoder : serviceLoaderDecoder) {
+                loadedDecoders.add(decoder);
+            }
+        } catch (ServiceConfigurationError sce) {
+            String text = "An IDecoder implementation could not be loaded!";
+            log.warn(text, sce);
+            throw new ConfigurationException(text, sce);
+        }
+		if (loadedDecoders.isEmpty()) {
             String exceptionText = "No IDecoder implementations is loaded!";
             log.error(exceptionText);
             throw new ConfigurationException(exceptionText);
         }
-        if (this.encoders.isEmpty()) {
+		return loadedDecoders;
+	}
+
+	private List<IEncoder<?,?>> loadEncoders() throws ConfigurationException {
+		List<IEncoder<?,?>> loadedEncoders = new LinkedList<IEncoder<?, ?>>();
+        try {
+            for (IEncoder<?,?> encoder : serviceLoaderEncoder) {
+                loadedEncoders.add(encoder);
+            }
+        } catch (ServiceConfigurationError sce) {
+            String text = "An IEncoder implementation could not be loaded!";
+            log.warn(text, sce);
+            throw new ConfigurationException(text, sce);
+        }
+		if (loadedEncoders.isEmpty()) {
             String exceptionText = "No IEncoder implementations is loaded!";
             log.error(exceptionText);
             throw new ConfigurationException(exceptionText);
         }
-        initDecoderMap();
-        initEncoderMap();
-    }
+		return loadedEncoders;
+	}
 
     public Set<IDecoder<?, ?>> getDecoders() {
         return CollectionHelper.unmodifiableSet(decoders);
@@ -264,6 +315,7 @@ public class CodingRepository {
     }
 
     private void initEncoderMap() {
+		this.encoderByKey.clear();
         for (IEncoder<?, ?> encoder : getEncoders()) {
             for (EncoderKey key : encoder.getEncoderKeyType()) {
                 Set<IEncoder<?, ?>> encodersForKey = encoderByKey.get(key);
@@ -276,6 +328,7 @@ public class CodingRepository {
     }
 
     private void initDecoderMap() {
+		this.decoderByKey.clear();
         for (IDecoder<?, ?> decoder : getDecoders()) {
             for (DecoderKey key : decoder.getDecoderKeyTypes()) {
                 Set<IDecoder<?, ?>> decodersForKey = decoderByKey.get(key);

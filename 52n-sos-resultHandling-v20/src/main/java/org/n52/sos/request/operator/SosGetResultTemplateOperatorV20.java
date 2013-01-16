@@ -51,11 +51,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SosGetResultTemplateOperatorV20 extends AbstractV2RequestOperator<IGetResultTemplateDAO, GetResultTemplateRequest> {
-    
+
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_RESULT_RETRIEVAL);
     private static final String OPERATION_NAME = Sos2Constants.Operations.GetResultTemplate.name();
     private static final Logger LOGGER = LoggerFactory.getLogger(SosInsertResultOperatorV20.class);
-    
+
     public SosGetResultTemplateOperatorV20() {
         super(OPERATION_NAME, GetResultTemplateRequest.class);
     }
@@ -64,7 +64,7 @@ public class SosGetResultTemplateOperatorV20 extends AbstractV2RequestOperator<I
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
     }
-    
+
     @Override
     public ServiceResponse receive(GetResultTemplateRequest sosRequest) throws OwsExceptionReport {
         checkRequestedParameter(sosRequest);
@@ -104,8 +104,7 @@ public class SosGetResultTemplateOperatorV20 extends AbstractV2RequestOperator<I
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(request.getVersion(), Configurator.getInstance()
-                    .getSupportedVersions());
+            OwsHelper.checkSingleVersionParameter(request.getVersion());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }

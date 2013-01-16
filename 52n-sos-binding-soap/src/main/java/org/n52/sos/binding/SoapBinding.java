@@ -67,7 +67,7 @@ public class SoapBinding extends Binding {
         SoapResponse soapResponse = new SoapResponse();
         String message = "HTTP GET is no supported for SOAP binding!";
         OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, message);
-        if (Configurator.getInstance().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
+        if (Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
             owse.setVersion(Sos1Constants.SERVICEVERSION);
         } else {
             owse.setVersion(Sos2Constants.SERVICEVERSION);
@@ -75,7 +75,7 @@ public class SoapBinding extends Binding {
         soapResponse.setException(owse);
         soapResponse.setSoapVersion(SOAPConstants.SOAP_1_2_PROTOCOL);
         soapResponse.setSoapNamespace(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE);
-        
+
         return (ServiceResponse) CodingHelper.encodeObjectToXml(soapResponse.getSoapNamespace(), soapResponse);
     }
 
@@ -113,8 +113,8 @@ public class SoapBinding extends Binding {
                         AbstractServiceRequest bodyRequest = (AbstractServiceRequest) aBodyRequest;
                         checkServiceOperatorKeyTypes(bodyRequest);
                         for (ServiceOperatorKeyType serviceVersionIdentifier : bodyRequest.getServiceOperatorKeyType()) {
-                            IServiceOperator serviceOperator =
-                                    Configurator.getInstance().getServiceOperator(serviceVersionIdentifier);
+                            IServiceOperator serviceOperator = Configurator.getInstance().getServiceOperatorRepository()
+									.getServiceOperator(serviceVersionIdentifier);
                             if (serviceOperator != null) {
                                 ServiceResponse bodyResponse = serviceOperator.receiveRequest(bodyRequest);
                                 if (!bodyResponse.isXmlResponse()) {
@@ -154,7 +154,7 @@ public class SoapBinding extends Binding {
             if (version != null) {
                 owse.setVersion(version);
             } else {
-                if (Configurator.getInstance().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
+                if (Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
                     owse.setVersion(Sos1Constants.SERVICEVERSION);
                 } else {
                     owse.setVersion(Sos2Constants.SERVICEVERSION);
@@ -185,7 +185,7 @@ public class SoapBinding extends Binding {
     private OwsExceptionReport createOperationNotSupportedException() {
         String exceptionText = "The requested service URL only supports HTTP-Post SOAP requests!";
         OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
+        if (Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
             owse.setVersion(Sos2Constants.SERVICEVERSION);
         } else {
             owse.setVersion(Sos1Constants.SERVICEVERSION);
@@ -200,7 +200,7 @@ public class SoapBinding extends Binding {
                 if (serviceVersionIdentifier.getService().isEmpty()) {
                     exceptions.add(Util4Exceptions.createMissingParameterValueException(RequestParams.service.name()));
                 } else {
-                    if (!Configurator.getInstance().isServiceSupported(serviceVersionIdentifier.getService())) {
+                    if (!Configurator.getInstance().getServiceOperatorRepository().isServiceSupported(serviceVersionIdentifier.getService())) {
                         String exceptionText = "The requested service is not supported!";
                         exceptions.add(Util4Exceptions.createInvalidParameterValueException(
                                 RequestParams.service.name(), exceptionText));
@@ -212,12 +212,12 @@ public class SoapBinding extends Binding {
                 if (getCapsRequest.isSetAcceptVersions()) {
                     boolean hasSupportedVersion = false;
                     for (String accaptVersion : getCapsRequest.getAcceptVersions()) {
-                        if (Configurator.getInstance().isVersionSupported(accaptVersion)) {
+                        if (Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(accaptVersion)) {
                             hasSupportedVersion = true;
                         }
                     }
                     if (!hasSupportedVersion) {
-                        String exceptionText = "The requested acceptedVersions are not supported by this service!"; 
+                        String exceptionText = "The requested acceptedVersions are not supported by this service!";
                         exceptions.add(Util4Exceptions.createVersionNegotiationFailedException(exceptionText));
                     }
                 }
@@ -227,7 +227,8 @@ public class SoapBinding extends Binding {
                         exceptions.add(Util4Exceptions.createMissingParameterValueException(RequestParams.version
                                 .name()));
                     } else {
-                        if (!Configurator.getInstance().isVersionSupported(serviceVersionIdentifier.getVersion())) {
+                        if (!Configurator.getInstance().getServiceOperatorRepository()
+								.isVersionSupported(serviceVersionIdentifier.getVersion())) {
                             String exceptionText = "The requested version is not supported!";
                             exceptions.add(Util4Exceptions.createInvalidParameterValueException(
                                     RequestParams.version.name(), exceptionText));

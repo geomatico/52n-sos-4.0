@@ -102,7 +102,7 @@ public class SosGetObservationByIdOperatorV20 extends AbstractV2RequestOperator<
             }
             // O&M 2.0 non SOS 1.0
             else if (!sosRequest.getVersion().equals(Sos2Constants.SERVICEVERSION)
-                    && (responseFormat.equals(OMConstants.CONTENT_TYPE_OM_2) 
+                    && (responseFormat.equals(OMConstants.CONTENT_TYPE_OM_2)
                         || responseFormat .equals(OMConstants.RESPONSE_FORMAT_OM_2))) {
                 namespace = responseFormat;
                 // xmlOptions =
@@ -140,13 +140,12 @@ public class SosGetObservationByIdOperatorV20 extends AbstractV2RequestOperator<
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion(), Configurator.getInstance()
-                    .getSupportedVersions());
+            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkObservationIDs(sosRequest.getObservationIdentifier(), 
+            SosHelper.checkObservationIDs(sosRequest.getObservationIdentifier(),
                     Configurator.getInstance().getCapabilitiesCacheController().getObservationIdentifiers(),
                     Sos2Constants.GetObservationByIdParams.observation.name());
         } catch (OwsExceptionReport owse) {

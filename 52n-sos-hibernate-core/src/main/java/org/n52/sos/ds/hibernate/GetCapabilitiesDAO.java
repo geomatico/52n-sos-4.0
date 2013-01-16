@@ -80,7 +80,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of the interface IGetCapabilitiesDAO
- * 
+ *
  */
 public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements IGetCapabilitiesDAO {
 
@@ -110,7 +110,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.n52.sos.ds.ISosOperationDAO#getOperationName()
      */
     @Override
@@ -120,7 +120,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.n52.sos.ds.hibernate.AbstractHibernateOperationDao#getOperationsMetadata
      * (java.lang.String, org.hibernate.Session)
@@ -150,14 +150,14 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.Sections, sectionsValues);
         opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptFormats,
                 Arrays.asList(SosConstants.getAcceptFormats()));
-        opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptVersions, getConfigurator()
-                .getSupportedVersions());
+        opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptVersions,
+				getConfigurator().getServiceOperatorRepository().getSupportedVersions());
         opsMeta.addAnyParameterValue(SosConstants.GetCapabilitiesParams.updateSequence);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.n52.sos.ds.IGetCapabilitiesDAO#getCapabilities(org.n52.sos.request
      * .AbstractSosRequest)
@@ -173,13 +173,15 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 if (request.getAcceptVersions() != null) {
                     String[] acceptedVersion = request.getAcceptVersions();
                     for (int i = 0; i < acceptedVersion.length; i++) {
-                        if (getConfigurator().isVersionSupported(acceptedVersion[i])) {
+                        if (getConfigurator().getServiceOperatorRepository()
+								.isVersionSupported(acceptedVersion[i])) {
                             response.setVersion(acceptedVersion[i]);
                             break;
                         }
                     }
                 } else {
-                    for (String supportedVersion : getConfigurator().getSupportedVersions()) {
+                    for (String supportedVersion : getConfigurator().getServiceOperatorRepository()
+							.getSupportedVersions()) {
                         response.setVersion(supportedVersion);
                         break;
                     }
@@ -291,10 +293,10 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     private List<String> getProfiles() {
         Set<String> profiles = new HashSet<String>();
-        for (Binding bindig : getConfigurator().getBindingOperators().values()) {
+        for (Binding bindig : getConfigurator().getBindingRepository().getBindings().values()) {
             profiles.addAll(bindig.getConformanceClasses());
         }
-        for (IRequestOperator requestOperator : getConfigurator().getRequestOperator().values()) {
+        for (IRequestOperator requestOperator : getConfigurator().getRequestOperatorRepository().getRequestOperator().values()) {
             profiles.addAll(requestOperator.getConformanceClasses());
         }
         for (IDecoder<?,?> decoder : getConfigurator().getCodingRepository().getDecoders()) {
@@ -308,7 +310,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     /**
      * Get the OperationsMetadat for all supported operations
-     * 
+     *
      * @param sosCapabilities
      *            SOS internal capabilities SOS internal capabilities
      * @param session
@@ -324,10 +326,10 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         operationsMetadata.addCommonValue(OWSConstants.RequestParams.service.name(),
                 new OWSParameterValuePossibleValues(SosConstants.SOS));
         operationsMetadata.addCommonValue(OWSConstants.RequestParams.version.name(),
-                new OWSParameterValuePossibleValues(getConfigurator().getSupportedVersions()));
+                new OWSParameterValuePossibleValues(getConfigurator().getServiceOperatorRepository().getSupportedVersions()));
 
         // FIXME: OpsMetadata for InsertSensor, InsertObservation SOS 2.0
-        Map<RequestOperatorKeyType, IRequestOperator> requestOperators = getConfigurator().getRequestOperator();
+        Map<RequestOperatorKeyType, IRequestOperator> requestOperators = getConfigurator().getRequestOperatorRepository().getRequestOperator();
         List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>(requestOperators.size());
         for (RequestOperatorKeyType requestOperatorKeyType : requestOperators.keySet()) {
             if (requestOperatorKeyType.getServiceOperatorKeyType().getVersion().equals(version)) {
@@ -345,7 +347,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     /**
      * Get the FilterCapabilities
-     * 
+     *
      * @param sosCapabilities
      *            SOS internal capabilities
      * @return FilterCapabilities
@@ -365,7 +367,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     /**
      * Get the contents for SOS 1.0.0 capabilities
-     * 
+     *
      * @param sosCapabilities
      *            SOS internal capabilities
      * @return Offerings for contents
@@ -459,7 +461,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     /**
      * Get the contents for SOS 2.0 capabilities
-     * 
+     *
      * @param sosCapabilities
      *            SOS internal capabilities
      * @param session
@@ -513,7 +515,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     /**
      * Set SpatialFilterCapabilities to FilterCapabilities
-     * 
+     *
      * @param filterCapabilities
      *            FilterCapabilities
      * @param version
@@ -566,7 +568,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     /**
      * Set TemporalFilterCapabilities to FilterCapabilities
-     * 
+     *
      * @param filterCapabilities
      *            FilterCapabilities
      * @param version
@@ -608,7 +610,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     /**
      * Set ScalarFilterCapabilities to FilterCapabilities
-     * 
+     *
      * @param filterCapabilities
      *            FilterCapabilities
      */
@@ -629,7 +631,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     /**
      * Get FOIs contained in an offering
-     * 
+     *
      * @param offering
      *            Offering identifier
      * @return FOI identifiers
@@ -650,7 +652,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     /**
      * Get the QName for resultModels from observationType constant
-     * 
+     *
      * @param resultModels4Offering
      *            Observation types
      * @return QNames for resultModel parameter
@@ -741,13 +743,14 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     /**
      * Get extensions and merge IMergableExtension of the same class.
-     * 
+     *
      * @return Extensions
      * @throws OwsExceptionReport
      */
     @SuppressWarnings("rawtypes")
     private List<IExtension> getAndMergeExtensions(Session session) throws OwsExceptionReport {
-        Map<RequestOperatorKeyType, IRequestOperator> requestOperators = getConfigurator().getRequestOperator();
+        Map<RequestOperatorKeyType, IRequestOperator> requestOperators = getConfigurator()
+				.getRequestOperatorRepository().getRequestOperator();
         List<IExtension> extensions = new ArrayList<IExtension>(requestOperators.size());
         HashMap<String, IMergableExtension> map = new HashMap<String, IMergableExtension>(requestOperators.size());
         for (IRequestOperator requestOperator : requestOperators.values()) {

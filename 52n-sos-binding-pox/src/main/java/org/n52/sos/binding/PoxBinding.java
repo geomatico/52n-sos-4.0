@@ -65,7 +65,7 @@ public class PoxBinding extends Binding {
     public ServiceResponse doGetOperation(HttpServletRequest request) throws OwsExceptionReport {
         String message = "HTTP GET is no supported for POX binding!";
         OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, message);
-        if (Configurator.getInstance().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
+        if (Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
             owse.setVersion(Sos1Constants.SERVICEVERSION);
         } else {
             owse.setVersion(Sos2Constants.SERVICEVERSION);
@@ -88,8 +88,8 @@ public class PoxBinding extends Binding {
                 AbstractServiceRequest sosRequest = (AbstractServiceRequest) abstractRequest;
                 checkServiceOperatorKeyTypes(sosRequest);
                 for (ServiceOperatorKeyType serviceVersionIdentifier : sosRequest.getServiceOperatorKeyType()) {
-                    IServiceOperator serviceOperator =
-                            Configurator.getInstance().getServiceOperator(serviceVersionIdentifier);
+                    IServiceOperator serviceOperator = Configurator.getInstance().getServiceOperatorRepository()
+							.getServiceOperator(serviceVersionIdentifier);
                     if (serviceOperator != null) {
                         serviceResponse = serviceOperator.receiveRequest(sosRequest);
                         break;
@@ -130,7 +130,7 @@ public class PoxBinding extends Binding {
             if (version != null) {
                 owse.setVersion(version);
             } else {
-                if (Configurator.getInstance().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
+                if (Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
                     owse.setVersion(Sos1Constants.SERVICEVERSION);
                 } else {
                     owse.setVersion(Sos2Constants.SERVICEVERSION);
@@ -148,7 +148,7 @@ public class PoxBinding extends Binding {
                 if (serviceVersionIdentifier.getService().isEmpty()) {
                     exceptions.add(Util4Exceptions.createMissingParameterValueException(RequestParams.service.name()));
                 } else {
-                    if (!Configurator.getInstance().isServiceSupported(serviceVersionIdentifier.getService())) {
+                    if (!Configurator.getInstance().getServiceOperatorRepository().isServiceSupported(serviceVersionIdentifier.getService())) {
                         String exceptionText = "The requested service is not supported!";
                         exceptions.add(Util4Exceptions.createInvalidParameterValueException(
                                 RequestParams.service.name(), exceptionText));
@@ -160,7 +160,7 @@ public class PoxBinding extends Binding {
                 if (getCapsRequest.isSetAcceptVersions()) {
                     boolean hasSupportedVersion = false;
                     for (String accaptVersion : getCapsRequest.getAcceptVersions()) {
-                        if (Configurator.getInstance().isVersionSupported(accaptVersion)) {
+                        if (Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(accaptVersion)) {
                             hasSupportedVersion = true;
                         }
                     }
@@ -175,7 +175,7 @@ public class PoxBinding extends Binding {
                         exceptions.add(Util4Exceptions.createMissingParameterValueException(RequestParams.version
                                 .name()));
                     } else {
-                        if (!Configurator.getInstance().isVersionSupported(serviceVersionIdentifier.getVersion())) {
+                        if (!Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(serviceVersionIdentifier.getVersion())) {
                             String exceptionText = "The requested version is not supported!";
                             exceptions.add(Util4Exceptions.createInvalidParameterValueException(
                                     RequestParams.version.name(), exceptionText));

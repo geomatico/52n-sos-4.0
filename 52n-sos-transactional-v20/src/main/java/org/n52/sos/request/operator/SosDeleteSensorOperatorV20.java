@@ -55,11 +55,11 @@ public class SosDeleteSensorOperatorV20 extends AbstractV2RequestOperator<IDelet
     private static final String OPERATION_NAME = Sos2Constants.Operations.DeleteSensor.name();
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_SENSOR_DELETION);
     private static final Logger LOGGER = LoggerFactory.getLogger(SosDeleteSensorOperatorV20.class);
-    
+
     public SosDeleteSensorOperatorV20() {
         super(OPERATION_NAME, DeleteSensorRequest.class);
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
@@ -107,8 +107,7 @@ public class SosDeleteSensorOperatorV20 extends AbstractV2RequestOperator<IDelet
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(request.getVersion(), 
-                    Configurator.getInstance().getSupportedVersions());
+            OwsHelper.checkSingleVersionParameter(request.getVersion());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }

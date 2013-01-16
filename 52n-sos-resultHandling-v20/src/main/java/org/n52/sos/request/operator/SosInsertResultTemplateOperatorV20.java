@@ -44,12 +44,10 @@ import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +66,7 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
     }
-    
+
     @Override
     public ServiceResponse receive(InsertResultTemplateRequest sosRequest) throws OwsExceptionReport {
         checkRequestedParameter(sosRequest);
@@ -110,8 +108,7 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(request.getVersion(), Configurator.getInstance()
-                    .getSupportedVersions());
+            OwsHelper.checkSingleVersionParameter(request.getVersion());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -163,18 +160,18 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
 
         /*
          * check observation template
-         * 
+         *
          * same resultSTructure for procedure, obsProp and Offering
-         * 
+         *
          * empty phenTime, resultTime and result
-         * 
+         *
          * phenTime and resultTime nilReason = 'template'
-         * 
+         *
          * proc, foi, obsProp not empty
-         * 
+         *
          * resultStructure: swe:Time or swe:TimeRange with value
          * “http://www.opengis.net/def/property/OGC/0/PhenomenonTime”
-         * 
+         *
          * If the resultStructure in the ResultTemplate has a swe:Time component
          * with definition property set to the value
          * “http://www.opengis.net/def/property/OGC/0/ResultTime” then the value
@@ -187,7 +184,7 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
          * each ResultTemplate). In case the om:phenomenonTime is not a
          * TimeInstant, an InvalidParameterValue exception shall be returned,
          * with locator ‘resultTime’.
-         * 
+         *
          * A client shall encode the om:phenomenonTime as a swe:Time or
          * swe:TimeRange component with definition
          * “http://www.opengis.net/def/property/OGC/0/PhenomenonTime”. in the
@@ -198,7 +195,7 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
          * different to the phenomenonTime then the resultStructure of the
          * ResultTemplate shall also have a swe:Time component with definition
          * “http://www.opengis.net/def/property/OGC/0/ResultTime”.
-         * 
+         *
          * If a result template with differing observationType or (SWE Common
          * encoded) result structure is inserted for the same constellation of
          * procedure, observedProperty and ObservationOffering (for which

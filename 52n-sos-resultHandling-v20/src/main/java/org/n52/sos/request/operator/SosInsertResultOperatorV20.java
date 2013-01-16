@@ -45,7 +45,6 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,11 +54,11 @@ public class SosInsertResultOperatorV20 extends AbstractV2RequestOperator<IInser
     private static final String OPERATION_NAME = Sos2Constants.Operations.InsertResult.name();
     private static final Logger LOGGER = LoggerFactory.getLogger(SosInsertResultOperatorV20.class);
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_RESULT_INSERTION);
-    
+
     public SosInsertResultOperatorV20() {
         super(OPERATION_NAME, InsertResultRequest.class);
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
@@ -105,8 +104,7 @@ public class SosInsertResultOperatorV20 extends AbstractV2RequestOperator<IInser
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(request.getVersion(), Configurator.getInstance()
-                    .getSupportedVersions());
+            OwsHelper.checkSingleVersionParameter(request.getVersion());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }

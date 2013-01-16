@@ -21,13 +21,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.service;
+package org.n52.sos.ogc.ows;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
+import org.n52.sos.service.Configurator;
+import org.n52.sos.util.LazyThreadSafeFactory;
 import org.n52.sos.util.XmlHelper;
 
 /**
@@ -103,7 +105,7 @@ public class SosServiceIdentificationFactory extends LazyThreadSafeFactory<SosSe
 			serviceIdentification.setFees(this.fees);
 			serviceIdentification.setServiceType(this.serviceType);
 			serviceIdentification.setTitle(this.title);
-			serviceIdentification.setVersions(Configurator.getInstance().getSupportedVersions());
+			serviceIdentification.setVersions(Configurator.getInstance().getServiceOperatorRepository().getSupportedVersions());
 			serviceIdentification.setKeywords(Arrays.asList(this.keywords));
 		}
 		return serviceIdentification;

@@ -56,11 +56,11 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInser
     private static final Logger LOGGER = LoggerFactory.getLogger(SosInsertSensorOperatorV20.class);
     private static final String OPERATION_NAME = Sos2Constants.Operations.InsertSensor.name();
     private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(ConformanceClasses.SOS_V2_INSERTION_CAPABILITIES, ConformanceClasses.SOS_V2_SENSOR_INSERTION);
-    
+
     public SosInsertSensorOperatorV20() {
         super(OPERATION_NAME, InsertSensorRequest.class);
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
@@ -109,8 +109,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInser
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(request.getVersion(), Configurator.getInstance()
-                    .getSupportedVersions());
+            OwsHelper.checkSingleVersionParameter(request.getVersion());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }

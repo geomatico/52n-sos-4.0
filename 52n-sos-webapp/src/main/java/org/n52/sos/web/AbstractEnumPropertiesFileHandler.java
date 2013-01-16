@@ -25,7 +25,7 @@ package org.n52.sos.web;
 
 import javax.servlet.ServletContext;
 
-import org.n52.sos.service.AbstractPropertyFileHandler;
+import org.n52.sos.util.AbstractPropertyFileHandler;
 import org.n52.sos.service.ConfigurationException;
 
 public abstract class AbstractEnumPropertiesFileHandler<E extends Enum<E>> extends AbstractPropertyFileHandler {

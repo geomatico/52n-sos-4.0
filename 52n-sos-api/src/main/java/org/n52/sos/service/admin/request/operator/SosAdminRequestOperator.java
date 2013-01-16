@@ -56,7 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SosAdminRequestOperator implements IAdminRequestOperator {
-    
+
     /*
      * To support full dynamic loading of a new JAR, the Tomcat context.xml file has to be modified.
      * Add the attribute 'reloadable="true"' to <Context>.
@@ -91,7 +91,7 @@ public class SosAdminRequestOperator implements IAdminRequestOperator {
 
     private static final List<String> PARAMETERS = CollectionHelper.list(UPDATE_BINDINGS,
         UPDATE_CONFIGURATION, UPDATE_DECODER, UPDATE_ENCODER, UPDATE_OPERATIONS, UPDATE_SERVICES);
-    
+
     @Override
     public String getKey() {
         return KEY;
@@ -121,7 +121,7 @@ public class SosAdminRequestOperator implements IAdminRequestOperator {
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
             for (String parameter : parameters) {
                 if (parameter.equalsIgnoreCase(UPDATE_BINDINGS)) {
-                    Configurator.getInstance().updateBindigs();
+                    Configurator.getInstance().updateBindings();
                     builder.append("Bindings");
                 } else if (parameter.equalsIgnoreCase(UPDATE_CONFIGURATION)) {
                     Configurator.getInstance().updateConfiguration();
@@ -177,7 +177,7 @@ public class SosAdminRequestOperator implements IAdminRequestOperator {
         opsMeta.addAnyParameterValue(AdministratorParams.parameter);
         return opsMeta;
     }
-    
+
     private OWSOperation getOpsMetadataForUpdate() {
         OWSOperation opsMeta = new OWSOperation();
         opsMeta.setOperationName(REQUEST_UPDATE);
@@ -187,7 +187,7 @@ public class SosAdminRequestOperator implements IAdminRequestOperator {
     }
 
     private Map<String, List<String>> getDCP() {
-        return Collections.singletonMap(SosConstants.HTTP_GET, 
+        return Collections.singletonMap(SosConstants.HTTP_GET,
                 Collections.singletonList(Configurator.getInstance().getServiceURL() + "/admin?"));
     }
 

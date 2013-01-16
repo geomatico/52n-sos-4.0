@@ -49,14 +49,13 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * class handles the DescribeSensor request
- * 
+ *
  */
 public class SosDescribeSensorOperatorV20 extends AbstractV2RequestOperator<IDescribeSensorDAO, DescribeSensorRequest> {
     private static final String OPERATION_NAME = SosConstants.Operations.DescribeSensor.name();
@@ -66,7 +65,7 @@ public class SosDescribeSensorOperatorV20 extends AbstractV2RequestOperator<IDes
     public SosDescribeSensorOperatorV20() {
         super(OPERATION_NAME, DescribeSensorRequest.class);
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
@@ -137,7 +136,7 @@ public class SosDescribeSensorOperatorV20 extends AbstractV2RequestOperator<IDes
             throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
         }
     }
-    
+
     private void checkRequestedParameters(DescribeSensorRequest sosRequest) throws OwsExceptionReport {
         List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
         try {
@@ -146,8 +145,7 @@ public class SosDescribeSensorOperatorV20 extends AbstractV2RequestOperator<IDes
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion(), Configurator.getInstance()
-                    .getSupportedVersions());
+            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }

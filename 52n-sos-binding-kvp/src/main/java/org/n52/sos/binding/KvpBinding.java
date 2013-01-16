@@ -54,12 +54,12 @@ import org.slf4j.LoggerFactory;
 
 /**
  * SOS operator for Key-Value-Pair (HTTP-Get) requests
- * 
+ *
  */
 public class KvpBinding extends Binding {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KvpBinding.class);
-    
+
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_KVP_CORE_BINDING);
 
     private static final String URL_PATTERN = "/kvp";
@@ -68,12 +68,12 @@ public class KvpBinding extends Binding {
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
     }
-    
+
     @Override
     public String getUrlPattern() {
         return URL_PATTERN;
     }
-    
+
     @Override
     public ServiceResponse doGetOperation(HttpServletRequest req) throws OwsExceptionReport {
         LOGGER.debug("KVP-REQUEST: {}", req.getQueryString());
@@ -90,16 +90,16 @@ public class KvpBinding extends Binding {
             KvpHelper.checkParameterValue(operation, RequestParams.request.name());
             String service = getServiceParameterValue(parameterValueMap);
             String version = getVersionParameterValue(parameterValueMap);
-            
-            
-            if (version != null && !Configurator.getInstance().isVersionSupported(version)) {
+
+
+            if (version != null && !Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(version)) {
                 throw Util4Exceptions.createInvalidParameterValueException(
                         RequestParams.version.name(), "The requested version is not supported!");
             }
             DecoderKey k = new KvpOperationDecoderKey(service, version, operation);
             IDecoder<AbstractServiceRequest, Map<String, String>> decoder = Configurator.getInstance()
                     .getCodingRepository().getDecoder(k);
-            
+
             if (decoder != null) {
                 request = decoder.decode(parameterValueMap);
             } else {
@@ -109,7 +109,8 @@ public class KvpBinding extends Binding {
             }
 
             for (ServiceOperatorKeyType serviceVersionIdentifier : request.getServiceOperatorKeyType()) {
-                IServiceOperator serviceOperator = Configurator.getInstance().getServiceOperator(serviceVersionIdentifier);
+                IServiceOperator serviceOperator = Configurator.getInstance().getServiceOperatorRepository()
+						.getServiceOperator(serviceVersionIdentifier);
                 if (serviceOperator != null) {
                     response = serviceOperator.receiveRequest(request);
                     LOGGER.debug("{} operation executed successfully!", request.getOperationName());
@@ -118,7 +119,7 @@ public class KvpBinding extends Binding {
             }
             if (response == null) {
                 if (request instanceof GetCapabilitiesRequest) {
-                    String exceptionText = String.format("The requested %s values (%s) are not supported by this server!", 
+                    String exceptionText = String.format("The requested %s values (%s) are not supported by this server!",
                             SosConstants.GetCapabilitiesParams.AcceptVersions.name(),
                             StringHelper.join(", ", (Object[])((GetCapabilitiesRequest) request).getAcceptVersions()));
                     throw Util4Exceptions.createVersionNegotiationFailedException(exceptionText);
@@ -138,7 +139,8 @@ public class KvpBinding extends Binding {
             if (request != null && request.getVersion() != null) {
                 owse.setVersion(request.getVersion());
             } else {
-                if (Configurator.getInstance().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
+                if (Configurator.getInstance().getServiceOperatorRepository()
+						.isVersionSupported(Sos2Constants.SERVICEVERSION)) {
                     owse.setVersion(Sos2Constants.SERVICEVERSION);
                 } else {
                     owse.setVersion(Sos1Constants.SERVICEVERSION);
@@ -153,14 +155,14 @@ public class KvpBinding extends Binding {
     public ServiceResponse doPostOperation(HttpServletRequest request) throws OwsExceptionReport {
         String message = "HTTP POST is no supported for KVP binding!";
         OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, message);
-        if (Configurator.getInstance().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
+        if (Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
             owse.setVersion(Sos1Constants.SERVICEVERSION);
         } else {
             owse.setVersion(Sos2Constants.SERVICEVERSION);
         }
         throw owse;
     }
-    
+
     private String getServiceParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
         String service = KvpHelper.getParameterValue(RequestParams.service.name(), parameterValueMap);
         boolean isGetCapabilities = KvpHelper.checkForGetCapabilities(parameterValueMap);
@@ -169,7 +171,7 @@ public class KvpBinding extends Binding {
         } else {
             KvpHelper.checkParameterValue(service, RequestParams.service.name());
         }
-        if (!Configurator.getInstance().isServiceSupported(service)) {
+        if (!Configurator.getInstance().getServiceOperatorRepository().isServiceSupported(service)) {
             String exceptionText = String.format(
                     "The value of parameter '%s' is invalid or the service is not supported!",
                     OWSConstants.RequestParams.service.name());
@@ -185,8 +187,8 @@ public class KvpBinding extends Binding {
         boolean isGetCapabilities = KvpHelper.checkForGetCapabilities(parameterValueMap);
         if (!isGetCapabilities) {
             KvpHelper.checkParameterValue(version, RequestParams.version.name());
-            if (!Configurator.getInstance().isVersionSupported(version)) {
-                String exceptionText = String.format("The value of parameter'%s' is invalid or the version is not supported!", 
+            if (!Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(version)) {
+                String exceptionText = String.format("The value of parameter'%s' is invalid or the version is not supported!",
                         OWSConstants.RequestParams.version.name());
                 LOGGER.debug(exceptionText);
                 throw Util4Exceptions.createInvalidParameterValueException(RequestParams.version.name(), exceptionText);

@@ -33,7 +33,7 @@ import org.n52.sos.service.operator.ServiceOperatorKeyType;
 
 /**
  * SOS GetCapabilities request
- * 
+ *
  */
 public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
@@ -81,7 +81,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Get accept Formats
-     * 
+     *
      * @return accept Formats
      */
     public List<String> getAcceptFormats() {
@@ -90,7 +90,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Set accept Formats
-     * 
+     *
      * @param acceptFormats
      *            accept Formats
      */
@@ -100,7 +100,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Get accept versions
-     * 
+     *
      * @return accept versions
      */
     public String[] getAcceptVersions() {
@@ -109,7 +109,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Set accept versions
-     * 
+     *
      * @param acceptVersions
      *            accept versions
      */
@@ -119,7 +119,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Get sections
-     * 
+     *
      * @return sections
      */
     public List<String> getSections() {
@@ -128,7 +128,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Set sections
-     * 
+     *
      * @param sections
      *            sections
      */
@@ -138,7 +138,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Get update sequence
-     * 
+     *
      * @return update sequence
      */
     public String getUpdateSequence() {
@@ -147,7 +147,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Set update sequence
-     * 
+     *
      * @param updateSequence
      *            update sequence
      */
@@ -157,7 +157,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Set extensions
-     * 
+     *
      * @param extensionArray
      *            extensions
      */
@@ -167,7 +167,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /**
      * Get extensions
-     * 
+     *
      * @return extensions
      */
     public List<XmlObject> getExtensionArray() {
@@ -176,7 +176,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.n52.sos.request.AbstractSosRequest#getOperationName()
      */
     @Override
@@ -184,6 +184,7 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
         return operationName;
     }
 
+	@Override
     public ServiceOperatorKeyType[] getServiceOperatorKeyType() {
         if (serviceOperatorKeyTypes == null) {
             if (acceptVersions != null && acceptVersions.length > 0) {
@@ -193,17 +194,17 @@ public class GetCapabilitiesRequest extends AbstractServiceRequest {
                 }
             } else {
                 serviceOperatorKeyTypes = new ServiceOperatorKeyType[1];
-                setVersion(Collections.max(Configurator.getInstance().getSupportedVersions()));
+                setVersion(Collections.max(Configurator.getInstance().getServiceOperatorRepository().getSupportedVersions()));
                 serviceOperatorKeyTypes[0] = new ServiceOperatorKeyType(getService(), getVersion());
             }
         }
         return serviceOperatorKeyTypes;
     }
-    
+
     public boolean isSetAcceptFormats() {
         return acceptFormats != null && !acceptFormats.isEmpty();
     }
-    
+
     public boolean isSetAcceptVersions() {
         return acceptVersions != null && acceptVersions.length > 0;
     }

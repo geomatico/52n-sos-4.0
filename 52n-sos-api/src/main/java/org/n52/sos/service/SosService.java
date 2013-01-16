@@ -322,10 +322,10 @@ public class SosService extends ConfiguratedHttpServlet {
      */
     private Binding getBindingOperatorForRequestURI(String requestURI) throws OwsExceptionReport {
         Binding bindingOperator = null;
-        for (String bindingOperatorKey : Configurator.getInstance().getBindingOperators().keySet()) {
+        for (String bindingOperatorKey : Configurator.getInstance().getBindingRepository().getBindings().keySet()) {
 			// FIXME this will fail e.g. for domain.tld/soap/52n-sos-webapp/sos/kvp
             if (requestURI.contains(bindingOperatorKey)) {
-                bindingOperator = Configurator.getInstance().getBindingOperator(bindingOperatorKey);
+                bindingOperator = Configurator.getInstance().getBindingRepository().getBinding(bindingOperatorKey);
                 break;
             }
         }

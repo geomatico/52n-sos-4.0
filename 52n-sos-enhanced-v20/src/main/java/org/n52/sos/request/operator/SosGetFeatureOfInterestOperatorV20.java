@@ -59,7 +59,7 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
     public SosGetFeatureOfInterestOperatorV20() {
         super(OPERATION_NAME, GetFeatureOfInterestRequest.class);
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
@@ -86,7 +86,7 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
                 throw Util4Exceptions.createInvalidParameterValueException(
                         OWSConstants.RequestParams.version.name(), exceptionText);
             }
-            
+
             XmlObject encodedObject = CodingHelper.encodeObjectToXml(namespace, response);
             if (encodedObject instanceof XmlObject) {
                 encodedObject.save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
@@ -103,7 +103,7 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
             throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
         }
     }
-    
+
     private void checkRequestedParameter(GetFeatureOfInterestRequest sosRequest) throws OwsExceptionReport {
         List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
         try {
@@ -112,8 +112,7 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion(), Configurator.getInstance()
-                    .getSupportedVersions());
+            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -144,7 +143,7 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
-        
+
         Util4Exceptions.mergeAndThrowExceptions(exceptions);
     }
 
