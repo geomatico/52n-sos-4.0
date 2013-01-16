@@ -284,7 +284,7 @@ public class SosService extends ConfiguratedHttpServlet {
 
     private void setSpecifiedHeaders(Map<String, String> headerMap, HttpServletResponse resp) {
         for (String headerIdentifier : headerMap.keySet()) {
-            String value = headerMap.get(headerIdentifier).toString();
+            String value = headerMap.get(headerIdentifier);
             if (isHeaderAndValueSet(headerIdentifier, value)) {
                 resp.setHeader(headerIdentifier, value);
             }
