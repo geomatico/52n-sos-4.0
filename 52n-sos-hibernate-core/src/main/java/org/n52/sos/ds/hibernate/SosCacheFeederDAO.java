@@ -428,12 +428,12 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
             parentFeatures.put(featureOfInterest.getIdentifier(),
                     getFeatureIDsFromFeatures(featureOfInterest.getFeatureOfInterestsForChildFeatureId()));
         }
-		List<String> ids = getFeatureIdentifier(hFeaturesOfInterest);
-        cache.setFeatureOfInterest(ids);
+		List<String> identifiers = getFeatureIdentifier(hFeaturesOfInterest);
+        cache.setFeatureOfInterest(identifiers);
         cache.setKFeatureOfInterestVProcedures(kFeatureOfInterestVProcedure);
         cache.setFeatureHierarchies(parentFeatures);
 		cache.setEnvelopeForFeatureOfInterest(Configurator.getInstance().getFeatureQueryHandler()
-			.getEnvelopeForFeatureIDs(ids, session));
+			.getEnvelopeForFeatureIDs(identifiers, session));
     }
 
 	private void setEventTimeValues(CapabilitiesCache cache, Session session) {
@@ -566,10 +566,10 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         return new ArrayList<String>(obsTypes);
     }
 
-    private Collection<String> getRelatedFeatureIdentifiersFrom(Offering offering) {
-        List<String> relatedFeatureList = new ArrayList<String>(offering.getRelatedFeatures().size());
-        for (RelatedFeature relatedFeature : offering.getRelatedFeatures()) {
-            relatedFeatureList.add(relatedFeature.getFeatureOfInterest().getIdentifier());
+    private Collection<String> getRelatedFeatureIdentifiersFrom(Offering hOffering) {
+        List<String> relatedFeatureList = new ArrayList<String>(hOffering.getRelatedFeatures().size());
+        for (RelatedFeature hRelatedFeature : hOffering.getRelatedFeatures()) {
+            relatedFeatureList.add(hRelatedFeature.getFeatureOfInterest().getIdentifier());
         }
         return relatedFeatureList;
     }
