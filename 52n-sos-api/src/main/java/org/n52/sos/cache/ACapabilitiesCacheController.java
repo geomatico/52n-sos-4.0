@@ -42,58 +42,50 @@ import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Abstract class for capabilities cache controller implementations.
- * 
- * 
+ *
+ *
  */
 public abstract class ACapabilitiesCacheController {
 
-    /** logger */
+	private class UpdateTimerTask extends TimerTask {
+
+		@Override
+		public void run() {
+			try {
+				if (update(true)) {
+					LOGGER.info("Timertask: capabilities cache update successful!");
+				} else {
+					LOGGER.warn("Timertask: capabilities cache update not successful!");
+				}
+				schedule();
+			} catch (OwsExceptionReport e) {
+				LOGGER.error("Fatal error: Timertask couldn't update capabilities cache! Switch log level to DEBUG to get more details.");
+				LOGGER.debug("Exception thrown",e);
+			}
+		}
+	}
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ACapabilitiesCacheController.class);
 
     /**
      * Lock management
      */
     private final ReentrantLock updateLock = new ReentrantLock(true);
-
     private final Condition updateFree = updateLock.newCondition();
-    
     private boolean initialized = false;
-
     private boolean updateIsFree = true;
-	private Timer timer = new Timer("52n-sos-capabilities-cache-controller");
+	private final Timer timer = new Timer("52n-sos-capabilities-cache-controller");
 	private TimerTask current = null;
-	
-    /**
-     * default constructor
-     */
-    public ACapabilitiesCacheController() {
-		schedule();
-    }
 
 	/**
 	 * Starts a new timer task
 	 */
 	protected final void schedule() {
-		/* 
+		/*
 		 * Timers can not be rescheduled.
 		 * To make the interval changeable schedule a anonymous timer.
 		 */
-		this.current = new TimerTask() {
-			@Override
-			public void run() {
-				try {
-					if (update(true)) {
-						LOGGER.info("Timertask: capabilities cache update successful!");
-					} else {
-						LOGGER.warn("Timertask: capabilities cache update not successful!");
-					}
-					schedule();
-				} catch (OwsExceptionReport e) {
-					LOGGER.error("Fatal error: Timertask couldn't update capabilities cache! Switch log level to DEBUG to get more details.");
-					LOGGER.debug("Exception thrown",e);
-				}
-			}
-		};
+		this.current = new UpdateTimerTask();
 		long delay = Configurator.getInstance().getUpdateIntervallInMillis();
 		if (!initialized) {
 			delay = 1;
@@ -104,8 +96,8 @@ public abstract class ACapabilitiesCacheController {
 			this.timer.schedule(this.current, delay);
 		}
 	}
-	
-	
+
+
 	/**
 	 * Stops the current task, if available and starts a new {@link TimerTask}.
 	 * @see {@link #schedule()}
@@ -116,7 +108,7 @@ public abstract class ACapabilitiesCacheController {
 		}
 		schedule();
 	}
-	
+
 	public void cancel() {
 		this.timer.cancel();
 	}
@@ -135,7 +127,7 @@ public abstract class ACapabilitiesCacheController {
      * queries the service offerings, the observedProperties for each offering,
      * and the offering names from the DB and sets these values in this
      * Configurator instance
-     * 
+     *
      * @param checkLastUpdateTime
      *            Indicator, if some other methods should be started
      * @return true, if updated successfully
@@ -143,21 +135,21 @@ public abstract class ACapabilitiesCacheController {
      *             if the query of one of the values described upside failed
      */
     public abstract boolean update(boolean checkLastUpdateTime) throws OwsExceptionReport;
-    
+
     public abstract void updateAfterSensorInsertion() throws OwsExceptionReport;
 
     public abstract void updateAfterObservationInsertion() throws OwsExceptionReport;
 
     public abstract void updateAfterSensorDeletion() throws OwsExceptionReport;
-    
-    public abstract void updateAfterObservationDeletion() throws OwsExceptionReport; 
-    
+
+    public abstract void updateAfterObservationDeletion() throws OwsExceptionReport;
+
     public abstract void updateAfterResultTemplateInsertion() throws OwsExceptionReport;
 
     /**
      * method for refreshing the metadata of fois in the capabilities cache; is
      * invoked when a new feature of interest is inserted into the SOS database
-     * 
+     *
      * @throws OwsExceptionReport
      *             if refreshing failed
      */
@@ -165,17 +157,17 @@ public abstract class ACapabilitiesCacheController {
 
     /**
      * refreshes sensor metadata; used after registration of new sensor at SOS
-     * 
+     *
      * @throws OwsExceptionReport
      *             if refreshing failed
-     * 
+     *
      */
     public abstract void updateSensorMetadata() throws OwsExceptionReport;
 
     /**
      * methods for adding relationships in Cache for recently received new
      * observation
-     * 
+     *
      * @param observation
      *            recently received observation which has been inserted into SOS
      *            db and whose relationships have to be maintained in cache
@@ -215,7 +207,7 @@ public abstract class ACapabilitiesCacheController {
 
     /**
      * Returns the observedProperties (phenomenons) for the requested offering
-     * 
+     *
      * @param offering
      *            the offering for which observedProperties should be returned
      * @return List<String> containing the phenomenons of the requested offering
@@ -224,14 +216,14 @@ public abstract class ACapabilitiesCacheController {
 
     /**
      * Returns copy of the phenomenons of all offerings
-     * 
+     *
      * @return List<String> containing the phenomenons of all offerings
      */
     public abstract Collection<String> getObservableProperties();
 
     /**
      * returns the offerings of this SOS
-     * 
+     *
      * @return List<String> containing the offerings of this SOS
      */
     public abstract Collection<String> getOfferings();
@@ -240,14 +232,14 @@ public abstract class ACapabilitiesCacheController {
 
     /**
      * returns the observation ids of this SOS
-     * 
+     *
      * @return List<String> containing the observation ids of this SOS
      */
     public abstract Collection<String> getObservationIdentifiers();
 
     /**
      * returns the observedProperties for each offering
-     * 
+     *
      * @return Map<String, String[]> containing the offerings with its
      *         observedProperties
      */
@@ -256,7 +248,7 @@ public abstract class ACapabilitiesCacheController {
     /**
      * Returns TreeMap containing all procedures which are used by the Offerings
      * offered in this SOS
-     * 
+     *
      * @return List<String> containing all procedures which are used by the
      *         Offerings offered in this SOS
      */
@@ -265,7 +257,7 @@ public abstract class ACapabilitiesCacheController {
     /**
      * Returns collection containing parent procedures for the passed procedure,
      * optionally navigating the full hierarchy and including itself
-     * 
+     *
      * @param procId
      *            the procedure id to find parents for
      * @param fullHierarchy
@@ -273,7 +265,7 @@ public abstract class ACapabilitiesCacheController {
      * @param includeSelf
      *            whether or not to include the passed procedure id in the
      *            result
-     * 
+     *
      * @return Collection<String> containing the passed procedure id's parents
      *         (and optionally itself)
      */
@@ -283,7 +275,7 @@ public abstract class ACapabilitiesCacheController {
      * Returns collection containing parent procedures for the passed
      * procedures, optionally navigating the full hierarchy and including
      * themselves
-     * 
+     *
      * @param procIds
      *            collection of the procedure ids to find parents for
      * @param fullHierarchy
@@ -291,7 +283,7 @@ public abstract class ACapabilitiesCacheController {
      * @param includeSelves
      *            whether or not to include the passed procedure ids in the
      *            result
-     * 
+     *
      * @return Collection<String> containing the passed procedure id's parents
      *         (and optionally themselves)
      */
@@ -301,7 +293,7 @@ public abstract class ACapabilitiesCacheController {
     /**
      * Returns collection containing child procedures for the passed procedure,
      * optionally navigating the full hierarchy and including itself
-     * 
+     *
      * @param procId
      *            procedure id to find children for
      * @param fullHierarchy
@@ -309,7 +301,7 @@ public abstract class ACapabilitiesCacheController {
      * @param includeSelf
      *            whether or not to include the passed procedure id in the
      *            result
-     * 
+     *
      * @return Collection<String> containing the passed procedure id's children
      *         (and optionally itself)
      */
@@ -318,7 +310,7 @@ public abstract class ACapabilitiesCacheController {
     /**
      * Returns collection containing child procedures for the passed procedures,
      * optionally navigating the full hierarchy and including themselves
-     * 
+     *
      * @param procIds
      *            collection of procedure ids to find children for
      * @param fullHierarchy
@@ -326,7 +318,7 @@ public abstract class ACapabilitiesCacheController {
      * @param includeSelves
      *            whether or not to include the passed procedure id in the
      *            result
-     * 
+     *
      * @return Collection<String> containing the passed procedure id's children
      *         (and optionally itself)
      */
@@ -335,7 +327,7 @@ public abstract class ACapabilitiesCacheController {
 
     /**
      * return the result models for the requested offering
-     * 
+     *
      * @param offering
      *            the offering for which the result models should be returned
      * @return String[] containing the result models for the requested offering
@@ -344,7 +336,7 @@ public abstract class ACapabilitiesCacheController {
 
     /**
      * returns the procedures for the requested offering
-     * 
+     *
      * @param offering
      *            the offering for which the procedures should be returned
      * @return String[] containing the procedures for the requested offering
@@ -353,7 +345,7 @@ public abstract class ACapabilitiesCacheController {
 
     /**
      * returns the procedureID for the feature of interest (station)
-     * 
+     *
      * @param foiID
      *            the foiID for which the procedureID should returned
      * @return String representing the procedureID
@@ -362,7 +354,7 @@ public abstract class ACapabilitiesCacheController {
 
     /**
      * return the unit of the values for the observedProperty
-     * 
+     *
      * @param observedProperty
      *            String observedProperty for which the type of the values
      *            should be returned
@@ -373,41 +365,41 @@ public abstract class ACapabilitiesCacheController {
 
     /**
      * returns only FOIs which are sampling features
-     * 
+     *
      * @return ArrayList<String> the FOIs
      */
     public abstract Collection<String> getFeatureOfInterest();
 
     /**
      * returns the phens4CompPhens
-     * 
+     *
      * @return HashMap<String, List<String>> the phens4CompPhens
      */
     public abstract Map<String, Collection<String>> getObservableProperties4CompositePhenomenons();
 
     /**
      * Returns the offCompPhens
-     * 
+     *
      * @return HashMap<String, List<String>> the offCompPhens
      */
     public abstract Map<String, Collection<String>> getKOfferingVCompositePhenomenons();
 
     /**
      * returns the procedures for phenomena
-     * 
+     *
      * @return HashMap<String, List<String>> the procedures for phenomena
      */
     public abstract Map<String, Collection<String>> getKObservablePropertyVProcedures();
 
     /**
      * returns the phenomena for procedures
-     * 
+     *
      * @return HashMap<String, List<String>> the phenomena for procedures
      */
     public abstract Map<String, Collection<String>> getKProcedureVObservableProperties();
 
     /**
-     * 
+     *
      * @return Returns Map containing offeringIDs as keys and list of
      *         corresponding features as values
      */
@@ -415,7 +407,7 @@ public abstract class ACapabilitiesCacheController {
 
     /**
      * returns the offerings for the passed procedure id
-     * 
+     *
      * @param procID
      *            id of procedure, for which related offerings should be
      *            returned
@@ -425,7 +417,7 @@ public abstract class ACapabilitiesCacheController {
 
     /**
      * returns the offerings for the passed phenomenon
-     * 
+     *
      * @param phenID
      *            id of procedure, for which related offerings should be
      *            returned
@@ -435,28 +427,28 @@ public abstract class ACapabilitiesCacheController {
 
     /**
      * Returns srids, which are supported by this SOS
-     * 
+     *
      * @return Returns srids, which are supported by this SOS
      */
     public abstract Collection<Integer> getSrids();
 
     /**
      * returns procedures for offerings
-     * 
+     *
      * @return Map<String, List<String>> procedures for offerings
      */
     public abstract Map<String, Collection<String>> getKOfferingVProcedures();
 
     /**
      * returns related features
-     * 
+     *
      * @return List<String> related features
      */
     public abstract Map<String, Collection<String>> getKOfferingVRelatedFeatures();
 
     /**
      * returns map with compositePhenomenon and their observableProperties
-     * 
+     *
      * @return Map<String, Collection<String>> observableProperties for
      *         compositePhenomenon
      */
@@ -464,7 +456,7 @@ public abstract class ACapabilitiesCacheController {
 
     /**
      * returns map with relatedFeatures and their roles.
-     * 
+     *
      * @return Map<String, Collection<String>> roles for relatedFeatures
      */
     public abstract Map<String, Collection<String>> getKRelatedFeaturesVRole();
@@ -474,25 +466,24 @@ public abstract class ACapabilitiesCacheController {
     public abstract Collection<String> getObservationTypes4Offering(String offering);
 
     public abstract Collection<String> getObservationTypes();
-    
+
     public abstract Collection<String> getFeatureOfInterestTypes();
-    
+
     public abstract Map<String, Collection<String>> getAllowedKOfferingVObservationTypes();
 
     public abstract Collection<String> getAllowedObservationTypes4Offering(String offering);
-    
-    public abstract Collection<String> getResultTemplates();
-	
-	public abstract SosEnvelope getEnvelopeForOffering(String offering);
-	
-	public abstract DateTime getMinTimeForOffering(String offering);
-	
-	public abstract DateTime getMaxTimeForOffering(String offering);
-	
-	public abstract Envelope getEnvelopeForFeatures();
-	
-	public abstract DateTime getMinEventTime();
-	
-	public abstract DateTime getMaxEventTime();
 
+    public abstract Collection<String> getResultTemplates();
+
+	public abstract SosEnvelope getEnvelopeForOffering(String offering);
+
+	public abstract DateTime getMinTimeForOffering(String offering);
+
+	public abstract DateTime getMaxTimeForOffering(String offering);
+
+	public abstract Envelope getEnvelopeForFeatures();
+
+	public abstract DateTime getMinEventTime();
+
+	public abstract DateTime getMaxEventTime();
 }

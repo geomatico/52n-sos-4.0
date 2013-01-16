@@ -63,12 +63,9 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     private ICacheFeederDAO cacheFeederDAO;
 
     public CapabilitiesCacheController() {
-        super();
         this.capabilitiesCache = new CapabilitiesCache();
         this.cacheFeederDAO = Configurator.getInstance().getCacheFeederDAO();
-        if (this.cacheFeederDAO == null) {
-            throw new NullPointerException("No ICacheFeederDAO found!");
-        }
+		schedule();
     }
 
     /**
