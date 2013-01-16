@@ -74,7 +74,7 @@ public class CapabilitiesCache{
     private Map<String, Collection<String>> kOffferingVObservationTypes;
 
     /** hash map containing the procedures for each offering */
-    private Map<String, Collection<String>> KOfferingVProcedures;
+    private Map<String, List<String>> KOfferingVProcedures;
 
     /** hash map containing the features of interest for each offering */
     private Map<String, Collection<String>> kOfferingVFeaturesOfInterest;
@@ -113,10 +113,10 @@ public class CapabilitiesCache{
      * hash map containing the phenomenon IDs as keys and the corresponding
      * procedure ids as values
      */
-    private Map<String, Collection<String>> kObservablePropertiesVProcedures;
+    private Map<String, List<String>> kObservablePropertiesVProcedures;
 
     /** map contains the offerings for each phenomenon */
-    private Map<String, Collection<String>> kObservablePropertyVOfferings;
+    private Map<String, List<String>> kObservablePropertyVOfferings;
 
     /** contains the unit (value) for each phenomenon (key) */
     private Map<String, String> unit4Phen;
@@ -301,7 +301,7 @@ public class CapabilitiesCache{
      * 
      * @return
      */
-    protected Map<String, Collection<String>> getOffProcedures() {
+    protected Map<String, List<String>> getOffProcedures() {
         return KOfferingVProcedures;
     }
 
@@ -417,7 +417,7 @@ public class CapabilitiesCache{
     /**
      * @return Returns the phenProcs.
      */
-    protected Map<String, Collection<String>> getPhenProcs() {
+    protected Map<String, List<String>> getPhenProcs() {
         return kObservablePropertiesVProcedures;
     }
 
@@ -560,7 +560,7 @@ public class CapabilitiesCache{
      * 
      * @param offProcedures
      */
-    public void setKOfferingVProcedures(Map<String, Collection<String>> offProcedures) {
+    public void setKOfferingVProcedures(Map<String, List<String>> offProcedures) {
         this.KOfferingVProcedures = offProcedures;
     }
 
@@ -623,7 +623,7 @@ public class CapabilitiesCache{
      * 
      * @param phenOffs
      */
-    public void setKObservablePropertyVOfferings(Map<String, Collection<String>> phenOffs) {
+    public void setKObservablePropertyVOfferings(Map<String, List<String>> phenOffs) {
         this.kObservablePropertyVOfferings = phenOffs;
     }
 
@@ -633,7 +633,7 @@ public class CapabilitiesCache{
      * @param phenProcs
      *            The phenProcs to set.
      */
-    public void setKObservablePropertyKProcedures(Map<String, Collection<String>> phenProcs) {
+    public void setKObservablePropertyKProcedures(Map<String, List<String>> phenProcs) {
         this.kObservablePropertiesVProcedures = phenProcs;
     }
 

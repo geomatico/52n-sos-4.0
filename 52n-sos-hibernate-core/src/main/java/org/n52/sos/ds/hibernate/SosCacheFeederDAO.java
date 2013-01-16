@@ -25,13 +25,13 @@ package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -63,8 +63,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
-import java.util.Collections;
-import java.util.LinkedList;
 
 /**
  * Implementation of the interface ICacheFeederDAO
@@ -229,7 +227,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         List<Offering> hOfferings = HibernateCriteriaQueryUtilities.getOfferingObjects(session);
 
         Map<String, String> 			kOfferingVName                      = Collections.synchronizedMap(new HashMap<String, String>(hOfferings.size(), 1.0f));
-        Map<String, Collection<String>> kOfferingVProcedures				= Collections.synchronizedMap(new HashMap<String, Collection<String>>(hOfferings.size(),1.0f));
+        Map<String, List<String>> 		kOfferingVProcedures				= Collections.synchronizedMap(new HashMap<String, List<String>>(hOfferings.size(),1.0f));
         Map<String, Collection<String>> kOfferingVObservableProperties		= Collections.synchronizedMap(new HashMap<String, Collection<String>>(hOfferings.size(),1.0f));
         Map<String, Collection<String>> kOfferingVRelatedFeatures			= Collections.synchronizedMap(new HashMap<String, Collection<String>>(hOfferings.size(),1.0f));
         Map<String, Collection<String>> kOfferingVObservationTypes			= Collections.synchronizedMap(new HashMap<String, Collection<String>>(hOfferings.size(),1.0f));
@@ -309,7 +307,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
 
     private void getOfferingInformationFromDbAndAddItToCacheMaps(Session session,
 			Map<String, String> kOfferingVName,
-			Map<String, Collection<String>> kOfferingVProcedures,
+			Map<String, List<String>> kOfferingVProcedures,
 			Map<String, Collection<String>> kOfferingVObservableProperties,
 			Map<String, Collection<String>> kOfferingVRelatedFeatures,
 			Map<String, Collection<String>> kOfferingVObservationTypes,
@@ -402,17 +400,20 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
     }
 
     private void setObservablePropertyValues(CapabilitiesCache cache, Session session) {
-        //List<String> observableProperties = new ArrayList<String>();
         List<ObservableProperty> hObservableProperties = HibernateCriteriaQueryUtilities.getObservablePropertyObjects(session);
-        Map<String, Collection<String>> kObservablePropertyVOffering = new HashMap<String, Collection<String>>(hObservableProperties.size());
-        Map<String, Collection<String>> kObservablePropertyVProcedures = new HashMap<String, Collection<String>>(hObservableProperties.size());
-        for (ObservableProperty observableProperty : hObservableProperties) {
-			//observableProperties.add(observableProperty.getIdentifier());
-            kObservablePropertyVOffering.put(observableProperty.getIdentifier(),
-                    getAllOfferingIdentifiersFrom(observableProperty.getObservationConstellations()));
-            kObservablePropertyVProcedures.put(observableProperty.getIdentifier(),
-                    getProcedureIdentifierFrom(observableProperty.getObservationConstellations()));
+        // fields 
+        Map<String, List<String>> kObservablePropertyVOffering 	= new HashMap<String, List<String>>(hObservableProperties.size());
+        Map<String, List<String>> 		kObservablePropertyVProcedures 	= new HashMap<String, List<String>>(hObservableProperties.size());
+        
+        for (ObservableProperty hObservableProperty : hObservableProperties) {
+        	List<String> offeringList = getAllOfferingIdentifiersFrom(hObservableProperty.getObservationConstellations());
+        	Collections.sort(offeringList);
+            kObservablePropertyVOffering.put(hObservableProperty.getIdentifier(),offeringList);
+            List<String> procedureList = getProcedureIdentifierFrom(hObservableProperty.getObservationConstellations());
+            Collections.sort(procedureList);
+            kObservablePropertyVProcedures.put(hObservableProperty.getIdentifier(),procedureList);
         }
+        
         cache.setKObservablePropertyVOfferings(kObservablePropertyVOffering);
         cache.setKObservablePropertyKProcedures(kObservablePropertyVProcedures);
     }
@@ -611,7 +612,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
 		private Map<String, String> kOfferingVName;
 		private Map<String, Collection<String>> kOfferingVObservableProperties;
 		private Map<String, Collection<String>> kOfferingVObservationTypes;
-		private Map<String, Collection<String>> kOfferingVProcedures;
+		private Map<String, List<String>> kOfferingVProcedures;
 		private Map<String, Collection<String>> kOfferingVRelatedFeatures;
 		private CountDownLatch countDownLatch;
 		private IConnectionProvider connectionProvider;
@@ -623,7 +624,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
 		private List<OwsExceptionReport> owsReports;
 		private Map<String, Collection<String>> kOfferingVFeaturesOfInterest;
 
-		public OfferingTask(CountDownLatch countDownLatch, IConnectionProvider connectionProvider, Map<String, String> kOfferingVName, Map<String, Collection<String>> kOfferingVProcedures,
+		public OfferingTask(CountDownLatch countDownLatch, IConnectionProvider connectionProvider, Map<String, String> kOfferingVName, Map<String, List<String>> kOfferingVProcedures,
 				Map<String, Collection<String>> kOfferingVObservableProperties, Map<String, Collection<String>> kOfferingVRelatedFeatures,
 				Map<String, Collection<String>> kOfferingVObservationTypes, Map<String, Collection<String>> allowedkOfferingVObservationTypes, Map<String, DateTime> kOfferingVMinTime,
 				Map<String, DateTime> kOfferingVMaxTime, Map<String, SosEnvelope> kOfferingVEnvelope, Map<String, Collection<String>> kOfferingVFeaturesOfInterest, Offering offering, List<OwsExceptionReport> owsReports) {
