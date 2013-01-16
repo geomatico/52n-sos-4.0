@@ -29,7 +29,7 @@ import org.hibernate.Session;
 import org.junit.Test;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.service.Configurator;
-import org.n52.swe.sos.test.AbstractSosTestCase;
+import org.n52.sos.test.AbstractSosTestCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

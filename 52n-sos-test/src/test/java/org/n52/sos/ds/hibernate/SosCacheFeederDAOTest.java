@@ -29,7 +29,7 @@ import org.junit.Test;
 import org.n52.sos.cache.CapabilitiesCache;
 import org.n52.sos.ds.hibernate.SosCacheFeederDAO.CacheCreationStrategy;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.swe.sos.test.AbstractSosTestCase;
+import org.n52.sos.test.AbstractSosTestCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

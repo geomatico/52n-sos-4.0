@@ -45,7 +45,7 @@ import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetObservationByIdRequest;
 import org.n52.sos.service.Configurator;
-import org.n52.swe.sos.test.AbstractSosTestCase;
+import org.n52.sos.test.AbstractSosTestCase;
 /**
  * The class <code>HibernateObservationUtilitiesTest</code> contains tests for
  * the class {@link <code>HibernateObservationUtilities</code>}
