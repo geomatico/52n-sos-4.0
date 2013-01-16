@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
 import org.n52.sos.binding.Binding;
 import org.n52.sos.cache.ACapabilitiesCacheController;
 import org.n52.sos.convert.ConverterKeyType;
@@ -369,7 +370,7 @@ public final class Configurator {
     }
 
     private void setSetting(Setting setting, String value, boolean initial) throws ConfigurationException {
-        /* TODO check what has to be reinitialized when settings change */
+        /* TODO check what has to be re-initialized when settings change */
         switch (setting) {
         case CAPABILITIES_CACHE_UPDATE_INTERVAL:
             int capCacheUpdateIntervall = parseInteger(setting, value);
@@ -388,6 +389,18 @@ public final class Configurator {
             }
             this.characterEncoding = value;
             XmlOptionsHelper.getInstance(this.characterEncoding, true);
+            break;
+        case CACHE_THREAD_COUNT:
+            this.cacheThreadCount = parseInteger(setting, value);
+            break;
+        case CONFIGURATION_FILES:
+            String configFileMapString = parseString(setting, value, true);
+            if (configFileMapString != null && !configFileMapString.isEmpty()) {
+                for (String kvp : configFileMapString.split(";")) {
+                    String[] keyValue = kvp.split(" ");
+                    this.configFileMap.put(keyValue[0], keyValue[1]);
+                }
+            }
             break;
         case CHILD_PROCEDURES_ENCODED_IN_PARENTS_DESCRIBE_SENSOR:
             this.childProceduresEncodedInParentsDescribeSensor = parseBoolean(setting, value);
@@ -562,20 +575,8 @@ public final class Configurator {
         case SERVICE_IDENTIFICATION_ACCESS_CONSTRAINTS:
             this.serviceIdentificationAccessConstraints = parseString(setting, value, true);
             break;
-        case CONFIGURATION_FILES:
-            String configFileMapString = parseString(setting, value, true);
-            if (configFileMapString != null && !configFileMapString.isEmpty()) {
-                for (String kvp : configFileMapString.split(";")) {
-                    String[] keyValue = kvp.split(" ");
-                    this.configFileMap.put(keyValue[0], keyValue[1]);
-                }
-            }
-            break;
         case MINIMUM_GZIP_SIZE:
             this.minimumGzipSize = parseInteger(setting, value);
-            break;
-        case CACHE_THREAD_COUNT:
-            this.cacheThreadCount = parseInteger(setting, value);
             break;
         default:
             String message = "Can not decode setting '" + setting.name() + "'!";
@@ -615,6 +616,8 @@ public final class Configurator {
                 val = Integer.valueOf(value);
             }
         } catch (NumberFormatException e) {
+        	LOGGER.error("Value \"{}\" expected to be an integer could not be parsed!",value);
+        	LOGGER.debug("Exception thrown",e);
         }
 
         if (val == null) {
