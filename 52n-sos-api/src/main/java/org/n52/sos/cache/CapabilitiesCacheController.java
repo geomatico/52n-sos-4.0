@@ -594,21 +594,21 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     }
 
     public Collection<String> getParentFeatures(String featureID, boolean fullHierarchy, boolean includeSelf) {
-        return this.capabilitiesCache.getParentProcs(featureID, fullHierarchy, includeSelf);
+        return this.capabilitiesCache.getParentFeatures(featureID, fullHierarchy, includeSelf);
     }
 
     public Collection<String> getParentFeatures(Collection<String> featureIDs, boolean fullHierarchy,
             boolean includeSelves) {
-        return this.capabilitiesCache.getParentProcs(featureIDs, fullHierarchy, includeSelves);
+        return this.capabilitiesCache.getParentFeatures(featureIDs, fullHierarchy, includeSelves);
     }
 
     public Collection<String> getChildFeatures(String featureIDs, boolean fullHierarchy, boolean includeSelf) {
-        return this.capabilitiesCache.getChildProcs(featureIDs, fullHierarchy, includeSelf);
+        return this.capabilitiesCache.getParentFeatures(featureIDs, fullHierarchy, includeSelf);
     }
 
     public Collection<String> getChildFeatures(Collection<String> featureIDs, boolean fullHierarchy,
             boolean includeSelves) {
-        return this.capabilitiesCache.getChildProcs(featureIDs, fullHierarchy, includeSelves);
+        return this.capabilitiesCache.getParentFeatures(featureIDs, fullHierarchy, includeSelves);
     }
 
     /**

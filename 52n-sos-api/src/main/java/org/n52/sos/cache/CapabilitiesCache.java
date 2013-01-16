@@ -927,7 +927,7 @@ public class CapabilitiesCache{
 
         for (String featureID : featureIDs) {
             collectionChildFeatures
-                    .addAll(SosHelper.getHierarchy(childProcs, featureID, fullHierarchy, includeSelves));
+                    .addAll(SosHelper.getHierarchy(childFeatures, featureID, fullHierarchy, includeSelves));
         }
 
         List<String> ccpList = new ArrayList<String>(collectionChildFeatures);
