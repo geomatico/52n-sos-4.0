@@ -127,7 +127,7 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<I
         }
         // observation [1..*]
         try {
-            checkObservations(request.getObservation());
+            checkObservations(request.getObservations());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -156,7 +156,7 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<I
                     exceptions.add(Util4Exceptions.createInvalidParameterValueException(
                             Sos2Constants.InsertObservationParams.offering.name(), exceptionText.toString()));
                 } else {
-                    for (SosObservation observation : request.getObservation()) {
+                    for (SosObservation observation : request.getObservations()) {
                         observation.getObservationConstellation().addOffering(offering);
                     }
                 }

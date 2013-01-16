@@ -106,7 +106,7 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
             session = getSession();
             transaction = session.beginTransaction();
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
-            for (SosObservation sosObservation : request.getObservation()) {
+            for (SosObservation sosObservation : request.getObservations()) {
                 SosObservationConstellation sosObsConst = sosObservation.getObservationConstellation();
                 ObservationConstellation hObsConst = null;
                 for (String offeringID : sosObsConst.getOfferings()) {
@@ -140,7 +140,7 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
                 }
             }
             // if no observationConstellation is valid, throw exception
-            if (exceptions.size() == request.getObservation().size()) {
+            if (exceptions.size() == request.getObservations().size()) {
                 Util4Exceptions.mergeAndThrowExceptions(exceptions);
             }
             session.flush();

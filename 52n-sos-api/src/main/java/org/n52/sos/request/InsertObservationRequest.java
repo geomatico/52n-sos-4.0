@@ -80,7 +80,7 @@ public class InsertObservationRequest extends AbstractServiceRequest {
      * 
      * @return observations to insert
      */
-    public List<SosObservation> getObservation() {
+    public List<SosObservation> getObservations() {
         return observations;
     }
 
