@@ -560,6 +560,12 @@
 				</exclusions>
 			</dependency>
 			<dependency>
+				  <groupId>com.thetransactioncompany</groupId>
+				  <artifactId>cors-filter</artifactId>
+				  <version>1.3.2</version>
+				  <scope>runtime</scope>
+			</dependency>
+			<dependency>
 				<groupId>org.codehaus.jettison</groupId>
 				<artifactId>jettison</artifactId>
 				<version>1.3.2</version>
@@ -704,7 +710,7 @@
 				<executions>
 					<execution>
 						<phase>test</phase>
-						<!-- test will fail if license headers are not correct, run license:format 
+						<!-- test will fail if license headers are not correct, run license:format
 							to add the headers. -->
 						<goals>
 							<!-- <goal>check</goal> -->
@@ -1008,7 +1014,7 @@
 		</profile>
 		<profile>
 			<id>release</id>
-			<!-- a profile which shall be activated if a release is performed, it 
+			<!-- a profile which shall be activated if a release is performed, it
 				is also automatic activated in the ci environment. -->
 			<modules>
 				<module>52n-sos-webapp-preconfigured</module>
@@ -1033,7 +1039,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-release-plugin</artifactId>
 						<configuration>
-							<!-- no build in release:prepare (takes to long time), so in bad cases 
+							<!-- no build in release:prepare (takes to long time), so in bad cases
 								release fails on perform -->
 							<preparationGoals>clean</preparationGoals>
 							<autoVersionSubmodules>true</autoVersionSubmodules>

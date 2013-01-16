@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The servlet of the SOS which receives the incoming HttpPost and HttpGet
  * requests and sends the operation result documents to the client
- * 
+ *
  */
 public class SosService extends ConfiguratedHttpServlet {
 
@@ -64,7 +64,7 @@ public class SosService extends ConfiguratedHttpServlet {
     private static final String CONTENT_ENCODING = "Content-Encoding";
 
     private static final String GZIP = "gzip";
-    
+
     /**
      * initializes the Servlet
      */
@@ -90,13 +90,13 @@ public class SosService extends ConfiguratedHttpServlet {
     /**
      * handles all GET requests, the request will be passed to the
      * RequestOperator
-     * 
+     *
      * @param req
      *            the incoming request
-     * 
+     *
      * @param resp
      *            the response for the incomming request
-     * 
+     *
      */
 	@Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
@@ -115,10 +115,10 @@ public class SosService extends ConfiguratedHttpServlet {
     /**
      * handles all POST requests, the request will be passed to the
      * requestOperator
-     * 
+     *
      * @param req
      *            the incomming request
-     * 
+     *
      * @param resp
      *            the response for the incoming request
      */
@@ -151,10 +151,10 @@ public class SosService extends ConfiguratedHttpServlet {
 
     /**
      * Handles OPTIONS request to enable Cross-Origin Resource Sharing.
-     * 
+     *
      * @param req
      *            the incoming request
-     * 
+     *
      * @param resp
      *            the response for the incoming request
      */
@@ -170,7 +170,6 @@ public class SosService extends ConfiguratedHttpServlet {
         }
         if (sosResp.getHttpResponseCode() == HttpServletResponse.SC_NOT_IMPLEMENTED) {
             super.doOptions(req, resp);
-            this.setCorsHeaders(resp);
         }
         doResponse(resp, sosResp, clientSupportsGzip);
     }
@@ -211,15 +210,15 @@ public class SosService extends ConfiguratedHttpServlet {
     /**
      * writes the content of the SosResponse to the outputStream of the
      * HttpServletResponse
-     * 
+     *
      * @param resp
      *            the HttpServletResponse to which the content will be written
-     * 
+     *
      * @param sosResponse
      *            the SosResponse, whose content will be written to the
      *            outputStream of resp param
      * @throws ServletException
-     * 
+     *
      */
     // FIXME what happens with responses having no output stream
     private void doResponse(HttpServletResponse resp, ServiceResponse sosResponse, boolean clientAcceptsGzip)
@@ -229,7 +228,6 @@ public class SosService extends ConfiguratedHttpServlet {
         try {
             String contentType = sosResponse.getContentType();
             resp.setContentType(contentType);
-            this.setCorsHeaders(resp);
 
             if (sosResponse.isSetHeaderMap()) {
                 this.setSpecifiedHeaders(sosResponse.getHeaderMap(), resp);
@@ -245,11 +243,11 @@ public class SosService extends ConfiguratedHttpServlet {
                 out = resp.getOutputStream();
                 int contentLength = sosResponse.getContentLength();
                 resp.setContentType(contentType);
-                if (sosResponse.getApplyGzipCompression() || (clientAcceptsGzip 
+                if (sosResponse.getApplyGzipCompression() || (clientAcceptsGzip
 						&& contentLength > Configurator.getInstance().getMinimumGzipSize())) {
                     if (clientAcceptsGzip) {
                         resp.addHeader(CONTENT_ENCODING, GZIP);
-                    } 
+                    }
                     if (sosResponse.getApplyGzipCompression()) {
                         resp.setContentType(SosConstants.CONTENT_TYPE_ZIP);
                     }
@@ -294,7 +292,7 @@ public class SosService extends ConfiguratedHttpServlet {
     private boolean isHeaderAndValueSet(String headerIdentifier, String value) {
         return headerIdentifier != null && !headerIdentifier.equalsIgnoreCase("") && value != null;
     }
-    
+
     private boolean checkForClientGZipSupport(HttpServletRequest req) {
         Enumeration<?> headers = req.getHeaders(ACCEPT_ENCODING);
         while (headers.hasMoreElements()) {
@@ -312,24 +310,9 @@ public class SosService extends ConfiguratedHttpServlet {
     }
 
     /**
-     * Set Headers according to CORS to enable Cross-Domain JavaScript access.
-     * 
-     * @see <a href="http://www.w3.org/TR/cors/">http://www.w3.org/TR/cors/</a>
-     */
-    // 
-    /* TODO Add HTTP-PUT and -DELETE?
-     * TODO Should be moved to ConfiguredService.java after merging back GSOC Installer
-     */
-    private void setCorsHeaders(HttpServletResponse resp) {
-        resp.addHeader("Access-Control-Allow-Origin", "*");
-        resp.addHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-        resp.addHeader("Access-Control-Allow-Headers", "Content-Type");
-    }
-
-    /**
      * Get the implementation of {@link Binding} that is registered for the
      * given <code>urlPattern</code>.
-     * 
+     *
      * @param requestURI
      *            URL pattern from request URL
      * @return The implementation of {@link Binding} that is registered for the
@@ -340,14 +323,15 @@ public class SosService extends ConfiguratedHttpServlet {
     private Binding getBindingOperatorForRequestURI(String requestURI) throws OwsExceptionReport {
         Binding bindingOperator = null;
         for (String bindingOperatorKey : Configurator.getInstance().getBindingOperators().keySet()) {
+			// FIXME this will fail e.g. for domain.tld/soap/52n-sos-webapp/sos/kvp
             if (requestURI.contains(bindingOperatorKey)) {
                 bindingOperator = Configurator.getInstance().getBindingOperator(bindingOperatorKey);
                 break;
             }
         }
         if (bindingOperator == null) {
-            String exceptionText =
-                    "The requested servlet path with pattern '" + requestURI + "' is not supported by this SOS!";
+            String exceptionText = String.format(
+                    "The requested servlet path with pattern '%s' is not supported by this SOS!", requestURI);
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }

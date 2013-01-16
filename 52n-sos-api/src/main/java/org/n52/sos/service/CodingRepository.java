@@ -43,23 +43,23 @@ import org.slf4j.LoggerFactory;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class CodingRepository {
-    
+
     private static abstract class SimilarityComparator<T> implements Comparator<T> {
-        
+
         @Override
         public int compare(T o1, T o2) {
             int s1 = getSimilarity(o1);
             int s2 = getSimilarity(o2);
-            return (s1 == s2) ?  0 : (s1 ==  0) ? -1 : (s2 ==  0) ?  1 : (s1  <  0) 
+            return (s1 == s2) ?  0 : (s1 ==  0) ? -1 : (s2 ==  0) ?  1 : (s1  <  0)
                 ? ((s2 < 0) ? 0 : 1) : (s2 <  0) ? -1 : ((s1 < s2) ? -1 : 1);
         }
-        
+
         protected abstract int getSimilarity(T t);
     }
-    
+
     private static class DecoderComparator extends SimilarityComparator<IDecoder<?,?>> {
         private DecoderKey key;
-        
+
         DecoderComparator(DecoderKey key) {
             this.key = key;
         }
@@ -81,10 +81,10 @@ public class CodingRepository {
             return similarity;
         }
     }
-    
+
     private static class EncoderComparator extends SimilarityComparator<IEncoder<?,?>> {
         private EncoderKey key;
-        
+
         EncoderComparator(EncoderKey key) {
             this.key = key;
         }
@@ -223,7 +223,7 @@ public class CodingRepository {
             return -1;
         }
     }
-    
+
     private static final Logger log = LoggerFactory.getLogger(CodingRepository.class);
     private final Set<IDecoder<?, ?>> decoders;
     private final Set<IEncoder<?, ?>> encoders;
@@ -318,13 +318,13 @@ public class CodingRepository {
     private <F, T> IEncoder<F, T> getEncoderCompositeKey(CompositeEncoderKey key) {
         return processEncoderMatches(findEncodersForCompositeKey(key), key);
     }
-    
+
 
     @SuppressWarnings("unchecked")
     private static <T> T unsafeCast(Object o) {
         return (T) o;
     }
-    
+
     private Set<IEncoder<?, ?>> findEncodersForSingleKey(EncoderKey key) {
         Set<IEncoder<?, ?>> matches = encoderByKey.get(key);
         if (matches == null) {
@@ -339,7 +339,7 @@ public class CodingRepository {
         }
         return matches;
     }
-    
+
     private Set<IDecoder<?, ?>> findDecodersForSingleKey(DecoderKey key) {
         Set<IDecoder<?, ?>> matches = decoderByKey.get(key);
         if (matches == null) {
@@ -386,10 +386,10 @@ public class CodingRepository {
         }
         return matches;
     }
-    
+
     private static <F, T> IDecoder<F, T> processDecoderMatches(Set<IDecoder<?, ?>> matches, DecoderKey key) {
         if (matches == null || matches.isEmpty()) {
-            log.warn("No Decoder implementation for {}", key);
+            log.debug("No Decoder implementation for {}", key);
             return null;
         } else if (matches.size() > 1) {
             List<IDecoder<?, ?>> list = new ArrayList<IDecoder<?, ?>>(matches);
@@ -405,7 +405,7 @@ public class CodingRepository {
 
     private static <F, T> IEncoder<F, T> processEncoderMatches(Set<IEncoder<?, ?>> matches, EncoderKey key) {
         if (matches.isEmpty()) {
-            log.warn("No Encoder for {}", key);
+            log.debug("No Encoder for {}", key);
             return null;
         } else if (matches.size() > 1) {
             List<IEncoder<?, ?>> list = new ArrayList<IEncoder<?, ?>>(matches);
