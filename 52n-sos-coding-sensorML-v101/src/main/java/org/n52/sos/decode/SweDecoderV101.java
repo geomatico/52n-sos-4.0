@@ -29,23 +29,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.opengis.swe.x101.AbstractDataComponentType;
 import net.opengis.swe.x101.AbstractDataRecordDocument;
 import net.opengis.swe.x101.AbstractDataRecordType;
 import net.opengis.swe.x101.AnyScalarPropertyType;
+import net.opengis.swe.x101.BooleanDocument;
+import net.opengis.swe.x101.CategoryDocument;
+import net.opengis.swe.x101.TextDocument;
+import net.opengis.swe.x101.CategoryDocument.Category;
+import net.opengis.swe.x101.CountDocument;
 import net.opengis.swe.x101.CountDocument.Count;
+import net.opengis.swe.x101.CountRangeDocument;
 import net.opengis.swe.x101.CountRangeDocument.CountRange;
 import net.opengis.swe.x101.DataArrayDocument;
 import net.opengis.swe.x101.DataArrayType;
 import net.opengis.swe.x101.DataComponentPropertyType;
 import net.opengis.swe.x101.DataRecordPropertyType;
 import net.opengis.swe.x101.DataRecordType;
+import net.opengis.swe.x101.ObservablePropertyDocument;
 import net.opengis.swe.x101.ObservablePropertyDocument.ObservableProperty;
 import net.opengis.swe.x101.PositionType;
+import net.opengis.swe.x101.QuantityDocument;
 import net.opengis.swe.x101.QuantityDocument.Quantity;
+import net.opengis.swe.x101.QuantityRangeDocument;
 import net.opengis.swe.x101.QuantityRangeDocument.QuantityRange;
 import net.opengis.swe.x101.SimpleDataRecordType;
 import net.opengis.swe.x101.TextDocument.Text;
+import net.opengis.swe.x101.TimeDocument;
 import net.opengis.swe.x101.TimeDocument.Time;
+import net.opengis.swe.x101.TimeRangeDocument;
 import net.opengis.swe.x101.TimeRangeDocument.TimeRange;
 import net.opengis.swe.x101.VectorType.Coordinate;
 
@@ -120,16 +132,30 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
             return parseSweDataArray((DataArrayDocument) element);
         } else if (element instanceof DataArrayType) {
             return parseSweDataArrayType((DataArrayType) element);
+        } else if (element instanceof AbstractDataComponentType) {
+            return parseAbstractDataComponentType((AbstractDataComponentType)element);
+        } else if (element instanceof BooleanDocument) {
+            return parseBoolean(((BooleanDocument)element).getBoolean());
+        } else if (element instanceof CategoryDocument) {
+            return parseCategory(((CategoryDocument)element).getCategory());
+        } else if (element instanceof CountDocument) {
+            return parseCount(((CountDocument)element).getCount());
+        } else if (element instanceof CountRangeDocument) {
+            return parseCountRange(((CountRangeDocument)element).getCountRange());
+        } else if (element instanceof ObservablePropertyDocument) {
+            return parseObservableProperty(((ObservablePropertyDocument)element).getObservableProperty());
+        } else if (element instanceof QuantityDocument) {
+            return parseQuantity(((QuantityDocument)element).getQuantity());
+        } else if (element instanceof QuantityRangeDocument) {
+            return parseQuantityRange(((QuantityRangeDocument)element).getQuantityRange());
+        } else if (element instanceof TextDocument) {
+            return parseText(((TextDocument)element).getText());
+        } else if (element instanceof TimeDocument) {
+            return parseTime(((TimeDocument)element).getTime());
+        } else if (element instanceof TimeRangeDocument) {
+            return parseTimeRange(((TimeRangeDocument)element).getTimeRange());
         } else if (element instanceof DataComponentPropertyType[]) {
             return parseDataComponentPropertyArray((DataComponentPropertyType[]) element);
-        } else if (element instanceof Count) {
-            return parseCount((Count) element);
-        } else if (element instanceof Quantity) {
-            return parseQuantity((Quantity) element);
-        } else if (element instanceof Text) {
-            return parseText((Text) element);
-        } else if (element instanceof ObservableProperty) {
-            return parseObservableProperty((ObservableProperty) element);
         } else if (element instanceof PositionType) {
             return parsePosition((PositionType) element);
         } else if (element instanceof Coordinate[]) {
@@ -152,6 +178,31 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
             LOGGER.debug(exceptionText.toString());
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
         }
+    }
+    
+    private Object parseAbstractDataComponentType(AbstractDataComponentType abstractDataComponentType) throws OwsExceptionReport {
+        if (abstractDataComponentType instanceof net.opengis.swe.x101.BooleanDocument.Boolean) {
+            return parseBoolean((net.opengis.swe.x101.BooleanDocument.Boolean)abstractDataComponentType);
+        } else if (abstractDataComponentType instanceof Category) {
+            return parseCategory((Category)abstractDataComponentType);
+        } else if (abstractDataComponentType instanceof Count) {
+            return parseCount((Count)abstractDataComponentType);
+        } else if (abstractDataComponentType instanceof CountRange) {
+            return parseCountRange((CountRange)abstractDataComponentType);
+        } else if (abstractDataComponentType instanceof ObservableProperty) {
+            return parseObservableProperty((ObservableProperty)abstractDataComponentType);
+        } else if (abstractDataComponentType instanceof Quantity) {
+            return parseQuantity((Quantity)abstractDataComponentType);
+        } else if (abstractDataComponentType instanceof QuantityRange) {
+            return parseQuantityRange((QuantityRange)abstractDataComponentType);
+        } else if (abstractDataComponentType instanceof Text) {
+            return parseText((Text)abstractDataComponentType);
+        } else if (abstractDataComponentType instanceof Time) {
+            return parseTime((Time)abstractDataComponentType);
+        } else if (abstractDataComponentType instanceof TimeRange) {
+            return parseTimeRange((TimeRange)abstractDataComponentType);
+        }
+        return null;
     }
 
     private Object parseAbstractDataRecord(AbstractDataRecordType abstractDataRecord) throws OwsExceptionReport {
@@ -233,19 +284,19 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         return sosFields;
     }
 
-    private SosSweAbstractSimpleType<Boolean> parseBoolean(XmlObject xbBoolean) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<Boolean> parseBoolean(net.opengis.swe.x101.BooleanDocument.Boolean xbBoolean) throws OwsExceptionReport {
         String exceptionText = "The Boolean is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private SosSweAbstractSimpleType<String> parseCategory(XmlObject xbCategory) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<String> parseCategory(Category xbCategory) throws OwsExceptionReport {
         String exceptionText = "The Category is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
     }
 
-    private SosSweAbstractSimpleType<Integer> parseCount(XmlObject xbCount) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<Integer> parseCount(Count xbCount) throws OwsExceptionReport {
         String exceptionText = "The Count is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
