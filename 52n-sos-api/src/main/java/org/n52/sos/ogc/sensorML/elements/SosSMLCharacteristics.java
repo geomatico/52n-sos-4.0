@@ -24,7 +24,6 @@
 package org.n52.sos.ogc.sensorML.elements;
 
 import org.n52.sos.ogc.swe.AbstractDataRecord;
-import org.n52.sos.ogc.swe.SWEConstants.SweAggregateType;
 
 /**
  * SOS internal representation of SensorML characteristics

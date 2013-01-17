@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.n52.sos.ogc.gml.SosGmlMetaDataProperty;
 import org.n52.sos.ogc.swe.AbstractDataRecord;
-import org.n52.sos.ogc.swe.SWEConstants.SweAggregateType;
 
 /**
  * SOS internal representation of SensorML capabilities

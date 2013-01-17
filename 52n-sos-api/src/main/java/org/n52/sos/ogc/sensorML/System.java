@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.n52.sos.ogc.gml.EngineeringCRS;
 import org.n52.sos.ogc.sensorML.elements.SosSMLComponent;
-import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
 
 public class System extends AbstractComponent {
 

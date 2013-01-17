@@ -30,8 +30,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.n52.sos.ogc.sos.SosConstants;
-
 /**
  * Class represents a OperationMetadata. Used in SosCapabilities.
  * 

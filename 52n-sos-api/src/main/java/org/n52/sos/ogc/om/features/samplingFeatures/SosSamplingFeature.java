@@ -23,6 +23,9 @@
  */
 package org.n52.sos.ogc.om.features.samplingFeatures;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.n52.sos.ogc.OGCConstants;
@@ -31,10 +34,6 @@ import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 
 /**
  * Abstract super class for all sampling features

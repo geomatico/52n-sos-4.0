@@ -31,7 +31,6 @@ import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.XmlHelper;
 
 public class ResultTemplate {
 

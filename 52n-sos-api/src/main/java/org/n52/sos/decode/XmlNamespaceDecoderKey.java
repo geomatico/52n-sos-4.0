@@ -24,8 +24,6 @@
 package org.n52.sos.decode;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.encode.EncoderKey;
-import org.n52.sos.encode.XmlEncoderKey;
 import org.n52.sos.util.ClassHelper;
 
 /**

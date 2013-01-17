@@ -28,7 +28,7 @@ import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosResultEncoding;
 import org.n52.sos.ogc.sos.SosResultStructure;
-import org.n52.sos.util.SosHelper;
+import org.n52.sos.util.JavaHelper;
 
 
 public class InsertResultTemplateRequest extends AbstractServiceRequest {
@@ -69,7 +69,7 @@ public class InsertResultTemplateRequest extends AbstractServiceRequest {
             StringBuilder builder = new StringBuilder();
             builder.append(resultStructure.getXml());
             builder.append(new DateTime().getMillis());
-            identifier = SosHelper.generateID(builder.toString());
+            identifier = JavaHelper.generateID(builder.toString());
         }
         return identifier;
     }

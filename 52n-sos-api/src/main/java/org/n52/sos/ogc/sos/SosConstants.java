@@ -23,12 +23,8 @@
  */
 package org.n52.sos.ogc.sos;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 import org.n52.sos.exception.IExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,28 +55,6 @@ public final class SosConstants {
      * RegisterSensor and DescribeSensor
      */
     public static final String SYS_CAP_PARENT_PROCEDURES_NAME = "parentProcedures";
-
-    /**
-     * hexadecimal values
-     */
-    public static final char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
-            'E', 'F' };
-
-    /**
-     * Message digest for generating single identifier
-     */
-    public static MessageDigest MESSAGE_DIGEST;
-
-    /**
-     * Instantiation of the message digest
-     */
-    static {
-        try {
-            MESSAGE_DIGEST = MessageDigest.getInstance("SHA1");
-        } catch (NoSuchAlgorithmException nsae) {
-            LOGGER.error("Error while getting SHA-1 messagedigest!", nsae);
-        }
-    }
 
     /** Constant for prefixes of FOIs */
     public static final String FOI_PREFIX = "urn:ogc:def:object:feature:";
