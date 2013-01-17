@@ -61,6 +61,7 @@ import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
+import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
@@ -260,7 +261,8 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
                         SosHelper.getFirstLatestTemporalFilter(request.getTemporalFilters());
                 for (FirstLatest firstLatest : firstLatestTemporalFilter) {
                     HibernateQueryObject firstLatestQueryObject = queryObject.clone();
-                    firstLatestQueryObject.addCriterion(Restrictions.in(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION, observationConstallations));
+                    firstLatestQueryObject.addCriterion(Restrictions.in(
+                            HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION, observationConstallations));
                     firstLatestQueryObject.setOrder(HibernateCriteriaQueryUtilities.getOrderForEnum(firstLatest));
                     firstLatestQueryObject.setMaxResult(1);
                     List<Observation> observations =
@@ -290,17 +292,22 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
                 HibernateQueryObject clonedQueryObject = queryObject.clone();
                 clonedQueryObject.addCriterion(Restrictions.eq(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION,
                         observationConstellation));
-                List<Observation> observations = HibernateCriteriaQueryUtilities.getObservations(clonedQueryObject, session);
+                List<Observation> observations =
+                        HibernateCriteriaQueryUtilities.getObservations(clonedQueryObject, session);
                 if (observations != null && !observations.isEmpty()) {
                     sosObservations.addAll(HibernateObservationUtilities.createSosObservationsFromObservations(
                             observations, request.getVersion(), session));
-//                } else {
-//                 // TODO Hydro-Profile add empty observation metadata as
-//                    // SosObservation (add FOI)
-//                    List<String> featureOfInterestIdentifiers = HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForObservationConstellation(observationConstellation, session);
-//                    sosObservations.addAll(HibernateObservationUtilities.createSosObservationFromObservationConstellation(observationConstellation, featureOfInterestIdentifiers, request.getVersion(), session));
+                } else {
+                    // TODO Hydro-Profile add empty observation metadata as
+                    // SosObservation (add FOI)
+                    if (getConfigurator().getActiveProfile().isShowMetadataOfEmptyObservations()) {
+                        List<String> featureOfInterestIdentifiers =
+                                getAndCheckFeatureOfInterest(observationConstellation, featureIdentifier, session);
+                        sosObservations.addAll(HibernateObservationUtilities
+                                .createSosObservationFromObservationConstellation(observationConstellation,
+                                        featureOfInterestIdentifiers, request.getVersion(), session));
+                    }
                 }
-
             }
         }
         return sosObservations;
@@ -329,6 +336,19 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
             String exceptionText = "Error while getting min/max time for OwsMetadata!";
             LOGGER.error(exceptionText, dte);
             throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+        }
+    }
+
+    private List<String> getAndCheckFeatureOfInterest(ObservationConstellation observationConstellation,
+            Set<String> featureIdentifier, Session session) {
+        List<String> featureOfInterestIdentifiersForObservationConstellation =
+                HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForObservationConstellation(
+                        observationConstellation, session);
+        if (featureIdentifier == null) {
+            return featureOfInterestIdentifiersForObservationConstellation;
+        } else {
+            return JavaHelper.conjunctCollections(featureOfInterestIdentifiersForObservationConstellation,
+                    featureIdentifier);
         }
     }
 }

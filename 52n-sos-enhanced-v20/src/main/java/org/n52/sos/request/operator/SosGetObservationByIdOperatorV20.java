@@ -42,6 +42,7 @@ import org.n52.sos.request.GetObservationByIdRequest;
 import org.n52.sos.response.GetObservationByIdResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.SosHelper;
@@ -69,12 +70,13 @@ public class SosGetObservationByIdOperatorV20 extends AbstractV2RequestOperator<
     public ServiceResponse receive(GetObservationByIdRequest sosRequest) throws OwsExceptionReport {
         checkRequestedParameter(sosRequest);
         boolean zipCompression;
+        Profile activeProfile = Configurator.getInstance().getActiveProfile();
         if (sosRequest.getResponseFormat() == null || sosRequest.getResponseFormat().isEmpty()) {
-            sosRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
+            sosRequest.setResponseFormat(activeProfile.getObservationResponseFormat());
         } else {
             zipCompression = SosHelper.checkResponseFormatForZipCompression(sosRequest.getResponseFormat());
             if (zipCompression) {
-                sosRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
+                sosRequest.setResponseFormat(activeProfile.getObservationResponseFormat());
             }
         }
 

@@ -62,7 +62,6 @@ import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.response.InsertObservationResponse;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

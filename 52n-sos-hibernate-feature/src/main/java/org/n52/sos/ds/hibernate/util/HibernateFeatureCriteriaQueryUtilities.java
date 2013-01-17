@@ -24,13 +24,10 @@
 package org.n52.sos.ds.hibernate.util;
 
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
-import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.spatial.criterion.SpatialProjections;
 import org.hibernate.spatial.criterion.SpatialRestrictions;

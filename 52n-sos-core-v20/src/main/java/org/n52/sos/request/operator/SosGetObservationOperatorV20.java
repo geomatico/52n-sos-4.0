@@ -46,6 +46,7 @@ import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.SosHelper;
@@ -62,8 +63,11 @@ import org.slf4j.LoggerFactory;
 public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGetObservationDAO, GetObservationRequest> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SosGetObservationOperatorV20.class.getName());
+
     private static final String OPERATION_NAME = SosConstants.Operations.GetObservation.name();
-    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_CORE_PROFILE);
+
+    private static final Set<String> CONFORMANCE_CLASSES = Collections
+            .singleton(ConformanceClasses.SOS_V2_CORE_PROFILE);
 
     public SosGetObservationOperatorV20() {
         super(OPERATION_NAME, GetObservationRequest.class);
@@ -106,21 +110,31 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
             }
 
             GetObservationResponse response = getDao().getObservation(sosRequest);
+            // TODO check for correct merging
+            Profile activeProfile = Configurator.getInstance().getActiveProfile();
             if (responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2)) {
-                if (!isSubsettingExtensionSet(sosRequest.getExtensions())) {
+                if (!isSubsettingExtensionSet(sosRequest.getExtensions())
+                        || !activeProfile.isAllowSubsettingForSOS20OM20()) {
                     response.mergeObservationsWithSameAntiSubsettingIdentifier();
                 } else {
                     response.mergeObservationsWithSameX();
                 }
             }
+            if (activeProfile.isMergeValues()) {
+                response.mergeObservationsWithSameX();
+            }
 
             IEncoder<XmlObject, GetObservationResponse> encoder;
             try {
                 encoder = CodingHelper.getEncoder(namespace, response);
-            }catch (OwsExceptionReport e) {
-                String exceptionText = String.format("The value '%s' of the responseFormat parameter is not supported by this server!", responseFormat);
+            } catch (OwsExceptionReport e) {
+                String exceptionText =
+                        String.format(
+                                "The value '%s' of the responseFormat parameter is not supported by this server!",
+                                responseFormat);
                 LOGGER.error(exceptionText, e);
-                throw Util4Exceptions.createInvalidParameterValueException(SosConstants.GetObservationParams.responseFormat.name(), exceptionText);
+                throw Util4Exceptions.createInvalidParameterValueException(
+                        SosConstants.GetObservationParams.responseFormat.name(), exceptionText);
             }
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -184,17 +198,18 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
             if (sosRequest.isSetTemporalFilter()) {
                 SosHelper.checkTemporalFilter(sosRequest.getTemporalFilters(),
                         Sos2Constants.GetObservationParams.temporalFilter.name());
-//            } else {
-//                // TODO check this for pofile
-//                List<TemporalFilter> filters = new ArrayList<TemporalFilter>();
-//                TemporalFilter filter = new TemporalFilter();
-//                filter.setOperator(TimeOperator.TM_Equals);
-//                filter.setValueReference("phenomenonTime");
-//                TimeInstant timeInstant = new TimeInstant();
-//                timeInstant.setIndeterminateValue(SosConstants.FirstLatest.latest.name());
-//                filter.setTime(timeInstant);
-//                filters.add(filter);
-//                sosRequest.setTemporalFilters(filters);
+                // } else {
+                // // TODO check this for pofile
+                // List<TemporalFilter> filters = new
+                // ArrayList<TemporalFilter>();
+                // TemporalFilter filter = new TemporalFilter();
+                // filter.setOperator(TimeOperator.TM_Equals);
+                // filter.setValueReference("phenomenonTime");
+                // TimeInstant timeInstant = new TimeInstant();
+                // timeInstant.setIndeterminateValue(SosConstants.FirstLatest.latest.name());
+                // filter.setTime(timeInstant);
+                // filters.add(filter);
+                // sosRequest.setTemporalFilters(filters);
             }
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
@@ -303,21 +318,23 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
 
     private boolean checkResponseFormat(GetObservationRequest request) throws OwsExceptionReport {
         boolean zipCompression = false;
+        Profile activeProfile = Configurator.getInstance().getActiveProfile();
         if (request.getResponseFormat() == null) {
-            request.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
+            request.setResponseFormat(activeProfile.getObservationResponseFormat());
         } else if (request.getResponseFormat() != null && request.getResponseFormat().isEmpty()) {
             throw Util4Exceptions
                     .createMissingParameterValueException(SosConstants.GetObservationParams.responseFormat.name());
         } else {
             zipCompression = SosHelper.checkResponseFormatForZipCompression(request.getResponseFormat());
             if (zipCompression) {
-                request.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
+                request.setResponseFormat(activeProfile.getObservationResponseFormat());
             } else {
                 Collection<String> supportedResponseFormats =
                         SosHelper.getSupportedResponseFormats(request.getService(), request.getVersion());
                 if (!supportedResponseFormats.contains(request.getResponseFormat())) {
-                    String exceptionText = String.format("The requested responseFormat (%s) is not supported by this server!",
-                            request.getResponseFormat());
+                    String exceptionText =
+                            String.format("The requested responseFormat (%s) is not supported by this server!",
+                                    request.getResponseFormat());
                     LOGGER.debug(exceptionText);
                     throw Util4Exceptions.createInvalidParameterValueException(
                             SosConstants.GetObservationParams.responseFormat.name(), exceptionText);
@@ -328,6 +345,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
     }
 
     private boolean isSubsettingExtensionSet(SwesExtensions extensions) {
-        return extensions != null ? extensions.isBooleanExentsionSet(Sos2Constants.Extensions.Subsetting.name()) : false;
+        return extensions != null ? extensions.isBooleanExentsionSet(Sos2Constants.Extensions.Subsetting.name())
+                : false;
     }
 }

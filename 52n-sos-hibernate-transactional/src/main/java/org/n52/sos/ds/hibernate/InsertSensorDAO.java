@@ -56,7 +56,7 @@ import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SosFeatureRelationship;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.InsertSensorResponse;
-import org.n52.sos.util.SosHelper;
+import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,7 +172,7 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
                 }
             }
             return getConfigurator().getDefaultProcedurePrefix()
-                    + SosHelper.generateID(sensorML.getSensorDescriptionXmlString());
+                    + JavaHelper.generateID(sensorML.getSensorDescriptionXmlString());
         }
         // if procedureDescription not SensorML
         else {
@@ -181,7 +181,7 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
                 return request.getProcedureDescription().getProcedureIdentifier();
             } else {
                 return getConfigurator().getDefaultProcedurePrefix()
-                        + SosHelper.generateID(request.getProcedureDescription().toString());
+                        + JavaHelper.generateID(request.getProcedureDescription().toString());
             }
         }
     }

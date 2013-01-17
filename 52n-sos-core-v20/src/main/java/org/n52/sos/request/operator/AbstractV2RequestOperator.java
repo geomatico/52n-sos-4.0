@@ -24,18 +24,9 @@
 package org.n52.sos.request.operator;
 
 import org.n52.sos.ds.IOperationDAO;
-import org.n52.sos.ogc.ows.IExtension;
-import org.n52.sos.ogc.ows.OWSOperation;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.Configurator;
-import org.n52.sos.service.operator.ServiceOperatorKeyType;
-import org.n52.sos.util.Util4Exceptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @param <T> The IOperationDAO implementation class

@@ -23,11 +23,9 @@
  */
 package org.n52.sos.decode;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,7 +35,6 @@ import net.opengis.ogc.BinaryTemporalOpType;
 import net.opengis.ogc.PropertyNameDocument;
 import net.opengis.ogc.PropertyNameType;
 import net.opengis.ogc.SpatialOperatorType;
-import net.opengis.ogc.SpatialOperatorsType;
 import net.opengis.ogc.TemporalOperatorType;
 import net.opengis.ogc.impl.BBOXTypeImpl;
 
@@ -46,9 +43,9 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.filter.FilterConstants;
+import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
-import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
