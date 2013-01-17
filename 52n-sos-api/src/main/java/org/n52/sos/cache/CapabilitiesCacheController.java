@@ -78,17 +78,8 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 		schedule();
     }
 
-    /**
-     * queries the service offerings, the observedProperties for each offering,
-     * and the offering names from the DB and sets these values in this
-     * configurator
-     *
-     * @throws OwsExceptionReport
-     *             if the query of one of the values described upside failed
-     *
-     */
-	@Override
-    public boolean update(boolean checkLastUpdateTime) throws OwsExceptionReport {
+    @Override
+    public boolean updateCacheFromDB() throws OwsExceptionReport {
 		LOGGER.info("Capabilities Cache Update started");
         boolean timeNotElapsed = true;
         try {

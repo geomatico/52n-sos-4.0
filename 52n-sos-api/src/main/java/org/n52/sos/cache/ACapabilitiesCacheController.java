@@ -52,7 +52,7 @@ public abstract class ACapabilitiesCacheController {
 		@Override
 		public void run() {
 			try {
-				if (update(true)) {
+				if (updateCacheFromDB()) {
 					LOGGER.info("Timertask: capabilities cache update successful!");
 				} else {
 					LOGGER.warn("Timertask: capabilities cache update not successful!");
@@ -124,17 +124,11 @@ public abstract class ACapabilitiesCacheController {
     }
 
     /**
-     * queries the service offerings, the observedProperties for each offering,
-     * and the offering names from the DB and sets these values in this
-     * Configurator instance
-     *
-     * @param checkLastUpdateTime
-     *            Indicator, if some other methods should be started
      * @return true, if updated successfully
      * @throws OwsExceptionReport
      *             if the query of one of the values described upside failed
      */
-    public abstract boolean update(boolean checkLastUpdateTime) throws OwsExceptionReport;
+    public abstract boolean updateCacheFromDB() throws OwsExceptionReport;
 
     public abstract void updateAfterSensorInsertion() throws OwsExceptionReport;
 
