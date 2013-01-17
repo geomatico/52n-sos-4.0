@@ -59,7 +59,7 @@ public class CapabilitiesCache{
     private Collection<String> procedures;
 
     /** contains the feature IDs offered in the database */
-    private Collection<String> featuresOfInterest;
+    private Collection<String> featureOfInterestIdentifiers;
 
     /** contains the observation IDs offered in the database */
     private Collection<String> observationIdentifiers;
@@ -142,8 +142,8 @@ public class CapabilitiesCache{
 	private Map<String, DateTime> kOfferingVMinTime;
 	private Map<String, DateTime> kOfferingVMaxTime;
 	private Envelope envelopeForFeatureOfInterest;
-	private DateTime minEventTime;
-	private DateTime maxEventTime;
+	private DateTime minPhenomenonTime;
+	private DateTime maxPhenomenonTime;
 
     /**
      * constructor
@@ -352,19 +352,19 @@ public class CapabilitiesCache{
      *            the offering for which the procedures should be returned
      * @return String[] containing the procedures for the requested offering
      */
-    protected Collection<String> getProcedures4Offering(String offering) {
+    protected Collection<String> getProcedureIdentifierFor(String offering) {
         return this.KOfferingVProcedures.get(offering);
     }
 
     /**
-     * returns the procedureID for the feature of interest (station)
+     * returns the procedureIdentifers for the feature of interest (station, for example)
      * 
-     * @param foiID
-     *            the foiID for which the procedureID should returned
-     * @return String representing the procedureID
+     * @param foiIdentifier
+     *            the foiIdentifier for which the procedureIdentifers should returned
+     * @return Collection<String> representing the procedureIdentifers
      */
-    protected Collection<String> getProc4FOI(String foiID) {
-        return this.kFeatureOfInterestVProcedures.get(foiID);
+    protected Collection<String> getProcedureIdentifiersFor(String foiIdentifier) {
+        return this.kFeatureOfInterestVProcedures.get(foiIdentifier);
     }
 
     /**
@@ -393,11 +393,11 @@ public class CapabilitiesCache{
      * @return Returns only FOIs which are sampling features
      */
     protected Collection<String> getFeatureOfInterest() {
-        return featuresOfInterest;
+        return featureOfInterestIdentifiers;
     }
 
     public void setFeatureOfInterest(Collection<String> featuresOfInterest) {
-        this.featuresOfInterest = featuresOfInterest;
+        this.featureOfInterestIdentifiers = featuresOfInterest;
     }
 
     /**
@@ -579,7 +579,7 @@ public class CapabilitiesCache{
      * @param fois
      */
     public void setAllFeatureOfInterests(Collection<String> featuresOfInterest) {
-        this.featuresOfInterest = featuresOfInterest;
+        this.featureOfInterestIdentifiers = featuresOfInterest;
     }
 
     /**
@@ -735,8 +735,8 @@ public class CapabilitiesCache{
         features.add(foiID);
 
         // if foi id is NOT contained add foi
-        if (!this.featuresOfInterest.contains(foiID)) {
-            this.featuresOfInterest.add(foiID);
+        if (!this.featureOfInterestIdentifiers.contains(foiID)) {
+            this.featureOfInterestIdentifiers.add(foiID);
         }
 
         // get offerings for phenomenon of observation
@@ -1044,19 +1044,19 @@ public class CapabilitiesCache{
 	}
 
 	public DateTime getMinEventTime() {
-		return this.minEventTime;
+		return this.minPhenomenonTime;
 	}
 	
 	public void setMinEventTime(DateTime minEventTime) {
-		this.minEventTime = minEventTime;
+		this.minPhenomenonTime = minEventTime;
 	}
 	
 	public DateTime getMaxEventTime() {
-		return this.maxEventTime;
+		return this.maxPhenomenonTime;
 	}
 	
 	public void setMaxEventTime(DateTime maxEventTime) {
-		this.maxEventTime = maxEventTime;
+		this.maxPhenomenonTime = maxEventTime;
 	}
 
 	@Override
@@ -1070,7 +1070,7 @@ public class CapabilitiesCache{
 		result = prime * result + ((childProcs == null) ? 0 : childProcs.hashCode());
 		result = prime * result + ((envelopeForFeatureOfInterest == null) ? 0 : envelopeForFeatureOfInterest.hashCode());
 		result = prime * result + ((featureOfInterestTypes == null) ? 0 : featureOfInterestTypes.hashCode());
-		result = prime * result + ((featuresOfInterest == null) ? 0 : featuresOfInterest.hashCode());
+		result = prime * result + ((featureOfInterestIdentifiers == null) ? 0 : featureOfInterestIdentifiers.hashCode());
 		result = prime * result + ((kFeatureOfInterestVProcedures == null) ? 0 : kFeatureOfInterestVProcedures.hashCode());
 		result = prime * result + ((kObservablePropertiesVProcedures == null) ? 0 : kObservablePropertiesVProcedures.hashCode());
 		result = prime * result + ((kObservablePropertyVOfferings == null) ? 0 : kObservablePropertyVOfferings.hashCode());
@@ -1085,8 +1085,8 @@ public class CapabilitiesCache{
 		result = prime * result + ((kProcedureVObservableProperties == null) ? 0 : kProcedureVObservableProperties.hashCode());
 		result = prime * result + ((kProcedureVOfferings == null) ? 0 : kProcedureVOfferings.hashCode());
 		result = prime * result + ((kRelatedFeatureVRole == null) ? 0 : kRelatedFeatureVRole.hashCode());
-		result = prime * result + ((maxEventTime == null) ? 0 : maxEventTime.hashCode());
-		result = prime * result + ((minEventTime == null) ? 0 : minEventTime.hashCode());
+		result = prime * result + ((maxPhenomenonTime == null) ? 0 : maxPhenomenonTime.hashCode());
+		result = prime * result + ((minPhenomenonTime == null) ? 0 : minPhenomenonTime.hashCode());
 		result = prime * result + ((observationIdentifiers == null) ? 0 : observationIdentifiers.hashCode());
 		result = prime * result + ((observationTypes == null) ? 0 : observationTypes.hashCode());
 		result = prime * result + ((offName == null) ? 0 : offName.hashCode());
@@ -1141,10 +1141,10 @@ public class CapabilitiesCache{
 				return false;
 		} else if (!featureOfInterestTypes.equals(other.featureOfInterestTypes))
 			return false;
-		if (featuresOfInterest == null) {
-			if (other.featuresOfInterest != null)
+		if (featureOfInterestIdentifiers == null) {
+			if (other.featureOfInterestIdentifiers != null)
 				return false;
-		} else if (!featuresOfInterest.equals(other.featuresOfInterest))
+		} else if (!featureOfInterestIdentifiers.equals(other.featureOfInterestIdentifiers))
 			return false;
 		if (kFeatureOfInterestVProcedures == null) {
 			if (other.kFeatureOfInterestVProcedures != null)
@@ -1216,15 +1216,15 @@ public class CapabilitiesCache{
 				return false;
 		} else if (!kRelatedFeatureVRole.equals(other.kRelatedFeatureVRole))
 			return false;
-		if (maxEventTime == null) {
-			if (other.maxEventTime != null)
+		if (maxPhenomenonTime == null) {
+			if (other.maxPhenomenonTime != null)
 				return false;
-		} else if (!maxEventTime.equals(other.maxEventTime))
+		} else if (!maxPhenomenonTime.equals(other.maxPhenomenonTime))
 			return false;
-		if (minEventTime == null) {
-			if (other.minEventTime != null)
+		if (minPhenomenonTime == null) {
+			if (other.minPhenomenonTime != null)
 				return false;
-		} else if (!minEventTime.equals(other.minEventTime))
+		} else if (!minPhenomenonTime.equals(other.minPhenomenonTime))
 			return false;
 		if (observationIdentifiers == null) {
 			if (other.observationIdentifiers != null)
@@ -1280,7 +1280,4 @@ public class CapabilitiesCache{
 			return false;
 		return true;
 	}
-
-	
-
 }

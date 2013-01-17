@@ -33,10 +33,16 @@ import java.util.concurrent.TimeUnit;
 
 import org.joda.time.DateTime;
 import org.n52.sos.ds.ICacheFeederDAO;
+import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.TimeInstant;
+import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
+import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +57,10 @@ import com.vividsolutions.jts.geom.Envelope;
 public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CapabilitiesCacheController.class);
+    
+    private enum Case{
+    	OBSERVATION_INSERTION,SENSOR_INSERTION,RESULT_TEMPLATE_INSERTION,SENSOR_DELETION,OBSERVATION_DELETION
+    }
 
     /**
      * CapabilitiesCache instance
@@ -113,161 +123,240 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         return true;
     }
 
-    @Override
-    public void updateAfterSensorInsertion() throws OwsExceptionReport {
+    private void update(Case c) throws OwsExceptionReport
+	{
+		boolean timeNotElapsed = true;
+	    try {
+	        // thread safe updating of the cache map
+	        timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
+	
+	        // has waiting for lock got a time out?
+	        if (!timeNotElapsed) {
+	            LOGGER.warn("\n******\nupdate after {} not successful because of time out while waiting for update lock." + 
+	            					"\nWaited {} milliseconds.\n******\n",c,SosConstants.UPDATE_TIMEOUT);
+	            return;
+	        }
+	        while (!isUpdateIsFree()) {
+	            getUpdateFree().await();
+	        }
+	        setUpdateIsFree(false);
+	        switch (c) {
+			case OBSERVATION_DELETION:
+				cacheFeederDAO.updateAfterObservationDeletion(capabilitiesCache);
+				break;
+			case SENSOR_DELETION:
+				cacheFeederDAO.updateAfterSensorDeletion(capabilitiesCache);
+				break;
+			case OBSERVATION_INSERTION:
+				cacheFeederDAO.updateAfterObservationInsertion(capabilitiesCache);
+				break;
+			case RESULT_TEMPLATE_INSERTION:
+				cacheFeederDAO.updateAfterResultTemplateInsertion(capabilitiesCache);
+				break;
+			case SENSOR_INSERTION:
+				cacheFeederDAO.updateAfterSensorInsertion(capabilitiesCache);
+				break;
+			}
+	
+	    } catch (InterruptedException e) {
+	        LOGGER.error("Problem while threadsafe capabilities cache update", e);
+	    } finally {
+	        if (timeNotElapsed) {
+	            getUpdateLock().unlock();
+	            setUpdateIsFree(true);
+	        }
+	    }
+	}
+
+	@Override
+	public void updateAfterObservationDeletion() throws OwsExceptionReport
+	{
+	    update(Case.OBSERVATION_DELETION);
+	}
+
+	@Override
+	public void updateAfterObservationInsertion() throws OwsExceptionReport {
+	    update(Case.OBSERVATION_INSERTION);
+	}
+
+	@Override
+	public void updateAfterResultTemplateInsertion() throws OwsExceptionReport {
+	    update(Case.RESULT_TEMPLATE_INSERTION);
+	}
+
+	@Override
+	public void updateAfterSensorDeletion() throws OwsExceptionReport {
+	    update(Case.SENSOR_DELETION);
+	}
+
+	@Override
+	public void updateAfterSensorInsertion() throws OwsExceptionReport {
+		update(Case.SENSOR_INSERTION);
+	}
+
+	/**
+     * WORK IN PROGRESS: Please do not use
+     * @deprecated not really, but this will cause eclipse to draw the attention of the developer to this comment 
+     */
+    public void updateAfterObservationInsertion(InsertObservationRequest sosRequest) throws OwsExceptionReport
+    {
         boolean timeNotElapsed = true;
-        try {
+        try
+        {
             // thread safe updating of the cache map
             timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
 
             // has waiting for lock got a time out?
-            if (!timeNotElapsed) {
-                LOGGER.warn("\n******\nupdateAfterSensorInsertion() not successful "
-                        + "because of time out while waiting for update lock." + "\nWaited "
-                        + SosConstants.UPDATE_TIMEOUT + " milliseconds.\n******\n");
-                return;
-            }
-            while (!isUpdateIsFree()) {
-
-                getUpdateFree().await();
-            }
-            setUpdateIsFree(false);
-            this.cacheFeederDAO.updateAfterSensorInsertion(capabilitiesCache);
-
-        } catch (InterruptedException e) {
-            LOGGER.error("Problem while threadsafe capabilities cache update", e);
-        } finally {
-            if (timeNotElapsed) {
-                getUpdateLock().unlock();
-                setUpdateIsFree(true);
-            }
-        }
-    }
-
-    @Override
-    public void updateAfterSensorDeletion() throws OwsExceptionReport {
-        boolean timeNotElapsed = true;
-        try {
-            // thread safe updating of the cache map
-            timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-            // has waiting for lock got a time out?
-            if (!timeNotElapsed) {
-                LOGGER.warn("\n******\nupdateAfterSensorDeletion() not successful "
-                        + "because of time out while waiting for update lock." + "\nWaited "
-                        + SosConstants.UPDATE_TIMEOUT + " milliseconds.\n******\n");
-                return;
-            }
-            while (!isUpdateIsFree()) {
-
-                getUpdateFree().await();
-            }
-            setUpdateIsFree(false);
-            this.cacheFeederDAO.updateAfterSensorDeletion(capabilitiesCache);
-
-        } catch (InterruptedException e) {
-            LOGGER.error("Problem while threadsafe capabilities cache update", e);
-        } finally {
-            if (timeNotElapsed) {
-                getUpdateLock().unlock();
-                setUpdateIsFree(true);
-            }
-        }
-
-    }
-
-    @Override
-    public void updateAfterObservationInsertion() throws OwsExceptionReport {
-        boolean timeNotElapsed = true;
-        try {
-            // thread safe updating of the cache map
-            timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-            // has waiting for lock got a time out?
-            if (!timeNotElapsed) {
+            if (!timeNotElapsed)
+            {
                 LOGGER.warn("\n******\nupdateAfterObservationInsertion() not successful "
                         + "because of time out while waiting for update lock." + "\nWaited "
                         + SosConstants.UPDATE_TIMEOUT + " milliseconds.\n******\n");
                 return;
             }
-            while (!isUpdateIsFree()) {
-
+            while (!isUpdateIsFree())
+            {
                 getUpdateFree().await();
             }
             setUpdateIsFree(false);
-            this.cacheFeederDAO.updateAfterObservationInsertion(capabilitiesCache);
-
-        } catch (InterruptedException e) {
+            // update cache maps
+            for (SosObservation sosObservation : sosRequest.getObservations())
+            {
+            	String procedureIdentifier = sosObservation.getObservationConstellation().getProcedure().getProcedureIdentifier();
+        		
+            	// update features
+            	SosAbstractFeature sosFeatureOfInterest = sosObservation.getObservationConstellation().getFeatureOfInterest();
+            	if (sosFeatureOfInterest instanceof SosSamplingFeature)
+            	{
+                	// add feature
+                	Collection<String> featureIdentifiers = capabilitiesCache.getFeatureOfInterest();
+                	String featureIdentifier = sosFeatureOfInterest.getIdentifier().getValue();
+                	if (!featureIdentifiers.contains(featureIdentifier))
+                	{
+                		featureIdentifiers.add(featureIdentifier);
+                	}
+            		// add foi-sensor-relation
+            		Collection<String> procedures4Feature = capabilitiesCache.getProcedureIdentifierFor(sosFeatureOfInterest.getIdentifier().getValue());
+            		if (!procedures4Feature.contains(procedureIdentifier));
+            		{
+            			procedures4Feature.add(procedureIdentifier);
+            		}
+            		// add foi-foi relations
+            		// sampledFeatures are parentFeatures
+        			// parent features aus dem aktuellen Observation-Kontext
+            		List<SosAbstractFeature> parentFeatures = ((SosSamplingFeature)sosFeatureOfInterest).getSampledFeatures();
+            		if (!parentFeatures.isEmpty())
+            		{
+            			// TODO update child features
+            			capabilitiesCache.getChildFeatures();
+            			// TODO update parent features
+            			Map<String, Collection<String>> parentFeaturesForFeatures = capabilitiesCache.getParentFeatures();
+            			Collection<String> parentFeaturesFromCache;
+            			if (parentFeaturesForFeatures.keySet().contains(featureIdentifier))
+            			{
+            				parentFeaturesFromCache = parentFeaturesForFeatures.get(featureIdentifier);
+            			}
+            			else
+            			{
+            				
+            			}
+            			// add or update parent features list
+        				
+            			// FIXME continue here
+            		}
+            		// update feature envelope
+            		Envelope featuresEnvelope = capabilitiesCache.getEnvelopeForFeatureOfInterest();
+            		Envelope featureEnvelope = ((SosSamplingFeature)sosFeatureOfInterest).getGeometry().getEnvelopeInternal();
+            		if (!featuresEnvelope.contains( featureEnvelope ))
+            		{
+            			// extend envelope
+            			featuresEnvelope.expandToInclude(featureEnvelope);
+            		}
+            	}
+            	else 
+            	{
+            		String errorMessage = String.format("Feature Type \"%s\" not supported.", sosFeatureOfInterest!=null?sosFeatureOfInterest.getClass().getName():sosFeatureOfInterest);
+            		LOGGER.error(errorMessage);
+            		throw new RuntimeException(errorMessage);
+            	}
+            	updateGlobalTemporalBBoxUsingNew(sosObservation);
+                
+            	// update offerings
+            	for (String offeringIdentifier : sosRequest.getOfferings()) {
+					// offering-procedures
+            		Collection<String> procedures4Offering = capabilitiesCache.getProcedureIdentifierFor(offeringIdentifier);
+            		if (!procedures4Offering.contains(procedureIdentifier))
+            		{
+            			procedures4Offering.add(procedureIdentifier);
+            		}
+            		// offering-observableProperties
+            		Collection<String> observableProperties4Offering = capabilitiesCache.getObservableProperties4Offering(offeringIdentifier);
+            		String observableProperty = sosObservation.getObservationConstellation().getObservableProperty().getIdentifier();
+            		if (!observableProperties4Offering.contains(observableProperty))
+            		{
+            			observableProperties4Offering.add(observableProperty);
+            		}
+            		// TODO offering-relatedFeatures
+            		// TODO offering-observationTypes
+            		Map<String, Collection<String>> observationTypes4Offerings = capabilitiesCache.getKOfferingVObservationTypes();
+            		Collection<String> observationTypesForOffering = observationTypes4Offerings.get(offeringIdentifier);
+            		if (observationTypesForOffering == null)
+            		{
+            			// add new list
+            		}
+            		else
+            		{
+            			// update current list
+            		}
+            		// TODO offering-maxtime
+            		// TODO offering-mintime
+            		// TODO offering-envelope
+            		// TODO offering-feature
+            		// FIXME continue
+            	}
+            	
+			}
+            
+            
+        } catch (InterruptedException e)
+        {
             LOGGER.error("Problem while threadsafe capabilities cache update", e);
-        } finally {
-            if (timeNotElapsed) {
+        } 
+        finally
+        {
+            if (timeNotElapsed)
+            {
                 getUpdateLock().unlock();
                 setUpdateIsFree(true);
             }
         }
     }
 
-    @Override
-    public void updateAfterObservationDeletion() throws OwsExceptionReport
-    {
-        boolean timeNotElapsed = true;
-        try {
-            // thread safe updating of the cache map
-            timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-            // has waiting for lock got a time out?
-            if (!timeNotElapsed) {
-                LOGGER.warn("\n******\nupdateAfterObservationDeletion() not successful "
-                        + "because of time out while waiting for update lock." + "\nWaited "
-                        + SosConstants.UPDATE_TIMEOUT + " milliseconds.\n******\n");
-                return;
-            }
-            while (!isUpdateIsFree()) {
-                getUpdateFree().await();
-            }
-            setUpdateIsFree(false);
-            this.cacheFeederDAO.updateAfterObservationDeletion(capabilitiesCache);
-
-        } catch (InterruptedException e) {
-            LOGGER.error("Problem while threadsafe capabilities cache update", e);
-        } finally {
-            if (timeNotElapsed) {
-                getUpdateLock().unlock();
-                setUpdateIsFree(true);
-            }
-        }
-    }
-
-    @Override
-    public void updateAfterResultTemplateInsertion() throws OwsExceptionReport {
-        boolean timeNotElapsed = true;
-        try {
-            // thread safe updating of the cache map
-            timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-            // has waiting for lock got a time out?
-            if (!timeNotElapsed) {
-                LOGGER.warn("\n******\nupdateAfterResultTemplateInsertion() not successful "
-                        + "because of time out while waiting for update lock." + "\nWaited "
-                        + SosConstants.UPDATE_TIMEOUT + " milliseconds.\n******\n");
-                return;
-            }
-            while (!isUpdateIsFree()) {
-                getUpdateFree().await();
-            }
-            setUpdateIsFree(false);
-            this.cacheFeederDAO.updateAfterResultTemplateInsertion(capabilitiesCache);
-
-        } catch (InterruptedException e) {
-            LOGGER.error("Problem while threadsafe capabilities cache update", e);
-        } finally {
-            if (timeNotElapsed) {
-                getUpdateLock().unlock();
-                setUpdateIsFree(true);
-            }
-        }
-    }
-
+	private void updateGlobalTemporalBBoxUsingNew(SosObservation sosObservation)
+	{
+		ITime phenomenonTime = sosObservation.getPhenomenonTime();
+		DateTime startTime = null;
+		DateTime endTime = null;
+		if (phenomenonTime instanceof TimeInstant)
+		{
+			startTime = endTime = ((TimeInstant) phenomenonTime).getValue();
+		}
+		else
+		{
+			TimePeriod timePeriod = (TimePeriod) phenomenonTime;
+			startTime = timePeriod.getStart();
+			endTime = timePeriod.getEnd();
+		}
+		if (capabilitiesCache.getMinEventTime().isAfter(startTime))
+		{
+			capabilitiesCache.setMinEventTime(startTime);
+		}
+		if (capabilitiesCache.getMaxEventTime().isBefore(endTime))
+		{
+			capabilitiesCache.setMaxEventTime(endTime);
+		}
+	}
+    
     /**
      * FIXME Update or remove, the method is doing nothing but wait
      * method for refreshing the metadata of fois in the capabilities cache; is
@@ -405,7 +494,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     }
 
     /**
-     * FIXME Update or remove, the method is doing nothing but wait
      * Returns the observedProperties (phenomenons) for the requested offering
      *
      * @param offering
@@ -849,8 +937,8 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      */
     @Override
     public Collection<String> getProcedures4FeatureOfInterest(String foiID) {
-        if (this.capabilitiesCache.getProc4FOI(foiID) != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getProc4FOI(foiID));
+        if (this.capabilitiesCache.getProcedureIdentifierFor(foiID) != null) {
+            return new ArrayList<String>(this.capabilitiesCache.getProcedureIdentifierFor(foiID));
         }
         return new ArrayList<String>(0);
     }
