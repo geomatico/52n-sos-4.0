@@ -152,7 +152,7 @@ public class AdminDatabaseController extends AbstractAdminController {
     public void removeTestData() throws SQLException, OwsExceptionReport, FileNotFoundException {
         log.info("Removing test data set.");
         executeSqlFile(ControllerConstants.REMOVE_TEST_DATA_SQL_FILE);
-        Configurator.getInstance().getCapabilitiesCacheController().update(false);
+        Configurator.getInstance().getCapabilitiesCacheController().updateCacheFromDB();
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -160,6 +160,6 @@ public class AdminDatabaseController extends AbstractAdminController {
     public void createTestData() throws SQLException, OwsExceptionReport, FileNotFoundException {
         log.info("Inserting test data set.");
         executeSqlFile(ControllerConstants.INSERT_TEST_DATA_SQL_FILE);
-        Configurator.getInstance().getCapabilitiesCacheController().update(false);
+        Configurator.getInstance().getCapabilitiesCacheController().updateCacheFromDB();
     }
 }
