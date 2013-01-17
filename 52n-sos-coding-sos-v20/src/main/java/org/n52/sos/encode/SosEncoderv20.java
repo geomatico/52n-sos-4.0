@@ -24,6 +24,8 @@
 package org.n52.sos.encode;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,8 +116,12 @@ import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.service.profile.Profile;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.OMHelper;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3CConstants;
 import org.n52.sos.util.XmlHelper;
@@ -124,11 +130,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
-import java.util.Collections;
-import java.util.EnumMap;
-import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.CollectionHelper;
-import org.n52.sos.util.StringHelper;
 
 public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommunicationObject> {
 
@@ -311,6 +312,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                         .getXmlOptions());
         GetFeatureOfInterestResponseType xbGetFoiResponse = xbGetFoiResponseDoc.addNewGetFeatureOfInterestResponse();
         SosAbstractFeature sosAbstractFeature = response.getAbstractFeature();
+        Profile activeProfile = Configurator.getInstance().getActiveProfile();
         if (sosAbstractFeature instanceof SosFeatureCollection) {
             Map<String, SosAbstractFeature> sosFeatColMap = ((SosFeatureCollection) sosAbstractFeature).getMembers();
             for (String sosFeatID : sosFeatColMap.keySet()) {
@@ -329,9 +331,14 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                         featureProperty.setTitle(sampFeat.getFirstName().getValue());
                     }
                 } else {
-                    // TODO HYDRO-PROFILE check for profile
+                    String namespace = null;
+                    if (activeProfile.isSetEncodeFeatureOfInterestNamespace()) {
+                        namespace = activeProfile.getEncodingNamespaceForFeatureOfInterest();
+                    } else {
+                        namespace = OMHelper.getNamespaceForFeatureType(sampFeat.getFeatureType());
+                    }
                     try {
-                        featureProperty.set(CodingHelper.encodeObjectToXml(OMHelper.getNamespaceForFeatureType(sampFeat.getFeatureType()), sampFeat));
+                        featureProperty.set(CodingHelper.encodeObjectToXml(namespace, sampFeat));
                     } catch (OwsExceptionReport e) {
                         if (sampFeat.getXmlDescription() != null) {
                             try {

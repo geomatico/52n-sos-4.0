@@ -25,6 +25,8 @@ package org.n52.sos.encode;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,7 +97,10 @@ import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
+import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -103,11 +108,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
-import java.util.Collections;
-import java.util.EnumMap;
-import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.CollectionHelper;
-import org.n52.sos.util.StringHelper;
 
 public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommunicationObject> {
 

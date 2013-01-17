@@ -35,6 +35,7 @@ import java.util.Set;
 
 import net.opengis.gml.x32.FeaturePropertyType;
 import net.opengis.om.x20.OMObservationType;
+import net.opengis.om.x20.OMProcessPropertyType;
 import net.opengis.om.x20.TimeObjectPropertyType;
 
 import org.apache.xmlbeans.XmlBoolean;
@@ -66,10 +67,12 @@ import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
+import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.GmlHelper;
@@ -224,8 +227,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
         addResultTime(xbObs, sosObservation);
 
         // set procedure
-        xbObs.addNewProcedure().setHref(
-                sosObservation.getObservationConstellation().getProcedure().getProcedureIdentifier());
+        addProcedure(xbObs.addNewProcedure(), sosObservation.getObservationConstellation().getProcedure(), observationID);
         // set observedProperty (phenomenon)
         List<SosObservableProperty> phenComponents = null;
         if (sosObservation.getObservationConstellation().getObservableProperty() instanceof SosObservableProperty) {
@@ -483,7 +485,21 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
     // "swe:DataArrayPropertyType");
     // cursor.dispose();
     // }
-
+    
+    private void addProcedure(OMProcessPropertyType procedure, SosProcedureDescription procedureDescription,
+            String observationID) throws OwsExceptionReport {
+        if (Configurator.getInstance().getActiveProfile().isEncodeProcedureInObservation(OMConstants.NS_OM_2)) {
+            XmlObject encodeProcedure = CodingHelper.encodeObjectToXml(procedureDescription.getDescriptionFormat(), procedureDescription);
+            if (encodeProcedure != null) {
+                procedure.set(encodeProcedure);
+            } else {
+                procedure.setHref(procedureDescription.getProcedureIdentifier());   
+            }
+        } else {
+            procedure.setHref(procedureDescription.getProcedureIdentifier());
+        }
+    }
+        
     private void addPhenomenonTime(TimeObjectPropertyType timeObjectPropertyType, ITime iTime)
             throws OwsExceptionReport {
         IEncoder<?, ITime> encoder =
@@ -1045,7 +1061,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
     /**
      * Encodes a SosAbstractFeature to an SpatialSamplingFeature under
      * consideration of duplicated SpatialSamplingFeature in the XML document.
-     *
+     * 
      * @param observation
      *            XmlObject O&M observation
      * @param absObs
@@ -1062,7 +1078,8 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
         // Sos2Constants.SERVICEVERSION));
         SosSamplingFeature samplingFeature = (SosSamplingFeature) feature;
         FeaturePropertyType featureProperty = observation.addNewFeatureOfInterest();
-        if (!Configurator.getInstance().isFoiEncodedInObservation() || !(feature instanceof SosSamplingFeature)) {
+        Profile activeProfile = Configurator.getInstance().getActiveProfile();
+        if (!activeProfile.isEncodeFeatureOfInterestInObservations() || !(feature instanceof SosSamplingFeature)) {
             // if (urlPattern != null) {
             // featureProperty.setHref(SosHelper.createFoiGetUrl(feature.getIdentifier(),
             // Sos2Constants.SERVICEVERSION,
@@ -1077,11 +1094,14 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
             if (samplingFeature.getUrl() != null) {
                 featureProperty.setHref(samplingFeature.getUrl());
             } else {
-                XmlObject encodedXmlObject =
-                        CodingHelper
-                                .encodeObjectToXml(
-                                        OMHelper.getNamespaceForFeatureType(samplingFeature.getFeatureType()),
-                                        samplingFeature);
+                String namespace = null;
+                if (activeProfile.isSetEncodeFeatureOfInterestNamespace()) {
+                    namespace = activeProfile.getEncodingNamespaceForFeatureOfInterest();
+                } else {
+                    namespace = OMHelper.getNamespaceForFeatureType(samplingFeature.getFeatureType());
+                }
+                XmlObject encodedXmlObject = CodingHelper.encodeObjectToXml(namespace, samplingFeature);
+
                 if (encodedXmlObject != null) {
                     featureProperty.set(encodedXmlObject);
                 } else {

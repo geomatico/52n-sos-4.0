@@ -23,7 +23,6 @@
  */
 package org.n52.sos.encode;
 
-import com.vividsolutions.jts.geom.Geometry;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
@@ -32,13 +31,16 @@ import java.util.Set;
 
 import net.opengis.gml.FeaturePropertyType;
 import net.opengis.gml.LocationPropertyType;
-import net.opengis.sampling.x10.*;
+import net.opengis.sampling.x10.SamplingFeatureCollectionDocument;
+import net.opengis.sampling.x10.SamplingFeatureCollectionType;
+import net.opengis.sampling.x10.SamplingFeatureDocument;
+import net.opengis.sampling.x10.SamplingFeaturePropertyType;
+import net.opengis.sampling.x10.SamplingFeatureType;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
 import org.n52.sos.ogc.OGCConstants;
-import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
@@ -52,6 +54,7 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -59,6 +62,8 @@ import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 public class SamplingEncoderv100 implements IEncoder<XmlObject, SosAbstractFeature> {
 
@@ -139,7 +144,7 @@ public class SamplingEncoderv100 implements IEncoder<XmlObject, SosAbstractFeatu
             }
             StringBuilder builder = new StringBuilder();
             builder.append("foi_");
-            builder.append(SosHelper.generateID(absFeature.getIdentifier().getValue()));
+            builder.append(JavaHelper.generateID(absFeature.getIdentifier().getValue()));
             absFeature.setGmlId(builder.toString());
 
             SamplingFeatureDocument xbSampFeatDoc =

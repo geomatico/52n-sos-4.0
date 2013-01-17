@@ -23,7 +23,6 @@
  */
 package org.n52.sos.encode;
 
-import com.vividsolutions.jts.geom.Geometry;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
@@ -56,6 +55,7 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -63,6 +63,8 @@ import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeature> {
 
@@ -145,7 +147,7 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
             }
             StringBuilder builder = new StringBuilder();
             builder.append("foi_");
-            builder.append(SosHelper.generateID(absFeature.getIdentifier().getValue()));
+            builder.append(JavaHelper.generateID(absFeature.getIdentifier().getValue()));
             absFeature.setGmlId(builder.toString());
 
             SFSpatialSamplingFeatureDocument xbSampFeatDoc =

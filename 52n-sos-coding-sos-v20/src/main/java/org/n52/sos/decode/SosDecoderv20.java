@@ -63,7 +63,6 @@ import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
-import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -88,9 +87,9 @@ import org.n52.sos.response.GetResultResponse;
 import org.n52.sos.response.GetResultTemplateResponse;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3CConstants;
 import org.n52.sos.util.XmlHelper;
@@ -294,9 +293,6 @@ public class SosDecoderv20 implements IDecoder<AbstractServiceCommunicationObjec
                 String exceptionText = "Error while encoding response format!";
                 throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
             }
-
-        } else {
-            getObsRequest.setResponseFormat(OMConstants.RESPONSE_FORMAT_OM_2);
         }
 
         return getObsRequest;

@@ -38,7 +38,6 @@ import net.opengis.gml.MeasureType;
 import net.opengis.om.x10.ObservationType;
 import net.opengis.swe.x101.TimeObjectPropertyType;
 
-import org.apache.xerces.xni.QName;
 import org.apache.xmlbeans.XmlBoolean;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlInteger;
@@ -73,10 +72,9 @@ import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
-import org.n52.sos.util.GmlHelper;
-import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.SweHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -289,7 +287,6 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
         } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
             addMultiObservationValueToResult(xbResult, sosObservation);
         }
-
     }
 
     // FIXME String.equals(QName) !?
@@ -406,7 +403,8 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
         // Sos2Constants.SERVICEVERSION));
         SosSamplingFeature samplingFeature = (SosSamplingFeature) feature;
         FeaturePropertyType featureProperty = observation.addNewFeatureOfInterest();
-        if (!Configurator.getInstance().isFoiEncodedInObservation() || !(feature instanceof SosSamplingFeature)) {
+        Profile activeProfile = Configurator.getInstance().getActiveProfile();
+        if (!activeProfile.isEncodeFeatureOfInterestInObservations() || !(feature instanceof SosSamplingFeature)) {
             // if (urlPattern != null) {
             // featureProperty.setHref(SosHelper.createFoiGetUrl(feature.getIdentifier(),
             // Sos2Constants.SERVICEVERSION,
