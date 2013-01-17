@@ -84,6 +84,22 @@ public class SWEConstants {
 
     public static final QName QN_SIMPLEDATARECORD_SWE_101 = new QName(NS_SWE, EN_SIMPLEDATARECORD, NS_SWE_PREFIX);
 
+    public static final QName QN_BOOLEAN_SWE_101 = new QName(NS_SWE, EN_BOOLEAN, NS_SWE_PREFIX);
+
+    public static final QName QN_CATEGORY_SWE_101 = new QName(NS_SWE, EN_CATEGORY, NS_SWE_PREFIX);
+
+    public static final QName QN_COUNT_SWE_101 = new QName(NS_SWE, EN_COUNT, NS_SWE_PREFIX);
+
+    public static final QName QN_QUANTITY_SWE_101 = new QName(NS_SWE, EN_QUANTITY, NS_SWE_PREFIX);
+
+    public static final QName QN_TEXT_SWE_101 = new QName(NS_SWE, EN_TEXT, NS_SWE_PREFIX);
+
+    public static final QName QN_TIME_SWE_101 = new QName(NS_SWE, EN_TIME, NS_SWE_PREFIX);
+
+    public static final QName QN_TIME_RANGE_SWE_101 = new QName(NS_SWE, EN_TIME_RANGE, NS_SWE_PREFIX);
+
+    public static final QName QN_TEXT_ENCODING_SWE_101 = new QName(NS_SWE, EN_TEXT_ENCODING, NS_SWE_PREFIX);
+    
     public static final QName QN_BOOLEAN_SWE_200 = new QName(NS_SWE_20, EN_BOOLEAN, NS_SWE_PREFIX);
 
     public static final QName QN_CATEGORY_SWE_200 = new QName(NS_SWE_20, EN_CATEGORY, NS_SWE_PREFIX);

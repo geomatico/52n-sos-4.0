@@ -25,6 +25,7 @@ package org.n52.sos.encode;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -283,12 +284,18 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
 
         Collection<SosObservation> observationCollection = null;
 
-//        HashMap<String, String> gmlID4sfIdentifier = new HashMap<String, String>();
-//        int sfIdCounter = 1;
-//        if (iObservationEncoder.shouldObservationsWithSameXBeMerged()) {
-//            response.mergeObservationsWithSameX();
-//        }
-        // TODO how to check merge or not?
+        IEncoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
+        if (!(encoder instanceof IObservationEncoder)) {
+            String exceptionText = "Error while encoding GetObservation response, encoder is not of type IObservationEncoder!";
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        }
+        IObservationEncoder<XmlObject, SosObservation> iObservationEncoder
+                = (IObservationEncoder<XmlObject, SosObservation>) encoder;
+        if (iObservationEncoder.shouldObservationsWithSameXBeMerged()) {
+            response.mergeObservationsWithSameX();
+        }
+
         observationCollection = response.getObservationCollection();
 
         if (observationCollection != null) {
