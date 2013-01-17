@@ -58,6 +58,8 @@ import org.n52.sos.ogc.ows.SosServiceProviderFactory;
 import org.n52.sos.service.admin.request.operator.AdminRequestOperatorRepository;
 import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.service.operator.ServiceOperatorRepository;
+import org.n52.sos.service.profile.Profile;
+import org.n52.sos.service.profile.ProfileHandler;
 import org.n52.sos.ds.OperationDaoRepository;
 import org.n52.sos.convert.ConverterRepository;
 import org.n52.sos.binding.BindingRepository;
@@ -129,12 +131,6 @@ public final class Configurator {
     private IFeatureQueryHandler featureQueryHandler;
 
     /**
-     * boolean indicates, whether SOS encodes the complete FOI-instance within
-     * the Observation instance or just the FOI id
-     */
-    private boolean foiEncodedInObservation = true;
-
-    /**
      * boolean, indicates if foi IDs should be included in capabilities
      */
     private boolean foiListedInOfferings = true;
@@ -153,6 +149,8 @@ public final class Configurator {
 
     /** tuple seperator for result element */
     private String noDataValue;
+    
+    private ProfileHandler profileHandler;
 
     /** directory of sensor descriptions in SensorML format */
     private File sensorDir;
@@ -323,9 +321,6 @@ public final class Configurator {
             break;
         case DEFAULT_PROCEDURE_PREFIX:
             this.defaultProcedurePrefix = SettingsHelper.parseString(setting, value, true);
-            break;
-        case FOI_ENCODED_IN_OBSERVATION:
-            this.foiEncodedInObservation = SettingsHelper.parseBoolean(setting, value);
             break;
         case FOI_LISTED_IN_OFFERINGS:
             this.foiListedInOfferings = SettingsHelper.parseBoolean(setting, value);
@@ -535,6 +530,7 @@ public final class Configurator {
         initializeDataSource();
         initializeCapabilitiesCacheController();
         this.tasking = new Tasking();
+        this.profileHandler = new ProfileHandler();
 
         LOGGER.info("\n******\n Configurator initialization finished\n******\n");
     }
@@ -884,13 +880,6 @@ public final class Configurator {
     }
 
     /**
-     * @return boolean indicating the foi encoded in observation
-     */
-    public boolean isFoiEncodedInObservation() {
-        return foiEncodedInObservation;
-    }
-
-    /**
      * @return foiIncludedInCapabilities
      */
     public boolean isFoiListedInOfferings() {
@@ -1110,5 +1099,13 @@ public final class Configurator {
 		getRequestOperatorRepository().update();
 	}
 
+	    public ProfileHandler getProfileHandler() {
+	        return this.profileHandler;
+	    }
+
+	    public Profile getActiveProfile() {
+	        return getProfileHandler().getActiveProfile();
+	        
+	    }
 
 }

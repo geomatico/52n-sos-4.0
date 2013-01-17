@@ -42,7 +42,6 @@ INSERT INTO global_settings(key,value) VALUES
 	('DEFAULT_EPSG', '4326'),
 	('DEFAULT_OFFERING_PREFIX', 'OFFERING_'),
 	('DEFAULT_PROCEDURE_PREFIX', 'http://www.example.org/sensors/'),
-	('FOI_ENCODED_IN_OBSERVATION', 'true'),
 	('FOI_LISTED_IN_OFFERINGS', 'true'),
 	('GML_DATE_FORMAT', ''),
 	('LEASE', '600'),
