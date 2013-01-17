@@ -24,8 +24,8 @@
 package org.n52.sos.util;
 
 import java.util.List;
-import org.n52.sos.ogc.ows.OWSConstants;
 
+import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;

@@ -26,6 +26,7 @@ package org.n52.sos.util;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.decode.DecoderKey;
@@ -37,7 +38,6 @@ import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.XmlEncoderKey;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;

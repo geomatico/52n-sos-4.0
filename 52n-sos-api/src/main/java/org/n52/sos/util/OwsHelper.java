@@ -101,6 +101,7 @@ public class OwsHelper {
      *
      * @param version
      *            the requested version of the SOS
+     * @param set 
      * @throws OwsExceptionReport
      *             if this SOS does not support the requested versions
      */

@@ -31,8 +31,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
