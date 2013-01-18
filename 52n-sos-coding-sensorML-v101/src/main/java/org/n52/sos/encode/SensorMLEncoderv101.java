@@ -92,6 +92,7 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLIo;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
+import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SweAggregateType;
 import org.n52.sos.ogc.swe.SWEConstants.SweSimpleType;
@@ -127,7 +128,10 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
     
     private Map<SupportedTypeKey, Set<String>> SUPPORTED_TYPES = Collections.singletonMap(
             SupportedTypeKey.ProcedureDescriptionFormat, Collections.singleton(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL));
-    private Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(SensorMLConstants.NS_SML, SosProcedureDescription.class, AbstractSensorML.class);
+    private Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(
+    		SensorMLConstants.NS_SML, 
+    		SosProcedureDescription.class, 
+    		AbstractSensorML.class);
 
     public SensorMLEncoderv101() {
         LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
@@ -170,6 +174,15 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
         if (response instanceof AbstractSensorML) {
             return createSensorDescription((AbstractSensorML) response);
         }
+     // FIXME workaround? if of type UnknowProcedureType try to parse the description string, UNIT is missing "NOT_DEFINED"?!
+        if (response instanceof SosProcedureDescriptionUnknowType) {
+        	
+        	String procDescXMLString = ((SosProcedureDescription) response).getSensorDescriptionXmlString();
+        	AbstractSensorML sensorDesc = new AbstractSensorML();
+        	sensorDesc.setSensorDescriptionXmlString(procDescXMLString);
+            return createSensorDescriptionFromString((AbstractSensorML) sensorDesc);
+        }
+        
         return null;
     }
 

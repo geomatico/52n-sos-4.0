@@ -84,6 +84,7 @@ import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
+import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -264,7 +265,6 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
         } else {
             outputFormat = response.getOutputFormat();
         }
-
 
         XmlObject xmlObject = CodingHelper.encodeObjectToXml(outputFormat, response.getSensorDescription());
         // describeSensorResponse.addNewDescription().addNewSensorDescription().addNewData().set(xmlObject);
