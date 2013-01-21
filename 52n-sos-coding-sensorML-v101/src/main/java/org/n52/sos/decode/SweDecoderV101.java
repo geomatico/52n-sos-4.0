@@ -87,25 +87,28 @@ import org.slf4j.LoggerFactory;
 
 public class SweDecoderV101 implements IDecoder<Object, Object> {
 
-    /**
-     * logger, used for logging while initializing the constants from config
-     * file
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SweDecoderV101.class);
 
     private static final Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(SWEConstants.NS_SWE,
+            DataArrayDocument.class,
             DataArrayType.class,
+            AbstractDataComponentType.class,
+            BooleanDocument.class, net.opengis.swe.x101.BooleanDocument.Boolean.class,
+            CategoryDocument.class, Category.class,
+            CountDocument.class, Count.class,
+            CountRangeDocument.class, CountRange.class,
+            ObservablePropertyDocument.class, ObservableProperty.class,
+            QuantityDocument.class, Quantity.class,
+            QuantityRangeDocument.class, QuantityRange.class,
+            TextDocument.class, Text.class,
+            TimeDocument.class, Time.class,
+            TimeRangeDocument.class, TimeRange.class,
             DataComponentPropertyType[].class,
-            Count.class,
-            Quantity.class,
-            Text.class,
             PositionType.class,
-            ObservableProperty.class,
             Coordinate[].class,
             AnyScalarPropertyType[].class,
             AbstractDataRecordDocument.class,
-            AbstractDataRecordType.class,
-            DataArrayDocument.class);
+            AbstractDataRecordType.class);
 
     public SweDecoderV101() {
         LOGGER.debug("Decoder for the following keys initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));

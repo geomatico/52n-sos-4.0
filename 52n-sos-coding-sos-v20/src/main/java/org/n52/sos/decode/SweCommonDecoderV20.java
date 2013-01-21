@@ -89,11 +89,22 @@ import org.slf4j.LoggerFactory;
 public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweCommonDecoderV20.class);
 
-    private Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(SWEConstants.NS_SWE_20,
-            DataArrayPropertyType.class, DataArrayDocument.class, DataArrayType.class, DataRecordDocument.class,
-            DataRecordType.class, CountType.class, QuantityType.class, TextType.class, Coordinate[].class,
-            AnyScalarPropertyType[].class, TextEncodingDocument.class, TextEncodingType.class,
-            AbstractDataComponentDocument.class, AbstractDataComponentType.class);
+    private Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(
+            SWEConstants.NS_SWE_20,
+            DataArrayPropertyType.class,
+            DataArrayDocument.class,
+            DataArrayType.class,
+            DataRecordDocument.class,
+            DataRecordType.class,
+            CountType.class,
+            QuantityType.class,
+            TextType.class,
+            Coordinate[].class,
+            AnyScalarPropertyType[].class,
+            TextEncodingDocument.class,
+            TextEncodingType.class,
+            AbstractDataComponentDocument.class,
+            AbstractDataComponentType.class);
 
     public SweCommonDecoderV20() {
         LOGGER.debug("Decoder for the following keys initialized successfully: {}!",
