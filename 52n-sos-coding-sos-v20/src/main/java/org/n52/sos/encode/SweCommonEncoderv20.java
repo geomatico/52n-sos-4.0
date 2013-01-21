@@ -147,8 +147,8 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 
         if (sosSweType instanceof SosSweCoordinate) {
             return createCoordinate((SosSweCoordinate) sosSweType);
-        } else if (sosSweType instanceof SosSweAbstractSimpleType) {
-            return createSimpleType((SosSweAbstractSimpleType) sosSweType);
+//        } else if (sosSweType instanceof SosSweAbstractSimpleType) {
+//            return createSimpleType((SosSweAbstractSimpleType) sosSweType);
         } else if (sosSweType instanceof SosSweAbstractEncoding) {
             return createAbstractEncoding((SosSweAbstractEncoding) sosSweType);
         } else if (sosSweType instanceof SosSweAbstractDataComponent) {
@@ -196,8 +196,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
             AbstractDataComponentType abstractDataComponentType = null;
             if (sosSweAbstractDataComponent instanceof SosSweAbstractSimpleType) {
                 abstractDataComponentType = createSimpleType((SosSweAbstractSimpleType) sosSweAbstractDataComponent);
-            }
-            if (sosSweAbstractDataComponent instanceof SosSweDataRecord) {
+            } else if (sosSweAbstractDataComponent instanceof SosSweDataRecord) {
                 abstractDataComponentType = createDataRecord((SosSweDataRecord) sosSweAbstractDataComponent);
             } else if (sosSweAbstractDataComponent instanceof SosSweDataArray) {
                 abstractDataComponentType = createDataArray((SosSweDataArray) sosSweAbstractDataComponent);
@@ -329,39 +328,33 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
             xbField.setName(sweField.getName());
         }
         AbstractDataComponentType xbDCD = xbField.addNewAbstractDataComponent();
+        xbDCD.set(createAbstractDataComponent(sosElement));
         if (sosElement instanceof SosSweBoolean)
         {
-            xbDCD.set(createBoolean((SosSweBoolean) sosElement));
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_BOOLEAN_SWE_200, BooleanType.type);
         } 
         else if (sosElement instanceof SosSweCategory)
         {
-            xbDCD.set(createCategoy((SosSweCategory) sosElement));
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_CATEGORY_SWE_200, CategoryType.type);
         } 
         else if (sosElement instanceof SosSweCount)
         {
-            xbDCD.set(createCount((SosSweCount) sosElement));
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_COUNT_SWE_200, CountType.type);
         } 
         else if (sosElement instanceof SosSweQuantity)
         {
-            xbDCD.set(createQuantity((SosSweQuantity) sosElement));
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_QUANTITY_SWE_200, QuantityType.type);
         } 
         else if (sosElement instanceof SosSweText)
         {
-            xbDCD.set(createText((SosSweText) sosElement));
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_TEXT_ENCODING_SWE_200, TextType.type);
         }
         else if (sosElement instanceof SosSweTimeRange)
         {
-            xbDCD.set(createTimeRange((SosSweTimeRange) sosElement));
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_TIME_RANGE_SWE_200, TimeRangeType.type);
         }
         else if (sosElement instanceof SosSweTime) 
         {
-            xbDCD.set(createTime((SosSweTime) sosElement));
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_TIME_SWE_200, TimeType.type);
         }
         else
@@ -384,7 +377,6 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
      */
     private AbstractDataComponentType createSimpleType(SosSweAbstractSimpleType<?> sosSimpleType)
             throws OwsExceptionReport {
-
         if (sosSimpleType instanceof SosSweBoolean) {
             return createBoolean((SosSweBoolean) sosSimpleType);
         } else if (sosSimpleType instanceof SosSweCategory) {
@@ -402,6 +394,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         } else if (sosSimpleType instanceof SosSweTime) {
             return createTime((SosSweTime) sosSimpleType);
         }
+        
         // TODO: NOT SUPPORTED EXCEPTION
         throw new OwsExceptionReport();
     }
@@ -418,9 +411,9 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
             Reference xbCodespace = xbCategory.addNewCodeSpace();
             xbCodespace.setHref(sosCategory.getCodeSpace());
         }
-        if (sosCategory.isSetDefinition()) {
-            xbCategory.setDefinition(sosCategory.getDefinition());
-        }
+//        if (sosCategory.isSetDefinition()) {
+//            xbCategory.setDefinition(sosCategory.getDefinition());
+//        }
         return xbCategory;
     }
 
@@ -430,9 +423,9 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
             BigInteger bigInt = new BigInteger(Integer.toString(sosCount.getValue().intValue()));
             xbCount.setValue(bigInt);
         }
-        if (sosCount.isSetDefinition()) {
-            xbCount.setDefinition(sosCount.getDefinition());
-        }
+//        if (sosCount.isSetDefinition()) {
+//            xbCount.setDefinition(sosCount.getDefinition());
+//        }
         return xbCount;
     }
 

@@ -149,7 +149,7 @@ public class AbstractSensorML extends SosProcedureDescription {
 
     @Override
     public String getProcedureIdentifier() {
-        if (identifications != null) {
+        if (isSetIdentifications()) {
             for (SosSMLIdentifier identification : identifications) {
                 if ((identification.getName() != null && identification.getName().equals("uniqueID"))
                         || (identification.getDefinition() != null
@@ -160,6 +160,10 @@ public class AbstractSensorML extends SosProcedureDescription {
                                 .getDefinition().contains("uniqueID"))))) {
                     return identification.getValue();
                 }
+            }
+        } else if (!isSetIdentifications() && this instanceof SensorML && ((SensorML)this).isWrapper()) {
+            for (AbstractProcess abstractProcess : ((SensorML)this).getMembers()) {
+                return abstractProcess.getProcedureIdentifier();
             }
         }
         return null;

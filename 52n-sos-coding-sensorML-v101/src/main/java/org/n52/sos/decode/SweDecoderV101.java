@@ -133,8 +133,6 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
     public Object decode(Object element) throws OwsExceptionReport {
         if (element instanceof DataArrayDocument) {
             return parseSweDataArray((DataArrayDocument) element);
-        } else if (element instanceof DataArrayType) {
-            return parseSweDataArrayType((DataArrayType) element);
         } else if (element instanceof AbstractDataComponentType) {
             return parseAbstractDataComponentType((AbstractDataComponentType)element);
         } else if (element instanceof BooleanDocument) {
@@ -159,16 +157,12 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
             return parseTimeRange(((TimeRangeDocument)element).getTimeRange());
         } else if (element instanceof DataComponentPropertyType[]) {
             return parseDataComponentPropertyArray((DataComponentPropertyType[]) element);
-        } else if (element instanceof PositionType) {
-            return parsePosition((PositionType) element);
         } else if (element instanceof Coordinate[]) {
             return parseCoordinates((Coordinate[]) element);
         } else if (element instanceof AnyScalarPropertyType[]) {
             return parseAnyScalarPropertyArray((AnyScalarPropertyType[]) element);
         } else if (element instanceof AbstractDataRecordDocument) {
             return parseAbstractDataRecord(((AbstractDataRecordDocument) element).getAbstractDataRecord());
-        } else if (element instanceof AbstractDataRecordType) {
-            return parseAbstractDataRecord((AbstractDataRecordType) element);
         } else {
             StringBuilder exceptionText = new StringBuilder();
             exceptionText.append("The requested element");
@@ -184,6 +178,7 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
     }
     
     private Object parseAbstractDataComponentType(AbstractDataComponentType abstractDataComponentType) throws OwsExceptionReport {
+        // TODO get parse definitions from AbstractDataComponentType here
         if (abstractDataComponentType instanceof net.opengis.swe.x101.BooleanDocument.Boolean) {
             return parseBoolean((net.opengis.swe.x101.BooleanDocument.Boolean)abstractDataComponentType);
         } else if (abstractDataComponentType instanceof Category) {
@@ -204,6 +199,12 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
             return parseTime((Time)abstractDataComponentType);
         } else if (abstractDataComponentType instanceof TimeRange) {
             return parseTimeRange((TimeRange)abstractDataComponentType);
+        } else if (abstractDataComponentType instanceof PositionType) {
+            return parsePosition((PositionType) abstractDataComponentType);
+        } else if (abstractDataComponentType instanceof AbstractDataRecordType) {
+            return parseAbstractDataRecord((AbstractDataRecordType) abstractDataComponentType);
+        } else if (abstractDataComponentType instanceof DataArrayType) {
+            return parseSweDataArrayType((DataArrayType) abstractDataComponentType);
         }
         return null;
     }
