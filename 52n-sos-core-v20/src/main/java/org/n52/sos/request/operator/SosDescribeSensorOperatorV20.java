@@ -140,17 +140,17 @@ public class SosDescribeSensorOperatorV20 extends AbstractV2RequestOperator<IDes
     private void checkRequestedParameters(DescribeSensorRequest sosRequest) throws OwsExceptionReport {
         List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
         try {
-            SosHelper.checkServiceParameter(sosRequest.getService());
+            checkServiceParameter(sosRequest.getService());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion());
+            checkSingleVersionParameter(sosRequest);
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkProcedureID(sosRequest.getProcedure(), Configurator.getInstance().getCapabilitiesCacheController()
+            checkProcedureID(sosRequest.getProcedure(), Configurator.getInstance().getCapabilitiesCacheController()
                     .getProcedures(), SosConstants.DescribeSensorParams.procedure.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);

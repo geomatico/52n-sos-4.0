@@ -103,18 +103,18 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
     private void checkRequestedParameter(InsertResultTemplateRequest request) throws OwsExceptionReport {
         List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
         try {
-            SosHelper.checkServiceParameter(request.getService());
+            checkServiceParameter(request.getService());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(request.getVersion());
+            checkSingleVersionParameter(request);
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         // check offering
         try {
-            SosHelper.checkOfferings(request.getObservationConstellation().getOfferings(), Configurator.getInstance()
+            checkOfferings(request.getObservationConstellation().getOfferings(), Configurator.getInstance()
                     .getCapabilitiesCacheController().getOfferings(),
                     Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
             try {
@@ -126,12 +126,12 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
             exceptions.add(owse);
         }
         // check procedure
-            SosHelper.checkProcedureID(request.getObservationConstellation().getProcedure().getProcedureIdentifier(), Configurator
+            checkProcedureID(request.getObservationConstellation().getProcedure().getProcedureIdentifier(), Configurator
                     .getInstance().getCapabilitiesCacheController().getProcedures(),
                     Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
         // check observedProperty
         try {
-            SosHelper.checkObservedProperty(request.getObservationConstellation().getObservableProperty()
+            checkObservedProperty(request.getObservationConstellation().getObservableProperty()
                     .getIdentifier(), Configurator.getInstance().getCapabilitiesCacheController()
                     .getObservableProperties(), Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
         } catch (OwsExceptionReport owse) {

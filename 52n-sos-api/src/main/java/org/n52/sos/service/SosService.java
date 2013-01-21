@@ -39,6 +39,8 @@ import org.n52.sos.binding.Binding;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.XmlEncoderKey;
+import org.n52.sos.event.SosEventBus;
+import org.n52.sos.event.events.OwsExceptionReportEvent;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.response.ServiceResponse;
@@ -176,6 +178,7 @@ public class SosService extends ConfiguratedHttpServlet {
 
     private ServiceResponse handleOwsExceptionReport(OwsExceptionReport owsExceptionReport) throws ServletException {
         try {
+			SosEventBus.getInstance().submit(new OwsExceptionReportEvent(owsExceptionReport));
             EncoderKey key = new XmlEncoderKey(owsExceptionReport.getNamespace(), owsExceptionReport.getClass());
             IEncoder<?, OwsExceptionReport> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
             if (encoder != null) {

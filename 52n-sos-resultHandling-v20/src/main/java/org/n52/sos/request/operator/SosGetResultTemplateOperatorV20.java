@@ -99,12 +99,12 @@ public class SosGetResultTemplateOperatorV20 extends AbstractV2RequestOperator<I
     private void checkRequestedParameter(GetResultTemplateRequest request) throws OwsExceptionReport {
         List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
         try {
-            SosHelper.checkServiceParameter(request.getService());
+            checkServiceParameter(request.getService());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(request.getVersion());
+            checkSingleVersionParameter(request);
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }

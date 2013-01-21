@@ -102,12 +102,12 @@ public class SosUpdateSensorDescriptionOperatorV20 extends AbstractV2RequestOper
     private void checkRequestedParameter(UpdateSensorRequest request) throws OwsExceptionReport {
         List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
         try {
-            SosHelper.checkServiceParameter(request.getService());
+            checkServiceParameter(request.getService());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(request.getVersion());
+            checkSingleVersionParameter(request);
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -129,6 +129,5 @@ public class SosUpdateSensorDescriptionOperatorV20 extends AbstractV2RequestOper
         } else {
             throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.DeleteSensorParams.procedure.name());
         }
-
     }
 }

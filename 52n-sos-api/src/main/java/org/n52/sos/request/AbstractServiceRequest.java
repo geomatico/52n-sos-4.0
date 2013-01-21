@@ -24,6 +24,7 @@
 package org.n52.sos.request;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.n52.sos.ogc.ows.OWSConstants;
@@ -35,12 +36,12 @@ import org.n52.sos.util.Util4Exceptions;
 
 /**
  * abstract super class for all service request classes
- * 
+ *
  */
 public abstract class AbstractServiceRequest extends AbstractServiceCommunicationObject {
 
     protected ServiceOperatorKeyType[] serviceOperatorKeyTypes;
-    
+
     protected SwesExtensions extensions;
 
     /**
@@ -51,12 +52,13 @@ public abstract class AbstractServiceRequest extends AbstractServiceCommunicatio
     public ServiceOperatorKeyType[] getServiceOperatorKeyType() throws OwsExceptionReport {
         if (serviceOperatorKeyTypes == null) {
             checkServiceAndVersionParameter();
-            serviceOperatorKeyTypes = new ServiceOperatorKeyType[1];
-            serviceOperatorKeyTypes[0] = new ServiceOperatorKeyType(getService(), getVersion());
+            serviceOperatorKeyTypes = new ServiceOperatorKeyType[] {
+				new ServiceOperatorKeyType(getService(), getVersion())
+			};
         }
         return serviceOperatorKeyTypes;
     }
-    
+
     private void checkServiceAndVersionParameter() throws OwsExceptionReport {
         List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
         if (getService() == null) {
@@ -74,9 +76,16 @@ public abstract class AbstractServiceRequest extends AbstractServiceCommunicatio
     public SwesExtensions getExtensions() {
         return extensions;
     }
-    
+
     public void setExtensions(SwesExtensions extensions) {
         this.extensions = extensions;
     }
+
+	@Override
+	public String toString() {
+		return String.format("%s[service=%s, verion=%s, operation=%s]",
+				getClass().getName(),
+				getService(), getVersion(), getOperationName());
+	}
 
 }

@@ -369,8 +369,9 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
             String errorMsg =
                     String.format(
                             "The type '%s' of the received %s is not supported by this encoder '%s'.",
-                            sosElement != null ? sosElement.getClass().getName() : null, sweField != null ? sweField
-                                    .getClass().getName() : null, getClass().getName());
+                            sosElement != null ? sosElement.getClass().getName() : null,
+							sweField != null ? sweField.getClass().getName() : null,
+							getClass().getName());
             LOGGER.error(errorMsg);
             throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
         }

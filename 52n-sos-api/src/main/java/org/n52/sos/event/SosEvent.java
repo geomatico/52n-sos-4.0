@@ -21,25 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.request.operator;
-
-import org.n52.sos.ds.IOperationDAO;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.request.AbstractServiceRequest;
+package org.n52.sos.event;
 
 /**
- * @param <D> The IOperationDAO implementation class
- * @param <R> The request type
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class AbstractV2RequestOperator<D extends IOperationDAO, R extends AbstractServiceRequest>
-                                                            extends AbstractRequestOperator<D, R> {
-
-    public AbstractV2RequestOperator(String operationName, Class<R> requestType) {
-        super(SosConstants.SOS, Sos2Constants.SERVICEVERSION, operationName, requestType);
-    }
-
-
-
-}
+public interface SosEvent {}

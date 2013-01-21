@@ -104,12 +104,12 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInser
         List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
         // check parameters with variable content
         try {
-            SosHelper.checkServiceParameter(request.getService());
+            checkServiceParameter(request.getService());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(request.getVersion());
+            checkSingleVersionParameter(request);
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }

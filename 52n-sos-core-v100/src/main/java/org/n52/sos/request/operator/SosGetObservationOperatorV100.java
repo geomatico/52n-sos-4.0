@@ -152,12 +152,12 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<IGe
     private void checkRequestedParameters(GetObservationRequest sosRequest) throws OwsExceptionReport {
         List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
         try {
-            SosHelper.checkServiceParameter(sosRequest.getService());
+            checkServiceParameter(sosRequest.getService());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion());
+            checkSingleVersionParameter(sosRequest);
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -177,15 +177,14 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<IGe
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkProcedureIDs(sosRequest.getProcedures(), Configurator.getInstance()
-                    .getCapabilitiesCacheController().getProcedures(),
+            checkProcedureIDs(sosRequest.getProcedures(),
                     SosConstants.GetObservationParams.procedure.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         // TODO check foi param is ID
         try {
-            SosHelper.checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
+            checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
                     .getCapabilitiesCacheController().getFeatureOfInterest(),
                     SosConstants.GetObservationParams.featureOfInterest.name());
         } catch (OwsExceptionReport owse) {
@@ -193,7 +192,7 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<IGe
         }
         // TODO spatial filter BBOX?
         try {
-            SosHelper.checkSpatialFilter(sosRequest.getSpatialFilter(),
+            checkSpatialFilter(sosRequest.getSpatialFilter(),
                     SosConstants.GetObservationParams.featureOfInterest.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
@@ -201,7 +200,7 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<IGe
         // TODO check for SOS 1.0.0 EventTime
         try {
             if (sosRequest.getTemporalFilters() != null && !sosRequest.getTemporalFilters().isEmpty()) {
-                SosHelper.checkTemporalFilter(sosRequest.getTemporalFilters(),
+                checkTemporalFilter(sosRequest.getTemporalFilters(),
                         Sos2Constants.GetObservationParams.temporalFilter.name());
 //            } else {
 //                List<TemporalFilter> filters = new ArrayList<TemporalFilter>();

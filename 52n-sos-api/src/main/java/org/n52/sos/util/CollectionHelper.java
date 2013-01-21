@@ -45,19 +45,19 @@ public class CollectionHelper {
         Collections.addAll(set, elements);
         return Collections.unmodifiableSet(set);
     }
-    
+
     public static <T> Set<T> set() {
         return new HashSet<T>();
     }
-    
+
     public static <K,V> Map<K,V> map() {
         return new HashMap<K, V>();
     }
-    
+
     public static <T> List<T> list() {
         return new LinkedList<T>();
     }
-    
+
     public static <T> Collection<T> collection() {
         return list();
     }
@@ -104,13 +104,21 @@ public class CollectionHelper {
     public static <T> List<T> unmodifiableList(List<? extends T> l) {
         return (l == null) ? Collections.<T>emptyList() : Collections.unmodifiableList(l);
     }
-    
+
     public static <T> List<T> asList(final T t, final T... ts) {
         ArrayList<T> list = new ArrayList<T>(ts.length+1);
         list.add(t);
         Collections.addAll(list, ts);
         return list;
     }
+
+	 public static <T> List<T> conjunctCollections(
+            Collection<T> list1, Collection<T> list2) {
+		HashSet<T> s1 = new HashSet<T>(list1);
+		s1.retainAll(list2);
+		return new ArrayList<T>(s1);
+	}
+
     private CollectionHelper() {
     }
 }

@@ -21,25 +21,31 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.request.operator;
+package org.n52.sos.event.listener;
 
-import org.n52.sos.ds.IOperationDAO;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.request.AbstractServiceRequest;
+import java.util.Collections;
+import java.util.Set;
+import org.n52.sos.event.SosEvent;
+import org.n52.sos.event.SosEventListener;
+import org.n52.sos.event.events.RequestEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * @param <D> The IOperationDAO implementation class
- * @param <R> The request type
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class AbstractV2RequestOperator<D extends IOperationDAO, R extends AbstractServiceRequest>
-                                                            extends AbstractRequestOperator<D, R> {
+public class RequestLoggingEventListener implements SosEventListener {
+	private static final Logger log = LoggerFactory.getLogger(RequestLoggingEventListener.class);
 
-    public AbstractV2RequestOperator(String operationName, Class<R> requestType) {
-        super(SosConstants.SOS, Sos2Constants.SERVICEVERSION, operationName, requestType);
-    }
+	@Override
+	public Set<Class<? extends SosEvent>> getTypes() {
+		return Collections.<Class<? extends SosEvent>>singleton(RequestEvent.class);
+	}
 
-
+	@Override
+	public void handle(SosEvent event) {
+		RequestEvent e = (RequestEvent) event;
+		log.info("Incoming request: {}", e.getRequest());
+	}
 
 }

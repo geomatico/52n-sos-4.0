@@ -56,7 +56,7 @@ public class SosGetCapabilitiesOperatorV20 extends AbstractV2RequestOperator<IGe
     public SosGetCapabilitiesOperatorV20() {
         super(OPERATION_NAME, GetCapabilitiesRequest.class);
     }
-    
+
     @Override
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);

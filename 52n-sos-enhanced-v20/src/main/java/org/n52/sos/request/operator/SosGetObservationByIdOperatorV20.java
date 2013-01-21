@@ -137,17 +137,17 @@ public class SosGetObservationByIdOperatorV20 extends AbstractV2RequestOperator<
         List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
         // check parameters with variable content
         try {
-            SosHelper.checkServiceParameter(sosRequest.getService());
+            checkServiceParameter(sosRequest.getService());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion());
+            checkSingleVersionParameter(sosRequest);
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkObservationIDs(sosRequest.getObservationIdentifier(),
+            checkObservationIDs(sosRequest.getObservationIdentifier(),
                     Configurator.getInstance().getCapabilitiesCacheController().getObservationIdentifiers(),
                     Sos2Constants.GetObservationByIdParams.observation.name());
         } catch (OwsExceptionReport owse) {

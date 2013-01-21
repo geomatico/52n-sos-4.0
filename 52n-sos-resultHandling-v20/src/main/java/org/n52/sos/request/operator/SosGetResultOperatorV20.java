@@ -100,36 +100,36 @@ public class SosGetResultOperatorV20 extends AbstractV2RequestOperator<IGetResul
     private void checkRequestedParameter(GetResultRequest request) throws OwsExceptionReport {
         List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
         try {
-            SosHelper.checkServiceParameter(request.getService());
+            checkServiceParameter(request.getService());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(request.getVersion());
+            checkSingleVersionParameter(request);
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkOffering(request.getOffering(), Configurator.getInstance().getCapabilitiesCacheController()
+            checkOffering(request.getOffering(), Configurator.getInstance().getCapabilitiesCacheController()
                     .getOfferings(), Sos2Constants.GetResultTemplateParams.offering.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkObservedProperty(request.getObservedProperty(), Configurator.getInstance()
+            checkObservedProperty(request.getObservedProperty(), Configurator.getInstance()
                     .getCapabilitiesCacheController().getObservableProperties(),
                     Sos2Constants.GetResultTemplateParams.observedProperty.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkSpatialFilter(request.getSpatialFilter(),
+            checkSpatialFilter(request.getSpatialFilter(),
                     SosConstants.GetObservationParams.featureOfInterest.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkTemporalFilter(request.getTemporalFilter(),
+            checkTemporalFilter(request.getTemporalFilter(),
                     Sos2Constants.GetObservationParams.temporalFilter.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);

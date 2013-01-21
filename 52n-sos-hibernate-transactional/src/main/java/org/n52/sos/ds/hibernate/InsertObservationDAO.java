@@ -44,6 +44,8 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateUtilities;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.event.SosEventBus;
+import org.n52.sos.event.events.SosObservationInsertionEvent;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosMultiObservationValues;
 import org.n52.sos.ogc.om.SosObservation;
@@ -137,6 +139,7 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
                         }
                     }
                 }
+				SosEventBus.getInstance().submit(new SosObservationInsertionEvent(sosObservation));
             }
             // if no observationConstellation is valid, throw exception
             if (exceptions.size() == request.getObservations().size()) {
@@ -181,9 +184,9 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
         resultTemplate.setObservationConstellation(obsConst);
         resultTemplate.setFeatureOfInterest(feature);
         SosSweDataArray dataArray = ((SweDataArrayValue) observation.getValue().getValue()).getValue();
-        
-        
-            
+
+
+
         if (dataArray.getElementType().getXml() == null) {
             EncoderKey key = CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, dataArray.getElementType());
             IEncoder<XmlObject, SosSweAbstractDataComponent> encoder = getConfigurator().getCodingRepository().getEncoder(key);
@@ -221,7 +224,7 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
         } else {
             resultTemplate.setResultEncoding(dataArray.getEncoding().getXml());
         }
-        
+
         return resultTemplate;
     }
 }

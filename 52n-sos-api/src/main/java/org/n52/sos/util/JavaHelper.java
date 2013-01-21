@@ -27,6 +27,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,10 +37,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JavaHelper {
-    
+
     /** logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaHelper.class);
-    
+
     /**
      * hexadecimal values
      */
@@ -61,10 +62,10 @@ public class JavaHelper {
             LOGGER.error("Error while getting SHA-1 messagedigest!", nsae);
         }
     }
-    
+
     /**
      * Generates a sensor id from description and current time as long.
-     * 
+     *
      * @param message
      *            sensor description
      * @return generated sensor id as hex SHA-1.
@@ -77,7 +78,7 @@ public class JavaHelper {
 
     /**
      * Transforms byte to hex representation
-     * 
+     *
      * @param b
      *            bytes
      * @return hex
@@ -90,41 +91,5 @@ public class JavaHelper {
         }
         return buf.toString();
     }
-    
-    public static List<String> conjunctCollections(
-            Collection<String> list1, Collection<String> list2) {
-        Set<String> conjunction = null;
-        if (list2 != null && list1 != null) {
-            if (!list2.isEmpty() && !list1.isEmpty()) {
-                conjunction = new HashSet<String>(0);
-                for (String object : list1) {
-                    if (list2.contains(object)) {
-                        conjunction.add(object);
-                    }
-                }
-            } else if (list2.isEmpty() && !list1.isEmpty()) {
-                new HashSet<String>(list1);
-            } else if (!list2.isEmpty() && list1.isEmpty()) {
-                new HashSet<String>(list2);
-            }
-        }
-        return new ArrayList<String>(conjunction);
-    }
-    
-    /**
-     * @param toNormalize the string to normalize
-     * @return a normalized String for use in a file path, i.e. all
-     *         [\,/,:,*,?,",<,>,;] characters are replaced by '_'.
-     */
-    public static String normalize(String toNormalize) {
-        // toNormalize = toNormalize.replaceAll("ä", "ae");
-        // toNormalize = toNormalize.replaceAll("ö", "oe");
-        // toNormalize = toNormalize.replaceAll("ü", "ue");
-        // toNormalize = toNormalize.replaceAll("Ä", "AE");
-        // toNormalize = toNormalize.replaceAll("Ö", "OE");
-        // toNormalize = toNormalize.replaceAll("Ü", "UE");
-        // toNormalize = toNormalize.replaceAll("ß", "ss");
-        return toNormalize.replaceAll("[\\\\,/,:,\\*,?,\",<,>,;,#,%,=,@]", "_");
-    }
-    
+
 }

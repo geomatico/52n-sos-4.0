@@ -68,10 +68,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
+import org.n52.sos.util.CollectionHelper;
 
 /**
  * Implementation of the interface IGetObservationDAO
- * 
+ *
  */
 public class GetObservationDAO extends AbstractHibernateOperationDao implements IGetObservationDAO {
 
@@ -87,7 +88,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.n52.sos.ds.ISosOperationDAO#getOperationName()
      */
     @Override
@@ -97,7 +98,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.n52.sos.ds.hibernate.AbstractHibernateOperationDao#getOperationsMetadata
      * (java.lang.String, org.hibernate.Session)
@@ -155,7 +156,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.n52.sos.ds.IGetObservationDAO#getObservation(org.n52.sos.request.
      * AbstractSosRequest)
@@ -189,7 +190,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
 
     /**
      * Query observations from database depending on requested filters
-     * 
+     *
      * @param request
      *            GetObservation request
      * @param session
@@ -315,7 +316,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
 
     /**
      * Get the min/max time of contained observations
-     * 
+     *
      * @param session
      *            Hibernate session
      * @return min/max observation time
@@ -347,7 +348,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
         if (featureIdentifier == null) {
             return featureOfInterestIdentifiersForObservationConstellation;
         } else {
-            return JavaHelper.conjunctCollections(featureOfInterestIdentifiersForObservationConstellation,
+            return CollectionHelper.conjunctCollections(featureOfInterestIdentifiersForObservationConstellation,
                     featureIdentifier);
         }
     }

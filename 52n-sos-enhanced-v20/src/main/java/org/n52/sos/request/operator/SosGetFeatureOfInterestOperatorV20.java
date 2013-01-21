@@ -107,38 +107,37 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
     private void checkRequestedParameter(GetFeatureOfInterestRequest sosRequest) throws OwsExceptionReport {
         List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
         try {
-            SosHelper.checkServiceParameter(sosRequest.getService());
+            checkServiceParameter(sosRequest.getService());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(sosRequest.getVersion());
+            checkSingleVersionParameter(sosRequest);
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkObservedProperties(sosRequest.getObservedProperties(), Configurator.getInstance()
+            checkObservedProperties(sosRequest.getObservedProperties(), Configurator.getInstance()
                     .getCapabilitiesCacheController().getObservableProperties(),
                     Sos2Constants.GetFeatureOfInterestParams.observedProperty.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkProcedureIDs(sosRequest.getProcedures(), Configurator.getInstance()
-                    .getCapabilitiesCacheController().getProcedures(),
+            checkProcedureIDs(sosRequest.getProcedures(),
                     Sos2Constants.GetFeatureOfInterestParams.procedure.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
+            checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
                     .getCapabilitiesCacheController().getFeatureOfInterest(),
                     Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkSpatialFilters(sosRequest.getSpatialFilters(),
+            checkSpatialFilters(sosRequest.getSpatialFilters(),
                     Sos2Constants.GetFeatureOfInterestParams.spatialFilter.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);

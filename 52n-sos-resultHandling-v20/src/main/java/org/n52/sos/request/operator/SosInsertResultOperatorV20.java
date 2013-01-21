@@ -99,17 +99,17 @@ public class SosInsertResultOperatorV20 extends AbstractV2RequestOperator<IInser
     private void checkRequestedParameter(InsertResultRequest request) throws OwsExceptionReport {
         List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
         try {
-            SosHelper.checkServiceParameter(request.getService());
+            checkServiceParameter(request.getService());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            OwsHelper.checkSingleVersionParameter(request.getVersion());
+            checkSingleVersionParameter(request);
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            SosHelper.checkResultTemplate(request.getTemplateIdentifier(), Sos2Constants.InsertResult.template.name());
+            checkResultTemplate(request.getTemplateIdentifier(), Sos2Constants.InsertResult.template.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
