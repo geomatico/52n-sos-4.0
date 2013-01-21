@@ -241,8 +241,16 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
             		Field xbField = createField(sosSweField);
             		xbFields.add(xbField);
             	}
+            	else
+            	{
+            		LOGGER.error("sosSweField is null is sosDataRecord");
+            	}
             }
             xbDataRecord.setFieldArray(xbFields.toArray(new Field[xbFields.size()]));
+        }
+        else
+        {
+        	LOGGER.error("sosDataRecord contained no fields");
         }
         return xbDataRecord;
     }
