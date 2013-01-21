@@ -24,6 +24,7 @@
 package org.n52.sos.encode;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -227,18 +228,21 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         }
     }
 
-    private DataRecordType createDataRecord(SosSweDataRecord sosDataRecord) throws OwsExceptionReport {
+    private DataRecordType createDataRecord(SosSweDataRecord sosDataRecord) throws OwsExceptionReport
+    {
         List<SosSweField> sosFields = sosDataRecord.getFields();
         DataRecordType xbDataRecord = DataRecordType.Factory.newInstance();
         if (sosFields != null) {
-            Field[] xbFields = new Field[sosFields.size()];
-            int xbFieldIndex = 0;
-            for (SosSweField sosSweField : sosFields) {
-                Field xbField = createField(sosSweField);
-                xbFields[xbFieldIndex] = xbField;
-                xbFieldIndex++;
+            ArrayList<Field> xbFields = new ArrayList<DataRecordType.Field>(sosFields.size());
+            for (SosSweField sosSweField : sosFields)
+            {
+            	if (sosSweField != null)
+            	{
+            		Field xbField = createField(sosSweField);
+            		xbFields.add(xbField);
+            	}
             }
-            xbDataRecord.setFieldArray(xbFields);
+            xbDataRecord.setFieldArray(xbFields.toArray(new Field[xbFields.size()]));
         }
         return xbDataRecord;
     }
@@ -310,37 +314,53 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 
     private DataRecordType.Field createField(SosSweField sweField) throws OwsExceptionReport {
         SosSweAbstractDataComponent sosElement = sweField.getElement();
+        LOGGER.trace("sweField: {}, sosElement: {}",sweField,sosElement);
         DataRecordType.Field xbField =
                 DataRecordType.Field.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (sweField.getName() != null) {
             xbField.setName(sweField.getName());
         }
         AbstractDataComponentType xbDCD = xbField.addNewAbstractDataComponent();
-        if (sosElement instanceof SosSweBoolean) {
+        if (sosElement instanceof SosSweBoolean)
+        {
             xbDCD.set(createBoolean((SosSweBoolean) sosElement));
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_BOOLEAN_SWE_200, BooleanType.type);
-        } else if (sosElement instanceof SosSweCategory) {
+        } 
+        else if (sosElement instanceof SosSweCategory)
+        {
             xbDCD.set(createCategoy((SosSweCategory) sosElement));
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_CATEGORY_SWE_200, CategoryType.type);
-        } else if (sosElement instanceof SosSweCount) {
+        } 
+        else if (sosElement instanceof SosSweCount)
+        {
             xbDCD.set(createCount((SosSweCount) sosElement));
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_COUNT_SWE_200, CountType.type);
-        } else if (sosElement instanceof SosSweQuantity) {
+        } 
+        else if (sosElement instanceof SosSweQuantity)
+        {
             xbDCD.set(createQuantity((SosSweQuantity) sosElement));
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_QUANTITY_SWE_200, QuantityType.type);
-        } else if (sosElement instanceof SosSweText) {
+        } 
+        else if (sosElement instanceof SosSweText)
+        {
             xbDCD.set(createText((SosSweText) sosElement));
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_TEXT_ENCODING_SWE_200, TextType.type);
-        } else if (sosElement instanceof SosSweTimeRange) {
+        }
+        else if (sosElement instanceof SosSweTimeRange)
+        {
             xbDCD.set(createTimeRange((SosSweTimeRange) sosElement));
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_TIME_RANGE_SWE_200, TimeRangeType.type);
-        } else if (sosElement instanceof SosSweTime) {
+        }
+        else if (sosElement instanceof SosSweTime) 
+        {
             xbDCD.set(createTime((SosSweTime) sosElement));
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_TIME_SWE_200, TimeType.type);
-        } else {
+        }
+        else
+        {
             String errorMsg =
                     String.format(
-                            "The element type '%s' of the received %s is not supported by this encoder '%s'.",
+                            "The type '%s' of the received %s is not supported by this encoder '%s'.",
                             sosElement != null ? sosElement.getClass().getName() : null, sweField != null ? sweField
                                     .getClass().getName() : null, getClass().getName());
             LOGGER.error(errorMsg);
