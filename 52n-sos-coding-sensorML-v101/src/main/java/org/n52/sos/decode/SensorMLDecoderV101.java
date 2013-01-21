@@ -419,20 +419,20 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
      *             if an error occurs
      */
     private SosSMLPosition parsePosition(Position position) throws OwsExceptionReport {
-        SosSMLPosition sosSMLPosition = new SosSMLPosition();
-        if (position.getName() != null) {
-            sosSMLPosition.setName(position.getName());
-        }
+        SosSMLPosition sosSMLPosition = null;
         if (position.isSetPosition()) {
             Object pos = CodingHelper.decodeXmlElement(position.getPosition());
             if (pos != null && pos instanceof SosSMLPosition) {
-                return (SosSMLPosition) pos;
+                sosSMLPosition = (SosSMLPosition) pos;
             }
         } else {
             String exceptionText = "Error while parsing the position of the SensorML (the position is not set)!";
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createInvalidParameterValueException(XmlHelper.getLocalName(position),
                     exceptionText);
+        }
+        if (position.getName() != null) {
+            sosSMLPosition.setName(position.getName());
         }
         return sosSMLPosition;
     }
