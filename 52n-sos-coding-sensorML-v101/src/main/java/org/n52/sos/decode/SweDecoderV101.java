@@ -382,6 +382,9 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
 
     private SosSMLPosition parsePosition(PositionType position) throws OwsExceptionReport {
         SosSMLPosition sosSMLPosition = new SosSMLPosition();
+        if (position.isSetReferenceFrame()) {
+            sosSMLPosition.setReferenceFrame(position.getReferenceFrame());
+        }
         if (position.isSetLocation()) {
             if (position.getLocation().isSetVector()) {
                 if (position.getLocation().getVector().isSetReferenceFrame()) {
