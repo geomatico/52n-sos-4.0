@@ -32,22 +32,13 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import net.opengis.swe.x101.AbstractDataComponentType;
-import net.opengis.swe.x101.AbstractDataRecordType;
 import net.opengis.swe.x101.AbstractEncodingType;
 import net.opengis.swe.x101.BlockEncodingPropertyType;
-import net.opengis.swe.x101.BooleanPropertyType;
-import net.opengis.swe.x101.CategoryPropertyType;
-import net.opengis.swe.x101.CountPropertyType;
 import net.opengis.swe.x101.DataArrayDocument;
 import net.opengis.swe.x101.DataArrayType;
 import net.opengis.swe.x101.DataComponentPropertyType;
-import net.opengis.swe.x101.DataRecordDocument;
 import net.opengis.swe.x101.DataRecordType;
 import net.opengis.swe.x101.DataValuePropertyType;
-import net.opengis.swe.x101.QuantityPropertyType;
-import net.opengis.swe.x101.TextPropertyType;
-import net.opengis.swe.x101.TimePropertyType;
-import net.opengis.swe.x101.TimeRangePropertyType;
 import net.opengis.swe.x101.CategoryDocument.Category;
 import net.opengis.swe.x101.CountDocument.Count;
 import net.opengis.swe.x101.ObservablePropertyDocument.ObservableProperty;
@@ -63,7 +54,6 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.apache.xmlbeans.impl.values.XmlValueDisconnectedException;
-import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
@@ -278,7 +268,7 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
         Quantity xbQuantity = Quantity.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         addAbstractDataComponentValues(xbQuantity, quantity);
         if (quantity.isSetAxisID()) {
-            xbQuantity.setAxisID(quantity.getDescription());
+            xbQuantity.setAxisID(quantity.getAxisID());
         }
         if (quantity.isSetValue()) {
             xbQuantity.setValue(Double.valueOf(quantity.getValue()));
