@@ -53,6 +53,8 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
      */
     private SosSweAbstractEncoding encoding;
 
+    private SosSweCount elementCount;
+
     /**
      * @return the values
      */
@@ -90,9 +92,11 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
             {
             	elementCount.setValue(values.size());
             }
-            else
+            else if (isSetElementCount())
             {
-            	elementCount.setValue(0);
+            	elementCount = this.elementCount;
+            } else {
+                elementCount.setValue(0);
             }
             return elementCount; 
     }
@@ -171,4 +175,17 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
     public boolean isSetElementTyp() {
         return elementType != null;
     }
+    
+    public boolean isSetEncoding() {
+        return encoding != null;
+    }
+
+    public void setElementCount(SosSweCount elementCount) {
+        this.elementCount = elementCount;
+    }
+    
+    public boolean isSetElementCount() {
+        return elementCount != null || isSetValues();
+    }
+    
 }
