@@ -57,8 +57,8 @@ public class TimePeriod extends ITime {
     /** duration value */
     private Period duration = null; // ISO8601 format
 
-    /** intervall value */
-    private String intervall = null; // ISO8601 format
+    /** interval value */
+    private String interval = null; // ISO8601 format
 
 
     /**
@@ -210,21 +210,21 @@ public class TimePeriod extends ITime {
     }
 
     /**
-     * Get intervall
+     * Get interval
      * 
      * @return
      */
-    public String getIntervall() {
-        return this.intervall;
+    public String getInterval() {
+        return this.interval;
     }
 
     /**
-     * Set intervall
+     * Set interval
      * 
-     * @param intervall
+     * @param interval
      */
-    public void setIntervall(String intervall) {
-        this.intervall = intervall;
+    public void setInterval(String interval) {
+        this.interval = interval;
     }
 
     /**
@@ -291,11 +291,6 @@ public class TimePeriod extends ITime {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         String result = "Time period: ";
@@ -310,11 +305,6 @@ public class TimePeriod extends ITime {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
     @Override
     public int compareTo(ITime o) {
         if (o instanceof TimeInstant) {
@@ -325,7 +315,6 @@ public class TimePeriod extends ITime {
                 return 1;
             }
         } else if (o instanceof TimePeriod) {
-            // TODO: CHECK if TimerPeriod for PhenTime is supported
             TimePeriod tp = (TimePeriod) o;
             if (start.isBefore(tp.getStart())) {
                 return -1;
@@ -366,9 +355,6 @@ public class TimePeriod extends ITime {
 		return end != null;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode()
 	{
@@ -377,15 +363,12 @@ public class TimePeriod extends ITime {
 		result = prime * result + ((duration == null) ? 0 : duration.hashCode());
 		result = prime * result + ((end == null) ? 0 : end.hashCode());
 		result = prime * result + ((endIndet == null) ? 0 : endIndet.hashCode());
-		result = prime * result + ((intervall == null) ? 0 : intervall.hashCode());
+		result = prime * result + ((interval == null) ? 0 : interval.hashCode());
 		result = prime * result + ((start == null) ? 0 : start.hashCode());
 		result = prime * result + ((startIndet == null) ? 0 : startIndet.hashCode());
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -411,10 +394,10 @@ public class TimePeriod extends ITime {
 				return false;
 		} else if (!endIndet.equals(other.endIndet))
 			return false;
-		if (intervall == null) {
-			if (other.intervall != null)
+		if (interval == null) {
+			if (other.interval != null)
 				return false;
-		} else if (!intervall.equals(other.intervall))
+		} else if (!interval.equals(other.interval))
 			return false;
 		if (start == null) {
 			if (other.start != null)
