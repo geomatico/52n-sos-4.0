@@ -34,6 +34,9 @@ import net.opengis.swe.x20.AbstractDataComponentDocument;
 import net.opengis.swe.x20.AbstractDataComponentType;
 import net.opengis.swe.x20.AbstractEncodingType;
 import net.opengis.swe.x20.AnyScalarPropertyType;
+import net.opengis.swe.x20.BooleanType;
+import net.opengis.swe.x20.CategoryType;
+import net.opengis.swe.x20.CountPropertyType;
 import net.opengis.swe.x20.CountRangeType;
 import net.opengis.swe.x20.CountType;
 import net.opengis.swe.x20.DataArrayDocument;
@@ -70,8 +73,10 @@ import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
 import org.n52.sos.ogc.swe.simpleType.SosSweCategory;
 import org.n52.sos.ogc.swe.simpleType.SosSweCount;
+import org.n52.sos.ogc.swe.simpleType.SosSweCountRange;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuality;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
+import org.n52.sos.ogc.swe.simpleType.SosSweQuantityRange;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
@@ -138,7 +143,7 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
         } else if (element instanceof Coordinate[]) {
             return parseCoordinates((Coordinate[]) element);
         } else if (element instanceof AnyScalarPropertyType[]) {
-            return parseSimpleDataRecordFieldArray((AnyScalarPropertyType[]) element);
+            return parseAnyScalarPropertyTypeArray((AnyScalarPropertyType[]) element);
         } else if (element instanceof TextEncodingDocument) {
             TextEncodingDocument textEncodingDoc = (TextEncodingDocument) element;
             SosSweTextEncoding sosTextEncoding = parseTextEncoding(textEncodingDoc.getTextEncoding());
@@ -169,10 +174,20 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
     private SosSweAbstractDataComponent parseAbstractDataComponent(AbstractDataComponentType abstractDataComponent)
             throws OwsExceptionReport {
         SosSweAbstractDataComponent sosAbstractDataComponent = null;
-        if (abstractDataComponent instanceof CountType) {
+        if (abstractDataComponent instanceof BooleanType) {
+            sosAbstractDataComponent = parseBoolean((BooleanType) abstractDataComponent);
+        } else if (abstractDataComponent instanceof CategoryType) {
+            sosAbstractDataComponent = parseCategory((CategoryType) abstractDataComponent);
+        } else if (abstractDataComponent instanceof CountRangeType) {
+            sosAbstractDataComponent = parseCountRange((CountRangeType) abstractDataComponent);
+        } else if (abstractDataComponent instanceof CountType) {
             sosAbstractDataComponent = parseCount((CountType) abstractDataComponent);
         } else if (abstractDataComponent instanceof QuantityType) {
             sosAbstractDataComponent = parseQuantity((QuantityType) abstractDataComponent);
+        } else if (abstractDataComponent instanceof QuantityRangeType) {
+            sosAbstractDataComponent = parseQuantityRange((QuantityRangeType) abstractDataComponent);
+        } else if (abstractDataComponent instanceof TextType) {
+            sosAbstractDataComponent = parseText((TextType) abstractDataComponent);
         } else if (abstractDataComponent instanceof TimeType) {
             sosAbstractDataComponent = parseTime((TimeType) abstractDataComponent);
         } else if (abstractDataComponent instanceof TimeRangeType) {
@@ -233,13 +248,20 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
 
     private SosSweDataArray parseDataArray(DataArrayType xbDataArray) throws OwsExceptionReport {
         SosSweDataArray sosSweDataArray = new SosSweDataArray();
+        
+        CountPropertyType elementCount = xbDataArray.getElementCount();
+        if (elementCount != null && elementCount != null) { 
+            sosSweDataArray.setElementCount(parseElementCount(elementCount));
+        }
+        
         // parse data record to elementType
         DataArrayType.ElementType xbElementType = xbDataArray.getElementType();
         if (xbElementType != null && xbElementType.getAbstractDataComponent() != null) {
             sosSweDataArray.setElementType(parseAbstractDataComponent(xbElementType.getAbstractDataComponent()));
         }
-
-        sosSweDataArray.setEncoding(parseEncoding(xbDataArray.getEncoding().getAbstractEncoding()));
+        if (xbDataArray.isSetEncoding()) {
+            sosSweDataArray.setEncoding(parseEncoding(xbDataArray.getEncoding().getAbstractEncoding()));
+        }
 
         // parse values
         if (xbDataArray.isSetValues()) {
@@ -356,7 +378,7 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
         return sosCount;
     }
 
-    private SosSweAbstractSimpleType parseCountRange(CountRangeType countRange) throws OwsExceptionReport {
+    private SosSweCountRange parseCountRange(CountRangeType countRange) throws OwsExceptionReport {
         String exceptionText = "The CountRange is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
@@ -388,7 +410,7 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
         return sosQuantity;
     }
 
-    private SosSweAbstractSimpleType parseQuantityRange(QuantityRangeType quantityRange) throws OwsExceptionReport {
+    private SosSweQuantityRange parseQuantityRange(QuantityRangeType quantityRange) throws OwsExceptionReport {
         String exceptionText = "The QuantityRange is not supported";
         LOGGER.debug(exceptionText);
         throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
@@ -423,7 +445,8 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
         SosSweTimeRange sosTimeRange = new SosSweTimeRange();
         if (xbTime.isSetValue()) {
             try {
-                List value = xbTime.getValue();
+                // FIXME check if this parses correct
+                List<?> value = xbTime.getValue();
                 if (value != null && !value.isEmpty()) {
                     RangeValue<DateTime> range = new RangeValue<DateTime>();
                     boolean first = true;
@@ -477,7 +500,7 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
         for (Coordinate xbCoordinate : coordinateArray) {
             if (xbCoordinate.isSetQuantity()) {
                 sosCoordinates.add(new SosSweCoordinate(checkCoordinateName(xbCoordinate.getName()),
-                        parseQuantity(xbCoordinate.getQuantity())));
+                        (SosSweAbstractSimpleType)parseAbstractDataComponent(xbCoordinate.getQuantity())));
             } else {
                 String exceptionText = "Error when parsing the Coordinates of Position: It must be of type Quantity!";
                 LOGGER.debug(exceptionText);
@@ -502,7 +525,7 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
         }
     }
 
-    private List<SosSweField> parseSimpleDataRecordFieldArray(AnyScalarPropertyType[] fieldArray)
+    private List<SosSweField> parseAnyScalarPropertyTypeArray(AnyScalarPropertyType[] fieldArray)
             throws OwsExceptionReport {
         List<SosSweField> sosFields = new ArrayList<SosSweField>(fieldArray.length);
         for (AnyScalarPropertyType xbField : fieldArray) {
@@ -540,5 +563,12 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
             sosTextEncoding.setCollapseWhiteSpaces(textEncoding.getCollapseWhiteSpaces());
         }
         return sosTextEncoding;
+    }
+
+    private SosSweCount parseElementCount(CountPropertyType elementCount) throws OwsExceptionReport {
+        if (elementCount.isSetCount()) {
+            return (SosSweCount)parseAbstractDataComponent(elementCount.getCount());
+        }
+        return null;
     }
 }
