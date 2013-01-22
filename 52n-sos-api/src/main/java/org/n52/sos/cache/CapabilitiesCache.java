@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.joda.time.DateTime;
+import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.util.SosHelper;
@@ -69,7 +70,7 @@ public class CapabilitiesCache{
     private Map<String, String> offName;
 
     /** hash map containing the name for each offering */
-    private Map<String, Collection<String>> kOffferingVObservationTypes;
+    private Map<String, Collection<String>> kOfferingVObservationTypes;
 
     /** hash map containing the procedures for each offering */
     private Map<String, List<String>> kOfferingVProcedures;
@@ -140,19 +141,43 @@ public class CapabilitiesCache{
 	private Map<String, DateTime> kOfferingVMinTime;
 	private Map<String, DateTime> kOfferingVMaxTime;
 	private SosEnvelope globalEnvelope;
-	private DateTime minPhenomenonTime;
-	private DateTime maxPhenomenonTime;
+	private TimePeriod phenomenonTime;
 
     public CapabilitiesCache() {
         // FIXME initialize fields with empty lists
+    	allowedKOfferingVObservationType = null;
+    	childFeatures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
+    	childProcs = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	featureOfInterestIdentifiers = Collections.synchronizedList(new ArrayList<String>());
-    	kOfferingVProcedures = Collections.synchronizedMap(new HashMap<String, List<String>>());
-    	kOfferingVRelatedFeatures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	kOfferingVObservableProperties = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
+    	featureOfInterestTypes = Collections.synchronizedList(new ArrayList<String>());
+    	globalEnvelope = null; // FIXME set to empty new SosEnvelope(null,-1);
+    	kFeatureOfInterestVProcedures = null;
+    	kObservablePropertiesVProcedures = null;
+    	kObservablePropertyVOfferings = null;
     	kOfferingVCompositePhenomenon = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
+    	kOfferingVEnvelope = Collections.synchronizedMap(new HashMap<String, SosEnvelope>());
+    	kOfferingVFeaturesOfInterest = null;
     	kOfferingVMaxTime = Collections.synchronizedMap(new HashMap<String, DateTime>());
     	kOfferingVMinTime = Collections.synchronizedMap(new HashMap<String, DateTime>());
-    	kOfferingVEnvelope = Collections.synchronizedMap(new HashMap<String, SosEnvelope>());
+    	kOfferingVObservableProperties = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
+    	kOfferingVObservationTypes = null;
+    	kOfferingVProcedures = Collections.synchronizedMap(new HashMap<String, List<String>>());
+    	kOfferingVRelatedFeatures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
+    	kProcedureVObservableProperties = null;
+    	kProcedureVOfferings = null;
+    	kRelatedFeatureVRole = null;
+    	observationIdentifiers = Collections.synchronizedList(new ArrayList<String>());
+    	observationTypes = Collections.synchronizedList(new ArrayList<String>());
+    	offName = null;
+    	parentFeatures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
+    	parentProcs = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
+    	phenomenonTime = new TimePeriod();
+    	phens4CompPhens = null;
+    	procedures = Collections.synchronizedList(new ArrayList<String>());
+    	resultTemplates = Collections.synchronizedList(new ArrayList<String>());
+    	srid = -1;
+    	srids = Collections.synchronizedList(new ArrayList<Integer>());
+    	unit4Phen = null;
     }
 
     protected Collection<String> getPhenomenons4Offering(String offering) {
@@ -263,7 +288,7 @@ public class CapabilitiesCache{
      * @return
      */
     protected Map<String, Collection<String>> getKOfferingVObservationTypes() {
-        return kOffferingVObservationTypes;
+        return kOfferingVObservationTypes;
     }
 
     /**
@@ -522,7 +547,7 @@ public class CapabilitiesCache{
      * @param offResultModels
      */
     public void setKOfferingVObservationTypes(Map<String, Collection<String>> offferingObservationTypes) {
-        this.kOffferingVObservationTypes = offferingObservationTypes;
+        this.kOfferingVObservationTypes = offferingObservationTypes;
     }
 
     /**
@@ -1004,19 +1029,19 @@ public class CapabilitiesCache{
 	}
 
 	public DateTime getMinEventTime() {
-		return minPhenomenonTime;
+		return phenomenonTime.getStart();
 	}
 	
 	public void setMinEventTime(DateTime minEventTime) {
-		this.minPhenomenonTime = minEventTime;
+		phenomenonTime.setStart(minEventTime);
 	}
 	
 	public DateTime getMaxEventTime() {
-		return maxPhenomenonTime;
+		return phenomenonTime.getEnd();
 	}
 	
 	public void setMaxEventTime(DateTime maxEventTime) {
-		this.maxPhenomenonTime = maxEventTime;
+		phenomenonTime.setEnd(maxEventTime);
 	}
 
 	@Override
@@ -1041,12 +1066,11 @@ public class CapabilitiesCache{
 		result = prime * result + ((kOfferingVMinTime == null) ? 0 : kOfferingVMinTime.hashCode());
 		result = prime * result + ((kOfferingVObservableProperties == null) ? 0 : kOfferingVObservableProperties.hashCode());
 		result = prime * result + ((kOfferingVRelatedFeatures == null) ? 0 : kOfferingVRelatedFeatures.hashCode());
-		result = prime * result + ((kOffferingVObservationTypes == null) ? 0 : kOffferingVObservationTypes.hashCode());
+		result = prime * result + ((kOfferingVObservationTypes == null) ? 0 : kOfferingVObservationTypes.hashCode());
 		result = prime * result + ((kProcedureVObservableProperties == null) ? 0 : kProcedureVObservableProperties.hashCode());
 		result = prime * result + ((kProcedureVOfferings == null) ? 0 : kProcedureVOfferings.hashCode());
 		result = prime * result + ((kRelatedFeatureVRole == null) ? 0 : kRelatedFeatureVRole.hashCode());
-		result = prime * result + ((maxPhenomenonTime == null) ? 0 : maxPhenomenonTime.hashCode());
-		result = prime * result + ((minPhenomenonTime == null) ? 0 : minPhenomenonTime.hashCode());
+		result = prime * result + ((phenomenonTime == null) ? 0 : phenomenonTime.hashCode());
 		result = prime * result + ((observationIdentifiers == null) ? 0 : observationIdentifiers.hashCode());
 		result = prime * result + ((observationTypes == null) ? 0 : observationTypes.hashCode());
 		result = prime * result + ((offName == null) ? 0 : offName.hashCode());
@@ -1156,10 +1180,10 @@ public class CapabilitiesCache{
 				return false;
 		} else if (!kOfferingVRelatedFeatures.equals(other.kOfferingVRelatedFeatures))
 			return false;
-		if (kOffferingVObservationTypes == null) {
-			if (other.kOffferingVObservationTypes != null)
+		if (kOfferingVObservationTypes == null) {
+			if (other.kOfferingVObservationTypes != null)
 				return false;
-		} else if (!kOffferingVObservationTypes.equals(other.kOffferingVObservationTypes))
+		} else if (!kOfferingVObservationTypes.equals(other.kOfferingVObservationTypes))
 			return false;
 		if (kProcedureVObservableProperties == null) {
 			if (other.kProcedureVObservableProperties != null)
@@ -1176,15 +1200,10 @@ public class CapabilitiesCache{
 				return false;
 		} else if (!kRelatedFeatureVRole.equals(other.kRelatedFeatureVRole))
 			return false;
-		if (maxPhenomenonTime == null) {
-			if (other.maxPhenomenonTime != null)
+		if (phenomenonTime == null) {
+			if (other.phenomenonTime != null)
 				return false;
-		} else if (!maxPhenomenonTime.equals(other.maxPhenomenonTime))
-			return false;
-		if (minPhenomenonTime == null) {
-			if (other.minPhenomenonTime != null)
-				return false;
-		} else if (!minPhenomenonTime.equals(other.minPhenomenonTime))
+		} else if (!phenomenonTime.equals(other.phenomenonTime))
 			return false;
 		if (observationIdentifiers == null) {
 			if (other.observationIdentifiers != null)
