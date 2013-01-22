@@ -335,23 +335,6 @@ public class TimePeriod extends ITime {
         }
         return 0;
     }
-
-    @Override
-    public boolean equals(Object paramObject) {
-        if (start != null && end != null && paramObject instanceof TimePeriod) {
-            TimePeriod tp = (TimePeriod) paramObject;
-            return (start.isEqual(tp.start) && end.isEqual(tp.end));
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 31 * hash + start.hashCode();
-        hash = 31 * hash + end.hashCode();
-        return hash;
-    }
     
     /**
      * @return <tt>true</tt>, if start and end are NOT set
@@ -381,6 +364,69 @@ public class TimePeriod extends ITime {
     public boolean isSetEnd()
 	{
 		return end != null;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((duration == null) ? 0 : duration.hashCode());
+		result = prime * result + ((end == null) ? 0 : end.hashCode());
+		result = prime * result + ((endIndet == null) ? 0 : endIndet.hashCode());
+		result = prime * result + ((intervall == null) ? 0 : intervall.hashCode());
+		result = prime * result + ((start == null) ? 0 : start.hashCode());
+		result = prime * result + ((startIndet == null) ? 0 : startIndet.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof TimePeriod))
+			return false;
+		TimePeriod other = (TimePeriod) obj;
+		if (duration == null) {
+			if (other.duration != null)
+				return false;
+		} else if (!duration.equals(other.duration))
+			return false;
+		if (end == null) {
+			if (other.end != null)
+				return false;
+		} else if (!end.equals(other.end))
+			return false;
+		if (endIndet == null) {
+			if (other.endIndet != null)
+				return false;
+		} else if (!endIndet.equals(other.endIndet))
+			return false;
+		if (intervall == null) {
+			if (other.intervall != null)
+				return false;
+		} else if (!intervall.equals(other.intervall))
+			return false;
+		if (start == null) {
+			if (other.start != null)
+				return false;
+		} else if (!start.equals(other.start))
+			return false;
+		if (startIndet == null) {
+			if (other.startIndet != null)
+				return false;
+		} else if (!startIndet.equals(other.startIndet))
+			return false;
+		return true;
 	}
     
 }
