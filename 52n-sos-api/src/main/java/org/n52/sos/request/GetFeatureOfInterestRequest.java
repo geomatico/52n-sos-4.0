@@ -64,7 +64,7 @@ public class GetFeatureOfInterestRequest extends AbstractServiceRequest {
     /**
      * FOI temporal filters list
      */
-    private List<TemporalFilter> eventTimes;
+    private List<TemporalFilter> temporalFilters;
 
     private Map<String, String> namespaces;
 
@@ -73,8 +73,8 @@ public class GetFeatureOfInterestRequest extends AbstractServiceRequest {
      * 
      * @return temporal filters
      */
-    public List<TemporalFilter> getEventTimes() {
-        return eventTimes;
+    public List<TemporalFilter> getTemporalFilters() {
+        return temporalFilters;
     }
 
     /**
@@ -83,8 +83,8 @@ public class GetFeatureOfInterestRequest extends AbstractServiceRequest {
      * @param eventTime
      *            temporal filters
      */
-    public void setEventTimes(List<TemporalFilter> eventTime) {
-        this.eventTimes = eventTime;
+    public void setTemporalFilters(List<TemporalFilter> temporalFilters) {
+        this.temporalFilters = temporalFilters;
     }
 
     /**
@@ -179,6 +179,26 @@ public class GetFeatureOfInterestRequest extends AbstractServiceRequest {
 
     public Map<String, String> getNamespaces() {
         return namespaces;
+    }
+    
+    public boolean isSetFeatureOfInterestIdentifiers() {
+        return featureIdentifiers != null && !featureIdentifiers.isEmpty();
+    }
+    
+    public boolean isSetTemporalFilters() {
+        return temporalFilters != null && !temporalFilters.isEmpty(); 
+    }
+    
+    public boolean isSetSpatialFilters() {
+        return spatialFilters != null && !spatialFilters.isEmpty(); 
+    }
+    
+    public boolean isSetObservableProperties() {
+        return observedProperties != null && !observedProperties.isEmpty();
+    }
+    
+    public boolean isSetProcedures() {
+        return procedures != null && !procedures.isEmpty();
     }
 
 }
