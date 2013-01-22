@@ -170,11 +170,11 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
          * proc, foi, obsProp not empty
          *
          * resultStructure: swe:Time or swe:TimeRange with value
-         * “http://www.opengis.net/def/property/OGC/0/PhenomenonTime”
+         * “http://www.opengis.net/def/property/OGC/0/PhenomenonTime�?
          *
          * If the resultStructure in the ResultTemplate has a swe:Time component
          * with definition property set to the value
-         * “http://www.opengis.net/def/property/OGC/0/ResultTime” then the value
+         * “http://www.opengis.net/def/property/OGC/0/ResultTime�? then the value
          * of this component shall be used by the service to populate the
          * om:resultTime property of the observation template for each new
          * result block the client is going to insert via the InsertResult
@@ -187,21 +187,21 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
          *
          * A client shall encode the om:phenomenonTime as a swe:Time or
          * swe:TimeRange component with definition
-         * “http://www.opengis.net/def/property/OGC/0/PhenomenonTime”. in the
+         * “http://www.opengis.net/def/property/OGC/0/PhenomenonTime�?. in the
          * resultStructure that it proposes to the service in the
          * InsertResultTemplate operation request. If any of the observation
          * results that the client intends to send to the service via the
          * InsertResult operation is going to have a resultTime that is
          * different to the phenomenonTime then the resultStructure of the
          * ResultTemplate shall also have a swe:Time component with definition
-         * “http://www.opengis.net/def/property/OGC/0/ResultTime”.
+         * “http://www.opengis.net/def/property/OGC/0/ResultTime�?.
          *
          * If a result template with differing observationType or (SWE Common
          * encoded) result structure is inserted for the same constellation of
          * procedure, observedProperty and ObservationOffering (for which
          * observations already exist) an exception shall be returned with the
-         * ExceptionCode “InvalidParameterValue” and locator value
-         * “proposedTemplate”.
+         * ExceptionCode “InvalidParameterValue�? and locator value
+         * “proposedTemplate�?.
          */
     }
 
