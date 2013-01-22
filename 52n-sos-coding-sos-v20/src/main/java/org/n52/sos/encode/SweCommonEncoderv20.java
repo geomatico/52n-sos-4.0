@@ -259,10 +259,10 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
 
             DataArrayType xbDataArray =
                     DataArrayType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-            if (sosDataArray.getElementCount() != null) {
+            if (sosDataArray.isSetElementCount()) {
                 xbDataArray.addNewElementCount().set(createCount(sosDataArray.getElementCount()));
             }
-            if (sosDataArray.getElementType() != null) {
+            if (sosDataArray.isSetElementTyp()) {
                 xbDataArray.addNewElementType().addNewAbstractDataComponent();
                 xbDataArray.getElementType().getAbstractDataComponent()
                         .set(createDataRecord((SosSweDataRecord) sosDataArray.getElementType()));
@@ -273,7 +273,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
                                 new QName(SWEConstants.NS_SWE_20, SWEConstants.EN_DATA_RECORD,
                                         SWEConstants.NS_SWE_PREFIX), DataRecordType.type);
             }
-            if (sosDataArray.getEncoding() != null) {
+            if (sosDataArray.isSetEncoding()) {
                 xbDataArray.addNewEncoding().addNewAbstractEncoding();
                 xbDataArray.getEncoding().getAbstractEncoding()
                         .set(createAbstractEncoding(sosDataArray.getEncoding()));
@@ -356,6 +356,12 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         else if (sosElement instanceof SosSweTime) 
         {
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_TIME_SWE_200, TimeType.type);
+        }
+        else if (sosElement instanceof SosSweDataArray) {
+            xbField.getAbstractDataComponent().substitute(SWEConstants.QN_DATA_ARRAY_SWE_200, DataArrayType.type);
+        }
+        else if (sosElement instanceof SosSweDataRecord) {
+            xbField.getAbstractDataComponent().substitute(SWEConstants.QN_DATA_RECORD_SWE_200, DataRecordType.type);
         }
         else
         {
