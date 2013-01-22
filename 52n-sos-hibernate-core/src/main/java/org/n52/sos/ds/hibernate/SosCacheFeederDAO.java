@@ -255,7 +255,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
 			owsReportsThrownByOfferingThreads = Collections.synchronizedList(new LinkedList<OwsExceptionReport>());
 		}
 		for (Offering offering : hOfferings) {
-			if (!checkOfferingForDeletedProcedure(offering.getObservationConstellations())) {
+			if (!containsDeletedProcedure(offering.getObservationConstellations())) {
 				if (strategy == CacheCreationStrategy.MULTI_THREAD)
 				{
 					// create runnable for offeringId
@@ -273,6 +273,9 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
 						kOfferingVRelatedFeatures, kOfferingVObservationTypes, allowedkOfferingVObservationTypes,
 						kOfferingVMinTime, kOfferingVMaxTime, kOfferingVEnvelope, kOfferingVFeaturesOfInterest, offering);
 				}
+			} else {
+			    offeringThreadsRunning.countDown();
+			    LOGGER.debug("Offering '{}' contains deleted procedure, latch.countDown().", offering.getIdentifier());
 			}
 		}
 		if (strategy == CacheCreationStrategy.MULTI_THREAD)
@@ -281,7 +284,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
 			// wait for all threads to finish
 			try
 			{
-				LOGGER.debug("Waiting for {} threads to finish",hOfferings.size());
+				LOGGER.debug("Waiting for {} threads to finish", offeringThreadsRunning.getCount());
 				offeringThreadsRunning.await();
 			}
 			catch (InterruptedException e) {/* nothing to do here */}
@@ -506,7 +509,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         cache.setObservationIdentifiers(HibernateCriteriaQueryUtilities.getObservationIdentifiers(session));
     }
 
-    private boolean checkOfferingForDeletedProcedure(Set<ObservationConstellation> observationConstellations) {
+    private boolean containsDeletedProcedure(Set<ObservationConstellation> observationConstellations) {
         for (ObservationConstellation observationConstellation : observationConstellations) {
             return observationConstellation.getProcedure().isDeleted();
         }
