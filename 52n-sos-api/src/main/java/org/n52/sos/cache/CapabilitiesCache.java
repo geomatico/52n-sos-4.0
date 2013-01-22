@@ -144,40 +144,39 @@ public class CapabilitiesCache{
 	private TimePeriod phenomenonTime;
 
     public CapabilitiesCache() {
-        // FIXME initialize fields with empty lists
-    	allowedKOfferingVObservationType = null;
+    	allowedKOfferingVObservationType = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	childFeatures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	childProcs = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	featureOfInterestIdentifiers = Collections.synchronizedList(new ArrayList<String>());
     	featureOfInterestTypes = Collections.synchronizedList(new ArrayList<String>());
-    	globalEnvelope = null; // FIXME set to empty new SosEnvelope(null,-1);
-    	kFeatureOfInterestVProcedures = null;
-    	kObservablePropertiesVProcedures = null;
-    	kObservablePropertyVOfferings = null;
+    	globalEnvelope = new SosEnvelope(null, getSrid());
+    	kFeatureOfInterestVProcedures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
+    	kObservablePropertiesVProcedures = Collections.synchronizedMap(new HashMap<String, List<String>>());
+    	kObservablePropertyVOfferings = Collections.synchronizedMap(new HashMap<String, List<String>>());
     	kOfferingVCompositePhenomenon = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	kOfferingVEnvelope = Collections.synchronizedMap(new HashMap<String, SosEnvelope>());
-    	kOfferingVFeaturesOfInterest = null;
+    	kOfferingVFeaturesOfInterest = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	kOfferingVMaxTime = Collections.synchronizedMap(new HashMap<String, DateTime>());
     	kOfferingVMinTime = Collections.synchronizedMap(new HashMap<String, DateTime>());
     	kOfferingVObservableProperties = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	kOfferingVObservationTypes = null;
+    	kOfferingVObservationTypes = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	kOfferingVProcedures = Collections.synchronizedMap(new HashMap<String, List<String>>());
     	kOfferingVRelatedFeatures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	kProcedureVObservableProperties = null;
-    	kProcedureVOfferings = null;
-    	kRelatedFeatureVRole = null;
+    	kProcedureVObservableProperties = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
+    	kProcedureVOfferings = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
+    	kRelatedFeatureVRole = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	observationIdentifiers = Collections.synchronizedList(new ArrayList<String>());
     	observationTypes = Collections.synchronizedList(new ArrayList<String>());
-    	offName = null;
+    	offName = Collections.synchronizedMap(new HashMap<String, String>());
     	parentFeatures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	parentProcs = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	phenomenonTime = new TimePeriod();
-    	phens4CompPhens = null;
+    	phens4CompPhens = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	procedures = Collections.synchronizedList(new ArrayList<String>());
     	resultTemplates = Collections.synchronizedList(new ArrayList<String>());
     	srid = -1;
     	srids = Collections.synchronizedList(new ArrayList<Integer>());
-    	unit4Phen = null;
+    	unit4Phen = Collections.synchronizedMap(new HashMap<String, String>());
     }
 
     protected Collection<String> getPhenomenons4Offering(String offering) {
@@ -463,7 +462,7 @@ public class CapabilitiesCache{
      */
     public void setProcedureHierarchies(Map<String, Collection<String>> parentProcs) {
         this.parentProcs = parentProcs;
-        this.childProcs = SosHelper.invertHierarchy(parentProcs);
+        childProcs = SosHelper.invertHierarchy(parentProcs);
     }
 
     /**
@@ -493,7 +492,7 @@ public class CapabilitiesCache{
     }
 
     protected Map<String, Collection<String>> getChildFeatures() {
-        return childProcs;
+        return childFeatures;
     }
 
     protected void setChildFeatures(Map<String, Collection<String>> childFeatures) {
