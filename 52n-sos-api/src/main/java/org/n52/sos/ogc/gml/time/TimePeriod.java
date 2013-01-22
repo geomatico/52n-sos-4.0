@@ -29,12 +29,16 @@ import java.util.Collection;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.format.ISOPeriodFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class represents a GML conform timePeriod element.
  * 
  */
 public class TimePeriod extends ITime {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(TimePeriod.class);
     
     private static final long serialVersionUID = 1L;
 
@@ -245,7 +249,9 @@ public class TimePeriod extends ITime {
         } else if( time instanceof TimePeriod ){
             extendToContain( (TimePeriod) time );
         } else {
-            //TODO: unknown ISosTime type, throw error?
+        	String errorMsg = String.format("Received ITime type \"%s\" unknown.", time!=null?time.getClass().getName():time);
+        	LOGGER.error(errorMsg);
+        	throw new IllegalArgumentException(errorMsg);
         }
     }
     
@@ -276,10 +282,10 @@ public class TimePeriod extends ITime {
      */
     public void extendToContain( DateTime time ){
         if( time != null ){
-            if( start == null || time.isBefore( start ) ){
+            if( isSetStart() || time.isBefore( start ) ){
                 start = time;
             }
-            if( end == null || time.isAfter( end ) ){
+            if( isSetEnd() || time.isAfter( end ) ){
                 end = time;
             }
         }
@@ -330,11 +336,6 @@ public class TimePeriod extends ITime {
         return 0;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object paramObject) {
         if (start != null && end != null && paramObject instanceof TimePeriod) {
@@ -344,11 +345,6 @@ public class TimePeriod extends ITime {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         int hash = 7;
@@ -356,4 +352,35 @@ public class TimePeriod extends ITime {
         hash = 31 * hash + end.hashCode();
         return hash;
     }
+    
+    /**
+     * @return <tt>true</tt>, if start and end are NOT set
+     * @see #isSetStart()
+     * @see #isSetEnd()
+     */
+    public boolean isEmpty()
+    {
+    	return !isSetEnd() && !isSetStart();
+    }
+
+    /**
+     * @return <tt>true</tt>, if start is set
+     * @see #isEmpty()
+     * @see #isSetEnd()
+     */
+    public boolean isSetStart()
+	{
+		return start != null;
+	}
+
+    /**
+     * @return <tt>true</tt>, if end is set
+     * @see #isSetStart()
+     * @see #isEmpty()
+     */
+    public boolean isSetEnd()
+	{
+		return end != null;
+	}
+    
 }
