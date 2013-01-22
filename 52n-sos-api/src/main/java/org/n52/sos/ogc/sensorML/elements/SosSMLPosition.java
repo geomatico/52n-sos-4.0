@@ -25,13 +25,14 @@ package org.n52.sos.ogc.sensorML.elements;
 
 import java.util.List;
 
+import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweCoordinate;
 
 /**
  * SOS internal representation of SensorML position
  * 
  */
-public class SosSMLPosition {
+public class SosSMLPosition extends SosSweAbstractDataComponent {
 
     private String name;
 
