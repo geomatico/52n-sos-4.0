@@ -26,6 +26,7 @@ package org.n52.sos.cache;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,6 @@ import java.util.Set;
 
 import org.joda.time.DateTime;
 import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.util.SosHelper;
 
@@ -72,7 +72,7 @@ public class CapabilitiesCache{
     private Map<String, Collection<String>> kOffferingVObservationTypes;
 
     /** hash map containing the procedures for each offering */
-    private Map<String, List<String>> KOfferingVProcedures;
+    private Map<String, List<String>> kOfferingVProcedures;
 
     /** hash map containing the features of interest for each offering */
     private Map<String, Collection<String>> kOfferingVFeaturesOfInterest;
@@ -123,7 +123,7 @@ public class CapabilitiesCache{
     private int srid;
 
     /** hash map containing the related features for each offering */
-    private Map<String, Collection<String>> kOfferingVRelatedFEatures;
+    private Map<String, Collection<String>> kOfferingVRelatedFeatures;
 
     /** hash map containing the roles for each related feature */
     private Map<String, Collection<String>> kRelatedFeatureVRole;
@@ -143,26 +143,20 @@ public class CapabilitiesCache{
 	private DateTime minPhenomenonTime;
 	private DateTime maxPhenomenonTime;
 
-    /**
-     * constructor
-     * 
-     * @throws OwsExceptionReport
-     */
     public CapabilitiesCache() {
-        super();
         // FIXME initialize fields with empty lists
+    	featureOfInterestIdentifiers = Collections.synchronizedList(new ArrayList<String>());
+    	kOfferingVProcedures = Collections.synchronizedMap(new HashMap<String, List<String>>());
+    	kOfferingVRelatedFeatures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
+    	kOfferingVObservableProperties = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
+    	kOfferingVCompositePhenomenon = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
+    	kOfferingVMaxTime = Collections.synchronizedMap(new HashMap<String, DateTime>());
+    	kOfferingVMinTime = Collections.synchronizedMap(new HashMap<String, DateTime>());
+    	kOfferingVEnvelope = Collections.synchronizedMap(new HashMap<String, SosEnvelope>());
     }
 
-    /**
-     * Returns the observedProperties (phenomenons) for the requested offering
-     * 
-     * @param offering
-     *            the offering for which observedProperties should be returned
-     * @return Returns String[] containing the phenomenons of the requested
-     *         offering
-     */
     protected Collection<String> getPhenomenons4Offering(String offering) {
-        return this.kOfferingVObservableProperties.get(offering);
+        return kOfferingVObservableProperties.get(offering);
     }
 
     /**
@@ -180,16 +174,16 @@ public class CapabilitiesCache{
         List<String> result = new ArrayList<String>();
 
         // single phenomena
-        if (this.kOfferingVObservableProperties.containsKey(offering)) {
+        if (kOfferingVObservableProperties.containsKey(offering)) {
 
-            result.addAll(this.kOfferingVObservableProperties.get(offering));
+            result.addAll(kOfferingVObservableProperties.get(offering));
 
             // components of composite phenomena
-            if (this.kOfferingVCompositePhenomenon.containsKey(offering)) {
-                Collection<String> compPhens = this.kOfferingVCompositePhenomenon.get(offering);
+            if (kOfferingVCompositePhenomenon.containsKey(offering)) {
+                Collection<String> compPhens = kOfferingVCompositePhenomenon.get(offering);
                 for (String cp : compPhens) {
-                    if (this.phens4CompPhens.containsKey(cp)) {
-                        result.addAll(this.phens4CompPhens.get(cp));
+                    if (phens4CompPhens.containsKey(cp)) {
+                        result.addAll(phens4CompPhens.get(cp));
                     }
                 }
 
@@ -198,11 +192,11 @@ public class CapabilitiesCache{
 
         // only components of composite phenomena
         else {
-            if (this.kOfferingVCompositePhenomenon.containsKey(offering)) {
-                Collection<String> compPhens = this.kOfferingVCompositePhenomenon.get(offering);
+            if (kOfferingVCompositePhenomenon.containsKey(offering)) {
+                Collection<String> compPhens = kOfferingVCompositePhenomenon.get(offering);
                 for (String cp : compPhens) {
-                    if (this.phens4CompPhens.containsKey(cp)) {
-                        result.addAll(this.phens4CompPhens.get(cp));
+                    if (phens4CompPhens.containsKey(cp)) {
+                        result.addAll(phens4CompPhens.get(cp));
                     }
                 }
 
@@ -221,29 +215,6 @@ public class CapabilitiesCache{
         if (kObservablePropertyVOfferings != null && kObservablePropertyVOfferings.keySet() != null) {
             observableProperties.addAll(kObservablePropertyVOfferings.keySet());
         }
-            // // get composite phenomena
-            // if (this.offCompPhens.containsKey(s)) {
-            // Collection<String> phen = this.offCompPhens.get(s);
-            // for (String p : phen) {
-            //
-            // // add id of the composite phenomenon to the result
-            // if (!phenomenons.contains(p)) {
-            // phenomenons.add(p);
-            // }
-            //
-            // // add components of composite phenomenon to the result
-            // if (phens4CompPhens.containsKey(p)) {
-            //
-            // Collection<String> components = phens4CompPhens.get(p);
-            // for (String phenComp : components) {
-            // if (!phenomenons.contains(phenComp)) {
-            // phenomenons.add(phenComp);
-            // }
-            // }
-            //
-            // }
-            // }
-            // }
         return observableProperties;
     }
 
@@ -301,7 +272,7 @@ public class CapabilitiesCache{
      * @return
      */
     protected Map<String, List<String>> getOffProcedures() {
-        return KOfferingVProcedures;
+        return kOfferingVProcedures;
     }
 
     /**
@@ -352,7 +323,7 @@ public class CapabilitiesCache{
      * @return String[] containing the procedures for the requested offering
      */
     protected Collection<String> getProcedureIdentifierFor(String offering) {
-        return this.KOfferingVProcedures.get(offering);
+        return kOfferingVProcedures.get(offering);
     }
 
     /**
@@ -560,7 +531,7 @@ public class CapabilitiesCache{
      * @param offProcedures
      */
     public void setKOfferingVProcedures(Map<String, List<String>> offProcedures) {
-        this.KOfferingVProcedures = offProcedures;
+        this.kOfferingVProcedures = offProcedures;
     }
 
     /**
@@ -778,7 +749,7 @@ public class CapabilitiesCache{
      *            the relatedFeatures to set
      */
     public void setKOfferingVRelatedFeatures(Map<String, Collection<String>> offRelatedFeatures) {
-        this.kOfferingVRelatedFEatures = offRelatedFeatures;
+        this.kOfferingVRelatedFeatures = offRelatedFeatures;
     }
 
     /**
@@ -787,7 +758,7 @@ public class CapabilitiesCache{
      * @return the relatedFeatures Map with related features for offerings
      */
     protected Map<String, Collection<String>> getKOfferingVRelatedFeatures() {
-        return kOfferingVRelatedFEatures;
+        return kOfferingVRelatedFeatures;
     }
 
     protected Map<String, Collection<String>> getKRelatedFeatureVRole() {
@@ -797,7 +768,7 @@ public class CapabilitiesCache{
     /**
      * method to set the related features for a offering
      * 
-     * @param kOfferingVRelatedFEatures
+     * @param kOfferingVRelatedFeatures
      *            the relatedFeatures to set
      */
     public void setKRelatedFeaturesVRole(Map<String, Collection<String>> kRelatedFeatureVRole) {
@@ -973,7 +944,7 @@ public class CapabilitiesCache{
      *
 	 */
 	public Map<String, SosEnvelope> getKOfferingVEnvelope() {
-		return this.kOfferingVEnvelope;
+		return kOfferingVEnvelope;
 	}
 	
 	/**
@@ -992,7 +963,7 @@ public class CapabilitiesCache{
      *
 	 */
 	public Map<String, DateTime> getKOfferingVMinTime() {
-		return this.kOfferingVMinTime;
+		return kOfferingVMinTime;
 	}
 	
 	/**
@@ -1012,7 +983,7 @@ public class CapabilitiesCache{
      *
 	 */
 	public Map<String, DateTime> getKOfferingVMaxTime() {
-		return this.kOfferingVMaxTime;
+		return kOfferingVMaxTime;
 	}
 	
 	/**
@@ -1025,7 +996,7 @@ public class CapabilitiesCache{
 	}
 			
 	public SosEnvelope getGlobalEnvelope() {
-		return this.globalEnvelope;
+		return globalEnvelope;
 	}
 
 	public void setGlobalEnvelope(SosEnvelope globalEnvelope) {
@@ -1033,7 +1004,7 @@ public class CapabilitiesCache{
 	}
 
 	public DateTime getMinEventTime() {
-		return this.minPhenomenonTime;
+		return minPhenomenonTime;
 	}
 	
 	public void setMinEventTime(DateTime minEventTime) {
@@ -1041,7 +1012,7 @@ public class CapabilitiesCache{
 	}
 	
 	public DateTime getMaxEventTime() {
-		return this.maxPhenomenonTime;
+		return maxPhenomenonTime;
 	}
 	
 	public void setMaxEventTime(DateTime maxEventTime) {
@@ -1053,7 +1024,7 @@ public class CapabilitiesCache{
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((KOfferingVProcedures == null) ? 0 : KOfferingVProcedures.hashCode());
+		result = prime * result + ((kOfferingVProcedures == null) ? 0 : kOfferingVProcedures.hashCode());
 		result = prime * result + ((allowedKOfferingVObservationType == null) ? 0 : allowedKOfferingVObservationType.hashCode());
 		result = prime * result + ((childFeatures == null) ? 0 : childFeatures.hashCode());
 		result = prime * result + ((childProcs == null) ? 0 : childProcs.hashCode());
@@ -1069,7 +1040,7 @@ public class CapabilitiesCache{
 		result = prime * result + ((kOfferingVMaxTime == null) ? 0 : kOfferingVMaxTime.hashCode());
 		result = prime * result + ((kOfferingVMinTime == null) ? 0 : kOfferingVMinTime.hashCode());
 		result = prime * result + ((kOfferingVObservableProperties == null) ? 0 : kOfferingVObservableProperties.hashCode());
-		result = prime * result + ((kOfferingVRelatedFEatures == null) ? 0 : kOfferingVRelatedFEatures.hashCode());
+		result = prime * result + ((kOfferingVRelatedFeatures == null) ? 0 : kOfferingVRelatedFeatures.hashCode());
 		result = prime * result + ((kOffferingVObservationTypes == null) ? 0 : kOffferingVObservationTypes.hashCode());
 		result = prime * result + ((kProcedureVObservableProperties == null) ? 0 : kProcedureVObservableProperties.hashCode());
 		result = prime * result + ((kProcedureVOfferings == null) ? 0 : kProcedureVOfferings.hashCode());
@@ -1100,10 +1071,10 @@ public class CapabilitiesCache{
 		if (!(obj instanceof CapabilitiesCache))
 			return false;
 		CapabilitiesCache other = (CapabilitiesCache) obj;
-		if (KOfferingVProcedures == null) {
-			if (other.KOfferingVProcedures != null)
+		if (kOfferingVProcedures == null) {
+			if (other.kOfferingVProcedures != null)
 				return false;
-		} else if (!KOfferingVProcedures.equals(other.KOfferingVProcedures))
+		} else if (!kOfferingVProcedures.equals(other.kOfferingVProcedures))
 			return false;
 		if (allowedKOfferingVObservationType == null) {
 			if (other.allowedKOfferingVObservationType != null)
@@ -1180,10 +1151,10 @@ public class CapabilitiesCache{
 				return false;
 		} else if (!kOfferingVObservableProperties.equals(other.kOfferingVObservableProperties))
 			return false;
-		if (kOfferingVRelatedFEatures == null) {
-			if (other.kOfferingVRelatedFEatures != null)
+		if (kOfferingVRelatedFeatures == null) {
+			if (other.kOfferingVRelatedFeatures != null)
 				return false;
-		} else if (!kOfferingVRelatedFEatures.equals(other.kOfferingVRelatedFEatures))
+		} else if (!kOfferingVRelatedFeatures.equals(other.kOfferingVRelatedFeatures))
 			return false;
 		if (kOffferingVObservationTypes == null) {
 			if (other.kOffferingVObservationTypes != null)
