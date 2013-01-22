@@ -194,7 +194,7 @@ public class SweHelper {
                 if (!(value instanceof NilTemplateValue)) {
                     if (sweField.getElement() instanceof SosSweTime) {
                         block.add(DateTimeHelper.format(phenomenonTime));
-                    } else if (sweField.getElement() instanceof SosSweAbstractSimpleType
+                    } else if (sweField.getElement() instanceof SosSweAbstractDataComponent
                             && sweField.getElement().getDefinition().equals(phenID)) {
                         block.add(value.getValue().toString());
                     } else if (sweField.getElement() instanceof SosSweObservableProperty) {
