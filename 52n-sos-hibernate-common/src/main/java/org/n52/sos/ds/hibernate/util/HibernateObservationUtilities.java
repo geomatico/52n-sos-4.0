@@ -131,12 +131,16 @@ public class HibernateObservationUtilities {
 
                 // TODO get full description
                 Procedure hProcedure = hObservationConstellation.getProcedure();
-                SosProcedureDescription procedure =
-                        HibernateProcedureUtilities.createSosProcedureDescription(hProcedure, hProcedure
-                                .getIdentifier(), hProcedure.getProcedureDescriptionFormat()
-                                .getProcedureDescriptionFormat());
-                if (!procedures.containsKey(procedure.getProcedureIdentifier())) {
-                    procedures.put(procedure.getProcedureIdentifier(), procedure);
+                String procedureIdentifier = hProcedure.getIdentifier();
+                SosProcedureDescription procedure = null;
+                if (procedures.containsKey(procedureIdentifier)) {
+                    procedure = procedures.get(procedureIdentifier);
+                } else {
+                    procedure =
+                            HibernateProcedureUtilities.createSosProcedureDescription(hProcedure, hProcedure
+                                    .getIdentifier(), hProcedure.getProcedureDescriptionFormat()
+                                    .getProcedureDescriptionFormat());
+                    procedures.put(procedureIdentifier, procedure);
                 }
 
                 String observationType = hObservationConstellation.getObservationType().getObservationType();
@@ -208,7 +212,11 @@ public class HibernateObservationUtilities {
                 int obsConstHash = obsConst.hashCode();
                 if (!observationConstellations.containsKey(obsConstHash)) {
                     if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)) {
-                        Set<ResultTemplate> hResultTemplates = hObservationConstellation.getResultTemplates();
+                        List<ResultTemplate> hResultTemplates =
+                                HibernateCriteriaQueryUtilities.getResultTemplateObjectsForObservationConstellation(
+                                        hObservationConstellation, session);
+                        // Set<ResultTemplate> hResultTemplates =
+                        // hObservationConstellation.getResultTemplates();
                         if (hResultTemplates != null && !hResultTemplates.isEmpty()) {
                             for (ResultTemplate hResultTemplate : hResultTemplates) {
                                 if (hResultTemplate.getIdentifier() != null
@@ -312,7 +320,12 @@ public class HibernateObservationUtilities {
     private static ITime getPhenomenonTime(Observation hObservation) {
         // create time element
         DateTime phenStartTime = new DateTime(hObservation.getPhenomenonTimeStart());
-        DateTime phenEndTime = new DateTime(hObservation.getPhenomenonTimeEnd());
+        DateTime phenEndTime = null;
+        if (hObservation.getPhenomenonTimeEnd() != null) {
+            phenEndTime = new DateTime(hObservation.getPhenomenonTimeEnd());
+        } else {
+            phenEndTime = phenStartTime;
+        }
         ITime phenomenonTime;
         if (phenStartTime.equals(phenEndTime)) {
             phenomenonTime = new TimeInstant(phenStartTime, "");

@@ -24,10 +24,16 @@
 package org.n52.sos.ds.hibernate.util;
 
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Conjunction;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Projection;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.spatial.criterion.SpatialProjections;
 import org.hibernate.spatial.criterion.SpatialRestrictions;
@@ -56,7 +62,7 @@ public class HibernateFeatureCriteriaQueryUtilities {
      * @return FeatureOfInterest objects
      */
     public static List<FeatureOfInterest> getFeatureOfInterests(HibernateQueryObject queryObject, Session session) {
-        return (List<FeatureOfInterest>) HibernateCriteriaQueryUtilities.getObject(queryObject,
+        return (List<FeatureOfInterest>) HibernateCriteriaQueryUtilities.getObjectList(queryObject,
                 session, FeatureOfInterest.class);
     }
 
@@ -84,5 +90,56 @@ public class HibernateFeatureCriteriaQueryUtilities {
         disjunction.add(SpatialRestrictions.eq(HibernateConstants.PARAMETER_GEOMETRY, geometry));
         criteria.add(disjunction);
         return (FeatureOfInterest)criteria.uniqueResult();
+    }
+
+    public static List<String> getFeatureOfInterestIdentifier(HibernateQueryObject queryObject, Session session) {
+        queryObject.addProjection(HibernateCriteriaQueryUtilities.getDistinctProjection(HibernateCriteriaQueryUtilities.getIdentifierParameter(null)));
+        return (List<String>) getObjectList(queryObject, session, FeatureOfInterest.class);
+    }
+    
+    
+    
+    protected static List<?> getObjectList(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
+        Criteria criteria = session.createCriteria(objectClass);
+        if (queryObject.isSetAliases()) {
+            addAliasesToCriteria(criteria, queryObject.getAliases());
+        }
+        if (queryObject.isSetCriterions()) {
+            Conjunction conjunction = Restrictions.conjunction();
+            for (Criterion criterion : queryObject.getCriterions()) {
+                conjunction.add(criterion);
+            }
+            criteria.add(conjunction);
+        }
+        if (queryObject.isSetProjections()) {
+                ProjectionList projectionList = Projections.projectionList();
+                for (Projection projection : queryObject.getProjections())
+                {
+                        projectionList.add(projection);
+                }
+                criteria.setProjection(projectionList);
+        }
+        if (queryObject.isSetOrder()) {
+            criteria.addOrder(queryObject.getOrder());
+        }
+        if (queryObject.isSetMaxResults()) {
+            criteria.setMaxResults(queryObject.getMaxResult());
+        }
+        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        return criteria.list();
+    }
+    
+    /**
+     * Add aliases to a Hibernate Criteria
+     * 
+     * @param criteria
+     *            Hibernate Criteria
+     * @param aliases
+     *            Aliases for query between tables
+     */
+    public static void addAliasesToCriteria(Criteria criteria, Map<String, String> aliases) {
+        for (String aliasKey : aliases.keySet()) {
+            criteria.createAlias(aliasKey, aliases.get(aliasKey));
+        }
     }
 }

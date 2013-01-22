@@ -33,6 +33,7 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
 import org.n52.sos.ds.IGetFeatureOfInterestDAO;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ogc.om.features.SosFeatureCollection;
@@ -151,18 +152,18 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
         // TODO get foi ids from foi table. Else only fois returned which relates to observations.
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
-        String obsAlias = HibernateCriteriaQueryUtilities.addObservationAliasToMap(aliases, null);
+//        String obsAlias = HibernateCriteriaQueryUtilities.addObservationAliasToMap(aliases, null);
         String obsConstAlias =
-                HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, obsAlias);
+                HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
         // featureOfInterest identifiers
-        if (sosRequest.getFeatureIdentifiers() != null && !sosRequest.getFeatureIdentifiers().isEmpty()) {
-            String foiAlias = HibernateCriteriaQueryUtilities.addFeatureOfInterestAliasToMap(aliases, obsAlias);
+        if (sosRequest.isSetFeatureOfInterestIdentifiers()) {
+            String foiAlias = HibernateCriteriaQueryUtilities.addFeatureOfInterestAliasToMap(aliases, null);
             queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                     HibernateCriteriaQueryUtilities.getIdentifierParameter(foiAlias),
                     sosRequest.getFeatureIdentifiers()));
         }
         // observableProperties
-        if (sosRequest.getObservedProperties() != null && !sosRequest.getObservedProperties().isEmpty()) {
+        if (sosRequest.isSetObservableProperties()) {
             String obsPropAlias =
                     HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, obsConstAlias);
             queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
@@ -170,14 +171,14 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
                     sosRequest.getObservedProperties()));
         }
         // procedures
-        if (sosRequest.getProcedures() != null && !sosRequest.getProcedures().isEmpty()) {
+        if (sosRequest.isSetProcedures()) {
             String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, obsConstAlias);
             queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                     HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), sosRequest.getProcedures()));
         }
         // temporal filters
-        if (sosRequest.getEventTimes() != null && !sosRequest.getEventTimes().isEmpty()) {
-            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(sosRequest.getEventTimes()));
+        if (sosRequest.isSetTemporalFilters()) {
+            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(sosRequest.getTemporalFilters()));
         }
         queryObject.setAliases(aliases);
         return HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(queryObject,

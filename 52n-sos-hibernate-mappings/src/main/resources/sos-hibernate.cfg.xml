@@ -47,7 +47,7 @@
         <mapping resource="mapping/RelatedFeatureRole.hbm.xml"/>
         <mapping resource="mapping/Request.hbm.xml"/>
         <mapping resource="mapping/ResultTemplate.hbm.xml"/>
-        <mapping resource="mapping/ResultType.hbm.xml"/>
+        <!-- <mapping resource="mapping/ResultType.hbm.xml"/> -->
         <mapping resource="mapping/SpatialFilteringProfile.hbm.xml"/>
         <mapping resource="mapping/SpatialRefSys.hbm.xml"/>
         <mapping resource="mapping/SweType.hbm.xml"/>

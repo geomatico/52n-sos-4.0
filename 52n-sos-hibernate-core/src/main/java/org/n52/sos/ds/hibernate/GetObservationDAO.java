@@ -36,7 +36,6 @@ import javax.xml.namespace.QName;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.IGetObservationDAO;
@@ -201,38 +200,39 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
             throws OwsExceptionReport {
 
         Map<String, String> observationConstellationAliases = new HashMap<String, String>();
-        List<Criterion> observationConstellationCriterions = new ArrayList<Criterion>();
+        HibernateQueryObject observationConstellationQueryObject = new HibernateQueryObject();
+        
+//        List<Criterion> observationConstellationCriterions = new ArrayList<Criterion>();
         // offering
-        if (request.getOfferings() != null && !request.getOfferings().isEmpty()) {
+        if (request.isSetOffering()) {
             String offAlias =
                     HibernateCriteriaQueryUtilities.addOfferingAliasToMap(observationConstellationAliases, null);
-            observationConstellationCriterions.add(HibernateCriteriaQueryUtilities
+            observationConstellationQueryObject.addCriterion(HibernateCriteriaQueryUtilities
                     .getDisjunctionCriterionForStringList(
                             HibernateCriteriaQueryUtilities.getIdentifierParameter(offAlias), request.getOfferings()));
         }
         // observableProperties
-        if (request.getObservedProperties() != null && !request.getObservedProperties().isEmpty()) {
+        if (request.isSetObservableProperty()) {
             String obsPropAlias =
                     HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(observationConstellationAliases,
                             null);
-            observationConstellationCriterions.add(HibernateCriteriaQueryUtilities
+            observationConstellationQueryObject.addCriterion(HibernateCriteriaQueryUtilities
                     .getDisjunctionCriterionForStringList(
                             HibernateCriteriaQueryUtilities.getIdentifierParameter(obsPropAlias),
                             request.getObservedProperties()));
         }
         // procedures
-        if (request.getProcedures() != null && !request.getProcedures().isEmpty()) {
+        if (request.isSetProcedure()) {
             String procAlias =
                     HibernateCriteriaQueryUtilities.addProcedureAliasToMap(observationConstellationAliases, null);
-            observationConstellationCriterions
-                    .add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+            observationConstellationQueryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                             HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), request.getProcedures()));
         }
-        observationConstellationCriterions.add(Restrictions.isNotNull(HibernateConstants.PARAMETER_OBSERVATION_TYPE));
+        observationConstellationQueryObject.addCriterion(Restrictions.isNotNull(HibernateConstants.PARAMETER_OBSERVATION_TYPE));
 
+        observationConstellationQueryObject.setAliases(observationConstellationAliases);
         List<ObservationConstellation> observationConstallations =
-                HibernateCriteriaQueryUtilities.getObservationConstallations(observationConstellationAliases,
-                        observationConstellationCriterions, session);
+                HibernateCriteriaQueryUtilities.getObservationConstallations(observationConstellationQueryObject, session);
 
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> observationAliases = new HashMap<String, String>();

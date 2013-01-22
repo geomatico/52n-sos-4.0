@@ -94,7 +94,7 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
                 queryObject.addCriterion(HibernateCriteriaQueryUtilities.getCriterionForSpatialFilter(propertyName,
                         filter));
             }
-            return HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(queryObject, session);
+            return HibernateFeatureCriteriaQueryUtilities.getFeatureOfInterestIdentifier(queryObject, session);
         } catch (HibernateException he) {
             String exceptionText =
                     "An error occurs while querying feature identifiers for a featureOfInterest identifier!";
