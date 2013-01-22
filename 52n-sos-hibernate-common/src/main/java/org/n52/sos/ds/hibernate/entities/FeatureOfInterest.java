@@ -54,37 +54,37 @@ public class FeatureOfInterest implements java.io.Serializable {
 
     private String url;
 
-    private Set<Observation> observations = new HashSet<Observation>(0);
+//    private Set<Observation> observations = new HashSet<Observation>(0);
 
     private Set<FeatureOfInterest> featureOfInterestsForChildFeatureId = new HashSet<FeatureOfInterest>(0);
 
     private Set<FeatureOfInterest> featureOfInterestsForParentFeatureId = new HashSet<FeatureOfInterest>(0);
 
-    private Set<ResultTemplate> resultTemplates = new HashSet<ResultTemplate>(0);
+//    private Set<ResultTemplate> resultTemplates = new HashSet<ResultTemplate>(0);
 
     public FeatureOfInterest() {
     }
 
-    public FeatureOfInterest(long featureOfInterestId, FeatureOfInterestType featureOfInterestType) {
-        this.featureOfInterestId = featureOfInterestId;
-        this.featureOfInterestType = featureOfInterestType;
-    }
-
-    public FeatureOfInterest(long featureOfInterestId, FeatureOfInterestType featureOfInterestType, String identifier, String name,
-            Geometry geom, String descriptionXml, String url, Set<Observation> observations,
-            Set<FeatureOfInterest> featureOfInterestsForChildFeatureId, Set<FeatureOfInterest> featureOfInterestsForParentFeatureId, Set<ResultTemplate> resultTemplates) {
-        this.featureOfInterestId = featureOfInterestId;
-        this.featureOfInterestType = featureOfInterestType;
-        this.identifier = identifier;
-        this.name = name;
-        this.geom = geom;
-        this.descriptionXml = descriptionXml;
-        this.url = url;
-        this.observations = observations;
-        this.featureOfInterestsForChildFeatureId = featureOfInterestsForChildFeatureId;
-        this.featureOfInterestsForParentFeatureId = featureOfInterestsForParentFeatureId;
-        this.resultTemplates = resultTemplates;
-    }
+//    public FeatureOfInterest(long featureOfInterestId, FeatureOfInterestType featureOfInterestType) {
+//        this.featureOfInterestId = featureOfInterestId;
+//        this.featureOfInterestType = featureOfInterestType;
+//    }
+//
+//    public FeatureOfInterest(long featureOfInterestId, FeatureOfInterestType featureOfInterestType, String identifier, String name,
+//            Geometry geom, String descriptionXml, String url, Set<Observation> observations,
+//            Set<FeatureOfInterest> featureOfInterestsForChildFeatureId, Set<FeatureOfInterest> featureOfInterestsForParentFeatureId, Set<ResultTemplate> resultTemplates) {
+//        this.featureOfInterestId = featureOfInterestId;
+//        this.featureOfInterestType = featureOfInterestType;
+//        this.identifier = identifier;
+//        this.name = name;
+//        this.geom = geom;
+//        this.descriptionXml = descriptionXml;
+//        this.url = url;
+//        this.observations = observations;
+//        this.featureOfInterestsForChildFeatureId = featureOfInterestsForChildFeatureId;
+//        this.featureOfInterestsForParentFeatureId = featureOfInterestsForParentFeatureId;
+//        this.resultTemplates = resultTemplates;
+//    }
 
     public long getFeatureOfInterestId() {
         return this.featureOfInterestId;
@@ -142,13 +142,13 @@ public class FeatureOfInterest implements java.io.Serializable {
         this.url = url;
     }
 
-    public Set<Observation> getObservations() {
-        return this.observations;
-    }
-
-    public void setObservations(Set<Observation> observations) {
-        this.observations = observations;
-    }
+//    public Set<Observation> getObservations() {
+//        return this.observations;
+//    }
+//
+//    public void setObservations(Set<Observation> observations) {
+//        this.observations = observations;
+//    }
 
     public Set<FeatureOfInterest> getFeatureOfInterestsForChildFeatureId() {
         return this.featureOfInterestsForChildFeatureId;
@@ -166,12 +166,12 @@ public class FeatureOfInterest implements java.io.Serializable {
         this.featureOfInterestsForParentFeatureId = featureOfInterestsForParentFeatureId;
     }
 
-    public Set<ResultTemplate> getResultTemplates() {
-        return this.resultTemplates;
-    }
-
-    public void setResultTemplates(Set<ResultTemplate> resultTemplates) {
-        this.resultTemplates = resultTemplates;
-    }
+//    public Set<ResultTemplate> getResultTemplates() {
+//        return this.resultTemplates;
+//    }
+//
+//    public void setResultTemplates(Set<ResultTemplate> resultTemplates) {
+//        this.resultTemplates = resultTemplates;
+//    }
 
 }

@@ -56,37 +56,37 @@ public class Procedure implements java.io.Serializable {
 
     private Set<Procedure> proceduresForChildSensorId = new HashSet<Procedure>(0);
 
-    private Set<ObservationTemplate> observationTemplates = new HashSet<ObservationTemplate>(0);
+//    private Set<ObservationTemplate> observationTemplates = new HashSet<ObservationTemplate>(0);
 
     private Set<Procedure> proceduresForParentSensorId = new HashSet<Procedure>(0);
 
     public Procedure() {
     }
 
-    public Procedure(long procedureId, ProcedureDescriptionFormat procedureDescriptionFormat, String identifier,
-            boolean deleted) {
-        this.procedureId = procedureId;
-        this.procedureDescriptionFormat = procedureDescriptionFormat;
-        this.identifier = identifier;
-        this.deleted = deleted;
-    }
-
-    public Procedure(long procedureId, ProcedureDescriptionFormat procedureDescriptionFormat, String identifier,
-            boolean deleted, Set<ValidProcedureTime> validProcedureTimes, Set<FeatureOfInterestType> featureOfInterestTypes, Set<ObservationConstellation> observationConstellations,
-            Set<ObservationType> observationTypes, Set<Procedure> proceduresForChildSensorId, Set<ObservationTemplate> observationTemplates,
-            Set<Procedure> proceduresForParentSensorId) {
-        this.procedureId = procedureId;
-        this.procedureDescriptionFormat = procedureDescriptionFormat;
-        this.identifier = identifier;
-        this.deleted = deleted;
-        this.validProcedureTimes = validProcedureTimes;
-        this.featureOfInterestTypes = featureOfInterestTypes;
-        this.observationConstellations = observationConstellations;
-        this.observationTypes = observationTypes;
-        this.proceduresForChildSensorId = proceduresForChildSensorId;
-        this.observationTemplates = observationTemplates;
-        this.proceduresForParentSensorId = proceduresForParentSensorId;
-    }
+//    public Procedure(long procedureId, ProcedureDescriptionFormat procedureDescriptionFormat, String identifier,
+//            boolean deleted) {
+//        this.procedureId = procedureId;
+//        this.procedureDescriptionFormat = procedureDescriptionFormat;
+//        this.identifier = identifier;
+//        this.deleted = deleted;
+//    }
+//
+//    public Procedure(long procedureId, ProcedureDescriptionFormat procedureDescriptionFormat, String identifier,
+//            boolean deleted, Set<ValidProcedureTime> validProcedureTimes, Set<FeatureOfInterestType> featureOfInterestTypes, Set<ObservationConstellation> observationConstellations,
+//            Set<ObservationType> observationTypes, Set<Procedure> proceduresForChildSensorId, Set<ObservationTemplate> observationTemplates,
+//            Set<Procedure> proceduresForParentSensorId) {
+//        this.procedureId = procedureId;
+//        this.procedureDescriptionFormat = procedureDescriptionFormat;
+//        this.identifier = identifier;
+//        this.deleted = deleted;
+//        this.validProcedureTimes = validProcedureTimes;
+//        this.featureOfInterestTypes = featureOfInterestTypes;
+//        this.observationConstellations = observationConstellations;
+//        this.observationTypes = observationTypes;
+//        this.proceduresForChildSensorId = proceduresForChildSensorId;
+//        this.observationTemplates = observationTemplates;
+//        this.proceduresForParentSensorId = proceduresForParentSensorId;
+//    }
 
     public long getProcedureId() {
         return this.procedureId;
@@ -160,13 +160,13 @@ public class Procedure implements java.io.Serializable {
         this.proceduresForChildSensorId = proceduresForChildSensorId;
     }
 
-    public Set<ObservationTemplate> getObservationTemplates() {
-        return this.observationTemplates;
-    }
-
-    public void setObservationTemplates(Set<ObservationTemplate> observationTemplates) {
-        this.observationTemplates = observationTemplates;
-    }
+//    public Set<ObservationTemplate> getObservationTemplates() {
+//        return this.observationTemplates;
+//    }
+//
+//    public void setObservationTemplates(Set<ObservationTemplate> observationTemplates) {
+//        this.observationTemplates = observationTemplates;
+//    }
 
     public Set<Procedure> getProceduresForParentSensorId() {
         return this.proceduresForParentSensorId;

@@ -42,21 +42,21 @@ public class RelatedFeatureRole implements java.io.Serializable {
 
     private String relatedFeatureRole;
 
-    private Set<RelatedFeature> relatedFeatures = new HashSet<RelatedFeature>(0);
+//    private Set<RelatedFeature> relatedFeatures = new HashSet<RelatedFeature>(0);
 
     public RelatedFeatureRole() {
     }
 
-    public RelatedFeatureRole(long relatedFeatureRoleId, String relatedFeatureRole) {
-        this.relatedFeatureRoleId = relatedFeatureRoleId;
-        this.relatedFeatureRole = relatedFeatureRole;
-    }
-
-    public RelatedFeatureRole(long relatedFeatureRoleId, String relatedFeatureRole, Set<RelatedFeature> relatedFeatures) {
-        this.relatedFeatureRoleId = relatedFeatureRoleId;
-        this.relatedFeatureRole = relatedFeatureRole;
-        this.relatedFeatures = relatedFeatures;
-    }
+//    public RelatedFeatureRole(long relatedFeatureRoleId, String relatedFeatureRole) {
+//        this.relatedFeatureRoleId = relatedFeatureRoleId;
+//        this.relatedFeatureRole = relatedFeatureRole;
+//    }
+//
+//    public RelatedFeatureRole(long relatedFeatureRoleId, String relatedFeatureRole, Set<RelatedFeature> relatedFeatures) {
+//        this.relatedFeatureRoleId = relatedFeatureRoleId;
+//        this.relatedFeatureRole = relatedFeatureRole;
+//        this.relatedFeatures = relatedFeatures;
+//    }
 
     public long getRelatedFeatureRoleId() {
         return this.relatedFeatureRoleId;
@@ -74,12 +74,12 @@ public class RelatedFeatureRole implements java.io.Serializable {
         this.relatedFeatureRole = relatedFeatureRole;
     }
 
-    public Set<RelatedFeature> getRelatedFeatures() {
-        return this.relatedFeatures;
-    }
-
-    public void setRelatedFeatures(Set<RelatedFeature> relatedFeatures) {
-        this.relatedFeatures = relatedFeatures;
-    }
+//    public Set<RelatedFeature> getRelatedFeatures() {
+//        return this.relatedFeatures;
+//    }
+//
+//    public void setRelatedFeatures(Set<RelatedFeature> relatedFeatures) {
+//        this.relatedFeatures = relatedFeatures;
+//    }
 
 }

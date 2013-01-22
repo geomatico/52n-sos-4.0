@@ -39,21 +39,21 @@ public class CategoryValue implements java.io.Serializable {
 
     private String value;
 
-    private Set<Observation> observations = new HashSet<Observation>(0);
+//    private Set<Observation> observations = new HashSet<Observation>(0);
 
     public CategoryValue() {
     }
 
-    public CategoryValue(long categoryValueId, String value) {
-        this.categoryValueId = categoryValueId;
-        this.value = value;
-    }
-
-    public CategoryValue(long categoryValueId, String value, Set<Observation> observations) {
-        this.categoryValueId = categoryValueId;
-        this.value = value;
-        this.observations = observations;
-    }
+//    public CategoryValue(long categoryValueId, String value) {
+//        this.categoryValueId = categoryValueId;
+//        this.value = value;
+//    }
+//
+//    public CategoryValue(long categoryValueId, String value, Set<Observation> observations) {
+//        this.categoryValueId = categoryValueId;
+//        this.value = value;
+//        this.observations = observations;
+//    }
 
     public long getCategoryValueId() {
         return this.categoryValueId;
@@ -71,12 +71,12 @@ public class CategoryValue implements java.io.Serializable {
         this.value = value;
     }
 
-    public Set<Observation> getObservations() {
-        return this.observations;
-    }
-
-    public void setObservations(Set<Observation> observations) {
-        this.observations = observations;
-    }
+//    public Set<Observation> getObservations() {
+//        return this.observations;
+//    }
+//
+//    public void setObservations(Set<Observation> observations) {
+//        this.observations = observations;
+//    }
 
 }

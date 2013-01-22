@@ -13,7 +13,7 @@
         <property name="featureOfInterestType" type="string">
             <column name="feature_of_interest_type" not-null="true" unique="true" />
         </property>
-        <set name="procedures" table="procedure_has_feature_of_interest_type" inverse="true" lazy="true" fetch="join">
+        <!-- <set name="procedures" table="procedure_has_feature_of_interest_type" inverse="true" lazy="true" fetch="join">
             <key>
                 <column name="feature_of_interest_type_id" not-null="true" />
             </key>
@@ -26,6 +26,6 @@
                 <column name="feature_of_interest_type_id" not-null="true" />
             </key>
             <one-to-many class="org.n52.sos.ds.hibernate.entities.FeatureOfInterest" />
-        </set>
+        </set> -->
     </class>
 </hibernate-mapping>

@@ -82,43 +82,43 @@ public class Observation implements java.io.Serializable {
     public Observation() {
     }
 
-    public Observation(long observationId, FeatureOfInterest featureOfInterest,
-            ObservationConstellation observationConstellation, Date phenomenonTimeStart, Date phenomenonTimeEnd, Date resultTime, boolean deleted) {
-        this.observationId = observationId;
-        this.featureOfInterest = featureOfInterest;
-        this.observationConstellation = observationConstellation;
-        this.phenomenonTimeStart = phenomenonTimeStart;
-        this.phenomenonTimeEnd = phenomenonTimeEnd;
-        this.resultTime = resultTime;
-        this.deleted = deleted;
-    }
-
-    public Observation(long observationId, FeatureOfInterest featureOfInterest,
-            ObservationConstellation observationConstellation, String identifier, Date phenomenonTimeStart,
-            Date phenomenonTimeEnd, Date resultTime, Date validTimeStart, Date validTimeEnd, Unit unit, String antiSubsetting,
-            Set<SpatialFilteringProfile> spatialFilteringProfiles, Set<Quality> qualities, Set<CountValue> countValues, Set<BooleanValue> booleanValues,Set<GeometryValue> geometryValues, Set<CategoryValue> categoryValues,
-            Set<NumericValue> numericValues, Set<TextValue> textValues, boolean deleted) {
-        this.observationId = observationId;
-        this.featureOfInterest = featureOfInterest;
-        this.observationConstellation = observationConstellation;
-        this.identifier = identifier;
-        this.phenomenonTimeStart = phenomenonTimeStart;
-        this.phenomenonTimeEnd = phenomenonTimeEnd;
-        this.resultTime = resultTime;
-        this.validTimeStart = validTimeStart;
-        this.validTimeEnd = validTimeEnd;
-        this.unit = unit;
-        this.antiSubsetting = antiSubsetting;
-        this.spatialFilteringProfiles = spatialFilteringProfiles;
-        this.qualities = qualities;
-        this.countValues = countValues;
-        this.booleanValues = booleanValues;
-        this.geometryValues = geometryValues;
-        this.categoryValues = categoryValues;
-        this.numericValues = numericValues;
-        this.textValues = textValues;
-        this.deleted = deleted;
-    }
+//    public Observation(long observationId, FeatureOfInterest featureOfInterest,
+//            ObservationConstellation observationConstellation, Date phenomenonTimeStart, Date phenomenonTimeEnd, Date resultTime, boolean deleted) {
+//        this.observationId = observationId;
+//        this.featureOfInterest = featureOfInterest;
+//        this.observationConstellation = observationConstellation;
+//        this.phenomenonTimeStart = phenomenonTimeStart;
+//        this.phenomenonTimeEnd = phenomenonTimeEnd;
+//        this.resultTime = resultTime;
+//        this.deleted = deleted;
+//    }
+//
+//    public Observation(long observationId, FeatureOfInterest featureOfInterest,
+//            ObservationConstellation observationConstellation, String identifier, Date phenomenonTimeStart,
+//            Date phenomenonTimeEnd, Date resultTime, Date validTimeStart, Date validTimeEnd, Unit unit, String antiSubsetting,
+//            Set<SpatialFilteringProfile> spatialFilteringProfiles, Set<Quality> qualities, Set<CountValue> countValues, Set<BooleanValue> booleanValues,Set<GeometryValue> geometryValues, Set<CategoryValue> categoryValues,
+//            Set<NumericValue> numericValues, Set<TextValue> textValues, boolean deleted) {
+//        this.observationId = observationId;
+//        this.featureOfInterest = featureOfInterest;
+//        this.observationConstellation = observationConstellation;
+//        this.identifier = identifier;
+//        this.phenomenonTimeStart = phenomenonTimeStart;
+//        this.phenomenonTimeEnd = phenomenonTimeEnd;
+//        this.resultTime = resultTime;
+//        this.validTimeStart = validTimeStart;
+//        this.validTimeEnd = validTimeEnd;
+//        this.unit = unit;
+//        this.antiSubsetting = antiSubsetting;
+//        this.spatialFilteringProfiles = spatialFilteringProfiles;
+//        this.qualities = qualities;
+//        this.countValues = countValues;
+//        this.booleanValues = booleanValues;
+//        this.geometryValues = geometryValues;
+//        this.categoryValues = categoryValues;
+//        this.numericValues = numericValues;
+//        this.textValues = textValues;
+//        this.deleted = deleted;
+//    }
 
     public long getObservationId() {
         return this.observationId;

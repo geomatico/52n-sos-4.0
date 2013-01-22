@@ -42,21 +42,21 @@ public class ResultType implements java.io.Serializable {
 
     private String resultType;
 
-    private Set<ObservationConstellation> observationConstellations = new HashSet<ObservationConstellation>(0);
+//    private Set<ObservationConstellation> observationConstellations = new HashSet<ObservationConstellation>(0);
 
     public ResultType() {
     }
 
-    public ResultType(long resultTypeId, String resultType) {
-        this.resultTypeId = resultTypeId;
-        this.resultType = resultType;
-    }
-
-    public ResultType(long resultTypeId, String resultType, Set<ObservationConstellation> observationConstellations) {
-        this.resultTypeId = resultTypeId;
-        this.resultType = resultType;
-        this.observationConstellations = observationConstellations;
-    }
+//    public ResultType(long resultTypeId, String resultType) {
+//        this.resultTypeId = resultTypeId;
+//        this.resultType = resultType;
+//    }
+//
+//    public ResultType(long resultTypeId, String resultType, Set<ObservationConstellation> observationConstellations) {
+//        this.resultTypeId = resultTypeId;
+//        this.resultType = resultType;
+//        this.observationConstellations = observationConstellations;
+//    }
 
     public long getResultTypeId() {
         return this.resultTypeId;
@@ -74,12 +74,12 @@ public class ResultType implements java.io.Serializable {
         this.resultType = resultType;
     }
 
-    public Set<ObservationConstellation> getObservationConstellations() {
-        return this.observationConstellations;
-    }
-
-    public void setObservationConstellations(Set<ObservationConstellation> observationConstellations) {
-        this.observationConstellations = observationConstellations;
-    }
+//    public Set<ObservationConstellation> getObservationConstellations() {
+//        return this.observationConstellations;
+//    }
+//
+//    public void setObservationConstellations(Set<ObservationConstellation> observationConstellations) {
+//        this.observationConstellations = observationConstellations;
+//    }
 
 }

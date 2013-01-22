@@ -22,20 +22,17 @@
         <many-to-one name="offering" class="org.n52.sos.ds.hibernate.entities.Offering" fetch="join">
             <column name="offering_id" not-null="true" />
         </many-to-one>
-        <many-to-one name="resultType" class="org.n52.sos.ds.hibernate.entities.ResultType" fetch="join">
-            <column name="result_type_id" not-null="false" />
-        </many-to-one>
-        <set name="resultTemplates" table="result_template" inverse="true" lazy="true" fetch="select">
+        <!-- <set name="resultTemplates" table="result_template" inverse="true" lazy="extra" fetch="select">
             <key>
                 <column name="observation_constellation_id" not-null="true" />
             </key>
             <one-to-many class="org.n52.sos.ds.hibernate.entities.ResultTemplate" />
         </set>
-        <set name="observations" table="observation" inverse="true" lazy="true" fetch="select">
+        <set name="observations" table="observation" inverse="true" lazy="extra" fetch="select">
             <key>
                 <column name="observation_constellation_id" not-null="true" />
             </key>
             <one-to-many class="org.n52.sos.ds.hibernate.entities.Observation" />
-        </set>
+        </set> -->
     </class>
 </hibernate-mapping>

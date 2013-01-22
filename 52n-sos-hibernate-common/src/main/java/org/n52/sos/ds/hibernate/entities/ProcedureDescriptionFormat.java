@@ -42,22 +42,22 @@ public class ProcedureDescriptionFormat implements java.io.Serializable {
 
     private String procedureDescriptionFormat;
 
-    private Set<Procedure> procedures = new HashSet<Procedure>(0);
+//    private Set<Procedure> procedures = new HashSet<Procedure>(0);
 
     public ProcedureDescriptionFormat() {
     }
 
-    public ProcedureDescriptionFormat(long procedureDescriptionFormatId, String procedureDescriptionFormat) {
-        this.procedureDescriptionFormatId = procedureDescriptionFormatId;
-        this.procedureDescriptionFormat = procedureDescriptionFormat;
-    }
-
-    public ProcedureDescriptionFormat(long procedureDescriptionFormatId, String procedureDescriptionFormat,
-            Set<Procedure> procedures) {
-        this.procedureDescriptionFormatId = procedureDescriptionFormatId;
-        this.procedureDescriptionFormat = procedureDescriptionFormat;
-        this.procedures = procedures;
-    }
+//    public ProcedureDescriptionFormat(long procedureDescriptionFormatId, String procedureDescriptionFormat) {
+//        this.procedureDescriptionFormatId = procedureDescriptionFormatId;
+//        this.procedureDescriptionFormat = procedureDescriptionFormat;
+//    }
+//
+//    public ProcedureDescriptionFormat(long procedureDescriptionFormatId, String procedureDescriptionFormat,
+//            Set<Procedure> procedures) {
+//        this.procedureDescriptionFormatId = procedureDescriptionFormatId;
+//        this.procedureDescriptionFormat = procedureDescriptionFormat;
+//        this.procedures = procedures;
+//    }
 
     public long getProcedureDescriptionFormatId() {
         return this.procedureDescriptionFormatId;
@@ -75,12 +75,12 @@ public class ProcedureDescriptionFormat implements java.io.Serializable {
         this.procedureDescriptionFormat = procedureDescriptionFormat;
     }
 
-    public Set<Procedure> getProcedures() {
-        return this.procedures;
-    }
-
-    public void setProcedures(Set<Procedure> procedures) {
-        this.procedures = procedures;
-    }
+//    public Set<Procedure> getProcedures() {
+//        return this.procedures;
+//    }
+//
+//    public void setProcedures(Set<Procedure> procedures) {
+//        this.procedures = procedures;
+//    }
 
 }

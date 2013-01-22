@@ -48,27 +48,27 @@ public class Quality implements java.io.Serializable {
 
     private String value;
 
-    private Set<Observation> observations = new HashSet<Observation>(0);
+//    private Set<Observation> observations = new HashSet<Observation>(0);
 
     public Quality() {
     }
 
-    public Quality(long qualityId, SweType sweType, Unit unit, String name, String value) {
-        this.qualityId = qualityId;
-        this.sweType = sweType;
-        this.unit = unit;
-        this.name = name;
-        this.value = value;
-    }
-
-    public Quality(long qualityId, SweType sweType, Unit unit, String name, String value, Set<Observation> observations) {
-        this.qualityId = qualityId;
-        this.sweType = sweType;
-        this.unit = unit;
-        this.name = name;
-        this.value = value;
-        this.observations = observations;
-    }
+//    public Quality(long qualityId, SweType sweType, Unit unit, String name, String value) {
+//        this.qualityId = qualityId;
+//        this.sweType = sweType;
+//        this.unit = unit;
+//        this.name = name;
+//        this.value = value;
+//    }
+//
+//    public Quality(long qualityId, SweType sweType, Unit unit, String name, String value, Set<Observation> observations) {
+//        this.qualityId = qualityId;
+//        this.sweType = sweType;
+//        this.unit = unit;
+//        this.name = name;
+//        this.value = value;
+//        this.observations = observations;
+//    }
 
     public long getQualityId() {
         return this.qualityId;
@@ -110,12 +110,12 @@ public class Quality implements java.io.Serializable {
         this.value = value;
     }
 
-    public Set<Observation> getObservations() {
-        return this.observations;
-    }
-
-    public void setObservations(Set<Observation> observations) {
-        this.observations = observations;
-    }
+//    public Set<Observation> getObservations() {
+//        return this.observations;
+//    }
+//
+//    public void setObservations(Set<Observation> observations) {
+//        this.observations = observations;
+//    }
 
 }

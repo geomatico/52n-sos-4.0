@@ -10,12 +10,12 @@
             	<param name="sequence">observation_template_id_seq</param>
             </generator>
         </id>
-        <many-to-one name="request" class="org.n52.sos.ds.hibernate.entities.Request" fetch="join">
+        <!-- <many-to-one name="request" class="org.n52.sos.ds.hibernate.entities.Request" lazy="true" fetch="select">
             <column name="request_id" not-null="true" />
         </many-to-one>
         <many-to-one name="procedure" class="org.n52.sos.ds.hibernate.entities.Procedure" fetch="join">
             <column name="procedure_id" not-null="true" />
-        </many-to-one>
+        </many-to-one> -->
         <property name="observationTemplate" type="string">
             <column name="observation_template" />
         </property>

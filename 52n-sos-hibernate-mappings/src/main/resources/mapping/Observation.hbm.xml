@@ -43,7 +43,7 @@
         <property name="antiSubsetting" type="java.lang.String">
             <column name="anti_subsetting" />
         </property>
-        <set name="spatialFilteringProfiles" table="observation_has_spatial_filtering_profile" inverse="false" lazy="true" fetch="join">
+        <set name="spatialFilteringProfiles" table="observation_has_spatial_filtering_profile" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="observation_id" not-null="true" />
             </key>
@@ -51,7 +51,7 @@
                 <column name="spatial_filtering_profile_id" not-null="true" />
             </many-to-many>
         </set>
-        <set name="qualities" table="observation_has_quality" inverse="false" lazy="true" fetch="join">
+        <set name="qualities" table="observation_has_quality" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="observation_id" not-null="true" />
             </key>
@@ -59,7 +59,7 @@
                 <column name="quality_id" not-null="true" />
             </many-to-many>
         </set>
-        <set name="countValues" table="observation_has_count_value" inverse="false" lazy="true" fetch="join">
+        <set name="countValues" table="observation_has_count_value" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="observation_id" not-null="true" />
             </key>
@@ -67,7 +67,7 @@
                 <column name="count_value_id" not-null="true" />
             </many-to-many>
         </set>
-         <set name="booleanValues" table="observation_has_boolean_value" inverse="false" lazy="true" fetch="join">
+         <set name="booleanValues" table="observation_has_boolean_value" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="observation_id" not-null="true" />
             </key>
@@ -75,7 +75,7 @@
                 <column name="boolean_value_id" not-null="true" />
             </many-to-many>
         </set>
-        <set name="geometryValues" table="observation_has_geometry_value" inverse="false" lazy="true" fetch="join">
+        <set name="geometryValues" table="observation_has_geometry_value" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="observation_id" not-null="true" />
             </key>
@@ -83,7 +83,7 @@
                 <column name="geometry_value_id" not-null="true" />
             </many-to-many>
         </set>
-        <set name="categoryValues" table="observation_has_category_value" inverse="false" lazy="true" fetch="join">
+        <set name="categoryValues" table="observation_has_category_value" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="observation_id" not-null="true" />
             </key>
@@ -91,7 +91,7 @@
                 <column name="category_value_id" not-null="true" />
             </many-to-many>
         </set>
-        <set name="numericValues" table="observation_has_numeric_value" inverse="false" lazy="true" fetch="join">
+        <set name="numericValues" table="observation_has_numeric_value" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="observation_id" not-null="true" />
             </key>
@@ -99,7 +99,7 @@
                 <column name="numeric_value_id" not-null="true" />
             </many-to-many>
         </set>
-        <set name="textValues" table="observation_has_text_value" inverse="false" lazy="true" fetch="join">
+        <set name="textValues" table="observation_has_text_value" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="observation_id" not-null="true" />
             </key>

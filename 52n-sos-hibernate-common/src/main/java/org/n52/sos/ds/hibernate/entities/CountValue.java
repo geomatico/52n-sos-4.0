@@ -39,21 +39,21 @@ public class CountValue implements java.io.Serializable {
 
     private int value;
 
-    private Set<Observation> observations = new HashSet<Observation>(0);
+//    private Set<Observation> observations = new HashSet<Observation>(0);
 
     public CountValue() {
     }
 
-    public CountValue(long countValueId, int value) {
-        this.countValueId = countValueId;
-        this.value = value;
-    }
-
-    public CountValue(long countValueId, int value, Set<Observation> observations) {
-        this.countValueId = countValueId;
-        this.value = value;
-        this.observations = observations;
-    }
+//    public CountValue(long countValueId, int value) {
+//        this.countValueId = countValueId;
+//        this.value = value;
+//    }
+//
+//    public CountValue(long countValueId, int value, Set<Observation> observations) {
+//        this.countValueId = countValueId;
+//        this.value = value;
+//        this.observations = observations;
+//    }
 
     public long getCountValueId() {
         return this.countValueId;
@@ -71,12 +71,12 @@ public class CountValue implements java.io.Serializable {
         this.value = value;
     }
 
-    public Set<Observation> getObservations() {
-        return this.observations;
-    }
-
-    public void setObservations(Set<Observation> observations) {
-        this.observations = observations;
-    }
+//    public Set<Observation> getObservations() {
+//        return this.observations;
+//    }
+//
+//    public void setObservations(Set<Observation> observations) {
+//        this.observations = observations;
+//    }
 
 }

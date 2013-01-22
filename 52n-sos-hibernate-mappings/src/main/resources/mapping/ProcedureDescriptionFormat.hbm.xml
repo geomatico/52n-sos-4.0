@@ -13,11 +13,11 @@
         <property name="procedureDescriptionFormat" type="string">
             <column name="procedure_description_format" not-null="true" />
         </property>
-        <set name="procedures" table="procedure" inverse="true" lazy="true" fetch="join">
+        <!-- <set name="procedures" table="procedure" inverse="true" lazy="true" fetch="join">
             <key>
                 <column name="procedure_description_format_id" not-null="true" />
             </key>
             <one-to-many class="org.n52.sos.ds.hibernate.entities.Procedure" />
-        </set>
+        </set> -->
     </class>
 </hibernate-mapping>

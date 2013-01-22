@@ -50,16 +50,16 @@ public class ResultTemplate implements java.io.Serializable {
     public ResultTemplate() {
     }
 
-    public ResultTemplate(long resultTemplateId, FeatureOfInterest featureOfInterest,
-            ObservationConstellation observationConstellation, String identifier, String resultStructure,
-            String resultEncoding) {
-        this.resultTemplateId = resultTemplateId;
-        this.featureOfInterest = featureOfInterest;
-        this.observationConstellation = observationConstellation;
-        this.identifier = identifier;
-        this.resultStructure = resultStructure;
-        this.resultEncoding = resultEncoding;
-    }
+//    public ResultTemplate(long resultTemplateId, FeatureOfInterest featureOfInterest,
+//            ObservationConstellation observationConstellation, String identifier, String resultStructure,
+//            String resultEncoding) {
+//        this.resultTemplateId = resultTemplateId;
+//        this.featureOfInterest = featureOfInterest;
+//        this.observationConstellation = observationConstellation;
+//        this.identifier = identifier;
+//        this.resultStructure = resultStructure;
+//        this.resultEncoding = resultEncoding;
+//    }
 
     public long getResultTemplateId() {
         return this.resultTemplateId;

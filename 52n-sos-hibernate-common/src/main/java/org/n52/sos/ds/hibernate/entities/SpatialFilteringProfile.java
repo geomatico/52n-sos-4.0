@@ -46,23 +46,23 @@ public class SpatialFilteringProfile implements java.io.Serializable {
 
     private Geometry geom;
 
-    private Set<Observation> observations = new HashSet<Observation>(0);
+//    private Set<Observation> observations = new HashSet<Observation>(0);
 
     public SpatialFilteringProfile() {
     }
 
-    public SpatialFilteringProfile(long spatialFilteringProfileId, String identifier, Geometry geom) {
-        this.spatialFilteringProfileId = spatialFilteringProfileId;
-        this.identifier = identifier;
-        this.geom = geom;
-    }
-
-    public SpatialFilteringProfile(long spatialFilteringProfileId, String identifier, Geometry geom, Set<Observation> observations) {
-        this.spatialFilteringProfileId = spatialFilteringProfileId;
-        this.identifier = identifier;
-        this.geom = geom;
-        this.observations = observations;
-    }
+//    public SpatialFilteringProfile(long spatialFilteringProfileId, String identifier, Geometry geom) {
+//        this.spatialFilteringProfileId = spatialFilteringProfileId;
+//        this.identifier = identifier;
+//        this.geom = geom;
+//    }
+//
+//    public SpatialFilteringProfile(long spatialFilteringProfileId, String identifier, Geometry geom, Set<Observation> observations) {
+//        this.spatialFilteringProfileId = spatialFilteringProfileId;
+//        this.identifier = identifier;
+//        this.geom = geom;
+//        this.observations = observations;
+//    }
 
     public long getSpatialFilteringProfileId() {
         return this.spatialFilteringProfileId;
@@ -88,12 +88,12 @@ public class SpatialFilteringProfile implements java.io.Serializable {
         this.geom = geom;
     }
 
-    public Set<Observation> getObservations() {
-        return this.observations;
-    }
-
-    public void setObservations(Set<Observation> observations) {
-        this.observations = observations;
-    }
+//    public Set<Observation> getObservations() {
+//        return this.observations;
+//    }
+//
+//    public void setObservations(Set<Observation> observations) {
+//        this.observations = observations;
+//    }
 
 }

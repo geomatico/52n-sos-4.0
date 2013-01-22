@@ -39,21 +39,21 @@ public class NumericValue implements java.io.Serializable {
 
     private double value;
 
-    private Set<Observation> observations = new HashSet<Observation>(0);
+//    private Set<Observation> observations = new HashSet<Observation>(0);
 
     public NumericValue() {
     }
 
-    public NumericValue(long numericValueId, double value) {
-        this.numericValueId = numericValueId;
-        this.value = value;
-    }
-
-    public NumericValue(long numericValueId, double value, Set<Observation> observations) {
-        this.numericValueId = numericValueId;
-        this.value = value;
-        this.observations = observations;
-    }
+//    public NumericValue(long numericValueId, double value) {
+//        this.numericValueId = numericValueId;
+//        this.value = value;
+//    }
+//
+//    public NumericValue(long numericValueId, double value, Set<Observation> observations) {
+//        this.numericValueId = numericValueId;
+//        this.value = value;
+//        this.observations = observations;
+//    }
 
     public long getNumericValueId() {
         return this.numericValueId;
@@ -71,12 +71,12 @@ public class NumericValue implements java.io.Serializable {
         this.value = value;
     }
 
-    public Set<Observation> getObservations() {
-        return this.observations;
-    }
-
-    public void setObservations(Set<Observation> observations) {
-        this.observations = observations;
-    }
+//    public Set<Observation> getObservations() {
+//        return this.observations;
+//    }
+//
+//    public void setObservations(Set<Observation> observations) {
+//        this.observations = observations;
+//    }
 
 }

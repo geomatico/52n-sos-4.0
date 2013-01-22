@@ -44,29 +44,29 @@ public class ObservableProperty implements java.io.Serializable {
 
     private String description;
 
-    private Set<Request> requests = new HashSet<Request>(0);
-
-    private Set<CompositePhenomenon> compositePhenomenons = new HashSet<CompositePhenomenon>(0);
+//    private Set<Request> requests = new HashSet<Request>(0);
+//
+//    private Set<CompositePhenomenon> compositePhenomenons = new HashSet<CompositePhenomenon>(0);
 
     private Set<ObservationConstellation> observationConstellations = new HashSet<ObservationConstellation>(0);
 
     public ObservableProperty() {
     }
 
-    public ObservableProperty(long observablePropertyId,String identifier) {
-        this.observablePropertyId = observablePropertyId;
-        this.identifier = identifier;
-    }
-
-    public ObservableProperty(long observablePropertyId, String identifier,
-            String description, Set<Request> requests, Set<CompositePhenomenon> compositePhenomenons, Set<ObservationConstellation> observationConstellations) {
-        this.observablePropertyId = observablePropertyId;
-        this.identifier = identifier;
-        this.description = description;
-        this.requests = requests;
-        this.compositePhenomenons = compositePhenomenons;
-        this.observationConstellations = observationConstellations;
-    }
+//    public ObservableProperty(long observablePropertyId,String identifier) {
+//        this.observablePropertyId = observablePropertyId;
+//        this.identifier = identifier;
+//    }
+//
+//    public ObservableProperty(long observablePropertyId, String identifier,
+//            String description, Set<Request> requests, Set<CompositePhenomenon> compositePhenomenons, Set<ObservationConstellation> observationConstellations) {
+//        this.observablePropertyId = observablePropertyId;
+//        this.identifier = identifier;
+//        this.description = description;
+//        this.requests = requests;
+//        this.compositePhenomenons = compositePhenomenons;
+//        this.observationConstellations = observationConstellations;
+//    }
 
     public long getObservablePropertyId() {
         return this.observablePropertyId;
@@ -92,21 +92,21 @@ public class ObservableProperty implements java.io.Serializable {
         this.description = description;
     }
 
-    public Set<Request> getRequests() {
-        return this.requests;
-    }
-
-    public void setRequests(Set<Request> requests) {
-        this.requests = requests;
-    }
-
-    public Set<CompositePhenomenon> getCompositePhenomenons() {
-        return this.compositePhenomenons;
-    }
-
-    public void setCompositePhenomenons(Set<CompositePhenomenon> compositePhenomenons) {
-        this.compositePhenomenons = compositePhenomenons;
-    }
+//    public Set<Request> getRequests() {
+//        return this.requests;
+//    }
+//
+//    public void setRequests(Set<Request> requests) {
+//        this.requests = requests;
+//    }
+//
+//    public Set<CompositePhenomenon> getCompositePhenomenons() {
+//        return this.compositePhenomenons;
+//    }
+//
+//    public void setCompositePhenomenons(Set<CompositePhenomenon> compositePhenomenons) {
+//        this.compositePhenomenons = compositePhenomenons;
+//    }
 
     public Set<ObservationConstellation> getObservationConstellations() {
         return this.observationConstellations;

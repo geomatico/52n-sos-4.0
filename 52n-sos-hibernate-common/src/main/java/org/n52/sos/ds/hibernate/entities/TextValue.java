@@ -39,21 +39,21 @@ public class TextValue implements java.io.Serializable {
 
     private String value;
 
-    private Set<Observation> observations = new HashSet<Observation>(0);
+//    private Set<Observation> observations = new HashSet<Observation>(0);
 
     public TextValue() {
     }
 
-    public TextValue(long textValueId, String value) {
-        this.textValueId = textValueId;
-        this.value = value;
-    }
-
-    public TextValue(long textValueId, String value, Set<Observation> observations) {
-        this.textValueId = textValueId;
-        this.value = value;
-        this.observations = observations;
-    }
+//    public TextValue(long textValueId, String value) {
+//        this.textValueId = textValueId;
+//        this.value = value;
+//    }
+//
+//    public TextValue(long textValueId, String value, Set<Observation> observations) {
+//        this.textValueId = textValueId;
+//        this.value = value;
+//        this.observations = observations;
+//    }
 
     public long getTextValueId() {
         return this.textValueId;
@@ -71,12 +71,12 @@ public class TextValue implements java.io.Serializable {
         this.value = value;
     }
 
-    public Set<Observation> getObservations() {
-        return this.observations;
-    }
-
-    public void setObservations(Set<Observation> observations) {
-        this.observations = observations;
-    }
+//    public Set<Observation> getObservations() {
+//        return this.observations;
+//    }
+//
+//    public void setObservations(Set<Observation> observations) {
+//        this.observations = observations;
+//    }
 
 }

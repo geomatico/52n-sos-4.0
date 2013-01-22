@@ -28,13 +28,13 @@
         <property name="url" type="string">
             <column name="url" unique="true" />
         </property>
-        <set name="observations" table="observation" inverse="true" lazy="true" fetch="select">
+        <!-- <set name="observations" table="observation" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="feature_of_interest_id" not-null="true" />
             </key>
             <one-to-many class="org.n52.sos.ds.hibernate.entities.Observation" />
-        </set>
-        <set name="featureOfInterestsForChildFeatureId" table="feature_relation" inverse="false" lazy="true" fetch="join">
+        </set> -->
+        <set name="featureOfInterestsForChildFeatureId" table="feature_relation" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="parent_feature_id" not-null="true" />
             </key>
@@ -42,7 +42,7 @@
                 <column name="child_feature_id" not-null="true" />
             </many-to-many>
         </set>
-        <set name="featureOfInterestsForParentFeatureId" table="feature_relation" inverse="false" lazy="true" fetch="join">
+        <set name="featureOfInterestsForParentFeatureId" table="feature_relation" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="child_feature_id" not-null="true" />
             </key>
@@ -50,11 +50,11 @@
                 <column name="parent_feature_id" not-null="true" />
             </many-to-many>
         </set>
-        <set name="resultTemplates" table="result_template" inverse="true" lazy="true" fetch="select">
+        <!-- <set name="resultTemplates" table="result_template" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="feature_of_interest_id" not-null="true" />
             </key>
             <one-to-many class="org.n52.sos.ds.hibernate.entities.ResultTemplate" />
-        </set>
+        </set> -->
     </class>
 </hibernate-mapping>

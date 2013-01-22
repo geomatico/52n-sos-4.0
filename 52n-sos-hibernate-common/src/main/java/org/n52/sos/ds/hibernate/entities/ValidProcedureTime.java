@@ -52,21 +52,21 @@ public class ValidProcedureTime implements java.io.Serializable {
     public ValidProcedureTime() {
     }
 
-    public ValidProcedureTime(long validProcedureTimeId, Procedure procedure, Date startTime) {
-        this.validProcedureTimeId = validProcedureTimeId;
-        this.procedure = procedure;
-        this.startTime = startTime;
-    }
-
-    public ValidProcedureTime(long validProcedureTimeId, Procedure procedure, Date startTime, Date endTime,
-            String descriptionUrl, String descriptionXml) {
-        this.validProcedureTimeId = validProcedureTimeId;
-        this.procedure = procedure;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.descriptionUrl = descriptionUrl;
-        this.descriptionXml = descriptionXml;
-    }
+//    public ValidProcedureTime(long validProcedureTimeId, Procedure procedure, Date startTime) {
+//        this.validProcedureTimeId = validProcedureTimeId;
+//        this.procedure = procedure;
+//        this.startTime = startTime;
+//    }
+//
+//    public ValidProcedureTime(long validProcedureTimeId, Procedure procedure, Date startTime, Date endTime,
+//            String descriptionUrl, String descriptionXml) {
+//        this.validProcedureTimeId = validProcedureTimeId;
+//        this.procedure = procedure;
+//        this.startTime = startTime;
+//        this.endTime = endTime;
+//        this.descriptionUrl = descriptionUrl;
+//        this.descriptionXml = descriptionXml;
+//    }
 
     public long getValidProcedureTimeId() {
         return this.validProcedureTimeId;

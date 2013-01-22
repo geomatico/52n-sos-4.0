@@ -45,35 +45,35 @@ public class ObservationConstellation implements java.io.Serializable {
 
     private Offering offering;
 
-    private ResultType resultType;
-
-    private Set<ResultTemplate> resultTemplates = new HashSet<ResultTemplate>(0);
-
-    private Set<Observation> observations = new HashSet<Observation>(0);
+//    private ResultType resultType;
+//
+//    private Set<ResultTemplate> resultTemplates = new HashSet<ResultTemplate>(0);
+//
+//    private Set<Observation> observations = new HashSet<Observation>(0);
 
     public ObservationConstellation() {
     }
 
-    public ObservationConstellation(long observationConstellationId,
-            ObservableProperty observableProperty, Procedure procedure, Offering offering) {
-        this.observationConstellationId = observationConstellationId;
-        this.observableProperty = observableProperty;
-        this.procedure = procedure;
-        this.offering = offering;
-    }
-
-    public ObservationConstellation(long observationConstellationId, ObservationType observationType,
-            ObservableProperty observableProperty, Procedure procedure, Offering offering, ResultType resultType,
-            Set<ResultTemplate> resultTemplates, Set<Observation> observations) {
-        this.observationConstellationId = observationConstellationId;
-        this.observationType = observationType;
-        this.observableProperty = observableProperty;
-        this.procedure = procedure;
-        this.offering = offering;
-        this.resultType = resultType;
-        this.resultTemplates = resultTemplates;
-        this.observations = observations;
-    }
+//    public ObservationConstellation(long observationConstellationId,
+//            ObservableProperty observableProperty, Procedure procedure, Offering offering) {
+//        this.observationConstellationId = observationConstellationId;
+//        this.observableProperty = observableProperty;
+//        this.procedure = procedure;
+//        this.offering = offering;
+//    }
+//
+//    public ObservationConstellation(long observationConstellationId, ObservationType observationType,
+//            ObservableProperty observableProperty, Procedure procedure, Offering offering, ResultType resultType,
+//            Set<ResultTemplate> resultTemplates, Set<Observation> observations) {
+//        this.observationConstellationId = observationConstellationId;
+//        this.observationType = observationType;
+//        this.observableProperty = observableProperty;
+//        this.procedure = procedure;
+//        this.offering = offering;
+//        this.resultType = resultType;
+//        this.resultTemplates = resultTemplates;
+//        this.observations = observations;
+//    }
 
     public long getObservationConstellationId() {
         return this.observationConstellationId;
@@ -115,28 +115,28 @@ public class ObservationConstellation implements java.io.Serializable {
         this.offering = offering;
     }
 
-    public ResultType getResultType() {
-        return this.resultType;
-    }
-
-    public void setResultType(ResultType resultType) {
-        this.resultType = resultType;
-    }
-
-    public Set<ResultTemplate> getResultTemplates() {
-        return this.resultTemplates;
-    }
-
-    public void setResultTemplates(Set<ResultTemplate> resultTemplates) {
-        this.resultTemplates = resultTemplates;
-    }
-
-    public Set<Observation> getObservations() {
-        return this.observations;
-    }
-
-    public void setObservations(Set<Observation> observations) {
-        this.observations = observations;
-    }
+//    public ResultType getResultType() {
+//        return this.resultType;
+//    }
+//
+//    public void setResultType(ResultType resultType) {
+//        this.resultType = resultType;
+//    }
+//
+//    public Set<ResultTemplate> getResultTemplates() {
+//        return this.resultTemplates;
+//    }
+//
+//    public void setResultTemplates(Set<ResultTemplate> resultTemplates) {
+//        this.resultTemplates = resultTemplates;
+//    }
+//
+//    public Set<Observation> getObservations() {
+//        return this.observations;
+//    }
+//
+//    public void setObservations(Set<Observation> observations) {
+//        this.observations = observations;
+//    }
 
 }

@@ -42,25 +42,25 @@ public class FeatureOfInterestType implements java.io.Serializable {
 
     private String featureOfInterestType;
 
-    private Set<Procedure> procedures = new HashSet<Procedure>(0);
-
-    private Set<FeatureOfInterest> featureOfInterests = new HashSet<FeatureOfInterest>(0);
+//    private Set<Procedure> procedures = new HashSet<Procedure>(0);
+//
+//    private Set<FeatureOfInterest> featureOfInterests = new HashSet<FeatureOfInterest>(0);
 
     public FeatureOfInterestType() {
     }
 
-    public FeatureOfInterestType(long featureOfInterestTypeId, String featureOfInterestType) {
-        this.featureOfInterestTypeId = featureOfInterestTypeId;
-        this.featureOfInterestType = featureOfInterestType;
-    }
-
-    public FeatureOfInterestType(long featureOfInterestTypeId, String featureOfInterestType, Set<Procedure> procedures,
-            Set<FeatureOfInterest> featureOfInterests) {
-        this.featureOfInterestTypeId = featureOfInterestTypeId;
-        this.featureOfInterestType = featureOfInterestType;
-        this.procedures = procedures;
-        this.featureOfInterests = featureOfInterests;
-    }
+//    public FeatureOfInterestType(long featureOfInterestTypeId, String featureOfInterestType) {
+//        this.featureOfInterestTypeId = featureOfInterestTypeId;
+//        this.featureOfInterestType = featureOfInterestType;
+//    }
+//
+//    public FeatureOfInterestType(long featureOfInterestTypeId, String featureOfInterestType, Set<Procedure> procedures,
+//            Set<FeatureOfInterest> featureOfInterests) {
+//        this.featureOfInterestTypeId = featureOfInterestTypeId;
+//        this.featureOfInterestType = featureOfInterestType;
+//        this.procedures = procedures;
+//        this.featureOfInterests = featureOfInterests;
+//    }
 
     public long getFeatureOfInterestTypeId() {
         return this.featureOfInterestTypeId;
@@ -78,20 +78,20 @@ public class FeatureOfInterestType implements java.io.Serializable {
         this.featureOfInterestType = featureOfInterestType;
     }
 
-    public Set<Procedure> getProcedures() {
-        return this.procedures;
-    }
-
-    public void setProcedures(Set<Procedure> procedures) {
-        this.procedures = procedures;
-    }
-
-    public Set<FeatureOfInterest> getFeatureOfInterests() {
-        return this.featureOfInterests;
-    }
-
-    public void setFeatureOfInterests(Set<FeatureOfInterest> featureOfInterests) {
-        this.featureOfInterests = featureOfInterests;
-    }
+//    public Set<Procedure> getProcedures() {
+//        return this.procedures;
+//    }
+//
+//    public void setProcedures(Set<Procedure> procedures) {
+//        this.procedures = procedures;
+//    }
+//
+//    public Set<FeatureOfInterest> getFeatureOfInterests() {
+//        return this.featureOfInterests;
+//    }
+//
+//    public void setFeatureOfInterests(Set<FeatureOfInterest> featureOfInterests) {
+//        this.featureOfInterests = featureOfInterests;
+//    }
 
 }

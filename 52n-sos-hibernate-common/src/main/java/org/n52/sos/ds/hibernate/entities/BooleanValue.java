@@ -39,21 +39,21 @@ public class BooleanValue implements java.io.Serializable {
 
     private boolean value;
 
-    private Set<Observation> observations = new HashSet<Observation>(0);
+//    private Set<Observation> observations = new HashSet<Observation>(0);
 
     public BooleanValue() {
     }
 
-    public BooleanValue(long booleanValueId, boolean value) {
-        this.booleanValueId = booleanValueId;
-        this.value = value;
-    }
-
-    public BooleanValue(long booleanValueId, boolean value, Set<Observation> observations) {
-        this.booleanValueId = booleanValueId;
-        this.value = value;
-        this.observations = observations;
-    }
+//    public BooleanValue(long booleanValueId, boolean value) {
+//        this.booleanValueId = booleanValueId;
+//        this.value = value;
+//    }
+//
+//    public BooleanValue(long booleanValueId, boolean value, Set<Observation> observations) {
+//        this.booleanValueId = booleanValueId;
+//        this.value = value;
+//        this.observations = observations;
+//    }
 
     public long getBooleanValueId() {
         return this.booleanValueId;
@@ -71,12 +71,12 @@ public class BooleanValue implements java.io.Serializable {
         this.value = value;
     }
 
-    public Set<Observation> getObservations() {
-        return this.observations;
-    }
-
-    public void setObservations(Set<Observation> observations) {
-        this.observations = observations;
-    }
+//    public Set<Observation> getObservations() {
+//        return this.observations;
+//    }
+//
+//    public void setObservations(Set<Observation> observations) {
+//        this.observations = observations;
+//    }
 
 }

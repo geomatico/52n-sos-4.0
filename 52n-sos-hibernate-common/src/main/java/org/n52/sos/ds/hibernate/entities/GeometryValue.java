@@ -41,21 +41,21 @@ public class GeometryValue implements java.io.Serializable {
 
     private Geometry value;
 
-    private Set<Observation> observations = new HashSet<Observation>(0);
+//    private Set<Observation> observations = new HashSet<Observation>(0);
 
     public GeometryValue() {
     }
 
-    public GeometryValue(long geometryValueId, Geometry value) {
-        this.geometryValueId = geometryValueId;
-        this.value = value;
-    }
-
-    public GeometryValue(long geometryValueId, Geometry value, Set<Observation> observations) {
-        this.geometryValueId = geometryValueId;
-        this.value = value;
-        this.observations = observations;
-    }
+//    public GeometryValue(long geometryValueId, Geometry value) {
+//        this.geometryValueId = geometryValueId;
+//        this.value = value;
+//    }
+//
+//    public GeometryValue(long geometryValueId, Geometry value, Set<Observation> observations) {
+//        this.geometryValueId = geometryValueId;
+//        this.value = value;
+//        this.observations = observations;
+//    }
 
     public long getGeometryValueId() {
         return this.geometryValueId;
@@ -73,12 +73,12 @@ public class GeometryValue implements java.io.Serializable {
         this.value = value;
     }
 
-    public Set<Observation> getObservations() {
-        return this.observations;
-    }
-
-    public void setObservations(Set<Observation> observations) {
-        this.observations = observations;
-    }
+//    public Set<Observation> getObservations() {
+//        return this.observations;
+//    }
+//
+//    public void setObservations(Set<Observation> observations) {
+//        this.observations = observations;
+//    }
 
 }

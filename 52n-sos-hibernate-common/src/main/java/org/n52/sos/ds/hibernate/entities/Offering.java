@@ -43,7 +43,7 @@ public class Offering implements java.io.Serializable {
 
     private Set<ObservationConstellation> observationConstellations = new HashSet<ObservationConstellation>(0);
 
-    private Set<Request> requests = new HashSet<Request>(0);
+//    private Set<Request> requests = new HashSet<Request>(0);
 
     private Set<ObservationType> observationTypes = new HashSet<ObservationType>(0);
 
@@ -52,22 +52,22 @@ public class Offering implements java.io.Serializable {
     public Offering() {
     }
 
-    public Offering(long offeringId, String identifier) {
-        this.offeringId = offeringId;
-        this.identifier = identifier;
-    }
-
-    public Offering(long offeringId, String identifier, String name,
-            Set<ObservationConstellation> observationConstellations, Set<Request> requests,
-            Set<ObservationType> observationTypes, Set<RelatedFeature> relatedFeatures) {
-        this.offeringId = offeringId;
-        this.identifier = identifier;
-        this.name = name;
-        this.observationConstellations = observationConstellations;
-        this.requests = requests;
-        this.observationTypes = observationTypes;
-        this.relatedFeatures = relatedFeatures;
-    }
+//    public Offering(long offeringId, String identifier) {
+//        this.offeringId = offeringId;
+//        this.identifier = identifier;
+//    }
+//
+//    public Offering(long offeringId, String identifier, String name,
+//            Set<ObservationConstellation> observationConstellations, Set<Request> requests,
+//            Set<ObservationType> observationTypes, Set<RelatedFeature> relatedFeatures) {
+//        this.offeringId = offeringId;
+//        this.identifier = identifier;
+//        this.name = name;
+//        this.observationConstellations = observationConstellations;
+//        this.requests = requests;
+//        this.observationTypes = observationTypes;
+//        this.relatedFeatures = relatedFeatures;
+//    }
 
     public long getOfferingId() {
         return this.offeringId;
@@ -101,13 +101,13 @@ public class Offering implements java.io.Serializable {
         this.observationConstellations = observationConstellations;
     }
 
-    public Set<Request> getRequests() {
-        return this.requests;
-    }
-
-    public void setRequests(Set<Request> requests) {
-        this.requests = requests;
-    }
+//    public Set<Request> getRequests() {
+//        return this.requests;
+//    }
+//
+//    public void setRequests(Set<Request> requests) {
+//        this.requests = requests;
+//    }
 
     public Set<ObservationType> getObservationTypes() {
         return this.observationTypes;

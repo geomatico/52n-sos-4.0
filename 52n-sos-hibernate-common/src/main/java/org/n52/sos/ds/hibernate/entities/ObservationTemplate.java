@@ -37,28 +37,28 @@ public class ObservationTemplate implements java.io.Serializable {
 
     private long observationTemplateId;
 
-    private Request request;
+//    private Request request;
 
-    private Procedure procedure;
+//    private Procedure procedure;
 
     private String observationTemplate;
 
     public ObservationTemplate() {
     }
 
-    public ObservationTemplate(long observationTemplateId, Request request, Procedure procedure) {
-        this.observationTemplateId = observationTemplateId;
-        this.request = request;
-        this.procedure = procedure;
-    }
-
-    public ObservationTemplate(long observationTemplateId, Request request, Procedure procedure,
-            String observationTemplate) {
-        this.observationTemplateId = observationTemplateId;
-        this.request = request;
-        this.procedure = procedure;
-        this.observationTemplate = observationTemplate;
-    }
+//    public ObservationTemplate(long observationTemplateId, Request request, Procedure procedure) {
+//        this.observationTemplateId = observationTemplateId;
+//        this.request = request;
+//        this.procedure = procedure;
+//    }
+//
+//    public ObservationTemplate(long observationTemplateId, Request request, Procedure procedure,
+//            String observationTemplate) {
+//        this.observationTemplateId = observationTemplateId;
+//        this.request = request;
+//        this.procedure = procedure;
+//        this.observationTemplate = observationTemplate;
+//    }
 
     public long getObservationTemplateId() {
         return this.observationTemplateId;
@@ -68,21 +68,21 @@ public class ObservationTemplate implements java.io.Serializable {
         this.observationTemplateId = observationTemplateId;
     }
 
-    public Request getRequest() {
-        return this.request;
-    }
-
-    public void setRequest(Request request) {
-        this.request = request;
-    }
-
-    public Procedure getProcedure() {
-        return this.procedure;
-    }
-
-    public void setProcedure(Procedure procedure) {
-        this.procedure = procedure;
-    }
+//    public Request getRequest() {
+//        return this.request;
+//    }
+//
+//    public void setRequest(Request request) {
+//        this.request = request;
+//    }
+//
+//    public Procedure getProcedure() {
+//        return this.procedure;
+//    }
+//
+//    public void setProcedure(Procedure procedure) {
+//        this.procedure = procedure;
+//    }
 
     public String getObservationTemplate() {
         return this.observationTemplate;
