@@ -576,6 +576,8 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
             return SensorMLConstants.SYSTEM_QNAME;
         } else if (type == ProcessModelType.type) {
             return SensorMLConstants.PROCESS_MODEL_QNAME;
+        } else if (type == ComponentType.type) {
+            return SensorMLConstants.COMPONENT_QNAME;
         }
         return SensorMLConstants.ABSTRACT_PROCESS_QNAME;
     }
