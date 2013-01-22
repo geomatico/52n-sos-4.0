@@ -31,8 +31,7 @@ import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-
-import com.vividsolutions.jts.geom.Envelope;
+import org.n52.sos.ogc.sos.SosEnvelope;
 
 /**
  * Interface for querying featurefInterest data from a data source
@@ -94,7 +93,7 @@ public interface IFeatureQueryHandler {
      * @return Envelope of requested FOI identifiers
      * @throws OwsExceptionReport
      */
-    public Envelope getEnvelopeForFeatureIDs(List<String> featureIDs, Object connection) throws OwsExceptionReport;
+    public SosEnvelope getEnvelopeForFeatureIDs(List<String> featureIDs, Object connection) throws OwsExceptionReport;
     
     public String insertFeature(SosSamplingFeature samplingFeature, Object connection) throws OwsExceptionReport;
 

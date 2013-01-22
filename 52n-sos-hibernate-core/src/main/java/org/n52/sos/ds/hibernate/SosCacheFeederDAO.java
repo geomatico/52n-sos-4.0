@@ -42,6 +42,7 @@ import org.joda.time.DateTime;
 import org.n52.sos.cache.CapabilitiesCache;
 import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ds.IConnectionProvider;
+import org.n52.sos.ds.IFeatureQueryHandler;
 import org.n52.sos.ds.hibernate.entities.CompositePhenomenon;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
@@ -61,8 +62,6 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Implementation of the interface ICacheFeederDAO
@@ -368,12 +367,14 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
 		List<String> featureIDs =
                 HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(offeringID, session);
         if (featureIDs != null && !featureIDs.isEmpty()) {
-            Envelope envelope = Configurator.getInstance().getFeatureQueryHandler()
-						.getEnvelopeForFeatureIDs(featureIDs, session);
-            SosEnvelope sosEnvelope = new SosEnvelope(envelope, Configurator.getInstance().getDefaultEPSG());
-            return sosEnvelope;
+            return getFeatureQueryHandler().getEnvelopeForFeatureIDs(featureIDs, session);
         }
         return null;
+	}
+
+	protected IFeatureQueryHandler getFeatureQueryHandler()
+	{
+		return Configurator.getInstance().getFeatureQueryHandler();
 	}
 
     private void setProcedureValues(CapabilitiesCache cache, Session session) {
@@ -432,7 +433,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         cache.setFeatureOfInterest(identifiers);
         cache.setKFeatureOfInterestVProcedures(kFeatureOfInterestVProcedure);
         cache.setFeatureHierarchies(parentFeatures);
-		cache.setEnvelopeForFeatureOfInterest(Configurator.getInstance().getFeatureQueryHandler()
+		cache.setGlobalEnvelope(getFeatureQueryHandler()
 			.getEnvelopeForFeatureIDs(identifiers, session));
     }
 

@@ -38,8 +38,6 @@ import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Envelope;
-
 /**
  * Abstract class for capabilities cache controller implementations.
  *
@@ -65,7 +63,11 @@ public abstract class ACapabilitiesCacheController {
 		}
 	}
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ACapabilitiesCacheController.class);
+    protected enum Case{
+		OBSERVATION_INSERTION,SENSOR_INSERTION,RESULT_TEMPLATE_INSERTION,SENSOR_DELETION,OBSERVATION_DELETION
+	}
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ACapabilitiesCacheController.class);
 
     /**
      * Lock management
@@ -85,16 +87,22 @@ public abstract class ACapabilitiesCacheController {
 		 * Timers can not be rescheduled.
 		 * To make the interval changeable schedule a anonymous timer.
 		 */
-		this.current = new UpdateTimerTask();
-		long delay = Configurator.getInstance().getUpdateIntervallInMillis();
+		current = new UpdateTimerTask();
+		long delay = getUpdateInterval();
 		if (!initialized) {
 			delay = 1;
 			initialized = true;
 		}
 		if (delay > 0) {
 			LOGGER.info("Next CapabilitiesCacheUpdate in {}ms", delay);
-			this.timer.schedule(this.current, delay);
+			timer.schedule(current, delay);
 		}
+	}
+
+
+	protected long getUpdateInterval()
+	{
+		return Configurator.getInstance().getUpdateIntervallInMillis();
 	}
 
 
@@ -103,20 +111,20 @@ public abstract class ACapabilitiesCacheController {
 	 * @see {@link #schedule()}
 	 */
 	public void reschedule() {
-		if (this.current != null) {
-			this.current.cancel();
+		if (current != null) {
+			current.cancel();
 		}
 		schedule();
 	}
 
 	public void cancel() {
-		this.timer.cancel();
+		timer.cancel();
 	}
 
     @Override
     protected void finalize() {
         try {
-			this.cancel();
+			cancel();
             super.finalize();
         } catch (Throwable e) {
             LOGGER.error("Could not finalize CapabilitiesCacheController! " + e.getMessage());
@@ -475,9 +483,11 @@ public abstract class ACapabilitiesCacheController {
 
 	public abstract DateTime getMaxTimeForOffering(String offering);
 
-	public abstract Envelope getEnvelopeForFeatures();
+	public abstract SosEnvelope getGlobalEnvelope();
 
 	public abstract DateTime getMinEventTime();
 
 	public abstract DateTime getMaxEventTime();
+
+	protected abstract CapabilitiesCache getCapabilitiesCache();
 }

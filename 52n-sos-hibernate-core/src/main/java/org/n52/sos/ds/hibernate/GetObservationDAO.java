@@ -57,18 +57,16 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.ogc.sos.SosConstants.GetObservationParams;
+import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
-import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.vividsolutions.jts.geom.Envelope;
-import org.n52.sos.util.CollectionHelper;
 
 /**
  * Implementation of the interface IGetObservationDAO
@@ -126,13 +124,13 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
             // SOS 2.0 parameter
             opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.temporalFilter, getEventTime(session));
-            Envelope envelope = null;
+            SosEnvelope envelope = null;
             if (featureIDs != null && !featureIDs.isEmpty()) {
-                envelope = getCache().getEnvelopeForFeatures();
+                envelope = getCache().getGlobalEnvelope();
             }
             if (envelope != null) {
                 opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.spatialFilter,
-                        SosHelper.getMinMaxMapFromEnvelope(envelope));
+                        SosHelper.getMinMaxMapFromEnvelope(envelope.getEnvelope()));
             }
         } else if (version.equals(Sos1Constants.SERVICEVERSION)) {
             // SOS 1.0.0 parameter

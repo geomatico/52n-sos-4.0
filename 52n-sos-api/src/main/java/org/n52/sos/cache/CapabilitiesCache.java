@@ -37,8 +37,6 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.util.SosHelper;
 
-import com.vividsolutions.jts.geom.Envelope;
-
 /**
  * This singleton class encapsulates HashMaps, which store relationships between
  * the different metadata components of this SOS (e.g. fois 4 offerings). The
@@ -141,7 +139,7 @@ public class CapabilitiesCache{
 	private Map<String, SosEnvelope> kOfferingVEnvelope;
 	private Map<String, DateTime> kOfferingVMinTime;
 	private Map<String, DateTime> kOfferingVMaxTime;
-	private Envelope envelopeForFeatureOfInterest;
+	private SosEnvelope globalEnvelope;
 	private DateTime minPhenomenonTime;
 	private DateTime maxPhenomenonTime;
 
@@ -152,6 +150,7 @@ public class CapabilitiesCache{
      */
     public CapabilitiesCache() {
         super();
+        // FIXME initialize fields with empty lists
     }
 
     /**
@@ -1025,22 +1024,12 @@ public class CapabilitiesCache{
 		this.kOfferingVMaxTime = kOfferingVMaxTime;
 	}
 			
-	/**
-	 * get the envelope for all features
-	 *
-	 * @return the envelope
-	 */
-	public Envelope getEnvelopeForFeatureOfInterest() {
-		return this.envelopeForFeatureOfInterest;
+	public SosEnvelope getGlobalEnvelope() {
+		return this.globalEnvelope;
 	}
 
-	/**
-	 * sets the envlope for all features
-	 *
-	 * @param envelope the envelope
-	 */
-	public void setEnvelopeForFeatureOfInterest(Envelope envelope) {
-		this.envelopeForFeatureOfInterest = envelope;
+	public void setGlobalEnvelope(SosEnvelope globalEnvelope) {
+		this.globalEnvelope = globalEnvelope;
 	}
 
 	public DateTime getMinEventTime() {
@@ -1068,7 +1057,7 @@ public class CapabilitiesCache{
 		result = prime * result + ((allowedKOfferingVObservationType == null) ? 0 : allowedKOfferingVObservationType.hashCode());
 		result = prime * result + ((childFeatures == null) ? 0 : childFeatures.hashCode());
 		result = prime * result + ((childProcs == null) ? 0 : childProcs.hashCode());
-		result = prime * result + ((envelopeForFeatureOfInterest == null) ? 0 : envelopeForFeatureOfInterest.hashCode());
+		result = prime * result + ((globalEnvelope == null) ? 0 : globalEnvelope.hashCode());
 		result = prime * result + ((featureOfInterestTypes == null) ? 0 : featureOfInterestTypes.hashCode());
 		result = prime * result + ((featureOfInterestIdentifiers == null) ? 0 : featureOfInterestIdentifiers.hashCode());
 		result = prime * result + ((kFeatureOfInterestVProcedures == null) ? 0 : kFeatureOfInterestVProcedures.hashCode());
@@ -1131,10 +1120,10 @@ public class CapabilitiesCache{
 				return false;
 		} else if (!childProcs.equals(other.childProcs))
 			return false;
-		if (envelopeForFeatureOfInterest == null) {
-			if (other.envelopeForFeatureOfInterest != null)
+		if (globalEnvelope == null) {
+			if (other.globalEnvelope != null)
 				return false;
-		} else if (!envelopeForFeatureOfInterest.equals(other.envelopeForFeatureOfInterest))
+		} else if (!globalEnvelope.equals(other.globalEnvelope))
 			return false;
 		if (featureOfInterestTypes == null) {
 			if (other.featureOfInterestTypes != null)

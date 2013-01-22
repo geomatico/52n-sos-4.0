@@ -33,21 +33,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.joda.time.DateTime;
 import org.n52.sos.ds.ICacheFeederDAO;
-import org.n52.sos.ogc.gml.time.ITime;
-import org.n52.sos.ogc.gml.time.TimeInstant;
-import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
-import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * CapabilitiesCacheController implements all methods to request all objects and
@@ -58,10 +50,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CapabilitiesCacheController.class);
     
-    private enum Case{
-    	OBSERVATION_INSERTION,SENSOR_INSERTION,RESULT_TEMPLATE_INSERTION,SENSOR_DELETION,OBSERVATION_DELETION
-    }
-
     /**
      * CapabilitiesCache instance
      */
@@ -73,10 +61,15 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
     private ICacheFeederDAO cacheFeederDAO;
 
     public CapabilitiesCacheController() {
-        this.capabilitiesCache = new CapabilitiesCache();
-        this.cacheFeederDAO = Configurator.getInstance().getCacheFeederDAO();
+        capabilitiesCache = new CapabilitiesCache();
+        cacheFeederDAO = getCacheDAO();
 		schedule();
     }
+
+	protected ICacheFeederDAO getCacheDAO()
+	{
+		return Configurator.getInstance().getCacheFeederDAO();
+	}
 
     @Override
     public boolean updateCacheFromDB() throws OwsExceptionReport {
@@ -100,7 +93,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
             }
             setUpdateIsFree(false);
 
-            this.cacheFeederDAO.updateCache(capabilitiesCache);
+            cacheFeederDAO.updateCache(capabilitiesCache);
 
         } catch (InterruptedException ie) {
             LOGGER.error("Problem while threadsafe capabilities cache update", ie);
@@ -186,254 +179,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 	}
 
 	/**
-     * WORK IN PROGRESS: Please do not use
-     * TODO
-     * - reduce size
-     * - extract common behaviour
-     * @deprecated not really, but this will cause eclipse to draw the attention of the developer to this comment 
-     */
-    public void updateAfterObservationInsertion(InsertObservationRequest sosRequest) throws OwsExceptionReport
-    {
-        boolean timeNotElapsed = true;
-        try
-        {
-            // thread safe updating of the cache map
-            timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-            // has waiting for lock got a time out?
-            if (!timeNotElapsed)
-            {
-                LOGGER.warn("\n******\nupdateAfterObservationInsertion() not successful "
-                        + "because of time out while waiting for update lock." + "\nWaited "
-                        + SosConstants.UPDATE_TIMEOUT + " milliseconds.\n******\n");
-                return;
-            }
-            while (!isUpdateIsFree())
-            {
-                getUpdateFree().await();
-            }
-            setUpdateIsFree(false);
-            // update cache maps
-            for (SosObservation sosObservation : sosRequest.getObservations())
-            {
-            	String procedureIdentifier = sosObservation.getObservationConstellation().getProcedure().getProcedureIdentifier();
-        		
-            	// update features
-            	SosAbstractFeature sosFeatureOfInterest = sosObservation.getObservationConstellation().getFeatureOfInterest();
-            	String observedFeatureIdentifier = sosFeatureOfInterest.getIdentifier().getValue();
-            	
-            	if (sosFeatureOfInterest instanceof SosSamplingFeature)
-            	{
-                	// add feature
-                	Collection<String> featureIdentifiers = capabilitiesCache.getFeatureOfInterest();
-                	if (!featureIdentifiers.contains(observedFeatureIdentifier))
-                	{
-                		featureIdentifiers.add(observedFeatureIdentifier);
-                	}
-            		// add foi-sensor-relation
-            		Collection<String> procedures4Feature = capabilitiesCache.getProcedureIdentifierFor(sosFeatureOfInterest.getIdentifier().getValue());
-            		if (!procedures4Feature.contains(procedureIdentifier));
-            		{
-            			procedures4Feature.add(procedureIdentifier);
-            		}
-            		// add foi-foi relations
-            		// sampledFeatures are parentFeatures
-        			// parent features aus dem aktuellen Observation-Kontext
-            		List<SosAbstractFeature> parentFeatures = ((SosSamplingFeature)sosFeatureOfInterest).getSampledFeatures();
-            		List<String> parentFeaturesIdentifiers = new ArrayList<String>(parentFeatures.size());
-            		for (SosAbstractFeature sosAbstractFeature : parentFeatures) {
-						parentFeaturesIdentifiers.add(sosAbstractFeature.getIdentifier().getValue());
-					}
-            		if (parentFeatures != null && !parentFeatures.isEmpty())
-            		{
-            			// update parent features
-            			Map<String, Collection<String>> parentFeaturesMapFromCache = capabilitiesCache.getParentFeatures();
-            			Collection<String> parentFeaturesFromCache = null;
-            			// 1 are parent features already available for this feature
-            			if (parentFeaturesMapFromCache != null && !parentFeaturesMapFromCache.isEmpty() && parentFeaturesMapFromCache.containsKey(observedFeatureIdentifier))
-            			{
-            				// if yes -> check list and add all not already contained ones
-            				parentFeaturesFromCache = parentFeaturesMapFromCache.get(observedFeatureIdentifier);
-            				for (String parentFeatureIdentifier : parentFeaturesIdentifiers)
-            				{
-								if (!parentFeaturesFromCache.contains(parentFeatureIdentifier))
-								{
-									parentFeaturesFromCache.add(parentFeatureIdentifier);
-								}
-							}
-            			}
-            			else // if not -> add parent features and done
-            			{
-            				parentFeaturesMapFromCache.put(observedFeatureIdentifier, parentFeaturesIdentifiers);
-            			}
-            			
-            			// update child features
-            			Map<String, Collection<String>> childFeaturesMapFromCache = capabilitiesCache.getChildFeatures();
-            			if (childFeaturesMapFromCache != null && !childFeaturesMapFromCache.isEmpty() && parentFeaturesFromCache != null)
-            			{
-                			// 1 check for the identifier of the parent features of this feature of this observation
-            				for (String parentFeatureIdentifier : parentFeaturesFromCache)
-            				{
-                				// if not -> add new list with one element
-            					if (!childFeaturesMapFromCache.containsKey(parentFeatureIdentifier))
-            					{
-            						ArrayList<String> newChildList = new ArrayList<String>(1);
-            						newChildList.add(observedFeatureIdentifier);
-            						childFeaturesMapFromCache.put(parentFeatureIdentifier, newChildList);
-            					}
-                				else // if yes -> get list and update if required
-            					{
-            						Collection<String> childFeatures = childFeaturesMapFromCache.get(parentFeatureIdentifier);
-            						if (!childFeatures.contains(observedFeatureIdentifier))
-            						{
-            							childFeatures.add(observedFeatureIdentifier);
-            						}
-            					}
-							}
-
-            			}
-            			
-            		}
-            		// update feature envelope
-            		Envelope featuresEnvelope = capabilitiesCache.getEnvelopeForFeatureOfInterest();
-            		Envelope observedFeatureEnvelope = ((SosSamplingFeature)sosFeatureOfInterest).getGeometry().getEnvelopeInternal();
-            		if (!featuresEnvelope.contains( observedFeatureEnvelope ))
-            		{
-            			// extend envelope
-            			featuresEnvelope.expandToInclude(observedFeatureEnvelope);
-            		}
-            	}
-            	else 
-            	{
-            		String errorMessage = String.format("Feature Type \"%s\" not supported.", sosFeatureOfInterest!=null?sosFeatureOfInterest.getClass().getName():sosFeatureOfInterest);
-            		LOGGER.error(errorMessage);
-            		throw new RuntimeException(errorMessage);
-            	}	
-            	TimePeriod observationEventTime = getPhenomenonTimeFrom(sosObservation);
-            	updateGlobalTemporalBBoxUsingNew(observationEventTime);
-                
-            	// update offerings
-            	for (String offeringIdentifier : sosRequest.getOfferings()) {
-					// offering-procedures
-            		Collection<String> procedures4Offering = capabilitiesCache.getProcedureIdentifierFor(offeringIdentifier);
-            		if (!procedures4Offering.contains(procedureIdentifier))
-            		{
-            			procedures4Offering.add(procedureIdentifier);
-            		}
-            		// offering-observableProperties
-            		Collection<String> observableProperties4Offering = capabilitiesCache.getObservableProperties4Offering(offeringIdentifier);
-            		String observableProperty = sosObservation.getObservationConstellation().getObservableProperty().getIdentifier();
-            		if (!observableProperties4Offering.contains(observableProperty))
-            		{
-            			observableProperties4Offering.add(observableProperty);
-            		}
-            		// offering-relatedFeatures
-            		Map<String, Collection<String>> offeringRelatedFeaturesMap = capabilitiesCache.getKOfferingVRelatedFeatures();
-            		if (offeringRelatedFeaturesMap != null)
-            		{
-            			if (offeringRelatedFeaturesMap.containsKey(offeringIdentifier) && !offeringRelatedFeaturesMap.get(offeringIdentifier).contains(observedFeatureIdentifier))
-            			{
-            				// if offering is already there and feature not contained -> add to list
-            				offeringRelatedFeaturesMap.get(offeringIdentifier).add(observedFeatureIdentifier);
-            			}
-            			else
-            			{
-            				// if not -> add new list
-            				ArrayList<String> relatedFeatures = new ArrayList<String>(1);
-            				relatedFeatures.add(observedFeatureIdentifier);
-            				offeringRelatedFeaturesMap.put(offeringIdentifier, relatedFeatures);
-            			}
-            		}
-            		// offering-observationTypes
-            		Map<String, Collection<String>> observationTypes4Offerings = capabilitiesCache.getKOfferingVObservationTypes();
-            		if (observationTypes4Offerings != null)
-            		{
-            			String observationType = sosObservation.getObservationConstellation().getObservationType();
-            			if (observationTypes4Offerings.containsKey(offeringIdentifier) && !observationTypes4Offerings.get(offeringIdentifier).contains(observationType))
-            			{
-            				observationTypes4Offerings.get(offeringIdentifier).add(observationType);
-            			}
-            			else
-            			{
-            				// add new list
-            				ArrayList<String> observationTypes = new ArrayList<String>(1);
-            				observationTypes.add(observationType);
-            				observationTypes4Offerings.put(offeringIdentifier, observationTypes);
-            			}
-            		}
-            		// offering-maxtime
-            		// check and update if later
-            		if (capabilitiesCache.getKOfferingVMaxTime().containsKey(offeringIdentifier) &&
-            				capabilitiesCache.getKOfferingVMaxTime().get(offeringIdentifier).isBefore(observationEventTime.getEnd()))
-            		{
-            				capabilitiesCache.getKOfferingVMaxTime().put(offeringIdentifier, observationEventTime.getEnd());
-            		}
-            		else
-            		{
-            			// add new
-            			capabilitiesCache.getKOfferingVMaxTime().put(offeringIdentifier, observationEventTime.getEnd());
-            		}
-            		// offering-mintime
-            		// check and update if before
-            		if (capabilitiesCache.getKOfferingVMinTime().containsKey(offeringIdentifier) &&
-            				capabilitiesCache.getKOfferingVMinTime().get(offeringIdentifier).isAfter(observationEventTime.getStart()))
-            		{
-            			capabilitiesCache.getKOfferingVMinTime().put(offeringIdentifier, observationEventTime.getStart());
-            		}
-            		else
-            		{
-            			// add new
-            			capabilitiesCache.getKOfferingVMinTime().put(offeringIdentifier, observationEventTime.getStart());
-            		}
-            		// TODO offering-envelope
-            		// TODO offering-feature
-            		// FIXME Eike: continue development here
-            	}
-            	
-			}
-            
-            
-        } catch (InterruptedException e)
-        {
-            LOGGER.error("Problem while threadsafe capabilities cache update", e);
-        } 
-        finally
-        {
-            if (timeNotElapsed)
-            {
-                getUpdateLock().unlock();
-                setUpdateIsFree(true);
-            }
-        }
-    }
-
-	private void updateGlobalTemporalBBoxUsingNew(TimePeriod observationEventTime)
-	{
-		if (capabilitiesCache.getMinEventTime().isAfter(observationEventTime.getStart()))
-		{
-			capabilitiesCache.setMinEventTime(observationEventTime.getStart());
-		}
-		if (capabilitiesCache.getMaxEventTime().isBefore(observationEventTime.getEnd()))
-		{
-			capabilitiesCache.setMaxEventTime(observationEventTime.getEnd());
-		}
-	}
-
-	private TimePeriod getPhenomenonTimeFrom(SosObservation sosObservation)
-	{
-		ITime phenomenonTime = sosObservation.getPhenomenonTime();
-		if (phenomenonTime instanceof TimeInstant)
-		{
-			return new TimePeriod(((TimeInstant) phenomenonTime).getValue(),
-					((TimeInstant) phenomenonTime).getValue());
-		}
-		else
-		{
-			return (TimePeriod) phenomenonTime;
-		}
-	}
-    
-    /**
      * FIXME Update or remove, the method is doing nothing but wait
      * method for refreshing the metadata of fois in the capabilities cache; is
      * invoked when a new feature of interest is inserted into the SOS database
@@ -1261,8 +1006,8 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 	}
 
 	@Override
-	public Envelope getEnvelopeForFeatures() {
-		return this.capabilitiesCache.getEnvelopeForFeatureOfInterest();
+	public SosEnvelope getGlobalEnvelope() {
+		return this.capabilitiesCache.getGlobalEnvelope();
 	}
 
 	@Override
@@ -1273,6 +1018,12 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 	@Override
 	public DateTime getMaxEventTime() {
 		return this.capabilitiesCache.getMaxEventTime();
+	}
+
+	@Override
+	protected CapabilitiesCache getCapabilitiesCache()
+	{
+		return capabilitiesCache;
 	}
 
 }

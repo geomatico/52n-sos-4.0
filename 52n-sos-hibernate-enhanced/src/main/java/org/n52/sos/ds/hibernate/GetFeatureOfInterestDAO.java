@@ -41,14 +41,13 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.request.GetFeatureOfInterestRequest;
 import org.n52.sos.response.GetFeatureOfInterestResponse;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao implements IGetFeatureOfInterestDAO {
 
@@ -89,13 +88,13 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
             parameterName = Sos1Constants.GetFeatureOfInterestParams.location.name();
         }
 
-        Envelope envelope = null;
+        SosEnvelope envelope = null;
         if (featureIDs != null && !featureIDs.isEmpty()) {
-            envelope = getCache().getEnvelopeForFeatures();
+            envelope = getCache().getGlobalEnvelope();
         }
         
         if (envelope != null) {
-            opsMeta.addRangeParameterValue(parameterName, SosHelper.getMinMaxMapFromEnvelope(envelope));
+            opsMeta.addRangeParameterValue(parameterName, SosHelper.getMinMaxMapFromEnvelope(envelope.getEnvelope()));
         } else {
             opsMeta.addAnyParameterValue(parameterName);
         }

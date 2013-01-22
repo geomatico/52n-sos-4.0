@@ -47,13 +47,14 @@ import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosEnvelope;
+import org.n52.sos.service.Configurator;
 import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -67,11 +68,6 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(DBFeatureQueryHandler.class);
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.ds.IFeatureQueryHandler#getFeatureByID(java.lang.String)
-     */
     @Override
     public SosAbstractFeature getFeatureByID(String featureID, Object connection, String version)
             throws OwsExceptionReport {
@@ -88,12 +84,6 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.ds.IFeatureQueryHandler#getFeatureIDs(java.util.List,
-     * org.n52.sos.ogc.filter.SpatialFilter)
-     */
     @Override
     public Collection<String> getFeatureIDs(SpatialFilter filter, Object connection) throws OwsExceptionReport {
         Session session = getSessionFromConnection(connection);
@@ -113,12 +103,6 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.ds.IFeatureQueryHandler#getFeatures(java.util.List,
-     * org.n52.sos.ogc.filter.SpatialFilter)
-     */
     @Override
     public Map<String, SosAbstractFeature> getFeatures(List<String> featureIDs, List<SpatialFilter> spatialFilters,
             Object connection, String version) throws OwsExceptionReport {
@@ -156,15 +140,8 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.sos.ds.IFeatureQueryHandler#getEnvelopeforFeatureIDs(java.util
-     * .List)
-     */
     @Override
-    public Envelope getEnvelopeForFeatureIDs(List<String> featureIDs, Object connection) throws OwsExceptionReport {
+    public SosEnvelope getEnvelopeForFeatureIDs(List<String> featureIDs, Object connection) throws OwsExceptionReport {
         Session session = getSessionFromConnection(connection);
         if (featureIDs != null && !featureIDs.isEmpty()) {
             try {
@@ -173,16 +150,21 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
                 criteria.setProjection(SpatialProjections.extent("geom"));
                 Geometry geom = (Geometry) criteria.uniqueResult();
                 if (geom != null) {
-                    return geom.getEnvelopeInternal();
+                    return new SosEnvelope(geom.getEnvelopeInternal(),getDefaultEPSGCode());
                 }
             } catch (HibernateException he) {
-                String exceptionText = "";
+                String exceptionText = "Exception thrown while requesting global feature envelope";
                 LOGGER.error(exceptionText, he);
                 throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
             }
         }
         return null;
     }
+
+	protected int getDefaultEPSGCode()
+	{
+		return Configurator.getInstance().getDefaultEPSG();
+	}
 
     @Override
     public String insertFeature(SosSamplingFeature samplingFeature, Object connection) throws OwsExceptionReport {

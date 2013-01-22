@@ -65,7 +65,7 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 	private void testCacheResult(CapabilitiesCache cache)
 	{
 		assertNotNull("cache is null", cache);
-		assertNotNull("envelope of features is null",cache.getEnvelopeForFeatureOfInterest());
+		assertNotNull("envelope of features is null",cache.getGlobalEnvelope());
 		assertNotNull("feature types is null",cache.getFeatureOfInterestTypes());
 		assertFalse("feature types is empty",cache.getFeatureOfInterestTypes().isEmpty());
 		assertNotNull("offering envelopes map is null",cache.getKOfferingVEnvelope());
