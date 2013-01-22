@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012
+ * Copyright (C) 2013
  * by 52 North Initiative for Geospatial Open Source Software GmbH
  *
  * Contact: Andreas Wytzisk
@@ -26,15 +26,19 @@ package org.n52.sos.service.profile;
 import org.n52.sos.ogc.om.OMConstants;
 
 public class ProfileConstants {
-    
+
+    public enum XmlElements {
+        profile, identifier, defaultProfile, observationResponseFormat, encodeFeatureOfInterestInObservations, encodingNamespaceForFeatureOfInterestEncoding, showMetadataOfEmptyObservations, allowSubsettingForSOS20OM20, mergeValues, encodeProcedureInObservation, namespace, encode
+    }
+
     public static final String DEFAULT_IDENTIFIER = "SOS_20_PROFILE";
-    
+
     public static final String DEFAULT_OBSERVATION_RESPONSE_FORMAT = OMConstants.NS_OM_2;
-    
+
     public static final String DEFAULT_ENCODING_NAMESPACE_FOR_FEATUTREOFINTEREST_SOS_20 = "";
-    
+
     public static final boolean DEFAULT_ENCODE_FEATUREOFINTEREST_IN_OBSERVATION = true;
-    
+
     public static final boolean DEFAULT_SHOW_METADATA_OF_EMPTY_OBSERVATIONS = false;
 
     public static final boolean DEFAULT_ALLOW_SUBSETTING_FOR_OM_20 = false;

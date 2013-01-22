@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012
+ * Copyright (C) 2013
  * by 52 North Initiative for Geospatial Open Source Software GmbH
  *
  * Contact: Andreas Wytzisk
@@ -52,7 +52,8 @@ public class Profile {
 
     private boolean allowSubsettingForSOS20OM20 = ProfileConstants.DEFAULT_ALLOW_SUBSETTING_FOR_OM_20;
 
-    private boolean mergeValues = ProfileConstants.DEAFULT_MERGE_VALUES;
+//    private boolean mergeValues = ProfileConstants.DEAFULT_MERGE_VALUES;
+    private boolean mergeValues = true;
     
     private Map<String, Boolean> encodeProcedureInObservation = new HashMap<String, Boolean>(0);
 

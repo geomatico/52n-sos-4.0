@@ -56,10 +56,11 @@ public class GetObservationResponse extends AbstractServiceResponse {
         List<SosObservation> mergedObservations = new ArrayList<SosObservation>(0);
         Map<String, SosObservation> antiSubsettingObservations = new HashMap<String, SosObservation>(0);
         for (SosObservation sosObservation : observationCollection) {
-         // TODO merge observations with the same antiSubsetting identifier.
+            // TODO merge observations with the same antiSubsetting identifier.
             if (sosObservation.isSetAntiSubsetting()) {
                 if (antiSubsettingObservations.containsKey(sosObservation.getAntiSubsetting())) {
-                    SosObservation antiSubsettingObservation = antiSubsettingObservations.get(sosObservation.getAntiSubsetting());
+                    SosObservation antiSubsettingObservation =
+                            antiSubsettingObservations.get(sosObservation.getAntiSubsetting());
                     antiSubsettingObservation.mergeWithObservation(sosObservation);
                 } else {
                     antiSubsettingObservations.put(sosObservation.getAntiSubsetting(), sosObservation);
@@ -73,75 +74,65 @@ public class GetObservationResponse extends AbstractServiceResponse {
     }
 
     public void mergeObservationsWithSameX() {
-        // TODO merge all observations with the same observationContellation (proc, obsProp, foi)
-        List<SosObservation> mergedObservations = new ArrayList<SosObservation>(0);
-        int obsIdCounter = 1;
-        for (SosObservation sosObservation : observationCollection) {
-            if (mergedObservations.isEmpty()) {
-                sosObservation.setObservationID(Integer.toString(obsIdCounter++));
-                mergedObservations.add(sosObservation);
-            } else {
-                boolean combined = false;
-                for (SosObservation combinedSosObs : mergedObservations) {
-                    if (combinedSosObs.getObservationConstellation().equals(
-                        sosObservation.getObservationConstellation())) {
-                        combinedSosObs.setResultTime(null);
-                        combinedSosObs.mergeWithObservation(sosObservation);
-                        combined = true;
-                        break;
+        // TODO merge all observations with the same observationContellation
+        // (proc, obsProp, foi)
+        if (observationCollection != null) {
+            List<SosObservation> mergedObservations = new ArrayList<SosObservation>(0);
+            int obsIdCounter = 1;
+                for (SosObservation sosObservation : observationCollection) {
+                    if (mergedObservations.isEmpty()) {
+                        sosObservation.setObservationID(Integer.toString(obsIdCounter++));
+                        mergedObservations.add(sosObservation);
+                    } else {
+                        boolean combined = false;
+                        for (SosObservation combinedSosObs : mergedObservations) {
+                            if (combinedSosObs.getObservationConstellation().equals(
+                                    sosObservation.getObservationConstellation())) {
+                                combinedSosObs.setResultTime(null);
+                                combinedSosObs.mergeWithObservation(sosObservation);
+                                combined = true;
+                                break;
+                            }
+                        }
+                        if (!combined) {
+                            mergedObservations.add(sosObservation);
+                        }
                     }
                 }
-                if (!combined) {
-                    mergedObservations.add(sosObservation);
-                }
-            }
+            
+            this.observationCollection = mergedObservations;
         }
-        this.observationCollection = mergedObservations;
     }
 
     public boolean hasObservationsWithResultTemplate() {
-       for (SosObservation sosObservation : observationCollection) {
-           if (sosObservation.getObservationConstellation().isSetResultTemplate()) {
-               return true;
-           }
-       }
+        for (SosObservation sosObservation : observationCollection) {
+            if (sosObservation.getObservationConstellation().isSetResultTemplate()) {
+                return true;
+            }
+        }
         return false;
     }
 
-    /* TODO uncomment when WaterML support is activated
-    public Collection<SosObservation> mergeObservations(boolean mergeObservationValuesWithSameParameters) {
-        Collection<SosObservation> combinedObsCol = new ArrayList<SosObservation>();
-        int obsIdCounter = 1;
-        for (SosObservation sosObservation : observationCollection) {
-            if (combinedObsCol.isEmpty()) {
-                sosObservation.setObservationID(Integer.toString(obsIdCounter++));
-                combinedObsCol.add(sosObservation);
-            } else {
-                boolean combined = false;
-                for (SosObservation combinedSosObs : combinedObsCol) {
-                    if (mergeObservationValuesWithSameParameters) {
-                        if (combinedSosObs.getObservationConstellation().equals(
-                                sosObservation.getObservationConstellation())) {
-                            combinedSosObs.mergeWithObservation(sosObservation, false);
-                            combined = true;
-                            break;
-                        }
-                    } else {
-                        if (combinedSosObs.getObservationConstellation().equalsExcludingObsProp(
-                                sosObservation.getObservationConstellation())) {
-                            combinedSosObs.mergeWithObservation(sosObservation, true);
-                            combined = true;
-                            break;
-                        }
-                    }
-                }
-                if (!combined) {
-                    combinedObsCol.add(sosObservation);
-                }
-            }
-        }
-        return combinedObsCol;
-    }
-    */
+    /*
+     * TODO uncomment when WaterML support is activated public
+     * Collection<SosObservation> mergeObservations(boolean
+     * mergeObservationValuesWithSameParameters) { Collection<SosObservation>
+     * combinedObsCol = new ArrayList<SosObservation>(); int obsIdCounter = 1;
+     * for (SosObservation sosObservation : observationCollection) { if
+     * (combinedObsCol.isEmpty()) {
+     * sosObservation.setObservationID(Integer.toString(obsIdCounter++));
+     * combinedObsCol.add(sosObservation); } else { boolean combined = false;
+     * for (SosObservation combinedSosObs : combinedObsCol) { if
+     * (mergeObservationValuesWithSameParameters) { if
+     * (combinedSosObs.getObservationConstellation().equals(
+     * sosObservation.getObservationConstellation())) {
+     * combinedSosObs.mergeWithObservation(sosObservation, false); combined =
+     * true; break; } } else { if
+     * (combinedSosObs.getObservationConstellation().equalsExcludingObsProp(
+     * sosObservation.getObservationConstellation())) {
+     * combinedSosObs.mergeWithObservation(sosObservation, true); combined =
+     * true; break; } } } if (!combined) { combinedObsCol.add(sosObservation); }
+     * } } return combinedObsCol; }
+     */
 
 }
