@@ -61,6 +61,8 @@ public class SWEConstants {
     public static final String EN_COUNT = "Count";
     
     public static final String EN_DATA_RECORD = "DataRecord";
+    
+    public static final String EN_DATA_ARRAY = "DataArray";
 
     public static final String EN_QUANTITY = "Quantity";
 
@@ -81,6 +83,10 @@ public class SWEConstants {
     public static final String EN_OFFERING = "offering";
     
     // QNames for elements
+
+    public static final QName QN_DATA_ARRAY_SWE_200 = new QName(NS_SWE, EN_DATA_ARRAY, NS_SWE_PREFIX);
+
+    public static final QName QN_DATA_RECORD_SWE_200 = new QName(NS_SWE, EN_DATA_RECORD, NS_SWE_PREFIX);
 
     public static final QName QN_SIMPLEDATARECORD_SWE_101 = new QName(NS_SWE, EN_SIMPLEDATARECORD, NS_SWE_PREFIX);
 
