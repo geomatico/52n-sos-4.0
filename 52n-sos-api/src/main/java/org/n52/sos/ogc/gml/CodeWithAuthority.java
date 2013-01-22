@@ -52,5 +52,44 @@ public class CodeWithAuthority {
     public boolean isSetValue() {
         return value != null && !value.isEmpty();
     }
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((codeSpace == null) ? 0 : codeSpace.hashCode());
+		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof CodeWithAuthority))
+			return false;
+		CodeWithAuthority other = (CodeWithAuthority) obj;
+		if (codeSpace == null) {
+			if (other.codeSpace != null)
+				return false;
+		} else if (!codeSpace.equals(other.codeSpace))
+			return false;
+		if (value == null) {
+			if (other.value != null)
+				return false;
+		} else if (!value.equals(other.value))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString()
+	{
+		return String.format("CodeWithAuthority [value=%s, codeSpace=%s]", value, codeSpace);
+	}
     
 }
