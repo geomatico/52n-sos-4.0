@@ -25,11 +25,12 @@ package org.n52.sos.util;
 
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 /**
  * Thread safe factory that creates a object only if
- * it is null or if it should be recreated explictly.
+ * it is null or if it should be recreated explicitly.
  * @param <T> the type to produce
  * @author Christian Autermann <c.autermann@52north.org>
  */
