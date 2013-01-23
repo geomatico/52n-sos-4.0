@@ -37,15 +37,15 @@
 		<link href="<c:url value="/static/images/favicon.ico" />" rel="shortcut icon" type="image/x-icon" />
 		<link rel="stylesheet" href="<c:url value="/static/css/52n.css" />" type="text/css" />
 		<link rel="stylesheet" href="<c:url value="/static/css/52n.cssmenu.no-hover.css" />" type="text/css"/>
-		<link rel="stylesheet" href="<c:url value="/static/css/bootstrap-2.1.1.min.css" />" type="text/css" />
+		<link rel="stylesheet" href="<c:url value="/static/lib/bootstrap-2.1.1.min.css" />" type="text/css" />
 		<link rel="stylesheet" href="<c:url value="/static/css/application.css" />" type="text/css" />
 		<style type="text/css">
 			#ja-cssmenu li { 
 				cursor: default !important; 
 			}
 		</style>
-		<script type="text/javascript" src="<c:url value="/static/js/jquery-1.8.2.min.js" />"></script>
-		<script type="text/javascript" src="<c:url value="/static/js/bootstrap-2.1.1.min.js" />"></script>
+		<script type="text/javascript" src="<c:url value="/static/lib/jquery-1.8.2.min.js" />"></script>
+		<script type="text/javascript" src="<c:url value="/static/lib/bootstrap-2.1.1.min.js" />"></script>
 		<script type="text/javascript" src="<c:url value="/static/js/application.js" />"></script>
 		<title>52&deg;North SOS installer</title>
 	</head>

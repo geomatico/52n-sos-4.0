@@ -28,13 +28,13 @@
 <jsp:include page="common/header.jsp">
 	<jsp:param name="activeMenu" value="client" />
 </jsp:include>
-<link rel="stylesheet" href="<c:url value="/static/css/prettify.css" />" type="text/css" />
-<link rel="stylesheet" href="<c:url value="/static/css/codemirror-2.34.css" />" type="text/css" />
+<link rel="stylesheet" href="<c:url value="/static/lib/prettify.css" />" type="text/css" />
+<link rel="stylesheet" href="<c:url value="/static/lib/codemirror-2.34.css" />" type="text/css" />
 <link rel="stylesheet" href="<c:url value="/static/css/codemirror.custom.css" />" type="text/css" />
-<script type="text/javascript" src="<c:url value="/static/js/codemirror-2.34.js" />"></script>
-<script type="text/javascript" src="<c:url value="/static/js/codemirror-2.34-xml.js" />"></script>
-<script type="text/javascript" src="<c:url value="/static/js/prettify.min.js" />"></script>
-<script type="text/javascript" src="<c:url value="/static/js/vkbeautify-0.99.00.beta.js" />"></script>
+<script type="text/javascript" src="<c:url value="/static/lib/codemirror-2.34.js" />"></script>
+<script type="text/javascript" src="<c:url value="/static/lib/codemirror-2.34-xml.js" />"></script>
+<script type="text/javascript" src="<c:url value="/static/lib/prettify.min.js" />"></script>
+<script type="text/javascript" src="<c:url value="/static/lib/vkbeautify-0.99.00.beta.js" />"></script>
 <jsp:include page="common/logotitle.jsp">
 	<jsp:param name="title" value="52&deg;North SOS Test Client" />
 	<jsp:param name="leadParagraph" value="Choose a request from the examples or write your own to test the SOS." />

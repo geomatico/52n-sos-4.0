@@ -689,17 +689,7 @@
 						<exclude>**/log4j*</exclude>
 						<exclude>**/*.xml</exclude>
 						<exclude>**/*.html</exclude>
-						<exclude>**/webapp/static/css/bootstrap*.css</exclude>
-						<exclude>**/webapp/static/css/codemirror-*.css</exclude>
-						<exclude>**/webapp/static/css/prettify*.css</exclude>
-						<exclude>**/webapp/static/js/bootstrap*.js</exclude>
-						<exclude>**/webapp/static/js/codemirror*.js</exclude>
-						<exclude>**/webapp/static/js/jquery*.js</exclude>
-						<exclude>**/webapp/static/js/prettify*.js</exclude>
-						<exclude>**/webapp/static/js/vkbeautify*.js</exclude>
-						<exclude>**/webapp/static/js/jsxml*.js</exclude>
-						<exclude>**/webapp/static/js/parseuri*.js</exclude>
-						<exclude>**/webapp/static/js/prettify*.js</exclude>
+						<exclude>**/webapp/static/lib*</exclude>
 						<exclude>**/webapp/WEB-INF/web.xml</exclude>
 						<exclude>**/buildNumber.properties</exclude>
 					</excludes>

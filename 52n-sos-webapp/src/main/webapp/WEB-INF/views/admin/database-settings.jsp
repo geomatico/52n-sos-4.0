@@ -36,7 +36,7 @@
 <p>To change more advanced settings of the database configuration, for example the database driver or connection pool, please export your settings using <a href="<c:url value="/admin/settings.json"/>">this configuration file</a> and re-run the installer after <a href="<c:url value="/admin/reset"/>">resetting</a> this installation.</p>
 
 
-<script type="text/javascript" src="<c:url value="/static/js/parseuri.js" />"></script>
+<script type="text/javascript" src="<c:url value="/static/lib/parseuri.js" />"></script>
 
 <form action="<c:url value="/admin/database/settings"/>" method="POST" class="form-horizontal">
     <jsp:include page="../common/database-configuration.jsp" />

@@ -32,7 +32,7 @@
     <jsp:param name="title" value="Database configuration" />
     <jsp:param name="leadParagraph" value="Please enter the details of the database you want to use for SOS." />
 </jsp:include>
-<script type="text/javascript" src="<c:url value="/static/js/parseuri.js" />"></script>
+<script type="text/javascript" src="<c:url value="/static/lib/parseuri.js" />"></script>
 
 <form action="<c:url value="/install/database" />" method="POST" class="form-horizontal">
     <jsp:include page="../common/database-configuration.jsp" />
