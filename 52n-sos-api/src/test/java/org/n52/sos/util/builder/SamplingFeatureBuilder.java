@@ -48,9 +48,10 @@ public class SamplingFeatureBuilder {
 
 	private String featureIdentifier;
 	private String codespace;
-	private double xCoord;
-	private double yCoord;
-	private int epsgCode;
+	private double xCoord = Integer.MIN_VALUE;
+	private double yCoord = Integer.MIN_VALUE;
+	private int epsgCode = Integer.MIN_VALUE;
+	private String featureType;
 
 	public SamplingFeatureBuilder setIdentifier(String featureIdentifier)
 	{
@@ -81,16 +82,29 @@ public class SamplingFeatureBuilder {
 		{
 			feature.getIdentifier().setCodeSpace(codespace);
 		}
-		try {
-			Geometry geom = new WKTReader().read(String.format("POINT ( %s %s )", xCoord, yCoord));
-			geom.setSRID(epsgCode);
-			feature.setGeometry(geom);
-		} catch (ParseException e) {
-			LOGGER.error(String.format("Exception thrown: %s",
+		if (xCoord != Integer.MIN_VALUE && yCoord != Integer.MIN_VALUE && epsgCode != Integer.MIN_VALUE)
+		{
+			try {
+				Geometry geom = new WKTReader().read(String.format("POINT ( %s %s )", xCoord, yCoord));
+				geom.setSRID(epsgCode);
+				feature.setGeometry(geom);
+			} catch (ParseException e) {
+				LOGGER.error(String.format("Exception thrown: %s",
 						e.getMessage()),
-					e);
+						e);
+			}
+		}
+		if (featureType != null && !featureType.isEmpty())
+		{
+			feature.setFeatureType(featureType);
 		}
 		return feature;
+	}
+
+	public SamplingFeatureBuilder setFeatureType(String featureType)
+	{
+		this.featureType = featureType;
+		return this;
 	}
 
 }
