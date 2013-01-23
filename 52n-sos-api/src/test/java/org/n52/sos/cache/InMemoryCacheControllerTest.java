@@ -23,7 +23,7 @@
  */
 package org.n52.sos.cache;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.n52.sos.util.builder.InsertObservationRequestBuilder.aInsertObservationRequest;
 import static org.n52.sos.util.builder.ObservablePropertyBuilder.aObservableProperty;
 import static org.n52.sos.util.builder.ObservationBuilder.anObservation;
@@ -33,11 +33,15 @@ import static org.n52.sos.util.builder.QuantityObservationValueBuilder.aQuantity
 import static org.n52.sos.util.builder.QuantityValueBuilder.aQuantitiy;
 import static org.n52.sos.util.builder.SamplingFeatureBuilder.aSamplingFeature;
 
-import org.junit.Ignore;
+import java.util.Collections;
+
 import org.junit.Test;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.om.OMConstants;
+import org.n52.sos.ogc.om.features.SFConstants;
+import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.request.InsertObservationRequest;
 
 /**
@@ -46,29 +50,134 @@ import org.n52.sos.request.InsertObservationRequest;
  */
 public class InMemoryCacheControllerTest
 {
-	@Ignore
-	@Test (expected=IllegalArgumentException.class)
-	public void shoudlThrowIllegalArgumentExceptionWhenReceivingNullArgument() throws OwsExceptionReport
-	{
+	private InsertObservationRequest request;
+	private InMemoryCacheController controller;
+
+	@Test (expected=IllegalArgumentException.class)	public void 
+	should_throw_IllegalArgumentException_when_receiving_null_parameter() 
+			throws OwsExceptionReport {
 		InMemoryCacheController controller = new TestableInMemoryCacheController();
 		controller.updateAfterObservationInsertion(null);
 	}
 	
-	@Ignore
-	@Test
-	public void shouldUpdateGlobalTemporalBoundingBox() throws OwsExceptionReport
+	@Test public void
+	should_update_global_temporal_BoundingBox_after_InsertObservation()
+			throws OwsExceptionReport {
+		updateEmptyCacheWithSingleObservation();
+		
+		assertEquals("maxtime",
+				controller.getMaxEventTime(),
+				((TimeInstant)request.getObservations().get(0).getPhenomenonTime()).getValue());
+		
+		assertEquals("mintime",
+				controller.getMinEventTime(),
+				((TimeInstant)request.getObservations().get(0).getPhenomenonTime()).getValue());
+	}
+	
+	@Test public void
+	should_contain_procedure_after_InsertObservation()
+			throws OwsExceptionReport {
+		updateEmptyCacheWithSingleObservation();
+		
+		assertTrue("procedure NOT in cache",
+				controller.getProcedures().contains(request.getAssignedSensorId()));
+		
+		assertTrue("offering -> procedure relation not in cache",
+				controller.getProcedures4Offering(request.getOfferings().get(0)).contains(request.getAssignedSensorId()));
+		
+		assertTrue("observable-property -> procedure relation NOT in cache",
+				controller.getKObservablePropertyVProcedures().get(getObservablePropertyIdentifier(request)).contains(request.getAssignedSensorId()));
+		
+		assertTrue("procedure -> observable-property relation NOT in cache",
+				controller.getKProcedureVObservableProperties().get(request.getAssignedSensorId()).contains(getObservablePropertyIdentifier(request)) );
+		
+		assertTrue("procedure -> offering relation NOT in cache",
+				controller.getOfferings4Procedure(request.getAssignedSensorId()).contains(request.getOfferings().get(0)));
+		
+	}
+
+	@Test public void 
+	should_contain_FeatureOfInterest_after_InsertObservation()
+			throws OwsExceptionReport {
+		updateEmptyCacheWithSingleObservation();
+		
+		assertTrue("feature NOT in cache",
+				controller.getFeatureOfInterest().contains(getFoiIdFromInsertObservationRequest(request)));
+		
+		assertTrue("feature -> procedure relation NOT in cache",
+				controller.getProcedures4FeatureOfInterest(getFoiIdFromInsertObservationRequest(request)).contains(request.getAssignedSensorId()));
+		
+		assertTrue("no parent features for feature",
+				controller.getParentFeatures(Collections.singletonList(getFoiIdFromInsertObservationRequest(request)), true, false).isEmpty());
+		
+		assertTrue("no child features for feature",
+				controller.getParentFeatures(Collections.singletonList(getFoiIdFromInsertObservationRequest(request)), true, false).isEmpty());
+		
+		assertTrue("feature to offering relation",
+				controller.getKOfferingVFeatures().get(request.getOfferings().get(0)).contains(getFoiIdFromInsertObservationRequest(request)));
+		
+	}
+	
+	@Test public void 
+	should_contain_feature_type_after_InsertObservation()
+			throws OwsExceptionReport {
+		updateEmptyCacheWithSingleObservation();
+		
+		assertTrue("feature type of observation is NOT in cache",
+				controller.getFeatureOfInterestTypes().contains(
+						((SosSamplingFeature)request.getObservations().get(0).getObservationConstellation().getFeatureOfInterest()).getFeatureType()));
+	}
+	
+	@Test public void 
+	should_contain_envelopes_after_InsertObservation()
+			throws OwsExceptionReport {
+		updateEmptyCacheWithSingleObservation();
+		
+		assertEquals("global envelope",
+				controller.getGlobalEnvelope(),
+				createEnvelopeWithDefaultEPSG(request, controller));
+		
+		assertEquals("offering envelop",
+				controller.getEnvelopeForOffering(request.getOfferings().get(0)),
+				createEnvelopeWithDefaultEPSG(request, controller));
+	}
+
+	private void updateEmptyCacheWithSingleObservation() throws OwsExceptionReport
 	{
+		request = insertObservationRequestExample();
+		controller = new TestableInMemoryCacheController();
+		controller.cancel(); // <-- we don't want no timer to run!
+		controller.updateAfterObservationInsertion(request);
+	}
+
+	private SosEnvelope createEnvelopeWithDefaultEPSG(InsertObservationRequest request,
+			InMemoryCacheController controller)
+	{
+		return new SosEnvelope(
+				((SosSamplingFeature)request.getObservations().get(0).getObservationConstellation().getFeatureOfInterest()).getGeometry().getEnvelopeInternal(),
+				controller.getDefaultEPSG());
+	}
+
+	private String getFoiIdFromInsertObservationRequest(InsertObservationRequest request)
+	{
+		return request.getObservations().get(0).getObservationConstellation().getFeatureOfInterest().getIdentifier().getValue();
+	}
+
+	private InsertObservationRequest insertObservationRequestExample()
+	{
+		String sensor = "test-procedure";
 		InsertObservationRequest request = aInsertObservationRequest()
-				.setProcedureId("test-procedure")
+				.setProcedureId(sensor)
 				.addOffering("test-offering")
 				.addObservation(anObservation()
 					.setObservationConstellation(aObservationConstellation()
 						.setFeature(aSamplingFeature()
 							.setIdentifier("test-feature")
+							.setFeatureType(SFConstants.FT_SAMPLINGPOINT)
 							.setGeometry(52.0,7.5,4326)
 							.build())
 						.setProcedure(aSensorMLProcedureDescription()
-							.setIdentifier("test-sensor")
+							.setIdentifier(sensor)
 							.build())
 						.setObservationType(OMConstants.OBS_TYPE_MEASUREMENT)
 						.setObservableProperty(aObservableProperty()
@@ -86,12 +195,14 @@ public class InMemoryCacheControllerTest
 							)
 					.build())
 				.build();
-		InMemoryCacheController controller = new TestableInMemoryCacheController();
-		controller.updateAfterObservationInsertion(request);
-		assertEquals("maxtime",controller.getMaxEventTime(),((TimeInstant)request.getObservations().get(0).getPhenomenonTime()).getValue());
-		assertEquals("mintime",controller.getMinEventTime(),((TimeInstant)request.getObservations().get(0).getPhenomenonTime()).getValue());
+		return request;
 	}
 	
+	private String getObservablePropertyIdentifier(InsertObservationRequest request)
+	{
+		return request.getObservations().get(0).getObservationConstellation().getObservableProperty().getIdentifier();
+	}
+
 	private class TestableInMemoryCacheController extends InMemoryCacheController
 	{
 		protected long getUpdateInterval()
