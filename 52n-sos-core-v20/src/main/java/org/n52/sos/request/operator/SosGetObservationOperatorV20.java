@@ -25,6 +25,7 @@ package org.n52.sos.request.operator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -35,6 +36,9 @@ import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IGetObservationDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.IObservationEncoder;
+import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
+import org.n52.sos.ogc.filter.TemporalFilter;
+import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -48,7 +52,6 @@ import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -58,7 +61,7 @@ import org.slf4j.LoggerFactory;
 /**
  * class and forwards requests to the GetObservationDAO; after query of
  * Database, class encodes the ObservationResponse (thru using the IOMEncoder)
- *
+ * 
  */
 public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGetObservationDAO, GetObservationRequest> {
 
@@ -174,8 +177,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
             exceptions.add(owse);
         }
         try {
-            checkProcedureIDs(sosRequest.getProcedures(),
-                    SosConstants.GetObservationParams.procedure.name());
+            checkProcedureIDs(sosRequest.getProcedures(), SosConstants.GetObservationParams.procedure.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -197,18 +199,20 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
             if (sosRequest.isSetTemporalFilter()) {
                 checkTemporalFilter(sosRequest.getTemporalFilters(),
                         Sos2Constants.GetObservationParams.temporalFilter.name());
-                // } else {
-                // // TODO check this for pofile
-                // List<TemporalFilter> filters = new
-                // ArrayList<TemporalFilter>();
-                // TemporalFilter filter = new TemporalFilter();
-                // filter.setOperator(TimeOperator.TM_Equals);
-                // filter.setValueReference("phenomenonTime");
-                // TimeInstant timeInstant = new TimeInstant();
-                // timeInstant.setIndeterminateValue(SosConstants.FirstLatest.latest.name());
-                // filter.setTime(timeInstant);
-                // filters.add(filter);
-                // sosRequest.setTemporalFilters(filters);
+            } else {
+                if (Configurator.getInstance().getProfileHandler().getActiveProfile()
+                        .isReturnLatestValueIfTemporalFilterIsMissingInGetObservation()) {
+                    // TODO check this for pofile
+                    List<TemporalFilter> filters = new ArrayList<TemporalFilter>();
+                    TemporalFilter filter = new TemporalFilter();
+                    filter.setOperator(TimeOperator.TM_Equals);
+                    filter.setValueReference("phenomenonTime");
+                    TimeInstant timeInstant = new TimeInstant();
+                    timeInstant.setIndeterminateValue(SosConstants.FirstLatest.latest.name());
+                    filter.setTime(timeInstant);
+                    filters.add(filter);
+                    sosRequest.setTemporalFilters(filters);
+                }
             }
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
@@ -226,7 +230,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
 
     /**
      * checks if mandatory parameter observed property is correct
-     *
+     * 
      * @param properties
      *            String[] containing the observed properties of the request
      * @param cacheController
@@ -249,8 +253,9 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
                                     .name()));
                 } else {
                     if (!validObservedProperties.contains(obsProp)) {
-                        String exceptionText = String.format("The value (%s) of the parameter '%s' is invalid",
-                                obsProp, SosConstants.GetObservationParams.observedProperty.toString());
+                        String exceptionText =
+                                String.format("The value (%s) of the parameter '%s' is invalid", obsProp,
+                                        SosConstants.GetObservationParams.observedProperty.toString());
                         LOGGER.error(exceptionText);
                         exceptions.add(Util4Exceptions.createInvalidParameterValueException(
                                 SosConstants.GetObservationParams.observedProperty.name(), exceptionText));
@@ -263,9 +268,9 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
 
     /**
      * checks if the passed offeringId is supported
-     *
+     * 
      * @param strings
-     *
+     * 
      * @param offeringId
      *            the offeringId to be checked
      * @throws OwsExceptionReport
@@ -285,8 +290,9 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
                     if (!offerings.contains(offArray[0])
                             || !Configurator.getInstance().getCapabilitiesCacheController()
                                     .getProcedures4Offering(offArray[0]).contains(offArray[1])) {
-                        String exceptionText = String.format("The value (%s) of the parameter '%s' is invalid",
-                                offeringId, SosConstants.GetObservationParams.offering.toString());
+                        String exceptionText =
+                                String.format("The value (%s) of the parameter '%s' is invalid", offeringId,
+                                        SosConstants.GetObservationParams.offering.toString());
                         LOGGER.error(exceptionText);
                         exceptions.add(Util4Exceptions.createInvalidParameterValueException(
                                 SosConstants.GetObservationParams.offering.name(), exceptionText));
@@ -294,9 +300,9 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
 
                 } else {
                     if (!offerings.contains(offeringId)) {
-                        String exceptionText = String.format(
-                                "The value (%s) of the parameter '%s' is invalid", offeringId,
-                                SosConstants.GetObservationParams.offering.toString());
+                        String exceptionText =
+                                String.format("The value (%s) of the parameter '%s' is invalid", offeringId,
+                                        SosConstants.GetObservationParams.offering.toString());
                         LOGGER.error(exceptionText);
                         exceptions.add(Util4Exceptions.createInvalidParameterValueException(
                                 SosConstants.GetObservationParams.offering.name(), exceptionText));
