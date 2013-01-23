@@ -386,15 +386,15 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         Map<String, Collection<String>> kProcedureVOffering = new HashMap<String, Collection<String>>(hProcedures.size());
         Map<String, Collection<String>> kProcedureVObservableProperties = new HashMap<String, Collection<String>>(hProcedures.size());
         Map<String, Collection<String>> parentProcs = new HashMap<String, Collection<String>>(hProcedures.size());
-        for (Procedure procedure : hProcedures) {
-            if (!procedure.isDeleted()) {
-                procedures.add(procedure.getIdentifier());
-                kProcedureVOffering.put(procedure.getIdentifier(),
-                        getAllOfferingIdentifiersFrom(procedure.getObservationConstellations()));
-                kProcedureVObservableProperties.put(procedure.getIdentifier(),
-                        getObservablePropertyIdentifierFrom(procedure.getObservationConstellations()));
-                parentProcs.put(procedure.getIdentifier(),
-                        getProcedureIDsFromProcedures(procedure.getProceduresForChildSensorId()));
+        for (Procedure hProcedure : hProcedures) {
+            if (!hProcedure.isDeleted()) {
+                procedures.add(hProcedure.getIdentifier());
+                kProcedureVOffering.put(hProcedure.getIdentifier(),
+                        getAllOfferingIdentifiersFrom(hProcedure.getObservationConstellations()));
+                kProcedureVObservableProperties.put(hProcedure.getIdentifier(),
+                        getObservablePropertyIdentifierFrom(hProcedure.getObservationConstellations()));
+                parentProcs.put(hProcedure.getIdentifier(),
+                        getProcedureIDsFromProcedures(hProcedure.getProceduresForChildSensorId()));
             }
         }
         cache.setProcedures(procedures);
