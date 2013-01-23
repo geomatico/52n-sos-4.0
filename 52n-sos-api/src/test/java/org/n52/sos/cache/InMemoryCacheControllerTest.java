@@ -142,6 +142,42 @@ public class InMemoryCacheControllerTest
 				createEnvelopeWithDefaultEPSG(request, controller));
 	}
 
+	@Test public void
+	should_contain_observation_timestamp_in_temporal_envelope_of_offering_after_InsertObservation()
+			throws OwsExceptionReport {
+		updateEmptyCacheWithSingleObservation();
+		
+		assertTrue("temporal envelope of does NOT contain observation timestamp",
+			(
+				controller.getMinTimeForOffering(request.getOfferings().get(0))
+				.isBefore(((TimeInstant)request.getObservations().get(0).getPhenomenonTime()).getValue())
+				||
+				controller.getMinTimeForOffering(request.getOfferings().get(0))
+				.isEqual(((TimeInstant)request.getObservations().get(0).getPhenomenonTime()).getValue())
+			)
+			&&
+			(
+				controller.getMaxTimeForOffering(request.getOfferings().get(0))
+				.isAfter(((TimeInstant)request.getObservations().get(0).getPhenomenonTime()).getValue())
+				|| 
+				controller.getMaxTimeForOffering(request.getOfferings().get(0))
+				.isEqual(((TimeInstant)request.getObservations().get(0).getPhenomenonTime()).getValue())
+			)
+		);
+	}
+		
+	@Test public void
+	should_contain_observalbe_property_after_InsertObservation()
+		throws OwsExceptionReport {
+		updateEmptyCacheWithSingleObservation();
+		
+		assertTrue("offering -> observable property NOT in cache",
+				controller.getObservablePropertiesForOffering(request.getOfferings().get(0)).contains(getObservablePropertyIdentifier(request)));
+		
+		assertTrue("observable property -> offering NOT in cache",
+				controller.getOfferings4ObservableProperty(getObservablePropertyIdentifier(request)).contains(request.getOfferings().get(0)));
+	}
+
 	private void updateEmptyCacheWithSingleObservation() throws OwsExceptionReport
 	{
 		request = insertObservationRequestExample();

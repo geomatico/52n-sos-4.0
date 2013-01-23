@@ -152,14 +152,35 @@ public class InMemoryCacheController extends CapabilitiesCacheController {
 			// update offerings
 			for (String offeringIdentifier : sosRequest.getOfferings())
 			{
+				// procedure
 				addOfferingToProcedureRelation(offeringIdentifier, getProcedureIdentifier(sosObservation));
 				addProcedureToOfferingRelation(getProcedureIdentifier(sosObservation),offeringIdentifier);
-				updateObservablePropertiesFor(offeringIdentifier, getObservablePropertyIdentifier(sosObservation));
+				// observable property
+				addObservablePropertiesToOfferingRelation(getObservablePropertyIdentifier(sosObservation),offeringIdentifier);
+				addOfferingToObservablePropertyRelation(offeringIdentifier, getObservablePropertyIdentifier(sosObservation));
+				// observation type
 				addOfferingToObservationTypeRelation(offeringIdentifier, sosObservation.getObservationConstellation().getObservationType());
+				// envelopes/bounding boxes (spatial and temporal)
 				updateTemporalBoundingBoxOf(offeringIdentifier, phenomenonTimeFrom(sosObservation));
 				updateOfferingEnvelope(observedFeatureEnvelope, observedFeatureEnvelopeSRID, offeringIdentifier);
 			}
 
+		}
+	}
+
+	private void addOfferingToObservablePropertyRelation(String offeringIdentifier,
+			String observablePropertyIdentifier)
+	{
+		// offering -> observableProperties
+		if (getCapabilitiesCache().getOffPhenomenons().get(offeringIdentifier) == null)
+		{
+			List<String> propertiesForOffering = Collections.synchronizedList(new ArrayList<String>());
+			propertiesForOffering.add(observablePropertyIdentifier);
+			getCapabilitiesCache().getOffPhenomenons().put(offeringIdentifier, propertiesForOffering);
+		}
+		else if (!getCapabilitiesCache().getOffPhenomenons().get(offeringIdentifier).contains(observablePropertyIdentifier))
+		{
+			getCapabilitiesCache().getOffPhenomenons().get(offeringIdentifier).add(observablePropertyIdentifier);
 		}
 	}
 
@@ -452,14 +473,19 @@ public class InMemoryCacheController extends CapabilitiesCacheController {
 		return allFeatures;
 	}
 
-	private void updateObservablePropertiesFor(String offeringIdentifier,
-			String observablePropertyIdentifier)
+	private void addObservablePropertiesToOfferingRelation(String observablePropertyIdentifier,
+			String offeringIdentifier)
 	{
-		// offering-observableProperties
-		Collection<String> observableProperties4Offering = getCapabilitiesCache().getObservableProperties4Offering(offeringIdentifier);
-		if (!observableProperties4Offering.contains(observablePropertyIdentifier))
+		// observableProperties-offering
+		if (getCapabilitiesCache().getKObservablePropertyVOffering().get(observablePropertyIdentifier) == null)
 		{
-			observableProperties4Offering.add(observablePropertyIdentifier);
+			List<String> offeringsForProperty = Collections.synchronizedList(new ArrayList<String>());
+			offeringsForProperty.add(offeringIdentifier);
+			getCapabilitiesCache().getKObservablePropertyVOffering().put(observablePropertyIdentifier, offeringsForProperty);
+		}
+		else if (!getCapabilitiesCache().getKObservablePropertyVOffering().get(observablePropertyIdentifier).contains(offeringIdentifier))
+		{
+			getCapabilitiesCache().getKObservablePropertyVOffering().get(observablePropertyIdentifier).add(offeringIdentifier);
 		}
 	}
 
