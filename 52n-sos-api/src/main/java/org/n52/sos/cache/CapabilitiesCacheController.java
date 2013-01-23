@@ -708,12 +708,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         return new HashMap<String, Collection<String>>(0);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.n52.sos.cache.ACapabilitiesCacheController#
-     * getObservablePropertiesForOffering(java.lang.String)
-     */
     @Override
     public Collection<String> getObservablePropertiesForOffering(String offering) {
         if (this.capabilitiesCache.getPhenomenons4Offering(offering) != null) {
@@ -722,12 +716,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         return new ArrayList<String>(0);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.n52.sos.cache.ACapabilitiesCacheController#getObservableProperties()
-     */
     @Override
     public Collection<String> getObservableProperties() {
         if (this.capabilitiesCache.getObservableProperties() != null) {
@@ -736,12 +724,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         return new ArrayList<String>(0);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.n52.sos.cache.ACapabilitiesCacheController#
-     * getKOfferingsVObservableProperties()
-     */
     @Override
     public Map<String, Collection<String>> getKOfferingsVObservableProperties() {
         if (this.capabilitiesCache.getOffCompPhens() != null) {
@@ -750,38 +732,19 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         return new HashMap<String, Collection<String>>(0);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.n52.sos.cache.ACapabilitiesCacheController#
-     * getProcedures4FeatureOfInterest(java.lang.String)
-     */
     @Override
     public Collection<String> getProcedures4FeatureOfInterest(String foiID) {
-        if (this.capabilitiesCache.getProcedureIdentifierFor(foiID) != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getProcedureIdentifierFor(foiID));
+        if (capabilitiesCache.getProceduresForFeature(foiID) != null) {
+            return new ArrayList<String>(capabilitiesCache.getProceduresForFeature(foiID));
         }
         return new ArrayList<String>(0);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.n52.sos.cache.ACapabilitiesCacheController#getUnit4ObservableProperty
-     * (java.lang.String)
-     */
     @Override
     public String getUnit4ObservableProperty(String observedProperty) {
         return this.capabilitiesCache.getUnit4ObsProp(observedProperty);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.n52.sos.cache.ACapabilitiesCacheController#getFeatureOfInterest()
-     */
     @Override
     public Collection<String> getFeatureOfInterest() {
         if (this.capabilitiesCache.getFeatureOfInterest() != null) {
@@ -790,12 +753,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         return new ArrayList<String>(0);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.n52.sos.cache.ACapabilitiesCacheController#
-     * getObservableProperties4CompositePhenomenons()
-     */
     @Override
     public Map<String, Collection<String>> getObservableProperties4CompositePhenomenons() {
         if (this.capabilitiesCache.getPhens4CompPhens() != null) {
@@ -804,12 +761,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         return new HashMap<String, Collection<String>>(0);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.n52.sos.cache.ACapabilitiesCacheController#
-     * getKOfferingVCompositePhenomenons()
-     */
     @Override
     public Map<String, Collection<String>> getKOfferingVCompositePhenomenons() {
         if (this.capabilitiesCache.getOffCompPhens() != null) {
@@ -818,12 +769,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         return new HashMap<String, Collection<String>>(0);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.n52.sos.cache.ACapabilitiesCacheController#
-     * getKObservablePropertyVProcedures()
-     */
     @Override
     public Map<String, Collection<String>> getKObservablePropertyVProcedures() {
         if (this.capabilitiesCache.getPhenProcs() != null) {
@@ -832,12 +777,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         return new HashMap<String, Collection<String>>(0);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.n52.sos.cache.ACapabilitiesCacheController#
-     * getKProcedureVObservableProperties()
-     */
     @Override
     public Map<String, Collection<String>> getKProcedureVObservableProperties() {
         if (this.capabilitiesCache.getProcPhens() != null) {
@@ -846,12 +785,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         return new HashMap<String, Collection<String>>(0);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.n52.sos.cache.ACapabilitiesCacheController#getKOfferingVFeatures()
-     */
     @Override
     public Map<String, Collection<String>> getKOfferingVFeatures() {
         if (this.capabilitiesCache.getOffFeatures() != null) {
@@ -860,12 +793,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         return new HashMap<String, Collection<String>>(0);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.n52.sos.cache.ACapabilitiesCacheController#
-     * getOfferings4ObservableProperty(java.lang.String)
-     */
     @Override
     public Collection<String> getOfferings4ObservableProperty(String phenID) {
         if (this.capabilitiesCache.getOfferings4Phenomenon(phenID) != null) {
@@ -874,12 +801,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         return new ArrayList<String>(0);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.n52.sos.cache.ACapabilitiesCacheController#getKOfferingVProcedures()
-     */
     @Override
     public Map<String, Collection<String>> getKOfferingVProcedures() {
         if (this.capabilitiesCache.getOffProcedures() != null) {
@@ -888,13 +809,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         return new HashMap<String, Collection<String>>(0);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.n52.sos.cache.ACapabilitiesCacheController#getKOfferingVRelatedFeatures
-     * ()
-     */
     @Override
     public Map<String, Collection<String>> getKOfferingVRelatedFeatures() {
         if (this.capabilitiesCache.getKOfferingVRelatedFeatures() != null) {
@@ -903,12 +817,6 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
         return new HashMap<String, Collection<String>>(0);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.n52.sos.cache.ACapabilitiesCacheController#
-     * getKCompositePhenomenonVObservableProperty()
-     */
     @Override
     public Map<String, Collection<String>> getKCompositePhenomenonVObservableProperty() {
         if (this.capabilitiesCache.getPhens4CompPhens() != null) {
