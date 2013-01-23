@@ -341,8 +341,8 @@
                     }
                 }
             },
-            "DecribeSensor": {
-                "DecribeSensor": {
+            "DescribeSensor": {
+                "DescribeSensor": {
                     "param": {
                         "service": "SOS",
                         "version": "2.0.0",
