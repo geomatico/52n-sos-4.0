@@ -480,7 +480,7 @@ public class WSDLBuilder {
 
         HTTPOperation httpOperation = (HTTPOperation) getExtensionRegistry().
                 createExtension(BindingOperation.class, WSDLConstants.QN_HTTP_OPERATION);
-        httpOperation.setLocationURI("/");
+        httpOperation.setLocationURI("");
         bindingOperation.addExtensibilityElement(httpOperation);
 
         BindingInput bindingInput = getDefinitions().createBindingInput();
@@ -516,7 +516,7 @@ public class WSDLBuilder {
 
         HTTPOperation httpOperation = (HTTPOperation) getExtensionRegistry().
                 createExtension(BindingOperation.class, WSDLConstants.QN_HTTP_OPERATION);
-        httpOperation.setLocationURI("/");
+        httpOperation.setLocationURI("");
         bindingOperation.addExtensibilityElement(httpOperation);
 
         BindingInput bindingInput = getDefinitions().createBindingInput();
