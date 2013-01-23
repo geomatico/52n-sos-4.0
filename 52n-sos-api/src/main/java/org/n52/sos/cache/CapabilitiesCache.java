@@ -45,6 +45,8 @@ import org.n52.sos.util.SosHelper;
  * this cache than to query always the DB for this information. (Usually the
  * informations stored here do not often change)
  * 
+ * TODO use one naming convention regarding getters and setters in this class
+ * 
  */
 public class CapabilitiesCache{
 
@@ -138,10 +140,14 @@ public class CapabilitiesCache{
     private Collection<String> resultTemplates;
 	
 	private Map<String, SosEnvelope> kOfferingVEnvelope;
+	
 	private Map<String, DateTime> kOfferingVMinTime;
+	
 	private Map<String, DateTime> kOfferingVMaxTime;
+	
 	private SosEnvelope globalEnvelope;
-	private TimePeriod phenomenonTime;
+	
+	private TimePeriod globalTemporalBoundingBox;
 
     public CapabilitiesCache() {
     	allowedKOfferingVObservationType = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
@@ -170,7 +176,7 @@ public class CapabilitiesCache{
     	offName = Collections.synchronizedMap(new HashMap<String, String>());
     	parentFeatures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	parentProcs = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	phenomenonTime = new TimePeriod();
+    	globalTemporalBoundingBox = new TimePeriod();
     	phens4CompPhens = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	procedures = Collections.synchronizedList(new ArrayList<String>());
     	resultTemplates = Collections.synchronizedList(new ArrayList<String>());
@@ -181,6 +187,35 @@ public class CapabilitiesCache{
 
     protected Collection<String> getPhenomenons4Offering(String offering) {
         return kOfferingVObservableProperties.get(offering);
+    }
+    
+    /**
+     * returns relationships between offerings and phenomena
+     * 
+     * @return
+     */
+    protected Map<String, Collection<String>> getOffPhenomenons() {
+        return kOfferingVObservableProperties;
+    }
+
+    /**
+     * returns the observedProperties for each offering
+     * 
+     * @return Map<String, String[]> containing the offerings with its
+     *         observedProperties
+     * @deprecated use {@link #getOffPhenomenons()}
+     */
+    protected Map<String, Collection<String>> getObsPhenomenons() {
+        return kOfferingVObservableProperties;
+    }
+    
+    /**
+     * sets relationships between offerings and phenomena
+     * 
+     * @param offPhenomenons
+     */
+    public void setKOfferingVObservableProperties(Map<String, Collection<String>> offPhenomenons) {
+        this.kOfferingVObservableProperties = offPhenomenons;
     }
 
     /**
@@ -230,16 +265,32 @@ public class CapabilitiesCache{
     }
 
     /**
-     * Returns the phenomenons of all offerings
+     * returns relationships between names and offerings
      * 
-     * @return List<String> containing the phenomenons of all offerings
+     * @return
      */
-    protected Collection<String> getObservableProperties() {
-        Set<String> observableProperties = new HashSet<String>(0);
-        if (kObservablePropertyVOfferings != null && kObservablePropertyVOfferings.keySet() != null) {
-            observableProperties.addAll(kObservablePropertyVOfferings.keySet());
-        }
-        return observableProperties;
+    protected Map<String, String> getOffName() {
+        return offName;
+    }
+    
+    /**
+     * sets relationships between names and offerings
+     * 
+     * @param offName
+     */
+    public void setKOfferingVName(Map<String, String> offName) {
+        this.offName = offName;
+    }
+    
+    /**
+     * returns the name of the requested offering
+     * 
+     * @param offering
+     *            the offering for which the name should be returned
+     * @return String containing the name of the offering
+     */
+    protected String getOfferingName(String offering) {
+        return offName.get(offering);
     }
 
     /**
@@ -248,8 +299,8 @@ public class CapabilitiesCache{
      * @return List<String> containing the offerings of this SOS
      */
     protected Collection<String> getOfferings() {
-        if (this.offName != null) {
-            return this.offName.keySet();
+        if (offName != null) {
+            return offName.keySet();
         }
         return new ArrayList<String>();
     }
@@ -260,27 +311,18 @@ public class CapabilitiesCache{
      * @return List<String> containing the observation ids of this SOS
      */
     protected Collection<String> getObservationIdentifiers() {
-        return this.observationIdentifiers;
+        return observationIdentifiers;
     }
-
+    
     /**
-     * returns relationships between offerings and phenomena
+     * sets the observation ids
      * 
-     * @return
+     * @param obsIds
      */
-    protected Map<String, Collection<String>> getOffPhenomenons() {
-        return kOfferingVObservableProperties;
+    public void setObservationIdentifiers(Collection<String> observationIdentifiers) {
+        this.observationIdentifiers = observationIdentifiers;
     }
-
-    /**
-     * returns relationships between names and offerings
-     * 
-     * @return
-     */
-    protected Map<String, String> getOffName() {
-        return offName;
-    }
-
+    
     /**
      * returns relationships between offerings and result models
      * 
@@ -288,6 +330,15 @@ public class CapabilitiesCache{
      */
     protected Map<String, Collection<String>> getKOfferingVObservationTypes() {
         return kOfferingVObservationTypes;
+    }
+    
+    /**
+     * sets relationships between offerings and result models
+     * 
+     * @param offResultModels
+     */
+    public void setKOfferingVObservationTypes(Map<String, Collection<String>> offferingObservationTypes) {
+        this.kOfferingVObservationTypes = offferingObservationTypes;
     }
 
     /**
@@ -298,6 +349,26 @@ public class CapabilitiesCache{
     protected Map<String, List<String>> getOffProcedures() {
         return kOfferingVProcedures;
     }
+    
+    /**
+     * sets relationships between offerings and procedures
+     * 
+     * @param offProcedures
+     */
+    public void setKOfferingVProcedures(Map<String, List<String>> offProcedures) {
+        this.kOfferingVProcedures = offProcedures;
+    }
+    
+    /**
+     * returns the procedures for the requested offering
+     * 
+     * @param offering
+     *            the offering for which the procedures should be returned
+     * @return String[] containing the procedures for the requested offering
+     */
+    protected Collection<String> getProceduresForOffering(String offering) {
+        return kOfferingVProcedures.get(offering);
+    }
 
     /**
      * returns the units for phenomena
@@ -307,26 +378,18 @@ public class CapabilitiesCache{
     protected Map<String, String> getUnit4Phen() {
         return unit4Phen;
     }
-
+    
     /**
-     * returns the observedProperties for each offering
+     * return the unit of the values for the observedProperty
      * 
-     * @return Map<String, String[]> containing the offerings with its
-     *         observedProperties
+     * @param observedProperty
+     *            String observedProperty for which the type of the values
+     *            should be returned
+     * @return String representing the valueType of the values for the
+     *         observedProperty
      */
-    protected Map<String, Collection<String>> getObsPhenomenons() {
-        return kOfferingVObservableProperties;
-    }
-
-    /**
-     * returns the name of the requested offering
-     * 
-     * @param offering
-     *            the offering for which the name should be returned
-     * @return String containing the name of the offering
-     */
-    protected String getOfferingName(String offering) {
-        return this.offName.get(offering);
+    protected String getUnit4ObsProp(String observedProperty) {
+        return unit4Phen.get(observedProperty);
     }
 
     /**
@@ -338,16 +401,14 @@ public class CapabilitiesCache{
     protected Collection<String> getProcedures() {
         return procedures;
     }
-
+    
     /**
-     * returns the procedures for the requested offering
+     * set procedures with SensorML
      * 
-     * @param offering
-     *            the offering for which the procedures should be returned
-     * @return String[] containing the procedures for the requested offering
+     * @param procedures
      */
-    protected Collection<String> getProcedureIdentifierFor(String offering) {
-        return kOfferingVProcedures.get(offering);
+    public void setProcedures(Collection<String> procedures) {
+        this.procedures = procedures;
     }
 
     /**
@@ -357,8 +418,8 @@ public class CapabilitiesCache{
      *            the foiIdentifier for which the procedureIdentifers should returned
      * @return Collection<String> representing the procedureIdentifers
      */
-    protected Collection<String> getProcedureIdentifiersFor(String foiIdentifier) {
-        return this.kFeatureOfInterestVProcedures.get(foiIdentifier);
+    protected Collection<String> getProceduresForFeature(String foiIdentifier) {
+        return kFeatureOfInterestVProcedures.get(foiIdentifier);
     }
 
     /**
@@ -369,18 +430,14 @@ public class CapabilitiesCache{
     protected Map<String, Collection<String>> getFoiProcedures() {
         return kFeatureOfInterestVProcedures;
     }
-
+    
     /**
-     * return the unit of the values for the observedProperty
+     * sets the feature of interest procedure relations
      * 
-     * @param observedProperty
-     *            String observedProperty for which the type of the values
-     *            should be returned
-     * @return String representing the valueType of the values for the
-     *         observedProperty
+     * @param foiProcedures
      */
-    protected String getUnit4ObsProp(String observedProperty) {
-        return this.unit4Phen.get(observedProperty);
+    public void setKFeatureOfInterestVProcedures(Map<String, Collection<String>> foiProcedures) {
+        this.kFeatureOfInterestVProcedures = foiProcedures;
     }
 
     /**
@@ -393,12 +450,31 @@ public class CapabilitiesCache{
     public void setFeatureOfInterest(Collection<String> featuresOfInterest) {
         this.featureOfInterestIdentifiers = featuresOfInterest;
     }
+    
+    /**
+     * sets FOIs
+     * 
+     * @param fois
+     * @deprecated use {@link #setFeatureOfInterest(Collection)}
+     */
+    public void setAllFeatureOfInterests(Collection<String> featuresOfInterest) {
+        this.featureOfInterestIdentifiers = featuresOfInterest;
+    }
 
     /**
      * @return Returns the phens4CompPhens.
      */
     protected Map<String, Collection<String>> getPhens4CompPhens() {
         return phens4CompPhens;
+    }
+    
+    /**
+     * sets relationships between phenomena and composite phenomena
+     * 
+     * @param phens4CompPhens
+     */
+    public void setKCompositePhenomenonVObservableProperties(Map<String, Collection<String>> phens4CompPhens) {
+        this.phens4CompPhens = phens4CompPhens;
     }
 
     /**
@@ -407,12 +483,31 @@ public class CapabilitiesCache{
     protected Map<String, Collection<String>> getOffCompPhens() {
         return kOfferingVCompositePhenomenon;
     }
+    
+    /**
+     * sets relationships between offerings and composite phenomena
+     * 
+     * @param offCompPhens
+     */
+    public void setKOfferingVCompositePhenomenon(Map<String, Collection<String>> offCompPhens) {
+        this.kOfferingVCompositePhenomenon = offCompPhens;
+    }
 
     /**
      * @return Returns the phenProcs.
      */
     protected Map<String, List<String>> getPhenProcs() {
         return kObservablePropertiesVProcedures;
+    }
+    
+    /**
+     * sets phenomenon procedure relations
+     * 
+     * @param phenProcs
+     *            The phenProcs to set.
+     */
+    public void setKObservablePropertyKProcedures(Map<String, List<String>> phenProcs) {
+        this.kObservablePropertiesVProcedures = phenProcs;
     }
 
     /**
@@ -464,341 +559,7 @@ public class CapabilitiesCache{
         this.parentProcs = parentProcs;
         childProcs = SosHelper.invertHierarchy(parentProcs);
     }
-
-    /**
-     * sets the observation ids
-     * 
-     * @param obsIds
-     */
-    public void setObservationIdentifiers(Collection<String> observationIdentifiers) {
-        this.observationIdentifiers = observationIdentifiers;
-    }
-
-    /**
-     * sets the SRIDs
-     * 
-     * @param srids
-     */
-    public void setSrids(Collection<Integer> srids) {
-        this.srids = srids;
-    }
-
-    protected Map<String, Collection<String>> getParentFeatures() {
-        return parentFeatures;
-    }
-
-    protected void setParentFeatures(Map<String, Collection<String>> parentFeatures) {
-        this.parentFeatures = parentFeatures;
-    }
-
-    protected Map<String, Collection<String>> getChildFeatures() {
-        return childFeatures;
-    }
-
-    protected void setChildFeatures(Map<String, Collection<String>> childFeatures) {
-        this.childFeatures = childFeatures;
-    }
-
-    public void setFeatureHierarchies(Map<String, Collection<String>> parentFeatures) {
-        this.parentFeatures = parentFeatures;
-        this.childFeatures = SosHelper.invertHierarchy(parentFeatures);
-    }
-
-    /**
-     * sets relationships between offerings and FOIs
-     * 
-     * @param offFeatures
-     */
-    public void setKOfferingVFeatures(Map<String, Collection<String>> offFeatures) {
-        this.kOfferingVFeaturesOfInterest = offFeatures;
-    }
-
-    /**
-     * sets relationships between offerings and phenomena
-     * 
-     * @param offPhenomenons
-     */
-    public void setKOfferingVObservableProperties(Map<String, Collection<String>> offPhenomenons) {
-        this.kOfferingVObservableProperties = offPhenomenons;
-    }
-
-    /**
-     * sets relationships between names and offerings
-     * 
-     * @param offName
-     */
-    public void setKOfferingVName(Map<String, String> offName) {
-        this.offName = offName;
-    }
-
-    /**
-     * set procedures with SensorML
-     * 
-     * @param procedures
-     */
-    public void setProcedures(Collection<String> procedures) {
-        this.procedures = procedures;
-    }
-
-    /**
-     * sets relationships between offerings and result models
-     * 
-     * @param offResultModels
-     */
-    public void setKOfferingVObservationTypes(Map<String, Collection<String>> offferingObservationTypes) {
-        this.kOfferingVObservationTypes = offferingObservationTypes;
-    }
-
-    /**
-     * sets relationships between offerings and procedures
-     * 
-     * @param offProcedures
-     */
-    public void setKOfferingVProcedures(Map<String, List<String>> offProcedures) {
-        this.kOfferingVProcedures = offProcedures;
-    }
-
-    /**
-     * sets relationships between procedures and offerings
-     * 
-     * @param procOffs
-     */
-    public void setKProcedureVOfferings(Map<String, Collection<String>> procOffs) {
-        this.kProcedureVOfferings = procOffs;
-    }
-
-    /**
-     * sets FOIs
-     * 
-     * @param fois
-     */
-    public void setAllFeatureOfInterests(Collection<String> featuresOfInterest) {
-        this.featureOfInterestIdentifiers = featuresOfInterest;
-    }
-
-    /**
-     * sets the feature of interest procedure relations
-     * 
-     * @param foiProcedures
-     */
-    public void setKFeatureOfInterestVProcedures(Map<String, Collection<String>> foiProcedures) {
-        this.kFeatureOfInterestVProcedures = foiProcedures;
-    }
-
-    /**
-     * sets relationships between phenomena and composite phenomena
-     * 
-     * @param phens4CompPhens
-     */
-    public void setKCompositePhenomenonVObservableProperties(Map<String, Collection<String>> phens4CompPhens) {
-        this.phens4CompPhens = phens4CompPhens;
-    }
-
-    /**
-     * sets relationships between offerings and composite phenomena
-     * 
-     * @param offCompPhens
-     */
-    public void setKOfferingVCompositePhenomenon(Map<String, Collection<String>> offCompPhens) {
-        this.kOfferingVCompositePhenomenon = offCompPhens;
-    }
-
-    /**
-     * sets the unit phenomenon relations
-     * 
-     * @param unit4Phen
-     */
-    public void setUnit4ObservableProperty(Map<String, String> unit4Phen) {
-        this.unit4Phen = unit4Phen;
-    }
-
-    /**
-     * sets relationships between phenomena and offerings
-     * 
-     * @param phenOffs
-     */
-    public void setKObservablePropertyVOfferings(Map<String, List<String>> phenOffs) {
-        this.kObservablePropertyVOfferings = phenOffs;
-    }
-
-    /**
-     * sets phenomenon procedure relations
-     * 
-     * @param phenProcs
-     *            The phenProcs to set.
-     */
-    public void setKObservablePropertyKProcedures(Map<String, List<String>> phenProcs) {
-        this.kObservablePropertiesVProcedures = phenProcs;
-    }
-
-    /**
-     * returns the procedure phenomenon relations
-     * 
-     * @return Returns the procPhens.
-     */
-    protected Map<String, Collection<String>> getProcPhens() {
-        return kProcedureVObservableProperties;
-    }
-
-    /**
-     * sets the procedure phenomenon relations
-     * 
-     * @param procPhens
-     *            The procPhens to set.
-     */
-    public void setProcPhens(Map<String, Collection<String>> procPhens) {
-        this.kProcedureVObservableProperties = procPhens;
-    }
-
-    /**
-     * returns the SRID
-     * 
-     * @return Returns Srid of coordinates stored in SOS database
-     */
-    protected int getSrid() {
-        return srid;
-    }
-
-    /**
-     * 
-     * @return Returns Map containing offeringIDs as keys and list of
-     *         corresponding features as values
-     */
-    protected Map<String, Collection<String>> getOffFeatures() {
-        return kOfferingVFeaturesOfInterest;
-    }
-
-    /**
-     * returns the offerings for the passed procedure id
-     * 
-     * @param procID
-     *            id of procedure, for which related offerings should be
-     *            returned
-     * @return Returns offerings, for which passed procedure produces data
-     */
-    protected Collection<String> getOfferings4Procedure(String procID) {
-        List<String> result = new ArrayList<String>();
-        if (this.kProcedureVOfferings.containsKey(procID)) {
-            result.addAll(this.kProcedureVOfferings.get(procID));
-        }
-        return result;
-    }
-
-    /**
-     * returns the offerings for the passed phenomenon
-     * 
-     * @param phenID
-     *            id of procedure, for which related offerings should be
-     *            returned
-     * @return Returns offerings, to which passed phenomenon belongs to
-     */
-    protected Collection<String> getOfferings4Phenomenon(String phenID) {
-        List<String> result = new ArrayList<String>();
-        if (this.kObservablePropertyVOfferings.containsKey(phenID)) {
-            result.addAll(this.kObservablePropertyVOfferings.get(phenID));
-        }
-        return result;
-    }
-
-    /**
-     * Returns srids, which are supported by this SOS
-     * 
-     * @return Returns srids, which are supported by this SOS
-     */
-    protected Collection<Integer> getSrids() {
-        return this.srids;
-    }
-
-    /**
-     * methods for adding relationships in Cache for recently received new
-     * observation
-     * 
-     * @param observation
-     *            recently received observation which has been inserted into SOS
-     *            db and whose relationships have to be maintained in cache
-     */
-    protected void refreshMetadata4newObservation(SosObservation observation) {
-
-        // create local variables for better readable code
-        String procID = observation.getObservationConstellation().getProcedure().getProcedureIdentifier();
-        ArrayList<String> procs = new ArrayList<String>(1);
-        procs.add(procID);
-
-        String foiID = observation.getObservationConstellation().getFeatureOfInterest().getIdentifier().getValue();
-        ArrayList<String> features = new ArrayList<String>(1);
-        features.add(foiID);
-
-        // if foi id is NOT contained add foi
-        if (!this.featureOfInterestIdentifiers.contains(foiID)) {
-            this.featureOfInterestIdentifiers.add(foiID);
-        }
-
-        // get offerings for phenomenon of observation
-        Collection<String> offs =
-                this.getOfferings4Phenomenon(observation.getObservationConstellation().getObservableProperty()
-                        .getIdentifier());
-
-        // insert foi_off relationsship for each offering
-        for (String offering_id : offs) {
-
-            // check whether offering foi relationship is already contained in
-            // DB
-            if (!this.getOffFeatures().containsKey(offering_id)) {
-
-                // Case 1: offering is NOT contained in foi_off -> insert
-                // relationsship
-                this.getOffFeatures().put(offering_id, features);
-            } else if (!this.getOffFeatures().get(offering_id).contains(foiID)) {
-
-                // Case 2: offering is already stored in foi_off -> insert
-                // relationsship if
-                // offering NOT contains foi id
-                this.getOffFeatures().get(offering_id).add(foiID);
-            }
-
-        }
-
-        // insert proc_foi relationsship
-        if (this.kFeatureOfInterestVProcedures.get(foiID) != null) {
-            this.kFeatureOfInterestVProcedures.get(foiID).add(procID);
-        } else {
-            this.kFeatureOfInterestVProcedures.put(foiID, procs);
-        }
-    }
-
-    /**
-     * method to set the related features for a offering
-     * 
-     * @param offRelatedFeatures
-     *            the relatedFeatures to set
-     */
-    public void setKOfferingVRelatedFeatures(Map<String, Collection<String>> offRelatedFeatures) {
-        this.kOfferingVRelatedFeatures = offRelatedFeatures;
-    }
-
-    /**
-     * method to get the related features for offerings
-     * 
-     * @return the relatedFeatures Map with related features for offerings
-     */
-    protected Map<String, Collection<String>> getKOfferingVRelatedFeatures() {
-        return kOfferingVRelatedFeatures;
-    }
-
-    protected Map<String, Collection<String>> getKRelatedFeatureVRole() {
-        return kRelatedFeatureVRole;
-    }
-
-    /**
-     * method to set the related features for a offering
-     * 
-     * @param kOfferingVRelatedFeatures
-     *            the relatedFeatures to set
-     */
-    public void setKRelatedFeaturesVRole(Map<String, Collection<String>> kRelatedFeatureVRole) {
-        this.kRelatedFeatureVRole = kRelatedFeatureVRole;
-    }
-
+    
     /**
      * Returns collection containing parent procedures for the passed procedure,
      * optionally navigating the full hierarchy and including itself
@@ -891,6 +652,262 @@ public class CapabilitiesCache{
         List<String> ccpList = new ArrayList<String>(collectionChildProcs);
         Collections.sort(ccpList);
         return ccpList;
+    }
+
+    /**
+     * sets the SRIDs
+     * 
+     * @param srids
+     */
+    public void setSrids(Collection<Integer> srids) {
+        this.srids = srids;
+    }
+    
+    /**
+     * Returns srids, which are supported by this SOS
+     * 
+     * @return Returns srids, which are supported by this SOS
+     */
+    protected Collection<Integer> getSrids() {
+        return this.srids;
+    }
+
+    protected Map<String, Collection<String>> getParentFeatures() {
+        return parentFeatures;
+    }
+
+    protected void setParentFeatures(Map<String, Collection<String>> parentFeatures) {
+        this.parentFeatures = parentFeatures;
+    }
+
+    protected Map<String, Collection<String>> getChildFeatures() {
+        return childFeatures;
+    }
+
+    protected void setChildFeatures(Map<String, Collection<String>> childFeatures) {
+        this.childFeatures = childFeatures;
+    }
+
+    public void setFeatureHierarchies(Map<String, Collection<String>> parentFeatures) {
+        this.parentFeatures = parentFeatures;
+        this.childFeatures = SosHelper.invertHierarchy(parentFeatures);
+    }
+
+    /**
+     * sets relationships between offerings and FOIs
+     * 
+     * @param offFeatures
+     */
+    public void setKOfferingVFeatures(Map<String, Collection<String>> offFeatures) {
+        this.kOfferingVFeaturesOfInterest = offFeatures;
+    }
+    
+    /**
+     * 
+     * @return Returns Map containing offeringIDs as keys and list of
+     *         corresponding features as values
+     */
+    protected Map<String, Collection<String>> getOffFeatures() {
+        return kOfferingVFeaturesOfInterest;
+    }
+
+    /**
+     * sets relationships between procedures and offerings
+     * 
+     * @param procOffs
+     */
+    public void setKProcedureVOfferings(Map<String, Collection<String>> procOffs) {
+        this.kProcedureVOfferings = procOffs;
+    }
+    
+    public Map<String, Collection<String>> getKProcedureVOffering() {
+    	return kProcedureVOfferings;
+    }
+    
+    /**
+     * returns the offerings for the passed procedure id
+     * 
+     * @param procID
+     *            id of procedure, for which related offerings should be
+     *            returned
+     * @return Returns offerings, for which passed procedure produces data
+     */
+    protected Collection<String> getOfferings4Procedure(String procID) {
+        List<String> result = new ArrayList<String>();
+        if (kProcedureVOfferings.containsKey(procID)) {
+            result.addAll(kProcedureVOfferings.get(procID));
+        }
+        return result;
+    }
+
+    /**
+     * sets the unit phenomenon relations
+     * 
+     * @param unit4Phen
+     */
+    public void setUnit4ObservableProperty(Map<String, String> unit4Phen) {
+        this.unit4Phen = unit4Phen;
+    }
+
+    /**
+     * sets relationships between phenomena and offerings
+     * 
+     * @param phenOffs
+     */
+    public void setKObservablePropertyVOfferings(Map<String, List<String>> phenOffs) {
+        this.kObservablePropertyVOfferings = phenOffs;
+    }
+    
+    public Map<String, List<String>> getKObservablePropertyVOffering()
+    {
+    	return kObservablePropertyVOfferings;
+    }
+    
+    /**
+     * Returns the phenomenons of all offerings
+     * 
+     * @return List<String> containing the phenomenons of all offerings
+     */
+    protected Collection<String> getObservableProperties() {
+        Set<String> observableProperties = new HashSet<String>(0);
+        if (kObservablePropertyVOfferings != null && kObservablePropertyVOfferings.keySet() != null) {
+            observableProperties.addAll(kObservablePropertyVOfferings.keySet());
+        }
+        return observableProperties;
+    }
+    
+    /**
+     * returns the offerings for the passed phenomenon
+     * 
+     * @param phenID
+     *            id of procedure, for which related offerings should be
+     *            returned
+     * @return Returns offerings, to which passed phenomenon belongs to
+     */
+    protected Collection<String> getOfferings4Phenomenon(String phenID) {
+        List<String> result = new ArrayList<String>();
+        if (kObservablePropertyVOfferings.containsKey(phenID)) {
+            result.addAll(kObservablePropertyVOfferings.get(phenID));
+        }
+        return result;
+    }
+
+    /**
+     * returns the procedure phenomenon relations
+     * 
+     * @return Returns the procPhens.
+     */
+    protected Map<String, Collection<String>> getProcPhens() {
+        return kProcedureVObservableProperties;
+    }
+
+    /**
+     * sets the procedure phenomenon relations
+     * 
+     * @param procPhens
+     *            The procPhens to set.
+     */
+    public void setProcPhens(Map<String, Collection<String>> procPhens) {
+        this.kProcedureVObservableProperties = procPhens;
+    }
+
+    /**
+     * returns the SRID
+     * 
+     * @return Returns Srid of coordinates stored in SOS database
+     */
+    protected int getSrid() {
+        return srid;
+    }
+
+    /**
+     * methods for adding relationships in Cache for recently received new
+     * observation
+     * 
+     * @param observation
+     *            recently received observation which has been inserted into SOS
+     *            db and whose relationships have to be maintained in cache
+     */
+    protected void refreshMetadata4newObservation(SosObservation observation) {
+
+        // create local variables for better readable code
+        String procID = observation.getObservationConstellation().getProcedure().getProcedureIdentifier();
+        ArrayList<String> procs = new ArrayList<String>(1);
+        procs.add(procID);
+
+        String foiID = observation.getObservationConstellation().getFeatureOfInterest().getIdentifier().getValue();
+        ArrayList<String> features = new ArrayList<String>(1);
+        features.add(foiID);
+
+        // if foi id is NOT contained add foi
+        if (!this.featureOfInterestIdentifiers.contains(foiID)) {
+            this.featureOfInterestIdentifiers.add(foiID);
+        }
+
+        // get offerings for phenomenon of observation
+        Collection<String> offs =
+                this.getOfferings4Phenomenon(observation.getObservationConstellation().getObservableProperty()
+                        .getIdentifier());
+
+        // insert foi_off relationsship for each offering
+        for (String offering_id : offs) {
+
+            // check whether offering foi relationship is already contained in
+            // DB
+            if (!this.getOffFeatures().containsKey(offering_id)) {
+
+                // Case 1: offering is NOT contained in foi_off -> insert
+                // relationsship
+                this.getOffFeatures().put(offering_id, features);
+            } else if (!this.getOffFeatures().get(offering_id).contains(foiID)) {
+
+                // Case 2: offering is already stored in foi_off -> insert
+                // relationsship if
+                // offering NOT contains foi id
+                this.getOffFeatures().get(offering_id).add(foiID);
+            }
+
+        }
+
+        // insert proc_foi relationsship
+        if (this.kFeatureOfInterestVProcedures.get(foiID) != null) {
+            this.kFeatureOfInterestVProcedures.get(foiID).add(procID);
+        } else {
+            this.kFeatureOfInterestVProcedures.put(foiID, procs);
+        }
+    }
+
+    /**
+     * method to set the related features for a offering
+     * 
+     * @param offRelatedFeatures
+     *            the relatedFeatures to set
+     */
+    public void setKOfferingVRelatedFeatures(Map<String, Collection<String>> offRelatedFeatures) {
+        this.kOfferingVRelatedFeatures = offRelatedFeatures;
+    }
+
+    /**
+     * method to get the related features for offerings
+     * 
+     * @return the relatedFeatures Map with related features for offerings
+     */
+    protected Map<String, Collection<String>> getKOfferingVRelatedFeatures() {
+        return kOfferingVRelatedFeatures;
+    }
+
+    protected Map<String, Collection<String>> getKRelatedFeatureVRole() {
+        return kRelatedFeatureVRole;
+    }
+
+    /**
+     * method to set the related features for a offering
+     * 
+     * @param kOfferingVRelatedFeatures
+     *            the relatedFeatures to set
+     */
+    public void setKRelatedFeaturesVRole(Map<String, Collection<String>> kRelatedFeatureVRole) {
+        this.kRelatedFeatureVRole = kRelatedFeatureVRole;
     }
 
     protected Collection<String> getParentFeatures(String featureID, boolean fullHierarchy, boolean includeSelf) {
@@ -1028,19 +1045,19 @@ public class CapabilitiesCache{
 	}
 
 	public DateTime getMinEventTime() {
-		return phenomenonTime.getStart();
+		return globalTemporalBoundingBox.getStart();
 	}
 	
 	public void setMinEventTime(DateTime minEventTime) {
-		phenomenonTime.setStart(minEventTime);
+		globalTemporalBoundingBox.setStart(minEventTime);
 	}
 	
 	public DateTime getMaxEventTime() {
-		return phenomenonTime.getEnd();
+		return globalTemporalBoundingBox.getEnd();
 	}
 	
 	public void setMaxEventTime(DateTime maxEventTime) {
-		phenomenonTime.setEnd(maxEventTime);
+		globalTemporalBoundingBox.setEnd(maxEventTime);
 	}
 
 	@Override
@@ -1069,7 +1086,7 @@ public class CapabilitiesCache{
 		result = prime * result + ((kProcedureVObservableProperties == null) ? 0 : kProcedureVObservableProperties.hashCode());
 		result = prime * result + ((kProcedureVOfferings == null) ? 0 : kProcedureVOfferings.hashCode());
 		result = prime * result + ((kRelatedFeatureVRole == null) ? 0 : kRelatedFeatureVRole.hashCode());
-		result = prime * result + ((phenomenonTime == null) ? 0 : phenomenonTime.hashCode());
+		result = prime * result + ((globalTemporalBoundingBox == null) ? 0 : globalTemporalBoundingBox.hashCode());
 		result = prime * result + ((observationIdentifiers == null) ? 0 : observationIdentifiers.hashCode());
 		result = prime * result + ((observationTypes == null) ? 0 : observationTypes.hashCode());
 		result = prime * result + ((offName == null) ? 0 : offName.hashCode());
@@ -1199,10 +1216,10 @@ public class CapabilitiesCache{
 				return false;
 		} else if (!kRelatedFeatureVRole.equals(other.kRelatedFeatureVRole))
 			return false;
-		if (phenomenonTime == null) {
-			if (other.phenomenonTime != null)
+		if (globalTemporalBoundingBox == null) {
+			if (other.globalTemporalBoundingBox != null)
 				return false;
-		} else if (!phenomenonTime.equals(other.phenomenonTime))
+		} else if (!globalTemporalBoundingBox.equals(other.globalTemporalBoundingBox))
 			return false;
 		if (observationIdentifiers == null) {
 			if (other.observationIdentifiers != null)
