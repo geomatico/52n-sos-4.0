@@ -156,7 +156,6 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
             if (decodedElement != null && decodedElement instanceof CodeType) {
                 names.add((CodeType)decodedElement);
             }
-            return names;
         }
         return names;
     }
