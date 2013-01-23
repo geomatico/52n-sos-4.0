@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012
+ * Copyright (C) 2013
  * by 52 North Initiative for Geospatial Open Source Software GmbH
  *
  * Contact: Andreas Wytzisk
@@ -42,11 +42,10 @@ import org.n52.sos.response.GetResultTemplateResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.OwsHelper;
-import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
+import org.n52.sos.wsdl.WSDLOperation;
+import org.n52.sos.wsdl.WSDLConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,6 +138,11 @@ public class SosGetResultTemplateOperatorV20 extends AbstractV2RequestOperator<I
             String exceptionText = String.format("The requested observedProperty (%s) is not supported by this server!", observedProperty);
             throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.GetResultTemplateParams.observedProperty.name(), exceptionText);
         }
+    }
+    
+    @Override
+    public WSDLOperation getSosOperationDefinition() {
+        return WSDLConstants.Operations.GET_RESULT_TEMPLATE;
     }
 
 }

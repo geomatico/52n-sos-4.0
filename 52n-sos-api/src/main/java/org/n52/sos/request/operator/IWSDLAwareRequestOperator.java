@@ -24,31 +24,14 @@
 package org.n52.sos.request.operator;
 
 import java.util.Map;
-import org.n52.sos.ds.IOperationDAO;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.wsdl.WSDLOperation;
 
 /**
- * @param <D> The IOperationDAO implementation class
- * @param <R> The request type
+ *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class AbstractV2RequestOperator<D extends IOperationDAO, R extends AbstractServiceRequest> 
-                    extends AbstractRequestOperator<D, R> implements IWSDLAwareRequestOperator {
-
-    public AbstractV2RequestOperator(String operationName, Class<R> requestType) {
-        super(SosConstants.SOS, Sos2Constants.SERVICEVERSION, operationName, requestType);
-    }
-
-    @Override
-    public Map<String, String> getAdditionalSchemaImports() {
-        return null;
-    }
-
-    @Override
-    public Map<String, String> getAdditionalPrefixes() {
-        return null;
-    }
-
+public interface IWSDLAwareRequestOperator extends IRequestOperator {
+    public WSDLOperation getSosOperationDefinition();
+    public Map<String, String> getAdditionalSchemaImports();
+    public Map<String, String> getAdditionalPrefixes();
 }

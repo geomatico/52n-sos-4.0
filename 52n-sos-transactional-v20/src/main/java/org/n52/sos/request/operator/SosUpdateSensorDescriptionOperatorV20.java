@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012
+ * Copyright (C) 2013
  * by 52 North Initiative for Geospatial Open Source Software GmbH
  *
  * Contact: Andreas Wytzisk
@@ -44,10 +44,10 @@ import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.response.UpdateSensorResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.OwsHelper;
-import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
+import org.n52.sos.wsdl.WSDLOperation;
+import org.n52.sos.wsdl.WSDLConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,5 +129,10 @@ public class SosUpdateSensorDescriptionOperatorV20 extends AbstractV2RequestOper
         } else {
             throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.DeleteSensorParams.procedure.name());
         }
+    }
+    
+    @Override
+    public WSDLOperation getSosOperationDefinition() {
+        return WSDLConstants.Operations.UPDATE_SENSOR_DESCRIPTION;
     }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012
+ * Copyright (C) 2013
  * by 52 North Initiative for Geospatial Open Source Software GmbH
  *
  * Contact: Andreas Wytzisk
@@ -61,8 +61,11 @@ public class CollectionHelper {
     public static <T> Collection<T> collection() {
         return list();
     }
+    public static <T> Collection<T> collection(T... elements) {
+        return list(elements);
+    }
 
-    public static <T> List<T> list(final T... elements) {
+    public static <T> List<T> list(T... elements) {
         return Collections.unmodifiableList(Arrays.asList(elements));
     }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012
+ * Copyright (C) 2013
  * by 52 North Initiative for Geospatial Open Source Software GmbH
  *
  * Contact: Andreas Wytzisk
@@ -44,6 +44,7 @@ public interface ControllerConstants {
 
     public static interface Paths {
         public static final String ROOT = "/";
+        public static final String WSDL = "/wsdl";
         public static final String INDEX = "/index";
         public static final String CLIENT = "/client";
         public static final String ADMIN_ROOT = "/admin";

@@ -39,7 +39,7 @@
        	<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-		</dependency>
+       	</dependency>
 		<!--
 		<dependency>
 			<groupId>org.apache.maven</groupId>
@@ -52,5 +52,10 @@
 		    <optional>true</optional>
 		</dependency>
  		-->
+        <dependency>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j</artifactId>
+            <version>1.6.2</version>
+        </dependency>
 	</dependencies>
 </project>
