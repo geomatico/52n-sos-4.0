@@ -703,7 +703,7 @@
 					</includes>
 					<strictCheck>true</strictCheck>
 					<properties>
-						<year>${project.inceptionYear}</year>
+						<year>2013</year>
 					</properties>
 					<mapping>
 						<sch>XML_STYLE</sch>
