@@ -554,6 +554,11 @@
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-coding-wml-v20</artifactId>
 				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>gda</id>
+			<dependencies>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-gda</artifactId>
