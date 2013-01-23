@@ -25,6 +25,8 @@ package org.n52.sos.cache;
 
 import static org.junit.Assert.*;
 
+import java.util.Collections;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -75,4 +77,12 @@ public class CapabilitiesCacheTest{
 		assertNotEquals("equal with Object", instance, new Object());
 	}
 
+	@Test public void
+	should_return_different_hashCodes_for_different_instances()
+	{
+		CapabilitiesCache cache = new CapabilitiesCache();
+		cache.setObservationIdentifiers(Collections.singleton("o_1"));
+		assertNotEquals("hashCode() of different caches are equal",cache.hashCode(), new CapabilitiesCache());
+	}
+	
 }
