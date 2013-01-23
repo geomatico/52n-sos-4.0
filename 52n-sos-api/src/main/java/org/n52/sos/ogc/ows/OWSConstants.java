@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ogc.ows;
 
+import javax.xml.namespace.QName;
 import org.n52.sos.exception.IExceptionCode;
 
 /**
@@ -82,6 +83,8 @@ public class OWSConstants {
     public static final String EN_LOCATOR = "locator";
 
     public static final String EN_EXCEPTION_TEXT = "ExceptionText";
+    
+    public static final QName QN_EXCEPTION = new QName(NS_OWS, EN_EXCEPTION, NS_OWS_PREFIX);
 
     /**
      * Enumeration for related feature role

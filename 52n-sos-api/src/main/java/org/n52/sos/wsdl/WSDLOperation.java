@@ -34,7 +34,7 @@ import javax.xml.namespace.QName;
  */
 public class WSDLOperation {
 
-    public static class SosOperationBuilder {
+    public static class WSDLOperationBuilder {
 
         private String name;
         private String version;
@@ -44,47 +44,47 @@ public class WSDLOperation {
         private QName response;
         private Collection<WSDLFault> faults;
 
-        private SosOperationBuilder() {
+        private WSDLOperationBuilder() {
         }
 
-        public SosOperationBuilder setName(String name) {
+        public WSDLOperationBuilder setName(String name) {
             this.name = name;
             return this;
         }
 
-        public SosOperationBuilder setRequestAction(URI requestAction) {
+        public WSDLOperationBuilder setRequestAction(URI requestAction) {
             this.requestAction = requestAction;
             return this;
         }
 
-        public SosOperationBuilder setResponseAction(URI responseAction) {
+        public WSDLOperationBuilder setResponseAction(URI responseAction) {
             this.responseAction = responseAction;
             return this;
         }
 
-        public SosOperationBuilder setRequest(QName request) {
+        public WSDLOperationBuilder setRequest(QName request) {
             this.request = request;
             return this;
         }
-        public SosOperationBuilder setVersion(String version) {
+        public WSDLOperationBuilder setVersion(String version) {
             this.version = version;
             return this;
         }
 
-        public SosOperationBuilder setRequest(String namespace, String localpart) {
+        public WSDLOperationBuilder setRequest(String namespace, String localpart) {
             return setRequest(new QName(namespace, localpart));
         }
 
-        public SosOperationBuilder setResponse(QName response) {
+        public WSDLOperationBuilder setResponse(QName response) {
             this.response = response;
             return this;
         }
 
-        public SosOperationBuilder setResponse(String namespace, String localpart) {
+        public WSDLOperationBuilder setResponse(String namespace, String localpart) {
             return setResponse(new QName(namespace, localpart));
         }
 
-        public SosOperationBuilder addFault(WSDLFault fault) {
+        public WSDLOperationBuilder addFault(WSDLFault fault) {
             if (this.faults == null) {
                 this.faults = new LinkedList<WSDLFault>();
             }
@@ -92,12 +92,12 @@ public class WSDLOperation {
             return this;
         }
         
-        public SosOperationBuilder setFaults(Collection<WSDLFault> faults) {
+        public WSDLOperationBuilder setFaults(Collection<WSDLFault> faults) {
             this.faults = new LinkedList<WSDLFault>(faults);
             return this;
         }
 
-        public SosOperationBuilder addFault(String name, URI action) {
+        public WSDLOperationBuilder addFault(String name, URI action) {
             return addFault(new WSDLFault(name, action));
         }
 
@@ -114,8 +114,8 @@ public class WSDLOperation {
     private QName response;
     private Collection<WSDLFault> faults;
 
-    public static SosOperationBuilder newBuilder() {
-        return new SosOperationBuilder();
+    public static WSDLOperationBuilder newBuilder() {
+        return new WSDLOperationBuilder();
     }
     
     public WSDLOperation(String name, String version, URI requestAction, URI responseAction, QName request, QName response, Collection<WSDLFault> faults) {

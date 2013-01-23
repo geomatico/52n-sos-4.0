@@ -67,6 +67,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.wsdl.WSDLConstants.Operations;
 import org.w3c.dom.Document;
@@ -217,9 +218,9 @@ public class WSDLBuilder {
     }
 
     private void setDefaultImports() throws WSDLException {
-        addSchemaImport(WSDLConstants.NS_SOS, Sos2Constants.SCHEMA_LOCATION_SOS);
-        addSchemaImport(WSDLConstants.NS_OWS, OWSConstants.SCHEMA_LOCATION_OWS);
-        addSchemaImport(WSDLConstants.NS_SWES, SWEConstants.SCHEMA_LOCATION_SWES_200);
+        addSchemaImport(Sos2Constants.NS_SOS_20, Sos2Constants.SCHEMA_LOCATION_SOS);
+        addSchemaImport(OWSConstants.NS_OWS, OWSConstants.SCHEMA_LOCATION_OWS);
+        addSchemaImport(SWEConstants.NS_SWES_20, SWEConstants.SCHEMA_LOCATION_SWES_200);
     }
 
     public WSDLBuilder addSchemaImport(String namespace, String schemaLocation) throws WSDLException {
@@ -236,9 +237,9 @@ public class WSDLBuilder {
         addNamespace(WSDLConstants.NS_WSAM_PREFIX, WSDLConstants.NS_WSAM);
         addNamespace(WSDLConstants.NS_MIME_PREFIX, WSDLConstants.NS_MIME);
         addNamespace(WSDLConstants.NS_HTTP_PREFIX, WSDLConstants.NS_HTTP);
-        addNamespace(WSDLConstants.NS_OWS_PREFIX, WSDLConstants.NS_OWS);
-        addNamespace(WSDLConstants.NS_SOS_PREFIX, WSDLConstants.NS_SOS);
-        addNamespace(WSDLConstants.NS_SWES_PREFIX, WSDLConstants.NS_SWES);
+        addNamespace(OWSConstants.NS_OWS_PREFIX, OWSConstants.NS_OWS);
+        addNamespace(SosConstants.NS_SOS_PREFIX, Sos2Constants.NS_SOS_20);
+        addNamespace(SWEConstants.NS_SWES_PREFIX, SWEConstants.NS_SWES_20);
     }
 
     public WSDLBuilder addNamespace(String prefix, String namespace) {
@@ -262,7 +263,7 @@ public class WSDLBuilder {
         if (this.faultMessage == null) {
             this.faultMessage = getDefinitions().createMessage();
             Part part = getDefinitions().createPart();
-            part.setElementName(WSDLConstants.QN_OWS_EXCEPTION_REPORT);
+            part.setElementName(OWSConstants.QN_EXCEPTION);
             part.setName("fault");
             this.faultMessage.addPart(part);
             this.faultMessage.setQName(new QName(WSDLConstants.NS_SOSW, "ExceptionMessage"));

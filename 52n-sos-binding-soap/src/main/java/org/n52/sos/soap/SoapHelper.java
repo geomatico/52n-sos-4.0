@@ -161,17 +161,17 @@ public class SoapHelper {
             throws OwsExceptionReport {
         if (soapAction != null && !soapAction.isEmpty()) {
             if (operationName.equals(Operations.GetCapabilities.name())
-                    && soapAction.equals(SosSoapConstants.REQ_ACTION_GETCAPABILITIES)) {
+                    && soapAction.equals(SosSoapConstants.REQ_ACTION_GET_CAPABILITIES)) {
                 LOGGER.debug("ActionURI and SOAPBody content are valid!");
-                return SosSoapConstants.RESP_ACTION_GETCAPABILITIES;
+                return SosSoapConstants.RESP_ACTION_GET_CAPABILITIES;
             } else if (operationName.equals(Operations.DescribeSensor.name())
-                    && soapAction.equals(SosSoapConstants.REQ_ACTION_DESCRIBESENSOR)) {
+                    && soapAction.equals(SosSoapConstants.REQ_ACTION_DESCRIBE_SENSOR)) {
                 LOGGER.debug("ActionURI and SOAPBody content are valid!");
-                return SosSoapConstants.RESP_ACTION_DESCRIBESENSOR;
+                return SosSoapConstants.RESP_ACTION_DESCRIBE_SENSOR;
             } else if (operationName.equals(Operations.GetObservation.name())
-                    && soapAction.equals(SosSoapConstants.REQ_ACTION_GETOBSERVATION)) {
+                    && soapAction.equals(SosSoapConstants.REQ_ACTION_GET_OBSERVATION)) {
                 LOGGER.debug("ActionURI and SOAPBody content are valid!");
-                return SosSoapConstants.RESP_ACTION_GETOBSERVATION;
+                return SosSoapConstants.RESP_ACTION_GET_OBSERVATION;
             } else {
                 throw Util4Exceptions.createNoApplicableCodeException(null, "Error while actionURI (" + soapAction
                         + ") is not compatible with the SOAPBody content (" + operationName + " request)!");

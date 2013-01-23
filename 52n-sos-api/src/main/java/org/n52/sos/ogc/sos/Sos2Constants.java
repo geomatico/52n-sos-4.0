@@ -31,8 +31,6 @@ import org.n52.sos.ogc.ows.OWSConstants;
 /**
  * SosConstants holds all important and often used constants (e.g. name of the
  * getCapabilities operation) that are specific to SOS 2.0
- * 
- * 
  */
 public final class Sos2Constants {
 
@@ -44,6 +42,45 @@ public final class Sos2Constants {
 
     /** Constant for the content types of the response formats */
     private static String[] RESPONSE_FORMATS = { OMConstants.RESPONSE_FORMAT_OM_2, SosConstants.CONTENT_TYPE_ZIP };
+    
+    public static final String EN_CAPABILITIES = "Capabilities";
+    public static final String EN_GET_CAPABILITIES = "GetCapabilities";
+    public static final String EN_GET_FEATURE_OF_INTEREST = "GetFeatureOfInterest";
+    public static final String EN_GET_FEATURE_OF_INTEREST_RESPONSE = "GetFeatureOfInterestResponse";
+    public static final String EN_GET_OBSERVATION = "GetObservation";
+    public static final String EN_GET_OBSERVATION_BY_ID = "GetObservationById";
+    public static final String EN_GET_OBSERVATION_BY_ID_RESPONSE = "GetObservationByIdResponse";
+    public static final String EN_GET_OBSERVATION_RESPONSE = "GetObservationResponse";
+    public static final String EN_GET_RESULT = "GetResult";
+    public static final String EN_GET_RESULT_RESPONSE = "GetResultResponse";
+    public static final String EN_GET_RESULT_TEMPLATE = "GetResultTemplate";
+    public static final String EN_GET_RESULT_TEMPLATE_RESPONSE = "GetResultTemplateResponse";
+    public static final String EN_INSERT_OBSERVATION = "InsertObservation";
+    public static final String EN_INSERT_OBSERVATION_RESPONSE = "InsertObservationResponse";
+    public static final String EN_INSERT_RESULT = "InsertResult";
+    public static final String EN_INSERT_RESULT_RESPONSE = "InsertResultResponse";
+    public static final String EN_INSERT_RESULT_TEMPLATE = "InsertResultTemplate";
+    public static final String EN_INSERT_RESULT_TEMPLATE_RESPONSE = "InsertResultTemplateResponse";
+    
+    public static final QName QN_CAPABILITIES = new QName(NS_SOS_20, EN_CAPABILITIES, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_GET_CAPABILITIES = new QName(NS_SOS_20, EN_GET_CAPABILITIES, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_GET_FEATURE_OF_INTEREST = new QName(NS_SOS_20, EN_GET_FEATURE_OF_INTEREST, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_GET_FEATURE_OF_INTEREST_RESPONSE = new QName(NS_SOS_20, EN_GET_FEATURE_OF_INTEREST_RESPONSE, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_GET_OBSERVATION = new QName(NS_SOS_20, EN_GET_OBSERVATION, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_GET_OBSERVATION_BY_ID = new QName(NS_SOS_20, EN_GET_OBSERVATION_BY_ID, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_GET_OBSERVATION_BY_ID_RESPONSE = new QName(NS_SOS_20, EN_GET_OBSERVATION_BY_ID_RESPONSE, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_GET_OBSERVATION_RESPONSE = new QName(NS_SOS_20, EN_GET_OBSERVATION_RESPONSE, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_GET_RESULT = new QName(NS_SOS_20, EN_GET_RESULT, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_GET_RESULT_RESPONSE = new QName(NS_SOS_20, EN_GET_RESULT_RESPONSE, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_GET_RESULT_TEMPLATE = new QName(NS_SOS_20, EN_GET_RESULT_TEMPLATE, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_GET_RESULT_TEMPLATE_RESPONSE = new QName(NS_SOS_20, EN_GET_RESULT_TEMPLATE_RESPONSE, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_INSERT_OBSERVATION = new QName(NS_SOS_20, EN_INSERT_OBSERVATION, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_INSERT_OBSERVATION_RESPONSE = new QName(NS_SOS_20, EN_INSERT_OBSERVATION_RESPONSE, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_INSERT_RESULT = new QName(NS_SOS_20, EN_INSERT_RESULT, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_INSERT_RESULT_RESPONSE = new QName(NS_SOS_20, EN_INSERT_RESULT_RESPONSE, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_INSERT_RESULT_TEMPLATE = new QName(NS_SOS_20, EN_INSERT_RESULT_TEMPLATE, SosConstants.NS_SOS_PREFIX);
+    public static final QName QN_INSERT_RESULT_TEMPLATE_RESPONSE = new QName(NS_SOS_20, EN_INSERT_RESULT_TEMPLATE_RESPONSE, SosConstants.NS_SOS_PREFIX);
+
 
     /**
      * The names of the extensions that we know off and might support

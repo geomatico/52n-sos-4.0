@@ -25,47 +25,52 @@ package org.n52.sos.ogc.sos;
 
 /**
  * Constants for SOAP messages
- * 
  */
 public class SosSoapConstants {
 
     // SOS core
-    public static final String REQ_ACTION_GETCAPABILITIES =
-            "http://www.opengis.net/def/serviceOperation/sos/core/2.0/GetCapabilities";
-
-    public static final String RESP_ACTION_GETCAPABILITIES =
-            "http://www.opengis.net/def/serviceOperation/sos/core/2.0/GetCapabilitiesResponse";
-
-    public static final String REQ_ACTION_GETOBSERVATION =
-            "http://www.opengis.net/def/serviceOperation/sos/core/2.0/GetObservation";
-
-    public static final String RESP_ACTION_GETOBSERVATION =
-            "http://www.opengis.net/def/serviceOperation/sos/core/2.0/GetObservationResponse";
-
-    public static final String REQ_ACTION_DESCRIBESENSOR = "http://www.opengis.net/swes/2.0/DescribeSensor";
-
-    public static final String RESP_ACTION_DESCRIBESENSOR = "http://www.opengis.net/swes/2.0/DescribeSensorResponse";
+    public static final String REQ_ACTION_GET_CAPABILITIES = "http://www.opengis.net/def/serviceOperation/sos/core/2.0/GetCapabilities";
+    public static final String RESP_ACTION_GET_CAPABILITIES = "http://www.opengis.net/def/serviceOperation/sos/core/2.0/GetCapabilitiesResponse";
+    
+    public static final String REQ_ACTION_DESCRIBE_SENSOR = "http://www.opengis.net/swes/2.0/DescribeSensor";
+    public static final String RESP_ACTION_DESCRIBE_SENSOR = "http://www.opengis.net/swes/2.0/DescribeSensorResponse";
+    
+    public static final String REQ_ACTION_GET_OBSERVATION = "http://www.opengis.net/def/serviceOperation/sos/core/2.0/GetObservation";
+    public static final String RESP_ACTION_GET_OBSERVATION = "http://www.opengis.net/def/serviceOperation/sos/core/2.0/GetObservationResponse";
 
     // SOS transactional
-    public static final String REQ_ACTION_INSERTSENSOR = "http://www.opengis.net/swes/2.0/InsertSensor";
+    public static final String REQ_ACTION_INSERT_OBSERVATION = "http://www.opengis.net/def/serviceOperation/sos/obsInsertion/2.0/InsertObservation";
+    public static final String RESP_ACTION_INSERT_OBSERVATION = "http://www.opengis.net/def/serviceOperation/sos/obsInsertion/2.0/InsertObservationResponse";
+    
+     public static final String REQ_ACTION_UPDATE_SENSOR_DESCRIPTION = "http://www.opengis.net/swes/2.0/UpdateSensorDescription";
+    public static final String RESP_ACTION_UPDATE_SENSOR_DESCRIPTION = "http://www.opengis.net/swes/2.0/UpdateSensorDescriptionResponse";
+    
+    public static final String REQ_ACTION_INSERT_SENSOR = "http://www.opengis.net/swes/2.0/InsertSensor";
+    public static final String RESP_ACTION_INSERT_SENSOR = "http://www.opengis.net/swes/2.0/InsertSensorResponse";
+    
+    public static final String REQ_ACTION_DELETE_SENSOR = "http://www.opengis.net/swes/2.0/DeleteSensor";
+    public static final String RESP_ACTION_DELETE_SENSOR = "http://www.opengis.net/swes/2.0/DeleteSensorResponse";
 
-    public static final String RESP_ACTION_INSERTSENSOR = "http://www.opengis.net/swes/2.0/InsertSensorResponse";
-
-    public static final String REQ_ACTION_INSERTOBSERVATION =
-            "http://www.opengis.net/def/serviceOperation/sos/obsInsertion/2.0/InsertObservation";
-
-    public static final String RESP_ACTION_INSERTOBSERVATION =
-            "http://www.opengis.net/def/serviceOperation/sos/obsInsertion/2.0/InsertObservationResponse";
-
-    public static final String REQ_ACTION_UPDATESENSOR = "http://www.opengis.net/swes/2.0/UpdateSensorDescription";
-
-    public static final String RESP_ACTION_UPDATESENSOR =
-            "http://www.opengis.net/swes/2.0/UpdateSensorDescriptionResponse";
-
-    public static final String REQ_ACTION_DELETESENSOR = "http://www.opengis.net/swes/2.0/DeleteSensor";
-
-    public static final String RESP_ACTION_DELETESENSOR = "http://www.opengis.net/swes/2.0/DeleteSensorResponse";
-
+    // SOS enhanced
+    public static final String REQ_ACTION_GET_FEATURE_OF_INTEREST = "http://www.opengis.net/def/serviceOperation/sos/foiRetrieval/2.0/GetFeatureOfInterest";
+    public static final String RESP_ACTION_GET_FEATURE_OF_INTEREST = "http://www.opengis.net/def/serviceOperation/sos/foiRetrieval/2.0/GetFeatureOfInterestResponse";
+    
+    public static final String REQ_ACTION_GET_OBSERVATION_BY_ID = "http://www.opengis.net/def/serviceOperation/sos/obsByIdRetrieval/2.0/GetObservationById";
+    public static final String RESP_ACTION_GET_OBSERVATION_BY_ID = "http://www.opengis.net/def/serviceOperation/sos/obsByIdRetrieval/2.0/GetObservationByIdResponse";
+    
+    // SOS result handling
+    public static final String REQ_ACTION_GET_RESULT_TEMPLATE = "http://www.opengis.net/def/serviceOperation/sos/resultRetrieval/2.0/GetResultTemplate";
+    public static final String RESP_ACTION_GET_RESULT_TEMPLATE = "http://www.opengis.net/def/serviceOperation/sos/resultRetrieval/2.0/GetResultTemplateResponse";
+    
+    public static final String REQ_ACTION_INSERT_RESULT_TEMPLATE = "http://www.opengis.net/def/serviceOperation/sos/resultInsertion/2.0/InsertResultTemplate";
+    public static final String RESP_ACTION_INSERT_RESULT_TEMPLATE = "http://www.opengis.net/def/serviceOperation/sos/resultInsertion/2.0/InsertResultTemplateResponse";
+    
+    public static final String REQ_ACTION_GET_RESULT = "http://www.opengis.net/def/serviceOperation/sos/resultRetrieval/2.0/GetResult";
+    public static final String RESP_ACTION_GET_RESULT = "http://www.opengis.net/def/serviceOperation/sos/resultRetrieval/2.0/GetResultResponse";
+     
+    public static final String REQ_ACTION_INSERT_RESULT = "http://www.opengis.net/def/serviceOperation/sos/resultInsertion/2.0/InsertResultTemplate";
+    public static final String RESP_ACTION_INSERT_RESULT = "http://www.opengis.net/def/serviceOperation/sos/resultInsertion/2.0/InsertResultTemplateResponse";
+    
     // Exceptions
 
     /**
@@ -97,5 +102,8 @@ public class SosSoapConstants {
      * WSN exception response action URI
      */
     public static final String RESP_ACTION_WSN = "http://docs.oasis-open.org/wsn/fault";
+
+    private SosSoapConstants() {
+    }
 
 }
