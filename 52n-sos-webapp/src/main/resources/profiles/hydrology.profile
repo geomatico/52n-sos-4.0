@@ -8,6 +8,7 @@
 	<showMetadataOfEmptyObservations>true</showMetadataOfEmptyObservations>
 	<allowSubsettingForSOS20OM20>true</allowSubsettingForSOS20OM20>
 	<mergeValues>true</mergeValues>
+	<returnLatestValueIfTemporalFilterIsMissingInGetObservation>true</returnLatestValueIfTemporalFilterIsMissingInGetObservation>
 	<encodeProcedureInObservation>
 		<namespace>http://www.opengis.net/waterml/2.0</namespace>
 		<encode>true</encode>

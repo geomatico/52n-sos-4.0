@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013
+ * Copyright (C) 2012
  * by 52 North Initiative for Geospatial Open Source Software GmbH
  *
  * Contact: Andreas Wytzisk
@@ -130,9 +130,13 @@ public class ProfileHandler {
            profile.setAllowSubsettingForSOS20OM20(checkAndGetBoolean(getTextValue(node)));
        } else if (checkNode(node, XmlElements.mergeValues.name())) {
            profile.setMergeValues(checkAndGetBoolean(getTextValue(node)));
+       } else if (checkNode(node, XmlElements.returnLatestValueIfTemporalFilterIsMissingInGetObservation.name())) {
+           profile.setReturnLatestValueIfTemporalFilterIsMissingInGetObservation(checkAndGetBoolean(getTextValue(node)));
        } else if (checkNode(node, XmlElements.encodeProcedureInObservation.name())) {
            addValuesForEncodeProcedureInObservation(profile, node);
-       } 
+       } else if (checkNode(node, XmlElements.defaultObservationTypesForEncoding.name())) {
+               addValuesForDefaultObservationTypesForEncoding(profile, node);
+       }
     }
 
     private String getTextValue(Node node) {
@@ -156,9 +160,10 @@ public class ProfileHandler {
     }
 
     private void addValuesForEncodeProcedureInObservation(Profile profile, Node node) {
-        String namespace = null;
-        Boolean encode = null;
+       
         if (node.hasChildNodes()) {
+            String namespace = null;
+            Boolean encode = null;
             NodeList childNodes = node.getChildNodes();
             for (int i = 0; i < childNodes.getLength(); i++) {
                 Node item = childNodes.item(i);
@@ -168,11 +173,24 @@ public class ProfileHandler {
                     encode = Boolean.valueOf(checkAndGetBoolean(getTextValue(item)));
                 } 
             }
+            profile.addEncodeProcedureInObservation(namespace, encode);
         }
-        if (namespace != null && !namespace.isEmpty() && encode != null) {
-            Map<String, Boolean> encodeProcedureInObservation = new HashMap<String, Boolean>();
-            encodeProcedureInObservation.put(namespace, encode);
-            profile.setEncodeProcedureInObservation(encodeProcedureInObservation);
+    }
+
+    private void addValuesForDefaultObservationTypesForEncoding(Profile profile, Node node) {
+        if (node.hasChildNodes()) {
+            String namespace = null;
+            String observationType = null;
+            NodeList childNodes = node.getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node item = childNodes.item(i);
+                if (checkNode(item, XmlElements.namespace.name())) {
+                    namespace = getTextValue(item);
+                } else if (checkNode(item, XmlElements.observationType.name())) {
+                    observationType = getTextValue(item);
+                } 
+            }
+            profile.addDefaultObservationTypesForEncoding(namespace, observationType);
         }
     }
 

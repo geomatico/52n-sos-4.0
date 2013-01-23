@@ -28,7 +28,7 @@ import org.n52.sos.ogc.om.OMConstants;
 public class ProfileConstants {
 
     public enum XmlElements {
-        profile, identifier, defaultProfile, observationResponseFormat, encodeFeatureOfInterestInObservations, encodingNamespaceForFeatureOfInterestEncoding, showMetadataOfEmptyObservations, allowSubsettingForSOS20OM20, mergeValues, encodeProcedureInObservation, namespace, encode
+        profile, identifier, defaultProfile, observationResponseFormat, encodeFeatureOfInterestInObservations, encodingNamespaceForFeatureOfInterestEncoding, showMetadataOfEmptyObservations, allowSubsettingForSOS20OM20, mergeValues, returnLatestValueIfTemporalFilterIsMissingInGetObservation, encodeProcedureInObservation, namespace, encode, defaultObservationTypesForEncoding, observationType
     }
 
     public static final String DEFAULT_IDENTIFIER = "SOS_20_PROFILE";
@@ -44,5 +44,7 @@ public class ProfileConstants {
     public static final boolean DEFAULT_ALLOW_SUBSETTING_FOR_OM_20 = false;
 
     public static final boolean DEAFULT_MERGE_VALUES = false;
+
+    public static final boolean DEAFULT_RETURN_LATEST_VALUE_IF_TEMPORAL_FILTER_IS_MISSING_IN_GETOBSERVATION = false;
 
 }

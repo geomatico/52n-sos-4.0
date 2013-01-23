@@ -52,10 +52,13 @@ public class Profile {
 
     private boolean allowSubsettingForSOS20OM20 = ProfileConstants.DEFAULT_ALLOW_SUBSETTING_FOR_OM_20;
 
-//    private boolean mergeValues = ProfileConstants.DEAFULT_MERGE_VALUES;
-    private boolean mergeValues = true;
+    private boolean mergeValues = ProfileConstants.DEAFULT_MERGE_VALUES;
+    
+    private boolean returnLatestValueIfTemporalFilterIsMissingInGetObservation = ProfileConstants.DEAFULT_RETURN_LATEST_VALUE_IF_TEMPORAL_FILTER_IS_MISSING_IN_GETOBSERVATION;
     
     private Map<String, Boolean> encodeProcedureInObservation = new HashMap<String, Boolean>(0);
+    
+    private Map<String, String> defaultObservationTypesForEncoding = new HashMap<String, String>(0);
 
     public Profile() {
     }
@@ -144,11 +147,41 @@ public class Profile {
     }
 
     public void setEncodeProcedureInObservation(Map<String, Boolean> encodeProcedureInObservation) {
-        this.encodeProcedureInObservation = encodeProcedureInObservation;
+        if (encodeProcedureInObservation != null) {
+            this.encodeProcedureInObservation.putAll(encodeProcedureInObservation);
+        }
     }
     
-    public void addEncodeProcedureInObservation(String namespace, boolean encode) {
-        encodeProcedureInObservation.put(namespace, Boolean.valueOf(encode));
+    public void addEncodeProcedureInObservation(String namespace, Boolean encode) {
+        if (namespace != null && !namespace.isEmpty() && encode != null) {
+            encodeProcedureInObservation.put(namespace, Boolean.valueOf(encode));
+        }
+    }
+
+    public boolean isReturnLatestValueIfTemporalFilterIsMissingInGetObservation() {
+        return returnLatestValueIfTemporalFilterIsMissingInGetObservation;
+    }
+
+    public void setReturnLatestValueIfTemporalFilterIsMissingInGetObservation(
+            boolean returnLatestValueIfTemporalFilterIsMissingInGetObservation) {
+        this.returnLatestValueIfTemporalFilterIsMissingInGetObservation =
+                returnLatestValueIfTemporalFilterIsMissingInGetObservation;
+    }
+
+    public Map<String, String> getDefaultObservationTypesForEncoding() {
+        return defaultObservationTypesForEncoding;
+    }
+
+    public void setDefaultObservationTypesForEncoding(Map<String, String> defaultObservationTypesForEncoding) {
+        if (defaultObservationTypesForEncoding != null) {
+            this.defaultObservationTypesForEncoding = defaultObservationTypesForEncoding;
+        }
+    }
+
+    public void addDefaultObservationTypesForEncoding(String namespace, String observationType) {
+        if (namespace != null && !namespace.isEmpty() && observationType != null && !observationType.isEmpty()) {
+            defaultObservationTypesForEncoding.put(namespace, observationType);
+        }
     }
 
 }
