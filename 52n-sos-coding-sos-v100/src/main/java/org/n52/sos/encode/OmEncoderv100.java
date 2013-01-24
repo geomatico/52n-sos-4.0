@@ -70,7 +70,7 @@ import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.service.profile.Profile;
+import org.n52.sos.service.profile.IProfile;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
@@ -85,41 +85,35 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(OmEncoderv100.class);
 
     private static final Map<SupportedTypeKey, Set<String>> SUPPORTED_TYPES = Collections.singletonMap(
-        SupportedTypeKey.ObservationType, CollectionHelper.set(
-            OMConstants.OBS_TYPE_CATEGORY_OBSERVATION,
-            OMConstants.OBS_TYPE_COUNT_OBSERVATION,
-            // OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION,
-            OMConstants.OBS_TYPE_MEASUREMENT,
-            OMConstants.OBS_TYPE_TEXT_OBSERVATION,
-            OMConstants.OBS_TYPE_TRUTH_OBSERVATION,
-            OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION
-        )
-    );
+            SupportedTypeKey.ObservationType, CollectionHelper.set(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION,
+                    OMConstants.OBS_TYPE_COUNT_OBSERVATION,
+                    // OMConstants.OBS_TYPE_GEOMETRY_OBSERVATION,
+                    OMConstants.OBS_TYPE_MEASUREMENT, OMConstants.OBS_TYPE_TEXT_OBSERVATION,
+                    OMConstants.OBS_TYPE_TRUTH_OBSERVATION, OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION));
 
     // TODO: change to correct conformance class
     private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(
-        "http://www.opengis.net/spec/OMXML/1.0/conf/measurement",
-        "http://www.opengis.net/spec/OMXML/1.0/conf/categoryObservation",
-        "http://www.opengis.net/spec/OMXML/1.0/conf/countObservation",
-        "http://www.opengis.net/spec/OMXML/1.0/conf/truthObservation",
-        "http://www.opengis.net/spec/OMXML/1.0/conf/geometryObservation",
-        "http://www.opengis.net/spec/OMXML/1.0/conf/textObservation"
-    );
+            "http://www.opengis.net/spec/OMXML/1.0/conf/measurement",
+            "http://www.opengis.net/spec/OMXML/1.0/conf/categoryObservation",
+            "http://www.opengis.net/spec/OMXML/1.0/conf/countObservation",
+            "http://www.opengis.net/spec/OMXML/1.0/conf/truthObservation",
+            "http://www.opengis.net/spec/OMXML/1.0/conf/geometryObservation",
+            "http://www.opengis.net/spec/OMXML/1.0/conf/textObservation");
 
-    private static final Map<String, Map<String, Set<String>>> supportedResponseFormats
-        = Collections.singletonMap(SosConstants.SOS,
+    private static final Map<String, Map<String, Set<String>>> supportedResponseFormats = Collections.singletonMap(
+            SosConstants.SOS,
             Collections.singletonMap(Sos1Constants.SERVICEVERSION,
-                CollectionHelper.set(OMConstants.NS_OM,OMConstants.CONTENT_TYPE_OM)));
+                    CollectionHelper.set(OMConstants.NS_OM, OMConstants.CONTENT_TYPE_OM)));
 
     private static final Set<EncoderKey> ENCODER_KEYS = CollectionHelper.union(
-        CodingHelper.encoderKeysForElements(OMConstants.NS_OM, SosObservation.class),
-        CodingHelper.encoderKeysForElements(OMConstants.CONTENT_TYPE_OM, SosObservation.class)
-    );
+            CodingHelper.encoderKeysForElements(OMConstants.NS_OM, SosObservation.class),
+            CodingHelper.encoderKeysForElements(OMConstants.CONTENT_TYPE_OM, SosObservation.class));
 
     private boolean supported = true;
 
     public OmEncoderv100() {
-        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!",
+                StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
@@ -192,9 +186,8 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
 
     private XmlObject createObservation(SosObservation sosObservation, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
-    	
-        ObservationType xbObs =
-                ObservationType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+
+        ObservationType xbObs = ObservationType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         xbObs.setId("o_" + Long.toString(System.currentTimeMillis()));
         String observationID;
         if (sosObservation.getObservationID() != null) {
@@ -203,14 +196,17 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
             observationID = xbObs.getId().replace("o_", "");
         }
         if (sosObservation.getIdentifier() != null && sosObservation.getIdentifier().isSetValue()) {
-        	// I reckon that might cause problems in SOS / OM 1.0 I get XmlValueDisconnectedExceptions 
-        	// either here or with the addSamplingTime for TimePeriod
-            // xbObs.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML, sosObservation.getIdentifier()));
+            // I reckon that might cause problems in SOS / OM 1.0 I get
+            // XmlValueDisconnectedExceptions
+            // either here or with the addSamplingTime for TimePeriod
+            // xbObs.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML,
+            // sosObservation.getIdentifier()));
         }
 
         String observationType = sosObservation.getObservationConstellation().getObservationType();
-        // FIXME, was addNewName - not here actually necessary 
-        // OGC-OM/2.0/OM_SWEArrayObservation won't be used for the om:Observation OM1
+        // FIXME, was addNewName - not here actually necessary
+        // OGC-OM/2.0/OM_SWEArrayObservation won't be used for the
+        // om:Observation OM1
         // xbObs.addNewParameter().setHref(observationType);
         /* SosMultiObservationValues will generate always a new ITime... */
         ITime samplingTime = sosObservation.getPhenomenonTime();
@@ -218,9 +214,9 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
         if (samplingTime.getId() == null) {
             samplingTime.setId(OMConstants.PHENOMENON_TIME_NAME + "_" + observationID);
         }
-        
-    	addSamplingTime(xbObs.addNewSamplingTime(), samplingTime);
-        
+
+        addSamplingTime(xbObs.addNewSamplingTime(), samplingTime);
+
         // set resultTime not in OM1, ?
         // xbObs.addNewResultTime().setHref("#" + phenomenonTime.getId());
         // set procedure
@@ -251,22 +247,19 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
 
     }
 
-    private void addSamplingTime(TimeObjectPropertyType timeObjectPropertyType, ITime iTime)
-            throws OwsExceptionReport {
-    	
+    private void addSamplingTime(TimeObjectPropertyType timeObjectPropertyType, ITime iTime) throws OwsExceptionReport {
+
         XmlObject xmlObject = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML, iTime);
-        
+
         // FIXME should go into GmlHelper
         javax.xml.namespace.QName timeObj = null;
         if (iTime instanceof TimeInstant) {
-        	timeObj = GMLConstants.QN_TIME_INSTANT;
+            timeObj = GMLConstants.QN_TIME_INSTANT;
         } else if (iTime instanceof TimePeriod) {
-        	timeObj = GMLConstants.QN_TIME_PERIOD;
+            timeObj = GMLConstants.QN_TIME_PERIOD;
         }
-        XmlObject substitution =
-                timeObjectPropertyType.addNewTimeObject().substitute(
-                		timeObj, xmlObject.schemaType());
-        
+        XmlObject substitution = timeObjectPropertyType.addNewTimeObject().substitute(timeObj, xmlObject.schemaType());
+
         substitution.set(xmlObject);
     }
 
@@ -360,14 +353,16 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
             if (geometryValue.getValue() != null) {
                 Map<HelperValues, String> additionalValue = new EnumMap<HelperValues, String>(HelperValues.class);
                 additionalValue.put(HelperValues.GMLID, SosConstants.OBS_ID_PREFIX + observationID);
-                xbResult.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML, geometryValue.getValue(), additionalValue));
+                xbResult.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML, geometryValue.getValue(),
+                        additionalValue));
             } else {
                 xbResult.setNil();
             }
         } else if (observationType.equals(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION)
                 || observationType.equals(OMConstants.RESULT_MODEL_OBSERVATION)) {
             SosSweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
-            Map<HelperValues, String> additionalValues = new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
+            Map<HelperValues, String> additionalValues =
+                    new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
             additionalValues.put(HelperValues.FOR_OBSERVATION, null);
             xbResult.set(CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, dataArray, additionalValues));
         }
@@ -376,7 +371,8 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
     private void addMultiObservationValueToResult(XmlObject xbResult, SosObservation sosObservation)
             throws OwsExceptionReport {
         SosMultiObservationValues<?> observationValue = (SosMultiObservationValues) sosObservation.getValue();
-        Map<HelperValues, String> additionalValues = new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
+        Map<HelperValues, String> additionalValues =
+                new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
         additionalValues.put(HelperValues.FOR_OBSERVATION, null);
         SosSweDataArray dataArray = SweHelper.createSosSweDataArrayFromObservationValue(sosObservation);
         xbResult.set(CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, dataArray, additionalValues));
@@ -385,7 +381,7 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
     /**
      * Encodes a SosAbstractFeature to an SpatialSamplingFeature under
      * consideration of duplicated SpatialSamplingFeature in the XML document.
-     *
+     * 
      * @param observation
      *            XmlObject O&M observation
      * @param absObs
@@ -401,7 +397,7 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
         // Sos2Constants.SERVICEVERSION));
         SosSamplingFeature samplingFeature = (SosSamplingFeature) feature;
         FeaturePropertyType featureProperty = observation.addNewFeatureOfInterest();
-        Profile activeProfile = Configurator.getInstance().getActiveProfile();
+        IProfile activeProfile = Configurator.getInstance().getActiveProfile();
         if (!activeProfile.isEncodeFeatureOfInterestInObservations() || !(feature instanceof SosSamplingFeature)) {
             // if (urlPattern != null) {
             // featureProperty.setHref(SosHelper.createFoiGetUrl(feature.getIdentifier(),
@@ -418,28 +414,32 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
                 featureProperty.setHref(samplingFeature.getUrl());
             } else {
                 try {
-                	// TODO agree on fetureType handling for SOS 1.0 -> OMHelper?!
-                	String featureType = null;
-                	String featureNamespace = null;
-                	if (samplingFeature.getFeatureType().equalsIgnoreCase(SFConstants.FT_SAMPLINGPOINT)) {
-                		featureType = SFConstants.FT_SAMPLINGPOINT;
-                		featureNamespace = SFConstants.NS_SA;
-					} else if (samplingFeature.getFeatureType().equalsIgnoreCase(SFConstants.FT_SAMPLINGSURFACE)) {
-						featureType = SFConstants.FT_SAMPLINGSURFACE;
-						featureNamespace = SFConstants.NS_SA;
-					} else if (samplingFeature.getFeatureType().equalsIgnoreCase(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_POINT)) {
-                		featureType = SFConstants.FT_SAMPLINGPOINT;
-                		featureNamespace = SFConstants.NS_SA;
-					} else if (samplingFeature.getFeatureType().equalsIgnoreCase(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_SURFACE)) {
-						featureType = SFConstants.FT_SAMPLINGSURFACE;
-						featureNamespace = SFConstants.NS_SA;
-					} else {
-						OwsExceptionReport owse = new OwsExceptionReport();
-						String exceptionText = "Error while encoding featureOfInterest in om:Observation!";
+                    // TODO agree on fetureType handling for SOS 1.0 ->
+                    // OMHelper?!
+                    String featureType = null;
+                    String featureNamespace = null;
+                    if (samplingFeature.getFeatureType().equalsIgnoreCase(SFConstants.FT_SAMPLINGPOINT)) {
+                        featureType = SFConstants.FT_SAMPLINGPOINT;
+                        featureNamespace = SFConstants.NS_SA;
+                    } else if (samplingFeature.getFeatureType().equalsIgnoreCase(SFConstants.FT_SAMPLINGSURFACE)) {
+                        featureType = SFConstants.FT_SAMPLINGSURFACE;
+                        featureNamespace = SFConstants.NS_SA;
+                    } else if (samplingFeature.getFeatureType().equalsIgnoreCase(
+                            SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_POINT)) {
+                        featureType = SFConstants.FT_SAMPLINGPOINT;
+                        featureNamespace = SFConstants.NS_SA;
+                    } else if (samplingFeature.getFeatureType().equalsIgnoreCase(
+                            SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_SURFACE)) {
+                        featureType = SFConstants.FT_SAMPLINGSURFACE;
+                        featureNamespace = SFConstants.NS_SA;
+                    } else {
+                        OwsExceptionReport owse = new OwsExceptionReport();
+                        String exceptionText = "Error while encoding featureOfInterest in om:Observation!";
                         LOGGER.error(exceptionText, owse);
-                        throw Util4Exceptions.createInvalidParameterValueException("sa:SamplingFeature", exceptionText);
-					}
-                	
+                        throw Util4Exceptions
+                                .createInvalidParameterValueException("sa:SamplingFeature", exceptionText);
+                    }
+
                     featureProperty.set(CodingHelper.encodeObjectToXml(featureNamespace, samplingFeature));
                 } catch (OwsExceptionReport e) {
                     if (samplingFeature.getXmlDescription() != null) {

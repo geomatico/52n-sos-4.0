@@ -116,7 +116,6 @@ import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
@@ -312,7 +311,6 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                         .getXmlOptions());
         GetFeatureOfInterestResponseType xbGetFoiResponse = xbGetFoiResponseDoc.addNewGetFeatureOfInterestResponse();
         SosAbstractFeature sosAbstractFeature = response.getAbstractFeature();
-        Profile activeProfile = Configurator.getInstance().getActiveProfile();
         if (sosAbstractFeature instanceof SosFeatureCollection) {
             Map<String, SosAbstractFeature> sosFeatColMap = ((SosFeatureCollection) sosAbstractFeature).getMembers();
             for (String sosFeatID : sosFeatColMap.keySet()) {
@@ -332,8 +330,8 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                     }
                 } else {
                     String namespace = null;
-                    if (activeProfile.isSetEncodeFeatureOfInterestNamespace()) {
-                        namespace = activeProfile.getEncodingNamespaceForFeatureOfInterest();
+                    if (Configurator.getInstance().getActiveProfile().isSetEncodeFeatureOfInterestNamespace()) {
+                        namespace = Configurator.getInstance().getActiveProfile().getEncodingNamespaceForFeatureOfInterest();
                     } else {
                         namespace = OMHelper.getNamespaceForFeatureType(sampFeat.getFeatureType());
                     }

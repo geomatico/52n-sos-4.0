@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<schema xmlns:profile="http://www.52north.org/sensorweb/sos/profile"
+	xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.w3.org/2001/XMLSchema http://www.w3.org/2001/XMLSchema.xsd"
+	targetNamespace="http://www.52north.org/sensorweb/sos/profile"
+	elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<element name="SosProfile" type="profile:SosProfileType" >
+		<annotation>
+			<documentation>Profile for the 52°North Sensor Observation Service</documentation>
+		</annotation>
+	</element>
+	<complexType name="SosProfileType">
+		<sequence>
+			<element name="identifier" type="string" nillable="false">
+				<annotation>
+					<documentation>TBD</documentation>
+				</annotation>
+			</element>
+			<element name="activeProfile" type="boolean" default="false">
+				<annotation>
+					<documentation>TBD</documentation>
+				</annotation>
+			</element>
+			<element name="observationResponseFormat" type="anyURI" nillable="false" default="http://www.opengis.net/om/2.0">
+				<annotation>
+					<documentation>TBD</documentation>
+				</annotation>
+			</element>
+			<element name="encodeFeatureOfInterestInObservations" type="boolean" default="true">
+				<annotation>
+					<documentation>TBD</documentation>
+				</annotation>
+			</element>
+			<element name="encodingNamespaceForFeatureOfInterestEncoding" type="anyURI" minOccurs="0" >
+				<annotation>
+					<documentation>TBD</documentation>
+				</annotation>
+			</element>
+			<element name="showMetadataOfEmptyObservations" type="boolean" default="false">
+				<annotation>
+					<documentation>TBD</documentation>
+				</annotation>
+			</element>
+			<element name="allowSubsettingForSOS20OM20" type="boolean" default="false">
+				<annotation>
+					<documentation>TBD</documentation>
+				</annotation>
+			</element>
+			<element name="mergeValues" type="boolean" default="false">
+				<annotation>
+					<documentation>TBD</documentation>
+				</annotation>
+			</element>
+			<element name="returnLatestValueIfTemporalFilterIsMissingInGetObservation" type="boolean" default="false"> 
+				<annotation>
+					<documentation>TBD</documentation>
+				</annotation>
+			</element>
+			<element ref="profile:EncodeProcedure" minOccurs="0" maxOccurs="unbounded">
+				<annotation>
+					<documentation>TBD</documentation>
+				</annotation>
+			</element>
+			<element  ref="profile:DefaultObservationTypesForEncoding" minOccurs="0" maxOccurs="unbounded">
+				<annotation>
+					<documentation>TBD</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<element name="EncodeProcedure">
+		<annotation>
+			<documentation>TBD</documentation>
+		</annotation>
+		<complexType>
+			<sequence>
+				<element name="namespace" type="anyURI" nillable="false" >
+					<annotation>
+						<documentation>TBD</documentation>
+					</annotation>
+				</element>
+				<element name="encode" type="boolean" default="true">
+					<annotation>
+						<documentation>TBD</documentation>
+					</annotation>
+				</element>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="DefaultObservationTypesForEncoding">
+		<annotation>
+			<documentation>TBD</documentation>
+		</annotation>
+		<complexType>
+			<sequence>
+				<element name="namespace" type="anyURI" nillable="false" >
+					<annotation>
+						<documentation>TBD</documentation>
+					</annotation>
+				</element>
+				<element name="observationType" type="anyURI" nillable="false">
+					<annotation>
+						<documentation>TBD</documentation>
+					</annotation>
+				</element>
+			</sequence>
+		</complexType>
+	</element>
+</schema>

@@ -50,13 +50,12 @@ import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
-import org.n52.sos.wsdl.WSDLOperation;
 import org.n52.sos.wsdl.WSDLConstants;
+import org.n52.sos.wsdl.WSDLOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,16 +115,15 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
 
             GetObservationResponse response = getDao().getObservation(sosRequest);
             // TODO check for correct merging
-            Profile activeProfile = Configurator.getInstance().getActiveProfile();
             if (responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2)) {
                 if (!isSubsettingExtensionSet(sosRequest.getExtensions())
-                        || !activeProfile.isAllowSubsettingForSOS20OM20()) {
+                        || Configurator.getInstance().getActiveProfile().isAllowSubsettingForSOS20OM20()) {
                     response.mergeObservationsWithSameAntiSubsettingIdentifier();
                 } else {
                     response.mergeObservationsWithSameX();
                 }
             }
-            if (activeProfile.isMergeValues()) {
+            if (Configurator.getInstance().getActiveProfile().isMergeValues()) {
                 response.mergeObservationsWithSameX();
             }
 
@@ -325,16 +323,15 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
 
     private boolean checkResponseFormat(GetObservationRequest request) throws OwsExceptionReport {
         boolean zipCompression = false;
-        Profile activeProfile = Configurator.getInstance().getActiveProfile();
         if (request.getResponseFormat() == null) {
-            request.setResponseFormat(activeProfile.getObservationResponseFormat());
+            request.setResponseFormat(Configurator.getInstance().getActiveProfile().getObservationResponseFormat());
         } else if (request.getResponseFormat() != null && request.getResponseFormat().isEmpty()) {
             throw Util4Exceptions
                     .createMissingParameterValueException(SosConstants.GetObservationParams.responseFormat.name());
         } else {
             zipCompression = SosHelper.checkResponseFormatForZipCompression(request.getResponseFormat());
             if (zipCompression) {
-                request.setResponseFormat(activeProfile.getObservationResponseFormat());
+                request.setResponseFormat(Configurator.getInstance().getActiveProfile().getObservationResponseFormat());
             } else {
                 Collection<String> supportedResponseFormats =
                         SosHelper.getSupportedResponseFormats(request.getService(), request.getVersion());
@@ -350,6 +347,14 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
         }
         return zipCompression;
     }
+
+//    private String getResponseFormat() {
+//        if (Configurator.getInstance().isSetActiveProfile()) {
+//            return Configurator.getInstance().getActiveProfile().getObservationResponseFormat();
+//        } else {
+//            return OMConstants.NS_OM_2;
+//        }
+//    }
 
     private boolean isSubsettingExtensionSet(SwesExtensions extensions) {
         return extensions != null ? extensions.isBooleanExentsionSet(Sos2Constants.Extensions.Subsetting.name())

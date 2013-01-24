@@ -1,0 +1,121 @@
+/**
+ * Copyright (C) 2013
+ * by 52 North Initiative for Geospatial Open Source Software GmbH
+ *
+ * Contact: Andreas Wytzisk
+ * 52 North Initiative for Geospatial Open Source Software GmbH
+ * Martin-Luther-King-Weg 24
+ * 48155 Muenster, Germany
+ * info@52north.org
+ *
+ * This program is free software; you can redistribute and/or modify it under
+ * the terms of the GNU General Public License version 2 as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; even without the implied
+ * WARRANTY OF MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program (see gnu-gpl v2.txt). If not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
+ * visit the Free Software Foundation web page, http://www.fsf.org.
+ */
+package org.n52.sos.service.profile;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.n52.sos.ogc.om.OMConstants;
+
+public class DefaultProfile implements IProfile {
+    
+    
+    private static final String DEFAULT_IDENTIFIER = "SOS_20_PROFILE";
+
+    private static final String DEFAULT_OBSERVATION_RESPONSE_FORMAT = OMConstants.NS_OM_2;
+
+    private static final String DEFAULT_ENCODING_NAMESPACE_FOR_FEATUTREOFINTEREST_SOS_20 = "";
+
+    private static final boolean DEFAULT_ENCODE_FEATUREOFINTEREST_IN_OBSERVATION = true;
+
+    private static final boolean DEFAULT_SHOW_METADATA_OF_EMPTY_OBSERVATIONS = false;
+
+    private static final boolean DEFAULT_ALLOW_SUBSETTING_FOR_OM_20 = false;
+
+    private static final boolean DEAFULT_MERGE_VALUES = false;
+
+    private static final boolean DEAFULT_RETURN_LATEST_VALUE_IF_TEMPORAL_FILTER_IS_MISSING_IN_GETOBSERVATION = false;
+    
+    private Map<String, Boolean> encodeProcedureInObservation = new HashMap<String, Boolean>(0);
+
+    private Map<String, String> defaultObservationTypesForEncoding = new HashMap<String, String>(0);
+
+    @Override
+    public String getIdentifier() {
+        return DEFAULT_IDENTIFIER;
+    }
+
+    @Override
+    public boolean isActiveProfile() {
+        return true;
+    }
+
+    @Override
+    public String getObservationResponseFormat() {
+        return DEFAULT_OBSERVATION_RESPONSE_FORMAT;
+    }
+
+    @Override
+    public boolean isEncodeFeatureOfInterestInObservations() {
+        return DEFAULT_ENCODE_FEATUREOFINTEREST_IN_OBSERVATION;
+    }
+
+    @Override
+    public String getEncodingNamespaceForFeatureOfInterest() {
+        return DEFAULT_ENCODING_NAMESPACE_FOR_FEATUTREOFINTEREST_SOS_20;
+    }
+
+    @Override
+    public boolean isShowMetadataOfEmptyObservations() {
+        return DEFAULT_SHOW_METADATA_OF_EMPTY_OBSERVATIONS;
+    }
+
+
+    @Override
+    public boolean isAllowSubsettingForSOS20OM20() {
+        return DEFAULT_ALLOW_SUBSETTING_FOR_OM_20;
+    }
+
+    @Override
+    public boolean isMergeValues() {
+        return DEAFULT_MERGE_VALUES;
+    }
+
+
+    @Override
+    public boolean isSetEncodeFeatureOfInterestNamespace() {
+        return false;
+    }
+
+    @Override
+    public boolean isEncodeProcedureInObservation(String namespace) {
+        if (encodeProcedureInObservation.get(namespace) != null) {
+            return encodeProcedureInObservation.get(namespace);
+        }
+        return false;
+    }
+
+
+    @Override
+    public boolean isReturnLatestValueIfTemporalFilterIsMissingInGetObservation() {
+        return DEAFULT_RETURN_LATEST_VALUE_IF_TEMPORAL_FILTER_IS_MISSING_IN_GETOBSERVATION;
+    }
+
+
+    @Override
+    public Map<String, String> getDefaultObservationTypesForEncoding() {
+        return defaultObservationTypesForEncoding;
+    }
+
+}

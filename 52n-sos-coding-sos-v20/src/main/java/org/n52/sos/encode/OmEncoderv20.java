@@ -72,7 +72,7 @@ import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.service.profile.Profile;
+import org.n52.sos.service.profile.IProfile;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.GmlHelper;
@@ -1077,7 +1077,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
         // Sos2Constants.SERVICEVERSION));
         SosSamplingFeature samplingFeature = (SosSamplingFeature) feature;
         FeaturePropertyType featureProperty = observation.addNewFeatureOfInterest();
-        Profile activeProfile = Configurator.getInstance().getActiveProfile();
+        IProfile activeProfile = Configurator.getInstance().getActiveProfile();
         if (!activeProfile.isEncodeFeatureOfInterestInObservations() || !(feature instanceof SosSamplingFeature)) {
             // if (urlPattern != null) {
             // featureProperty.setHref(SosHelper.createFoiGetUrl(feature.getIdentifier(),
@@ -1095,7 +1095,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
             } else {
                 String namespace = null;
                 if (activeProfile.isSetEncodeFeatureOfInterestNamespace()) {
-                    namespace = activeProfile.getEncodingNamespaceForFeatureOfInterest();
+                    namespace = Configurator.getInstance().getActiveProfile().getEncodingNamespaceForFeatureOfInterest();
                 } else {
                     namespace = OMHelper.getNamespaceForFeatureType(samplingFeature.getFeatureType());
                 }

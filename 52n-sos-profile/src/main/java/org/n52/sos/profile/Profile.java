@@ -21,67 +21,80 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.service.profile;
+package org.n52.sos.profile;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.n52.sos.service.profile.IProfile;
 import org.n52.sos.util.JavaHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Profile {
+public class Profile implements IProfile {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Profile.class.getName());
-    
-    private String identifier = ProfileConstants.DEFAULT_IDENTIFIER;
 
-    private String observationResponseFormat = ProfileConstants.DEFAULT_OBSERVATION_RESPONSE_FORMAT;
+    private String identifier;
+    
+    private boolean activeProfile;
+
+    private String observationResponseFormat;
 
     /**
      * boolean indicates, whether SOS encodes the complete FOI-instance within
      * the Observation instance or just the FOI id
      */
-    private boolean encodeFeatureOfInterestInObservations =
-            ProfileConstants.DEFAULT_ENCODE_FEATUREOFINTEREST_IN_OBSERVATION;
+    private boolean encodeFeatureOfInterestInObservations;
 
-    private String encodingNamespaceForFeatureOfInterestEncoding =
-            ProfileConstants.DEFAULT_ENCODING_NAMESPACE_FOR_FEATUTREOFINTEREST_SOS_20;
+    private String encodingNamespaceForFeatureOfInterestEncoding;
 
-    private boolean showMetadataOfEmptyObservations = ProfileConstants.DEFAULT_SHOW_METADATA_OF_EMPTY_OBSERVATIONS;
+    private boolean showMetadataOfEmptyObservations;
 
-    private boolean allowSubsettingForSOS20OM20 = ProfileConstants.DEFAULT_ALLOW_SUBSETTING_FOR_OM_20;
+    private boolean allowSubsettingForSOS20OM20;
 
-    private boolean mergeValues = ProfileConstants.DEAFULT_MERGE_VALUES;
-    
-    private boolean returnLatestValueIfTemporalFilterIsMissingInGetObservation = ProfileConstants.DEAFULT_RETURN_LATEST_VALUE_IF_TEMPORAL_FILTER_IS_MISSING_IN_GETOBSERVATION;
-    
+    private boolean mergeValues;
+
+    private boolean returnLatestValueIfTemporalFilterIsMissingInGetObservation;
+
     private Map<String, Boolean> encodeProcedureInObservation = new HashMap<String, Boolean>(0);
-    
+
     private Map<String, String> defaultObservationTypesForEncoding = new HashMap<String, String>(0);
 
     public Profile() {
+
     }
 
+    @Override
     public String getIdentifier() {
         return identifier;
     }
+    
+    @Override
+    public boolean isActiveProfile() {
+        return activeProfile;
+    }
 
+    @Override
     public String getObservationResponseFormat() {
         return observationResponseFormat;
     }
 
+    @Override
     public boolean isEncodeFeatureOfInterestInObservations() {
         return encodeFeatureOfInterestInObservations;
     }
 
+    @Override
     public String getEncodingNamespaceForFeatureOfInterest() {
         return encodingNamespaceForFeatureOfInterestEncoding;
     }
 
+    @Override
     public boolean isShowMetadataOfEmptyObservations() {
         return showMetadataOfEmptyObservations;
     }
+
 
     public void setIdentifier(String identifier) {
         if (identifier != null && !identifier.isEmpty()) {
@@ -92,6 +105,11 @@ public class Profile {
         }
     }
 
+
+    public void setActiveProfile(boolean activeProfile) {
+        this.activeProfile = activeProfile;
+    }
+
     public void setObservationResponseFormat(String observationResponseFormat) {
         if (observationResponseFormat != null && !observationResponseFormat.isEmpty()) {
             this.observationResponseFormat = observationResponseFormat;
@@ -100,9 +118,11 @@ public class Profile {
         }
     }
 
+
     public void setEncodeFeatureOfInterestInObservations(boolean encodeFeatureOfInterestInObservations) {
         this.encodeFeatureOfInterestInObservations = encodeFeatureOfInterestInObservations;
     }
+
 
     public void setEncodingNamespaceForFeatureOfInterest(String encodingNamespateForFeatureOfInterestEncoding) {
         if (encodingNamespateForFeatureOfInterestEncoding != null) {
@@ -113,31 +133,38 @@ public class Profile {
 
     }
 
+
     public void setShowMetadataOfEmptyObservations(boolean showMetadataOfEmptyObservations) {
         this.showMetadataOfEmptyObservations = showMetadataOfEmptyObservations;
     }
 
+    @Override
     public boolean isAllowSubsettingForSOS20OM20() {
         return allowSubsettingForSOS20OM20;
     }
 
+    @Override
     public boolean isMergeValues() {
         return mergeValues;
     }
+
 
     public void setAllowSubsettingForSOS20OM20(boolean allowSubsetting) {
         this.allowSubsettingForSOS20OM20 = allowSubsetting;
     }
 
+
     public void setMergeValues(boolean mergeValues) {
         this.mergeValues = mergeValues;
     }
 
+    @Override
     public boolean isSetEncodeFeatureOfInterestNamespace() {
         return encodingNamespaceForFeatureOfInterestEncoding != null
                 && !encodingNamespaceForFeatureOfInterestEncoding.isEmpty();
     }
 
+    @Override
     public boolean isEncodeProcedureInObservation(String namespace) {
         Boolean encode = encodeProcedureInObservation.get(namespace);
         if (encode != null) {
@@ -146,21 +173,25 @@ public class Profile {
         return false;
     }
 
+
     public void setEncodeProcedureInObservation(Map<String, Boolean> encodeProcedureInObservation) {
         if (encodeProcedureInObservation != null) {
             this.encodeProcedureInObservation.putAll(encodeProcedureInObservation);
         }
     }
-    
-    public void addEncodeProcedureInObservation(String namespace, Boolean encode) {
-        if (namespace != null && !namespace.isEmpty() && encode != null) {
-            encodeProcedureInObservation.put(namespace, Boolean.valueOf(encode));
+
+
+    public void addEncodeProcedureInObservation(String namespace, boolean  encode) {
+        if (namespace != null && !namespace.isEmpty()) {
+            encodeProcedureInObservation.put(namespace, encode);
         }
     }
 
+    @Override
     public boolean isReturnLatestValueIfTemporalFilterIsMissingInGetObservation() {
         return returnLatestValueIfTemporalFilterIsMissingInGetObservation;
     }
+
 
     public void setReturnLatestValueIfTemporalFilterIsMissingInGetObservation(
             boolean returnLatestValueIfTemporalFilterIsMissingInGetObservation) {
@@ -168,15 +199,18 @@ public class Profile {
                 returnLatestValueIfTemporalFilterIsMissingInGetObservation;
     }
 
+    @Override
     public Map<String, String> getDefaultObservationTypesForEncoding() {
         return defaultObservationTypesForEncoding;
     }
+
 
     public void setDefaultObservationTypesForEncoding(Map<String, String> defaultObservationTypesForEncoding) {
         if (defaultObservationTypesForEncoding != null) {
             this.defaultObservationTypesForEncoding = defaultObservationTypesForEncoding;
         }
     }
+
 
     public void addDefaultObservationTypesForEncoding(String namespace, String observationType) {
         if (namespace != null && !namespace.isEmpty() && observationType != null && !observationType.isEmpty()) {

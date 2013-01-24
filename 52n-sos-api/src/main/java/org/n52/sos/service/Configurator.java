@@ -23,7 +23,6 @@
  */
 package org.n52.sos.service;
 
-import org.n52.sos.tasking.Tasking;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -39,30 +38,32 @@ import java.util.ServiceLoader;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.n52.sos.binding.BindingRepository;
 import org.n52.sos.cache.ACapabilitiesCacheController;
+import org.n52.sos.convert.ConverterRepository;
 import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IDataSourceInitializator;
 import org.n52.sos.ds.IFeatureQueryHandler;
 import org.n52.sos.ds.ISettingsDao;
+import org.n52.sos.ds.OperationDaoRepository;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
+import org.n52.sos.ogc.ows.SosServiceIdentificationFactory;
 import org.n52.sos.ogc.ows.SosServiceProvider;
+import org.n52.sos.ogc.ows.SosServiceProviderFactory;
 import org.n52.sos.ogc.sos.Range;
+import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.service.admin.operator.IAdminServiceOperator;
+import org.n52.sos.service.admin.request.operator.AdminRequestOperatorRepository;
+import org.n52.sos.service.operator.ServiceOperatorRepository;
+import org.n52.sos.service.profile.DefaultProfileHandler;
+import org.n52.sos.service.profile.IProfile;
+import org.n52.sos.service.profile.IProfileHandler;
+import org.n52.sos.tasking.Tasking;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.SettingsHelper;
 import org.n52.sos.util.XmlOptionsHelper;
-import org.n52.sos.ogc.ows.SosServiceIdentificationFactory;
-import org.n52.sos.ogc.ows.SosServiceProviderFactory;
-import org.n52.sos.service.admin.request.operator.AdminRequestOperatorRepository;
-import org.n52.sos.request.operator.RequestOperatorRepository;
-import org.n52.sos.service.operator.ServiceOperatorRepository;
-import org.n52.sos.service.profile.Profile;
-import org.n52.sos.service.profile.ProfileHandler;
-import org.n52.sos.ds.OperationDaoRepository;
-import org.n52.sos.convert.ConverterRepository;
-import org.n52.sos.binding.BindingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,8 +151,10 @@ public final class Configurator {
     /** tuple seperator for result element */
     private String noDataValue;
     
-    private ProfileHandler profileHandler;
-
+    private IProfileHandler profileHandler;
+    
+    private ServiceLoader<IProfileHandler> serviceLoaderProfileHandler;
+    
     /** directory of sensor descriptions in SensorML format */
     private File sensorDir;
 
@@ -530,8 +533,7 @@ public final class Configurator {
         initializeDataSource();
         initializeCapabilitiesCacheController();
         this.tasking = new Tasking();
-        this.profileHandler = new ProfileHandler();
-
+        initializeProfileHandler();
         LOGGER.info("\n******\n Configurator initialization finished\n******\n");
     }
 
@@ -738,6 +740,12 @@ public final class Configurator {
         LOGGER.info("\n******\n FeatureQueryHandler loaded successfully!\n******\n");
     }
 
+    private void initializeProfileHandler() {
+        serviceLoaderProfileHandler = ServiceLoader.load(IProfileHandler.class);
+        setProfileHandler();
+        LOGGER.info("\n******\n ProfileHandler loaded successfully!\n******\n");
+    }
+
     /**
      * Load the implemented cache feeder dao and add them to a map with
      * operation name as key
@@ -777,6 +785,27 @@ public final class Configurator {
             String exceptionText = "No IFeatureQueryHandler implementations is loaded!";
             LOGGER.error(exceptionText);
             throw new ConfigurationException(exceptionText);
+        }
+    }
+    
+    /**
+     * Load the implemented profile handler and add them to a map with
+     * operation name as key
+     *
+     * @throws OwsExceptionReport
+     *             If no profile handler is implemented
+     */
+    private void setProfileHandler() {
+        Iterator<IProfileHandler> iter = serviceLoaderProfileHandler.iterator();
+        try {
+            this.profileHandler = iter.hasNext() ? iter.next() : null;
+        } catch (ServiceConfigurationError sce) {
+            LOGGER.warn("No IProfileHandler implementation could be loaded!", sce);
+        }
+        if (this.profileHandler == null) {
+            this.profileHandler = new DefaultProfileHandler();
+            LOGGER.info("No IProfileHandler implementations is loaded! DefaultHandler is used!");
+            
         }
     }
 
@@ -1099,13 +1128,13 @@ public final class Configurator {
 		getRequestOperatorRepository().update();
 	}
 
-	    public ProfileHandler getProfileHandler() {
-	        return this.profileHandler;
-	    }
-
-	    public Profile getActiveProfile() {
-	        return getProfileHandler().getActiveProfile();
-	        
-	    }
+        public IProfileHandler getProfileHandler() {
+            return this.profileHandler;
+        }
+        
+        public IProfile getActiveProfile() {
+            return getProfileHandler().getActiveProfile();
+    
+        }
 
 }

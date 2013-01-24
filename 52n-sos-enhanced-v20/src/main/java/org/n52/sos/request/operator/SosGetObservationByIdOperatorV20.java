@@ -42,13 +42,12 @@ import org.n52.sos.request.GetObservationByIdRequest;
 import org.n52.sos.response.GetObservationByIdResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
-import org.n52.sos.wsdl.WSDLOperation;
 import org.n52.sos.wsdl.WSDLConstants;
+import org.n52.sos.wsdl.WSDLOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,13 +70,12 @@ public class SosGetObservationByIdOperatorV20 extends AbstractV2RequestOperator<
     public ServiceResponse receive(GetObservationByIdRequest sosRequest) throws OwsExceptionReport {
         checkRequestedParameter(sosRequest);
         boolean zipCompression;
-        Profile activeProfile = Configurator.getInstance().getActiveProfile();
         if (sosRequest.getResponseFormat() == null || sosRequest.getResponseFormat().isEmpty()) {
-            sosRequest.setResponseFormat(activeProfile.getObservationResponseFormat());
+            sosRequest.setResponseFormat(Configurator.getInstance().getActiveProfile().getObservationResponseFormat());
         } else {
             zipCompression = SosHelper.checkResponseFormatForZipCompression(sosRequest.getResponseFormat());
             if (zipCompression) {
-                sosRequest.setResponseFormat(activeProfile.getObservationResponseFormat());
+                sosRequest.setResponseFormat(Configurator.getInstance().getActiveProfile().getObservationResponseFormat());
             }
         }
 

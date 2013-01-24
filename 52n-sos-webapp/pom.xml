@@ -125,6 +125,10 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
+			<artifactId>52n-sos-profile</artifactId>
+		</dependency>	
+		<dependency>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-api</artifactId>
 		</dependency>
 		<dependency>
@@ -321,7 +325,7 @@
 			</dependencies>
 		</profile>
 		<profile>
-			<id>develope</id>
+			<id>develop</id>
 			<dependencies>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
