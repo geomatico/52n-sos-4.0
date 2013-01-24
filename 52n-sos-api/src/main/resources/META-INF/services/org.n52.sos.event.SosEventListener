@@ -1,2 +1,0 @@
-org.n52.sos.event.listener.ExceptionReportLoggingEventListener
-org.n52.sos.event.listener.RequestLoggingEventListener
