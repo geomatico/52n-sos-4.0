@@ -145,9 +145,7 @@ public class CodingRepository {
         }
 
         public boolean matches(Set<EncoderKey> toTest) {
-            return toTest != null ? 
-            		keys.isEmpty() : 
-            			toTest.containsAll(keys);  // FIXME fix NPE here: toTest is null
+            return toTest == null ? keys.isEmpty() : toTest.containsAll(keys);
         }
 
         @Override
@@ -205,9 +203,7 @@ public class CodingRepository {
         }
 
         public boolean matches(Set<DecoderKey> toTest) {
-            return toTest != null ? 
-            		keys.isEmpty() : 
-            			toTest.containsAll(keys); // FIXME fix NPE here: toTest is null
+            return toTest == null ? keys.isEmpty() : toTest.containsAll(keys);
         }
 
         @Override
