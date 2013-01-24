@@ -37,10 +37,17 @@ public class InsertSensorResponseBuilder {
 	}
 
 	private String offering;
+	private String procedure;
 
-	public InsertSensorResponseBuilder setOffering(String offering)
+	public InsertSensorResponseBuilder setOffering(String assignedOffering)
 	{
-		this.offering = offering;
+		this.offering = assignedOffering;
+		return this;
+	}
+	
+	public InsertSensorResponseBuilder setProcedure(String assignedProcedure)
+	{
+		this.procedure = assignedProcedure;
 		return this;
 	}
 
@@ -50,6 +57,10 @@ public class InsertSensorResponseBuilder {
 		if (offering != null)
 		{
 			response.setAssignedOffering(offering);
+		}
+		if(procedure != null)
+		{
+			response.setAssignedProcedure(procedure);
 		}
 		return response;
 	}
