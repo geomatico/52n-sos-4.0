@@ -118,10 +118,10 @@ public class InMemoryCacheControllerTest
 				controller.getProcedures4Offering(getFirstOffering()).contains(getSensorIdFromInsertObservation()));
 		
 		assertTrue("observable-property -> procedure relation NOT in cache",
-				controller.getKObservablePropertyVProcedures().get(getObservablePropertyIdentifier()).contains(getSensorIdFromInsertObservation()));
+				controller.getKObservablePropertyVProcedures().get(getObservablePropertyFromInsertObservation()).contains(getSensorIdFromInsertObservation()));
 		
 		assertTrue("procedure -> observable-property relation NOT in cache",
-				controller.getKProcedureVObservableProperties().get(getSensorIdFromInsertObservation()).contains(getObservablePropertyIdentifier()) );
+				controller.getKProcedureVObservableProperties().get(getSensorIdFromInsertObservation()).contains(getObservablePropertyFromInsertObservation()) );
 		
 		assertTrue("procedure -> offering relation NOT in cache",
 				controller.getOfferings4Procedure(getSensorIdFromInsertObservation()).contains(getFirstOffering()));
@@ -219,10 +219,10 @@ public class InMemoryCacheControllerTest
 		updateEmptyCacheWithSingleObservation();
 		
 		assertTrue("offering -> observable property NOT in cache",
-				controller.getObservablePropertiesForOffering(getFirstOffering()).contains(getObservablePropertyIdentifier()));
+				controller.getObservablePropertiesForOffering(getFirstOffering()).contains(getObservablePropertyFromInsertObservation()));
 		
 		assertTrue("observable property -> offering NOT in cache",
-				controller.getOfferings4ObservableProperty(getObservablePropertyIdentifier()).contains(getFirstOffering()));
+				controller.getOfferings4ObservableProperty(getObservablePropertyFromInsertObservation()).contains(getFirstOffering()));
 	}
 
 	@Test public void
@@ -283,9 +283,54 @@ public class InMemoryCacheControllerTest
 				controller.getOfferings4Procedure(getSensorIdFromInsertSensorRequest()).contains( getAssignedOfferingId() )  );
 	}
 	
-	// TODO Eike: continue relation testing
+	@Test public void
+	should_contain_observable_property_relations_after_InsertSensor()
+			throws OwsExceptionReport {
+		updateEmptyCacheWithInsertSensor();
 
-	private String getAssignedOfferingId()
+		assertTrue("observable property -> procedure relation NOT in cache",
+				controller
+				.getKObservablePropertyVProcedures()
+				.get( getObservablePropertyFromInsertSensor() )
+				.contains(getAssignedProcedure())
+				);
+
+		assertTrue("procedure -> observable property relation NOT in cache",
+				controller
+				.getProcPhens()
+				.get( getAssignedProcedure() ) 
+				.contains( getObservablePropertyFromInsertSensor() )
+				);
+		
+		assertTrue("observable property -> offering relation NOT in cache",
+				controller
+				.getOfferings4ObservableProperty(getObservablePropertyFromInsertSensor())
+				.contains( getAssignedOfferingId() )
+				);
+		
+		assertTrue("offering -> observable property relation NOT in cache",
+				controller
+				.getPhenomenons4Offering(getAssignedOfferingId())
+				.contains(getObservablePropertyFromInsertSensor())
+				);
+		
+	}
+
+	private 
+	String getAssignedProcedure()
+	{
+		return ((InsertSensorResponse)response).getAssignedProcedure();
+	}
+
+	private 
+	String getObservablePropertyFromInsertSensor()
+	{
+		return ((InsertSensorRequest)request).getObservableProperty().get(0);
+	}
+	
+	// TODO Eike: continue relation testing
+	private
+	String getAssignedOfferingId()
 	{
 		return ((InsertSensorResponse)response).getAssignedOffering();
 	}
@@ -300,15 +345,14 @@ public class InMemoryCacheControllerTest
 		controller.updateAfterSensorInsertion((InsertSensorRequest)request,(InsertSensorResponse)response);
 	}
 	
-
 	private void
 	insertSensorResponseExample()
 	{
 		response = anInsertSensorResponse()
 				.setOffering("test-offering")
+				.setProcedure("test-procedure")
 				.build();
 	}
-	
 
 	private void
 	insertSensorRequestExample()
@@ -317,9 +361,9 @@ public class InMemoryCacheControllerTest
 				.setProcedure(aSensorMLProcedureDescription()
 						.setIdentifier("test-procedure")
 						.build())
+				.addObservableProperty("test-observable-property")
 				.build();
 	}
-	
 
 	private 
 	String getObservationTypeFromFirstObservation()
@@ -391,7 +435,7 @@ public class InMemoryCacheControllerTest
 	}
 	
 	private
-	String getObservablePropertyIdentifier()
+	String getObservablePropertyFromInsertObservation()
 	{
 		return ((InsertObservationRequest) request).getObservations().get(0).getObservationConstellation().getObservableProperty().getIdentifier();
 	}

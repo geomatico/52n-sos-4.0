@@ -135,9 +135,18 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	private void 
 	updateAfterSensorInsertionHelper(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse)
 	{
-		addProcedureToCache(sosRequest.getProcedureDescription().getProcedureIdentifier());
-		addOfferingToProcedureRelation(sosResponse.getAssignedOffering(), sosRequest.getProcedureDescription().getProcedureIdentifier());
-		addProcedureToOfferingRelation(sosRequest.getProcedureDescription().getProcedureIdentifier(),sosResponse.getAssignedOffering());
+		// procedure relations
+		addProcedureToCache(sosResponse.getAssignedProcedure());
+		addOfferingToProcedureRelation(sosResponse.getAssignedOffering(), sosResponse.getAssignedProcedure());
+		addProcedureToOfferingRelation(sosResponse.getAssignedProcedure(), sosResponse.getAssignedOffering());
+		
+		// observable property relations
+		for (String observableProperty : sosRequest.getObservableProperty()) {
+			addObservablePropertyToProcedureRelation(observableProperty, sosResponse.getAssignedProcedure());
+			addProcedureToObservablePropertyRelation(sosResponse.getAssignedProcedure(), observableProperty);
+			addObservablePropertiesToOfferingRelation(observableProperty, sosResponse.getAssignedOffering());
+			addOfferingToObservablePropertyRelation(sosResponse.getAssignedOffering(), observableProperty);
+		}
 	}
 
 	private void 
@@ -147,8 +156,8 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		for (SosObservation sosObservation : sosRequest.getObservations())
 		{
 			addProcedureToCache(getProcedureIdentifier(sosObservation));
-			addObservablePropertyProcedureRelation(getObservablePropertyIdentifier(sosObservation),getProcedureIdentifier(sosObservation));
-			addProcedureObservablePropertyRelation(getProcedureIdentifier(sosObservation),getObservablePropertyIdentifier(sosObservation));
+			addObservablePropertyToProcedureRelation(getObservablePropertyIdentifier(sosObservation),getProcedureIdentifier(sosObservation));
+			addProcedureToObservablePropertyRelation(getProcedureIdentifier(sosObservation),getObservablePropertyIdentifier(sosObservation));
 			
 			updateGlobalTemporalBBoxUsingNew(phenomenonTimeFrom(sosObservation));
 			
@@ -261,7 +270,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		}
 	}
 
-	private void addProcedureObservablePropertyRelation(String procedureIdentifier,
+	private void addProcedureToObservablePropertyRelation(String procedureIdentifier,
 			String observablePropertyIdentifier)
 	{
 		if (getCapabilitiesCache().getProcPhens().get(procedureIdentifier) == null)
@@ -286,7 +295,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		return sosObservation.getObservationConstellation().getObservableProperty().getIdentifier();
 	}
 
-	private void addObservablePropertyProcedureRelation(String observablePropertyIdentifier,
+	private void addObservablePropertyToProcedureRelation(String observablePropertyIdentifier,
 			String procedureIdentifier)
 	{
 		if (getCapabilitiesCache().getPhenProcs().get(observablePropertyIdentifier) == null)
