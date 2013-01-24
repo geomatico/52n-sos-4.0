@@ -22,17 +22,18 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>52n-sos-api</module>
+		<module>52n-sos-admin</module>
 		<module>52n-sos-hibernate-common</module>
 		<module>52n-sos-hibernate-mappings</module>
 		<module>52n-sos-hibernate-dialect</module>
 		<module>52n-sos-hibernate-feature</module>
 		<module>52n-sos-hibernate-core</module>
+		<module>52n-sos-cache</module>
 		<module>52n-sos-core-v20</module>
 		<module>52n-sos-coding-ows-v110</module>
 		<module>52n-sos-coding-sensorML-v101</module>
 		<module>52n-sos-coding-sos-v20</module>
 		<module>52n-sos-webapp</module>
-    	<module>52n-sos-cache</module>
   </modules>
 
 	<licenses>
@@ -71,6 +72,11 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-api</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>52n-sos-admin</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
