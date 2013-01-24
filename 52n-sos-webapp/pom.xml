@@ -66,34 +66,34 @@
 			</plugin>
 		</plugins>
 	   <pluginManagement>
-        <plugins>
-               <!-- Ignore/Execute plugin execution -->
-               <plugin>
-                   <groupId>org.eclipse.m2e</groupId>
-                   <artifactId>lifecycle-mapping</artifactId>
-                   <version>1.0.0</version>
-                   <configuration>
-                       <lifecycleMappingMetadata>
-                           <pluginExecutions> <!-- copy-dependency plugin -->
-                               <pluginExecution>
-                                   <pluginExecutionFilter>
-                                       <groupId>org.apache.maven.plugins</groupId>
-                                       <artifactId>maven-dependency-plugin</artifactId>
-                                       <versionRange>[1.0.0,)</versionRange>
-                                       <goals>
-                                           <goal>copy-dependencies</goal>
-                                           <goal>unpack</goal>
-                                       </goals>
-                                   </pluginExecutionFilter>
-                                   <action>
-                                       <ignore />
-                                   </action>
-                               </pluginExecution>
-                           </pluginExecutions>
-                       </lifecycleMappingMetadata>
-                   </configuration>
-               </plugin>
-           </plugins>
+		<plugins>
+			   <!-- Ignore/Execute plugin execution -->
+			   <plugin>
+				   <groupId>org.eclipse.m2e</groupId>
+				   <artifactId>lifecycle-mapping</artifactId>
+				   <version>1.0.0</version>
+				   <configuration>
+					   <lifecycleMappingMetadata>
+						   <pluginExecutions> <!-- copy-dependency plugin -->
+							   <pluginExecution>
+								   <pluginExecutionFilter>
+									   <groupId>org.apache.maven.plugins</groupId>
+									   <artifactId>maven-dependency-plugin</artifactId>
+									   <versionRange>[1.0.0,)</versionRange>
+									   <goals>
+										   <goal>copy-dependencies</goal>
+										   <goal>unpack</goal>
+									   </goals>
+								   </pluginExecutionFilter>
+								   <action>
+									   <ignore />
+								   </action>
+							   </pluginExecution>
+						   </pluginExecutions>
+					   </lifecycleMappingMetadata>
+				   </configuration>
+			   </plugin>
+		   </plugins>
 	   </pluginManagement>
 	</build>
 	<dependencies>
@@ -325,6 +325,10 @@
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-binding-pox</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-enhanced-v20</artifactId>
 				</dependency>
 				<dependency>
@@ -355,101 +359,109 @@
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-coding-sos-v100</artifactId>
 				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-coding-wml-v20</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-gda</artifactId>
+				</dependency>
 			</dependencies>
 		</profile>
-        <profile>
-            <id>autermann</id>
-            <dependencies>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-api</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-kvp</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-pox</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-binding-soap</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-coding-ows-v110</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-coding-sensorML-v101</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-coding-sos-v100</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-coding-sos-v20</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-coding-wml-v20</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-core-v100</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-core-v20</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-enhanced-v20</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-gda</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-hibernate-common</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-hibernate-core</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-hibernate-dialect</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-hibernate-enhanced</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-hibernate-feature</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-hibernate-resultHandling</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-hibernate-transactional</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-resultHandling-v20</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-transactional-v20</artifactId>
-                </dependency>
+		<profile>
+			<id>autermann</id>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-api</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-binding-kvp</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-binding-pox</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-binding-soap</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-coding-ows-v110</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-coding-sensorML-v101</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-coding-sos-v100</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-coding-sos-v20</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-coding-wml-v20</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-core-v100</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-core-v20</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-enhanced-v20</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-gda</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-hibernate-common</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-hibernate-core</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-hibernate-dialect</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-hibernate-enhanced</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-hibernate-feature</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-hibernate-resultHandling</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-hibernate-transactional</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-resultHandling-v20</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-transactional-v20</artifactId>
+				</dependency>
 			</dependencies>
-        </profile>
+		</profile>
 		<profile>
 			<id>both</id>
 			<dependencies>

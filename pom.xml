@@ -624,18 +624,18 @@
 				</configuration>
 			</plugin>
 			  <!--<plugin>
-		        <groupId>org.codehaus.mojo</groupId>
-		        <artifactId>license-maven-plugin</artifactId>
-		        <version>1.3</version>
-		        <executions>
-		          <execution>
-		            <id>download-licenses</id>
-		            <goals>
-		              <goal>download-licenses</goal>
-		            </goals>
-		          </execution>
-		        </executions>
-		      </plugin> -->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>1.3</version>
+				<executions>
+				  <execution>
+					<id>download-licenses</id>
+					<goals>
+					  <goal>download-licenses</goal>
+					</goals>
+				  </execution>
+				</executions>
+			  </plugin> -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
@@ -904,6 +904,7 @@
 			<modules>
 				<module>52n-sos-webapp-preconfigured</module>
 				<module>52n-sos-binding-kvp</module>
+				<module>52n-sos-binding-pox</module>
 				<module>52n-sos-binding-soap</module>
 				<module>52n-sos-enhanced-v20</module>
 				<module>52n-sos-hibernate-enhanced</module>
@@ -913,39 +914,41 @@
 				<module>52n-sos-hibernate-resultHandling</module>
 				<module>52n-sos-core-v100</module>
 				<module>52n-sos-coding-sos-v100</module>
+				<module>52n-sos-coding-wml-v20</module>
+				<module>52n-sos-gda</module>
 			</modules>
 			<properties>
 				<config.logger.level>TRACE</config.logger.level>
 			</properties>
 		</profile>
-        <profile>
+		<profile>
 			<id>autermann</id>
 			<modules>
-                <module>52n-sos-api</module>
-                <module>52n-sos-binding-kvp</module>
-                <module>52n-sos-binding-pox</module>
-                <module>52n-sos-binding-soap</module>
-                <module>52n-sos-coding-ows-v110</module>
-                <module>52n-sos-coding-sensorML-v101</module>
-                <module>52n-sos-coding-sos-v100</module>
-                <module>52n-sos-coding-sos-v20</module>
-                <module>52n-sos-coding-wml-v20</module>
-                <module>52n-sos-core-v100</module>
-                <module>52n-sos-core-v20</module>
-                <module>52n-sos-enhanced-v20</module>
-                <module>52n-sos-gda</module>
-                <module>52n-sos-hibernate-common</module>
-                <module>52n-sos-hibernate-core</module>
-                <module>52n-sos-hibernate-dialect</module>
-                <module>52n-sos-hibernate-enhanced</module>
-                <module>52n-sos-hibernate-feature</module>
-                <module>52n-sos-hibernate-resultHandling</module>
-                <module>52n-sos-hibernate-transactional</module>
-                <module>52n-sos-resultHandling-v20</module>
-                <module>52n-sos-transactional-v20</module>
-                <module>52n-sos-webapp</module>
-                <!--<module>52n-sos-test</module>-->
-                <!--<module>52n-sos-webapp-preconfigured</module>-->
+				<module>52n-sos-api</module>
+				<module>52n-sos-binding-kvp</module>
+				<module>52n-sos-binding-pox</module>
+				<module>52n-sos-binding-soap</module>
+				<module>52n-sos-coding-ows-v110</module>
+				<module>52n-sos-coding-sensorML-v101</module>
+				<module>52n-sos-coding-sos-v100</module>
+				<module>52n-sos-coding-sos-v20</module>
+				<module>52n-sos-coding-wml-v20</module>
+				<module>52n-sos-core-v100</module>
+				<module>52n-sos-core-v20</module>
+				<module>52n-sos-enhanced-v20</module>
+				<module>52n-sos-gda</module>
+				<module>52n-sos-hibernate-common</module>
+				<module>52n-sos-hibernate-core</module>
+				<module>52n-sos-hibernate-dialect</module>
+				<module>52n-sos-hibernate-enhanced</module>
+				<module>52n-sos-hibernate-feature</module>
+				<module>52n-sos-hibernate-resultHandling</module>
+				<module>52n-sos-hibernate-transactional</module>
+				<module>52n-sos-resultHandling-v20</module>
+				<module>52n-sos-transactional-v20</module>
+				<module>52n-sos-webapp</module>
+				<!--<module>52n-sos-test</module>-->
+				<!--<module>52n-sos-webapp-preconfigured</module>-->
 			</modules>
 			<properties>
 				<config.logger.level>TRACE</config.logger.level>
