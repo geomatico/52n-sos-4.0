@@ -44,6 +44,9 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.InsertObservationRequest;
+import org.n52.sos.request.InsertSensorRequest;
+import org.n52.sos.response.AbstractServiceResponse;
+import org.n52.sos.response.InsertSensorResponse;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,8 +68,21 @@ public class InMemoryCacheController extends CapabilitiesCacheController {
 		update(Case.OBSERVATION_INSERTION, sosRequest);
 	}
 	
-    private void update(Case c, AbstractServiceRequest sosRequest) throws OwsExceptionReport
-	{
+	private void 
+	update(Case observationInsertion, InsertObservationRequest sosRequest)
+					throws OwsExceptionReport {
+		update(observationInsertion, sosRequest, null);
+	}
+
+	public void 
+	updateAfterSensorInsertion(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse)
+			throws OwsExceptionReport {
+		update(Case.SENSOR_INSERTION, sosRequest,sosResponse);
+	}
+
+	private void 
+	update(Case c, AbstractServiceRequest sosRequest, AbstractServiceResponse sosResponse)
+			throws OwsExceptionReport {
     	if (c == null || sosRequest == null)
     	{
     		String errorMsg = String.format("Missing arguments: Case: %s, AbstractServiceRequest: %s", c,sosRequest);
@@ -102,8 +118,8 @@ public class InMemoryCacheController extends CapabilitiesCacheController {
 				throw new RuntimeException("NOT IMPLEMENTED");
 //				break;
 			case SENSOR_INSERTION:
-				throw new RuntimeException("NOT IMPLEMENTED");
-//				break;
+				updateAfterSensorInsertionHelper((InsertSensorRequest) sosRequest, (InsertSensorResponse)sosResponse);
+				break;
 			}
 	
 	    } catch (InterruptedException e) {
@@ -116,7 +132,16 @@ public class InMemoryCacheController extends CapabilitiesCacheController {
 	    }
 	}
 
-	private void updateAfterObservationInsertionHelper(InsertObservationRequest sosRequest)
+	private void 
+	updateAfterSensorInsertionHelper(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse)
+	{
+		addProcedureToCache(sosRequest.getProcedureDescription().getProcedureIdentifier());
+		addOfferingToProcedureRelation(sosResponse.getAssignedOffering(), sosRequest.getProcedureDescription().getProcedureIdentifier());
+		addProcedureToOfferingRelation(sosRequest.getProcedureDescription().getProcedureIdentifier(),sosResponse.getAssignedOffering());
+	}
+
+	private void 
+	updateAfterObservationInsertionHelper(InsertObservationRequest sosRequest)
 	{
 		// update cache maps
 		for (SosObservation sosObservation : sosRequest.getObservations())
