@@ -56,7 +56,7 @@ import com.vividsolutions.jts.geom.Envelope;
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  */
-public class InMemoryCacheController extends CapabilitiesCacheController {
+public class InMemoryCacheController extends CacheControllerImpl {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryCacheController.class);
 

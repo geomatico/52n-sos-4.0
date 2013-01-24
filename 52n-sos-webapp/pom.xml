@@ -128,6 +128,10 @@
 			<artifactId>52n-sos-api</artifactId>
 		</dependency>
 		<dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>52n-sos-cache</artifactId>
+        </dependency>
+		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-coding-ows-v110</artifactId>
 		</dependency>

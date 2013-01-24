@@ -32,7 +32,7 @@
 		<module>52n-sos-coding-sensorML-v101</module>
 		<module>52n-sos-coding-sos-v20</module>
 		<module>52n-sos-webapp</module>
-
+    	<module>52n-sos-cache</module>
   </modules>
 
 	<licenses>
@@ -73,6 +73,11 @@
 				<artifactId>52n-sos-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+			<dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>52n-sos-cache</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-coding-ows-v110</artifactId>
@@ -601,6 +606,12 @@
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-gda</artifactId>
 				<version>${project.version}</version>
+			</dependency>
+			<!--  required for common test classes -->
+			<dependency>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-jar-plugin</artifactId>
+			    <version>2.4</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

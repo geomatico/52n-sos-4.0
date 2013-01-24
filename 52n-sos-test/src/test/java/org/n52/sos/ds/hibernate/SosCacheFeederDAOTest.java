@@ -25,6 +25,7 @@ package org.n52.sos.ds.hibernate;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.n52.sos.cache.CacheImpl;
 import org.n52.sos.cache.CapabilitiesCache;
 import org.n52.sos.ds.hibernate.SosCacheFeederDAO.CacheCreationStrategy;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -56,9 +57,14 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 	@Test
 	public void updateCacheFillsCapabilitiesCache() throws OwsExceptionReport
 	{
-		CapabilitiesCache cache = new CapabilitiesCache();
+		CapabilitiesCache cache = initCache();
 		instance.updateCache(cache);
 		testCacheResult(cache);
+	}
+
+	private CapabilitiesCache initCache()
+	{
+		return new CacheImpl();
 	}
 
 	private void testCacheResult(CapabilitiesCache cache)
@@ -86,7 +92,7 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 	@Test
 	public void updateCacheWithStrategyNullFillsCapabilitiesCache() throws OwsExceptionReport
 	{
-		CapabilitiesCache cache = new CapabilitiesCache();
+		CapabilitiesCache cache = initCache();
 		instance.updateCache(cache, null);
 		testCacheResult(cache);
 	}
@@ -94,7 +100,7 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 	@Test
 	public void updateCacheUsingComplexDBQueriesFillsCapabilitiesCache() throws OwsExceptionReport
 	{
-		CapabilitiesCache cache = new CapabilitiesCache();
+		CapabilitiesCache cache = initCache();
 		instance.updateCache(cache, CacheCreationStrategy.COMPLEX_DB_QUERIES);
 		testCacheResult(cache);
 	}
@@ -102,7 +108,7 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 	@Test
 	public void updateCacheUsingMultiThreadingFillsCapabilitiesCache() throws OwsExceptionReport
 	{
-		CapabilitiesCache cache = new CapabilitiesCache();
+		CapabilitiesCache cache = initCache();
 		instance.updateCache(cache, CacheCreationStrategy.MULTI_THREAD);
 		testCacheResult(cache);
 	}
@@ -110,8 +116,8 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 	@Test 
 	public void strategyMultiEqualsSingle() throws OwsExceptionReport
 	{
-		CapabilitiesCache cacheSingleThread = new CapabilitiesCache(),
-				cacheMultithread = new CapabilitiesCache();
+		CapabilitiesCache cacheSingleThread = new CacheImpl(),
+				cacheMultithread = new CacheImpl();
 		instance.updateCache(cacheSingleThread, CacheCreationStrategy.SINGLE_THREAD);
 		instance.updateCache(cacheMultithread, CacheCreationStrategy.MULTI_THREAD);
 		assertEquals("single != multi threaded",cacheSingleThread, cacheMultithread);
@@ -120,8 +126,8 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 	@Test 
 	public void strategyComplexDBQueriesEqualsSingle() throws OwsExceptionReport
 	{
-		CapabilitiesCache cacheSingleThread = new CapabilitiesCache(),
-				cacheComplexDBQueries = new CapabilitiesCache();
+		CapabilitiesCache cacheSingleThread = new CacheImpl(),
+				cacheComplexDBQueries = new CacheImpl();
 		instance.updateCache(cacheSingleThread, CacheCreationStrategy.SINGLE_THREAD);
 		instance.updateCache(cacheComplexDBQueries, CacheCreationStrategy.COMPLEX_DB_QUERIES);
 		assertEquals("single != complex db queries",cacheSingleThread, cacheComplexDBQueries);
@@ -130,8 +136,8 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 	@Test
 	public void strategyMultiEqualsComplexDBQueries() throws OwsExceptionReport
 	{
-		CapabilitiesCache cacheComplexDBQueries = new CapabilitiesCache(),
-				cacheMultithread = new CapabilitiesCache();
+		CapabilitiesCache cacheComplexDBQueries = new CacheImpl(),
+				cacheMultithread = new CacheImpl();
 		instance.updateCache(cacheComplexDBQueries, CacheCreationStrategy.COMPLEX_DB_QUERIES);
 		instance.updateCache(cacheMultithread, CacheCreationStrategy.MULTI_THREAD);
 		assertEquals("multi threaded != complex db queries",cacheMultithread,cacheComplexDBQueries);
@@ -145,10 +151,10 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 		for (int i = 0; i < times; i++) {
 			long singleThreadStart, multiThreadStart, singleThreadEnd, multiThreadEnd;
 			singleThreadStart = System.currentTimeMillis();
-			CapabilitiesCache cache = new CapabilitiesCache();
+			CapabilitiesCache cache = initCache();
 			instance.updateCache(cache, CacheCreationStrategy.SINGLE_THREAD);
 			singleThreadEnd = System.currentTimeMillis();
-			cache = new CapabilitiesCache();
+			cache = new CacheImpl();
 			multiThreadStart = System.currentTimeMillis();
 			instance.updateCache(cache, CacheCreationStrategy.MULTI_THREAD);
 			multiThreadEnd = System.currentTimeMillis();

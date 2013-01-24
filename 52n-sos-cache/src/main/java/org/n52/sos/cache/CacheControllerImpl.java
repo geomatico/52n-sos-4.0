@@ -42,26 +42,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * CapabilitiesCacheController implements all methods to request all objects and
+ * CacheControllerImpl implements all methods to request all objects and
  * relationships from a standard datasource
  *
  */
-public class CapabilitiesCacheController extends ACapabilitiesCacheController {
+public class CacheControllerImpl extends ACapabilitiesCacheController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CapabilitiesCacheController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CacheControllerImpl.class);
     
     /**
-     * CapabilitiesCache instance
+     * CacheImpl instance
      */
-    private CapabilitiesCache capabilitiesCache;
+    private CacheImpl cacheImpl;
 
     /**
      * ICacheFeederDAO instance
      */
     private ICacheFeederDAO cacheFeederDAO;
 
-    public CapabilitiesCacheController() {
-        capabilitiesCache = new CapabilitiesCache();
+    public CacheControllerImpl() {
+        cacheImpl = new CacheImpl();
         cacheFeederDAO = getCacheDAO();
 		schedule();
     }
@@ -93,7 +93,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
             }
             setUpdateIsFree(false);
 
-            cacheFeederDAO.updateCache(capabilitiesCache);
+            cacheFeederDAO.updateCache(cacheImpl);
 
         } catch (InterruptedException ie) {
             LOGGER.error("Problem while threadsafe capabilities cache update", ie);
@@ -126,19 +126,19 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 	        setUpdateIsFree(false);
 	        switch (c) {
 			case OBSERVATION_DELETION:
-				cacheFeederDAO.updateAfterObservationDeletion(capabilitiesCache);
+				cacheFeederDAO.updateAfterObservationDeletion(cacheImpl);
 				break;
 			case SENSOR_DELETION:
-				cacheFeederDAO.updateAfterSensorDeletion(capabilitiesCache);
+				cacheFeederDAO.updateAfterSensorDeletion(cacheImpl);
 				break;
 			case OBSERVATION_INSERTION:
-				cacheFeederDAO.updateAfterObservationInsertion(capabilitiesCache);
+				cacheFeederDAO.updateAfterObservationInsertion(cacheImpl);
 				break;
 			case RESULT_TEMPLATE_INSERTION:
-				cacheFeederDAO.updateAfterResultTemplateInsertion(capabilitiesCache);
+				cacheFeederDAO.updateAfterResultTemplateInsertion(cacheImpl);
 				break;
 			case SENSOR_INSERTION:
-				cacheFeederDAO.updateAfterSensorInsertion(capabilitiesCache);
+				cacheFeederDAO.updateAfterSensorInsertion(cacheImpl);
 				break;
 			}
 	
@@ -323,8 +323,8 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      *         offering
      */
     public List<String> getPhenomenons4Offering(String offering) {
-        if (this.capabilitiesCache.getPhenomenons4Offering(offering) != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getPhenomenons4Offering(offering));
+        if (this.cacheImpl.getPhenomenons4Offering(offering) != null) {
+            return new ArrayList<String>(this.cacheImpl.getPhenomenons4Offering(offering));
         }
         return new ArrayList<String>(0);
     }
@@ -341,7 +341,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      *         offering
      */
     public List<String> getAllPhenomenons4Offering(String offering) {
-        return new ArrayList<String>(this.capabilitiesCache.getObservableProperties4Offering(offering));
+        return new ArrayList<String>(this.cacheImpl.getObservableProperties4Offering(offering));
     }
 
     /**
@@ -350,7 +350,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @return List<String> containing the phenomenons of all offerings
      */
     public List<String> getAllPhenomenons() {
-        return new ArrayList<String>(this.capabilitiesCache.getObservableProperties());
+        return new ArrayList<String>(this.cacheImpl.getObservableProperties());
     }
 
     /**
@@ -360,8 +360,8 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      */
 	@Override
     public List<String> getOfferings() {
-        if (this.capabilitiesCache.getOfferings() != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getOfferings());
+        if (this.cacheImpl.getOfferings() != null) {
+            return new ArrayList<String>(this.cacheImpl.getOfferings());
         }
         return new ArrayList<String>(0);
     }
@@ -373,8 +373,8 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      */
 	@Override
     public List<String> getObservationIdentifiers() {
-        if (this.capabilitiesCache.getObservationIdentifiers() != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getObservationIdentifiers());
+        if (this.cacheImpl.getObservationIdentifiers() != null) {
+            return new ArrayList<String>(this.cacheImpl.getObservationIdentifiers());
         }
         return new ArrayList<String>(0);
     }
@@ -386,8 +386,8 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      *         observedProperties
      */
     public Map<String, Collection<String>> getObsPhenomenons() {
-        if (this.capabilitiesCache.getOffPhenomenons() != null) {
-            return new TreeMap<String, Collection<String>>(this.capabilitiesCache.getOffPhenomenons());
+        if (this.cacheImpl.getOffPhenomenons() != null) {
+            return new TreeMap<String, Collection<String>>(this.cacheImpl.getOffPhenomenons());
         }
         return new TreeMap<String, Collection<String>>();
     }
@@ -401,7 +401,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      */
 	@Override
     public String getOfferingName(String offering) {
-        return this.capabilitiesCache.getOffName().get(offering);
+        return this.cacheImpl.getOffName().get(offering);
     }
 
     /**
@@ -413,8 +413,8 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      */
 	@Override
     public List<String> getProcedures() {
-        if (this.capabilitiesCache.getProcedures() != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getProcedures());
+        if (this.cacheImpl.getProcedures() != null) {
+            return new ArrayList<String>(this.cacheImpl.getProcedures());
         }
         return new ArrayList<String>(0);
     }
@@ -436,7 +436,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      */
 	@Override
     public Collection<String> getParentProcedures(String procId, boolean fullHierarchy, boolean includeSelf) {
-        return this.capabilitiesCache.getParentProcs(procId, fullHierarchy, includeSelf);
+        return this.cacheImpl.getParentProcs(procId, fullHierarchy, includeSelf);
     }
 
     /**
@@ -458,7 +458,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 	@Override
     public Collection<String> getParentProcedures(Collection<String> procIds, boolean fullHierarchy,
             boolean includeSelves) {
-        return this.capabilitiesCache.getParentProcs(procIds, fullHierarchy, includeSelves);
+        return this.cacheImpl.getParentProcs(procIds, fullHierarchy, includeSelves);
     }
 
     /**
@@ -478,7 +478,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      */
 	@Override
     public Collection<String> getChildProcedures(String procId, boolean fullHierarchy, boolean includeSelf) {
-        return this.capabilitiesCache.getChildProcs(procId, fullHierarchy, includeSelf);
+        return this.cacheImpl.getChildProcs(procId, fullHierarchy, includeSelf);
     }
 
     /**
@@ -499,25 +499,25 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
 	@Override
     public Collection<String> getChildProcedures(Collection<String> procIds, boolean fullHierarchy,
             boolean includeSelves) {
-        return this.capabilitiesCache.getChildProcs(procIds, fullHierarchy, includeSelves);
+        return this.cacheImpl.getChildProcs(procIds, fullHierarchy, includeSelves);
     }
 
     public Collection<String> getParentFeatures(String featureID, boolean fullHierarchy, boolean includeSelf) {
-        return this.capabilitiesCache.getParentFeatures(featureID, fullHierarchy, includeSelf);
+        return this.cacheImpl.getParentFeatures(featureID, fullHierarchy, includeSelf);
     }
 
     public Collection<String> getParentFeatures(Collection<String> featureIDs, boolean fullHierarchy,
             boolean includeSelves) {
-        return this.capabilitiesCache.getParentFeatures(featureIDs, fullHierarchy, includeSelves);
+        return this.cacheImpl.getParentFeatures(featureIDs, fullHierarchy, includeSelves);
     }
 
     public Collection<String> getChildFeatures(String featureIDs, boolean fullHierarchy, boolean includeSelf) {
-        return this.capabilitiesCache.getParentFeatures(featureIDs, fullHierarchy, includeSelf);
+        return this.cacheImpl.getParentFeatures(featureIDs, fullHierarchy, includeSelf);
     }
 
     public Collection<String> getChildFeatures(Collection<String> featureIDs, boolean fullHierarchy,
             boolean includeSelves) {
-        return this.capabilitiesCache.getParentFeatures(featureIDs, fullHierarchy, includeSelves);
+        return this.cacheImpl.getParentFeatures(featureIDs, fullHierarchy, includeSelves);
     }
 
     /**
@@ -529,10 +529,10 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      */
 	@Override
     public Collection<String> getResultModels4Offering(String offering) {
-        if (!this.capabilitiesCache.getKOfferingVObservationTypes().containsKey(offering)) {
+        if (!this.cacheImpl.getKOfferingVObservationTypes().containsKey(offering)) {
             return new ArrayList<String>(0);
         }
-        return this.capabilitiesCache.getKOfferingVObservationTypes().get(offering);
+        return this.cacheImpl.getKOfferingVObservationTypes().get(offering);
     }
 
     /**
@@ -544,10 +544,10 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      */
 	@Override
     public Collection<String> getProcedures4Offering(String offering) {
-        if (!this.capabilitiesCache.getOffProcedures().containsKey(offering)) {
+        if (!this.cacheImpl.getOffProcedures().containsKey(offering)) {
             return new ArrayList<String>(0);
         }
-        return new ArrayList<String>(this.capabilitiesCache.getOffProcedures().get(offering));
+        return new ArrayList<String>(this.cacheImpl.getOffProcedures().get(offering));
     }
 
     /**
@@ -558,10 +558,10 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @return String representing the procedureID
      */
     public Collection<String> getProc4FOI(String foiID) {
-        if (!this.capabilitiesCache.getFoiProcedures().containsKey(foiID)) {
+        if (!this.cacheImpl.getFoiProcedures().containsKey(foiID)) {
             return new ArrayList<String>(0);
         }
-        return new ArrayList<String>(this.capabilitiesCache.getFoiProcedures().get(foiID));
+        return new ArrayList<String>(this.cacheImpl.getFoiProcedures().get(foiID));
     }
 
     /**
@@ -574,7 +574,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      *         observedProperty
      */
     public String getUnit4ObsProp(String observedProperty) {
-        return this.capabilitiesCache.getUnit4Phen().get(observedProperty);
+        return this.cacheImpl.getUnit4Phen().get(observedProperty);
     }
 
     /**
@@ -583,8 +583,8 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @return HashMap<String, List<String>> the phens4CompPhens
      */
     public Map<String, Collection<String>> getPhens4CompPhens() {
-        if (this.capabilitiesCache.getPhens4CompPhens() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getPhens4CompPhens());
+        if (this.cacheImpl.getPhens4CompPhens() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getPhens4CompPhens());
         }
         return new HashMap<String, Collection<String>>(0);
     }
@@ -595,8 +595,8 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @return HashMap<String, List<String>> the offCompPhens
      */
     public Map<String, Collection<String>> getOffCompPhens() {
-        if (this.capabilitiesCache.getOffCompPhens() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getOffCompPhens());
+        if (this.cacheImpl.getOffCompPhens() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getOffCompPhens());
         }
         return new HashMap<String, Collection<String>>(0);
     }
@@ -607,8 +607,8 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @return HashMap<String, List<String>> the procedures for phenomena
      */
     public Map<String, Collection<String>> getPhenProcs() {
-        if (this.capabilitiesCache.getPhenProcs() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getPhenProcs());
+        if (this.cacheImpl.getPhenProcs() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getPhenProcs());
         }
         return new HashMap<String, Collection<String>>(0);
     }
@@ -619,8 +619,8 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @return HashMap<String, List<String>> the phenomena for procedures
      */
     public Map<String, Collection<String>> getProcPhens() {
-        if (this.capabilitiesCache.getProcPhens() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getProcPhens());
+        if (this.cacheImpl.getProcPhens() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getProcPhens());
         }
         return new HashMap<String, Collection<String>>(0);
     }
@@ -631,7 +631,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @return int Srid of coordinates stored in SOS database
      */
     public int getSrid() {
-        return this.capabilitiesCache.getSrid();
+        return this.cacheImpl.getSrid();
     }
 
     /**
@@ -640,8 +640,8 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      *         corresponding features as values
      */
     public Map<String, Collection<String>> getOffFeatures() {
-        if (this.capabilitiesCache.getOffFeatures() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getOffFeatures());
+        if (this.cacheImpl.getOffFeatures() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getOffFeatures());
         }
         return new HashMap<String, Collection<String>>(0);
     }
@@ -656,7 +656,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      */
 	@Override
     public List<String> getOfferings4Procedure(String procID) {
-        return new ArrayList<String>(this.capabilitiesCache.getOfferings4Procedure(procID));
+        return new ArrayList<String>(this.cacheImpl.getOfferings4Procedure(procID));
     }
 
     /**
@@ -668,7 +668,7 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @return Returns offerings, to which passed phenomenon belongs to
      */
     public List<String> getOfferings4Phenomenon(String phenID) {
-        return new ArrayList<String>(this.capabilitiesCache.getOfferings4Phenomenon(phenID));
+        return new ArrayList<String>(this.cacheImpl.getOfferings4Phenomenon(phenID));
     }
 
     /**
@@ -678,8 +678,8 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      */
 	@Override
     public Collection<Integer> getSrids() {
-        if (this.capabilitiesCache.getSrids() != null) {
-            return new ArrayList<Integer>(this.capabilitiesCache.getSrids());
+        if (this.cacheImpl.getSrids() != null) {
+            return new ArrayList<Integer>(this.cacheImpl.getSrids());
         }
         return new ArrayList<Integer>(0);
     }
@@ -690,8 +690,8 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @return Map<String, List<String>> procedures for offerings
      */
     public Map<String, Collection<String>> getOffProcedures() {
-        if (this.capabilitiesCache.getOffProcedures() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getOffProcedures());
+        if (this.cacheImpl.getOffProcedures() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getOffProcedures());
         }
         return new HashMap<String, Collection<String>>(0);
     }
@@ -702,236 +702,236 @@ public class CapabilitiesCacheController extends ACapabilitiesCacheController {
      * @return Map<String, List<String>> related features for offerings
      */
     public Map<String, Collection<String>> getOffRelatedFeatures() {
-        if (this.capabilitiesCache.getKOfferingVRelatedFeatures() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getKOfferingVRelatedFeatures());
+        if (this.cacheImpl.getKOfferingVRelatedFeatures() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getKOfferingVRelatedFeatures());
         }
         return new HashMap<String, Collection<String>>(0);
     }
 
     @Override
     public Collection<String> getObservablePropertiesForOffering(String offering) {
-        if (this.capabilitiesCache.getPhenomenons4Offering(offering) != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getPhenomenons4Offering(offering));
+        if (this.cacheImpl.getPhenomenons4Offering(offering) != null) {
+            return new ArrayList<String>(this.cacheImpl.getPhenomenons4Offering(offering));
         }
         return new ArrayList<String>(0);
     }
 
     @Override
     public Collection<String> getObservableProperties() {
-        if (this.capabilitiesCache.getObservableProperties() != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getObservableProperties());
+        if (this.cacheImpl.getObservableProperties() != null) {
+            return new ArrayList<String>(this.cacheImpl.getObservableProperties());
         }
         return new ArrayList<String>(0);
     }
 
     @Override
     public Map<String, Collection<String>> getKOfferingsVObservableProperties() {
-        if (this.capabilitiesCache.getOffCompPhens() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getOffCompPhens());
+        if (this.cacheImpl.getOffCompPhens() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getOffCompPhens());
         }
         return new HashMap<String, Collection<String>>(0);
     }
 
     @Override
     public Collection<String> getProcedures4FeatureOfInterest(String foiID) {
-        if (capabilitiesCache.getProceduresForFeature(foiID) != null) {
-            return new ArrayList<String>(capabilitiesCache.getProceduresForFeature(foiID));
+        if (cacheImpl.getProceduresForFeature(foiID) != null) {
+            return new ArrayList<String>(cacheImpl.getProceduresForFeature(foiID));
         }
         return new ArrayList<String>(0);
     }
 
     @Override
     public String getUnit4ObservableProperty(String observedProperty) {
-        return this.capabilitiesCache.getUnit4ObsProp(observedProperty);
+        return this.cacheImpl.getUnit4ObsProp(observedProperty);
     }
 
     @Override
     public Collection<String> getFeatureOfInterest() {
-        if (this.capabilitiesCache.getFeatureOfInterest() != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getFeatureOfInterest());
+        if (this.cacheImpl.getFeatureOfInterest() != null) {
+            return new ArrayList<String>(this.cacheImpl.getFeatureOfInterest());
         }
         return new ArrayList<String>(0);
     }
 
     @Override
     public Map<String, Collection<String>> getObservableProperties4CompositePhenomenons() {
-        if (this.capabilitiesCache.getPhens4CompPhens() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getPhens4CompPhens());
+        if (this.cacheImpl.getPhens4CompPhens() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getPhens4CompPhens());
         }
         return new HashMap<String, Collection<String>>(0);
     }
 
     @Override
     public Map<String, Collection<String>> getKOfferingVCompositePhenomenons() {
-        if (this.capabilitiesCache.getOffCompPhens() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getOffCompPhens());
+        if (this.cacheImpl.getOffCompPhens() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getOffCompPhens());
         }
         return new HashMap<String, Collection<String>>(0);
     }
 
     @Override
     public Map<String, Collection<String>> getKObservablePropertyVProcedures() {
-        if (this.capabilitiesCache.getPhenProcs() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getPhenProcs());
+        if (this.cacheImpl.getPhenProcs() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getPhenProcs());
         }
         return new HashMap<String, Collection<String>>(0);
     }
 
     @Override
     public Map<String, Collection<String>> getKProcedureVObservableProperties() {
-        if (this.capabilitiesCache.getProcPhens() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getProcPhens());
+        if (this.cacheImpl.getProcPhens() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getProcPhens());
         }
         return new HashMap<String, Collection<String>>(0);
     }
 
     @Override
     public Map<String, Collection<String>> getKOfferingVFeatures() {
-        if (this.capabilitiesCache.getOffFeatures() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getOffFeatures());
+        if (this.cacheImpl.getOffFeatures() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getOffFeatures());
         }
         return new HashMap<String, Collection<String>>(0);
     }
 
     @Override
     public Collection<String> getOfferings4ObservableProperty(String phenID) {
-        if (this.capabilitiesCache.getOfferings4Phenomenon(phenID) != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getOfferings4Phenomenon(phenID));
+        if (this.cacheImpl.getOfferings4Phenomenon(phenID) != null) {
+            return new ArrayList<String>(this.cacheImpl.getOfferings4Phenomenon(phenID));
         }
         return new ArrayList<String>(0);
     }
 
     @Override
     public Map<String, Collection<String>> getKOfferingVProcedures() {
-        if (this.capabilitiesCache.getOffProcedures() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getOffProcedures());
+        if (this.cacheImpl.getOffProcedures() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getOffProcedures());
         }
         return new HashMap<String, Collection<String>>(0);
     }
 
     @Override
     public Map<String, Collection<String>> getKOfferingVRelatedFeatures() {
-        if (this.capabilitiesCache.getKOfferingVRelatedFeatures() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getKOfferingVRelatedFeatures());
+        if (this.cacheImpl.getKOfferingVRelatedFeatures() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getKOfferingVRelatedFeatures());
         }
         return new HashMap<String, Collection<String>>(0);
     }
 
     @Override
     public Map<String, Collection<String>> getKCompositePhenomenonVObservableProperty() {
-        if (this.capabilitiesCache.getPhens4CompPhens() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getPhens4CompPhens());
+        if (this.cacheImpl.getPhens4CompPhens() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getPhens4CompPhens());
         }
         return new HashMap<String, Collection<String>>(0);
     }
 
     @Override
     public Map<String, Collection<String>> getKRelatedFeaturesVRole() {
-        if (this.capabilitiesCache.getKRelatedFeatureVRole() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getKRelatedFeatureVRole());
+        if (this.cacheImpl.getKRelatedFeatureVRole() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getKRelatedFeatureVRole());
         }
         return new HashMap<String, Collection<String>>(0);
     }
 
     @Override
     public Map<String, Collection<String>> getKOfferingVObservationTypes() {
-        if (this.capabilitiesCache.getKOfferingVObservationTypes() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getKOfferingVObservationTypes());
+        if (this.cacheImpl.getKOfferingVObservationTypes() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getKOfferingVObservationTypes());
         }
         return new HashMap<String, Collection<String>>(0);
     }
 
     @Override
     public Collection<String> getObservationTypes4Offering(String offering) {
-        if (this.capabilitiesCache.getKOfferingVObservationTypes() != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getKOfferingVObservationTypes().get(offering));
+        if (this.cacheImpl.getKOfferingVObservationTypes() != null) {
+            return new ArrayList<String>(this.cacheImpl.getKOfferingVObservationTypes().get(offering));
         }
         return new ArrayList<String>(0);
     }
 
     @Override
     public Collection<String> getObservationTypes() {
-        if (this.capabilitiesCache.getObservationTypes() != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getObservationTypes());
+        if (this.cacheImpl.getObservationTypes() != null) {
+            return new ArrayList<String>(this.cacheImpl.getObservationTypes());
         }
         return new ArrayList<String>(0);
     }
 
     @Override
     public Collection<String> getFeatureOfInterestTypes() {
-        if (this.capabilitiesCache.getFeatureOfInterestTypes() != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getFeatureOfInterestTypes());
+        if (this.cacheImpl.getFeatureOfInterestTypes() != null) {
+            return new ArrayList<String>(this.cacheImpl.getFeatureOfInterestTypes());
         }
         return new ArrayList<String>(0);
     }
 
     @Override
     public Map<String, Collection<String>> getAllowedKOfferingVObservationTypes() {
-        if (this.capabilitiesCache.getAllowedKOfferingVObservationType() != null) {
-            return new HashMap<String, Collection<String>>(this.capabilitiesCache.getAllowedKOfferingVObservationType());
+        if (this.cacheImpl.getAllowedKOfferingVObservationType() != null) {
+            return new HashMap<String, Collection<String>>(this.cacheImpl.getAllowedKOfferingVObservationType());
         }
         return new HashMap<String, Collection<String>>(0);
     }
 
     @Override
     public Collection<String> getAllowedObservationTypes4Offering(String offering) {
-        if (this.capabilitiesCache.getAllowedKOfferingVObservationType() != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getAllowedKOfferingVObservationType().get(offering));
+        if (this.cacheImpl.getAllowedKOfferingVObservationType() != null) {
+            return new ArrayList<String>(this.cacheImpl.getAllowedKOfferingVObservationType().get(offering));
         }
         return new ArrayList<String>(0);
     }
 
     @Override
     public Collection<String> getResultTemplates() {
-        if (this.capabilitiesCache.getResultTemplates() != null) {
-            return new ArrayList<String>(this.capabilitiesCache.getResultTemplates());
+        if (this.cacheImpl.getResultTemplates() != null) {
+            return new ArrayList<String>(this.cacheImpl.getResultTemplates());
         }
         return new ArrayList<String>(0);
     }
 
 	@Override
 	public SosEnvelope getEnvelopeForOffering(String offering) {
-		if (this.capabilitiesCache.getKOfferingVEnvelope() != null) {
-			return this.capabilitiesCache.getKOfferingVEnvelope().get(offering);
+		if (this.cacheImpl.getKOfferingVEnvelope() != null) {
+			return this.cacheImpl.getKOfferingVEnvelope().get(offering);
 		}
 		return null;
 	}
 
 	@Override
 	public DateTime getMinTimeForOffering(String offering) {
-		if (this.capabilitiesCache.getKOfferingVMinTime() != null) {
-			return this.capabilitiesCache.getKOfferingVMinTime().get(offering);
+		if (this.cacheImpl.getKOfferingVMinTime() != null) {
+			return this.cacheImpl.getKOfferingVMinTime().get(offering);
 		}
 		return null;
 	}
 
 	@Override
 	public DateTime getMaxTimeForOffering(String offering) {
-		if (this.capabilitiesCache.getKOfferingVMaxTime() != null) {
-			return this.capabilitiesCache.getKOfferingVMaxTime().get(offering);
+		if (this.cacheImpl.getKOfferingVMaxTime() != null) {
+			return this.cacheImpl.getKOfferingVMaxTime().get(offering);
 		}
 		return null;
 	}
 
 	@Override
 	public SosEnvelope getGlobalEnvelope() {
-		return this.capabilitiesCache.getGlobalEnvelope();
+		return this.cacheImpl.getGlobalEnvelope();
 	}
 
 	@Override
 	public DateTime getMinEventTime() {
-		return this.capabilitiesCache.getMinEventTime();
+		return this.cacheImpl.getMinEventTime();
 	}
 
 	@Override
 	public DateTime getMaxEventTime() {
-		return this.capabilitiesCache.getMaxEventTime();
+		return this.cacheImpl.getMaxEventTime();
 	}
 
 	@Override
-	protected CapabilitiesCache getCapabilitiesCache()
+	protected CacheImpl getCapabilitiesCache()
 	{
-		return capabilitiesCache;
+		return cacheImpl;
 	}
 
 }
