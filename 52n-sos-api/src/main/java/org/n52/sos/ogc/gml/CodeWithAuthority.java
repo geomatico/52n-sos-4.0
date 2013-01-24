@@ -32,6 +32,12 @@ public class CodeWithAuthority {
     public CodeWithAuthority(String value) {
         this.value = value;
     }
+    
+    public CodeWithAuthority(String identifier, String codeSpace)
+    {
+    	this.value = identifier;
+    	this.codeSpace = codeSpace;
+    }
 
     public String getValue() {
         return value;
