@@ -35,6 +35,8 @@ import static org.n52.sos.util.builder.SamplingFeatureBuilder.aSamplingFeature;
 
 import java.util.Collections;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.om.OMConstants;
@@ -46,13 +48,34 @@ import org.n52.sos.request.InsertObservationRequest;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
- *
+ * TODO Test after InsertSensor
+ * TODO Test after DeleteSensor
+ * TODO Test after DeleteObservation => Store observation count for each offering
  */
 public class InMemoryCacheControllerTest
 {
 	private InsertObservationRequest request;
 	private InMemoryCacheController controller;
 
+	@Before public void
+	initController() 
+	{
+		controller = new TestableInMemoryCacheController();
+		controller.cancel(); // <-- we don't want no timer to run!
+	}
+	
+
+	@After public void 
+	cleanUpAfterEachTest()
+	{
+		request = null;
+		controller = null;
+	}
+	
+	/* TESTS */
+	
+	/* Update after InsertObservation */
+	
 	@Test (expected=IllegalArgumentException.class)	public void 
 	should_throw_IllegalArgumentException_when_receiving_null_parameter() 
 			throws OwsExceptionReport {
@@ -83,16 +106,16 @@ public class InMemoryCacheControllerTest
 				controller.getProcedures().contains(request.getAssignedSensorId()));
 		
 		assertTrue("offering -> procedure relation not in cache",
-				controller.getProcedures4Offering(request.getOfferings().get(0)).contains(request.getAssignedSensorId()));
+				controller.getProcedures4Offering(getFirstOffering()).contains(request.getAssignedSensorId()));
 		
 		assertTrue("observable-property -> procedure relation NOT in cache",
-				controller.getKObservablePropertyVProcedures().get(getObservablePropertyIdentifier(request)).contains(request.getAssignedSensorId()));
+				controller.getKObservablePropertyVProcedures().get(getObservablePropertyIdentifier()).contains(request.getAssignedSensorId()));
 		
 		assertTrue("procedure -> observable-property relation NOT in cache",
-				controller.getKProcedureVObservableProperties().get(request.getAssignedSensorId()).contains(getObservablePropertyIdentifier(request)) );
+				controller.getKProcedureVObservableProperties().get(request.getAssignedSensorId()).contains(getObservablePropertyIdentifier()) );
 		
 		assertTrue("procedure -> offering relation NOT in cache",
-				controller.getOfferings4Procedure(request.getAssignedSensorId()).contains(request.getOfferings().get(0)));
+				controller.getOfferings4Procedure(request.getAssignedSensorId()).contains(getFirstOffering()));
 		
 	}
 
@@ -102,19 +125,19 @@ public class InMemoryCacheControllerTest
 		updateEmptyCacheWithSingleObservation();
 		
 		assertTrue("feature NOT in cache",
-				controller.getFeatureOfInterest().contains(getFoiIdFromInsertObservationRequest(request)));
+				controller.getFeatureOfInterest().contains(getFoiIdFromInsertObservationRequest()));
 		
 		assertTrue("feature -> procedure relation NOT in cache",
-				controller.getProcedures4FeatureOfInterest(getFoiIdFromInsertObservationRequest(request)).contains(request.getAssignedSensorId()));
+				controller.getProcedures4FeatureOfInterest(getFoiIdFromInsertObservationRequest()).contains(request.getAssignedSensorId()));
 		
 		assertTrue("no parent features for feature",
-				controller.getParentFeatures(Collections.singletonList(getFoiIdFromInsertObservationRequest(request)), true, false).isEmpty());
+				controller.getParentFeatures(Collections.singletonList(getFoiIdFromInsertObservationRequest()), true, false).isEmpty());
 		
 		assertTrue("no child features for feature",
-				controller.getParentFeatures(Collections.singletonList(getFoiIdFromInsertObservationRequest(request)), true, false).isEmpty());
+				controller.getParentFeatures(Collections.singletonList(getFoiIdFromInsertObservationRequest()), true, false).isEmpty());
 		
 		assertTrue("feature to offering relation",
-				controller.getKOfferingVFeatures().get(request.getOfferings().get(0)).contains(getFoiIdFromInsertObservationRequest(request)));
+				controller.getKOfferingVFeatures().get(getFirstOffering()).contains(getFoiIdFromInsertObservationRequest()));
 		
 	}
 	
@@ -135,11 +158,11 @@ public class InMemoryCacheControllerTest
 		
 		assertEquals("global envelope",
 				controller.getGlobalEnvelope(),
-				createEnvelopeWithDefaultEPSG(request, controller));
+				getSosEnvelopeFromFirstObservation());
 		
 		assertEquals("offering envelop",
-				controller.getEnvelopeForOffering(request.getOfferings().get(0)),
-				createEnvelopeWithDefaultEPSG(request, controller));
+				controller.getEnvelopeForOffering(getFirstOffering()),
+				getSosEnvelopeFromFirstObservation());
 	}
 
 	@Test public void
@@ -149,18 +172,18 @@ public class InMemoryCacheControllerTest
 		
 		assertTrue("temporal envelope of does NOT contain observation timestamp",
 			(
-				controller.getMinTimeForOffering(request.getOfferings().get(0))
+				controller.getMinTimeForOffering(getFirstOffering())
 				.isBefore(((TimeInstant)request.getObservations().get(0).getPhenomenonTime()).getValue())
 				||
-				controller.getMinTimeForOffering(request.getOfferings().get(0))
+				controller.getMinTimeForOffering(getFirstOffering())
 				.isEqual(((TimeInstant)request.getObservations().get(0).getPhenomenonTime()).getValue())
 			)
 			&&
 			(
-				controller.getMaxTimeForOffering(request.getOfferings().get(0))
+				controller.getMaxTimeForOffering(getFirstOffering())
 				.isAfter(((TimeInstant)request.getObservations().get(0).getPhenomenonTime()).getValue())
 				|| 
-				controller.getMaxTimeForOffering(request.getOfferings().get(0))
+				controller.getMaxTimeForOffering(getFirstOffering())
 				.isEqual(((TimeInstant)request.getObservations().get(0).getPhenomenonTime()).getValue())
 			)
 		);
@@ -172,34 +195,89 @@ public class InMemoryCacheControllerTest
 		updateEmptyCacheWithSingleObservation();
 		
 		assertTrue("offering -> observable property NOT in cache",
-				controller.getObservablePropertiesForOffering(request.getOfferings().get(0)).contains(getObservablePropertyIdentifier(request)));
+				controller.getObservablePropertiesForOffering(getFirstOffering()).contains(getObservablePropertyIdentifier()));
 		
 		assertTrue("observable property -> offering NOT in cache",
-				controller.getOfferings4ObservableProperty(getObservablePropertyIdentifier(request)).contains(request.getOfferings().get(0)));
+				controller.getOfferings4ObservableProperty(getObservablePropertyIdentifier()).contains(getFirstOffering()));
 	}
 
-	private void updateEmptyCacheWithSingleObservation() throws OwsExceptionReport
+	@Test public void
+	should_contain_offering_spatial_boundingbox_after_InsertObservation()
+			throws OwsExceptionReport {
+		updateEmptyCacheWithSingleObservation();
+		
+		assertTrue("spatial bounding box of offering NOT contained in cache",
+				controller.getEnvelopeForOffering(getFirstOffering()).isSetEnvelope());
+		
+		assertEquals("spatial bounding box of offering NOT same as feature envelope",
+				controller.getEnvelopeForOffering(getFirstOffering()),
+				getSosEnvelopeFromFirstObservation());
+	}
+
+	@Test public void
+	should_contain_offering_observation_type_relation_after_InsertObservation()
+			throws OwsExceptionReport {
+		updateEmptyCacheWithSingleObservation();
+		
+		assertTrue("observation type NOT in cache",
+				controller.getObservationTypes().contains(getObservationTypeFromFirstObservation()));
+		
+		assertTrue("offering -> observation type relation NOT in cache",
+				controller.getObservationTypes4Offering(getFirstOffering()).contains(getObservationTypeFromFirstObservation()));
+	}
+
+	@Test public void 
+	should_contain_observation_id_after_InsertObservation()
+			throws OwsExceptionReport{
+		updateEmptyCacheWithSingleObservation();
+		
+		assertTrue("observation id NOT in cache",
+				controller.getObservationIdentifiers().contains(request.getObservations().get(0).getIdentifier().getValue()));
+	}
+	
+	/* Update after InsertSensor */
+	
+	/* HELPER */
+	
+
+
+	private 
+	String getObservationTypeFromFirstObservation()
 	{
-		request = insertObservationRequestExample();
-		controller = new TestableInMemoryCacheController();
-		controller.cancel(); // <-- we don't want no timer to run!
-		controller.updateAfterObservationInsertion(request);
+		return request.getObservations().get(0).getObservationConstellation().getObservationType();
+	}
+	
+	private 
+	String getFirstOffering()
+	{
+		return request.getOfferings().get(0);
 	}
 
-	private SosEnvelope createEnvelopeWithDefaultEPSG(InsertObservationRequest request,
-			InMemoryCacheController controller)
+
+	
+	private
+	SosEnvelope getSosEnvelopeFromFirstObservation()
 	{
 		return new SosEnvelope(
 				((SosSamplingFeature)request.getObservations().get(0).getObservationConstellation().getFeatureOfInterest()).getGeometry().getEnvelopeInternal(),
 				controller.getDefaultEPSG());
 	}
+	
+	private void 
+	updateEmptyCacheWithSingleObservation()
+			throws OwsExceptionReport {
+		request = insertObservationRequestExample();
+		controller.updateAfterObservationInsertion(request);
+	}
 
-	private String getFoiIdFromInsertObservationRequest(InsertObservationRequest request)
+	private
+	String getFoiIdFromInsertObservationRequest()
 	{
 		return request.getObservations().get(0).getObservationConstellation().getFeatureOfInterest().getIdentifier().getValue();
 	}
 
-	private InsertObservationRequest insertObservationRequestExample()
+	private
+	InsertObservationRequest insertObservationRequestExample()
 	{
 		String sensor = "test-procedure";
 		InsertObservationRequest request = aInsertObservationRequest()
@@ -229,17 +307,20 @@ public class InMemoryCacheControllerTest
 							.setPhenomenonTime(System.currentTimeMillis())
 							.build()
 							)
+					.setIdentifier("codespace","my-id")
 					.build())
 				.build();
 		return request;
 	}
 	
-	private String getObservablePropertyIdentifier(InsertObservationRequest request)
+	private
+	String getObservablePropertyIdentifier()
 	{
 		return request.getObservations().get(0).getObservationConstellation().getObservableProperty().getIdentifier();
 	}
 
-	private class TestableInMemoryCacheController extends InMemoryCacheController
+	private class 
+	TestableInMemoryCacheController extends InMemoryCacheController
 	{
 		protected long getUpdateInterval()
 		{

@@ -124,7 +124,12 @@ public class InMemoryCacheController extends CapabilitiesCacheController {
 			addProcedureToCache(getProcedureIdentifier(sosObservation));
 			addObservablePropertyProcedureRelation(getObservablePropertyIdentifier(sosObservation),getProcedureIdentifier(sosObservation));
 			addProcedureObservablePropertyRelation(getProcedureIdentifier(sosObservation),getObservablePropertyIdentifier(sosObservation));
+			
 			updateGlobalTemporalBBoxUsingNew(phenomenonTimeFrom(sosObservation));
+			
+			addObservationTypeToCache(sosObservation);
+			
+			addObservationIdToCacheIfSet(sosObservation);
 
 			// update features
 			Envelope observedFeatureEnvelope = null;
@@ -165,6 +170,22 @@ public class InMemoryCacheController extends CapabilitiesCacheController {
 				updateOfferingEnvelope(observedFeatureEnvelope, observedFeatureEnvelopeSRID, offeringIdentifier);
 			}
 
+		}
+	}
+
+	private void addObservationIdToCacheIfSet(SosObservation sosObservation)
+	{
+		if (sosObservation.getIdentifier() != null)
+		{
+			getCapabilitiesCache().getObservationIdentifiers().add(sosObservation.getIdentifier().getValue());
+		}
+	}
+
+	private void addObservationTypeToCache(SosObservation sosObservation)
+	{
+		if (!getObservationTypes().contains(sosObservation.getObservationConstellation().getObservationType()))
+		{
+			getCapabilitiesCache().getObservationTypes().add(sosObservation.getObservationConstellation().getObservationType());
 		}
 	}
 
