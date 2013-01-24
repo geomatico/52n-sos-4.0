@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<!--
-		Remove the parent in the case of 52North repos are not available
-	-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<!-- Remove the parent in the case of 52North repos are not available -->
 	<parent>
 		<groupId>org.n52</groupId>
 		<artifactId>52-North</artifactId>
@@ -15,7 +14,7 @@
 	<name>52North Sensor Observation Service</name>
 	<description>52North Sensor Observation Service - Parent POM for defining dependency versions</description>
 	<inceptionYear>2012</inceptionYear>
-		<issueManagement>
+	<issueManagement>
 		<system>Bugzilla</system>
 		<url>https://bugzilla.52north.org/</url>
 	</issueManagement>
@@ -34,8 +33,7 @@
 		<module>52n-sos-coding-sensorML-v101</module>
 		<module>52n-sos-coding-sos-v20</module>
 		<module>52n-sos-webapp</module>
-  </modules>
-
+	</modules>
 	<licenses>
 		<license>
 			<name>GPLv2</name>
@@ -44,7 +42,6 @@
 			<comments>See also http://52north.org/about/licensing/ for all information about 52°North licenses.</comments>
 		</license>
 	</licenses>
-
 	<properties>
 		<!-- sos name -->
 		<conf.sos.name>52n-sos-webapp-${project.version}</conf.sos.name>
@@ -66,7 +63,6 @@
 		<hibernate.version>4.1.4.Final</hibernate.version>
 		<hibernate.spatial.version>4.0-M1</hibernate.spatial.version>
 	</properties>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -80,10 +76,10 @@
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-cache</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>52n-sos-cache</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-coding-ows-v110</artifactId>
@@ -162,7 +158,7 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-hibernate-enhanced</artifactId>
-			   <version>${project.version}</version>
+				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>${project.groupId}</groupId>
@@ -577,10 +573,10 @@
 				</exclusions>
 			</dependency>
 			<dependency>
-				  <groupId>com.thetransactioncompany</groupId>
-				  <artifactId>cors-filter</artifactId>
-				  <version>1.3.2</version>
-				  <scope>runtime</scope>
+				<groupId>com.thetransactioncompany</groupId>
+				<artifactId>cors-filter</artifactId>
+				<version>1.3.2</version>
+				<scope>runtime</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.jettison</groupId>
@@ -613,11 +609,11 @@
 				<artifactId>52n-sos-gda</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<!--  required for common test classes -->
+			<!-- required for common test classes -->
 			<dependency>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-jar-plugin</artifactId>
-			    <version>2.4</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -640,19 +636,21 @@
 					<preparationGoals>clean install</preparationGoals>
 				</configuration>
 			</plugin>
-			  <!--<plugin>
+<!--
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
 				<version>1.3</version>
 				<executions>
-				  <execution>
-					<id>download-licenses</id>
-					<goals>
-					  <goal>download-licenses</goal>
-					</goals>
-				  </execution>
+					<execution>
+						<id>download-licenses</id>
+						<goals>
+							<goal>download-licenses</goal>
+						</goals>
+					</execution>
 				</executions>
-			  </plugin> -->
+			</plugin>
+-->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
@@ -728,7 +726,7 @@
 				<executions>
 					<execution>
 						<phase>test</phase>
-						<!-- test will fail if license headers are not correct, run license:format
+						<!-- test will fail if license headers are not correct, run license:format 
 							to add the headers. -->
 						<goals>
 							<!-- <goal>check</goal> -->
@@ -775,27 +773,27 @@
 					<artifactId>properties-maven-plugin</artifactId>
 					<version>1.0-alpha-2</version>
 				</plugin>
-				 <plugin>
+				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>sql-maven-plugin</artifactId>
 					<version>1.5</version>
-				 </plugin>
-				 <plugin>
-					 <groupId>org.apache.maven.plugins</groupId>
-					 <artifactId>maven-failsafe-plugin</artifactId>
-					 <version>2.13</version>
-				 </plugin>
-				 <plugin>
-					 <groupId>org.mortbay.jetty</groupId>
-					 <artifactId>maven-jetty-plugin</artifactId>
-					 <version>6.1.26</version>
-				 </plugin>
-				 <plugin>
-					 <groupId>org.codehaus.cargo</groupId>
-					 <artifactId>cargo-maven2-plugin</artifactId>
-					 <version>1.3.2</version>
-				 </plugin>
-				 <plugin>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>2.13</version>
+				</plugin>
+				<plugin>
+					<groupId>org.mortbay.jetty</groupId>
+					<artifactId>maven-jetty-plugin</artifactId>
+					<version>6.1.26</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.cargo</groupId>
+					<artifactId>cargo-maven2-plugin</artifactId>
+					<version>1.3.2</version>
+				</plugin>
+				<plugin>
 					<artifactId>maven-release-plugin</artifactId>
 					<configuration>
 						<connectionUrl>scm:svn:https://svn.52north.org/svn/swe/main/SOS/Service/branches/52n-sos-400-refactored</connectionUrl>
@@ -819,8 +817,6 @@
 		<developerConnection>scm:svn:https://52north.org/svn/swe/main/SOS/Service/branches/52n-sos-400-refactored</developerConnection>
 		<url>https://52north.org/svn/swe/main/SOS/Service/branches/52n-sos-400-refactored</url>
 	</scm>
-
-
 	<repositories>
 		<repository>
 			<id>Apache</id>
@@ -917,7 +913,7 @@
 			</modules>
 		</profile>
 		<profile>
-			<id>develope</id>
+			<id>develop</id>
 			<modules>
 				<module>52n-sos-webapp-preconfigured</module>
 				<module>52n-sos-binding-kvp</module>
@@ -971,7 +967,7 @@
 				<config.logger.level>TRACE</config.logger.level>
 			</properties>
 		</profile>
-		<profile>
+		<profile>		
 			<id>sosV100</id>
 			<modules>
 				<module>52n-sos-core-v100</module>
@@ -1063,7 +1059,7 @@
 		</profile>
 		<profile>
 			<id>release</id>
-			<!-- a profile which shall be activated if a release is performed, it
+			<!-- a profile which shall be activated if a release is performed, it 
 				is also automatic activated in the ci environment. -->
 			<modules>
 				<module>52n-sos-webapp-preconfigured</module>
@@ -1088,7 +1084,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-release-plugin</artifactId>
 						<configuration>
-							<!-- no build in release:prepare (takes to long time), so in bad cases
+							<!-- no build in release:prepare (takes to long time), so in bad cases 
 								release fails on perform -->
 							<preparationGoals>clean</preparationGoals>
 							<autoVersionSubmodules>true</autoVersionSubmodules>
