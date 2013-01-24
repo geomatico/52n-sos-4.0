@@ -23,6 +23,9 @@
  */
 package org.n52.sos.util.builder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.request.InsertSensorRequest;
 
@@ -32,14 +35,31 @@ import org.n52.sos.request.InsertSensorRequest;
  */
 public class InsertSensorRequestBuilder {
 
+	private SosProcedureDescription procedureDescription;
+	private List<String> observableProperties;
+	
 	public static InsertSensorRequestBuilder anInsertSensorRequest()
 	{
 		return new InsertSensorRequestBuilder();
 	}
 
-	private SosProcedureDescription procedureDescription;
+	public InsertSensorRequestBuilder setProcedure(SosProcedureDescription procedureDescription)
+	{
+		this.procedureDescription = procedureDescription;
+		return this;
+	}
 
 
+	public InsertSensorRequestBuilder addObservableProperty(String observableProperty)
+	{
+		if (observableProperties == null)
+		{
+			observableProperties = new ArrayList<String>();
+		}
+		observableProperties.add(observableProperty);
+		return this;
+	}
+	
 	public InsertSensorRequest build()
 	{
 		InsertSensorRequest request = new InsertSensorRequest();
@@ -47,14 +67,11 @@ public class InsertSensorRequestBuilder {
 		{
 			request.setProcedureDescription(procedureDescription);
 		}
+		if (observableProperties != null && !observableProperties.isEmpty())
+		{
+			request.setObservableProperty(observableProperties);
+		}
 		return request;
-	}
-
-
-	public InsertSensorRequestBuilder setProcedure(SosProcedureDescription procedureDescription)
-	{
-		this.procedureDescription = procedureDescription;
-		return this;
 	}
 
 }
