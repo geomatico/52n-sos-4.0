@@ -37,7 +37,6 @@ import net.opengis.gml.DirectPositionType;
 import net.opengis.gml.LineStringType;
 import net.opengis.gml.LinearRingType;
 import net.opengis.gml.MeasureType;
-import net.opengis.gml.NameDocument;
 import net.opengis.gml.PointType;
 import net.opengis.gml.PolygonType;
 import net.opengis.gml.ReferenceType;

@@ -55,13 +55,11 @@ import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3cHelper;
-import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsa.WsaConstants;
 import org.n52.sos.wsa.WsaHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3.x2003.x05.soapEnvelope.EnvelopeDocument;
 import org.w3c.dom.Document;
 
 /**

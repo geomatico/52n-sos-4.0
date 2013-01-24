@@ -1068,7 +1068,6 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
      *            SOS observation
      * @throws OwsExceptionReport
      */
-    @SuppressWarnings("unchecked")
     private void encodeFeatureOfInterest(OMObservationType observation, SosAbstractFeature feature)
             throws OwsExceptionReport {
         // String urlPattern =

@@ -24,7 +24,6 @@
 package org.n52.sos.request;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.n52.sos.ogc.ows.OWSConstants;

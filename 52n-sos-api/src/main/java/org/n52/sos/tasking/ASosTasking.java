@@ -25,15 +25,7 @@ package org.n52.sos.tasking;
 
 import java.util.TimerTask;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public abstract class ASosTasking extends TimerTask {
-    
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(ASosTasking.class);
     
     private final int DEFAULT_EXECUTION_INTERVALL = 15;
     

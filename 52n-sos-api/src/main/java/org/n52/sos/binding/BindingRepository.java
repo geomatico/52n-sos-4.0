@@ -26,9 +26,8 @@ package org.n52.sos.binding;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ServiceConfigurationError;
-import java.util.ServiceLoader;
 import java.util.Set;
+
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.util.AbstractServiceLoaderRepository;
 import org.slf4j.Logger;

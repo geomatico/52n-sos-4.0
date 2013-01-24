@@ -24,7 +24,6 @@
 package org.n52.sos.ds.hibernate;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.n52.sos.cache.CapabilitiesCache;
 import org.n52.sos.ds.hibernate.SosCacheFeederDAO.CacheCreationStrategy;
