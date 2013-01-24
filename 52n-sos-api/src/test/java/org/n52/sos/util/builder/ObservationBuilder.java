@@ -23,6 +23,7 @@
  */
 package org.n52.sos.util.builder;
 
+import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.IObservationValue;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
@@ -40,6 +41,8 @@ public class ObservationBuilder {
 
 	private SosObservationConstellation observationConstellation;
 	private IObservationValue<?> value;
+	private String identifer;
+	private String identiferCodespace;
 
 	public ObservationBuilder setObservationConstellation(SosObservationConstellation observationConstellation)
 	{
@@ -50,14 +53,32 @@ public class ObservationBuilder {
 	public SosObservation build()
 	{
 		SosObservation sosObservation = new SosObservation();
-		sosObservation.setObservationConstellation(observationConstellation);
-		sosObservation.setValue(value);
+		if (observationConstellation != null)
+		{
+			sosObservation.setObservationConstellation(observationConstellation);
+		}
+		if (value != null)
+		{
+			sosObservation.setValue(value);
+		}
+		if (identifer != null && identiferCodespace != null)
+		{
+			sosObservation.setIdentifier(new CodeWithAuthority(identifer,identiferCodespace));
+		}
 		return sosObservation;
 	}
 
 	public ObservationBuilder setValue(IObservationValue<?> observationValue)
 	{
 		this.value = observationValue;
+		return this;
+	}
+
+	public ObservationBuilder setIdentifier(String identifierCodeSpace,
+			String identifier)
+	{
+		this.identifer = identifier;
+		this.identiferCodespace = identifierCodeSpace;
 		return this;
 	}
 
