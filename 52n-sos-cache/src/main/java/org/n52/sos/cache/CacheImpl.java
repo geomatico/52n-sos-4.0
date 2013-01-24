@@ -114,7 +114,7 @@ public class CacheImpl implements CapabilitiesCache{
      * hash map containing the phenomenon IDs as keys and the corresponding
      * procedure ids as values
      */
-    private Map<String, List<String>> kObservablePropertiesVProcedures;
+    private Map<String, List<String>> kObservablePropertyVProcedures;
 
     /** map contains the offerings for each phenomenon */
     private Map<String, List<String>> kObservablePropertyVOfferings;
@@ -157,7 +157,7 @@ public class CacheImpl implements CapabilitiesCache{
     	featureOfInterestTypes = Collections.synchronizedList(new ArrayList<String>());
     	globalEnvelope = new SosEnvelope(null, getSrid());
     	kFeatureOfInterestVProcedures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	kObservablePropertiesVProcedures = Collections.synchronizedMap(new HashMap<String, List<String>>());
+    	kObservablePropertyVProcedures = Collections.synchronizedMap(new HashMap<String, List<String>>());
     	kObservablePropertyVOfferings = Collections.synchronizedMap(new HashMap<String, List<String>>());
     	kOfferingVCompositePhenomenon = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	kOfferingVEnvelope = Collections.synchronizedMap(new HashMap<String, SosEnvelope>());
@@ -209,9 +209,6 @@ public class CacheImpl implements CapabilitiesCache{
         return kOfferingVObservableProperties;
     }
     
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setKOfferingVObservableProperties(java.util.Map)
-	 */
     @Override
 	public void setKOfferingVObservableProperties(Map<String, Collection<String>> offPhenomenons) {
         this.kOfferingVObservableProperties = offPhenomenons;
@@ -272,9 +269,6 @@ public class CacheImpl implements CapabilitiesCache{
         return offName;
     }
     
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setKOfferingVName(java.util.Map)
-	 */
     @Override
 	public void setKOfferingVName(Map<String, String> offName) {
         this.offName = offName;
@@ -312,9 +306,6 @@ public class CacheImpl implements CapabilitiesCache{
         return observationIdentifiers;
     }
     
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setObservationIdentifiers(java.util.Collection)
-	 */
     @Override
 	public void setObservationIdentifiers(Collection<String> observationIdentifiers) {
         this.observationIdentifiers = observationIdentifiers;
@@ -329,9 +320,6 @@ public class CacheImpl implements CapabilitiesCache{
         return kOfferingVObservationTypes;
     }
     
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setKOfferingVObservationTypes(java.util.Map)
-	 */
     @Override
 	public void setKOfferingVObservationTypes(Map<String, Collection<String>> offferingObservationTypes) {
         this.kOfferingVObservationTypes = offferingObservationTypes;
@@ -346,9 +334,6 @@ public class CacheImpl implements CapabilitiesCache{
         return kOfferingVProcedures;
     }
     
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setKOfferingVProcedures(java.util.Map)
-	 */
     @Override
 	public void setKOfferingVProcedures(Map<String, List<String>> offProcedures) {
         this.kOfferingVProcedures = offProcedures;
@@ -397,9 +382,6 @@ public class CacheImpl implements CapabilitiesCache{
         return procedures;
     }
     
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setProcedures(java.util.Collection)
-	 */
     @Override
 	public void setProcedures(Collection<String> procedures) {
         this.procedures = procedures;
@@ -425,9 +407,6 @@ public class CacheImpl implements CapabilitiesCache{
         return kFeatureOfInterestVProcedures;
     }
     
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setKFeatureOfInterestVProcedures(java.util.Map)
-	 */
     @Override
 	public void setKFeatureOfInterestVProcedures(Map<String, Collection<String>> foiProcedures) {
         this.kFeatureOfInterestVProcedures = foiProcedures;
@@ -440,17 +419,11 @@ public class CacheImpl implements CapabilitiesCache{
         return featureOfInterestIdentifiers;
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setFeatureOfInterest(java.util.Collection)
-	 */
     @Override
 	public void setFeatureOfInterest(Collection<String> featuresOfInterest) {
         this.featureOfInterestIdentifiers = featuresOfInterest;
     }
     
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setAllFeatureOfInterests(java.util.Collection)
-	 */
     @Override
 	public void setAllFeatureOfInterests(Collection<String> featuresOfInterest) {
         this.featureOfInterestIdentifiers = featuresOfInterest;
@@ -463,9 +436,6 @@ public class CacheImpl implements CapabilitiesCache{
         return phens4CompPhens;
     }
     
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setKCompositePhenomenonVObservableProperties(java.util.Map)
-	 */
     @Override
 	public void setKCompositePhenomenonVObservableProperties(Map<String, Collection<String>> phens4CompPhens) {
         this.phens4CompPhens = phens4CompPhens;
@@ -478,9 +448,6 @@ public class CacheImpl implements CapabilitiesCache{
         return kOfferingVCompositePhenomenon;
     }
     
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setKOfferingVCompositePhenomenon(java.util.Map)
-	 */
     @Override
 	public void setKOfferingVCompositePhenomenon(Map<String, Collection<String>> offCompPhens) {
         this.kOfferingVCompositePhenomenon = offCompPhens;
@@ -490,15 +457,12 @@ public class CacheImpl implements CapabilitiesCache{
      * @return Returns the phenProcs.
      */
     protected Map<String, List<String>> getPhenProcs() {
-        return kObservablePropertiesVProcedures;
+        return kObservablePropertyVProcedures;
     }
     
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setKObservablePropertyKProcedures(java.util.Map)
-	 */
     @Override
 	public void setKObservablePropertyKProcedures(Map<String, List<String>> phenProcs) {
-        this.kObservablePropertiesVProcedures = phenProcs;
+        this.kObservablePropertyVProcedures = phenProcs;
     }
 
     /**
@@ -539,9 +503,6 @@ public class CacheImpl implements CapabilitiesCache{
         this.childProcs = childProcs;
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setProcedureHierarchies(java.util.Map)
-	 */
     @Override
 	public void setProcedureHierarchies(Map<String, Collection<String>> parentProcs) {
         this.parentProcs = parentProcs;
@@ -642,9 +603,6 @@ public class CacheImpl implements CapabilitiesCache{
         return ccpList;
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setSrids(java.util.Collection)
-	 */
     @Override
 	public void setSrids(Collection<Integer> srids) {
         this.srids = srids;
@@ -675,18 +633,12 @@ public class CacheImpl implements CapabilitiesCache{
         this.childFeatures = childFeatures;
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setFeatureHierarchies(java.util.Map)
-	 */
     @Override
 	public void setFeatureHierarchies(Map<String, Collection<String>> parentFeatures) {
         this.parentFeatures = parentFeatures;
         this.childFeatures = SosHelper.invertHierarchy(parentFeatures);
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setKOfferingVFeatures(java.util.Map)
-	 */
     @Override
 	public void setKOfferingVFeatures(Map<String, Collection<String>> offFeatures) {
         this.kOfferingVFeaturesOfInterest = offFeatures;
@@ -701,17 +653,11 @@ public class CacheImpl implements CapabilitiesCache{
         return kOfferingVFeaturesOfInterest;
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setKProcedureVOfferings(java.util.Map)
-	 */
     @Override
 	public void setKProcedureVOfferings(Map<String, Collection<String>> procOffs) {
         this.kProcedureVOfferings = procOffs;
     }
     
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#getKProcedureVOffering()
-	 */
     @Override
 	public Map<String, Collection<String>> getKProcedureVOffering() {
     	return kProcedureVOfferings;
@@ -733,25 +679,16 @@ public class CacheImpl implements CapabilitiesCache{
         return result;
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setUnit4ObservableProperty(java.util.Map)
-	 */
     @Override
 	public void setUnit4ObservableProperty(Map<String, String> unit4Phen) {
         this.unit4Phen = unit4Phen;
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setKObservablePropertyVOfferings(java.util.Map)
-	 */
     @Override
 	public void setKObservablePropertyVOfferings(Map<String, List<String>> phenOffs) {
         this.kObservablePropertyVOfferings = phenOffs;
     }
     
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#getKObservablePropertyVOffering()
-	 */
     @Override
 	public Map<String, List<String>> getKObservablePropertyVOffering()
     {
@@ -796,9 +733,6 @@ public class CacheImpl implements CapabilitiesCache{
         return kProcedureVObservableProperties;
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setProcPhens(java.util.Map)
-	 */
     @Override
 	public void setProcPhens(Map<String, Collection<String>> procPhens) {
         this.kProcedureVObservableProperties = procPhens;
@@ -870,9 +804,6 @@ public class CacheImpl implements CapabilitiesCache{
         }
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setKOfferingVRelatedFeatures(java.util.Map)
-	 */
     @Override
 	public void setKOfferingVRelatedFeatures(Map<String, Collection<String>> offRelatedFeatures) {
         this.kOfferingVRelatedFeatures = offRelatedFeatures;
@@ -891,9 +822,6 @@ public class CacheImpl implements CapabilitiesCache{
         return kRelatedFeatureVRole;
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setKRelatedFeaturesVRole(java.util.Map)
-	 */
     @Override
 	public void setKRelatedFeaturesVRole(Map<String, Collection<String>> kRelatedFeatureVRole) {
         this.kRelatedFeatureVRole = kRelatedFeatureVRole;
@@ -939,154 +867,97 @@ public class CacheImpl implements CapabilitiesCache{
         return allowedKOfferingVObservationType;
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setAllowedKOfferingVObservationType(java.util.Map)
-	 */
     @Override
 	public void setAllowedKOfferingVObservationType(Map<String, Collection<String>> allowedKOfferingVObservationType) {
         this.allowedKOfferingVObservationType = allowedKOfferingVObservationType;
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setObservationTypes(java.util.Collection)
-	 */
     @Override
 	public void setObservationTypes(Collection<String> observationTypes) {
         this.observationTypes = observationTypes;
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#getObservationTypes()
-	 */
     @Override
 	public Collection<String> getObservationTypes() {
         return observationTypes;
     }
     
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setFeatureOfInterestTypes(java.util.Collection)
-	 */
     @Override
 	public void setFeatureOfInterestTypes(Collection<String> featureOfInterestTypes) {
         this.featureOfInterestTypes = featureOfInterestTypes;
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#getFeatureOfInterestTypes()
-	 */
     @Override
 	public Collection<String> getFeatureOfInterestTypes() {
         return featureOfInterestTypes;
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setResultTemplates(java.util.Collection)
-	 */
     @Override
 	public void setResultTemplates(Collection<String> resultTemplates) {
         this.resultTemplates = resultTemplates;
     }
 
-    /* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#getResultTemplates()
-	 */
     @Override
 	public Collection<String> getResultTemplates() {
         return resultTemplates;
     }
 	
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#getKOfferingVEnvelope()
-	 */
 	@Override
 	public Map<String, SosEnvelope> getKOfferingVEnvelope() {
 		return kOfferingVEnvelope;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setKOfferingVEnvelope(java.util.Map)
-	 */
 	@Override
 	public void setKOfferingVEnvelope(Map<String, SosEnvelope> kOfferingVEnvelope) {
 		this.kOfferingVEnvelope = kOfferingVEnvelope;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#getKOfferingVMinTime()
-	 */
 	@Override
 	public Map<String, DateTime> getKOfferingVMinTime() {
 		return kOfferingVMinTime;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setKOfferingVMinTime(java.util.Map)
-	 */
 	@Override
 	public void setKOfferingVMinTime(Map<String, DateTime> kOfferingVMinTime) {
 		this.kOfferingVMinTime = kOfferingVMinTime;
 	}
 
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#getKOfferingVMaxTime()
-	 */
 	@Override
 	public Map<String, DateTime> getKOfferingVMaxTime() {
 		return kOfferingVMaxTime;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setKOfferingVMaxTime(java.util.Map)
-	 */
 	@Override
 	public void setKOfferingVMaxTime(Map<String, DateTime> kOfferingVMaxTime) {
 		this.kOfferingVMaxTime = kOfferingVMaxTime;
 	}
 			
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#getGlobalEnvelope()
-	 */
 	@Override
 	public SosEnvelope getGlobalEnvelope() {
 		return globalEnvelope;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setGlobalEnvelope(org.n52.sos.ogc.sos.SosEnvelope)
-	 */
 	@Override
 	public void setGlobalEnvelope(SosEnvelope globalEnvelope) {
 		this.globalEnvelope = globalEnvelope;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#getMinEventTime()
-	 */
 	@Override
 	public DateTime getMinEventTime() {
 		return globalTemporalBoundingBox.getStart();
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setMinEventTime(org.joda.time.DateTime)
-	 */
 	@Override
 	public void setMinEventTime(DateTime minEventTime) {
 		globalTemporalBoundingBox.setStart(minEventTime);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#getMaxEventTime()
-	 */
 	@Override
 	public DateTime getMaxEventTime() {
 		return globalTemporalBoundingBox.getEnd();
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.n52.sos.cache.CacheImpl#setMaxEventTime(org.joda.time.DateTime)
-	 */
 	@Override
 	public void setMaxEventTime(DateTime maxEventTime) {
 		globalTemporalBoundingBox.setEnd(maxEventTime);
@@ -1105,7 +976,7 @@ public class CacheImpl implements CapabilitiesCache{
 		result = prime * result + ((featureOfInterestTypes == null) ? 0 : featureOfInterestTypes.hashCode());
 		result = prime * result + ((featureOfInterestIdentifiers == null) ? 0 : featureOfInterestIdentifiers.hashCode());
 		result = prime * result + ((kFeatureOfInterestVProcedures == null) ? 0 : kFeatureOfInterestVProcedures.hashCode());
-		result = prime * result + ((kObservablePropertiesVProcedures == null) ? 0 : kObservablePropertiesVProcedures.hashCode());
+		result = prime * result + ((kObservablePropertyVProcedures == null) ? 0 : kObservablePropertyVProcedures.hashCode());
 		result = prime * result + ((kObservablePropertyVOfferings == null) ? 0 : kObservablePropertyVOfferings.hashCode());
 		result = prime * result + ((kOfferingVCompositePhenomenon == null) ? 0 : kOfferingVCompositePhenomenon.hashCode());
 		result = prime * result + ((kOfferingVEnvelope == null) ? 0 : kOfferingVEnvelope.hashCode());
@@ -1183,10 +1054,10 @@ public class CacheImpl implements CapabilitiesCache{
 				return false;
 		} else if (!kFeatureOfInterestVProcedures.equals(other.kFeatureOfInterestVProcedures))
 			return false;
-		if (kObservablePropertiesVProcedures == null) {
-			if (other.kObservablePropertiesVProcedures != null)
+		if (kObservablePropertyVProcedures == null) {
+			if (other.kObservablePropertyVProcedures != null)
 				return false;
-		} else if (!kObservablePropertiesVProcedures.equals(other.kObservablePropertiesVProcedures))
+		} else if (!kObservablePropertyVProcedures.equals(other.kObservablePropertyVProcedures))
 			return false;
 		if (kObservablePropertyVOfferings == null) {
 			if (other.kObservablePropertyVOfferings != null)
