@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,7 @@ import javax.xml.namespace.QName;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.IGetObservationDAO;
@@ -251,63 +253,65 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
 
         queryObject.setAliases(observationAliases);
         List<SosObservation> sosObservations = new ArrayList<SosObservation>();
+        
 
         // temporal filters
-        List<TemporalFilter> nonFirstLatestTemporalFilter = null;
-        if (request.hasTemporalFilterst()) {
-            if (SosHelper.hasFirstLatestTemporalFilter(request.getTemporalFilters())) {
-                List<FirstLatest> firstLatestTemporalFilter =
-                        SosHelper.getFirstLatestTemporalFilter(request.getTemporalFilters());
-                for (FirstLatest firstLatest : firstLatestTemporalFilter) {
-                    HibernateQueryObject firstLatestQueryObject = queryObject.clone();
-                    firstLatestQueryObject.addCriterion(Restrictions.in(
-                            HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION, observationConstallations));
-                    firstLatestQueryObject.setOrder(HibernateCriteriaQueryUtilities.getOrderForEnum(firstLatest));
-                    firstLatestQueryObject.setMaxResult(1);
-                    List<Observation> observations =
-                            HibernateCriteriaQueryUtilities.getObservations(firstLatestQueryObject, session);
-                    sosObservations.addAll(HibernateObservationUtilities.createSosObservationsFromObservations(
-                            observations, request.getVersion(), session));
-
-                    nonFirstLatestTemporalFilter =
-                            SosHelper.getNonFirstLatestTemporalFilter(request.getTemporalFilters());
-                }
-            } else {
-                nonFirstLatestTemporalFilter = request.getTemporalFilters();
+        List<FirstLatest> firstLatestTemporalFilter = null;
+        Criterion criterionForTemporalFilters = null;
+        if (request.hasTemporalFilters()) {
+            firstLatestTemporalFilter =
+                    SosHelper.getFirstLatestTemporalFilter(request.getTemporalFilters());
+            List<TemporalFilter> nonFirstLatestTemporalFilter =
+                    SosHelper.getNonFirstLatestTemporalFilter(request.getTemporalFilters());
+            if (nonFirstLatestTemporalFilter != null && !nonFirstLatestTemporalFilter.isEmpty()) {
+                criterionForTemporalFilters = HibernateCriteriaQueryUtilities
+                        .getCriterionForTemporalFilters(nonFirstLatestTemporalFilter);
             }
         }
-        if (nonFirstLatestTemporalFilter == null
-                || (nonFirstLatestTemporalFilter != null && !nonFirstLatestTemporalFilter.isEmpty())) {
-            if (nonFirstLatestTemporalFilter != null && !nonFirstLatestTemporalFilter.isEmpty()) {
-                queryObject.addCriterion(HibernateCriteriaQueryUtilities
-                        .getCriterionForTemporalFilters(nonFirstLatestTemporalFilter));
-            }
-
-            // TODO Threadable !?!
-            // TODO How to ensure no duplicated observations ?!
-            // TODO How to ensure that anti subsetting observation are also
-            // included ?!
-            for (ObservationConstellation observationConstellation : observationConstallations) {
-                HibernateQueryObject clonedQueryObject = queryObject.clone();
-                clonedQueryObject.addCriterion(Restrictions.eq(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION,
-                        observationConstellation));
-                List<Observation> observations =
-                        HibernateCriteriaQueryUtilities.getObservations(clonedQueryObject, session);
-                if (observations != null && !observations.isEmpty()) {
-                    sosObservations.addAll(HibernateObservationUtilities.createSosObservationsFromObservations(
-                            observations, request.getVersion(), session));
-                } else {
-                    // TODO Hydro-Profile add empty observation metadata as
-                    // SosObservation (add FOI)
-                    if (getConfigurator().getActiveProfile().isShowMetadataOfEmptyObservations()) {
-                        List<String> featureOfInterestIdentifiers =
-                                getAndCheckFeatureOfInterest(observationConstellation, featureIdentifier, session);
-                        sosObservations.addAll(HibernateObservationUtilities
-                                .createSosObservationFromObservationConstellation(observationConstellation,
-                                        featureOfInterestIdentifiers, request.getVersion(), session));
+        // query observations
+        // TODO Threadable !?!
+        // TODO How to ensure no duplicated observations ?!
+        // TODO How to ensure that anti subsetting observation are also
+        // included ?!
+        Set<Observation> allObservations = new HashSet<Observation>(0);
+        for (ObservationConstellation observationConstellation : observationConstallations) {
+            Set<Observation> observations = new HashSet<Observation>(0);
+            HibernateQueryObject defaultQueryObject = queryObject.clone();
+            defaultQueryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION, observationConstellation));
+            if (request.hasTemporalFilters()) {
+                if (firstLatestTemporalFilter != null && !firstLatestTemporalFilter.isEmpty()) {
+                    for (FirstLatest firstLatest : firstLatestTemporalFilter) {
+                        HibernateQueryObject firstLatestQueryObject = defaultQueryObject.clone();
+                        firstLatestQueryObject.setOrder(HibernateCriteriaQueryUtilities.getOrderForEnum(firstLatest));
+                        firstLatestQueryObject.setMaxResult(1);
+                        observations.addAll(HibernateCriteriaQueryUtilities.getObservations(firstLatestQueryObject, session));
                     }
+                } else if (criterionForTemporalFilters != null) {
+                    defaultQueryObject.addCriterion(criterionForTemporalFilters);
+                    observations.addAll(HibernateCriteriaQueryUtilities.getObservations(defaultQueryObject, session));
+                }
+            } else {
+                observations.addAll(HibernateCriteriaQueryUtilities.getObservations(defaultQueryObject, session));
+            }
+            // create SosObservations
+            if (observations != null && !observations.isEmpty()) {
+                allObservations.addAll(observations);
+            } else {
+                // TODO Hydro-Profile add empty observation metadata as
+                // SosObservation (add FOI)
+                if (getConfigurator().getActiveProfile().isShowMetadataOfEmptyObservations()) {
+                    List<String> featureOfInterestIdentifiers =
+                            getAndCheckFeatureOfInterest(observationConstellation, featureIdentifier, session);
+                    sosObservations.addAll(HibernateObservationUtilities
+                            .createSosObservationFromObservationConstellation(observationConstellation,
+                                    featureOfInterestIdentifiers, request.getVersion(), session));
                 }
             }
+        }
+        
+        if (allObservations != null && !allObservations.isEmpty()) {
+            sosObservations.addAll(HibernateObservationUtilities.createSosObservationsFromObservations(
+                    allObservations, request.getVersion(), session));
         }
         return sosObservations;
     }

@@ -487,7 +487,7 @@ public class GetObservationRequest extends AbstractServiceRequest {
         return null;
     }
 
-    public boolean hasTemporalFilterst() {
+    public boolean hasTemporalFilters() {
         return temporalFilters != null && !temporalFilters.isEmpty();
     }
     

@@ -108,7 +108,7 @@ public class HibernateObservationUtilities {
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    public static List<SosObservation> createSosObservationsFromObservations(List<Observation> observations,
+    public static List<SosObservation> createSosObservationsFromObservations(Collection<Observation> observations,
             String version, Session session) throws OwsExceptionReport {
         List<SosObservation> observationCollection = new ArrayList<SosObservation>(0);
 
