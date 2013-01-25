@@ -9,6 +9,6 @@
 	<profile:encodingNamespaceForFeatureOfInterestEncoding></profile:encodingNamespaceForFeatureOfInterestEncoding>
 	<profile:showMetadataOfEmptyObservations>false</profile:showMetadataOfEmptyObservations>
 	<profile:allowSubsettingForSOS20OM20>false</profile:allowSubsettingForSOS20OM20>
-	<profile:mergeValues>true</profile:mergeValues>
+	<profile:mergeValues>false</profile:mergeValues>
 	<profile:returnLatestValueIfTemporalFilterIsMissingInGetObservation>false</profile:returnLatestValueIfTemporalFilterIsMissingInGetObservation>
 </profile:SosProfile>
