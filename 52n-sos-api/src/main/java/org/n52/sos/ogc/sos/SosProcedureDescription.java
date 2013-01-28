@@ -43,7 +43,7 @@ public abstract class SosProcedureDescription {
     private Map<String, Set<SosProcedureDescription>> childProcedureForProcedure =
             new HashMap<String, Set<SosProcedureDescription>>(0);
 
-    public abstract String getProcedureIdentifier();
+	public abstract String getProcedureIdentifier();
 
     public abstract SosOffering getOfferingIdentifier();
 
@@ -205,15 +205,11 @@ public abstract class SosProcedureDescription {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         int hash = 7;
         hash = (getProcedureIdentifier() == null) ? 0 : 31 * hash + getProcedureIdentifier().hashCode();
         return hash;
     }
+
 }

@@ -225,6 +225,5 @@ public class AbstractSensorML extends SosProcedureDescription {
     public boolean isSetHistory() {
         return history != null && !history.isEmpty();
     }
-    
-    
+
 }

@@ -23,6 +23,7 @@
  */
 package org.n52.sos.util.builder;
 
+import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
 
@@ -32,12 +33,14 @@ import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
  */
 public class ProcedureDescriptionBuilder {
 
+	private String procedureIdentifer;
+	private String offeringIdentifier;
+	private String offeringName;
+	
 	public static ProcedureDescriptionBuilder aSensorMLProcedureDescription()
 	{
 		return new ProcedureDescriptionBuilder();
 	}
-
-	private String procedureIdentifer;
 
 	public ProcedureDescriptionBuilder setIdentifier(String procedureIdentifer)
 	{
@@ -45,9 +48,21 @@ public class ProcedureDescriptionBuilder {
 		return this;
 	}
 
-	public SosProcedureDescription build()
+	public ProcedureDescriptionBuilder setOffering(String offeringIdentifier,
+			String offeringName)
 	{
-		return new SosProcedureDescriptionUnknowType(procedureIdentifer, null, null);
+		this.offeringIdentifier = offeringIdentifier;
+		this.offeringName = offeringName;
+		return this;
 	}
 
+	public SosProcedureDescription build()
+	{
+		SosProcedureDescription description = new SosProcedureDescriptionUnknowType(procedureIdentifer, null, null);
+		if (offeringIdentifier != null && offeringName != null)
+		{
+			((SosProcedureDescriptionUnknowType) description).setOfferingIdentifier(new SosOffering(offeringIdentifier, offeringName));
+		}
+		return description;
+	}
 }

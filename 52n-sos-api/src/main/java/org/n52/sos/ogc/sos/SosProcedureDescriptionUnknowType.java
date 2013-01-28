@@ -28,6 +28,7 @@ import org.n52.sos.ogc.om.SosOffering;
 public class SosProcedureDescriptionUnknowType extends SosProcedureDescription {
     
     private String identifier;
+	private SosOffering offering;
     
     
     public SosProcedureDescriptionUnknowType(String identifier, String procedureDescriptionFormat, String xmlDescription) {
@@ -43,7 +44,13 @@ public class SosProcedureDescriptionUnknowType extends SosProcedureDescription {
 
     @Override
     public SosOffering getOfferingIdentifier() {
-        // TODO Auto-generated method stub
-        return null;
+        return offering;
     }
+
+	public void setOfferingIdentifier(SosOffering sosOffering)
+	{
+		this.offering = sosOffering;
+	}
+    
+    
 }
