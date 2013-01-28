@@ -69,7 +69,7 @@ public class CacheImpl implements CapabilitiesCache{
     private Map<String, Collection<String>> kOfferingVObservableProperties;
 
     /** hash map containing the name for each offering */
-    private Map<String, String> offName;
+    private Map<String, String> kOfferingVName;
 
     /** hash map containing the name for each offering */
     private Map<String, Collection<String>> kOfferingVObservationTypes;
@@ -173,7 +173,7 @@ public class CacheImpl implements CapabilitiesCache{
     	kRelatedFeatureVRole = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	observationIdentifiers = Collections.synchronizedList(new ArrayList<String>());
     	observationTypes = Collections.synchronizedList(new ArrayList<String>());
-    	offName = Collections.synchronizedMap(new HashMap<String, String>());
+    	kOfferingVName = Collections.synchronizedMap(new HashMap<String, String>());
     	parentFeatures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	parentProcs = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	globalTemporalBoundingBox = new TimePeriod();
@@ -266,12 +266,12 @@ public class CacheImpl implements CapabilitiesCache{
      * @return
      */
     protected Map<String, String> getOffName() {
-        return offName;
+        return kOfferingVName;
     }
     
     @Override
 	public void setKOfferingVName(Map<String, String> offName) {
-        this.offName = offName;
+        this.kOfferingVName = offName;
     }
     
     /**
@@ -282,7 +282,7 @@ public class CacheImpl implements CapabilitiesCache{
      * @return String containing the name of the offering
      */
     protected String getOfferingName(String offering) {
-        return offName.get(offering);
+        return kOfferingVName.get(offering);
     }
 
     /**
@@ -291,8 +291,8 @@ public class CacheImpl implements CapabilitiesCache{
      * @return List<String> containing the offerings of this SOS
      */
     protected Collection<String> getOfferings() {
-        if (offName != null) {
-            return offName.keySet();
+        if (kOfferingVName != null) {
+            return kOfferingVName.keySet();
         }
         return new ArrayList<String>();
     }
@@ -992,7 +992,7 @@ public class CacheImpl implements CapabilitiesCache{
 		result = prime * result + ((globalTemporalBoundingBox == null) ? 0 : globalTemporalBoundingBox.hashCode());
 		result = prime * result + ((observationIdentifiers == null) ? 0 : observationIdentifiers.hashCode());
 		result = prime * result + ((observationTypes == null) ? 0 : observationTypes.hashCode());
-		result = prime * result + ((offName == null) ? 0 : offName.hashCode());
+		result = prime * result + ((kOfferingVName == null) ? 0 : kOfferingVName.hashCode());
 		result = prime * result + ((parentFeatures == null) ? 0 : parentFeatures.hashCode());
 		result = prime * result + ((parentProcs == null) ? 0 : parentProcs.hashCode());
 		result = prime * result + ((phens4CompPhens == null) ? 0 : phens4CompPhens.hashCode());
@@ -1134,10 +1134,10 @@ public class CacheImpl implements CapabilitiesCache{
 				return false;
 		} else if (!observationTypes.equals(other.observationTypes))
 			return false;
-		if (offName == null) {
-			if (other.offName != null)
+		if (kOfferingVName == null) {
+			if (other.kOfferingVName != null)
 				return false;
-		} else if (!offName.equals(other.offName))
+		} else if (!kOfferingVName.equals(other.kOfferingVName))
 			return false;
 		if (parentFeatures == null) {
 			if (other.parentFeatures != null)

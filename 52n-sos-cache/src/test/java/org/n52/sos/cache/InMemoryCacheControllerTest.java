@@ -316,6 +316,15 @@ public class InMemoryCacheControllerTest
 		
 	}
 
+	@Test public void 
+	should_contain_offering_name_after_InsertSensor()
+			throws OwsExceptionReport{
+		updateEmptyCacheWithInsertSensor();
+		
+		assertTrue("offering NOT in cache",
+				controller.getOfferings().contains(getAssignedOfferingId()) );
+	}
+	
 	private 
 	String getAssignedProcedure()
 	{
@@ -349,7 +358,7 @@ public class InMemoryCacheControllerTest
 	insertSensorResponseExample()
 	{
 		response = anInsertSensorResponse()
-				.setOffering("test-offering")
+				.setOffering("test-offering-identifier")
 				.setProcedure("test-procedure")
 				.build();
 	}
@@ -360,6 +369,7 @@ public class InMemoryCacheControllerTest
 		request = anInsertSensorRequest()
 				.setProcedure(aSensorMLProcedureDescription()
 						.setIdentifier("test-procedure")
+						.setOffering("test-offering-identifier","test-offering-identifier")
 						.build())
 				.addObservableProperty("test-observable-property")
 				.build();

@@ -36,6 +36,7 @@ import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.SosFeatureCollection;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
@@ -140,6 +141,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		addOfferingToProcedureRelation(sosResponse.getAssignedOffering(), sosResponse.getAssignedProcedure());
 		addProcedureToOfferingRelation(sosResponse.getAssignedProcedure(), sosResponse.getAssignedOffering());
 		
+		// offering relations
+		addOfferingNameToCache(sosRequest.getProcedureDescription().getOfferingIdentifier());
+		
 		// observable property relations
 		for (String observableProperty : sosRequest.getObservableProperty()) {
 			addObservablePropertyToProcedureRelation(observableProperty, sosResponse.getAssignedProcedure());
@@ -204,6 +208,14 @@ public class InMemoryCacheController extends CacheControllerImpl {
 				updateOfferingEnvelope(observedFeatureEnvelope, observedFeatureEnvelopeSRID, offeringIdentifier);
 			}
 
+		}
+	}
+	
+	private void addOfferingNameToCache(SosOffering offeringIdentifier)
+	{
+		if (!getCapabilitiesCache().getOffName().containsKey(offeringIdentifier.getOfferingIdentifier()))
+		{
+			getCapabilitiesCache().getOffName().put(offeringIdentifier.getOfferingIdentifier(), offeringIdentifier.getOfferingName());
 		}
 	}
 
