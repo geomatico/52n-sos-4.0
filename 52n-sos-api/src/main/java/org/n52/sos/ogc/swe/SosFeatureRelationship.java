@@ -47,4 +47,9 @@ public class SosFeatureRelationship {
         this.feature = feature;
     }
 
+	@Override
+	public String toString()
+	{
+		return String.format("SosFeatureRelationship [role=%s, feature=%s]", role, feature);
+	}
 }

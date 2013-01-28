@@ -170,5 +170,12 @@ public class SosSamplingFeature extends SosAbstractFeature {
     public boolean isSetGeometry() {
         return geometry != null && !geometry.isEmpty();
     }
+
+    @Override
+	public String toString()
+	{
+		return String.format("SosSamplingFeature [name=%s, description=%s, geometry=%s, epsgCode=%s, featureType=%s, url=%s, sampledFeatures=%s]", 
+				name, description, geometry, epsgCode, featureType,	url, sampledFeatures);
+	}
     
 }
