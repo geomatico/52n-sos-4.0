@@ -326,18 +326,21 @@ public class CacheImpl implements CapabilitiesCache{
     }
 
     /**
-     * returns relationships between offerings and procedures
-     * 
-     * @return
+     * @deprecated use {@link #getKOfferingVProcedures()}
      */
     protected Map<String, List<String>> getOffProcedures() {
-        return kOfferingVProcedures;
+        return getKOfferingVProcedures();
     }
     
     @Override
 	public void setKOfferingVProcedures(Map<String, List<String>> offProcedures) {
         this.kOfferingVProcedures = offProcedures;
     }
+    
+	protected Map<String, List<String>> getKOfferingVProcedures()
+	{
+		return kOfferingVProcedures;
+	}
     
     /**
      * returns the procedures for the requested offering
@@ -454,14 +457,18 @@ public class CacheImpl implements CapabilitiesCache{
     }
 
     /**
-     * @return Returns the phenProcs.
+     * @deprecated use {@link #getKObservablePropertyVProcedures()}
      */
     protected Map<String, List<String>> getPhenProcs() {
         return kObservablePropertyVProcedures;
     }
     
+    protected Map<String, List<String>> getKObservablePropertyVProcedures() {
+        return kObservablePropertyVProcedures;
+    }
+    
     @Override
-	public void setKObservablePropertyKProcedures(Map<String, List<String>> phenProcs) {
+	public void setKObservablePropertyVProcedures(Map<String, List<String>> phenProcs) {
         this.kObservablePropertyVProcedures = phenProcs;
     }
 
@@ -725,12 +732,19 @@ public class CacheImpl implements CapabilitiesCache{
     }
 
     /**
+     * @deprecated use {@link #getKProcedureVObservableProperties()}
+     */
+    protected Map<String, Collection<String>> getProcPhens() {
+        return kProcedureVObservableProperties;
+    }
+    
+    /**
      * returns the procedure phenomenon relations
      * 
      * @return Returns the procPhens.
      */
-    protected Map<String, Collection<String>> getProcPhens() {
-        return kProcedureVObservableProperties;
+    protected Map<String, Collection<String>> getKProcedureVObservableProperties() {
+    	return kProcedureVObservableProperties;
     }
 
     @Override
@@ -1178,4 +1192,5 @@ public class CacheImpl implements CapabilitiesCache{
 			return false;
 		return true;
 	}
+
 }

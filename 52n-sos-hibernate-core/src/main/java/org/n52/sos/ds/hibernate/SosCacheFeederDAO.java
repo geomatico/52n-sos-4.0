@@ -419,7 +419,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         }
         
         cache.setKObservablePropertyVOfferings(kObservablePropertyVOffering);
-        cache.setKObservablePropertyKProcedures(kObservablePropertyVProcedures);
+        cache.setKObservablePropertyVProcedures(kObservablePropertyVProcedures);
     }
 
     private void setFeatureOfInterestValues(CapabilitiesCache cache, Session session) throws OwsExceptionReport {

@@ -45,6 +45,7 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.ogc.swe.SosFeatureRelationship;
 import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.AbstractServiceResponse;
@@ -56,105 +57,115 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk
+ *         J&uuml;rrens</a> TODO add more log statement for debug level on
+ *         failed or successful operation
  */
 public class InMemoryCacheController extends CacheControllerImpl {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryCacheController.class);
 
+	public void updateAfterSensorInsertion(InsertSensorRequest sosRequest,
+			InsertSensorResponse sosResponse) throws OwsExceptionReport
+	{
+		update(Case.SENSOR_INSERTION, sosRequest, sosResponse);
+	}
+
 	/**
-	 * Updates the underlying capabilities cache without accessing the data store
+	 * Updates the underlying capabilities cache without accessing the data
+	 * store
 	 */
 	public void updateAfterObservationInsertion(InsertObservationRequest sosRequest) throws OwsExceptionReport
 	{
 		update(Case.OBSERVATION_INSERTION, sosRequest);
 	}
-	
-	private void 
-	update(Case observationInsertion, InsertObservationRequest sosRequest)
-					throws OwsExceptionReport {
+
+	/*
+	 * Updates the underlying capabilities cache without accessing the data
+	 * store
+	 */
+	public void updateAfterSensorDeletion(DeleteSensorRequest sosRequest) throws OwsExceptionReport
+	{
+		update(Case.SENSOR_DELETION, sosRequest);
+	}
+
+	private void update(Case observationInsertion,
+			AbstractServiceRequest sosRequest) throws OwsExceptionReport
+	{
 		update(observationInsertion, sosRequest, null);
 	}
 
-	public void 
-	updateAfterSensorInsertion(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse)
-			throws OwsExceptionReport {
-		update(Case.SENSOR_INSERTION, sosRequest,sosResponse);
-	}
-
-	private void 
-	update(Case c, AbstractServiceRequest sosRequest, AbstractServiceResponse sosResponse)
-			throws OwsExceptionReport {
-    	if (c == null || 
-    			sosRequest == null || 
-    			(sosRequest instanceof InsertSensorRequest && (sosResponse == null)) )
-    	{
-    		String errorMsg = String.format("Missing arguments: Case: %s, AbstractServiceRequest: %s, AbstractServiceResponse: %s", 
-    				c,sosRequest,sosResponse);
-    		LOGGER.warn(errorMsg);
-    		throw new IllegalArgumentException(errorMsg);
-    	}
+	private void update(Case c,
+			AbstractServiceRequest sosRequest,
+			AbstractServiceResponse sosResponse) throws OwsExceptionReport
+	{
+		if (c == null || sosRequest == null || (sosRequest != null && sosRequest instanceof InsertSensorRequest && (sosResponse == null))) {
+			String errorMsg = String.format("Missing arguments: Case: %s, AbstractServiceRequest: %s, AbstractServiceResponse: %s", c, sosRequest, sosResponse);
+			LOGGER.warn(errorMsg);
+			throw new IllegalArgumentException(errorMsg);
+		}
 		boolean timeNotElapsed = true;
-	    try {
-	        // thread safe updating of the cache map
-	        timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
-	
-	        // has waiting for lock got a time out?
-	        if (!timeNotElapsed) {
-	            LOGGER.warn("\n******\nupdate after {} not successful because of time out while waiting for update lock." + 
-	            					"\nWaited {} milliseconds.\n******\n",c,SosConstants.UPDATE_TIMEOUT);
-	            return;
-	        }
-	        while (!isUpdateIsFree()) {
-	            getUpdateFree().await();
-	        }
-	        setUpdateIsFree(false);
-	        switch (c) {
+		try {
+			// thread safe updating of the cache map
+			timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
+
+			// has waiting for lock got a time out?
+			if (!timeNotElapsed) {
+				LOGGER.warn("\n******\nupdate after {} not successful because of time out while waiting for update lock." + "\nWaited {} milliseconds.\n******\n", c, SosConstants.UPDATE_TIMEOUT);
+				return;
+			}
+			while (!isUpdateIsFree()) {
+				getUpdateFree().await();
+			}
+			setUpdateIsFree(false);
+			switch (c) {
 			case OBSERVATION_DELETION:
 				throw new RuntimeException("NOT IMPLEMENTED");
-//				break;
+				// break;
 			case SENSOR_DELETION:
-				throw new RuntimeException("NOT IMPLEMENTED");
-//				break;
+				doUpdateAfterSensorDeletion((DeleteSensorRequest) sosRequest);
+				break;
 			case OBSERVATION_INSERTION:
-				updateAfterObservationInsertionHelper((InsertObservationRequest) sosRequest);
+				doUpdateAfterObservationInsertion((InsertObservationRequest) sosRequest);
 				break;
 			case RESULT_TEMPLATE_INSERTION:
 				throw new RuntimeException("NOT IMPLEMENTED");
-//				break;
+				// break;
 			case SENSOR_INSERTION:
-				updateAfterSensorInsertionHelper((InsertSensorRequest) sosRequest, (InsertSensorResponse)sosResponse);
+				doUpdateAfterSensorInsertion((InsertSensorRequest) sosRequest, (InsertSensorResponse) sosResponse);
 				break;
 			}
-	
-	    } catch (InterruptedException e) {
-	        LOGGER.error("Problem while threadsafe capabilities cache update", e);
-	    } finally {
-	        if (timeNotElapsed) {
-	            getUpdateLock().unlock();
-	            setUpdateIsFree(true);
-	        }
-	    }
+
+		} catch (InterruptedException e) {
+			LOGGER.error("Problem while threadsafe capabilities cache update", e);
+		} finally {
+			if (timeNotElapsed) {
+				getUpdateLock().unlock();
+				setUpdateIsFree(true);
+			}
+		}
 	}
 
-	private void 
-	updateAfterSensorInsertionHelper(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse)
+	/* WORKER */
+	
+	private void doUpdateAfterSensorInsertion(InsertSensorRequest sosRequest,
+			InsertSensorResponse sosResponse)
 	{
 		// procedure relations
 		addProcedureToCache(sosResponse.getAssignedProcedure());
 		addOfferingToProcedureRelation(sosResponse.getAssignedOffering(), sosResponse.getAssignedProcedure());
 		addProcedureToOfferingRelation(sosResponse.getAssignedProcedure(), sosResponse.getAssignedOffering());
-		
-		// offering relations
+
+		// offering name
 		addOfferingNameToCache(sosRequest.getProcedureDescription().getOfferingIdentifier());
-		
+
 		// allowed observation types
-		addAllowedObservationTypes(sosResponse.getAssignedOffering(),sosRequest.getMetadata().getObservationTypes());
-		
+		addAllowedObservationTypes(sosResponse.getAssignedOffering(), sosRequest.getMetadata().getObservationTypes());
+
 		// related features
-		addRelatedFeatures(sosRequest.getRelatedFeatures(),sosResponse.getAssignedOffering());
+		addRelatedFeatures(sosRequest.getRelatedFeatures(), sosResponse.getAssignedOffering());
 		addRelatedFeatureRoles(sosRequest.getRelatedFeatures());
-		
+
 		// observable property relations
 		for (String observableProperty : sosRequest.getObservableProperty()) {
 			addObservablePropertyToProcedureRelation(observableProperty, sosResponse.getAssignedProcedure());
@@ -164,21 +175,18 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		}
 	}
 
-
-	private void 
-	updateAfterObservationInsertionHelper(InsertObservationRequest sosRequest)
+	private void doUpdateAfterObservationInsertion(InsertObservationRequest sosRequest)
 	{
 		// update cache maps
-		for (SosObservation sosObservation : sosRequest.getObservations())
-		{
+		for (SosObservation sosObservation : sosRequest.getObservations()) {
 			addProcedureToCache(getProcedureIdentifier(sosObservation));
-			addObservablePropertyToProcedureRelation(getObservablePropertyIdentifier(sosObservation),getProcedureIdentifier(sosObservation));
-			addProcedureToObservablePropertyRelation(getProcedureIdentifier(sosObservation),getObservablePropertyIdentifier(sosObservation));
-			
+			addObservablePropertyToProcedureRelation(getObservablePropertyIdentifier(sosObservation), getProcedureIdentifier(sosObservation));
+			addProcedureToObservablePropertyRelation(getProcedureIdentifier(sosObservation), getObservablePropertyIdentifier(sosObservation));
+
 			updateGlobalTemporalBBoxUsingNew(phenomenonTimeFrom(sosObservation));
-			
+
 			addObservationTypeToCache(sosObservation);
-			
+
 			addObservationIdToCacheIfSet(sosObservation);
 
 			// update features
@@ -189,14 +197,13 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			observedFeatureEnvelope = createEnvelopeFrom(observedFeatures);
 			updateGlobalEnvelopeUsing(observedFeatureEnvelope);
 
-			for (SosSamplingFeature sosSamplingFeature : observedFeatures)
-			{
+			for (SosSamplingFeature sosSamplingFeature : observedFeatures) {
 				String observedFeatureIdentifier = sosSamplingFeature.getIdentifier().getValue();
 
 				addFeatureIdentifierToCache(observedFeatureIdentifier);
 				addFeatureTypeToCache(sosSamplingFeature.getFeatureType());
 				addProcedureToFeatureRelationToCache(getProcedureIdentifier(sosObservation), observedFeatureIdentifier);
-				addFeatureToProcedureRelationToCache(observedFeatureIdentifier,getProcedureIdentifier(sosObservation));
+				addFeatureToProcedureRelationToCache(observedFeatureIdentifier, getProcedureIdentifier(sosObservation));
 				updateInterFeatureRelations(sosSamplingFeature);
 				for (String offeringIdentifier : sosRequest.getOfferings()) {
 					addOfferingRelatedFeatureRelationToCache(observedFeatureIdentifier, offeringIdentifier);
@@ -205,13 +212,12 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			}
 
 			// update offerings
-			for (String offeringIdentifier : sosRequest.getOfferings())
-			{
+			for (String offeringIdentifier : sosRequest.getOfferings()) {
 				// procedure
 				addOfferingToProcedureRelation(offeringIdentifier, getProcedureIdentifier(sosObservation));
-				addProcedureToOfferingRelation(getProcedureIdentifier(sosObservation),offeringIdentifier);
+				addProcedureToOfferingRelation(getProcedureIdentifier(sosObservation), offeringIdentifier);
 				// observable property
-				addObservablePropertiesToOfferingRelation(getObservablePropertyIdentifier(sosObservation),offeringIdentifier);
+				addObservablePropertiesToOfferingRelation(getObservablePropertyIdentifier(sosObservation), offeringIdentifier);
 				addOfferingToObservablePropertyRelation(offeringIdentifier, getObservablePropertyIdentifier(sosObservation));
 				// observation type
 				addOfferingToObservationTypeRelation(offeringIdentifier, sosObservation.getObservationConstellation().getObservationType());
@@ -223,21 +229,98 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		}
 	}
 
+	private void doUpdateAfterSensorDeletion(DeleteSensorRequest sosRequest) throws OwsExceptionReport
+	{
+		// remove procedure from cache
+		removeProcedureFromCache(sosRequest.getProcedureIdentifier());
+	
+		// remove procedure offering relations
+		removeOfferingToProcedureRelation(sosRequest.getProcedureIdentifier());
+		
+		// observable property relations
+		for (String observableProperty : getCapabilitiesCache().getKProcedureVObservableProperties().get(sosRequest.getProcedureIdentifier())) {
+			removeObservablePropertyToProcedureRelation(observableProperty, sosRequest.getProcedureIdentifier());
+			removeProcedureToObservablePropertyRelations(sosRequest.getProcedureIdentifier());
+			// TODO Eike: Continue implementation here
+//			removeObservablePropertiesToOfferingRelation(observableProperty, sosRequest.getProcedureIdentifier());
+//			removeOfferingToObservablePropertyRelation(sosRequest.getProcedureIdentifier(), observableProperty);
+		}
+		
+		// At the latest
+		removeProcedureToOfferingRelation(sosRequest.getProcedureIdentifier());
+	}
+	
+	/* HELPER */
+
+	private void removeProcedureToObservablePropertyRelations(String procedureIdentifier)
+	{
+		getCapabilitiesCache().getKProcedureVObservableProperties().remove(procedureIdentifier);
+		if (getCapabilitiesCache().getKProcedureVObservableProperties().get(procedureIdentifier) == null)
+		{
+			LOGGER.debug("Removed procedure to observable properties relations from cache for procedure \"{}\"", procedureIdentifier);
+		}
+	}
+
+	private void removeObservablePropertyToProcedureRelation(String observableProperty,
+			String procedureIdentifier)
+	{
+		if (getCapabilitiesCache().getKObservablePropertyVProcedures().get(observableProperty).remove(procedureIdentifier))
+		{
+			LOGGER.debug("Removed observable property \"{}\" -> procedure \"{}\" relation from cache",
+					observableProperty,procedureIdentifier);
+			if (getCapabilitiesCache().getKObservablePropertyVProcedures().get(observableProperty) != null &&
+					getCapabilitiesCache().getKObservablePropertyVProcedures().get(observableProperty).isEmpty() &&
+					getCapabilitiesCache().getKObservablePropertyVProcedures().remove(observableProperty) == null)
+			{
+				LOGGER.debug("Removed entry for observable property \"{}\" from cache map",observableProperty);
+			}
+		}
+	}
+
+	private void removeOfferingToProcedureRelation(String procedureIdentifier)
+	{
+		for (Entry<String, List<String>> offeringToProcedureRelation : getCapabilitiesCache().getKOfferingVProcedures().entrySet()) {
+			if (offeringToProcedureRelation.getValue().remove(procedureIdentifier))
+			{
+				LOGGER.debug("procedure to offering relation removed for \"{}\"->\"{}\"",
+						procedureIdentifier,
+						offeringToProcedureRelation.getKey());
+				if (offeringToProcedureRelation.getValue().isEmpty())
+				{
+					getCapabilitiesCache().getKOfferingVProcedures().remove(offeringToProcedureRelation.getKey());
+				}
+			}
+		}
+	}
+
+	private void removeProcedureToOfferingRelation(String procedureIdentifer)
+	{
+		if (getCapabilitiesCache().getKProcedureVOffering().remove(procedureIdentifer) != null)
+		{
+			LOGGER.debug("procedure to offering relation removed from cache for procedure {}",
+					procedureIdentifer);
+		}
+	}
+
+	private void removeProcedureFromCache(String procedureIdentifier)
+	{
+		if (getCapabilitiesCache().getProcedures().remove(procedureIdentifier)) {
+			LOGGER.debug("Procedure removed from list of procedures: {}", procedureIdentifier);
+		}
+	}
+
 	private void addRelatedFeatureRoles(List<SosFeatureRelationship> relatedFeatures)
 	{
-		if (relatedFeatures != null && !relatedFeatures.isEmpty())
-		{
+		if (relatedFeatures != null && !relatedFeatures.isEmpty()) {
 			for (SosFeatureRelationship featureRelation : relatedFeatures) {
 				// add new
-				if (!getCapabilitiesCache().getKRelatedFeatureVRole().containsKey(getFeatureIdentifier(featureRelation)))
-				{
+				if (!getCapabilitiesCache().getKRelatedFeatureVRole().containsKey(getFeatureIdentifier(featureRelation))) {
 					List<String> roles = new ArrayList<String>(1);
 					roles.add(featureRelation.getRole());
 					getCapabilitiesCache().getKRelatedFeatureVRole().put(getFeatureIdentifier(featureRelation), roles);
 				}
 				// update
-				else if (!getCapabilitiesCache().getKRelatedFeatureVRole().get(getFeatureIdentifier(featureRelation)).contains(featureRelation.getRole())) 
-				{
+				else if (!getCapabilitiesCache().getKRelatedFeatureVRole().get(getFeatureIdentifier(featureRelation)).contains(featureRelation.getRole())) {
 					getCapabilitiesCache().getKRelatedFeatureVRole().get(getFeatureIdentifier(featureRelation)).add(featureRelation.getRole());
 				}
 			}
@@ -248,24 +331,20 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	{
 		return sosFeatureRelationship.getFeature().getIdentifier().getValue();
 	}
-	
-	private void addRelatedFeatures(List<SosFeatureRelationship> relatedFeatures, String offeringId)
+
+	private void addRelatedFeatures(List<SosFeatureRelationship> relatedFeatures,
+			String offeringId)
 	{
-		if (relatedFeatures != null && !relatedFeatures.isEmpty())
-		{
-			if (getCapabilitiesCache().getKOfferingVRelatedFeatures().get(offeringId) == null)
-			{
+		if (relatedFeatures != null && !relatedFeatures.isEmpty()) {
+			if (getCapabilitiesCache().getKOfferingVRelatedFeatures().get(offeringId) == null) {
 				Collection<String> relatedFeatureIdentifiers = new ArrayList<String>(relatedFeatures.size());
 				for (SosFeatureRelationship sosFeatureRelationship : relatedFeatures) {
 					relatedFeatureIdentifiers.add(getFeatureIdentifier(sosFeatureRelationship));
 				}
 				getCapabilitiesCache().getKOfferingVRelatedFeatures().put(offeringId, relatedFeatureIdentifiers);
-			}
-			else
-			{
+			} else {
 				for (SosFeatureRelationship sosFeatureRelationship : relatedFeatures) {
-					if (!getCapabilitiesCache().getKOfferingVRelatedFeatures().get(offeringId).contains(getFeatureIdentifier(sosFeatureRelationship)))
-					{
+					if (!getCapabilitiesCache().getKOfferingVRelatedFeatures().get(offeringId).contains(getFeatureIdentifier(sosFeatureRelationship))) {
 						getCapabilitiesCache().getKOfferingVRelatedFeatures().get(offeringId).add(getFeatureIdentifier(sosFeatureRelationship));
 					}
 				}
@@ -276,38 +355,32 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	private void addAllowedObservationTypes(String assignedOffering,
 			List<String> observationTypes)
 	{
-		if (!getCapabilitiesCache().getAllowedKOfferingVObservationType().containsKey(assignedOffering))
-		{
+		if (!getCapabilitiesCache().getAllowedKOfferingVObservationType().containsKey(assignedOffering)) {
 			getCapabilitiesCache().getAllowedKOfferingVObservationType().put(assignedOffering, observationTypes);
-		}
-		else
-		{
+		} else {
 			for (String observationType : observationTypes) {
 				getCapabilitiesCache().getAllowedKOfferingVObservationType().get(assignedOffering).add(observationType);
 			}
 		}
 	}
-	
+
 	private void addOfferingNameToCache(SosOffering offeringIdentifier)
 	{
-		if (!getCapabilitiesCache().getOffName().containsKey(offeringIdentifier.getOfferingIdentifier()))
-		{
+		if (!getCapabilitiesCache().getOffName().containsKey(offeringIdentifier.getOfferingIdentifier())) {
 			getCapabilitiesCache().getOffName().put(offeringIdentifier.getOfferingIdentifier(), offeringIdentifier.getOfferingName());
 		}
 	}
 
 	private void addObservationIdToCacheIfSet(SosObservation sosObservation)
 	{
-		if (sosObservation.getIdentifier() != null)
-		{
+		if (sosObservation.getIdentifier() != null) {
 			getCapabilitiesCache().getObservationIdentifiers().add(sosObservation.getIdentifier().getValue());
 		}
 	}
 
 	private void addObservationTypeToCache(SosObservation sosObservation)
 	{
-		if (!getObservationTypes().contains(sosObservation.getObservationConstellation().getObservationType()))
-		{
+		if (!getObservationTypes().contains(sosObservation.getObservationConstellation().getObservationType())) {
 			getCapabilitiesCache().getObservationTypes().add(sosObservation.getObservationConstellation().getObservationType());
 		}
 	}
@@ -316,14 +389,11 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			String observablePropertyIdentifier)
 	{
 		// offering -> observableProperties
-		if (getCapabilitiesCache().getOffPhenomenons().get(offeringIdentifier) == null)
-		{
+		if (getCapabilitiesCache().getOffPhenomenons().get(offeringIdentifier) == null) {
 			List<String> propertiesForOffering = Collections.synchronizedList(new ArrayList<String>());
 			propertiesForOffering.add(observablePropertyIdentifier);
 			getCapabilitiesCache().getOffPhenomenons().put(offeringIdentifier, propertiesForOffering);
-		}
-		else if (!getCapabilitiesCache().getOffPhenomenons().get(offeringIdentifier).contains(observablePropertyIdentifier))
-		{
+		} else if (!getCapabilitiesCache().getOffPhenomenons().get(offeringIdentifier).contains(observablePropertyIdentifier)) {
 			getCapabilitiesCache().getOffPhenomenons().get(offeringIdentifier).add(observablePropertyIdentifier);
 		}
 	}
@@ -331,14 +401,11 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	private void addFeatureToProcedureRelationToCache(String observedFeatureIdentifier,
 			String procedureIdentifier)
 	{
-		if (getCapabilitiesCache().getProceduresForFeature(observedFeatureIdentifier) == null)
-		{
+		if (getCapabilitiesCache().getProceduresForFeature(observedFeatureIdentifier) == null) {
 			List<String> procedures4Feature = Collections.synchronizedList(new ArrayList<String>());
 			procedures4Feature.add(procedureIdentifier);
 			getCapabilitiesCache().getFoiProcedures().put(observedFeatureIdentifier, procedures4Feature);
-		}
-		else if (!getCapabilitiesCache().getProceduresForFeature(observedFeatureIdentifier).contains(procedureIdentifier))
-		{
+		} else if (!getCapabilitiesCache().getProceduresForFeature(observedFeatureIdentifier).contains(procedureIdentifier)) {
 			getCapabilitiesCache().getProceduresForFeature(observedFeatureIdentifier).add(procedureIdentifier);
 		}
 	}
@@ -347,14 +414,11 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			String offeringIdentifier)
 	{
 		// offering-procedures
-		if (getCapabilitiesCache().getKProcedureVOffering().get(procedureIdentifier) == null)
-		{
+		if (getCapabilitiesCache().getKProcedureVOffering().get(procedureIdentifier) == null) {
 			List<String> offerings4Procedure = Collections.synchronizedList(new ArrayList<String>());
 			offerings4Procedure.add(offeringIdentifier);
 			getCapabilitiesCache().getKProcedureVOffering().put(procedureIdentifier, offerings4Procedure);
-		}
-		else if (!getCapabilitiesCache().getKProcedureVOffering().get(procedureIdentifier).contains(offeringIdentifier))
-		{
+		} else if (!getCapabilitiesCache().getKProcedureVOffering().get(procedureIdentifier).contains(offeringIdentifier)) {
 			getCapabilitiesCache().getKProcedureVOffering().get(procedureIdentifier).add(offeringIdentifier);
 		}
 	}
@@ -362,14 +426,11 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	private void addProcedureToObservablePropertyRelation(String procedureIdentifier,
 			String observablePropertyIdentifier)
 	{
-		if (getCapabilitiesCache().getProcPhens().get(procedureIdentifier) == null)
-		{
+		if (getCapabilitiesCache().getProcPhens().get(procedureIdentifier) == null) {
 			List<String> relatedProperties = Collections.synchronizedList(new ArrayList<String>());
 			relatedProperties.add(observablePropertyIdentifier);
 			getCapabilitiesCache().getProcPhens().put(procedureIdentifier, relatedProperties);
-		}
-		else if (!getCapabilitiesCache().getProcPhens().get(procedureIdentifier).contains(observablePropertyIdentifier))
-		{
+		} else if (!getCapabilitiesCache().getProcPhens().get(procedureIdentifier).contains(observablePropertyIdentifier)) {
 			getCapabilitiesCache().getProcPhens().get(procedureIdentifier).add(observablePropertyIdentifier);
 		}
 	}
@@ -387,30 +448,25 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	private void addObservablePropertyToProcedureRelation(String observablePropertyIdentifier,
 			String procedureIdentifier)
 	{
-		if (getCapabilitiesCache().getPhenProcs().get(observablePropertyIdentifier) == null)
-		{
+		if (getCapabilitiesCache().getPhenProcs().get(observablePropertyIdentifier) == null) {
 			List<String> relatedProcedures = Collections.synchronizedList(new ArrayList<String>());
 			relatedProcedures.add(procedureIdentifier);
 			getCapabilitiesCache().getPhenProcs().put(observablePropertyIdentifier, relatedProcedures);
-		}
-		else if (!getCapabilitiesCache().getPhenProcs().get(observablePropertyIdentifier).contains(procedureIdentifier))
-		{
+		} else if (!getCapabilitiesCache().getPhenProcs().get(observablePropertyIdentifier).contains(procedureIdentifier)) {
 			getCapabilitiesCache().getPhenProcs().get(observablePropertyIdentifier).add(procedureIdentifier);
 		}
 	}
 
 	private void addFeatureTypeToCache(String featureType)
 	{
-		if (!getCapabilitiesCache().getFeatureOfInterestTypes().contains(featureType))
-		{
+		if (!getCapabilitiesCache().getFeatureOfInterestTypes().contains(featureType)) {
 			getCapabilitiesCache().getFeatureOfInterestTypes().add(featureType);
 		}
 	}
 
 	private void addProcedureToCache(String procedureIdentifier)
 	{
-		if (!getCapabilitiesCache().getProcedures().contains(procedureIdentifier))
-		{
+		if (!getCapabilitiesCache().getProcedures().contains(procedureIdentifier)) {
 			getCapabilitiesCache().getProcedures().add(procedureIdentifier);
 		}
 	}
@@ -419,14 +475,11 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			String offeringIdentifier)
 	{
 		// offering-feature
-		if (!getCapabilitiesCache().getOffFeatures().containsKey(offeringIdentifier))
-		{
+		if (!getCapabilitiesCache().getOffFeatures().containsKey(offeringIdentifier)) {
 			List<String> relatedFeatures = Collections.synchronizedList(new ArrayList<String>());
 			relatedFeatures.add(observedFeatureIdentifier);
 			getCapabilitiesCache().getOffFeatures().put(offeringIdentifier, relatedFeatures);
-		}
-		else if (!getCapabilitiesCache().getOffFeatures().get(offeringIdentifier).contains(observedFeatureIdentifier))
-		{
+		} else if (!getCapabilitiesCache().getOffFeatures().get(offeringIdentifier).contains(observedFeatureIdentifier)) {
 			getCapabilitiesCache().getOffFeatures().get(offeringIdentifier).add(observedFeatureIdentifier);
 		}
 	}
@@ -436,15 +489,12 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	{
 		// offering-relatedFeatures
 		Map<String, Collection<String>> offeringRelatedFeaturesMap = getCapabilitiesCache().getKOfferingVRelatedFeatures();
-		if (offeringRelatedFeaturesMap != null)
-		{
-			if (offeringRelatedFeaturesMap.containsKey(offeringIdentifier) && !offeringRelatedFeaturesMap.get(offeringIdentifier).contains(observedFeatureIdentifier))
-			{
-				// if offering is already there and feature not contained -> add to list
+		if (offeringRelatedFeaturesMap != null) {
+			if (offeringRelatedFeaturesMap.containsKey(offeringIdentifier) && !offeringRelatedFeaturesMap.get(offeringIdentifier).contains(observedFeatureIdentifier)) {
+				// if offering is already there and feature not contained -> add
+				// to list
 				offeringRelatedFeaturesMap.get(offeringIdentifier).add(observedFeatureIdentifier);
-			}
-			else
-			{
+			} else {
 				// if not -> add new list
 				ArrayList<String> relatedFeatures = new ArrayList<String>(1);
 				relatedFeatures.add(observedFeatureIdentifier);
@@ -458,17 +508,13 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			String offeringIdentifier)
 	{
 		// offering-envelope
-		if (getCapabilitiesCache().getKOfferingVEnvelope().containsKey(offeringIdentifier) && 
-				getCapabilitiesCache().getKOfferingVEnvelope().get(offeringIdentifier).isSetEnvelope() && 
-				!getCapabilitiesCache().getKOfferingVEnvelope().get(offeringIdentifier).getEnvelope().contains(observedFeatureEnvelope))
-		{
+		if (getCapabilitiesCache().getKOfferingVEnvelope().containsKey(offeringIdentifier) && getCapabilitiesCache().getKOfferingVEnvelope().get(offeringIdentifier).isSetEnvelope()
+				&& !getCapabilitiesCache().getKOfferingVEnvelope().get(offeringIdentifier).getEnvelope().contains(observedFeatureEnvelope)) {
 			// update envelope
 			getCapabilitiesCache().getKOfferingVEnvelope().get(offeringIdentifier).getEnvelope().expandToInclude(observedFeatureEnvelope);
-		}
-		else
-		{
+		} else {
 			// add new envelope
-			SosEnvelope newOfferingEnvelope = new SosEnvelope(observedFeatureEnvelope,observedFeatureEnvelopeSRID);
+			SosEnvelope newOfferingEnvelope = new SosEnvelope(observedFeatureEnvelope, observedFeatureEnvelopeSRID);
 			getCapabilitiesCache().getKOfferingVEnvelope().put(offeringIdentifier, newOfferingEnvelope);
 		}
 	}
@@ -482,10 +528,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		for (SosAbstractFeature sosAbstractFeature : parentFeatures) {
 			parentFeaturesIdentifiers.add(sosAbstractFeature.getIdentifier().getValue());
 		}
-		if (parentFeatures != null && !parentFeatures.isEmpty())
-		{
+		if (parentFeatures != null && !parentFeatures.isEmpty()) {
 			Collection<String> parentFeaturesFromCache = null;
-			
+
 			updateParentFeatures(sosSamplingFeature.getIdentifier().getValue(), parentFeaturesIdentifiers, parentFeaturesFromCache);
 			updateChildFeatures(sosSamplingFeature.getIdentifier().getValue(), parentFeaturesFromCache);
 		}
@@ -496,23 +541,19 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	{
 		// update child features
 		Map<String, Collection<String>> childFeaturesMapFromCache = getCapabilitiesCache().getChildFeatures();
-		if (childFeaturesMapFromCache != null && !childFeaturesMapFromCache.isEmpty() && parentFeaturesFromCache != null)
-		{
-			// 1 check for the identifier of the parent features of this feature of this observation
-			for (String parentFeatureIdentifier : parentFeaturesFromCache)
-			{
+		if (childFeaturesMapFromCache != null && !childFeaturesMapFromCache.isEmpty() && parentFeaturesFromCache != null) {
+			// 1 check for the identifier of the parent features of this feature
+			// of this observation
+			for (String parentFeatureIdentifier : parentFeaturesFromCache) {
 				// if not -> add new list with one element
-				if (!childFeaturesMapFromCache.containsKey(parentFeatureIdentifier))
-				{
+				if (!childFeaturesMapFromCache.containsKey(parentFeatureIdentifier)) {
 					ArrayList<String> newChildList = new ArrayList<String>(1);
 					newChildList.add(observedFeatureIdentifier);
 					childFeaturesMapFromCache.put(parentFeatureIdentifier, newChildList);
-				}
-				else // if yes -> get list and update if required
+				} else // if yes -> get list and update if required
 				{
 					Collection<String> childFeatures = childFeaturesMapFromCache.get(parentFeatureIdentifier);
-					if (!childFeatures.contains(observedFeatureIdentifier))
-					{
+					if (!childFeatures.contains(observedFeatureIdentifier)) {
 						childFeatures.add(observedFeatureIdentifier);
 					}
 				}
@@ -527,19 +568,15 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		// update parent features
 		Map<String, Collection<String>> parentFeaturesMapFromCache = getCapabilitiesCache().getParentFeatures();
 		// 1 are parent features already available for this feature
-		if (parentFeaturesMapFromCache != null && !parentFeaturesMapFromCache.isEmpty() && parentFeaturesMapFromCache.containsKey(observedFeatureIdentifier))
-		{
+		if (parentFeaturesMapFromCache != null && !parentFeaturesMapFromCache.isEmpty() && parentFeaturesMapFromCache.containsKey(observedFeatureIdentifier)) {
 			// if yes -> check list and add all not already contained ones
 			parentFeaturesFromCache = parentFeaturesMapFromCache.get(observedFeatureIdentifier);
-			for (String parentFeatureIdentifier : parentFeaturesIdentifiers)
-			{
-				if (!parentFeaturesFromCache.contains(parentFeatureIdentifier))
-				{
+			for (String parentFeatureIdentifier : parentFeaturesIdentifiers) {
+				if (!parentFeaturesFromCache.contains(parentFeatureIdentifier)) {
 					parentFeaturesFromCache.add(parentFeatureIdentifier);
 				}
 			}
-		}
-		else // if not -> add parent features and done
+		} else // if not -> add parent features and done
 		{
 			parentFeaturesMapFromCache.put(observedFeatureIdentifier, parentFeaturesIdentifiers);
 		}
@@ -549,14 +586,11 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			String observedFeatureIdentifier)
 	{
 		// add foi-sensor-relation
-		if (getCapabilitiesCache().getProceduresForFeature(observedFeatureIdentifier) == null)
-		{
-			List<String>procedures4Feature = Collections.synchronizedList(new ArrayList<String>());
+		if (getCapabilitiesCache().getProceduresForFeature(observedFeatureIdentifier) == null) {
+			List<String> procedures4Feature = Collections.synchronizedList(new ArrayList<String>());
 			procedures4Feature.add(procedureIdentifier);
 			getCapabilitiesCache().getFoiProcedures().put(observedFeatureIdentifier, procedures4Feature);
-		}
-		else if (!getCapabilitiesCache().getProceduresForFeature(observedFeatureIdentifier).contains(procedureIdentifier))
-		{
+		} else if (!getCapabilitiesCache().getProceduresForFeature(observedFeatureIdentifier).contains(procedureIdentifier)) {
 			getCapabilitiesCache().getFoiProcedures().get(observedFeatureIdentifier).add(procedureIdentifier);
 		}
 	}
@@ -565,27 +599,21 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	{
 		// add feature
 		Collection<String> featureIdentifiers = getCapabilitiesCache().getFeatureOfInterest();
-		if (!featureIdentifiers.contains(observedFeatureIdentifier))
-		{
+		if (!featureIdentifiers.contains(observedFeatureIdentifier)) {
 			featureIdentifiers.add(observedFeatureIdentifier);
 		}
 	}
 
 	private List<SosSamplingFeature> sosFeaturesToList(SosAbstractFeature sosFeatureOfInterest)
 	{
-		if (sosFeatureOfInterest instanceof SosFeatureCollection)
-		{
-			return getAllFeaturesFrom((SosFeatureCollection)sosFeatureOfInterest);
-		}
-		else if (sosFeatureOfInterest instanceof SosSamplingFeature)
-		{
+		if (sosFeatureOfInterest instanceof SosFeatureCollection) {
+			return getAllFeaturesFrom((SosFeatureCollection) sosFeatureOfInterest);
+		} else if (sosFeatureOfInterest instanceof SosSamplingFeature) {
 			List<SosSamplingFeature> observedFeatures = new ArrayList<SosSamplingFeature>(1);
 			observedFeatures.add((SosSamplingFeature) sosFeatureOfInterest);
 			return observedFeatures;
-		}
-		else
-		{
-			String errorMessage = String.format("Feature Type \"%s\" not supported.", sosFeatureOfInterest!=null?sosFeatureOfInterest.getClass().getName():sosFeatureOfInterest);
+		} else {
+			String errorMessage = String.format("Feature Type \"%s\" not supported.", sosFeatureOfInterest != null ? sosFeatureOfInterest.getClass().getName() : sosFeatureOfInterest);
 			LOGGER.error(errorMessage);
 			throw new RuntimeException(errorMessage);
 		}
@@ -603,14 +631,10 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	private List<SosSamplingFeature> getAllFeaturesFrom(SosFeatureCollection sosFeatureOfInterest)
 	{
 		List<SosSamplingFeature> allFeatures = new ArrayList<SosSamplingFeature>(((SosFeatureCollection) sosFeatureOfInterest).getMembers().size());
-		for (Entry<String, SosAbstractFeature> entry : ((SosFeatureCollection) sosFeatureOfInterest).getMembers().entrySet())
-		{
-			if (entry.getValue() instanceof SosSamplingFeature)
-			{
+		for (Entry<String, SosAbstractFeature> entry : ((SosFeatureCollection) sosFeatureOfInterest).getMembers().entrySet()) {
+			if (entry.getValue() instanceof SosSamplingFeature) {
 				allFeatures.add((SosSamplingFeature) entry.getValue());
-			}
-			else if (entry.getValue() instanceof SosFeatureCollection)
-			{
+			} else if (entry.getValue() instanceof SosFeatureCollection) {
 				allFeatures.addAll(getAllFeaturesFrom((SosFeatureCollection) entry.getValue()));
 			}
 		}
@@ -621,14 +645,11 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			String offeringIdentifier)
 	{
 		// observableProperties-offering
-		if (getCapabilitiesCache().getKObservablePropertyVOffering().get(observablePropertyIdentifier) == null)
-		{
+		if (getCapabilitiesCache().getKObservablePropertyVOffering().get(observablePropertyIdentifier) == null) {
 			List<String> offeringsForProperty = Collections.synchronizedList(new ArrayList<String>());
 			offeringsForProperty.add(offeringIdentifier);
 			getCapabilitiesCache().getKObservablePropertyVOffering().put(observablePropertyIdentifier, offeringsForProperty);
-		}
-		else if (!getCapabilitiesCache().getKObservablePropertyVOffering().get(observablePropertyIdentifier).contains(offeringIdentifier))
-		{
+		} else if (!getCapabilitiesCache().getKObservablePropertyVOffering().get(observablePropertyIdentifier).contains(offeringIdentifier)) {
 			getCapabilitiesCache().getKObservablePropertyVOffering().get(observablePropertyIdentifier).add(offeringIdentifier);
 		}
 	}
@@ -638,14 +659,11 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	{
 		// offering-procedures
 		Collection<String> procedures4Offering = getCapabilitiesCache().getProceduresForOffering(offeringIdentifier);
-		if (procedures4Offering == null)
-		{
+		if (procedures4Offering == null) {
 			procedures4Offering = Collections.synchronizedList(new ArrayList<String>());
 			procedures4Offering.add(procedureIdentifier);
-			getCapabilitiesCache().getOffProcedures().put(offeringIdentifier, (List<String>) procedures4Offering);
-		}
-		else if (!procedures4Offering.contains(procedureIdentifier))
-		{
+			getCapabilitiesCache().getKOfferingVProcedures().put(offeringIdentifier, (List<String>) procedures4Offering);
+		} else if (!procedures4Offering.contains(procedureIdentifier)) {
 			procedures4Offering.add(procedureIdentifier);
 		}
 	}
@@ -655,14 +673,10 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	{
 		// offering-observationTypes
 		Map<String, Collection<String>> observationTypes4Offerings = getCapabilitiesCache().getKOfferingVObservationTypes();
-		if (observationTypes4Offerings != null)
-		{
-			if (observationTypes4Offerings.containsKey(offeringIdentifier) && !observationTypes4Offerings.get(offeringIdentifier).contains(observationType))
-			{
+		if (observationTypes4Offerings != null) {
+			if (observationTypes4Offerings.containsKey(offeringIdentifier) && !observationTypes4Offerings.get(offeringIdentifier).contains(observationType)) {
 				observationTypes4Offerings.get(offeringIdentifier).add(observationType);
-			}
-			else
-			{
+			} else {
 				// add new list
 				List<String> observationTypes = Collections.synchronizedList(new ArrayList<String>());
 				observationTypes.add(observationType);
@@ -676,25 +690,19 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	{
 		// offering-maxtime
 		// check and update if later
-		if (getCapabilitiesCache().getKOfferingVMaxTime().containsKey(offeringIdentifier) &&
-				getCapabilitiesCache().getKOfferingVMaxTime().get(offeringIdentifier).isBefore(observationEventTime.getEnd()))
-		{
+		if (getCapabilitiesCache().getKOfferingVMaxTime().containsKey(offeringIdentifier)
+				&& getCapabilitiesCache().getKOfferingVMaxTime().get(offeringIdentifier).isBefore(observationEventTime.getEnd())) {
 			getCapabilitiesCache().getKOfferingVMaxTime().put(offeringIdentifier, observationEventTime.getEnd());
-		}
-		else
-		{
+		} else {
 			// add new
 			getCapabilitiesCache().getKOfferingVMaxTime().put(offeringIdentifier, observationEventTime.getEnd());
 		}
 		// offering-mintime
 		// check and update if before
-		if (getCapabilitiesCache().getKOfferingVMinTime().containsKey(offeringIdentifier) &&
-				getCapabilitiesCache().getKOfferingVMinTime().get(offeringIdentifier).isAfter(observationEventTime.getStart()))
-		{
+		if (getCapabilitiesCache().getKOfferingVMinTime().containsKey(offeringIdentifier)
+				&& getCapabilitiesCache().getKOfferingVMinTime().get(offeringIdentifier).isAfter(observationEventTime.getStart())) {
 			getCapabilitiesCache().getKOfferingVMinTime().put(offeringIdentifier, observationEventTime.getStart());
-		}
-		else
-		{
+		} else {
 			// add new
 			getCapabilitiesCache().getKOfferingVMinTime().put(offeringIdentifier, observationEventTime.getStart());
 		}
@@ -703,16 +711,33 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	private void updateGlobalEnvelopeUsing(Envelope observedFeatureEnvelope)
 	{
 		SosEnvelope globalEnvelope = getCapabilitiesCache().getGlobalEnvelope();
-		if (!globalEnvelope.isSetEnvelope())
-		{
+		if (!globalEnvelope.isSetEnvelope()) {
 			// add new envelope
-			SosEnvelope newFeatureEnvelope = new SosEnvelope(observedFeatureEnvelope,getDefaultEPSG());
+			SosEnvelope newFeatureEnvelope = new SosEnvelope(observedFeatureEnvelope, getDefaultEPSG());
 			getCapabilitiesCache().setGlobalEnvelope(newFeatureEnvelope);
-		}
-		else if (!globalEnvelope.getEnvelope().contains( observedFeatureEnvelope ))
-		{
+		} else if (!globalEnvelope.getEnvelope().contains(observedFeatureEnvelope)) {
 			// extend envelope
 			globalEnvelope.getEnvelope().expandToInclude(observedFeatureEnvelope);
+		}
+	}
+
+	private TimePeriod phenomenonTimeFrom(SosObservation sosObservation)
+	{
+		ITime phenomenonTime = sosObservation.getPhenomenonTime();
+		if (phenomenonTime instanceof TimeInstant) {
+			return new TimePeriod(((TimeInstant) phenomenonTime).getValue(), ((TimeInstant) phenomenonTime).getValue());
+		} else {
+			return (TimePeriod) phenomenonTime;
+		}
+	}
+
+	private void updateGlobalTemporalBBoxUsingNew(TimePeriod observationEventTime)
+	{
+		if (getCapabilitiesCache().getMinEventTime() == null || getCapabilitiesCache().getMinEventTime().isAfter(observationEventTime.getStart())) {
+			getCapabilitiesCache().setMinEventTime(observationEventTime.getStart());
+		}
+		if (getCapabilitiesCache().getMaxEventTime() == null || getCapabilitiesCache().getMaxEventTime().isBefore(observationEventTime.getEnd())) {
+			getCapabilitiesCache().setMaxEventTime(observationEventTime.getEnd());
 		}
 	}
 
@@ -721,38 +746,10 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		return Configurator.getInstance().getDefaultEPSG();
 	}
 
-	private TimePeriod phenomenonTimeFrom(SosObservation sosObservation)
-	{
-		ITime phenomenonTime = sosObservation.getPhenomenonTime();
-		if (phenomenonTime instanceof TimeInstant)
-		{
-			return new TimePeriod(((TimeInstant) phenomenonTime).getValue(),
-					((TimeInstant) phenomenonTime).getValue());
-		}
-		else
-		{
-			return (TimePeriod) phenomenonTime;
-		}
-	}
-
-	private void updateGlobalTemporalBBoxUsingNew(TimePeriod observationEventTime)
-	{
-		if (getCapabilitiesCache().getMinEventTime() == null || 
-				getCapabilitiesCache().getMinEventTime().isAfter(observationEventTime.getStart()))
-		{
-			getCapabilitiesCache().setMinEventTime(observationEventTime.getStart());
-		}
-		if (getCapabilitiesCache().getMaxEventTime() == null || 
-				getCapabilitiesCache().getMaxEventTime().isBefore(observationEventTime.getEnd()))
-		{
-			getCapabilitiesCache().setMaxEventTime(observationEventTime.getEnd());
-		}
-	}
-
 	@Override
 	protected ICacheFeederDAO getCacheDAO()
 	{
 		return null; // We don't need not DAO --> TODO change CCC hierarchy
 	}
-	
+
 }

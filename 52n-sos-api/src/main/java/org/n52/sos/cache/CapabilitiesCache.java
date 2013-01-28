@@ -115,7 +115,7 @@ public interface CapabilitiesCache {
 	 * @param phenProcs
 	 *            The phenProcs to set.
 	 */
-	public abstract void setKObservablePropertyKProcedures(Map<String, List<String>> phenProcs);
+	public abstract void setKObservablePropertyVProcedures(Map<String, List<String>> phenProcs);
 
 	/**
 	 * sets the parent procedure map, then inverts it and sets child procedure
