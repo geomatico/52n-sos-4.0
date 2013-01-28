@@ -43,6 +43,7 @@ import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
+import org.n52.sos.ogc.swe.SosFeatureRelationship;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.request.InsertSensorRequest;
@@ -147,6 +148,10 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		// allowed observation types
 		addAllowedObservationTypes(sosResponse.getAssignedOffering(),sosRequest.getMetadata().getObservationTypes());
 		
+		// related features
+		addRelatedFeatures(sosRequest.getRelatedFeatures(),sosResponse.getAssignedOffering());
+		addRelatedFeatureRoles(sosRequest.getRelatedFeatures());
+		
 		// observable property relations
 		for (String observableProperty : sosRequest.getObservableProperty()) {
 			addObservablePropertyToProcedureRelation(observableProperty, sosResponse.getAssignedProcedure());
@@ -155,6 +160,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			addOfferingToObservablePropertyRelation(sosResponse.getAssignedOffering(), observableProperty);
 		}
 	}
+
 
 	private void 
 	updateAfterObservationInsertionHelper(InsertObservationRequest sosRequest)
@@ -213,7 +219,57 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 		}
 	}
+
+	private void addRelatedFeatureRoles(List<SosFeatureRelationship> relatedFeatures)
+	{
+		if (relatedFeatures != null && !relatedFeatures.isEmpty())
+		{
+			for (SosFeatureRelationship featureRelation : relatedFeatures) {
+				// add new
+				if (!getCapabilitiesCache().getKRelatedFeatureVRole().containsKey(getFeatureIdentifier(featureRelation)))
+				{
+					List<String> roles = new ArrayList<String>(1);
+					roles.add(featureRelation.getRole());
+					getCapabilitiesCache().getKRelatedFeatureVRole().put(getFeatureIdentifier(featureRelation), roles);
+				}
+				// update
+				else if (!getCapabilitiesCache().getKRelatedFeatureVRole().get(getFeatureIdentifier(featureRelation)).contains(featureRelation.getRole())) 
+				{
+					getCapabilitiesCache().getKRelatedFeatureVRole().get(getFeatureIdentifier(featureRelation)).add(featureRelation.getRole());
+				}
+			}
+		}
+	}
+
+	private String getFeatureIdentifier(SosFeatureRelationship sosFeatureRelationship)
+	{
+		return sosFeatureRelationship.getFeature().getIdentifier().getValue();
+	}
 	
+	private void addRelatedFeatures(List<SosFeatureRelationship> relatedFeatures, String offeringId)
+	{
+		if (relatedFeatures != null && !relatedFeatures.isEmpty())
+		{
+			if (getCapabilitiesCache().getKOfferingVRelatedFeatures().get(offeringId) == null)
+			{
+				Collection<String> relatedFeatureIdentifiers = new ArrayList<String>(relatedFeatures.size());
+				for (SosFeatureRelationship sosFeatureRelationship : relatedFeatures) {
+					relatedFeatureIdentifiers.add(getFeatureIdentifier(sosFeatureRelationship));
+				}
+				getCapabilitiesCache().getKOfferingVRelatedFeatures().put(offeringId, relatedFeatureIdentifiers);
+			}
+			else
+			{
+				for (SosFeatureRelationship sosFeatureRelationship : relatedFeatures) {
+					if (!getCapabilitiesCache().getKOfferingVRelatedFeatures().get(offeringId).contains(getFeatureIdentifier(sosFeatureRelationship)))
+					{
+						getCapabilitiesCache().getKOfferingVRelatedFeatures().get(offeringId).add(getFeatureIdentifier(sosFeatureRelationship));
+					}
+				}
+			}
+		}
+	}
+
 	private void addAllowedObservationTypes(String assignedOffering,
 			List<String> observationTypes)
 	{

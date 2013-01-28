@@ -47,6 +47,7 @@ import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
+import org.n52.sos.ogc.swe.SosFeatureRelationship;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.request.InsertSensorRequest;
@@ -336,6 +337,24 @@ public class InMemoryCacheControllerTest
 		}
 	}
 	
+	@Test public void 
+	should_contain_related_features_after_InsertObservation()
+			throws OwsExceptionReport{
+		updateEmptyCacheWithInsertSensor();
+		
+		assertTrue("offering -> related feature relations NOT in cache",
+				controller.getKOfferingVRelatedFeatures().containsKey(getAssignedOfferingId()));
+		
+		for (SosFeatureRelationship relatedFeature : ((InsertSensorRequest)request).getRelatedFeatures()) {
+			assertTrue("single \"offering -> related features relation\" NOT in cache",
+					controller.getKOfferingVRelatedFeatures().get(getAssignedOfferingId())
+					.contains(relatedFeature.getFeature().getIdentifier().getValue()));
+			
+			assertTrue("single \"related feature -> role relation\" NOT in cache",
+					controller.getKRelatedFeaturesVRole().get(relatedFeature.getFeature().getIdentifier().getValue()).contains(relatedFeature.getRole()) );
+		}
+	}
+	
 	/* HELPER */
 	
 	private 
@@ -385,6 +404,14 @@ public class InMemoryCacheControllerTest
 				.addObservableProperty("test-observable-property")
 				.addObservationType("test-observation-type-1")
 				.addObservationType("test-observation-type-2")
+				.addRelatedFeature(aSamplingFeature()
+						.setIdentifier("test-related-feature-1")
+						.build(),
+						"test-role-1")
+				.addRelatedFeature(aSamplingFeature()
+						.setIdentifier("test-related-feature-2")
+						.build(),
+						"test-role-2")
 				.build();
 	}
 
