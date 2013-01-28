@@ -129,11 +129,6 @@ public class InMemoryCacheControllerTest
 		
 	}
 
-	private String getSensorIdFromInsertObservation()
-	{
-		return ((InsertObservationRequest) request).getAssignedSensorId();
-	}
-
 	@Test public void 
 	should_contain_FeatureOfInterest_after_InsertObservation()
 			throws OwsExceptionReport {
@@ -166,11 +161,6 @@ public class InMemoryCacheControllerTest
 						getFeatureTypeFromFirstObservation()));
 	}
 
-	private String getFeatureTypeFromFirstObservation()
-	{
-		return ((SosSamplingFeature)((InsertObservationRequest) request).getObservations().get(0).getObservationConstellation().getFeatureOfInterest()).getFeatureType();
-	}
-	
 	@Test public void 
 	should_contain_envelopes_after_InsertObservation()
 			throws OwsExceptionReport {
@@ -209,11 +199,6 @@ public class InMemoryCacheControllerTest
 		);
 	}
 
-	private DateTime getPhenomenonTimeFromFirstObservation()
-	{
-		return ((TimeInstant)((InsertObservationRequest) request).getObservations().get(0).getPhenomenonTime()).getValue();
-	}
-		
 	@Test public void
 	should_contain_observalbe_property_after_InsertObservation()
 		throws OwsExceptionReport {
@@ -261,6 +246,18 @@ public class InMemoryCacheControllerTest
 	}
 	
 	/* Update after InsertSensor */
+	
+	@Test (expected=IllegalArgumentException.class) public void 
+	should_throw_IllegalArgumentException_if_called_with_one_or_more_null_parameters()
+			throws OwsExceptionReport{
+		controller.updateAfterSensorInsertion(null, null);
+		insertSensorRequestExample();
+		controller.updateAfterSensorInsertion((InsertSensorRequest) request, null);
+		request = null;
+		insertSensorResponseExample();
+		controller.updateAfterSensorInsertion(null, (InsertSensorResponse) response);
+		
+	}
 	
 	@Test public void 
 	should_contain_procedure_after_InsertSensor()
@@ -357,6 +354,35 @@ public class InMemoryCacheControllerTest
 	
 	/* HELPER */
 	
+	private void 
+	updateEmptyCacheWithSingleObservation()
+			throws OwsExceptionReport {
+		insertObservationRequestExample();
+		controller.updateAfterObservationInsertion((InsertObservationRequest) request);
+	}
+
+	
+	private void 
+	updateEmptyCacheWithInsertSensor() 
+			throws OwsExceptionReport {
+		insertSensorRequestExample();
+		insertSensorResponseExample();
+		controller.updateAfterSensorInsertion((InsertSensorRequest)request,(InsertSensorResponse)response);
+	}
+
+
+	private 
+	DateTime getPhenomenonTimeFromFirstObservation()
+	{
+		return ((TimeInstant)((InsertObservationRequest) request).getObservations().get(0).getPhenomenonTime()).getValue();
+	}
+	
+	private 
+	String getFeatureTypeFromFirstObservation()
+	{
+		return ((SosSamplingFeature)((InsertObservationRequest) request).getObservations().get(0).getObservationConstellation().getFeatureOfInterest()).getFeatureType();
+	}
+	
 	private 
 	String getAssignedProcedure()
 	{
@@ -369,19 +395,10 @@ public class InMemoryCacheControllerTest
 		return ((InsertSensorRequest)request).getObservableProperty().get(0);
 	}
 	
-	// TODO Eike: continue relation testing
 	private
 	String getAssignedOfferingId()
 	{
 		return ((InsertSensorResponse)response).getAssignedOffering();
-	}
-	
-	private void 
-	updateEmptyCacheWithInsertSensor() 
-			throws OwsExceptionReport {
-		insertSensorRequestExample();
-		insertSensorResponseExample();
-		controller.updateAfterSensorInsertion((InsertSensorRequest)request,(InsertSensorResponse)response);
 	}
 	
 	private void
@@ -416,6 +433,12 @@ public class InMemoryCacheControllerTest
 	}
 
 	private 
+	String getSensorIdFromInsertObservation()
+	{
+		return ((InsertObservationRequest) request).getAssignedSensorId();
+	}
+	
+	private 
 	String getObservationTypeFromFirstObservation()
 	{
 		return ((InsertObservationRequest) request).getObservations().get(0).getObservationConstellation().getObservationType();
@@ -435,13 +458,6 @@ public class InMemoryCacheControllerTest
 				controller.getDefaultEPSG());
 	}
 	
-	private void 
-	updateEmptyCacheWithSingleObservation()
-			throws OwsExceptionReport {
-		insertObservationRequestExample();
-		controller.updateAfterObservationInsertion((InsertObservationRequest) request);
-	}
-
 	private
 	String getFoiIdFromInsertObservationRequest()
 	{

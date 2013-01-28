@@ -85,9 +85,12 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	private void 
 	update(Case c, AbstractServiceRequest sosRequest, AbstractServiceResponse sosResponse)
 			throws OwsExceptionReport {
-    	if (c == null || sosRequest == null)
+    	if (c == null || 
+    			sosRequest == null || 
+    			(sosRequest instanceof InsertSensorRequest && (sosResponse == null)) )
     	{
-    		String errorMsg = String.format("Missing arguments: Case: %s, AbstractServiceRequest: %s", c,sosRequest);
+    		String errorMsg = String.format("Missing arguments: Case: %s, AbstractServiceRequest: %s, AbstractServiceResponse: %s", 
+    				c,sosRequest,sosResponse);
     		LOGGER.warn(errorMsg);
     		throw new IllegalArgumentException(errorMsg);
     	}
