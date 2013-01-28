@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.n52.sos.ogc.sos.SosProcedureDescription;
+import org.n52.sos.ogc.swe.SosMetadata;
 import org.n52.sos.request.InsertSensorRequest;
 
 /**
@@ -37,6 +38,7 @@ public class InsertSensorRequestBuilder {
 
 	private SosProcedureDescription procedureDescription;
 	private List<String> observableProperties;
+	private List<String> observationTypes;
 	
 	public static InsertSensorRequestBuilder anInsertSensorRequest()
 	{
@@ -60,6 +62,16 @@ public class InsertSensorRequestBuilder {
 		return this;
 	}
 	
+	public InsertSensorRequestBuilder addObservationType(String observationType)
+	{
+		if (observationTypes == null)
+		{
+			observationTypes = new ArrayList<String>();
+		}
+		observationTypes.add(observationType);
+		return this;
+	}
+	
 	public InsertSensorRequest build()
 	{
 		InsertSensorRequest request = new InsertSensorRequest();
@@ -70,6 +82,16 @@ public class InsertSensorRequestBuilder {
 		if (observableProperties != null && !observableProperties.isEmpty())
 		{
 			request.setObservableProperty(observableProperties);
+		}
+		SosMetadata meta = null;
+		if (observationTypes != null && !observationTypes.isEmpty())
+		{
+			meta = new SosMetadata();
+			meta.setObservationTypes(observationTypes);
+		}
+		if (meta != null)
+		{
+			request.setMetadata(meta);
 		}
 		return request;
 	}
