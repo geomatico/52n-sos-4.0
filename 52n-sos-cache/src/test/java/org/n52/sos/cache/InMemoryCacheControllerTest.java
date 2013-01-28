@@ -56,7 +56,6 @@ import org.n52.sos.response.InsertSensorResponse;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
- * TODO Eike: Test after InsertSensor
  * TODO Eike: Test after DeleteSensor
  * TODO Eike: Test after InsertResultTemplate
  * TODO Eike: Test after InsertResult
@@ -87,9 +86,8 @@ public class InMemoryCacheControllerTest
 	/* Update after InsertObservation */
 	
 	@Test (expected=IllegalArgumentException.class)	public void 
-	should_throw_IllegalArgumentException_when_receiving_null_parameter() 
+	should_throw_IllegalArgumentException_when_receiving_null_parameter_after_InsertObservation() 
 			throws OwsExceptionReport {
-		InMemoryCacheController controller = new TestableInMemoryCacheController();
 		controller.updateAfterObservationInsertion(null);
 	}
 	
@@ -248,7 +246,7 @@ public class InMemoryCacheControllerTest
 	/* Update after InsertSensor */
 	
 	@Test (expected=IllegalArgumentException.class) public void 
-	should_throw_IllegalArgumentException_if_called_with_one_or_more_null_parameters()
+	should_throw_IllegalArgumentException_if_called_with_one_or_more_null_parameters_after_InsertSensor()
 			throws OwsExceptionReport{
 		controller.updateAfterSensorInsertion(null, null);
 		insertSensorRequestExample();
@@ -351,6 +349,18 @@ public class InMemoryCacheControllerTest
 					controller.getKRelatedFeaturesVRole().get(relatedFeature.getFeature().getIdentifier().getValue()).contains(relatedFeature.getRole()) );
 		}
 	}
+	
+	/* Update after DeleteSensor */
+	
+	@Test (expected=IllegalArgumentException.class) public void 
+	should_throw_IllegalArgumentException_if_receiving_null_parameter_after_DeleteSensor()
+			throws OwsExceptionReport{
+		controller.updateAfterSensorDeletion(null);
+	}
+	
+	// TODO check removed offerings
+	
+	
 	
 	/* HELPER */
 	
