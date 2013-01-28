@@ -126,7 +126,7 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
                 List<ObservableProperty> obsProps =
                         getOrInsertNewObservableProperties(request.getObservableProperty(), session);
                 Offering offering =
-                        insertNewOffering(assignedOffering, request.getRelatatedFeature(), observationTypes, session);
+                        insertNewOffering(assignedOffering, request.getRelatedFeatures(), observationTypes, session);
                 HibernateCriteriaTransactionalUtilities.checkOrInsertObservationConstellation(procedure, obsProps,
                         offering, session);
                 // TODO: parent and child procedures

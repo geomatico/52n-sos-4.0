@@ -128,7 +128,7 @@ public class InsertSensorRequest extends AbstractServiceRequest {
         this.relatedFeatures = relatedFeatures;
     }
     
-    public List<SosFeatureRelationship> getRelatatedFeature() {
+    public List<SosFeatureRelationship> getRelatedFeatures() {
         return relatedFeatures;
     }
 
