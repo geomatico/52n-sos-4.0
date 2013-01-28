@@ -23,6 +23,9 @@
  */
 package org.n52.sos.ogc.sensorML;
 
+import static org.n52.sos.ogc.OGCConstants.*;
+import static org.n52.sos.ogc.sensorML.SensorMLConstants.ELEMENT_NAME_OFFERING;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -151,13 +154,13 @@ public class AbstractSensorML extends SosProcedureDescription {
     public String getProcedureIdentifier() {
         if (isSetIdentifications()) {
             for (SosSMLIdentifier identification : identifications) {
-                if ((identification.getName() != null && identification.getName().equals("uniqueID"))
+                if ((identification.getName() != null && identification.getName().equals(URN_UNIQUE_IDENTIFIER_END))
                         || (identification.getDefinition() != null
-                                && (identification.getDefinition().equals("urn:ogc:def:identifier:OGC:uniqueID")
-                                || identification.getDefinition().equals(
-                                        "urn:ogc:def:identifier:OGC::identification.getDefinition()") || (identification
-                                .getDefinition().startsWith("urn:ogc:def:identifier:OGC:") && identification
-                                .getDefinition().contains("uniqueID"))))) {
+                                && (identification.getDefinition().equals(URN_UNIQUE_IDENTIFIER)
+                                || identification.getDefinition().equals(URN_IDENTIFIER_IDENTIFICATION) 
+                                || (identification.getDefinition().startsWith(URN_UNIQUE_IDENTIFIER_START) 
+                                		&& identification.getDefinition().contains(URN_UNIQUE_IDENTIFIER_END))
+                                ))) {
                     return identification.getValue();
                 }
             }
@@ -178,8 +181,8 @@ public class AbstractSensorML extends SosProcedureDescription {
         if (identifications != null) {
             for (SosSMLIdentifier identification : identifications) {
                 if (identification.getDefinition() != null
-                        && (identification.getDefinition().equals("urn:ogc:def:identifier:OGC:offeringID")
-                                || identification.getDefinition().contains("offering"))) {
+                        && (identification.getDefinition().equals(URN_OFFERING_ID)
+                                || identification.getDefinition().contains(ELEMENT_NAME_OFFERING))) {
                             return new SosOffering(identification.getValue(), identification.getName());
                 }
             }

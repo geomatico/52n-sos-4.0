@@ -36,4 +36,29 @@ public class OGCConstants {
     public static final String SCHEMA_LOCATION_OGC = "http://schemas.opengis.net/sos/1.0.0/ogc4sos.xsd";
 
     public static final String UNKNOWN = "http://www.opengis.net/def/nil/OGC/0/unknown";
+
+	/** Constant for prefixes of FOIs */
+	public static final String URN_FOI_PREFIX = "urn:ogc:def:object:feature:";
+
+	public static final String URN_IDENTIFIER_IDENTIFICATION = "urn:ogc:def:identifier:OGC::identification";
+
+	public static final String URN_OFFERING_ID = "urn:ogc:def:identifier:OGC:offeringID";
+
+	/** Constant for prefixes of procedures */
+	public static final String URN_PHENOMENON_PREFIX = "urn:ogc:def:phenomenon:OGC:1.0.30:";
+
+	/** Constant for prefixes of procedures */
+	public static final String URN_PROCEDURE_PREFIX = "urn:ogc:object:feature:Sensor:IFGI:";
+
+	public static final String URN_PROPERTY_NAME_LOCATION = "urn:ogc:data:location";
+
+	public static final String URN_PROPERTY_NAME_SAMPLING_GEOMETRY = "urn:ogc:data:samplingGeometry";
+
+	public static final String URN_PROPERTY_NAME_SPATIAL_VALUE = "urn:ogc:data:spatialValue";
+
+	public static final String URN_UNIQUE_IDENTIFIER = "urn:ogc:def:identifier:OGC:uniqueID";
+
+	public static final String URN_UNIQUE_IDENTIFIER_END = "uniqueID";
+
+	public static final String URN_UNIQUE_IDENTIFIER_START = "urn:ogc:def:identifier:OGC:";
 }

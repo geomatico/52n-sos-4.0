@@ -62,6 +62,11 @@ public class SensorMLConstants {
 
     public static final String VERSION_V101 = "1.0.1";
 
+	/**
+	 * Name of a SensorML element describing the offering, a procedure/sensor is related to, or should be inserted into
+	 */
+	static final String ELEMENT_NAME_OFFERING = "offering";
+
     private SensorMLConstants() {
     }
 }

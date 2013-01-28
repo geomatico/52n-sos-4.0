@@ -24,9 +24,8 @@
 package org.n52.sos.ogc.sos;
 
 import org.n52.sos.exception.IExceptionCode;
+import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * SosConstants holds all important and often used constants of this SOS (e.g.
@@ -35,9 +34,6 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public final class SosConstants {
-
-    /** logger */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SosConstants.class);
 
     public static final String NS_SOS_PREFIX = "sos";
 
@@ -56,16 +52,19 @@ public final class SosConstants {
      */
     public static final String SYS_CAP_PARENT_PROCEDURES_NAME = "parentProcedures";
 
-    /** Constant for prefixes of FOIs */
-    public static final String FOI_PREFIX = "urn:ogc:def:object:feature:";
+    /** Constant for prefixes of FOIs 
+	 * @deprecated Use {@link OGCConstants#URN_FOI_PREFIX} instead*/
+	public static final String FOI_PREFIX = OGCConstants.URN_FOI_PREFIX;
 
-    /** Constant for prefixes of procedures */
-    public static final String PROCEDURE_PREFIX = "urn:ogc:object:feature:Sensor:IFGI:";
+    /** Constant for prefixes of procedures 
+	 * @deprecated Use {@link OGCConstants#URN_PROCEDURE_PREFIX} instead*/
+	public static final String PROCEDURE_PREFIX = OGCConstants.URN_PROCEDURE_PREFIX;
 
     public static final String PROCEDURE_STANDARD_DESC_URL = "standardURL";
 
-    /** Constant for prefixes of procedures */
-    public static final String PHENOMENON_PREFIX = "urn:ogc:def:phenomenon:OGC:1.0.30:";
+    /** Constant for prefixes of procedures 
+	 * @deprecated Use {@link OGCConstants#URN_PHENOMENON_PREFIX} instead*/
+	public static final String PHENOMENON_PREFIX = OGCConstants.URN_PHENOMENON_PREFIX;
 
     /** Constant for the service name of the SOS */
     public static final String SOS = "SOS";
@@ -163,11 +162,20 @@ public final class SosConstants {
 
     public static final String SEPARATOR_4_OFFERINGS = "_._";
 
-    public static final String PROPERTY_NAME_LOCATION = "urn:ogc:data:location";
+    /**
+	 * @deprecated Use {@link OGCConstants#URN_PROPERTY_NAME_LOCATION} instead
+	 */
+	public static final String PROPERTY_NAME_LOCATION = OGCConstants.URN_PROPERTY_NAME_LOCATION;
 
-    public static final String PROPERTY_NAME_SAMPLING_GEOMETRY = "urn:ogc:data:samplingGeometry";
+    /**
+	 * @deprecated Use {@link OGCConstants#URN_PROPERTY_NAME_SAMPLING_GEOMETRY} instead
+	 */
+	public static final String PROPERTY_NAME_SAMPLING_GEOMETRY = OGCConstants.URN_PROPERTY_NAME_SAMPLING_GEOMETRY;
 
-    public static final String PROPERTY_NAME_SPATIAL_VALUE = "urn:ogc:data:spatialValue";
+    /**
+	 * @deprecated Use {@link OGCConstants#URN_PROPERTY_NAME_SPATIAL_VALUE} instead
+	 */
+	public static final String PROPERTY_NAME_SPATIAL_VALUE = OGCConstants.URN_PROPERTY_NAME_SPATIAL_VALUE;
 
     private static final String SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT =
             "The requested result set exceeds the response size limit of this service and thus cannot be delivered.";
