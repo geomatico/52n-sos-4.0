@@ -150,7 +150,7 @@ public class InMemoryCacheControllerTest
 		assertTrue("no child features for feature",
 				controller.getParentFeatures(Collections.singletonList(getFoiIdFromInsertObservationRequest()), true, false).isEmpty());
 		
-		assertTrue("feature to offering relation",
+		assertTrue("offering -> feature relation",
 				controller.getKOfferingVFeatures().get(getFirstOffering()).contains(getFoiIdFromInsertObservationRequest()));
 		
 	}
@@ -325,6 +325,19 @@ public class InMemoryCacheControllerTest
 				controller.getOfferings().contains(getAssignedOfferingId()) );
 	}
 	
+	@Test public void 
+	should_contain_allowed_observation_types_after_InsertSensor()
+			throws OwsExceptionReport{
+		updateEmptyCacheWithInsertSensor();
+		
+		for (String observationType : ((InsertSensorRequest)request).getMetadata().getObservationTypes()) {
+			assertTrue("observation type NOT in cache",
+					controller.getAllowedKOfferingVObservationTypes().get(getAssignedOfferingId()).contains(observationType));
+		}
+	}
+	
+	/* HELPER */
+	
 	private 
 	String getAssignedProcedure()
 	{
@@ -343,8 +356,6 @@ public class InMemoryCacheControllerTest
 	{
 		return ((InsertSensorResponse)response).getAssignedOffering();
 	}
-
-	/* HELPER */
 	
 	private void 
 	updateEmptyCacheWithInsertSensor() 
@@ -369,9 +380,11 @@ public class InMemoryCacheControllerTest
 		request = anInsertSensorRequest()
 				.setProcedure(aSensorMLProcedureDescription()
 						.setIdentifier("test-procedure")
-						.setOffering("test-offering-identifier","test-offering-identifier")
+						.setOffering("test-offering-identifier","test-offering-name")
 						.build())
 				.addObservableProperty("test-observable-property")
+				.addObservationType("test-observation-type-1")
+				.addObservationType("test-observation-type-2")
 				.build();
 	}
 

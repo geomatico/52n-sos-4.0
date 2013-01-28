@@ -144,6 +144,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		// offering relations
 		addOfferingNameToCache(sosRequest.getProcedureDescription().getOfferingIdentifier());
 		
+		// allowed observation types
+		addAllowedObservationTypes(sosResponse.getAssignedOffering(),sosRequest.getMetadata().getObservationTypes());
+		
 		// observable property relations
 		for (String observableProperty : sosRequest.getObservableProperty()) {
 			addObservablePropertyToProcedureRelation(observableProperty, sosResponse.getAssignedProcedure());
@@ -172,7 +175,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			// update features
 			Envelope observedFeatureEnvelope = null;
 			int observedFeatureEnvelopeSRID = getDefaultEPSG();
-			List<SosSamplingFeature> observedFeatures = toList(sosObservation.getObservationConstellation().getFeatureOfInterest());
+			List<SosSamplingFeature> observedFeatures = sosFeaturesToList(sosObservation.getObservationConstellation().getFeatureOfInterest());
 
 			observedFeatureEnvelope = createEnvelopeFrom(observedFeatures);
 			updateGlobalEnvelopeUsing(observedFeatureEnvelope);
@@ -208,6 +211,21 @@ public class InMemoryCacheController extends CacheControllerImpl {
 				updateOfferingEnvelope(observedFeatureEnvelope, observedFeatureEnvelopeSRID, offeringIdentifier);
 			}
 
+		}
+	}
+	
+	private void addAllowedObservationTypes(String assignedOffering,
+			List<String> observationTypes)
+	{
+		if (!getCapabilitiesCache().getAllowedKOfferingVObservationType().containsKey(assignedOffering))
+		{
+			getCapabilitiesCache().getAllowedKOfferingVObservationType().put(assignedOffering, observationTypes);
+		}
+		else
+		{
+			for (String observationType : observationTypes) {
+				getCapabilitiesCache().getAllowedKOfferingVObservationType().get(assignedOffering).add(observationType);
+			}
 		}
 	}
 	
@@ -494,7 +512,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		}
 	}
 
-	private List<SosSamplingFeature> toList(SosAbstractFeature sosFeatureOfInterest)
+	private List<SosSamplingFeature> sosFeaturesToList(SosAbstractFeature sosFeatureOfInterest)
 	{
 		if (sosFeatureOfInterest instanceof SosFeatureCollection)
 		{
