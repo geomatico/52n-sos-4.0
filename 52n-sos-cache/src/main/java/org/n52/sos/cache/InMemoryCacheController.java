@@ -237,28 +237,45 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		// remove procedure offering relations
 		removeOfferingToProcedureRelation(sosRequest.getProcedureIdentifier());
 		
+		// remove envelopes for each offering this procedure relates to
+		removeOfferingEnvelopes(sosRequest.getProcedureIdentifier());
+		
 		// observable property relations
-		for (String observableProperty : getCapabilitiesCache().getKProcedureVObservableProperties().get(sosRequest.getProcedureIdentifier())) {
-			removeObservablePropertyToProcedureRelation(observableProperty, sosRequest.getProcedureIdentifier());
-			removeProcedureToObservablePropertyRelations(sosRequest.getProcedureIdentifier());
-			// TODO Eike: Continue implementation here
-//			removeObservablePropertiesToOfferingRelation(observableProperty, sosRequest.getProcedureIdentifier());
-//			removeOfferingToObservablePropertyRelation(sosRequest.getProcedureIdentifier(), observableProperty);
-		}
+		removeObservablePropertyRelations(sosRequest.getProcedureIdentifier());
 		
 		// At the latest
 		removeProcedureToOfferingRelation(sosRequest.getProcedureIdentifier());
 	}
-	
+
 	/* HELPER */
+
+	private void removeOfferingEnvelopes(String procedureIdentifier)
+	{
+		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier)) {
+			getCapabilitiesCache().getKOfferingVEnvelope().remove(offeringId);
+			LOGGER.debug("Envelope removed for offering \"{}\"? {}",
+					offeringId,
+					getCapabilitiesCache().getKOfferingVEnvelope().containsKey(offeringId));
+		}
+	}
+	
+	private void removeObservablePropertyRelations(String procedureIdentifier)
+	{
+		for (String observableProperty : getCapabilitiesCache().getKProcedureVObservableProperties().get(procedureIdentifier)) {
+			removeObservablePropertyToProcedureRelation(observableProperty, procedureIdentifier);
+			removeProcedureToObservablePropertyRelations(procedureIdentifier);
+			// TODO Eike: Continue implementation here
+//			removeObservablePropertiesToOfferingRelation(observableProperty, sosRequest.getProcedureIdentifier());
+//			removeOfferingToObservablePropertyRelation(sosRequest.getProcedureIdentifier(), observableProperty);
+		}
+	}
 
 	private void removeProcedureToObservablePropertyRelations(String procedureIdentifier)
 	{
 		getCapabilitiesCache().getKProcedureVObservableProperties().remove(procedureIdentifier);
-		if (getCapabilitiesCache().getKProcedureVObservableProperties().get(procedureIdentifier) == null)
-		{
-			LOGGER.debug("Removed procedure to observable properties relations from cache for procedure \"{}\"", procedureIdentifier);
-		}
+		LOGGER.debug("Removed procedure to observable properties relations from cache for procedure \"{}\"? {}",
+				procedureIdentifier,
+				getCapabilitiesCache().getKProcedureVObservableProperties().containsKey(procedureIdentifier));
 	}
 
 	private void removeObservablePropertyToProcedureRelation(String observableProperty,
@@ -295,18 +312,18 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 	private void removeProcedureToOfferingRelation(String procedureIdentifer)
 	{
-		if (getCapabilitiesCache().getKProcedureVOffering().remove(procedureIdentifer) != null)
-		{
-			LOGGER.debug("procedure to offering relation removed from cache for procedure {}",
-					procedureIdentifer);
-		}
+		getCapabilitiesCache().getKProcedureVOffering().remove(procedureIdentifer);
+		LOGGER.debug("procedure to offering relation removed from cache for procedure \"{}\"? {}",
+					procedureIdentifer,
+					getCapabilitiesCache().getKProcedureVOffering().containsKey(procedureIdentifer));
 	}
 
 	private void removeProcedureFromCache(String procedureIdentifier)
 	{
-		if (getCapabilitiesCache().getProcedures().remove(procedureIdentifier)) {
-			LOGGER.debug("Procedure removed from list of procedures: {}", procedureIdentifier);
-		}
+		getCapabilitiesCache().getProcedures().remove(procedureIdentifier);
+		LOGGER.debug("Procedure \"{}\" removed from list of procedures? {}",
+				procedureIdentifier,
+				getCapabilitiesCache().getProcedures().contains(procedureIdentifier));
 	}
 
 	private void addRelatedFeatureRoles(List<SosFeatureRelationship> relatedFeatures)

@@ -66,25 +66,11 @@ import org.n52.sos.util.builder.DeleteSensorRequestBuilder;
  */
 public class InMemoryCacheControllerTest
 {
-	/**
-	 * 
-	 */
+	/* FIXTURES */
 	private static final String RELATED_FEATURE_ROLE_2 = "test-role-2";
-	/**
-	 * 
-	 */
 	private static final String RELATED_FEATURE_ROLE = "test-role-1";
-	/**
-	 * 
-	 */
 	private static final String FEATURE_2 = "test-related-feature-2";
-	/**
-	 * 
-	 */
 	private static final String OBSERVATION_TYPE_2 = "test-observation-type-2";
-	/**
-	 * 
-	 */
 	private static final String OBSERVATION_TYPE = "test-observation-type";
 	private static final String OFFERING_NAME = "test-offering-name";
 	private static final String OFFERING_IDENTIFIER = "test-offering-identifier";
@@ -410,34 +396,46 @@ public class InMemoryCacheControllerTest
 				controller.getOfferings4Procedure( getProcedureIdentifier() ).contains( OFFERING_IDENTIFIER )  );
 	}
 	
-	// TODO Eike: continue implementation here
-	@Test @Ignore ("implementation not finished") public void 
+	@Test public void 
 	should_not_contain_observable_properties_relations_after_DeleteSensor()
 			throws OwsExceptionReport {
 		deleteSensorPreparation();
 		
-		assertFalse("observable property -> procedure relation STILL in cache",
+		assertTrue("observable property -> procedure relation STILL in cache",
 				controller
 				.getKObservablePropertyVProcedures()
-				.get( OBSERVABLE_PROPERTY )
-				.contains( getProcedureIdentifier() )
+				.get( OBSERVABLE_PROPERTY ) == null
+				|| 
+				!controller
+				.getKObservablePropertyVProcedures()
+				.get( OBSERVABLE_PROPERTY ).contains( getProcedureIdentifier() )
 				);
 
-		assertFalse("procedure -> observable property relation STILL in cache",
+		assertTrue("procedure -> observable property relation STILL in cache",
 				controller
 				.getProcPhens()
-				.get( getProcedureIdentifier() ) 
+				.get( getProcedureIdentifier() ) == null
+				||
+				!controller
+				.getProcPhens()
+				.get( getProcedureIdentifier() )
 				.contains( OBSERVABLE_PROPERTY )
 				);
 		
-		assertFalse("observable property -> offering relation STILL in cache",
+		assertTrue("observable property -> offering relation STILL in cache",
 				controller
+				.getOfferings4ObservableProperty( OBSERVABLE_PROPERTY ) == null
+				||
+				!controller
 				.getOfferings4ObservableProperty( OBSERVABLE_PROPERTY )
 				.contains( getProcedureIdentifier() )
 				);
-		
-		assertFalse("offering -> observable property relation STILL in cache",
+
+		assertTrue("offering -> observable property relation STILL in cache",
 				controller
+				.getPhenomenons4Offering( getProcedureIdentifier() ) == null
+				||
+				!controller
 				.getPhenomenons4Offering( getProcedureIdentifier() )
 				.contains( OBSERVABLE_PROPERTY )
 				);
@@ -448,6 +446,15 @@ public class InMemoryCacheControllerTest
 			throws OwsExceptionReport{
 		// TODO implement
 		fail("make it green and refactor!");
+	}
+	
+	@Test public void 
+	should_not_contain_an_envlope_after_DeleteSensor()
+			throws OwsExceptionReport{
+		deleteSensorPreparation();
+		
+		assertTrue("envolpe for offering STILL in cache",
+				controller.getEnvelopeForOffering(OFFERING_IDENTIFIER) == null);
 	}
 	
 	/* HELPER */
@@ -474,7 +481,6 @@ public class InMemoryCacheControllerTest
 				.build();
 		controller.updateAfterSensorDeletion((DeleteSensorRequest) request);
 	}
-	
 
 	private void 
 	updateCacheWithSingleObservation()
@@ -482,7 +488,6 @@ public class InMemoryCacheControllerTest
 		insertObservationRequestExample();
 		controller.updateAfterObservationInsertion((InsertObservationRequest) request);
 	}
-
 	
 	private void 
 	updateCacheWithInsertSensor() 
@@ -491,7 +496,6 @@ public class InMemoryCacheControllerTest
 		insertSensorResponseExample();
 		controller.updateAfterSensorInsertion((InsertSensorRequest)request,(InsertSensorResponse)response);
 	}
-
 
 	private 
 	DateTime getPhenomenonTimeFromFirstObservation()
