@@ -38,6 +38,7 @@ import static org.n52.sos.util.builder.QuantityValueBuilder.aQuantitiy;
 import static org.n52.sos.util.builder.SamplingFeatureBuilder.aSamplingFeature;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -501,7 +502,39 @@ public class InMemoryCacheControllerTest
 				controller.getKOfferingVRelatedFeatures().containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
 	}
 	
+	@Test public void 
+	should_not_contain_roles_for_deleted_related_features_after_DeleteSensor()
+			throws OwsExceptionReport {
+		deleteSensorPreparation();
+		
+		assertTrue("roles for deleted related features are STILL in cache",
+				controller.getKRelatedFeaturesVRole().isEmpty() 
+				||
+				onlyValidRelatedFeaturesAreInRoleMap());
+	}
+	
+	@Test @Ignore
+	public void should_not_contain_offering_names_after_DeleteSensor()
+	{
+		fail("make it green and refactor!");
+	}
+	
 	/* HELPER */
+
+	private 
+	boolean onlyValidRelatedFeaturesAreInRoleMap()
+	{
+		List<String> allowedRelatedFeatures = controller.getAllowedRelatedFeatures();
+		for (String relatedFeatureWithRole : controller.getCapabilitiesCache().getKRelatedFeatureVRole().keySet())
+		{
+			if (!allowedRelatedFeatures.contains(relatedFeatureWithRole))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 
 	private String 
 	getProcedureIdentifier()

@@ -252,6 +252,8 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		
 		removeOfferingsToRelatedFeaturesRelations(sosRequest.getProcedureIdentifier());
 		
+		removeRemovedRelatedFeaturesFromRoleMap(sosRequest.getProcedureIdentifier());
+		
 		// observable property relations
 		removeObservablePropertyRelations(sosRequest.getProcedureIdentifier());
 		
@@ -262,6 +264,42 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 	/* HELPER */
 	
+	private void removeRemovedRelatedFeaturesFromRoleMap(String procedureIdentifier)
+	{
+		List<String> allowedRelatedFeatures = getAllowedRelatedFeatures();
+		List<String> featuresToRemove = new ArrayList<String>();
+		for (String relatedFeatureWithRole : getCapabilitiesCache().getKRelatedFeatureVRole().keySet())
+		{
+			if (!allowedRelatedFeatures.contains(relatedFeatureWithRole))
+			{
+				featuresToRemove.add(relatedFeatureWithRole);
+			}
+		}
+		for (String featureToRemove : featuresToRemove) {
+			getCapabilitiesCache().getKRelatedFeatureVRole().remove(featureToRemove);
+			LOGGER.debug("related feature \"{}\" removed from role map? {}",
+					featuresToRemove,
+					getCapabilitiesCache().getKRelatedFeatureVRole().containsKey(featureToRemove));
+		}
+	}
+
+	protected List<String> getAllowedRelatedFeatures()
+	{
+		Collection<Collection<String>> values = getCapabilitiesCache().getKOfferingVRelatedFeatures().values();
+		List<String> allowedRelatedFeatures = new ArrayList<String>();
+		for (Collection<String> relatedFeaturesEntry : values)
+		{
+			for (String relatedFeature : relatedFeaturesEntry)
+			{
+				if (!allowedRelatedFeatures.contains(relatedFeature))
+				{
+					allowedRelatedFeatures.add(relatedFeature);
+				}
+			}
+		}
+		return allowedRelatedFeatures;
+	}
+
 	private void removeOfferingsToRelatedFeaturesRelations(String procedureIdentifier)
 	{
 		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier)) {
