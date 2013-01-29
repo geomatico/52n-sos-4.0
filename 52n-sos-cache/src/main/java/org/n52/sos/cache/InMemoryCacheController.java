@@ -242,15 +242,32 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		
 		// remove temporal bounding boxes from cache
 		removeTemporalBoundingBoxesForEachOfferingFromCache(sosRequest.getProcedureIdentifier());
+		removeGlobalTemporalBoundingBoxIfRequired();
 		
 		// observable property relations
 		removeObservablePropertyRelations(sosRequest.getProcedureIdentifier());
 		
 		// At the latest
 		removeProcedureToOfferingRelation(sosRequest.getProcedureIdentifier());
+		
+		// TODO delete global bbox
+		// TODO delete global envelope
 	}
 
 	/* HELPER */
+
+	private void removeGlobalTemporalBoundingBoxIfRequired()
+	{
+		if (getCapabilitiesCache().getKOfferingVMinTime().isEmpty() &&
+				getCapabilitiesCache().getKOfferingVMaxTime().isEmpty())
+		{
+			getCapabilitiesCache().setMaxEventTime(null);
+			getCapabilitiesCache().setMinEventTime(null);
+		}
+		LOGGER.debug("Global temporal bounding box: max time: {}, min time: {}",
+				getCapabilitiesCache().getMaxEventTime(),
+				getCapabilitiesCache().getMinEventTime());
+	}
 
 	private void removeTemporalBoundingBoxesForEachOfferingFromCache(String procedureIdentifier)
 	{
@@ -311,6 +328,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 	private void removeOfferingToProcedureRelation(String procedureIdentifier)
 	{
+		List<String> offeringsToRemove = new ArrayList<String>();
 		for (Entry<String, List<String>> offeringToProcedureRelation : getCapabilitiesCache().getKOfferingVProcedures().entrySet()) {
 			if (offeringToProcedureRelation.getValue().remove(procedureIdentifier))
 			{
@@ -319,8 +337,18 @@ public class InMemoryCacheController extends CacheControllerImpl {
 						offeringToProcedureRelation.getKey());
 				if (offeringToProcedureRelation.getValue().isEmpty())
 				{
-					getCapabilitiesCache().getKOfferingVProcedures().remove(offeringToProcedureRelation.getKey());
+					offeringsToRemove.add(offeringToProcedureRelation.getKey());
 				}
+			}
+		}
+		// this to by-pass concurrent modification exceptions
+		if (!offeringsToRemove.isEmpty())
+		{
+			for (String offeringToRemove : offeringsToRemove) {
+				getCapabilitiesCache().getKOfferingVProcedures().remove(offeringToRemove);
+				LOGGER.debug("offering \"{}\" removed from offering->procedure map ? {}",
+						offeringsToRemove,
+						getCapabilitiesCache().getKOfferingVProcedures().containsKey(offeringToRemove));
 			}
 		}
 	}

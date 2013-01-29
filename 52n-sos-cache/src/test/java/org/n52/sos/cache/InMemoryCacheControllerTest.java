@@ -73,12 +73,13 @@ public class InMemoryCacheControllerTest
 	private static final String OBSERVATION_TYPE_2 = "test-observation-type-2";
 	private static final String OBSERVATION_TYPE = "test-observation-type";
 	private static final String OFFERING_NAME = "test-offering-name";
-	private static final String OFFERING_IDENTIFIER = "test-offering-identifier";
+	private static final String OFFERING_EXTENSION_FOR_PROCEDURE_NAME = "-offering";
 	private static final String OBSERVATION_ID = "test-observation-id";
 	private static final String CODESPACE = "test-codespace";
 	private static final String FEATURE = "test-feature";
 	private static final String OBSERVABLE_PROPERTY = "test-observable-property";
 	private static final String PROCEDURE = "test-procedure";
+	private static final String PROCEDURE_2 = "test-procedure-2";
 	private AbstractServiceRequest request;
 	private InMemoryCacheController controller;
 	private AbstractServiceResponse response;
@@ -265,10 +266,10 @@ public class InMemoryCacheControllerTest
 	should_throw_IllegalArgumentException_if_called_with_one_or_more_null_parameters_after_InsertSensor()
 			throws OwsExceptionReport{
 		controller.updateAfterSensorInsertion(null, null);
-		insertSensorRequestExample();
+		insertSensorRequestExample(PROCEDURE);
 		controller.updateAfterSensorInsertion((InsertSensorRequest) request, null);
 		request = null;
-		insertSensorResponseExample();
+		insertSensorResponseExample(PROCEDURE);
 		controller.updateAfterSensorInsertion(null, (InsertSensorResponse) response);
 		
 	}
@@ -277,7 +278,7 @@ public class InMemoryCacheControllerTest
 	should_contain_procedure_after_InsertSensor()
 		throws OwsExceptionReport{
 		
-		updateCacheWithInsertSensor();
+		updateCacheWithInsertSensor(PROCEDURE);
 		
 		assertTrue("procedure NOT in cache",
 				controller.getProcedures().contains(getSensorIdFromInsertSensorRequest()));
@@ -286,7 +287,7 @@ public class InMemoryCacheControllerTest
 	@Test public void 
 	should_contain_procedure_offering_relations_after_InsertSensor()
 			throws OwsExceptionReport{
-		updateCacheWithInsertSensor();
+		updateCacheWithInsertSensor(PROCEDURE);
 		
 		assertTrue("offering -> procedure relation NOT in cache",
 				controller.getProcedures4Offering( getAssignedOfferingId() ).contains( getSensorIdFromInsertSensorRequest() ));
@@ -298,7 +299,7 @@ public class InMemoryCacheControllerTest
 	@Test public void
 	should_contain_observable_property_relations_after_InsertSensor()
 			throws OwsExceptionReport {
-		updateCacheWithInsertSensor();
+		updateCacheWithInsertSensor(PROCEDURE);
 
 		assertTrue("observable property -> procedure relation NOT in cache",
 				controller
@@ -331,7 +332,7 @@ public class InMemoryCacheControllerTest
 	@Test public void 
 	should_contain_offering_name_after_InsertSensor()
 			throws OwsExceptionReport{
-		updateCacheWithInsertSensor();
+		updateCacheWithInsertSensor(PROCEDURE);
 		
 		assertTrue("offering NOT in cache",
 				controller.getOfferings().contains(getAssignedOfferingId()) );
@@ -340,7 +341,7 @@ public class InMemoryCacheControllerTest
 	@Test public void 
 	should_contain_allowed_observation_types_after_InsertSensor()
 			throws OwsExceptionReport{
-		updateCacheWithInsertSensor();
+		updateCacheWithInsertSensor(PROCEDURE);
 		
 		for (String observationType : ((InsertSensorRequest)request).getMetadata().getObservationTypes()) {
 			assertTrue("observation type NOT in cache",
@@ -351,7 +352,7 @@ public class InMemoryCacheControllerTest
 	@Test public void 
 	should_contain_related_features_after_InsertObservation()
 			throws OwsExceptionReport{
-		updateCacheWithInsertSensor();
+		updateCacheWithInsertSensor(PROCEDURE);
 		
 		assertTrue("offering -> related feature relations NOT in cache",
 				controller.getKOfferingVRelatedFeatures().containsKey(getAssignedOfferingId()));
@@ -390,10 +391,10 @@ public class InMemoryCacheControllerTest
 		deleteSensorPreparation();
 		
 		assertFalse("offering -> procedure relation STILL in cache",
-				controller.getProcedures4Offering( OFFERING_IDENTIFIER ).contains( getProcedureIdentifier() ));
+				controller.getProcedures4Offering( getProcedureIdentifier()+OFFERING_EXTENSION_FOR_PROCEDURE_NAME ).contains( getProcedureIdentifier() ));
 		
 		assertFalse("procedure -> offering relation STILL in cache",
-				controller.getOfferings4Procedure( getProcedureIdentifier() ).contains( OFFERING_IDENTIFIER )  );
+				controller.getOfferings4Procedure( getProcedureIdentifier() ).contains( getProcedureIdentifier()+OFFERING_EXTENSION_FOR_PROCEDURE_NAME )  );
 	}
 	
 	@Test public void 
@@ -454,7 +455,14 @@ public class InMemoryCacheControllerTest
 		deleteSensorPreparation();
 		
 		assertTrue("envolpe for offering STILL in cache",
-				controller.getEnvelopeForOffering( OFFERING_IDENTIFIER ) == null);
+				controller.getEnvelopeForOffering( getProcedureIdentifier()+OFFERING_EXTENSION_FOR_PROCEDURE_NAME ) == null);
+	}
+	
+	@Test @Ignore public void 
+	should_not_contain_global_envelope_if_deleted_sensor_was_last_one_available()
+			throws OwsExceptionReport {
+		// TODO implement
+		fail("make it green and refactor!");
 	}
 	
 	@Test public void 
@@ -463,10 +471,22 @@ public class InMemoryCacheControllerTest
 		deleteSensorPreparation();
 		
 		assertTrue("temporal bounding box STILL in cache",
-				controller.getMaxTimeForOffering( OFFERING_IDENTIFIER ) == null
+				controller.getMaxTimeForOffering( getProcedureIdentifier()+OFFERING_EXTENSION_FOR_PROCEDURE_NAME ) == null
 				&&
-				controller.getMinTimeForOffering( OFFERING_IDENTIFIER ) == null);
+				controller.getMinTimeForOffering( getProcedureIdentifier()+OFFERING_EXTENSION_FOR_PROCEDURE_NAME ) == null);
 	}	
+	
+	@Test public void 
+	should_not_contain_global_temporal_bouding_box_if_deleted_sensor_was_last_one_available()
+			throws OwsExceptionReport {
+		updateCacheWithInsertSensor(PROCEDURE_2);
+		deleteSensorPreparation();
+		
+		assertTrue("global temporal bounding box still in cache after deletion of last sensor",
+				controller.getMaxEventTime() == null
+				&&
+				controller.getMinEventTime() == null);
+	}
 	
 	/* HELPER */
 
@@ -479,7 +499,7 @@ public class InMemoryCacheControllerTest
 	private void 
 	deleteSensorPreparation()
 			throws OwsExceptionReport{
-		updateCacheWithInsertSensor();
+		updateCacheWithInsertSensor(PROCEDURE);
 		updateCacheWithSingleObservation();
 		updateCacheWithDeleteSensor();
 	}
@@ -501,10 +521,10 @@ public class InMemoryCacheControllerTest
 	}
 	
 	private void 
-	updateCacheWithInsertSensor() 
+	updateCacheWithInsertSensor(String procedureIdentifier) 
 			throws OwsExceptionReport {
-		insertSensorRequestExample();
-		insertSensorResponseExample();
+		insertSensorRequestExample(procedureIdentifier);
+		insertSensorResponseExample(procedureIdentifier);
 		controller.updateAfterSensorInsertion((InsertSensorRequest)request,(InsertSensorResponse)response);
 	}
 
@@ -539,21 +559,21 @@ public class InMemoryCacheControllerTest
 	}
 	
 	private void
-	insertSensorResponseExample()
+	insertSensorResponseExample(String procedureIdentifier)
 	{
 		response = anInsertSensorResponse()
-				.setOffering(OFFERING_IDENTIFIER)
-				.setProcedure(PROCEDURE)
+				.setOffering(procedureIdentifier + OFFERING_EXTENSION_FOR_PROCEDURE_NAME)
+				.setProcedure(procedureIdentifier)
 				.build();
 	}
 
 	private void
-	insertSensorRequestExample()
+	insertSensorRequestExample(String procedureIdentifier)
 	{
 		request = anInsertSensorRequest()
 				.setProcedure(aSensorMLProcedureDescription()
-						.setIdentifier(PROCEDURE)
-						.setOffering(OFFERING_IDENTIFIER,OFFERING_NAME)
+						.setIdentifier(procedureIdentifier)
+						.setOffering(procedureIdentifier+OFFERING_EXTENSION_FOR_PROCEDURE_NAME,OFFERING_NAME)
 						.build())
 				.addObservableProperty(OBSERVABLE_PROPERTY)
 				.addObservationType(OBSERVATION_TYPE)
@@ -606,7 +626,7 @@ public class InMemoryCacheControllerTest
 	{
 		request = aInsertObservationRequest()
 				.setProcedureId(PROCEDURE)
-				.addOffering(OFFERING_IDENTIFIER)
+				.addOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME)
 				.addObservation(anObservation()
 					.setObservationConstellation(aObservationConstellation()
 						.setFeature(aSamplingFeature()
