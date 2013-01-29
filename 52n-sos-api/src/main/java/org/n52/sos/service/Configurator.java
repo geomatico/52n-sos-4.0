@@ -71,7 +71,7 @@ import org.slf4j.LoggerFactory;
  * Singleton class reads the configFile and builds the RequestOperator and DAO;
  * configures the logger.
  */
-public final class Configurator {
+public class Configurator {
 
     /** logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(Configurator.class);
@@ -249,6 +249,62 @@ public final class Configurator {
     private Properties connectionProviderProperties;
 
     /**
+     * @return Returns the instance of the SosConfigurator. Null will be
+     *         returned if the parameterized getInstance method was not invoked
+     *         before. Usually this will be done in the SOS.
+     * @see Configurator#createInstance(Properties, String)
+     */
+    public static Configurator getInstance() {
+    	INITIALIZE_LOCK.lock();
+    	try {
+    		return instance;
+    	} finally {
+    		INITIALIZE_LOCK.unlock();
+    	}
+    }
+
+    /**
+     * @param connectionProviderConfig
+     * @param basepath
+     * @return Returns an instance of the SosConfigurator. This method is used
+     *         to implement the singelton pattern
+     *
+     * @throws ConfigurationException
+     *             if the initialization failed
+     */
+    public static Configurator createInstance(Properties connectionProviderConfig, String basepath)
+            throws ConfigurationException {
+    	if (instance == null) {
+    		boolean initialize = false;
+        	INITIALIZE_LOCK.lock();
+        	try {
+        		if (instance == null) {
+            		try {
+            			instance = new Configurator(connectionProviderConfig, basepath);
+            			initialize = true;
+            		} catch (RuntimeException t) {
+                        cleanUpAndThrow(t);
+                    } catch (ConfigurationException t) {
+                        cleanUpAndThrow(t);
+                    }
+        		}
+        	} finally {
+        		INITIALIZE_LOCK.unlock();
+        	}
+        	if (initialize) {
+        		try {
+                    instance.initialize();
+                } catch (RuntimeException t) {
+                    cleanUpAndThrow(t);
+                } catch (ConfigurationException t) {
+                    cleanUpAndThrow(t);
+                }
+    		}
+    	}
+        return instance;
+    }
+
+    /**
      * private constructor due to the singelton pattern.
      *
      * @param configis
@@ -261,20 +317,20 @@ public final class Configurator {
      *             if the
      * @throws IOException
      */
-    private Configurator(Properties config, String basepath) throws ConfigurationException {
+    private Configurator(Properties connectionProviderConfig, String basepath) throws ConfigurationException {
         if (basepath == null) {
             String message = "No basepath available!";
             LOGGER.info(message);
             throw new ConfigurationException(message);
         }
-        if (config == null) {
+        if (connectionProviderConfig == null) {
             String message = "No connection provider configuration available!";
             LOGGER.info(message);
             throw new ConfigurationException(message);
         }
 
         this.basepath = basepath;
-        this.connectionProviderProperties = config;
+        this.connectionProviderProperties = connectionProviderConfig;
         LOGGER.info("Configurator initialized: [basepath={}]",
                 this.basepath, this.connectionProviderProperties);
     }
@@ -554,48 +610,7 @@ public final class Configurator {
         instance = null;
     }
 
-    /**
-     * @param config
-     * @param basepath
-     * @return Returns an instance of the SosConfigurator. This method is used
-     *         to implement the singelton pattern
-     *
-     * @throws ConfigurationException
-     *             if the initialization failed
-     */
-    public static Configurator getInstance(Properties config, String basepath)
-            throws ConfigurationException {
-    	if (instance == null) {
-    		boolean initialize = false;
-        	INITIALIZE_LOCK.lock();
-        	try {
-        		if (instance == null) {
-            		try {
-            			instance = new Configurator(config, basepath);
-            			initialize = true;
-            		} catch (RuntimeException t) {
-                        cleanUpAndThrow(t);
-                    } catch (ConfigurationException t) {
-                        cleanUpAndThrow(t);
-                    }
-        		}
-        	} finally {
-        		INITIALIZE_LOCK.unlock();
-        	}
-        	if (initialize) {
-        		try {
-                    instance.initialize();
-                } catch (RuntimeException t) {
-                    cleanUpAndThrow(t);
-                } catch (ConfigurationException t) {
-                    cleanUpAndThrow(t);
-                }
-    		}
-    	}
-        return instance;
-    }
-
-	private static void cleanUpAndThrow(ConfigurationException t) throws ConfigurationException {
+    private static void cleanUpAndThrow(ConfigurationException t) throws ConfigurationException {
 		if (instance != null) {
 			instance.cleanup();
 			instance = null;
@@ -612,20 +627,6 @@ public final class Configurator {
 	}
 
     private static final Lock INITIALIZE_LOCK = new ReentrantLock();
-
-    /**
-     * @return Returns the instance of the SosConfigurator. Null will be
-     *         returned if the parameterized getInstance method was not invoked
-     *         before. Usually this will be done in the SOS.
-     */
-    public static Configurator getInstance() {
-    	INITIALIZE_LOCK.lock();
-    	try {
-    		return instance;
-    	} finally {
-    		INITIALIZE_LOCK.unlock();
-    	}
-    }
 
     /**
      * reads the requestListeners from the configFile and returns a

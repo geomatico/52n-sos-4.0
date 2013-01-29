@@ -47,7 +47,7 @@ public class SosContextListener implements ServletContextListener {
 				try {
 					log.debug("Initialising Configurator ({},{})", 
                             dbsh.getPath(), context.getRealPath("/"));
-					Configurator.getInstance(dbsh.getAll(), context.getRealPath("/"));
+					Configurator.createInstance(dbsh.getAll(), context.getRealPath("/"));
 				} catch (ConfigurationException ce) {
 					String message = "Configurator initialization failed!";
 					log.error(message, ce);
