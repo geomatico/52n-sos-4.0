@@ -443,11 +443,26 @@ public class InMemoryCacheControllerTest
 				);
 	}
 	
-	@Test @Ignore public void 
-	should_not_contain_inter_procedure_relations_after_DeleteSensor()
+	@Test public void 
+	should_not_contain_parent_procedures_after_DeleteSensor()
 			throws OwsExceptionReport{
-		// TODO implement
-		fail("make it green and refactor!");
+		deleteSensorPreparation();
+		
+		assertTrue("parent procedures STILL available in cache",
+				controller.getParentProcedures(PROCEDURE, true, false) == null
+				||
+				controller.getParentProcedures(PROCEDURE, true, false).isEmpty());
+	}
+	
+	@Test @Ignore public void 
+	should_not_contain_child_procedures_after_DeleteSensor()
+			throws OwsExceptionReport{
+		deleteSensorPreparation();
+		
+		assertTrue("parent procedures STILL available in cache",
+				controller.getChildProcedures(PROCEDURE, true, false) == null
+				||
+				controller.getChildProcedures(PROCEDURE, true, false).isEmpty());
 	}
 	
 	@Test public void 

@@ -57,9 +57,10 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk
- *         J&uuml;rrens</a> TODO add more log statement for debug level on
+ * <b>TODO</b> add more log statements for debug level on
  *         failed or successful operation
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk
+ *         J&uuml;rrens</a> 
  */
 public class InMemoryCacheController extends CacheControllerImpl {
 
@@ -232,7 +233,6 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	private void doUpdateAfterSensorDeletion(DeleteSensorRequest sosRequest) throws OwsExceptionReport
 	{
 		// TODO group offering loops
-		// remove procedure from cache
 		
 		removeProcedureFromCache(sosRequest.getProcedureIdentifier());
 	
