@@ -513,10 +513,13 @@ public class InMemoryCacheControllerTest
 				onlyValidRelatedFeaturesAreInRoleMap());
 	}
 	
-	@Test @Ignore
-	public void should_not_contain_offering_names_after_DeleteSensor()
-	{
-		fail("make it green and refactor!");
+	@Test public void 
+	should_not_contain_offering_names_after_DeleteSensor()
+			throws OwsExceptionReport{
+		deleteSensorPreparation();
+		
+		assertNull("offering name STILL in cache",
+				controller.getOfferingName(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
 	}
 	
 	/* HELPER */

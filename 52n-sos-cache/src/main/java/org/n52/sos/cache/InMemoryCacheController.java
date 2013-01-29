@@ -250,6 +250,8 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			removeGlobalTemporalBoundingBox();
 		}
 		
+		removeOfferingNames(sosRequest.getProcedureIdentifier());
+		
 		removeOfferingsToRelatedFeaturesRelations(sosRequest.getProcedureIdentifier());
 		
 		removeRemovedRelatedFeaturesFromRoleMap(sosRequest.getProcedureIdentifier());
@@ -264,6 +266,16 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 	/* HELPER */
 	
+	private void removeOfferingNames(String procedureIdentifier)
+	{
+		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier)) {
+			getCapabilitiesCache().getOffName().remove(offeringId);
+			LOGGER.debug("offering name removed for offering \"{}\"? {}",
+					offeringId,
+					getCapabilitiesCache().getOffName().containsKey(offeringId));
+		}
+	}
+
 	private void removeRemovedRelatedFeaturesFromRoleMap(String procedureIdentifier)
 	{
 		List<String> allowedRelatedFeatures = getAllowedRelatedFeatures();
