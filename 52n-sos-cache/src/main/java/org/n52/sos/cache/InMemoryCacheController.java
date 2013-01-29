@@ -239,10 +239,16 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		
 		// remove envelopes for each offering this procedure relates to
 		removeOfferingEnvelopes(sosRequest.getProcedureIdentifier());
-		
+		if (getCapabilitiesCache().getKOfferingVEnvelope().isEmpty())
+		{
+			removeGlobalEnvelope();
+		}
 		// remove temporal bounding boxes from cache
 		removeTemporalBoundingBoxesForEachOfferingFromCache(sosRequest.getProcedureIdentifier());
-		removeGlobalTemporalBoundingBoxIfRequired();
+		if (offeringToTimeLimitMapsAreEmpty())
+		{
+			removeGlobalTemporalBoundingBoxIfRequired();
+		}
 		
 		// observable property relations
 		removeObservablePropertyRelations(sosRequest.getProcedureIdentifier());
@@ -250,20 +256,26 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		// At the latest
 		removeProcedureToOfferingRelation(sosRequest.getProcedureIdentifier());
 		
-		// TODO delete global bbox
-		// TODO delete global envelope
 	}
 
 	/* HELPER */
+	
+	private void removeGlobalEnvelope()
+	{
+		getCapabilitiesCache().setGlobalEnvelope(new SosEnvelope(null, getSrid()));
+		LOGGER.debug("global envelope: {}",getCapabilitiesCache().getGlobalEnvelope());
+	}
+
+	private boolean offeringToTimeLimitMapsAreEmpty()
+	{
+		return getCapabilitiesCache().getKOfferingVMinTime().isEmpty() &&
+				getCapabilitiesCache().getKOfferingVMaxTime().isEmpty();
+	}
 
 	private void removeGlobalTemporalBoundingBoxIfRequired()
 	{
-		if (getCapabilitiesCache().getKOfferingVMinTime().isEmpty() &&
-				getCapabilitiesCache().getKOfferingVMaxTime().isEmpty())
-		{
-			getCapabilitiesCache().setMaxEventTime(null);
-			getCapabilitiesCache().setMinEventTime(null);
-		}
+		getCapabilitiesCache().setMaxEventTime(null);
+		getCapabilitiesCache().setMinEventTime(null);
 		LOGGER.debug("Global temporal bounding box: max time: {}, min time: {}",
 				getCapabilitiesCache().getMaxEventTime(),
 				getCapabilitiesCache().getMinEventTime());

@@ -458,11 +458,15 @@ public class InMemoryCacheControllerTest
 				controller.getEnvelopeForOffering( getProcedureIdentifier()+OFFERING_EXTENSION_FOR_PROCEDURE_NAME ) == null);
 	}
 	
-	@Test @Ignore public void 
+	@Test public void 
 	should_not_contain_global_envelope_if_deleted_sensor_was_last_one_available()
 			throws OwsExceptionReport {
-		// TODO implement
-		fail("make it green and refactor!");
+		deleteSensorPreparation();
+		
+		assertFalse("global envelope STILL in cache after deletion of last sensor",
+				controller.getGlobalEnvelope() != null
+				&&
+				controller.getGlobalEnvelope().isSetEnvelope());
 	}
 	
 	@Test public void 
