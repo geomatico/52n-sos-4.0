@@ -252,6 +252,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		
 		removeOfferingNames(sosRequest.getProcedureIdentifier());
 		
+		removeOfferingsToFeaturesRelations(sosRequest.getProcedureIdentifier());
+		removeRemovedFeaturesFromCache();
+		
 		removeOfferingsToRelatedFeaturesRelations(sosRequest.getProcedureIdentifier());
 		
 		removeRemovedRelatedFeaturesFromRoleMap(sosRequest.getProcedureIdentifier());
@@ -266,9 +269,41 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 	/* HELPER */
 	
+	private void removeOfferingsToFeaturesRelations(String procedureIdentifier)
+	{
+		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier))
+		{
+			getCapabilitiesCache().getOffFeatures().remove(offeringId);
+			LOGGER.debug("features removed for offering \"{}\"? {}",
+					offeringId,
+					getCapabilitiesCache().getOffFeatures().containsKey(offeringId));
+		}
+	}
+	
+	private void removeRemovedFeaturesFromCache()
+	{
+		List<String> allowedFeatures = getAllowedFeatures();
+		List<String> featuresToRemove = new ArrayList<String>();
+		for (String feature : getCapabilitiesCache().getFeatureOfInterest()) 
+		{
+			if (!allowedFeatures.contains(feature))
+			{
+				featuresToRemove.add(feature);
+			}
+		}
+		for (String feature : featuresToRemove)
+		{
+			getCapabilitiesCache().getFeatureOfInterest().remove(feature);
+			LOGGER.debug("feature \"{}\" removed from cache? {}",
+					feature,
+					getCapabilitiesCache().getFeatureOfInterest().contains(feature));
+		}
+	}
+
 	private void removeOfferingNames(String procedureIdentifier)
 	{
-		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier)) {
+		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier))
+		{
 			getCapabilitiesCache().getOffName().remove(offeringId);
 			LOGGER.debug("offering name removed for offering \"{}\"? {}",
 					offeringId,
@@ -287,7 +322,8 @@ public class InMemoryCacheController extends CacheControllerImpl {
 				featuresToRemove.add(relatedFeatureWithRole);
 			}
 		}
-		for (String featureToRemove : featuresToRemove) {
+		for (String featureToRemove : featuresToRemove)
+		{
 			getCapabilitiesCache().getKRelatedFeatureVRole().remove(featureToRemove);
 			LOGGER.debug("related feature \"{}\" removed from role map? {}",
 					featuresToRemove,
@@ -310,6 +346,23 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			}
 		}
 		return allowedRelatedFeatures;
+	}
+	
+	private List<String> getAllowedFeatures()
+	{
+		Collection<Collection<String>> values = getCapabilitiesCache().getOffFeatures().values();
+		List<String> allowedFeatures = new ArrayList<String>();
+		for (Collection<String> featuresEntry : values)
+		{
+			for (String feature : featuresEntry)
+			{
+				if (!allowedFeatures.contains(feature))
+				{
+					allowedFeatures.add(feature);
+				}
+			}
+		}
+		return allowedFeatures;
 	}
 
 	private void removeOfferingsToRelatedFeaturesRelations(String procedureIdentifier)
@@ -560,12 +613,12 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	private void addProcedureToObservablePropertyRelation(String procedureIdentifier,
 			String observablePropertyIdentifier)
 	{
-		if (getCapabilitiesCache().getProcPhens().get(procedureIdentifier) == null) {
+		if (getCapabilitiesCache().getKProcedureVObservableProperties().get(procedureIdentifier) == null) {
 			List<String> relatedProperties = Collections.synchronizedList(new ArrayList<String>());
 			relatedProperties.add(observablePropertyIdentifier);
-			getCapabilitiesCache().getProcPhens().put(procedureIdentifier, relatedProperties);
-		} else if (!getCapabilitiesCache().getProcPhens().get(procedureIdentifier).contains(observablePropertyIdentifier)) {
-			getCapabilitiesCache().getProcPhens().get(procedureIdentifier).add(observablePropertyIdentifier);
+			getCapabilitiesCache().getKProcedureVObservableProperties().put(procedureIdentifier, relatedProperties);
+		} else if (!getCapabilitiesCache().getKProcedureVObservableProperties().get(procedureIdentifier).contains(observablePropertyIdentifier)) {
+			getCapabilitiesCache().getKProcedureVObservableProperties().get(procedureIdentifier).add(observablePropertyIdentifier);
 		}
 	}
 
@@ -582,12 +635,12 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	private void addObservablePropertyToProcedureRelation(String observablePropertyIdentifier,
 			String procedureIdentifier)
 	{
-		if (getCapabilitiesCache().getPhenProcs().get(observablePropertyIdentifier) == null) {
+		if (getCapabilitiesCache().getKObservablePropertyVProcedures().get(observablePropertyIdentifier) == null) {
 			List<String> relatedProcedures = Collections.synchronizedList(new ArrayList<String>());
 			relatedProcedures.add(procedureIdentifier);
-			getCapabilitiesCache().getPhenProcs().put(observablePropertyIdentifier, relatedProcedures);
-		} else if (!getCapabilitiesCache().getPhenProcs().get(observablePropertyIdentifier).contains(procedureIdentifier)) {
-			getCapabilitiesCache().getPhenProcs().get(observablePropertyIdentifier).add(procedureIdentifier);
+			getCapabilitiesCache().getKObservablePropertyVProcedures().put(observablePropertyIdentifier, relatedProcedures);
+		} else if (!getCapabilitiesCache().getKObservablePropertyVProcedures().get(observablePropertyIdentifier).contains(procedureIdentifier)) {
+			getCapabilitiesCache().getKObservablePropertyVProcedures().get(observablePropertyIdentifier).add(procedureIdentifier);
 		}
 	}
 

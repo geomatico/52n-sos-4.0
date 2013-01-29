@@ -537,6 +537,31 @@ public class InMemoryCacheControllerTest
 				controller.getOfferingName(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
 	}
 	
+	@Test public void 
+	should_not_contain_composite_phenomenons_after_DeleteSensor()
+			throws OwsExceptionReport{
+		deleteSensorPreparation();
+		
+		assertTrue("composite phenomenons STILL in cache for deleted sensor",
+				controller.getKOfferingVCompositePhenomenons().get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME) == null
+				||
+				controller.getKOfferingVCompositePhenomenons().get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).isEmpty());
+	}
+	
+	@Test public void 
+	should_not_contain_features_after_DeleteSensor()
+			throws OwsExceptionReport {
+		deleteSensorPreparation();
+		
+		assertTrue("features STILL related to offering",
+				controller.getKOfferingVFeatures() == null
+				||
+				controller.getKOfferingVFeatures().isEmpty());
+		
+		assertFalse("features STILL in cache",
+				controller.getFeatureOfInterest().contains(FEATURE));
+	}
+	
 	/* HELPER */
 
 	private 
