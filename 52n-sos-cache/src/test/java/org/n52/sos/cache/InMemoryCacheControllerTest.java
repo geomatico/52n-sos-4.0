@@ -492,6 +492,15 @@ public class InMemoryCacheControllerTest
 				controller.getMinEventTime() == null);
 	}
 	
+	@Test public void 
+	should_not_contain_related_features_after_DeleteSensor()
+			throws OwsExceptionReport {
+		deleteSensorPreparation();
+		
+		assertFalse("related features for offering STILL in cache",
+				controller.getKOfferingVRelatedFeatures().containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
+	}
+	
 	/* HELPER */
 
 	private String 

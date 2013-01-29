@@ -231,24 +231,26 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 	private void doUpdateAfterSensorDeletion(DeleteSensorRequest sosRequest) throws OwsExceptionReport
 	{
+		// TODO group offering loops
 		// remove procedure from cache
+		
 		removeProcedureFromCache(sosRequest.getProcedureIdentifier());
 	
-		// remove procedure offering relations
 		removeOfferingToProcedureRelation(sosRequest.getProcedureIdentifier());
 		
-		// remove envelopes for each offering this procedure relates to
 		removeOfferingEnvelopes(sosRequest.getProcedureIdentifier());
 		if (getCapabilitiesCache().getKOfferingVEnvelope().isEmpty())
 		{
 			removeGlobalEnvelope();
 		}
-		// remove temporal bounding boxes from cache
+		
 		removeTemporalBoundingBoxesForEachOfferingFromCache(sosRequest.getProcedureIdentifier());
-		if (offeringToTimeLimitMapsAreEmpty())
+		if (areOfferingToTimeLimitMapsEmpty())
 		{
-			removeGlobalTemporalBoundingBoxIfRequired();
+			removeGlobalTemporalBoundingBox();
 		}
+		
+		removeOfferingsToRelatedFeaturesRelations(sosRequest.getProcedureIdentifier());
 		
 		// observable property relations
 		removeObservablePropertyRelations(sosRequest.getProcedureIdentifier());
@@ -260,19 +262,29 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 	/* HELPER */
 	
+	private void removeOfferingsToRelatedFeaturesRelations(String procedureIdentifier)
+	{
+		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier)) {
+			getCapabilitiesCache().getKOfferingVRelatedFeatures().remove(offeringId);
+			LOGGER.debug("Related features removed for offering \"{}\"? {}",
+					offeringId,
+					getCapabilitiesCache().getKOfferingVRelatedFeatures().containsKey(offeringId));
+		}
+	}
+
 	private void removeGlobalEnvelope()
 	{
 		getCapabilitiesCache().setGlobalEnvelope(new SosEnvelope(null, getSrid()));
 		LOGGER.debug("global envelope: {}",getCapabilitiesCache().getGlobalEnvelope());
 	}
 
-	private boolean offeringToTimeLimitMapsAreEmpty()
+	private boolean areOfferingToTimeLimitMapsEmpty()
 	{
 		return getCapabilitiesCache().getKOfferingVMinTime().isEmpty() &&
 				getCapabilitiesCache().getKOfferingVMaxTime().isEmpty();
 	}
 
-	private void removeGlobalTemporalBoundingBoxIfRequired()
+	private void removeGlobalTemporalBoundingBox()
 	{
 		getCapabilitiesCache().setMaxEventTime(null);
 		getCapabilitiesCache().setMinEventTime(null);
