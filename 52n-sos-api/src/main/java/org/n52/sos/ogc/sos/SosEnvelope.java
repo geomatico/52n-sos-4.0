@@ -127,4 +127,10 @@ public class SosEnvelope {
 		return true;
 	}
 
+	@Override
+	public String toString()
+	{
+		return String.format("SosEnvelope [envelope=%s, srid=%s]", envelope, srid);
+	}
+	
 }
