@@ -454,8 +454,19 @@ public class InMemoryCacheControllerTest
 		deleteSensorPreparation();
 		
 		assertTrue("envolpe for offering STILL in cache",
-				controller.getEnvelopeForOffering(OFFERING_IDENTIFIER) == null);
+				controller.getEnvelopeForOffering( OFFERING_IDENTIFIER ) == null);
 	}
+	
+	@Test public void 
+	should_not_contain_temporal_bounding_box_after_DeleteSensor()
+			throws OwsExceptionReport {
+		deleteSensorPreparation();
+		
+		assertTrue("temporal bounding box STILL in cache",
+				controller.getMaxTimeForOffering( OFFERING_IDENTIFIER ) == null
+				&&
+				controller.getMinTimeForOffering( OFFERING_IDENTIFIER ) == null);
+	}	
 	
 	/* HELPER */
 

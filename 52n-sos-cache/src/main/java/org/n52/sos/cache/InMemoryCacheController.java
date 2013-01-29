@@ -240,6 +240,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		// remove envelopes for each offering this procedure relates to
 		removeOfferingEnvelopes(sosRequest.getProcedureIdentifier());
 		
+		// remove temporal bounding boxes from cache
+		removeTemporalBoundingBoxesForEachOfferingFromCache(sosRequest.getProcedureIdentifier());
+		
 		// observable property relations
 		removeObservablePropertyRelations(sosRequest.getProcedureIdentifier());
 		
@@ -248,6 +251,18 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	}
 
 	/* HELPER */
+
+	private void removeTemporalBoundingBoxesForEachOfferingFromCache(String procedureIdentifier)
+	{
+		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier)) {
+			getCapabilitiesCache().getKOfferingVMaxTime().remove(offeringId);
+			getCapabilitiesCache().getKOfferingVMinTime().remove(offeringId);
+			LOGGER.debug("Temporal boundingbox removed for offering \"{}\"? max time: {}; min time: {}",
+					offeringId,
+					getCapabilitiesCache().getKOfferingVMaxTime().containsKey(offeringId),
+					getCapabilitiesCache().getKOfferingVMinTime().containsKey(offeringId));
+		}
+	}
 
 	private void removeOfferingEnvelopes(String procedureIdentifier)
 	{
