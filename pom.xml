@@ -1040,13 +1040,13 @@
 		<profile>
 			<id>wml</id>
 			<modules>
-				<module>../52n-sos-coding-wml-v20</module>
+				<module>52n-sos-coding-wml-v20</module>
 			</modules>
 		</profile>
 		<profile>
 			<id>gda</id>
 			<modules>
-				<module>../52n-sos-gda</module>
+				<module>52n-sos-gda</module>
 			</modules>
 		</profile>
 		<profile>
