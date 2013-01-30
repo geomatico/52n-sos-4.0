@@ -283,6 +283,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		
 		removeOfferingsToObservationTypesRelations(sosRequest.getProcedureIdentifier());
 		
+		removeOfferingToObservationIdentifierRelations(sosRequest.getProcedureIdentifier());
+		removeRemovedObservationIdentifiers();
+		
 		// observable property relations
 		removeObservablePropertyRelations(sosRequest.getProcedureIdentifier());
 		
@@ -293,6 +296,22 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 	/* HELPER */
 	
+	private void removeRemovedObservationIdentifiers()
+	{
+		// TODO Auto-generated method "removeRemovedObservationIdentifiers" stub generated on 30.01.2013 around 10:21:32 by eike
+	}
+
+	private void removeOfferingToObservationIdentifierRelations(String procedureIdentifier)
+	{
+		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier))
+		{
+			getCapabilitiesCache().getKOfferingVObservationIdentifiers().remove(offeringId);
+			LOGGER.debug("observation types removed for offering \"{}\"? {}",
+					offeringId,
+					getCapabilitiesCache().getKOfferingVObservationIdentifiers().containsKey(offeringId));
+		}
+	}
+
 	private void removeFeatureToProcedureRelationsFromCache(String procedureIdentifier)
 	{
 		List<String> featuresToRemove = new ArrayList<String>();

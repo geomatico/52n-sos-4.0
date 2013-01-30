@@ -598,6 +598,15 @@ public class InMemoryCacheControllerTest
 				controller.getCapabilitiesCache().getKFeatureOfInterestVProcedures().isEmpty());
 	}
 	
+	@Test public void 
+	should_not_contain_offering_to_observation_id_relations_after_DeleteSensor()
+			throws OwsExceptionReport {
+		deleteSensorPreparation();
+		
+		assertFalse("offering -> observation ids relations STILL in cache",
+				controller.getCapabilitiesCache().getKOfferingVObservationIdentifiers().containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
+	}
+	
 	/* HELPER */
 
 	private 
