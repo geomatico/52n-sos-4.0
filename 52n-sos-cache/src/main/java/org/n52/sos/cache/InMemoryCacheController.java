@@ -253,44 +253,50 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 	private void doUpdateAfterSensorDeletion(DeleteSensorRequest sosRequest) throws OwsExceptionReport
 	{
-		// TODO group offering loops
-		
 		removeProcedureFromCache(sosRequest.getProcedureIdentifier());
 		
 		removeFeatureToProcedureRelationsFromCache(sosRequest.getProcedureIdentifier());
-	
-		removeOfferingToProcedureRelation(sosRequest.getProcedureIdentifier());
 		
-		removeOfferingEnvelopes(sosRequest.getProcedureIdentifier());
-		if (getCapabilitiesCache().getKOfferingVEnvelope().isEmpty())
+		removeOfferingsToProcedureRelation(sosRequest.getProcedureIdentifier());
+
+		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(sosRequest.getProcedureIdentifier()))
 		{
-			removeGlobalEnvelope();
+			removeTemporalBoundingBoxFromCache(offeringId);
+		
+			removeOfferingName(offeringId);
+
+			removeOfferingToFeaturesRelations(offeringId);
+
+			removeOfferingToRelatedFeaturesRelations(offeringId);
+
+			removeOfferingToObservationTypesRelations(offeringId);
+
+			removeOfferingToObservationIdentifierRelations(offeringId);
+
+			removeOfferingEnvelope(offeringId);
 		}
 		
-		removeTemporalBoundingBoxesForEachOfferingFromCache(sosRequest.getProcedureIdentifier());
+		removeRemovedRelatedFeaturesFromRoleMap();
+		
+		removeRemovedFeaturesFromCache();
+		
+		removeRemovedObservationIdentifiers();
+		
 		if (areOfferingToTimeLimitMapsEmpty())
 		{
 			removeGlobalTemporalBoundingBox();
 		}
 		
-		removeOfferingNames(sosRequest.getProcedureIdentifier());
-		
-		removeOfferingsToFeaturesRelations(sosRequest.getProcedureIdentifier());
-		removeRemovedFeaturesFromCache();
-		
-		removeOfferingsToRelatedFeaturesRelations(sosRequest.getProcedureIdentifier());
-		removeRemovedRelatedFeaturesFromRoleMap(sosRequest.getProcedureIdentifier());
-		
-		removeOfferingsToObservationTypesRelations(sosRequest.getProcedureIdentifier());
-		
-		removeOfferingToObservationIdentifierRelations(sosRequest.getProcedureIdentifier());
-		removeRemovedObservationIdentifiers();
+		if (getCapabilitiesCache().getKOfferingVEnvelope().isEmpty())
+		{
+			removeGlobalEnvelope();
+		}
 		
 		// observable property relations
 		removeObservablePropertyRelations(sosRequest.getProcedureIdentifier());
 		
 		// At the latest
-		removeProcedureToOfferingRelation(sosRequest.getProcedureIdentifier());
+		removeProcedureToOfferingsRelation(sosRequest.getProcedureIdentifier());
 		
 	}
 
@@ -301,15 +307,12 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		// TODO Auto-generated method "removeRemovedObservationIdentifiers" stub generated on 30.01.2013 around 10:21:32 by eike
 	}
 
-	private void removeOfferingToObservationIdentifierRelations(String procedureIdentifier)
+	private void removeOfferingToObservationIdentifierRelations(String offeringId)
 	{
-		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier))
-		{
-			getCapabilitiesCache().getKOfferingVObservationIdentifiers().remove(offeringId);
-			LOGGER.debug("observation types removed for offering \"{}\"? {}",
-					offeringId,
-					getCapabilitiesCache().getKOfferingVObservationIdentifiers().containsKey(offeringId));
-		}
+		getCapabilitiesCache().getKOfferingVObservationIdentifiers().remove(offeringId);
+		LOGGER.debug("observation types removed for offering \"{}\"? {}",
+				offeringId,
+				getCapabilitiesCache().getKOfferingVObservationIdentifiers().containsKey(offeringId));
 	}
 
 	private void removeFeatureToProcedureRelationsFromCache(String procedureIdentifier)
@@ -337,26 +340,20 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		}
 	}
 
-	private void removeOfferingsToObservationTypesRelations(String procedureIdentifier)
+	private void removeOfferingToObservationTypesRelations(String offeringId)
 	{
-		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier))
-		{
-			getCapabilitiesCache().getKOfferingVObservationTypes().remove(offeringId);
-			LOGGER.debug("observation types removed for offering \"{}\"? {}",
-					offeringId,
-					getCapabilitiesCache().getKOfferingVObservationTypes().containsKey(offeringId));
-		}
+		getCapabilitiesCache().getKOfferingVObservationTypes().remove(offeringId);
+		LOGGER.debug("observation types removed for offering \"{}\"? {}",
+				offeringId,
+				getCapabilitiesCache().getKOfferingVObservationTypes().containsKey(offeringId));
 	}
 
-	private void removeOfferingsToFeaturesRelations(String procedureIdentifier)
+	private void removeOfferingToFeaturesRelations(String offeringId)
 	{
-		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier))
-		{
-			getCapabilitiesCache().getOffFeatures().remove(offeringId);
-			LOGGER.debug("features removed for offering \"{}\"? {}",
-					offeringId,
-					getCapabilitiesCache().getOffFeatures().containsKey(offeringId));
-		}
+		getCapabilitiesCache().getOffFeatures().remove(offeringId);
+		LOGGER.debug("features removed for offering \"{}\"? {}",
+				offeringId,
+				getCapabilitiesCache().getOffFeatures().containsKey(offeringId));
 	}
 	
 	private void removeRemovedFeaturesFromCache()
@@ -385,18 +382,15 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		return entriesToRemove;
 	}
 
-	private void removeOfferingNames(String procedureIdentifier)
+	private void removeOfferingName(String offeringId)
 	{
-		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier))
-		{
-			getCapabilitiesCache().getOffName().remove(offeringId);
-			LOGGER.debug("offering name removed for offering \"{}\"? {}",
-					offeringId,
-					getCapabilitiesCache().getOffName().containsKey(offeringId));
-		}
+		getCapabilitiesCache().getOffName().remove(offeringId);
+		LOGGER.debug("offering name removed for offering \"{}\"? {}",
+				offeringId,
+				getCapabilitiesCache().getOffName().containsKey(offeringId));
 	}
 
-	private void removeRemovedRelatedFeaturesFromRoleMap(String procedureIdentifier)
+	private void removeRemovedRelatedFeaturesFromRoleMap()
 	{
 		List<String> allowedRelatedFeatures = getAllowedRelatedFeatures();
 		List<String> featuresToRemove = getEntriesToRemove(allowedRelatedFeatures, 
@@ -431,14 +425,12 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		return allowedEntries;
 	}
 
-	private void removeOfferingsToRelatedFeaturesRelations(String procedureIdentifier)
+	private void removeOfferingToRelatedFeaturesRelations(String offeringId)
 	{
-		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier)) {
-			getCapabilitiesCache().getKOfferingVRelatedFeatures().remove(offeringId);
-			LOGGER.debug("Related features removed for offering \"{}\"? {}",
-					offeringId,
-					getCapabilitiesCache().getKOfferingVRelatedFeatures().containsKey(offeringId));
-		}
+		getCapabilitiesCache().getKOfferingVRelatedFeatures().remove(offeringId);
+		LOGGER.debug("Related features removed for offering \"{}\"? {}",
+				offeringId,
+				getCapabilitiesCache().getKOfferingVRelatedFeatures().containsKey(offeringId));
 	}
 
 	private void removeGlobalEnvelope()
@@ -462,26 +454,22 @@ public class InMemoryCacheController extends CacheControllerImpl {
 				getCapabilitiesCache().getMinEventTime());
 	}
 
-	private void removeTemporalBoundingBoxesForEachOfferingFromCache(String procedureIdentifier)
+	private void removeTemporalBoundingBoxFromCache(String offeringId)
 	{
-		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier)) {
-			getCapabilitiesCache().getKOfferingVMaxTime().remove(offeringId);
-			getCapabilitiesCache().getKOfferingVMinTime().remove(offeringId);
-			LOGGER.debug("Temporal boundingbox removed for offering \"{}\"? max time: {}; min time: {}",
-					offeringId,
-					getCapabilitiesCache().getKOfferingVMaxTime().containsKey(offeringId),
-					getCapabilitiesCache().getKOfferingVMinTime().containsKey(offeringId));
-		}
+		getCapabilitiesCache().getKOfferingVMaxTime().remove(offeringId);
+		getCapabilitiesCache().getKOfferingVMinTime().remove(offeringId);
+		LOGGER.debug("Temporal boundingbox removed for offering \"{}\"? max time: {}; min time: {}",
+				offeringId,
+				getCapabilitiesCache().getKOfferingVMaxTime().containsKey(offeringId),
+				getCapabilitiesCache().getKOfferingVMinTime().containsKey(offeringId));
 	}
 
-	private void removeOfferingEnvelopes(String procedureIdentifier)
+	private void removeOfferingEnvelope(String offeringId)
 	{
-		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier)) {
-			getCapabilitiesCache().getKOfferingVEnvelope().remove(offeringId);
-			LOGGER.debug("Envelope removed for offering \"{}\"? {}",
-					offeringId,
-					getCapabilitiesCache().getKOfferingVEnvelope().containsKey(offeringId));
-		}
+		getCapabilitiesCache().getKOfferingVEnvelope().remove(offeringId);
+		LOGGER.debug("Envelope removed for offering \"{}\"? {}",
+				offeringId,
+				getCapabilitiesCache().getKOfferingVEnvelope().containsKey(offeringId));
 	}
 	
 	private void removeObservablePropertyRelations(String procedureIdentifier)
@@ -519,7 +507,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		}
 	}
 
-	private void removeOfferingToProcedureRelation(String procedureIdentifier)
+	private void removeOfferingsToProcedureRelation(String procedureIdentifier)
 	{
 		List<String> offeringsToRemove = new ArrayList<String>();
 		for (Entry<String, List<String>> offeringToProcedureRelation : getCapabilitiesCache().getKOfferingVProcedures().entrySet()) {
@@ -543,10 +531,10 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		}
 	}
 
-	private void removeProcedureToOfferingRelation(String procedureIdentifer)
+	private void removeProcedureToOfferingsRelation(String procedureIdentifer)
 	{
 		getCapabilitiesCache().getKProcedureVOffering().remove(procedureIdentifer);
-		LOGGER.debug("procedure to offering relation removed from cache for procedure \"{}\"? {}",
+		LOGGER.debug("procedure to offerings relation removed from cache for procedure \"{}\"? {}",
 					procedureIdentifer,
 					getCapabilitiesCache().getKProcedureVOffering().containsKey(procedureIdentifer));
 	}
