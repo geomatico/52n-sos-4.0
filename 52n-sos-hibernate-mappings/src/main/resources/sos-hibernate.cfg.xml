@@ -37,6 +37,7 @@
         <mapping resource="mapping/ObservableProperty.hbm.xml"/>
         <mapping resource="mapping/Observation.hbm.xml"/>
         <mapping resource="mapping/ObservationConstellation.hbm.xml"/>
+        <mapping resource="mapping/ObservationConstellationOfferingObservationType.hbm.xml"/>
         <mapping resource="mapping/ObservationTemplate.hbm.xml"/>
         <mapping resource="mapping/ObservationType.hbm.xml"/>
         <mapping resource="mapping/Offering.hbm.xml"/>

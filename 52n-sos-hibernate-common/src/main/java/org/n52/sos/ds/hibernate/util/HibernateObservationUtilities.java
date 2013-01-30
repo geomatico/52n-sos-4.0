@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,6 +43,7 @@ import org.n52.sos.ds.hibernate.entities.GeometryValue;
 import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
+import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.Quality;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
@@ -126,6 +128,16 @@ public class HibernateObservationUtilities {
                 // reached
                 SosHelper.checkFreeMemory();
 
+                Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes =
+                        hObservation.getObservationConstellationOfferingObservationTypes();
+                Iterator<ObservationConstellationOfferingObservationType> iterator = observationConstellationOfferingObservationTypes.iterator();
+                ObservationConstellationOfferingObservationType hObservationConstellationOfferingObservationType = null;
+                while (iterator.hasNext()) {
+                    hObservationConstellationOfferingObservationType =
+                            (ObservationConstellationOfferingObservationType) iterator.next();
+                    break;
+                }
+                
                 ObservationConstellation hObservationConstellation = hObservation.getObservationConstellation();
                 FeatureOfInterest hFeatureOfInterest = hObservation.getFeatureOfInterest();
 
@@ -143,7 +155,7 @@ public class HibernateObservationUtilities {
                     procedures.put(procedureIdentifier, procedure);
                 }
 
-                String observationType = hObservationConstellation.getObservationType().getObservationType();
+                String observationType = hObservationConstellationOfferingObservationType.getObservationType().getObservationType();
 
                 // feature of interest
                 String foiID = hFeatureOfInterest.getIdentifier();
@@ -240,8 +252,8 @@ public class HibernateObservationUtilities {
                 }
                 SosObservation sosObservation =
                         createNewObservation(observationConstellations, hObservation, qualityList, value, obsConstHash);
-                if (hObservation.getAntiSubsetting() != null && !hObservation.getAntiSubsetting().isEmpty()) {
-                    sosObservation.setAntiSubsetting(hObservation.getAntiSubsetting());
+                if (hObservation.getSetId() != null && !hObservation.getSetId().isEmpty()) {
+                    sosObservation.setAntiSubsetting(hObservation.getSetId());
                 }
                 observationCollection.add(sosObservation);
             }
@@ -262,8 +274,6 @@ public class HibernateObservationUtilities {
             identifiers.add(identifier);
             procedure.setIdentifications(identifiers);
 
-            String observationType = observationConstellation.getObservationType().getObservationType();
-
             // phenomenon
             String phenID = observationConstellation.getObservableProperty().getIdentifier();
             String description = observationConstellation.getObservableProperty().getDescription();
@@ -275,7 +285,7 @@ public class HibernateObservationUtilities {
                                 .getFeatureByID(featureIdentifier, session, version);
 
                 final SosObservationConstellation obsConst =
-                        new SosObservationConstellation(procedure, obsProp, null, feature, observationType);
+                        new SosObservationConstellation(procedure, obsProp, null, feature, null);
                 /* get the offerings to find the templates */
                 if (obsConst.getOfferings() == null) {
                     Set<String> offerings =

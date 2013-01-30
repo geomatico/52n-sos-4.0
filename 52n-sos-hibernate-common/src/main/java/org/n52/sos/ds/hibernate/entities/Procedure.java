@@ -128,28 +128,12 @@ public class Procedure implements java.io.Serializable {
         this.validProcedureTimes = validProcedureTimes;
     }
 
-    public Set<FeatureOfInterestType> getFeatureOfInterestTypes() {
-        return this.featureOfInterestTypes;
-    }
-
-    public void setFeatureOfInterestTypes(Set<FeatureOfInterestType> featureOfInterestTypes) {
-        this.featureOfInterestTypes = featureOfInterestTypes;
-    }
-
     public Set<ObservationConstellation> getObservationConstellations() {
         return this.observationConstellations;
     }
 
     public void setObservationConstellations(Set<ObservationConstellation> observationConstellations) {
         this.observationConstellations = observationConstellations;
-    }
-
-    public Set<ObservationType> getObservationTypes() {
-        return this.observationTypes;
-    }
-
-    public void setObservationTypes(Set<ObservationType> observationTypes) {
-        this.observationTypes = observationTypes;
     }
 
     public Set<Procedure> getProceduresForChildSensorId() {

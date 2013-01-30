@@ -35,6 +35,7 @@ import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
+import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.ObservationType;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ogc.om.OMConstants;
@@ -62,7 +63,7 @@ public class HibernateObservationUtilitiesTest extends AbstractSosTestCase{
 	 */
 	private static final String featureIdentifier = "1000";
 	private static final String observablePropertyIdentifier = "http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl#Discharge";
-	private static final String antiSubsetting = "junit_antisubsetting";
+	private static final String setId = "junit_setId";
 
 	@Test
 	public void returnEmptyCollectionIfCalledWithoutAnyParameters() throws OwsExceptionReport 
@@ -90,17 +91,21 @@ public class HibernateObservationUtilitiesTest extends AbstractSosTestCase{
 		obsType.setObservationType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
 		ObservationConstellation obsConst = new ObservationConstellation();
 		obsConst.setProcedure(p);
-		obsConst.setObservationType(obsType);
 		obsConst.setObservableProperty(oP);
+		ObservationConstellationOfferingObservationType obsConstOffObType = new ObservationConstellationOfferingObservationType();
+		obsConstOffObType.setObservationConstellation(obsConst);
+		obsConstOffObType.setObservationType(obsType);
 		Observation dbObservation = new Observation();
+		Set<ObservationConstellation> obsConsts = new HashSet<ObservationConstellation>(1);
+		obsConsts.add(obsConst);
 		dbObservation.setObservationConstellation(obsConst);
 		dbObservation.setFeatureOfInterest(f);
-		Set<NumericValue> nVs = new HashSet<NumericValue>();
+		Set<NumericValue> nVs = new HashSet<NumericValue>(1);
 		NumericValue nV = new NumericValue();
 		nV.setValue(1.0);
 		nVs.add(nV);
 		dbObservation.setNumericValues(nVs);
-		dbObservation.setAntiSubsetting(antiSubsetting);
+		dbObservation.setSetId(setId);
 		List<Observation> observationsFromDataBase = new ArrayList<Observation>();
 		observationsFromDataBase.add(dbObservation);
 		// CALL

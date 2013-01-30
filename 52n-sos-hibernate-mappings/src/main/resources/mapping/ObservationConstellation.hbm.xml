@@ -10,19 +10,28 @@
             	<param name="sequence">observation_constellation_id_seq</param>
             </generator>
         </id>
-        <many-to-one name="observationType" class="org.n52.sos.ds.hibernate.entities.ObservationType" fetch="join">
-            <column name="observation_type_id" not-null="false" />
-        </many-to-one>
+
         <many-to-one name="observableProperty" class="org.n52.sos.ds.hibernate.entities.ObservableProperty" fetch="join">
             <column name="observable_property_id" not-null="true" />
         </many-to-one>
         <many-to-one name="procedure" class="org.n52.sos.ds.hibernate.entities.Procedure" fetch="join">
             <column name="procedure_id" not-null="true" />
         </many-to-one>
+        <set name="observationConstellationOfferingObservationTypes" table="observation_constellation_offering_observation_type" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="observation_constellation_id" />
+            </key>
+            <one-to-many class="org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType" />
+        </set>
+   
+        <!--
+        <many-to-one name="observationType" class="org.n52.sos.ds.hibernate.entities.ObservationType" fetch="join">
+            <column name="observation_type_id" not-null="false" />
+        </many-to-one> 
         <many-to-one name="offering" class="org.n52.sos.ds.hibernate.entities.Offering" fetch="join">
             <column name="offering_id" not-null="true" />
         </many-to-one>
-        <!-- <set name="resultTemplates" table="result_template" inverse="true" lazy="extra" fetch="select">
+        <set name="resultTemplates" table="result_template" inverse="true" lazy="extra" fetch="select">
             <key>
                 <column name="observation_constellation_id" not-null="true" />
             </key>

@@ -1,4 +1,4 @@
---
+﻿--
 -- Copyright (C) 2013
 -- by 52 North Initiative for Geospatial Open Source Software GmbH
 --
@@ -40,11 +40,10 @@ TRUNCATE
  feature_relation,
  feature_of_interest,
  observable_property,
- procedure_has_observation_type,
  offering_has_allowed_observation_type,
+ offering_has_allowed_feature_of_interest_type,
  quality,
  offering_has_related_feature,
- procedure_has_feature_of_interest_type,
  observation_template,
  request_has_composite_phenomenon,
  request_has_observable_property,
@@ -52,6 +51,8 @@ TRUNCATE
  valid_procedure_time,
  composite_phenomenon_has_observable_property,
  observation,
+ observation_constellation_offering_observation_type,
+ observation_relates_to_obs_const_off_obs_type,
  observation_has_text_value,
  observation_has_category_value,
  result_template,

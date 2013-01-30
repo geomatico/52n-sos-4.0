@@ -61,8 +61,10 @@ public class Observation implements java.io.Serializable {
     
     private Unit unit;
 
-    private String antiSubsetting;
+    private String setId;
 
+    private Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes = new HashSet<ObservationConstellationOfferingObservationType>(0);
+    
     private Set<SpatialFilteringProfile> spatialFilteringProfiles = new HashSet<SpatialFilteringProfile>(0);
 
     private Set<Quality> qualities = new HashSet<Quality>(0);
@@ -200,12 +202,21 @@ public class Observation implements java.io.Serializable {
         this.unit = unit;
     }
 
-    public String getAntiSubsetting() {
-        return this.antiSubsetting;
+    public String getSetId() {
+        return this.setId;
     }
 
-    public void setAntiSubsetting(String antiSubsetting) {
-        this.antiSubsetting = antiSubsetting;
+    public void setSetId(String setId) {
+        this.setId = setId;
+    }
+    
+    public Set<ObservationConstellationOfferingObservationType> getObservationConstellationOfferingObservationTypes() {
+        return this.observationConstellationOfferingObservationTypes;
+    }
+
+    public void setObservationConstellationOfferingObservationTypes(
+            Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes) {
+        this.observationConstellationOfferingObservationTypes = observationConstellationOfferingObservationTypes;
     }
 
     public Set<SpatialFilteringProfile> getSpatialFilteringProfiles() {

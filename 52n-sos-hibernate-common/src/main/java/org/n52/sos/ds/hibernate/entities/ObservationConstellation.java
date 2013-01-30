@@ -23,6 +23,9 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
+import java.util.HashSet;
+import java.util.Set;
+
 // Generated 19.09.2012 15:09:37 by Hibernate Tools 3.4.0.CR1
 
 
@@ -35,14 +38,16 @@ public class ObservationConstellation implements java.io.Serializable {
 
     private long observationConstellationId;
 
-    private ObservationType observationType;
-
     private ObservableProperty observableProperty;
 
     private Procedure procedure;
-
-    private Offering offering;
-
+    
+    private Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes = new HashSet<ObservationConstellationOfferingObservationType>(0);
+    
+//    private ObservationType observationType;
+//
+//    private Offering offering;
+//
 //    private ResultType resultType;
 //
 //    private Set<ResultTemplate> resultTemplates = new HashSet<ResultTemplate>(0);
@@ -81,13 +86,13 @@ public class ObservationConstellation implements java.io.Serializable {
         this.observationConstellationId = observationConstellationId;
     }
 
-    public ObservationType getObservationType() {
-        return this.observationType;
-    }
-
-    public void setObservationType(ObservationType observationType) {
-        this.observationType = observationType;
-    }
+//    public ObservationType getObservationType() {
+//        return this.observationType;
+//    }
+//
+//    public void setObservationType(ObservationType observationType) {
+//        this.observationType = observationType;
+//    }
 
     public ObservableProperty getObservableProperty() {
         return this.observableProperty;
@@ -105,14 +110,14 @@ public class ObservationConstellation implements java.io.Serializable {
         this.procedure = procedure;
     }
 
-    public Offering getOffering() {
-        return this.offering;
-    }
-
-    public void setOffering(Offering offering) {
-        this.offering = offering;
-    }
-
+//    public Offering getOffering() {
+//        return this.offering;
+//    }
+//
+//    public void setOffering(Offering offering) {
+//        this.offering = offering;
+//    }
+//
 //    public ResultType getResultType() {
 //        return this.resultType;
 //    }
@@ -136,5 +141,14 @@ public class ObservationConstellation implements java.io.Serializable {
 //    public void setObservations(Set<Observation> observations) {
 //        this.observations = observations;
 //    }
+    
+    public Set<ObservationConstellationOfferingObservationType> getObservationConstellationOfferingObservationTypes() {
+        return this.observationConstellationOfferingObservationTypes;
+    }
+
+    public void setObservationConstellationOfferingObservationTypes(
+            Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes) {
+        this.observationConstellationOfferingObservationTypes = observationConstellationOfferingObservationTypes;
+    }
 
 }

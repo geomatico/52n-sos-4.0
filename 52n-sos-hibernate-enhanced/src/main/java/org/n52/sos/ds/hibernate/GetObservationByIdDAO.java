@@ -106,7 +106,7 @@ public class GetObservationByIdDAO extends AbstractHibernateOperationDao impleme
         criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                 HibernateConstants.PARAMETER_IDENTIFIER, request.getObservationIdentifier()));
         criterions.add(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
-        		HibernateConstants.PARAMETER_ANTI_SUBSETTING, request.getObservationIdentifier()));
+        		HibernateConstants.PARAMETER_SET_ID, request.getObservationIdentifier()));
         queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionFor(criterions));
         List<Observation> observations =
                 HibernateCriteriaQueryUtilities.getObservations(queryObject, session);

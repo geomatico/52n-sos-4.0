@@ -71,7 +71,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of the interface IGetObservationDAO
- *
+ * 
  */
 public class GetObservationDAO extends AbstractHibernateOperationDao implements IGetObservationDAO {
 
@@ -87,7 +87,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.n52.sos.ds.ISosOperationDAO#getOperationName()
      */
     @Override
@@ -97,7 +97,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.n52.sos.ds.hibernate.AbstractHibernateOperationDao#getOperationsMetadata
      * (java.lang.String, org.hibernate.Session)
@@ -155,7 +155,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * org.n52.sos.ds.IGetObservationDAO#getObservation(org.n52.sos.request.
      * AbstractSosRequest)
@@ -189,7 +189,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
 
     /**
      * Query observations from database depending on requested filters
-     *
+     * 
      * @param request
      *            GetObservation request
      * @param session
@@ -203,41 +203,45 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
 
         Map<String, String> observationConstellationAliases = new HashMap<String, String>();
         HibernateQueryObject observationConstellationQueryObject = new HibernateQueryObject();
+        String obsConstOffObsTypeAlias =
+                HibernateCriteriaQueryUtilities.addObservationConstellationOfferingObservationTypesAliasToMap(
+                        observationConstellationAliases, null);
         
-//        List<Criterion> observationConstellationCriterions = new ArrayList<Criterion>();
+        Map<String, String> observationAliases = new HashMap<String, String>();
+        HibernateQueryObject observationQueryObject = new HibernateQueryObject();
+        String obsConstAlias =
+                HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(observationAliases, null);
+        HibernateCriteriaQueryUtilities.addObservationConstellationOfferingObservationTypesAliasToMap(
+                observationAliases, null);
+
         // offering
         if (request.isSetOffering()) {
-            String offAlias =
-                    HibernateCriteriaQueryUtilities.addOfferingAliasToMap(observationConstellationAliases, null);
-            observationConstellationQueryObject.addCriterion(HibernateCriteriaQueryUtilities
-                    .getDisjunctionCriterionForStringList(
-                            HibernateCriteriaQueryUtilities.getIdentifierParameter(offAlias), request.getOfferings()));
+            observationConstellationQueryObject.addCriterion(getCriterionForOffering(observationConstellationAliases,
+                    obsConstOffObsTypeAlias, request.getOfferings()));
         }
         // observableProperties
         if (request.isSetObservableProperty()) {
-            String obsPropAlias =
-                    HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(observationConstellationAliases,
-                            null);
-            observationConstellationQueryObject.addCriterion(HibernateCriteriaQueryUtilities
-                    .getDisjunctionCriterionForStringList(
-                            HibernateCriteriaQueryUtilities.getIdentifierParameter(obsPropAlias),
-                            request.getObservedProperties()));
+            observationConstellationQueryObject.addCriterion(getCriterionForObservableProperties(
+                    observationConstellationAliases, null, request.getObservedProperties()));
+            observationQueryObject.addCriterion(getCriterionForObservableProperties(observationAliases, obsConstAlias,
+                    request.getObservedProperties()));
         }
         // procedures
         if (request.isSetProcedure()) {
-            String procAlias =
-                    HibernateCriteriaQueryUtilities.addProcedureAliasToMap(observationConstellationAliases, null);
-            observationConstellationQueryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
-                            HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), request.getProcedures()));
+            observationConstellationQueryObject.addCriterion(getCriterionForProcedures(
+                    observationConstellationAliases, null, request.getProcedures()));
+            observationQueryObject.addCriterion(getCriterionForProcedures(observationAliases, obsConstAlias,
+                    request.getProcedures()));
         }
-        observationConstellationQueryObject.addCriterion(Restrictions.isNotNull(HibernateConstants.PARAMETER_OBSERVATION_TYPE));
+        observationConstellationQueryObject.addCriterion(Restrictions.isNotNull(HibernateCriteriaQueryUtilities
+                .getParameterWithPrefix(HibernateConstants.PARAMETER_OBSERVATION_TYPE, obsConstOffObsTypeAlias)));
+        observationQueryObject.addCriterion(Restrictions.isNotNull(HibernateCriteriaQueryUtilities
+                .getParameterWithPrefix(HibernateConstants.PARAMETER_OBSERVATION_TYPE, obsConstOffObsTypeAlias)));
 
         observationConstellationQueryObject.setAliases(observationConstellationAliases);
         List<ObservationConstellation> observationConstallations =
-                HibernateCriteriaQueryUtilities.getObservationConstallations(observationConstellationQueryObject, session);
-
-        HibernateQueryObject queryObject = new HibernateQueryObject();
-        Map<String, String> observationAliases = new HashMap<String, String>();
+                HibernateCriteriaQueryUtilities.getObservationConstallations(observationConstellationQueryObject,
+                        session);
 
         // feature identifier
         Set<String> featureIdentifier =
@@ -246,26 +250,24 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
             return null;
         } else if (featureIdentifier != null && !featureIdentifier.isEmpty()) {
             String foiAlias = HibernateCriteriaQueryUtilities.addFeatureOfInterestAliasToMap(observationAliases, null);
-            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+            observationQueryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                     HibernateCriteriaQueryUtilities.getIdentifierParameter(foiAlias), new ArrayList<String>(
                             featureIdentifier)));
         }
 
-        queryObject.setAliases(observationAliases);
+        observationQueryObject.setAliases(observationAliases);
         List<SosObservation> sosObservations = new ArrayList<SosObservation>();
-        
 
         // temporal filters
         List<FirstLatest> firstLatestTemporalFilter = null;
         Criterion criterionForTemporalFilters = null;
         if (request.hasTemporalFilters()) {
-            firstLatestTemporalFilter =
-                    SosHelper.getFirstLatestTemporalFilter(request.getTemporalFilters());
+            firstLatestTemporalFilter = SosHelper.getFirstLatestTemporalFilter(request.getTemporalFilters());
             List<TemporalFilter> nonFirstLatestTemporalFilter =
                     SosHelper.getNonFirstLatestTemporalFilter(request.getTemporalFilters());
             if (nonFirstLatestTemporalFilter != null && !nonFirstLatestTemporalFilter.isEmpty()) {
-                criterionForTemporalFilters = HibernateCriteriaQueryUtilities
-                        .getCriterionForTemporalFilters(nonFirstLatestTemporalFilter);
+                criterionForTemporalFilters =
+                        HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(nonFirstLatestTemporalFilter);
             }
         }
         // query observations
@@ -276,15 +278,20 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
         Set<Observation> allObservations = new HashSet<Observation>(0);
         for (ObservationConstellation observationConstellation : observationConstallations) {
             Set<Observation> observations = new HashSet<Observation>(0);
-            HibernateQueryObject defaultQueryObject = queryObject.clone();
-            defaultQueryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION, observationConstellation));
+            HibernateQueryObject defaultQueryObject = observationQueryObject.clone();
+
+            String id = HibernateCriteriaQueryUtilities.getParameterWithPrefix(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION, null);
+            defaultQueryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(id,
+                    observationConstellation));
+
             if (request.hasTemporalFilters()) {
                 if (firstLatestTemporalFilter != null && !firstLatestTemporalFilter.isEmpty()) {
                     for (FirstLatest firstLatest : firstLatestTemporalFilter) {
                         HibernateQueryObject firstLatestQueryObject = defaultQueryObject.clone();
                         firstLatestQueryObject.setOrder(HibernateCriteriaQueryUtilities.getOrderForEnum(firstLatest));
                         firstLatestQueryObject.setMaxResult(1);
-                        observations.addAll(HibernateCriteriaQueryUtilities.getObservations(firstLatestQueryObject, session));
+                        observations.addAll(HibernateCriteriaQueryUtilities.getObservations(firstLatestQueryObject,
+                                session));
                     }
                 } else if (criterionForTemporalFilters != null) {
                     defaultQueryObject.addCriterion(criterionForTemporalFilters);
@@ -308,7 +315,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
                 }
             }
         }
-        
+
         if (allObservations != null && !allObservations.isEmpty()) {
             sosObservations.addAll(HibernateObservationUtilities.createSosObservationsFromObservations(
                     allObservations, request.getVersion(), session));
@@ -318,7 +325,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
 
     /**
      * Get the min/max time of contained observations
-     *
+     * 
      * @param session
      *            Hibernate session
      * @return min/max observation time
@@ -353,5 +360,24 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
             return CollectionHelper.conjunctCollections(featureOfInterestIdentifiersForObservationConstellation,
                     featureIdentifier);
         }
+    }
+
+    private Criterion getCriterionForOffering(Map<String, String> aliasMap, String prefix, List<String> offerings) {
+        String offAlias = HibernateCriteriaQueryUtilities.addOfferingAliasToMap(aliasMap, prefix);
+        return HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+                HibernateCriteriaQueryUtilities.getIdentifierParameter(offAlias), offerings);
+    }
+
+    private Criterion getCriterionForObservableProperties(Map<String, String> aliasMap, String prefix,
+            List<String> observedProperties) {
+        String obsPropAlias = HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliasMap, prefix);
+        return HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+                HibernateCriteriaQueryUtilities.getIdentifierParameter(obsPropAlias), observedProperties);
+    }
+
+    private Criterion getCriterionForProcedures(Map<String, String> aliasMap, String prefix, List<String> procedures) {
+        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliasMap, prefix);
+        return HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+                HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), procedures);
     }
 }

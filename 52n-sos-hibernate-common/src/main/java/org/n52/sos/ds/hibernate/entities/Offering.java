@@ -41,11 +41,13 @@ public class Offering implements java.io.Serializable {
 
     private String name;
 
-    private Set<ObservationConstellation> observationConstellations = new HashSet<ObservationConstellation>(0);
+    private Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes = new HashSet<ObservationConstellationOfferingObservationType>(0);
 
 //    private Set<Request> requests = new HashSet<Request>(0);
 
     private Set<ObservationType> observationTypes = new HashSet<ObservationType>(0);
+    
+    private Set<FeatureOfInterestType> featureOfInterestTypes = new HashSet<FeatureOfInterestType>(0);
 
     private Set<RelatedFeature> relatedFeatures = new HashSet<RelatedFeature>(0);
 
@@ -93,12 +95,13 @@ public class Offering implements java.io.Serializable {
         this.name = name;
     }
 
-    public Set<ObservationConstellation> getObservationConstellations() {
-        return this.observationConstellations;
+    public Set<ObservationConstellationOfferingObservationType> getObservationConstellationOfferingObservationTypes() {
+        return this.observationConstellationOfferingObservationTypes;
     }
 
-    public void setObservationConstellations(Set<ObservationConstellation> observationConstellations) {
-        this.observationConstellations = observationConstellations;
+    public void setObservationConstellationOfferingObservationTypes(
+            Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes) {
+        this.observationConstellationOfferingObservationTypes = observationConstellationOfferingObservationTypes;
     }
 
 //    public Set<Request> getRequests() {
@@ -115,6 +118,14 @@ public class Offering implements java.io.Serializable {
 
     public void setObservationTypes(Set<ObservationType> observationTypes) {
         this.observationTypes = observationTypes;
+    }
+    
+    public Set<FeatureOfInterestType> getFeatureOfInterestTypes() {
+        return this.featureOfInterestTypes;
+    }
+
+    public void setFeatureOfInterestTypes(Set<FeatureOfInterestType> featureOfInterestTypes) {
+        this.featureOfInterestTypes = featureOfInterestTypes;
     }
 
     public Set<RelatedFeature> getRelatedFeatures() {

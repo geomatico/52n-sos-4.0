@@ -36,6 +36,7 @@ import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.IGetResultDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
+import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
@@ -86,8 +87,10 @@ public class GetResultDAO extends AbstractHibernateOperationDao implements IGetR
             templateIdentifiers = new HashSet<String>(0);
             for (ResultTemplate resultTemplate : resultTemplates) {
                 templateIdentifiers.add(resultTemplate.getIdentifier());
-                ObservationConstellation observationConstellation = resultTemplate.getObservationConstellation();
-                offerings.add(observationConstellation.getOffering().getIdentifier());
+                ObservationConstellationOfferingObservationType observationConstellationOfferingObservationType =
+                        resultTemplate.getObservationConstellationOfferingObservationType();
+                ObservationConstellation observationConstellation = observationConstellationOfferingObservationType.getObservationConstellation();
+                offerings.add(observationConstellationOfferingObservationType.getOffering().getIdentifier());
                 observableProperties.add(observationConstellation.getObservableProperty().getIdentifier());
             }
         }
@@ -162,9 +165,10 @@ public class GetResultDAO extends AbstractHibernateOperationDao implements IGetR
             Session session) throws OwsExceptionReport {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
+        String obsConstOffObsTypeAlias = HibernateCriteriaQueryUtilities.addObservationConstellationOfferingObservationTypesAliasToMap(aliases, null);
         String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
         // offering
-        String offAlias = HibernateCriteriaQueryUtilities.addOfferingAliasToMap(aliases, obsConstAlias);
+        String offAlias = HibernateCriteriaQueryUtilities.addOfferingAliasToMap(aliases, obsConstOffObsTypeAlias);
         queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(offAlias), request.getOffering()));
         // observableProperties

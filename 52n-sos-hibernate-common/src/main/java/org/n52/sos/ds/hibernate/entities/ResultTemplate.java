@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ds.hibernate.entities;
 
+
 // Generated 10.07.2012 15:18:23 by Hibernate Tools 3.4.0.CR1
 
 /**
@@ -39,7 +40,7 @@ public class ResultTemplate implements java.io.Serializable {
 
     private FeatureOfInterest featureOfInterest;
 
-    private ObservationConstellation observationConstellation;
+    private ObservationConstellationOfferingObservationType observationConstellationOfferingObservationType;
 
     private String identifier;
 
@@ -77,12 +78,13 @@ public class ResultTemplate implements java.io.Serializable {
         this.featureOfInterest = featureOfInterest;
     }
 
-    public ObservationConstellation getObservationConstellation() {
-        return this.observationConstellation;
+    public ObservationConstellationOfferingObservationType getObservationConstellationOfferingObservationType() {
+        return this.observationConstellationOfferingObservationType;
     }
 
-    public void setObservationConstellation(ObservationConstellation observationConstellation) {
-        this.observationConstellation = observationConstellation;
+    public void setObservationConstellationOfferingObservationType(
+            ObservationConstellationOfferingObservationType observationConstellationOfferingObservationType) {
+        this.observationConstellationOfferingObservationType = observationConstellationOfferingObservationType;
     }
 
     public String getIdentifier() {

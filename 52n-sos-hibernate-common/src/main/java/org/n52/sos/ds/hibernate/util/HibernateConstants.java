@@ -45,7 +45,7 @@ public class HibernateConstants {
 
     // table and column names
     // TODO: make this constants configurable
-	public static final String PARAMETER_ANTI_SUBSETTING = "antiSubsetting";
+	public static final String PARAMETER_SET_ID = "setId";
 	
     public static final String PARAMETER_IDENTIFIER = "identifier";
 
@@ -60,6 +60,14 @@ public class HibernateConstants {
     public static final String PARAMETER_OBSERVABLE_PROPERTY = "observableProperty";
 
     public static final String PARAMETER_OBSERVATION_CONSTELLATION = "observationConstellation";
+    
+    public static final String PARAMETER_OBSERVATION_CONSTELLATIONS = "observationConstellations";
+
+    public static final String PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPE = "observationConstellationOfferingObservationType";
+
+    public static final String PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPES = "observationConstellationOfferingObservationTypes";
+
+    public static final String PARAMETER_OBSERVATION_CONSTELLATIONS_ID = "observationConstellationId";
 
     public static final String PARAMETER_PHENOMENON_TIME_START = "phenomenonTimeStart";
 

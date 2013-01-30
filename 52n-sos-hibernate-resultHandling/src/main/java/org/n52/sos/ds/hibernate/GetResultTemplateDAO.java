@@ -31,6 +31,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.n52.sos.ds.IGetResultTemplateDAO;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
+import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
@@ -71,9 +72,9 @@ public class GetResultTemplateDAO extends AbstractHibernateOperationDao implemen
             offerings = new HashSet<String>(0);
             observableProperties = new HashSet<String>(0);
             for (ResultTemplate rt : resultTemplates) {
-                ObservationConstellation oc = rt.getObservationConstellation();
-                offerings.add(oc.getOffering().getIdentifier());
-                observableProperties.add(oc.getObservableProperty().getIdentifier());
+                ObservationConstellationOfferingObservationType ocoot = rt.getObservationConstellationOfferingObservationType();
+                offerings.add(ocoot.getOffering().getIdentifier());
+                observableProperties.add(ocoot.getObservationConstellation().getObservableProperty().getIdentifier());
             }
         }
         opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultTemplateParams.offering, offerings);

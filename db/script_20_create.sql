@@ -1,4 +1,4 @@
---
+﻿--
 -- Copyright (C) 2013
 -- by 52 North Initiative for Geospatial Open Source Software GmbH
 --
@@ -45,18 +45,20 @@ DROP TABLE IF EXISTS procedure CASCADE;
 DROP TABLE IF EXISTS feature_relation CASCADE;
 DROP TABLE IF EXISTS feature_of_interest CASCADE;
 DROP TABLE IF EXISTS observable_property CASCADE;
-DROP TABLE IF EXISTS procedure_has_observation_type CASCADE;
 DROP TABLE IF EXISTS offering_has_allowed_observation_type CASCADE;
+DROP TABLE IF EXISTS offering_has_allowed_feature_of_interest_type CASCADE;
 DROP TABLE IF EXISTS quality CASCADE;
 DROP TABLE IF EXISTS offering_has_related_feature CASCADE;
-DROP TABLE IF EXISTS procedure_has_feature_of_interest_type CASCADE;
 DROP TABLE IF EXISTS observation_template CASCADE;
 DROP TABLE IF EXISTS request_has_composite_phenomenon CASCADE;
 DROP TABLE IF EXISTS request_has_observable_property CASCADE;
 DROP TABLE IF EXISTS observation_constellation CASCADE;
 DROP TABLE IF EXISTS valid_procedure_time CASCADE;
+DROP TABLE IF EXISTS observation_constellation_offering_observation_type CASCADE;
+DROP TABLE IF EXISTS observation_relates_to_obs_const_off_obs_type CASCADE;
 DROP TABLE IF EXISTS composite_phenomenon_has_observable_property CASCADE;
 DROP TABLE IF EXISTS observation CASCADE;
+DROP TABLE IF EXISTS observation_relates_to_obs_const_off_obs_type CASCADE;
 DROP TABLE IF EXISTS observation_has_text_value CASCADE;
 DROP TABLE IF EXISTS observation_has_category_value CASCADE;
 DROP TABLE IF EXISTS result_template CASCADE;
@@ -79,8 +81,9 @@ DROP SEQUENCE IF EXISTS feature_of_interest_type_id_seq;
 DROP SEQUENCE IF EXISTS geometry_value_id_seq;
 DROP SEQUENCE IF EXISTS numeric_value_id_seq;
 DROP SEQUENCE IF EXISTS observable_property_id_seq;
-DROP SEQUENCE IF EXISTS observation_constellation_id_seq;
+DROP SEQUENCE IF EXISTS observation_constellation_offering_observation_type_id_seq;
 DROP SEQUENCE IF EXISTS observation_id_seq;
+DROP SEQUENCE IF EXISTS observation_constellation_id_seq;
 DROP SEQUENCE IF EXISTS observation_template_id_seq;
 DROP SEQUENCE IF EXISTS observation_type_id_seq;
 DROP SEQUENCE IF EXISTS offering_id_seq;
@@ -109,6 +112,7 @@ CREATE SEQUENCE geometry_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036
 CREATE SEQUENCE numeric_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE observable_property_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE observation_constellation_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
+CREATE SEQUENCE observation_constellation_offering_observation_type_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE observation_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE observation_template_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE observation_type_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
@@ -306,16 +310,16 @@ CREATE TABLE observable_property (
   PRIMARY KEY(observable_property_id)
 );
 
-CREATE TABLE procedure_has_observation_type (
-  procedure_id INTEGER NOT NULL,
-  observation_type_id INTEGER NOT NULL,
-  PRIMARY KEY(procedure_id, observation_type_id)
-);
-
 CREATE TABLE offering_has_allowed_observation_type (
   offering_id INTEGER NOT NULL,
   observation_type_id INTEGER NOT NULL,
   PRIMARY KEY(offering_id, observation_type_id)
+);
+
+CREATE TABLE offering_has_allowed_feature_of_interest_type (
+  offering_id INTEGER NOT NULL,
+  feature_of_interest_type_id INTEGER NOT NULL,
+  PRIMARY KEY(offering_id, feature_of_interest_type_id)
 );
 
 CREATE TABLE quality (
@@ -331,12 +335,6 @@ CREATE TABLE offering_has_related_feature (
   offering_id INTEGER NOT NULL,
   related_feature_id INTEGER NOT NULL,
   PRIMARY KEY(offering_id, related_feature_id)
-);
-
-CREATE TABLE procedure_has_feature_of_interest_type (
-  procedure_id INTEGER NOT NULL,
-  feature_of_interest_type_id INTEGER NOT NULL,
-  PRIMARY KEY(procedure_id, feature_of_interest_type_id)
 );
 
 CREATE TABLE observation_template (
@@ -367,13 +365,19 @@ CREATE TABLE related_feature_has_related_feature_role (
 
 CREATE TABLE observation_constellation (
   observation_constellation_id bigint NOT NULL DEFAULT nextval('observation_constellation_id_seq'),
-  observation_type_id INTEGER NULL,
   procedure_id INTEGER NOT NULL,
-  result_type_id INTEGER NULL,
-  offering_id INTEGER NOT NULL,
   observable_property_id INTEGER NOT NULL,
-  UNIQUE (observation_type_id,procedure_id,result_type_id,offering_id,observable_property_id),
+  UNIQUE (procedure_id,observable_property_id),
   PRIMARY KEY(observation_constellation_id)
+);
+
+CREATE TABLE observation_constellation_offering_observation_type (
+  observation_constellation_offering_observation_type_id bigint NOT NULL DEFAULT nextval('observation_constellation_offering_observation_type_id_seq'),
+  observation_constellation_id INTEGER NULL,
+  offering_id INTEGER NOT NULL,
+  observation_type_id INTEGER NULL,
+  UNIQUE (observation_constellation_id,offering_id,observation_type_id),
+  PRIMARY KEY(observation_constellation_offering_observation_type_id)
 );
 
 CREATE TABLE valid_procedure_time (
@@ -404,10 +408,16 @@ CREATE TABLE observation (
   valid_time_start TIMESTAMP NULL,
   valid_time_end TIMESTAMP NULL,
   unit_id INTEGER NULL,
-  anti_subsetting TEXT NULL,
+  set_id TEXT NULL,
   deleted BOOL NOT NULL DEFAULT false,
-  UNIQUE (feature_of_interest_id,observation_constellation_id,phenomenon_time_start,identifier),
+  UNIQUE (feature_of_interest_id,observation_constellation_id,phenomenon_time_start,phenomenon_time_end,result_time,identifier),
   PRIMARY KEY(observation_id)
+  );
+  
+CREATE TABLE observation_relates_to_obs_const_off_obs_type (
+  observation_id bigint NOT NULL,
+  observation_constellation_offering_observation_type_id bigint NOT NULL,
+  PRIMARY KEY (observation_id,observation_constellation_offering_observation_type_id)
   );
 
 CREATE TABLE observation_has_text_value (
@@ -424,12 +434,12 @@ CREATE TABLE observation_has_category_value (
 
 CREATE TABLE result_template (
   result_template_id bigint NOT NULL DEFAULT nextval('result_template_id_seq'),
-  observation_constellation_id INTEGER NOT NULL,
+  observation_constellation_offering_observation_type_id INTEGER NOT NULL,
   feature_of_interest_id INTEGER NOT NULL,
   identifier TEXT NOT NULL,
   result_structure TEXT NOT NULL,
   result_encoding TEXT NOT NULL,
-  UNIQUE (feature_of_interest_id,observation_constellation_id,identifier,result_structure,result_encoding),
+  UNIQUE (feature_of_interest_id,observation_constellation_offering_observation_type_id,identifier,result_structure,result_encoding),
   PRIMARY KEY(result_template_id)
 );
 
@@ -479,16 +489,14 @@ CREATE INDEX sensor_system_FKIndex2 ON sensor_system(child_sensor_id);
 CREATE INDEX observable_property_FKIndex1 ON observation(unit_id);
 CREATE INDEX offering_has_allowed_observation_type_FKIndex1 ON offering_has_allowed_observation_type(offering_id);
 CREATE INDEX offering_has_allowed_observation_type_FKIndex2 ON offering_has_allowed_observation_type(observation_type_id);
-CREATE INDEX procedure_has_observation_type_FKIndex1 ON procedure_has_observation_type(procedure_id);
-CREATE INDEX procedure_has_observation_type_FKIndex2 ON procedure_has_observation_type(observation_type_id);
+CREATE INDEX offering_has_allowed_feature_of_interest_type_FKIndex1 ON offering_has_allowed_feature_of_interest_type(offering_id);
+CREATE INDEX offering_has_allowed_feature_of_interest_type_FKIndex2 ON offering_has_allowed_feature_of_interest_type(feature_of_interest_type_id);
 CREATE INDEX quality_FKIndex1 ON quality(swe_type_id);
 CREATE INDEX quality_FKIndex3 ON quality(unit_id);
 CREATE INDEX offering_has_related_feature_FKIndex1 ON offering_has_related_feature(offering_id);
 CREATE INDEX offering_has_related_feature_FKIndex2 ON offering_has_related_feature(related_feature_id);
 CREATE INDEX feature_relation_FKIndex1 ON feature_relation(parent_feature_id);
 CREATE INDEX feature_relation_FKIndex2 ON feature_relation(child_feature_id);
-CREATE INDEX procedure_has_feature_of_interest_type_FKIndex1 ON procedure_has_feature_of_interest_type(procedure_id);
-CREATE INDEX procedure_has_feature_of_interest_type_FKIndex2 ON procedure_has_feature_of_interest_type(feature_of_interest_type_id);
 CREATE INDEX observation_template_FKIndex1 ON observation_template(request_id);
 CREATE INDEX observation_template_FKIndex2 ON observation_template(procedure_id);
 CREATE INDEX request_has_composite_phenomenon_FKIndex1 ON request_has_composite_phenomenon(request_id);
@@ -497,22 +505,23 @@ CREATE INDEX request_has_observable_property_FKIndex1 ON request_has_observable_
 CREATE INDEX request_has_observable_property_FKIndex2 ON request_has_observable_property(observable_property_id);
 CREATE INDEX related_feature_has_related_feature_role_FKIndex1 ON related_feature_has_related_feature_role(related_feature_id);
 CREATE INDEX related_feature_has_related_feature_role_FKIndex2 ON related_feature_has_related_feature_role(related_feature_role_id);
-CREATE INDEX observation_constellation_FKIndex1 ON observation_constellation(offering_id);
+CREATE INDEX observation_constellation_offering_observation_type_FKIndex ON observation_constellation_offering_observation_type(offering_id);
+CREATE INDEX observation_constellation_offering_observation_type_FKIndex1 ON observation_constellation_offering_observation_type(observation_type_id);
+CREATE INDEX observation_constellation_offering_observation_type_FKIndex2 ON observation_constellation_offering_observation_type(observation_constellation_id);
 CREATE INDEX observation_constellation_FKIndex ON observation_constellation(procedure_id);
-CREATE INDEX observation_constellation_FKIndex3 ON observation_constellation(observable_property_id);
-CREATE INDEX observation_constellation_FKIndex4 ON observation_constellation(result_type_id);
-CREATE INDEX observation_constellation_FKIndex5 ON observation_constellation(observation_type_id);
+CREATE INDEX observation_constellation_FKIndex1 ON observation_constellation(observable_property_id);
 CREATE INDEX valid_procedure_time_FKIndex1 ON valid_procedure_time(procedure_id);
 CREATE INDEX composite_phenomenon_has_observable_property_FKIndex1 ON composite_phenomenon_has_observable_property(composite_phenomenon_id);
 CREATE INDEX composite_phenomenon_has_observable_property_FKIndex2 ON composite_phenomenon_has_observable_property(observable_property_id);
-CREATE INDEX observation_FKIndex1 ON observation(observation_constellation_id);
 CREATE INDEX observation_FKIndex2 ON observation(feature_of_interest_id);
+CREATE INDEX observation_relates_to_obs_const_off_obs_type_FKindex1 ON observation_relates_to_obs_const_off_obs_type (observation_id );
+CREATE INDEX observation_relates_to_obs_const_off_obs_type_FKindex2 ON observation_relates_to_obs_const_off_obs_type (observation_constellation_offering_observation_type_id );
 CREATE INDEX observation_has_text_value_FKIndex1 ON observation_has_text_value(observation_id);
 CREATE INDEX observation_has_text_value_FKIndex2 ON observation_has_text_value(text_value_id);
 CREATE INDEX observation_has_category_value_FKIndex1 ON observation_has_category_value(observation_id);
 CREATE INDEX observation_has_category_value_FKIndex2 ON observation_has_category_value(category_value_id);
 CREATE INDEX result_template_FKIndex1 ON result_template(feature_of_interest_id);
-CREATE INDEX result_template_FKIndex3 ON result_template(observation_constellation_id);
+CREATE INDEX result_template_FKIndex3 ON result_template(observation_constellation_offering_observation_type_id);
 CREATE INDEX observation_has_numeric_value_FKIndex1 ON observation_has_numeric_value(observation_id);
 CREATE INDEX observation_has_numeric_value_FKIndex2 ON observation_has_numeric_value(numeric_value_id);
 CREATE INDEX observation_has_count_value_FKIndex1 ON observation_has_count_value(observation_id);
@@ -541,36 +550,35 @@ ALTER TABLE feature_of_interest ADD FOREIGN KEY (feature_of_interest_type_id) RE
 ALTER TABLE observation ADD FOREIGN KEY (unit_id) REFERENCES unit(unit_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE offering_has_allowed_observation_type ADD FOREIGN KEY (offering_id) REFERENCES offering(offering_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE offering_has_allowed_observation_type ADD FOREIGN KEY (observation_type_id) REFERENCES observation_type(observation_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE procedure_has_observation_type ADD FOREIGN KEY (procedure_id) REFERENCES procedure(procedure_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE procedure_has_observation_type ADD FOREIGN KEY (observation_type_id) REFERENCES observation_type(observation_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE offering_has_allowed_feature_of_interest_type ADD FOREIGN KEY (offering_id) REFERENCES offering(offering_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE offering_has_allowed_feature_of_interest_type ADD FOREIGN KEY (feature_of_interest_type_id) REFERENCES feature_of_interest_type(feature_of_interest_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE quality ADD FOREIGN KEY (swe_type_id) REFERENCES swe_type(swe_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE quality ADD FOREIGN KEY (unit_id) REFERENCES unit(unit_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE offering_has_related_feature ADD FOREIGN KEY (offering_id) REFERENCES offering(offering_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE offering_has_related_feature ADD FOREIGN KEY (related_feature_id) REFERENCES related_feature(related_feature_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE feature_relation ADD FOREIGN KEY (parent_feature_id) REFERENCES feature_of_interest(feature_of_interest_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE feature_relation ADD FOREIGN KEY (child_feature_id) REFERENCES feature_of_interest(feature_of_interest_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE procedure_has_feature_of_interest_type ADD FOREIGN KEY (procedure_id) REFERENCES procedure(procedure_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE procedure_has_feature_of_interest_type ADD FOREIGN KEY (feature_of_interest_type_id) REFERENCES feature_of_interest_type(feature_of_interest_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_template ADD FOREIGN KEY (request_id) REFERENCES request(request_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_template ADD FOREIGN KEY (procedure_id) REFERENCES procedure(procedure_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE request_has_composite_phenomenon ADD FOREIGN KEY (request_id) REFERENCES request(request_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE request_has_composite_phenomenon ADD FOREIGN KEY (composite_phenomenon_id) REFERENCES composite_phenomenon(composite_phenomenon_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE request_has_observable_property ADD FOREIGN KEY (request_id) REFERENCES request(request_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE request_has_observable_property ADD FOREIGN KEY (observable_property_id) REFERENCES observable_property(observable_property_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE observation_constellation ADD FOREIGN KEY (offering_id) REFERENCES offering(offering_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_constellation ADD FOREIGN KEY (procedure_id) REFERENCES procedure(procedure_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_constellation ADD FOREIGN KEY (observable_property_id) REFERENCES observable_property(observable_property_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE observation_constellation ADD FOREIGN KEY (result_type_id) REFERENCES result_type(result_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE observation_constellation ADD FOREIGN KEY (observation_type_id) REFERENCES observation_type(observation_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE observation_constellation_offering_observation_type ADD FOREIGN KEY (observation_constellation_id) REFERENCES observation_constellation(observation_constellation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE observation_constellation_offering_observation_type ADD FOREIGN KEY (offering_id) REFERENCES offering(offering_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE observation_constellation_offering_observation_type ADD FOREIGN KEY (observation_type_id) REFERENCES observation_type(observation_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE valid_procedure_time ADD FOREIGN KEY (procedure_id) REFERENCES procedure(procedure_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE composite_phenomenon_has_observable_property ADD FOREIGN KEY (composite_phenomenon_id) REFERENCES composite_phenomenon(Composite_Phenomenon_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE composite_phenomenon_has_observable_property ADD FOREIGN KEY (observable_property_id) REFERENCES observable_property(Observable_Property_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE observation ADD FOREIGN KEY (observation_constellation_id) REFERENCES observation_constellation(observation_constellation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation ADD FOREIGN KEY (feature_of_interest_id) REFERENCES feature_of_interest(feature_of_interest_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_text_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_text_value ADD FOREIGN KEY (text_value_id) REFERENCES text_value(text_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE result_template ADD FOREIGN KEY (observation_constellation_id) REFERENCES observation_constellation(observation_constellation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE result_template ADD FOREIGN KEY (observation_constellation_offering_observation_type_id) REFERENCES observation_constellation_offering_observation_type(observation_constellation_offering_observation_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE result_template ADD FOREIGN KEY (feature_of_interest_id) REFERENCES feature_of_interest(feature_of_interest_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE observation_relates_to_obs_const_off_obs_type ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE observation_relates_to_obs_const_off_obs_type ADD FOREIGN KEY (observation_constellation_offering_observation_type_id) REFERENCES observation_constellation_offering_observation_type(observation_constellation_offering_observation_type_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_numeric_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_numeric_value ADD FOREIGN KEY (numeric_value_id) REFERENCES numeric_value(numeric_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_count_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;

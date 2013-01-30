@@ -34,6 +34,7 @@ import org.joda.time.DateTime;
 import org.n52.sos.ds.IInsertSensorDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
+import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
@@ -117,7 +118,7 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
             if (procedureDescriptionFormat != null && observationTypes != null && featureOfInterestTypes != null) {
                 Procedure procedure =
                         HibernateCriteriaTransactionalUtilities.getOrInsertProcedure(assignedProcedureID,
-                                procedureDescriptionFormat, observationTypes, featureOfInterestTypes, session);
+                                procedureDescriptionFormat, session);
                 // TODO: set correct validTime,
                 HibernateCriteriaTransactionalUtilities.insertValidProcedureTime(
                         procedure,
@@ -126,9 +127,13 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
                 List<ObservableProperty> obsProps =
                         getOrInsertNewObservableProperties(request.getObservableProperty(), session);
                 Offering offering =
-                        insertNewOffering(assignedOffering, request.getRelatedFeatures(), observationTypes, session);
-                HibernateCriteriaTransactionalUtilities.checkOrInsertObservationConstellation(procedure, obsProps,
-                        offering, session);
+                        insertNewOffering(assignedOffering, request.getRelatedFeatures(), observationTypes, featureOfInterestTypes, session);
+                for (ObservableProperty observableProperty : obsProps) {
+                    ObservationConstellation obsConst = HibernateCriteriaTransactionalUtilities.checkOrInsertObservationConstellation(procedure, observableProperty,
+                            session);
+                    HibernateCriteriaTransactionalUtilities.checkOrInsertObservationConstellationOfferingObservationType(obsConst,
+                            offering, session);
+                }
                 // TODO: parent and child procedures
                 response.setAssignedProcedure(assignedProcedureID);
                 response.setAssignedOffering(assignedOffering.getOfferingIdentifier());
@@ -229,7 +234,7 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
     }
 
     private Offering insertNewOffering(SosOffering assignedOffering, List<SosFeatureRelationship> relatedFeatures,
-            List<ObservationType> observationTypes, Session session) throws OwsExceptionReport {
+            List<ObservationType> observationTypes, List<FeatureOfInterestType> featureOfInterestTypes, Session session) throws OwsExceptionReport {
         List<RelatedFeature> hRelatedFeatures = new LinkedList<RelatedFeature>();
         if (relatedFeatures != null && !relatedFeatures.isEmpty()) {
             for (SosFeatureRelationship relatedFeature : relatedFeatures) {
@@ -241,7 +246,7 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
             }
         }
         return HibernateCriteriaTransactionalUtilities.insertOffering(assignedOffering.getOfferingIdentifier(),
-                assignedOffering.getOfferingName(), hRelatedFeatures, observationTypes, session);
+                assignedOffering.getOfferingName(), hRelatedFeatures, observationTypes, featureOfInterestTypes, session);
     }
 
     private List<ObservableProperty> getOrInsertNewObservableProperties(List<String> obsProps, Session session) {

@@ -40,9 +40,17 @@
         <many-to-one name="unit" class="org.n52.sos.ds.hibernate.entities.Unit" fetch="join">
             <column name="unit_id" not-null="false" />
         </many-to-one>
-        <property name="antiSubsetting" type="java.lang.String">
-            <column name="anti_subsetting" />
+        <property name="setId" type="java.lang.String">
+            <column name="set_id" />
         </property>
+                <set name="observationConstellationOfferingObservationTypes" table="observation_relates_to_obs_const_off_obs_type" inverse="false" lazy="true" fetch="select">
+            <key>
+                <column name="observation_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType">
+                <column name="observation_constellation_offering_observation_type_id" not-null="true" />
+            </many-to-many>
+        </set>
         <set name="spatialFilteringProfiles" table="observation_has_spatial_filtering_profile" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="observation_id" not-null="true" />

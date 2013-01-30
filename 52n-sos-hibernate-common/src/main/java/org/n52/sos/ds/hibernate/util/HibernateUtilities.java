@@ -31,9 +31,11 @@ import java.util.Map;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
+import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
+import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ogc.gml.time.ITime;
@@ -63,36 +65,37 @@ public class HibernateUtilities {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtilities.class);
 
-    public static ObservationConstellation checkObservationConstellationForObservation(
+    public static ObservationConstellationOfferingObservationType checkObservationConstellationOfferingObservationTypeForObservation(
             SosObservationConstellation sosObservationConstellation, String offeringIdentifier, Session session, String parameterName)
             throws OwsExceptionReport, HibernateException {
         // FIXME parameterName should not be part of the parameters
         // check if multiple offerings.
-        List<Criterion> criterions = new ArrayList<Criterion>();
+        HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
+        String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
         String offAlias = HibernateCriteriaQueryUtilities.addOfferingAliasToMap(aliases, null);
-        criterions.add(HibernateCriteriaQueryUtilities.getEqualRestriction(
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(offAlias), offeringIdentifier));
-        String obsPropAlias = HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, null);
-        criterions.add(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateCriteriaQueryUtilities
+        String obsPropAlias = HibernateCriteriaQueryUtilities.addObservablePropertyAliasToMap(aliases, obsConstAlias);
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateCriteriaQueryUtilities
                 .getIdentifierParameter(obsPropAlias), sosObservationConstellation.getObservableProperty()
                 .getIdentifier()));
-        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, null);
-        criterions.add(HibernateCriteriaQueryUtilities.getEqualRestriction(
+        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, obsConstAlias);
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias),
                 sosObservationConstellation.getProcedure().getProcedureIdentifier()));
-        ObservationConstellation obsConst =
-                HibernateCriteriaQueryUtilities.getObservationConstallation(aliases, criterions, session);
-        if (obsConst != null) {
-            if (obsConst.getObservationType() == null
-                    || (obsConst.getObservationType() != null && (obsConst.getObservationType().getObservationType()
-                            .equals("NOT_DEFINED") || obsConst.getObservationType().getObservationType().isEmpty()))) {
-                return HibernateCriteriaTransactionalUtilities.updateObservationConstellation(obsConst,
+        queryObject.setAliases(aliases);
+        ObservationConstellationOfferingObservationType obsConstsOffObsType = HibernateCriteriaQueryUtilities.getObservationConstellationOfferingObservationType(queryObject, session);
+        if (obsConstsOffObsType != null) {
+            if (obsConstsOffObsType.getObservationType() == null
+                    || (obsConstsOffObsType.getObservationType() != null && (obsConstsOffObsType.getObservationType().getObservationType()
+                            .equals("NOT_DEFINED") || obsConstsOffObsType.getObservationType().getObservationType().isEmpty()))) {
+                return HibernateCriteriaTransactionalUtilities.updateObservationConstellationOfferingObservationType(obsConstsOffObsType,
                         sosObservationConstellation.getObservationType(), session);
             } else {
-                if (obsConst.getObservationType().getObservationType()
+                if (obsConstsOffObsType.getObservationType().getObservationType()
                         .equals(sosObservationConstellation.getObservationType())) {
-                    return obsConst;
+                    return obsConstsOffObsType;
                 } else {
                     StringBuilder exceptionText = new StringBuilder();
                     exceptionText.append("The requested observationType (");
@@ -106,7 +109,7 @@ public class HibernateUtilities {
                     exceptionText.append(sosObservationConstellation.getOfferings());
                     exceptionText.append("!");
                     exceptionText.append("The valid observationType is '");
-                    exceptionText.append(obsConst.getObservationType().getObservationType());
+                    exceptionText.append(obsConstsOffObsType.getObservationType().getObservationType());
                     exceptionText.append("'!");
                     LOGGER.debug(exceptionText.toString());
                     throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText.toString());
@@ -184,7 +187,11 @@ public class HibernateUtilities {
                 // TODO: exception not valid resultTime
             }
         } else {
-            // TODO: exception missing resultTime
+            if (phenomenonTime instanceof TimeInstant) {
+                hObservation.setResultTime(((TimeInstant) phenomenonTime).getValue().toDate());
+            } else {
+                // TODO exception
+            }
         }
     }
 

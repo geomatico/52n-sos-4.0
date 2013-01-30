@@ -25,6 +25,7 @@ package org.n52.sos.ds.hibernate.util;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,7 @@ import org.n52.sos.ds.hibernate.entities.CategoryValue;
 import org.n52.sos.ds.hibernate.entities.CountValue;
 import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.Observation;
+import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.TextValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosResultEncoding;
@@ -149,7 +151,8 @@ public class ResultHandlingHelper {
     }
 
     private static String getValueAsStringForObservedProperty(Observation observation, String definition) {
-        String observedProperty = observation.getObservationConstellation().getObservableProperty().getIdentifier();
+        ObservationConstellation observationConstellation = observation.getObservationConstellation();
+        String observedProperty = observationConstellation.getObservableProperty().getIdentifier();
         
 		if (observedProperty.equals(definition)) {
             // TODO multiple values?
