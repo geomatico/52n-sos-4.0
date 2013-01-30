@@ -75,6 +75,8 @@ import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.SosSweField;
 import org.n52.sos.ogc.swe.SosSweSimpleDataRecord;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
+import org.n52.sos.ogc.swe.simpleType.SosSweBoolean;
+import org.n52.sos.ogc.swe.simpleType.SosSweCategory;
 import org.n52.sos.ogc.swe.simpleType.SosSweCount;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuality;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
@@ -295,15 +297,30 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
     }
 
     private SosSweAbstractSimpleType<Boolean> parseBoolean(net.opengis.swe.x101.BooleanDocument.Boolean xbBoolean) throws OwsExceptionReport {
-        String exceptionText = "The Boolean is not supported";
-        LOGGER.debug(exceptionText);
-        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        SosSweBoolean sosBoolean = new SosSweBoolean();
+        if (xbBoolean.isSetValue()) {
+            sosBoolean.setValue(xbBoolean.getValue());
+        }
+        if (xbBoolean.isSetDefinition()) {
+            sosBoolean.setDefinition(xbBoolean.getDefinition());
+        }
+        if (xbBoolean.isSetDescription()) {
+            sosBoolean.setDescription(xbBoolean.getDescription().getStringValue());
+        }
+        return sosBoolean;
     }
 
     private SosSweAbstractSimpleType<String> parseCategory(Category category) throws OwsExceptionReport {
-        String exceptionText = "The Category is not supported";
-        LOGGER.debug(exceptionText);
-        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        SosSweCategory sosCategory = new SosSweCategory();
+        sosCategory.setValue(category.getValue());
+        sosCategory.setDefinition(category.getDefinition());
+        if (category.isSetDescription()) {
+            sosCategory.setDescription(category.getDescription().getStringValue());
+        }
+        if (category.isSetCodeSpace()) {
+            sosCategory.setCodeSpace(category.getCodeSpace().getHref());
+        }
+        return sosCategory;
     }
 
     private SosSweAbstractSimpleType<Integer> parseCount(Count xbCount) throws OwsExceptionReport {
