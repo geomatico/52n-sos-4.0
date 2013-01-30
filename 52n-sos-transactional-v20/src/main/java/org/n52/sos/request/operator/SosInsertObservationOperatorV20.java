@@ -179,7 +179,7 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<I
                     exceptionText.append(") is not supported by this server!");
                     exceptions.add(Util4Exceptions.createInvalidParameterValueException(
                             Sos2Constants.InsertObservationParams.observationType.name(), exceptionText.toString()));
-                } else if (obsConstallation.getOfferings() != null) {
+                } else if (obsConstallation.isSetOfferings()) {
                     for (String offeringID : obsConstallation.getOfferings()) {
                         Collection<String> allowedObservationTypes =
                                 capsController.getAllowedObservationTypes4Offering(offeringID);
@@ -207,15 +207,13 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<I
         ACapabilitiesCacheController capabilitiesCacheController = Configurator.getInstance().getCapabilitiesCacheController();
         checkProcedureID(obsConstallation.getProcedure().getProcedureIdentifier(), capabilitiesCacheController.getProcedures(), Sos2Constants.InsertObservationParams.procedure.name());
         checkObservedProperty(obsConstallation.getObservableProperty().getIdentifier(), capabilitiesCacheController.getObservableProperties(), Sos2Constants.InsertObservationParams.observedProperty.name());
-//        String foiIdentifier = obsConstallation.getFeatureOfInterest().getIdentifier().getValue();
-//        SosHelper.checkFeatureOfInterstIdentifier(foiIdentifier, capabilitiesCacheController.getFeatureOfInterest(), Sos2Constants.InsertObservationParams.featureOfInterest.name());
     }
 
 
     private void checkOrSetObservationType(SosObservation sosObservation) throws OwsExceptionReport {
         SosObservationConstellation observationConstellation = sosObservation.getObservationConstellation();
         String obsTypeFromValue = OMHelper.getObservationTypeFromValue(sosObservation.getValue().getValue());
-        if (observationConstellation.getObservationType() != null) {
+        if (observationConstellation.isSetObservationType()) {
             SosHelper.checkObservationType(observationConstellation.getObservationType(), Sos2Constants.InsertObservationParams.observationType
                     .name());
             if (obsTypeFromValue != null

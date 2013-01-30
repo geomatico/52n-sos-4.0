@@ -48,11 +48,11 @@ public class Procedure implements java.io.Serializable {
 
     private Set<ValidProcedureTime> validProcedureTimes = new HashSet<ValidProcedureTime>(0);
 
-    private Set<FeatureOfInterestType> featureOfInterestTypes = new HashSet<FeatureOfInterestType>(0);
+//    private Set<FeatureOfInterestType> featureOfInterestTypes = new HashSet<FeatureOfInterestType>(0);
 
     private Set<ObservationConstellation> observationConstellations = new HashSet<ObservationConstellation>(0);
 
-    private Set<ObservationType> observationTypes = new HashSet<ObservationType>(0);
+//    private Set<ObservationType> observationTypes = new HashSet<ObservationType>(0);
 
     private Set<Procedure> proceduresForChildSensorId = new HashSet<Procedure>(0);
 

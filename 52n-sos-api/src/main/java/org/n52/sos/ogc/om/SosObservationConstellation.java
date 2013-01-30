@@ -268,4 +268,8 @@ public class SosObservationConstellation implements Serializable {
         return observationType != null && !observationType.isEmpty();
     }
 
+    public boolean isSetOfferings() {
+        return offerings != null && !offerings.isEmpty();
+    }
+
 }
