@@ -562,6 +562,15 @@ public class InMemoryCacheControllerTest
 				controller.getFeatureOfInterest().contains(FEATURE));
 	}
 	
+	@Test public void 
+	should_not_contain_observation_types_for_the_offerings_after_DeleteSensor()
+			throws OwsExceptionReport {
+		deleteSensorPreparation();
+		
+		assertFalse("observation types for offering STILL in cache",
+				controller.getKOfferingVObservationTypes().containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
+	}
+	
 	/* HELPER */
 
 	private 

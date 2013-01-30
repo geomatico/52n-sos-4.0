@@ -256,8 +256,10 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		removeRemovedFeaturesFromCache();
 		
 		removeOfferingsToRelatedFeaturesRelations(sosRequest.getProcedureIdentifier());
-		
 		removeRemovedRelatedFeaturesFromRoleMap(sosRequest.getProcedureIdentifier());
+		
+		removeOfferingsToObservationTypesRelations(sosRequest.getProcedureIdentifier());
+		removeRemovedObservationTypes();
 		
 		// observable property relations
 		removeObservablePropertyRelations(sosRequest.getProcedureIdentifier());
@@ -269,6 +271,23 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 	/* HELPER */
 	
+	private void removeRemovedObservationTypes()
+	{
+		// TODO Auto-generated method "removeRemovedObservationTypes" stub generated on 30.01.2013 around 08:36:07 by eike
+		
+	}
+
+	private void removeOfferingsToObservationTypesRelations(String procedureIdentifier)
+	{
+		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier))
+		{
+			getCapabilitiesCache().getKOfferingVObservationTypes().remove(offeringId);
+			LOGGER.debug("observation types removed for offering \"{}\"? {}",
+					offeringId,
+					getCapabilitiesCache().getKOfferingVObservationTypes().containsKey(offeringId));
+		}
+	}
+
 	private void removeOfferingsToFeaturesRelations(String procedureIdentifier)
 	{
 		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(procedureIdentifier))
@@ -282,15 +301,8 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	
 	private void removeRemovedFeaturesFromCache()
 	{
-		List<String> allowedFeatures = getAllowedFeatures();
-		List<String> featuresToRemove = new ArrayList<String>();
-		for (String feature : getCapabilitiesCache().getFeatureOfInterest()) 
-		{
-			if (!allowedFeatures.contains(feature))
-			{
-				featuresToRemove.add(feature);
-			}
-		}
+		List<String> allowedFeatures = getAllowedEntries(getCapabilitiesCache().getOffFeatures().values());
+		List<String> featuresToRemove = getEntriesToRemove(allowedFeatures,getCapabilitiesCache().getFeatureOfInterest());
 		for (String feature : featuresToRemove)
 		{
 			getCapabilitiesCache().getFeatureOfInterest().remove(feature);
@@ -298,6 +310,19 @@ public class InMemoryCacheController extends CacheControllerImpl {
 					feature,
 					getCapabilitiesCache().getFeatureOfInterest().contains(feature));
 		}
+	}
+
+	private List<String> getEntriesToRemove(List<String> allowedEntries, Collection<String> currentEntries)
+	{
+		List<String> entriesToRemove = new ArrayList<String>();
+		for (String entry : currentEntries) 
+		{
+			if (!allowedEntries.contains(entry))
+			{
+				entriesToRemove.add(entry);
+			}
+		}
+		return entriesToRemove;
 	}
 
 	private void removeOfferingNames(String procedureIdentifier)
@@ -333,36 +358,23 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 	protected List<String> getAllowedRelatedFeatures()
 	{
-		Collection<Collection<String>> values = getCapabilitiesCache().getKOfferingVRelatedFeatures().values();
-		List<String> allowedRelatedFeatures = new ArrayList<String>();
-		for (Collection<String> relatedFeaturesEntry : values)
-		{
-			for (String relatedFeature : relatedFeaturesEntry)
-			{
-				if (!allowedRelatedFeatures.contains(relatedFeature))
-				{
-					allowedRelatedFeatures.add(relatedFeature);
-				}
-			}
-		}
-		return allowedRelatedFeatures;
+		return getAllowedEntries(getCapabilitiesCache().getKOfferingVRelatedFeatures().values());
 	}
 	
-	private List<String> getAllowedFeatures()
+	private List<String> getAllowedEntries(Collection<Collection<String>> values)
 	{
-		Collection<Collection<String>> values = getCapabilitiesCache().getOffFeatures().values();
-		List<String> allowedFeatures = new ArrayList<String>();
-		for (Collection<String> featuresEntry : values)
+		List<String> allowedEntries = new ArrayList<String>();
+		for (Collection<String> entries : values)
 		{
-			for (String feature : featuresEntry)
+			for (String entry : entries)
 			{
-				if (!allowedFeatures.contains(feature))
+				if (!allowedEntries.contains(entry))
 				{
-					allowedFeatures.add(feature);
+					allowedEntries.add(entry);
 				}
 			}
 		}
-		return allowedFeatures;
+		return allowedEntries;
 	}
 
 	private void removeOfferingsToRelatedFeaturesRelations(String procedureIdentifier)
