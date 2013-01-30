@@ -571,6 +571,18 @@ public class InMemoryCacheControllerTest
 				controller.getKOfferingVObservationTypes().containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
 	}
 	
+	@Test public void 
+	should_not_contain_feature_to_procedure_relations_after_DeleteSensor()
+			throws OwsExceptionReport {
+		deleteSensorPreparation();
+		
+		assertFalse("feature -> procedure relation STILL in cache",
+				controller.getProc4FOI(FEATURE).contains(PROCEDURE));
+		
+		assertTrue("feature -> procedure map is NOT emtpy", 
+				controller.getCapabilitiesCache().getKFeatureOfInterestVProcedures().isEmpty());
+	}
+	
 	/* HELPER */
 
 	private 
@@ -586,7 +598,6 @@ public class InMemoryCacheControllerTest
 		}
 		return true;
 	}
-
 
 	private String 
 	getProcedureIdentifier()

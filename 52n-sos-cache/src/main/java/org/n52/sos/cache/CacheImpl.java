@@ -402,12 +402,16 @@ public class CacheImpl implements CapabilitiesCache{
     }
 
     /**
-     * returns the foiProcedures
-     * 
-     * @return Map<String, List<String>> foiProcedures
+     * @return Map&lt;String, List&lt;String>> kFeatureOfInterestVProcedures
+     * @deprecated use {@link #getKFeatureOfInterestVProcedures()}
      */
     protected Map<String, Collection<String>> getFoiProcedures() {
-        return kFeatureOfInterestVProcedures;
+        return getKFeatureOfInterestVProcedures();
+    }
+    
+    protected Map<String, Collection<String>> getKFeatureOfInterestVProcedures()
+    {
+    	return kFeatureOfInterestVProcedures;
     }
     
     @Override

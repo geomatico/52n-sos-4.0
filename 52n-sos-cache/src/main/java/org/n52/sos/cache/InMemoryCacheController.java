@@ -235,6 +235,8 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		// TODO group offering loops
 		
 		removeProcedureFromCache(sosRequest.getProcedureIdentifier());
+		
+		removeFeatureToProcedureRelationsFromCache(sosRequest.getProcedureIdentifier());
 	
 		removeOfferingToProcedureRelation(sosRequest.getProcedureIdentifier());
 		
@@ -259,7 +261,6 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		removeRemovedRelatedFeaturesFromRoleMap(sosRequest.getProcedureIdentifier());
 		
 		removeOfferingsToObservationTypesRelations(sosRequest.getProcedureIdentifier());
-		removeRemovedObservationTypes();
 		
 		// observable property relations
 		removeObservablePropertyRelations(sosRequest.getProcedureIdentifier());
@@ -271,10 +272,29 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 	/* HELPER */
 	
-	private void removeRemovedObservationTypes()
+	private void removeFeatureToProcedureRelationsFromCache(String procedureIdentifier)
 	{
-		// TODO Auto-generated method "removeRemovedObservationTypes" stub generated on 30.01.2013 around 08:36:07 by eike
-		
+		List<String> featuresToRemove = new ArrayList<String>();
+		for (String feature : getCapabilitiesCache().getKFeatureOfInterestVProcedures().keySet())
+		{
+			getCapabilitiesCache().getKFeatureOfInterestVProcedures().get(feature).remove(procedureIdentifier);
+			LOGGER.debug("removed feature \"{}\" -> procedure \"{}\" relation from cache? {}",
+					feature,
+					procedureIdentifier,
+					getCapabilitiesCache().getKFeatureOfInterestVProcedures().get(feature).contains(procedureIdentifier));
+			if (getCapabilitiesCache().getKFeatureOfInterestVProcedures().get(feature) == null ||
+					getCapabilitiesCache().getKFeatureOfInterestVProcedures().get(feature).isEmpty())
+			{
+				featuresToRemove.add(feature);
+			}
+		}
+		for (String featureToRemove : featuresToRemove) {
+			getCapabilitiesCache().getKFeatureOfInterestVProcedures().remove(featureToRemove);
+			LOGGER.debug("removed feature \"{}\" from featur -> procedure map? {}",
+					featureToRemove,
+					procedureIdentifier,
+					getCapabilitiesCache().getKFeatureOfInterestVProcedures().containsKey(featureToRemove));
+		}
 	}
 
 	private void removeOfferingsToObservationTypesRelations(String procedureIdentifier)
@@ -339,14 +359,8 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	private void removeRemovedRelatedFeaturesFromRoleMap(String procedureIdentifier)
 	{
 		List<String> allowedRelatedFeatures = getAllowedRelatedFeatures();
-		List<String> featuresToRemove = new ArrayList<String>();
-		for (String relatedFeatureWithRole : getCapabilitiesCache().getKRelatedFeatureVRole().keySet())
-		{
-			if (!allowedRelatedFeatures.contains(relatedFeatureWithRole))
-			{
-				featuresToRemove.add(relatedFeatureWithRole);
-			}
-		}
+		List<String> featuresToRemove = getEntriesToRemove(allowedRelatedFeatures, 
+				getCapabilitiesCache().getKRelatedFeatureVRole().keySet());
 		for (String featureToRemove : featuresToRemove)
 		{
 			getCapabilitiesCache().getKRelatedFeatureVRole().remove(featureToRemove);
