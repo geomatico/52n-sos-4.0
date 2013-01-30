@@ -59,7 +59,7 @@ public abstract class AbstractSosTestCase extends Assert {
                     }
                 }
             }
-            Configurator.getInstance(p, "/");
+            Configurator.createInstance(p, "/");
         }
     }
 

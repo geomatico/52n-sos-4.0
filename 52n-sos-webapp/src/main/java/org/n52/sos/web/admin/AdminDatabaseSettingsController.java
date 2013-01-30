@@ -101,7 +101,7 @@ public class AdminDatabaseSettingsController extends AbstractController {
                 Configurator.getInstance().cleanup();
             }
             /* reinitialize */
-            Configurator.getInstance(getDatabaseSettingsHandler().getAll(), getBasePath());
+            Configurator.createInstance(getDatabaseSettingsHandler().getAll(), getBasePath());
         } catch (ConfigurationException ex) {
             return onSaveError(jdbc, null, ex);
         } catch (URISyntaxException ex) {

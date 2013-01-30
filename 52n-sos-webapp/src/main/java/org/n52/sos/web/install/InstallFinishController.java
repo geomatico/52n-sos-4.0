@@ -205,7 +205,7 @@ public class InstallFinishController extends AbstractInstallController {
         if (Configurator.getInstance() == null) {
             log.info("Instantiation Configurator...");
             try {
-                Configurator.getInstance(properties, getBasePath());
+                Configurator.createInstance(properties, getBasePath());
             }
             catch (ConfigurationException ex) {
                 String message = "Cannot instantiate Configurator: " + ex.getMessage();
