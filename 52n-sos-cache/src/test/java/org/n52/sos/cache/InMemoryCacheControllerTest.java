@@ -258,7 +258,22 @@ public class InMemoryCacheControllerTest
 		updateCacheWithSingleObservation();
 		
 		assertTrue("observation id NOT in cache",
-				controller.getObservationIdentifiers().contains(((InsertObservationRequest) request).getObservations().get(0).getIdentifier().getValue()));
+				controller.getObservationIdentifiers().contains(getObservationIdFromInsertObservation()));
+	}
+
+	@Test public void 
+	should_contain_observation_id_to_offering_relation_after_InsertObservation()
+			throws OwsExceptionReport {
+		updateCacheWithInsertSensor(PROCEDURE);
+		updateCacheWithSingleObservation();
+		
+		assertTrue("observation id -> procedure relation NOT in cache", 
+				controller.getCapabilitiesCache().getKOfferingVObservationIdentifiers()
+				.containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME)
+				&&
+				controller.getCapabilitiesCache().getKOfferingVObservationIdentifiers()
+				.get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME)
+				.contains(getObservationIdFromInsertObservation()));
 	}
 	
 	/* Update after InsertSensor */
@@ -585,6 +600,12 @@ public class InMemoryCacheControllerTest
 	
 	/* HELPER */
 
+	private 
+	String getObservationIdFromInsertObservation()
+	{
+		return ((InsertObservationRequest) request).getObservations().get(0).getIdentifier().getValue();
+	}
+	
 	private 
 	boolean onlyValidRelatedFeaturesAreInRoleMap()
 	{

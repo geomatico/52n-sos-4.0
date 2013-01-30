@@ -141,13 +141,15 @@ public class CacheImpl implements CapabilitiesCache{
 	
 	private Map<String, SosEnvelope> kOfferingVEnvelope;
 	
+	// TODO merge next two maps
 	private Map<String, DateTime> kOfferingVMinTime;
-	
 	private Map<String, DateTime> kOfferingVMaxTime;
 	
 	private SosEnvelope globalEnvelope;
 	
 	private TimePeriod globalTemporalBoundingBox;
+
+	private Map<String, Collection<String>> kOfferingVObservationIdentifiers;
 
     public CacheImpl() {
     	allowedKOfferingVObservationType = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
@@ -165,6 +167,7 @@ public class CacheImpl implements CapabilitiesCache{
     	kOfferingVMaxTime = Collections.synchronizedMap(new HashMap<String, DateTime>());
     	kOfferingVMinTime = Collections.synchronizedMap(new HashMap<String, DateTime>());
     	kOfferingVObservableProperties = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
+    	kOfferingVObservationIdentifiers = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	kOfferingVObservationTypes = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	kOfferingVProcedures = Collections.synchronizedMap(new HashMap<String, List<String>>());
     	kOfferingVRelatedFeatures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
@@ -1195,6 +1198,11 @@ public class CacheImpl implements CapabilitiesCache{
 		} else if (!unit4Phen.equals(other.unit4Phen))
 			return false;
 		return true;
+	}
+
+	protected Map<String,Collection<String>> getKOfferingVObservationIdentifiers()
+	{
+		return kOfferingVObservationIdentifiers;
 	}
 
 }

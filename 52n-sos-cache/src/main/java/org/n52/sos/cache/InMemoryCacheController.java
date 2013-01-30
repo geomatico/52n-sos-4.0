@@ -188,8 +188,11 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 			addObservationTypeToCache(sosObservation);
 
-			addObservationIdToCacheIfSet(sosObservation);
-
+			if (sosObservation.getIdentifier() != null)
+			{
+				addObservationIdToCache(sosObservation);
+			}
+			
 			// update features
 			Envelope observedFeatureEnvelope = null;
 			int observedFeatureEnvelopeSRID = getDefaultEPSG();
@@ -225,9 +228,27 @@ public class InMemoryCacheController extends CacheControllerImpl {
 				// envelopes/bounding boxes (spatial and temporal)
 				updateTemporalBoundingBoxOf(offeringIdentifier, phenomenonTimeFrom(sosObservation));
 				updateOfferingEnvelope(observedFeatureEnvelope, observedFeatureEnvelopeSRID, offeringIdentifier);
+				if (sosObservation.getIdentifier() != null)
+				{
+					addOfferingToObservationIdRelationToCache(sosObservation.getIdentifier().getValue(),offeringIdentifier);
+				}
 			}
 
 		}
+	}
+
+	private void addOfferingToObservationIdRelationToCache(String observationIdentifier, String offeringIdentifier)
+	{
+		if (!getCapabilitiesCache().getKOfferingVObservationIdentifiers().containsKey(offeringIdentifier))
+		{
+			Collection<String> value = Collections.synchronizedList(new ArrayList<String>());
+			getCapabilitiesCache().getKOfferingVObservationIdentifiers().put(offeringIdentifier, value);
+		}
+		getCapabilitiesCache().getKOfferingVObservationIdentifiers().get(offeringIdentifier).add(observationIdentifier);
+		LOGGER.debug("offering \"{}\" to observation id \"{}\" relation added to cache? {}",
+				offeringIdentifier,
+				observationIdentifier,
+				getCapabilitiesCache().getKOfferingVObservationIdentifiers().get(offeringIdentifier).contains(observationIdentifier));
 	}
 
 	private void doUpdateAfterSensorDeletion(DeleteSensorRequest sosRequest) throws OwsExceptionReport
@@ -495,14 +516,11 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			}
 		}
 		// this to by-pass concurrent modification exceptions
-		if (!offeringsToRemove.isEmpty())
-		{
-			for (String offeringToRemove : offeringsToRemove) {
-				getCapabilitiesCache().getKOfferingVProcedures().remove(offeringToRemove);
-				LOGGER.debug("offering \"{}\" removed from offering->procedure map ? {}",
-						offeringsToRemove,
-						getCapabilitiesCache().getKOfferingVProcedures().containsKey(offeringToRemove));
-			}
+		for (String offeringToRemove : offeringsToRemove) {
+			getCapabilitiesCache().getKOfferingVProcedures().remove(offeringToRemove);
+			LOGGER.debug("offering \"{}\" removed from offering->procedure map ? {}",
+					offeringsToRemove,
+					getCapabilitiesCache().getKOfferingVProcedures().containsKey(offeringToRemove));
 		}
 	}
 
@@ -584,11 +602,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		}
 	}
 
-	private void addObservationIdToCacheIfSet(SosObservation sosObservation)
+	private void addObservationIdToCache(SosObservation sosObservation)
 	{
-		if (sosObservation.getIdentifier() != null) {
-			getCapabilitiesCache().getObservationIdentifiers().add(sosObservation.getIdentifier().getValue());
-		}
+		getCapabilitiesCache().getObservationIdentifiers().add(sosObservation.getIdentifier().getValue());
 	}
 
 	private void addObservationTypeToCache(SosObservation sosObservation)
@@ -617,7 +633,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		if (getCapabilitiesCache().getProceduresForFeature(observedFeatureIdentifier) == null) {
 			List<String> procedures4Feature = Collections.synchronizedList(new ArrayList<String>());
 			procedures4Feature.add(procedureIdentifier);
-			getCapabilitiesCache().getFoiProcedures().put(observedFeatureIdentifier, procedures4Feature);
+			getCapabilitiesCache().getKFeatureOfInterestVProcedures().put(observedFeatureIdentifier, procedures4Feature);
 		} else if (!getCapabilitiesCache().getProceduresForFeature(observedFeatureIdentifier).contains(procedureIdentifier)) {
 			getCapabilitiesCache().getProceduresForFeature(observedFeatureIdentifier).add(procedureIdentifier);
 		}
@@ -802,9 +818,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		if (getCapabilitiesCache().getProceduresForFeature(observedFeatureIdentifier) == null) {
 			List<String> procedures4Feature = Collections.synchronizedList(new ArrayList<String>());
 			procedures4Feature.add(procedureIdentifier);
-			getCapabilitiesCache().getFoiProcedures().put(observedFeatureIdentifier, procedures4Feature);
+			getCapabilitiesCache().getKFeatureOfInterestVProcedures().put(observedFeatureIdentifier, procedures4Feature);
 		} else if (!getCapabilitiesCache().getProceduresForFeature(observedFeatureIdentifier).contains(procedureIdentifier)) {
-			getCapabilitiesCache().getFoiProcedures().get(observedFeatureIdentifier).add(procedureIdentifier);
+			getCapabilitiesCache().getKFeatureOfInterestVProcedures().get(observedFeatureIdentifier).add(procedureIdentifier);
 		}
 	}
 
