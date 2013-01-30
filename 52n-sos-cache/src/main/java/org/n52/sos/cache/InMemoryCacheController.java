@@ -304,7 +304,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	
 	private void removeRemovedObservationIdentifiers()
 	{
-		// TODO Auto-generated method "removeRemovedObservationIdentifiers" stub generated on 30.01.2013 around 10:21:32 by eike
+		List<String> allowedObservationIdentifiers = getAllowedEntries(getCapabilitiesCache().getKOfferingVObservationIdentifiers().values());
+		List<String> featuresToRemove = getEntriesToRemove(allowedObservationIdentifiers,getCapabilitiesCache().getObservationIdentifiers());
+		removeEntries(featuresToRemove,getCapabilitiesCache().getObservationIdentifiers());
 	}
 
 	private void removeOfferingToObservationIdentifierRelations(String offeringId)
@@ -360,12 +362,17 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	{
 		List<String> allowedFeatures = getAllowedEntries(getCapabilitiesCache().getOffFeatures().values());
 		List<String> featuresToRemove = getEntriesToRemove(allowedFeatures,getCapabilitiesCache().getFeatureOfInterest());
-		for (String feature : featuresToRemove)
+		removeEntries(featuresToRemove,getCapabilitiesCache().getFeatureOfInterest());
+	}
+
+	private void removeEntries(List<String> entriesToRemove, Collection<String> listToRemoveFrom)
+	{
+		for (String entryToRemove : entriesToRemove)
 		{
-			getCapabilitiesCache().getFeatureOfInterest().remove(feature);
-			LOGGER.debug("feature \"{}\" removed from cache? {}",
-					feature,
-					getCapabilitiesCache().getFeatureOfInterest().contains(feature));
+			listToRemoveFrom.remove(entryToRemove);
+			LOGGER.debug("entry \"{}\" removed from list in cache? {}",
+					entryToRemove,
+					listToRemoveFrom.contains(entryToRemove));
 		}
 	}
 
@@ -395,13 +402,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		List<String> allowedRelatedFeatures = getAllowedRelatedFeatures();
 		List<String> featuresToRemove = getEntriesToRemove(allowedRelatedFeatures, 
 				getCapabilitiesCache().getKRelatedFeatureVRole().keySet());
-		for (String featureToRemove : featuresToRemove)
-		{
-			getCapabilitiesCache().getKRelatedFeatureVRole().remove(featureToRemove);
-			LOGGER.debug("related feature \"{}\" removed from role map? {}",
-					featuresToRemove,
-					getCapabilitiesCache().getKRelatedFeatureVRole().containsKey(featureToRemove));
-		}
+		removeEntries(featuresToRemove, getCapabilitiesCache().getKRelatedFeatureVRole().keySet());
 	}
 
 	protected List<String> getAllowedRelatedFeatures()

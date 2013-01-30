@@ -607,6 +607,15 @@ public class InMemoryCacheControllerTest
 				controller.getCapabilitiesCache().getKOfferingVObservationIdentifiers().containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
 	}
 	
+	@Test public void 
+	should_not_contain_removed_observation_ids_after_DeleteSensor()
+	throws OwsExceptionReport{
+		deleteSensorPreparation();
+		
+		assertTrue("observation identifiers STILL in cache", 
+				controller.getObservationIdentifiers().isEmpty());
+	}
+	
 	/* HELPER */
 
 	private 
