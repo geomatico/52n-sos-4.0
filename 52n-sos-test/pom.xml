@@ -24,6 +24,11 @@
 			<artifactId>52n-sos-coding-ows-v110</artifactId>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>52n-sos-hibernate-mappings</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-coding-sensorML-v101</artifactId>
