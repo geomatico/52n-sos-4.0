@@ -35,6 +35,8 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -255,7 +257,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
             getTemporalBBoxesOfOfferingsAndSaveInMap(session, kOfferingVMinTime, kOfferingVMaxTime);
         } else if (strategy == CacheCreationStrategy.MULTI_THREAD) {
             LOGGER.debug("multithreading init");
-            executor = Executors.newFixedThreadPool(Configurator.getInstance().getCacheThreadCount());
+            executor = Executors.newFixedThreadPool(Configurator.getInstance().getCacheThreadCount(), new UpdateThreadFactory());
             offeringThreadsRunning = new CountDownLatch(hOfferings.size());
             connectionProvider = Configurator.getInstance().getConnectionProvider();
             owsReportsThrownByOfferingThreads = Collections.synchronizedList(new LinkedList<OwsExceptionReport>());
@@ -308,7 +310,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         cache.setKOfferingVMinTime(kOfferingVMinTime);
         cache.setKOfferingVMaxTime(kOfferingVMaxTime);
     }
-
+    
     private void getOfferingInformationFromDbAndAddItToCacheMaps(Session session, Map<String, String> kOfferingVName,
             Map<String, List<String>> kOfferingVProcedures,
             Map<String, Collection<String>> kOfferingVObservableProperties,
@@ -632,6 +634,14 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
             resultTemplates.add(resultTemplateObject.getIdentifier());
         }
         cache.setResultTemplates(resultTemplates);
+    }
+    
+    private static class UpdateThreadFactory implements ThreadFactory  {
+        private final AtomicInteger i = new AtomicInteger(0);
+        private final ThreadGroup tg = new ThreadGroup("cache-update");
+        @Override public Thread newThread(Runnable r) {
+            return new Thread(tg, r, "cache-update-" + i.getAndIncrement());
+        }
     }
 
     private class OfferingTask implements Runnable {
