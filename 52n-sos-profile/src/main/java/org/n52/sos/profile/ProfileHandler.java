@@ -78,7 +78,7 @@ public class ProfileHandler implements IProfileHandler {
 
     private void addAvailableProvile(IProfile profile) {
         if (availableProfiles.containsKey(profile.getIdentifier())) {
-            LOGGER.warn("Profile with the identifier {} still exist! Exiting profile is overwritten!",
+            LOGGER.warn("Profile with the identifier {} still exist! Existing profile is overwritten!",
                     profile.getIdentifier());
         }
         availableProfiles.put(profile.getIdentifier(), profile);
