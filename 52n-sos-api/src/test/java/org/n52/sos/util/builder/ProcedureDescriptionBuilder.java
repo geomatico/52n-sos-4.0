@@ -61,7 +61,7 @@ public class ProcedureDescriptionBuilder {
 		SosProcedureDescription description = new SosProcedureDescriptionUnknowType(procedureIdentifer, null, null);
 		if (offeringIdentifier != null && offeringName != null)
 		{
-			((SosProcedureDescriptionUnknowType) description).setOfferingIdentifier(new SosOffering(offeringIdentifier, offeringName));
+			((SosProcedureDescriptionUnknowType) description).addOfferingIdentifier(new SosOffering(offeringIdentifier, offeringName));
 		}
 		return description;
 	}
