@@ -23,6 +23,9 @@
  */
 package org.n52.sos.ds.hibernate;
 
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION;
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,6 +43,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.n52.sos.cache.CapabilitiesCache;
 import org.n52.sos.ds.ICacheFeederDAO;
@@ -48,6 +53,7 @@ import org.n52.sos.ds.IFeatureQueryHandler;
 import org.n52.sos.ds.hibernate.entities.CompositePhenomenon;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
+import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.ObservationType;
@@ -96,7 +102,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
 
             throw Util4Exceptions.createNoApplicableCodeException(e, errorMsg);
         }
-        updateCache(capabilitiesCache, null);
+        updateCache(capabilitiesCache, strategy!=null?strategy:DEFAULT_STRATEGY);
     }
 
     protected void updateCache(CapabilitiesCache cache, CacheCreationStrategy strategy) throws OwsExceptionReport {
@@ -276,7 +282,8 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
                     executor.submit(task);
                 } else {
                     getOfferingInformationFromDbAndAddItToCacheMaps(session, kOfferingVName, kOfferingVProcedures,
-                            kOfferingVObservableProperties, kOfferingVRelatedFeatures, kOfferingVObservationTypes,
+                            kOfferingVObservableProperties, kOfferingVRelatedFeatures,
+                            kOfferingVObservationTypes,
                             allowedkOfferingVObservationTypes, kOfferingVMinTime, kOfferingVMaxTime,
                             kOfferingVEnvelope, kOfferingVFeaturesOfInterest, offering);
                 }
@@ -317,8 +324,10 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
             Map<String, Collection<String>> kOfferingVRelatedFeatures,
             Map<String, Collection<String>> kOfferingVObservationTypes,
             Map<String, Collection<String>> allowedkOfferingVObservationTypes,
-            Map<String, DateTime> kOfferingVMinTime, Map<String, DateTime> kOfferingVMaxTime,
-            Map<String, SosEnvelope> kOfferingVEnvelope, Map<String, Collection<String>> kOfferingVFeaturesOfInterest,
+            Map<String, DateTime> kOfferingVMinTime,
+            Map<String, DateTime> kOfferingVMaxTime,
+            Map<String, SosEnvelope> kOfferingVEnvelope,
+            Map<String, Collection<String>> kOfferingVFeaturesOfInterest,
             Offering offering) throws OwsExceptionReport {
         String offeringId = offering.getIdentifier();
         kOfferingVName.put(offeringId, offering.getName());
@@ -351,7 +360,66 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         }
     }
 
-    private void getTemporalBBoxesOfOfferingsAndSaveInMap(Session session, Map<String, DateTime> kOfferingVMinTime,
+	private Collection<String> getObservationIdentifiersForProcedure(Session session, String procedureIdentifier)
+	{
+		Map<String, String> observationConstellationAliases = new HashMap<String, String>();
+        HibernateQueryObject observationConstellationQueryObject = new HibernateQueryObject();
+        
+        Map<String, String> observationAliases = new HashMap<String, String>();
+        HibernateQueryObject observationQueryObject = new HibernateQueryObject();
+        String obsConstAlias =
+                addObservationConstallationAliasToMap(observationAliases, null);
+        
+		observationConstellationQueryObject.addCriterion(getCriterionForProcedures(
+                observationConstellationAliases, null, procedureIdentifier));
+        observationQueryObject.addCriterion(getCriterionForProcedures(observationAliases, obsConstAlias,
+        		procedureIdentifier));
+        
+        observationConstellationQueryObject.setAliases(observationConstellationAliases);
+        List<ObservationConstellation> observationConstellations =
+                getObservationConstellations(observationConstellationQueryObject,
+                        session);
+        
+        observationQueryObject.setAliases(observationAliases);
+        
+        Set<Observation> allObservations = new HashSet<Observation>(0);
+        for (ObservationConstellation observationConstellation : observationConstellations) {
+            HibernateQueryObject defaultQueryObject = observationQueryObject.clone();
+
+            String id = getParameterWithPrefix(PARAMETER_OBSERVATION_CONSTELLATION, null);
+            defaultQueryObject.addCriterion(getEqualRestriction(id,
+                    observationConstellation));
+            
+            allObservations.addAll(getObservations(defaultQueryObject, session));
+        }
+        
+        List<String> observationIdentifier = Collections.synchronizedList(new ArrayList<String>());
+        for (Observation observation : allObservations) {
+			if (observation.getIdentifier() != null && 
+					!observation.getIdentifier().isEmpty() &&
+					!observationIdentifier.contains(observation.getIdentifier()))
+			{
+				observationIdentifier.add(observation.getIdentifier());
+			}
+			if (observation.getSetId() != null && 
+					!observation.getSetId().isEmpty() &&
+					!observationIdentifier.contains(observation.getSetId()))
+			{
+				observationIdentifier.add(observation.getSetId());
+			}
+		}
+		return observationIdentifier;
+	}
+	
+	/**
+	 * @see {@linkplain GetObservationDAO#getCriterionForProcedures()}
+	 */
+    private Criterion getCriterionForProcedures(Map<String, String> aliasMap, String prefix, String procedure) {
+        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliasMap, prefix);
+        return Restrictions.in(HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), Collections.singletonList(procedure));
+    }
+
+	private void getTemporalBBoxesOfOfferingsAndSaveInMap(Session session, Map<String, DateTime> kOfferingVMinTime,
             Map<String, DateTime> kOfferingVMaxTime) {
         Map<String, TimePeriod> temporalBoundingBoxesOfOfferings =
                 HibernateCriteriaQueryUtilities.getTemporalBoundingBoxesForOfferings(session);
@@ -384,6 +452,8 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
                 new HashMap<String, Collection<String>>(hProcedures.size());
         Map<String, Collection<String>> kProcedureVObservableProperties =
                 new HashMap<String, Collection<String>>(hProcedures.size());
+        Map<String, Collection<String>> kProcedureVObservationIdentifiers = 
+        		Collections.synchronizedMap(new HashMap<String, Collection<String>>());
         Map<String, Collection<String>> parentProcs = new HashMap<String, Collection<String>>(hProcedures.size());
         for (Procedure hProcedure : hProcedures) {
             if (!hProcedure.isDeleted()) {
@@ -394,6 +464,8 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
                         getObservablePropertyIdentifierFromObservationConstellation(hProcedure.getObservationConstellations()));
                 parentProcs.put(hProcedure.getIdentifier(),
                         getProcedureIDsFromProcedures(hProcedure.getProceduresForChildSensorId()));
+                kProcedureVObservationIdentifiers.put(hProcedure.getIdentifier(),
+                		getObservationIdentifiersForProcedure(session, hProcedure.getIdentifier()));
             }
         }
         cache.setProcedures(procedures);
@@ -648,7 +720,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         private Map<String, String> kOfferingVName;
 
         private Map<String, Collection<String>> kOfferingVObservableProperties;
-
+        
         private Map<String, Collection<String>> kOfferingVObservationTypes;
 
         private Map<String, List<String>> kOfferingVProcedures;
