@@ -23,8 +23,10 @@
  */
 package org.n52.sos.request;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SosFeatureRelationship;
@@ -43,6 +45,10 @@ public class InsertSensorRequest extends AbstractServiceRequest {
 
     /** SOS SensorML description */
     private SosProcedureDescription procedureDescription;
+    
+    private String assignedProcedureIdentifier;
+    
+    private List<SosOffering> assignedOfferings = new ArrayList<SosOffering>();
 
     /** metadata parameter */
     private SosMetadata metadata;
@@ -132,4 +138,30 @@ public class InsertSensorRequest extends AbstractServiceRequest {
         return relatedFeatures;
     }
 
+    public String getAssignedProcedureIdentifier() {
+        return assignedProcedureIdentifier;
+    }
+
+    public List<SosOffering> getAssignedOfferings() {
+        return assignedOfferings;
+    }
+    
+    public SosOffering getFirstAssignedOffering() {
+        if (isSetAssignedOfferings()) {
+            return assignedOfferings.get(0);
+        }
+        return null;
+    }
+
+    private boolean isSetAssignedOfferings() {
+        return assignedOfferings != null && !assignedOfferings.isEmpty();
+    }
+
+    public void setAssignedProcedureIdentifier(String assignedProcedureID) {
+        this.assignedProcedureIdentifier = assignedProcedureID;
+    }
+
+    public void setAssignedOfferings(List<SosOffering> assignedOfferings) {
+        this.assignedOfferings.addAll(assignedOfferings);
+    }
 }
