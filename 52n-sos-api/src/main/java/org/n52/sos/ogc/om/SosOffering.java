@@ -47,6 +47,11 @@ public class SosOffering {
         this.offeringIdentifier = offeringIdentifier;
         this.offeringName = offeringName;
     }
+    
+    public SosOffering(String procedureIdentifier) {
+        this.offeringIdentifier = procedureIdentifier + "/observations";
+        this.offeringName = "Offering for sensor " + procedureIdentifier;
+    }
 
     /**
      * Get offering identifier
@@ -84,6 +89,14 @@ public class SosOffering {
      */
     public void setOfferingName(String offeringName) {
         this.offeringName = offeringName;
+    }
+
+    public boolean isSetOfferingIdentifier() {
+        return offeringIdentifier != null && !offeringIdentifier.isEmpty();
+    }
+    
+    public boolean isSetOfferingName() {
+        return offeringName != null && !offeringName.isEmpty();
     }
 
 }
