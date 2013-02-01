@@ -216,7 +216,7 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
         if (bool.isSetValue()) {
             xbBoolean.setValue(bool.getValue().booleanValue());
         }
-        if (xbBoolean.isSetQuality()) {
+        if (bool.isSetQuality()) {
             // TODO
         }
         return xbBoolean;
