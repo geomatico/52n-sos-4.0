@@ -219,6 +219,9 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
             if (abstractDataComponent.isSetIdentifier()) {
                 sosAbstractDataComponent.setIdentifier(abstractDataComponent.getIdentifier());
             }
+            if (abstractDataComponent.isSetLabel()) {
+                sosAbstractDataComponent.setLabel(abstractDataComponent.getLabel());
+            }
         }
         return sosAbstractDataComponent;
     }

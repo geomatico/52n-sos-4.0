@@ -218,6 +218,9 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
                 if (sosSweAbstractDataComponent.isSetIdentifier()) {
                     abstractDataComponentType.setIdentifier(sosSweAbstractDataComponent.getIdentifier());
                 }
+                if (sosSweAbstractDataComponent.isSetLabel()) {
+                    abstractDataComponentType.setLabel(sosSweAbstractDataComponent.getLabel());
+                }
             }
             return abstractDataComponentType;
         } catch (XmlException e) {
