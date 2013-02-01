@@ -23,10 +23,18 @@
  */
 package org.n52.sos.util;
 
+import java.util.HashSet;
+import java.util.Set;
+import org.n52.sos.event.SosEventBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class ClassHelper {
+    
+    private static final Logger log = LoggerFactory.getLogger(ClassHelper.class);
     
     /**
      * Calculates class similarity based on hierarchy depth.
@@ -72,6 +80,33 @@ public class ClassHelper {
         } else {
             return difference;
         }
+    }
+
+    protected static <T> Set<Class<? extends T>> flattenPartialHierachy(Set<Class<? extends T>> alreadyFoundClasses, Class<T> limitingClass, Class<?> currentClass) {
+        if (limitingClass.isAssignableFrom(currentClass)) {
+            alreadyFoundClasses.add((Class<? extends T>) currentClass);
+            if (limitingClass.isInterface()) {
+                for (Class<?> c : currentClass.getInterfaces()) {
+                    if (limitingClass.isAssignableFrom(c)) {
+                        alreadyFoundClasses.add((Class<? extends T>) c);
+                    }
+                }
+            }
+            Class<?> superClass = currentClass.getSuperclass();
+            if (superClass != null) {
+                return flattenPartialHierachy(alreadyFoundClasses, limitingClass, (Class<?>) currentClass.getSuperclass());
+            } else {
+                return alreadyFoundClasses;
+            }
+        } else {
+            return alreadyFoundClasses;
+        }
+    }
+
+    public static <T> Set<Class<? extends T>> flattenPartialHierachy(Class<T> limitingClass, Class<? extends T> actualClass) {
+        Set<Class<? extends T>> classes = flattenPartialHierachy(new HashSet<Class<? extends T>>(), limitingClass, actualClass);
+        log.debug("Flatten class hierarchy for {} extending/implementing {}; Found: {}", actualClass, limitingClass, StringHelper.join(", ", classes));
+        return classes;
     }
 
     private ClassHelper() {

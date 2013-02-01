@@ -35,6 +35,8 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IInsertSensorDAO;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.event.SosEventBus;
+import org.n52.sos.event.events.SensorInsertion;
 import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
@@ -81,11 +83,11 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInser
     }
 
     @Override
-    public ServiceResponse receive(InsertSensorRequest sosRequest) throws OwsExceptionReport {
-        checkRequestedParameter(sosRequest);
+    public ServiceResponse receive(InsertSensorRequest request) throws OwsExceptionReport {
+        checkRequestedParameter(request);
 
-        InsertSensorResponse response = getDao().insertSensor(sosRequest);
-        Configurator.getInstance().getCapabilitiesCacheController().updateAfterSensorInsertion();
+        InsertSensorResponse response = getDao().insertSensor(request);
+        SosEventBus.getInstance().submit(new SensorInsertion(request, response));
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {

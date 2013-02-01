@@ -101,7 +101,7 @@ public abstract class AbstractRequestOperator<D extends IOperationDAO, R extends
 
     @Override
     public final ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
-		SosEventBus.getInstance().submit(new RequestEvent(request));
+		SosEventBus.fire(new RequestEvent(request));
         if (requestType.isAssignableFrom(request.getClass())) {
             return receive(requestType.cast(request));
         } else {

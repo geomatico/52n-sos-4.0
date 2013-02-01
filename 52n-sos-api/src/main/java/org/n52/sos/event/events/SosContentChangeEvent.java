@@ -23,15 +23,32 @@
  */
 package org.n52.sos.event.events;
 
+import org.n52.sos.event.SosEvent;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.AbstractServiceResponse;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class SosInsertionEvent<I extends AbstractServiceRequest, O extends AbstractServiceResponse> extends SosContentChangeEvent<I, O> {
+public abstract class SosContentChangeEvent<I extends AbstractServiceRequest, O extends AbstractServiceResponse> implements SosEvent {
+    private I request;
+    private O response;
 
-    public SosInsertionEvent(I request, O response) {
-        super(request, response);
+    public SosContentChangeEvent(I request, O response) {
+        this.request = request;
+        this.response = response;
+    }
+
+    public I getRequest() {
+        return request;
+    }
+
+    public O getResponse() {
+        return response;
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("%s[request=%s, response=%s]", getClass().getSimpleName(), getRequest(), getResponse());
     }
 }

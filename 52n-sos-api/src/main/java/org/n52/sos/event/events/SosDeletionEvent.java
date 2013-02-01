@@ -29,9 +29,9 @@ import org.n52.sos.response.AbstractServiceResponse;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class SosInsertionEvent<I extends AbstractServiceRequest, O extends AbstractServiceResponse> extends SosContentChangeEvent<I, O> {
+public abstract class SosDeletionEvent<I extends AbstractServiceRequest, O extends AbstractServiceResponse> extends SosContentChangeEvent<I,O> {
 
-    public SosInsertionEvent(I request, O response) {
+    public SosDeletionEvent(I request, O response) {
         super(request, response);
     }
 }

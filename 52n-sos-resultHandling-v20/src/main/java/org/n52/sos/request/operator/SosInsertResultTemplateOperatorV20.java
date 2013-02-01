@@ -34,6 +34,8 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IInsertResultTemplateDAO;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.event.SosEventBus;
+import org.n52.sos.event.events.ResultTemplateInsertion;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -71,9 +73,8 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
     @Override
     public ServiceResponse receive(InsertResultTemplateRequest sosRequest) throws OwsExceptionReport {
         checkRequestedParameter(sosRequest);
-
         InsertResultTemplateResponse response = getDao().insertResultTemplate(sosRequest);
-        Configurator.getInstance().getCapabilitiesCacheController().updateAfterResultTemplateInsertion();
+        SosEventBus.fire(new ResultTemplateInsertion(sosRequest, response));
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {

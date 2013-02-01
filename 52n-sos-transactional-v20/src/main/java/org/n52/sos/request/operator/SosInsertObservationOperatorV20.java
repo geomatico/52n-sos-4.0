@@ -35,6 +35,8 @@ import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.cache.ACapabilitiesCacheController;
 import org.n52.sos.ds.IInsertObservationDAO;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.event.SosEventBus;
+import org.n52.sos.event.events.ObservationInsertion;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -70,10 +72,10 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<I
     }
 
     @Override
-    public ServiceResponse receive(InsertObservationRequest sosRequest) throws OwsExceptionReport {
-        checkRequestedParameter(sosRequest);
-        InsertObservationResponse response = getDao().insertObservation(sosRequest);
-        Configurator.getInstance().getCapabilitiesCacheController().updateAfterObservationInsertion();
+    public ServiceResponse receive(InsertObservationRequest request) throws OwsExceptionReport {
+        checkRequestedParameter(request);
+        InsertObservationResponse response = getDao().insertObservation(request);
+        SosEventBus.fire(new ObservationInsertion(request, response));
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {

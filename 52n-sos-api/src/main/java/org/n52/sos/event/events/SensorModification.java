@@ -23,15 +23,16 @@
  */
 package org.n52.sos.event.events;
 
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.response.AbstractServiceResponse;
+import org.n52.sos.request.UpdateSensorRequest;
+import org.n52.sos.response.UpdateSensorResponse;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class SosInsertionEvent<I extends AbstractServiceRequest, O extends AbstractServiceResponse> extends SosContentChangeEvent<I, O> {
+public class SensorModification extends SosModificationEvent<UpdateSensorRequest, UpdateSensorResponse> {
 
-    public SosInsertionEvent(I request, O response) {
+    public SensorModification(UpdateSensorRequest request, UpdateSensorResponse response) {
         super(request, response);
     }
+    
 }

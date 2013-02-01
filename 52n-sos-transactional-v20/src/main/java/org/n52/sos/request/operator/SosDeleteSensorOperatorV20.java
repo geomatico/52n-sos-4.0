@@ -33,6 +33,8 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IDeleteSensorDAO;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.event.SosEventBus;
+import org.n52.sos.event.events.SensorDeletion;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -66,10 +68,10 @@ public class SosDeleteSensorOperatorV20 extends AbstractV2RequestOperator<IDelet
     }
 
     @Override
-    public ServiceResponse receive(DeleteSensorRequest sosRequest) throws OwsExceptionReport {
-        checkRequestedParameter(sosRequest);
-        DeleteSensorResponse response = getDao().deleteSensor(sosRequest);
-        Configurator.getInstance().getCapabilitiesCacheController().updateAfterSensorDeletion();
+    public ServiceResponse receive(DeleteSensorRequest request) throws OwsExceptionReport {
+        checkRequestedParameter(request);
+        DeleteSensorResponse response = getDao().deleteSensor(request);
+        SosEventBus.fire(new SensorDeletion(request, response));
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {

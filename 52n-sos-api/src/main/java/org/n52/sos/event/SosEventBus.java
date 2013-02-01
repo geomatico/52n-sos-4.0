@@ -26,8 +26,6 @@ package org.n52.sos.event;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.ServiceConfigurationError;
@@ -40,6 +38,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import org.n52.sos.util.ClassHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,20 +46,21 @@ import org.slf4j.LoggerFactory;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class SosEventBus {
+    private static final Logger log = LoggerFactory.getLogger(SosEventBus.class);
+    private static final boolean ASYNCHRONOUS_EXECUTION = false;
+    private static final int THREAD_POOL_SIZE = 3;
+    private static final String THREAD_PREFIX = "SosEventBus-Worker-";
+    private static final Object SINGLETON_CREATION_LOCK = new Object();
 
-	private static final Logger log = LoggerFactory.getLogger(SosEvent.class);
-	private static final String THREAD_PREFIX = "SosEventBus-Worker-";
-	private static final int THREAD_POOL_SIZE = 3;
-	private static final Object SINGLETON_CREATION_LOCK = new Object();
-	private static SosEventBus instance;
-	private final ClassCache classCache = new ClassCache();
-	private final ReadWriteLock lock = new ReentrantReadWriteLock();
-	private final Executor executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE,
-			new ExecutorThreadPoolFactory());
-	private final Map<Class<? extends SosEvent>, Set<SosEventListener>> listeners
-			= new HashMap<Class<? extends SosEvent>, Set<SosEventListener>>();
-	private final Queue<EventHandler> queue = new ConcurrentLinkedQueue<EventHandler>();
-
+    private static SosEventBus instance;
+    
+    private final ClassCache classCache = new ClassCache();
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final Executor executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE, new ExecutorThreadPoolFactory());
+    private final Map<Class<? extends SosEvent>, Set<SosEventListener>> listeners 
+            = new HashMap<Class<? extends SosEvent>, Set<SosEventListener>>();
+    private final Queue<EventHandler> queue = new ConcurrentLinkedQueue<EventHandler>();
+    
 	public static SosEventBus getInstance() {
 		if (instance == null) {
 			synchronized (SINGLETON_CREATION_LOCK) {
@@ -71,7 +71,11 @@ public class SosEventBus {
 		}
 		return instance;
 	}
-
+    
+    public static void fire(SosEvent event) {
+        getInstance().submit(event);
+    }
+    
 	private SosEventBus() {
 		loadListenerImplementations();
 	}
@@ -94,7 +98,14 @@ public class SosEventBus {
 		try {
 			for (Class<? extends SosEvent> eventType : this.classCache.getClasses(event.getClass())) {
 				Set<SosEventListener> listenersForClass = this.listeners.get(eventType);
-				if (listenersForClass != null) { result.addAll(listenersForClass); }
+                
+				if (listenersForClass != null) {
+                    log.debug("Adding {} Listeners for event {} (eventType={})", listenersForClass.size(), event, eventType);
+                    result.addAll(listenersForClass);
+                } else {
+                    log.debug("Adding 0 Listeners for event {} (eventType={})", event, eventType);
+                }
+                
 			}
 		} finally {
 			this.lock.readLock().unlock();
@@ -117,7 +128,11 @@ public class SosEventBus {
 		}
 		EventHandler r;
 		while((r = this.queue.poll()) != null) {
-			this.executor.execute(r);
+            if (ASYNCHRONOUS_EXECUTION) {
+                this.executor.execute(r);
+            } else {
+                r.run();
+            }
 		}
 		if (!submittedEvent) {
 			log.info("No Listeners for SosEvent {}", event);
@@ -204,23 +219,10 @@ public class SosEventBus {
 		}
 
 		private Set<Class<? extends SosEvent>> flatten(Class<? extends SosEvent> eventClass) {
-			List<Class<? extends SosEvent>> classes = new LinkedList<Class<? extends SosEvent>>();
-			for (Class<?> c : eventClass.getClasses()) {
-				if (SosEvent.class.isAssignableFrom(c)) {
-					classes.add((Class<? extends SosEvent>) c);
-				}
-			}
-			for (Class<?> c : eventClass.getInterfaces()) {
-				if (SosEvent.class.isAssignableFrom(c)) {
-					classes.add((Class<? extends SosEvent>) c);
-				}
-			}
-			classes.add(eventClass);
-			return new HashSet<Class<? extends SosEvent>>(classes);
+			return ClassHelper.flattenPartialHierachy(SosEvent.class, eventClass);
 		}
-
 	}
-
+    
 	private class EventHandler implements Runnable {
 		private SosEvent event;
 		private SosEventListener listener;

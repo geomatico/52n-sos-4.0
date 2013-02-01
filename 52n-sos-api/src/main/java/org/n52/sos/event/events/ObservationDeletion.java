@@ -29,9 +29,11 @@ import org.n52.sos.response.AbstractServiceResponse;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class SosInsertionEvent<I extends AbstractServiceRequest, O extends AbstractServiceResponse> extends SosContentChangeEvent<I, O> {
+//XXX move this to the DeleteObservation extension
+public class ObservationDeletion extends SosDeletionEvent {
 
-    public SosInsertionEvent(I request, O response) {
+    public ObservationDeletion(AbstractServiceRequest request, AbstractServiceResponse response) {
         super(request, response);
     }
+    
 }

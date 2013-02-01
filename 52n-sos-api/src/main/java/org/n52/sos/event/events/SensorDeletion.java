@@ -23,15 +23,16 @@
  */
 package org.n52.sos.event.events;
 
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.response.AbstractServiceResponse;
+import org.n52.sos.request.DeleteSensorRequest;
+import org.n52.sos.response.DeleteSensorResponse;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class SosInsertionEvent<I extends AbstractServiceRequest, O extends AbstractServiceResponse> extends SosContentChangeEvent<I, O> {
+public class SensorDeletion extends SosDeletionEvent<DeleteSensorRequest, DeleteSensorResponse> {
 
-    public SosInsertionEvent(I request, O response) {
+    public SensorDeletion(DeleteSensorRequest request, DeleteSensorResponse response) {
         super(request, response);
     }
+    
 }

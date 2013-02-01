@@ -48,7 +48,7 @@ import org.n52.sos.ds.hibernate.util.HibernateUtilities;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.event.SosEventBus;
-import org.n52.sos.event.events.SosObservationInsertionEvent;
+import org.n52.sos.event.events.ObservationInsertion;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosMultiObservationValues;
 import org.n52.sos.ogc.om.SosObservation;
@@ -153,7 +153,6 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
                                 hFeature, sosObservation, session);
                     }
                 }
-                SosEventBus.getInstance().submit(new SosObservationInsertionEvent(sosObservation));
             }
             // if no observationConstellation is valid, throw exception
             if (exceptions.size() == request.getObservations().size()) {

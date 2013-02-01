@@ -33,6 +33,9 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IInsertResultDAO;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.event.SosEvent;
+import org.n52.sos.event.SosEventBus;
+import org.n52.sos.event.events.ResultInsertion;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -65,10 +68,10 @@ public class SosInsertResultOperatorV20 extends AbstractV2RequestOperator<IInser
     }
 
     @Override
-    public ServiceResponse receive(InsertResultRequest sosRequest) throws OwsExceptionReport {
-        checkRequestedParameter(sosRequest);
-        InsertResultResponse response = getDao().insertResult(sosRequest);
-        Configurator.getInstance().getCapabilitiesCacheController().updateAfterObservationInsertion();
+    public ServiceResponse receive(InsertResultRequest request) throws OwsExceptionReport {
+        checkRequestedParameter(request);
+        InsertResultResponse response = getDao().insertResult(request);
+        SosEventBus.fire(new ResultInsertion(request, response));
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {

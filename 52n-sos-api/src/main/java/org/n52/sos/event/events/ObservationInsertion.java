@@ -23,25 +23,15 @@
  */
 package org.n52.sos.event.events;
 
-import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.request.InsertObservationRequest;
+import org.n52.sos.response.InsertObservationResponse;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class SosObservationInsertionEvent implements SosInsertionEvent {
-	private SosObservation observation;
+public class ObservationInsertion extends SosInsertionEvent<InsertObservationRequest, InsertObservationResponse> {
 
-	public SosObservationInsertionEvent(SosObservation observation) {
-		this.observation = observation;
-	}
-
-	public SosObservation getObservation() {
-		return observation;
-	}
-
-	@Override
-	public String toString() {
-		return String.format("ObservationInsertionEvent[observation=%s]", getObservation());
-	}
-
+    public ObservationInsertion(InsertObservationRequest request, InsertObservationResponse response) {
+        super(request, response);
+    }
 }

@@ -59,4 +59,10 @@ public abstract class AbstractServiceCommunicationObject {
     public String getVersion() {
         return version;
     }
+    
+    @Override
+	public String toString() {
+		return String.format("%s[service=%s, verion=%s]",
+				getClass().getName(), getService(), getVersion());
+	}
 }

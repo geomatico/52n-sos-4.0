@@ -178,7 +178,7 @@ public class SosService extends ConfiguratedHttpServlet {
 
     private ServiceResponse handleOwsExceptionReport(OwsExceptionReport owsExceptionReport) throws ServletException {
         try {
-			SosEventBus.getInstance().submit(new OwsExceptionReportEvent(owsExceptionReport));
+			SosEventBus.fire(new OwsExceptionReportEvent(owsExceptionReport));
             EncoderKey key = new XmlEncoderKey(owsExceptionReport.getNamespace(), owsExceptionReport.getClass());
             IEncoder<?, OwsExceptionReport> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
             if (encoder != null) {

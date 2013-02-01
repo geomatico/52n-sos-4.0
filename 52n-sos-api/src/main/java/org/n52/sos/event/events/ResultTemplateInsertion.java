@@ -23,15 +23,18 @@
  */
 package org.n52.sos.event.events;
 
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.response.AbstractServiceResponse;
+import org.n52.sos.request.InsertResultRequest;
+import org.n52.sos.request.InsertResultTemplateRequest;
+import org.n52.sos.response.InsertResultTemplateResponse;
 
 /**
+ *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class SosInsertionEvent<I extends AbstractServiceRequest, O extends AbstractServiceResponse> extends SosContentChangeEvent<I, O> {
+public class ResultTemplateInsertion extends SosInsertionEvent<InsertResultTemplateRequest, InsertResultTemplateResponse> {
 
-    public SosInsertionEvent(I request, O response) {
+    public ResultTemplateInsertion(InsertResultTemplateRequest request, InsertResultTemplateResponse response) {
         super(request, response);
     }
+    
 }
