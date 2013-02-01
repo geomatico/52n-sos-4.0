@@ -72,6 +72,8 @@ public class HibernateConstants {
     public static final String PARAMETER_PHENOMENON_TIME_START = "phenomenonTimeStart";
 
     public static final String PARAMETER_PHENOMENON_TIME_END = "phenomenonTimeEnd";
+    
+    public static final String PARAMETER_RESULT_TIME = "resultTime";
 
     public static final String PARAMETER_OBSERVATION = "observation";
 
@@ -106,6 +108,18 @@ public class HibernateConstants {
     public static final String PARAMETER_OBSERVATION_ID = "observationId";
 
     public static final String PARAMETER_PROCEDURES = "procedures";
+    
+    public static final String PARAMETER_BOOLEAN_VALUES = "booleanValues";
+
+    public static final String PARAMETER_CATEGORY_VALUES = "categoryValues";
+
+    public static final String PARAMETER_COUNT_VALUES = "countValues";
+
+    public static final String PARAMETER_NUMERIC_VALUES = "numericValues";
+
+    public static final String PARAMETER_GEOMETRY_VALUES = "geometryValues";
+
+    public static final String PARAMETER_TEXT_VALUES = "textValues";
 
 	public static final String PARAMETER_SETTING_KEY = "key";
 
@@ -124,4 +138,7 @@ public class HibernateConstants {
     public static final String DIALECT_PROPERTY = "hibernate.dialect";
 
     public static final String CLAZZ = "clazz";
+
+
+
 }

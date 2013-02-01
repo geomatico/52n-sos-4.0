@@ -33,10 +33,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.ProjectionList;
@@ -76,7 +78,12 @@ import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.Sos1Constants;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
+import org.n52.sos.ogc.sos.SosConstants.GetObservationParams;
+import org.n52.sos.response.GetObservationResponse;
+import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
@@ -357,6 +364,10 @@ public class HibernateCriteriaQueryUtilities {
      */
     public static List<Observation> getObservations(HibernateQueryObject queryObject, Session session) {
         queryObject.addCriterion(getEqualRestriction(HibernateConstants.DELETED, false));
+        return (List<Observation>) getObjectList(queryObject, session, Observation.class);
+    }
+
+    public static List<Observation> getAllObservations(HibernateQueryObject queryObject, Session session) {
         return (List<Observation>) getObjectList(queryObject, session, Observation.class);
     }
 
@@ -1149,6 +1160,12 @@ public class HibernateCriteriaQueryUtilities {
         return (List<Offering>) getObjectList(new HibernateQueryObject(), session, Offering.class);
     }
 
+    public static Offering getOfferingForIdentifier(String offeringIdentifier, Session session) {
+        HibernateQueryObject queryObject = new HibernateQueryObject();
+        queryObject.addCriterion(getEqualRestriction(getIdentifierParameter(null), offeringIdentifier));
+        return (Offering) getObject(queryObject, session, Offering.class);
+    }
+
     public static List<ObservableProperty> getObservablePropertyObjects(Session session) {
         return (List<ObservableProperty>) getObjectList(new HibernateQueryObject(), session, ObservableProperty.class);
     }
@@ -1186,10 +1203,12 @@ public class HibernateCriteriaQueryUtilities {
     public static List<ResultTemplate> getResultTemplateObjectsForObservationConstellation(
             ObservationConstellation observationConstellation, Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
-        Map<String, String> aliases  = new HashMap<String, String>(1);
+        Map<String, String> aliases = new HashMap<String, String>(1);
         String obsConstOffObsTypAlias = addObservationConstellationOfferingObservationTypeAliasToMap(aliases, null);
-        queryObject.addCriterion(getEqualRestriction(getParameterWithPrefix(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION, obsConstOffObsTypAlias),
-                observationConstellation));
+        queryObject
+                .addCriterion(getEqualRestriction(
+                        getParameterWithPrefix(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION,
+                                obsConstOffObsTypAlias), observationConstellation));
         queryObject.setAliases(aliases);
         return (List<ResultTemplate>) getObjectList(queryObject, session, ResultTemplate.class);
     }
@@ -1258,9 +1277,9 @@ public class HibernateCriteriaQueryUtilities {
         return null;
     }
 
-    public static ObservationConstellationOfferingObservationType getObservationConstellationOfferingObservationType(
+    public static List<ObservationConstellationOfferingObservationType> getObservationConstellationOfferingObservationType(
             HibernateQueryObject queryObject, Session session) {
-        return (ObservationConstellationOfferingObservationType) getObject(queryObject, session,
+        return (List<ObservationConstellationOfferingObservationType>) getObjectList(queryObject, session,
                 ObservationConstellationOfferingObservationType.class);
     }
 

@@ -41,6 +41,7 @@ CREATE TABLE observation_constellation_offering_observation_type (
   observation_constellation_id INTEGER NULL,
   offering_id INTEGER NOT NULL,
   observation_type_id INTEGER NULL,
+  deleted BOOL NOT NULL DEFAULT false,
   UNIQUE (observation_constellation_id,offering_id,observation_type_id),
   PRIMARY KEY(observation_constellation_offering_observation_type_id)
 );

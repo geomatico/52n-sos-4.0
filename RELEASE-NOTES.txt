@@ -6,6 +6,27 @@ RELEASE NOTES
  SensorML instance document), and information about the sensor mounting platform 
  (SensorML as well).
 
+Changes since last release
+===========================
+
+--- New features ---
+
+   * Dynamic WSDL generation, query via http://[HOST]:[PORT]/[WEBAPP_NAME]/wsdl, e.g. http://localhost:8080/52n-sos-webapp-4.0.0-SNAPSHOT/wsdl
+   * InsertSensor: 
+       * for more than one offering
+       * again for another offering
+       * again for the same offering if the procedure was deleted before, observations inserted before deletion are not provided
+
+--- Changes ---
+
+  * Database model has changed: observation are not inserted twice if they relate to a different 
+        offering but same procedure, observedProperty and featureOfInterest
+
+--- Fixed bugs ---
+  
+   * Insert an observation again without an error.
+
+
  
 Release 52n-sos-webapp-4.0.0-Beta1
 ===================================
@@ -33,6 +54,7 @@ Release 52n-sos-webapp-4.0.0-Beta1
    * Simple installation of the 52North SOS: step by step installation
    * Administration GUI: change setting, clear database, add example data, change log levels
    * New TestClient
+
 
 --- Changes ---
 

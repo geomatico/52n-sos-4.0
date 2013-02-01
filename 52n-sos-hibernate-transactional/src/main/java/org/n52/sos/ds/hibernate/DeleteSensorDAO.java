@@ -71,6 +71,8 @@ public class DeleteSensorDAO extends AbstractHibernateOperationDao implements ID
             session = getSession();
             transaction = session.beginTransaction();
             HibernateCriteriaTransactionalUtilities.setDeleteSensorFlag(request.getProcedureIdentifier(), true, session);
+            HibernateCriteriaTransactionalUtilities.setValidProcedureDescriptionEndTime(request.getProcedureIdentifier(), session);
+            // TODO set all obs to deleted
             transaction.commit();
             response.setDeletedProcedure(request.getProcedureIdentifier());
         } catch (HibernateException he) {

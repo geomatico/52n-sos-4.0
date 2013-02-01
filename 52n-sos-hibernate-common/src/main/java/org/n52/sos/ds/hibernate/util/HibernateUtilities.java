@@ -23,18 +23,15 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
 import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.Observation;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
@@ -85,34 +82,36 @@ public class HibernateUtilities {
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias),
                 sosObservationConstellation.getProcedure().getProcedureIdentifier()));
         queryObject.setAliases(aliases);
-        ObservationConstellationOfferingObservationType obsConstsOffObsType = HibernateCriteriaQueryUtilities.getObservationConstellationOfferingObservationType(queryObject, session);
-        if (obsConstsOffObsType != null) {
-            if (obsConstsOffObsType.getObservationType() == null
-                    || (obsConstsOffObsType.getObservationType() != null && (obsConstsOffObsType.getObservationType().getObservationType()
-                            .equals("NOT_DEFINED") || obsConstsOffObsType.getObservationType().getObservationType().isEmpty()))) {
-                return HibernateCriteriaTransactionalUtilities.updateObservationConstellationOfferingObservationType(obsConstsOffObsType,
-                        sosObservationConstellation.getObservationType(), session);
-            } else {
-                if (obsConstsOffObsType.getObservationType().getObservationType()
-                        .equals(sosObservationConstellation.getObservationType())) {
-                    return obsConstsOffObsType;
+        List<ObservationConstellationOfferingObservationType> obsConstsOffObsTypes = HibernateCriteriaQueryUtilities.getObservationConstellationOfferingObservationType(queryObject, session);
+        if (obsConstsOffObsTypes != null && !obsConstsOffObsTypes.isEmpty()) {
+            for (ObservationConstellationOfferingObservationType obsConstsOffObsType : obsConstsOffObsTypes) {
+                if (obsConstsOffObsType.getObservationType() == null
+                        || (obsConstsOffObsType.getObservationType() != null && (obsConstsOffObsType.getObservationType().getObservationType()
+                                .equals("NOT_DEFINED") || obsConstsOffObsType.getObservationType().getObservationType().isEmpty()))) {
+                    return HibernateCriteriaTransactionalUtilities.updateObservationConstellationOfferingObservationType(obsConstsOffObsType,
+                            sosObservationConstellation.getObservationType(), session);
                 } else {
-                    StringBuilder exceptionText = new StringBuilder();
-                    exceptionText.append("The requested observationType (");
-                    exceptionText.append(sosObservationConstellation.getObservationType());
-                    exceptionText.append(") is invalid for ");
-                    exceptionText.append("procedure = ");
-                    exceptionText.append(sosObservationConstellation.getProcedure());
-                    exceptionText.append(", observedProperty = ");
-                    exceptionText.append(sosObservationConstellation.getObservableProperty().getIdentifier());
-                    exceptionText.append("and offering = ");
-                    exceptionText.append(sosObservationConstellation.getOfferings());
-                    exceptionText.append("!");
-                    exceptionText.append("The valid observationType is '");
-                    exceptionText.append(obsConstsOffObsType.getObservationType().getObservationType());
-                    exceptionText.append("'!");
-                    LOGGER.debug(exceptionText.toString());
-                    throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText.toString());
+                    if (obsConstsOffObsType.getObservationType().getObservationType()
+                            .equals(sosObservationConstellation.getObservationType())) {
+                        return obsConstsOffObsType;
+                    } else {
+                        StringBuilder exceptionText = new StringBuilder();
+                        exceptionText.append("The requested observationType (");
+                        exceptionText.append(sosObservationConstellation.getObservationType());
+                        exceptionText.append(") is invalid for ");
+                        exceptionText.append("procedure = ");
+                        exceptionText.append(sosObservationConstellation.getProcedure());
+                        exceptionText.append(", observedProperty = ");
+                        exceptionText.append(sosObservationConstellation.getObservableProperty().getIdentifier());
+                        exceptionText.append("and offering = ");
+                        exceptionText.append(sosObservationConstellation.getOfferings());
+                        exceptionText.append("!");
+                        exceptionText.append("The valid observationType is '");
+                        exceptionText.append(obsConstsOffObsType.getObservationType().getObservationType());
+                        exceptionText.append("'!");
+                        LOGGER.debug(exceptionText.toString());
+                        throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText.toString());
+                    }
                 }
             }
         } else {
@@ -130,6 +129,7 @@ public class HibernateUtilities {
             throw Util4Exceptions.createInvalidParameterValueException(
                     Sos2Constants.InsertObservationParams.observation.name(), exceptionText.toString());
         }
+        return null;
     }
 
     public static FeatureOfInterest checkOrInsertFeatureOfInterest(SosAbstractFeature featureOfInterest, Session session)

@@ -112,18 +112,19 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
             for (SosObservation sosObservation : request.getObservations()) {
                 SosObservationConstellation sosObsConst = sosObservation.getObservationConstellation();
-                Set<ObservationConstellationOfferingObservationType> hObsConstOffObsTypes = new HashSet<ObservationConstellationOfferingObservationType>(0);
+                Set<ObservationConstellationOfferingObservationType> hObsConstOffObsTypes =
+                        new HashSet<ObservationConstellationOfferingObservationType>(0);
                 FeatureOfInterest hFeature = null;
                 for (String offeringID : sosObsConst.getOfferings()) {
                     ObservationConstellationOfferingObservationType hObsConstOffObsType = null;
                     try {
                         hObsConstOffObsType =
-//                                HibernateUtilities.checkObservationConstellationForObservation(sosObsConst,
-//                                        offeringID, session,
-//                                        Sos2Constants.InsertObservationParams.observationType.name());
-                        HibernateUtilities.checkObservationConstellationOfferingObservationTypeForObservation(sosObsConst,
-                                offeringID, session,
-                                Sos2Constants.InsertObservationParams.observationType.name());
+                                // HibernateUtilities.checkObservationConstellationForObservation(sosObsConst,
+                                // offeringID, session,
+                                // Sos2Constants.InsertObservationParams.observationType.name());
+                                HibernateUtilities.checkObservationConstellationOfferingObservationTypeForObservation(
+                                        sosObsConst, offeringID, session,
+                                        Sos2Constants.InsertObservationParams.observationType.name());
                     } catch (OwsExceptionReport owse) {
                         exceptions.add(owse);
                     }
@@ -134,25 +135,26 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
                         HibernateUtilities.checkOrInsertFeatureOfInterestRelatedFeatureRelation(hFeature,
                                 hObsConstOffObsType.getOffering(), session);
                         if (isSweArrayObservation(hObsConstOffObsType)) {
-                            ResultTemplate resultTemplate = createResultTemplate(sosObservation, hObsConstOffObsType, hFeature);
+                            ResultTemplate resultTemplate =
+                                    createResultTemplate(sosObservation, hObsConstOffObsType, hFeature);
                             session.save(resultTemplate);
                             session.flush();
                         }
                         hObsConstOffObsTypes.add(hObsConstOffObsType);
                     }
                 }
-                        
-                 if (!hObsConstOffObsTypes.isEmpty()) { 
-                        if (sosObservation.getValue() instanceof SosSingleObservationValue) {
-                            HibernateCriteriaTransactionalUtilities.insertObservationSingleValue(hObsConstOffObsTypes, hFeature,
-                                    sosObservation, session);
-                        } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
-                            HibernateCriteriaTransactionalUtilities.insertObservationMutliValue(hObsConstOffObsTypes, hFeature,
-                                    sosObservation, session);
-                        }
+
+                if (!hObsConstOffObsTypes.isEmpty()) {
+                    if (sosObservation.getValue() instanceof SosSingleObservationValue) {
+                        HibernateCriteriaTransactionalUtilities.insertObservationSingleValue(hObsConstOffObsTypes,
+                                hFeature, sosObservation, session);
+                    } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
+                        HibernateCriteriaTransactionalUtilities.insertObservationMutliValue(hObsConstOffObsTypes,
+                                hFeature, sosObservation, session);
                     }
-				SosEventBus.getInstance().submit(new SosObservationInsertionEvent(sosObservation));
-        }
+                }
+                SosEventBus.getInstance().submit(new SosObservationInsertionEvent(sosObservation));
+            }
             // if no observationConstellation is valid, throw exception
             if (exceptions.size() == request.getObservations().size()) {
                 Util4Exceptions.mergeAndThrowExceptions(exceptions);
@@ -181,8 +183,9 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
                 .equalsIgnoreCase(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
     }
 
-    private ResultTemplate createResultTemplate(SosObservation observation, ObservationConstellationOfferingObservationType hObsConstOffObsType,
-            FeatureOfInterest feature) throws OwsExceptionReport {
+    private ResultTemplate createResultTemplate(SosObservation observation,
+            ObservationConstellationOfferingObservationType hObsConstOffObsType, FeatureOfInterest feature)
+            throws OwsExceptionReport {
         ResultTemplate resultTemplate = new ResultTemplate();
         // TODO identifier handling: ignoring code space now
         String identifier;
@@ -197,11 +200,10 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
         resultTemplate.setFeatureOfInterest(feature);
         SosSweDataArray dataArray = ((SweDataArrayValue) observation.getValue().getValue()).getValue();
 
-
-
         if (dataArray.getElementType().getXml() == null) {
             EncoderKey key = CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, dataArray.getElementType());
-            IEncoder<XmlObject, SosSweAbstractDataComponent> encoder = getConfigurator().getCodingRepository().getEncoder(key);
+            IEncoder<XmlObject, SosSweAbstractDataComponent> encoder =
+                    getConfigurator().getCodingRepository().getEncoder(key);
             if (encoder == null) {
                 String errorMsg = String.format("Could not find encoder for key \"%s\".", key.toString());
                 LOGGER.error(errorMsg);
@@ -220,7 +222,8 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
         }
         if (dataArray.getEncoding().getXml() == null) {
             EncoderKey key = CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, dataArray.getEncoding());
-            IEncoder<XmlObject, SosSweAbstractEncoding> encoder = getConfigurator().getCodingRepository().getEncoder(key);
+            IEncoder<XmlObject, SosSweAbstractEncoding> encoder =
+                    getConfigurator().getCodingRepository().getEncoder(key);
             if (encoder == null) {
                 String errorMsg = String.format("Could not find encoder for key \"%s\".", key.toString());
                 LOGGER.error(errorMsg);

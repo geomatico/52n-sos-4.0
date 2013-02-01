@@ -47,6 +47,7 @@ import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.JavaHelper;
@@ -176,7 +177,7 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
             if (samplingFeature.isSetIdentifier()) {
                 featureIdentifier = samplingFeature.getIdentifier().getValue();
             } else {
-                featureIdentifier = "generated_" + JavaHelper.generateID(samplingFeature.getXmlDescription());
+                featureIdentifier = SosConstants.GENERATED_IDENTIFIER_PREFIX + JavaHelper.generateID(samplingFeature.getXmlDescription());
                 samplingFeature.setIdentifier(new CodeWithAuthority(featureIdentifier));
             }
             HibernateFeatureCriteriaTransactionalUtilities.insertFeatureOfInterest(samplingFeature, session);

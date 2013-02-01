@@ -72,6 +72,7 @@ import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
@@ -130,14 +131,16 @@ public class HibernateObservationUtilities {
 
                 Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes =
                         hObservation.getObservationConstellationOfferingObservationTypes();
-                Iterator<ObservationConstellationOfferingObservationType> iterator = observationConstellationOfferingObservationTypes.iterator();
-                ObservationConstellationOfferingObservationType hObservationConstellationOfferingObservationType = null;
+                Iterator<ObservationConstellationOfferingObservationType> iterator =
+                        observationConstellationOfferingObservationTypes.iterator();
+                ObservationConstellationOfferingObservationType hObservationConstellationOfferingObservationType =
+                        null;
                 while (iterator.hasNext()) {
                     hObservationConstellationOfferingObservationType =
                             (ObservationConstellationOfferingObservationType) iterator.next();
                     break;
                 }
-                
+
                 ObservationConstellation hObservationConstellation = hObservation.getObservationConstellation();
                 FeatureOfInterest hFeatureOfInterest = hObservation.getFeatureOfInterest();
 
@@ -155,7 +158,8 @@ public class HibernateObservationUtilities {
                     procedures.put(procedureIdentifier, procedure);
                 }
 
-                String observationType = hObservationConstellationOfferingObservationType.getObservationType().getObservationType();
+                String observationType =
+                        hObservationConstellationOfferingObservationType.getObservationType().getObservationType();
 
                 // feature of interest
                 String foiID = hFeatureOfInterest.getIdentifier();
@@ -253,7 +257,7 @@ public class HibernateObservationUtilities {
                 SosObservation sosObservation =
                         createNewObservation(observationConstellations, hObservation, qualityList, value, obsConstHash);
                 if (hObservation.getSetId() != null && !hObservation.getSetId().isEmpty()) {
-                    sosObservation.setAntiSubsetting(hObservation.getSetId());
+                    sosObservation.setSetId(hObservation.getSetId());
                 }
                 observationCollection.add(sosObservation);
             }
@@ -315,7 +319,8 @@ public class HibernateObservationUtilities {
             ArrayList<SosQuality> qualityList, IValue value, int obsConstHash) {
         SosObservation sosObservation = new SosObservation();
         sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
-        if (hObservation.getIdentifier() != null && !hObservation.getIdentifier().isEmpty()) {
+        if (hObservation.getIdentifier() != null && !hObservation.getIdentifier().isEmpty()
+                && !hObservation.getIdentifier().startsWith(SosConstants.GENERATED_IDENTIFIER_PREFIX)) {
             sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
         }
         sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());

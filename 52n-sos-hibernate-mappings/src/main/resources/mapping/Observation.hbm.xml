@@ -17,10 +17,10 @@
             <column name="observation_constellation_id" not-null="true" />
         </many-to-one>
         <property name="identifier" type="string">
-            <column name="identifier" />
+            <column name="identifier" not-null="true" />
         </property>
         <property name="deleted" type="boolean">
-            <column name="deleted" not-null="true" />
+            <column name="deleted" not-null="true" default="true"/>
         </property>
         <property name="phenomenonTimeStart" type="timestamp">
             <column name="phenomenon_time_start" length="29" not-null="true" />

@@ -25,6 +25,7 @@ package org.n52.sos.request.operator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -34,7 +35,10 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IInsertSensorDAO;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sensorML.AbstractProcess;
+import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -45,18 +49,22 @@ import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
-import org.n52.sos.wsdl.WSDLOperation;
 import org.n52.sos.wsdl.WSDLConstants;
+import org.n52.sos.wsdl.WSDLOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInsertSensorDAO, InsertSensorRequest>  {
+public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInsertSensorDAO, InsertSensorRequest> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SosInsertSensorOperatorV20.class);
+
     private static final String OPERATION_NAME = Sos2Constants.Operations.InsertSensor.name();
-    private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(ConformanceClasses.SOS_V2_INSERTION_CAPABILITIES, ConformanceClasses.SOS_V2_SENSOR_INSERTION);
+
+    private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(
+            ConformanceClasses.SOS_V2_INSERTION_CAPABILITIES, ConformanceClasses.SOS_V2_SENSOR_INSERTION);
 
     public SosInsertSensorOperatorV20() {
         super(OPERATION_NAME, InsertSensorRequest.class);
@@ -68,6 +76,11 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInser
     }
 
     @Override
+    public WSDLOperation getSosOperationDefinition() {
+        return WSDLConstants.Operations.INSERT_SENSOR;
+    }
+
+    @Override
     public ServiceResponse receive(InsertSensorRequest sosRequest) throws OwsExceptionReport {
         checkRequestedParameter(sosRequest);
 
@@ -76,8 +89,9 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInser
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            IEncoder<?, InsertSensorResponse> encoder = Configurator.getInstance().getCodingRepository()
-                    .getEncoder(CodingHelper.getEncoderKey(SWEConstants.NS_SWES_20, response));
+            IEncoder<?, InsertSensorResponse> encoder =
+                    Configurator.getInstance().getCodingRepository()
+                            .getEncoder(CodingHelper.getEncoderKey(SWEConstants.NS_SWES_20, response));
             if (encoder != null) {
                 // TODO valid or validate (?) response object
                 Object encodedObject = encoder.encode(response);
@@ -125,6 +139,14 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInser
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
+        checkAndSetAssignedProcedureID(request);
+        checkAndSetAssignedOffering(request);
+        try {
+            checkProcedureAndOfferingCombination(request);
+        } catch (OwsExceptionReport owse) {
+            exceptions.add(owse);
+        }
+
         if (request.getMetadata() != null) {
             try {
                 checkObservationTypes(request.getMetadata().getObservationTypes());
@@ -187,17 +209,97 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInser
             List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             for (String observationType : observationTypes) {
                 try {
-                    SosHelper.checkObservationType(observationType, Sos2Constants.InsertSensorParams.observationType.name());
+                    SosHelper.checkObservationType(observationType,
+                            Sos2Constants.InsertSensorParams.observationType.name());
                 } catch (OwsExceptionReport e) {
-                   exceptions.add(e);
+                    exceptions.add(e);
                 }
             }
             Util4Exceptions.mergeAndThrowExceptions(exceptions);
         }
     }
-    
-    @Override
-    public WSDLOperation getSosOperationDefinition() {
-        return WSDLConstants.Operations.INSERT_SENSOR;
+
+    private void checkAndSetAssignedProcedureID(InsertSensorRequest request) {
+        String procedureIdentifier = null;
+        String procedurePrefix = Configurator.getInstance().getDefaultProcedurePrefix();
+        // if procedureDescription is SensorML
+        if (request.getProcedureDescription() instanceof SensorML) {
+            SensorML sensorML = (SensorML) request.getProcedureDescription();
+            // if SensorML is not a wrapper
+            if (!sensorML.isWrapper()) {
+                if (request.getProcedureDescription().getProcedureIdentifier() != null
+                        && !request.getProcedureDescription().getProcedureIdentifier().isEmpty()) {
+                    procedureIdentifier = request.getProcedureDescription().getProcedureIdentifier();
+                }
+            }
+            // if SensorML is a wrapper and member size is 1
+            else if (sensorML.isWrapper() && sensorML.getMembers().size() == 1) {
+                AbstractProcess process = sensorML.getMembers().get(0);
+                if (process.getProcedureIdentifier() != null && !process.getProcedureIdentifier().isEmpty()) {
+                    procedureIdentifier = process.getProcedureIdentifier();
+                }
+            } else {
+                procedureIdentifier =
+                        procedurePrefix + JavaHelper.generateID(sensorML.getSensorDescriptionXmlString());
+            }
+        }
+        // if procedureDescription not SensorML
+        else {
+            if (request.getProcedureDescription().getProcedureIdentifier() != null
+                    && !request.getProcedureDescription().getProcedureIdentifier().isEmpty()) {
+                procedureIdentifier = request.getProcedureDescription().getProcedureIdentifier();
+            } else {
+                procedureIdentifier =
+                        procedurePrefix + JavaHelper.generateID(request.getProcedureDescription().toString());
+            }
+        }
+        request.setAssignedProcedureIdentifier(procedureIdentifier);
+    }
+
+    private void checkAndSetAssignedOffering(InsertSensorRequest request) {
+        // if procedureDescription is SensorML
+        List<SosOffering> sosOfferings = null;
+        if (request.getProcedureDescription() instanceof SensorML) {
+            SensorML sensorML = (SensorML) request.getProcedureDescription();
+            // if SensorML is not a wrapper
+            if (!sensorML.isWrapper()) {
+                if (request.getProcedureDescription().getOfferingIdentifiers() != null) {
+                    sosOfferings = request.getProcedureDescription().getOfferingIdentifiers();
+                }
+            }
+            // if SensorML is a wrapper and member size is 1
+            else if (sensorML.isWrapper() && sensorML.getMembers().size() == 1) {
+                AbstractProcess process = sensorML.getMembers().get(0);
+                if (process.getOfferingIdentifiers() != null && !process.getOfferingIdentifiers().isEmpty()) {
+                    sosOfferings = process.getOfferingIdentifiers();
+                }
+            }
+        }
+        // if procedureDescription not SensorML
+        else {
+            if (request.getProcedureDescription().getOfferingIdentifiers() != null) {
+                sosOfferings = request.getProcedureDescription().getOfferingIdentifiers();
+            }
+        }
+        // check if offering is valid
+        if (sosOfferings == null || (sosOfferings != null && sosOfferings.isEmpty())) {
+            sosOfferings = new ArrayList<SosOffering>(0);
+            sosOfferings.add(new SosOffering(request.getAssignedProcedureIdentifier()));
+        }
+        request.setAssignedOfferings(sosOfferings);
+    }
+
+    private void checkProcedureAndOfferingCombination(InsertSensorRequest request) throws OwsExceptionReport {
+        for (SosOffering offering : request.getAssignedOfferings()) {
+            if (getCache().getOfferings().contains(offering.getOfferingIdentifier())) {
+                String message =
+                        String.format(
+                                "The offering with the identifier '%s' still exists in this service and it is not allowed to insert more than one procedure to an offering!",
+                                offering.getOfferingIdentifier());
+                LOGGER.debug(message);
+                throw Util4Exceptions.createInvalidParameterValueException(
+                        Sos2Constants.InsertSensorParams.offeringIdentifier.name(), message);
+            }
+        }
     }
 }

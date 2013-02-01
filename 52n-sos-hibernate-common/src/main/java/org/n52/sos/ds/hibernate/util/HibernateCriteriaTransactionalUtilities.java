@@ -24,13 +24,18 @@
 package org.n52.sos.ds.hibernate.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
@@ -73,8 +78,8 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class HibernateCriteriaTransactionalUtilities {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(HibernateCriteriaTransactionalUtilities.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateCriteriaTransactionalUtilities.class);
 
     public static synchronized void setDeleteSensorFlag(String identifier, boolean deleteFlag, Session session)
             throws OwsExceptionReport {
@@ -83,6 +88,8 @@ public class HibernateCriteriaTransactionalUtilities {
             procedure.setDeleted(deleteFlag);
             session.saveOrUpdate(procedure);
             session.flush();
+            setObservationConstellationOfferingObservationTypeAsDeletedForProcedure(identifier, session);
+            setObservationsAsDeletedForProcedure(identifier, session);
         } else {
             String exceptionText = "The requested identifier is not contained in database";
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
@@ -95,10 +102,11 @@ public class HibernateCriteriaTransactionalUtilities {
             result = new Procedure();
             result.setProcedureDescriptionFormat(pdf);
             result.setIdentifier(identifier);
-            result.setDeleted(false);
-            session.save(result);
-            session.flush();
         }
+        result.setDeleted(false);
+        session.saveOrUpdate(result);
+        session.flush();
+        session.refresh(result);
         return result;
     }
 
@@ -112,26 +120,38 @@ public class HibernateCriteriaTransactionalUtilities {
         session.flush();
     }
 
-    public static Offering insertOffering(String offeringIdentifier, String offeringName,
-            List<RelatedFeature> relatedFeatures, List<ObservationType> observationTypes, List<FeatureOfInterestType> featureOfInterestTypes, Session session) {
-        Offering offering = new Offering();
-        offering.setIdentifier(offeringIdentifier);
-        if (offeringName != null) {
-            offering.setName(offeringName);
-        } else {
-            offering.setName("Offering for the procedure " + offeringIdentifier);
+    public static Offering getAndUpdateOrNewInsertNewOffering(String offeringIdentifier, String offeringName,
+            List<RelatedFeature> relatedFeatures, List<ObservationType> observationTypes,
+            List<FeatureOfInterestType> featureOfInterestTypes, Session session) {
+
+        Offering offering = HibernateCriteriaQueryUtilities.getOfferingForIdentifier(offeringIdentifier, session);
+        if (offering == null) {
+            offering = new Offering();
+            offering.setIdentifier(offeringIdentifier);
+            if (offeringName != null) {
+                offering.setName(offeringName);
+            } else {
+                offering.setName("Offering for the procedure " + offeringIdentifier);
+            }
         }
         if (!relatedFeatures.isEmpty()) {
             offering.setRelatedFeatures(new HashSet<RelatedFeature>(relatedFeatures));
+        } else {
+            offering.setRelatedFeatures(new HashSet<RelatedFeature>(0));
         }
         if (!observationTypes.isEmpty()) {
             offering.setObservationTypes(new HashSet<ObservationType>(observationTypes));
+        } else {
+            offering.setObservationTypes(new HashSet<ObservationType>(0));
         }
         if (!featureOfInterestTypes.isEmpty()) {
             offering.setFeatureOfInterestTypes(new HashSet<FeatureOfInterestType>(featureOfInterestTypes));
+        } else {
+            offering.setFeatureOfInterestTypes(new HashSet<FeatureOfInterestType>(0));
         }
         session.saveOrUpdate(offering);
         session.flush();
+        session.refresh(offering);
         return offering;
     }
 
@@ -192,10 +212,12 @@ public class HibernateCriteriaTransactionalUtilities {
                 obsProp.setIdentifier(sosObsProp.getIdentifier());
                 obsProp.setDescription(sosObsProp.getDescription());
                 session.save(obsProp);
+                session.flush();
+                session.refresh(obsProp);
                 obsProps.add(obsProp);
             }
         }
-        session.flush();
+
         return obsProps;
     }
 
@@ -206,15 +228,20 @@ public class HibernateCriteriaTransactionalUtilities {
             result.setUnit(unit);
             session.save(result);
             session.flush();
+            session.refresh(result);
         }
         return result;
     }
 
-    public static ObservationConstellation checkOrInsertObservationConstellation(Procedure proc, ObservableProperty obsProp, Session session) {
+    public static ObservationConstellation checkOrInsertObservationConstellation(Procedure proc,
+            ObservableProperty obsProp, Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateConstants.PARAMETER_PROCEDURE, proc));
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateConstants.PARAMETER_OBSERVABLE_PROPERTY, obsProp));
-        ObservationConstellation obsConst = HibernateCriteriaQueryUtilities.getObservationConstellation(queryObject, session);
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
+                HibernateConstants.PARAMETER_PROCEDURE, proc));
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
+                HibernateConstants.PARAMETER_OBSERVABLE_PROPERTY, obsProp));
+        ObservationConstellation obsConst =
+                HibernateCriteriaQueryUtilities.getObservationConstellation(queryObject, session);
         if (obsConst == null) {
             obsConst = new ObservationConstellation();
             obsConst.setObservableProperty(obsProp);
@@ -222,23 +249,34 @@ public class HibernateCriteriaTransactionalUtilities {
             session.save(obsConst);
             session.flush();
             session.refresh(obsConst);
-           
         }
         return obsConst;
     }
 
-    public static ObservationConstellationOfferingObservationType checkOrInsertObservationConstellationOfferingObservationType(ObservationConstellation obsConst,
-           Offering offering, Session session) {
+    public static ObservationConstellationOfferingObservationType checkOrInsertObservationConstellationOfferingObservationType(
+            ObservationConstellation obsConst, Offering offering, Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION, obsConst));
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateConstants.PARAMETER_OFFERING, offering));
-        ObservationConstellationOfferingObservationType obsConstOffObsType = HibernateCriteriaQueryUtilities.getObservationConstellationOfferingObservationType(queryObject, session);
-        if (obsConstOffObsType == null) {
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
+                HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION, obsConst));
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
+                HibernateConstants.PARAMETER_OFFERING, offering));
+        List<ObservationConstellationOfferingObservationType> obsConstOffObsTypes =
+                HibernateCriteriaQueryUtilities.getObservationConstellationOfferingObservationType(queryObject,
+                        session);
+        ObservationConstellationOfferingObservationType obsConstOffObsType = null;
+        if (obsConstOffObsTypes == null || (obsConstOffObsTypes != null && obsConstOffObsTypes.isEmpty())) {
             obsConstOffObsType = new ObservationConstellationOfferingObservationType();
             obsConstOffObsType.setObservationConstellation(obsConst);
             obsConstOffObsType.setOffering(offering);
+            obsConstOffObsType.setDeleted(false);
             session.save(obsConstOffObsType);
             session.flush();
+            return obsConstOffObsType;
+        } else {
+            for (ObservationConstellationOfferingObservationType type : obsConstOffObsTypes) {
+                obsConstOffObsType = type;
+                break;
+            }
         }
         return obsConstOffObsType;
     }
@@ -247,8 +285,8 @@ public class HibernateCriteriaTransactionalUtilities {
         session.saveOrUpdate(validProcedureTime);
     }
 
-    public static ObservationConstellationOfferingObservationType updateObservationConstellationOfferingObservationType(ObservationConstellationOfferingObservationType obsConstOffObsType,
-            String observationType, Session session) {
+    public static ObservationConstellationOfferingObservationType updateObservationConstellationOfferingObservationType(
+            ObservationConstellationOfferingObservationType obsConstOffObsType, String observationType, Session session) {
         ObservationType obsType = HibernateCriteriaQueryUtilities.getObservationTypeObject(observationType, session);
         obsConstOffObsType.setObservationType(obsType);
         session.saveOrUpdate(obsConstOffObsType);
@@ -353,12 +391,6 @@ public class HibernateCriteriaTransactionalUtilities {
         return values;
     }
 
-    public static Observation insertObservation(Observation observation, Session session) {
-        session.save(observation);
-        session.flush();
-        return observation;
-    }
-
     public static void insertFeatureOfInterestTypes(Set<String> featureTypes, Session session) {
         for (String featureType : featureTypes) {
             FeatureOfInterestType featureOfInterestType =
@@ -393,7 +425,7 @@ public class HibernateCriteriaTransactionalUtilities {
                 procedureDescriptionFormat = new ProcedureDescriptionFormat();
                 procedureDescriptionFormat.setProcedureDescriptionFormat(procDescFormat);
                 session.save(procedureDescriptionFormat);
-                
+
             }
         }
         session.flush();
@@ -410,8 +442,8 @@ public class HibernateCriteriaTransactionalUtilities {
     }
 
     public static void checkOrInsertResultTemplate(InsertResultTemplateRequest request,
-            ObservationConstellationOfferingObservationType obsConstOffObsType, FeatureOfInterest featureOfInterest, Session session)
-            throws OwsExceptionReport {
+            ObservationConstellationOfferingObservationType obsConstOffObsType, FeatureOfInterest featureOfInterest,
+            Session session) throws OwsExceptionReport {
         ObservationConstellation observationConstellation = obsConstOffObsType.getObservationConstellation();
         List<ResultTemplate> resultTemplates =
                 HibernateCriteriaQueryUtilities.getResultTemplateObject(obsConstOffObsType.getOffering()
@@ -425,14 +457,15 @@ public class HibernateCriteriaTransactionalUtilities {
                 storedIdentifiers.add(storedResultTemplate.getIdentifier());
                 SosResultStructure storedStructure = new SosResultStructure(storedResultTemplate.getResultStructure());
                 SosResultStructure newStructure = new SosResultStructure(request.getResultStructure().getXml());
-                
+
                 if (!storedStructure.equals(newStructure)) {
-                    String exceptionText = String.format(
-                                    "The requested resultStructure is different from already inserted result template " +
-                                    "for procedure (%s) observedProperty (%s) and offering (%s)!",
-                                    observationConstellation.getProcedure().getIdentifier(),
-                                    observationConstellation.getObservableProperty().getIdentifier(),
-                                    obsConstOffObsType.getOffering().getIdentifier());
+                    String exceptionText =
+                            String.format(
+                                    "The requested resultStructure is different from already inserted result template "
+                                            + "for procedure (%s) observedProperty (%s) and offering (%s)!",
+                                    observationConstellation.getProcedure().getIdentifier(), observationConstellation
+                                            .getObservableProperty().getIdentifier(), obsConstOffObsType.getOffering()
+                                            .getIdentifier());
                     LOGGER.error(exceptionText);
                     throw Util4Exceptions.createInvalidParameterValueException(
                             Sos2Constants.InsertResultTemplateParams.proposedTemplate.name(), exceptionText);
@@ -440,12 +473,13 @@ public class HibernateCriteriaTransactionalUtilities {
                 SosResultEncoding storedEncoding = new SosResultEncoding(storedResultTemplate.getResultEncoding());
                 SosResultEncoding newEndoding = new SosResultEncoding(request.getResultEncoding().getXml());
                 if (!storedEncoding.equals(newEndoding)) {
-                    String exceptionText = String.format(
-                                    "The requested resultEncoding is different from already inserted result template " +
-                                    "for procedure (%s) observedProperty (%s) and offering (%s)!",
-                                    observationConstellation.getProcedure().getIdentifier(),
-                                    observationConstellation.getObservableProperty().getIdentifier(),
-                                    obsConstOffObsType.getOffering().getIdentifier());
+                    String exceptionText =
+                            String.format(
+                                    "The requested resultEncoding is different from already inserted result template "
+                                            + "for procedure (%s) observedProperty (%s) and offering (%s)!",
+                                    observationConstellation.getProcedure().getIdentifier(), observationConstellation
+                                            .getObservableProperty().getIdentifier(), obsConstOffObsType.getOffering()
+                                            .getIdentifier());
                     LOGGER.error(exceptionText);
                     throw Util4Exceptions.createInvalidParameterValueException(
                             Sos2Constants.InsertResultTemplateParams.proposedTemplate.name(), exceptionText);
@@ -458,13 +492,13 @@ public class HibernateCriteriaTransactionalUtilities {
         }
     }
 
-	private static boolean resultTemplateListContainsElements(List<ResultTemplate> resultTemplates)
-	{
-		return resultTemplates != null && !resultTemplates.isEmpty();
-	}
+    private static boolean resultTemplateListContainsElements(List<ResultTemplate> resultTemplates) {
+        return resultTemplates != null && !resultTemplates.isEmpty();
+    }
 
     private static void createAndSaveResultTemplate(InsertResultTemplateRequest request,
-            ObservationConstellationOfferingObservationType obsConstOffObsType, FeatureOfInterest featureOfInterest, Session session) {
+            ObservationConstellationOfferingObservationType obsConstOffObsType, FeatureOfInterest featureOfInterest,
+            Session session) {
         ResultTemplate resultTemplate = new ResultTemplate();
         resultTemplate.setIdentifier(request.getIdentifier());
         resultTemplate.setObservationConstellationOfferingObservationType(obsConstOffObsType);
@@ -475,18 +509,15 @@ public class HibernateCriteriaTransactionalUtilities {
         session.flush();
     }
 
-    public static void insertObservationSingleValue(Set<ObservationConstellationOfferingObservationType> hObsConstOffObsTypes,
-            FeatureOfInterest feature,
-            SosObservation observation,
-            Session session) {
-            insertObservationSingleValueWithSetId(hObsConstOffObsTypes, feature, observation, null, session);
+    public static void insertObservationSingleValue(
+            Set<ObservationConstellationOfferingObservationType> hObsConstOffObsTypes, FeatureOfInterest feature,
+            SosObservation observation, Session session) {
+        insertObservationSingleValueWithSetId(hObsConstOffObsTypes, feature, observation, null, session);
     }
-    
-    private static void insertObservationSingleValueWithSetId(Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes,
-            FeatureOfInterest feature,
-            SosObservation sosObservation,
-            String setId,
-            Session session) {
+
+    private static void insertObservationSingleValueWithSetId(
+            Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes,
+            FeatureOfInterest feature, SosObservation sosObservation, String setId, Session session) {
         SosSingleObservationValue<?> value = (SosSingleObservationValue) sosObservation.getValue();
         Observation hObservation = new Observation();
         hObservation.setDeleted(false);
@@ -496,69 +527,119 @@ public class HibernateCriteriaTransactionalUtilities {
         if (setId != null && !setId.isEmpty()) {
             hObservation.setSetId(setId);
         }
-        Iterator<ObservationConstellationOfferingObservationType> iterator = observationConstellationOfferingObservationTypes.iterator();
+        Iterator<ObservationConstellationOfferingObservationType> iterator =
+                observationConstellationOfferingObservationTypes.iterator();
         while (iterator.hasNext()) {
             ObservationConstellationOfferingObservationType observationConstellationOfferingObservationType =
                     (ObservationConstellationOfferingObservationType) iterator.next();
-            hObservation.setObservationConstellation(observationConstellationOfferingObservationType.getObservationConstellation());
+            hObservation.setObservationConstellation(observationConstellationOfferingObservationType
+                    .getObservationConstellation());
             break;
         }
         hObservation.setFeatureOfInterest(feature);
-        HibernateUtilities.addPhenomeonTimeAndResultTimeToObservation(hObservation, sosObservation.getPhenomenonTime(),
-                sosObservation.getResultTime());
+        HibernateUtilities.addPhenomeonTimeAndResultTimeToObservation(hObservation,
+                sosObservation.getPhenomenonTime(), sosObservation.getResultTime());
         HibernateUtilities.addValueToObservation(hObservation, value.getValue(), session);
         if (value.getValue().getUnit() != null) {
             hObservation.setUnit(HibernateCriteriaTransactionalUtilities.getOrInsertUnit(value.getValue().getUnit(),
                     session));
         }
-        hObservation.setObservationConstellationOfferingObservationTypes(observationConstellationOfferingObservationTypes);
-        HibernateCriteriaTransactionalUtilities.insertObservation(hObservation, session);
+        
+        // TODO if this observation is a deleted=true, how to set deleted=false instead of insert
+        hObservation
+                .setObservationConstellationOfferingObservationTypes(observationConstellationOfferingObservationTypes);
+        session.saveOrUpdate(hObservation);
+        session.flush();
     }
 
-    // TODO setID not yet tested - request observations of subset by id is working
-    public static void insertObservationMutliValue(Set<ObservationConstellationOfferingObservationType> hObsConstOffObsTypes,
-            FeatureOfInterest feature,
-            SosObservation containerObservation,
-            Session session) throws OwsExceptionReport {
-        List<SosObservation> unfoldObservations = HibernateObservationUtilities.unfoldObservation(containerObservation);
+    // TODO setID not yet tested - request observations of subset by id is
+    // working
+    public static void insertObservationMutliValue(
+            Set<ObservationConstellationOfferingObservationType> hObsConstOffObsTypes, FeatureOfInterest feature,
+            SosObservation containerObservation, Session session) throws OwsExceptionReport {
+        List<SosObservation> unfoldObservations =
+                HibernateObservationUtilities.unfoldObservation(containerObservation);
         int subObservationIndex = 0;
         String setId = getSetId(containerObservation);
         for (SosObservation sosObservation : unfoldObservations) {
-            String idExtension = subObservationIndex+"";
+            String idExtension = subObservationIndex + "";
             setIdentifier(containerObservation, sosObservation, setId, idExtension);
             insertObservationSingleValueWithSetId(hObsConstOffObsTypes, feature, sosObservation, setId, session);
             subObservationIndex++;
         }
     }
 
-    private static void setIdentifier(SosObservation containerObservation,
-            SosObservation sosObservation,
-            String antiSubsettingId,
-            String idExtension)
-    {
+    private static void setIdentifier(SosObservation containerObservation, SosObservation sosObservation,
+            String antiSubsettingId, String idExtension) {
         if (containerObservation.getIdentifier() != null && containerObservation.getIdentifier().isSetValue()) {
-            String subObservationIdentifier = String.format("%s-%s", antiSubsettingId, idExtension); 
+            String subObservationIdentifier = String.format("%s-%s", antiSubsettingId, idExtension);
             CodeWithAuthority subObsIdentifier = new CodeWithAuthority(subObservationIdentifier);
             subObsIdentifier.setCodeSpace(containerObservation.getIdentifier().getCodeSpace());
-            sosObservation.setIdentifier(subObsIdentifier);    
+            sosObservation.setIdentifier(subObsIdentifier);
         }
     }
 
-    private static String getSetId(SosObservation containerObservation)
-    {
+    private static String getSetId(SosObservation containerObservation) {
         String antiSubsettingId = null;
         if (containerObservation.getIdentifier() != null) {
             antiSubsettingId = containerObservation.getIdentifier().getValue();
         }
-        
+
         if (antiSubsettingId == null || antiSubsettingId.isEmpty()) {
-            // if identifier of sweArrayObservation is not set, generate UUID for antisubsetting column
+            // if identifier of sweArrayObservation is not set, generate UUID
+            // for antisubsetting column
             antiSubsettingId = UUID.randomUUID().toString();
         }
         return antiSubsettingId;
     }
 
     private HibernateCriteriaTransactionalUtilities() {
+    }
+
+    public static void setValidProcedureDescriptionEndTime(String procedureIdentifier, Session session) {
+        Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(procedureIdentifier, session);
+        Set<ValidProcedureTime> validProcedureTimes = procedure.getValidProcedureTimes();
+        for (ValidProcedureTime validProcedureTime : validProcedureTimes) {
+            if (validProcedureTime.getEndTime() == null) {
+                validProcedureTime.setEndTime(new DateTime().toDate());
+                HibernateCriteriaTransactionalUtilities.updateValidProcedureTime(validProcedureTime, session);
+            }
+        }
+    }
+
+    private static void setObservationConstellationOfferingObservationTypeAsDeletedForProcedure(
+            String procedureIdentifier, Session session) {
+        HibernateQueryObject queryObject = new HibernateQueryObject();
+        Map<String, String> aliases = new HashMap<String, String>(0);
+        String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
+        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, obsConstAlias);
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
+                HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), procedureIdentifier));
+        queryObject.setAliases(aliases);
+        List<ObservationConstellationOfferingObservationType> obsConstOffObsTypes =
+                HibernateCriteriaQueryUtilities.getObservationConstellationOfferingObservationType(queryObject,
+                        session);
+        for (ObservationConstellationOfferingObservationType obsConstOffObsType : obsConstOffObsTypes) {
+            obsConstOffObsType.setDeleted(true);
+            session.saveOrUpdate(obsConstOffObsType);
+            session.flush();
+        }
+    }
+
+    private static void setObservationsAsDeletedForProcedure(String procedureIdentifier, Session session) {
+        HibernateQueryObject queryObject = new HibernateQueryObject();
+        Map<String, String> aliases = new HashMap<String, String>(0);
+        String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
+        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, obsConstAlias);
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
+                HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), procedureIdentifier));
+        queryObject.setAliases(aliases);
+        List<Observation> observations = HibernateCriteriaQueryUtilities.getObservations(queryObject, session);
+        for (Observation observation : observations) {
+            observation.setDeleted(true);
+            session.saveOrUpdate(observation);
+            session.flush();
+        }
     }
 
 }

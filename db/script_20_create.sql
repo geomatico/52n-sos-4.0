@@ -376,6 +376,7 @@ CREATE TABLE observation_constellation_offering_observation_type (
   observation_constellation_id INTEGER NULL,
   offering_id INTEGER NOT NULL,
   observation_type_id INTEGER NULL,
+  deleted BOOL NOT NULL DEFAULT false,
   UNIQUE (observation_constellation_id,offering_id,observation_type_id),
   PRIMARY KEY(observation_constellation_offering_observation_type_id)
 );
@@ -410,7 +411,8 @@ CREATE TABLE observation (
   unit_id INTEGER NULL,
   set_id TEXT NULL,
   deleted BOOL NOT NULL DEFAULT false,
-  UNIQUE (feature_of_interest_id,observation_constellation_id,phenomenon_time_start,phenomenon_time_end,result_time,identifier),
+  UNIQUE (feature_of_interest_id,observation_constellation_id,phenomenon_time_start,phenomenon_time_end,result_time),
+  UNIQUE (identifier),
   PRIMARY KEY(observation_id)
   );
   

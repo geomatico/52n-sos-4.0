@@ -17,7 +17,7 @@
             <column name="identifier" not-null="true" unique="true" />
         </property>
         <property name="deleted" type="boolean">
-            <column name="deleted" not-null="true" />
+            <column name="deleted" not-null="true" default="true"/>
         </property>
         <set name="validProcedureTimes" table="valid_procedure_time" inverse="true" lazy="true" fetch="select">
             <key>
