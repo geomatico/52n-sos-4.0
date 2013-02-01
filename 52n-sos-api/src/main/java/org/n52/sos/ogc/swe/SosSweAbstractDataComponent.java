@@ -27,10 +27,18 @@ public abstract class SosSweAbstractDataComponent {
     
     private String definition;
     
+    /**
+     * optional: swe:description[0..1]
+     */
     private String description;
     
     /**
-     * optional: swe:identifier
+     * optional: swe:label [0..1]
+     */
+    private String label;
+    
+    /**
+     * optional: swe:identifier [0..1]
      */
     private String identifier;
 
@@ -46,6 +54,10 @@ public abstract class SosSweAbstractDataComponent {
     public String getDescription() {
         return description;
     }
+    
+    public String getLabel() {
+        return label;
+    }
 
     public String getIdentifier() {
         return identifier;
@@ -57,6 +69,10 @@ public abstract class SosSweAbstractDataComponent {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+    
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public void setIdentifier(String identifier) {
@@ -77,6 +93,10 @@ public abstract class SosSweAbstractDataComponent {
     
     public boolean isSetDescription() {
         return description != null && !description.isEmpty();
+    }
+    
+    public boolean isSetLabel() {
+        return label != null && !label.isEmpty();
     }
     
     public boolean isSetIdentifier() {
