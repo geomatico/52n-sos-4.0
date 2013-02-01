@@ -23,17 +23,12 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import static org.n52.sos.ds.hibernate.SosCacheFeederDAO.CacheCreationStrategy.*;
-
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.n52.sos.cache.CacheImpl;
 import org.n52.sos.cache.CapabilitiesCache;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.test.AbstractSosTestCase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
@@ -42,8 +37,6 @@ import org.slf4j.LoggerFactory;
 public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 	
 	/* FIXTURES */
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(SosCacheFeederDAOTest.class);
 	private static SosCacheFeederDAO instance;
 	
 	@BeforeClass
@@ -60,10 +53,10 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 		assertNotNull("instance returned by constructor", instance);
 	}
 	
-	@Test @Ignore public void 
+	@Test public void 
 	updateCacheFillsCapabilitiesCache() 
 			throws OwsExceptionReport {
-		CapabilitiesCache cache = initCache();
+		CapabilitiesCache cache = new CacheImpl();
 		instance.updateCache(cache);
 		testCacheResult(cache);
 	}
@@ -72,92 +65,6 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 	updateNullThrowsOwsExceptionReport() 
 			throws OwsExceptionReport {
 		instance.updateCache(null);
-	}
-	
-	@Test @Ignore public void 
-	updateCacheWithStrategyNullFillsCapabilitiesCache()
-			throws OwsExceptionReport {
-		CapabilitiesCache cache = initCache();
-		instance.updateCache(cache, null);
-		testCacheResult(cache);
-	}
-	
-	@Test public void
-	updateCacheWithStrategySingleThreadFillsCapabilitiesCache()
-	throws OwsExceptionReport {
-		CapabilitiesCache cache = initCache();
-		instance.updateCache(cache, SINGLE_THREAD);
-		testCacheResult(cache);
-	}
-	
-	@Test @Ignore public void 
-	updateCacheUsingComplexDBQueriesFillsCapabilitiesCache()
-			throws OwsExceptionReport {
-		CapabilitiesCache cache = initCache();
-		instance.updateCache(cache, COMPLEX_DB_QUERIES);
-		testCacheResult(cache);
-	}
-	
-	@Test @Ignore public void 
-	updateCacheUsingMultiThreadingFillsCapabilitiesCache()
-			throws OwsExceptionReport {
-		CapabilitiesCache cache = initCache();
-		instance.updateCache(cache, MULTI_THREAD);
-		testCacheResult(cache);
-	}
-	
-	@Test @Ignore public void 
-	strategyMultiEqualsSingle() 
-			throws OwsExceptionReport {
-		CapabilitiesCache cacheSingleThread = new CacheImpl(),
-				cacheMultithread = new CacheImpl();
-		instance.updateCache(cacheSingleThread, SINGLE_THREAD);
-		instance.updateCache(cacheMultithread, MULTI_THREAD);
-		assertEquals("single != multi threaded",cacheSingleThread, cacheMultithread);
-	}
-	
-	@Test @Ignore public void 
-	strategyComplexDBQueriesEqualsSingle()
-			throws OwsExceptionReport {
-		CapabilitiesCache cacheSingleThread = new CacheImpl(),
-				cacheComplexDBQueries = new CacheImpl();
-		instance.updateCache(cacheSingleThread, SINGLE_THREAD);
-		instance.updateCache(cacheComplexDBQueries, COMPLEX_DB_QUERIES);
-		assertEquals("single != complex db queries",cacheSingleThread, cacheComplexDBQueries);
-	}
-	
-	@Test @Ignore public void 
-	strategyMultiEqualsComplexDBQueries()
-			throws OwsExceptionReport {
-		CapabilitiesCache cacheComplexDBQueries = new CacheImpl(),
-				cacheMultithread = new CacheImpl();
-		instance.updateCache(cacheComplexDBQueries, COMPLEX_DB_QUERIES);
-		instance.updateCache(cacheMultithread, MULTI_THREAD);
-		assertEquals("multi threaded != complex db queries",cacheMultithread,cacheComplexDBQueries);
-	}
-	
-	@Test @Ignore ("runtime test") public void 
-	runTimeComparisonBetweenSingleAndMultiThread()
-			throws OwsExceptionReport {
-		int times = 10;
-		long[] singleThreadTimes = new long[10], multiThreadTimes = new long[10];
-		for (int i = 0; i < times; i++) {
-			long singleThreadStart, multiThreadStart, singleThreadEnd, multiThreadEnd;
-			singleThreadStart = System.currentTimeMillis();
-			CapabilitiesCache cache = initCache();
-			instance.updateCache(cache, SINGLE_THREAD);
-			singleThreadEnd = System.currentTimeMillis();
-			cache = new CacheImpl();
-			multiThreadStart = System.currentTimeMillis();
-			instance.updateCache(cache, MULTI_THREAD);
-			multiThreadEnd = System.currentTimeMillis();
-			long singleThreadTime = singleThreadEnd - singleThreadStart, multiThreadTime = multiThreadEnd - multiThreadStart;
-			singleThreadTimes[i] = singleThreadTime;
-			multiThreadTimes[i] = multiThreadTime;
-			assertTrue(String.format("single thread is faster? single thread: %sms; multi thread: %sms",singleThreadTime,multiThreadTime), multiThreadTime < singleThreadTime);
-			LOGGER.debug("single thread is faster?\n\t\tsingle thread: {}ms\n\t\tmulti thread: {}ms",singleThreadTime,multiThreadTime);
-		}
-		LOGGER.debug("Average time results of {} runs:\n\t\tsingleThread: {}ms\n\t\tmulti thread: {}ms",times,average(singleThreadTimes),average(multiThreadTimes));
 	}
 	
 	/* HELPER */
@@ -178,17 +85,4 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 		assertNotNull("result templates is null",cache.getResultTemplates());
 	}
 	
-	private CapabilitiesCache initCache()
-	{
-		return new CacheImpl();
-	}
-
-	private long average(long[] singleThreadTimes)
-	{
-		long sum = 0;
-		for (long l : singleThreadTimes) {
-			sum += l;
-		}
-		return sum / singleThreadTimes.length;
-	}
 }
