@@ -60,10 +60,7 @@ public class HibernateFeatureCriteriaTransactionalUtilities {
             if (samplingFeature.getSampledFeatures() != null && !samplingFeature.getSampledFeatures().isEmpty()) {
                 // TODO: create relationship
             }
-            Long id = (Long) session.save(feature);
-            session.flush();
-            feature.setFeatureOfInterestId(id);
-            session.update(feature);
+            session.save(feature);
             session.flush();
         }
     }
