@@ -28,6 +28,18 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-hibernate-mappings</artifactId>
 			<scope>test</scope>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>52n-sos-admin</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>52n-sos-cache</artifactId>
+			<scope>test</scope>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -112,6 +124,11 @@
 		<dependency>
 			<groupId>org.n52.sensorweb.sos</groupId>
 			<artifactId>52n-sos-cache</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.n52.sensorweb.sos</groupId>
+			<artifactId>52n-sos-hibernate-mappings</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>
