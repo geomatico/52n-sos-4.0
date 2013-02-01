@@ -122,5 +122,14 @@ public class HibernateQueryObject {
         copy.setOrder(this.order);
         return copy;
     }
+
+	@Override
+	public String toString()
+	{
+		return String.format("HibernateQueryObject [aliases=%s, criterions=%s, projections=%s, order=%s, maxResult=%s]", 
+				aliases, criterions, projections, order, maxResult);
+	}
+    
+    
     
 }
