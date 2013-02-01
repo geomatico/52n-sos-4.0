@@ -57,13 +57,13 @@ public class GetObservationResponse extends AbstractServiceResponse {
         Map<String, SosObservation> antiSubsettingObservations = new HashMap<String, SosObservation>(0);
         for (SosObservation sosObservation : observationCollection) {
             // TODO merge observations with the same antiSubsetting identifier.
-            if (sosObservation.isSetAntiSubsetting()) {
-                if (antiSubsettingObservations.containsKey(sosObservation.getAntiSubsetting())) {
+            if (sosObservation.isSetSetId()) {
+                if (antiSubsettingObservations.containsKey(sosObservation.getSetId())) {
                     SosObservation antiSubsettingObservation =
-                            antiSubsettingObservations.get(sosObservation.getAntiSubsetting());
+                            antiSubsettingObservations.get(sosObservation.getSetId());
                     antiSubsettingObservation.mergeWithObservation(sosObservation);
                 } else {
-                    antiSubsettingObservations.put(sosObservation.getAntiSubsetting(), sosObservation);
+                    antiSubsettingObservations.put(sosObservation.getSetId(), sosObservation);
                 }
             } else {
                 mergedObservations.add(sosObservation);
