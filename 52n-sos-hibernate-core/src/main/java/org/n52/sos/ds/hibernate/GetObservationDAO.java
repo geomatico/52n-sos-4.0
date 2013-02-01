@@ -240,7 +240,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
 
         observationConstellationQueryObject.setAliases(observationConstellationAliases);
         List<ObservationConstellation> observationConstallations =
-                HibernateCriteriaQueryUtilities.getObservationConstallations(observationConstellationQueryObject,
+                HibernateCriteriaQueryUtilities.getObservationConstellations(observationConstellationQueryObject,
                         session);
 
         // feature identifier
