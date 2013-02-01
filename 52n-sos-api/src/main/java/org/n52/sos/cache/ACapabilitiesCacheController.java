@@ -155,6 +155,7 @@ public abstract class ACapabilitiesCacheController {
      * @throws OwsExceptionReport
      *             if refreshing failed
      */
+    @Deprecated
     public abstract void updateFoisCache() throws OwsExceptionReport;
 
     /**
@@ -164,6 +165,7 @@ public abstract class ACapabilitiesCacheController {
      *             if refreshing failed
      *
      */
+    @Deprecated
     public abstract void updateSensorMetadata() throws OwsExceptionReport;
 
     /**
