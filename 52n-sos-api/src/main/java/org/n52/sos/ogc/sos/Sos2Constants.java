@@ -288,7 +288,7 @@ public final class Sos2Constants {
 
     /** enum with parameter names for registerSensor request */
     public enum InsertSensorParams {
-        service, version, procedureDescriptionFormat, procedureDescription, observableProperty, metadata, featureOfInterestType, observationType;
+        service, version, procedureDescriptionFormat, procedureDescription, observableProperty, metadata, featureOfInterestType, observationType, procedureIdentifier, offeringIdentifier;
 
         /**
          * method checks whether the string parameter is contained in this
