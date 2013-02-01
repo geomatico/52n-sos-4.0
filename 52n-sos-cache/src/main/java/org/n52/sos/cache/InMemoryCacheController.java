@@ -158,7 +158,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		addProcedureToOfferingRelation(sosResponse.getAssignedProcedure(), sosResponse.getAssignedOffering());
 
 		// offering name
-		addOfferingNameToCache(sosRequest.getProcedureDescription().getOfferingIdentifier());
+		for (SosOffering sosOffering : sosRequest.getProcedureDescription().getOfferingIdentifiers()) {
+		    addOfferingNameToCache(sosOffering);
+                }
 
 		// allowed observation types
 		addAllowedObservationTypes(sosResponse.getAssignedOffering(), sosRequest.getMetadata().getObservationTypes());
