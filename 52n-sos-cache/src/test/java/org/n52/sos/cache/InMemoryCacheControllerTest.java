@@ -261,7 +261,7 @@ public class InMemoryCacheControllerTest
 				controller.getObservationIdentifiers().contains(getObservationIdFromInsertObservation()));
 	}
 
-	@Test @Ignore ("currently implementing") public void 
+	@Test public void 
 	should_contain_observation_id_to_offering_relation_after_InsertObservation()
 			throws OwsExceptionReport {
 		updateCacheWithInsertSensor(PROCEDURE);
@@ -269,10 +269,10 @@ public class InMemoryCacheControllerTest
 		
 		assertTrue("procedure -> observation-identifier relation NOT in cache", 
 				controller.getCapabilitiesCache().getKProcedureVObservationIdentifiers()
-				.containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME)
+				.containsKey(PROCEDURE)
 				&&
 				controller.getCapabilitiesCache().getKProcedureVObservationIdentifiers()
-				.get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME)
+				.get(PROCEDURE)
 				.contains(getObservationIdFromInsertObservation()));
 	}
 	
@@ -599,12 +599,12 @@ public class InMemoryCacheControllerTest
 	}
 	
 	@Test public void 
-	should_not_contain_offering_to_observation_id_relations_after_DeleteSensor()
+	should_not_contain_procedure_to_observation_ids_relations_after_DeleteSensor()
 			throws OwsExceptionReport {
 		deleteSensorPreparation();
 		
-		assertFalse("offering -> observation ids relations STILL in cache",
-				controller.getCapabilitiesCache().getKProcedureVObservationIdentifiers().containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
+		assertFalse("procedure -> observation ids relations STILL in cache",
+				controller.getCapabilitiesCache().getKProcedureVObservationIdentifiers().containsKey(PROCEDURE));
 	}
 	
 	@Test public void 
