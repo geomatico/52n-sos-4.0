@@ -177,17 +177,18 @@ public class AbstractSensorML extends SosProcedureDescription {
     }
 
     @Override
-    public SosOffering getOfferingIdentifier() {
+    public List<SosOffering> getOfferingIdentifiers() {
+        List<SosOffering> sosOfferings = new ArrayList<SosOffering>(0);
         if (identifications != null) {
             for (SosSMLIdentifier identification : identifications) {
                 if (identification.getDefinition() != null
                         && (identification.getDefinition().equals(URN_OFFERING_ID)
                                 || identification.getDefinition().contains(ELEMENT_NAME_OFFERING))) {
-                            return new SosOffering(identification.getValue(), identification.getName());
+                    sosOfferings.add(new SosOffering(identification.getValue(), identification.getName()));
                 }
             }
         }
-        return null;
+        return sosOfferings;
     }
 
     public boolean isSetKeywords() {

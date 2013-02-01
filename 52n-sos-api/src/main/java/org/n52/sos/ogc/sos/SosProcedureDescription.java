@@ -25,6 +25,7 @@ package org.n52.sos.ogc.sos;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,9 +44,9 @@ public abstract class SosProcedureDescription {
     private Map<String, Set<SosProcedureDescription>> childProcedureForProcedure =
             new HashMap<String, Set<SosProcedureDescription>>(0);
 
-	public abstract String getProcedureIdentifier();
+    public abstract String getProcedureIdentifier();
 
-    public abstract SosOffering getOfferingIdentifier();
+    public abstract List<SosOffering> getOfferingIdentifiers();
 
     public String getSensorDescriptionXmlString() {
         return sensorDescriptionXmlString;

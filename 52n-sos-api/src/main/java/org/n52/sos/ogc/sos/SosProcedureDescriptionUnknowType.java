@@ -23,12 +23,15 @@
  */
 package org.n52.sos.ogc.sos;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.n52.sos.ogc.om.SosOffering;
 
 public class SosProcedureDescriptionUnknowType extends SosProcedureDescription {
     
     private String identifier;
-	private SosOffering offering;
+	private List<SosOffering> offerings = new ArrayList<SosOffering>(0);
     
     
     public SosProcedureDescriptionUnknowType(String identifier, String procedureDescriptionFormat, String xmlDescription) {
@@ -43,14 +46,17 @@ public class SosProcedureDescriptionUnknowType extends SosProcedureDescription {
     }
 
     @Override
-    public SosOffering getOfferingIdentifier() {
-        return offering;
+    public List<SosOffering> getOfferingIdentifiers() {
+        return offerings;
     }
 
-	public void setOfferingIdentifier(SosOffering sosOffering)
+	public void setOfferingIdentifiers(List<SosOffering> sosOfferings)
 	{
-		this.offering = sosOffering;
+		this.offerings = sosOfferings;
 	}
-    
+
+    public void addOfferingIdentifier(SosOffering sosOffering) {
+        this.offerings.add(sosOffering);
+    }
     
 }
