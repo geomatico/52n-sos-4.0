@@ -28,6 +28,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import org.n52.sos.cache.ACapabilitiesCacheController;
 import org.n52.sos.ds.IOperationDAO;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.RequestEvent;
@@ -107,6 +109,10 @@ public abstract class AbstractRequestOperator<D extends IOperationDAO, R extends
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
         }
+    }
+    
+    protected ACapabilitiesCacheController getCache() {
+        return Configurator.getInstance().getCapabilitiesCacheController();
     }
 
 	 /**
