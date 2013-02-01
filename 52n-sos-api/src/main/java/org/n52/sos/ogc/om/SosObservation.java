@@ -71,7 +71,7 @@ public class SosObservation implements Serializable {
      */
     private IObservationValue<?> value;
     
-    private String antiSubsetting;
+    private String setId;
 
     /**
      * token separator for the value tuples contained in the result element of
@@ -372,16 +372,16 @@ public class SosObservation implements Serializable {
         return tvpValue;
     }
 
-    public void setAntiSubsetting(String antiSubsetting) {
-        this.antiSubsetting = antiSubsetting;
+    public void setSetId(String setId) {
+        this.setId = setId;
     }
     
-    public String getAntiSubsetting() {
-        return antiSubsetting;
+    public String getSetId() {
+        return setId;
     }
 
-    public boolean isSetAntiSubsetting() {
-        return antiSubsetting != null && !antiSubsetting.isEmpty();
+    public boolean isSetSetId() {
+        return setId != null && !setId.isEmpty();
     }
     
     public boolean isSetObservationID() {
