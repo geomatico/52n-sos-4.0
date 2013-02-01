@@ -23,6 +23,9 @@
  */
 package org.n52.sos.util;
 
+import javax.xml.namespace.QName;
+
+import org.n52.sos.ogc.ows.OWSConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,5 +50,10 @@ public class OwsHelper {
 
    
     private OwsHelper() {
+    }
+
+
+    public static QName getQNameForLocalName(String localName) {
+        return new QName(OWSConstants.NS_OWS, localName, OWSConstants.NS_OWS_PREFIX);
     }
 }

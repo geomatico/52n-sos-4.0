@@ -85,5 +85,12 @@ public class JavaHelper {
         }
         return buf.toString();
     }
+    
+    public static void appendTextToStringBuilderWithLineBreak(StringBuilder stringBuilder, String message) {
+        if (message != null && !message.isEmpty()) {
+            stringBuilder.append(message);
+            stringBuilder.append("\n");
+        }
+     }
 
 }
