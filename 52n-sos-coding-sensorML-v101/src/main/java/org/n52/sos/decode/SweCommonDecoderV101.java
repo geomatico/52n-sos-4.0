@@ -93,9 +93,9 @@ import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SweDecoderV101 implements IDecoder<Object, Object> {
+public class SweCommonDecoderV101 implements IDecoder<Object, Object> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SweDecoderV101.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SweCommonDecoderV101.class);
 
     private static final Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(SWEConstants.NS_SWE,
             DataArrayDocument.class,
@@ -118,7 +118,7 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
             AbstractDataRecordDocument.class,
             AbstractDataRecordType.class);
 
-    public SweDecoderV101() {
+    public SweCommonDecoderV101() {
         LOGGER.debug("Decoder for the following keys initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));
     }
 
@@ -301,21 +301,13 @@ public class SweDecoderV101 implements IDecoder<Object, Object> {
         if (xbBoolean.isSetValue()) {
             sosBoolean.setValue(xbBoolean.getValue());
         }
-        if (xbBoolean.isSetDefinition()) {
-            sosBoolean.setDefinition(xbBoolean.getDefinition());
-        }
-        if (xbBoolean.isSetDescription()) {
-            sosBoolean.setDescription(xbBoolean.getDescription().getStringValue());
-        }
         return sosBoolean;
     }
 
     private SosSweAbstractSimpleType<String> parseCategory(Category category) throws OwsExceptionReport {
         SosSweCategory sosCategory = new SosSweCategory();
-        sosCategory.setValue(category.getValue());
-        sosCategory.setDefinition(category.getDefinition());
-        if (category.isSetDescription()) {
-            sosCategory.setDescription(category.getDescription().getStringValue());
+        if (category.isSetValue()) {
+            sosCategory.setValue(category.getValue());
         }
         if (category.isSetCodeSpace()) {
             sosCategory.setCodeSpace(category.getCodeSpace().getHref());
