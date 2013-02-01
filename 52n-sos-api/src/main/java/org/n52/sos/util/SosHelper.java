@@ -84,8 +84,6 @@ public class SosHelper {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosHelper.class);
 
-    private static final String generatedFoiPrefix = "generated_";
-
     /**
      * Hide utility constructor
      */
@@ -375,7 +373,7 @@ public class SosHelper {
      */
     public static boolean checkFeatureOfInterestIdentifierForSosV2(String featureOfInterestIdentifier, String version) {
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
-            if (featureOfInterestIdentifier.startsWith(generatedFoiPrefix)) {
+            if (featureOfInterestIdentifier.startsWith(SosConstants.GENERATED_IDENTIFIER_PREFIX)) {
                 return false;
             }
         }
