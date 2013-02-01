@@ -41,9 +41,6 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
 
-import net.opengis.ows.x11.ExceptionDocument;
-import net.opengis.ows.x11.ExceptionType;
-
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
@@ -65,6 +62,7 @@ import org.n52.sos.soap.SoapResponse;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
+import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3CConstants;
@@ -91,15 +89,15 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
     private static Logger LOGGER = LoggerFactory.getLogger(SoapEncoder.class);
 
     private static final Set<EncoderKey> ENCODER_KEYS = CollectionHelper.union(
-        CodingHelper.encoderKeysForElements(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE, SoapResponse.class),
-        CodingHelper.encoderKeysForElements(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE, SoapResponse.class)
-    );
+            CodingHelper.encoderKeysForElements(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE, SoapResponse.class),
+            CodingHelper.encoderKeysForElements(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE, SoapResponse.class));
 
     /**
      * constructor
      */
     public SoapEncoder() {
-        LOGGER.debug("Encoder for the following keys initialized successfully: {}!", StringHelper.join(", ", ENCODER_KEYS));
+        LOGGER.debug("Encoder for the following keys initialized successfully: {}!",
+                StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
@@ -171,8 +169,9 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
                         wsa.setActionValue(action);
                     }
                     try {
-                        IEncoder<Map<QName, String>, SoapHeader> encoder = Configurator.getInstance()
-                                .getCodingRepository().getEncoder(CodingHelper.getEncoderKey(namespace, header));
+                        IEncoder<Map<QName, String>, SoapHeader> encoder =
+                                Configurator.getInstance().getCodingRepository()
+                                        .getEncoder(CodingHelper.getEncoderKey(namespace, header));
                         if (encoder != null) {
                             Map<QName, String> headerElements = encoder.encode(header);
                             for (QName qName : headerElements.keySet()) {
@@ -409,7 +408,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
                 body.set(bodyContent);
             }
         }
-        
+
         // if (response.getHeader() != null) {
         // Map<String, SoapHeader> headers = response.getHeader();
         // for (String namespace : headers.keySet()) {
@@ -438,7 +437,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
         // }
 
         // TODO for testing an validating
-//        checkAndValidateSoapMessage(envelopeDoc);
+        // checkAndValidateSoapMessage(envelopeDoc);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
@@ -458,7 +457,8 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
 
     private XmlObject createSOAP12Body(ServiceResponse response) throws OwsExceptionReport {
         try {
-            return XmlObject.Factory.parse(new String(response.getByteArray()), XmlOptionsHelper.getInstance().getXmlOptions());
+            return XmlObject.Factory.parse(new String(response.getByteArray()), XmlOptionsHelper.getInstance()
+                    .getXmlOptions());
         } catch (XmlException xmle) {
             String exceptionText = "Error while creating SOAP body!";
             LOGGER.error(exceptionText, xmle);
@@ -481,7 +481,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
         return faultDoc;
     }
 
-    private XmlObject createSOAP12FaultFromExceptionResponse(OwsExceptionReport owsExceptionReport) {
+    private XmlObject createSOAP12FaultFromExceptionResponse(OwsExceptionReport owsExceptionReport) throws OwsExceptionReport {
         FaultDocument faultDoc = FaultDocument.Factory.newInstance();
         Fault fault = faultDoc.addNewFault();
         Faultcode code = fault.addNewCode();
@@ -492,49 +492,19 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
             Subcode subcode = code.addNewSubcode();
             QName qName;
             if (firstException.getCode() != null) {
-                qName =
-                        new QName(OWSConstants.NS_OWS, firstException.getCode().toString(), OWSConstants.NS_OWS_PREFIX);
+                qName = OwsHelper.getQNameForLocalName(firstException.getCode().toString());
             } else {
-                qName =
-                        new QName(OWSConstants.NS_OWS, OwsExceptionCode.NoApplicableCode.name(),
-                                OWSConstants.NS_OWS_PREFIX);
+                qName = OwsHelper.getQNameForLocalName(OwsExceptionCode.NoApplicableCode.name());
             }
             subcode.setValue(qName);
             Reasontext addNewText = fault.addNewReason().addNewText();
-            addNewText.setLang(Locale.ENGLISH.getDisplayLanguage());
+            addNewText.setLang(Locale.ENGLISH.getLanguage());
             addNewText.setStringValue(SoapHelper.getSoapFaultReasonText(firstException.getCode()));
-            ExceptionDocument exceptionDoc = ExceptionDocument.Factory.newInstance();
-            ExceptionType exception = exceptionDoc.addNewException();
-            boolean first = true;
+
             for (OwsException owsException : owsExceptionReport.getExceptions()) {
-                if (first) {
-                    exception.setExceptionCode(owsException.getCode().toString());
-                    if (owsException.getLocator() != null && !owsException.getLocator().isEmpty()) {
-                        exception.setLocator(owsException.getLocator());
-                    }
-                    first = false;
-                }
-                StringBuilder exceptionText = new StringBuilder();
-                for (String text : owsException.getMessages()) {
-                    exceptionText.append(text);
-                    exceptionText.append("\n");
-                }
-                if (owsException.getException() != null) {
-                    exceptionText.append("\n[EXEPTION]: \n");
-                    if (owsException.getException().getLocalizedMessage() != null
-                            && !owsException.getException().getLocalizedMessage().isEmpty()) {
-                        exceptionText.append(owsException.getException().getLocalizedMessage());
-                        exceptionText.append("\n");
-                    }
-                    if (owsException.getException().getMessage() != null
-                            && !owsException.getException().getMessage().isEmpty()) {
-                        exceptionText.append(owsException.getException().getMessage());
-                        exceptionText.append("\n");
-                    }
-                }
-                exception.addExceptionText(exceptionText.toString());
+                fault.addNewDetail().set(CodingHelper.encodeObjectToXml(OWSConstants.NS_OWS, owsException));
+                break;
             }
-            fault.addNewDetail().set(exceptionDoc);
         }
         return faultDoc;
     }
