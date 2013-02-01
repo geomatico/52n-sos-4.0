@@ -681,9 +681,9 @@
                     "request": "static/examples/sos_v20/requests_soap/Transactional/InsertSensor.xml"
                 }
             },
-            "UpdateSensor": {
-                "UpdateSensor": {
-                    "request": "static/examples/sos_v20/requests_soap/Transactional/UpdateSensor.xml"
+            "UpdateSensorDescription": {
+                "UpdateSensorDescription": {
+                    "request": "static/examples/sos_v20/requests_soap/Transactional/UpdateSensorDescription.xml"
                 }
             },
             "GetDataAvailability": {
@@ -765,9 +765,9 @@
                     "request": "static/examples/sos_v20/requests_xml/Transactional/InsertSensor.xml"
                 }
             },
-            "UpdateSensor": {
-                "UpdateSensor": {
-                    "request": "static/examples/sos_v20/requests_xml/Transactional/UpdateSensor.xml"
+            "UpdateSensorDescription": {
+                "UpdateSensorDescription": {
+                    "request": "static/examples/sos_v20/requests_xml/Transactional/UpdateSensorDescription.xml"
                 }
             },
             "GetDataAvailability": {

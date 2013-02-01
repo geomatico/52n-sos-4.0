@@ -2,6 +2,6 @@
 <sos:GetResult service="SOS" version="2.0.0" xmlns:sos="http://www.opengis.net/sos/2.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0.0/sos.xsd">
-	<sos:offering>test_offering_6</sos:offering>
-	<sos:observedProperty>test_observable_property_6</sos:observedProperty>
+	<sos:offering>test_offering_7</sos:offering>
+	<sos:observedProperty>test_observable_property_7_3</sos:observedProperty>
 </sos:GetResult>

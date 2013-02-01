@@ -4,7 +4,7 @@
 	<env:Body>
 		<swes:DeleteSensor service="SOS" version="2.0.0" xmlns:swes="http://www.opengis.net/swes/2.0"
 			xsi:schemaLocation="http://www.opengis.net/swes/2.0 http://schemas.opengis.net/swes/2.0/swes.xsd">
-			<swes:procedure>http://www.example.org/sensors/102</swes:procedure>
+			<swes:procedure>http://www.example.org/sensors/107</swes:procedure>
 		</swes:DeleteSensor>
 	</env:Body>
 </env:Envelope>
