@@ -261,5 +261,7 @@ public interface CapabilitiesCache {
 	public abstract DateTime getMaxEventTime();
 
 	public abstract void setMaxEventTime(DateTime maxEventTime);
+	
+	public abstract Map<String, Collection<String>> getKProcedureVObservationIdentifiers();
 
 }

@@ -193,6 +193,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			if (sosObservation.getIdentifier() != null)
 			{
 				addObservationIdToCache(sosObservation);
+				addProcedureToObservationIdRelationToCache(getProcedureIdentifier(sosObservation),sosObservation.getIdentifier().getValue());
 			}
 			
 			// update features
@@ -230,27 +231,23 @@ public class InMemoryCacheController extends CacheControllerImpl {
 				// envelopes/bounding boxes (spatial and temporal)
 				updateTemporalBoundingBoxOf(offeringIdentifier, phenomenonTimeFrom(sosObservation));
 				updateOfferingEnvelope(observedFeatureEnvelope, observedFeatureEnvelopeSRID, offeringIdentifier);
-				if (sosObservation.getIdentifier() != null)
-				{
-					addOfferingToObservationIdRelationToCache(sosObservation.getIdentifier().getValue(),offeringIdentifier);
-				}
 			}
 
 		}
 	}
 
-	private void addOfferingToObservationIdRelationToCache(String observationIdentifier, String offeringIdentifier)
+	private void addProcedureToObservationIdRelationToCache(String procedureIdentifier, String observationIdentifier)
 	{
-		if (!getCapabilitiesCache().getKOfferingVObservationIdentifiers().containsKey(offeringIdentifier))
+		if (!getCapabilitiesCache().getKProcedureVObservationIdentifiers().containsKey(procedureIdentifier))
 		{
 			Collection<String> value = Collections.synchronizedList(new ArrayList<String>());
-			getCapabilitiesCache().getKOfferingVObservationIdentifiers().put(offeringIdentifier, value);
+			getCapabilitiesCache().getKProcedureVObservationIdentifiers().put(procedureIdentifier, value);
 		}
-		getCapabilitiesCache().getKOfferingVObservationIdentifiers().get(offeringIdentifier).add(observationIdentifier);
-		LOGGER.debug("offering \"{}\" to observation id \"{}\" relation added to cache? {}",
-				offeringIdentifier,
+		getCapabilitiesCache().getKProcedureVObservationIdentifiers().get(procedureIdentifier).add(observationIdentifier);
+		LOGGER.debug("procedure \"{}\" to observation id \"{}\" relation added to cache? {}",
+				procedureIdentifier,
 				observationIdentifier,
-				getCapabilitiesCache().getKOfferingVObservationIdentifiers().get(offeringIdentifier).contains(observationIdentifier));
+				getCapabilitiesCache().getKProcedureVObservationIdentifiers().get(procedureIdentifier).contains(observationIdentifier));
 	}
 
 	private void doUpdateAfterSensorDeletion(DeleteSensorRequest sosRequest) throws OwsExceptionReport
@@ -260,6 +257,8 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		removeFeatureToProcedureRelationsFromCache(sosRequest.getProcedureIdentifier());
 		
 		removeOfferingsToProcedureRelation(sosRequest.getProcedureIdentifier());
+		
+		removeProcedureToObservationIdentifierRelations(sosRequest.getProcedureIdentifier());
 
 		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(sosRequest.getProcedureIdentifier()))
 		{
@@ -272,8 +271,6 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			removeOfferingToRelatedFeaturesRelations(offeringId);
 
 			removeOfferingToObservationTypesRelations(offeringId);
-
-			removeOfferingToObservationIdentifierRelations(offeringId);
 
 			removeOfferingEnvelope(offeringId);
 		}
@@ -306,17 +303,17 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	
 	private void removeRemovedObservationIdentifiers()
 	{
-		List<String> allowedObservationIdentifiers = getAllowedEntries(getCapabilitiesCache().getKOfferingVObservationIdentifiers().values());
+		List<String> allowedObservationIdentifiers = getAllowedEntries(getCapabilitiesCache().getKProcedureVObservationIdentifiers().values());
 		List<String> featuresToRemove = getEntriesToRemove(allowedObservationIdentifiers,getCapabilitiesCache().getObservationIdentifiers());
 		removeEntries(featuresToRemove,getCapabilitiesCache().getObservationIdentifiers());
 	}
 
-	private void removeOfferingToObservationIdentifierRelations(String offeringId)
+	private void removeProcedureToObservationIdentifierRelations(String procedureIdentifier)
 	{
-		getCapabilitiesCache().getKOfferingVObservationIdentifiers().remove(offeringId);
-		LOGGER.debug("observation types removed for offering \"{}\"? {}",
-				offeringId,
-				getCapabilitiesCache().getKOfferingVObservationIdentifiers().containsKey(offeringId));
+		getCapabilitiesCache().getKProcedureVObservationIdentifiers().remove(procedureIdentifier);
+		LOGGER.debug("observation identifiers removed for procedure \"{}\"? {}",
+				procedureIdentifier,
+				getCapabilitiesCache().getKProcedureVObservationIdentifiers().containsKey(procedureIdentifier));
 	}
 
 	private void removeFeatureToProcedureRelationsFromCache(String procedureIdentifier)
@@ -687,11 +684,14 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	private void addObservablePropertyToProcedureRelation(String observablePropertyIdentifier,
 			String procedureIdentifier)
 	{
-		if (getCapabilitiesCache().getKObservablePropertyVProcedures().get(observablePropertyIdentifier) == null) {
+		if (getCapabilitiesCache().getKObservablePropertyVProcedures().get(observablePropertyIdentifier) == null)
+		{
 			List<String> relatedProcedures = Collections.synchronizedList(new ArrayList<String>());
 			relatedProcedures.add(procedureIdentifier);
 			getCapabilitiesCache().getKObservablePropertyVProcedures().put(observablePropertyIdentifier, relatedProcedures);
-		} else if (!getCapabilitiesCache().getKObservablePropertyVProcedures().get(observablePropertyIdentifier).contains(procedureIdentifier)) {
+		}
+		else if (!getCapabilitiesCache().getKObservablePropertyVProcedures().get(observablePropertyIdentifier).contains(procedureIdentifier))
+		{
 			getCapabilitiesCache().getKObservablePropertyVProcedures().get(observablePropertyIdentifier).add(procedureIdentifier);
 		}
 	}

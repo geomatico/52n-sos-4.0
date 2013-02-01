@@ -149,7 +149,7 @@ public class CacheImpl implements CapabilitiesCache{
 	
 	private TimePeriod globalTemporalBoundingBox;
 
-	private Map<String, Collection<String>> kOfferingVObservationIdentifiers;
+	private Map<String, Collection<String>> kProcedureVObservationIdentifiers;
 
     public CacheImpl() {
     	allowedKOfferingVObservationType = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
@@ -167,7 +167,7 @@ public class CacheImpl implements CapabilitiesCache{
     	kOfferingVMaxTime = Collections.synchronizedMap(new HashMap<String, DateTime>());
     	kOfferingVMinTime = Collections.synchronizedMap(new HashMap<String, DateTime>());
     	kOfferingVObservableProperties = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	kOfferingVObservationIdentifiers = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
+    	kProcedureVObservationIdentifiers = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	kOfferingVObservationTypes = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	kOfferingVProcedures = Collections.synchronizedMap(new HashMap<String, List<String>>());
     	kOfferingVRelatedFeatures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
@@ -985,35 +985,43 @@ public class CacheImpl implements CapabilitiesCache{
 	}
 
 	@Override
+	public
+	Map<String,Collection<String>> getKProcedureVObservationIdentifiers()
+	{
+		return kProcedureVObservationIdentifiers;
+	}
+
+	@Override
 	public int hashCode()
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((kOfferingVProcedures == null) ? 0 : kOfferingVProcedures.hashCode());
 		result = prime * result + ((allowedKOfferingVObservationType == null) ? 0 : allowedKOfferingVObservationType.hashCode());
 		result = prime * result + ((childFeatures == null) ? 0 : childFeatures.hashCode());
 		result = prime * result + ((childProcs == null) ? 0 : childProcs.hashCode());
-		result = prime * result + ((globalEnvelope == null) ? 0 : globalEnvelope.hashCode());
-		result = prime * result + ((featureOfInterestTypes == null) ? 0 : featureOfInterestTypes.hashCode());
 		result = prime * result + ((featureOfInterestIdentifiers == null) ? 0 : featureOfInterestIdentifiers.hashCode());
+		result = prime * result + ((featureOfInterestTypes == null) ? 0 : featureOfInterestTypes.hashCode());
+		result = prime * result + ((globalEnvelope == null) ? 0 : globalEnvelope.hashCode());
+		result = prime * result + ((globalTemporalBoundingBox == null) ? 0 : globalTemporalBoundingBox.hashCode());
 		result = prime * result + ((kFeatureOfInterestVProcedures == null) ? 0 : kFeatureOfInterestVProcedures.hashCode());
-		result = prime * result + ((kObservablePropertyVProcedures == null) ? 0 : kObservablePropertyVProcedures.hashCode());
 		result = prime * result + ((kObservablePropertyVOfferings == null) ? 0 : kObservablePropertyVOfferings.hashCode());
+		result = prime * result + ((kObservablePropertyVProcedures == null) ? 0 : kObservablePropertyVProcedures.hashCode());
 		result = prime * result + ((kOfferingVCompositePhenomenon == null) ? 0 : kOfferingVCompositePhenomenon.hashCode());
 		result = prime * result + ((kOfferingVEnvelope == null) ? 0 : kOfferingVEnvelope.hashCode());
 		result = prime * result + ((kOfferingVFeaturesOfInterest == null) ? 0 : kOfferingVFeaturesOfInterest.hashCode());
 		result = prime * result + ((kOfferingVMaxTime == null) ? 0 : kOfferingVMaxTime.hashCode());
 		result = prime * result + ((kOfferingVMinTime == null) ? 0 : kOfferingVMinTime.hashCode());
+		result = prime * result + ((kOfferingVName == null) ? 0 : kOfferingVName.hashCode());
 		result = prime * result + ((kOfferingVObservableProperties == null) ? 0 : kOfferingVObservableProperties.hashCode());
-		result = prime * result + ((kOfferingVRelatedFeatures == null) ? 0 : kOfferingVRelatedFeatures.hashCode());
 		result = prime * result + ((kOfferingVObservationTypes == null) ? 0 : kOfferingVObservationTypes.hashCode());
+		result = prime * result + ((kOfferingVProcedures == null) ? 0 : kOfferingVProcedures.hashCode());
+		result = prime * result + ((kOfferingVRelatedFeatures == null) ? 0 : kOfferingVRelatedFeatures.hashCode());
 		result = prime * result + ((kProcedureVObservableProperties == null) ? 0 : kProcedureVObservableProperties.hashCode());
+		result = prime * result + ((kProcedureVObservationIdentifiers == null) ? 0 : kProcedureVObservationIdentifiers.hashCode());
 		result = prime * result + ((kProcedureVOfferings == null) ? 0 : kProcedureVOfferings.hashCode());
 		result = prime * result + ((kRelatedFeatureVRole == null) ? 0 : kRelatedFeatureVRole.hashCode());
-		result = prime * result + ((globalTemporalBoundingBox == null) ? 0 : globalTemporalBoundingBox.hashCode());
 		result = prime * result + ((observationIdentifiers == null) ? 0 : observationIdentifiers.hashCode());
 		result = prime * result + ((observationTypes == null) ? 0 : observationTypes.hashCode());
-		result = prime * result + ((kOfferingVName == null) ? 0 : kOfferingVName.hashCode());
 		result = prime * result + ((parentFeatures == null) ? 0 : parentFeatures.hashCode());
 		result = prime * result + ((parentProcs == null) ? 0 : parentProcs.hashCode());
 		result = prime * result + ((phens4CompPhens == null) ? 0 : phens4CompPhens.hashCode());
@@ -1035,11 +1043,6 @@ public class CacheImpl implements CapabilitiesCache{
 		if (!(obj instanceof CacheImpl))
 			return false;
 		CacheImpl other = (CacheImpl) obj;
-		if (kOfferingVProcedures == null) {
-			if (other.kOfferingVProcedures != null)
-				return false;
-		} else if (!kOfferingVProcedures.equals(other.kOfferingVProcedures))
-			return false;
 		if (allowedKOfferingVObservationType == null) {
 			if (other.allowedKOfferingVObservationType != null)
 				return false;
@@ -1055,35 +1058,40 @@ public class CacheImpl implements CapabilitiesCache{
 				return false;
 		} else if (!childProcs.equals(other.childProcs))
 			return false;
-		if (globalEnvelope == null) {
-			if (other.globalEnvelope != null)
+		if (featureOfInterestIdentifiers == null) {
+			if (other.featureOfInterestIdentifiers != null)
 				return false;
-		} else if (!globalEnvelope.equals(other.globalEnvelope))
+		} else if (!featureOfInterestIdentifiers.equals(other.featureOfInterestIdentifiers))
 			return false;
 		if (featureOfInterestTypes == null) {
 			if (other.featureOfInterestTypes != null)
 				return false;
 		} else if (!featureOfInterestTypes.equals(other.featureOfInterestTypes))
 			return false;
-		if (featureOfInterestIdentifiers == null) {
-			if (other.featureOfInterestIdentifiers != null)
+		if (globalEnvelope == null) {
+			if (other.globalEnvelope != null)
 				return false;
-		} else if (!featureOfInterestIdentifiers.equals(other.featureOfInterestIdentifiers))
+		} else if (!globalEnvelope.equals(other.globalEnvelope))
+			return false;
+		if (globalTemporalBoundingBox == null) {
+			if (other.globalTemporalBoundingBox != null)
+				return false;
+		} else if (!globalTemporalBoundingBox.equals(other.globalTemporalBoundingBox))
 			return false;
 		if (kFeatureOfInterestVProcedures == null) {
 			if (other.kFeatureOfInterestVProcedures != null)
 				return false;
 		} else if (!kFeatureOfInterestVProcedures.equals(other.kFeatureOfInterestVProcedures))
 			return false;
-		if (kObservablePropertyVProcedures == null) {
-			if (other.kObservablePropertyVProcedures != null)
-				return false;
-		} else if (!kObservablePropertyVProcedures.equals(other.kObservablePropertyVProcedures))
-			return false;
 		if (kObservablePropertyVOfferings == null) {
 			if (other.kObservablePropertyVOfferings != null)
 				return false;
 		} else if (!kObservablePropertyVOfferings.equals(other.kObservablePropertyVOfferings))
+			return false;
+		if (kObservablePropertyVProcedures == null) {
+			if (other.kObservablePropertyVProcedures != null)
+				return false;
+		} else if (!kObservablePropertyVProcedures.equals(other.kObservablePropertyVProcedures))
 			return false;
 		if (kOfferingVCompositePhenomenon == null) {
 			if (other.kOfferingVCompositePhenomenon != null)
@@ -1110,25 +1118,40 @@ public class CacheImpl implements CapabilitiesCache{
 				return false;
 		} else if (!kOfferingVMinTime.equals(other.kOfferingVMinTime))
 			return false;
+		if (kOfferingVName == null) {
+			if (other.kOfferingVName != null)
+				return false;
+		} else if (!kOfferingVName.equals(other.kOfferingVName))
+			return false;
 		if (kOfferingVObservableProperties == null) {
 			if (other.kOfferingVObservableProperties != null)
 				return false;
 		} else if (!kOfferingVObservableProperties.equals(other.kOfferingVObservableProperties))
-			return false;
-		if (kOfferingVRelatedFeatures == null) {
-			if (other.kOfferingVRelatedFeatures != null)
-				return false;
-		} else if (!kOfferingVRelatedFeatures.equals(other.kOfferingVRelatedFeatures))
 			return false;
 		if (kOfferingVObservationTypes == null) {
 			if (other.kOfferingVObservationTypes != null)
 				return false;
 		} else if (!kOfferingVObservationTypes.equals(other.kOfferingVObservationTypes))
 			return false;
+		if (kOfferingVProcedures == null) {
+			if (other.kOfferingVProcedures != null)
+				return false;
+		} else if (!kOfferingVProcedures.equals(other.kOfferingVProcedures))
+			return false;
+		if (kOfferingVRelatedFeatures == null) {
+			if (other.kOfferingVRelatedFeatures != null)
+				return false;
+		} else if (!kOfferingVRelatedFeatures.equals(other.kOfferingVRelatedFeatures))
+			return false;
 		if (kProcedureVObservableProperties == null) {
 			if (other.kProcedureVObservableProperties != null)
 				return false;
 		} else if (!kProcedureVObservableProperties.equals(other.kProcedureVObservableProperties))
+			return false;
+		if (kProcedureVObservationIdentifiers == null) {
+			if (other.kProcedureVObservationIdentifiers != null)
+				return false;
+		} else if (!kProcedureVObservationIdentifiers.equals(other.kProcedureVObservationIdentifiers))
 			return false;
 		if (kProcedureVOfferings == null) {
 			if (other.kProcedureVOfferings != null)
@@ -1140,11 +1163,6 @@ public class CacheImpl implements CapabilitiesCache{
 				return false;
 		} else if (!kRelatedFeatureVRole.equals(other.kRelatedFeatureVRole))
 			return false;
-		if (globalTemporalBoundingBox == null) {
-			if (other.globalTemporalBoundingBox != null)
-				return false;
-		} else if (!globalTemporalBoundingBox.equals(other.globalTemporalBoundingBox))
-			return false;
 		if (observationIdentifiers == null) {
 			if (other.observationIdentifiers != null)
 				return false;
@@ -1154,11 +1172,6 @@ public class CacheImpl implements CapabilitiesCache{
 			if (other.observationTypes != null)
 				return false;
 		} else if (!observationTypes.equals(other.observationTypes))
-			return false;
-		if (kOfferingVName == null) {
-			if (other.kOfferingVName != null)
-				return false;
-		} else if (!kOfferingVName.equals(other.kOfferingVName))
 			return false;
 		if (parentFeatures == null) {
 			if (other.parentFeatures != null)
@@ -1198,11 +1211,6 @@ public class CacheImpl implements CapabilitiesCache{
 		} else if (!unit4Phen.equals(other.unit4Phen))
 			return false;
 		return true;
-	}
-
-	protected Map<String,Collection<String>> getKOfferingVObservationIdentifiers()
-	{
-		return kOfferingVObservationIdentifiers;
 	}
 
 }
