@@ -39,7 +39,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
  */
 public class FeatureOfInterestCacheUpdate extends CacheUpdate {
 
-    private List<String> getFeatureIdentifier(List<FeatureOfInterest> featuresOfInterest) {
+    protected List<String> getFeatureIdentifier(List<FeatureOfInterest> featuresOfInterest) {
         List<String> featureList = new ArrayList<String>(featuresOfInterest.size());
         for (FeatureOfInterest featureOfInterest : featuresOfInterest) {
             featureList.add(featureOfInterest.getIdentifier());
@@ -47,7 +47,7 @@ public class FeatureOfInterestCacheUpdate extends CacheUpdate {
         return featureList;
     }
 
-    private Collection<String> getFeatureIDsFromFeatures(Set<FeatureOfInterest> featureOfInterestsForChildFeatureId) {
+    protected Collection<String> getFeatureIDsFromFeatures(Set<FeatureOfInterest> featureOfInterestsForChildFeatureId) {
         List<String> featureIDs = new ArrayList<String>(featureOfInterestsForChildFeatureId.size());
         for (FeatureOfInterest feature : featureOfInterestsForChildFeatureId) {
             featureIDs.add(feature.getIdentifier());

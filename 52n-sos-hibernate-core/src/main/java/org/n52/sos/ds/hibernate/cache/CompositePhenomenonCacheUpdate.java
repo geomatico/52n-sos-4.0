@@ -54,7 +54,7 @@ public class CompositePhenomenonCacheUpdate extends CacheUpdate {
         getCache().setKCompositePhenomenonVObservableProperties(kCompositePhenomenonVObservableProperty);
     }
 
-    private List<String> getObservablePropertyIdentifierFromObservableProperties(
+    protected List<String> getObservablePropertyIdentifierFromObservableProperties(
             Set<ObservableProperty> observableProperties) {
         List<String> observablePropertyIdentifiers = new ArrayList<String>(observableProperties.size());
         for (ObservableProperty observableProperty : observableProperties) {

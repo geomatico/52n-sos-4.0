@@ -40,7 +40,7 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
  */
 public class ObservablePropertiesCacheUpdate extends CacheUpdate {
 
-    private List<String> getProcedureIdentifierFromObservationConstellation(Set<ObservationConstellation> set) {
+    protected List<String> getProcedureIdentifierFromObservationConstellation(Set<ObservationConstellation> set) {
         Set<String> procedures = new HashSet<String>(set.size());
         for (ObservationConstellation oc : set) {
             procedures.add(oc.getProcedure().getIdentifier());

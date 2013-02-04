@@ -106,7 +106,7 @@ public class ProcedureCacheUpdate extends CacheUpdate {
         return observationIdentifier;
     }
 
-    private Criterion getCriterionForProcedures(Map<String, String> aliasMap, String prefix, String procedure) {
+    protected Criterion getCriterionForProcedures(Map<String, String> aliasMap, String prefix, String procedure) {
         String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliasMap, prefix);
         return Restrictions.in(HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), Collections.singletonList(procedure));
     }

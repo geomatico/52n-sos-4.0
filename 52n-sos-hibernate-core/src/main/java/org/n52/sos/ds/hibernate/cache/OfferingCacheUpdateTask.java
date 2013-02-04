@@ -27,11 +27,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import org.hibernate.Session;
-import org.joda.time.DateTime;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.ObservationType;
@@ -55,67 +53,61 @@ public class OfferingCacheUpdateTask implements Runnable {
     private IConnectionProvider connectionProvider;
     private List<OwsExceptionReport> errors;
     private Offering offering;
-    private Map<String, String> kOfferingVName;
-    private Map<String, Collection<String>> kOfferingVObservableProperties;
-    private Map<String, Collection<String>> kOfferingVObservationTypes;
-    private Map<String, List<String>> kOfferingVProcedures;
-    private Map<String, Collection<String>> kOfferingVRelatedFeatures;
-    private Map<String, Collection<String>> allowedkOfferingVObservationTypes;
-    private Map<String, SosEnvelope> kOfferingVEnvelope;
-    private Map<String, DateTime> kOfferingVMaxTime;
-    private Map<String, DateTime> kOfferingVMinTime;
-    
-    private Map<String, Collection<String>> kOfferingVFeaturesOfInterest;
+    private OfferingCache offeringCache;
 
     public OfferingCacheUpdateTask(CountDownLatch countDownLatch, IConnectionProvider connectionProvider,
-            Map<String, String> kOfferingVName, Map<String, List<String>> kOfferingVProcedures,
-            Map<String, Collection<String>> kOfferingVObservableProperties,
-            Map<String, Collection<String>> kOfferingVRelatedFeatures,
-            Map<String, Collection<String>> kOfferingVObservationTypes,
-            Map<String, Collection<String>> allowedkOfferingVObservationTypes,
-            Map<String, DateTime> kOfferingVMinTime, Map<String, DateTime> kOfferingVMaxTime,
-            Map<String, SosEnvelope> kOfferingVEnvelope,
-            Map<String, Collection<String>> kOfferingVFeaturesOfInterest, Offering offering,
+            OfferingCache offeringCache, Offering offering,
             List<OwsExceptionReport> error) {
         this.countDownLatch = countDownLatch;
         this.connectionProvider = connectionProvider;
-        this.kOfferingVName = kOfferingVName;
-        this.kOfferingVObservableProperties = kOfferingVObservableProperties;
-        this.kOfferingVObservationTypes = kOfferingVObservationTypes;
-        this.kOfferingVProcedures = kOfferingVProcedures;
-        this.kOfferingVRelatedFeatures = kOfferingVRelatedFeatures;
-        this.allowedkOfferingVObservationTypes = allowedkOfferingVObservationTypes;
-        this.kOfferingVMinTime = kOfferingVMinTime;
-        this.kOfferingVMaxTime = kOfferingVMaxTime;
-        this.kOfferingVEnvelope = kOfferingVEnvelope;
+        this.offeringCache = offeringCache;
         this.offering = offering;
         this.errors = error;
-        this.kOfferingVFeaturesOfInterest = kOfferingVFeaturesOfInterest;
+    }
+    
+    protected CountDownLatch getCountDownLatch() {
+        return countDownLatch;
     }
 
-    private void getOfferingInformationFromDbAndAddItToCacheMaps(Session session) throws OwsExceptionReport {
-        String offeringId = offering.getIdentifier();
-        kOfferingVName.put(offeringId, offering.getName());
+    protected IConnectionProvider getConnectionProvider() {
+        return connectionProvider;
+    }
+
+    protected List<OwsExceptionReport> getErrors() {
+        return errors;
+    }
+
+    protected Offering getOffering() {
+        return offering;
+    }
+
+    protected OfferingCache getOfferingCache() {
+        return offeringCache;
+    }
+
+    protected void getOfferingInformationFromDbAndAddItToCacheMaps(Session session) throws OwsExceptionReport {
+        String offeringId = getOffering().getIdentifier();
+        getOfferingCache().getKOfferingVName().put(offeringId, getOffering().getName());
         // Procedures
-        kOfferingVProcedures.put(offeringId, getProcedureIdentifierFrom(offering.getObservationConstellationOfferingObservationTypes()));
+        getOfferingCache().getKOfferingVProcedures().put(offeringId, getProcedureIdentifierFrom(getOffering().getObservationConstellationOfferingObservationTypes()));
         // Observable properties
-        kOfferingVObservableProperties.put(offeringId, getObservablePropertyIdentifierFrom(offering.getObservationConstellationOfferingObservationTypes()));
+        getOfferingCache().getKOfferingVObservableProperties().put(offeringId, getObservablePropertyIdentifierFrom(getOffering().getObservationConstellationOfferingObservationTypes()));
         // Related features
-        kOfferingVRelatedFeatures.put(offeringId, getRelatedFeatureIdentifiersFrom(offering));
+        getOfferingCache().getKOfferingVRelatedFeatures().put(offeringId, getRelatedFeatureIdentifiersFrom(getOffering()));
         // Observation types
-        kOfferingVObservationTypes.put(offeringId, getObservationTypesFrom(offering.getObservationConstellationOfferingObservationTypes()));
-        allowedkOfferingVObservationTypes.put(offeringId, getObservationTypesFromObservationType(offering.getObservationTypes()));
+        getOfferingCache().getKOfferingVObservationTypes().put(offeringId, getObservationTypesFrom(getOffering().getObservationConstellationOfferingObservationTypes()));
+        getOfferingCache().getAllowedkOfferingVObservationTypes().put(offeringId, getObservationTypesFromObservationType(getOffering().getObservationTypes()));
         // Spatial Envelope
-        kOfferingVEnvelope.put(offeringId, getEnvelopeForOffering(offeringId, session));
+        getOfferingCache().getKOfferingVEnvelope().put(offeringId, getEnvelopeForOffering(offeringId, session));
         // Features of Interest
-        List<String> featureOfInterestIdentifiers = HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(offering.getName(), session);
-        kOfferingVFeaturesOfInterest.put(offering.getName(), featureOfInterestIdentifiers);
+        List<String> featureOfInterestIdentifiers = HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(getOffering().getName(), session);
+        getOfferingCache().getKOfferingVFeaturesOfInterest().put(getOffering().getName(), featureOfInterestIdentifiers);
         // Temporal Envelope
-        kOfferingVMinTime.put(offeringId, HibernateCriteriaQueryUtilities.getMinDate4Offering(offeringId, session));
-        kOfferingVMaxTime.put(offeringId, HibernateCriteriaQueryUtilities.getMaxDate4Offering(offeringId, session));
+        getOfferingCache().getKOfferingVMinTime().put(offeringId, HibernateCriteriaQueryUtilities.getMinDate4Offering(offeringId, session));
+        getOfferingCache().getKOfferingVMaxTime().put(offeringId, HibernateCriteriaQueryUtilities.getMaxDate4Offering(offeringId, session));
     }
 
-    private List<String> getProcedureIdentifierFrom(Set<ObservationConstellationOfferingObservationType> set) {
+    protected List<String> getProcedureIdentifierFrom(Set<ObservationConstellationOfferingObservationType> set) {
         Set<String> procedures = new HashSet<String>(set.size());
         for (ObservationConstellationOfferingObservationType ocoot : set) {
             procedures.add(ocoot.getObservationConstellation().getProcedure().getIdentifier());
@@ -123,7 +115,7 @@ public class OfferingCacheUpdateTask implements Runnable {
         return new ArrayList<String>(procedures);
     }
 
-    private Collection<String> getRelatedFeatureIdentifiersFrom(Offering hOffering) {
+    protected Collection<String> getRelatedFeatureIdentifiersFrom(Offering hOffering) {
         List<String> relatedFeatureList = new ArrayList<String>(hOffering.getRelatedFeatures().size());
         for (RelatedFeature hRelatedFeature : hOffering.getRelatedFeatures()) {
             relatedFeatureList.add(hRelatedFeature.getFeatureOfInterest().getIdentifier());
@@ -131,7 +123,7 @@ public class OfferingCacheUpdateTask implements Runnable {
         return relatedFeatureList;
     }
 
-    private List<String> getObservablePropertyIdentifierFrom(Set<ObservationConstellationOfferingObservationType> set) {
+    protected List<String> getObservablePropertyIdentifierFrom(Set<ObservationConstellationOfferingObservationType> set) {
         Set<String> observableProperties = new HashSet<String>(set.size());
         for (ObservationConstellationOfferingObservationType ocoot : set) {
             if (ocoot.getObservationConstellation().getObservableProperty() != null) {
@@ -141,7 +133,7 @@ public class OfferingCacheUpdateTask implements Runnable {
         return new ArrayList<String>(observableProperties);
     }
 
-    private List<String> getObservationTypesFrom(Set<ObservationConstellationOfferingObservationType> set) {
+    protected List<String> getObservationTypesFrom(Set<ObservationConstellationOfferingObservationType> set) {
         Set<String> observationTypes = new HashSet<String>(set.size());
         for (ObservationConstellationOfferingObservationType ocoot : set) {
             if (ocoot.getObservationType() != null) {
@@ -151,7 +143,7 @@ public class OfferingCacheUpdateTask implements Runnable {
         return new ArrayList<String>(observationTypes);
     }
 
-    private SosEnvelope getEnvelopeForOffering(String offeringID, Session session) throws OwsExceptionReport {
+    protected SosEnvelope getEnvelopeForOffering(String offeringID, Session session) throws OwsExceptionReport {
         List<String> featureIDs = HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(offeringID, session);
         if (featureIDs != null && !featureIDs.isEmpty()) {
             return Configurator.getInstance().getFeatureQueryHandler().getEnvelopeForFeatureIDs(featureIDs, session);
@@ -159,7 +151,7 @@ public class OfferingCacheUpdateTask implements Runnable {
         return null;
     }
 
-    private Collection<String> getObservationTypesFromObservationType(Set<ObservationType> observationTypes) {
+    protected Collection<String> getObservationTypesFromObservationType(Set<ObservationType> observationTypes) {
         Set<String> obsTypes = new HashSet<String>(observationTypes.size());
         for (ObservationType obsType : observationTypes) {
             obsTypes.add(obsType.getObservationType());
@@ -171,17 +163,17 @@ public class OfferingCacheUpdateTask implements Runnable {
     public void run() {
         Session session = null;
         try {
-            session = (Session) connectionProvider.getConnection();
+            session = (Session) getConnectionProvider().getConnection();
             getOfferingInformationFromDbAndAddItToCacheMaps(session);
         } catch (OwsExceptionReport e) {
             LOGGER.error(String.format("Exception thrown: %s", e.getMessage()), e);
-            errors.add(e);
+            getErrors().add(e);
         } finally {
             if (session != null) {
-                connectionProvider.returnConnection(session);
+                getConnectionProvider().returnConnection(session);
             }
             LOGGER.debug("OfferingTask finished, latch.countDown().");
-            countDownLatch.countDown();
+            getCountDownLatch().countDown();
         }
     }
 }
