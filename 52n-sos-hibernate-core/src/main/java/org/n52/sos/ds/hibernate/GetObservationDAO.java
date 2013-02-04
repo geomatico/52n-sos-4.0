@@ -113,7 +113,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
         opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.responseFormat,
                 SosHelper.getSupportedResponseFormats(SosConstants.SOS, version));
 
-        if (getConfigurator().isShowFullOperationsMetadata4Observations()) {
+        if (getConfigurator().getActiveProfile().isShowFullOperationsMetadataForObservations()) {
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCache()
                     .getObservableProperties());
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.featureOfInterest, featureIDs);

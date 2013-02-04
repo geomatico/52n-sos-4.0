@@ -82,11 +82,11 @@ public class Configurator {
     /** Capabilities Cache Controller */
     private ACapabilitiesCacheController capabilitiesCacheController;
 
-    /**
-     * property indicates whether SOS encodes the complete child procedure
-     * System within a parent's DescribeSensor response or just the id and link
-     */
-    private boolean childProceduresEncodedInParentsDescribeSensor = false;
+//    /**
+//     * property indicates whether SOS encodes the complete child procedure
+//     * System within a parent's DescribeSensor response or just the id and link
+//     */
+//    private boolean childProceduresEncodedInParentsDescribeSensor = false;
 
     /**
      * se Implementation of ICacheFeederDAO
@@ -131,10 +131,10 @@ public class Configurator {
      */
     private IFeatureQueryHandler featureQueryHandler;
 
-    /**
-     * boolean, indicates if foi IDs should be included in capabilities
-     */
-    private boolean foiListedInOfferings = true;
+//    /**
+//     * boolean, indicates if foi IDs should be included in capabilities
+//     */
+//    private boolean foiListedInOfferings = true;
 
     /** date format of gml */
     private String gmlDateFormat;
@@ -148,8 +148,8 @@ public class Configurator {
     /** maximum number of GetObservation results */
     private int maxGetObsResults;
 
-    /** tuple seperator for result element */
-    private String noDataValue;
+//    /** tuple seperator for result element */
+//    private String noDataValue;
     
     private IProfileHandler profileHandler;
     
@@ -176,17 +176,17 @@ public class Configurator {
     /** URL of this service */
     private String serviceURL;
 
-    /**
-     * boolean, indicates if possible values for operation parameters should be
-     * included in capabilities
-     */
-    private boolean showFullOperationsMetadata = true;
-
-    /**
-     * boolean indicates, whether SOS shows the full OperationsMetadata for
-     * observation.
-     */
-    private boolean showFullOperationsMetadata4Observations = false;
+//    /**
+//     * boolean, indicates if possible values for operation parameters should be
+//     * included in capabilities
+//     */
+//    private boolean showFullOperationsMetadata = true;
+//
+//    /**
+//     * boolean indicates, whether SOS shows the full OperationsMetadata for
+//     * observation.
+//     */
+//    private boolean showFullOperationsMetadata4Observations = false;
 
     /**
      * boolean, indicates if duplicate observation should be silently ignored
@@ -372,18 +372,18 @@ public class Configurator {
                 }
             }
             break;
-        case CHILD_PROCEDURES_ENCODED_IN_PARENTS_DESCRIBE_SENSOR:
-            this.childProceduresEncodedInParentsDescribeSensor = SettingsHelper.parseBoolean(setting, value);
-            break;
+//        case CHILD_PROCEDURES_ENCODED_IN_PARENTS_DESCRIBE_SENSOR:
+//            this.childProceduresEncodedInParentsDescribeSensor = SettingsHelper.parseBoolean(setting, value);
+//            break;
         case DEFAULT_OFFERING_PREFIX:
             this.defaultOfferingPrefix = SettingsHelper.parseString(setting, value, true);
             break;
         case DEFAULT_PROCEDURE_PREFIX:
             this.defaultProcedurePrefix = SettingsHelper.parseString(setting, value, true);
             break;
-        case FOI_LISTED_IN_OFFERINGS:
-            this.foiListedInOfferings = SettingsHelper.parseBoolean(setting, value);
-            break;
+//        case FOI_LISTED_IN_OFFERINGS:
+//            this.foiListedInOfferings = SettingsHelper.parseBoolean(setting, value);
+//            break;
         case GML_DATE_FORMAT:
             this.gmlDateFormat = SettingsHelper.parseString(setting, value, true);
             if (this.gmlDateFormat != null && !this.gmlDateFormat.isEmpty()) {
@@ -402,18 +402,18 @@ public class Configurator {
         case MAX_GET_OBSERVATION_RESULTS:
             this.maxGetObsResults = SettingsHelper.parseInteger(setting, value);
             break;
-        case NO_DATA_VALUE:
-            this.noDataValue = SettingsHelper.parseString(setting, value, false);
-            break;
+//        case NO_DATA_VALUE:
+//            this.noDataValue = SettingsHelper.parseString(setting, value, false);
+//            break;
         case SENSOR_DIRECTORY:
             this.sensorDir = SettingsHelper.parseFile(setting, value, true);
             break;
-        case SHOW_FULL_OPERATIONS_METADATA:
-            this.showFullOperationsMetadata = SettingsHelper.parseBoolean(setting, value);
-            break;
-        case SHOW_FULL_OPERATIONS_METADATA_FOR_OBSERVATIONS:
-            this.showFullOperationsMetadata4Observations = SettingsHelper.parseBoolean(setting, value);
-            break;
+//        case SHOW_FULL_OPERATIONS_METADATA:
+//            this.showFullOperationsMetadata = SettingsHelper.parseBoolean(setting, value);
+//            break;
+//        case SHOW_FULL_OPERATIONS_METADATA_FOR_OBSERVATIONS:
+//            this.showFullOperationsMetadata4Observations = SettingsHelper.parseBoolean(setting, value);
+//            break;
         case SKIP_DUPLICATE_OBSERVATIONS:
             this.skipDuplicateObservations = SettingsHelper.parseBoolean(setting, value);
             break;
@@ -882,12 +882,12 @@ public class Configurator {
         return gmlDateFormat;
     }
 
-    /**
-     * @return Returns the noDataValue.
-     */
-    public String getNoDataValue() {
-        return noDataValue;
-    }
+//    /**
+//     * @return Returns the noDataValue.
+//     */
+//    public String getNoDataValue() {
+//        return noDataValue;
+//    }
 
     /**
      * @return the supportsQuality
@@ -909,20 +909,20 @@ public class Configurator {
         return false;
     }
 
-    /**
-     * @return foiIncludedInCapabilities
-     */
-    public boolean isFoiListedInOfferings() {
-        return foiListedInOfferings;
-    }
-
-    /**
-     * @return boolean indicating if child procedures should be fully encoded in
-     *         parents' DescribeSensor resposnes
-     */
-    public boolean isChildProceduresEncodedInParentsDescribeSensor() {
-        return childProceduresEncodedInParentsDescribeSensor;
-    }
+//    /**
+//     * @return foiIncludedInCapabilities
+//     */
+//    public boolean isFoiListedInOfferings() {
+//        return foiListedInOfferings;
+//    }
+//
+//    /**
+//     * @return boolean indicating if child procedures should be fully encoded in
+//     *         parents' DescribeSensor resposnes
+//     */
+//    public boolean isChildProceduresEncodedInParentsDescribeSensor() {
+//        return childProceduresEncodedInParentsDescribeSensor;
+//    }
 
     /**
      * @return true if duplicate observations should be skipped during insertion
@@ -931,20 +931,20 @@ public class Configurator {
         return skipDuplicateObservations;
     }
 
-    /**
-     * @return boolean indicating the show full OperationsMetadata for
-     *         observations
-     */
-    public boolean isShowFullOperationsMetadata4Observations() {
-        return showFullOperationsMetadata4Observations;
-    }
-
-    /**
-     * @return showFullOperationsMetadata
-     */
-    public boolean isShowFullOperationsMetadata() {
-        return showFullOperationsMetadata;
-    }
+//    /**
+//     * @return boolean indicating the show full OperationsMetadata for
+//     *         observations
+//     */
+//    public boolean isShowFullOperationsMetadata4Observations() {
+//        return showFullOperationsMetadata4Observations;
+//    }
+//
+//    /**
+//     * @return showFullOperationsMetadata
+//     */
+//    public boolean isShowFullOperationsMetadata() {
+//        return showFullOperationsMetadata;
+//    }
 
     /**
      * @return the characterEncoding

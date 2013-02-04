@@ -24,6 +24,7 @@
 package org.n52.sos.service.profile;
 
 import java.util.Map;
+import java.util.Set;
 
 public interface IProfile {
 
@@ -50,5 +51,18 @@ public interface IProfile {
     public boolean isReturnLatestValueIfTemporalFilterIsMissingInGetObservation();
 
     public Map<String, String> getDefaultObservationTypesForEncoding();
+    
+    public boolean isListFeatureOfInterestsInOfferings();
 
+    public boolean isEncodeChildProcedureDescriptions();
+
+    public boolean isShowFullOperationsMetadata();
+
+    public boolean isShowFullOperationsMetadataForObservations();
+    
+    public String getResponseNoDataPlaceholder();
+
+    public Set<String> getNoDataPlaceholder();
+    
+    public boolean isSetNoDataPlaceholder();
 }

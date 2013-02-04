@@ -8,8 +8,16 @@
 	<profile:encodeFeatureOfInterestInObservations>true</profile:encodeFeatureOfInterestInObservations>
 	<profile:encodingNamespaceForFeatureOfInterestEncoding></profile:encodingNamespaceForFeatureOfInterestEncoding>
 	<profile:showMetadataOfEmptyObservations>true</profile:showMetadataOfEmptyObservations>
+	 <profile:listFeatureOfInterestsInOfferings>true</profile:listFeatureOfInterestsInOfferings>
+	 <profile:encodeChildProcedureDescriptions>false</profile:encodeChildProcedureDescriptions>
+	 <profile:showFullOperationsMetadata>true</profile:showFullOperationsMetadata>
+	 <profile:showFullOperationsMetadataForObservations>true</profile:showFullOperationsMetadataForObservations>
 	<profile:allowSubsettingForSOS20OM20>false</profile:allowSubsettingForSOS20OM20>
 	<profile:mergeValues>true</profile:mergeValues>
+	<profile:NoDataPlaceholder>
+		<profile:responsePlaceholder>noData</profile:responsePlaceholder>
+		<profile:placeholder>noData</profile:placeholder>
+	</profile:NoDataPlaceholder>
 	<profile:returnLatestValueIfTemporalFilterIsMissingInGetObservation>false</profile:returnLatestValueIfTemporalFilterIsMissingInGetObservation>
 	<profile:EncodeProcedure>
 		<profile:namespace></profile:namespace>

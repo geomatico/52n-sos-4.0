@@ -421,7 +421,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 sosOffering.setTime(new TimePeriod(minDate, maxDate));
 
                 // add feature of interests
-                if (getConfigurator().isFoiListedInOfferings()) {
+                if (getConfigurator().getActiveProfile().isListFeatureOfInterestsInOfferings()) {
                     sosOffering.setFeatureOfInterest(getFOI4offering(offering));
                 }
 
@@ -642,7 +642,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         List<String> featureIDs = new ArrayList<String>(0);
         Collection<String> features =
                 getConfigurator().getCapabilitiesCacheController().getKOfferingVFeatures().get(offering);
-        if (!getConfigurator().isFoiListedInOfferings() || features == null) {
+        if (!getConfigurator().getActiveProfile().isListFeatureOfInterestsInOfferings() || features == null) {
             featureIDs.add(OGCConstants.UNKNOWN);
         } else {
             featureIDs.addAll(features);

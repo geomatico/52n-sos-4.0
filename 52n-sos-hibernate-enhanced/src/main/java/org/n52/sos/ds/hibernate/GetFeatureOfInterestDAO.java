@@ -72,7 +72,7 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
         
         Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeatureOfInterest(), version);
         
-        if (getConfigurator().isShowFullOperationsMetadata4Observations()) {
+        if (getConfigurator().getActiveProfile().isShowFullOperationsMetadataForObservations()) {
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCache().getObservableProperties());
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.featureOfInterest, featureIDs);

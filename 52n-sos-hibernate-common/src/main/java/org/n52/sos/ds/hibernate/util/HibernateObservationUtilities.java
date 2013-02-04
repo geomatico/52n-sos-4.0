@@ -301,7 +301,7 @@ public class HibernateObservationUtilities {
                     obsConst.setOfferings(offerings);
                 }
                 SosObservation sosObservation = new SosObservation();
-                sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
+                sosObservation.setNoDataValue(Configurator.getInstance().getActiveProfile().getResponseNoDataPlaceholder());
                 sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
                 sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
                 sosObservation.setObservationConstellation(obsConst);
@@ -323,7 +323,7 @@ public class HibernateObservationUtilities {
                 && !hObservation.getIdentifier().startsWith(SosConstants.GENERATED_IDENTIFIER_PREFIX)) {
             sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
         }
-        sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
+        sosObservation.setNoDataValue(Configurator.getInstance().getActiveProfile().getResponseNoDataPlaceholder());
         sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
         sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
         sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));

@@ -24,7 +24,9 @@
 package org.n52.sos.service.profile;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.n52.sos.ogc.om.OMConstants;
 
@@ -46,6 +48,18 @@ public class DefaultProfile implements IProfile {
     private static final boolean DEAFULT_MERGE_VALUES = false;
 
     private static final boolean DEAFULT_RETURN_LATEST_VALUE_IF_TEMPORAL_FILTER_IS_MISSING_IN_GETOBSERVATION = false;
+
+    private static final boolean DEFAULT_LIST_FEATURE_OF_INSEREST_IN_OFFERINGS = true;
+
+    private static final boolean DEFAULT_ENCODE_CHILD_PROCEDURE_DESCRIPTION = false;
+
+    private static final boolean DEFAULT_SHOW_FULL_OPERATIONS_METADATA = false;
+
+    private static final boolean DEFAULT_SHOW_FULL_OPERATIONS_METADATA_FOR_OBSERVATIONS = false;
+
+    private static final String DAFUALT_RESPONSE_NODATA_PLACEHOLDER = "noData";
+    
+    private Set<String> defaultNoDataPlaceholder = new HashSet<String>();
     
     private Map<String, Boolean> encodeProcedureInObservation = new HashMap<String, Boolean>(0);
 
@@ -116,6 +130,41 @@ public class DefaultProfile implements IProfile {
     @Override
     public Map<String, String> getDefaultObservationTypesForEncoding() {
         return defaultObservationTypesForEncoding;
+    }
+
+    @Override
+    public boolean isListFeatureOfInterestsInOfferings() {
+        return DEFAULT_LIST_FEATURE_OF_INSEREST_IN_OFFERINGS;
+    }
+
+    @Override
+    public boolean isEncodeChildProcedureDescriptions() {
+        return DEFAULT_ENCODE_CHILD_PROCEDURE_DESCRIPTION;
+    }
+
+    @Override
+    public boolean isShowFullOperationsMetadata() {
+        return DEFAULT_SHOW_FULL_OPERATIONS_METADATA;
+    }
+
+    @Override
+    public boolean isShowFullOperationsMetadataForObservations() {
+        return DEFAULT_SHOW_FULL_OPERATIONS_METADATA_FOR_OBSERVATIONS;
+    }
+
+    @Override
+    public String getResponseNoDataPlaceholder() {
+        return DAFUALT_RESPONSE_NODATA_PLACEHOLDER;
+    }
+
+    @Override
+    public Set<String> getNoDataPlaceholder() {
+        return defaultNoDataPlaceholder;
+    }
+
+    @Override
+    public boolean isSetNoDataPlaceholder() {
+        return defaultNoDataPlaceholder != null && !defaultNoDataPlaceholder.isEmpty();
     }
 
 }

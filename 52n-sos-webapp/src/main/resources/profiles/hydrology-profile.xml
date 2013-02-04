@@ -8,8 +8,16 @@
 	<profile:encodeFeatureOfInterestInObservations>false</profile:encodeFeatureOfInterestInObservations>
 	<profile:encodingNamespaceForFeatureOfInterestEncoding>http://www.opengis.net/waterml/2.0</profile:encodingNamespaceForFeatureOfInterestEncoding>
 	<profile:showMetadataOfEmptyObservations>true</profile:showMetadataOfEmptyObservations>
+	<profile:listFeatureOfInterestsInOfferings>true</profile:listFeatureOfInterestsInOfferings>
+	<profile:encodeChildProcedureDescriptions>false</profile:encodeChildProcedureDescriptions>
+	<profile:showFullOperationsMetadata>true</profile:showFullOperationsMetadata>
+	<profile:showFullOperationsMetadataForObservations>true</profile:showFullOperationsMetadataForObservations>
 	<profile:allowSubsettingForSOS20OM20>true</profile:allowSubsettingForSOS20OM20>
 	<profile:mergeValues>true</profile:mergeValues>
+	<profile:NoDataPlaceholder>
+		<profile:responsePlaceholder>noData</profile:responsePlaceholder>
+		<profile:placeholder>noData</profile:placeholder>
+	</profile:NoDataPlaceholder>
 	<profile:returnLatestValueIfTemporalFilterIsMissingInGetObservation>true</profile:returnLatestValueIfTemporalFilterIsMissingInGetObservation>
 	<profile:EncodeProcedure>
 		<profile:namespace>http://www.opengis.net/waterml/2.0</profile:namespace>

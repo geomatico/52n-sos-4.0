@@ -23,25 +23,35 @@
  */
 package org.n52.sos.profile;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 import org.n52.sos.service.profile.IProfile;
 import org.x52North.sensorweb.sos.profile.DefaultObservationTypesForEncodingDocument.DefaultObservationTypesForEncoding;
 import org.x52North.sensorweb.sos.profile.EncodeProcedureDocument.EncodeProcedure;
+import org.x52North.sensorweb.sos.profile.NoDataPlaceholderDocument.NoDataPlaceholder;
 import org.x52North.sensorweb.sos.profile.SosProfileDocument;
 import org.x52North.sensorweb.sos.profile.SosProfileType;
 
 public class ProfileParser {
-    
+
     public static IProfile parseSosProfile(SosProfileDocument sosProfileDoc) {
         Profile profile = new Profile();
         SosProfileType sosProfile = sosProfileDoc.getSosProfile();
         profile.setIdentifier(sosProfile.getIdentifier());
         profile.setActiveProfile(sosProfile.getActiveProfile());
+        profile.setListFeatureOfInterestsInOfferings(sosProfile.getListFeatureOfInterestsInOfferings());
+        profile.setEncodeChildProcedureDescriptions(sosProfile.getEncodeChildProcedureDescriptions());
+        profile.setShowFullOperationsMetadata(sosProfile.getShowFullOperationsMetadata());
+        profile.setShowFullOperationsMetadataForObservations(sosProfile.getShowFullOperationsMetadataForObservations());
         profile.setAllowSubsettingForSOS20OM20(sosProfile.getAllowSubsettingForSOS20OM20());
         profile.setEncodeFeatureOfInterestInObservations(sosProfile.getEncodeFeatureOfInterestInObservations());
         profile.setEncodingNamespaceForFeatureOfInterest(sosProfile.getEncodingNamespaceForFeatureOfInterestEncoding());
         profile.setMergeValues(sosProfile.getMergeValues());
         profile.setObservationResponseFormat(sosProfile.getObservationResponseFormat());
-        profile.setReturnLatestValueIfTemporalFilterIsMissingInGetObservation(sosProfile.getReturnLatestValueIfTemporalFilterIsMissingInGetObservation());
+        parseNoDataPlaceholder(profile, sosProfile.getNoDataPlaceholder());
+        profile.setReturnLatestValueIfTemporalFilterIsMissingInGetObservation(sosProfile
+                .getReturnLatestValueIfTemporalFilterIsMissingInGetObservation());
         profile.setShowMetadataOfEmptyObservations(sosProfile.getShowMetadataOfEmptyObservations());
         if (sosProfile.getDefaultObservationTypesForEncodingArray() != null) {
             parseDefaultObservationTypesForEncoding(profile, sosProfile.getDefaultObservationTypesForEncodingArray());
@@ -50,23 +60,36 @@ public class ProfileParser {
             parseEncodeProcedure(profile, sosProfile.getEncodeProcedureArray());
         }
         if (sosProfile.isSetEncodingNamespaceForFeatureOfInterestEncoding()) {
-            profile.setEncodingNamespaceForFeatureOfInterest(sosProfile.getEncodingNamespaceForFeatureOfInterestEncoding());
+            profile.setEncodingNamespaceForFeatureOfInterest(sosProfile
+                    .getEncodingNamespaceForFeatureOfInterestEncoding());
         }
-        
+
         return profile;
+    }
+
+    private static void parseNoDataPlaceholder(Profile profile, NoDataPlaceholder noDataPlaceholder) {
+        if (noDataPlaceholder.getResponsePlaceholder() != null
+                && !noDataPlaceholder.getResponsePlaceholder().isEmpty()) {
+            profile.setResponseNoDataPlaceholder(noDataPlaceholder.getResponsePlaceholder());
+        }
+        if (noDataPlaceholder.getPlaceholderArray() != null && noDataPlaceholder.getPlaceholderArray().length > 0) {
+            profile.setNoDataPlaceholder(new HashSet<String>(Arrays.asList(noDataPlaceholder.getPlaceholderArray())));
+        }
+
     }
 
     private static void parseEncodeProcedure(Profile profile, EncodeProcedure[] encodeProcedureArray) {
         for (EncodeProcedure encodeProcedure : encodeProcedureArray) {
             profile.addEncodeProcedureInObservation(encodeProcedure.getNamespace(), encodeProcedure.getEncode());
         }
-        
+
     }
 
     private static void parseDefaultObservationTypesForEncoding(Profile profile,
             DefaultObservationTypesForEncoding[] defaultObservationTypesForEncodingArray) {
         for (DefaultObservationTypesForEncoding defaultObservationTypesForEncoding : defaultObservationTypesForEncodingArray) {
-            profile.addDefaultObservationTypesForEncoding(defaultObservationTypesForEncoding.getNamespace(), defaultObservationTypesForEncoding.getObservationType());
+            profile.addDefaultObservationTypesForEncoding(defaultObservationTypesForEncoding.getNamespace(),
+                    defaultObservationTypesForEncoding.getObservationType());
         }
     }
 
