@@ -122,6 +122,18 @@ public class CollectionHelper {
 		return new ArrayList<T>(s1);
 	}
 
+    public static <K, V> Map<K, V> synchronizedMap(int initialCapacity, float loadFactor) {
+        return Collections.synchronizedMap(new HashMap<K, V>(initialCapacity, loadFactor));
+    }
+    
+    public static <E> List<E> synchronizedLinkedList() {
+        return Collections.synchronizedList(new LinkedList<E>());
+    }
+    
+    public static <E> List<E> synchronizedArrayList(int initialCapacity) {
+        return Collections.synchronizedList(new ArrayList<E>(initialCapacity));
+    }
+
     private CollectionHelper() {
     }
 }
