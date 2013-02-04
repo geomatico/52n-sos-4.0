@@ -407,10 +407,14 @@ public class HibernateCriteriaQueryUtilities {
         if (queryObject.isSetMaxResults()) {
             criteria.setMaxResults(queryObject.getMaxResult());
         }
-        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        if (queryObject.isSetResultTransformer()) {
+            criteria.setResultTransformer(queryObject.getResultTransformer());
+        } else {
+            criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        }
         return criteria.list();
     }
-
+    
     protected static Object getObject(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
         Criteria criteria = session.createCriteria(objectClass);
         if (queryObject.isSetAliases()) {
@@ -1277,6 +1281,10 @@ public class HibernateCriteriaQueryUtilities {
             HibernateQueryObject queryObject, Session session) {
         return (List<ObservationConstellationOfferingObservationType>) getObjectList(queryObject, session,
                 ObservationConstellationOfferingObservationType.class);
+    }
+
+    public static List<?> getDataAvailabilityValues(HibernateQueryObject queryObject, Session session) {
+        return getObjectList(queryObject, session, Observation.class);
     }
 
 }

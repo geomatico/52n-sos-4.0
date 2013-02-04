@@ -31,6 +31,7 @@ import java.util.Map;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projection;
+import org.hibernate.transform.ResultTransformer;
 
 public class HibernateQueryObject {
     
@@ -43,6 +44,8 @@ public class HibernateQueryObject {
     private Order order;
     
     private int maxResult = -1;
+    
+    private ResultTransformer resultTransformer;
     
     public Map<String, String> getAliases() {
         return aliases;
@@ -129,7 +132,18 @@ public class HibernateQueryObject {
 		return String.format("HibernateQueryObject [aliases=%s, criterions=%s, projections=%s, order=%s, maxResult=%s]", 
 				aliases, criterions, projections, order, maxResult);
 	}
+
+    public void setResultTransformer(ResultTransformer resultTransformer) {
+        this.resultTransformer = resultTransformer;
+    }
     
-    
+
+    public ResultTransformer getResultTransformer() {
+        return resultTransformer;
+    }
+   
+    public boolean isSetResultTransformer() {
+        return resultTransformer != null;
+    }
     
 }
