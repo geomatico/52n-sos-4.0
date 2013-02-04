@@ -216,7 +216,7 @@ public class InMemoryCacheControllerTest
 	}
 
 	@Test public void
-	should_contain_observalbe_property_after_InsertObservation()
+	should_contain_observable_property_after_InsertObservation()
 		throws OwsExceptionReport {
 		updateCacheWithSingleObservation();
 		
@@ -333,14 +333,14 @@ public class InMemoryCacheControllerTest
 		
 		assertTrue("observable property -> offering relation NOT in cache",
 				controller
-				.getOfferings4ObservableProperty(getObservablePropertyFromInsertSensor())
+				.getOfferings4ObservableProperty( getObservablePropertyFromInsertSensor() )
 				.contains( getAssignedOfferingId() )
 				);
 		
 		assertTrue("offering -> observable property relation NOT in cache",
 				controller
-				.getPhenomenons4Offering(getAssignedOfferingId())
-				.contains(getObservablePropertyFromInsertSensor())
+				.getPhenomenons4Offering( getAssignedOfferingId() )
+				.contains( getObservablePropertyFromInsertSensor() )
 				);
 		
 	}
@@ -614,6 +614,18 @@ public class InMemoryCacheControllerTest
 		
 		assertTrue("observation identifiers STILL in cache", 
 				controller.getObservationIdentifiers().isEmpty());
+	}
+	
+	@Test public void 
+	should_not_contain_offering_observable_property_relations_afterDeleteSensor()
+			throws OwsExceptionReport{
+		deleteSensorPreparation();
+		
+		assertFalse("offering to observable property relation STILL in cache",
+				controller.getCapabilitiesCache().getKOfferingVObservableProperties().containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
+		
+		assertFalse("observable property to offering relation STILL in cache",
+				controller.getCapabilitiesCache().getKObservablePropertyVOffering().containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
 	}
 	
 	/* HELPER */

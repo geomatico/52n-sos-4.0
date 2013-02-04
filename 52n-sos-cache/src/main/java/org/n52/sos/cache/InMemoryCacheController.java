@@ -273,6 +273,11 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			removeOfferingToObservationTypesRelations(offeringId);
 
 			removeOfferingEnvelope(offeringId);
+			
+			// TODO Eike: Continue implementation here
+//			removeObservablePropertiesToOfferingRelation(offeringId);
+			
+			removeOfferingToObservablePropertyRelation(offeringId);
 		}
 		
 		removeRemovedRelatedFeaturesFromRoleMap();
@@ -306,6 +311,14 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		List<String> allowedObservationIdentifiers = getAllowedEntries(getCapabilitiesCache().getKProcedureVObservationIdentifiers().values());
 		List<String> featuresToRemove = getEntriesToRemove(allowedObservationIdentifiers,getCapabilitiesCache().getObservationIdentifiers());
 		removeEntries(featuresToRemove,getCapabilitiesCache().getObservationIdentifiers());
+	}
+	
+	private void removeOfferingToObservablePropertyRelation(String offeringId)
+	{
+		getCapabilitiesCache().getKOfferingVObservableProperties().remove(offeringId);
+		LOGGER.debug("offering \"{}\" to observable properties relations removed? {}",
+				offeringId,
+				getCapabilitiesCache().getKOfferingVObservableProperties().containsKey(offeringId));
 	}
 
 	private void removeProcedureToObservationIdentifierRelations(String procedureIdentifier)
@@ -477,9 +490,6 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		for (String observableProperty : getCapabilitiesCache().getKProcedureVObservableProperties().get(procedureIdentifier)) {
 			removeObservablePropertyToProcedureRelation(observableProperty, procedureIdentifier);
 			removeProcedureToObservablePropertyRelations(procedureIdentifier);
-			// TODO Eike: Continue implementation here
-//			removeObservablePropertiesToOfferingRelation(observableProperty, sosRequest.getProcedureIdentifier());
-//			removeOfferingToObservablePropertyRelation(sosRequest.getProcedureIdentifier(), observableProperty);
 		}
 	}
 
@@ -625,12 +635,12 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			String observablePropertyIdentifier)
 	{
 		// offering -> observableProperties
-		if (getCapabilitiesCache().getOffPhenomenons().get(offeringIdentifier) == null) {
+		if (getCapabilitiesCache().getKOfferingVObservableProperties().get(offeringIdentifier) == null) {
 			List<String> propertiesForOffering = Collections.synchronizedList(new ArrayList<String>());
 			propertiesForOffering.add(observablePropertyIdentifier);
-			getCapabilitiesCache().getOffPhenomenons().put(offeringIdentifier, propertiesForOffering);
-		} else if (!getCapabilitiesCache().getOffPhenomenons().get(offeringIdentifier).contains(observablePropertyIdentifier)) {
-			getCapabilitiesCache().getOffPhenomenons().get(offeringIdentifier).add(observablePropertyIdentifier);
+			getCapabilitiesCache().getKOfferingVObservableProperties().put(offeringIdentifier, propertiesForOffering);
+		} else if (!getCapabilitiesCache().getKOfferingVObservableProperties().get(offeringIdentifier).contains(observablePropertyIdentifier)) {
+			getCapabilitiesCache().getKOfferingVObservableProperties().get(offeringIdentifier).add(observablePropertyIdentifier);
 		}
 	}
 

@@ -193,23 +193,28 @@ public class CacheImpl implements CapabilitiesCache{
     }
     
     /**
-     * returns relationships between offerings and phenomena
-     * 
-     * @return
+     * @deprecated use {@link #getKOfferingVObservableProperties()}
      */
     protected Map<String, Collection<String>> getOffPhenomenons() {
-        return kOfferingVObservableProperties;
+        return getKOfferingVObservableProperties();
     }
-
+    
     /**
      * returns the observedProperties for each offering
      * 
      * @return Map<String, String[]> containing the offerings with its
      *         observedProperties
+     * @return
+     */
+    protected Map<String, Collection<String>> getKOfferingVObservableProperties() {
+        return kOfferingVObservableProperties;
+    }
+
+    /**
      * @deprecated use {@link #getOffPhenomenons()}
      */
     protected Map<String, Collection<String>> getObsPhenomenons() {
-        return kOfferingVObservableProperties;
+        return getKOfferingVObservableProperties();
     }
     
     @Override
@@ -467,7 +472,7 @@ public class CacheImpl implements CapabilitiesCache{
      * @deprecated use {@link #getKObservablePropertyVProcedures()}
      */
     protected Map<String, List<String>> getPhenProcs() {
-        return kObservablePropertyVProcedures;
+        return getKObservablePropertyVProcedures();
     }
     
     protected Map<String, List<String>> getKObservablePropertyVProcedures() {
@@ -742,7 +747,7 @@ public class CacheImpl implements CapabilitiesCache{
      * @deprecated use {@link #getKProcedureVObservableProperties()}
      */
     protected Map<String, Collection<String>> getProcPhens() {
-        return kProcedureVObservableProperties;
+        return getKProcedureVObservableProperties();
     }
     
     /**
