@@ -21,13 +21,12 @@
  */
 package org.n52.sos.ds.hibernate.cache;
 
+import org.n52.sos.util.GroupedAndNamedThreadFactory;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
@@ -41,14 +40,6 @@ import org.n52.sos.util.CollectionHelper;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class OfferingCacheUpdate extends CacheUpdate {
-
-    protected static class UpdateThreadFactory implements ThreadFactory {
-        private final AtomicInteger i = new AtomicInteger(0);
-        private final ThreadGroup tg = new ThreadGroup("cache-update");
-        @Override public Thread newThread(Runnable r) {
-            return new Thread(tg, r, "cache-update-" + i.getAndIncrement());
-        }
-    }
     
     @Override
     public void run() {
@@ -56,7 +47,8 @@ public class OfferingCacheUpdate extends CacheUpdate {
         OfferingCache offeringCache = new OfferingCache(hOfferings);
         // fields required for multithreading
         log.debug("multithreading init");
-        ExecutorService executor = Executors.newFixedThreadPool(Configurator.getInstance().getCacheThreadCount(), new UpdateThreadFactory());
+        ExecutorService executor = Executors.newFixedThreadPool(Configurator.getInstance().getCacheThreadCount(), 
+                new GroupedAndNamedThreadFactory("offering-cache-update"));
         CountDownLatch offeringThreadsRunning = new CountDownLatch(hOfferings.size());
         IConnectionProvider connectionProvider = Configurator.getInstance().getConnectionProvider();
         List<OwsExceptionReport> errors = CollectionHelper.synchronizedLinkedList();
@@ -76,8 +68,8 @@ public class OfferingCacheUpdate extends CacheUpdate {
         try {
             log.debug("Waiting for {} threads to finish", offeringThreadsRunning.getCount());
             offeringThreadsRunning.await();
-        } catch (InterruptedException e) {/* nothing to do here */
-
+        } catch (InterruptedException e) {
+            /* nothing to do here */
         }
         log.debug("Finished waiting for other threads");
         if (!errors.isEmpty()) {
