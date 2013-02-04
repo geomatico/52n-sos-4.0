@@ -33,7 +33,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projection;
 import org.hibernate.transform.ResultTransformer;
 
-public class HibernateQueryObject {
+public class HibernateQueryObject implements Cloneable {
     
     private Map<String, String> aliases = new HashMap<String, String>(0);
     
