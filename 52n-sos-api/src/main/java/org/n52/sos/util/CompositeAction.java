@@ -21,17 +21,45 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ds.hibernate.cache;
+package org.n52.sos.util;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
- *
+ * @param <A>
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class StaticCapabilitiesCacheUpdate extends CompositeCacheUpdate {
+public abstract class CompositeAction<A extends Action> extends RunnableAction {
 
-    public StaticCapabilitiesCacheUpdate() {
-        super(new SridCacheUpdate(), 
-              new ObservationTypeCacheUpdate(), 
-              new FeatureOfInterestTypeCacheUpdate());
+    private List<A> actions;
+
+    public CompositeAction(A... actions) {
+        this.actions = Arrays.asList(actions);
+    }
+
+    public List<A> getActions() {
+        return Collections.unmodifiableList(actions);
+    }
+
+    @Override
+    public void execute() {
+        if (getActions() != null) {
+            for (A action : getActions()) {
+                pre(action);
+                action.execute();
+                post(action);
+            }
+        }
+    }
+
+    protected abstract void pre(A action);
+    protected abstract void post(A action);
+
+    @Override
+    public String toString() {
+        return String.format("%s[actions=[%s]]", getClass().getSimpleName(),
+                StringHelper.join(", ", getActions()));
     }
 }

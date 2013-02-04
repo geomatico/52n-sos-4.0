@@ -23,6 +23,10 @@
  */
 package org.n52.sos.ds.hibernate.cache;
 
+import org.n52.sos.ds.hibernate.cache.base.OfferingCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.FeatureOfInterestCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.EventTimeCacheUpdate;
+
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>

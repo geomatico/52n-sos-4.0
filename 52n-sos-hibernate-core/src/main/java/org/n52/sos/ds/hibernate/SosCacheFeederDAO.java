@@ -93,7 +93,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
             action.setCache(cache);
             action.setSession(session);
             action.setErrors(errors);
-            action.update();
+            action.execute();
         } catch (HibernateException he) {
             String exceptionText = "Error while updating CapabilitiesCache!";
             LOGGER.error(exceptionText, he);

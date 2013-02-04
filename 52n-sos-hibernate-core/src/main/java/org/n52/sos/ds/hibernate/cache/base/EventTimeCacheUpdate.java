@@ -21,18 +21,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ds.hibernate.cache;
+package org.n52.sos.ds.hibernate.cache.base;
 
+import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class ObservationIdentifiersCacheUpdate extends CacheUpdate {
+public class EventTimeCacheUpdate extends CacheUpdate {
 
     @Override
-    public void run() {
-        getCache().setObservationIdentifiers(HibernateCriteriaQueryUtilities.getObservationIdentifiers(getSession()));
+    public void execute() {
+        getCache().setMinEventTime(HibernateCriteriaQueryUtilities.getMinObservationTime(getSession()));
+        getCache().setMaxEventTime(HibernateCriteriaQueryUtilities.getMaxObservationTime(getSession()));
     }
+    
 }

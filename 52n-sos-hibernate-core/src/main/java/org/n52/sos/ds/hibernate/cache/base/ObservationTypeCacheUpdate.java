@@ -21,8 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ds.hibernate.cache;
+package org.n52.sos.ds.hibernate.cache.base;
 
+import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 
 /**
@@ -32,7 +33,7 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 public class ObservationTypeCacheUpdate extends CacheUpdate {
 
     @Override
-    public void run() {
+    public void execute() {
         getCache().setObservationTypes(HibernateCriteriaQueryUtilities.getObservationTypes(getSession()));
     }
 }

@@ -87,7 +87,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInser
         checkRequestedParameter(request);
 
         InsertSensorResponse response = getDao().insertSensor(request);
-        SosEventBus.getInstance().submit(new SensorInsertion(request, response));
+        SosEventBus.fire(new SensorInsertion(request, response));
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {

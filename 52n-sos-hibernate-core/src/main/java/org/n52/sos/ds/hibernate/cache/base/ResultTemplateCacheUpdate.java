@@ -21,10 +21,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ds.hibernate.cache;
+package org.n52.sos.ds.hibernate.cache.base;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 
@@ -35,7 +36,7 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 public class ResultTemplateCacheUpdate extends CacheUpdate {
 
     @Override
-    public void run() {
+    public void execute() {
         List<ResultTemplate> resultTemplateObjects = HibernateCriteriaQueryUtilities.getResultTemplateObjects(getSession());
         List<String> resultTemplates = new ArrayList<String>(resultTemplateObjects.size());
         for (ResultTemplate resultTemplateObject : resultTemplateObjects) {

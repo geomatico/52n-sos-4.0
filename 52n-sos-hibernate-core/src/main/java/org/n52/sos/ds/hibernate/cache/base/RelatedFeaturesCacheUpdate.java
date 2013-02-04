@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ds.hibernate.cache;
+package org.n52.sos.ds.hibernate.cache.base;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
@@ -39,7 +40,7 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 public class RelatedFeaturesCacheUpdate extends CacheUpdate {
 
     @Override
-    public void run() {
+    public void execute() {
         // TODO Carsten: use RelatedFeatures and query...
         List<RelatedFeature> relatedFeatures = HibernateCriteriaQueryUtilities.getRelatedFeatureObjects(getSession());
         Map<String, Collection<String>> relatedFeatureList =

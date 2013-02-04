@@ -21,27 +21,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ds.hibernate.cache;
-
-import java.util.ArrayList;
-import java.util.List;
-import org.n52.sos.ds.hibernate.entities.SpatialRefSys;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
+package org.n52.sos.util;
 
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class SridCacheUpdate extends CacheUpdate {
-
-    @Override
-    public void run() {
-        List<SpatialRefSys> spatialRefSyss = HibernateCriteriaQueryUtilities.getSpatialReySysObjects(getSession());
-        List<Integer> srids = new ArrayList<Integer>(spatialRefSyss.size());
-        for (SpatialRefSys spatialRefSys : spatialRefSyss) {
-            srids.add(spatialRefSys.getSrid());
-        }
-        getCache().setSrids(srids);
-    }
-    
+public interface Action {
+    public void execute();
 }

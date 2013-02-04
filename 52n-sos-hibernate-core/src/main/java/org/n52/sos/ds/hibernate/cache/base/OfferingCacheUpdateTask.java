@@ -21,7 +21,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ds.hibernate.cache;
+package org.n52.sos.ds.hibernate.cache.base;
+
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import org.hibernate.Session;
-import org.n52.sos.ds.IConnectionProvider;
+import org.n52.sos.ds.hibernate.util.ThreadLocalSessionFactory;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.ObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
@@ -39,6 +40,7 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.RunnableAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,20 +48,23 @@ import org.slf4j.LoggerFactory;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class OfferingCacheUpdateTask implements Runnable {
+class OfferingCacheUpdateTask extends RunnableAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OfferingCacheUpdateTask.class);
     private CountDownLatch countDownLatch;
-    private IConnectionProvider connectionProvider;
+    private ThreadLocalSessionFactory sessionFactory;
     private List<OwsExceptionReport> errors;
     private Offering offering;
     private OfferingCache offeringCache;
 
-    public OfferingCacheUpdateTask(CountDownLatch countDownLatch, IConnectionProvider connectionProvider,
-            OfferingCache offeringCache, Offering offering,
+    OfferingCacheUpdateTask(
+            CountDownLatch countDownLatch, 
+            ThreadLocalSessionFactory sessionFactory,
+            OfferingCache offeringCache, 
+            Offering offering,
             List<OwsExceptionReport> error) {
         this.countDownLatch = countDownLatch;
-        this.connectionProvider = connectionProvider;
+        this.sessionFactory = sessionFactory;
         this.offeringCache = offeringCache;
         this.offering = offering;
         this.errors = error;
@@ -67,10 +72,6 @@ public class OfferingCacheUpdateTask implements Runnable {
     
     protected CountDownLatch getCountDownLatch() {
         return countDownLatch;
-    }
-
-    protected IConnectionProvider getConnectionProvider() {
-        return connectionProvider;
     }
 
     protected List<OwsExceptionReport> getErrors() {
@@ -84,27 +85,31 @@ public class OfferingCacheUpdateTask implements Runnable {
     protected OfferingCache getOfferingCache() {
         return offeringCache;
     }
+    
+    public ThreadLocalSessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
 
     protected void getOfferingInformationFromDbAndAddItToCacheMaps(Session session) throws OwsExceptionReport {
         String offeringId = getOffering().getIdentifier();
-        getOfferingCache().addOfferingName(offeringId, getOffering().getName());
+        getOfferingCache().setName(offeringId, getOffering().getName());
         // Procedures
-        getOfferingCache().addProcedures(offeringId, getProcedureIdentifierFrom(getOffering().getObservationConstellationOfferingObservationTypes()));
+        getOfferingCache().setProcedures(offeringId, getProcedureIdentifierFrom(getOffering().getObservationConstellationOfferingObservationTypes()));
         // Observable properties
-        getOfferingCache().addObservableProperties(offeringId, getObservablePropertyIdentifierFrom(getOffering().getObservationConstellationOfferingObservationTypes()));
+        getOfferingCache().setObservableProperties(offeringId, getObservablePropertyIdentifierFrom(getOffering().getObservationConstellationOfferingObservationTypes()));
         // Related features
-        getOfferingCache().addRelatedFeatures(offeringId, getRelatedFeatureIdentifiersFrom(getOffering()));
+        getOfferingCache().setRelatedFeatures(offeringId, getRelatedFeatureIdentifiersFrom(getOffering()));
         // Observation types
-        getOfferingCache().addObservationTypes(offeringId, getObservationTypesFrom(getOffering().getObservationConstellationOfferingObservationTypes()));
-        getOfferingCache().addAllowedObservationType(offeringId, getObservationTypesFromObservationType(getOffering().getObservationTypes()));
+        getOfferingCache().setObservationTypes(offeringId, getObservationTypesFrom(getOffering().getObservationConstellationOfferingObservationTypes()));
+        getOfferingCache().setAllowedObservationType(offeringId, getObservationTypesFromObservationType(getOffering().getObservationTypes()));
         // Spatial Envelope
-        getOfferingCache().addEnvelope(offeringId, getEnvelopeForOffering(offeringId, session));
+        getOfferingCache().setEnvelope(offeringId, getEnvelopeForOffering(offeringId, session));
         // Features of Interest
         List<String> featureOfInterestIdentifiers = HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(getOffering().getName(), session);
-        getOfferingCache().addFeaturesOfInterest(getOffering().getName(), featureOfInterestIdentifiers);
+        getOfferingCache().setFeaturesOfInterest(getOffering().getName(), featureOfInterestIdentifiers);
         // Temporal Envelope
-        getOfferingCache().addMinTime(offeringId, HibernateCriteriaQueryUtilities.getMinDate4Offering(offeringId, session));
-        getOfferingCache().addMaxTime(offeringId, HibernateCriteriaQueryUtilities.getMaxDate4Offering(offeringId, session));
+        getOfferingCache().setMinTime(offeringId, HibernateCriteriaQueryUtilities.getMinDate4Offering(offeringId, session));
+        getOfferingCache().setMaxTime(offeringId, HibernateCriteriaQueryUtilities.getMaxDate4Offering(offeringId, session));
     }
 
     protected List<String> getProcedureIdentifierFrom(Set<ObservationConstellationOfferingObservationType> set) {
@@ -158,18 +163,15 @@ public class OfferingCacheUpdateTask implements Runnable {
         }
         return new ArrayList<String>(obsTypes);
     }
-
+    
     @Override
-    public void run() {
-        Session session = null;
+    public void execute() {
         try {
-            session = (Session) getConnectionProvider().getConnection();
-            getOfferingInformationFromDbAndAddItToCacheMaps(session);
+            getOfferingInformationFromDbAndAddItToCacheMaps(getSessionFactory().getSession());
         } catch (OwsExceptionReport e) {
             LOGGER.error(String.format("Exception thrown: %s", e.getMessage()), e);
             getErrors().add(e);
         } finally {
-            getConnectionProvider().returnConnection(session);
             LOGGER.debug("OfferingTask finished, latch.countDown().");
             getCountDownLatch().countDown();
         }

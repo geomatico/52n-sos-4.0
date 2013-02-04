@@ -121,9 +121,21 @@ public class CollectionHelper {
 		s1.retainAll(list2);
 		return new ArrayList<T>(s1);
 	}
+     
+    public static <K, V> Map<K, V> synchronizedFixedSizeMap(final int capacity) {
+        return CollectionHelper.synchronizedMap(capacity, 1.0F);
+    }
 
-    public static <K, V> Map<K, V> synchronizedMap(int initialCapacity, float loadFactor) {
+    public static <K, V> Map<K, V> synchronizedMap(int initialCapacity) {
+        return Collections.synchronizedMap(new HashMap<K, V>(initialCapacity));
+    }
+    
+    protected static <K, V> Map<K, V> synchronizedMap(int initialCapacity, float loadFactor) {
         return Collections.synchronizedMap(new HashMap<K, V>(initialCapacity, loadFactor));
+    }
+    
+    public static <T> Set<T> synchronizedSet() {
+        return Collections.synchronizedSet(new HashSet<T>());
     }
     
     public static <E> List<E> synchronizedLinkedList() {

@@ -21,40 +21,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ds.hibernate.cache;
+package org.n52.sos.ds.hibernate.cache.base;
 
-import org.n52.sos.util.CompositeAction;
-import org.n52.sos.util.StringHelper;
+import org.n52.sos.ds.hibernate.cache.CompositeCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.FeatureOfInterestTypeCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.ObservationTypeCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.SridCacheUpdate;
 
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class CompositeCacheUpdate extends CacheUpdate {
-    private CompositeAction<CacheUpdate> action;
+public class StaticCapabilitiesCacheUpdate extends CompositeCacheUpdate {
 
-    public CompositeCacheUpdate(CacheUpdate... actions) {
-        this.action = new CompositeAction<CacheUpdate>(actions) {
-            @Override protected void pre(CacheUpdate action) {
-                action.setCache(getCache());
-                action.setErrors(getErrors());
-                action.setSession(getSession());
-                log.debug("Running {}.", action);
-            }
-            @Override protected void post(CacheUpdate action) {
-                getSession().clear();
-            }
-        };
-    }
-
-    @Override
-    public void execute() {
-        action.execute();
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s[actions=[%s]]",  getClass().getSimpleName(),
-                StringHelper.join(", ", action.getActions()));
+    public StaticCapabilitiesCacheUpdate() {
+        super(new SridCacheUpdate(), 
+              new ObservationTypeCacheUpdate(), 
+              new FeatureOfInterestTypeCacheUpdate());
     }
 }

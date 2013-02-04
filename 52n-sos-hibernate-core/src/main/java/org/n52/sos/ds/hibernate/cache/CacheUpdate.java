@@ -34,6 +34,7 @@ import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class CacheUpdate implements Runnable {
+public abstract class CacheUpdate implements Action {
     
     protected Logger log = LoggerFactory.getLogger(CacheUpdate.class);
     
@@ -72,11 +73,7 @@ public abstract class CacheUpdate implements Runnable {
     protected CapabilitiesCache getCache() {
         return cache;
     }
-    
-    public void update() {
-        run();
-    }
-    
+
     protected List<String> getAllOfferingIdentifiersFrom(Set<ObservationConstellation> observationConstellations) {
         Set<String> offerings = new HashSet<String>(observationConstellations.size());
         for (ObservationConstellation oc : observationConstellations) {

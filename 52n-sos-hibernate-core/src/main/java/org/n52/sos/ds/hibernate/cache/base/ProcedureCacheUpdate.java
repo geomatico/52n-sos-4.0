@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ds.hibernate.cache;
+package org.n52.sos.ds.hibernate.cache.base;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,6 +36,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.hibernate.HibernateQueryObject;
+import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
@@ -112,7 +113,7 @@ public class ProcedureCacheUpdate extends CacheUpdate {
     }
 
     @Override
-    public void run() {
+    public void execute() {
         List<Procedure> hProcedures = HibernateCriteriaQueryUtilities.getProcedureObjects(getSession());
         Set<String> procedures = new HashSet<String>(hProcedures.size());
         Map<String, Collection<String>> kProcedureVOffering = new HashMap<String, Collection<String>>(hProcedures.size());
