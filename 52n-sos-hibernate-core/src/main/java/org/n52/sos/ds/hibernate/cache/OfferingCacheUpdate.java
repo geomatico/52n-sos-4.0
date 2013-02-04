@@ -59,11 +59,11 @@ public class OfferingCacheUpdate extends CacheUpdate {
         ExecutorService executor = Executors.newFixedThreadPool(Configurator.getInstance().getCacheThreadCount(), new UpdateThreadFactory());
         CountDownLatch offeringThreadsRunning = new CountDownLatch(hOfferings.size());
         IConnectionProvider connectionProvider = Configurator.getInstance().getConnectionProvider();
-        List<OwsExceptionReport> owsReportsThrownByOfferingThreads = CollectionHelper.synchronizedLinkedList();
+        List<OwsExceptionReport> errors = CollectionHelper.synchronizedLinkedList();
         for (Offering offering : hOfferings) {
             if (!containsDeletedProcedure(offering.getObservationConstellationOfferingObservationTypes())) {
                 // create runnable for offeringId
-                Runnable task = new OfferingCacheUpdateTask(offeringThreadsRunning, connectionProvider, offeringCache, offering, owsReportsThrownByOfferingThreads);
+                Runnable task = new OfferingCacheUpdateTask(offeringThreadsRunning, connectionProvider, offeringCache, offering, errors);
                 // put runnable in executor service
                 executor.submit(task);
             } else {
@@ -80,8 +80,8 @@ public class OfferingCacheUpdate extends CacheUpdate {
 
         }
         log.debug("Finished waiting for other threads");
-        if (!owsReportsThrownByOfferingThreads.isEmpty()) {
-            getErrors().addAll(owsReportsThrownByOfferingThreads);
+        if (!errors.isEmpty()) {
+            getErrors().addAll(errors);
             return;
         }
         // save all information in cache

@@ -31,83 +31,123 @@ import org.n52.sos.util.CollectionHelper;
  */
 public class OfferingCache {
     
-    private Map<String, String> kOfferingVName;
-    private Map<String, List<String>> kOfferingVProcedures;
-    private Map<String, Collection<String>> kOfferingVObservableProperties;
-    private Map<String, Collection<String>> kOfferingVRelatedFeatures;
-    private Map<String, Collection<String>> kOfferingVObservationTypes;
-    private Map<String, Collection<String>> allowedkOfferingVObservationTypes;
-    private Map<String, DateTime> kOfferingVMinTime;
-    private Map<String, DateTime> kOfferingVMaxTime;
-    private Map<String, SosEnvelope> kOfferingVEnvelope;
-    private Map<String, Collection<String>> kOfferingVFeaturesOfInterest;
+    private Map<String, String> names;
+    private Map<String, List<String>> procedures;
+    private Map<String, Collection<String>> observableProperties;
+    private Map<String, Collection<String>> relatedFeatures;
+    private Map<String, Collection<String>> observationTypes;
+    private Map<String, Collection<String>> allowedObservationTypes;
+    private Map<String, DateTime> minTimes;
+    private Map<String, DateTime> maxTimes;
+    private Map<String, SosEnvelope> envelopes;
+    private Map<String, Collection<String>> featuresOfInterests;
 
     public OfferingCache(List<Offering> offerings) {
         final int size = offerings.size();
         final float loadFactor = 1.0f;
-        kOfferingVName = CollectionHelper.synchronizedMap(size, loadFactor);
-        kOfferingVProcedures = CollectionHelper.synchronizedMap(size, loadFactor);
-        kOfferingVObservableProperties = CollectionHelper.synchronizedMap(size, loadFactor);
-        kOfferingVRelatedFeatures = CollectionHelper.synchronizedMap(size, loadFactor);
-        kOfferingVObservationTypes = CollectionHelper.synchronizedMap(size, loadFactor);
-        allowedkOfferingVObservationTypes = CollectionHelper.synchronizedMap(size, loadFactor);
-        kOfferingVMinTime = CollectionHelper.synchronizedMap(size, loadFactor);
-        kOfferingVMaxTime = CollectionHelper.synchronizedMap(size, loadFactor);
-        kOfferingVEnvelope = CollectionHelper.synchronizedMap(size, loadFactor);
-        kOfferingVFeaturesOfInterest = CollectionHelper.synchronizedMap(size, loadFactor);
+        this.names = CollectionHelper.synchronizedMap(size, loadFactor);
+        this.procedures = CollectionHelper.synchronizedMap(size, loadFactor);
+        this.observableProperties = CollectionHelper.synchronizedMap(size, loadFactor);
+        this.relatedFeatures = CollectionHelper.synchronizedMap(size, loadFactor);
+        this.observationTypes = CollectionHelper.synchronizedMap(size, loadFactor);
+        this.allowedObservationTypes = CollectionHelper.synchronizedMap(size, loadFactor);
+        this.minTimes = CollectionHelper.synchronizedMap(size, loadFactor);
+        this.maxTimes = CollectionHelper.synchronizedMap(size, loadFactor);
+        this.envelopes = CollectionHelper.synchronizedMap(size, loadFactor);
+        this.featuresOfInterests = CollectionHelper.synchronizedMap(size, loadFactor);
     }
 
-    public Map<String, String> getKOfferingVName() {
-        return kOfferingVName;
+    public Map<String, String> getNames() {
+        return this.names;
     }
 
-    public Map<String, List<String>> getKOfferingVProcedures() {
-        return kOfferingVProcedures;
+    public Map<String, List<String>> getProcedures() {
+        return this.procedures;
     }
 
-    public Map<String, Collection<String>> getKOfferingVObservableProperties() {
-        return kOfferingVObservableProperties;
+    public Map<String, Collection<String>> getObservableProperties() {
+        return this.observableProperties;
     }
 
-    public Map<String, Collection<String>> getKOfferingVRelatedFeatures() {
-        return kOfferingVRelatedFeatures;
+    public Map<String, Collection<String>> getRelatedFeatures() {
+        return this.relatedFeatures;
     }
 
-    public Map<String, Collection<String>> getKOfferingVObservationTypes() {
-        return kOfferingVObservationTypes;
+    public Map<String, Collection<String>> getObservationTypes() {
+        return this.observationTypes;
     }
 
-    public Map<String, Collection<String>> getAllowedkOfferingVObservationTypes() {
-        return allowedkOfferingVObservationTypes;
+    public Map<String, Collection<String>> getAllowedObservationTypes() {
+        return this.allowedObservationTypes;
     }
 
-    public Map<String, DateTime> getKOfferingVMinTime() {
-        return kOfferingVMinTime;
+    public Map<String, DateTime> getMinTimes() {
+        return this.minTimes;
     }
 
-    public Map<String, DateTime> getKOfferingVMaxTime() {
-        return kOfferingVMaxTime;
+    public Map<String, DateTime> getMaxTimes() {
+        return this.maxTimes;
     }
 
-    public Map<String, SosEnvelope> getKOfferingVEnvelope() {
-        return kOfferingVEnvelope;
+    public Map<String, SosEnvelope> getEnvelopes() {
+        return this.envelopes;
     }
 
-    public Map<String, Collection<String>> getKOfferingVFeaturesOfInterest() {
-        return kOfferingVFeaturesOfInterest;
+    public Map<String, Collection<String>> getFeaturesOfInterests() {
+        return this.featuresOfInterests;
+    }
+    
+    public void addOfferingName(String offering, String name) {
+        getNames().put(offering, name);
+    }
+    
+    public void addProcedures(String offering, List<String> procedures) {
+        getProcedures().put(offering, procedures);
+    }
+
+    public void addObservableProperties(String offering, Collection<String> observableProperties) {
+        getObservableProperties().put(offering, observableProperties);
+    }
+
+    public void addRelatedFeatures(String offering, Collection<String> relatedFeatures) {
+        getRelatedFeatures().put(offering, relatedFeatures);
+    }
+    
+    public void addObservationTypes(String offering, Collection<String> observationTypes) {
+        getObservationTypes().put(offering, observationTypes);
+    }
+    
+    public void addAllowedObservationType(String offering, Collection<String> allowedObservationTypes) {
+        getAllowedObservationTypes().put(offering, allowedObservationTypes);
+    }
+    
+    public void addMinTime(String offering, DateTime minTime) {
+        getMinTimes().put(offering, minTime);
+    }
+    
+    public void addMaxTime(String offering, DateTime maxTime) {
+        getMaxTimes().put(offering, maxTime);
+    }
+    
+    public void addEnvelope(String offering, SosEnvelope envelope) {
+        getEnvelopes().put(offering, envelope);
+    }
+
+    public void addFeaturesOfInterest(String offering, Collection<String> featuresOfInterest) {
+        getFeaturesOfInterests().put(offering, featuresOfInterest);
     }
     
     public void save(CapabilitiesCache cache) {
-        cache.setKOfferingVName(kOfferingVName);
-        cache.setKOfferingVObservableProperties(kOfferingVObservableProperties);
-        cache.setKOfferingVProcedures(kOfferingVProcedures);
-        cache.setKOfferingVRelatedFeatures(kOfferingVRelatedFeatures);
-        cache.setKOfferingVObservationTypes(kOfferingVObservationTypes);
-        cache.setKOfferingVFeatures(kOfferingVFeaturesOfInterest);
-        cache.setAllowedKOfferingVObservationType(allowedkOfferingVObservationTypes);
-        cache.setKOfferingVEnvelope(kOfferingVEnvelope);
-        cache.setKOfferingVMinTime(kOfferingVMinTime);
-        cache.setKOfferingVMaxTime(kOfferingVMaxTime);
+        cache.setKOfferingVName(getNames());
+        cache.setKOfferingVObservableProperties(getObservableProperties());
+        cache.setKOfferingVProcedures(getProcedures());
+        cache.setKOfferingVRelatedFeatures(getRelatedFeatures());
+        cache.setKOfferingVObservationTypes(getObservationTypes());
+        cache.setKOfferingVFeatures(getFeaturesOfInterests());
+        cache.setAllowedKOfferingVObservationType(getAllowedObservationTypes());
+        cache.setKOfferingVEnvelope(getEnvelopes());
+        cache.setKOfferingVMinTime(getMinTimes());
+        cache.setKOfferingVMaxTime(getMaxTimes());
     }
     
 }

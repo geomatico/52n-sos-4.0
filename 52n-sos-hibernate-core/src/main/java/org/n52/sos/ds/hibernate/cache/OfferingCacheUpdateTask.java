@@ -87,24 +87,24 @@ public class OfferingCacheUpdateTask implements Runnable {
 
     protected void getOfferingInformationFromDbAndAddItToCacheMaps(Session session) throws OwsExceptionReport {
         String offeringId = getOffering().getIdentifier();
-        getOfferingCache().getKOfferingVName().put(offeringId, getOffering().getName());
+        getOfferingCache().addOfferingName(offeringId, getOffering().getName());
         // Procedures
-        getOfferingCache().getKOfferingVProcedures().put(offeringId, getProcedureIdentifierFrom(getOffering().getObservationConstellationOfferingObservationTypes()));
+        getOfferingCache().addProcedures(offeringId, getProcedureIdentifierFrom(getOffering().getObservationConstellationOfferingObservationTypes()));
         // Observable properties
-        getOfferingCache().getKOfferingVObservableProperties().put(offeringId, getObservablePropertyIdentifierFrom(getOffering().getObservationConstellationOfferingObservationTypes()));
+        getOfferingCache().addObservableProperties(offeringId, getObservablePropertyIdentifierFrom(getOffering().getObservationConstellationOfferingObservationTypes()));
         // Related features
-        getOfferingCache().getKOfferingVRelatedFeatures().put(offeringId, getRelatedFeatureIdentifiersFrom(getOffering()));
+        getOfferingCache().addRelatedFeatures(offeringId, getRelatedFeatureIdentifiersFrom(getOffering()));
         // Observation types
-        getOfferingCache().getKOfferingVObservationTypes().put(offeringId, getObservationTypesFrom(getOffering().getObservationConstellationOfferingObservationTypes()));
-        getOfferingCache().getAllowedkOfferingVObservationTypes().put(offeringId, getObservationTypesFromObservationType(getOffering().getObservationTypes()));
+        getOfferingCache().addObservationTypes(offeringId, getObservationTypesFrom(getOffering().getObservationConstellationOfferingObservationTypes()));
+        getOfferingCache().addAllowedObservationType(offeringId, getObservationTypesFromObservationType(getOffering().getObservationTypes()));
         // Spatial Envelope
-        getOfferingCache().getKOfferingVEnvelope().put(offeringId, getEnvelopeForOffering(offeringId, session));
+        getOfferingCache().addEnvelope(offeringId, getEnvelopeForOffering(offeringId, session));
         // Features of Interest
         List<String> featureOfInterestIdentifiers = HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(getOffering().getName(), session);
-        getOfferingCache().getKOfferingVFeaturesOfInterest().put(getOffering().getName(), featureOfInterestIdentifiers);
+        getOfferingCache().addFeaturesOfInterest(getOffering().getName(), featureOfInterestIdentifiers);
         // Temporal Envelope
-        getOfferingCache().getKOfferingVMinTime().put(offeringId, HibernateCriteriaQueryUtilities.getMinDate4Offering(offeringId, session));
-        getOfferingCache().getKOfferingVMaxTime().put(offeringId, HibernateCriteriaQueryUtilities.getMaxDate4Offering(offeringId, session));
+        getOfferingCache().addMinTime(offeringId, HibernateCriteriaQueryUtilities.getMinDate4Offering(offeringId, session));
+        getOfferingCache().addMaxTime(offeringId, HibernateCriteriaQueryUtilities.getMaxDate4Offering(offeringId, session));
     }
 
     protected List<String> getProcedureIdentifierFrom(Set<ObservationConstellationOfferingObservationType> set) {
@@ -169,9 +169,7 @@ public class OfferingCacheUpdateTask implements Runnable {
             LOGGER.error(String.format("Exception thrown: %s", e.getMessage()), e);
             getErrors().add(e);
         } finally {
-            if (session != null) {
-                getConnectionProvider().returnConnection(session);
-            }
+            getConnectionProvider().returnConnection(session);
             LOGGER.debug("OfferingTask finished, latch.countDown().");
             getCountDownLatch().countDown();
         }
