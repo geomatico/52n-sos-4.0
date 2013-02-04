@@ -23,43 +23,16 @@
  */
 package org.n52.sos.ds.hibernate.cache;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import org.n52.sos.util.StringHelper;
-
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class CompositeCacheUpdate extends CacheUpdate {
+public class ObservationDeletionCacheUpdate extends CompositeCacheUpdate {
 
-    private List<CacheUpdate> actions;
-
-    public CompositeCacheUpdate(CacheUpdate... actions) {
-        this.actions = Arrays.asList(actions);
+    public ObservationDeletionCacheUpdate() {
+        super(new FeatureOfInterestCacheUpdate(),
+              new OfferingCacheUpdate(),
+              new EventTimeCacheUpdate());
     }
-
-    public List<CacheUpdate> getActions() {
-        return Collections.unmodifiableList(actions);
-    }
-
-    @Override
-    public void run() {
-        if (getActions() != null) {
-            for (CacheUpdate action : getActions()) {
-                action.setCache(getCache());
-                action.setErrors(getErrors());
-                action.setSession(getSession());
-                log.debug("Running {}.", action);
-                action.run();
-            }
-        }
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s[actions=[%s]]",  getClass().getSimpleName(),
-                StringHelper.join(", ", getActions()));
-    }
+    
 }

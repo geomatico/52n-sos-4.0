@@ -24,24 +24,18 @@
 package org.n52.sos.ds.hibernate;
 
 import java.util.LinkedList;
-import java.util.List;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.n52.sos.cache.CapabilitiesCache;
 import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
-import org.n52.sos.ds.hibernate.cache.CompositePhenomenonCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.EventTimeCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.FeatureOfInterestCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.ObservablePropertiesCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.ObservationIdentifiersCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.OfferingCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.ProcedureCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.RelatedFeaturesCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.ResultTemplateCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.StaticCapabilitiesCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.InitialCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.ObservationDeletionCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.ObservationInsertionCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.ResultTemplateInsertionCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.SensorDeletionCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.SensorInsertionCacheUpdate;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,72 +50,35 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
 
     @Override
     public void updateCache(CapabilitiesCache cache) throws OwsExceptionReport {
-        List<CacheUpdate> actions = CollectionHelper.list(
-                new OfferingCacheUpdate(),
-                new ProcedureCacheUpdate(),
-                new ObservablePropertiesCacheUpdate(),
-                new FeatureOfInterestCacheUpdate(),
-                new RelatedFeaturesCacheUpdate(),
-                new CompositePhenomenonCacheUpdate(),
-                new StaticCapabilitiesCacheUpdate(),
-                new ObservationIdentifiersCacheUpdate(),
-                new ResultTemplateCacheUpdate(),
-                new EventTimeCacheUpdate());
-        update(cache, actions);
+        update(cache, new InitialCacheUpdate());
     }
 
     @Override
     public void updateAfterSensorInsertion(CapabilitiesCache cache) throws OwsExceptionReport {
-        List<CacheUpdate> actions = CollectionHelper.list(
-                new OfferingCacheUpdate(),
-                new ProcedureCacheUpdate(),
-                new ObservablePropertiesCacheUpdate(),
-                new FeatureOfInterestCacheUpdate(),
-                new RelatedFeaturesCacheUpdate(),
-                new CompositePhenomenonCacheUpdate());
-        update(cache, actions);
+        update(cache, new SensorInsertionCacheUpdate());
     }
 
     @Override
     public void updateAfterSensorDeletion(CapabilitiesCache cache) throws OwsExceptionReport {
-        List<CacheUpdate> actions = CollectionHelper.list(
-                new OfferingCacheUpdate(),
-                new ProcedureCacheUpdate());
-        update(cache, actions);
+        update(cache, new SensorDeletionCacheUpdate());
     }
 
     @Override
     public void updateAfterObservationInsertion(CapabilitiesCache cache) throws OwsExceptionReport {
-        List<CacheUpdate> actions = CollectionHelper.list(
-                new FeatureOfInterestCacheUpdate(),
-                new OfferingCacheUpdate(),
-                new EventTimeCacheUpdate());
-        update(cache, actions);
+        update(cache, new ObservationInsertionCacheUpdate());
     }
 
     @Override
     public void updateAfterObservationDeletion(CapabilitiesCache cache) throws OwsExceptionReport {
-        List<CacheUpdate> actions = CollectionHelper.list(
-                new FeatureOfInterestCacheUpdate(),
-                new OfferingCacheUpdate(),
-                new EventTimeCacheUpdate());
-        update(cache, actions);
+        update(cache, new ObservationDeletionCacheUpdate());
     }
 
     @Override
     public void updateAfterResultTemplateInsertion(CapabilitiesCache cache) throws OwsExceptionReport {
-        List<CacheUpdate> actions = CollectionHelper.list(
-                new OfferingCacheUpdate(),
-                new ProcedureCacheUpdate(),
-                new ObservablePropertiesCacheUpdate(),
-                new FeatureOfInterestCacheUpdate(),
-                new RelatedFeaturesCacheUpdate(),
-                new CompositePhenomenonCacheUpdate(),
-                new ResultTemplateCacheUpdate());
-        update(cache, actions);
+        update(cache, new ResultTemplateInsertionCacheUpdate());
     }
 
-    protected void update(CapabilitiesCache cache, List<CacheUpdate> actions) throws OwsExceptionReport {
+    protected void update(CapabilitiesCache cache, CacheUpdate action) throws OwsExceptionReport {
         if (cache == null) {
             String errorMsg = "CapabilitiesCache object is null";
             IllegalArgumentException e = new IllegalArgumentException(errorMsg);
@@ -133,12 +90,10 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         Session session = null;
         try {
             session = getSession();
-            for (CacheUpdate action : actions) {
-                action.setCache(cache);
-                action.setSession(session);
-                action.setErrors(errors);
-                action.update();
-            }
+            action.setCache(cache);
+            action.setSession(session);
+            action.setErrors(errors);
+            action.update();
         } catch (HibernateException he) {
             String exceptionText = "Error while updating CapabilitiesCache!";
             LOGGER.error(exceptionText, he);

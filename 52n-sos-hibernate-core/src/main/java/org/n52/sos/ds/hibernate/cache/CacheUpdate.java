@@ -73,10 +73,10 @@ public abstract class CacheUpdate implements Runnable {
         return cache;
     }
     
-    public void update() throws OwsExceptionReport {
-        log.debug("{} running.", getClass().getSimpleName());
+    public void update() {
         run();
     }
+    
     protected List<String> getAllOfferingIdentifiersFrom(Set<ObservationConstellation> observationConstellations) {
         Set<String> offerings = new HashSet<String>(observationConstellations.size());
         for (ObservationConstellation oc : observationConstellations) {
@@ -90,5 +90,10 @@ public abstract class CacheUpdate implements Runnable {
     
     protected IFeatureQueryHandler getFeatureQueryHandler() {
         return Configurator.getInstance().getFeatureQueryHandler();
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
     }
 }

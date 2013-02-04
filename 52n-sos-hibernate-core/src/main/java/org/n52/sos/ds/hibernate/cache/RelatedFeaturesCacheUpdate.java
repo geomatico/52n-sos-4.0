@@ -34,7 +34,6 @@ import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 
 /**
- *
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class RelatedFeaturesCacheUpdate extends CacheUpdate {

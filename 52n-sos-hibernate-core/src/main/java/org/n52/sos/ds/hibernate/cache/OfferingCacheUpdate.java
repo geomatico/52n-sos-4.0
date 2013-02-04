@@ -1,9 +1,11 @@
 /**
- * Copyright (C) 2013 by 52 North Initiative for Geospatial Open Source Software
- * GmbH
+ * Copyright (C) 2013
+ * by 52 North Initiative for Geospatial Open Source Software GmbH
  *
- * Contact: Andreas Wytzisk 52 North Initiative for Geospatial Open Source
- * Software GmbH Martin-Luther-King-Weg 24 48155 Muenster, Germany
+ * Contact: Andreas Wytzisk
+ * 52 North Initiative for Geospatial Open Source Software GmbH
+ * Martin-Luther-King-Weg 24
+ * 48155 Muenster, Germany
  * info@52north.org
  *
  * This program is free software; you can redistribute and/or modify it under
@@ -21,7 +23,6 @@
  */
 package org.n52.sos.ds.hibernate.cache;
 
-import org.n52.sos.util.GroupedAndNamedThreadFactory;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -34,6 +35,7 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.GroupedAndNamedThreadFactory;
 
 /**
  *
