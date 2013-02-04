@@ -90,11 +90,10 @@ import org.slf4j.LoggerFactory;
 
 public class InsertResultDAO extends AbstractHibernateOperationDao implements IInsertResultDAO {
 
-    /**
-     * logger
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(InsertResultDAO.class);
 
+    private static final int FLUSH_THRESHOLD = 50;
+    
     /**
      * supported SOS operation
      */
@@ -109,7 +108,7 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
         /* nothing to add here */
     }
-
+    
     @Override
     public InsertResultResponse insertResult(InsertResultRequest request) throws OwsExceptionReport {
         InsertResultResponse response = new InsertResultResponse();
@@ -126,11 +125,19 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
                     getSingleObservationsFromResultValues(request.getResultValues(), resultTemplate);
             Set<ObservationConstellationOfferingObservationType> obsConstOffObsTypes = new HashSet<ObservationConstellationOfferingObservationType>(1);
             obsConstOffObsTypes.add(resultTemplate.getObservationConstellationOfferingObservationType());
+            int insertion = 0, size = observations.size();
+            LOGGER.debug("Start saving {} observations.", size);
             for (SosObservation observation : observations) {
                 HibernateCriteriaTransactionalUtilities.insertObservationSingleValue(
                         obsConstOffObsTypes, resultTemplate.getFeatureOfInterest(),
                         observation, session);
+                if ((++insertion % FLUSH_THRESHOLD) == 0) {
+                    session.flush();
+                    session.clear();
+                    LOGGER.debug("Saved {}/{} observations.", insertion, size);
+                }
             }
+            LOGGER.debug("Saved {} observations.", size);
             transaction.commit();
         } catch (HibernateException he) {
             if (transaction != null) {
