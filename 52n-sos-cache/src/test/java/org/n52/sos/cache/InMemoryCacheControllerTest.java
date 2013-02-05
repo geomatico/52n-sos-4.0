@@ -43,7 +43,6 @@ import java.util.List;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
@@ -55,15 +54,16 @@ import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.AbstractServiceResponse;
+import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.response.InsertSensorResponse;
 import org.n52.sos.util.builder.DeleteSensorRequestBuilder;
+import org.n52.sos.util.builder.InsertResultTemplateResponseBuilder;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
- * TODO Eike: Test after DeleteSensor
  * TODO Eike: Test after InsertResultTemplate
  * TODO Eike: Test after InsertResult
- * TODO Eike: Test after DeleteObservation => Store observation count for each offering
+ * TODO Eike: Test after DeleteObservation => not possible with InMemory because of bounding box issues, for example.
  */
 public class InMemoryCacheControllerTest
 {
@@ -81,6 +81,7 @@ public class InMemoryCacheControllerTest
 	private static final String OBSERVABLE_PROPERTY = "test-observable-property";
 	private static final String PROCEDURE = "test-procedure";
 	private static final String PROCEDURE_2 = "test-procedure-2";
+	private static final String RESULT_TEMPLATE_IDENTIFIER = "test-result-template";
 	private AbstractServiceRequest request;
 	private InMemoryCacheController controller;
 	private AbstractServiceResponse response;
@@ -469,7 +470,7 @@ public class InMemoryCacheControllerTest
 				controller.getParentProcedures(PROCEDURE, true, false).isEmpty());
 	}
 	
-	@Test @Ignore public void 
+	@Test public void 
 	should_not_contain_child_procedures_after_DeleteSensor()
 			throws OwsExceptionReport{
 		deleteSensorPreparation();
@@ -628,7 +629,40 @@ public class InMemoryCacheControllerTest
 				controller.getCapabilitiesCache().getKObservablePropertyVOffering().containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
 	}
 	
+	/* Update after InsertResultTemplate */
+	
+	@Test public void 
+	should_contain_resulttemplate_identifier_after_InsertResultTemplate()
+			throws OwsExceptionReport{
+		insertResultTemplatePreparation();
+		
+		assertTrue("result template identifier NOT in cache",
+				controller.getCapabilitiesCache().getResultTemplates().contains(RESULT_TEMPLATE_IDENTIFIER));
+	}
+	
 	/* HELPER */
+
+	private void 
+	insertResultTemplatePreparation()
+			throws OwsExceptionReport {
+		updateCacheWithInsertSensor(PROCEDURE);
+		updateCacheWithInsertResultTemplate(RESULT_TEMPLATE_IDENTIFIER);
+	}
+
+
+	private void updateCacheWithInsertResultTemplate(String resultTemplateIdentifier)
+			 throws OwsExceptionReport {
+		insertResultTemplateResponse(resultTemplateIdentifier);
+		controller.updateAfterResultTemplateInsertion((InsertResultTemplateResponse) response);
+	}
+	
+
+	private void insertResultTemplateResponse(String resultTemplateIdentifier)
+	{
+		response = InsertResultTemplateResponseBuilder.anInsertResultTemplateResponse()
+				.setTemplateIdentifier(resultTemplateIdentifier)
+				.build();
+	}
 
 	private 
 	String getObservationIdFromInsertObservation()

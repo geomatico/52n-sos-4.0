@@ -49,6 +49,7 @@ import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.AbstractServiceResponse;
+import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.response.InsertSensorResponse;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
@@ -90,6 +91,11 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		update(Case.SENSOR_DELETION, sosRequest);
 	}
 
+	public void updateAfterResultTemplateInsertion(InsertResultTemplateResponse sosResponse) throws OwsExceptionReport
+	{
+		update(Case.RESULT_TEMPLATE_INSERTION,null,sosResponse);
+	}
+
 	private void update(Case observationInsertion,
 			AbstractServiceRequest sosRequest) throws OwsExceptionReport
 	{
@@ -100,7 +106,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			AbstractServiceRequest sosRequest,
 			AbstractServiceResponse sosResponse) throws OwsExceptionReport
 	{
-		if (c == null || sosRequest == null || (sosRequest != null && sosRequest instanceof InsertSensorRequest && (sosResponse == null))) {
+		if (c == null || 
+				(sosRequest == null && sosResponse == null) || 
+				(sosRequest instanceof InsertSensorRequest && (sosResponse == null))) {
 			String errorMsg = String.format("Missing arguments: Case: %s, AbstractServiceRequest: %s, AbstractServiceResponse: %s", c, sosRequest, sosResponse);
 			LOGGER.warn(errorMsg);
 			throw new IllegalArgumentException(errorMsg);
@@ -130,6 +138,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 				doUpdateAfterObservationInsertion((InsertObservationRequest) sosRequest);
 				break;
 			case RESULT_TEMPLATE_INSERTION:
+				doUpdateAfterResultTemplateInsertion((InsertResultTemplateResponse) sosResponse);
+				break;
+			case RESULT_INSERTION:
 				throw new RuntimeException("NOT IMPLEMENTED");
 				// break;
 			case SENSOR_INSERTION:
@@ -149,6 +160,18 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 	/* WORKER */
 	
+	/**
+	 * 
+	 * @param sosResponse
+	 */
+	private void doUpdateAfterResultTemplateInsertion(InsertResultTemplateResponse sosResponse)
+	{
+		getCapabilitiesCache().getResultTemplates().add(sosResponse.getAcceptedTemplate());
+		LOGGER.debug("added result template identifier '{}' to cache? {}",
+				sosResponse.getAcceptedTemplate(),
+				getCapabilitiesCache().getResultTemplates().contains(sosResponse.getAcceptedTemplate()));
+	}
+
 	private void doUpdateAfterSensorInsertion(InsertSensorRequest sosRequest,
 			InsertSensorResponse sosResponse)
 	{
@@ -236,6 +259,59 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		}
 	}
 
+	private void doUpdateAfterSensorDeletion(DeleteSensorRequest sosRequest) throws OwsExceptionReport
+		{
+			removeProcedureFromCache(sosRequest.getProcedureIdentifier());
+			
+			removeFeatureToProcedureRelationsFromCache(sosRequest.getProcedureIdentifier());
+			
+			removeOfferingsToProcedureRelation(sosRequest.getProcedureIdentifier());
+			
+			removeProcedureToObservationIdentifierRelations(sosRequest.getProcedureIdentifier());
+	
+			for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(sosRequest.getProcedureIdentifier()))
+			{
+				removeTemporalBoundingBoxFromCache(offeringId);
+			
+				removeOfferingName(offeringId);
+	
+				removeOfferingToFeaturesRelations(offeringId);
+	
+				removeOfferingToRelatedFeaturesRelations(offeringId);
+	
+				removeOfferingToObservationTypesRelations(offeringId);
+	
+				removeOfferingEnvelope(offeringId);
+				
+	//			removeObservablePropertiesToOfferingRelation(offeringId);
+				
+				removeOfferingToObservablePropertyRelation(offeringId);
+			}
+			
+			removeRemovedRelatedFeaturesFromRoleMap();
+			
+			removeRemovedFeaturesFromCache();
+			
+			removeRemovedObservationIdentifiers();
+			
+			if (areOfferingToTimeLimitMapsEmpty())
+			{
+				removeGlobalTemporalBoundingBox();
+			}
+			
+			if (getCapabilitiesCache().getKOfferingVEnvelope().isEmpty())
+			{
+				removeGlobalEnvelope();
+			}
+			
+			// observable property relations
+			removeObservablePropertyRelations(sosRequest.getProcedureIdentifier());
+			
+			// At the latest
+			removeProcedureToOfferingsRelation(sosRequest.getProcedureIdentifier());
+			
+		}
+
 	private void addProcedureToObservationIdRelationToCache(String procedureIdentifier, String observationIdentifier)
 	{
 		if (!getCapabilitiesCache().getKProcedureVObservationIdentifiers().containsKey(procedureIdentifier))
@@ -250,59 +326,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 				getCapabilitiesCache().getKProcedureVObservationIdentifiers().get(procedureIdentifier).contains(observationIdentifier));
 	}
 
-	private void doUpdateAfterSensorDeletion(DeleteSensorRequest sosRequest) throws OwsExceptionReport
-	{
-		removeProcedureFromCache(sosRequest.getProcedureIdentifier());
-		
-		removeFeatureToProcedureRelationsFromCache(sosRequest.getProcedureIdentifier());
-		
-		removeOfferingsToProcedureRelation(sosRequest.getProcedureIdentifier());
-		
-		removeProcedureToObservationIdentifierRelations(sosRequest.getProcedureIdentifier());
-
-		for (String offeringId : getCapabilitiesCache().getOfferings4Procedure(sosRequest.getProcedureIdentifier()))
-		{
-			removeTemporalBoundingBoxFromCache(offeringId);
-		
-			removeOfferingName(offeringId);
-
-			removeOfferingToFeaturesRelations(offeringId);
-
-			removeOfferingToRelatedFeaturesRelations(offeringId);
-
-			removeOfferingToObservationTypesRelations(offeringId);
-
-			removeOfferingEnvelope(offeringId);
-			
-			// TODO Eike: Continue implementation here
-//			removeObservablePropertiesToOfferingRelation(offeringId);
-			
-			removeOfferingToObservablePropertyRelation(offeringId);
-		}
-		
-		removeRemovedRelatedFeaturesFromRoleMap();
-		
-		removeRemovedFeaturesFromCache();
-		
-		removeRemovedObservationIdentifiers();
-		
-		if (areOfferingToTimeLimitMapsEmpty())
-		{
-			removeGlobalTemporalBoundingBox();
-		}
-		
-		if (getCapabilitiesCache().getKOfferingVEnvelope().isEmpty())
-		{
-			removeGlobalEnvelope();
-		}
-		
-		// observable property relations
-		removeObservablePropertyRelations(sosRequest.getProcedureIdentifier());
-		
-		// At the latest
-		removeProcedureToOfferingsRelation(sosRequest.getProcedureIdentifier());
-		
-	}
+	
 
 	/* HELPER */
 	
