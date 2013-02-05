@@ -23,15 +23,17 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 /**
@@ -58,11 +60,11 @@ public class FeatureOfInterestCacheUpdate extends CacheUpdate {
 
     @Override
     public void execute() {
-        List<FeatureOfInterest> hFeaturesOfInterest = HibernateCriteriaQueryUtilities.getFeatureOfInterestObjects(getSession());
+        List<FeatureOfInterest> hFeaturesOfInterest = getFeatureOfInterestObjects(getSession());
         Map<String, Collection<String>> kFeatureOfInterestVProcedure = new HashMap<String, Collection<String>>(hFeaturesOfInterest.size());
         Map<String, Collection<String>> parentFeatures = new HashMap<String, Collection<String>>(hFeaturesOfInterest.size());
         for (FeatureOfInterest featureOfInterest : hFeaturesOfInterest) {
-            kFeatureOfInterestVProcedure.put(featureOfInterest.getIdentifier(), HibernateCriteriaQueryUtilities.getProceduresForFeatureOfInterest(getSession(), featureOfInterest));
+            kFeatureOfInterestVProcedure.put(featureOfInterest.getIdentifier(), getProceduresForFeatureOfInterest(getSession(), featureOfInterest));
             parentFeatures.put(featureOfInterest.getIdentifier(), getFeatureIDsFromFeatures(featureOfInterest.getFeatureOfInterestsForChildFeatureId()));
         }
         List<String> identifiers = getFeatureIdentifier(hFeaturesOfInterest);

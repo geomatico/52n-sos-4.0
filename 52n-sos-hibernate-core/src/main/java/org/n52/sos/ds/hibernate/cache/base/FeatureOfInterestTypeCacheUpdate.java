@@ -23,8 +23,9 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getFeatureOfInterestTypes;
+
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 
 /**
  *
@@ -34,7 +35,7 @@ public class FeatureOfInterestTypeCacheUpdate extends CacheUpdate {
 
     @Override
     public void execute() {
-        getCache().setFeatureOfInterestTypes(HibernateCriteriaQueryUtilities.getFeatureOfInterestTypes(getSession()));
+        getCache().setFeatureOfInterestTypes(getFeatureOfInterestTypes(getSession()));
     }
     
 }

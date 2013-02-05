@@ -23,7 +23,10 @@
  */
 package org.n52.sos.ds.hibernate;
 
+import static org.n52.sos.util.Util4Exceptions.*;
+
 import java.util.LinkedList;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.n52.sos.cache.CapabilitiesCache;
@@ -36,7 +39,6 @@ import org.n52.sos.ds.hibernate.cache.ResultTemplateInsertionCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.SensorDeletionCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.SensorInsertionCacheUpdate;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +86,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
             IllegalArgumentException e = new IllegalArgumentException(errorMsg);
             LOGGER.debug("Exception thrown:", e);
             LOGGER.error(errorMsg);
-            throw Util4Exceptions.createNoApplicableCodeException(e, errorMsg);
+            throw createNoApplicableCodeException(e, errorMsg);
         }
         LinkedList<OwsExceptionReport> errors = new LinkedList<OwsExceptionReport>();
         Session session = null;
@@ -100,6 +102,6 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
         } finally {
             returnSession(session);
         }
-        Util4Exceptions.mergeAndThrowExceptions(errors);
+        mergeAndThrowExceptions(errors);
     }
 }

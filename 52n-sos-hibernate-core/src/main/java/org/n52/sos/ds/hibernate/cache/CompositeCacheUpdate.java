@@ -23,14 +23,24 @@
  */
 package org.n52.sos.ds.hibernate.cache;
 
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
+
+import java.util.List;
 import org.n52.sos.util.CompositeAction;
 import org.n52.sos.util.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public abstract class CompositeCacheUpdate extends CacheUpdate {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(CompositeCacheUpdate.class);
+
     private CompositeAction<CacheUpdate> action;
 
     public CompositeCacheUpdate(CacheUpdate... actions) {
@@ -39,7 +49,7 @@ public abstract class CompositeCacheUpdate extends CacheUpdate {
                 action.setCache(getCache());
                 action.setErrors(getErrors());
                 action.setSession(getSession());
-                log.debug("Running {}.", action);
+                LOGGER.debug("Running {}.", action);
             }
             @Override protected void post(CacheUpdate action) {
                 getSession().clear();
@@ -54,7 +64,7 @@ public abstract class CompositeCacheUpdate extends CacheUpdate {
 
     @Override
     public String toString() {
-        return String.format("%s[actions=[%s]]",  getClass().getSimpleName(),
+        return format("%s[actions=[%s]]",  getClass().getSimpleName(),
                 StringHelper.join(", ", action.getActions()));
     }
 }

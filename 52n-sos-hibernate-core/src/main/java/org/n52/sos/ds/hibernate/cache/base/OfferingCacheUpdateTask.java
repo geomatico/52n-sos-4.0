@@ -24,19 +24,22 @@
 package org.n52.sos.ds.hibernate.cache.base;
 
 
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+
 import org.hibernate.Session;
-import org.n52.sos.ds.hibernate.util.ThreadLocalSessionFactory;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.ObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
+import org.n52.sos.ds.hibernate.util.ThreadLocalSessionFactory;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.Configurator;
@@ -149,7 +152,7 @@ class OfferingCacheUpdateTask extends RunnableAction {
     }
 
     protected SosEnvelope getEnvelopeForOffering(String offeringID, Session session) throws OwsExceptionReport {
-        List<String> featureIDs = HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(offeringID, session);
+        List<String> featureIDs = getFeatureOfInterestIdentifiersForOffering(offeringID, session);
         if (featureIDs != null && !featureIDs.isEmpty()) {
             return Configurator.getInstance().getFeatureQueryHandler().getEnvelopeForFeatureIDs(featureIDs, session);
         }

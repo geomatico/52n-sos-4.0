@@ -872,14 +872,14 @@ public class HibernateCriteriaQueryUtilities {
 
     public static List<String> getObservationIdentifiers(Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
-        queryObject.addCriterion(Restrictions.ne(getIdentifierParameter(null), "null"));
+        queryObject.addCriterion(ne(getIdentifierParameter(null), "null"));
         queryObject.addProjection(getDistinctProjectionForIdentifier());
         return (List<String>) getObjectList(queryObject, session, Observation.class);
     }
 
     public static ProcedureDescriptionFormat getProcedureDescriptionFormatObject(String procDescFormat, Session session) {
         Criteria criteria = session.createCriteria(ProcedureDescriptionFormat.class);
-        criteria.add(Restrictions.eq(PARAMETER_PROCEDURE_DESCRIPTION_FORMAT, procDescFormat));
+        criteria.add(eq(PARAMETER_PROCEDURE_DESCRIPTION_FORMAT, procDescFormat));
         return (ProcedureDescriptionFormat) criteria.uniqueResult();
     }
 
@@ -1182,7 +1182,7 @@ public class HibernateCriteriaQueryUtilities {
                 CompositePhenomenon.class);
     }
 
-    public static List<SpatialRefSys> getSpatialReySysObjects(Session session) {
+    public static List<SpatialRefSys> getSpatialRefSysObjects(Session session) {
         return (List<SpatialRefSys>) getObjectList(new HibernateQueryObject(), session, SpatialRefSys.class);
     }
 

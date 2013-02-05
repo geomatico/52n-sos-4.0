@@ -23,25 +23,27 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
+import static java.util.Collections.singletonList;
+import static org.hibernate.criterion.Restrictions.in;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION;
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
-import org.n52.sos.ds.hibernate.util.HibernateConstants;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 
 /**
  *
@@ -71,13 +73,13 @@ public class ProcedureCacheUpdate extends CacheUpdate {
 
         Map<String, String> observationAliases = new HashMap<String, String>();
         HibernateQueryObject observationQueryObject = new HibernateQueryObject();
-        String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(observationAliases, null);
+        String obsConstAlias = addObservationConstallationAliasToMap(observationAliases, null);
 
         observationConstellationQueryObject.addCriterion(getCriterionForProcedures(observationConstellationAliases, null, procedureIdentifier));
         observationQueryObject.addCriterion(getCriterionForProcedures(observationAliases, obsConstAlias, procedureIdentifier));
 
         observationConstellationQueryObject.setAliases(observationConstellationAliases);
-        List<ObservationConstellation> observationConstellations = HibernateCriteriaQueryUtilities.getObservationConstellations(observationConstellationQueryObject, session);
+        List<ObservationConstellation> observationConstellations = getObservationConstellations(observationConstellationQueryObject, session);
 
         observationQueryObject.setAliases(observationAliases);
 
@@ -85,10 +87,10 @@ public class ProcedureCacheUpdate extends CacheUpdate {
         for (ObservationConstellation observationConstellation : observationConstellations) {
             HibernateQueryObject defaultQueryObject = observationQueryObject.clone();
 
-            String id = HibernateCriteriaQueryUtilities.getParameterWithPrefix(HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION, null);
-            defaultQueryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(id, observationConstellation));
+            String id = getParameterWithPrefix(PARAMETER_OBSERVATION_CONSTELLATION, null);
+            defaultQueryObject.addCriterion(getEqualRestriction(id, observationConstellation));
 
-            allObservations.addAll(HibernateCriteriaQueryUtilities.getObservations(defaultQueryObject, session));
+            allObservations.addAll(getObservations(defaultQueryObject, session));
         }
 
         List<String> observationIdentifier = new LinkedList<String>();
@@ -108,13 +110,13 @@ public class ProcedureCacheUpdate extends CacheUpdate {
     }
 
     protected Criterion getCriterionForProcedures(Map<String, String> aliasMap, String prefix, String procedure) {
-        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliasMap, prefix);
-        return Restrictions.in(HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), Collections.singletonList(procedure));
+        String procAlias = addProcedureAliasToMap(aliasMap, prefix);
+        return in(getIdentifierParameter(procAlias), singletonList(procedure));
     }
 
     @Override
     public void execute() {
-        List<Procedure> hProcedures = HibernateCriteriaQueryUtilities.getProcedureObjects(getSession());
+        List<Procedure> hProcedures = getProcedureObjects(getSession());
         Set<String> procedures = new HashSet<String>(hProcedures.size());
         Map<String, Collection<String>> kProcedureVOffering = new HashMap<String, Collection<String>>(hProcedures.size());
         Map<String, Collection<String>> kProcedureVObservableProperties = new HashMap<String, Collection<String>>(hProcedures.size());

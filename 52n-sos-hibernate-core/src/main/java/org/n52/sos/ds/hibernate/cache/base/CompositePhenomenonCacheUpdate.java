@@ -23,16 +23,18 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getCompositePhenomenonObjects;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.entities.CompositePhenomenon;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
@@ -42,7 +44,7 @@ public class CompositePhenomenonCacheUpdate extends CacheUpdate {
     @Override
     public void execute() {
         List<CompositePhenomenon> compositePhenomenons =
-                HibernateCriteriaQueryUtilities.getCompositePhenomenonObjects(getSession());
+                getCompositePhenomenonObjects(getSession());
         Map<String, Collection<String>> kCompositePhenomenonVObservableProperty =
                 new HashMap<String, Collection<String>>(compositePhenomenons.size());
 

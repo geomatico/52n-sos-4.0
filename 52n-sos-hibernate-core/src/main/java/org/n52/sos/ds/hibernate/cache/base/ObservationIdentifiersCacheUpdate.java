@@ -23,8 +23,9 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getObservationIdentifiers;
+
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 
 /**
  *
@@ -34,6 +35,6 @@ public class ObservationIdentifiersCacheUpdate extends CacheUpdate {
 
     @Override
     public void execute() {
-        getCache().setObservationIdentifiers(HibernateCriteriaQueryUtilities.getObservationIdentifiers(getSession()));
+        getCache().setObservationIdentifiers(getObservationIdentifiers(getSession()));
     }
 }

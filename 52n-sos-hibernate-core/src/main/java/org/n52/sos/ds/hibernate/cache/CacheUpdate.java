@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.hibernate.Session;
 import org.n52.sos.cache.CapabilitiesCache;
 import org.n52.sos.ds.IFeatureQueryHandler;
@@ -35,16 +36,12 @@ import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObserva
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.Action;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public abstract class CacheUpdate implements Action {
-    
-    protected Logger log = LoggerFactory.getLogger(CacheUpdate.class);
     
     private Session session;
     private CapabilitiesCache cache;

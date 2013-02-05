@@ -23,16 +23,18 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getRelatedFeatureObjects;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
@@ -42,7 +44,7 @@ public class RelatedFeaturesCacheUpdate extends CacheUpdate {
     @Override
     public void execute() {
         // TODO Carsten: use RelatedFeatures and query...
-        List<RelatedFeature> relatedFeatures = HibernateCriteriaQueryUtilities.getRelatedFeatureObjects(getSession());
+        List<RelatedFeature> relatedFeatures = getRelatedFeatureObjects(getSession());
         Map<String, Collection<String>> relatedFeatureList =
                 new HashMap<String, Collection<String>>(relatedFeatures.size());
         for (RelatedFeature relatedFeature : relatedFeatures) {

@@ -23,11 +23,13 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getResultTemplateObjects;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 
 /**
  *
@@ -37,7 +39,7 @@ public class ResultTemplateCacheUpdate extends CacheUpdate {
 
     @Override
     public void execute() {
-        List<ResultTemplate> resultTemplateObjects = HibernateCriteriaQueryUtilities.getResultTemplateObjects(getSession());
+        List<ResultTemplate> resultTemplateObjects = getResultTemplateObjects(getSession());
         List<String> resultTemplates = new ArrayList<String>(resultTemplateObjects.size());
         for (ResultTemplate resultTemplateObject : resultTemplateObjects) {
             resultTemplates.add(resultTemplateObject.getIdentifier());

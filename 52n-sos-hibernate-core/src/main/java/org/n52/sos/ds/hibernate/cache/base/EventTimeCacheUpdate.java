@@ -23,8 +23,9 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.*;
+
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 
 /**
  *
@@ -34,8 +35,8 @@ public class EventTimeCacheUpdate extends CacheUpdate {
 
     @Override
     public void execute() {
-        getCache().setMinEventTime(HibernateCriteriaQueryUtilities.getMinObservationTime(getSession()));
-        getCache().setMaxEventTime(HibernateCriteriaQueryUtilities.getMaxObservationTime(getSession()));
+        getCache().setMinEventTime(getMinObservationTime(getSession()));
+        getCache().setMaxEventTime(getMaxObservationTime(getSession()));
     }
     
 }

@@ -23,29 +23,34 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getOfferingObjects;
+
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import org.hibernate.Session;
+
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
-import org.n52.sos.ds.hibernate.util.ThreadLocalSessionFactory;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
+import org.n52.sos.ds.hibernate.util.ThreadLocalSessionFactory;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.GroupedAndNamedThreadFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class OfferingCacheUpdate extends CacheUpdate {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(OfferingCacheUpdate.class);
 
     private static final String THREAD_GROUP_NAME = "offering-cache-update";
     private final int threadCount = Configurator.getInstance().getCacheThreadCount();
@@ -70,17 +75,17 @@ public class OfferingCacheUpdate extends CacheUpdate {
 
     @Override
     public void execute() {
-        List<Offering> offerings = HibernateCriteriaQueryUtilities.getOfferingObjects(getSession());
+        List<Offering> offerings = getOfferingObjects(getSession());
         OfferingCache offeringCache = new OfferingCache(offerings);
         // fields required for multithreading
-        log.debug("multithreading init");
+        LOGGER.debug("multithreading init");
         offeringThreadsRunning = new CountDownLatch(offerings.size());
         errors = CollectionHelper.synchronizedLinkedList();
 
         try {
             queueTasks(offerings, offeringCache);
             waitForTaskCompletion();
-            log.debug("Finished waiting for other threads");
+            LOGGER.debug("Finished waiting for other threads");
             if (!errors.isEmpty()) {
                 getErrors().addAll(errors);
                 return;
@@ -113,7 +118,7 @@ public class OfferingCacheUpdate extends CacheUpdate {
             getExecutor().submit(task);
         } else {
             getCountDownLatch().countDown();
-            log.debug("Offering '{}' contains deleted procedure, latch.countDown().", offering.getIdentifier());
+            LOGGER.debug("Offering '{}' contains deleted procedure, latch.countDown().", offering.getIdentifier());
         }
     }
 
@@ -121,7 +126,7 @@ public class OfferingCacheUpdate extends CacheUpdate {
         getExecutor().shutdown(); // <-- will finish all submitted tasks
         // wait for all threads to finish
         try {
-            log.debug("Waiting for {} threads to finish", getCountDownLatch().getCount());
+            LOGGER.debug("Waiting for {} threads to finish", getCountDownLatch().getCount());
             getCountDownLatch().await();
         } catch (InterruptedException e) {
             /* nothing to do here */

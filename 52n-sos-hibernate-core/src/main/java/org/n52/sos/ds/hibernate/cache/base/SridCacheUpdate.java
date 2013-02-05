@@ -23,11 +23,13 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getSpatialRefSysObjects;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.entities.SpatialRefSys;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 
 /**
  *
@@ -37,7 +39,7 @@ public class SridCacheUpdate extends CacheUpdate {
 
     @Override
     public void execute() {
-        List<SpatialRefSys> spatialRefSyss = HibernateCriteriaQueryUtilities.getSpatialReySysObjects(getSession());
+        List<SpatialRefSys> spatialRefSyss = getSpatialRefSysObjects(getSession());
         List<Integer> srids = new ArrayList<Integer>(spatialRefSyss.size());
         for (SpatialRefSys spatialRefSys : spatialRefSyss) {
             srids.add(spatialRefSys.getSrid());
