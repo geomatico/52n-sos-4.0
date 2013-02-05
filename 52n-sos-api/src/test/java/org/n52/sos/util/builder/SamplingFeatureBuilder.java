@@ -23,6 +23,7 @@
  */
 package org.n52.sos.util.builder;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
@@ -30,8 +31,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.geom.PrecisionModel.Type;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
@@ -52,7 +55,7 @@ public class SamplingFeatureBuilder {
 	private double yCoord = Integer.MIN_VALUE;
 	private int epsgCode = Integer.MIN_VALUE;
 	private String featureType;
-
+    
 	public SamplingFeatureBuilder setIdentifier(String featureIdentifier)
 	{
 		this.featureIdentifier = featureIdentifier;
@@ -84,15 +87,9 @@ public class SamplingFeatureBuilder {
 		}
 		if (xCoord != Integer.MIN_VALUE && yCoord != Integer.MIN_VALUE && epsgCode != Integer.MIN_VALUE)
 		{
-			try {
-				Geometry geom = new WKTReader().read(String.format("POINT ( %s %s )", xCoord, yCoord));
-				geom.setSRID(epsgCode);
-				feature.setGeometry(geom);
-			} catch (ParseException e) {
-				LOGGER.error(String.format("Exception thrown: %s",
-						e.getMessage()),
-						e);
-			}
+			GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), epsgCode);
+			Geometry geom = geometryFactory.createPoint(new Coordinate(xCoord, yCoord));
+			feature.setGeometry(geom);
 		}
 		if (featureType != null && !featureType.isEmpty())
 		{
