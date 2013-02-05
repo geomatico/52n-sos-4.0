@@ -26,6 +26,7 @@ package org.n52.sos.event;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.ServiceConfigurationError;
@@ -58,7 +59,7 @@ public class SosEventBus {
     private final Executor executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE, new GroupedAndNamedThreadFactory(THREAD_GROUP_NAME));
     private final Map<Class<? extends SosEvent>, Set<SosEventListener>> listeners 
             = new HashMap<Class<? extends SosEvent>, Set<SosEventListener>>();
-    private final Queue<EventHandler> queue = new ConcurrentLinkedQueue<EventHandler>();
+    private final Queue<HandlerExecution> queue = new ConcurrentLinkedQueue<HandlerExecution>();
     
 	public static SosEventBus getInstance() {
 		if (instance == null) {
@@ -92,7 +93,7 @@ public class SosEventBus {
 	}
 
 	private Set<SosEventListener> getListenersForEvent(SosEvent event) {
-		Set<SosEventListener> result = new HashSet<SosEventListener>();
+		LinkedList<SosEventListener> result = new LinkedList<SosEventListener>();
 		this.lock.readLock().lock();
 		try {
 			for (Class<? extends SosEvent> eventType : this.classCache.getClasses(event.getClass())) {
@@ -109,7 +110,7 @@ public class SosEventBus {
 		} finally {
 			this.lock.readLock().unlock();
 		}
-		return result;
+		return new HashSet<SosEventListener>(result);
 	}
 
 	public void submit(SosEvent event) {
@@ -120,12 +121,12 @@ public class SosEventBus {
 			for (SosEventListener listener : getListenersForEvent(event)) {
 				submittedEvent = true;
 				log.debug("Queueing Event {} for Listener {}", event, listener);
-				this.queue.offer(new EventHandler(event, listener));
+				this.queue.offer(new HandlerExecution(event, listener));
 			}
 		} finally {
 			this.lock.readLock().unlock();
 		}
-		EventHandler r;
+		HandlerExecution r;
 		while((r = this.queue.poll()) != null) {
             if (ASYNCHRONOUS_EXECUTION) {
                 this.executor.execute(r);
@@ -222,11 +223,11 @@ public class SosEventBus {
 		}
 	}
     
-	private class EventHandler implements Runnable {
+	private class HandlerExecution implements Runnable {
 		private SosEvent event;
 		private SosEventListener listener;
 
-		EventHandler(SosEvent event, SosEventListener listener) {
+		HandlerExecution(SosEvent event, SosEventListener listener) {
 			this.event = event;
 			this.listener = listener;
 		}
