@@ -25,36 +25,34 @@ package org.n52.sos.ogc.om;
 
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.om.values.IMultiValue;
-import org.n52.sos.ogc.om.values.IValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosMultiObservationValues<T> implements IObservationValue<IValue<T>> {
+public class SosMultiObservationValues<T> implements IObservationValue<IMultiValue<T>> {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(SosMultiObservationValues.class);
 
     private static final long serialVersionUID = 1L;
 
-    private IValue<T> values;
+    private IMultiValue<T> values;
 
     private ITime phenomenonTime;
 
     @Override
     public ITime getPhenomenonTime() {
-        if (phenomenonTime == null && values != null && values instanceof IMultiValue) {
-            phenomenonTime = ((IMultiValue)values).getPhenomenonTime();
+        if (phenomenonTime == null && values != null) {
+            phenomenonTime = values.getPhenomenonTime();
         }
         return phenomenonTime;
     }
 
     @Override
-    public IValue<T> getValue() {
-
+    public IMultiValue<T> getValue() {
         return values;
     }
 
     @Override
-    public void setValue(IValue<T> value) {
+    public void setValue(IMultiValue<T> value) {
         this.values = value;
     }
 
