@@ -473,7 +473,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
             measureType.setUom("");
         }
         if (!quantityValue.getValue().equals(Double.NaN)) {
-            measureType.setDoubleValue(quantityValue.getValue());
+            measureType.setDoubleValue(quantityValue.getValue().doubleValue());
         } else {
             measureType.setNil();
         }

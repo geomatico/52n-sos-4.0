@@ -3,19 +3,19 @@
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 10.07.2012 15:18:27 by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
-    <class name="org.n52.sos.ds.hibernate.entities.CountValue" table="count_value">
-        <id name="countValueId" type="long">
-            <column name="count_value_id" />
+    <class name="org.n52.sos.ds.hibernate.entities.BlobValue" table="blob_value">
+        <id name="blobValueId" type="long">
+            <column name="blob_value_id" />
             <generator class="sequence">
-            	<param name="sequence">count_value_id_seq</param>
+            	<param name="sequence">blob_value_id_seq</param>
             </generator>
         </id>
-        <property name="value" type="integer">
+        <property name="value" type="blob">
             <column name="value" not-null="true" unique="true" />
         </property>
-        <!-- <set name="observations" table="observation_has_count_value" inverse="true" lazy="true" fetch="join">
+        <!-- <set name="observations" table="observation_has_blob_value" inverse="true" lazy="true" fetch="join">
             <key>
-                <column name="count_value_id" not-null="true" />
+                <column name="blob_value_id" not-null="true" />
             </key>
             <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.Observation">
                 <column name="observation_id" not-null="true" />

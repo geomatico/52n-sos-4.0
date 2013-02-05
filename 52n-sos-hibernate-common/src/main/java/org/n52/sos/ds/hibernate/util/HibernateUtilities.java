@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +31,19 @@ import java.util.Map;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.n52.sos.ds.hibernate.HibernateQueryObject;
+import org.n52.sos.ds.hibernate.entities.BlobObservation;
+import org.n52.sos.ds.hibernate.entities.BlobValue;
+import org.n52.sos.ds.hibernate.entities.BooleanObservation;
+import org.n52.sos.ds.hibernate.entities.CategoryObservation;
+import org.n52.sos.ds.hibernate.entities.CountObservation;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
+import org.n52.sos.ds.hibernate.entities.GeometryObservation;
+import org.n52.sos.ds.hibernate.entities.NumericObservation;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
+import org.n52.sos.ds.hibernate.entities.TextObservation;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
@@ -48,6 +57,7 @@ import org.n52.sos.ogc.om.values.GeometryValue;
 import org.n52.sos.ogc.om.values.IValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.TextValue;
+import org.n52.sos.ogc.om.values.UnknownValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.Configurator;
@@ -202,26 +212,44 @@ public class HibernateUtilities {
         }
     }
 
-    public static void addValueToObservation(Observation hObservation, IValue value, Session session) {
+    public static Observation createObservationFromValue(IValue value, Session session) {
         if (value instanceof BooleanValue) {
-            hObservation.setBooleanValues(HibernateCriteriaTransactionalUtilities.getOrInsertBooleanValue(
+            BooleanObservation observation = new BooleanObservation();
+            observation.setValue(HibernateCriteriaTransactionalUtilities.getOrInsertBooleanValue(
                     ((BooleanValue) value).getValue(), session));
+            return observation;
+        } else if (value instanceof UnknownValue) {
+            BlobObservation observation = new BlobObservation();
+            observation.setValue(HibernateCriteriaTransactionalUtilities.getOrInsertBlobValue(
+                    ((BlobValue) value).getValue(), session));
+            return observation;
         } else if (value instanceof CategoryValue) {
-            hObservation.setCategoryValues(HibernateCriteriaTransactionalUtilities.getOrInsertCategoryValue(
+            CategoryObservation observation = new CategoryObservation();
+            observation.setValue(HibernateCriteriaTransactionalUtilities.getOrInsertCategoryValue(
                     ((CategoryValue) value).getValue(), session));
+            return observation;
         } else if (value instanceof CountValue) {
-            hObservation.setCountValues(HibernateCriteriaTransactionalUtilities.getOrInsertCountValue(
+            CountObservation observation = new CountObservation();
+            observation.setValue(HibernateCriteriaTransactionalUtilities.getOrInsertCountValue(
                     ((CountValue) value).getValue(), session));
+            return observation;
         } else if (value instanceof GeometryValue) {
-            hObservation.setGeometryValues(HibernateCriteriaTransactionalUtilities.getOrInsertGeometryValue(
+            GeometryObservation observation = new GeometryObservation();
+            observation.setValue(HibernateCriteriaTransactionalUtilities.getOrInsertGeometryValue(
                     ((GeometryValue) value).getValue(), session));
+            return observation;
         } else if (value instanceof QuantityValue) {
-            hObservation.setNumericValues(HibernateCriteriaTransactionalUtilities.getOrInsertQuantityValue(
+            NumericObservation observation = new NumericObservation();
+            observation.setValue(HibernateCriteriaTransactionalUtilities.getOrInsertNumericValue(
                     ((QuantityValue) value).getValue(), session));
+            return observation;
         } else if (value instanceof TextValue) {
-            hObservation.setTextValues(HibernateCriteriaTransactionalUtilities.getOrInsertTextValue(
+            TextObservation observation = new TextObservation();
+            observation.setValue(HibernateCriteriaTransactionalUtilities.getOrInsertTextValue(
                     ((TextValue) value).getValue(), session));
+            return observation;
         }
+        return new Observation();
     }
 
 }

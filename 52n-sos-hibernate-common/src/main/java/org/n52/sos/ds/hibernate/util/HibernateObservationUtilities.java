@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,11 +36,18 @@ import java.util.Set;
 
 import org.hibernate.Session;
 import org.joda.time.DateTime;
+import org.n52.sos.ds.hibernate.entities.BlobObservation;
+import org.n52.sos.ds.hibernate.entities.BlobValue;
+import org.n52.sos.ds.hibernate.entities.BooleanObservation;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
+import org.n52.sos.ds.hibernate.entities.CategoryObservation;
 import org.n52.sos.ds.hibernate.entities.CategoryValue;
+import org.n52.sos.ds.hibernate.entities.CountObservation;
 import org.n52.sos.ds.hibernate.entities.CountValue;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
+import org.n52.sos.ds.hibernate.entities.GeometryObservation;
 import org.n52.sos.ds.hibernate.entities.GeometryValue;
+import org.n52.sos.ds.hibernate.entities.NumericObservation;
 import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
@@ -47,6 +55,7 @@ import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObserva
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.Quality;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
+import org.n52.sos.ds.hibernate.entities.TextObservation;
 import org.n52.sos.ds.hibernate.entities.TextValue;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.time.ITime;
@@ -67,6 +76,7 @@ import org.n52.sos.ogc.om.values.IValue;
 import org.n52.sos.ogc.om.values.NilTemplateValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
+import org.n52.sos.ogc.om.values.UnknownValue;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -207,7 +217,7 @@ public class HibernateObservationUtilities {
                         }
                     }
                 }
-                IValue value = getValueFromAllTable(hObservation);
+                IValue value = getValueFromObservation(hObservation);
                 if (hObservation.getUnit() != null) {
                     value.setUnit(hObservation.getUnit().getUnit());
                 }
@@ -301,7 +311,8 @@ public class HibernateObservationUtilities {
                     obsConst.setOfferings(offerings);
                 }
                 SosObservation sosObservation = new SosObservation();
-                sosObservation.setNoDataValue(Configurator.getInstance().getActiveProfile().getResponseNoDataPlaceholder());
+                sosObservation.setNoDataValue(Configurator.getInstance().getActiveProfile()
+                        .getResponseNoDataPlaceholder());
                 sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
                 sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
                 sosObservation.setObservationConstellation(obsConst);
@@ -366,88 +377,148 @@ public class HibernateObservationUtilities {
      *            Observation object
      * @return Observation value
      */
-    private static IValue getValueFromAllTable(Observation hObservation) {
-        if (hObservation.getBooleanValues() != null && !hObservation.getBooleanValues().isEmpty()) {
-            return new org.n52.sos.ogc.om.values.BooleanValue(
-                    getValueFromBooleanValueTable(hObservation.getBooleanValues()));
-        } else if (hObservation.getCategoryValues() != null && !hObservation.getCategoryValues().isEmpty()) {
-            return new org.n52.sos.ogc.om.values.CategoryValue(
-                    getValueFromCategoryValueTable(hObservation.getCategoryValues()));
-        } else if (hObservation.getCountValues() != null && !hObservation.getCountValues().isEmpty()) {
-            return new org.n52.sos.ogc.om.values.CountValue(getValueFromCountValueTable(hObservation.getCountValues()));
-        } else if (hObservation.getNumericValues() != null && !hObservation.getNumericValues().isEmpty()) {
-            return new QuantityValue(getValueFromNumericValueTable(hObservation.getNumericValues()));
-        } else if (hObservation.getTextValues() != null && !hObservation.getTextValues().isEmpty()) {
-            return new org.n52.sos.ogc.om.values.TextValue(getValueFromTextValueTable(hObservation.getTextValues()));
-        } else if (hObservation.getGeometryValues() != null && !hObservation.getGeometryValues().isEmpty()) {
-            return new org.n52.sos.ogc.om.values.GeometryValue(
-                    getValueFromGeometryValueTable(hObservation.getGeometryValues()));
+    private static IValue getValueFromObservation(Observation hObservation) {
+        if (hObservation instanceof NumericObservation) {
+            return new QuantityValue(getNumericValueTable(((NumericObservation) hObservation).getValue()));
+        } else if (hObservation instanceof BooleanObservation) {
+            return new org.n52.sos.ogc.om.values.BooleanValue(getBooleanValueTable(((BooleanObservation) hObservation).getValue()));
+        } else if (hObservation instanceof CategoryObservation) {
+            return new org.n52.sos.ogc.om.values.CategoryValue(getCategoryValueTable(((CategoryObservation) hObservation).getValue()));
+        } else if (hObservation instanceof CountObservation) {
+            return new org.n52.sos.ogc.om.values.CountValue(getCountValueTable(((CountObservation) hObservation).getValue()));
+        } else if (hObservation instanceof TextObservation) {
+            return new org.n52.sos.ogc.om.values.TextValue(getTextValueTable(((TextObservation) hObservation).getValue()));
+        } else if (hObservation instanceof GeometryObservation) {
+            return new org.n52.sos.ogc.om.values.GeometryValue(getGeometryValueTable(((GeometryObservation) hObservation).getValue()));
+        } else if (hObservation instanceof BlobObservation) {
+            return new UnknownValue(getBlobValueTable(((BlobObservation) hObservation).getValue()));
         }
         return null;
+
+        // if (hObservation.getBooleanValues() != null &&
+        // !hObservation.getBooleanValues().isEmpty()) {
+        // return new org.n52.sos.ogc.om.values.BooleanValue(
+        // getValueFromBooleanValueTable(hObservation.getBooleanValues()));
+        // } else if (hObservation.getCategoryValues() != null &&
+        // !hObservation.getCategoryValues().isEmpty()) {
+        // return new org.n52.sos.ogc.om.values.CategoryValue(
+        // getValueFromCategoryValueTable(hObservation.getCategoryValues()));
+        // } else if (hObservation.getCountValues() != null &&
+        // !hObservation.getCountValues().isEmpty()) {
+        // return new
+        // org.n52.sos.ogc.om.values.CountValue(getValueFromCountValueTable(hObservation.getCountValues()));
+        // } else if (hObservation.getNumericValues() != null &&
+        // !hObservation.getNumericValues().isEmpty()) {
+        // return new
+        // QuantityValue(getValueFromNumericValueTable(hObservation.getNumericValues()));
+        // } else if (hObservation.getTextValues() != null &&
+        // !hObservation.getTextValues().isEmpty()) {
+        // return new
+        // org.n52.sos.ogc.om.values.TextValue(getValueFromTextValueTable(hObservation.getTextValues()));
+        // } else if (hObservation.getGeometryValues() != null &&
+        // !hObservation.getGeometryValues().isEmpty()) {
+        // return new org.n52.sos.ogc.om.values.GeometryValue(
+        // getValueFromGeometryValueTable(hObservation.getGeometryValues()));
+        // }
+        // return null;
     }
 
-    /**
-     * Get observation value from numeric table
-     * 
-     * @param numericValues
-     *            Numeric values
-     * @return Numeric value
-     */
-    private static Double getValueFromNumericValueTable(Set<NumericValue> numericValues) {
-        for (NumericValue numericValue : numericValues) {
-            return new Double(numericValue.getValue());
-        }
-        return Double.NaN;
+    private static Object getBlobValueTable(BlobValue value) {
+        return value.getValue();
     }
 
-    private static Boolean getValueFromBooleanValueTable(Set<BooleanValue> booleanValues) {
-        for (BooleanValue booleanValue : booleanValues) {
-            return Boolean.valueOf(booleanValue.getValue());
-        }
-        return null;
+    private static Boolean getBooleanValueTable(BooleanValue value) {
+        return Boolean.valueOf(value.getValue());
     }
 
-    private static Integer getValueFromCountValueTable(Set<CountValue> countValues) {
-        for (CountValue countValue : countValues) {
-            return Integer.valueOf(countValue.getValue());
-        }
-        return Integer.MIN_VALUE;
+    private static String getCategoryValueTable(CategoryValue value) {
+        return value.getValue();
     }
 
-    /**
-     * Get observation value from text table
-     * 
-     * @param textValues
-     *            Text values
-     * @return Text value
-     */
-    private static String getValueFromTextValueTable(Set<TextValue> textValues) {
-        for (TextValue textValue : textValues) {
-            return textValue.getValue();
-        }
-        return "";
+    private static Integer getCountValueTable(CountValue value) {
+        return Integer.valueOf(value.getValue());
     }
 
-    private static String getValueFromCategoryValueTable(Set<CategoryValue> categoryValues) {
-        for (CategoryValue categoryValue : categoryValues) {
-            return categoryValue.getValue();
-        }
-        return "";
+    private static Geometry getGeometryValueTable(GeometryValue value) {
+        return value.getValue();
     }
 
-    /**
-     * Get observation value from spatial table
-     * 
-     * @param geometryValues
-     *            Spatial values
-     * @return Spatial value
-     */
-    private static Geometry getValueFromGeometryValueTable(Set<GeometryValue> geometryValues) {
-        for (GeometryValue geometryValue : geometryValues) {
-            return geometryValue.getValue();
-        }
-        return null;
+    private static BigDecimal getNumericValueTable(NumericValue value) {
+        return value.getValue();
     }
+
+    private static String getTextValueTable(TextValue value) {
+        return value.getValue();
+    }
+
+    // /**
+    // * Get observation value from numeric table
+    // *
+    // * @param numericValues
+    // * Numeric values
+    // * @return Numeric value
+    // */
+    // private static Double getValueFromNumericValueTable(Set<NumericValue>
+    // numericValues) {
+    // for (NumericValue numericValue : numericValues) {
+    // return new Double(numericValue.getValue());
+    // }
+    // return Double.NaN;
+    // }
+    //
+    // private static Boolean getValueFromBooleanValueTable(Set<BooleanValue>
+    // booleanValues) {
+    // for (BooleanValue booleanValue : booleanValues) {
+    // return Boolean.valueOf(booleanValue.getValue());
+    // }
+    // return null;
+    // }
+    //
+    // private static Integer getValueFromCountValueTable(Set<CountValue>
+    // countValues) {
+    // for (CountValue countValue : countValues) {
+    // return Integer.valueOf(countValue.getValue());
+    // }
+    // return Integer.MIN_VALUE;
+    // }
+    //
+    // /**
+    // * Get observation value from text table
+    // *
+    // * @param textValues
+    // * Text values
+    // * @return Text value
+    // */
+    // private static String getValueFromTextValueTable(Set<TextValue>
+    // textValues) {
+    // for (TextValue textValue : textValues) {
+    // return textValue.getValue();
+    // }
+    // return "";
+    // }
+    //
+    // private static String getValueFromCategoryValueTable(Set<CategoryValue>
+    // categoryValues) {
+    // for (CategoryValue categoryValue : categoryValues) {
+    // return categoryValue.getValue();
+    // }
+    // return "";
+    // }
+    //
+    // /**
+    // * Get observation value from spatial table
+    // *
+    // * @param geometryValues
+    // * Spatial values
+    // * @return Spatial value
+    // */
+    // private static Geometry getValueFromGeometryValueTable(Set<GeometryValue>
+    // geometryValues) {
+    // for (GeometryValue geometryValue : geometryValues) {
+    // return geometryValue.getValue();
+    // }
+    // return null;
+    // }
 
     public static List<SosObservation> unfoldObservation(SosObservation multiObservation) throws OwsExceptionReport {
         if (multiObservation.getValue() instanceof SosSingleObservationValue) {
@@ -529,7 +600,7 @@ public class HibernateObservationUtilities {
                      * observation values
                      */
                     else if (fieldForToken instanceof SosSweQuantity) {
-                        observedValue = new QuantityValue(Double.parseDouble(token));
+                        observedValue = new QuantityValue(new BigDecimal(token));
                         observedValue.setUnit(((SosSweQuantity) fieldForToken).getUom());
                     } else if (fieldForToken instanceof SosSweBoolean) {
                         observedValue = new org.n52.sos.ogc.om.values.BooleanValue(Boolean.parseBoolean(token));
@@ -588,314 +659,5 @@ public class HibernateObservationUtilities {
         newObservation.setValue(value);
         return newObservation;
     }
-
-    // private static SosObservation createNewObservation(
-    // Map<Integer, SosObservationConstellation> observationConstellations,
-    // Map<Integer, List<ResultTemplate>> template4ObsConst, Observation
-    // hObservation, String phenID,
-    // ITime phenomenonTime, IValue value, int obsConstHash) throws
-    // OwsExceptionReport {
-    // SosObservation sosObservation = new SosObservation();
-    // sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
-    // if (hObservation.getIdentifier() != null &&
-    // !hObservation.getIdentifier().isEmpty()) {
-    // sosObservation.setIdentifier(new
-    // CodeWithAuthority(hObservation.getIdentifier()));
-    // }
-    // sosObservation.setNoDataValue(Configurator.getInstance().getNoDataValue());
-    // sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
-    // sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
-    // sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
-    //
-    // SosSweDataArray dataArray = new SosSweDataArray();
-    // // Get ResultTemplate for this observation
-    // // TODO clarify when there are more than one template?
-    // List<ResultTemplate> templates = template4ObsConst.get(obsConstHash);
-    // if (templates == null || (templates != null && templates.size() == 0)) {
-    // String errorMsg = "No result template available for observation.";
-    // LOGGER.error(errorMsg);
-    // throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
-    // }
-    // ResultTemplate hResultTemplate = templates.get(0);
-    // dataArray.setElementType(createElementType(hResultTemplate.getResultStructure()));
-    // dataArray.setEncoding(createEncoding(hResultTemplate.getResultEncoding()));
-    //
-    // SweDataArrayValue dataArrayValue = new SweDataArrayValue();
-    // dataArrayValue.setValue(dataArray);
-    // List<String> newBlock = createBlock(dataArray.getElementType(),
-    // phenomenonTime, phenID, value);
-    // dataArrayValue.addBlock(newBlock);
-    //
-    // SosMultiObservationValues observationValue = new
-    // SosMultiObservationValues();
-    // observationValue.setValue(dataArrayValue);
-    // sosObservation.setValue(observationValue);
-    // return sosObservation;
-    // }
-    //
-    // private static void mergeObservations(Map<String, SosObservation>
-    // antiSubsettingObservations,
-    // Observation hObservation, String phenID, ITime phenomenonTime, IValue
-    // value) {
-    // SosObservation sosObservation =
-    // antiSubsettingObservations.get(hObservation.getAntiSubsetting());
-    // // add value
-    // SosMultiObservationValues sosMultiObservationValues =
-    // (SosMultiObservationValues) sosObservation.getValue();
-    // SweDataArrayValue sweDataArrayValue = ((SweDataArrayValue)
-    // sosMultiObservationValues.getValue());
-    // List<String> newBlock =
-    // createBlock(sweDataArrayValue.getValue().getElementType(),
-    // phenomenonTime, phenID, value);
-    // sweDataArrayValue.addBlock(newBlock);
-    // // reset identifier if required
-    // if (sosObservation.getIdentifier() == null) {
-    // sosObservation.setIdentifier(new
-    // CodeWithAuthority(hObservation.getAntiSubsetting()));
-    // } else if
-    // (!sosObservation.getIdentifier().getValue().equalsIgnoreCase(hObservation.getAntiSubsetting()))
-    // {
-    // sosObservation.getIdentifier().setValue(hObservation.getAntiSubsetting());
-    // }
-    // }
-    //
-    // private static boolean isMergeObservations(AbstractServiceRequest
-    // request, Observation hObservation) {
-    // return !isSubsettingExtensionSet(request.getExtensions())
-    // || isContainerObservationRequested(request,
-    // hObservation.getAntiSubsetting());
-    // }
-    //
-    // private static boolean
-    // isContainerObservationRequested(AbstractServiceRequest request, String
-    // antiSubsetting) {
-    // if (request instanceof GetObservationByIdRequest) {
-    // GetObservationByIdRequest getbyId = (GetObservationByIdRequest) request;
-    // if (getbyId.getObservationIdentifier() != null &&
-    // !getbyId.getObservationIdentifier().isEmpty()) {
-    // for (String requestedObservationId : getbyId.getObservationIdentifier())
-    // {
-    // if (requestedObservationId.equalsIgnoreCase(antiSubsetting)) {
-    // return true;
-    // }
-    // }
-    // }
-    // }
-    // return false;
-    // }
-    //
-    // private static void removeNullValuesFromCollection(Map<Integer,
-    // SosObservation> templatedObservations) {
-    // if (templatedObservations != null && templatedObservations.keySet() !=
-    // null) {
-    // for (Integer observationHash : templatedObservations.keySet()) {
-    // if (templatedObservations.get(observationHash) == null) {
-    // templatedObservations.remove(observationHash);
-    // }
-    // }
-    // }
-    // }
-    //
-    // private static SosSweAbstractEncoding createEncoding(String
-    // resultEncoding) throws OwsExceptionReport {
-    // Object decodedObject = XmlHelper.decodeGenericXmlObject(resultEncoding);
-    // if (decodedObject instanceof SosSweTextEncoding) {
-    // return (SosSweTextEncoding) decodedObject;
-    // }
-    // String errorMsg =
-    // String.format("Decoding of string \"%s\" failed. Returned type is \"%s\".",
-    // resultEncoding,
-    // decodedObject.getClass().getName());
-    // LOGGER.error(errorMsg);
-    // throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
-    // }
-    //
-    // private static SosSweDataRecord createElementType(String resultStructure)
-    // throws OwsExceptionReport {
-    // Object decodedObject = XmlHelper.decodeGenericXmlObject(resultStructure);
-    // if (decodedObject instanceof SosSweDataRecord) {
-    // return (SosSweDataRecord) decodedObject;
-    // }
-    // String errorMsg =
-    // String.format("Decoding of string \"%s\" failed. Returned type is \"%s\".",
-    // resultStructure,
-    // decodedObject.getClass().getName());
-    // LOGGER.error(errorMsg);
-    // throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
-    // }
-    //
-    // private static boolean isSubsetIdAvailable(Observation hObservation) {
-    // return hObservation.getAntiSubsetting() != null &&
-    // !hObservation.getAntiSubsetting().isEmpty();
-    // }
-    //
-    // private static void addPhenomenonTimeField(Observation hObservation,
-    // SosSweDataRecord elementType) {
-    // if (hObservation.getPhenomenonTimeEnd() != null) {
-    // // it is a time range -> definition constant, uom constant
-    // // swe:TimeRange
-    // SosSweTimeRange timeFieldElement = new SosSweTimeRange();
-    // timeFieldElement.setDefinition(OMConstants.PHENOMENON_TIME);
-    // timeFieldElement.setUom(OMConstants.PHEN_UOM_ISO8601);
-    // SosSweField phenTimeField = new SosSweField("phenomenonTime",
-    // timeFieldElement);
-    // elementType.addField(phenTimeField);
-    // } else {
-    // // it is a time instant -> swe:Time
-    // SosSweTime timeFieldElement = new SosSweTime();
-    // timeFieldElement.setDefinition(OMConstants.PHENOMENON_TIME);
-    // timeFieldElement.setUom(OMConstants.PHEN_UOM_ISO8601);
-    // SosSweField phenTimeField = new SosSweField("phenomenonTime",
-    // timeFieldElement);
-    // elementType.addField(phenTimeField);
-    // }
-    // }
-    //
-    // private static void addResultTimeField(SosSweDataRecord elementType) {
-    // // add time field for result time
-    // SosSweTime resultTimeFieldElement = new SosSweTime();
-    // // TODO is this the correct constants for resultTime?
-    // resultTimeFieldElement.setDefinition(OMConstants.PHEN_SAMPLING_TIME);
-    // resultTimeFieldElement.setUom(OMConstants.PHEN_UOM_ISO8601);
-    // SosSweField resultTimeField = new SosSweField("resultTime",
-    // resultTimeFieldElement);
-    // elementType.addField(resultTimeField);
-    // }
-    //
-    // private static void addObservationResultField(SosSweDataRecord
-    // elementType, Observation hObservation,
-    // String observationType, String observedProperty) {
-    // SosSweField observationResultField;
-    // SosSweAbstractDataComponent observedValueFieldElement;
-    // if (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_MEASUREMENT)) {
-    // observedValueFieldElement = new SosSweQuantity();
-    // ((SosSweQuantity)
-    // observedValueFieldElement).setUom(hObservation.getUnit().getUnit());
-    // } else if
-    // (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_CATEGORY_OBSERVATION))
-    // {
-    // observedValueFieldElement = new SosSweCategory();
-    // ((SosSweCategory)
-    // observedValueFieldElement).setCodeSpace(hObservation.getUnit().getUnit());
-    // } else if
-    // (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_COUNT_OBSERVATION))
-    // {
-    // observedValueFieldElement = new SosSweCount();
-    // } else if
-    // (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_COMPLEX_OBSERVATION))
-    // {
-    // // TODO what todo in the case of complex observations?
-    // String exceptionMsg =
-    // String.format("Received observation type is not supported: %s",
-    // observationType);
-    // LOGGER.debug(exceptionMsg);
-    // throw new IllegalArgumentException(exceptionMsg);
-    // } else if
-    // (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_OBSERVATION)) {
-    // // TODO what todo in the case of a generic observation?
-    // String exceptionMsg =
-    // String.format("Received observation type is not supported: %s",
-    // observationType);
-    // LOGGER.debug(exceptionMsg);
-    // throw new IllegalArgumentException(exceptionMsg);
-    // } else if
-    // (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_TEXT_OBSERVATION))
-    // {
-    // observedValueFieldElement = new SosSweText();
-    // } else if
-    // (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_TRUTH_OBSERVATION))
-    // {
-    // observedValueFieldElement = new SosSweBoolean();
-    // } else if
-    // (observationType.equalsIgnoreCase(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION))
-    // {
-    // observedValueFieldElement = new SosSweDataArray();
-    // } else {
-    // String exceptionMsg =
-    // String.format("Received observation type is not supported: %s",
-    // observationType);
-    // LOGGER.debug(exceptionMsg);
-    // throw new IllegalArgumentException(exceptionMsg);
-    // }
-    // observedValueFieldElement.setDefinition(observedProperty);
-    // observationResultField = new SosSweField("result",
-    // observedValueFieldElement);
-    // elementType.addField(observationResultField);
-    // }
-    //
-    // private static List<String> createBlock(SosSweAbstractDataComponent
-    // elementType, ITime phenomenonTime,
-    // String phenID, IValue value) {
-    // if (elementType != null && elementType instanceof SosSweDataRecord) {
-    // SosSweDataRecord elementTypeRecord = (SosSweDataRecord) elementType;
-    // List<String> block = new ArrayList<String>();
-    // for (SosSweField sweField : elementTypeRecord.getFields()) {
-    // if (sweField.getElement() instanceof SosSweTime) {
-    // block.add(DateTimeHelper.format(phenomenonTime));
-    // } else if (sweField.getElement() instanceof SosSweAbstractSimpleType
-    // && sweField.getElement().getDefinition().equals(phenID)) {
-    // block.add(value.getValue().toString());
-    // } else if (sweField.getElement() instanceof SosSweObservableProperty) {
-    // block.add(phenID);
-    // }
-    // }
-    // return block;
-    // }
-    // String exceptionMsg =
-    // String.format("Type of ElementType is not supported: %s", elementType !=
-    // null ? elementType.getClass()
-    // .getName() : "null");
-    // LOGGER.debug(exceptionMsg);
-    // throw new IllegalArgumentException(exceptionMsg);
-    // }
-    //
-    // private static boolean isSubsettingExtensionSet(SwesExtensions
-    // extensions) {
-    // return extensions != null ?
-    // extensions.isBooleanExentsionSet(Sos2Constants.Extensions.Subsetting.name())
-    // : false;
-    // }
-    // /**
-    // * Adds a FOI to the map with FOIs for procedures
-    // *
-    // * @param feature4proc
-    // * FOIs for procedure map
-    // * @param procID
-    // * procedure identifier
-    // * @param foiID
-    // * FOI identifier
-    // * @return updated map
-    // */
-    // private static Map<String, Set<String>>
-    // setFeatureForProcedure(Map<String, Set<String>> feature4proc,
-    // String procID, String foiID) {
-    // Set<String> features;
-    // if (feature4proc.containsKey(procID)) {
-    // features = feature4proc.get(procID);
-    //
-    // } else {
-    // features = new HashSet<String>();
-    // }
-    // if (!features.contains(foiID)) {
-    // // TODO do something or remove if-statement
-    // }
-    // features.add(foiID);
-    // feature4proc.put(procID, features);
-    // return feature4proc;
-    // }
-    // private static SosObservationConstellation
-    // createObservationConstellationForSubObservation(
-    // SosObservationConstellation observationConstellation, IValue iValue,
-    // String phenomenonID) {
-    // SosObservationConstellation constellation = new
-    // SosObservationConstellation();
-    // constellation.setFeatureOfInterest(observationConstellation.getFeatureOfInterest());
-    // constellation.setObservableProperty(new
-    // AbstractSosPhenomenon(phenomenonID));
-    // constellation.setObservationType(OMHelper.getObservationTypeFromValue(iValue));
-    // constellation.setOfferings(observationConstellation.getOfferings());
-    // constellation.setProcedure(observationConstellation.getProcedure());
-    // return constellation;
-    // }
 
 }

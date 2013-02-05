@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,6 +39,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.hibernate.HibernateQueryObject;
+import org.n52.sos.ds.hibernate.entities.BlobValue;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.CategoryValue;
 import org.n52.sos.ds.hibernate.entities.CountValue;
@@ -312,8 +314,19 @@ public class HibernateCriteriaTransactionalUtilities {
         }
         return feature;
     }
+    
+    public static BlobValue getOrInsertBlobValue(Object value, Session session) {
+        BlobValue blobValue = HibernateCriteriaQueryUtilities.getBlobValue(value, session);
+        if (blobValue == null) {
+            blobValue = new BlobValue();
+            blobValue.setValue(value);
+            session.save(blobValue);
+            session.flush();
+        }
+        return blobValue;
+    }
 
-    public static Set<BooleanValue> getOrInsertBooleanValue(Boolean value, Session session) {
+    public static BooleanValue getOrInsertBooleanValue(Boolean value, Session session) {
         BooleanValue booleanValue = HibernateCriteriaQueryUtilities.getBooleanValue(value, session);
         if (booleanValue == null) {
             booleanValue = new BooleanValue();
@@ -321,12 +334,10 @@ public class HibernateCriteriaTransactionalUtilities {
             session.save(booleanValue);
             session.flush();
         }
-        Set<BooleanValue> values = new HashSet<BooleanValue>(1);
-        values.add(booleanValue);
-        return values;
+        return booleanValue;
     }
 
-    public static Set<CategoryValue> getOrInsertCategoryValue(String value, Session session) {
+    public static CategoryValue getOrInsertCategoryValue(String value, Session session) {
         CategoryValue categoryValue = HibernateCriteriaQueryUtilities.getCategoryValue(value, session);
         if (categoryValue == null) {
             categoryValue = new CategoryValue();
@@ -334,12 +345,10 @@ public class HibernateCriteriaTransactionalUtilities {
             session.save(categoryValue);
             session.flush();
         }
-        Set<CategoryValue> values = new HashSet<CategoryValue>(1);
-        values.add(categoryValue);
-        return values;
+        return categoryValue;
     }
 
-    public static Set<CountValue> getOrInsertCountValue(Integer value, Session session) {
+    public static CountValue getOrInsertCountValue(Integer value, Session session) {
         CountValue countValue = HibernateCriteriaQueryUtilities.getCountValue(value, session);
         if (countValue == null) {
             countValue = new CountValue();
@@ -347,12 +356,10 @@ public class HibernateCriteriaTransactionalUtilities {
             session.save(countValue);
             session.flush();
         }
-        Set<CountValue> values = new HashSet<CountValue>(1);
-        values.add(countValue);
-        return values;
+        return countValue;
     }
 
-    public static Set<GeometryValue> getOrInsertGeometryValue(Geometry value, Session session) {
+    public static GeometryValue getOrInsertGeometryValue(Geometry value, Session session) {
         GeometryValue geomtryValue = HibernateCriteriaQueryUtilities.getGeometryValue(value, session);
         if (geomtryValue == null) {
             geomtryValue = new GeometryValue();
@@ -360,12 +367,10 @@ public class HibernateCriteriaTransactionalUtilities {
             session.save(geomtryValue);
             session.flush();
         }
-        Set<GeometryValue> values = new HashSet<GeometryValue>(1);
-        values.add(geomtryValue);
-        return values;
+        return geomtryValue;
     }
 
-    public static Set<NumericValue> getOrInsertQuantityValue(Double value, Session session) {
+    public static NumericValue getOrInsertNumericValue(BigDecimal value, Session session) {
         NumericValue numericValue = HibernateCriteriaQueryUtilities.getNumericValue(value, session);
         if (numericValue == null) {
             numericValue = new NumericValue();
@@ -373,12 +378,10 @@ public class HibernateCriteriaTransactionalUtilities {
             session.save(numericValue);
             session.flush();
         }
-        Set<NumericValue> values = new HashSet<NumericValue>(1);
-        values.add(numericValue);
-        return values;
+        return numericValue;
     }
 
-    public static Set<TextValue> getOrInsertTextValue(String value, Session session) {
+    public static TextValue getOrInsertTextValue(String value, Session session) {
         TextValue textValue = HibernateCriteriaQueryUtilities.getTextValue(value, session);
         if (textValue == null) {
             textValue = new TextValue();
@@ -386,9 +389,7 @@ public class HibernateCriteriaTransactionalUtilities {
             session.save(textValue);
             session.flush();
         }
-        Set<TextValue> values = new HashSet<TextValue>(1);
-        values.add(textValue);
-        return values;
+        return textValue;
     }
 
     public static void insertFeatureOfInterestTypes(Set<String> featureTypes, Session session) {
@@ -519,7 +520,7 @@ public class HibernateCriteriaTransactionalUtilities {
             Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes,
             FeatureOfInterest feature, SosObservation sosObservation, String setId, Session session) {
         SosSingleObservationValue<?> value = (SosSingleObservationValue) sosObservation.getValue();
-        Observation hObservation = new Observation();
+        Observation hObservation =  HibernateUtilities.createObservationFromValue(value.getValue(), session);
         hObservation.setDeleted(false);
         if (sosObservation.isSetIdentifier()) {
             hObservation.setIdentifier(sosObservation.getIdentifier().getValue());
@@ -539,7 +540,7 @@ public class HibernateCriteriaTransactionalUtilities {
         hObservation.setFeatureOfInterest(feature);
         HibernateUtilities.addPhenomeonTimeAndResultTimeToObservation(hObservation,
                 sosObservation.getPhenomenonTime(), sosObservation.getResultTime());
-        HibernateUtilities.addValueToObservation(hObservation, value.getValue(), session);
+       
         if (value.getValue().getUnit() != null) {
             hObservation.setUnit(HibernateCriteriaTransactionalUtilities.getOrInsertUnit(value.getValue().getUnit(),
                     session));

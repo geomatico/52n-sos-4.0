@@ -296,7 +296,7 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
                 xbMeasureType.setUom("");
             }
             if (!quantityValue.getValue().equals(Double.NaN)) {
-                xbMeasureType.setDoubleValue(quantityValue.getValue());
+                xbMeasureType.setDoubleValue(quantityValue.getValue().doubleValue());
             } else {
                 xbMeasureType.setNil();
             }

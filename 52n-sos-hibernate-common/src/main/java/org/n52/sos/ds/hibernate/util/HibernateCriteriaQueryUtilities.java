@@ -27,6 +27,7 @@ import static org.hibernate.criterion.Projections.*;
 import static org.hibernate.criterion.Restrictions.*;
 import static org.n52.sos.ds.hibernate.util.HibernateConstants.*;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,6 +51,7 @@ import org.hibernate.criterion.SimpleExpression;
 import org.hibernate.spatial.criterion.SpatialRestrictions;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.hibernate.HibernateQueryObject;
+import org.n52.sos.ds.hibernate.entities.BlobValue;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
 import org.n52.sos.ds.hibernate.entities.CategoryValue;
 import org.n52.sos.ds.hibernate.entities.CompositePhenomenon;
@@ -1105,6 +1107,12 @@ public class HibernateCriteriaQueryUtilities {
         return (BooleanValue) criteria.uniqueResult();
     }
 
+    public static BlobValue getBlobValue(Object value, Session session) {
+        Criteria criteria = session.createCriteria(BlobValue.class);
+        criteria.add(getEqualRestriction(PARAMETER_VALUE, value));
+        return (BlobValue) criteria.uniqueResult();
+    }
+
     public static CategoryValue getCategoryValue(String value, Session session) {
         Criteria criteria = session.createCriteria(CategoryValue.class);
         criteria.add(getEqualRestriction(PARAMETER_VALUE, value));
@@ -1123,7 +1131,7 @@ public class HibernateCriteriaQueryUtilities {
         return (GeometryValue) criteria.uniqueResult();
     }
 
-    public static NumericValue getNumericValue(Double value, Session session) {
+    public static NumericValue getNumericValue(BigDecimal value, Session session) {
         Criteria criteria = session.createCriteria(NumericValue.class);
         criteria.add(getEqualRestriction(PARAMETER_VALUE, value));
         return (NumericValue) criteria.uniqueResult();

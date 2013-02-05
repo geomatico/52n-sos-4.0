@@ -10,7 +10,7 @@
             	<param name="sequence">numeric_value_id_seq</param>
             </generator>
         </id>
-        <property name="value" type="double">
+        <property name="value" type="big_decimal">
             <column name="value" precision="131089" scale="0" not-null="true" unique="true" />
         </property>
         <!-- <set name="observations" table="observation_has_numeric_value" inverse="true" lazy="true" fetch="join">

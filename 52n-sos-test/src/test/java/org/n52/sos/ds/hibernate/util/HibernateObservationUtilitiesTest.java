@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.Set;
 import org.hibernate.Session;
 import org.junit.Test;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
+import org.n52.sos.ds.hibernate.entities.NumericObservation;
 import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Observation;
@@ -95,16 +97,14 @@ public class HibernateObservationUtilitiesTest extends AbstractSosTestCase{
 		ObservationConstellationOfferingObservationType obsConstOffObType = new ObservationConstellationOfferingObservationType();
 		obsConstOffObType.setObservationConstellation(obsConst);
 		obsConstOffObType.setObservationType(obsType);
-		Observation dbObservation = new Observation();
+		NumericObservation dbObservation = new NumericObservation();
+		NumericValue nVa = new NumericValue();
+		nVa.setValue(BigDecimal.valueOf(1.0));
+		dbObservation.setValue(nVa);
 		Set<ObservationConstellation> obsConsts = new HashSet<ObservationConstellation>(1);
 		obsConsts.add(obsConst);
 		dbObservation.setObservationConstellation(obsConst);
 		dbObservation.setFeatureOfInterest(f);
-		Set<NumericValue> nVs = new HashSet<NumericValue>(1);
-		NumericValue nV = new NumericValue();
-		nV.setValue(1.0);
-		nVs.add(nV);
-		dbObservation.setNumericValues(nVs);
 		dbObservation.setSetId(setId);
 		List<Observation> observationsFromDataBase = new ArrayList<Observation>();
 		observationsFromDataBase.add(dbObservation);

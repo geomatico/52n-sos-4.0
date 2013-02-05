@@ -21,44 +21,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ogc.om.values;
+package org.n52.sos.ds.hibernate.entities;
 
-import java.math.BigDecimal;
-
-public class QuantityValue implements IValue<BigDecimal> {
-
-    private BigDecimal value;
+public class CountObservation extends Observation {
     
-    private String unit;
+    private CountValue value;
 
-    public QuantityValue(BigDecimal value) {
-       this.value = value;
-    }
-
-    @Override
-    public void setValue(BigDecimal value) {
-       this.value = value;
-    }
-
-    @Override
-    public BigDecimal getValue() {
+    public CountValue getValue() {
         return value;
     }
 
-    @Override
-    public void setUnit(String unit) {
-       this.unit = unit;
+    public void setValue(CountValue value) {
+        this.value = value;
     }
-
-    @Override
-    public String getUnit() {
-        return unit;
-    }
-
-	@Override
-	public String toString()
-	{
-		return String.format("QuantityValue [value=%s, unit=%s]", value, unit);
-	}
 
 }

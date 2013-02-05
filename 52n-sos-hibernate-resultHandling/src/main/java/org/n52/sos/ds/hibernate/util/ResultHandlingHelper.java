@@ -32,13 +32,22 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.joda.time.DateTime;
+import org.n52.sos.ds.hibernate.entities.BlobObservation;
+import org.n52.sos.ds.hibernate.entities.BooleanObservation;
 import org.n52.sos.ds.hibernate.entities.BooleanValue;
+import org.n52.sos.ds.hibernate.entities.CategoryObservation;
 import org.n52.sos.ds.hibernate.entities.CategoryValue;
+import org.n52.sos.ds.hibernate.entities.CountObservation;
 import org.n52.sos.ds.hibernate.entities.CountValue;
+import org.n52.sos.ds.hibernate.entities.GeometryObservation;
+import org.n52.sos.ds.hibernate.entities.NumericObservation;
 import org.n52.sos.ds.hibernate.entities.NumericValue;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
+import org.n52.sos.ds.hibernate.entities.TextObservation;
 import org.n52.sos.ds.hibernate.entities.TextValue;
+import org.n52.sos.ogc.om.values.QuantityValue;
+import org.n52.sos.ogc.om.values.UnknownValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosResultEncoding;
 import org.n52.sos.ogc.sos.SosResultStructure;
@@ -51,6 +60,8 @@ import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeHelper;
+
+import com.vividsolutions.jts.io.WKTWriter;
 
 public class ResultHandlingHelper {
 
@@ -155,37 +166,53 @@ public class ResultHandlingHelper {
         String observedProperty = observationConstellation.getObservableProperty().getIdentifier();
         
 		if (observedProperty.equals(definition)) {
-            // TODO multiple values?
-			Set<BooleanValue> booleanValues = observation.getBooleanValues();
-			if (booleanValues != null && !booleanValues.isEmpty()) {
-				return String.valueOf(booleanValues.iterator().next().getValue());
-			}
-			
-			Set<CategoryValue> categoryValues = observation.getCategoryValues();
-			if (categoryValues != null && !categoryValues.isEmpty()) {
-				return categoryValues.iterator().next().getValue();
-			}
-			
-			Set<CountValue> countValues = observation.getCountValues();
-			if (countValues != null && !countValues.isEmpty()) {
-				return String.valueOf(countValues.iterator().next().getValue());
-			}
-			
-			Set<NumericValue> numericValues = observation.getNumericValues();
-			if (numericValues != null && !numericValues.isEmpty()) {
-				return String.valueOf(numericValues.iterator().next().getValue());
-			}
-			
-			//TODO geometry values;
-			
-            Set<TextValue> textValues = observation.getTextValues();
-            if (textValues != null && !textValues.isEmpty()) {
-                StringBuilder builder = new StringBuilder();
-                for (TextValue textValue : textValues) {
-                    builder.append(textValue.getValue());
-                }
-                return builder.toString();
-            }
+		        if (observation instanceof NumericObservation) {
+		            return String.valueOf(((NumericObservation) observation).getValue().getValue());
+		        } else if (observation instanceof BooleanObservation) {
+		            return String.valueOf(((BooleanObservation) observation).getValue().getValue());
+		        } else if (observation instanceof CategoryObservation) {
+		            return String.valueOf(((CategoryObservation) observation).getValue().getValue());
+		        } else if (observation instanceof CountObservation) {
+		            return String.valueOf(((CountObservation) observation).getValue().getValue());
+		        } else if (observation instanceof TextObservation) {
+		            return String.valueOf(((TextObservation) observation).getValue().getValue());
+		        } else if (observation instanceof GeometryObservation) {
+		            WKTWriter writer = new WKTWriter();
+		            return writer.write(((GeometryObservation) observation).getValue().getValue());
+		        } else if (observation instanceof BlobObservation) {
+		            return String.valueOf(((BlobObservation) observation).getValue().getValue());
+		        }
+//            // TODO multiple values?
+//			Set<BooleanValue> booleanValues = observation.getBooleanValue();
+//			if (booleanValues != null && !booleanValues.isEmpty()) {
+//				return String.valueOf(booleanValues.iterator().next().getValue());
+//			}
+//			
+//			Set<CategoryValue> categoryValues = observation.getCategoryValue();
+//			if (categoryValues != null && !categoryValues.isEmpty()) {
+//				return categoryValues.iterator().next().getValue();
+//			}
+//			
+//			Set<CountValue> countValues = observation.getCountValue();
+//			if (countValues != null && !countValues.isEmpty()) {
+//				return String.valueOf(countValues.iterator().next().getValue());
+//			}
+//			
+//			Set<NumericValue> numericValues = observation.getNumericValues();
+//			if (numericValues != null && !numericValues.isEmpty()) {
+//				return String.valueOf(numericValues.iterator().next().getValue());
+//			}
+//			
+//			//TODO geometry values;
+//			
+//            Set<TextValue> textValues = observation.getTextValues();
+//            if (textValues != null && !textValues.isEmpty()) {
+//                StringBuilder builder = new StringBuilder();
+//                for (TextValue textValue : textValues) {
+//                    builder.append(textValue.getValue());
+//                }
+//                return builder.toString();
+//            }
         }
         return Configurator.getInstance().getActiveProfile().getResponseNoDataPlaceholder();
     }

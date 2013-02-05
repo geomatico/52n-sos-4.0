@@ -53,12 +53,13 @@
         </set>
         <set name="spatialFilteringProfiles" table="observation_has_spatial_filtering_profile" inverse="false" lazy="true" fetch="select">
             <key>
-                <column name="observation_id" not-null="true" />
+                <column name="observation_id" not-null="true" unique="true" />
             </key>
             <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.SpatialFilteringProfile">
                 <column name="spatial_filtering_profile_id" not-null="true" />
             </many-to-many>
         </set>
+
         <set name="qualities" table="observation_has_quality" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="observation_id" not-null="true" />
@@ -67,7 +68,15 @@
                 <column name="quality_id" not-null="true" />
             </many-to-many>
         </set>
-        <set name="countValues" table="observation_has_count_value" inverse="false" lazy="true" fetch="select">
+                <!-- <set name="spatialFilteringProfiles" table="observation_has_spatial_filtering_profile" inverse="false" lazy="true" fetch="select">
+            <key>
+                <column name="observation_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.SpatialFilteringProfile">
+                <column name="spatial_filtering_profile_id" not-null="true" />
+            </many-to-many>
+        </set> -->
+       <!--  <set name="countValues" table="observation_has_count_value" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="observation_id" not-null="true" />
             </key>
@@ -114,6 +123,48 @@
             <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.TextValue">
                 <column name="text_value_id" not-null="true" />
             </many-to-many>
-        </set>
+        </set> -->
+        <joined-subclass name="org.n52.sos.ds.hibernate.entities.BlobObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="observation_has_blob_value">
+        	<key column="observation_id"/>
+         	<many-to-one name="value" class="org.n52.sos.ds.hibernate.entities.BlobValue">
+                <column name="blob_value_id" not-null="true" />
+            </many-to-one>
+        </joined-subclass>
+		<joined-subclass name="org.n52.sos.ds.hibernate.entities.BooleanObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="observation_has_boolean_value">
+        	<key column="observation_id"/>
+         	<many-to-one name="value" class="org.n52.sos.ds.hibernate.entities.BooleanValue">
+                <column name="boolean_value_id" not-null="true" />
+            </many-to-one>
+        </joined-subclass>
+		<joined-subclass name="org.n52.sos.ds.hibernate.entities.CategoryObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="observation_has_category_value">
+        	<key column="observation_id"/>
+         	<many-to-one name="value" class="org.n52.sos.ds.hibernate.entities.CategoryValue">
+                <column name="category_value_id" not-null="true" />
+            </many-to-one>
+        </joined-subclass>
+		<joined-subclass name="org.n52.sos.ds.hibernate.entities.CountObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="observation_has_count_value">
+        	<key column="observation_id"/>
+         	<many-to-one name="value" class="org.n52.sos.ds.hibernate.entities.CountValue">
+                <column name="count_value_id" not-null="true" />
+            </many-to-one>
+        </joined-subclass>
+		<joined-subclass name="org.n52.sos.ds.hibernate.entities.GeometryObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="observation_has_geometry_value">
+        	<key column="observation_id"/>
+         	<many-to-one name="value" class="org.n52.sos.ds.hibernate.entities.GeometryValue">
+                <column name="geometry_value_id" not-null="true" />
+            </many-to-one>
+        </joined-subclass>
+		<joined-subclass name="org.n52.sos.ds.hibernate.entities.NumericObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="observation_has_numeric_value">
+        	<key column="observation_id"/>
+         	<many-to-one name="value" class="org.n52.sos.ds.hibernate.entities.NumericValue">
+                <column name="numeric_value_id" not-null="true" />
+            </many-to-one>
+        </joined-subclass>
+		<joined-subclass name="org.n52.sos.ds.hibernate.entities.TextObservation" extends="org.n52.sos.ds.hibernate.entities.Observation" table="observation_has_text_value">
+        	<key column="observation_id"/>
+         	<many-to-one name="value" class="org.n52.sos.ds.hibernate.entities.TextValue">
+                <column name="text_value_id" not-null="true" />
+            </many-to-one>
+        </joined-subclass>
     </class>
 </hibernate-mapping>

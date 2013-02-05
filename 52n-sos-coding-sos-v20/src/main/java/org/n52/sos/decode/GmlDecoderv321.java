@@ -23,6 +23,7 @@
  */
 package org.n52.sos.decode;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -343,10 +344,10 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         return value;
     }
 
-    private SosSingleObservationValue<Double> parseMeasureType(MeasureType measureType) {
-        QuantityValue quantityValue = new QuantityValue(measureType.getDoubleValue());
+    private SosSingleObservationValue<BigDecimal> parseMeasureType(MeasureType measureType) {
+        QuantityValue quantityValue = new QuantityValue(new BigDecimal(measureType.getDoubleValue()));
         quantityValue.setUnit(measureType.getUom());
-        return new SosSingleObservationValue<Double>(quantityValue);
+        return new SosSingleObservationValue<BigDecimal>(quantityValue);
     }
 
     private Object parsePointType(PointType xbPointType) throws OwsExceptionReport {

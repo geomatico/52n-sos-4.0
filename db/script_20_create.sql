@@ -40,6 +40,7 @@ DROP TABLE IF EXISTS unit CASCADE;
 DROP TABLE IF EXISTS numeric_value CASCADE;
 DROP TABLE IF EXISTS count_value CASCADE;
 DROP TABLE IF EXISTS boolean_value CASCADE;
+DROP TABLE IF EXISTS blob_value CASCADE;
 DROP TABLE IF EXISTS request CASCADE;
 DROP TABLE IF EXISTS procedure CASCADE;
 DROP TABLE IF EXISTS feature_relation CASCADE;
@@ -65,6 +66,7 @@ DROP TABLE IF EXISTS result_template CASCADE;
 DROP TABLE IF EXISTS observation_has_numeric_value CASCADE;
 DROP TABLE IF EXISTS observation_has_count_value CASCADE;
 DROP TABLE IF EXISTS observation_has_boolean_value CASCADE;
+DROP TABLE IF EXISTS observation_has_blob_value CASCADE;
 DROP TABLE IF EXISTS observation_has_quality CASCADE;
 DROP TABLE IF EXISTS observation_has_spatial_filtering_profile CASCADE;
 DROP TABLE IF EXISTS observation_has_geometry_value CASCADE;
@@ -72,6 +74,7 @@ DROP TABLE IF EXISTS related_feature_has_related_feature_role CASCADE;
 DROP TABLE IF EXISTS related_feature_role CASCADE;
 
 -- drop sequences
+DROP SEQUENCE IF EXISTS blob_value_id_seq;
 DROP SEQUENCE IF EXISTS boolean_value_id_seq;
 DROP SEQUENCE IF EXISTS category_value_id_seq;
 DROP SEQUENCE IF EXISTS composite_phenomenon_id_seq;
@@ -102,6 +105,7 @@ DROP SEQUENCE IF EXISTS unit_id_seq;
 DROP SEQUENCE IF EXISTS valid_procedure_time_id_seq;
 
 -- create sequences
+CREATE SEQUENCE blob_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE boolean_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE category_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE composite_phenomenon_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
@@ -175,7 +179,7 @@ CREATE TABLE procedure_description_format (
 
 CREATE TABLE related_feature (
   related_feature_id bigint NOT NULL DEFAULT nextval('related_feature_id_seq'),
-  feature_of_interest_id INTEGER NULL,
+  feature_of_interest_id bigint NULL,
   UNIQUE (feature_of_interest_id),
   PRIMARY KEY(related_feature_id)
 );
@@ -258,9 +262,16 @@ CREATE TABLE boolean_value (
   PRIMARY KEY(boolean_value_id)
 );
 
+CREATE TABLE blob_value (
+  blob_value_id bigint NOT NULL DEFAULT nextval('blob_value_id_seq'),
+  value bytea NOT NULL,
+  UNIQUE (value),
+  PRIMARY KEY(blob_value_id)
+);
+
 CREATE TABLE request (
   request_id bigint NOT NULL DEFAULT nextval('request_id_seq'),
-  offering_id INTEGER NOT NULL,
+  offering_id bigint NOT NULL,
   request TEXT NOT NULL,
   begin_lease TIMESTAMP NULL,
   end_lease TIMESTAMP NOT NULL,
@@ -269,7 +280,7 @@ CREATE TABLE request (
 
 CREATE TABLE procedure (
   procedure_id bigint NOT NULL DEFAULT nextval('procedure_id_seq'),
-  procedure_description_format_id INTEGER NOT NULL,
+  procedure_description_format_id bigint NOT NULL,
   identifier TEXT NOT NULL,
   deleted BOOL NOT NULL,
   UNIQUE (identifier),
@@ -277,14 +288,14 @@ CREATE TABLE procedure (
 );
 
 CREATE TABLE sensor_system (
-  parent_sensor_id INTEGER NOT NULL,
-  child_sensor_id INTEGER NOT NULL,
+  parent_sensor_id bigint NOT NULL,
+  child_sensor_id bigint NOT NULL,
   PRIMARY KEY(parent_sensor_id, child_sensor_id)
 );
 
 CREATE TABLE feature_of_interest (
   feature_of_interest_id bigint NOT NULL DEFAULT nextval('feature_of_interest_id_seq'),
-  feature_of_interest_type_id INTEGER NOT NULL,
+  feature_of_interest_type_id bigint NOT NULL,
   identifier TEXT NULL,
   name Text NULL,
   geom GEOMETRY NULL,
@@ -297,8 +308,8 @@ CREATE TABLE feature_of_interest (
 );
 
 CREATE TABLE feature_relation (
-  parent_feature_id INTEGER NOT NULL,
-  child_feature_id INTEGER NOT NULL,
+  parent_feature_id bigint NOT NULL,
+  child_feature_id bigint NOT NULL,
   PRIMARY KEY(parent_feature_id, child_feature_id)
 );
 
@@ -311,71 +322,71 @@ CREATE TABLE observable_property (
 );
 
 CREATE TABLE offering_has_allowed_observation_type (
-  offering_id INTEGER NOT NULL,
-  observation_type_id INTEGER NOT NULL,
+  offering_id bigint NOT NULL,
+  observation_type_id bigint NOT NULL,
   PRIMARY KEY(offering_id, observation_type_id)
 );
 
 CREATE TABLE offering_has_allowed_feature_of_interest_type (
-  offering_id INTEGER NOT NULL,
-  feature_of_interest_type_id INTEGER NOT NULL,
+  offering_id bigint NOT NULL,
+  feature_of_interest_type_id bigint NOT NULL,
   PRIMARY KEY(offering_id, feature_of_interest_type_id)
 );
 
 CREATE TABLE quality (
   quality_id bigint NOT NULL DEFAULT nextval('quality_id_seq'),
-  unit_id INTEGER NOT NULL,
-  swe_type_id INTEGER NOT NULL,
+  unit_id bigint NOT NULL,
+  swe_type_id bigint NOT NULL,
   name TEXT NOT NULL,
   value TEXT NOT NULL,
   PRIMARY KEY(quality_id)
 );
 
 CREATE TABLE offering_has_related_feature (
-  offering_id INTEGER NOT NULL,
-  related_feature_id INTEGER NOT NULL,
+  offering_id bigint NOT NULL,
+  related_feature_id bigint NOT NULL,
   PRIMARY KEY(offering_id, related_feature_id)
 );
 
 CREATE TABLE observation_template (
   observation_template_id bigint NOT NULL DEFAULT nextval('observation_template_id_seq'),
-  procedure_id INTEGER NOT NULL,
-  request_id INTEGER NOT NULL,
+  procedure_id bigint NOT NULL,
+  request_id bigint NOT NULL,
   observation_template TEXT NULL,
   PRIMARY KEY(observation_template_id)
 );
 
 CREATE TABLE request_has_composite_phenomenon (
-  request_id INTEGER NOT NULL,
-  composite_phenomenon_id INTEGER NOT NULL,
+  request_id bigint NOT NULL,
+  composite_phenomenon_id bigint NOT NULL,
   PRIMARY KEY(request_id, composite_phenomenon_id)
 );
 
 CREATE TABLE request_has_observable_property (
-  request_id INTEGER NOT NULL,
-  observable_property_id INTEGER NOT NULL,
+  request_id bigint NOT NULL,
+  observable_property_id bigint NOT NULL,
   PRIMARY KEY(request_id, observable_property_id)
 );
 
 CREATE TABLE related_feature_has_related_feature_role (
-  related_feature_id INTEGER NOT NULL,
-  related_feature_role_id INTEGER NOT NULL,
+  related_feature_id bigint NOT NULL,
+  related_feature_role_id bigint NOT NULL,
   PRIMARY KEY(related_feature_id, related_feature_role_id)
 );
 
 CREATE TABLE observation_constellation (
   observation_constellation_id bigint NOT NULL DEFAULT nextval('observation_constellation_id_seq'),
-  procedure_id INTEGER NOT NULL,
-  observable_property_id INTEGER NOT NULL,
+  procedure_id bigint NOT NULL,
+  observable_property_id bigint NOT NULL,
   UNIQUE (procedure_id,observable_property_id),
   PRIMARY KEY(observation_constellation_id)
 );
 
 CREATE TABLE observation_constellation_offering_observation_type (
   observation_constellation_offering_observation_type_id bigint NOT NULL DEFAULT nextval('observation_constellation_offering_observation_type_id_seq'),
-  observation_constellation_id INTEGER NULL,
-  offering_id INTEGER NOT NULL,
-  observation_type_id INTEGER NULL,
+  observation_constellation_id bigint NULL,
+  offering_id bigint NOT NULL,
+  observation_type_id bigint NULL,
   deleted BOOL NOT NULL DEFAULT false,
   UNIQUE (observation_constellation_id,offering_id,observation_type_id),
   PRIMARY KEY(observation_constellation_offering_observation_type_id)
@@ -383,7 +394,7 @@ CREATE TABLE observation_constellation_offering_observation_type (
 
 CREATE TABLE valid_procedure_time (
   valid_procedure_time_id bigint NOT NULL DEFAULT nextval('valid_procedure_time_id_seq'),
-  procedure_id INTEGER NOT NULL,
+  procedure_id bigint NOT NULL,
   start_time TIMESTAMP NOT NULL,
   end_time TIMESTAMP NULL,
   description_url TEXT NULL,
@@ -393,22 +404,22 @@ CREATE TABLE valid_procedure_time (
 );
 
 CREATE TABLE composite_phenomenon_has_observable_property (
-  composite_phenomenon_id INTEGER NOT NULL,
-  observable_property_id INTEGER NOT NULL,
+  composite_phenomenon_id bigint NOT NULL,
+  observable_property_id bigint NOT NULL,
   PRIMARY KEY(composite_phenomenon_id, observable_property_id)
 );
 
 CREATE TABLE observation (
   observation_id bigint NOT NULL DEFAULT nextval('observation_id_seq'),
-  feature_of_interest_id INTEGER NOT NULL,
-  observation_constellation_id INTEGER NOT NULL,
+  feature_of_interest_id bigint NOT NULL,
+  observation_constellation_id bigint NOT NULL,
   identifier TEXT NULL,
   phenomenon_time_start TIMESTAMP NOT NULL,
   phenomenon_time_end TIMESTAMP NOT NULL,
   result_time TIMESTAMP NOT NULL,
   valid_time_start TIMESTAMP NULL,
   valid_time_end TIMESTAMP NULL,
-  unit_id INTEGER NULL,
+  unit_id bigint NULL,
   set_id TEXT NULL,
   deleted BOOL NOT NULL DEFAULT false,
   UNIQUE (feature_of_interest_id,observation_constellation_id,phenomenon_time_start,phenomenon_time_end,result_time),
@@ -423,21 +434,23 @@ CREATE TABLE observation_relates_to_obs_const_off_obs_type (
   );
 
 CREATE TABLE observation_has_text_value (
-  observation_id INTEGER NOT NULL,
-  text_value_id INTEGER NOT NULL,
+  observation_id bigint NOT NULL,
+  text_value_id bigint NOT NULL,
+  UNIQUE (observation_id),
   PRIMARY KEY(observation_id, text_value_id)
 );
 
 CREATE TABLE observation_has_category_value (
-  observation_id INTEGER NOT NULL,
-  category_value_id INTEGER NOT NULL,
+  observation_id bigint NOT NULL,
+  category_value_id bigint NOT NULL,
+  UNIQUE (observation_id),
   PRIMARY KEY(observation_id, category_value_id)
 );
 
 CREATE TABLE result_template (
   result_template_id bigint NOT NULL DEFAULT nextval('result_template_id_seq'),
-  observation_constellation_offering_observation_type_id INTEGER NOT NULL,
-  feature_of_interest_id INTEGER NOT NULL,
+  observation_constellation_offering_observation_type_id bigint NOT NULL,
+  feature_of_interest_id bigint NOT NULL,
   identifier TEXT NOT NULL,
   result_structure TEXT NOT NULL,
   result_encoding TEXT NOT NULL,
@@ -446,38 +459,50 @@ CREATE TABLE result_template (
 );
 
 CREATE TABLE observation_has_numeric_value (
-  observation_id INTEGER NOT NULL,
-  numeric_value_id INTEGER NOT NULL,
+  observation_id bigint NOT NULL,
+  numeric_value_id bigint NOT NULL,
+  UNIQUE (observation_id),
   PRIMARY KEY(observation_id, numeric_value_id)
 );
 
 CREATE TABLE observation_has_count_value (
-  observation_id INTEGER NOT NULL,
-  count_value_id INTEGER NOT NULL,
+  observation_id bigint NOT NULL,
+  count_value_id bigint NOT NULL,
+  UNIQUE (observation_id),
   PRIMARY KEY(observation_id, count_value_id)
 );
 
 CREATE TABLE observation_has_boolean_value (
-  observation_id INTEGER NOT NULL,
-  boolean_value_id INTEGER NOT NULL,
+  observation_id bigint NOT NULL,
+  boolean_value_id bigint NOT NULL,
+  UNIQUE (observation_id),
   PRIMARY KEY(observation_id, boolean_value_id)
 );
 
+CREATE TABLE observation_has_blob_value (
+  observation_id bigint NOT NULL,
+  blob_value_id bigint NOT NULL,
+  UNIQUE (observation_id),
+  PRIMARY KEY(observation_id, blob_value_id)
+);
+
 CREATE TABLE observation_has_quality (
-  observation_id INTEGER NOT NULL,
-  quality_id INTEGER NOT NULL,
+  observation_id bigint NOT NULL,
+  quality_id bigint NOT NULL,
+  UNIQUE (observation_id),
   PRIMARY KEY(observation_id, quality_id)
 );
 
 CREATE TABLE observation_has_spatial_filtering_profile (
-  observation_id INTEGER NOT NULL,
-  spatial_filtering_profile_id INTEGER NOT NULL,
+  observation_id bigint NOT NULL,
+  spatial_filtering_profile_id bigint NOT NULL,
   PRIMARY KEY(observation_id, spatial_filtering_profile_id)
 );
 
 CREATE TABLE observation_has_geometry_value (
-  observation_id INTEGER NOT NULL,
-  geometry_value_id INTEGER NOT NULL,
+  observation_id bigint NOT NULL,
+  geometry_value_id bigint NOT NULL,
+  UNIQUE (observation_id),
   PRIMARY KEY(observation_id, geometry_value_id)
 );
 
@@ -530,6 +555,8 @@ CREATE INDEX observation_has_count_value_FKIndex1 ON observation_has_count_value
 CREATE INDEX observation_has_count_value_FKIndex2 ON observation_has_count_value(count_value_id);
 CREATE INDEX observation_has_boolean_value_FKIndex1 ON observation_has_boolean_value(observation_id);
 CREATE INDEX observation_has_boolean_value_FKIndex2 ON observation_has_boolean_value(boolean_value_id);
+CREATE INDEX observation_has_blob_value_FKIndex1 ON observation_has_blob_value(observation_id);
+CREATE INDEX observation_has_blob_value_FKIndex2 ON observation_has_blob_value(blob_value_id);
 CREATE INDEX observation_has_quality_FKIndex1 ON observation_has_quality(observation_id);
 CREATE INDEX observation_has_quality_FKIndex2 ON observation_has_quality(quality_id);
 CREATE INDEX observation_has_spatial_filtering_profile_FKIndex1 ON observation_has_spatial_filtering_profile(observation_id);
@@ -587,6 +614,8 @@ ALTER TABLE observation_has_count_value ADD FOREIGN KEY (observation_id) REFEREN
 ALTER TABLE observation_has_count_value ADD FOREIGN KEY (count_value_id) REFERENCES count_value(count_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_boolean_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_boolean_value ADD FOREIGN KEY (boolean_value_id) REFERENCES boolean_value(boolean_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE observation_has_blob_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE observation_has_blob_value ADD FOREIGN KEY (blob_value_id) REFERENCES blob_value(blob_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_category_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_category_value ADD FOREIGN KEY (category_value_id) REFERENCES category_value(category_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_quality ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;

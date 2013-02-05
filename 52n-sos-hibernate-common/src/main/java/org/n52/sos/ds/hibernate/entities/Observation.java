@@ -65,21 +65,21 @@ public class Observation implements java.io.Serializable {
 
     private Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes = new HashSet<ObservationConstellationOfferingObservationType>(0);
     
-    private Set<SpatialFilteringProfile> spatialFilteringProfiles = new HashSet<SpatialFilteringProfile>(0);
+    private Set<SpatialFilteringProfile> spatialFilteringProfiles;
 
     private Set<Quality> qualities = new HashSet<Quality>(0);
-
-    private Set<CountValue> countValues = new HashSet<CountValue>(0);
-    
-    private Set<BooleanValue> booleanValues = new HashSet<BooleanValue>(0);
-
-    private Set<GeometryValue> geometryValues = new HashSet<GeometryValue>(0);
-
-    private Set<CategoryValue> categoryValues = new HashSet<CategoryValue>(0);
-
-    private Set<NumericValue> numericValues = new HashSet<NumericValue>(0);
-
-    private Set<TextValue> textValues = new HashSet<TextValue>(0);
+//
+//    private Set<CountValue> countValues = new HashSet<CountValue>(0);
+//    
+//    private Set<BooleanValue> booleanValues = new HashSet<BooleanValue>(0);
+//
+//    private Set<GeometryValue> geometryValues = new HashSet<GeometryValue>(0);
+//
+//    private Set<CategoryValue> categoryValues = new HashSet<CategoryValue>(0);
+//
+//    private Set<NumericValue> numericValues = new HashSet<NumericValue>(0);
+//
+//    private Set<TextValue> textValues = new HashSet<TextValue>(0);
 
     public Observation() {
     }
@@ -235,53 +235,53 @@ public class Observation implements java.io.Serializable {
         this.qualities = qualities;
     }
 
-    public Set<CountValue> getCountValues() {
-        return this.countValues;
-    }
-
-    public void setCountValues(Set<CountValue> countValues) {
-        this.countValues = countValues;
-    }
-    
-    public Set<BooleanValue> getBooleanValues() {
-        return this.booleanValues;
-    }
-
-    public void setBooleanValues(Set<BooleanValue> booleanValues) {
-        this.booleanValues = booleanValues;
-    }
-
-    public Set<GeometryValue> getGeometryValues() {
-        return this.geometryValues;
-    }
-
-    public void setGeometryValues(Set<GeometryValue> geometryValues) {
-        this.geometryValues = geometryValues;
-    }
-
-    public Set<CategoryValue> getCategoryValues() {
-        return this.categoryValues;
-    }
-
-    public void setCategoryValues(Set<CategoryValue> categoryValues) {
-        this.categoryValues = categoryValues;
-    }
-
-    public Set<NumericValue> getNumericValues() {
-        return this.numericValues;
-    }
-
-    public void setNumericValues(Set<NumericValue> numericValues) {
-        this.numericValues = numericValues;
-    }
-
-    public Set<TextValue> getTextValues() {
-        return this.textValues;
-    }
-
-    public void setTextValues(Set<TextValue> textValues) {
-        this.textValues = textValues;
-    }
+//    public Set<CountValue> getCountValues() {
+//        return this.countValues;
+//    }
+//
+//    public void setCountValues(Set<CountValue> countValues) {
+//        this.countValues = countValues;
+//    }
+//    
+//    public Set<BooleanValue> getBooleanValues() {
+//        return this.booleanValues;
+//    }
+//
+//    public void setBooleanValues(Set<BooleanValue> booleanValues) {
+//        this.booleanValues = booleanValues;
+//    }
+//
+//    public Set<GeometryValue> getGeometryValues() {
+//        return this.geometryValues;
+//    }
+//
+//    public void setGeometryValues(Set<GeometryValue> geometryValues) {
+//        this.geometryValues = geometryValues;
+//    }
+//
+//    public Set<CategoryValue> getCategoryValues() {
+//        return this.categoryValues;
+//    }
+//
+//    public void setCategoryValues(Set<CategoryValue> categoryValues) {
+//        this.categoryValues = categoryValues;
+//    }
+//
+//    public Set<NumericValue> getNumericValues() {
+//        return this.numericValues;
+//    }
+//
+//    public void setNumericValues(Set<NumericValue> numericValues) {
+//        this.numericValues = numericValues;
+//    }
+//
+//    public Set<TextValue> getTextValues() {
+//        return this.textValues;
+//    }
+//
+//    public void setTextValues(Set<TextValue> textValues) {
+//        this.textValues = textValues;
+//    }
 
     public Boolean getDeleted()
     {

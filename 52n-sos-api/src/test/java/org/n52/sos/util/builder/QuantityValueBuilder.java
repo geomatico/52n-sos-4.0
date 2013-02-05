@@ -23,6 +23,8 @@
  */
 package org.n52.sos.util.builder;
 
+import java.math.BigDecimal;
+
 import org.n52.sos.ogc.om.values.QuantityValue;
 
 
@@ -37,10 +39,10 @@ public class QuantityValueBuilder {
 		return new QuantityValueBuilder();
 	}
 
-	private double value;
+	private BigDecimal value;
 	private String unit;
 
-	public QuantityValueBuilder setValue(double value)
+	public QuantityValueBuilder setValue(BigDecimal value)
 	{
 		this.value = value;
 		return this;

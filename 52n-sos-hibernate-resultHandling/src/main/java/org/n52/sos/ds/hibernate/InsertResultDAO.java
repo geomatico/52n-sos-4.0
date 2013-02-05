@@ -23,6 +23,7 @@
  */
 package org.n52.sos.ds.hibernate;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -288,7 +289,7 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
             }
         case Quantity:
             try {
-                return new QuantityValue(Double.valueOf(value));
+                return new QuantityValue(new BigDecimal(value));
             } catch (NumberFormatException e) {
                 String exceptionText = "Error while parsing quantity value!";
                 LOGGER.error(exceptionText, e);

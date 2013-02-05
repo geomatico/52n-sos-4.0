@@ -37,6 +37,7 @@ import static org.n52.sos.util.builder.QuantityObservationValueBuilder.aQuantity
 import static org.n52.sos.util.builder.QuantityValueBuilder.aQuantitiy;
 import static org.n52.sos.util.builder.SamplingFeatureBuilder.aSamplingFeature;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -839,7 +840,7 @@ public class InMemoryCacheControllerTest
 					.setValue(aQuantityValue()
 							.setValue(
 								aQuantitiy()
-									.setValue(2.0)
+									.setValue(new BigDecimal(2.0))
 									.setUnit("m")
 									.build())
 							.setPhenomenonTime(System.currentTimeMillis())
