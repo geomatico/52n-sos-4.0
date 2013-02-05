@@ -23,6 +23,8 @@
  */
 package org.n52.sos.request;
 
+import static org.n52.sos.util.Util4Exceptions.createMissingParameterValueException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,13 +63,13 @@ public abstract class AbstractServiceRequest extends AbstractServiceCommunicatio
     private void checkServiceAndVersionParameter() throws OwsExceptionReport {
         List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
         if (getService() == null) {
-            exceptions.add(Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.service.name()));
+            exceptions.add(createMissingParameterValueException(OWSConstants.RequestParams.service.name()));
         } else if ( (getService() != null && getService().isEmpty())) {
-            exceptions.add(Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.service.name()));
+            exceptions.add(createMissingParameterValueException(OWSConstants.RequestParams.service.name()));
         } else if (getVersion() == null) {
-            exceptions.add(Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.version.name()));
+            exceptions.add(createMissingParameterValueException(OWSConstants.RequestParams.version.name()));
         } else if ( (getVersion() != null && getVersion().isEmpty())) {
-            exceptions.add(Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.version.name()));
+            exceptions.add(createMissingParameterValueException(OWSConstants.RequestParams.version.name()));
         }
         Util4Exceptions.mergeAndThrowExceptions(exceptions);
     }
