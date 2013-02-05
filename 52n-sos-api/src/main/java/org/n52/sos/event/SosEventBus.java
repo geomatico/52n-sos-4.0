@@ -34,11 +34,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.n52.sos.util.ClassHelper;
+import org.n52.sos.util.GroupedAndNamedThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,14 +48,14 @@ public class SosEventBus {
     private static final Logger log = LoggerFactory.getLogger(SosEventBus.class);
     private static final boolean ASYNCHRONOUS_EXECUTION = false;
     private static final int THREAD_POOL_SIZE = 3;
-    private static final String THREAD_PREFIX = "SosEventBus-Worker-";
+    private static final String THREAD_GROUP_NAME = "SosEventBus-Worker";
     private static final Object SINGLETON_CREATION_LOCK = new Object();
 
     private static SosEventBus instance;
     
     private final ClassCache classCache = new ClassCache();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private final Executor executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE, new ExecutorThreadPoolFactory());
+    private final Executor executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE, new GroupedAndNamedThreadFactory(THREAD_GROUP_NAME));
     private final Map<Class<? extends SosEvent>, Set<SosEventListener>> listeners 
             = new HashMap<Class<? extends SosEvent>, Set<SosEventListener>>();
     private final Queue<EventHandler> queue = new ConcurrentLinkedQueue<EventHandler>();
@@ -239,13 +238,6 @@ public class SosEventBus {
 			} catch (Throwable t) {
 				log.error(String.format("Error handling event %s by handler %s", event, listener), t);
 			}
-		}
-	}
-
-	private class ExecutorThreadPoolFactory implements ThreadFactory {
-		private final AtomicInteger i = new AtomicInteger(0);
-		@Override public Thread newThread(Runnable runnable) {
-			return new Thread(runnable, THREAD_PREFIX + i.getAndIncrement());
 		}
 	}
 }
