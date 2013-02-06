@@ -173,5 +173,19 @@ public class TimeInstant extends ITime {
         return value != null;
     }
     
+    public boolean isSetIndeterminateValue() {
+        return indeterminateValue != null && !indeterminateValue.isEmpty();
+    }
+    
+    /**
+     * @return <tt>true</tt>, if value and indeterminateValue are NOT set
+     * @see #isSetValue()
+     * @see #isSetIndeterminateValue()
+     */
+    public boolean isEmpty()
+    {
+        return !isSetValue() && !isSetIndeterminateValue();
+    }
+    
 
 }
