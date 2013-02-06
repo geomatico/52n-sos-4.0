@@ -380,6 +380,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 				addOfferingToProcedureRelation(offeringIdentifier, getProcedureIdentifier(sosObservation));
 				addProcedureToOfferingRelation(getProcedureIdentifier(sosObservation), offeringIdentifier);
 				updateOfferingEnvelope(observedFeatureEnvelope, getDefaultEPSG(), offeringIdentifier);
+				updateTemporalBoundingBoxOf(offeringIdentifier, phenomenonTimeFrom(sosObservation));
 			}
 			// End of "real update"
 

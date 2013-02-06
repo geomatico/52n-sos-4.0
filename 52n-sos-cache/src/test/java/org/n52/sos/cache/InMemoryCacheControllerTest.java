@@ -210,18 +210,18 @@ public class InMemoryCacheControllerTest
 		assertTrue("temporal envelope of does NOT contain observation timestamp",
 			(
 				controller.getMinTimeForOffering(getFirstOffering())
-				.isBefore(getPhenomenonTimeFromFirstObservation())
+				.isBefore(getPhenomenonTimeFromObservation())
 				||
 				controller.getMinTimeForOffering(getFirstOffering())
-				.isEqual(getPhenomenonTimeFromFirstObservation())
+				.isEqual(getPhenomenonTimeFromObservation())
 			)
 			&&
 			(
 				controller.getMaxTimeForOffering(getFirstOffering())
-				.isAfter(getPhenomenonTimeFromFirstObservation())
+				.isAfter(getPhenomenonTimeFromObservation())
 				|| 
 				controller.getMaxTimeForOffering(getFirstOffering())
-				.isEqual(getPhenomenonTimeFromFirstObservation())
+				.isEqual(getPhenomenonTimeFromObservation())
 			)
 		);
 	}
@@ -735,9 +735,8 @@ public class InMemoryCacheControllerTest
 				controller.getEnvelopeForOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME),
 				getSosEnvelopeFromObservation(observation));
 	}
-	
-	/*		
-	@Ignore ("Not yet implemented") @Test public void
+
+	@Test public void
 	should_contain_observation_timestamp_in_temporal_envelope_of_offering_after_InsertResult()
 			throws OwsExceptionReport {
 		insertResultPreparation();
@@ -745,21 +744,23 @@ public class InMemoryCacheControllerTest
 		assertTrue("temporal envelope of does NOT contain observation timestamp",
 			(
 				controller.getMinTimeForOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME)
-				.isBefore(getPhenomenonTimeFromFirstObservation())
+				.isBefore( ((TimePeriod)observation.getPhenomenonTime()).getStart() )
 				||
 				controller.getMinTimeForOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME)
-				.isEqual(getPhenomenonTimeFromFirstObservation())
+				.isEqual( ((TimePeriod)observation.getPhenomenonTime()).getStart() )
 			)
 			&&
 			(
 				controller.getMaxTimeForOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME)
-				.isAfter(getPhenomenonTimeFromFirstObservation())
+				.isAfter( ((TimePeriod)observation.getPhenomenonTime()).getEnd() )
 				|| 
 				controller.getMaxTimeForOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME)
-				.isEqual(getPhenomenonTimeFromFirstObservation())
+				.isEqual( ((TimePeriod)observation.getPhenomenonTime()).getEnd() )
 			)
 		);
 	}
+	
+	/*		
 
 	@Ignore ("Not yet implemented") @Test public void
 	should_contain_observable_property_after_InsertResult()
@@ -940,7 +941,7 @@ public class InMemoryCacheControllerTest
 	}
 
 	private 
-	DateTime getPhenomenonTimeFromFirstObservation()
+	DateTime getPhenomenonTimeFromObservation()
 	{
 		return ((TimeInstant)((InsertObservationRequest) request).getObservations().get(0).getPhenomenonTime()).getValue();
 	}
