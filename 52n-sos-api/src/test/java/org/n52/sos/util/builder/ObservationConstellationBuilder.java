@@ -23,6 +23,8 @@
  */
 package org.n52.sos.util.builder;
 
+import java.util.ArrayList;
+
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
@@ -43,6 +45,7 @@ public class ObservationConstellationBuilder {
 	private SosProcedureDescription procedure;
 	private String observationType;
 	private SosObservableProperty observableProperty;
+	private ArrayList<String> offerings;
 
 	public ObservationConstellationBuilder setFeature(SosAbstractFeature featureOfInterest)
 	{
@@ -68,6 +71,19 @@ public class ObservationConstellationBuilder {
 		return this;
 	}
 
+	public ObservationConstellationBuilder addOffering(String offeringIdentifier)
+	{
+		if (offeringIdentifier != null && !offeringIdentifier.isEmpty())
+		{
+			if (offerings == null)
+			{
+				offerings = new ArrayList<String>();
+			}
+			offerings.add(offeringIdentifier);
+		}
+		return this;
+	}
+	
 	public SosObservationConstellation build()
 	{
 		SosObservationConstellation sosObservationConstellation = new SosObservationConstellation();
@@ -75,6 +91,10 @@ public class ObservationConstellationBuilder {
 		sosObservationConstellation.setObservableProperty(observableProperty);
 		sosObservationConstellation.setObservationType(observationType);
 		sosObservationConstellation.setProcedure(procedure);
+		if (offerings != null && !offerings.isEmpty())
+		{
+			sosObservationConstellation.setOfferings(offerings);
+		}
 		return sosObservationConstellation;
 	}
 
