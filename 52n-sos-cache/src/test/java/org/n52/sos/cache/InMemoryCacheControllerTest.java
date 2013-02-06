@@ -95,17 +95,19 @@ public class InMemoryCacheControllerTest
 	private SosObservation observation;
 
 	@Before public void
-	initController() 
+	initControllerAndStopTimer() 
 	{
 		controller = new TestableInMemoryCacheController();
 		controller.cancel(); // <-- we don't want no timer to run!
 	}
 
 	@After public void 
-	cleanUpAfterEachTest()
+	setAllFixturesToNullAfterEachTest()
 	{
 		request = null;
 		controller = null;
+		observation = null;
+		response = null;
 	}
 	
 	/* TESTS */
@@ -183,7 +185,7 @@ public class InMemoryCacheControllerTest
 		
 		assertTrue("feature type of observation is NOT in cache",
 				controller.getFeatureOfInterestTypes().contains(
-						getFeatureTypeFromFirstObservation()));
+						FT_SAMPLINGPOINT));
 	}
 
 	@Test public void 
@@ -193,11 +195,11 @@ public class InMemoryCacheControllerTest
 		
 		assertEquals("global envelope",
 				controller.getGlobalEnvelope(),
-				getSosEnvelopeFromFirstObservation());
+				getSosEnvelopeFromObservation(((InsertObservationRequest) request).getObservations().get(0)));
 		
 		assertEquals("offering envelop",
 				controller.getEnvelopeForOffering(getFirstOffering()),
-				getSosEnvelopeFromFirstObservation());
+				getSosEnvelopeFromObservation(((InsertObservationRequest) request).getObservations().get(0)));
 	}
 
 	@Test public void
@@ -246,7 +248,7 @@ public class InMemoryCacheControllerTest
 		
 		assertEquals("spatial bounding box of offering NOT same as feature envelope",
 				controller.getEnvelopeForOffering(getFirstOffering()),
-				getSosEnvelopeFromFirstObservation());
+				getSosEnvelopeFromObservation(((InsertObservationRequest) request).getObservations().get(0)));
 	}
 
 	@Test public void
@@ -710,53 +712,31 @@ public class InMemoryCacheControllerTest
 		
 	}
 	
-	/*	
-	@Ignore ("Not yet implemented") @Test public void 
-	should_contain_FeatureOfInterest_after_InsertResult()
-			throws OwsExceptionReport {
-		insertResultPreparation();
-		
-		assertTrue("feature NOT in cache",
-				controller.getFeatureOfInterest().contains(getFoiIdFromInsertResultRequest()));
-		
-		assertTrue("feature -> procedure relation NOT in cache",
-				controller.getProcedures4FeatureOfInterest(getFoiIdFromInsertResultRequest()).contains(PROCEDURE));
-		
-		assertTrue("no parent features for feature",
-				controller.getParentFeatures(Collections.singletonList(getFoiIdFromInsertResultRequest()), true, false).isEmpty());
-		
-		assertTrue("no child features for feature",
-				controller.getParentFeatures(Collections.singletonList(getFoiIdFromInsertResultRequest()), true, false).isEmpty());
-		
-		assertTrue("offering -> feature relation",
-				controller.getKOfferingVFeatures().get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).contains(getFoiIdFromInsertResultRequest()));
-		
-	}
-	
-	@Ignore ("Not yet implemented") @Test public void 
+	@Test public void 
 	should_contain_feature_type_after_InsertResult()
 			throws OwsExceptionReport {
 		insertResultPreparation();
 		
 		assertTrue("feature type of observation is NOT in cache",
 				controller.getFeatureOfInterestTypes().contains(
-						getFeatureTypeFromFirstObservation()));
+						FT_SAMPLINGPOINT));
 	}
-
-	@Ignore ("Not yet implemented") @Test public void 
+	
+	@Test public void 
 	should_contain_envelopes_after_InsertResult()
 			throws OwsExceptionReport {
 		insertResultPreparation();
 		
 		assertEquals("global envelope",
 				controller.getGlobalEnvelope(),
-				getSosEnvelopeFromFirstObservation());
+				getSosEnvelopeFromObservation(observation));
 		
 		assertEquals("offering envelop",
 				controller.getEnvelopeForOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME),
-				getSosEnvelopeFromFirstObservation());
+				getSosEnvelopeFromObservation(observation));
 	}
-
+	
+	/*		
 	@Ignore ("Not yet implemented") @Test public void
 	should_contain_observation_timestamp_in_temporal_envelope_of_offering_after_InsertResult()
 			throws OwsExceptionReport {
@@ -876,6 +856,8 @@ public class InMemoryCacheControllerTest
 							.addOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME)
 							.setFeature(aSamplingFeature()
 									.setIdentifier(FEATURE)
+									.setFeatureType(FT_SAMPLINGPOINT)
+									.setGeometry(52.0,7.5,4326)
 									.build())
 							.build())
 				.setValue(
@@ -963,11 +945,6 @@ public class InMemoryCacheControllerTest
 		return ((TimeInstant)((InsertObservationRequest) request).getObservations().get(0).getPhenomenonTime()).getValue();
 	}
 	
-	private 
-	String getFeatureTypeFromFirstObservation()
-	{
-		return ((SosSamplingFeature)((InsertObservationRequest) request).getObservations().get(0).getObservationConstellation().getFeatureOfInterest()).getFeatureType();
-	}
 	
 	private 
 	String getAssignedProcedure()
@@ -1037,10 +1014,10 @@ public class InMemoryCacheControllerTest
 	}
 
 	private
-	SosEnvelope getSosEnvelopeFromFirstObservation()
+	SosEnvelope getSosEnvelopeFromObservation(SosObservation sosObservation)
 	{
 		return new SosEnvelope(
-				((SosSamplingFeature)((InsertObservationRequest) request).getObservations().get(0).getObservationConstellation().getFeatureOfInterest()).getGeometry().getEnvelopeInternal(),
+				((SosSamplingFeature)sosObservation.getObservationConstellation().getFeatureOfInterest()).getGeometry().getEnvelopeInternal(),
 				controller.getDefaultEPSG());
 	}
 	

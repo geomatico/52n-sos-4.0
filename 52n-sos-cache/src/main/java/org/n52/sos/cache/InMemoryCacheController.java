@@ -210,7 +210,8 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	private void doUpdateAfterObservationInsertion(InsertObservationRequest sosRequest)
 	{
 		// update cache maps
-		for (SosObservation sosObservation : sosRequest.getObservations()) {
+		for (SosObservation sosObservation : sosRequest.getObservations())
+		{
 			addProcedureToCache(getProcedureIdentifier(sosObservation));
 			addObservablePropertyToProcedureRelation(getObservablePropertyIdentifier(sosObservation), getProcedureIdentifier(sosObservation));
 			addProcedureToObservablePropertyRelation(getProcedureIdentifier(sosObservation), getObservablePropertyIdentifier(sosObservation));
@@ -226,14 +227,14 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			}
 			
 			// update features
-			Envelope observedFeatureEnvelope = null;
 			int observedFeatureEnvelopeSRID = getDefaultEPSG();
 			List<SosSamplingFeature> observedFeatures = sosFeaturesToList(sosObservation.getObservationConstellation().getFeatureOfInterest());
 
-			observedFeatureEnvelope = createEnvelopeFrom(observedFeatures);
+			Envelope observedFeatureEnvelope = createEnvelopeFrom(observedFeatures);
 			updateGlobalEnvelopeUsing(observedFeatureEnvelope);
 
-			for (SosSamplingFeature sosSamplingFeature : observedFeatures) {
+			for (SosSamplingFeature sosSamplingFeature : observedFeatures)
+			{
 				String observedFeatureIdentifier = sosSamplingFeature.getIdentifier().getValue();
 
 				addFeatureIdentifierToCache(observedFeatureIdentifier);
@@ -241,14 +242,16 @@ public class InMemoryCacheController extends CacheControllerImpl {
 				addProcedureToFeatureRelationToCache(getProcedureIdentifier(sosObservation), observedFeatureIdentifier);
 				addFeatureToProcedureRelationToCache(observedFeatureIdentifier, getProcedureIdentifier(sosObservation));
 				updateInterFeatureRelations(sosSamplingFeature);
-				for (String offeringIdentifier : sosRequest.getOfferings()) {
+				for (String offeringIdentifier : sosRequest.getOfferings())
+				{
 					addOfferingRelatedFeatureRelationToCache(observedFeatureIdentifier, offeringIdentifier);
 					addOfferingFeatureRelationToCache(observedFeatureIdentifier, offeringIdentifier);
 				}
 			}
 
 			// update offerings
-			for (String offeringIdentifier : sosRequest.getOfferings()) {
+			for (String offeringIdentifier : sosRequest.getOfferings())
+			{
 				// procedure
 				addOfferingToProcedureRelation(offeringIdentifier, getProcedureIdentifier(sosObservation));
 				addProcedureToOfferingRelation(getProcedureIdentifier(sosObservation), offeringIdentifier);
@@ -356,13 +359,27 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			// do "real update" here
 			updateGlobalTemporalBoundingBox(sosObservation.getPhenomenonTime());
 			addProcedureToCache(getProcedureIdentifier(sosObservation));
-			addFeatureIdentifierToCache(getFeatureIdentifier(sosObservation));
-			addFeatureToProcedureRelationToCache(getFeatureIdentifier(sosObservation), getProcedureIdentifier(sosObservation));
+			List<SosSamplingFeature> observedFeatures = sosFeaturesToList(sosObservation.getObservationConstellation().getFeatureOfInterest());
+
+			Envelope observedFeatureEnvelope = createEnvelopeFrom(observedFeatures);
+			updateGlobalEnvelopeUsing(observedFeatureEnvelope);
+
+			for (SosSamplingFeature sosSamplingFeature : observedFeatures)
+			{
+				String observedFeatureIdentifier = sosSamplingFeature.getIdentifier().getValue();
+				addFeatureIdentifierToCache(observedFeatureIdentifier);
+				addFeatureToProcedureRelationToCache(observedFeatureIdentifier, getProcedureIdentifier(sosObservation));
+				addFeatureTypeToCache(sosSamplingFeature.getFeatureType());
+				for (String offeringIdentifier : sosObservation.getObservationConstellation().getOfferings())
+				{
+					addOfferingFeatureRelationToCache(observedFeatureIdentifier, offeringIdentifier);
+				}
+			}
 			for (String offeringIdentifier : sosObservation.getObservationConstellation().getOfferings())
 			{
 				addOfferingToProcedureRelation(offeringIdentifier, getProcedureIdentifier(sosObservation));
 				addProcedureToOfferingRelation(getProcedureIdentifier(sosObservation), offeringIdentifier);
-				addOfferingFeatureRelationToCache(getFeatureIdentifier(sosObservation), offeringIdentifier);
+				updateOfferingEnvelope(observedFeatureEnvelope, getDefaultEPSG(), offeringIdentifier);
 			}
 			// End of "real update"
 
@@ -374,11 +391,6 @@ public class InMemoryCacheController extends CacheControllerImpl {
 				setUpdateIsFree(true);
 			}
 		}
-	}
-
-	private String getFeatureIdentifier(SosObservation sosObservation)
-	{
-		return sosObservation.getObservationConstellation().getFeatureOfInterest().getIdentifier().getValue();
 	}
 
 	/* HELPER */
