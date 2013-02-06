@@ -34,7 +34,7 @@ import org.n52.sos.ogc.sos.SosProcedureDescription;
  */
 public class ObservationConstellationBuilder {
 	
-	public static ObservationConstellationBuilder aObservationConstellation()
+	public static ObservationConstellationBuilder anObservationConstellation()
 	{
 		return new ObservationConstellationBuilder();
 	}

@@ -96,6 +96,11 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		update(Case.RESULT_TEMPLATE_INSERTION,null,sosResponse);
 	}
 
+	public void updateAfterResultInsertion(SosObservation observation)
+	{
+		doUpdateAfterResultInsertion(observation);
+	}
+
 	private void update(Case observationInsertion,
 			AbstractServiceRequest sosRequest) throws OwsExceptionReport
 	{
@@ -259,7 +264,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		}
 	}
 
-	private void doUpdateAfterSensorDeletion(DeleteSensorRequest sosRequest) throws OwsExceptionReport
+	private void doUpdateAfterSensorDeletion(DeleteSensorRequest sosRequest)
 		{
 			removeProcedureFromCache(sosRequest.getProcedureIdentifier());
 			
@@ -326,7 +331,54 @@ public class InMemoryCacheController extends CacheControllerImpl {
 				getCapabilitiesCache().getKProcedureVObservationIdentifiers().get(procedureIdentifier).contains(observationIdentifier));
 	}
 
-	
+	private void doUpdateAfterResultInsertion(SosObservation sosObservation)
+	{
+		if (sosObservation == null) {
+			String errorMsg = String.format("Missing argument: SosObservation: %s", sosObservation);
+			LOGGER.warn(errorMsg);
+			throw new IllegalArgumentException(errorMsg);
+		}
+		boolean timeNotElapsed = true;
+		try {
+			// thread safe updating of the cache map
+			timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
+
+			// has waiting for lock got a time out?
+			if (!timeNotElapsed) {
+				LOGGER.warn("\n******\nupdate after InsertResult not successful because of time out while waiting for update lock." + "\nWaited {} milliseconds.\n******\n", SosConstants.UPDATE_TIMEOUT);
+				return;
+			}
+			while (!isUpdateIsFree()) {
+				getUpdateFree().await();
+			}
+			setUpdateIsFree(false);
+			// do "real update" here
+			if (sosObservation.getPhenomenonTime() instanceof TimeInstant)
+			{
+				updateGlobalTemporalBBoxUsingNew(new TimePeriod(((TimeInstant)sosObservation.getPhenomenonTime()).getValue(), ((TimeInstant)sosObservation.getPhenomenonTime()).getValue()));
+			}
+			else if (sosObservation.getPhenomenonTime() instanceof TimePeriod)
+			{
+				updateGlobalTemporalBBoxUsingNew((TimePeriod) sosObservation.getPhenomenonTime());
+			}
+			else
+			{
+				// TODO throw exception?
+				LOGGER.error("observation phenomenon time type '{}' is not supported implementation of '{}'",
+						sosObservation.getPhenomenonTime().getClass().getName(),
+						ITime.class.getName());
+			}
+			// End of "real update"
+
+		} catch (InterruptedException e) {
+			LOGGER.error("Problem while threadsafe capabilities cache update", e);
+		} finally {
+			if (timeNotElapsed) {
+				getUpdateLock().unlock();
+				setUpdateIsFree(true);
+			}
+		}
+	}
 
 	/* HELPER */
 	

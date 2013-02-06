@@ -51,6 +51,12 @@ public class QuantityObservationValueBuilder {
 		return this;
 	}
 
+	public QuantityObservationValueBuilder setPhenomenonTime(long currentTimeMillis)
+	{
+		this.phenomenonTime = currentTimeMillis;
+		return this;
+	}
+
 	public SosSingleObservationValue<BigDecimal> build()
 	{
 		SosSingleObservationValue<BigDecimal> value = new SosSingleObservationValue<BigDecimal>();
@@ -58,11 +64,5 @@ public class QuantityObservationValueBuilder {
 		value.setPhenomenonTime(new TimeInstant(new DateTime(phenomenonTime)));
 		return value;
 	}
-
-	public QuantityObservationValueBuilder setPhenomenonTime(long currentTimeMillis)
-	{
-		this.phenomenonTime = currentTimeMillis;
-		return this;
-	}
-
+	
 }
