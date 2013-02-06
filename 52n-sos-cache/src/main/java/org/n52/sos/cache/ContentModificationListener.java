@@ -25,6 +25,7 @@ package org.n52.sos.cache;
 
 import java.util.Collections;
 import java.util.Set;
+
 import org.n52.sos.event.SosEvent;
 import org.n52.sos.event.SosEventListener;
 import org.n52.sos.event.events.ObservationDeletion;
@@ -43,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ContentModificationListener implements SosEventListener {
 
-    private static final Logger log = LoggerFactory.getLogger(ContentModificationListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContentModificationListener.class);
     private static final Set<Class<? extends SosEvent>> TYPES = Collections.<Class<? extends SosEvent>>singleton(SosContentChangeEvent.class);
     
     @Override
@@ -58,24 +59,25 @@ public class ContentModificationListener implements SosEventListener {
     @Override
     public void handle(SosEvent event) {
         try {
-            log.debug("Updating Cache after content modification: {}", event);
+            LOGGER.debug("Updating Cache after content modification: {}", event);
             /* TODO pass actual events to the cache controller */
             if (event instanceof SensorInsertion) {
                 getCacheController().updateAfterSensorInsertion(/*(SensorInsertion) event*/);
             } else if (event instanceof ObservationInsertion) {
                 getCacheController().updateAfterObservationInsertion(/*(ObservationInsertion) event*/);
             } else if (event instanceof ObservationDeletion) {
-                getCacheController().updateAfterObservationDeletion(/*(ObservationDeletion) event*/);
+            	// this update will always be performed based on database information
+                getCacheController().updateAfterObservationDeletion();
             } else if (event instanceof ResultTemplateInsertion) {
                 getCacheController().updateAfterResultTemplateInsertion(/*(ResultTemplateInsertion) event*/);
             } else if (event instanceof SensorDeletion) {
                 getCacheController().updateAfterSensorDeletion(/*(SensorDeletion) event*/);
             } else {
-                log.warn("Can not handle modification event: {}", event);
+                LOGGER.warn("Can not handle modification event: {}", event);
             }
             
         } catch (OwsExceptionReport ex) {
-            log.error("Error processing Event", ex);
+            LOGGER.error("Error processing Event", ex);
         }
     }
 }
