@@ -28,6 +28,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,8 +64,11 @@ import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
+import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
+import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -356,12 +360,19 @@ public class SosDecoderv20 implements IDecoder<AbstractServiceCommunicationObjec
         }
 
         if (insertObservationType.getObservationArray() != null) {
+            int length = insertObservationType.getObservationArray().length;
+            Map<String, ITime> phenomenonTimes = new HashMap<String, ITime>(length);
+            Map<String, TimeInstant> resultTimes = new HashMap<String, TimeInstant>(length);
+            Map<String, SosAbstractFeature> features = new HashMap<String, SosAbstractFeature>(length);
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(insertObservationType.getObservationArray().length);
             for (Observation observation : insertObservationType.getObservationArray()) {
                 Object decodedObject = CodingHelper.decodeXmlElement(observation.getOMObservation());
                 if (decodedObject != null && decodedObject instanceof SosObservation) {
-                    insertObservationRequest.addObservation((SosObservation) decodedObject);
-                    break;
+                    SosObservation sosObservation = (SosObservation) decodedObject;
+                    checkAndAddPhenomenonTime(sosObservation.getPhenomenonTime(), phenomenonTimes);
+                    checkAndAddResultTime(sosObservation.getResultTime(), resultTimes);
+                    checkAndAddFeatures(sosObservation.getObservationConstellation().getFeatureOfInterest(), features);
+                    insertObservationRequest.addObservation(sosObservation);
                 } else {
                     StringBuilder exceptionText = new StringBuilder();
                     exceptionText.append("The requested observation type (");
@@ -372,9 +383,13 @@ public class SosDecoderv20 implements IDecoder<AbstractServiceCommunicationObjec
                             Sos2Constants.InsertObservationParams.observation.name(), exceptionText.toString()));
                 }
             }
+            checkReferencedElements(insertObservationRequest.getObservations(), phenomenonTimes, resultTimes, features);
             Util4Exceptions.mergeAndThrowExceptions(exceptions);
-            // TODO: add offering to observationConstellation (duplicate obs if
-            // more than one offering)
+        } else {
+            String exceptionText = "The request does not contain an observation";
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createInvalidParameterValueException(
+                    Sos2Constants.InsertObservationParams.observation.name(), exceptionText);
         }
         return insertObservationRequest;
 
@@ -613,6 +628,50 @@ public class SosDecoderv20 implements IDecoder<AbstractServiceCommunicationObjec
         } else {
             throw Util4Exceptions.createNoApplicableCodeException(null,
                     "The requested resultValue type is not supported");
+        }
+    }
+
+    private void checkAndAddPhenomenonTime(ITime phenomenonTime, Map<String, ITime> phenomenonTimes) {
+        if (!phenomenonTime.isReferenced()) {
+            phenomenonTimes.put(phenomenonTime.getGmlId(), phenomenonTime);
+        }
+    }
+
+    private void checkAndAddResultTime(TimeInstant resultTime, Map<String, TimeInstant> resultTimes) {
+        if (!resultTime.isReferenced()) {
+            resultTimes.put(resultTime.getGmlId(), resultTime);
+        }
+    }
+
+    private void checkAndAddFeatures(SosAbstractFeature featureOfInterest, Map<String, SosAbstractFeature> features) {
+        if (!featureOfInterest.isReferenced()) {
+            features.put(featureOfInterest.getGmlId(), featureOfInterest);
+        }
+    }
+
+    private void checkReferencedElements(List<SosObservation> observations, Map<String, ITime> phenomenonTimes,
+            Map<String, TimeInstant> resultTimes, Map<String, SosAbstractFeature> features) {
+        for (SosObservation observation : observations) {
+            // phenomenonTime
+            ITime phenomenonTime = observation.getPhenomenonTime();
+            if (phenomenonTime.isReferenced()) {
+                observation.getValue().setPhenomenonTime(phenomenonTimes.get(phenomenonTime.getGmlId()));
+            }
+            // resultTime
+            TimeInstant resultTime = observation.getResultTime();
+            if (resultTime.isReferenced()) {
+                if (resultTimes.containsKey(resultTime.getGmlId())) {
+                    observation.setResultTime(resultTimes.get(resultTime.getGmlId()));
+                } else if (phenomenonTimes.containsKey(resultTime.getGmlId())) {
+                    observation.setResultTime((TimeInstant)phenomenonTimes.get(resultTime.getGmlId()));
+                }
+            }
+            // featureOfInterest
+            SosAbstractFeature featureOfInterest = observation.getObservationConstellation().getFeatureOfInterest();
+            if (featureOfInterest.isReferenced()) {
+                observation.getObservationConstellation().setFeatureOfInterest(features.get(featureOfInterest.getGmlId()));
+            }
+            
         }
     }
 }

@@ -60,27 +60,23 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-
 public class GmlDecoderv311 implements IDecoder<Object, XmlObject> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(GmlDecoderv311.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GmlDecoderv311.class);
 
-    private Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(
-    		GMLConstants.NS_GML,
-    		EnvelopeDocument.class,
-            TimeInstantType.class,
-            TimePeriodType.class,
-            TimeInstantDocument.class,
-            TimePeriodDocument.class,
-            CodeType.class
-            );
+    private Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(GMLConstants.NS_GML,
+            EnvelopeDocument.class, TimeInstantType.class, TimePeriodType.class, TimeInstantDocument.class,
+            TimePeriodDocument.class, CodeType.class);
 
     private static final String CS = ",";
+
     private static final String DECIMAL = ".";
+
     private static final String TS = " ";
 
     public GmlDecoderv311() {
-        LOGGER.debug("Decoder for the following keys initialized successfully: {}!", StringHelper.join(", ", DECODER_KEYS));
+        LOGGER.debug("Decoder for the following keys initialized successfully: {}!",
+                StringHelper.join(", ", DECODER_KEYS));
     }
 
     @Override
@@ -110,16 +106,16 @@ public class GmlDecoderv311 implements IDecoder<Object, XmlObject> {
             return parseTimeInstant(((TimeInstantDocument) xmlObject).getTimeInstant());
         } else if (xmlObject instanceof TimePeriodDocument) {
             return parseTimePeriod(((TimePeriodDocument) xmlObject).getTimePeriod());
-        } 
+        }
         if (xmlObject instanceof CodeType) {
-            return parseCodeType((CodeType)xmlObject);
+            return parseCodeType((CodeType) xmlObject);
         }
 
         return null;
     }
 
-	private Object getGeometry4BBOX(EnvelopeDocument xb_bbox) throws OwsExceptionReport {
-		Geometry result = null;
+    private Object getGeometry4BBOX(EnvelopeDocument xb_bbox) throws OwsExceptionReport {
+        Geometry result = null;
 
         EnvelopeType xb_envelope = xb_bbox.getEnvelope();
 
@@ -139,16 +135,16 @@ public class GmlDecoderv311 implements IDecoder<Object, XmlObject> {
             lower = JTSHelper.switchCoordinatesInString(lower);
             upper = JTSHelper.switchCoordinatesInString(upper);
         }
-        
+
         geomWKT = "MULTIPOINT(" + lower + ", " + upper + ")";
 
         result = JTSHelper.createGeometryFromWKT(geomWKT).getEnvelope();
         result.setSRID(srid);
         return result;
-	}
+    }
 
-	private Object parseTimePeriod(TimePeriodType xbTimePeriod) throws OwsExceptionReport {
-		try {
+    private Object parseTimePeriod(TimePeriodType xbTimePeriod) throws OwsExceptionReport {
+        try {
             // begin position
             TimePositionType xbBeginTPT = xbTimePeriod.getBeginPosition();
             DateTime begin = null;
@@ -174,17 +170,19 @@ public class GmlDecoderv311 implements IDecoder<Object, XmlObject> {
                 LOGGER.debug(exceptionText);
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
             }
-
-            return new TimePeriod(begin, end);
+            TimePeriod timePeriod = new TimePeriod(begin, end);
+            timePeriod.setGmlId(xbTimePeriod.getId());
+            return timePeriod;
         } catch (DateTimeException dte) {
             String exceptionText = "Error while parsing TimePeriod!";
             LOGGER.error(exceptionText, dte);
             throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
         }
-	}
+    }
 
-	private Object parseTimeInstant(TimeInstantType xbTimeIntant) throws OwsExceptionReport {
-		TimeInstant ti = new TimeInstant();
+    private Object parseTimeInstant(TimeInstantType xbTimeIntant) throws OwsExceptionReport {
+        TimeInstant ti = new TimeInstant();
+        ti.setGmlId(xbTimeIntant.getId());
         TimePositionType xbTimePositionType = xbTimeIntant.getTimePosition();
         String timeString = xbTimePositionType.getStringValue();
         if (timeString != null && !timeString.equals("")) {
@@ -193,7 +191,7 @@ public class GmlDecoderv311 implements IDecoder<Object, XmlObject> {
             } else {
                 try {
                     ti.setValue(DateTimeHelper.parseIsoString2DateTime(timeString));
-                    
+
                 } catch (DateTimeException dte) {
                     String exceptionText = "Error while parsing TimeInstant!";
                     LOGGER.error(exceptionText, dte);
@@ -206,9 +204,9 @@ public class GmlDecoderv311 implements IDecoder<Object, XmlObject> {
             ti.setIndeterminateValue(xbTimePositionType.getIndeterminatePosition().toString());
         }
         return ti;
-	}
-	
-	private org.n52.sos.ogc.gml.CodeType parseCodeType(CodeType element) {
+    }
+
+    private org.n52.sos.ogc.gml.CodeType parseCodeType(CodeType element) {
         org.n52.sos.ogc.gml.CodeType codeType = new org.n52.sos.ogc.gml.CodeType(element.getStringValue());
         if (element.isSetCodeSpace()) {
             codeType.setCodeSpace(element.getCodeSpace());

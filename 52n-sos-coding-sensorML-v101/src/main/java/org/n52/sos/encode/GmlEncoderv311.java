@@ -197,8 +197,8 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
             if (timePeriodType == null) {
                 timePeriodType = TimePeriodType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             }
-            if (timePeriod.getId() != null && !timePeriod.getId().isEmpty()) {
-                timePeriodType.setId(timePeriod.getId());
+            if (timePeriod.getGmlId() != null && !timePeriod.getGmlId().isEmpty()) {
+                timePeriodType.setId(timePeriod.getGmlId());
             }
             // beginPosition
             TimePositionType xbTimePositionBegin = TimePositionType.Factory.newInstance();
@@ -265,8 +265,8 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
             if (timeInstantType == null) {
                 timeInstantType = TimeInstantType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             }
-            if (timeInstant.isSetId()) {
-                timeInstantType.setId(timeInstant.getId());
+            if (timeInstant.isSetGmlId()) {
+                timeInstantType.setId(timeInstant.getGmlId());
             }
             TimePositionType xb_posType = timeInstantType.addNewTimePosition();
 

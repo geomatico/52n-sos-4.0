@@ -219,8 +219,8 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
         /* SosMultiObservationValues will generate always a new ITime... */
         ITime phenomenonTime = sosObservation.getPhenomenonTime();
         // set phenomenonTime
-        if (phenomenonTime.getId() == null) {
-            phenomenonTime.setId(OMConstants.PHENOMENON_TIME_NAME + "_" + observationID);
+        if (phenomenonTime.getGmlId() == null) {
+            phenomenonTime.setGmlId(OMConstants.PHENOMENON_TIME_NAME + "_" + observationID);
         }
         addPhenomenonTime(xbObs.addNewPhenomenonTime(), phenomenonTime);
         // set resultTime
@@ -522,13 +522,13 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
         ITime phenomenonTime = sosObservation.getPhenomenonTime();
         if (sosObservation.getResultTime() != null) {
             if (resultTime.equals(phenomenonTime)) {
-                xbObs.addNewResultTime().setHref("#" + phenomenonTime.getId());
+                xbObs.addNewResultTime().setHref("#" + phenomenonTime.getGmlId());
             } else {
                 addResultTime(xbObs, resultTime);
             }
         } else {
             if (phenomenonTime instanceof TimeInstant) {
-                xbObs.addNewResultTime().setHref("#" + phenomenonTime.getId());
+                xbObs.addNewResultTime().setHref("#" + phenomenonTime.getGmlId());
             } else if (phenomenonTime instanceof TimePeriod) {
                 TimeInstant rsTime = new TimeInstant(((TimePeriod) sosObservation.getPhenomenonTime()).getEnd());
                 addResultTime(xbObs, rsTime);

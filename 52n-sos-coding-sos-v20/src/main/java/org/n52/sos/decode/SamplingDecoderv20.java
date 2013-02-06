@@ -139,6 +139,7 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
         sosFeat.setXmlDescription(getXmlDescription(spatialSamplingFeature));
         sosFeat.setGeometry(getGeometry(spatialSamplingFeature.getShape()));
         checkTypeAndGeometry(sosFeat);
+        sosFeat.setGmlId(spatialSamplingFeature.getId());
         return sosFeat;
     }
 

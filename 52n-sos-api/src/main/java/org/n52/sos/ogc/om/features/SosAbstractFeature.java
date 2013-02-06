@@ -110,7 +110,7 @@ public abstract class SosAbstractFeature implements Serializable {
     }
 
     public String getGmlId() {
-        return gmlId;
+        return gmlId.replaceFirst("#", "");
     }
 
     public void setGmlId(String gmlId) {
@@ -119,6 +119,10 @@ public abstract class SosAbstractFeature implements Serializable {
 
     public boolean isSetGmlID() {
        return gmlId != null && !gmlId.isEmpty();
+    }
+    
+    public boolean isReferenced() {
+        return isSetGmlID() && gmlId.startsWith("#");
     }
 
 }

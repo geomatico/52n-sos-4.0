@@ -265,6 +265,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
     private TimeInstant parseTimeInstant(TimeInstantType xbTimeIntant) throws OwsExceptionReport {
         
             TimeInstant ti = new TimeInstant();
+            ti.setGmlId(xbTimeIntant.getId());
             TimePositionType xbTimePositionType = xbTimeIntant.getTimePosition();
             String timeString = xbTimePositionType.getStringValue();
             if (timeString != null && !timeString.isEmpty()) {
@@ -325,8 +326,9 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
                 LOGGER.debug(exceptionText);
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
             }
-
-            return new TimePeriod(begin, end);
+            TimePeriod timePeriod = new TimePeriod(begin, end);
+            timePeriod.setGmlId(xbTimePeriod.getId());
+            return timePeriod;
         } catch (DateTimeException dte) {
             String exceptionText = "Error while parsing TimePeriod!";
             LOGGER.error(exceptionText, dte);

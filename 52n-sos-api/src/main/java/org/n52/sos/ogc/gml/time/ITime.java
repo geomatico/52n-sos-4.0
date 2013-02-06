@@ -33,23 +33,26 @@ public abstract class ITime implements Comparable<ITime>, Serializable {
     
     private static final long serialVersionUID = 1366100818431254519L;
 
-    private String id;
+    private String gmlId;
     
     private String indeterminateValue;
     
     public ITime() {
     }
 
-    public ITime(String id) {
-        this.id = id;
+    public ITime(String gmlId) {
+        this.gmlId = gmlId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setGmlId(String gmlId) {
+        this.gmlId = gmlId;
     }
 
-    public String getId() {
-        return this.id;
+    public String getGmlId() {
+        if (isSetGmlId()) {
+            return this.gmlId.replaceFirst("#", "");
+        }
+        return this.gmlId;
     }
 
     /**
@@ -71,11 +74,15 @@ public abstract class ITime implements Comparable<ITime>, Serializable {
         this.indeterminateValue = indeterminateValue;
     }
     
-    public boolean isSetId() {
-        return id != null && !id.isEmpty();
+    public boolean isSetGmlId() {
+        return gmlId != null && !gmlId.isEmpty();
     }
     
     public boolean isSetIndeterminateValue(){
         return indeterminateValue != null && !indeterminateValue.isEmpty();
+    }
+    
+    public boolean isReferenced() {
+        return isSetGmlId() && gmlId.startsWith("#");
     }
 }

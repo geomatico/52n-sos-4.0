@@ -211,8 +211,8 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
         /* SosMultiObservationValues will generate always a new ITime... */
         ITime samplingTime = sosObservation.getPhenomenonTime();
         // set phenomenonTime
-        if (samplingTime.getId() == null) {
-            samplingTime.setId(OMConstants.PHENOMENON_TIME_NAME + "_" + observationID);
+        if (samplingTime.getGmlId() == null) {
+            samplingTime.setGmlId(OMConstants.PHENOMENON_TIME_NAME + "_" + observationID);
         }
 
         addSamplingTime(xbObs.addNewSamplingTime(), samplingTime);

@@ -31,7 +31,9 @@ import java.util.Map;
 import java.util.Set;
 
 import net.opengis.gml.x32.FeaturePropertyType;
+import net.opengis.gml.x32.TimeInstantPropertyType;
 import net.opengis.om.x20.OMObservationType;
+import net.opengis.om.x20.TimeObjectPropertyType;
 
 import org.apache.xmlbeans.XmlBoolean;
 import org.apache.xmlbeans.XmlException;
@@ -204,6 +206,7 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
                         feature.addName(new CodeType(featureOfInterest.getTitle()));
                     }
                 }
+                feature.setGmlId(featureOfInterest.getHref());
         }
         // if feature is encoded
         else {
@@ -243,14 +246,19 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
     }
 
     private ITime getPhenomenonTime(OMObservationType omObservation) throws OwsExceptionReport {
-        if (omObservation.getPhenomenonTime().isSetNilReason()
-                && omObservation.getPhenomenonTime().getNilReason() instanceof String
-                && ((String) omObservation.getPhenomenonTime().getNilReason()).equals("template")) {
+        TimeObjectPropertyType phenomenonTime = omObservation.getPhenomenonTime();
+        if (phenomenonTime.isSetHref() && phenomenonTime.getHref().startsWith("#")) {
             TimeInstant timeInstant = new TimeInstant();
-            timeInstant.setIndeterminateValue((String) omObservation.getPhenomenonTime().getNilReason());
+            timeInstant.setGmlId(phenomenonTime.getHref());
+            return timeInstant;
+        } else if (phenomenonTime.isSetNilReason()
+                && phenomenonTime.getNilReason() instanceof String
+                && ((String) phenomenonTime.getNilReason()).equals("template")) {
+            TimeInstant timeInstant = new TimeInstant();
+            timeInstant.setIndeterminateValue((String) phenomenonTime.getNilReason());
             return timeInstant;
         } else {
-            Object decodedObject = CodingHelper.decodeXmlObject(omObservation.getPhenomenonTime().getAbstractTimeObject());
+            Object decodedObject = CodingHelper.decodeXmlObject(phenomenonTime.getAbstractTimeObject());
             if (decodedObject != null && decodedObject instanceof ITime) {
                 return (ITime) decodedObject;
             }
@@ -262,25 +270,27 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
     }
 
     private TimeInstant getResultTime(OMObservationType omObservation) throws OwsExceptionReport {
-        if (omObservation.getResultTime().isSetHref()) {
+        TimeInstantPropertyType resultTime = omObservation.getResultTime();
+        if (resultTime.isSetHref()) {
         	TimeInstant timeInstant = new TimeInstant();
-        	if (omObservation.getResultTime().getHref().charAt(0) == '#') {
+        	timeInstant.setGmlId(resultTime.getHref());
+        	if (resultTime.getHref().charAt(0) == '#') {
         		// document internal link
         		// TODO parse linked element
         		timeInstant.setIndeterminateValue(Sos2Constants.EN_PHENOMENON_TIME);
         	}
         	else {
-        		timeInstant.setIndeterminateValue(omObservation.getResultTime().getHref());
+        		timeInstant.setIndeterminateValue(resultTime.getHref());
         	}
         	return timeInstant;
-        } else if (omObservation.getResultTime().isSetNilReason()
-                && omObservation.getResultTime().getNilReason() instanceof String
-                && ((String) omObservation.getResultTime().getNilReason()).equals("template")) {
+        } else if (resultTime.isSetNilReason()
+                && resultTime.getNilReason() instanceof String
+                && ((String) resultTime.getNilReason()).equals("template")) {
             TimeInstant timeInstant = new TimeInstant();
-            timeInstant.setIndeterminateValue((String) omObservation.getResultTime().getNilReason());
+            timeInstant.setIndeterminateValue((String) resultTime.getNilReason());
             return timeInstant;
         } else {
-            Object decodedObject = CodingHelper.decodeXmlObject(omObservation.getResultTime().getTimeInstant());
+            Object decodedObject = CodingHelper.decodeXmlObject(resultTime.getTimeInstant());
             if (decodedObject != null && decodedObject instanceof TimeInstant) {
                 return (TimeInstant) decodedObject;
             }
