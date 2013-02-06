@@ -688,6 +688,28 @@ public class InMemoryCacheControllerTest
 		
 	}
 
+	@Test public void 
+	should_contain_FeatureOfInterest_after_InsertResult()
+			throws OwsExceptionReport {
+		insertResultPreparation();
+		
+		assertTrue("feature NOT in cache",
+				controller.getFeatureOfInterest().contains( FEATURE ));
+		
+		assertTrue("feature -> procedure relation NOT in cache",
+				controller.getProcedures4FeatureOfInterest( FEATURE ).contains(PROCEDURE));
+		
+		assertTrue("no parent features for feature",
+				controller.getParentFeatures(Collections.singletonList( FEATURE ), true, false).isEmpty());
+		
+		assertTrue("no child features for feature",
+				controller.getParentFeatures(Collections.singletonList( FEATURE ), true, false).isEmpty());
+		
+		assertTrue("offering -> feature relation",
+				controller.getKOfferingVFeatures().get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).contains( FEATURE ));
+		
+	}
+	
 	/*	
 	@Ignore ("Not yet implemented") @Test public void 
 	should_contain_FeatureOfInterest_after_InsertResult()
@@ -852,6 +874,9 @@ public class InMemoryCacheControllerTest
 									.setIdentifier(PROCEDURE)
 									.build())
 							.addOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME)
+							.setFeature(aSamplingFeature()
+									.setIdentifier(FEATURE)
+									.build())
 							.build())
 				.setValue(
 						aSweDataArrayValue()

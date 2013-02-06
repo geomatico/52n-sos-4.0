@@ -356,10 +356,13 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			// do "real update" here
 			updateGlobalTemporalBoundingBox(sosObservation.getPhenomenonTime());
 			addProcedureToCache(getProcedureIdentifier(sosObservation));
+			addFeatureIdentifierToCache(getFeatureIdentifier(sosObservation));
+			addFeatureToProcedureRelationToCache(getFeatureIdentifier(sosObservation), getProcedureIdentifier(sosObservation));
 			for (String offeringIdentifier : sosObservation.getObservationConstellation().getOfferings())
 			{
 				addOfferingToProcedureRelation(offeringIdentifier, getProcedureIdentifier(sosObservation));
 				addProcedureToOfferingRelation(getProcedureIdentifier(sosObservation), offeringIdentifier);
+				addOfferingFeatureRelationToCache(getFeatureIdentifier(sosObservation), offeringIdentifier);
 			}
 			// End of "real update"
 
@@ -371,6 +374,11 @@ public class InMemoryCacheController extends CacheControllerImpl {
 				setUpdateIsFree(true);
 			}
 		}
+	}
+
+	private String getFeatureIdentifier(SosObservation sosObservation)
+	{
+		return sosObservation.getObservationConstellation().getFeatureOfInterest().getIdentifier().getValue();
 	}
 
 	/* HELPER */
