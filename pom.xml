@@ -971,6 +971,7 @@
 			<id>autermann</id>
 			<modules>
 				<module>52n-sos-api</module>
+				<module>52n-sos-sqlite-config</module>
 				<module>52n-sos-binding-kvp</module>
 				<module>52n-sos-binding-pox</module>
 				<module>52n-sos-binding-soap</module>
