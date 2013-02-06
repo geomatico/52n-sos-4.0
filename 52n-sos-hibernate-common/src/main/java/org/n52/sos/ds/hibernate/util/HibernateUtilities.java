@@ -23,7 +23,6 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -215,8 +214,9 @@ public class HibernateUtilities {
     public static Observation createObservationFromValue(IValue value, Session session) {
         if (value instanceof BooleanValue) {
             BooleanObservation observation = new BooleanObservation();
-            observation.setValue(HibernateCriteriaTransactionalUtilities.getOrInsertBooleanValue(
-                    ((BooleanValue) value).getValue(), session));
+            org.n52.sos.ds.hibernate.entities.BooleanValue booleanValue = new org.n52.sos.ds.hibernate.entities.BooleanValue();
+            booleanValue.setValue(((BooleanValue) value).getValue());
+            observation.setValue(booleanValue);
             return observation;
         } else if (value instanceof UnknownValue) {
             BlobObservation observation = new BlobObservation();
@@ -230,8 +230,9 @@ public class HibernateUtilities {
             return observation;
         } else if (value instanceof CountValue) {
             CountObservation observation = new CountObservation();
-            observation.setValue(HibernateCriteriaTransactionalUtilities.getOrInsertCountValue(
-                    ((CountValue) value).getValue(), session));
+            org.n52.sos.ds.hibernate.entities.CountValue countValue = new org.n52.sos.ds.hibernate.entities.CountValue();
+            countValue.setValue(((CountValue) value).getValue());
+            observation.setValue(countValue);
             return observation;
         } else if (value instanceof GeometryValue) {
             GeometryObservation observation = new GeometryObservation();

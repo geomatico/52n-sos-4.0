@@ -74,6 +74,27 @@ WHERE   ohbv.observation_id = o.observation_id AND
             
         );
 
+DELETE FROM observation_has_blob_value AS ohbv
+USING   observation AS o, 
+        observation_constellation  AS oc,
+        feature_of_interest AS f,
+        procedure AS p,
+        unit AS u,
+        observable_property AS op
+WHERE   ohbv.observation_id = o.observation_id AND
+        o.observation_constellation_id = oc.observation_constellation_id AND
+        f.feature_of_interest_id = o.feature_of_interest_id AND
+        u.unit_id = o.unit_id AND
+        p.procedure_id = oc.procedure_id AND
+        oc.observable_property_id = op.observable_property_id AND
+        (
+            p.identifier LIKE 'http://www.example.org/sensors/%' OR
+            f.identifier LIKE 'test_feature%' OR
+            op.identifier LIKE 'test_observable_property%' OR
+            u.unit LIKE 'test_unit%'
+            
+        );
+
 DELETE FROM observation_has_count_value AS ohcv
 USING   observation AS o, 
         observation_constellation  AS oc,

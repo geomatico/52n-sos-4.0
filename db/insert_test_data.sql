@@ -82,13 +82,6 @@ $$
 $$
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION insert_count_value(int) RETURNS bigint AS
-$$
-	INSERT INTO count_value(value) SELECT $1 WHERE $1 NOT IN (SELECT value FROM count_value);
-	SELECT count_value_id FROM count_value WHERE value = $1;
-$$
-LANGUAGE 'sql';
-
 CREATE OR REPLACE FUNCTION insert_numeric_value(numeric) RETURNS bigint AS
 $$
 	INSERT INTO numeric_value(value) SELECT $1 WHERE $1 NOT IN (SELECT value FROM numeric_value);
@@ -336,12 +329,6 @@ $$
 $$
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION get_boolean_value(boolean) RETURNS bigint AS
-$$
-	SELECT boolean_value_id FROM boolean_value WHERE value = $1;
-$$
-LANGUAGE 'sql';
-
 CREATE OR REPLACE FUNCTION insert_numeric_observation(bigint, numeric) RETURNS VOID AS
 $$
 	INSERT INTO observation_has_numeric_value(observation_id, numeric_value_id) 
@@ -377,17 +364,13 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insert_boolean_observation(bigint, boolean) RETURNS VOID AS
 $$ 
- 	INSERT INTO observation_has_boolean_value(observation_id, boolean_value_id) SELECT $1, get_boolean_value($2)
- 	WHERE $1 NOT IN (SELECT observation_id FROM observation_has_boolean_value 
-			WHERE observation_id = $1 AND boolean_value_id = get_boolean_value($2));
+ 	INSERT INTO observation_has_boolean_value(observation_id, value) VALUES ($1,$2);
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insert_count_observation(bigint, int) RETURNS VOID AS
 $$ 
- 	INSERT INTO observation_has_count_value(observation_id, count_value_id) SELECT $1, insert_count_value($2)
- 	WHERE $1 NOT IN (SELECT observation_id FROM observation_has_count_value 
-			WHERE observation_id = $1 AND count_value_id = insert_count_value($2));
+ 	INSERT INTO observation_has_count_value(observation_id, value) VALUES ($1,$2);
 $$
 LANGUAGE 'sql';
 
@@ -461,10 +444,6 @@ SELECT insert_feature_of_interest_type('http://www.opengis.net/def/nil/OGC/0/unk
 
 ---- PROCEDURE_DESCRIPTION_FORMAT
 SELECT insert_procedure_description_format('http://www.opengis.net/sensorML/1.0.1');
-
----- INSERT VALUES
-INSERT INTO boolean_value(value) SELECT true  WHERE true  NOT IN (SELECT value FROM boolean_value);
-INSERT INTO boolean_value(value) SELECT false WHERE false NOT IN (SELECT value FROM boolean_value);
 
 ---- OFFERING
 SELECT insert_offering('test_offering_1');
@@ -802,8 +781,6 @@ SELECT insert_observation_observation_constellation_offering_observation_type(ge
 	get_observation_constellation_offering_observation_type('http://www.example.org/sensors/101', 'test_observable_property_1', 'Measurement', 'test_offering_1'));
 
 
-DROP FUNCTION create_sensor_description(text, text, numeric, numeric, numeric);
-DROP FUNCTION get_boolean_value(boolean);
 DROP FUNCTION get_feature_of_interest(text);
 DROP FUNCTION get_feature_of_interest_type(text);
 DROP FUNCTION get_observable_property(text);
@@ -819,7 +796,6 @@ DROP FUNCTION insert_boolean_observation(bigint, boolean);
 DROP FUNCTION insert_category_observation(bigint, text);
 DROP FUNCTION insert_category_value(text);
 DROP FUNCTION insert_count_observation(bigint, int);
-DROP FUNCTION insert_count_value(int);
 DROP FUNCTION insert_feature_of_interest(text, numeric, numeric);
 DROP FUNCTION insert_feature_of_interest_type(text);
 DROP FUNCTION insert_geometry_value(geometry);

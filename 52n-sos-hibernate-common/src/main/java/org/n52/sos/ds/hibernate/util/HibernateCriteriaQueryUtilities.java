@@ -23,9 +23,36 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
-import static org.hibernate.criterion.Projections.*;
-import static org.hibernate.criterion.Restrictions.*;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.*;
+import static org.hibernate.criterion.Projections.distinct;
+import static org.hibernate.criterion.Projections.property;
+import static org.hibernate.criterion.Restrictions.eq;
+import static org.hibernate.criterion.Restrictions.in;
+import static org.hibernate.criterion.Restrictions.ne;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.DELETED;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_FEATURE_OF_INTEREST;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_FEATURE_OF_INTEREST_TYPE;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_FEATURE_OF_INTEREST_TYPES;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_IDENTIFIER;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVABLE_PROPERTY;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVATIONS;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATIONS;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPE;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPES;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVATION_TYPE;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OFFERING;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OFFERINGS;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_PHENOMENON_TIME_END;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_PHENOMENON_TIME_START;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_PROCEDURE;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_PROCEDURES;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_PROCEDURE_DESCRIPTION_FORMAT;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_RELATED_FEATURES;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_RELATED_FEATURE_ROLE;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_RESULT_TYPE;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_UNIT;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_VALUE;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_VALUE_TYPE;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -1101,6 +1128,7 @@ public class HibernateCriteriaQueryUtilities {
         return (FeatureOfInterest) criteria.uniqueResult();
     }
 
+    @Deprecated
     public static BooleanValue getBooleanValue(Boolean value, Session session) {
         Criteria criteria = session.createCriteria(BooleanValue.class);
         criteria.add(getEqualRestriction(PARAMETER_VALUE, value));
@@ -1119,6 +1147,7 @@ public class HibernateCriteriaQueryUtilities {
         return (CategoryValue) criteria.uniqueResult();
     }
 
+    @Deprecated
     public static CountValue getCountValue(Integer value, Session session) {
         Criteria criteria = session.createCriteria(CountValue.class);
         criteria.add(getEqualRestriction(PARAMETER_VALUE, value));

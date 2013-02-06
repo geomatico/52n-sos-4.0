@@ -33,10 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.entities.BlobValue;
@@ -326,6 +323,7 @@ public class HibernateCriteriaTransactionalUtilities {
         return blobValue;
     }
 
+    @Deprecated
     public static BooleanValue getOrInsertBooleanValue(Boolean value, Session session) {
         BooleanValue booleanValue = HibernateCriteriaQueryUtilities.getBooleanValue(value, session);
         if (booleanValue == null) {
@@ -348,6 +346,7 @@ public class HibernateCriteriaTransactionalUtilities {
         return categoryValue;
     }
 
+    @Deprecated
     public static CountValue getOrInsertCountValue(Integer value, Session session) {
         CountValue countValue = HibernateCriteriaQueryUtilities.getCountValue(value, session);
         if (countValue == null) {

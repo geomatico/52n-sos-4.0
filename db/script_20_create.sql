@@ -106,10 +106,8 @@ DROP SEQUENCE IF EXISTS valid_procedure_time_id_seq;
 
 -- create sequences
 CREATE SEQUENCE blob_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
-CREATE SEQUENCE boolean_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE category_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE composite_phenomenon_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
-CREATE SEQUENCE count_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE feature_of_interest_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE feature_of_interest_type_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE geometry_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
@@ -246,20 +244,6 @@ CREATE TABLE numeric_value (
   value numeric NOT NULL,
   UNIQUE (value),
   PRIMARY KEY(numeric_value_id)
-);
-
-CREATE TABLE count_value (
-  count_value_id bigint NOT NULL DEFAULT nextval('count_value_id_seq'),
-  value integer NOT NULL,
-  UNIQUE (value),
-  PRIMARY KEY(count_value_id)
-);
-
-CREATE TABLE boolean_value (
-  boolean_value_id bigint NOT NULL DEFAULT nextval('boolean_value_id_seq'),
-  value boolean NOT NULL,
-  UNIQUE (value),
-  PRIMARY KEY(boolean_value_id)
 );
 
 CREATE TABLE blob_value (
@@ -467,16 +451,16 @@ CREATE TABLE observation_has_numeric_value (
 
 CREATE TABLE observation_has_count_value (
   observation_id bigint NOT NULL,
-  count_value_id bigint NOT NULL,
+  value bigint NOT NULL,
   UNIQUE (observation_id),
-  PRIMARY KEY(observation_id, count_value_id)
+  PRIMARY KEY(observation_id, value)
 );
 
 CREATE TABLE observation_has_boolean_value (
   observation_id bigint NOT NULL,
-  boolean_value_id bigint NOT NULL,
+  value boolean NOT NULL,
   UNIQUE (observation_id),
-  PRIMARY KEY(observation_id, boolean_value_id)
+  PRIMARY KEY(observation_id, value)
 );
 
 CREATE TABLE observation_has_blob_value (
@@ -552,9 +536,7 @@ CREATE INDEX result_template_FKIndex3 ON result_template(observation_constellati
 CREATE INDEX observation_has_numeric_value_FKIndex1 ON observation_has_numeric_value(observation_id);
 CREATE INDEX observation_has_numeric_value_FKIndex2 ON observation_has_numeric_value(numeric_value_id);
 CREATE INDEX observation_has_count_value_FKIndex1 ON observation_has_count_value(observation_id);
-CREATE INDEX observation_has_count_value_FKIndex2 ON observation_has_count_value(count_value_id);
 CREATE INDEX observation_has_boolean_value_FKIndex1 ON observation_has_boolean_value(observation_id);
-CREATE INDEX observation_has_boolean_value_FKIndex2 ON observation_has_boolean_value(boolean_value_id);
 CREATE INDEX observation_has_blob_value_FKIndex1 ON observation_has_blob_value(observation_id);
 CREATE INDEX observation_has_blob_value_FKIndex2 ON observation_has_blob_value(blob_value_id);
 CREATE INDEX observation_has_quality_FKIndex1 ON observation_has_quality(observation_id);
@@ -611,9 +593,7 @@ ALTER TABLE observation_relates_to_obs_const_off_obs_type ADD FOREIGN KEY (obser
 ALTER TABLE observation_has_numeric_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_numeric_value ADD FOREIGN KEY (numeric_value_id) REFERENCES numeric_value(numeric_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_count_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE observation_has_count_value ADD FOREIGN KEY (count_value_id) REFERENCES count_value(count_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_boolean_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE observation_has_boolean_value ADD FOREIGN KEY (boolean_value_id) REFERENCES boolean_value(boolean_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_blob_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_blob_value ADD FOREIGN KEY (blob_value_id) REFERENCES blob_value(blob_value_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE observation_has_category_value ADD FOREIGN KEY (observation_id) REFERENCES observation(observation_id) ON DELETE NO ACTION ON UPDATE NO ACTION;
