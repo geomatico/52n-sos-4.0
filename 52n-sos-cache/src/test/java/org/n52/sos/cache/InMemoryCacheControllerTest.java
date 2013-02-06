@@ -50,6 +50,7 @@ import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
@@ -68,9 +69,7 @@ import org.n52.sos.util.builder.DeleteSensorRequestBuilder;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
- * TODO Eike: Test after InsertResultTemplate
- * TODO Eike: Test after InsertResult
- * TODO Eike: Test after DeleteObservation => not possible with InMemory because of bounding box issues, for example.
+ * Test after DeleteObservation => not possible with InMemory because of bounding box issues, for example.
  */
 public class InMemoryCacheControllerTest
 {
@@ -1077,6 +1076,10 @@ public class InMemoryCacheControllerTest
 		protected int getDefaultEPSG()
 		{
 			return 4326;
+		}
+	
+		protected ICacheFeederDAO getCacheDAO() {
+			return null;
 		}
 	}
 }

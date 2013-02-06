@@ -31,7 +31,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
-import org.n52.sos.ds.ICacheFeederDAO;
+import org.n52.sos.cache.action.InMemoryCacheUpdate;
+import org.n52.sos.cache.action.ResultTemplateInsertionInMemoryCacheUpdate;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
@@ -94,7 +95,8 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 	public void updateAfterResultTemplateInsertion(InsertResultTemplateResponse sosResponse) throws OwsExceptionReport
 	{
-		update(Case.RESULT_TEMPLATE_INSERTION,null,sosResponse);
+//		update(Case.RESULT_TEMPLATE_INSERTION,null,sosResponse);
+		update(new ResultTemplateInsertionInMemoryCacheUpdate(sosResponse));
 	}
 
 	public void updateAfterResultInsertion(SosObservation observation)
@@ -108,6 +110,45 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		update(observationInsertion, sosRequest, null);
 	}
 
+	/**
+	 * TODO Eike: continue implementation here: Call this method from public methods and create the required actions 
+	 */
+	private void update(InMemoryCacheUpdate cacheUpdate)
+	{
+		if (cacheUpdate == null ) {
+			String errorMsg = String.format("Missing argument: InMemoryCacheUpdate: '%s'",
+					cacheUpdate);
+			LOGGER.warn(errorMsg);
+			throw new IllegalArgumentException(errorMsg);
+		}
+		boolean timeNotElapsed = true;
+		try {
+			// thread safe updating of the cache map
+			timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
+
+			// has waiting for lock got a time out?
+			if (!timeNotElapsed) {
+				LOGGER.warn("\n******\n{} not successful because of time out while waiting for update lock." + "\nWaited {} milliseconds.\n******\n", 
+						cacheUpdate, 
+						SosConstants.UPDATE_TIMEOUT);
+				return;
+			}
+			while (!isUpdateIsFree()) {
+				getUpdateFree().await();
+			}
+			setUpdateIsFree(false);
+			cacheUpdate.setCache(getCapabilitiesCache());
+			cacheUpdate.execute();
+		} catch (InterruptedException e) {
+			LOGGER.error("Problem while threadsafe capabilities cache update", e);
+		} finally {
+			if (timeNotElapsed) {
+				getUpdateLock().unlock();
+				setUpdateIsFree(true);
+			}
+		}
+	}
+	
 	private void update(Case c,
 			AbstractServiceRequest sosRequest,
 			AbstractServiceResponse sosResponse) throws OwsExceptionReport
@@ -143,12 +184,6 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			case OBSERVATION_INSERTION:
 				doUpdateAfterObservationInsertion((InsertObservationRequest) sosRequest);
 				break;
-			case RESULT_TEMPLATE_INSERTION:
-				doUpdateAfterResultTemplateInsertion((InsertResultTemplateResponse) sosResponse);
-				break;
-			case RESULT_INSERTION:
-				throw new RuntimeException("NOT IMPLEMENTED");
-				// break;
 			case SENSOR_INSERTION:
 				doUpdateAfterSensorInsertion((InsertSensorRequest) sosRequest, (InsertSensorResponse) sosResponse);
 				break;
@@ -166,18 +201,6 @@ public class InMemoryCacheController extends CacheControllerImpl {
 
 	/* WORKER */
 	
-	/**
-	 * 
-	 * @param sosResponse
-	 */
-	private void doUpdateAfterResultTemplateInsertion(InsertResultTemplateResponse sosResponse)
-	{
-		getCapabilitiesCache().getResultTemplates().add(sosResponse.getAcceptedTemplate());
-		LOGGER.debug("added result template identifier '{}' to cache? {}",
-				sosResponse.getAcceptedTemplate(),
-				getCapabilitiesCache().getResultTemplates().contains(sosResponse.getAcceptedTemplate()));
-	}
-
 	private void doUpdateAfterSensorInsertion(InsertSensorRequest sosRequest,
 			InsertSensorResponse sosResponse)
 	{
@@ -335,6 +358,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 				getCapabilitiesCache().getKProcedureVObservationIdentifiers().get(procedureIdentifier).contains(observationIdentifier));
 	}
 
+	// TODO extract same behaviour as in doUpdateAfterObservationInsertion to methods 
 	private void doUpdateAfterResultInsertion(SosObservation sosObservation)
 	{
 		if (sosObservation == null) {
@@ -1120,12 +1144,6 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	protected int getDefaultEPSG()
 	{
 		return Configurator.getInstance().getDefaultEPSG();
-	}
-
-	@Override
-	protected ICacheFeederDAO getCacheDAO()
-	{
-		return null; // We don't need not DAO --> TODO change CCC hierarchy
 	}
 
 }

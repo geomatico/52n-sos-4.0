@@ -24,10 +24,7 @@
 package org.n52.sos.ds.hibernate.cache;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
 
-import java.util.List;
 import org.n52.sos.util.CompositeAction;
 import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;
@@ -64,7 +61,8 @@ public abstract class CompositeCacheUpdate extends CacheUpdate {
 
     @Override
     public String toString() {
-        return format("%s[actions=[%s]]",  getClass().getSimpleName(),
+        return format("%s [actions=[%s]]",  
+        		getClass().getSimpleName(),
                 StringHelper.join(", ", action.getActions()));
     }
 }

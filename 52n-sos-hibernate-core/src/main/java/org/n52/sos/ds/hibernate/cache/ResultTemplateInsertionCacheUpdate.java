@@ -23,13 +23,7 @@
  */
 package org.n52.sos.ds.hibernate.cache;
 
-import org.n52.sos.ds.hibernate.cache.base.OfferingCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.CompositePhenomenonCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.RelatedFeaturesCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.FeatureOfInterestCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.ResultTemplateCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.ProcedureCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.ObservablePropertiesCacheUpdate;
 
 /**
  *
@@ -38,12 +32,12 @@ import org.n52.sos.ds.hibernate.cache.base.ObservablePropertiesCacheUpdate;
 public class ResultTemplateInsertionCacheUpdate extends CompositeCacheUpdate {
 
     public ResultTemplateInsertionCacheUpdate() {
-        super(new OfferingCacheUpdate(),
+        super(/*new OfferingCacheUpdate(), // TODO Review [!Eike]: We store only the result template id in the cache
               new ProcedureCacheUpdate(),
               new ObservablePropertiesCacheUpdate(),
               new FeatureOfInterestCacheUpdate(),
               new RelatedFeaturesCacheUpdate(),
-              new CompositePhenomenonCacheUpdate(),
+              new CompositePhenomenonCacheUpdate(),*/
               new ResultTemplateCacheUpdate());
     }
     

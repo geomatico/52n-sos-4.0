@@ -382,6 +382,11 @@ public class CacheImpl implements CapabilitiesCache{
     protected String getUnit4ObsProp(String observedProperty) {
         return unit4Phen.get(observedProperty);
     }
+    
+    @Override
+	public void setUnit4ObservableProperty(Map<String, String> unit4Phen) {
+        this.unit4Phen = unit4Phen;
+    }
 
     /**
      * 
@@ -698,10 +703,6 @@ public class CacheImpl implements CapabilitiesCache{
         return result;
     }
 
-    @Override
-	public void setUnit4ObservableProperty(Map<String, String> unit4Phen) {
-        this.unit4Phen = unit4Phen;
-    }
 
     @Override
 	public void setKObservablePropertyVOfferings(Map<String, List<String>> phenOffs) {
