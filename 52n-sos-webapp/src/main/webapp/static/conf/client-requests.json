@@ -674,6 +674,9 @@
                 },
                 "InsertObservation (SweArray)": {
                     "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_SweArray.xml"
+                },
+                "InsertObservation (Multiple observations)": {
+                    "request": "static/examples/sos_v20/requests_soap/Transactional/InsertObservation_Multiple.xml"
                 }
             },
             "InsertSensor": {
