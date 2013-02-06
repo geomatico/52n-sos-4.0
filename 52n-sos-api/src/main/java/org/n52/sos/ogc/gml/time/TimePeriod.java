@@ -282,10 +282,10 @@ public class TimePeriod extends ITime {
      */
     public void extendToContain( DateTime time ){
         if( time != null ){
-            if( isSetStart() || time.isBefore( start ) ){
+            if( !isSetStart() || time.isBefore( start ) ){
                 start = time;
             }
-            if( isSetEnd() || time.isAfter( end ) ){
+            if( !isSetEnd() || time.isAfter( end ) ){
                 end = time;
             }
         }

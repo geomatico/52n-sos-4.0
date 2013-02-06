@@ -30,7 +30,7 @@ import org.junit.Test;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
- *
+ * TODO test extent to methods!!!
  */
 public class TimePeriodTest {
 	
@@ -55,6 +55,18 @@ public class TimePeriodTest {
 	public void isSetEndTest()
 	{
 		assertTrue("new TimePeriod(null,new DateTime()).isSetEnd() == false",new TimePeriod(null,new DateTime()).isSetEnd());
+	}
+	
+	@Test
+	public void emptyTimePeriodExtendedByTimeInstantShouldHaveTheSameValueForStartAndEnd()
+	{
+		TimePeriod timePeriod = new TimePeriod();
+		
+		timePeriod.extendToContain(new TimeInstant(new DateTime()));
+		
+		assertFalse("TimePeriod is emtpy after extending", timePeriod.isEmpty());
+		assertTrue("Start value not set",timePeriod.isSetStart());
+		assertTrue("End value not set", timePeriod.isSetEnd());
 	}
 
 }
