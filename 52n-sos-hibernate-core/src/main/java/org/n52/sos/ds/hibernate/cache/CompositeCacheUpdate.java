@@ -23,8 +23,6 @@
  */
 package org.n52.sos.ds.hibernate.cache;
 
-import static java.lang.String.format;
-
 import org.n52.sos.util.CompositeAction;
 import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;
@@ -38,10 +36,10 @@ public abstract class CompositeCacheUpdate extends CacheUpdate {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(CompositeCacheUpdate.class);
 
-    private CompositeAction<CacheUpdate> action;
+    private CompositeAction<CacheUpdate> delegatedAction;
 
     public CompositeCacheUpdate(CacheUpdate... actions) {
-        this.action = new CompositeAction<CacheUpdate>(actions) {
+        this.delegatedAction = new CompositeAction<CacheUpdate>(actions) {
             @Override protected void pre(CacheUpdate action) {
                 action.setCache(getCache());
                 action.setErrors(getErrors());
@@ -56,13 +54,12 @@ public abstract class CompositeCacheUpdate extends CacheUpdate {
 
     @Override
     public void execute() {
-        action.execute();
+        delegatedAction.execute();
     }
 
     @Override
     public String toString() {
-        return format("%s [actions=[%s]]",  
-        		getClass().getSimpleName(),
-                StringHelper.join(", ", action.getActions()));
+        return String.format("%s [actions=[%s]]", getClass().getSimpleName(),
+                StringHelper.join(", ", delegatedAction.getActions()));
     }
 }
