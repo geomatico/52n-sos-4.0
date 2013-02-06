@@ -117,8 +117,9 @@ public class PostgisDialect52N extends PostgreSQLDialect implements SpatialDiale
      */
     @Override
     public String getTypeName(int code, long length, int precision, int scale) throws HibernateException {
-        if (code == 3000)
+        if (code == 3000) {
             return "GEOMETRY";
+        }
         return super.getTypeName(code, length, precision, scale);
     }
 
@@ -130,6 +131,7 @@ public class PostgisDialect52N extends PostgreSQLDialect implements SpatialDiale
         return super.remapSqlTypeDescriptor(sqlTypeDescriptor);
     }
 
+    @Override
     public String getSpatialRelateSQL(String columnName, int spatialRelation) {
         switch (spatialRelation) {
         case SpatialRelation.WITHIN:
@@ -154,23 +156,28 @@ public class PostgisDialect52N extends PostgreSQLDialect implements SpatialDiale
 
     }
 
+    @Override
     public String getDWithinSQL(String columnName) {
         return "ST_DWithin(" + columnName + ",?,?)";
     }
 
+    @Override
     public String getHavingSridSQL(String columnName) {
         return "( ST_srid(" + columnName + ") = ?)";
     }
 
+    @Override
     public String getIsEmptySQL(String columnName, boolean isEmpty) {
         String emptyExpr = " ST_IsEmpty(" + columnName + ") ";
         return isEmpty ? emptyExpr : "( NOT " + emptyExpr + ")";
     }
 
+    @Override
     public String getSpatialFilterExpression(String columnName) {
         return "(" + columnName + " && ? ) ";
     }
 
+    @Override
     public String getSpatialAggregateSQL(String columnName, int aggregation) {
         switch (aggregation) {
         case SpatialAggregate.EXTENT:
@@ -183,10 +190,12 @@ public class PostgisDialect52N extends PostgreSQLDialect implements SpatialDiale
         }
     }
 
+    @Override
     public boolean supportsFiltering() {
         return true;
     }
 
+    @Override
     public boolean supports(SpatialFunction function) {
         return (getFunctions().get(function.toString()) != null);
     }
