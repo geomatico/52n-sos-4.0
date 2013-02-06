@@ -357,6 +357,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			}
 			setUpdateIsFree(false);
 			// do "real update" here
+			addObservationTypeToCache(sosObservation);
 			updateGlobalTemporalBoundingBox(sosObservation.getPhenomenonTime());
 			addProcedureToCache(getProcedureIdentifier(sosObservation));
 			addObservablePropertyToProcedureRelation(getObservablePropertyIdentifier(sosObservation), getProcedureIdentifier(sosObservation));
@@ -387,6 +388,8 @@ public class InMemoryCacheController extends CacheControllerImpl {
 				// observable property
 				addObservablePropertiesToOfferingRelation(getObservablePropertyIdentifier(sosObservation), offeringIdentifier);
 				addOfferingToObservablePropertyRelation(offeringIdentifier, getObservablePropertyIdentifier(sosObservation));
+				// observation type
+				addOfferingToObservationTypeRelation(offeringIdentifier, sosObservation.getObservationConstellation().getObservationType());
 			}
 			// End of "real update"
 

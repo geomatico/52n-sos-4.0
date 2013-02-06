@@ -24,7 +24,7 @@
 package org.n52.sos.cache;
 
 import static org.junit.Assert.*;
-import static org.n52.sos.ogc.om.OMConstants.OBS_TYPE_MEASUREMENT;
+import static org.n52.sos.ogc.om.OMConstants.*;
 import static org.n52.sos.ogc.om.features.SFConstants.FT_SAMPLINGPOINT;
 import static org.n52.sos.util.builder.DataRecordBuilder.aDataRecord;
 import static org.n52.sos.util.builder.InsertObservationRequestBuilder.aInsertObservationRequest;
@@ -200,6 +200,13 @@ public class InMemoryCacheControllerTest
 		assertEquals("offering envelop",
 				controller.getEnvelopeForOffering(getFirstOffering()),
 				getSosEnvelopeFromObservation(((InsertObservationRequest) request).getObservations().get(0)));
+		
+		assertTrue("spatial bounding box of offering NOT contained in cache",
+				controller.getEnvelopeForOffering(getFirstOffering()).isSetEnvelope());
+		
+		assertEquals("spatial bounding box of offering NOT same as feature envelope",
+				controller.getEnvelopeForOffering(getFirstOffering()),
+				getSosEnvelopeFromObservation(((InsertObservationRequest) request).getObservations().get(0)));
 	}
 
 	@Test public void
@@ -236,19 +243,6 @@ public class InMemoryCacheControllerTest
 		
 		assertTrue("observable property -> offering NOT in cache",
 				controller.getOfferings4ObservableProperty(getObservablePropertyFromInsertObservation()).contains(getFirstOffering()));
-	}
-
-	@Test public void
-	should_contain_offering_spatial_boundingbox_after_InsertObservation()
-			throws OwsExceptionReport {
-		updateCacheWithSingleObservation();
-		
-		assertTrue("spatial bounding box of offering NOT contained in cache",
-				controller.getEnvelopeForOffering(getFirstOffering()).isSetEnvelope());
-		
-		assertEquals("spatial bounding box of offering NOT same as feature envelope",
-				controller.getEnvelopeForOffering(getFirstOffering()),
-				getSosEnvelopeFromObservation(((InsertObservationRequest) request).getObservations().get(0)));
 	}
 
 	@Test public void
@@ -734,6 +728,13 @@ public class InMemoryCacheControllerTest
 		assertEquals("offering envelop",
 				controller.getEnvelopeForOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME),
 				getSosEnvelopeFromObservation(observation));
+		
+		assertTrue("spatial bounding box of offering NOT contained in cache",
+				controller.getEnvelopeForOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).isSetEnvelope());
+		
+		assertEquals("spatial bounding box of offering NOT same as feature envelope",
+				controller.getEnvelopeForOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME),
+				getSosEnvelopeFromObservation(observation));
 	}
 
 	@Test public void
@@ -777,33 +778,20 @@ public class InMemoryCacheControllerTest
 		assertTrue("procedure -> observable-property relation NOT in cache",
 				controller.getKProcedureVObservableProperties().get(PROCEDURE).contains( OBSERVABLE_PROPERTY ));
 	}
-	
-	/*		
-	@Ignore ("Not yet implemented") @Test public void
-	should_contain_offering_spatial_boundingbox_after_InsertResult()
-			throws OwsExceptionReport {
-		insertResultPreparation();
-		
-		assertTrue("spatial bounding box of offering NOT contained in cache",
-				controller.getEnvelopeForOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).isSetEnvelope());
-		
-		assertEquals("spatial bounding box of offering NOT same as feature envelope",
-				controller.getEnvelopeForOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME),
-				getSosEnvelopeFromFirstObservation());
-	}
 
-	@Ignore ("Not yet implemented") @Test public void
+	@Test public void
 	should_contain_offering_observation_type_relation_after_InsertResult()
 			throws OwsExceptionReport {
 		insertResultPreparation();
 		
 		assertTrue("observation type NOT in cache",
-				controller.getObservationTypes().contains(getObservationTypeFromFirstObservation()));
+				controller.getObservationTypes().contains(OBS_TYPE_SWE_ARRAY_OBSERVATION));
 		
 		assertTrue("offering -> observation type relation NOT in cache",
-				controller.getObservationTypes4Offering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).contains(getObservationTypeFromFirstObservation()));
+				controller.getObservationTypes4Offering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).contains(OBS_TYPE_SWE_ARRAY_OBSERVATION));
 	}
-
+	
+	/*		
 	@Ignore ("Not yet implemented") @Test public void 
 	should_contain_observation_id_after_InsertResult()
 			throws OwsExceptionReport{
@@ -862,6 +850,7 @@ public class InMemoryCacheControllerTest
 							.setObservableProperty(aObservableProperty()
 									.setIdentifier(OBSERVABLE_PROPERTY)
 									.build())
+							.setObservationType(OBS_TYPE_SWE_ARRAY_OBSERVATION)
 							.build())
 				.setValue(
 						aSweDataArrayValue()
