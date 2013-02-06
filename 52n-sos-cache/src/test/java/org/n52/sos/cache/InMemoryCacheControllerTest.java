@@ -791,17 +791,16 @@ public class InMemoryCacheControllerTest
 				controller.getObservationTypes4Offering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).contains(OBS_TYPE_SWE_ARRAY_OBSERVATION));
 	}
 	
-	/*		
-	@Ignore ("Not yet implemented") @Test public void 
+	@Test public void 
 	should_contain_observation_id_after_InsertResult()
 			throws OwsExceptionReport{
 		insertResultPreparation();
 		
 		assertTrue("observation id NOT in cache",
-				controller.getObservationIdentifiers().contains(getObservationIdFromInsertResult()));
+				controller.getObservationIdentifiers().contains( OBSERVATION_ID ));
 	}
-
-	@Ignore ("Not yet implemented") @Test public void 
+	
+	@Test public void 
 	should_contain_observation_id_to_offering_relation_after_InsertResult()
 			throws OwsExceptionReport {
 		updateCacheWithInsertSensor(PROCEDURE);
@@ -813,9 +812,9 @@ public class InMemoryCacheControllerTest
 				&&
 				controller.getCapabilitiesCache().getKProcedureVObservationIdentifiers()
 				.get(PROCEDURE)
-				.contains(getObservationIdFromInsertResult()));
+				.contains( OBSERVATION_ID ));
 	}
-*/	
+	
 	/* HELPER */
 
 	private void 
@@ -865,7 +864,8 @@ public class InMemoryCacheControllerTest
 										.setEncoding("text","@",";",".")
 										.addBlock("2013-02-06T10:28:00","2.5")
 										.build())
-							.build())			
+							.build())
+				.setIdentifier(CODESPACE, OBSERVATION_ID)
 				.build();
 		
 		controller.updateAfterResultInsertion(observation);

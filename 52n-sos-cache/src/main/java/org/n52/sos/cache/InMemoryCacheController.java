@@ -363,6 +363,12 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			addObservablePropertyToProcedureRelation(getObservablePropertyIdentifier(sosObservation), getProcedureIdentifier(sosObservation));
 			addProcedureToObservablePropertyRelation(getProcedureIdentifier(sosObservation), getObservablePropertyIdentifier(sosObservation));
 			
+			if (sosObservation.getIdentifier() != null)
+			{
+				addObservationIdToCache(sosObservation);
+				addProcedureToObservationIdRelationToCache(getProcedureIdentifier(sosObservation),sosObservation.getIdentifier().getValue());
+			}
+			
 			List<SosSamplingFeature> observedFeatures = sosFeaturesToList(sosObservation.getObservationConstellation().getFeatureOfInterest());
 
 			Envelope observedFeatureEnvelope = createEnvelopeFrom(observedFeatures);
@@ -740,6 +746,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	private void addObservationIdToCache(SosObservation sosObservation)
 	{
 		getCapabilitiesCache().getObservationIdentifiers().add(sosObservation.getIdentifier().getValue());
+		LOGGER.debug("Added observation id '{}' to cache? {}",
+				sosObservation.getIdentifier().getValue(),
+				getCapabilitiesCache().getObservationIdentifiers().contains(sosObservation.getIdentifier().getValue()));
 	}
 
 	private void addObservationTypeToCache(SosObservation sosObservation)
