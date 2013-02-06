@@ -59,7 +59,8 @@ import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * <b>TODO</b> add more log statements for debug level on
- *         failed or successful operation
+ *         failed or successful operation<br />
+ * <b>TODO</b> use commands design as in {@link CacheControllerImpl}      
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk
  *         J&uuml;rrens</a> 
  */
@@ -353,20 +354,12 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			}
 			setUpdateIsFree(false);
 			// do "real update" here
-			if (sosObservation.getPhenomenonTime() instanceof TimeInstant)
+			updateGlobalTemporalBoundingBox(sosObservation.getPhenomenonTime());
+			addProcedureToCache(getProcedureIdentifier(sosObservation));
+			for (String offeringIdentifier : sosObservation.getObservationConstellation().getOfferings())
 			{
-				updateGlobalTemporalBBoxUsingNew(new TimePeriod(((TimeInstant)sosObservation.getPhenomenonTime()).getValue(), ((TimeInstant)sosObservation.getPhenomenonTime()).getValue()));
-			}
-			else if (sosObservation.getPhenomenonTime() instanceof TimePeriod)
-			{
-				updateGlobalTemporalBBoxUsingNew((TimePeriod) sosObservation.getPhenomenonTime());
-			}
-			else
-			{
-				// TODO throw exception?
-				LOGGER.error("observation phenomenon time type '{}' is not supported implementation of '{}'",
-						sosObservation.getPhenomenonTime().getClass().getName(),
-						ITime.class.getName());
+				addOfferingToProcedureRelation(offeringIdentifier, getProcedureIdentifier(sosObservation));
+				addProcedureToOfferingRelation(getProcedureIdentifier(sosObservation), offeringIdentifier);
 			}
 			// End of "real update"
 
@@ -381,6 +374,25 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	}
 
 	/* HELPER */
+	
+	private void updateGlobalTemporalBoundingBox(ITime phenomenonTime)
+	{
+		if (phenomenonTime instanceof TimeInstant)
+		{
+			updateGlobalTemporalBBoxUsingNew(new TimePeriod(((TimeInstant)phenomenonTime).getValue(), ((TimeInstant)phenomenonTime).getValue()));
+		}
+		else if (phenomenonTime instanceof TimePeriod)
+		{
+			updateGlobalTemporalBBoxUsingNew((TimePeriod) phenomenonTime);
+		}
+		else
+		{
+			// TODO throw exception?
+			LOGGER.error("phenomenon time type '{}' is not supported implementation of '{}'",
+					phenomenonTime.getClass().getName(),
+					ITime.class.getName());
+		}
+	}
 	
 	private void removeRemovedObservationIdentifiers()
 	{

@@ -672,8 +672,7 @@ public class InMemoryCacheControllerTest
 				);
 	}
 	
-	/*	
-	@Ignore ("Not yet implemented") @Test public void
+	@Test public void
 	should_contain_procedure_after_InsertResult()
 			throws OwsExceptionReport {
 		insertResultPreparation();
@@ -684,17 +683,12 @@ public class InMemoryCacheControllerTest
 		assertTrue("offering -> procedure relation not in cache",
 				controller.getProcedures4Offering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).contains(PROCEDURE));
 		
-		assertTrue("observable-property -> procedure relation NOT in cache",
-				controller.getKObservablePropertyVProcedures().get(getObservablePropertyFromInsertResult()).contains(PROCEDURE));
-		
-		assertTrue("procedure -> observable-property relation NOT in cache",
-				controller.getKProcedureVObservableProperties().get(PROCEDURE).contains(getObservablePropertyFromInsertResult()) );
-		
 		assertTrue("procedure -> offering relation NOT in cache",
 				controller.getOfferings4Procedure(PROCEDURE).contains(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
 		
 	}
 
+	/*	
 	@Ignore ("Not yet implemented") @Test public void 
 	should_contain_FeatureOfInterest_after_InsertResult()
 			throws OwsExceptionReport {
@@ -775,6 +769,12 @@ public class InMemoryCacheControllerTest
 		
 		assertTrue("observable property -> offering NOT in cache",
 				controller.getOfferings4ObservableProperty(getObservablePropertyFromInsertResult()).contains(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
+				
+		assertTrue("observable-property -> procedure relation NOT in cache",
+				controller.getKObservablePropertyVProcedures().get(getObservablePropertyFromInsertResult()).contains(PROCEDURE));
+		
+		assertTrue("procedure -> observable-property relation NOT in cache",
+				controller.getKProcedureVObservableProperties().get(PROCEDURE).contains(getObservablePropertyFromInsertResult()) );
 	}
 
 	@Ignore ("Not yet implemented") @Test public void
@@ -848,6 +848,10 @@ public class InMemoryCacheControllerTest
 		observation = anObservation()
 				.setObservationConstellation(
 						anObservationConstellation()
+							.setProcedure(aSensorMLProcedureDescription()
+									.setIdentifier(PROCEDURE)
+									.build())
+							.addOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME)
 							.build())
 				.setValue(
 						aSweDataArrayValue()
