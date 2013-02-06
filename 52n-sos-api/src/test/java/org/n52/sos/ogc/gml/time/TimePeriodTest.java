@@ -29,44 +29,78 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 
 /**
- * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
- * TODO test extent to methods!!!
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk
+ *         J&uuml;rrens</a> TODO test extent to methods!!!
  */
 public class TimePeriodTest {
-	
-	@Test
-	public void isEmptyTest()
-	{
-		assertTrue("new Timeperiod is NOT empty", new TimePeriod().isEmpty());
-		assertTrue("new TimePeriod(null, null) is NOT empty",new TimePeriod(null, null).isEmpty());
-		assertTrue("new TimePeriod(null, null,null) is NOT empty",new TimePeriod(null, null, null).isEmpty());
-		assertTrue("new TimePeriod(null, null,\"id\") is NOT empty",new TimePeriod(null, null, "id").isEmpty());
-		assertFalse("new TimePeriod(new DateTime(),null) is empty",new TimePeriod(new DateTime(), null).isEmpty());
-		assertFalse("new TimePeriod(null,new DateTime()) is empty",new TimePeriod(null,new DateTime()).isEmpty());
-	}
-	
-	@Test
-	public void isSetStartTest()
-	{
-		assertTrue("new TimePeriod(new DateTime(),null).isSetStart() == false",new TimePeriod(new DateTime(),null).isSetStart());
-	}
-	
-	@Test
-	public void isSetEndTest()
-	{
-		assertTrue("new TimePeriod(null,new DateTime()).isSetEnd() == false",new TimePeriod(null,new DateTime()).isSetEnd());
-	}
-	
-	@Test
-	public void emptyTimePeriodExtendedByTimeInstantShouldHaveTheSameValueForStartAndEnd()
-	{
-		TimePeriod timePeriod = new TimePeriod();
-		
-		timePeriod.extendToContain(new TimeInstant(new DateTime()));
-		
-		assertFalse("TimePeriod is emtpy after extending", timePeriod.isEmpty());
-		assertTrue("Start value not set",timePeriod.isSetStart());
-		assertTrue("End value not set", timePeriod.isSetEnd());
-	}
+
+    @Test
+    public void isEmptyForDefaultConstructorTest() {
+        assertTrue("new Timeperiod is NOT empty", new TimePeriod().isEmpty());
+    }
+
+    @Test
+    public void isEmptyForConstructorWithNullStartAndEndTimeTest() {
+        assertTrue("new TimePeriod(null, null) is NOT empty", new TimePeriod(null, null).isEmpty());
+    }
+
+    @Test
+    public void isEmptyForConstructorWithAllNullTest() {
+        assertTrue("new TimePeriod(null, null, null) is NOT empty", new TimePeriod(null, null, null).isEmpty());
+    }
+
+    @Test
+    public void isEmptyForConstructorWithNullStartAndEndTimeAndGmlIdTest() {
+        assertTrue("new TimePeriod(null, null, \"gmlId\") is NOT empty", new TimePeriod(null, null, "gmlId").isEmpty());
+    }
+    
+    @Test
+    public void isEmptyForConstructorWithStartTimeAndNullEndTimeTest() {
+        assertFalse("new TimePeriod(new DateTime(), null) is empty", new TimePeriod(new DateTime(), null).isEmpty());
+    }
+    
+    @Test
+    public void isEmptyForConstructorWithNullStartTimeAndEndTimeTest() {
+        assertFalse("new TimePeriod(null, ew DateTime()) is empty", new TimePeriod(null, new DateTime()).isEmpty());
+    }
+
+    @Test
+    public void isSetStartTest() {
+        assertTrue("new TimePeriod(new DateTime(),null).isSetStart() == false",
+                new TimePeriod(new DateTime(), null).isSetStart());
+    }
+
+    @Test
+    public void isSetEndTest() {
+        assertTrue("new TimePeriod(null,new DateTime()).isSetEnd() == false",
+                new TimePeriod(null, new DateTime()).isSetEnd());
+    }
+
+    @Test
+    public void emptyTimePeriodExtendedByTimeInstantShouldHaveTheSameValueForStartAndEnd() {
+        TimePeriod timePeriod = new TimePeriod();
+
+        timePeriod.extendToContain(new TimeInstant(new DateTime()));
+
+        assertFalse("TimePeriod is emtpy after extending", timePeriod.isEmpty());
+        assertTrue("Start value not set", timePeriod.isSetStart());
+        assertTrue("End value not set", timePeriod.isSetEnd());
+    }
+
+    @Test
+    public void shouldRemoveReferencPrefixForGetGmlIdTest() {
+        TimePeriod timePeriod = new TimePeriod();
+        timePeriod.setGmlId("#test");
+        assertTrue("GmlId starts with '#' for getGmlId()", !timePeriod.getGmlId().startsWith("#"));
+    }
+
+    @Test
+    public void isReferencedTest() {
+        TimePeriod timePeriod = new TimePeriod();
+        timePeriod.setGmlId("#test");
+        assertTrue("TimePeriod is NOT referenced", timePeriod.isReferenced());
+        timePeriod.setGmlId("test");
+        assertFalse("TimePeriod is referenced", timePeriod.isReferenced());
+    }
 
 }
