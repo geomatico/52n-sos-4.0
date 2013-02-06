@@ -359,6 +359,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			// do "real update" here
 			updateGlobalTemporalBoundingBox(sosObservation.getPhenomenonTime());
 			addProcedureToCache(getProcedureIdentifier(sosObservation));
+			addObservablePropertyToProcedureRelation(getObservablePropertyIdentifier(sosObservation), getProcedureIdentifier(sosObservation));
+			addProcedureToObservablePropertyRelation(getProcedureIdentifier(sosObservation), getObservablePropertyIdentifier(sosObservation));
+			
 			List<SosSamplingFeature> observedFeatures = sosFeaturesToList(sosObservation.getObservationConstellation().getFeatureOfInterest());
 
 			Envelope observedFeatureEnvelope = createEnvelopeFrom(observedFeatures);
@@ -381,6 +384,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 				addProcedureToOfferingRelation(getProcedureIdentifier(sosObservation), offeringIdentifier);
 				updateOfferingEnvelope(observedFeatureEnvelope, getDefaultEPSG(), offeringIdentifier);
 				updateTemporalBoundingBoxOf(offeringIdentifier, phenomenonTimeFrom(sosObservation));
+				// observable property
+				addObservablePropertiesToOfferingRelation(getObservablePropertyIdentifier(sosObservation), offeringIdentifier);
+				addOfferingToObservablePropertyRelation(offeringIdentifier, getObservablePropertyIdentifier(sosObservation));
 			}
 			// End of "real update"
 

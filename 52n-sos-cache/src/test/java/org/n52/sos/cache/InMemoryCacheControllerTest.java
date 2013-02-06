@@ -759,27 +759,26 @@ public class InMemoryCacheControllerTest
 			)
 		);
 	}
-	
-	/*		
 
-	@Ignore ("Not yet implemented") @Test public void
+	@Test public void
 	should_contain_observable_property_after_InsertResult()
 		throws OwsExceptionReport {
 		insertResultPreparation();
 		
 		assertTrue("offering -> observable property NOT in cache",
-				controller.getObservablePropertiesForOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).contains(getObservablePropertyFromInsertResult()));
+				controller.getObservablePropertiesForOffering(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).contains( OBSERVABLE_PROPERTY ));
 		
 		assertTrue("observable property -> offering NOT in cache",
-				controller.getOfferings4ObservableProperty(getObservablePropertyFromInsertResult()).contains(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
+				controller.getOfferings4ObservableProperty( OBSERVABLE_PROPERTY ).contains(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
 				
 		assertTrue("observable-property -> procedure relation NOT in cache",
-				controller.getKObservablePropertyVProcedures().get(getObservablePropertyFromInsertResult()).contains(PROCEDURE));
+				controller.getKObservablePropertyVProcedures().get( OBSERVABLE_PROPERTY ).contains(PROCEDURE));
 		
 		assertTrue("procedure -> observable-property relation NOT in cache",
-				controller.getKProcedureVObservableProperties().get(PROCEDURE).contains(getObservablePropertyFromInsertResult()) );
+				controller.getKProcedureVObservableProperties().get(PROCEDURE).contains( OBSERVABLE_PROPERTY ));
 	}
-
+	
+	/*		
 	@Ignore ("Not yet implemented") @Test public void
 	should_contain_offering_spatial_boundingbox_after_InsertResult()
 			throws OwsExceptionReport {
@@ -859,6 +858,9 @@ public class InMemoryCacheControllerTest
 									.setIdentifier(FEATURE)
 									.setFeatureType(FT_SAMPLINGPOINT)
 									.setGeometry(52.0,7.5,4326)
+									.build())
+							.setObservableProperty(aObservableProperty()
+									.setIdentifier(OBSERVABLE_PROPERTY)
 									.build())
 							.build())
 				.setValue(
