@@ -41,6 +41,7 @@ import net.opengis.gml.x32.DirectPositionListType;
 import net.opengis.gml.x32.DirectPositionType;
 import net.opengis.gml.x32.EnvelopeDocument;
 import net.opengis.gml.x32.EnvelopeType;
+import net.opengis.gml.x32.FeaturePropertyType;
 import net.opengis.gml.x32.LineStringType;
 import net.opengis.gml.x32.LinearRingType;
 import net.opengis.gml.x32.MeasureType;
@@ -54,6 +55,7 @@ import net.opengis.gml.x32.TimePeriodDocument;
 import net.opengis.gml.x32.TimePeriodType;
 import net.opengis.gml.x32.TimePositionType;
 
+import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
@@ -61,9 +63,11 @@ import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosSingleObservationValue;
+import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
@@ -75,6 +79,7 @@ import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,7 +105,9 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
             PolygonType.class,
             CompositeSurfaceType.class,
             CodeWithAuthorityType.class,
-            CodeType.class
+            CodeType.class,
+            FeaturePropertyType.class
+            
         ),
         CodingHelper.decoderKeysForElements(MeasureType.type.toString(), MeasureType.class)
     );
@@ -130,7 +137,9 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
 
     @Override
     public Object decode(XmlObject xmlObject) throws OwsExceptionReport {
-        if (xmlObject instanceof EnvelopeDocument) {
+        if (xmlObject instanceof FeaturePropertyType) {
+            return parseFeaturePropertyType((FeaturePropertyType) xmlObject);
+        } else if (xmlObject instanceof EnvelopeDocument) {
             return getGeometry4BBOX((EnvelopeDocument) xmlObject);
         } else if (xmlObject instanceof TimeInstantType) {
             return parseTimeInstant((TimeInstantType) xmlObject);
@@ -158,6 +167,57 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
             return parseCodeType((CodeType)xmlObject);
         }
         return null;
+    }
+
+    private Object parseFeaturePropertyType(FeaturePropertyType featurePropertyType) throws OwsExceptionReport {
+        SosSamplingFeature feature = null;
+        // if xlink:href is set
+        if (featurePropertyType.getHref() != null) {
+                if (featurePropertyType.getHref().startsWith("#")) {
+                    feature = new SosSamplingFeature(null, featurePropertyType.getHref().replace("#", ""));
+                } else {
+                    feature = new SosSamplingFeature(new CodeWithAuthority(featurePropertyType.getHref()));
+                    if (featurePropertyType.getTitle() != null && !featurePropertyType.getTitle().isEmpty()) {
+                        feature.addName(new org.n52.sos.ogc.gml.CodeType(featurePropertyType.getTitle()));
+                    }
+                }
+                feature.setGmlId(featurePropertyType.getHref());
+        }
+        // if feature is encoded
+        else {
+            XmlObject abstractFeature = null;
+            if (featurePropertyType.getAbstractFeature() != null) {
+                abstractFeature = featurePropertyType.getAbstractFeature();
+            } else if (featurePropertyType.getDomNode().hasChildNodes()) {
+                try {
+                    abstractFeature =
+                            XmlObject.Factory.parse(XmlHelper.getNodeFromNodeList(featurePropertyType.getDomNode()
+                                    .getChildNodes()));
+                } catch (XmlException xmle) {
+                    String exceptionText = "Error while parsing feature request!";
+                    LOGGER.error(exceptionText, xmle);
+                    throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+                }
+            }
+            if (abstractFeature != null) {
+                Object decodedObject = CodingHelper.decodeXmlObject(abstractFeature);
+                if (decodedObject != null && decodedObject instanceof SosSamplingFeature) {
+                    feature = (SosSamplingFeature) decodedObject;
+                } else {
+                    String exceptionText = "The requested featurePropertyType type is not supported by this service!";
+                    LOGGER.debug(exceptionText);
+                    throw Util4Exceptions.createInvalidParameterValueException(
+                            Sos2Constants.InsertObservationParams.observation.name(), exceptionText);
+                }
+            }
+        }
+        if (feature == null) {
+            String exceptionText = "The requested featurePropertyType type is not supported by this service!";
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createInvalidParameterValueException(
+                    Sos2Constants.InsertObservationParams.observation.name(), exceptionText);
+        }
+        return feature;
     }
 
     /**

@@ -30,17 +30,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.opengis.gml.x32.FeaturePropertyType;
-import net.opengis.gml.x32.TimeInstantPropertyType;
 import net.opengis.om.x20.OMObservationType;
 import net.opengis.om.x20.TimeObjectPropertyType;
 
 import org.apache.xmlbeans.XmlBoolean;
-import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlInteger;
-import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
-import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -54,7 +49,6 @@ import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.om.values.BooleanValue;
 import org.n52.sos.ogc.om.values.CountValue;
 import org.n52.sos.ogc.om.values.NilTemplateValue;
@@ -74,7 +68,6 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,8 +127,11 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
         sosObservation.setValidTime(getValidTime(omObservation));
         sosObservation.setValue(getObservationValue(omObservation));
         try {
-            SosAbstractFeature featureOfInterest = getFeatureOfInterest(omObservation.getFeatureOfInterest());
-            observationConstallation.setFeatureOfInterest(checkFeatureWithMap(featureOfInterest, featureMap));
+            Object decodeXmlElement = CodingHelper.decodeXmlElement(omObservation.getFeatureOfInterest());
+            if (decodeXmlElement instanceof SosAbstractFeature) {
+                SosAbstractFeature featureOfInterest = (SosAbstractFeature) decodeXmlElement;
+                observationConstallation.setFeatureOfInterest(checkFeatureWithMap(featureOfInterest, featureMap));
+            }
         } catch (OwsExceptionReport e) {
             if (sosObservation.getValue().getPhenomenonTime().getIndeterminateValue().equals("template")) {
                 for (OwsException exception : e.getExceptions()) {
@@ -194,57 +190,6 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
         return null;
     }
 
-    private SosAbstractFeature getFeatureOfInterest(FeaturePropertyType featureOfInterest) throws OwsExceptionReport {
-        SosSamplingFeature feature = null;
-        // if xlink:href is set
-        if (featureOfInterest.getHref() != null) {
-                if (featureOfInterest.getHref().startsWith("#")) {
-                    feature = new SosSamplingFeature(null, featureOfInterest.getHref().replace("#", ""));
-                } else {
-                    feature = new SosSamplingFeature(new CodeWithAuthority(featureOfInterest.getHref()));
-                    if (featureOfInterest.getTitle() != null && !featureOfInterest.getTitle().isEmpty()) {
-                        feature.addName(new CodeType(featureOfInterest.getTitle()));
-                    }
-                }
-                feature.setGmlId(featureOfInterest.getHref());
-        }
-        // if feature is encoded
-        else {
-            XmlObject abstractFeature = null;
-            if (featureOfInterest.getAbstractFeature() != null) {
-                abstractFeature = featureOfInterest.getAbstractFeature();
-            } else if (featureOfInterest.getDomNode().hasChildNodes()) {
-                try {
-                    abstractFeature =
-                            XmlObject.Factory.parse(XmlHelper.getNodeFromNodeList(featureOfInterest.getDomNode()
-                                    .getChildNodes()));
-                } catch (XmlException xmle) {
-                    String exceptionText = "Error while parsing feature request!";
-                    LOGGER.error(exceptionText, xmle);
-                    throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
-                }
-            }
-            if (abstractFeature != null) {
-                Object decodedObject = CodingHelper.decodeXmlObject(abstractFeature);
-                if (decodedObject != null && decodedObject instanceof SosSamplingFeature) {
-                    feature = (SosSamplingFeature) decodedObject;
-                } else {
-                    String exceptionText = "The requested featureOfInterest type is not supported by this service!";
-                    LOGGER.debug(exceptionText);
-                    throw Util4Exceptions.createInvalidParameterValueException(
-                            Sos2Constants.InsertObservationParams.observation.name(), exceptionText);
-                }
-            }
-        }
-        if (feature == null) {
-            String exceptionText = "The requested featureOfInterest type is not supported by this service!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    Sos2Constants.InsertObservationParams.observation.name(), exceptionText);
-        }
-        return feature;
-    }
-
     private ITime getPhenomenonTime(OMObservationType omObservation) throws OwsExceptionReport {
         TimeObjectPropertyType phenomenonTime = omObservation.getPhenomenonTime();
         if (phenomenonTime.isSetHref() && phenomenonTime.getHref().startsWith("#")) {
@@ -270,27 +215,26 @@ public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType>
     }
 
     private TimeInstant getResultTime(OMObservationType omObservation) throws OwsExceptionReport {
-        TimeInstantPropertyType resultTime = omObservation.getResultTime();
-        if (resultTime.isSetHref()) {
+        if (omObservation.getResultTime().isSetHref()) {
         	TimeInstant timeInstant = new TimeInstant();
-        	timeInstant.setGmlId(resultTime.getHref());
-        	if (resultTime.getHref().charAt(0) == '#') {
+        	timeInstant.setGmlId(omObservation.getResultTime().getHref());
+        	if (omObservation.getResultTime().getHref().charAt(0) == '#') {
         		// document internal link
         		// TODO parse linked element
         		timeInstant.setIndeterminateValue(Sos2Constants.EN_PHENOMENON_TIME);
         	}
         	else {
-        		timeInstant.setIndeterminateValue(resultTime.getHref());
+        		timeInstant.setIndeterminateValue(omObservation.getResultTime().getHref());
         	}
         	return timeInstant;
-        } else if (resultTime.isSetNilReason()
-                && resultTime.getNilReason() instanceof String
-                && ((String) resultTime.getNilReason()).equals("template")) {
+        } else if (omObservation.getResultTime().isSetNilReason()
+                && omObservation.getResultTime().getNilReason() instanceof String
+                && ((String) omObservation.getResultTime().getNilReason()).equals("template")) {
             TimeInstant timeInstant = new TimeInstant();
-            timeInstant.setIndeterminateValue((String) resultTime.getNilReason());
+            timeInstant.setIndeterminateValue((String) omObservation.getResultTime().getNilReason());
             return timeInstant;
         } else {
-            Object decodedObject = CodingHelper.decodeXmlObject(resultTime.getTimeInstant());
+            Object decodedObject = CodingHelper.decodeXmlObject(omObservation.getResultTime().getTimeInstant());
             if (decodedObject != null && decodedObject instanceof TimeInstant) {
                 return (TimeInstant) decodedObject;
             }
