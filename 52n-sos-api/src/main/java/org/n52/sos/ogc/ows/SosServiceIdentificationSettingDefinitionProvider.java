@@ -31,7 +31,7 @@ import java.util.Set;
 import org.n52.sos.config.ISettingDefinition;
 import org.n52.sos.config.ISettingDefinitionProvider;
 import org.n52.sos.config.ISettingValue;
-import org.n52.sos.config.SettingDefinitions;
+import org.n52.sos.config.ServiceIdentificationSettingDefinitions;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CollectionHelper;
@@ -44,13 +44,13 @@ import org.n52.sos.util.CollectionHelper;
 public class SosServiceIdentificationSettingDefinitionProvider implements ISettingDefinitionProvider {
 
     private static final Set<ISettingDefinition<?>> DEFINITIONS = CollectionHelper.<ISettingDefinition<?>>set(
-            SettingDefinitions.SERVICE_IDENTIFICATION_TITLE,
-            SettingDefinitions.SERVICE_IDENTIFICATION_ABSTRACT,
-            SettingDefinitions.SERVICE_IDENTIFICATION_SERVICE_TYPE,
-            SettingDefinitions.SERVICE_IDENTIFICATION_KEYWORDS,
-            SettingDefinitions.SERVICE_IDENTIFICATION_FEES,
-            SettingDefinitions.SERVICE_IDENTIFICATION_ACCESS_CONSTRAINTS,
-            SettingDefinitions.SERVICE_IDENTIFICATION_FILE);
+            ServiceIdentificationSettingDefinitions.TITLE,
+            ServiceIdentificationSettingDefinitions.ABSTRACT,
+            ServiceIdentificationSettingDefinitions.SERVICE_TYPE,
+            ServiceIdentificationSettingDefinitions.KEYWORDS,
+            ServiceIdentificationSettingDefinitions.FEES,
+            ServiceIdentificationSettingDefinitions.ACCESS_CONSTRAINTS,
+            ServiceIdentificationSettingDefinitions.FILE);
 
     @Override
     public Set<ISettingDefinition<?>> getSettingDefinitions() {
@@ -70,19 +70,19 @@ public class SosServiceIdentificationSettingDefinitionProvider implements ISetti
                                    ISettingValue<?> newValue) throws ConfigurationException {
         if (Configurator.getInstance() != null && Configurator.getInstance().getServiceIdentificationFactory() != null) {
             final SosServiceIdentificationFactory factory = Configurator.getInstance().getServiceIdentificationFactory();
-            if (definition.equals(SettingDefinitions.SERVICE_IDENTIFICATION_TITLE)) {
+            if (definition.equals(ServiceIdentificationSettingDefinitions.TITLE)) {
                 factory.setTitle((String) newValue.getValue());
-            } else if (definition.equals(SettingDefinitions.SERVICE_IDENTIFICATION_ABSTRACT)) {
+            } else if (definition.equals(ServiceIdentificationSettingDefinitions.ABSTRACT)) {
                 factory.setAbstract((String) newValue.getValue());
-            } else if (definition.equals(SettingDefinitions.SERVICE_IDENTIFICATION_SERVICE_TYPE)) {
+            } else if (definition.equals(ServiceIdentificationSettingDefinitions.SERVICE_TYPE)) {
                 factory.setServiceType((String) newValue.getValue());
-            } else if (definition.equals(SettingDefinitions.SERVICE_IDENTIFICATION_KEYWORDS)) {
+            } else if (definition.equals(ServiceIdentificationSettingDefinitions.KEYWORDS)) {
                 factory.setKeywords((String) newValue.getValue());
-            } else if (definition.equals(SettingDefinitions.SERVICE_IDENTIFICATION_FEES)) {
+            } else if (definition.equals(ServiceIdentificationSettingDefinitions.FEES)) {
                 factory.setFees((String) newValue.getValue());
-            } else if (definition.equals(SettingDefinitions.SERVICE_IDENTIFICATION_ACCESS_CONSTRAINTS)) {
+            } else if (definition.equals(ServiceIdentificationSettingDefinitions.ACCESS_CONSTRAINTS)) {
                 factory.setConstraints((String) newValue.getValue());
-            } else if (definition.equals(SettingDefinitions.SERVICE_IDENTIFICATION_FILE)) {
+            } else if (definition.equals(ServiceIdentificationSettingDefinitions.FILE)) {
                 factory.setFile((File) newValue.getValue());
             }
         }
