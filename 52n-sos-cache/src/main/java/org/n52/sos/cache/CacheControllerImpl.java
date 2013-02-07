@@ -615,8 +615,8 @@ public class CacheControllerImpl extends ACapabilitiesCacheController {
      *         corresponding features as values
      */
     public Map<String, Collection<String>> getOffFeatures() {
-        if (cache.getOffFeatures() != null) {
-            return new HashMap<String, Collection<String>>(cache.getOffFeatures());
+        if (cache.getKOfferingVFeaturesOfInterest() != null) {
+            return new HashMap<String, Collection<String>>(cache.getKOfferingVFeaturesOfInterest());
         }
         return new HashMap<String, Collection<String>>(0);
     }
@@ -764,8 +764,8 @@ public class CacheControllerImpl extends ACapabilitiesCacheController {
 
     @Override
     public Map<String, Collection<String>> getKOfferingVFeatures() {
-        if (cache.getOffFeatures() != null) {
-            return new HashMap<String, Collection<String>>(cache.getOffFeatures());
+        if (cache.getKOfferingVFeaturesOfInterest() != null) {
+            return new HashMap<String, Collection<String>>(cache.getKOfferingVFeaturesOfInterest());
         }
         return new HashMap<String, Collection<String>>(0);
     }
@@ -906,7 +906,7 @@ public class CacheControllerImpl extends ACapabilitiesCacheController {
 	}
 
 	@Override
-	protected CacheImpl getCapabilitiesCache()
+	protected CacheImpl getCache()
 	{
 		return cache;
 	}

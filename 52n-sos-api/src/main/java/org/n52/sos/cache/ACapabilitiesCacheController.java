@@ -480,5 +480,5 @@ public abstract class ACapabilitiesCacheController {
 
 	public abstract DateTime getMaxEventTime();
 
-	protected abstract CapabilitiesCache getCapabilitiesCache();
+	protected abstract CapabilitiesCache getCache();
 }

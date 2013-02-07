@@ -206,7 +206,7 @@ public class CacheImpl implements CapabilitiesCache{
      *         observedProperties
      * @return
      */
-    protected Map<String, Collection<String>> getKOfferingVObservableProperties() {
+    public Map<String, Collection<String>> getKOfferingVObservableProperties() {
         return kOfferingVObservableProperties;
     }
 
@@ -310,7 +310,7 @@ public class CacheImpl implements CapabilitiesCache{
      * 
      * @return List<String> containing the observation ids of this SOS
      */
-    protected Collection<String> getObservationIdentifiers() {
+    public Collection<String> getObservationIdentifiers() {
         return observationIdentifiers;
     }
     
@@ -324,7 +324,7 @@ public class CacheImpl implements CapabilitiesCache{
      * 
      * @return
      */
-    protected Map<String, Collection<String>> getKOfferingVObservationTypes() {
+    public Map<String, Collection<String>> getKOfferingVObservationTypes() {
         return kOfferingVObservationTypes;
     }
     
@@ -345,7 +345,7 @@ public class CacheImpl implements CapabilitiesCache{
         this.kOfferingVProcedures = offProcedures;
     }
     
-	protected Map<String, List<String>> getKOfferingVProcedures()
+	public Map<String, List<String>> getKOfferingVProcedures()
 	{
 		return kOfferingVProcedures;
 	}
@@ -367,7 +367,7 @@ public class CacheImpl implements CapabilitiesCache{
      * @return Returns ListString containing all procedures which are used by
      *         the Offerings offered in this SOS
      */
-    protected Collection<String> getProcedures() {
+    public Collection<String> getProcedures() {
         return procedures;
     }
     
@@ -395,7 +395,7 @@ public class CacheImpl implements CapabilitiesCache{
         return getKFeatureOfInterestVProcedures();
     }
     
-    protected Map<String, Collection<String>> getKFeatureOfInterestVProcedures()
+    public Map<String, Collection<String>> getKFeatureOfInterestVProcedures()
     {
     	return kFeatureOfInterestVProcedures;
     }
@@ -405,10 +405,8 @@ public class CacheImpl implements CapabilitiesCache{
         this.kFeatureOfInterestVProcedures = foiProcedures;
     }
 
-    /**
-     * @return Returns only FOIs which are sampling features
-     */
-    protected Collection<String> getFeatureOfInterest() {
+    @Override
+    public Collection<String> getFeatureOfInterest() {
         return featureOfInterestIdentifiers;
     }
 
@@ -453,7 +451,7 @@ public class CacheImpl implements CapabilitiesCache{
         return getKObservablePropertyVProcedures();
     }
     
-    protected Map<String, List<String>> getKObservablePropertyVProcedures() {
+    public Map<String, List<String>> getKObservablePropertyVProcedures() {
         return kObservablePropertyVProcedures;
     }
     
@@ -614,7 +612,7 @@ public class CacheImpl implements CapabilitiesCache{
         return this.srids;
     }
 
-    protected Map<String, Collection<String>> getParentFeatures() {
+    public Map<String, Collection<String>> getParentFeatures() {
         return parentFeatures;
     }
 
@@ -622,7 +620,7 @@ public class CacheImpl implements CapabilitiesCache{
         this.parentFeatures = parentFeatures;
     }
 
-    protected Map<String, Collection<String>> getChildFeatures() {
+    public Map<String, Collection<String>> getChildFeatures() {
         return childFeatures;
     }
 
@@ -646,7 +644,7 @@ public class CacheImpl implements CapabilitiesCache{
      * @return Returns Map containing offeringIDs as keys and list of
      *         corresponding features as values
      */
-    protected Map<String, Collection<String>> getOffFeatures() {
+    public Map<String, Collection<String>> getKOfferingVFeaturesOfInterest() {
         return kOfferingVFeaturesOfInterest;
     }
 
@@ -729,7 +727,7 @@ public class CacheImpl implements CapabilitiesCache{
      * 
      * @return Returns the procPhens.
      */
-    protected Map<String, Collection<String>> getKProcedureVObservableProperties() {
+    public Map<String, Collection<String>> getKProcedureVObservableProperties() {
     	return kProcedureVObservableProperties;
     }
 
@@ -739,12 +737,15 @@ public class CacheImpl implements CapabilitiesCache{
     }
 
     /**
-     * returns the SRID
-     * 
-     * @return Returns Srid of coordinates stored in SOS database
+     * @deprecated use {@link #getDatabaseEPSGCode()}
      */
     protected int getSrid() {
-        return srid;
+        return getDatabaseEPSGCode();
+    }
+    
+    @Override
+    public int getDatabaseEPSGCode() {
+    	return srid;
     }
 
     /**
@@ -781,17 +782,17 @@ public class CacheImpl implements CapabilitiesCache{
 
             // check whether offering foi relationship is already contained in
             // DB
-            if (!this.getOffFeatures().containsKey(offering_id)) {
+            if (!this.getKOfferingVFeaturesOfInterest().containsKey(offering_id)) {
 
                 // Case 1: offering is NOT contained in foi_off -> insert
                 // relationsship
-                this.getOffFeatures().put(offering_id, features);
-            } else if (!this.getOffFeatures().get(offering_id).contains(foiID)) {
+                this.getKOfferingVFeaturesOfInterest().put(offering_id, features);
+            } else if (!this.getKOfferingVFeaturesOfInterest().get(offering_id).contains(foiID)) {
 
                 // Case 2: offering is already stored in foi_off -> insert
                 // relationsship if
                 // offering NOT contains foi id
-                this.getOffFeatures().get(offering_id).add(foiID);
+                this.getKOfferingVFeaturesOfInterest().get(offering_id).add(foiID);
             }
 
         }
@@ -814,7 +815,7 @@ public class CacheImpl implements CapabilitiesCache{
      * 
      * @return the relatedFeatures Map with related features for offerings
      */
-    protected Map<String, Collection<String>> getKOfferingVRelatedFeatures() {
+    public Map<String, Collection<String>> getKOfferingVRelatedFeatures() {
         return kOfferingVRelatedFeatures;
     }
 

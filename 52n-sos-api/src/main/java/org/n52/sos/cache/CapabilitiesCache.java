@@ -261,4 +261,35 @@ public interface CapabilitiesCache {
 
 	public abstract Map<String, Collection<String>> getKOfferingVResultTemplates();
 
+	public abstract Collection<String> getProcedures();
+
+	public abstract Map<String, List<String>> getKObservablePropertyVProcedures();
+
+	public abstract Map<String, Collection<String>> getKProcedureVObservableProperties();
+
+	public abstract Collection<String> getObservationIdentifiers();
+
+	/**
+     * @return the EPSG code of coordinates stored in SOS database
+     */
+	public abstract int getDatabaseEPSGCode();
+
+	public abstract Collection<String> getFeatureOfInterest();
+
+	public abstract Map<String, Collection<String>> getKFeatureOfInterestVProcedures();
+
+	public abstract Map<String, Collection<String>> getKOfferingVFeaturesOfInterest();
+
+	public abstract Map<String, Collection<String>> getKOfferingVRelatedFeatures();
+
+	public abstract Map<String, List<String>> getKOfferingVProcedures();
+
+	public abstract Map<String, Collection<String>> getKOfferingVObservableProperties();
+
+	public abstract Map<String, Collection<String>> getKOfferingVObservationTypes();
+
+	public abstract Map<String, Collection<String>> getChildFeatures();
+
+	public abstract Map<String, Collection<String>> getParentFeatures();
+
 }

@@ -274,10 +274,10 @@ public class InMemoryCacheControllerTest
 		updateCacheWithSingleObservation();
 		
 		assertTrue("procedure -> observation-identifier relation NOT in cache", 
-				controller.getCapabilitiesCache().getKProcedureVObservationIdentifiers()
+				controller.getCache().getKProcedureVObservationIdentifiers()
 				.containsKey(PROCEDURE)
 				&&
-				controller.getCapabilitiesCache().getKProcedureVObservationIdentifiers()
+				controller.getCache().getKProcedureVObservationIdentifiers()
 				.get(PROCEDURE)
 				.contains(OBSERVATION_ID));
 	}
@@ -601,7 +601,7 @@ public class InMemoryCacheControllerTest
 				controller.getProc4FOI(FEATURE).contains(PROCEDURE));
 		
 		assertTrue("feature -> procedure map is NOT emtpy", 
-				controller.getCapabilitiesCache().getKFeatureOfInterestVProcedures().isEmpty());
+				controller.getCache().getKFeatureOfInterestVProcedures().isEmpty());
 	}
 	
 	@Test public void 
@@ -610,7 +610,7 @@ public class InMemoryCacheControllerTest
 		deleteSensorPreparation();
 		
 		assertFalse("procedure -> observation ids relations STILL in cache",
-				controller.getCapabilitiesCache().getKProcedureVObservationIdentifiers().containsKey(PROCEDURE));
+				controller.getCache().getKProcedureVObservationIdentifiers().containsKey(PROCEDURE));
 	}
 	
 	@Test public void 
@@ -628,10 +628,10 @@ public class InMemoryCacheControllerTest
 		deleteSensorPreparation();
 		
 		assertFalse("offering to observable property relation STILL in cache",
-				controller.getCapabilitiesCache().getKOfferingVObservableProperties().containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
+				controller.getCache().getKOfferingVObservableProperties().containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
 		
 		assertFalse("observable property to offering relation STILL in cache",
-				controller.getCapabilitiesCache().getKObservablePropertyVOffering().containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
+				controller.getCache().getKObservablePropertyVOffering().containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
 	}
 	
 	@Test public void 
@@ -641,9 +641,9 @@ public class InMemoryCacheControllerTest
 		deleteSensorPreparation();
 		
 		assertTrue("offering -> result templates relations STILL in cache",
-				controller.getCapabilitiesCache().getKOfferingVResultTemplates().get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME) == null
+				controller.getCache().getKOfferingVResultTemplates().get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME) == null
 				|| 
-				controller.getCapabilitiesCache().getKOfferingVResultTemplates().get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).isEmpty());
+				controller.getCache().getKOfferingVResultTemplates().get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).isEmpty());
 		
 		assertFalse("result template identifier STILL in cache",
 				controller.getResultTemplates().contains(RESULT_TEMPLATE_IDENTIFIER));
@@ -657,7 +657,7 @@ public class InMemoryCacheControllerTest
 		insertResultTemplatePreparation();
 		
 		assertTrue("result template identifier NOT in cache",
-				controller.getCapabilitiesCache().getResultTemplates().contains(RESULT_TEMPLATE_IDENTIFIER));
+				controller.getCache().getResultTemplates().contains(RESULT_TEMPLATE_IDENTIFIER));
 	}
 	
 	@Test public void 
@@ -666,9 +666,9 @@ public class InMemoryCacheControllerTest
 		insertResultTemplatePreparation();
 		
 		assertTrue("offering -> result template relation NOT in cache",
-				controller.getCapabilitiesCache().getKOfferingVResultTemplates().get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME) != null
+				controller.getCache().getKOfferingVResultTemplates().get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME) != null
 				&&
-				controller.getCapabilitiesCache().getKOfferingVResultTemplates().get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).contains(RESULT_TEMPLATE_IDENTIFIER));
+				controller.getCache().getKOfferingVResultTemplates().get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).contains(RESULT_TEMPLATE_IDENTIFIER));
 	}
 	
 	/* Update after InsertResult */
@@ -834,10 +834,10 @@ public class InMemoryCacheControllerTest
 		insertResultPreparation();
 		
 		assertTrue("procedure -> observation-identifier relation NOT in cache", 
-				controller.getCapabilitiesCache().getKProcedureVObservationIdentifiers()
+				controller.getCache().getKProcedureVObservationIdentifiers()
 				.containsKey(PROCEDURE)
 				&&
-				controller.getCapabilitiesCache().getKProcedureVObservationIdentifiers()
+				controller.getCache().getKProcedureVObservationIdentifiers()
 				.get(PROCEDURE)
 				.contains( OBSERVATION_ID ));
 	}
@@ -919,7 +919,7 @@ public class InMemoryCacheControllerTest
 	boolean onlyValidRelatedFeaturesAreInRoleMap()
 	{
 		List<String> allowedRelatedFeatures = controller.getAllowedRelatedFeatures();
-		for (String relatedFeatureWithRole : controller.getCapabilitiesCache().getKRelatedFeatureVRole().keySet())
+		for (String relatedFeatureWithRole : controller.getCache().getKRelatedFeatureVRole().keySet())
 		{
 			if (!allowedRelatedFeatures.contains(relatedFeatureWithRole))
 			{
@@ -1110,11 +1110,6 @@ public class InMemoryCacheControllerTest
 			return 60000;
 		}
 		
-		protected int getDefaultEPSG()
-		{
-			return 4326;
-		}
-	
 		protected ICacheFeederDAO getCacheDAO() {
 			return null;
 		}
