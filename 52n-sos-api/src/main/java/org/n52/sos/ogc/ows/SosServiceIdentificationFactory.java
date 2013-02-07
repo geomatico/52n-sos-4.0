@@ -26,8 +26,7 @@ package org.n52.sos.ogc.ows;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.ows.SosServiceIdentification;
+
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.LazyThreadSafeFactory;
 import org.n52.sos.util.XmlHelper;
@@ -36,78 +35,82 @@ import org.n52.sos.util.XmlHelper;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class SosServiceIdentificationFactory extends LazyThreadSafeFactory<SosServiceIdentification> {
-	private File file;
-	private String[] keywords;
-	private String title;
-	private String description;
-	private String serviceType;
-	private String fees;
-	private String constraints;
 
-	public void setFile(File file) {
-		this.file = file;
-		setRecreate();
-	}
+    private File file;
+    private String[] keywords;
+    private String title;
+    private String description;
+    private String serviceType;
+    private String fees;
+    private String constraints;
 
-	public void setKeywords(String[] keywords) {
-		this.keywords = keywords;
-		setRecreate();
-	}
+    public void setFile(File file) {
+        this.file = file;
+        setRecreate();
+    }
 
-	public void setKeywords(String keywords) {
-		if (keywords != null) {
-			String[] keywordArray = keywords.split(",");
-			ArrayList<String> keywordList = new ArrayList<String>(keywordArray.length);
-			for (String s : keywordArray) {
-				if (s != null && !s.trim().isEmpty()) {
-					keywordList.add(s.trim());
-				}
-			}
-			setKeywords(keywordList.toArray(new String[keywordList.size()]));
-		} else {
-			setKeywords(new String[0]);
-		}
-	}
+    public void setKeywords(String[] keywords) {
+        this.keywords = keywords;
+        setRecreate();
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-		setRecreate();
-	}
+    public void setKeywords(String keywords) {
+        if (keywords != null) {
+            String[] keywordArray = keywords.split(",");
+            ArrayList<String> keywordList = new ArrayList<String>(keywordArray.length);
+            for (String s : keywordArray) {
+                if (s != null && !s.trim()
+                        .isEmpty()) {
+                    keywordList.add(s.trim());
+                }
+            }
+            setKeywords(keywordList.toArray(new String[keywordList.size()]));
+        } else {
+            setKeywords(new String[0]);
+        }
+    }
 
-	public void setAbstract(String description) {
-		this.description = description;
-		setRecreate();
-	}
+    public void setTitle(String title) {
+        this.title = title;
+        setRecreate();
+    }
 
-	public void setServiceType(String serviceType) {
-		this.serviceType = serviceType;
-		setRecreate();
-	}
+    public void setAbstract(String description) {
+        this.description = description;
+        setRecreate();
+    }
 
-	public void setFees(String fees) {
-		this.fees = fees;
-		setRecreate();
-	}
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
+        setRecreate();
+    }
 
-	public void setConstraints(String constraints) {
-		this.constraints = constraints;
-		setRecreate();
-	}
+    public void setFees(String fees) {
+        this.fees = fees;
+        setRecreate();
+    }
 
-	@Override
-	protected SosServiceIdentification create() throws OwsExceptionReport {
-		SosServiceIdentification serviceIdentification = new SosServiceIdentification();
-		if (this.file != null) {
-			serviceIdentification.setServiceIdentification(XmlHelper.loadXmlDocumentFromFile(this.file));
-		} else {
-			serviceIdentification.setAbstract(this.description);
-			serviceIdentification.setAccessConstraints(this.constraints);
-			serviceIdentification.setFees(this.fees);
-			serviceIdentification.setServiceType(this.serviceType);
-			serviceIdentification.setTitle(this.title);
-			serviceIdentification.setVersions(Configurator.getInstance().getServiceOperatorRepository().getSupportedVersions());
-			serviceIdentification.setKeywords(Arrays.asList(this.keywords));
-		}
-		return serviceIdentification;
-	}
+    public void setConstraints(String constraints) {
+        this.constraints = constraints;
+        setRecreate();
+    }
+
+    @Override
+    protected SosServiceIdentification create() throws OwsExceptionReport {
+        SosServiceIdentification serviceIdentification = new SosServiceIdentification();
+        if (this.file != null) {
+            serviceIdentification.setServiceIdentification(XmlHelper.loadXmlDocumentFromFile(this.file));
+        } else {
+            serviceIdentification.setAbstract(this.description);
+            serviceIdentification.setAccessConstraints(this.constraints);
+            serviceIdentification.setFees(this.fees);
+            serviceIdentification.setServiceType(this.serviceType);
+            serviceIdentification.setTitle(this.title);
+            serviceIdentification.setVersions(Configurator.getInstance()
+                    .getServiceOperatorRepository()
+                    .getSupportedVersions());
+            serviceIdentification.setKeywords(Arrays.asList(this.keywords));
+        }
+        return serviceIdentification;
+    }
 }
