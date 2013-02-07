@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import org.n52.sos.event.SosEvent;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.SettingsChangeEvent;
 import org.n52.sos.service.ConfigurationException;
@@ -141,6 +140,11 @@ public abstract class AbstractSettingsManager extends SettingsManager {
             settingsByDefinition.put(getSettingDefinitionRepository().getDefinition(value.getKey()), value);
         }
         return settingsByDefinition;
+    }
+    
+    @Override
+    public void deleteAdminUser(IAdministratorUser user) {
+        deleteAdminUser(user.getUsername());
     }
     
     protected abstract Set<ISettingValue<?>> getSettingValues();

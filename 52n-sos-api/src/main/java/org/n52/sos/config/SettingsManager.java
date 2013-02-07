@@ -30,7 +30,6 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.n52.sos.service.AdminUser;
 import org.n52.sos.service.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +81,8 @@ public abstract class SettingsManager {
     public abstract IAdministratorUser getAdminUser(String username);
     public abstract IAdministratorUser createAdminUser(String username, String password);
     public abstract void saveAdminUser(IAdministratorUser username);
+    public abstract void deleteAdminUser(String username);
+    public abstract void deleteAdminUser(IAdministratorUser user);
 
 
 }

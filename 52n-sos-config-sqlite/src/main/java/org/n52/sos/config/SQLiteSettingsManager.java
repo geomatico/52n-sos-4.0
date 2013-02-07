@@ -23,7 +23,6 @@
  */
 package org.n52.sos.config;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -233,7 +232,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     protected IAdministratorUser getAdminUser(String username, Session session) throws HibernateException {
         log.debug("Getting AdministratorUsers");
         return (IAdministratorUser) session.createCriteria(AdministratorUser.class)
-                .add(Restrictions.eq(AdministratorUser.USERNAME_PROPERTY, username));
+                .add(Restrictions.eq(AdministratorUser.USERNAME_PROPERTY, username)).uniqueResult();
     }
 
     @Override
@@ -252,7 +251,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
         Transaction transaction = null;
         try {
             transaction = session.beginTransaction();
-            IAdministratorUser user = new AdministratorUser().setPassword(username).setPassword(password);
+            IAdministratorUser user = new AdministratorUser().setUsername(username).setPassword(password);
             log.debug("Creating AdministratorUser {}", user);
             session.save(user);
             session.flush();
@@ -290,4 +289,29 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
             throw e;
         }
     }
+    
+    @Override
+    public void deleteAdminUser(String username) throws HibernateException {
+        Session session = null;
+        try {
+            deleteAdminUser(username, session = getSession());
+        } finally {
+            returnSession(session);
+        }
+    }
+    
+    protected void deleteAdminUser(String username, Session session) throws HibernateException {
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            session.delete(getAdminUser(username, session));
+            transaction.commit();
+        } catch(HibernateException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw e;
+        }
+        
+    } 
 }
