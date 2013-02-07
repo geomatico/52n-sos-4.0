@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import org.n52.sos.config.IAdministratorUser;
@@ -40,6 +41,7 @@ public class AdministratorUser implements Serializable, IAdministratorUser {
     private static final long serialVersionUID = 1L;
     public static final String USERNAME_PROPERTY = "username";
     @Id
+    @GeneratedValue
     private Long id;
     @Column(name = AdministratorUser.USERNAME_PROPERTY, unique = true)
     private String username;
