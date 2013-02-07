@@ -140,26 +140,31 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
 
     @Override
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
-        if (element instanceof ITime) {
-            return createTime((ITime) element, additionalValues);
-        } else if (element instanceof Geometry) {
-            return createPosition((Geometry) element, additionalValues.get(HelperValues.GMLID));
-        } else if (element instanceof CategoryValue) {
-            return createReferenceTypeForCategroyValue((CategoryValue) element);
-        } else if (element instanceof org.n52.sos.ogc.gml.ReferenceType) {
-            return createReferencType((org.n52.sos.ogc.gml.ReferenceType) element);
-        } else if (element instanceof CodeWithAuthority) {
-            return createCodeWithAuthorityType((CodeWithAuthority) element);
-        } else if (element instanceof QuantityValue) {
-            return createMeasureType((QuantityValue)element);
-        } else if (element instanceof org.n52.sos.ogc.gml.CodeType) {
-            return createCodeType((org.n52.sos.ogc.gml.CodeType) element);
-        } else if (element instanceof SosAbstractFeature) {
-            return createFeaturePropertyType((SosAbstractFeature)element, additionalValues);
-        } else if (element instanceof SosEnvelope) {
-            return createEnvelope((SosEnvelope)element);
+        if (element != null) {
+            if (element instanceof ITime) {
+                return createTime((ITime) element, additionalValues);
+            } else if (element instanceof Geometry) {
+                return createPosition((Geometry) element, additionalValues.get(HelperValues.GMLID));
+            } else if (element instanceof CategoryValue) {
+                return createReferenceTypeForCategroyValue((CategoryValue) element);
+            } else if (element instanceof org.n52.sos.ogc.gml.ReferenceType) {
+                return createReferencType((org.n52.sos.ogc.gml.ReferenceType) element);
+            } else if (element instanceof CodeWithAuthority) {
+                return createCodeWithAuthorityType((CodeWithAuthority) element);
+            } else if (element instanceof QuantityValue) {
+                return createMeasureType((QuantityValue)element);
+            } else if (element instanceof org.n52.sos.ogc.gml.CodeType) {
+                return createCodeType((org.n52.sos.ogc.gml.CodeType) element);
+            } else if (element instanceof SosAbstractFeature) {
+                return createFeaturePropertyType((SosAbstractFeature)element, additionalValues);
+            } else if (element instanceof SosEnvelope) {
+                return createEnvelope((SosEnvelope)element);
+            }
+            return null;
         }
-        return null;
+        String exceptionText = "The element to encode is null!";
+        LOGGER.error(exceptionText);
+        throw new IllegalArgumentException(exceptionText);
     }
 
     private XmlObject createFeaturePropertyType(SosAbstractFeature feature, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
@@ -531,7 +536,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
 
     private XmlObject createReferenceTypeForCategroyValue(CategoryValue categoryValue) {
         ReferenceType xbRef = ReferenceType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        if (categoryValue.getValue() != null && !categoryValue.getValue().isEmpty()) {
+        if (categoryValue.isSetValue()) {
             if (categoryValue.getValue().startsWith("http://")) {
                 xbRef.setHref(categoryValue.getValue());
             } else {
@@ -543,52 +548,70 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
         return xbRef;
     }
 
-    private XmlObject createReferencType(org.n52.sos.ogc.gml.ReferenceType sosReferenceType) {
-        if (sosReferenceType.isSetHref()) {
-            ReferenceType referenceType = ReferenceType.Factory.newInstance();
-            referenceType.setHref(sosReferenceType.getHref());
-            if (sosReferenceType.isSetTitle()) {
-                referenceType.setTitle(sosReferenceType.getTitle());
-            }
-            if (sosReferenceType.isSetRole()) {
-                referenceType.setRole(sosReferenceType.getRole());
-            }
-            return referenceType;
+    private ReferenceType createReferencType(org.n52.sos.ogc.gml.ReferenceType sosReferenceType) {
+        if (!sosReferenceType.isSetHref()) {
+            String exceptionText = String.format("The required 'href' parameter is empty for encoding %s!", ReferenceType.class.getName());
+            LOGGER.error(exceptionText);
+            throw new IllegalArgumentException(exceptionText);
         }
-        return null;
-
+        ReferenceType referenceType = ReferenceType.Factory.newInstance();
+        referenceType.setHref(sosReferenceType.getHref());
+        if (sosReferenceType.isSetTitle()) {
+            referenceType.setTitle(sosReferenceType.getTitle());
+        }
+        if (sosReferenceType.isSetRole()) {
+            referenceType.setRole(sosReferenceType.getRole());
+        }
+        return referenceType;
     }
 
-    private XmlObject createCodeWithAuthorityType(CodeWithAuthority sosCodeWithAuthority) {
-        if (sosCodeWithAuthority.isSetValue()) {
-            CodeWithAuthorityType codeWithAuthority = CodeWithAuthorityType.Factory.newInstance();
-            codeWithAuthority.setStringValue(sosCodeWithAuthority.getValue());
+    private CodeWithAuthorityType createCodeWithAuthorityType(CodeWithAuthority sosCodeWithAuthority) {
+        if (!sosCodeWithAuthority.isSetValue()) {
+            String exceptionText = String.format("The required 'value' parameter is empty for encoding %s!", CodeWithAuthorityType.class.getName());
+            LOGGER.error(exceptionText);
+            throw new IllegalArgumentException(exceptionText);
+        }
+        CodeWithAuthorityType codeWithAuthority = CodeWithAuthorityType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        codeWithAuthority.setStringValue(sosCodeWithAuthority.getValue());
+        if (sosCodeWithAuthority.isSetCodeSpace()) {
             codeWithAuthority.setCodeSpace(sosCodeWithAuthority.getCodeSpace());
-            return codeWithAuthority;
+        } else {
+            codeWithAuthority.setCodeSpace(OGCConstants.UNKNOWN);
         }
-        return null;
+        return codeWithAuthority;
     }
 
-    private XmlObject createCodeType(org.n52.sos.ogc.gml.CodeType sosCodeType) {
+    private CodeType createCodeType(org.n52.sos.ogc.gml.CodeType sosCodeType) {
+        if (!sosCodeType.isSetValue()) {
+            String exceptionText = String.format("The required 'value' parameter is empty for encoding %s!", CodeType.class.getName());
+            LOGGER.error(exceptionText);
+            throw new IllegalArgumentException(exceptionText);
+        }
         CodeType codeType = CodeType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        codeType.setCodeSpace(sosCodeType.getCodeSpace());
         codeType.setStringValue(sosCodeType.getValue());
+        if (sosCodeType.isSetCodeSpace()) {
+            codeType.setCodeSpace(sosCodeType.getCodeSpace());
+        } else {
+            codeType.setCodeSpace(OGCConstants.UNKNOWN);
+        }
         return codeType;
     }
 
-    private XmlObject createMeasureType(QuantityValue quantityValue) {
+    private MeasureType createMeasureType(QuantityValue quantityValue) {
+        if (!quantityValue.isSetValue()) {
+            String exceptionText = String.format("The required 'value' parameter is empty for encoding %s!", MeasureType.class.getName());
+            LOGGER.error(exceptionText);
+            throw new IllegalArgumentException(exceptionText);
+        }
         MeasureType measureType =
                 MeasureType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        if (quantityValue.getUnit() != null) {
+        measureType.setDoubleValue(quantityValue.getValue().doubleValue());
+        if (quantityValue.isSetUnit()) {
             measureType.setUom(quantityValue.getUnit());
         } else {
-            measureType.setUom("");
+            measureType.setUom(OGCConstants.UNKNOWN);
         }
-        if (!quantityValue.getValue().equals(Double.NaN)) {
-            measureType.setDoubleValue(quantityValue.getValue().doubleValue());
-        } else {
-            measureType.setNil();
-        }
+
         return measureType;
     }
 
