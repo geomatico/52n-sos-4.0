@@ -29,6 +29,9 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import org.n52.sos.event.SosEvent;
+import org.n52.sos.event.SosEventBus;
+import org.n52.sos.event.events.SettingsChangeEvent;
 import org.n52.sos.service.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +80,8 @@ public abstract class AbstractSettingsManager extends SettingsManager {
             applySetting(setting, oldValue, newValue);
             saveSettingValue(newValue);
         }
+        
+        SosEventBus.fire(new SettingsChangeEvent(setting, oldValue, newValue));
     }
 
     @Override
@@ -86,6 +91,8 @@ public abstract class AbstractSettingsManager extends SettingsManager {
             applySetting(setting, oldValue, null);
             deleteSettingValue(setting.getKey());
         }
+        
+        SosEventBus.fire(new SettingsChangeEvent(setting, oldValue, null));
     }
 
     private void applySetting(ISettingDefinition<?> setting, ISettingValue<?> oldValue,
