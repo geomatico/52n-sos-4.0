@@ -474,61 +474,61 @@ public class Configurator {
             this.tupleSeperator = SettingsHelper.parseString(setting, value, false);
             break;
         case SERVICE_PROVIDER_FILE:
-			this.serviceProviderFactory.setFile(SettingsHelper.parseFile(setting, value, true));
+			getServiceProviderFactory().setFile(SettingsHelper.parseFile(setting, value, true));
             break;
         case SERVICE_PROVIDER_NAME:
-            this.serviceProviderFactory.setName(SettingsHelper.parseString(setting, value, true));
+            getServiceProviderFactory().setName(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_SITE:
-            this.serviceProviderFactory.setSite(SettingsHelper.parseString(setting, value, true));
+            getServiceProviderFactory().setSite(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_INDIVIDUAL_NAME:
-            this.serviceProviderFactory.setIndividualName(SettingsHelper.parseString(setting, value, true));
+            getServiceProviderFactory().setIndividualName(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_POSITION_NAME:
-            this.serviceProviderFactory.setPositionName(SettingsHelper.parseString(setting, value, true));
+            getServiceProviderFactory().setPositionName(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_PHONE:
-            this.serviceProviderFactory.setPhone(SettingsHelper.parseString(setting, value, true));
+            getServiceProviderFactory().setPhone(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_ADDRESS:
-            this.serviceProviderFactory.setDeliveryPoint(SettingsHelper.parseString(setting, value, true));
+            getServiceProviderFactory().setDeliveryPoint(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_CITY:
-            this.serviceProviderFactory.setCity(SettingsHelper.parseString(setting, value, true));
+            getServiceProviderFactory().setCity(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_ZIP:
-            this.serviceProviderFactory.setPostalCode(SettingsHelper.parseString(setting, value, true));
+            getServiceProviderFactory().setPostalCode(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_STATE:
-            this.serviceProviderFactory.setAdministrativeArea(SettingsHelper.parseString(setting, value, true));
+            getServiceProviderFactory().setAdministrativeArea(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_COUNTRY:
-            this.serviceProviderFactory.setCountry(SettingsHelper.parseString(setting, value, true));
+            getServiceProviderFactory().setCountry(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_PROVIDER_EMAIL:
-            this.serviceProviderFactory.setMailAddress(SettingsHelper.parseString(setting, value, true));
+            getServiceProviderFactory().setMailAddress(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_FILE:
-            this.serviceIdentificationFactory.setFile(SettingsHelper.parseFile(setting, value, true));
+            getServiceIdentificationFactory().setFile(SettingsHelper.parseFile(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_KEYWORDS:
-            this.serviceIdentificationFactory.setKeywords(SettingsHelper.parseString(setting, value, true));
+            getServiceIdentificationFactory().setKeywords(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_SERVICE_TYPE:
-            this.serviceIdentificationFactory.setServiceType(SettingsHelper.parseString(setting, value, true));
+            getServiceIdentificationFactory().setServiceType(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_TITLE:
-            this.serviceIdentificationFactory.setTitle(SettingsHelper.parseString(setting, value, true));
+            getServiceIdentificationFactory().setTitle(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_ABSTRACT:
-            this.serviceIdentificationFactory.setAbstract(SettingsHelper.parseString(setting, value, true));
+            getServiceIdentificationFactory().setAbstract(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_FEES:
-            this.serviceIdentificationFactory.setFees(SettingsHelper.parseString(setting, value, true));
+            getServiceIdentificationFactory().setFees(SettingsHelper.parseString(setting, value, true));
             break;
         case SERVICE_IDENTIFICATION_ACCESS_CONSTRAINTS:
-            this.serviceIdentificationFactory.setConstraints(SettingsHelper.parseString(setting, value, true));
+            getServiceIdentificationFactory().setConstraints(SettingsHelper.parseString(setting, value, true));
             break;
         case MINIMUM_GZIP_SIZE:
             this.minimumGzipSize = SettingsHelper.parseInteger(setting, value);
@@ -815,7 +815,7 @@ public class Configurator {
      * @throws OwsExceptionReport
      */
     public SosServiceIdentification getServiceIdentification() throws OwsExceptionReport {
-		return this.serviceIdentificationFactory.get();
+		return getServiceIdentificationFactory().get();
     }
 
     /**
@@ -823,7 +823,7 @@ public class Configurator {
      * @throws OwsExceptionReport
      */
     public SosServiceProvider getServiceProvider() throws OwsExceptionReport {
-        return this.serviceProviderFactory.get();
+        return getServiceProviderFactory().get();
     }
 
     /**
@@ -1137,5 +1137,13 @@ public class Configurator {
             return getProfileHandler().getActiveProfile();
     
         }
+
+    public SosServiceIdentificationFactory getServiceIdentificationFactory() {
+        return this.serviceIdentificationFactory;
+    }
+
+    public SosServiceProviderFactory getServiceProviderFactory() {
+        return this.serviceProviderFactory;
+    }
 
 }
