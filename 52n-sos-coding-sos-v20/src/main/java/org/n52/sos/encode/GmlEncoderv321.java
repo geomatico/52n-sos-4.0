@@ -35,6 +35,8 @@ import net.opengis.gml.x32.CodeType;
 import net.opengis.gml.x32.CodeWithAuthorityType;
 import net.opengis.gml.x32.DirectPositionListType;
 import net.opengis.gml.x32.DirectPositionType;
+import net.opengis.gml.x32.EnvelopeType;
+import net.opengis.gml.x32.FeaturePropertyType;
 import net.opengis.gml.x32.LineStringType;
 import net.opengis.gml.x32.LinearRingType;
 import net.opengis.gml.x32.MeasureType;
@@ -48,6 +50,7 @@ import net.opengis.gml.x32.TimePeriodType;
 import net.opengis.gml.x32.TimePositionType;
 
 import org.apache.xmlbeans.XmlCursor;
+import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
 import org.n52.sos.ogc.OGCConstants;
@@ -56,10 +59,13 @@ import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
+import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
@@ -67,12 +73,14 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
+import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -91,7 +99,9 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
             org.n52.sos.ogc.gml.ReferenceType.class,
             org.n52.sos.ogc.om.values.QuantityValue.class,
             org.n52.sos.ogc.gml.CodeWithAuthority.class,
-            org.n52.sos.ogc.gml.CodeType.class
+            org.n52.sos.ogc.gml.CodeType.class,
+            SosSamplingFeature.class,
+            SosEnvelope.class
             );
 
     public GmlEncoderv321() {
@@ -144,8 +154,110 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
             return createMeasureType((QuantityValue)element);
         } else if (element instanceof org.n52.sos.ogc.gml.CodeType) {
             return createCodeType((org.n52.sos.ogc.gml.CodeType) element);
+        } else if (element instanceof SosAbstractFeature) {
+            return createFeaturePropertyType((SosAbstractFeature)element, additionalValues);
+        } else if (element instanceof SosEnvelope) {
+            return createEnvelope((SosEnvelope)element);
         }
         return null;
+    }
+
+    private XmlObject createFeaturePropertyType(SosAbstractFeature feature, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+        FeaturePropertyType featurePropertyType = FeaturePropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        SosSamplingFeature samplingFeature = (SosSamplingFeature) feature;
+        if ((additionalValues.containsKey(HelperValues.ENCODE) && additionalValues.get(HelperValues.ENCODE).equals("false")) || !(feature instanceof SosSamplingFeature)) {
+            featurePropertyType.setHref(feature.getIdentifier().getValue());
+            return featurePropertyType;
+        } else {
+            if (samplingFeature.isSetGmlID()) {
+                featurePropertyType.setHref("#" + samplingFeature.getGmlId());
+                return featurePropertyType;
+            } else {
+                if (!samplingFeature.isSetGeometry()) {
+                    featurePropertyType.setHref(samplingFeature.getIdentifier().getValue());
+                    if (samplingFeature.isSetNames()) {
+                        featurePropertyType.setTitle(samplingFeature.getFirstName().getValue());
+                    }
+                    return featurePropertyType;
+                } 
+                if (samplingFeature.getUrl() != null) {
+                    featurePropertyType.setHref(samplingFeature.getUrl());
+                    if (samplingFeature.isSetNames()) {
+                        featurePropertyType.setTitle(samplingFeature.getFirstName().getValue());
+                    }
+                    return featurePropertyType;
+                } else {
+                    String namespace = null;
+                    if (additionalValues.containsKey(HelperValues.ENCODE_NAMESPACE)) {
+                        namespace = additionalValues.get(HelperValues.ENCODE_NAMESPACE);
+                    } else {
+                        namespace = OMHelper.getNamespaceForFeatureType(samplingFeature.getFeatureType());
+                    }
+                    XmlObject encodedXmlObject = CodingHelper.encodeObjectToXml(namespace, samplingFeature);
+    
+                    if (encodedXmlObject != null) {
+                        return encodedXmlObject;
+                    } else {
+                        if (samplingFeature.getXmlDescription() != null) {
+                            try {
+                                // TODO how set gml:id in already existing
+                                // XmlDescription?
+                                return XmlObject.Factory.parse(samplingFeature.getXmlDescription());
+                            } catch (XmlException xmle) {
+                                String exceptionText = "Error while encoding featurePropertyType!";
+                                LOGGER.error(exceptionText, xmle);
+                                throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+                            }
+                        } else {
+                            featurePropertyType.setHref(samplingFeature.getIdentifier().getValue());
+                            if (samplingFeature.isSetNames()) {
+                                featurePropertyType.setTitle(samplingFeature.getFirstName().getValue());
+                            }
+                            return featurePropertyType;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private XmlObject createEnvelope(SosEnvelope sosEnvelope) {
+        Envelope envelope = sosEnvelope.getEnvelope();
+        int srid = sosEnvelope.getSrid();
+        double minx = envelope.getMinX();
+        double maxx = envelope.getMaxX();
+        double miny = envelope.getMinY();
+        double maxy = envelope.getMaxY();
+        @SuppressWarnings("unused")
+        String minz = null;
+        @SuppressWarnings("unused")
+        String maxz = null;
+
+        EnvelopeType envelopeType = EnvelopeType.Factory.newInstance();
+
+        // set lower corner
+        // TODO for full 3D support add minz to parameter in setStringValue
+        DirectPositionType lowerCorner = envelopeType.addNewLowerCorner();
+        DirectPositionType upperCorner = envelopeType.addNewUpperCorner();
+        if (srid > 0) {
+            if (!Configurator.getInstance().reversedAxisOrderRequired(srid)) {
+                lowerCorner.setStringValue(minx + " " + miny);
+            } else {
+                lowerCorner.setStringValue(miny + " " + minx);
+            }
+
+            // set upper corner
+            // TODO for full 3D support add maxz to parameter in setStringValue
+            if (!Configurator.getInstance().reversedAxisOrderRequired(srid)) {
+                upperCorner.setStringValue(maxx + " " + maxy);
+            } else {
+                upperCorner.setStringValue(maxy + " " + maxx);
+            }
+            // set SRS
+            envelopeType.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + srid);
+        }
+
+        return envelopeType;
     }
 
     private XmlObject createTime(ITime time, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {

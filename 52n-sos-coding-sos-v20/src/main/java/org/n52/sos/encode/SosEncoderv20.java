@@ -33,15 +33,6 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import net.opengis.fes.x20.FilterCapabilitiesDocument.FilterCapabilities;
-import net.opengis.gml.x32.DirectPositionType;
-import net.opengis.gml.x32.EnvelopeType;
-import net.opengis.gml.x32.FeaturePropertyType;
-import net.opengis.gml.x32.TimePeriodType;
-import net.opengis.om.x20.OMObservationType;
-import net.opengis.ows.x11.OperationsMetadataDocument.OperationsMetadata;
-import net.opengis.ows.x11.ServiceIdentificationDocument.ServiceIdentification;
-import net.opengis.ows.x11.ServiceProviderDocument.ServiceProvider;
 import net.opengis.sos.x20.CapabilitiesDocument;
 import net.opengis.sos.x20.CapabilitiesType;
 import net.opengis.sos.x20.CapabilitiesType.Contents;
@@ -116,10 +107,10 @@ import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.service.profile.IProfile;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
-import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3CConstants;
@@ -127,8 +118,6 @@ import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommunicationObject> {
 
@@ -244,21 +233,20 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         SosCapabilities sosCapabilities = response.getCapabilities();
 
         if (sosCapabilities.getServiceIdentification() != null) {
-            xbCaps.setServiceIdentification((ServiceIdentification) CodingHelper.encodeObjectToXml(OWSConstants.NS_OWS, sosCapabilities.getServiceIdentification()));
+            xbCaps.addNewServiceIdentification().set(CodingHelper.encodeObjectToXml(OWSConstants.NS_OWS, sosCapabilities.getServiceIdentification()));
         }
         if (sosCapabilities.getServiceProvider() != null) {
-            xbCaps.setServiceProvider((ServiceProvider) CodingHelper.encodeObjectToXml(OWSConstants.NS_OWS, sosCapabilities.getServiceProvider()));
+            xbCaps.addNewServiceProvider().set(CodingHelper.encodeObjectToXml(OWSConstants.NS_OWS, sosCapabilities.getServiceProvider()));
 
         }
         if (sosCapabilities.getOperationsMetadata() != null
                 && sosCapabilities.getOperationsMetadata().getOperations() != null
                 && !sosCapabilities.getOperationsMetadata().getOperations().isEmpty()) {
 
-            xbCaps.setOperationsMetadata((OperationsMetadata) CodingHelper.encodeObjectToXml(OWSConstants.NS_OWS, sosCapabilities.getOperationsMetadata()));
+            xbCaps.addNewOperationsMetadata().set(CodingHelper.encodeObjectToXml(OWSConstants.NS_OWS, sosCapabilities.getOperationsMetadata()));
         }
         if (sosCapabilities.getFilterCapabilities() != null) {
-            xbCaps.addNewFilterCapabilities().setFilterCapabilities(
-                    (FilterCapabilities) CodingHelper.encodeObjectToXml(FilterConstants.NS_FES_2, sosCapabilities.getFilterCapabilities()));
+            xbCaps.addNewFilterCapabilities().addNewFilterCapabilities().set(CodingHelper.encodeObjectToXml(FilterConstants.NS_FES_2, sosCapabilities.getFilterCapabilities()));
         }
         if (sosCapabilities.getContents() != null && !sosCapabilities.getContents().isEmpty()) {
             setContents(xbCaps.addNewContents(), sosCapabilities.getContents(), response.getVersion());
@@ -291,8 +279,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             response.mergeObservationsWithSameX();
         }
         for (SosObservation sosObservation : response.getObservationCollection()) {
-            xbGetObsResp.addNewObservationData().setOMObservation(
-                    (OMObservationType) encoder.encode(sosObservation, null));
+            xbGetObsResp.addNewObservationData().addNewOMObservation().set(encoder.encode(sosObservation, null));
         }
         // set schema location
         XmlHelper.makeGmlIdsUnique(xbGetObsRespDoc.getDomNode());
@@ -304,8 +291,6 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
 
     private XmlObject createGetFeatureOfInterestResponse(GetFeatureOfInterestResponse response)
             throws OwsExceptionReport {
-//        int sfIdCounter = 1;
-//        HashMap<String, String> gmlID4sfIdentifier = new HashMap<String, String>();
         GetFeatureOfInterestResponseDocument xbGetFoiResponseDoc =
                 GetFeatureOfInterestResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance()
                         .getXmlOptions());
@@ -314,57 +299,28 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         if (sosAbstractFeature instanceof SosFeatureCollection) {
             Map<String, SosAbstractFeature> sosFeatColMap = ((SosFeatureCollection) sosAbstractFeature).getMembers();
             for (String sosFeatID : sosFeatColMap.keySet()) {
-                FeaturePropertyType featureProperty = xbGetFoiResponse.addNewFeatureMember();
                 SosAbstractFeature feature = sosFeatColMap.get(sosFeatID);
-                String identifier;
-                if (feature.isSetIdentifier()) {
-                    identifier = feature.getIdentifier().getValue();
-                } else {
-                    identifier = sosFeatID;
-                }
-                SosSamplingFeature sampFeat = (SosSamplingFeature) feature;
-                if (sampFeat.getUrl() != null) {
-                    featureProperty.setHref(sampFeat.getUrl());
-                    if (sampFeat.isSetNames()) {
-                        featureProperty.setTitle(sampFeat.getFirstName().getValue());
-                    }
-                } else {
-                    String namespace = null;
-                    if (Configurator.getInstance().getActiveProfile().isSetEncodeFeatureOfInterestNamespace()) {
-                        namespace = Configurator.getInstance().getActiveProfile().getEncodingNamespaceForFeatureOfInterest();
-                    } else {
-                        namespace = OMHelper.getNamespaceForFeatureType(sampFeat.getFeatureType());
-                    }
-                    try {
-                        featureProperty.set(CodingHelper.encodeObjectToXml(namespace, sampFeat));
-                    } catch (OwsExceptionReport e) {
-                        if (sampFeat.getXmlDescription() != null) {
-                            try {
-                                featureProperty.set(XmlObject.Factory.parse(sampFeat.getXmlDescription()));
-                            } catch (XmlException xmle) {
-                                String exceptionText = "Error while encoding featureOfInterest in OMObservation!";
-                                LOGGER.error(exceptionText, xmle);
-                                throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
-                            }
-                        } else {
-                            featureProperty.setHref(identifier);
-                            if (sampFeat.isSetNames()) {
-                                featureProperty.setTitle(sampFeat.getFirstName().getValue());
-                            }
-                        }
-                    }
-                }
+                addFeatureOfInterestGetFeatureOfInterestResponse(feature, xbGetFoiResponse);
             }
         } else {
             if (sosAbstractFeature instanceof SosSamplingFeature) {
-                SosSamplingFeature sampFeat = (SosSamplingFeature) sosAbstractFeature;
-                xbGetFoiResponse.set(CodingHelper.encodeObjectToXml(sampFeat.getFeatureType(), sampFeat));
+                addFeatureOfInterestGetFeatureOfInterestResponse(sosAbstractFeature, xbGetFoiResponse);
             }
         }
         // set schemLocation
         N52XmlHelper.setSchemaLocationsToDocument(xbGetFoiResponseDoc, CollectionHelper.list(
                 N52XmlHelper.getSchemaLocationForSOS200(), N52XmlHelper.getSchemaLocationForSAMS200()));
         return xbGetFoiResponseDoc;
+    }
+    
+    private void addFeatureOfInterestGetFeatureOfInterestResponse(SosAbstractFeature feature, GetFeatureOfInterestResponseType getFoiResponse) throws OwsExceptionReport {
+        Map<HelperValues, String> additionalValues = new HashMap<SosConstants.HelperValues, String>(1);
+        IProfile activeProfile = Configurator.getInstance().getActiveProfile();
+        if (activeProfile.isSetEncodeFeatureOfInterestNamespace()) {
+            additionalValues.put(HelperValues.ENCODE_NAMESPACE, activeProfile.getEncodingNamespaceForFeatureOfInterest());
+        }
+        XmlObject encodeObjectToXml = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, feature, additionalValues);
+        getFoiResponse.addNewFeatureMember().set(encodeObjectToXml);
     }
 
     private XmlObject createGetObservationByIdResponse(GetObservationByIdResponse response) throws OwsExceptionReport {
@@ -387,8 +343,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                 foiHelper.put(HelperValues.EXIST_FOI_IN_DOC, Boolean.toString(false));
             }
             foiHelper.put(HelperValues.GMLID, gmlId);
-
-            xbGetObsByIdResp.addNewObservation().setOMObservation((OMObservationType) encoder.encode(sosObservation, foiHelper));
+            xbGetObsByIdResp.addNewObservation().addNewOMObservation().set(encoder.encode(sosObservation, foiHelper));
         }
         XmlHelper.makeGmlIdsUnique(xbGetObsByIdResp.getDomNode());
         // set schema location
@@ -546,44 +501,20 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             // set observed area [0..1]
             if (offering.getObservedArea() != null) {
                 if (offering.getObservedArea().getEnvelope() != null && offering.getObservedArea().getSrid() != -1) {
-                    xbObsOff.addNewObservedArea().setEnvelope(
-                            getBBOX4Offering(offering.getObservedArea().getEnvelope(), offering.getObservedArea()
-                                    .getSrid()));
+                    XmlObject encodeObjectToXml = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, offering.getObservedArea());
+                    xbObsOff.addNewObservedArea().addNewEnvelope().set(encodeObjectToXml);
                 }
             }
 
             // set up phenomenon time [0..1]
             if (offering.getTime() instanceof TimePeriod) {
                 TimePeriod tp = (TimePeriod) offering.getTime();
-                if (tp.getStart() != null && tp.getEnd() != null) {
+                if (!tp.isEmpty()) {
                     XmlObject xmlObject = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, offering.getTime());
-                    if (xmlObject instanceof TimePeriodType) {
-                        xbObsOff.addNewPhenomenonTime().setTimePeriod((TimePeriodType) xmlObject);
+                        xbObsOff.addNewPhenomenonTime().addNewTimePeriod().set(xmlObject);
                         xbObsOff.getPhenomenonTime().substitute(
                                 new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_PHENOMENON_TIME,
                                         SosConstants.NS_SOS_PREFIX), xbObsOff.getPhenomenonTime().schemaType());
-                        // XmlObject substitution =
-                        // timeObjectPropertyType.addNewAbstractTimeObject().substitute(getQnameForITime(iTime),
-                        // xmlObject.schemaType());
-                        // substitution.set((AbstractTimeObjectType)
-                        // xmlObject);
-                    } else {
-                        String exceptionText = "Error while encoding phenomenon time, needed encoder is missing!";
-                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-                    }
-                    // PhenomenonTime xbPhenTime =
-                    // xbObsOff.addNewPhenomenonTime();
-                    // TimePeriodType xbTime = xbPhenTime.addNewTimePeriod();
-                    // xbTime.setId("pt_" + normalize(offering.getOffering()));
-                    // xbTime.addNewBeginPosition().setStringValue(
-                    // DateTimeHelper.formatDateTime2ResponseString(tp.getStart()));
-                    // xbTime.addNewEndPosition().setStringValue(
-                    // DateTimeHelper.formatDateTime2ResponseString(tp.getEnd()));
-                    // xbObsOff.getPhenomenonTime().substitute(
-                    // new QName(Sos2Constants.NS_SOS_20,
-                    // Sos2Constants.EN_PHENOMENON_TIME,
-                    // SosConstants.NS_SOS_PREFIX),
-                    // xbObsOff.getPhenomenonTime().schemaType());
                 }
             }
 
@@ -685,56 +616,23 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         return insertionCapabilitiesDoc;
     }
 
-    /**
-     * queries the bounding box of all requested feature of interest IDs
-     *
-     * @param envelope
-     *
-     * @param foiIDs
-     *            ArrayList with String[]s containing the ids of the feature of
-     *            interests for which the BBOX should be returned
-     * @return Returns EnvelopeType XmlBean which represents the BBOX of the
-     *         requested feature of interests
-     * @throws OwsExceptionReport
-     *             if query of the BBOX failed
-     */
-    private EnvelopeType getBBOX4Offering(Envelope envelope, int srsID) throws OwsExceptionReport {
-
-        double minx = envelope.getMinX();
-        double maxx = envelope.getMaxX();
-        double miny = envelope.getMinY();
-        double maxy = envelope.getMaxY();
-        @SuppressWarnings("unused")
-        String minz = null;
-        @SuppressWarnings("unused")
-        String maxz = null;
-
-        EnvelopeType envelopeType = EnvelopeType.Factory.newInstance();
-
-        // set lower corner
-        // TODO for full 3D support add minz to parameter in setStringValue
-        DirectPositionType lowerCorner = envelopeType.addNewLowerCorner();
-        DirectPositionType upperCorner = envelopeType.addNewUpperCorner();
-        if (srsID > 0) {
-            if (!Configurator.getInstance().reversedAxisOrderRequired(srsID)) {
-                lowerCorner.setStringValue(minx + " " + miny);
-            } else {
-                lowerCorner.setStringValue(miny + " " + minx);
-            }
-
-            // set upper corner
-            // TODO for full 3D support add maxz to parameter in setStringValue
-            if (!Configurator.getInstance().reversedAxisOrderRequired(srsID)) {
-                upperCorner.setStringValue(maxx + " " + maxy);
-            } else {
-                upperCorner.setStringValue(maxy + " " + maxx);
-            }
-            // set SRS
-            envelopeType.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + srsID);
-        }
-
-        return envelopeType;
-    }
+//    /**
+//     * queries the bounding box of all requested feature of interest IDs
+//     *
+//     * @param envelope
+//     *
+//     * @param foiIDs
+//     *            ArrayList with String[]s containing the ids of the feature of
+//     *            interests for which the BBOX should be returned
+//     * @return Returns EnvelopeType XmlBean which represents the BBOX of the
+//     *         requested feature of interests
+//     * @throws OwsExceptionReport
+//     *             if query of the BBOX failed
+//     */
+//    private EnvelopeType getBBOX4Offering(Envelope envelope, int srsID) throws OwsExceptionReport {
+//
+//       
+//    }
 
     private void renameContentsElementNames(Contents xbContents) {
         for (Offering offering : xbContents.getContents().getOfferingArray()) {
