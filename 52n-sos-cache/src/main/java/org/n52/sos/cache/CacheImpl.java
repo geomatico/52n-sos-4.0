@@ -65,7 +65,9 @@ public class CacheImpl implements CapabilitiesCache{
     /** contains the observation IDs offered in the database */
     private Collection<String> observationIdentifiers;
 
-    /** hash map containing the phenomenons for each offering */
+    private Map<String, Collection<String>> allowedKOfferingVObservationType;
+
+	/** hash map containing the phenomenons for each offering */
     private Map<String, Collection<String>> kOfferingVObservableProperties;
 
     /** hash map containing the name for each offering */
@@ -80,19 +82,31 @@ public class CacheImpl implements CapabilitiesCache{
     /** hash map containing the features of interest for each offering */
     private Map<String, Collection<String>> kOfferingVFeaturesOfInterest;
 
-    /** hash map containing the procedures for each feature of interest */
+    private Map<String, DateTime> kOfferingVMaxTime;
+
+	// TODO merge next two maps
+	private Map<String, DateTime> kOfferingVMinTime;
+
+	private Map<String, SosEnvelope> kOfferingVEnvelope;
+
+	/** hash map containing the related features for each offering */
+	private Map<String, Collection<String>> kOfferingVRelatedFeatures;
+	
+	private Map<String, Collection<String>> kOfferingVResultTemplates;
+
+	/**
+	 * hash map containing the offering IDs as keys and the corresponding
+	 * composite phenomena ids as values
+	 */
+	private Map<String, Collection<String>> kOfferingVCompositePhenomenon;
+
+	/** hash map containing the procedures for each feature of interest */
     private Map<String, Collection<String>> kFeatureOfInterestVProcedures;
 
     /**
      * hash map containing the phenomenon components of each compositePhenomenon
      */
     private Map<String, Collection<String>> phens4CompPhens;
-
-    /**
-     * hash map containing the offering IDs as keys and the corresponding
-     * composite phenomena ids as values
-     */
-    private Map<String, Collection<String>> kOfferingVCompositePhenomenon;
 
     /** hash map containing parent procedures for each procedure */
     private Map<String, Collection<String>> parentProcs;
@@ -106,7 +120,9 @@ public class CacheImpl implements CapabilitiesCache{
     /** hash map containing the offerings(values) for each procedure (key) */
     private Map<String, Collection<String>> kProcedureVOfferings;
 
-    private Map<String, Collection<String>> parentFeatures;
+    private Map<String, Collection<String>> kProcedureVObservationIdentifiers;
+
+	private Map<String, Collection<String>> parentFeatures;
 
     private Map<String, Collection<String>> childFeatures;
 
@@ -119,19 +135,11 @@ public class CacheImpl implements CapabilitiesCache{
     /** map contains the offerings for each phenomenon */
     private Map<String, List<String>> kObservablePropertyVOfferings;
 
-    /** contains the unit (value) for each phenomenon (key) */
-    private Map<String, String> unit4Phen;
-
     /** EPSG code of coordinates contained in the database */
     private int srid;
 
-    /** hash map containing the related features for each offering */
-    private Map<String, Collection<String>> kOfferingVRelatedFeatures;
-
     /** hash map containing the roles for each related feature */
     private Map<String, Collection<String>> kRelatedFeatureVRole;
-
-    private Map<String, Collection<String>> allowedKOfferingVObservationType;
 
     private Collection<String> observationTypes;
     
@@ -139,19 +147,11 @@ public class CacheImpl implements CapabilitiesCache{
 
     private Collection<String> resultTemplates;
 	
-	private Map<String, SosEnvelope> kOfferingVEnvelope;
-	
-	// TODO merge next two maps
-	private Map<String, DateTime> kOfferingVMinTime;
-	private Map<String, DateTime> kOfferingVMaxTime;
-	
 	private SosEnvelope globalEnvelope;
 	
 	private TimePeriod globalTemporalBoundingBox;
 
-	private Map<String, Collection<String>> kProcedureVObservationIdentifiers;
-
-    public CacheImpl() {
+	public CacheImpl() {
     	allowedKOfferingVObservationType = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	childFeatures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	childProcs = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
@@ -166,6 +166,7 @@ public class CacheImpl implements CapabilitiesCache{
     	kOfferingVFeaturesOfInterest = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	kOfferingVMaxTime = Collections.synchronizedMap(new HashMap<String, DateTime>());
     	kOfferingVMinTime = Collections.synchronizedMap(new HashMap<String, DateTime>());
+    	setkOfferingVResultTemplates(Collections.synchronizedMap(new HashMap<String, Collection<String>>()));
     	kOfferingVObservableProperties = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	kProcedureVObservationIdentifiers = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	kOfferingVObservationTypes = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
@@ -185,7 +186,6 @@ public class CacheImpl implements CapabilitiesCache{
     	resultTemplates = Collections.synchronizedList(new ArrayList<String>());
     	srid = -1;
     	srids = Collections.synchronizedList(new ArrayList<Integer>());
-    	unit4Phen = Collections.synchronizedMap(new HashMap<String, String>());
     }
 
     protected Collection<String> getPhenomenons4Offering(String offering) {
@@ -359,33 +359,6 @@ public class CacheImpl implements CapabilitiesCache{
      */
     protected Collection<String> getProceduresForOffering(String offering) {
         return kOfferingVProcedures.get(offering);
-    }
-
-    /**
-     * returns the units for phenomena
-     * 
-     * @return the units related to phenomenon
-     */
-    protected Map<String, String> getUnit4Phen() {
-        return unit4Phen;
-    }
-    
-    /**
-     * return the unit of the values for the observedProperty
-     * 
-     * @param observedProperty
-     *            String observedProperty for which the type of the values
-     *            should be returned
-     * @return String representing the valueType of the values for the
-     *         observedProperty
-     */
-    protected String getUnit4ObsProp(String observedProperty) {
-        return unit4Phen.get(observedProperty);
-    }
-    
-    @Override
-	public void setUnit4ObservableProperty(Map<String, String> unit4Phen) {
-        this.unit4Phen = unit4Phen;
     }
 
     /**
@@ -960,6 +933,24 @@ public class CacheImpl implements CapabilitiesCache{
 		this.kOfferingVMaxTime = kOfferingVMaxTime;
 	}
 			
+	/**
+	 * @return the kOfferingVResultTemplates
+	 */
+	@Override
+	public Map<String, Collection<String>> getKOfferingVResultTemplates()
+	{
+		return kOfferingVResultTemplates;
+	}
+
+	/**
+	 * @param kOfferingVResultTemplates the kOfferingVResultTemplates to set
+	 */
+	@Override
+	public void setkOfferingVResultTemplates(Map<String, Collection<String>> kOfferingVResultTemplates)
+	{
+		this.kOfferingVResultTemplates = kOfferingVResultTemplates;
+	}
+
 	@Override
 	public SosEnvelope getGlobalEnvelope() {
 		return globalEnvelope;
@@ -1035,7 +1026,6 @@ public class CacheImpl implements CapabilitiesCache{
 		result = prime * result + ((resultTemplates == null) ? 0 : resultTemplates.hashCode());
 		result = prime * result + srid;
 		result = prime * result + ((srids == null) ? 0 : srids.hashCode());
-		result = prime * result + ((unit4Phen == null) ? 0 : unit4Phen.hashCode());
 		return result;
 	}
 
@@ -1210,11 +1200,6 @@ public class CacheImpl implements CapabilitiesCache{
 			if (other.srids != null)
 				return false;
 		} else if (!srids.equals(other.srids))
-			return false;
-		if (unit4Phen == null) {
-			if (other.unit4Phen != null)
-				return false;
-		} else if (!unit4Phen.equals(other.unit4Phen))
 			return false;
 		return true;
 	}

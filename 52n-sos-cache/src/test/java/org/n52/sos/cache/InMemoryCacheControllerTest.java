@@ -28,6 +28,7 @@ import static org.n52.sos.ogc.om.OMConstants.*;
 import static org.n52.sos.ogc.om.features.SFConstants.FT_SAMPLINGPOINT;
 import static org.n52.sos.util.builder.DataRecordBuilder.aDataRecord;
 import static org.n52.sos.util.builder.InsertObservationRequestBuilder.aInsertObservationRequest;
+import static org.n52.sos.util.builder.InsertResultTemplateRequestBuilder.anInsertResultTemplateRequest;
 import static org.n52.sos.util.builder.InsertResultTemplateResponseBuilder.anInsertResultTemplateResponse;
 import static org.n52.sos.util.builder.InsertSensorRequestBuilder.anInsertSensorRequest;
 import static org.n52.sos.util.builder.InsertSensorResponseBuilder.anInsertSensorResponse;
@@ -61,6 +62,7 @@ import org.n52.sos.ogc.swe.SosFeatureRelationship;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.request.InsertObservationRequest;
+import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.AbstractServiceResponse;
 import org.n52.sos.response.InsertResultTemplateResponse;
@@ -621,7 +623,7 @@ public class InMemoryCacheControllerTest
 	}
 	
 	@Test public void 
-	should_not_contain_offering_observable_property_relations_afterDeleteSensor()
+	should_not_contain_offering_observable_property_relations_after_DeleteSensor()
 			throws OwsExceptionReport{
 		deleteSensorPreparation();
 		
@@ -630,6 +632,21 @@ public class InMemoryCacheControllerTest
 		
 		assertFalse("observable property to offering relation STILL in cache",
 				controller.getCapabilitiesCache().getKObservablePropertyVOffering().containsKey(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME));
+	}
+	
+	@Test public void 
+	should_not_contain_related_result_templates_after_DeleteSenosr()
+			throws OwsExceptionReport{
+		updateCacheWithInsertResultTemplate(RESULT_TEMPLATE_IDENTIFIER);
+		deleteSensorPreparation();
+		
+		assertTrue("offering -> result templates relations STILL in cache",
+				controller.getCapabilitiesCache().getKOfferingVResultTemplates().get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME) == null
+				|| 
+				controller.getCapabilitiesCache().getKOfferingVResultTemplates().get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).isEmpty());
+		
+		assertFalse("result template identifier STILL in cache",
+				controller.getResultTemplates().contains(RESULT_TEMPLATE_IDENTIFIER));
 	}
 	
 	/* Update after InsertResultTemplate */
@@ -641,6 +658,17 @@ public class InMemoryCacheControllerTest
 		
 		assertTrue("result template identifier NOT in cache",
 				controller.getCapabilitiesCache().getResultTemplates().contains(RESULT_TEMPLATE_IDENTIFIER));
+	}
+	
+	@Test public void 
+	should_contain_result_template_to_offering_relation_after_InsertResultTemplate()
+			throws OwsExceptionReport {
+		insertResultTemplatePreparation();
+		
+		assertTrue("offering -> result template relation NOT in cache",
+				controller.getCapabilitiesCache().getKOfferingVResultTemplates().get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME) != null
+				&&
+				controller.getCapabilitiesCache().getKOfferingVResultTemplates().get(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME).contains(RESULT_TEMPLATE_IDENTIFIER));
 	}
 	
 	/* Update after InsertResult */
@@ -827,9 +855,18 @@ public class InMemoryCacheControllerTest
 	updateCacheWithInsertResultTemplate(String resultTemplateIdentifier)
 			 throws OwsExceptionReport {
 		insertResultTemplateResponse(resultTemplateIdentifier);
-		controller.updateAfterResultTemplateInsertion((InsertResultTemplateResponse) response);
+		insertResultTemplateRequest(PROCEDURE+OFFERING_EXTENSION_FOR_PROCEDURE_NAME);
+		controller.updateAfterResultTemplateInsertion((InsertResultTemplateRequest) request,(InsertResultTemplateResponse) response);
 	}
 	
+	private void 
+	insertResultTemplateRequest(String offeringForResultTemplate)
+	{
+		request = anInsertResultTemplateRequest()
+				.setOffering(offeringForResultTemplate)
+				.build();
+	}
+
 	private	void 
 	insertResultPreparation()
 	{

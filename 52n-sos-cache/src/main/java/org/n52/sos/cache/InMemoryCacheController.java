@@ -48,6 +48,7 @@ import org.n52.sos.ogc.swe.SosFeatureRelationship;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.request.InsertObservationRequest;
+import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.AbstractServiceResponse;
 import org.n52.sos.response.InsertResultTemplateResponse;
@@ -93,10 +94,10 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		update(Case.SENSOR_DELETION, sosRequest);
 	}
 
-	public void updateAfterResultTemplateInsertion(InsertResultTemplateResponse sosResponse) throws OwsExceptionReport
+	public void updateAfterResultTemplateInsertion(InsertResultTemplateRequest sosRequest, InsertResultTemplateResponse sosResponse) throws OwsExceptionReport
 	{
 //		update(Case.RESULT_TEMPLATE_INSERTION,null,sosResponse);
-		update(new ResultTemplateInsertionInMemoryCacheUpdate(sosResponse));
+		update(new ResultTemplateInsertionInMemoryCacheUpdate(sosRequest,sosResponse));
 	}
 
 	public void updateAfterResultInsertion(SosObservation observation)
@@ -318,6 +319,8 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	//			removeObservablePropertiesToOfferingRelation(offeringId);
 				
 				removeOfferingToObservablePropertyRelation(offeringId);
+				
+				removeOfferintgToResultTemplatesRelation(offeringId);
 			}
 			
 			removeRemovedRelatedFeaturesFromRoleMap();
@@ -343,20 +346,6 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			removeProcedureToOfferingsRelation(sosRequest.getProcedureIdentifier());
 			
 		}
-
-	private void addProcedureToObservationIdRelationToCache(String procedureIdentifier, String observationIdentifier)
-	{
-		if (!getCapabilitiesCache().getKProcedureVObservationIdentifiers().containsKey(procedureIdentifier))
-		{
-			Collection<String> value = Collections.synchronizedList(new ArrayList<String>());
-			getCapabilitiesCache().getKProcedureVObservationIdentifiers().put(procedureIdentifier, value);
-		}
-		getCapabilitiesCache().getKProcedureVObservationIdentifiers().get(procedureIdentifier).add(observationIdentifier);
-		LOGGER.debug("procedure \"{}\" to observation id \"{}\" relation added to cache? {}",
-				procedureIdentifier,
-				observationIdentifier,
-				getCapabilitiesCache().getKProcedureVObservationIdentifiers().get(procedureIdentifier).contains(observationIdentifier));
-	}
 
 	// TODO extract same behaviour as in doUpdateAfterObservationInsertion to methods 
 	private void doUpdateAfterResultInsertion(SosObservation sosObservation)
@@ -434,6 +423,39 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	}
 
 	/* HELPER */
+	
+	private void removeOfferintgToResultTemplatesRelation(String offeringId)
+	{
+		Collection<String> resultTemplateIdentifiersToRemove = getCapabilitiesCache().getKOfferingVResultTemplates().remove(offeringId);
+		LOGGER.debug("offering '{}' to result templates removed from map? {}",
+				offeringId,
+				getCapabilitiesCache().getKOfferingVResultTemplates().containsKey(offeringId));
+		if (resultTemplateIdentifiersToRemove != null)
+		{
+			for (String resultTemplateIdentiferToRemove : resultTemplateIdentifiersToRemove)
+			{
+				getCapabilitiesCache().getResultTemplates().remove(resultTemplateIdentiferToRemove);
+				LOGGER.debug("Removed result template identifier '{}' from cache? {}",
+						resultTemplateIdentiferToRemove,
+						getCapabilitiesCache().getResultTemplates().contains(resultTemplateIdentiferToRemove));
+			}
+		}
+	}
+
+	private void addProcedureToObservationIdRelationToCache(String procedureIdentifier, String observationIdentifier)
+	{
+		if (!getCapabilitiesCache().getKProcedureVObservationIdentifiers().containsKey(procedureIdentifier))
+		{
+			Collection<String> value = Collections.synchronizedList(new ArrayList<String>());
+			getCapabilitiesCache().getKProcedureVObservationIdentifiers().put(procedureIdentifier, value);
+		}
+		getCapabilitiesCache().getKProcedureVObservationIdentifiers().get(procedureIdentifier).add(observationIdentifier);
+		LOGGER.debug("procedure \"{}\" to observation id \"{}\" relation added to cache? {}",
+				procedureIdentifier,
+				observationIdentifier,
+				getCapabilitiesCache().getKProcedureVObservationIdentifiers().get(procedureIdentifier).contains(observationIdentifier));
+	}
+
 	
 	private void updateGlobalTemporalBoundingBox(ITime phenomenonTime)
 	{
