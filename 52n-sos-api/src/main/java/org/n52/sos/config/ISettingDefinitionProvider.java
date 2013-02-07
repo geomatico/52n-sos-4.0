@@ -29,7 +29,6 @@ import java.util.Set;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-//TODO better class name
 public interface ISettingDefinitionProvider {
     public Set<ISettingDefinition<?>> getSettingDefinitions();
     public void setSettingValues(Set<ISettingValue<?>> settings);
