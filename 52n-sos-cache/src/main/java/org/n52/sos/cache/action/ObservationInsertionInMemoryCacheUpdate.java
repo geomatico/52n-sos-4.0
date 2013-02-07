@@ -40,9 +40,24 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * This &auml;ction (see {@link Action}) adds the following relations to the cache:<ul>
- * <li>item to add</li>
- * <li>last item</li></ul>
+ * This &auml;ction (see {@link Action}) the following relations are added, settings are updated in cache:<ul>
+ * <li>Procedure</li>
+ * <li>Observation Type</li>
+ * <li>Observation identifier (OPTIONAL)</li>
+ * <li>Procedure &rarr; Observation identifier (OPTIONAL)</li>
+ * <li>Observable Property &harr; Procedure</li>
+ * <li>Global spatiakl bounding box</li>
+ * <li>Feature identifier</li>
+ * <li>Feature types</li>
+ * <li>Feature &harr; procedure</li>
+ * <li>Feature &harr; feature</li>
+ * <li>Offering &harr; related feature</li>
+ * <li>Offering &harr; procedure</li>
+ * <li>Offering &harr; observable property</li>
+ * <li>Offering &rarr; observation type</li>
+ * <li>Offering &rarr; temporal bounding box</li>
+ * <li>Offering &rarr; spatial bounding box</li>
+ * <li>Global temporal bounding box</li></ul>
  * 
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @since 4.0
@@ -69,6 +84,7 @@ public class ObservationInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate
 	@Override
 	public void execute()
 	{
+		// TODO Review required methods and update test accordingly
 		for (SosObservation sosObservation : sosRequest.getObservations())
 		{
 			addProcedureToCache(getProcedureIdentifier(sosObservation));
