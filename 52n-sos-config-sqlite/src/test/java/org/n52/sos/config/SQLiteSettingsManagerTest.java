@@ -29,6 +29,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
+
+import org.hibernate.HibernateException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -62,6 +64,8 @@ public class SQLiteSettingsManagerTest {
     private static final String FILE_SETTING = "file_setting";
     private static final String STRING_SETTING = "string_setting";
     private static final String BOOLEAN_SETTING = "boolean_setting";
+    private static final String USERNAME = "admin";
+    private static final String PASSWORD = "password";
     private static final Logger log = LoggerFactory.getLogger(SQLiteSettingsManagerTest.class);
     private static IConnectionProvider connectionProvider;
     private static File databaseFile;
@@ -181,5 +185,40 @@ public class SQLiteSettingsManagerTest {
 
         settingsManager.deleteSetting(settingDefinition);
         assertNull(settingsManager.getSetting(settingDefinition));
+    }
+    
+    @Test
+    public void createAdminUserTest() {
+        IAdministratorUser au = settingsManager.createAdminUser(USERNAME, PASSWORD);
+        assertNotNull(au);
+        assertEquals(USERNAME, au.getUsername());
+        assertEquals(PASSWORD, au.getPassword());
+        
+        IAdministratorUser au2 = settingsManager.getAdminUser(USERNAME);
+        assertNotNull(au2);
+        assertEquals(au, au2);
+    }
+    
+    @Test(expected = HibernateException.class)
+    public void createDuplicateAdminUser() {
+        settingsManager.createAdminUser(USERNAME, PASSWORD);
+        settingsManager.createAdminUser(USERNAME, PASSWORD);
+    }
+    
+    @Test
+    public void deleteAdminUserTest() {
+        IAdministratorUser au = settingsManager.getAdminUser(USERNAME);
+        if (au == null) {
+            au = settingsManager.createAdminUser(USERNAME, PASSWORD);
+            
+        }
+        assertNotNull(au);
+        settingsManager.deleteAdminUser(au);
+        assertNull(settingsManager.getAdminUser(USERNAME));
+        
+        settingsManager.createAdminUser(USERNAME, PASSWORD);
+        assertNotNull(settingsManager.getAdminUser(USERNAME));
+        settingsManager.deleteAdminUser(USERNAME);
+        assertNull(settingsManager.getAdminUser(USERNAME));
     }
 }
