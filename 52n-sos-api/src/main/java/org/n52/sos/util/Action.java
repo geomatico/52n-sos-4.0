@@ -24,8 +24,11 @@
 package org.n52.sos.util;
 
 /**
+ * This is an &Auml;ction, that can be executed.
  *
  * @author Christian Autermann <c.autermann@52north.org>
+ * 
+ * @see <a href="http://www.sfgate.com/politics/article/THE-CALIFORNIA-TRANSITION-Incoming-governor-s-2581330.php">[...]Incoming governor's mantra: 'Action'[...]</a>
  */
 public interface Action {
     public void execute();
