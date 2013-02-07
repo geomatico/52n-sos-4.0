@@ -33,7 +33,6 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IInsertResultDAO;
 import org.n52.sos.encode.IEncoder;
-import org.n52.sos.event.SosEvent;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.ResultInsertion;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
