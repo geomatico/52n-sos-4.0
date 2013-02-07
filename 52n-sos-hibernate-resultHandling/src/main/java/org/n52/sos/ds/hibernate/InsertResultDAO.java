@@ -122,8 +122,9 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
             ResultTemplate resultTemplate =
                     HibernateCriteriaQueryUtilities.getResultTemplateObject(request.getTemplateIdentifier(), session);
             transaction = session.beginTransaction();
-            List<SosObservation> observations =
-                    getSingleObservationsFromResultValues(request.getResultValues(), resultTemplate);
+            SosObservation singleObservation = getSingleObservationFromResultValues(resultTemplate, request.getResultValues());
+            response.setObservation(singleObservation);
+            List<SosObservation> observations = getSingleObservationsFromObservation(singleObservation);
             Set<ObservationConstellationOfferingObservationType> obsConstOffObsTypes = new HashSet<ObservationConstellationOfferingObservationType>(1);
             obsConstOffObsTypes.add(resultTemplate.getObservationConstellationOfferingObservationType());
             int insertion = 0, size = observations.size();
@@ -153,15 +154,19 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
         }
         return response;
     }
-
-    private List<SosObservation> getSingleObservationsFromResultValues(String resultValues,
-            ResultTemplate resultTemplate) throws OwsExceptionReport {
+    
+    private SosObservation getSingleObservationFromResultValues(ResultTemplate resultTemplate, String resultValues) throws OwsExceptionReport {
         SosResultEncoding resultEncoding = new SosResultEncoding(resultTemplate.getResultEncoding());
         SosResultStructure resultStructure = new SosResultStructure(resultTemplate.getResultStructure());
         String[] blockValues = getBlockValues(resultValues, resultEncoding.getEncoding());
-        SosObservation observation =
-                getObservation(resultTemplate.getObservationConstellationOfferingObservationType(), blockValues,
-                        resultStructure.getResultStructure(), resultEncoding.getEncoding());
+        SosObservation singleObservation =
+                       getObservation(resultTemplate.getObservationConstellationOfferingObservationType(),
+                                      blockValues,
+                                      resultStructure.getResultStructure(), resultEncoding.getEncoding());
+        return singleObservation;
+    }
+    
+     private List<SosObservation> getSingleObservationsFromObservation(SosObservation observation) throws OwsExceptionReport {
         try {
             return HibernateObservationUtilities.unfoldObservation(observation);
         } catch (Exception e) {
