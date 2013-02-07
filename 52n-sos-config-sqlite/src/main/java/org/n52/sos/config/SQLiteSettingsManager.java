@@ -26,17 +26,63 @@ package org.n52.sos.config;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.n52.sos.config.entities.AbstractSettingValue;
+import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.service.AdminUser;
 import org.n52.sos.service.ConfigurationException;
 
-public class HibernateSettingsManagerImpl extends HibernateSettingsManager {
+public class SQLiteSettingsManager extends SettingsManager {
 
-    public HibernateSettingsManagerImpl() throws ConfigurationException {
+    public static final SQLiteSettingFactory SQLITE_SETTING_FACTORY = new SQLiteSettingFactory();
+    private IConnectionProvider connectionProvider;
+    private final ReentrantLock lock = new ReentrantLock();
+
+    public SQLiteSettingsManager() throws ConfigurationException {
         super();
+    }
+    
+    private IConnectionProvider getConnectionProvider() {
+        if (this.connectionProvider == null) {
+            createDefaultConnectionProvider();
+        }
+        return connectionProvider;
+    }
+    
+    public void setConnectionProvider(IConnectionProvider connectionProvider) {
+        lock.lock();
+        try {
+            this.connectionProvider = connectionProvider;
+        } finally {
+            lock.unlock();
+        }
+    }
+    
+    protected void createDefaultConnectionProvider() {
+        lock.lock();
+        try {
+            if (this.connectionProvider == null) {
+                this.connectionProvider = new SQLiteSessionFactory();
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+    
+    protected Session getSession() {
+        return (Session) getConnectionProvider().getConnection();
+    }
+    
+    protected void returnSession(Session session) {
+        getConnectionProvider().returnConnection(session);
+    }
+    
+    @Override
+    public ISettingValueFactory getSettingFactory() {
+        return SQLITE_SETTING_FACTORY;
     }
 
     @Override

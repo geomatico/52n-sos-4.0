@@ -23,6 +23,8 @@
  */
 package org.n52.sos.config;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -31,7 +33,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.n52.sos.config.entities.BooleanSettingValue;
 import org.n52.sos.config.entities.FileSettingValue;
 import org.n52.sos.config.entities.IntegerSettingValue;
@@ -53,7 +54,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class HibernateSettingsManagerImplTest {
+public class SQLiteSettingsManagerTest {
 
     private static final String URI_SETTING = "uri_setting";
     private static final String DOUBLE_SETTING = "double_setting";
@@ -62,18 +63,18 @@ public class HibernateSettingsManagerImplTest {
     private static final String STRING_SETTING = "string_setting";
     private static final String BOOLEAN_SETTING = "boolean_setting";
     
-    private static final Logger log = LoggerFactory.getLogger(HibernateSettingsManagerImplTest.class);
+    private static final Logger log = LoggerFactory.getLogger(SQLiteSettingsManagerTest.class);
     private static IConnectionProvider connectionProvider;
     private static File databaseFile;
-    private HibernateSettingsManagerImpl dao;
+    private SQLiteSettingsManager dao;
     
     @BeforeClass
     public static void setUpClass() throws ConfigurationException, IOException {
         databaseFile = File.createTempFile("configuration-test", ".db");
         Properties properties = new Properties();
-        properties.put(HibernateSettingsSessionFactory.HIBERNATE_CONNECTION_URL, 
+        properties.put(SQLiteSessionFactory.HIBERNATE_CONNECTION_URL, 
                 String.format("jdbc:sqlite:%s", databaseFile.getAbsolutePath()));
-        connectionProvider = new HibernateSettingsSessionFactory();
+        connectionProvider = new SQLiteSessionFactory();
         connectionProvider.initialize(properties);
         log.info("using database file: {}", databaseFile.getAbsolutePath());
     }
@@ -90,7 +91,7 @@ public class HibernateSettingsManagerImplTest {
 
     @Before
     public void setUp() throws ConfigurationException {
-        this.dao = new HibernateSettingsManagerImpl();
+        this.dao = new SQLiteSettingsManager();
         this.dao.setConnectionProvider(connectionProvider);
     }
 

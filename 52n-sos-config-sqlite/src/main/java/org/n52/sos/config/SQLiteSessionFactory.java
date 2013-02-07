@@ -49,9 +49,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class HibernateSettingsSessionFactory implements IConnectionProvider {
+public class SQLiteSessionFactory implements IConnectionProvider {
 
-    private static final Logger log = LoggerFactory.getLogger(HibernateSettingsSessionFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(SQLiteSessionFactory.class);
     
     public static final String HIBERNATE_DIALECT = "hibernate.dialect";
     public static final String HIBERNATE_CONNECTION_URL = "hibernate.connection.url";
