@@ -44,6 +44,8 @@ import static org.n52.sos.util.builder.SweDataArrayValueBuilder.aSweDataArrayVal
 import static org.n52.sos.util.builder.SweTimeBuilder.aSweTime;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -918,7 +920,7 @@ public class InMemoryCacheControllerTest
 	private 
 	boolean onlyValidRelatedFeaturesAreInRoleMap()
 	{
-		List<String> allowedRelatedFeatures = controller.getAllowedRelatedFeatures();
+		List<String> allowedRelatedFeatures = getAllowedRelatedFeatures();
 		for (String relatedFeatureWithRole : controller.getCache().getKRelatedFeatureVRole().keySet())
 		{
 			if (!allowedRelatedFeatures.contains(relatedFeatureWithRole))
@@ -927,6 +929,23 @@ public class InMemoryCacheControllerTest
 			}
 		}
 		return true;
+	}
+
+	private 
+	List<String> getAllowedRelatedFeatures()
+	{
+		List<String> allowedEntries = new ArrayList<String>();
+		for (Collection<String> entries : controller.getCache().getKOfferingVRelatedFeatures().values())
+		{
+			for (String entry : entries)
+			{
+				if (!allowedEntries.contains(entry))
+				{
+					allowedEntries.add(entry);
+				}
+			}
+		}
+		return allowedEntries;
 	}
 
 	private String 
