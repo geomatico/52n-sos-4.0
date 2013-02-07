@@ -23,20 +23,25 @@
  */
 package org.n52.sos.config.entities;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+
 import org.n52.sos.config.ISettingValue;
 
 /**
  * @param <T> settings type
+ * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
  */
 @Entity(name = "settings")
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class AbstractSettingValue<T> implements ISettingValue<T> {
-
+public abstract class AbstractSettingValue<T> implements ISettingValue<T>, Serializable {
+    private static final long serialVersionUID = 1L;
+    
     @Id
     private String identifier;
 
@@ -53,7 +58,24 @@ public abstract class AbstractSettingValue<T> implements ISettingValue<T> {
 
     @Override
     public String toString() {
-        return String.format("%s[key=%s, value=%s]", getClass().getSimpleName(),
-                getKey(), getValue());
+        return String.format("%s[key=%s, value=%s]", getClass().getSimpleName(), getKey(), getValue());
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + (this.getKey() != null ? this.getKey().hashCode() : 0);
+        hash = 79 * hash + (this.getValue() != null ? this.getValue().hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof ISettingValue) {
+            final ISettingValue<?> other = (ISettingValue<?>) obj;
+            return (getKey() == null ? other.getKey() == null : getKey().equals(other.getKey()))
+                   && (getValue() == null ? other.getValue() == null : getValue().equals(other.getValue()));
+        }
+        return false;
     }
 }

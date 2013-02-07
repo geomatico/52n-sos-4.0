@@ -23,14 +23,16 @@
  */
 package org.n52.sos.config;
 
-import org.n52.sos.service.ConfigurationException;
-
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public interface ISettingValue<T> {
+
     public String getKey();
+
     public T getValue();
+
     public ISettingValue<T> setKey(String key);
+
     public ISettingValue<T> setValue(T value);
 }

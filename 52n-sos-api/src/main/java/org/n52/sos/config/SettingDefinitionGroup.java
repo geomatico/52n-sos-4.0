@@ -32,23 +32,41 @@ public class SettingDefinitionGroup {
     private String title;
     private String description;
 
-    public SettingDefinitionGroup(String title, String description) {
-        this.title = title;
-        this.description = description;
-    }
-
     public String getTitle() {
         return title;
+    }
+
+    public boolean hasTitle() {
+        return hasStringProperty(getTitle());
+    }
+
+    public SettingDefinitionGroup setTitle(String title) {
+        this.title = title;
+        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
+    public boolean hasDescription() {
+        return hasStringProperty(getDescription());
+    }
+
+    public SettingDefinitionGroup setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+    protected boolean hasStringProperty(String s) {
+        return s != null && !s.isEmpty();
+    }
+
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 97 * hash + (this.getTitle() != null ? this.getTitle().hashCode() : 0);
+        hash = 97 * hash + (this.getTitle() != null ? this.getTitle()
+                            .hashCode() : 0);
         return hash;
     }
 
@@ -61,8 +79,9 @@ public class SettingDefinitionGroup {
             return false;
         }
         final SettingDefinitionGroup other = (SettingDefinitionGroup) obj;
-        if ((this.getTitle() == null) ? (other.getTitle() != null) 
-                : !this.getTitle().equals(other.getTitle())) {
+        if ((this.getTitle() == null) ? (other.getTitle() != null)
+            : !this.getTitle()
+                .equals(other.getTitle())) {
             return false;
         }
         return true;

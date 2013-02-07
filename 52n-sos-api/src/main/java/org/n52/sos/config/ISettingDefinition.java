@@ -24,14 +24,39 @@
 package org.n52.sos.config;
 
 /**
- *
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public interface ISettingDefinition<T> {
-    public T getDefaultValue();
-    public String getDescription();
+
     public String getKey();
+
     public String getTitle();
-    public boolean hasDefaultValue();
+
+    public String getDescription();
+
     public boolean isOptional();
+
+    public T getDefaultValue();
+
+    public SettingDefinitionGroup getGroup();
+
+    public boolean hasTitle();
+
+    public boolean hasDescription();
+
+    public boolean hasDefaultValue();
+
+    public boolean hasGroup();
+
+    public ISettingDefinition<T> setKey(String key);
+
+    public ISettingDefinition<T> setTitle(String title);
+
+    public ISettingDefinition<T> setDescription(String description);
+
+    public ISettingDefinition<T> setOptional(boolean optional);
+
+    public ISettingDefinition<T> setDefaultValue(T defaultValue);
+
+    public ISettingDefinition<T> setGroup(SettingDefinitionGroup group);
 }

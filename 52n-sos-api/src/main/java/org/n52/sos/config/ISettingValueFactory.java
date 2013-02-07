@@ -25,6 +25,7 @@ package org.n52.sos.config;
 
 import java.io.File;
 import java.net.URI;
+
 import org.n52.sos.config.settings.BooleanSettingDefinition;
 import org.n52.sos.config.settings.FileSettingDefinition;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
@@ -35,11 +36,14 @@ import org.n52.sos.config.settings.UriSettingDefinition;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public interface ISettingValueFactory {
- 
+
     public ISettingValue<Boolean> newBooleanSettingValue(BooleanSettingDefinition setting, String stringValue);
+
     public ISettingValue<Integer> newIntegerSettingValue(IntegerSettingDefinition setting, String stringValue);
+
     public ISettingValue<String> newStringSettingValue(StringSettingDefinition setting, String stringValue);
+
     public ISettingValue<File> newFileSettingValue(FileSettingDefinition setting, String stringValue);
+
     public ISettingValue<URI> newUriSettingValue(UriSettingDefinition setting, String stringValue);
-    
 }

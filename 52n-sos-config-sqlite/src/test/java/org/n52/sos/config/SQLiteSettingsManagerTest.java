@@ -62,18 +62,17 @@ public class SQLiteSettingsManagerTest {
     private static final String FILE_SETTING = "file_setting";
     private static final String STRING_SETTING = "string_setting";
     private static final String BOOLEAN_SETTING = "boolean_setting";
-    
     private static final Logger log = LoggerFactory.getLogger(SQLiteSettingsManagerTest.class);
     private static IConnectionProvider connectionProvider;
     private static File databaseFile;
-    private SQLiteSettingsManager dao;
-    
+    private SettingsManager settingsManager;
+
     @BeforeClass
     public static void setUpClass() throws ConfigurationException, IOException {
         databaseFile = File.createTempFile("configuration-test", ".db");
         Properties properties = new Properties();
-        properties.put(SQLiteSessionFactory.HIBERNATE_CONNECTION_URL, 
-                String.format("jdbc:sqlite:%s", databaseFile.getAbsolutePath()));
+        properties.put(SQLiteSessionFactory.HIBERNATE_CONNECTION_URL,
+                       String.format("jdbc:sqlite:%s", databaseFile.getAbsolutePath()));
         connectionProvider = new SQLiteSessionFactory();
         connectionProvider.initialize(properties);
         log.info("using database file: {}", databaseFile.getAbsolutePath());
@@ -84,57 +83,103 @@ public class SQLiteSettingsManagerTest {
         if (connectionProvider != null) {
             connectionProvider.cleanup();
         }
-        if (databaseFile !=  null && databaseFile.exists()) {
+        if (databaseFile != null && databaseFile.exists()) {
             databaseFile.delete();
         }
     }
 
     @Before
     public void setUp() throws ConfigurationException {
-        this.dao = new SQLiteSettingsManager();
-        this.dao.setConnectionProvider(connectionProvider);
+        SQLiteSettingsManager manager = new SQLiteSettingsManager();
+        manager.setConnectionProvider(connectionProvider);
+        this.settingsManager = manager;
     }
 
     @Test
-    public void testBooleanSettings() {
-        Boolean value = Boolean.FALSE;
-        dao.saveValue(new BooleanSettingValue().setKey(BOOLEAN_SETTING).setValue(value));
-        assertEquals(value, dao.getValue(new BooleanSettingDefinition().setKey(BOOLEAN_SETTING)).getValue());
+    public void testBooleanSettings() throws ConfigurationException {
+        final ISettingDefinition<Boolean> settingDefinition = new BooleanSettingDefinition().setKey(BOOLEAN_SETTING);
+        final ISettingValue<Boolean> settingValue = new BooleanSettingValue().setKey(BOOLEAN_SETTING).setValue(
+                Boolean.TRUE);
+        final ISettingValue<Boolean> newSettingValue = new BooleanSettingValue().setKey(BOOLEAN_SETTING)
+                .setValue(Boolean.FALSE);
+        testSaveGetAndDelete(settingDefinition, settingValue, newSettingValue);
     }
 
     @Test
-    public void testStringSettings() {
-        String value = "string";
-        dao.saveValue(new StringSettingValue().setKey(STRING_SETTING).setValue(value));
-        assertEquals(value, dao.getValue(new StringSettingDefinition().setKey(STRING_SETTING)).getValue());
+    public void testStringSettings() throws ConfigurationException {
+        final ISettingDefinition<String> settingDefinition = new StringSettingDefinition().setKey(STRING_SETTING);
+        final ISettingValue<String> settingValue = new StringSettingValue().setKey(STRING_SETTING).setValue("string1");
+        final ISettingValue<String> newSettingValue = new StringSettingValue().setKey(STRING_SETTING)
+                .setValue("string2");
+        testSaveGetAndDelete(settingDefinition, settingValue, newSettingValue);
     }
 
     @Test
-    public void testFileSettings() {
-        File value = new File("/home/auti/sos");
-        dao.saveValue(new FileSettingValue().setKey(FILE_SETTING).setValue(value));
-        assertEquals(value, dao.getValue(new FileSettingDefinition().setKey(FILE_SETTING)).getValue());
+    public void testFileSettings() throws ConfigurationException {
+        final ISettingDefinition<File> settingDefinition = new FileSettingDefinition().setKey(FILE_SETTING);
+        final ISettingValue<File> settingValue = new FileSettingValue().setKey(FILE_SETTING).setValue(new File(
+                "/home/auti/sos1"));
+        final ISettingValue<File> newSettingValue = new FileSettingValue().setKey(FILE_SETTING).setValue(new File(
+                "/home/auti/sos2"));
+        testSaveGetAndDelete(settingDefinition, settingValue, newSettingValue);
     }
 
     @Test
-    public void testIntegerSettings() {
-        Integer value = Integer.valueOf(12312);
-        dao.saveValue(new IntegerSettingValue().setKey(INTEGER_SETTING).setValue(value));
-        assertEquals(value, dao.getValue(new IntegerSettingDefinition().setKey(INTEGER_SETTING)).getValue());
+    public void testIntegerSettings() throws ConfigurationException {
+        final ISettingDefinition<Integer> settingDefinition = new IntegerSettingDefinition().setKey(INTEGER_SETTING);
+        final ISettingValue<Integer> settingValue = new IntegerSettingValue().setKey(INTEGER_SETTING).setValue(12312);
+        final ISettingValue<Integer> newSettingValue = new IntegerSettingValue().setKey(INTEGER_SETTING).setValue(12311);
+        testSaveGetAndDelete(settingDefinition, settingValue, newSettingValue);
     }
 
     @Test
-    public void testNumericSettings() {
-        double value = 212.1213;
-        dao.saveValue(new NumericSettingValue().setKey(DOUBLE_SETTING).setValue(Double.valueOf(value)));
-        assertEquals(value, dao.getValue(new NumericSettingDefinition().setKey(DOUBLE_SETTING)).getValue(), 0.0000001);
-
+    public void testNumericSettings() throws ConfigurationException {
+        final ISettingDefinition<Double> settingDefinition = new NumericSettingDefinition().setKey(DOUBLE_SETTING);
+        final ISettingValue<Double> settingValue = new NumericSettingValue().setKey(DOUBLE_SETTING).setValue(212.1213);
+        final ISettingValue<Double> newSettingValue = new NumericSettingValue().setKey(DOUBLE_SETTING)
+                .setValue(212.1211);
+        testSaveGetAndDelete(settingDefinition, settingValue, newSettingValue);
     }
 
     @Test
-    public void testUriSettings() {
-        URI value = URI.create("http://localhost:8080/a");
-        dao.saveValue(new UriSettingValue().setKey(URI_SETTING).setValue(value));
-        assertEquals(value, dao.getValue(new UriSettingDefinition().setKey(URI_SETTING)).getValue());
+    public void testUriSettings() throws ConfigurationException {
+        final ISettingDefinition<URI> settingDefinition = new UriSettingDefinition().setKey(URI_SETTING);
+        final ISettingValue<URI> settingValue = new UriSettingValue().setKey(URI_SETTING).setValue(URI.create(
+                "http://localhost:8080/a"));
+        final ISettingValue<URI> newSettingValue = new UriSettingValue().setKey(URI_SETTING).setValue(URI.create(
+                "http://localhost:8080/b"));
+        testSaveGetAndDelete(settingDefinition, settingValue, newSettingValue);
+    }
+
+    @Test
+    public void testChangedSettingsTypeForKey() throws ConfigurationException {
+        final ISettingDefinition<Boolean> booleanDefinition = new BooleanSettingDefinition().setKey(BOOLEAN_SETTING);
+        final ISettingDefinition<Double> doubleDefinition = new NumericSettingDefinition().setKey(BOOLEAN_SETTING);
+        final ISettingValue<Boolean> booleanValue = new BooleanSettingValue().setKey(BOOLEAN_SETTING).setValue(Boolean.TRUE);
+        final ISettingValue<Double> doubleValue = new NumericSettingValue().setKey(BOOLEAN_SETTING).setValue(212.1213);
+        
+        settingsManager.changeSetting(doubleDefinition, doubleValue);
+        assertEquals(doubleValue, settingsManager.getSetting(doubleDefinition));
+
+        settingsManager.changeSetting(booleanDefinition, booleanValue);
+        assertEquals(booleanValue, settingsManager.getSetting(booleanDefinition));
+    }
+
+    public <T> void testSaveGetAndDelete(
+            final ISettingDefinition<T> settingDefinition,
+            final ISettingValue<T> settingValue,
+            final ISettingValue<T> newSettingValue) throws ConfigurationException {
+
+        assertNotEquals(settingValue, newSettingValue);
+        settingsManager.changeSetting(settingDefinition, settingValue);
+        assertEquals(settingValue, settingsManager.getSetting(settingDefinition));
+
+        settingsManager.changeSetting(settingDefinition, newSettingValue);
+        final ISettingValue<T> value = settingsManager.getSetting(settingDefinition);
+        assertEquals(newSettingValue, value);
+        assertNotEquals(settingValue, value);
+
+        settingsManager.deleteSetting(settingDefinition);
+        assertNull(settingsManager.getSetting(settingDefinition));
     }
 }

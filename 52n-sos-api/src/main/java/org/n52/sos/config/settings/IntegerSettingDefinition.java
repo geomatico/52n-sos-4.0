@@ -23,5 +23,99 @@
  */
 package org.n52.sos.config.settings;
 
+/**
+ * TODO JavaDoc
+ *
+ * @author Christian Autermann <c.autermann@52north.org>
+ */
+public class IntegerSettingDefinition extends AbstractSettingDefinition<Integer> {
 
-public class IntegerSettingDefinition extends AbstractSettingDefinition<Integer> {}
+    private Integer minimum;
+    private Integer maximum;
+    private boolean exclusiveMaximum = false;
+    private boolean exclusiveMinimum = false;
+
+    /**
+     * Get the value of minimum
+     * <p/>
+     * @return the value of minimum
+     */
+    public Integer getMinimum() {
+        return minimum;
+    }
+
+    /**
+     * Set the value of minimum
+     * <p/>
+     * @param minimum new value of minimum
+     * <p/>
+     * @return this
+     */
+    public IntegerSettingDefinition setMinimum(Integer minimum) {
+        this.minimum = minimum;
+        return this;
+    }
+
+    /**
+     * Get the value of maximum
+     * <p/>
+     * @return the value of maximum
+     */
+    public Integer getMaximum() {
+        return maximum;
+    }
+
+    /**
+     * Set the value of maximum
+     * <p/>
+     * @param maximum new value of maximum
+     * <p/>
+     * @return this
+     */
+    public IntegerSettingDefinition setMaximum(Integer maximum) {
+        this.maximum = maximum;
+        return this;
+    }
+
+    /**
+     * Get the value of exclusiveMaximum
+     * <p/>
+     * @return the value of exclusiveMaximum
+     */
+    public boolean isExclusiveMaximum() {
+        return exclusiveMaximum;
+    }
+
+    /**
+     * Set the value of exclusiveMaximum
+     * <p/>
+     * @param exclusiveMaximum new value of exclusiveMaximum
+     * <p/>
+     * @return this
+     */
+    public IntegerSettingDefinition setExclusiveMaximum(boolean exclusiveMaximum) {
+        this.exclusiveMaximum = exclusiveMaximum;
+        return this;
+    }
+
+    /**
+     * Get the value of exclusiveMinimum
+     * <p/>
+     * @return the value of exclusiveMinimum
+     */
+    public boolean isExclusiveMinimum() {
+        return exclusiveMinimum;
+    }
+
+    /**
+     * Set the value of exclusiveMinimum
+     * <p/>
+     * @param exclusiveMinimum new value of exclusiveMinimum
+     * <p/>
+     * @return this
+     */
+    public IntegerSettingDefinition setExclusiveMinimum(boolean exclusiveMinimum) {
+        this.exclusiveMinimum = exclusiveMinimum;
+        return this;
+    }
+}

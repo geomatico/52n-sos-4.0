@@ -24,17 +24,19 @@
 package org.n52.sos.config.settings;
 
 import org.n52.sos.config.ISettingDefinition;
+import org.n52.sos.config.SettingDefinitionGroup;
 
 /**
- * @param <T> 
+ * @param <T>
  * @author Christian Autermann <c.autermann@52north.org>
  */
 abstract class AbstractSettingDefinition<T> implements ISettingDefinition<T> {
-    
-    private boolean optional;
+
+    private boolean optional = false;
     private String identifier;
     private String title;
     private String description;
+    private SettingDefinitionGroup group;
     private T defaultValue;
 
     @Override
@@ -43,13 +45,68 @@ abstract class AbstractSettingDefinition<T> implements ISettingDefinition<T> {
     }
 
     @Override
-    public boolean isOptional() {
-        return optional;
+    public ISettingDefinition<T> setKey(String key) {
+        this.identifier = key;
+        return this;
     }
 
     @Override
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public boolean hasDescription() {
+        return hasStringProperty(getDescription());
+    }
+
+    @Override
+    public ISettingDefinition<T> setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+    @Override
+    public String getTitle() {
+        return title;
+    }
+
+    @Override
+    public boolean hasTitle() {
+        return hasStringProperty(getTitle());
+    }
+
+    @Override
+    public ISettingDefinition<T> setTitle(String title) {
+        this.title = title;
+        return this;
+    }
+
+    @Override
+    public boolean isOptional() {
+        return optional;
+    }
+
+    @Override
+    public ISettingDefinition<T> setOptional(boolean optional) {
+        this.optional = optional;
+        return this;
+    }
+    
+    @Override
+    public SettingDefinitionGroup getGroup() {
+        return group;
+    }
+    
+    @Override
+    public boolean hasGroup() {
+        return getGroup() != null;
+    }
+    
+    @Override
+    public ISettingDefinition<T> setGroup(SettingDefinitionGroup group) {
+        this.group = group;
+        return this;
     }
 
     @Override
@@ -63,33 +120,13 @@ abstract class AbstractSettingDefinition<T> implements ISettingDefinition<T> {
     }
 
     @Override
-    public String getTitle() {
-        return title;
-    }
-
-    public AbstractSettingDefinition<T> setOptional(boolean optional) {
-        this.optional = optional;
-        return this;
-    }
-
-    public AbstractSettingDefinition<T> setKey(String key) {
-        this.identifier = key;
-        return this;
-    }
-
-    public AbstractSettingDefinition<T> setTitle(String title) {
-        this.title = title;
-        return this;
-    }
-
-    public AbstractSettingDefinition<T> setDescription(String description) {
-        this.description = description;
-        return this;
-    }
-
-    public AbstractSettingDefinition<T> setDefaultValue(T defaultValue) {
+    public ISettingDefinition<T> setDefaultValue(T defaultValue) {
         this.defaultValue = defaultValue;
         return this;
+    }
+    
+    protected boolean hasStringProperty(String s) {
+        return s != null && !s.isEmpty();
     }
 
     @Override
@@ -110,5 +147,4 @@ abstract class AbstractSettingDefinition<T> implements ISettingDefinition<T> {
     public String toString() {
         return String.format("%s[key=%s]", getClass().getSimpleName(), getKey());
     }
-
 }

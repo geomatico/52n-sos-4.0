@@ -28,26 +28,32 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.util.AbstractServiceLoaderRepository;
+import org.n52.sos.util.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-class SettingDefinitionProviderRepository extends AbstractServiceLoaderRepository<ISettingDefinitionProvider> {
-    private Set<ISettingDefinition<?>> settingDefinition = Collections.emptySet();
+public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRepository<ISettingDefinitionProvider> {
+
+    private static final Logger log = LoggerFactory.getLogger(SettingDefinitionProviderRepository.class);
+    private Map<String, ISettingDefinition<?>> definitionsByKey = Collections.emptyMap();
+    private Set<ISettingDefinition<?>> settingDefinitions = Collections.emptySet();
     private Map<ISettingDefinition<?>, Set<ISettingDefinitionProvider>> providersByDefinition = Collections.emptyMap();
 
     SettingDefinitionProviderRepository() throws ConfigurationException {
         super(ISettingDefinitionProvider.class, false);
     }
 
-    public Set<ISettingDefinition<?>> getWantedSettings() {
-        return Collections.unmodifiableSet(this.settingDefinition);
+    public Set<ISettingDefinition<?>> getSettingDefinitions() {
+        return Collections.unmodifiableSet(this.settingDefinitions);
     }
 
-    public Set<ISettingDefinitionProvider> getWantersForSetting(ISettingDefinition<?> setting) {
+    public Set<ISettingDefinitionProvider> getProviders(ISettingDefinition<?> setting) {
         Set<ISettingDefinitionProvider> set = this.providersByDefinition.get(setting);
         if (set == null) {
             return Collections.emptySet();
@@ -55,14 +61,27 @@ class SettingDefinitionProviderRepository extends AbstractServiceLoaderRepositor
             return Collections.unmodifiableSet(set);
         }
     }
+    
+    public ISettingDefinition<?> getDefinition(String key) {
+        return this.definitionsByKey.get(key);
+    }
 
     @Override
     protected void processImplementations(Set<ISettingDefinitionProvider> implementations) throws ConfigurationException {
-        this.settingDefinition = new HashSet<ISettingDefinition<?>>();
+        this.settingDefinitions = new HashSet<ISettingDefinition<?>>();
         this.providersByDefinition = new HashMap<ISettingDefinition<?>, Set<ISettingDefinitionProvider>>();
+        this.definitionsByKey = new HashMap<String, ISettingDefinition<?>>();
         for (ISettingDefinitionProvider provider : implementations) {
             Set<ISettingDefinition<?>> requiredSettings = provider.getSettingDefinitions();
-            this.settingDefinition.addAll(requiredSettings);
+            for (ISettingDefinition<?> definition : requiredSettings) {
+                ISettingDefinition<?> prev = definitionsByKey.put(definition.getKey(), definition);
+                if (prev != null && !prev.equals(definition)) {
+                    log.warn("{} overwrites {} requested by [{}]", definition, prev,
+                             StringHelper.join(", ", this.providersByDefinition.get(prev)));
+                    this.providersByDefinition.remove(prev);
+                }
+            }
+            this.settingDefinitions.addAll(requiredSettings);
             for (ISettingDefinition<?> setting : requiredSettings) {
                 Set<ISettingDefinitionProvider> wanters = this.providersByDefinition.get(setting);
                 if (wanters == null) {
@@ -72,5 +91,4 @@ class SettingDefinitionProviderRepository extends AbstractServiceLoaderRepositor
             }
         }
     }
-    
 }

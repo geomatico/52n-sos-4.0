@@ -24,6 +24,7 @@
 package org.hibernate.userType;
 
 import java.io.Serializable;
+
 import org.hibernate.HibernateException;
 import org.hibernate.usertype.UserType;
 

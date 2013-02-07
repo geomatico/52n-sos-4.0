@@ -26,6 +26,7 @@ package org.n52.sos.config;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import org.n52.sos.config.settings.BooleanSettingDefinition;
 import org.n52.sos.config.settings.FileSettingDefinition;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
@@ -104,8 +105,12 @@ public abstract class AbstractSettingValueFactory implements ISettingValueFactor
     }
 
     protected abstract ISettingValue<Boolean> newBooleanSettingValue();
+
     protected abstract ISettingValue<Integer> newIntegerSettingValue();
+
     protected abstract ISettingValue<String> newStringSettingValue();
+
     protected abstract ISettingValue<File> newFileSettingValue();
+
     protected abstract ISettingValue<URI> newUriSettingValue();
 }

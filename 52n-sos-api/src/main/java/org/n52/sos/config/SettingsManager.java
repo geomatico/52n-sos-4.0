@@ -23,12 +23,13 @@
  */
 package org.n52.sos.config;
 
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+
 import org.n52.sos.service.AdminUser;
 import org.n52.sos.service.ConfigurationException;
 import org.slf4j.Logger;
@@ -69,35 +70,18 @@ public abstract class SettingsManager {
         }
         throw new ConfigurationException("No SettingsManager implementation loaded");
     }
-    private final SettingDefinitionProviderRepository settingWanterRepository;
 
-    protected SettingsManager() throws ConfigurationException {
-        settingWanterRepository = new SettingDefinitionProviderRepository();
-    }
+    public abstract Set<ISettingDefinition<?>> getSettingDefinitions();
+    public abstract <T> ISettingValue<T> getSetting(ISettingDefinition<T> key);
+    public abstract Map<ISettingDefinition<?>, ISettingValue<?>> getSettings();
+    public abstract void deleteSetting(ISettingDefinition<?> setting) throws ConfigurationException;
+    public abstract void changeSetting(ISettingDefinition<?> setting, ISettingValue<?> value) throws ConfigurationException;
 
-    public SettingDefinitionProviderRepository getSettingWanterRepository() {
-        return settingWanterRepository;
-    }
-
-    public Set<ISettingDefinition<?>> getSettings() {
-        return getSettingWanterRepository().getWantedSettings();
-    }
-
-    public Set<String> getKeys() {
-        Set<ISettingDefinition<?>> settings = getSettings();
-        HashSet<String> keys = new HashSet<String>(settings.size());
-        for (ISettingDefinition<?> setting  : settings) {
-            keys.add(setting.getKey());
-        }
-        return keys;
-    }
-    
-    public abstract <T> ISettingValue<T> getValue(ISettingDefinition<T> key);
-    public abstract Set<ISettingValue<?>> getValues();
-    public abstract void saveValue(ISettingValue<?> setting);
-    public abstract AdminUser getAdminUser();
-    public abstract void saveAdminUser(AdminUser adminUser);
-    public abstract void setAdminUserName(String name);
-    public abstract void setAdminPassword(String password);
     public abstract ISettingValueFactory getSettingFactory();
+    
+    public abstract IAdministratorUser getAdminUser(String username);
+    public abstract IAdministratorUser createAdminUser(String username, String password);
+    public abstract void saveAdminUser(IAdministratorUser username);
+
+
 }
