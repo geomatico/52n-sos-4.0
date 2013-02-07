@@ -34,12 +34,16 @@ import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.Configurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * SOS XML utility class
  * 
  */
 public class XmlOptionsHelper {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(XmlOptionsHelper.class);
     private static XmlOptionsHelper instance;
     private XmlOptions xmlOptions;
     private String characterEncoding;
@@ -64,8 +68,12 @@ public class XmlOptionsHelper {
         prefixMap.put(W3CConstants.NS_XLINK, W3CConstants.NS_XLINK_PREFIX);
         prefixMap.put(W3CConstants.NS_XSI, W3CConstants.NS_XSI_PREFIX);
         prefixMap.put(W3CConstants.NS_XS, W3CConstants.NS_XS_PREFIX);
-        for (IEncoder<?, ?> encoder : Configurator.getInstance().getCodingRepository().getEncoders()) {
-            encoder.addNamespacePrefixToMap(prefixMap);
+        if (Configurator.getInstance() != null) {
+            for (IEncoder<?, ?> encoder : Configurator.getInstance().getCodingRepository().getEncoders()) {
+                encoder.addNamespacePrefixToMap(prefixMap);
+            }
+        } else {
+            LOGGER.debug("No Configurator instance available!");
         }
         return prefixMap;
     }
