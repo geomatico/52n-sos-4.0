@@ -37,7 +37,7 @@ public class InsertResultTemplateRequest extends AbstractServiceRequest {
     
     private String identifier;
     
-    private SosObservationConstellation observationConstellation;
+    private SosObservationConstellation observationTemplate;
     
     private SosResultStructure resultStructure;
     
@@ -53,7 +53,7 @@ public class InsertResultTemplateRequest extends AbstractServiceRequest {
     }
 
     public void setObservationTemplate(SosObservationConstellation observationConstellation) {
-        this.observationConstellation = observationConstellation;
+        this.observationTemplate = observationConstellation;
     }
 
     public void setResultStructure(SosResultStructure resultStructure) {
@@ -74,10 +74,10 @@ public class InsertResultTemplateRequest extends AbstractServiceRequest {
         return identifier;
     }
 
-    public SosObservationConstellation getObservationConstellation() {
-        return observationConstellation;
+    public SosObservationConstellation getObservationTemplate() {
+        return observationTemplate;
     }
-
+    
     public SosResultStructure getResultStructure() {
         return resultStructure;
     }
@@ -85,11 +85,5 @@ public class InsertResultTemplateRequest extends AbstractServiceRequest {
     public SosResultEncoding getResultEncoding() {
         return resultEncoding;
     }
-
-    public void setObservationConstellation(SosObservationConstellation observationConstellation) {
-        this.observationConstellation = observationConstellation;
-    }
-    
-    
 
 }

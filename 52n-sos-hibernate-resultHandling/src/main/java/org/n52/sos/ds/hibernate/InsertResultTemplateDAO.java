@@ -76,7 +76,7 @@ public class InsertResultTemplateDAO extends AbstractHibernateOperationDao imple
         try {
             session = getSession();
             transaction = session.beginTransaction();
-            SosObservationConstellation sosObsConst = request.getObservationConstellation();
+            SosObservationConstellation sosObsConst = request.getObservationTemplate();
 //            if (request.getResultStructure().getResultStructure() instanceof SosSweDataArray
 //                    || request.getResultStructure().getResultStructure() instanceof SosSweDataRecord) {
 //                sosObsConst.setObservationType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);

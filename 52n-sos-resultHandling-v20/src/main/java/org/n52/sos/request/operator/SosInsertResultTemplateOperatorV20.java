@@ -116,7 +116,7 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
         }
         // check offering
         try {
-            checkOfferings(request.getObservationConstellation().getOfferings(), Configurator.getInstance()
+            checkOfferings(request.getObservationTemplate().getOfferings(), Configurator.getInstance()
                     .getCapabilitiesCacheController().getOfferings(),
                     Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
             try {
@@ -128,19 +128,19 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
             exceptions.add(owse);
         }
         // check procedure
-            checkProcedureID(request.getObservationConstellation().getProcedure().getProcedureIdentifier(), Configurator
+            checkProcedureID(request.getObservationTemplate().getProcedure().getProcedureIdentifier(), Configurator
                     .getInstance().getCapabilitiesCacheController().getProcedures(),
                     Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
         // check observedProperty
         try {
-            checkObservedProperty(request.getObservationConstellation().getObservableProperty()
+            checkObservedProperty(request.getObservationTemplate().getObservableProperty()
                     .getIdentifier(), Configurator.getInstance().getCapabilitiesCacheController()
                     .getObservableProperties(), Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
-            String identifier = request.getObservationConstellation().getFeatureOfInterest().getIdentifier().getValue();
+            String identifier = request.getObservationTemplate().getFeatureOfInterest().getIdentifier().getValue();
             if (identifier.isEmpty()) {
                 throw Util4Exceptions
                         .createMissingParameterValueException(Sos2Constants.InsertResultTemplateParams.proposedTemplate
@@ -218,7 +218,7 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
     }
 
     private void checkObservationType(InsertResultTemplateRequest request) throws OwsExceptionReport {
-        SosObservationConstellation observationConstellation = request.getObservationConstellation();
+        SosObservationConstellation observationConstellation = request.getObservationTemplate();
         if (!observationConstellation.isSetObservationType()) {
             observationConstellation.setObservationType(OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
         }
