@@ -35,7 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This &auml;ction (see {@link Action}) adds the 'result template identifer' and the 'offering' &rarr; 'result template' relation to the cache
+ * When executing this &auml;ction (see {@link Action}), the following relations are added, settings are updated in cache:<ul>
+ * <li>Result template</li>
+ * <li>Offering &rarr; Result template</li></ul>
  * 
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @since 4.0

@@ -25,23 +25,16 @@ package org.n52.sos.cache;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.n52.sos.cache.action.InMemoryCacheUpdate;
 import org.n52.sos.cache.action.ObservationInsertionInMemoryCacheUpdate;
+import org.n52.sos.cache.action.ResultInsertionInMemoryCacheUpdate;
 import org.n52.sos.cache.action.ResultTemplateInsertionInMemoryCacheUpdate;
 import org.n52.sos.cache.action.SensorInsertionInMemoryCacheUpdate;
-import org.n52.sos.ogc.gml.time.ITime;
-import org.n52.sos.ogc.gml.time.TimeInstant;
-import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.om.features.SosAbstractFeature;
-import org.n52.sos.ogc.om.features.SosFeatureCollection;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
@@ -55,8 +48,6 @@ import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.response.InsertSensorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * <b>TODO</b> add more log statements for debug level on
@@ -99,9 +90,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		update(new ResultTemplateInsertionInMemoryCacheUpdate(sosRequest,sosResponse));
 	}
 
-	public void updateAfterResultInsertion(SosObservation observation)
+	public void updateAfterResultInsertion(SosObservation sosObservation)
 	{
-		doUpdateAfterResultInsertion(observation);
+		update(new ResultInsertionInMemoryCacheUpdate(sosObservation));
 	}
 
 	private void update(Case c,
@@ -250,81 +241,6 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			
 		}
 
-	// TODO extract same behaviour as in doUpdateAfterObservationInsertion to methods 
-	private void doUpdateAfterResultInsertion(SosObservation sosObservation)
-	{
-		if (sosObservation == null) {
-			String errorMsg = String.format("Missing argument: SosObservation: %s", sosObservation);
-			LOGGER.warn(errorMsg);
-			throw new IllegalArgumentException(errorMsg);
-		}
-		boolean timeNotElapsed = true;
-		try {
-			// thread safe updating of the cache map
-			timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-			// has waiting for lock got a time out?
-			if (!timeNotElapsed) {
-				LOGGER.warn("\n******\nupdate after InsertResult not successful because of time out while waiting for update lock." + "\nWaited {} milliseconds.\n******\n", SosConstants.UPDATE_TIMEOUT);
-				return;
-			}
-			while (!isUpdateIsFree()) {
-				getUpdateFree().await();
-			}
-			setUpdateIsFree(false);
-			// do "real update" here
-			addObservationTypeToCache(sosObservation);
-			updateGlobalTemporalBoundingBox(sosObservation.getPhenomenonTime());
-			addProcedureToCache(getProcedureIdentifier(sosObservation));
-			addObservablePropertyToProcedureRelation(getObservablePropertyIdentifier(sosObservation), getProcedureIdentifier(sosObservation));
-			addProcedureToObservablePropertyRelation(getProcedureIdentifier(sosObservation), getObservablePropertyIdentifier(sosObservation));
-			
-			if (sosObservation.getIdentifier() != null)
-			{
-				addObservationIdToCache(sosObservation);
-				addProcedureToObservationIdRelationToCache(getProcedureIdentifier(sosObservation),sosObservation.getIdentifier().getValue());
-			}
-			
-			List<SosSamplingFeature> observedFeatures = sosFeaturesToList(sosObservation.getObservationConstellation().getFeatureOfInterest());
-
-			Envelope observedFeatureEnvelope = createEnvelopeFrom(observedFeatures);
-			updateGlobalEnvelopeUsing(observedFeatureEnvelope);
-
-			for (SosSamplingFeature sosSamplingFeature : observedFeatures)
-			{
-				String observedFeatureIdentifier = sosSamplingFeature.getIdentifier().getValue();
-				addFeatureIdentifierToCache(observedFeatureIdentifier);
-				addFeatureToProcedureRelationToCache(observedFeatureIdentifier, getProcedureIdentifier(sosObservation));
-				addFeatureTypeToCache(sosSamplingFeature.getFeatureType());
-				for (String offeringIdentifier : sosObservation.getObservationConstellation().getOfferings())
-				{
-					addOfferingFeatureRelationToCache(observedFeatureIdentifier, offeringIdentifier);
-				}
-			}
-			for (String offeringIdentifier : sosObservation.getObservationConstellation().getOfferings())
-			{
-				addOfferingToProcedureRelation(offeringIdentifier, getProcedureIdentifier(sosObservation));
-				addProcedureToOfferingRelation(getProcedureIdentifier(sosObservation), offeringIdentifier);
-				updateOfferingEnvelope(observedFeatureEnvelope, getDefaultEPSG(), offeringIdentifier);
-				updateTemporalBoundingBoxOf(offeringIdentifier, phenomenonTimeFrom(sosObservation));
-				// observable property
-				addObservablePropertiesToOfferingRelation(getObservablePropertyIdentifier(sosObservation), offeringIdentifier);
-				addOfferingToObservablePropertyRelation(offeringIdentifier, getObservablePropertyIdentifier(sosObservation));
-				// observation type
-				addOfferingToObservationTypeRelation(offeringIdentifier, sosObservation.getObservationConstellation().getObservationType());
-			}
-			// End of "real update"
-
-		} catch (InterruptedException e) {
-			LOGGER.error("Problem while threadsafe capabilities cache update", e);
-		} finally {
-			if (timeNotElapsed) {
-				getUpdateLock().unlock();
-				setUpdateIsFree(true);
-			}
-		}
-	}
-
 	/* HELPER */
 	
 	private void removeOfferintgToResultTemplatesRelation(String offeringId)
@@ -345,40 +261,6 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		}
 	}
 
-	private void addProcedureToObservationIdRelationToCache(String procedureIdentifier, String observationIdentifier)
-	{
-		if (!getCache().getKProcedureVObservationIdentifiers().containsKey(procedureIdentifier))
-		{
-			Collection<String> value = Collections.synchronizedList(new ArrayList<String>());
-			getCache().getKProcedureVObservationIdentifiers().put(procedureIdentifier, value);
-		}
-		getCache().getKProcedureVObservationIdentifiers().get(procedureIdentifier).add(observationIdentifier);
-		LOGGER.debug("procedure \"{}\" to observation id \"{}\" relation added to cache? {}",
-				procedureIdentifier,
-				observationIdentifier,
-				getCache().getKProcedureVObservationIdentifiers().get(procedureIdentifier).contains(observationIdentifier));
-	}
-
-	
-	private void updateGlobalTemporalBoundingBox(ITime phenomenonTime)
-	{
-		if (phenomenonTime instanceof TimeInstant)
-		{
-			updateGlobalTemporalBBoxUsingNew(new TimePeriod(((TimeInstant)phenomenonTime).getValue(), ((TimeInstant)phenomenonTime).getValue()));
-		}
-		else if (phenomenonTime instanceof TimePeriod)
-		{
-			updateGlobalTemporalBBoxUsingNew((TimePeriod) phenomenonTime);
-		}
-		else
-		{
-			// TODO throw exception?
-			LOGGER.error("phenomenon time type '{}' is not supported implementation of '{}'",
-					phenomenonTime.getClass().getName(),
-					ITime.class.getName());
-		}
-	}
-	
 	private void removeRemovedObservationIdentifiers()
 	{
 		List<String> allowedObservationIdentifiers = getAllowedEntries(getCache().getKProcedureVObservationIdentifiers().values());
@@ -628,292 +510,6 @@ public class InMemoryCacheController extends CacheControllerImpl {
 		LOGGER.debug("Procedure \"{}\" removed from list of procedures? {}",
 				procedureIdentifier,
 				getCache().getProcedures().contains(procedureIdentifier));
-	}
-
-	private void addObservationIdToCache(SosObservation sosObservation)
-	{
-		getCache().getObservationIdentifiers().add(sosObservation.getIdentifier().getValue());
-		LOGGER.debug("Added observation id '{}' to cache? {}",
-				sosObservation.getIdentifier().getValue(),
-				getCache().getObservationIdentifiers().contains(sosObservation.getIdentifier().getValue()));
-	}
-
-	private void addObservationTypeToCache(SosObservation sosObservation)
-	{
-		if (!getObservationTypes().contains(sosObservation.getObservationConstellation().getObservationType())) {
-			getCache().getObservationTypes().add(sosObservation.getObservationConstellation().getObservationType());
-		}
-	}
-
-	private void addOfferingToObservablePropertyRelation(String offeringIdentifier,
-			String observablePropertyIdentifier)
-	{
-		// offering -> observableProperties
-		if (getCache().getKOfferingVObservableProperties().get(offeringIdentifier) == null) {
-			List<String> propertiesForOffering = Collections.synchronizedList(new ArrayList<String>());
-			propertiesForOffering.add(observablePropertyIdentifier);
-			getCache().getKOfferingVObservableProperties().put(offeringIdentifier, propertiesForOffering);
-		} else if (!getCache().getKOfferingVObservableProperties().get(offeringIdentifier).contains(observablePropertyIdentifier)) {
-			getCache().getKOfferingVObservableProperties().get(offeringIdentifier).add(observablePropertyIdentifier);
-		}
-	}
-
-	private void addFeatureToProcedureRelationToCache(String observedFeatureIdentifier,
-			String procedureIdentifier)
-	{
-		if (getCache().getProceduresForFeature(observedFeatureIdentifier) == null) {
-			List<String> procedures4Feature = Collections.synchronizedList(new ArrayList<String>());
-			procedures4Feature.add(procedureIdentifier);
-			getCache().getKFeatureOfInterestVProcedures().put(observedFeatureIdentifier, procedures4Feature);
-		} else if (!getCache().getProceduresForFeature(observedFeatureIdentifier).contains(procedureIdentifier)) {
-			getCache().getProceduresForFeature(observedFeatureIdentifier).add(procedureIdentifier);
-		}
-	}
-
-	private void addProcedureToOfferingRelation(String procedureIdentifier,
-			String offeringIdentifier)
-	{
-		// offering-procedures
-		if (getCache().getKProcedureVOffering().get(procedureIdentifier) == null) {
-			List<String> offerings4Procedure = Collections.synchronizedList(new ArrayList<String>());
-			offerings4Procedure.add(offeringIdentifier);
-			getCache().getKProcedureVOffering().put(procedureIdentifier, offerings4Procedure);
-		} else if (!getCache().getKProcedureVOffering().get(procedureIdentifier).contains(offeringIdentifier)) {
-			getCache().getKProcedureVOffering().get(procedureIdentifier).add(offeringIdentifier);
-		}
-	}
-
-	private void addProcedureToObservablePropertyRelation(String procedureIdentifier,
-			String observablePropertyIdentifier)
-	{
-		if (getCache().getKProcedureVObservableProperties().get(procedureIdentifier) == null) {
-			List<String> relatedProperties = Collections.synchronizedList(new ArrayList<String>());
-			relatedProperties.add(observablePropertyIdentifier);
-			getCache().getKProcedureVObservableProperties().put(procedureIdentifier, relatedProperties);
-		} else if (!getCache().getKProcedureVObservableProperties().get(procedureIdentifier).contains(observablePropertyIdentifier)) {
-			getCache().getKProcedureVObservableProperties().get(procedureIdentifier).add(observablePropertyIdentifier);
-		}
-	}
-
-	private String getProcedureIdentifier(SosObservation sosObservation)
-	{
-		return sosObservation.getObservationConstellation().getProcedure().getProcedureIdentifier();
-	}
-
-	private String getObservablePropertyIdentifier(SosObservation sosObservation)
-	{
-		return sosObservation.getObservationConstellation().getObservableProperty().getIdentifier();
-	}
-
-	private void addObservablePropertyToProcedureRelation(String observablePropertyIdentifier,
-			String procedureIdentifier)
-	{
-		if (getCache().getKObservablePropertyVProcedures().get(observablePropertyIdentifier) == null)
-		{
-			List<String> relatedProcedures = Collections.synchronizedList(new ArrayList<String>());
-			relatedProcedures.add(procedureIdentifier);
-			getCache().getKObservablePropertyVProcedures().put(observablePropertyIdentifier, relatedProcedures);
-		}
-		else if (!getCache().getKObservablePropertyVProcedures().get(observablePropertyIdentifier).contains(procedureIdentifier))
-		{
-			getCache().getKObservablePropertyVProcedures().get(observablePropertyIdentifier).add(procedureIdentifier);
-		}
-	}
-
-	private void addFeatureTypeToCache(String featureType)
-	{
-		if (!getCache().getFeatureOfInterestTypes().contains(featureType)) {
-			getCache().getFeatureOfInterestTypes().add(featureType);
-			LOGGER.debug("feature type '{}' added to cache? {}",
-					featureType,
-					getCache().getFeatureOfInterestTypes().contains(featureType));
-		}
-	}
-
-	private void addProcedureToCache(String procedureIdentifier)
-	{
-		if (!getCache().getProcedures().contains(procedureIdentifier)) {
-			getCache().getProcedures().add(procedureIdentifier);
-		}
-	}
-
-	private void addOfferingFeatureRelationToCache(String observedFeatureIdentifier,
-			String offeringIdentifier)
-	{
-		// offering-feature
-		if (!getCache().getKOfferingVFeaturesOfInterest().containsKey(offeringIdentifier)) {
-			List<String> relatedFeatures = Collections.synchronizedList(new ArrayList<String>());
-			relatedFeatures.add(observedFeatureIdentifier);
-			getCache().getKOfferingVFeaturesOfInterest().put(offeringIdentifier, relatedFeatures);
-		} else if (!getCache().getKOfferingVFeaturesOfInterest().get(offeringIdentifier).contains(observedFeatureIdentifier)) {
-			getCache().getKOfferingVFeaturesOfInterest().get(offeringIdentifier).add(observedFeatureIdentifier);
-		}
-	}
-
-	private List<SosSamplingFeature> sosFeaturesToList(SosAbstractFeature sosFeatureOfInterest)
-	{
-		if (sosFeatureOfInterest instanceof SosFeatureCollection) {
-			return getAllFeaturesFrom((SosFeatureCollection) sosFeatureOfInterest);
-		} else if (sosFeatureOfInterest instanceof SosSamplingFeature) {
-			List<SosSamplingFeature> observedFeatures = new ArrayList<SosSamplingFeature>(1);
-			observedFeatures.add((SosSamplingFeature) sosFeatureOfInterest);
-			return observedFeatures;
-		} else {
-			String errorMessage = String.format("Feature Type \"%s\" not supported.", sosFeatureOfInterest != null ? sosFeatureOfInterest.getClass().getName() : sosFeatureOfInterest);
-			LOGGER.error(errorMessage);
-			throw new RuntimeException(errorMessage);
-		}
-	}
-
-	private Envelope createEnvelopeFrom(List<SosSamplingFeature> observedFeatures)
-	{
-		Envelope featureEnvelope = new Envelope();
-		for (SosSamplingFeature sosSamplingFeature : observedFeatures) {
-			featureEnvelope.expandToInclude(sosSamplingFeature.getGeometry().getEnvelopeInternal());
-		}
-		return featureEnvelope;
-	}
-
-	private List<SosSamplingFeature> getAllFeaturesFrom(SosFeatureCollection sosFeatureOfInterest)
-	{
-		List<SosSamplingFeature> allFeatures = new ArrayList<SosSamplingFeature>(((SosFeatureCollection) sosFeatureOfInterest).getMembers().size());
-		for (Entry<String, SosAbstractFeature> entry : ((SosFeatureCollection) sosFeatureOfInterest).getMembers().entrySet()) {
-			if (entry.getValue() instanceof SosSamplingFeature) {
-				allFeatures.add((SosSamplingFeature) entry.getValue());
-			} else if (entry.getValue() instanceof SosFeatureCollection) {
-				allFeatures.addAll(getAllFeaturesFrom((SosFeatureCollection) entry.getValue()));
-			}
-		}
-		return allFeatures;
-	}
-
-	private void addObservablePropertiesToOfferingRelation(String observablePropertyIdentifier,
-			String offeringIdentifier)
-	{
-		// observableProperties-offering
-		if (getCache().getKObservablePropertyVOffering().get(observablePropertyIdentifier) == null) {
-			List<String> offeringsForProperty = Collections.synchronizedList(new ArrayList<String>());
-			offeringsForProperty.add(offeringIdentifier);
-			getCache().getKObservablePropertyVOffering().put(observablePropertyIdentifier, offeringsForProperty);
-		} else if (!getCache().getKObservablePropertyVOffering().get(observablePropertyIdentifier).contains(offeringIdentifier)) {
-			getCache().getKObservablePropertyVOffering().get(observablePropertyIdentifier).add(offeringIdentifier);
-		}
-	}
-
-	private void addOfferingToProcedureRelation(String offeringIdentifier,
-			String procedureIdentifier)
-	{
-		Collection<String> procedures4Offering = getCache().getProceduresForOffering(offeringIdentifier);
-		if (procedures4Offering == null) {
-			procedures4Offering = Collections.synchronizedList(new ArrayList<String>());
-			procedures4Offering.add(procedureIdentifier);
-			getCache().getKOfferingVProcedures().put(offeringIdentifier, (List<String>) procedures4Offering);
-		} else if (!procedures4Offering.contains(procedureIdentifier)) {
-			procedures4Offering.add(procedureIdentifier);
-		}
-	}
-
-	private void addOfferingToObservationTypeRelation(String offeringIdentifier,
-			String observationType)
-	{
-		Map<String, Collection<String>> observationTypes4Offerings = getCache().getKOfferingVObservationTypes();
-		if (observationTypes4Offerings != null) {
-			if (observationTypes4Offerings.containsKey(offeringIdentifier) && !observationTypes4Offerings.get(offeringIdentifier).contains(observationType)) {
-				observationTypes4Offerings.get(offeringIdentifier).add(observationType);
-			} else {
-				// add new list
-				List<String> observationTypes = Collections.synchronizedList(new ArrayList<String>());
-				observationTypes.add(observationType);
-				observationTypes4Offerings.put(offeringIdentifier, observationTypes);
-			}
-		}
-	}
-
-	private void updateTemporalBoundingBoxOf(String offeringIdentifier,
-			TimePeriod observationEventTime)
-	{
-		// offering-maxtime
-		// check and update if later
-		if (getCache().getKOfferingVMaxTime().containsKey(offeringIdentifier)
-				&& getCache().getKOfferingVMaxTime().get(offeringIdentifier).isBefore(observationEventTime.getEnd())) {
-			getCache().getKOfferingVMaxTime().put(offeringIdentifier, observationEventTime.getEnd());
-		} else {
-			// add new
-			getCache().getKOfferingVMaxTime().put(offeringIdentifier, observationEventTime.getEnd());
-		}
-		// offering-mintime
-		// check and update if before
-		if (getCache().getKOfferingVMinTime().containsKey(offeringIdentifier)
-				&& getCache().getKOfferingVMinTime().get(offeringIdentifier).isAfter(observationEventTime.getStart())) {
-			getCache().getKOfferingVMinTime().put(offeringIdentifier, observationEventTime.getStart());
-		} else {
-			// add new
-			getCache().getKOfferingVMinTime().put(offeringIdentifier, observationEventTime.getStart());
-		}
-	}
-
-	private void updateGlobalEnvelopeUsing(Envelope observedFeatureEnvelope)
-	{
-		SosEnvelope globalEnvelope = getCache().getGlobalEnvelope();
-		if (!globalEnvelope.isSetEnvelope()) {
-			// add new envelope
-			SosEnvelope newFeatureEnvelope = new SosEnvelope(observedFeatureEnvelope, getDefaultEPSG());
-			getCache().setGlobalEnvelope(newFeatureEnvelope);
-		} else if (!globalEnvelope.getEnvelope().contains(observedFeatureEnvelope)) {
-			// extend envelope
-			globalEnvelope.getEnvelope().expandToInclude(observedFeatureEnvelope);
-		}
-	}
-
-	private TimePeriod phenomenonTimeFrom(SosObservation sosObservation)
-	{
-		ITime phenomenonTime = sosObservation.getPhenomenonTime();
-		if (phenomenonTime instanceof TimeInstant) {
-			return new TimePeriod(((TimeInstant) phenomenonTime).getValue(), ((TimeInstant) phenomenonTime).getValue());
-		} else {
-			return (TimePeriod) phenomenonTime;
-		}
-	}
-
-	private void updateGlobalTemporalBBoxUsingNew(TimePeriod observationEventTime)
-	{
-		if (getCache().getMinEventTime() == null || getCache().getMinEventTime().isAfter(observationEventTime.getStart())) {
-			getCache().setMinEventTime(observationEventTime.getStart());
-		}
-		if (getCache().getMaxEventTime() == null || getCache().getMaxEventTime().isBefore(observationEventTime.getEnd())) {
-			getCache().setMaxEventTime(observationEventTime.getEnd());
-		}
-	}
-
-	protected int getDefaultEPSG()
-	{
-		return getCache().getDatabaseEPSGCode();
-	}
-	
-	private void addFeatureIdentifierToCache(String observedFeatureIdentifier)
-	{
-		if (!getCache().getFeatureOfInterest().contains(observedFeatureIdentifier)) {
-			getCache().getFeatureOfInterest().add(observedFeatureIdentifier);
-			LOGGER.debug("feature identifier '{}' added to cache? {}",
-					observedFeatureIdentifier,
-					getCache().getFeatureOfInterest().contains(observedFeatureIdentifier));
-		}
-	}
-	
-	private void updateOfferingEnvelope(Envelope observedFeatureEnvelope,
-			int observedFeatureEnvelopeSRID,
-			String offeringIdentifier)
-	{
-		// offering-envelope
-		if (getCache().getKOfferingVEnvelope().containsKey(offeringIdentifier) && getCache().getKOfferingVEnvelope().get(offeringIdentifier).isSetEnvelope()
-				&& !getCache().getKOfferingVEnvelope().get(offeringIdentifier).getEnvelope().contains(observedFeatureEnvelope)) {
-			// update envelope
-			getCache().getKOfferingVEnvelope().get(offeringIdentifier).getEnvelope().expandToInclude(observedFeatureEnvelope);
-		} else {
-			// add new envelope
-			SosEnvelope newOfferingEnvelope = new SosEnvelope(observedFeatureEnvelope, observedFeatureEnvelopeSRID);
-			getCache().getKOfferingVEnvelope().put(offeringIdentifier, newOfferingEnvelope);
-		}
 	}
 
 }

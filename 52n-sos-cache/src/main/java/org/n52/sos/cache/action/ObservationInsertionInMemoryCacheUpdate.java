@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * This &auml;ction (see {@link Action}) the following relations are added, settings are updated in cache:<ul>
+ * When executing this &auml;ction (see {@link Action}), the following relations are added, settings are updated in cache:<ul>
  * <li>Procedure</li>
  * <li>Observation Type</li>
  * <li>Observation identifier (OPTIONAL)</li>

@@ -54,8 +54,8 @@ public class SensorInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SensorInsertionInMemoryCacheUpdate.class);
 	
-	private InsertSensorResponse sosResponse;
-	private InsertSensorRequest sosRequest;
+	private final InsertSensorResponse sosResponse;
+	private final InsertSensorRequest sosRequest;
 
 	public SensorInsertionInMemoryCacheUpdate(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse) {
 		if (sosRequest == null || sosResponse == null)

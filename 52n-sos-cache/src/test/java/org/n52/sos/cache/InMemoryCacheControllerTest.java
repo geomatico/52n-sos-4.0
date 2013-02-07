@@ -1046,7 +1046,7 @@ public class InMemoryCacheControllerTest
 	{
 		return new SosEnvelope(
 				((SosSamplingFeature)sosObservation.getObservationConstellation().getFeatureOfInterest()).getGeometry().getEnvelopeInternal(),
-				controller.getDefaultEPSG());
+				controller.getCache().getDatabaseEPSGCode());
 	}
 	
 	private
