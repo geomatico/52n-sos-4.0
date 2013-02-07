@@ -59,4 +59,14 @@ public class CountValue implements IValue<Integer> {
 		return String.format("CountValue [value=%s, unit=%s]", value, unit);
 	}
 
+    @Override
+    public boolean isSetValue() {
+        return value != null;
+    }
+
+    @Override
+    public boolean isSetUnit() {
+        return unit != null && !unit.isEmpty();
+    }
+
 }

@@ -97,5 +97,9 @@ public class CodeWithAuthority {
 	{
 		return String.format("CodeWithAuthority [value=%s, codeSpace=%s]", value, codeSpace);
 	}
+
+    public boolean isSetCodeSpace() {
+        return codeSpace != null && !codeSpace.isEmpty();
+    }
     
 }

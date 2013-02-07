@@ -61,4 +61,14 @@ public class GeometryValue implements IValue<Geometry> {
 		return String.format("GeometryValue [value=%s, unit=%s]", value, unit);
 	}
 
+    @Override
+    public boolean isSetValue() {
+        return value != null && !value.isEmpty();
+    }
+
+    @Override
+    public boolean isSetUnit() {
+        return unit != null && !unit.isEmpty();
+    }
+
 }

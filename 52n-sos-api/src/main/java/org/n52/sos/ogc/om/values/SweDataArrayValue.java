@@ -143,5 +143,15 @@ public class SweDataArrayValue implements IMultiValue<SosSweDataArray> {
         return timePeriod;
     }
 
+    @Override
+    public boolean isSetValue() {
+        return value != null && value.isEmpty();
+    }
+
+    @Override
+    public boolean isSetUnit() {
+        return false;
+    }
+
 
 }

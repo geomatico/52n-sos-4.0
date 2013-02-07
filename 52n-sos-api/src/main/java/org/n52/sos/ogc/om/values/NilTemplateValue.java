@@ -52,4 +52,14 @@ public class NilTemplateValue implements IValue<String> {
 		return String.format("NilTemplateValue [value=%s, unit=null]", getValue());
 	}
 
+    @Override
+    public boolean isSetValue() {
+        return true;
+    }
+
+    @Override
+    public boolean isSetUnit() {
+        return false;
+    }
+
 }

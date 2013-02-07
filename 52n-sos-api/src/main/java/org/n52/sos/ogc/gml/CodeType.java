@@ -53,4 +53,8 @@ public class CodeType {
         return value != null && !value.isEmpty();
     }
 
+    public boolean isSetCodeSpace() {
+        return codeSpace != null && !codeSpace.isEmpty();
+    }
+
 }

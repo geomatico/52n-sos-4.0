@@ -59,4 +59,14 @@ public class CategoryValue implements IValue<String> {
 		return String.format("CategoryValue [value=%s, unit=%s]", value, unit);
 	}
 
+    @Override
+    public boolean isSetValue() {
+        return value != null && !value.isEmpty();
+    }
+
+    @Override
+    public boolean isSetUnit() {
+        return unit != null && !unit.isEmpty();
+    }
+
 }

@@ -59,4 +59,14 @@ public class UnknownValue implements IValue<Object> {
 		return String.format("UnknownValue [value=%s, unit=%s]", value, unit);
 	}
 
+    @Override
+    public boolean isSetValue() {
+        return value != null;
+    }
+
+    @Override
+    public boolean isSetUnit() {
+        return unit != null && !unit.isEmpty();
+    }
+
 }

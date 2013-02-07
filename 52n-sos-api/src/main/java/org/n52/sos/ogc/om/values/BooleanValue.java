@@ -58,5 +58,15 @@ public class BooleanValue implements IValue<Boolean> {
 	{
 		return String.format("BooleanValue [value=%s, unit=%s]", value, unit);
 	}
+
+    @Override
+    public boolean isSetValue() {
+        return value != null;
+    }
+
+    @Override
+    public boolean isSetUnit() {
+        return unit != null && !unit.isEmpty();
+    }
     
 }

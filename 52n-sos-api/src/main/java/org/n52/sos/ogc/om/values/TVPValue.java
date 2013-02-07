@@ -77,4 +77,14 @@ public class TVPValue implements IMultiValue<List<TimeValuePair>> {
         return timePeriod;
     }
 
+    @Override
+    public boolean isSetValue() {
+        return value != null && !value.isEmpty();
+    }
+
+    @Override
+    public boolean isSetUnit() {
+        return unit != null && !unit.isEmpty();
+    }
+
 }

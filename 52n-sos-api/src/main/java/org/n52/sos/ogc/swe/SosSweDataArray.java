@@ -187,5 +187,9 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
     public boolean isSetElementCount() {
         return elementCount != null || isSetValues();
     }
+
+    public boolean isEmpty() {
+        return isSetElementTyp() && isSetEncoding() && isSetValues();
+    }
     
 }

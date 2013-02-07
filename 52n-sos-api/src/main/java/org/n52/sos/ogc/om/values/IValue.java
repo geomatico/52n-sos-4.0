@@ -34,5 +34,9 @@ public interface IValue<T> extends Serializable{
     public void setUnit(String unit);
     
     public String getUnit();
+    
+    public boolean isSetValue();
+    
+    public boolean isSetUnit();
 
 }
