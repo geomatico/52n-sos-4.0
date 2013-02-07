@@ -21,6 +21,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.config.settings;
+package org.n52.sos.config;
 
-public class StringSetting extends AbstractSetting<String> {}
+import java.util.Set;
+
+/**
+ *
+ * @author Christian Autermann <c.autermann@52north.org>
+ */
+//TODO better class name
+public interface ISettingDefinitionProvider {
+    public Set<ISettingDefinition<?>> getSettingDefinitions();
+    public void setSettingValues(Set<ISettingValue<?>> settings);
+    public void changeSettingValue(ISettingValue<?> setting);
+}

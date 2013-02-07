@@ -38,12 +38,12 @@ import org.n52.sos.config.entities.IntegerSettingValue;
 import org.n52.sos.config.entities.NumericSettingValue;
 import org.n52.sos.config.entities.StringSettingValue;
 import org.n52.sos.config.entities.UriSettingValue;
-import org.n52.sos.config.settings.BooleanSetting;
-import org.n52.sos.config.settings.FileSetting;
-import org.n52.sos.config.settings.IntegerSetting;
-import org.n52.sos.config.settings.NumericSetting;
-import org.n52.sos.config.settings.StringSetting;
-import org.n52.sos.config.settings.UriSetting;
+import org.n52.sos.config.settings.BooleanSettingDefinition;
+import org.n52.sos.config.settings.FileSettingDefinition;
+import org.n52.sos.config.settings.IntegerSettingDefinition;
+import org.n52.sos.config.settings.NumericSettingDefinition;
+import org.n52.sos.config.settings.StringSettingDefinition;
+import org.n52.sos.config.settings.UriSettingDefinition;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.service.ConfigurationException;
 import org.slf4j.Logger;
@@ -98,35 +98,35 @@ public class HibernateSettingsManagerImplTest {
     public void testBooleanSettings() {
         Boolean value = Boolean.FALSE;
         dao.saveValue(new BooleanSettingValue().setKey(BOOLEAN_SETTING).setValue(value));
-        assertEquals(value, dao.getValue(new BooleanSetting().setKey(BOOLEAN_SETTING)).getValue());
+        assertEquals(value, dao.getValue(new BooleanSettingDefinition().setKey(BOOLEAN_SETTING)).getValue());
     }
 
     @Test
     public void testStringSettings() {
         String value = "string";
         dao.saveValue(new StringSettingValue().setKey(STRING_SETTING).setValue(value));
-        assertEquals(value, dao.getValue(new StringSetting().setKey(STRING_SETTING)).getValue());
+        assertEquals(value, dao.getValue(new StringSettingDefinition().setKey(STRING_SETTING)).getValue());
     }
 
     @Test
     public void testFileSettings() {
         File value = new File("/home/auti/sos");
         dao.saveValue(new FileSettingValue().setKey(FILE_SETTING).setValue(value));
-        assertEquals(value, dao.getValue(new FileSetting().setKey(FILE_SETTING)).getValue());
+        assertEquals(value, dao.getValue(new FileSettingDefinition().setKey(FILE_SETTING)).getValue());
     }
 
     @Test
     public void testIntegerSettings() {
         Integer value = Integer.valueOf(12312);
         dao.saveValue(new IntegerSettingValue().setKey(INTEGER_SETTING).setValue(value));
-        assertEquals(value, dao.getValue(new IntegerSetting().setKey(INTEGER_SETTING)).getValue());
+        assertEquals(value, dao.getValue(new IntegerSettingDefinition().setKey(INTEGER_SETTING)).getValue());
     }
 
     @Test
     public void testNumericSettings() {
         double value = 212.1213;
         dao.saveValue(new NumericSettingValue().setKey(DOUBLE_SETTING).setValue(Double.valueOf(value)));
-        assertEquals(value, dao.getValue(new NumericSetting().setKey(DOUBLE_SETTING)).getValue(), 0.0000001);
+        assertEquals(value, dao.getValue(new NumericSettingDefinition().setKey(DOUBLE_SETTING)).getValue(), 0.0000001);
 
     }
 
@@ -134,6 +134,6 @@ public class HibernateSettingsManagerImplTest {
     public void testUriSettings() {
         URI value = URI.create("http://localhost:8080/a");
         dao.saveValue(new UriSettingValue().setKey(URI_SETTING).setValue(value));
-        assertEquals(value, dao.getValue(new UriSetting().setKey(URI_SETTING)).getValue());
+        assertEquals(value, dao.getValue(new UriSettingDefinition().setKey(URI_SETTING)).getValue());
     }
 }

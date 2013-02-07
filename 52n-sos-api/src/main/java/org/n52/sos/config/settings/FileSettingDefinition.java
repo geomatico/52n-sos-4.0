@@ -21,17 +21,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.config;
+package org.n52.sos.config.settings;
 
-/**
- *
- * @author Christian Autermann <c.autermann@52north.org>
- */
-public interface ISetting<T> {
-    public T getDefaultValue();
-    public String getDescription();
-    public String getKey();
-    public String getTitle();
-    public boolean hasDefaultValue();
-    public boolean isOptional();
-}
+import java.io.File;
+
+public class FileSettingDefinition extends AbstractSettingDefinition<File> {}

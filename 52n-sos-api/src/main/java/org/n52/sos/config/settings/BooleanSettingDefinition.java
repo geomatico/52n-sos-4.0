@@ -24,4 +24,4 @@
 package org.n52.sos.config.settings;
 
 
-public class BooleanSetting extends AbstractSetting<Boolean> {}
+public class BooleanSettingDefinition extends AbstractSettingDefinition<Boolean> {}

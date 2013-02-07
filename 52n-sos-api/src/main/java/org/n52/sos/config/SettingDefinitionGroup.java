@@ -27,12 +27,12 @@ package org.n52.sos.config;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class SettingsGroup {
+public class SettingDefinitionGroup {
 
     private String title;
     private String description;
 
-    public SettingsGroup(String title, String description) {
+    public SettingDefinitionGroup(String title, String description) {
         this.title = title;
         this.description = description;
     }
@@ -60,7 +60,7 @@ public class SettingsGroup {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final SettingsGroup other = (SettingsGroup) obj;
+        final SettingDefinitionGroup other = (SettingDefinitionGroup) obj;
         if ((this.getTitle() == null) ? (other.getTitle() != null) 
                 : !this.getTitle().equals(other.getTitle())) {
             return false;

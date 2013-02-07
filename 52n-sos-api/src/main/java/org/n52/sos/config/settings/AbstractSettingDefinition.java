@@ -23,13 +23,13 @@
  */
 package org.n52.sos.config.settings;
 
-import org.n52.sos.config.ISetting;
+import org.n52.sos.config.ISettingDefinition;
 
 /**
  * @param <T> 
  * @author Christian Autermann <c.autermann@52north.org>
  */
-abstract class AbstractSetting<T> implements ISetting<T> {
+abstract class AbstractSettingDefinition<T> implements ISettingDefinition<T> {
     
     private boolean optional;
     private String identifier;
@@ -67,27 +67,27 @@ abstract class AbstractSetting<T> implements ISetting<T> {
         return title;
     }
 
-    public AbstractSetting<T> setOptional(boolean optional) {
+    public AbstractSettingDefinition<T> setOptional(boolean optional) {
         this.optional = optional;
         return this;
     }
 
-    public AbstractSetting<T> setKey(String key) {
+    public AbstractSettingDefinition<T> setKey(String key) {
         this.identifier = key;
         return this;
     }
 
-    public AbstractSetting<T> setTitle(String title) {
+    public AbstractSettingDefinition<T> setTitle(String title) {
         this.title = title;
         return this;
     }
 
-    public AbstractSetting<T> setDescription(String description) {
+    public AbstractSettingDefinition<T> setDescription(String description) {
         this.description = description;
         return this;
     }
 
-    public AbstractSetting<T> setDefaultValue(T defaultValue) {
+    public AbstractSettingDefinition<T> setDefaultValue(T defaultValue) {
         this.defaultValue = defaultValue;
         return this;
     }
@@ -99,8 +99,8 @@ abstract class AbstractSetting<T> implements ISetting<T> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof AbstractSetting) {
-            AbstractSetting<?> other = (AbstractSetting<?>) obj;
+        if (obj != null && obj instanceof AbstractSettingDefinition) {
+            AbstractSettingDefinition<?> other = (AbstractSettingDefinition<?>) obj;
             return getKey() == null ? other.getKey() == null : getKey().equals(other.getKey());
         }
         return true;

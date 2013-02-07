@@ -40,7 +40,7 @@ public class HibernateSettingsManagerImpl extends HibernateSettingsManager {
     }
 
     @Override
-    public <T> ISettingValue<T> getValue(final ISetting<T> key) {
+    public <T> ISettingValue<T> getValue(final ISettingDefinition<T> key) {
         Session s = null;
         try {
             s = getSession();

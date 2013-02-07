@@ -23,6 +23,6 @@
  */
 package org.n52.sos.config.settings;
 
-import java.io.File;
+import java.net.URI;
 
-public class FileSetting extends AbstractSetting<File> {}
+public class UriSettingDefinition extends AbstractSettingDefinition<URI> {}

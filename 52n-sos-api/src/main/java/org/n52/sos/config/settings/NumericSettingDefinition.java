@@ -24,4 +24,4 @@
 package org.n52.sos.config.settings;
 
 
-public class NumericSetting extends AbstractSetting<Double> {}
+public class NumericSettingDefinition extends AbstractSettingDefinition<Double> {}

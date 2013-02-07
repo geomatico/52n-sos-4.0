@@ -69,30 +69,30 @@ public abstract class SettingsManager {
         }
         throw new ConfigurationException("No SettingsManager implementation loaded");
     }
-    private final SettingWanterRepository settingWanterRepository;
+    private final SettingDefinitionProviderRepository settingWanterRepository;
 
     protected SettingsManager() throws ConfigurationException {
-        settingWanterRepository = new SettingWanterRepository();
+        settingWanterRepository = new SettingDefinitionProviderRepository();
     }
 
-    public SettingWanterRepository getSettingWanterRepository() {
+    public SettingDefinitionProviderRepository getSettingWanterRepository() {
         return settingWanterRepository;
     }
 
-    public Set<ISetting<?>> getSettings() {
+    public Set<ISettingDefinition<?>> getSettings() {
         return getSettingWanterRepository().getWantedSettings();
     }
 
     public Set<String> getKeys() {
-        Set<ISetting<?>> settings = getSettings();
+        Set<ISettingDefinition<?>> settings = getSettings();
         HashSet<String> keys = new HashSet<String>(settings.size());
-        for (ISetting<?> setting  : settings) {
+        for (ISettingDefinition<?> setting  : settings) {
             keys.add(setting.getKey());
         }
         return keys;
     }
     
-    public abstract <T> ISettingValue<T> getValue(ISetting<T> key);
+    public abstract <T> ISettingValue<T> getValue(ISettingDefinition<T> key);
     public abstract Set<ISettingValue<?>> getValues();
     public abstract void saveValue(ISettingValue<?> setting);
     public abstract AdminUser getAdminUser();

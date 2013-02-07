@@ -26,11 +26,11 @@ package org.n52.sos.config;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import org.n52.sos.config.settings.BooleanSetting;
-import org.n52.sos.config.settings.FileSetting;
-import org.n52.sos.config.settings.IntegerSetting;
-import org.n52.sos.config.settings.StringSetting;
-import org.n52.sos.config.settings.UriSetting;
+import org.n52.sos.config.settings.BooleanSettingDefinition;
+import org.n52.sos.config.settings.FileSettingDefinition;
+import org.n52.sos.config.settings.IntegerSettingDefinition;
+import org.n52.sos.config.settings.StringSettingDefinition;
+import org.n52.sos.config.settings.UriSettingDefinition;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
@@ -38,27 +38,27 @@ import org.n52.sos.config.settings.UriSetting;
 public abstract class AbstractSettingValueFactory implements ISettingValueFactory {
 
     @Override
-    public ISettingValue<Boolean> newBooleanSettingValue(BooleanSetting setting, String stringValue) {
+    public ISettingValue<Boolean> newBooleanSettingValue(BooleanSettingDefinition setting, String stringValue) {
         return newBooleanSettingValue().setValue(parseBoolean(stringValue)).setKey(setting.getKey());
     }
 
     @Override
-    public ISettingValue<Integer> newIntegerSettingValue(IntegerSetting setting, String stringValue) {
+    public ISettingValue<Integer> newIntegerSettingValue(IntegerSettingDefinition setting, String stringValue) {
         return newIntegerSettingValue().setValue(parseInteger(stringValue)).setKey(setting.getKey());
     }
 
     @Override
-    public ISettingValue<String> newStringSettingValue(StringSetting setting, String stringValue) {
+    public ISettingValue<String> newStringSettingValue(StringSettingDefinition setting, String stringValue) {
         return newStringSettingValue().setValue(parseString(stringValue)).setKey(setting.getKey());
     }
 
     @Override
-    public ISettingValue<File> newFileSettingValue(FileSetting setting, String stringValue) {
+    public ISettingValue<File> newFileSettingValue(FileSettingDefinition setting, String stringValue) {
         return newFileSettingValue().setValue(parseFile(stringValue)).setKey(setting.getKey());
     }
 
     @Override
-    public ISettingValue<URI> newUriSettingValue(UriSetting setting, String stringValue) {
+    public ISettingValue<URI> newUriSettingValue(UriSettingDefinition setting, String stringValue) {
         return newUriSettingValue().setValue(parseUri(stringValue)).setKey(setting.getKey());
     }
 
