@@ -84,7 +84,8 @@ public class ObservationInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate
 	@Override
 	public void execute()
 	{
-		// TODO Review required methods and update test accordingly
+		// TODO Review required methods and update test accordingly (@see SensorInsertionInMemoryCacheUpdate)
+		// Always update the javadoc when changing this method!
 		for (SosObservation sosObservation : sosRequest.getObservations())
 		{
 			addProcedureToCache(getProcedureIdentifier(sosObservation));
