@@ -357,17 +357,6 @@ public abstract class ACapabilitiesCacheController {
     public abstract Collection<String> getProcedures4FeatureOfInterest(String foiID);
 
     /**
-     * return the unit of the values for the observedProperty
-     *
-     * @param observedProperty
-     *            String observedProperty for which the type of the values
-     *            should be returned
-     * @return String representing the valueType of the values for the
-     *         observedProperty
-     */
-    public abstract String getUnit4ObservableProperty(String observedProperty);
-
-    /**
      * returns only FOIs which are sampling features
      *
      * @return ArrayList<String> the FOIs

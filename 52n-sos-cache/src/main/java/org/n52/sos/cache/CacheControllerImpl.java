@@ -565,19 +565,6 @@ public class CacheControllerImpl extends ACapabilitiesCacheController {
     }
 
     /**
-     * return the unit of the values for the observedProperty
-     *
-     * @param observedProperty
-     *            String observedProperty for which the type of the values
-     *            should be returned
-     * @return String representing the valueType of the values for the
-     *         observedProperty
-     */
-    public String getUnit4ObsProp(String observedProperty) {
-        return cache.getUnit4Phen().get(observedProperty);
-    }
-
-    /**
      * returns the phens4CompPhens
      *
      * @return HashMap<String, List<String>> the phens4CompPhens
@@ -726,11 +713,6 @@ public class CacheControllerImpl extends ACapabilitiesCacheController {
             return new ArrayList<String>(cache.getProceduresForFeature(foiID));
         }
         return new ArrayList<String>(0);
-    }
-
-    @Override
-    public String getUnit4ObservableProperty(String observedProperty) {
-        return cache.getUnit4ObsProp(observedProperty);
     }
 
     @Override

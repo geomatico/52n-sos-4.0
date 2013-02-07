@@ -152,13 +152,6 @@ public interface CapabilitiesCache {
 	public abstract Map<String, Collection<String>> getKProcedureVOffering();
 
 	/**
-	 * sets the unit phenomenon relations
-	 * 
-	 * @param unit4Phen
-	 */
-	public abstract void setUnit4ObservableProperty(Map<String, String> unit4Phen);
-
-	/**
 	 * sets relationships between phenomena and offerings
 	 * 
 	 * @param phenOffs
@@ -263,5 +256,9 @@ public interface CapabilitiesCache {
 	public abstract void setMaxEventTime(DateTime maxEventTime);
 	
 	public abstract Map<String, Collection<String>> getKProcedureVObservationIdentifiers();
+
+	public abstract void setkOfferingVResultTemplates(Map<String, Collection<String>> kOfferingVResultTemplates);
+
+	public abstract Map<String, Collection<String>> getKOfferingVResultTemplates();
 
 }
