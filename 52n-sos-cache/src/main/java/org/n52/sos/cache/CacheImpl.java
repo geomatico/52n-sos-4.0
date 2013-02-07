@@ -267,14 +267,18 @@ public class CacheImpl implements CapabilitiesCache{
         }
         return result;
     }
-
     /**
-     * returns relationships between names and offerings
+     * @deprecated use #getKOfferingVName()
      * 
      * @return
      */
     protected Map<String, String> getOffName() {
-        return kOfferingVName;
+        return getKOfferingVName();
+    }
+    
+    public Map<String, String> getKOfferingVName()
+    {
+    	return kOfferingVName;
     }
     
     @Override
@@ -819,7 +823,7 @@ public class CacheImpl implements CapabilitiesCache{
         return kOfferingVRelatedFeatures;
     }
 
-    protected Map<String, Collection<String>> getKRelatedFeatureVRole() {
+    public Map<String, Collection<String>> getKRelatedFeatureVRole() {
         return kRelatedFeatureVRole;
     }
 
@@ -864,7 +868,7 @@ public class CacheImpl implements CapabilitiesCache{
         return ccpList;
     }
 
-    protected Map<String, Collection<String>> getAllowedKOfferingVObservationType() {
+    public Map<String, Collection<String>> getAllowedKOfferingVObservationType() {
         return allowedKOfferingVObservationType;
     }
 

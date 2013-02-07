@@ -41,73 +41,71 @@ public interface CapabilitiesCache {
 	 * 
 	 * @param offPhenomenons
 	 */
-	public abstract void setKOfferingVObservableProperties(Map<String, Collection<String>> offPhenomenons);
+	public void setKOfferingVObservableProperties(Map<String, Collection<String>> offPhenomenons);
 
 	/**
 	 * sets relationships between names and offerings
 	 * 
 	 * @param offName
 	 */
-	public abstract void setKOfferingVName(Map<String, String> offName);
+	public void setKOfferingVName(Map<String, String> offName);
 
 	/**
 	 * sets the observation ids
 	 * 
 	 * @param obsIds
 	 */
-	public abstract void setObservationIdentifiers(Collection<String> observationIdentifiers);
+	public void setObservationIdentifiers(Collection<String> observationIdentifiers);
 
 	/**
 	 * sets relationships between offerings and result models
 	 * 
 	 * @param offResultModels
 	 */
-	public abstract void setKOfferingVObservationTypes(Map<String, Collection<String>> offferingObservationTypes);
+	public void setKOfferingVObservationTypes(Map<String, Collection<String>> offferingObservationTypes);
 
 	/**
 	 * sets relationships between offerings and procedures
 	 * 
 	 * @param offProcedures
 	 */
-	public abstract void setKOfferingVProcedures(Map<String, List<String>> offProcedures);
+	public void setKOfferingVProcedures(Map<String, List<String>> offProcedures);
 
 	/**
 	 * set procedures with SensorML
 	 * 
 	 * @param procedures
 	 */
-	public abstract void setProcedures(Collection<String> procedures);
+	public void setProcedures(Collection<String> procedures);
 
 	/**
 	 * sets the feature of interest procedure relations
 	 * 
 	 * @param foiProcedures
 	 */
-	public abstract void setKFeatureOfInterestVProcedures(Map<String, Collection<String>> foiProcedures);
+	public void setKFeatureOfInterestVProcedures(Map<String, Collection<String>> foiProcedures);
 
-	public abstract void setFeatureOfInterest(Collection<String> featuresOfInterest);
+	public void setFeatureOfInterest(Collection<String> featuresOfInterest);
 
 	/**
-	 * sets FOIs
-	 * 
 	 * @param fois
 	 * @deprecated use {@link #setFeatureOfInterest(Collection)}
 	 */
-	public abstract void setAllFeatureOfInterests(Collection<String> featuresOfInterest);
+	public void setAllFeatureOfInterests(Collection<String> featuresOfInterest);
 
 	/**
 	 * sets relationships between phenomena and composite phenomena
 	 * 
 	 * @param phens4CompPhens
 	 */
-	public abstract void setKCompositePhenomenonVObservableProperties(Map<String, Collection<String>> phens4CompPhens);
+	public void setKCompositePhenomenonVObservableProperties(Map<String, Collection<String>> phens4CompPhens);
 
 	/**
 	 * sets relationships between offerings and composite phenomena
 	 * 
 	 * @param offCompPhens
 	 */
-	public abstract void setKOfferingVCompositePhenomenon(Map<String, Collection<String>> offCompPhens);
+	public void setKOfferingVCompositePhenomenon(Map<String, Collection<String>> offCompPhens);
 
 	/**
 	 * sets phenomenon procedure relations
@@ -115,7 +113,7 @@ public interface CapabilitiesCache {
 	 * @param phenProcs
 	 *            The phenProcs to set.
 	 */
-	public abstract void setKObservablePropertyVProcedures(Map<String, List<String>> phenProcs);
+	public void setKObservablePropertyVProcedures(Map<String, List<String>> phenProcs);
 
 	/**
 	 * sets the parent procedure map, then inverts it and sets child procedure
@@ -124,41 +122,41 @@ public interface CapabilitiesCache {
 	 * @param parentProcs
 	 *            The parentProcs map to set.
 	 */
-	public abstract void setProcedureHierarchies(Map<String, Collection<String>> parentProcs);
+	public void setProcedureHierarchies(Map<String, Collection<String>> parentProcs);
 
 	/**
 	 * sets the SRIDs
 	 * 
 	 * @param srids
 	 */
-	public abstract void setSrids(Collection<Integer> srids);
+	public void setSrids(Collection<Integer> srids);
 
-	public abstract void setFeatureHierarchies(Map<String, Collection<String>> parentFeatures);
+	public void setFeatureHierarchies(Map<String, Collection<String>> parentFeatures);
 
 	/**
 	 * sets relationships between offerings and FOIs
 	 * 
 	 * @param offFeatures
 	 */
-	public abstract void setKOfferingVFeatures(Map<String, Collection<String>> offFeatures);
+	public void setKOfferingVFeatures(Map<String, Collection<String>> offFeatures);
 
 	/**
 	 * sets relationships between procedures and offerings
 	 * 
 	 * @param procOffs
 	 */
-	public abstract void setKProcedureVOfferings(Map<String, Collection<String>> procOffs);
+	public void setKProcedureVOfferings(Map<String, Collection<String>> procOffs);
 
-	public abstract Map<String, Collection<String>> getKProcedureVOffering();
+	public Map<String, Collection<String>> getKProcedureVOffering();
 
 	/**
 	 * sets relationships between phenomena and offerings
 	 * 
 	 * @param phenOffs
 	 */
-	public abstract void setKObservablePropertyVOfferings(Map<String, List<String>> phenOffs);
+	public void setKObservablePropertyVOfferings(Map<String, List<String>> phenOffs);
 
-	public abstract Map<String, List<String>> getKObservablePropertyVOffering();
+	public Map<String, List<String>> getKObservablePropertyVOffering();
 
 	/**
 	 * sets the procedure phenomenon relations
@@ -166,7 +164,7 @@ public interface CapabilitiesCache {
 	 * @param procPhens
 	 *            The procPhens to set.
 	 */
-	public abstract void setProcPhens(Map<String, Collection<String>> procPhens);
+	public void setProcPhens(Map<String, Collection<String>> procPhens);
 
 	/**
 	 * method to set the related features for a offering
@@ -174,7 +172,7 @@ public interface CapabilitiesCache {
 	 * @param offRelatedFeatures
 	 *            the relatedFeatures to set
 	 */
-	public abstract void setKOfferingVRelatedFeatures(Map<String, Collection<String>> offRelatedFeatures);
+	public void setKOfferingVRelatedFeatures(Map<String, Collection<String>> offRelatedFeatures);
 
 	/**
 	 * method to set the related features for a offering
@@ -182,21 +180,21 @@ public interface CapabilitiesCache {
 	 * @param kOfferingVRelatedFeatures
 	 *            the relatedFeatures to set
 	 */
-	public abstract void setKRelatedFeaturesVRole(Map<String, Collection<String>> kRelatedFeatureVRole);
+	public void setKRelatedFeaturesVRole(Map<String, Collection<String>> kRelatedFeatureVRole);
 
-	public abstract void setAllowedKOfferingVObservationType(Map<String, Collection<String>> allowedKOfferingVObservationType);
+	public void setAllowedKOfferingVObservationType(Map<String, Collection<String>> allowedKOfferingVObservationType);
 
-	public abstract void setObservationTypes(Collection<String> observationTypes);
+	public void setObservationTypes(Collection<String> observationTypes);
 
-	public abstract Collection<String> getObservationTypes();
+	public Collection<String> getObservationTypes();
 
-	public abstract void setFeatureOfInterestTypes(Collection<String> featureOfInterestTypes);
+	public void setFeatureOfInterestTypes(Collection<String> featureOfInterestTypes);
 
-	public abstract Collection<String> getFeatureOfInterestTypes();
+	public Collection<String> getFeatureOfInterestTypes();
 
-	public abstract void setResultTemplates(Collection<String> resultTemplates);
+	public void setResultTemplates(Collection<String> resultTemplates);
 
-	public abstract Collection<String> getResultTemplates();
+	public Collection<String> getResultTemplates();
 
 	/**
 	 * gets relationships between offerings and en
@@ -204,14 +202,14 @@ public interface CapabilitiesCache {
 	 * @return the envelopes of the offerings
 	 *
 	 */
-	public abstract Map<String, SosEnvelope> getKOfferingVEnvelope();
+	public Map<String, SosEnvelope> getKOfferingVEnvelope();
 
 	/**
 	 * sets relationships between offerings and envelopes
 	 * 
 	 * @param kOfferingVEnvelope
 	 */
-	public abstract void setKOfferingVEnvelope(Map<String, SosEnvelope> kOfferingVEnvelope);
+	public void setKOfferingVEnvelope(Map<String, SosEnvelope> kOfferingVEnvelope);
 
 	/**
 	 * gets relationships between offerings and their min time
@@ -219,14 +217,14 @@ public interface CapabilitiesCache {
 	 * @return the min times of the offerings
 	 *
 	 */
-	public abstract Map<String, DateTime> getKOfferingVMinTime();
+	public Map<String, DateTime> getKOfferingVMinTime();
 
 	/**
 	 * sets relationships between offerings and their min time
 	 * 
 	 * @param kOfferingVMinTime
 	 */
-	public abstract void setKOfferingVMinTime(Map<String, DateTime> kOfferingVMinTime);
+	public void setKOfferingVMinTime(Map<String, DateTime> kOfferingVMinTime);
 
 	/**
 	 * gets relationships between offerings and their max time
@@ -234,62 +232,68 @@ public interface CapabilitiesCache {
 	 * @return the max times of the offerings
 	 *
 	 */
-	public abstract Map<String, DateTime> getKOfferingVMaxTime();
+	public Map<String, DateTime> getKOfferingVMaxTime();
 
 	/**
 	 * sets relationships between offerings and their max time
 	 * 
 	 * @param kOfferingVMaxTime
 	 */
-	public abstract void setKOfferingVMaxTime(Map<String, DateTime> kOfferingVMaxTime);
+	public void setKOfferingVMaxTime(Map<String, DateTime> kOfferingVMaxTime);
 
-	public abstract SosEnvelope getGlobalEnvelope();
+	public SosEnvelope getGlobalEnvelope();
 
-	public abstract void setGlobalEnvelope(SosEnvelope globalEnvelope);
+	public void setGlobalEnvelope(SosEnvelope globalEnvelope);
 
-	public abstract DateTime getMinEventTime();
+	public DateTime getMinEventTime();
 
-	public abstract void setMinEventTime(DateTime minEventTime);
+	public void setMinEventTime(DateTime minEventTime);
 
-	public abstract DateTime getMaxEventTime();
+	public DateTime getMaxEventTime();
 
-	public abstract void setMaxEventTime(DateTime maxEventTime);
+	public void setMaxEventTime(DateTime maxEventTime);
 	
-	public abstract Map<String, Collection<String>> getKProcedureVObservationIdentifiers();
+	public Map<String, Collection<String>> getKProcedureVObservationIdentifiers();
 
-	public abstract void setkOfferingVResultTemplates(Map<String, Collection<String>> kOfferingVResultTemplates);
+	public void setkOfferingVResultTemplates(Map<String, Collection<String>> kOfferingVResultTemplates);
 
-	public abstract Map<String, Collection<String>> getKOfferingVResultTemplates();
+	public Map<String, Collection<String>> getKOfferingVResultTemplates();
 
-	public abstract Collection<String> getProcedures();
+	public Collection<String> getProcedures();
 
-	public abstract Map<String, List<String>> getKObservablePropertyVProcedures();
+	public Map<String, List<String>> getKObservablePropertyVProcedures();
 
-	public abstract Map<String, Collection<String>> getKProcedureVObservableProperties();
+	public Map<String, Collection<String>> getKProcedureVObservableProperties();
 
-	public abstract Collection<String> getObservationIdentifiers();
+	public Collection<String> getObservationIdentifiers();
 
 	/**
      * @return the EPSG code of coordinates stored in SOS database
      */
-	public abstract int getDatabaseEPSGCode();
+	public int getDatabaseEPSGCode();
 
-	public abstract Collection<String> getFeatureOfInterest();
+	public Collection<String> getFeatureOfInterest();
 
-	public abstract Map<String, Collection<String>> getKFeatureOfInterestVProcedures();
+	public Map<String, Collection<String>> getKFeatureOfInterestVProcedures();
 
-	public abstract Map<String, Collection<String>> getKOfferingVFeaturesOfInterest();
+	public Map<String, Collection<String>> getKOfferingVFeaturesOfInterest();
 
-	public abstract Map<String, Collection<String>> getKOfferingVRelatedFeatures();
+	public Map<String, Collection<String>> getKOfferingVRelatedFeatures();
 
-	public abstract Map<String, List<String>> getKOfferingVProcedures();
+	public Map<String, List<String>> getKOfferingVProcedures();
 
-	public abstract Map<String, Collection<String>> getKOfferingVObservableProperties();
+	public Map<String, Collection<String>> getKOfferingVObservableProperties();
 
-	public abstract Map<String, Collection<String>> getKOfferingVObservationTypes();
+	public Map<String, Collection<String>> getKOfferingVObservationTypes();
 
-	public abstract Map<String, Collection<String>> getChildFeatures();
+	public Map<String, Collection<String>> getChildFeatures();
 
-	public abstract Map<String, Collection<String>> getParentFeatures();
+	public Map<String, Collection<String>> getParentFeatures();
+
+	public Map<String, Collection<String>> getAllowedKOfferingVObservationType();
+
+	public Map<String, Collection<String>> getKRelatedFeatureVRole();
+	
+	public Map<String, String> getKOfferingVName();
 
 }
