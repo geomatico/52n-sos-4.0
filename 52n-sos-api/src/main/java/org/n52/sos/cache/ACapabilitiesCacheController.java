@@ -34,6 +34,12 @@ import org.joda.time.DateTime;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
+import org.n52.sos.request.DeleteSensorRequest;
+import org.n52.sos.request.InsertObservationRequest;
+import org.n52.sos.request.InsertResultTemplateRequest;
+import org.n52.sos.request.InsertSensorRequest;
+import org.n52.sos.response.InsertResultTemplateResponse;
+import org.n52.sos.response.InsertSensorResponse;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +100,7 @@ public abstract class ACapabilitiesCacheController {
 			initialized = true;
 		}
 		if (delay > 0) {
-			LOGGER.info("Next CapabilitiesCacheUpdate in {}ms", delay);
+			LOGGER.info("Next CapabilitiesCacheUpdate in {}m: {}", delay/60000, new DateTime(System.currentTimeMillis()+delay));
 			timer.schedule(current, delay);
 		}
 	}
@@ -132,84 +138,62 @@ public abstract class ACapabilitiesCacheController {
     }
 
     /**
+	 * @return the updateIsFree
+	 */
+	protected boolean isUpdateIsFree() {
+	    return updateIsFree;
+	}
+
+
+	/**
+	 * @param updateIsFree
+	 *            the updateIsFree to set
+	 */
+	protected void setUpdateIsFree(boolean updateIsFree) {
+	    this.updateIsFree = updateIsFree;
+	}
+
+
+	/**
+	 * @return the updateLock
+	 */
+	protected ReentrantLock getUpdateLock() {
+	    return updateLock;
+	}
+
+
+	/**
+	 * @return the updateFree
+	 */
+	protected Condition getUpdateFree() {
+	    return updateFree;
+	}
+
+
+	/**
      * @return true, if updated successfully
      * @throws OwsExceptionReport
      *             if the query of one of the values described upside failed
      */
     public abstract boolean updateCacheFromDB() throws OwsExceptionReport;
 
-    public abstract void updateAfterSensorInsertion() throws OwsExceptionReport;
+    public abstract void updateAfterSensorInsertion(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse);
 
-    public abstract void updateAfterObservationInsertion() throws OwsExceptionReport;
 
-    public abstract void updateAfterSensorDeletion() throws OwsExceptionReport;
+	public abstract void updateAfterObservationInsertion(InsertObservationRequest sosRequest);
 
-    public abstract void updateAfterObservationDeletion() throws OwsExceptionReport;
 
-    public abstract void updateAfterResultTemplateInsertion() throws OwsExceptionReport;
+	public abstract void updateAfterSensorDeletion(DeleteSensorRequest sosRequest);
 
-    /**
-     * method for refreshing the metadata of fois in the capabilities cache; is
-     * invoked when a new feature of interest is inserted into the SOS database
-     *
-     * @throws OwsExceptionReport
-     *             if refreshing failed
-     */
-    @Deprecated
-    public abstract void updateFoisCache() throws OwsExceptionReport;
 
-    /**
-     * refreshes sensor metadata; used after registration of new sensor at SOS
-     *
-     * @throws OwsExceptionReport
-     *             if refreshing failed
-     *
-     */
-    @Deprecated
-    public abstract void updateSensorMetadata() throws OwsExceptionReport;
+	public abstract void updateAfterObservationDeletion() throws OwsExceptionReport;
 
-    /**
-     * methods for adding relationships in Cache for recently received new
-     * observation
-     *
-     * @param observation
-     *            recently received observation which has been inserted into SOS
-     *            db and whose relationships have to be maintained in cache
-     * @throws OwsExceptionReport
-     *             if refreshing failed
-     */
-    public abstract void updateMetadata4newObservation(SosObservation observation) throws OwsExceptionReport;
+    public abstract void updateAfterResultTemplateInsertion(InsertResultTemplateRequest sosRequest, InsertResultTemplateResponse sosResponse);
 
-    /**
-     * @return the updateIsFree
-     */
-    protected boolean isUpdateIsFree() {
-        return updateIsFree;
-    }
 
-    /**
-     * @param updateIsFree
-     *            the updateIsFree to set
-     */
-    protected void setUpdateIsFree(boolean updateIsFree) {
-        this.updateIsFree = updateIsFree;
-    }
+	public abstract void updateAfterResultInsertion(SosObservation sosObservation);
 
-    /**
-     * @return the updateLock
-     */
-    protected ReentrantLock getUpdateLock() {
-        return updateLock;
-    }
-
-    /**
-     * @return the updateFree
-     */
-    protected Condition getUpdateFree() {
-        return updateFree;
-    }
-
-    /**
+	/**
      * Returns the observedProperties (phenomenons) for the requested offering
      *
      * @param offering
