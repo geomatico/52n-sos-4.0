@@ -107,7 +107,8 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
     
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
-        /* nothing to add here */
+        opsMeta.addPossibleValuesParameter(Sos2Constants.InsertResultParams.template, getCache().getResultTemplates());
+        opsMeta.addAnyParameterValue(Sos2Constants.InsertResultParams.resultValues);
     }
     
     @Override
@@ -172,7 +173,7 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
         } catch (Exception e) {
             String exceptionText = "The resultValues format does not comply to the resultStructure of the resultTemplate!";
             LOGGER.debug(exceptionText, e);
-            throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.InsertResult.resultValues.name(),
+            throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.InsertResultParams.resultValues.name(),
                     exceptionText);
         }
     }

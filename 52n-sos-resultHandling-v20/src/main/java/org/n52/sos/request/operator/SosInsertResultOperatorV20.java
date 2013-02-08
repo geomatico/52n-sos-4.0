@@ -111,7 +111,7 @@ public class SosInsertResultOperatorV20 extends AbstractV2RequestOperator<IInser
             exceptions.add(owse);
         }
         try {
-            checkResultTemplate(request.getTemplateIdentifier(), Sos2Constants.InsertResult.template.name());
+            checkResultTemplate(request.getTemplateIdentifier(), Sos2Constants.InsertResultParams.template.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -125,7 +125,7 @@ public class SosInsertResultOperatorV20 extends AbstractV2RequestOperator<IInser
 
     private void checkResultValues(String resultValues) throws OwsExceptionReport {
         if (resultValues == null || (resultValues != null && resultValues.isEmpty())) {
-            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertResult.resultValues.name());
+            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertResultParams.resultValues.name());
         }
     }
 

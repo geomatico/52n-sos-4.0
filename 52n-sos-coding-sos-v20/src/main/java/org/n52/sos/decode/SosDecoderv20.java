@@ -624,7 +624,7 @@ public class SosDecoderv20 implements IDecoder<AbstractServiceCommunicationObjec
                     }
                 }
             }
-            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertResult.resultValues.name());
+            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertResultParams.resultValues.name());
         } else {
             throw Util4Exceptions.createNoApplicableCodeException(null,
                     "The requested resultValue type is not supported");

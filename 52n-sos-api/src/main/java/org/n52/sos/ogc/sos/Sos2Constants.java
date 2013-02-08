@@ -282,7 +282,7 @@ public final class Sos2Constants {
         offering, observedProperty, featureOfInterest, temporalFilter, spatialFilter;
     }
     
-    public enum InsertResult {
+    public enum InsertResultParams {
         template, resultValues
     }
 

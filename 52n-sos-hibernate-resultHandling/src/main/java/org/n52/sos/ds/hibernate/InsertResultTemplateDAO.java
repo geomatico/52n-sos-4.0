@@ -28,7 +28,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.n52.sos.ds.IInsertResultTemplateDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateUtilities;
@@ -61,7 +60,7 @@ public class InsertResultTemplateDAO extends AbstractHibernateOperationDao imple
 
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
-        /* nothing to add here */
+        opsMeta.addAnyParameterValue(Sos2Constants.InsertResultTemplateParams.proposedTemplate);
     }
 
     @Override
