@@ -33,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.joda.time.DateTime;
 import org.n52.sos.ds.ICacheFeederDAO;
-import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
@@ -46,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * relationships from a standard datasource
  *
  */
-public class CacheControllerImpl extends ACapabilitiesCacheController {
+public abstract class CacheControllerImpl extends ACapabilitiesCacheController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheControllerImpl.class);
     
@@ -107,7 +106,8 @@ public class CacheControllerImpl extends ACapabilitiesCacheController {
         return true;
     }
 
-    private void update(Case c) throws OwsExceptionReport
+	@Override
+	public void updateAfterObservationDeletion() throws OwsExceptionReport
 	{
 		boolean timeNotElapsed = true;
 	    try {
@@ -116,31 +116,15 @@ public class CacheControllerImpl extends ACapabilitiesCacheController {
 	
 	        // has waiting for lock got a time out?
 	        if (!timeNotElapsed) {
-	            LOGGER.warn("\n******\nupdate after {} not successful because of time out while waiting for update lock." + 
-	            					"\nWaited {} milliseconds.\n******\n",c,SosConstants.UPDATE_TIMEOUT);
+	            LOGGER.warn("\n******\nupdate after Observation Deletion not successful because of time out while waiting for update lock." + 
+	            					"\nWaited {} milliseconds.\n******\n",SosConstants.UPDATE_TIMEOUT);
 	            return;
 	        }
 	        while (!isUpdateIsFree()) {
 	            getUpdateFree().await();
 	        }
 	        setUpdateIsFree(false);
-	        switch (c) {
-			case OBSERVATION_DELETION:
-				cacheFeederDAO.updateAfterObservationDeletion(cache);
-				break;
-			case SENSOR_DELETION:
-				cacheFeederDAO.updateAfterSensorDeletion(cache);
-				break;
-			case OBSERVATION_INSERTION:
-				cacheFeederDAO.updateAfterObservationInsertion(cache);
-				break;
-			case RESULT_TEMPLATE_INSERTION:
-				cacheFeederDAO.updateAfterResultTemplateInsertion(cache);
-				break;
-			case SENSOR_INSERTION:
-				cacheFeederDAO.updateAfterSensorInsertion(cache);
-				break;
-			}
+	        cacheFeederDAO.updateAfterObservationDeletion(cache);
 	
 	    } catch (InterruptedException e) {
 	        LOGGER.error("Problem while threadsafe capabilities cache update", e);
@@ -151,168 +135,6 @@ public class CacheControllerImpl extends ACapabilitiesCacheController {
 	        }
 	    }
 	}
-
-	@Override
-	public void updateAfterObservationDeletion() throws OwsExceptionReport
-	{
-	    update(Case.OBSERVATION_DELETION);
-	}
-
-	@Override
-	public void updateAfterObservationInsertion() throws OwsExceptionReport {
-	    update(Case.OBSERVATION_INSERTION);
-	}
-
-	@Override
-	public void updateAfterResultTemplateInsertion() throws OwsExceptionReport {
-	    update(Case.RESULT_TEMPLATE_INSERTION);
-	}
-
-	@Override
-	public void updateAfterSensorDeletion() throws OwsExceptionReport {
-	    update(Case.SENSOR_DELETION);
-	}
-
-	@Override
-	public void updateAfterSensorInsertion() throws OwsExceptionReport {
-		update(Case.SENSOR_INSERTION);
-	}
-
-	/**
-     * FIXME Update or remove, the method is doing nothing but wait
-     * method for refreshing the metadata of fois in the capabilities cache; is
-     * invoked when a new feature of interest is inserted into the SOS database
-     *
-     * @throws OwsExceptionReport
-     *             if refreshing failed
-     */
-	@Override
-    public void updateFoisCache() throws OwsExceptionReport {
-
-        boolean timeNotElapsed = true;
-        try {
-            // thread safe updating of the cache map
-            timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-            // has waiting for lock got a time out?
-            if (!timeNotElapsed) {
-                LOGGER.warn("\n******\nupdateFois() not successful "
-                        + "because of time out while waiting for update lock." + "\nWaited "
-                        + SosConstants.UPDATE_TIMEOUT + " milliseconds.\n******\n");
-                return;
-            }
-            while (!isUpdateIsFree()) {
-
-                getUpdateFree().await();
-            }
-            setUpdateIsFree(false);
-            // queryFois();
-            // queryFoiProcedures();
-            // queryOffFois();
-            // queryOffRelatedFeatures();
-
-        } catch (InterruptedException e) {
-            LOGGER.error("Problem while threadsafe capabilities cache update", e);
-        } finally {
-            if (timeNotElapsed) {
-                getUpdateLock().unlock();
-                setUpdateIsFree(true);
-            }
-        }
-    }
-
-    /**
-     * FIXME Update or remove, the method is doing nothing but wait
-     * refreshes sensor metadata; used after registration of new sensor at SOS
-     *
-     * @throws OwsExceptionReport
-     *
-     */
-	@Override
-    public void updateSensorMetadata() throws OwsExceptionReport {
-
-        boolean timeNotElapsed = true;
-        try {
-            // thread safe updating of the cache map
-            timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-            // has waiting for lock got a time out?
-            if (!timeNotElapsed) {
-                LOGGER.warn("\n******\nupdateSensorMetadata() not successful "
-                        + "because of time out while waiting for update lock." + "\nWaited "
-                        + SosConstants.UPDATE_TIMEOUT + " milliseconds.\n******\n");
-                return;
-            }
-            while (!isUpdateIsFree()) {
-
-                getUpdateFree().await();
-            }
-            setUpdateIsFree(false);
-            // queryPhenProcs();
-            // queryProcPhens();
-            // queryProcedures();
-            // queryOffProcedures();
-
-        } catch (InterruptedException e) {
-            LOGGER.error("Problem while threadsafe capabilities cache update", e);
-        } finally {
-            if (timeNotElapsed) {
-                getUpdateLock().unlock();
-                setUpdateIsFree(true);
-            }
-        }
-    }
-
-    /**
-     * FIXME Update or remove, the method is doing nothing but wait
-     * methods for adding relationships in Cache for recently received new
-     * observation
-     *
-     * @param observation
-     *            recently received observation which has been inserted into SOS
-     *            db and whose relationships have to be maintained in cache
-     * @throws OwsExceptionReport
-     */
-	@Override
-    public void updateMetadata4newObservation(SosObservation observation) throws OwsExceptionReport {
-
-        boolean timeNotElapsed = true;
-        try {
-            // thread safe updating of the cache map
-            timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-            // has waiting for lock got a time out?
-            if (!timeNotElapsed) {
-                LOGGER.warn("\n******\nupdateMetadata4newObservation() not successful "
-                        + "because of time out while waiting for update lock." + "\nWaited "
-                        + SosConstants.UPDATE_TIMEOUT + " milliseconds.\n******\n");
-                return;
-            }
-            while (!isUpdateIsFree()) {
-
-                getUpdateFree().await();
-            }
-            setUpdateIsFree(false);
-
-            // queryOffResultModels();
-            // queryOffFois();
-            // queryFois();
-            // queryFoiProcedures();
-            // queryPhens4CompPhens();
-            // queryOffCompPhens();
-            // queryTimes4Offerings();
-            // querySRIDs();
-            // queryOffRelatedFeatures();
-
-        } catch (InterruptedException e) {
-            LOGGER.error("Problem while threadsafe capabilities cache update", e);
-        } finally {
-            if (timeNotElapsed) {
-                getUpdateLock().unlock();
-                setUpdateIsFree(true);
-            }
-        }
-    }
 
     /**
      * Returns the observedProperties (phenomenons) for the requested offering
@@ -401,7 +223,7 @@ public class CacheControllerImpl extends ACapabilitiesCacheController {
      */
 	@Override
     public String getOfferingName(String offering) {
-        return cache.getOffName().get(offering);
+        return cache.getKOfferingVName().get(offering);
     }
 
     /**
@@ -606,7 +428,7 @@ public class CacheControllerImpl extends ACapabilitiesCacheController {
      * @return int Srid of coordinates stored in SOS database
      */
     public int getSrid() {
-        return cache.getSrid();
+        return cache.getDatabaseEPSGCode();
     }
 
     /**

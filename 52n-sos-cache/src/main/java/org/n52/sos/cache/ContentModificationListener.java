@@ -30,6 +30,7 @@ import org.n52.sos.event.SosEvent;
 import org.n52.sos.event.SosEventListener;
 import org.n52.sos.event.events.ObservationDeletion;
 import org.n52.sos.event.events.ObservationInsertion;
+import org.n52.sos.event.events.ResultInsertion;
 import org.n52.sos.event.events.ResultTemplateInsertion;
 import org.n52.sos.event.events.SensorDeletion;
 import org.n52.sos.event.events.SensorInsertion;
@@ -60,19 +61,39 @@ public class ContentModificationListener implements SosEventListener {
     public void handle(SosEvent event) {
         try {
             LOGGER.debug("Updating Cache after content modification: {}", event);
-            /* TODO pass actual events to the cache controller */
-            if (event instanceof SensorInsertion) {
-                getCacheController().updateAfterSensorInsertion(/*(SensorInsertion) event*/);
-            } else if (event instanceof ObservationInsertion) {
-                getCacheController().updateAfterObservationInsertion(/*(ObservationInsertion) event*/);
-            } else if (event instanceof ObservationDeletion) {
+            if (event instanceof SensorInsertion) 
+            {
+                getCacheController().updateAfterSensorInsertion(
+                		((SensorInsertion) event).getRequest(),
+                		((SensorInsertion) event).getResponse());
+            } 
+            else if (event instanceof ObservationInsertion)
+            {
+                getCacheController().updateAfterObservationInsertion(
+                		((ObservationInsertion) event).getRequest());
+            }
+            else if (event instanceof ObservationDeletion)
+            {
             	// this update will always be performed based on database information
                 getCacheController().updateAfterObservationDeletion();
-            } else if (event instanceof ResultTemplateInsertion) {
-                getCacheController().updateAfterResultTemplateInsertion(/*(ResultTemplateInsertion) event*/);
-            } else if (event instanceof SensorDeletion) {
-                getCacheController().updateAfterSensorDeletion(/*(SensorDeletion) event*/);
-            } else {
+            }
+            else if (event instanceof ResultTemplateInsertion)
+            {
+                getCacheController().updateAfterResultTemplateInsertion(
+                		((ResultTemplateInsertion) event).getRequest(),
+                		((ResultTemplateInsertion) event).getResponse());
+            }
+            else if (event instanceof SensorDeletion)
+            {
+                getCacheController().updateAfterSensorDeletion(
+                		((SensorDeletion) event).getRequest());
+            } 
+            else if (event instanceof ResultInsertion)
+            {
+            	getCacheController().updateAfterResultInsertion( 
+            			((ResultInsertion)event).getResponse().getObservation() );
+            }
+            else {
                 LOGGER.warn("Can not handle modification event: {}", event);
             }
             

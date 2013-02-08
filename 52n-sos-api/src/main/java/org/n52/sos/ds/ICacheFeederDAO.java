@@ -35,12 +35,24 @@ public interface ICacheFeederDAO {
 
     public void updateCache(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
 
+    /**
+     * @deprecated should be deleted after successful test of InMemoryCacheController 
+     */
     public void updateAfterSensorInsertion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
 
+    /**
+     * @deprecated should be deleted after successful test of InMemoryCacheController 
+     */
     public void updateAfterObservationInsertion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
 
+    /**
+     * @deprecated should be deleted after successful test of InMemoryCacheController 
+     */
     public void updateAfterSensorDeletion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
 
+    /**
+     * @deprecated should be deleted after successful test of InMemoryCacheController 
+     */
     public void updateAfterResultTemplateInsertion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
 
     public void updateAfterObservationDeletion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;

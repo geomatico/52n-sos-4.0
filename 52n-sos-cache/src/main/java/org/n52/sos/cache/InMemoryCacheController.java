@@ -43,11 +43,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <b>TODO</b> add more log statements for debug level on
- *         failed or successful operation<br />
- * <b>TODO</b> use commands design as in {@link CacheControllerImpl}      
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk
- *         J&uuml;rrens</a> 
+ *         J&uuml;rrens</a>
+ * @since 4.0 
  */
 public class InMemoryCacheController extends CacheControllerImpl {
 
@@ -56,6 +54,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	/**
 	 * @see SensorInsertionInMemoryCacheUpdate 
 	 */
+	@Override
 	public void updateAfterSensorInsertion(InsertSensorRequest sosRequest,
 			InsertSensorResponse sosResponse)
 	{
@@ -65,6 +64,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	/**
 	 * @see ObservationInsertionInMemoryCacheUpdate
 	 */
+	@Override
 	public void updateAfterObservationInsertion(InsertObservationRequest sosRequest)
 	{
 		update(new ObservationInsertionInMemoryCacheUpdate(sosRequest));
@@ -73,6 +73,7 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	/**
 	 * @see SensorDeletionInMemoryCacheUpdate
 	 */
+	@Override
 	public void updateAfterSensorDeletion(DeleteSensorRequest sosRequest)
 	{
 		update(new SensorDeletionInMemoryCacheUpdate(sosRequest));
@@ -81,18 +82,19 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	/**
 	 * @see ResultTemplateInsertionInMemoryCacheUpdate 
 	 */
+	@Override
 	public void updateAfterResultTemplateInsertion(InsertResultTemplateRequest sosRequest, InsertResultTemplateResponse sosResponse)
 	{
 		update(new ResultTemplateInsertionInMemoryCacheUpdate(sosRequest,sosResponse));
 	}
 
+	@Override
 	public void updateAfterResultInsertion(SosObservation sosObservation)
 	{
 		update(new ResultInsertionInMemoryCacheUpdate(sosObservation));
 	}
 
 	/**
-	 * TODO Eike: continue implementation here: Call this method from public methods and create the required actions 
 	 * TODO Eike: test removal of locking mechanisms
 	 */
 	private void update(InMemoryCacheUpdate cacheUpdate)
