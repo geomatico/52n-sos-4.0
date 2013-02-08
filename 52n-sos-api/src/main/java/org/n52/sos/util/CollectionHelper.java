@@ -122,7 +122,7 @@ public class CollectionHelper {
 		return new ArrayList<T>(s1);
 	}
      
-    public static <K, V> Map<K, V> synchronizedFixedSizeMap(final int capacity) {
+    public static <K, V> Map<K, V> synchronizedInitialSizeMapWithLoadFactor1(final int capacity) {
         return CollectionHelper.synchronizedMap(capacity, 1.0F);
     }
 
