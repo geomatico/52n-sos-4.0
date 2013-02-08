@@ -77,8 +77,9 @@ public class OfferingCacheUpdate extends CacheUpdate {
     public void execute() {
         List<Offering> offerings = getOfferingObjects(getSession());
         OfferingCache offeringCache = new OfferingCache(offerings);
-        // fields required for multithreading
+
         LOGGER.debug("multithreading init");
+        
         offeringThreadsRunning = new CountDownLatch(offerings.size());
         errors = CollectionHelper.synchronizedLinkedList();
 

@@ -24,9 +24,9 @@
 package org.n52.sos.ds.hibernate.cache.base;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import org.joda.time.DateTime;
 import org.n52.sos.cache.CapabilitiesCache;
 import org.n52.sos.ds.hibernate.entities.Offering;
@@ -51,60 +51,60 @@ public class OfferingCache {
 
     public OfferingCache(List<Offering> offerings) {
         final int size = offerings.size();
-        this.names = CollectionHelper.synchronizedFixedSizeMap(size);
-        this.procedures = CollectionHelper.synchronizedFixedSizeMap(size);
-        this.observableProperties = CollectionHelper.synchronizedFixedSizeMap(size);
-        this.relatedFeatures = CollectionHelper.synchronizedFixedSizeMap(size);
-        this.observationTypes = CollectionHelper.synchronizedFixedSizeMap(size);
-        this.allowedObservationTypes = CollectionHelper.synchronizedFixedSizeMap(size);
-        this.minTimes = CollectionHelper.synchronizedFixedSizeMap(size);
-        this.maxTimes = CollectionHelper.synchronizedFixedSizeMap(size);
-        this.envelopes = CollectionHelper.synchronizedFixedSizeMap(size);
-        this.featuresOfInterest = CollectionHelper.synchronizedFixedSizeMap(size);
+        names = CollectionHelper.synchronizedMap(size);
+        procedures = CollectionHelper.synchronizedMap(size);
+        observableProperties = CollectionHelper.synchronizedMap(size);
+        relatedFeatures = CollectionHelper.synchronizedMap(size);
+        observationTypes = CollectionHelper.synchronizedMap(size);
+        allowedObservationTypes = CollectionHelper.synchronizedMap(size);
+        minTimes = CollectionHelper.synchronizedMap(size);
+        maxTimes = CollectionHelper.synchronizedMap(size);
+        envelopes = CollectionHelper.synchronizedMap(size);
+        featuresOfInterest = CollectionHelper.synchronizedMap(size);
     }
 
     public Map<String, String> getNames() {
-        return Collections.unmodifiableMap(this.names);
+        return names;
     }
 
     public Map<String, List<String>> getProcedures() {
-        return Collections.unmodifiableMap(this.procedures);
+        return procedures;
     }
 
     public Map<String, Collection<String>> getObservableProperties() {
-        return Collections.unmodifiableMap(this.observableProperties);
+        return observableProperties;
     }
 
     public Map<String, Collection<String>> getRelatedFeatures() {
-        return Collections.unmodifiableMap(this.relatedFeatures);
+        return relatedFeatures;
     }
 
     public Map<String, Collection<String>> getObservationTypes() {
-        return Collections.unmodifiableMap(this.observationTypes);
+        return observationTypes;
     }
 
     public Map<String, Collection<String>> getAllowedObservationTypes() {
-        return Collections.unmodifiableMap(this.allowedObservationTypes);
+        return allowedObservationTypes;
     }
 
     public Map<String, DateTime> getMinTimes() {
-        return Collections.unmodifiableMap(this.minTimes);
+        return minTimes;
     }
 
     public Map<String, DateTime> getMaxTimes() {
-        return Collections.unmodifiableMap(this.maxTimes);
+        return maxTimes;
     }
 
     public Map<String, SosEnvelope> getEnvelopes() {
-        return Collections.unmodifiableMap(this.envelopes);
+        return envelopes;
     }
 
     public Map<String, Collection<String>> getFeaturesOfInterest() {
-        return Collections.unmodifiableMap(this.featuresOfInterest);
+        return featuresOfInterest;
     }
     
     public void setName(String offering, String name) {
-        this.names.put(offering, name);
+        names.put(offering, name);
     }
     
     public void setProcedures(String offering, List<String> procedures) {
@@ -128,15 +128,15 @@ public class OfferingCache {
     }
     
     public void setMinTime(String offering, DateTime minTime) {
-        this.minTimes.put(offering, minTime);
+        minTimes.put(offering, minTime);
     }
     
     public void setMaxTime(String offering, DateTime maxTime) {
-        this.maxTimes.put(offering, maxTime);
+        maxTimes.put(offering, maxTime);
     }
     
     public void setEnvelope(String offering, SosEnvelope envelope) {
-        this.envelopes.put(offering, envelope);
+        envelopes.put(offering, envelope);
     }
 
     public void setFeaturesOfInterest(String offering, Collection<String> featuresOfInterest) {
