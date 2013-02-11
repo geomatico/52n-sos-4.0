@@ -1,0 +1,6 @@
+org.n52.sos.web.json.impl.BooleanSettingDefinitionEncoder
+org.n52.sos.web.json.impl.FileSettingDefinitionEncoder
+org.n52.sos.web.json.impl.IntegerSettingDefinitionEncoder
+org.n52.sos.web.json.impl.NumericSettingDefinitionEncoder
+org.n52.sos.web.json.impl.StringSettingDefinitionEncoder
+org.n52.sos.web.json.impl.UriSettingDefinitionEncoder
