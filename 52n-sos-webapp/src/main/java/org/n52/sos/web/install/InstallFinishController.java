@@ -96,7 +96,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         } catch (SQLException e) {
             throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_CONNECT_TO_THE_DATABASE, e.getMessage()));
         } finally {
-            close(con);
+            SqlUtils.close(con);
         }
         instantiateConfigurator(properties, c);
         saveDatabaseProperties(properties, c);

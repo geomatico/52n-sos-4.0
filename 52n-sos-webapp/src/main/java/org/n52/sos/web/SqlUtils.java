@@ -24,12 +24,14 @@
 package org.n52.sos.web;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -39,6 +41,10 @@ import org.slf4j.LoggerFactory;
 public class SqlUtils {
 
     private static final Logger log = LoggerFactory.getLogger(SqlUtils.class);
+
+    private SqlUtils() {
+        // private constructor to enforce static access
+    }
 
     /*
      * TODO find a working library function that can parse and execute a SQL file...
@@ -55,46 +61,63 @@ public class SqlUtils {
             String strLine;
             StringBuilder sql = new StringBuilder();
             log.debug("Executing SQL file {}", path);
-            while ( (strLine = br.readLine()) != null) {
+            while ((strLine = br.readLine()) != null) {
                 strLine = strLine.trim();
-                if ( (strLine.length() > 0) && ( !strLine.contains("--"))) {
+                if ((strLine.length() > 0) && (!strLine.contains("--"))) {
                     if (strLine.equals("$$")) {
                         stringLiteral = !stringLiteral;
                     }
                     sql.append(" ").append(strLine).append(" ");
-                    if ( !stringLiteral && strLine.substring(strLine.length() - 1).equals(";")) {
+                    if (!stringLiteral && strLine.substring(strLine.length() - 1).equals(";")) {
                         st.execute(sql.substring(0, sql.length() - 1));
                         sql = new StringBuilder();
                     }
                 }
             }
+        } finally {
+            close(st);
+            close(in);
+            close(br);
         }
-        finally {
-            if (st != null) {
-                try {
-                    st.close();
-                }
-                catch (SQLException e) {
-                }
+    }
+
+    public static void close(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (Throwable t) {
+                log.error(String.format("Error closing %s!", closeable.getClass()), t);
             }
-            if (in != null) {
-                try {
-                    in.close();
-                }
-                catch (IOException e) {
-                }
-            }
-            if (br != null) {
-                try {
-                    br.close();
-                }
-                catch (IOException e) {
-                }
+        }
+    }
+    
+    public static void close(ResultSet closable) {
+        if (closable != null) {
+            try {
+                closable.close();
+            } catch (Throwable ex) {
+                log.error("Error closing ResultSet!", ex);
             }
         }
     }
 
-    private SqlUtils() {
-        // private constructor to enforce static access
+    public static void close(Statement closable) {
+        if (closable != null) {
+            try {
+                closable.close();
+            } catch (Throwable ex) {
+                log.error("Error closing Statement!", ex);
+            }
+        }
+    }
+
+    public static void close(Connection closable) {
+        if (closable != null) {
+            try {
+                closable.close();
+            } catch (Throwable ex) {
+                log.error("Error closing Connection!", ex);
+            }
+        }
     }
 }

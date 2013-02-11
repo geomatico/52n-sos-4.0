@@ -106,15 +106,6 @@ public abstract class AbstractInstallController extends AbstractController {
         return session.getAttribute(step.getCompletionAttribute()) != null;
     }
     
-    protected void close(AutoCloseable closable) {
-        if (closable != null) {
-            try {
-                closable.close();
-            } catch (Exception ex) {
-            }
-        }
-    }
-    
     @ExceptionHandler(value = InstallationRedirectError.class)
     public ModelAndView onError(InstallationRedirectError e) {
         return redirect(e.getPath());

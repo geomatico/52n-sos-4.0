@@ -40,6 +40,7 @@ import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.JdbcUrl;
 import org.n52.sos.web.MetaDataHandler;
+import org.n52.sos.web.SqlUtils;
 import org.n52.sos.web.install.InstallConstants.Step;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -77,8 +78,8 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
         } catch (SQLException ex) {
             throw new InstallationSettingsError(settings, String.format(ErrorMessages.COULD_NOT_CONNECT_TO_DB_SERVER, ex.getMessage()), ex);
         } finally {
-            close(st);
-            close(con);
+            SqlUtils.close(st);
+            SqlUtils.close(con);
         }
     }
 
@@ -220,7 +221,7 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
         } catch (SQLException e) {
             log.error("Could not determine version of installed database schema.", e);
         } finally {
-            close(rs);
+            SqlUtils.close(rs);
         }
         
         try {
