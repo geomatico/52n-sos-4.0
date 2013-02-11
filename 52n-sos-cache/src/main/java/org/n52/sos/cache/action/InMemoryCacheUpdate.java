@@ -82,7 +82,7 @@ public abstract class InMemoryCacheUpdate implements Action {
 	{
 		if (!getCache().getProcedures().contains(procedureIdentifier)) {
 			getCache().getProcedures().add(procedureIdentifier);
-			LOGGER.debug("added porcedure '{}' to cache? {}",
+			LOGGER.debug("added procedure '{}' to cache? {}",
 					procedureIdentifier,
 					getCache().getProcedures().contains(procedureIdentifier));
 		}
