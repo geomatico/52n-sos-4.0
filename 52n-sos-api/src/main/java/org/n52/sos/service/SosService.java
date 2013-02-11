@@ -228,6 +228,9 @@ public class SosService extends ConfiguratedHttpServlet {
             throws ServletException {
         OutputStream out = null;
         GZIPOutputStream gzip = null;
+        
+        LOGGER.debug("SERVICE-RESPONSE: {}",sosResponse);
+        
         try {
             String contentType = sosResponse.getContentType();
             resp.setContentType(contentType);

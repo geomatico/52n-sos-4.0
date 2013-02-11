@@ -278,5 +278,18 @@ public class ServiceResponse {
     {
         this.httpResponseCode = httpResponseCode;
     }
-	
+
+	@Override
+	public String toString()
+	{
+		return String.format("ServiceResponse [byteArrayOutputStream=%s, httpResponseCode=%s, contentType=%s, headerMap=%s, applyZipCompression=%s, xmlResponse=%s]", 
+				byteArrayOutputStream,
+				httpResponseCode, 
+				contentType, 
+				headerMap, 
+				applyZipCompression, 
+				xmlResponse);
+	}
+    
+    
 }
