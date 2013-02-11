@@ -45,6 +45,13 @@ public class IntegerSettingDefinition extends AbstractSettingDefinition<Integer>
     }
 
     /**
+     * @return whether a minimum value is set
+     */
+    public boolean hasMinimum() {
+        return getMinimum() != null;
+    }
+
+    /**
      * Set the value of minimum
      * <p/>
      * @param minimum new value of minimum
@@ -63,6 +70,13 @@ public class IntegerSettingDefinition extends AbstractSettingDefinition<Integer>
      */
     public Integer getMaximum() {
         return maximum;
+    }
+
+    /**
+     * @return whether a maximum value is set
+     */
+    public boolean hasMaximum() {
+        return getMaximum() != null;
     }
 
     /**
