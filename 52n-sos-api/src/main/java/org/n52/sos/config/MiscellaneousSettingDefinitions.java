@@ -60,12 +60,6 @@ public class MiscellaneousSettingDefinitions {
             .setOptional(true)
             .setTitle("Date format of GML")
             .setDescription("Date format of Geography Markup Language");
-    public static final ISettingDefinition<String> NO_DATA_VALUE = new StringSettingDefinition()
-            .setGroup(GROUP)
-            .setKey("NO_DATA_VALUE")
-            .setDefaultValue("noData")
-            .setTitle("No data value")
-            .setDescription("No data value");
     public static final ISettingDefinition<String> SRS_NAME_PREFIX_SOS_V1 = new StringSettingDefinition()
             .setGroup(GROUP)
             .setKey("SRS_NAME_PREFIX_SOS_V1")

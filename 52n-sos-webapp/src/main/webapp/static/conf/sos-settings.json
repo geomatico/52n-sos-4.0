@@ -161,30 +161,6 @@
 					"title": "Skip duplicate observations",
 					"description": "Skip duplicate observations silently when inserted by batch."
 				},
-				"FOI_ENCODED_IN_OBSERVATION": {
-					"type": "boolean",
-					"default": true,
-					"title": "FOI encoded in observation",
-					"description": "Encode the complete FOI instance within an Observation instance instead of just the FOI id."
-				},
-				"FOI_LISTED_IN_OFFERINGS": {
-					"type": "boolean",
-					"default": true,
-					"title": "FOI in offerings",
-					"description": "Include list of FOI IDs in offerings."
-				},
-				"SHOW_FULL_OPERATIONS_METADATA": {
-					"type": "boolean",
-					"default": true,
-					"title": "Show full operations metadata",
-					"description": "Include allowed values in OperationMetadata of GetCapabilities response."
-				},
-				"SHOW_FULL_OPERATIONS_METADATA_FOR_OBSERVATIONS": {
-					"type": "boolean",
-					"default": true,
-					"title": "Show full operations metadata for observations",
-					"description": "Include allowed values for featureOfInterest in OperationMetadata of GetObservation."
-				},
 				"CHILD_PROCEDURES_ENCODED_IN_PARENTS_DESCRIBE_SENSOR": {
 					"type": "boolean",
 					"default": false,
@@ -278,13 +254,6 @@
 					"required": false,
 					"title": "Date format of GML",
 					"description": "Date format of Geography Markup Language"
-				},
-				"NO_DATA_VALUE": {
-					"type": "string",
-					"default": "noData",
-					"required": true,
-					"title": "No data value",
-					"description": "No data value"
 				},
 				"SRS_NAME_PREFIX_SOS_V1": {
 					"type": "string",

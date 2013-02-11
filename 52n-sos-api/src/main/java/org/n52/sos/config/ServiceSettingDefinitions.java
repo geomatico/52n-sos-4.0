@@ -66,12 +66,6 @@ public class ServiceSettingDefinitions {
             .setDefaultValue(1048576)
             .setTitle("GZIP Threshold")
             .setDescription("The size (in byte) the SOS starts to gzip responses (if the client supports it).");
-    public static final ISettingDefinition<Boolean> FOI_ENCODED_IN_OBSERVATION = new BooleanSettingDefinition()
-            .setGroup(GROUP).
-            setKey("FOI_ENCODED_IN_OBSERVATION")
-            .setDefaultValue(true)
-            .setTitle("FOI encoded in observation").
-            setDescription("Encode the complete FOI instance within an Observation instance instead of just the FOI id.");
     public static final ISettingDefinition<Integer> MAX_GET_OBSERVATION_RESULTS = new IntegerSettingDefinition()
             .setGroup(GROUP)
             .setKey("MAX_GET_OBSERVATION_RESULTS")
@@ -79,24 +73,12 @@ public class ServiceSettingDefinitions {
             .setTitle("Maximum number of observations")
             .setDescription("Maximum number of observation in GetObservation responses. " 
                             + "Set to <code>0</code> (zero) for unlimited number of observations.");
-    public static final ISettingDefinition<Boolean> SHOW_FULL_OPERATIONS_METADATA = new BooleanSettingDefinition()
-            .setGroup(GROUP)
-            .setKey("SHOW_FULL_OPERATIONS_METADATA")
-            .setDefaultValue(true)
-            .setTitle("Show full operations metadata")
-            .setDescription("Include allowed values in OperationMetadata of GetCapabilities response.");
     public static final ISettingDefinition<Boolean> SUPPORTS_QUALITY = new BooleanSettingDefinition()
             .setGroup(GROUP)
             .setKey("SUPPORTS_QUALITY")
             .setDefaultValue(true)
             .setTitle("Supports quality")
             .setDescription("Support quality information in observations.");
-    public static final ISettingDefinition<Boolean> SHOW_FULL_OPERATIONS_METADATA_FOR_OBSERVATIONS = new BooleanSettingDefinition()
-            .setGroup(GROUP)
-            .setKey("SHOW_FULL_OPERATIONS_METADATA_FOR_OBSERVATIONS")
-            .setDefaultValue(true)
-            .setTitle("Show full operations metadata for observations")
-            .setDescription("Include allowed values for featureOfInterest in OperationMetadata of GetObservation.");
     public static final ISettingDefinition<Integer> CAPABILITIES_CACHE_UPDATE_INTERVAL = new IntegerSettingDefinition()
             .setMinimum(0)
             .setGroup(GROUP)
@@ -130,12 +112,6 @@ public class ServiceSettingDefinitions {
             .setDefaultValue(false)
             .setTitle("Encode child procedures.")
             .setDescription("Encode the complete sensor description of a child procedure in the parent procedure description.");
-    public static final ISettingDefinition<Boolean> FOI_LISTED_IN_OFFERINGS = new BooleanSettingDefinition()
-            .setGroup(GROUP)
-            .setKey("FOI_LISTED_IN_OFFERINGS")
-            .setDefaultValue(true)
-            .setTitle("FOI in offerings")
-            .setDescription("Include list of FOI IDs in offerings.");
     public static final ISettingDefinition<String> CONFIGURATION_FILES = new StringSettingDefinition()
             .setGroup(GROUP)
             .setKey("CONFIGURATION_FILES")
