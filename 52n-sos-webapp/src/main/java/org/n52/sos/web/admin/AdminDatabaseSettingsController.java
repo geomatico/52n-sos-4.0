@@ -57,7 +57,7 @@ public class AdminDatabaseSettingsController extends AbstractController {
         } catch (Exception ex) {
             log.error("Error reading database settings", ex);
             return new ModelAndView(ControllerConstants.Views.ADMIN_DATABASE_SETTINGS,
-                    ControllerConstants.ERROR_MESSAGE_ATTRIBUTE, ex.getMessage());
+                    ControllerConstants.ERROR_MODEL_ATTRIBUTE, ex.getMessage());
         }
     }
     
@@ -113,7 +113,7 @@ public class AdminDatabaseSettingsController extends AbstractController {
     
     private ModelAndView onSaveError(String uri, String message, Throwable e) {
         Map<String, String> model = new HashMap<String, String>(2);
-        model.put(ControllerConstants.ERROR_MESSAGE_ATTRIBUTE, (message != null) ? 
+        model.put(ControllerConstants.ERROR_MODEL_ATTRIBUTE, (message != null) ? 
                 message : (e != null) ? e.getMessage() : "Could not save settings");
         if (uri != null) {
             model.put(ControllerConstants.JDBC_PARAMETER, uri);

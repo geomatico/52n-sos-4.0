@@ -42,11 +42,13 @@
 
 <script type="text/javascript">
     function overwriteDefaultSettings(settings) {
-        <c:forEach items="<%=org.n52.sos.service.Setting.getNames()%>" var="setting">
-            <c:if test="${not empty requestScope[setting]}">
-                setSetting("${setting}","${requestScope[setting]}", settings);
-            </c:if>
-        </c:forEach>
+        <c:if test="${not empty settings}">
+            <c:forEach items="${settings}" var="entry">
+                <c:if test="${not empty entry.value}">
+                    setSetting("${entry.key}","${entry.value}", settings);
+                </c:if>
+            </c:forEach>
+        </c:if>
     }
 </script>
 

@@ -49,7 +49,7 @@
 	<div class="control-group">
 		<label class="control-label" for="sos_website">Username</label>
 		<div class="controls">
-			<input class="input-xlarge" type="text" name="admin_username" autocomplete="off" placeholder="admin"/>
+			<input class="input-xlarge" type="text" name="admin_username" autocomplete="off" placeholder="admin" value="${admin_username}"/>
 			<span class="help-block"><span class="label label-warning">required</span> The username to login into the admin backend.</span>
 		</div>
 	</div>
@@ -57,8 +57,8 @@
 	<div class="control-group">
 		<label class="control-label" for="password">Password</label>
 		<div class="controls">
-			<input type="hidden" name="admin_password"/>
-			<input id="password" class="input-xlarge" type="text" autocomplete="off" placeholder="password"/>
+			<input type="hidden" name="admin_password" value="${admin_password}"/>
+			<input id="password" class="input-xlarge" type="text" autocomplete="off" placeholder="password" value="${admin_password}"/>
 			<span class="help-block"><span class="label label-warning">required</span> The password to login into the admin backend.</span>
 		</div>
 	</div>
@@ -78,24 +78,30 @@
 	<br/>
 	<script type="text/javascript">
 		$(function(){
-			$("input[type=text]").bind("keyup input", function() {
+            var $pwFacade = $("input#password"),
+                $pwHidden = $("input[name=admin_password]"),
+                $submit = $('button[type=submit]'),
+                $inputs = $("input[type=text]");
+			
+            $inputs.bind("keyup input", function() {
 				var empty = false;
-				$("input[type=text]").each(function() {
-					if ($(this).val() === "") { empty = true; }
+				$inputs.each(function() {
+					if ($(this).val() === "") { 
+                        empty = true;
+                    }
 				});
-				$("button[type=submit]").attr("disabled", empty);	
+				$submit.attr("disabled", empty);	
 			}).trigger("input");
-			$("input#password")
-			  .bind('focus', function() {
-				$(this).val($("input[name=admin_password]").val());
-			}).bind('blur', function() {
-				$(this).val($(this).val().replace(/./g, String.fromCharCode(8226)));
-			}).bind("keyup input", function() {
-				$("input[name=admin_password]").val($(this).val());
-			});
-			$('button[type=submit]').click(function() {
-				$(this).attr("disabled", true);
-				$(this).parents("form").submit();
+            $pwFacade.bind('focus', function() {
+                $pwFacade.val($pwHidden.val());
+            }).bind('blur', function() {
+                $pwFacade.val($pwFacade.val().replace(/./g, String.fromCharCode(8226)));
+            }).bind("keyup input", function() {
+                $pwHidden.val($pwFacade.val());
+            }).trigger("blur");
+			$submit.click(function() {
+				$submit.attr("disabled", true);
+				$submit.parents("form").submit();
 			});
 		});
 	</script>

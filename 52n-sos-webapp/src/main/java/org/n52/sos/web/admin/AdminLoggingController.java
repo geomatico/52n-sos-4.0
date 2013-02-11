@@ -59,15 +59,15 @@ public class AdminLoggingController extends AbstractController {
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView view() {
         AbstractLoggingConfigurator lc = AbstractLoggingConfigurator.getInstance();
-        Map<String, Object> config = new HashMap<String, Object>(5);
-        config.put(IS_FILE_ENABLED_MODEL_ATTRIBUTE, lc.isEnabled(AbstractLoggingConfigurator.Appender.FILE));
-        config.put(IS_CONSOLE_ENABLED_MODEL_ATTRIBUTE, lc.isEnabled(AbstractLoggingConfigurator.Appender.CONSOLE));
-        config.put(ROOT_LOG_LEVEL_MODEL_ATTRIBUTE, lc.getRootLogLevel());
-        config.put(DAYS_TO_KEEP_MDOEL_ATTRIBUTE, lc.getMaxHistory());
-        config.put(LOGGER_LEVELS_MODEL_ATTRIBUTE, lc.getLoggerLevels());
-        config.put(LOG_MESSAGES_MODEL_ATTRIBUTE, lc.getLastLogEntries(LOG_MESSAGES));
-        config.put(MAX_FILE_SIZE_MODEL_ATTRIBUTE, lc.getMaxFileSize());
-        return new ModelAndView(ControllerConstants.Views.ADMIN_LOGGING, config);
+        Map<String, Object> model = new HashMap<String, Object>(5);
+        model.put(IS_FILE_ENABLED_MODEL_ATTRIBUTE, lc.isEnabled(AbstractLoggingConfigurator.Appender.FILE));
+        model.put(IS_CONSOLE_ENABLED_MODEL_ATTRIBUTE, lc.isEnabled(AbstractLoggingConfigurator.Appender.CONSOLE));
+        model.put(ROOT_LOG_LEVEL_MODEL_ATTRIBUTE, lc.getRootLogLevel());
+        model.put(DAYS_TO_KEEP_MDOEL_ATTRIBUTE, lc.getMaxHistory());
+        model.put(LOGGER_LEVELS_MODEL_ATTRIBUTE, lc.getLoggerLevels());
+        model.put(LOG_MESSAGES_MODEL_ATTRIBUTE, lc.getLastLogEntries(LOG_MESSAGES));
+        model.put(MAX_FILE_SIZE_MODEL_ATTRIBUTE, lc.getMaxFileSize());
+        return new ModelAndView(ControllerConstants.Views.ADMIN_LOGGING, model);
     }
     
 

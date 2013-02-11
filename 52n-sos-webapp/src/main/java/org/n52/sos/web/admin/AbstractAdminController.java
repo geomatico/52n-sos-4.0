@@ -39,7 +39,7 @@ import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.SqlUtils;
 
 public abstract class AbstractAdminController extends AbstractController {
-       
+
     protected void executeSqlFile(String path) throws SQLException, FileNotFoundException {
         final File f = new File(getContext().getRealPath(path));
         if (!f.exists()) {
@@ -52,12 +52,10 @@ public abstract class AbstractAdminController extends AbstractController {
             if (con instanceof Connection) {
                 try {
                     SqlUtils.executeSQLFile((Connection) con, f);
-                }
-                catch (IOException ex) {
+                } catch (IOException ex) {
                     throw new SQLException(ex);
                 }
-            }
-            else if (con instanceof Session) {
+            } else if (con instanceof Session) {
                 Session s = (Session) con;
                 Transaction t = s.beginTransaction();
                 try {
@@ -66,23 +64,19 @@ public abstract class AbstractAdminController extends AbstractController {
                         public void execute(Connection connection) throws SQLException {
                             try {
                                 SqlUtils.executeSQLFile(connection, f);
-                            }
-                            catch (IOException ex) {
+                            } catch (IOException ex) {
                                 throw new SQLException(ex);
                             }
                         }
                     });
                     t.commit();
-                }
-                catch (HibernateException e) {
+                } catch (HibernateException e) {
                     t.rollback();
                 }
-            }
-            else {
+            } else {
                 throw new SQLException("Unknown conncetion type: " + con.getClass());
             }
-        }
-        finally {
+        } finally {
             p.returnConnection(con);
         }
     }

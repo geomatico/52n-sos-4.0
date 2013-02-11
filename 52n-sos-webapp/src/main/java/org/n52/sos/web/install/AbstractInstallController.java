@@ -23,6 +23,7 @@
  */
 package org.n52.sos.web.install;
 
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,36 +31,44 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
+import org.n52.sos.web.install.InstallConstants.Step;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
 public abstract class AbstractInstallController extends AbstractController {
 
-    protected boolean wasSuccessfull(Map<String, Object> settings) {
-        Boolean success = (Boolean) settings.get(InstallConstants.SUCCESS);
-        if (success != null) {
-            settings.remove(InstallConstants.SUCCESS);
-            return success.booleanValue();
+    private static final String INSTALLATION_CONFIGURATION = "installation_configuration";
+    
+    public static InstallationConfiguration getSettings(HttpSession s) {
+        InstallationConfiguration c = (InstallationConfiguration) s.getAttribute(INSTALLATION_CONFIGURATION);
+        if (c == null) {
+            c = new InstallationConfiguration();
         }
-        return false;
+        return c;
     }
 
-    protected Map<String, Object> getSettings(HttpSession s) {
-        s.removeAttribute(ControllerConstants.ERROR_MESSAGE_ATTRIBUTE);
-        Map<String, Object> settings = new HashMap<String, Object>();
-        Enumeration< ? > e = s.getAttributeNames();
-        while (e.hasMoreElements()) {
-            String key = (String) e.nextElement();
-            settings.put(key, s.getAttribute(key));
-        }
-        return settings;
+    public static void setSettings(HttpSession session, InstallationConfiguration settings) {
+        session.setAttribute(INSTALLATION_CONFIGURATION, settings);
     }
+    
+    protected Map<String, Object> toModel(InstallationConfiguration c) {
+        Map<String, Object> model = new HashMap<String, Object>(4);
+        model.put(ControllerConstants.SETTINGS_MODEL_ATTRIBUTE, c.getSettings());
+        model.put(ControllerConstants.DATABASE_SETTINGS_MODEL_ATTRIBUTE, c.getDatabaseSettings());
+        model.put(HibernateConstants.ADMIN_USERNAME_KEY, c.getUsername());
+        model.put(HibernateConstants.ADMIN_PASSWORD_KEY, c.getPassword());
+        return model;
+    } 
 
     protected Map<String, String> getParameters(HttpServletRequest req) {
         Map<String, String> parameters = new HashMap<String, String>();
-        Enumeration< ? > e = req.getParameterNames();
+        Enumeration<?> e = req.getParameterNames();
         while (e.hasMoreElements()) {
             String key = (String) e.nextElement();
             parameters.put(key, req.getParameter(key));
@@ -67,32 +76,62 @@ public abstract class AbstractInstallController extends AbstractController {
         return parameters;
     }
 
-    protected void setSettings(HttpSession session, Map<String, Object> settings) {
-        for (Map.Entry<String, Object> e : settings.entrySet()) {
-            session.setAttribute(e.getKey(), e.getValue());
+    protected ModelAndView redirect(String path) {
+        return new ModelAndView(new RedirectView(path, true));
+    }
+
+    protected void setComplete(HttpSession session) {
+        session.setAttribute(getStep().getCompletionAttribute(), true);
+    }
+
+    protected HttpSession checkPrevious(HttpServletRequest req) throws InstallationRedirectError {
+        HttpSession session = req.getSession(true);
+        checkPrevious(session);
+        return session;
+    }
+
+    private void checkPrevious(HttpSession session) throws InstallationRedirectError {
+        for (Step step : reverseSteps(getStep())) {
+            if (!isComplete(session, step)) {
+                throw new InstallationRedirectError(step.getPath());
+            }
         }
     }
 
-    protected boolean hasError(Map<String, Object> settings) {
-        return settings.containsKey(ControllerConstants.ERROR_MESSAGE_ATTRIBUTE);
+    private Step[] reverseSteps(Step step) {
+        return Arrays.copyOfRange(step.values(), 0, step.ordinal());
     }
 
-    protected Map<String, Object> error(Map<String, Object> settings, String message) {
-        log.error(message);
-        settings.put(ControllerConstants.ERROR_MESSAGE_ATTRIBUTE, message);
-        settings.put(InstallConstants.SUCCESS, Boolean.FALSE);
-        return settings;
+    private boolean isComplete(HttpSession session, Step step) {
+        return session.getAttribute(step.getCompletionAttribute()) != null;
+    }
+    
+    protected void close(AutoCloseable closable) {
+        if (closable != null) {
+            try {
+                closable.close();
+            } catch (Exception ex) {
+            }
+        }
+    }
+    
+    @ExceptionHandler(value = InstallationRedirectError.class)
+    public ModelAndView onError(InstallationRedirectError e) {
+        return redirect(e.getPath());
     }
 
-    protected Map<String, Object> error(Map<String, Object> settings, String message, Throwable t) {
-        log.error(message, t);
-        settings.put(ControllerConstants.ERROR_MESSAGE_ATTRIBUTE, message);
-        settings.put(InstallConstants.SUCCESS, Boolean.FALSE);
-        return settings;
+    @ExceptionHandler(value = InstallationSettingsError.class)
+    public ModelAndView onError(HttpSession session, InstallationSettingsError e) {
+        if (e.getCause() != null) {
+            log.error(e.getMessage(), e.getCause());
+        } else {
+            log.error(e.getMessage());
+        }
+        setSettings(session, e.getSettings());
+        Map<String, Object> model = toModel(e.getSettings());
+        model.put(ControllerConstants.ERROR_MODEL_ATTRIBUTE, e.getMessage());
+        return new ModelAndView(getStep().getView(), model);
     }
 
-    protected Map<String, Object> success(Map<String, Object> settings) {
-        settings.put(InstallConstants.SUCCESS, Boolean.TRUE);
-        return settings;
-    }
+    protected abstract Step getStep();
 }

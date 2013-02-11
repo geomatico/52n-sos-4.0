@@ -35,12 +35,13 @@
 <form id="settings" class="form-horizontal"></form>
 <script type="text/javascript">
     function overwriteDefaultSettings(settings) {
-    <c:forEach items="<%=org.n52.sos.service.Setting.getNames()%>" var="setting">
-        <c:if test="${not empty requestScope[setting]}">
-            setSetting("${setting}","${requestScope[setting]}", settings);
+        <c:if test="${not empty settings}">
+            <c:forEach items="${settings}" var="entry">
+                <c:if test="${not empty entry.value}">
+                    setSetting("${entry.key}","${entry.value}", settings);
+                </c:if>
+            </c:forEach>
         </c:if>
-    </c:forEach>
-            setSetting("admin_username","${requestScope["admin_username"]}", settings);
     }
 </script>
 <script type="text/javascript">

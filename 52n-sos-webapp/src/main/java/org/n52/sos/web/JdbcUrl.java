@@ -239,10 +239,13 @@ public class JdbcUrl {
 
     @Override
     public String toString() {
-        return new StringBuilder(getConnectionString()).append('?').append(QUERY_PARAMETER_USER).append('=').append(getUser()).append('&').append(QUERY_PARAMETER_PASSWORD).append('=').append(getPassword()).toString();
+        return new StringBuilder(getConnectionString()).append('?').append(QUERY_PARAMETER_USER).append('=')
+                .append(getUser()).append('&').append(QUERY_PARAMETER_PASSWORD).append('=').append(getPassword())
+                .toString();
     }
 
     public String getConnectionString() {
-        return new StringBuilder().append(getScheme()).append(':').append(getType()).append("://").append(getHost()).append(':').append(getPort()).append('/').append(getDatabase()).toString();
+        return new StringBuilder().append(getScheme()).append(':').append(getType()).append("://").append(getHost())
+                .append(':').append(getPort()).append('/').append(getDatabase()).toString();
     }
 }

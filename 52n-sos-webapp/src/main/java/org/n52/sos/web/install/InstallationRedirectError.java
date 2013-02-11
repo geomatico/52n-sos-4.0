@@ -23,27 +23,20 @@
  */
 package org.n52.sos.web.install;
 
-import javax.servlet.http.HttpServletRequest;
+/**
+ * TODO JavaDoc
+ *
+ * @author Christian Autermann <c.autermann@52north.org>
+ */
+public class InstallationRedirectError extends Exception {
+    private static final long serialVersionUID = 1L;
+    private String path;
 
-import org.n52.sos.web.ControllerConstants;
-import org.n52.sos.web.install.InstallConstants.Step;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
-@Controller
-@RequestMapping({ControllerConstants.Paths.INSTALL_ROOT, ControllerConstants.Paths.INSTALL_INDEX})
-public class InstallIndexController extends AbstractInstallController {
-
-    @RequestMapping(method = RequestMethod.GET)
-    public String get(HttpServletRequest req) {
-        /* create a session */
-        setComplete(req.getSession(true));
-        return ControllerConstants.Views.INSTALL_INDEX;
+    public InstallationRedirectError(String path) {
+        this.path = path;
     }
 
-    @Override
-    protected Step getStep() {
-        return Step.WELCOME;
+    public String getPath() {
+        return path;
     }
 }

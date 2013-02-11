@@ -64,7 +64,7 @@ public interface ControllerConstants {
         public static final String ADMIN_LOGGING_FILE_DOWNLOAD = "/admin/logging/file";
         public static final String INSTALL_ROOT = "/install";
         public static final String INSTALL_INDEX = "/install/index";
-        public static final String INSTALL_DATABASE_CONFIGURATION = "/install/database";
+        public static final String INSTALL_DATABASE = "/install/database";
         public static final String INSTALL_SETTINGS = "/install/settings";
         public static final String INSTALL_FINISH = "/install/finish";
         public static final String INSTALL_LOAD_CONFIGURATION = "/install/load";
@@ -72,7 +72,9 @@ public interface ControllerConstants {
         public static final String LOGOUT = "/j_spring_security_logout";
     }
     
-    public static final String ERROR_MESSAGE_ATTRIBUTE = "error";
+    public static final String SETTINGS_MODEL_ATTRIBUTE = "settings";
+    public static final String DATABASE_SETTINGS_MODEL_ATTRIBUTE = "databaseSettings";
+    public static final String ERROR_MODEL_ATTRIBUTE = "error";
     public static final String JDBC_PARAMETER = "jdbc_uri";
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
     

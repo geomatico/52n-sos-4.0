@@ -30,6 +30,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.ServiceLoader;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -52,95 +53,56 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class AdminDatabaseController extends AbstractAdminController {
-    
+
+    public static final String TEST_OFFERING_PREFIX = "test_offering";
     private static final String ROWS = "rows";
     private static final String NAMES = "names";
-    private static final String TEST_DATA_SET_INSTALLED = "SELECT CASE WHEN EXISTS (SELECT identifier FROM offering WHERE identifier LIKE 'test_offering%' LIMIT 1) THEN true ELSE false END;";
     private static final String IS_TEST_DATA_SET_INSTALLED_MODEL_ATTRIBUTE = "IS_TEST_DATA_SET_INSTALLED_MODEL_ATTRIBUTE";
     private ServiceLoader<IGeneralQueryDao> daoServiceLoader = ServiceLoader.load(IGeneralQueryDao.class);
 
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE)
     public ModelAndView index() throws SQLException {
-        IConnectionProvider c = Configurator.getInstance().getConnectionProvider();
-        boolean isInstalled = false;
-        Object con = c.getConnection();
-        try {
-            if (con instanceof Connection) {
-                isInstalled = isTestDataSetInstalled((Connection) con);
-            }
-            else if (con instanceof Session) {
-                isInstalled = ((Session) con).doReturningWork(new ReturningWork<Boolean>() {
-                    @Override
-                    public Boolean execute(Connection connection) throws SQLException {
-                        return Boolean.valueOf(isTestDataSetInstalled(connection));
-                    }
-                }).booleanValue();
-            }
-        }
-        finally {
-            c.returnConnection(con);
-        }
         return new ModelAndView(ControllerConstants.Views.ADMIN_DATABASE,
                                 IS_TEST_DATA_SET_INSTALLED_MODEL_ATTRIBUTE,
-                                Boolean.valueOf(isInstalled));
+                                Boolean.valueOf(checkCacheForTestDataSet()));
     }
 
-    private boolean isTestDataSetInstalled(Connection con) throws SQLException {
-        Statement st = null;
-        ResultSet rs = null;
-        try {
-            st = con.createStatement();
-            rs = st.executeQuery(TEST_DATA_SET_INSTALLED);
-            rs.next();
-            return rs.getBoolean(1);
-        }
-        finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                }
-                catch (Exception e) {
-                    log.error("Error closing ResultSet", e);
-                }
-            }
-            if (st != null) {
-                try {
-                    st.close();
-                }
-                catch (Exception e) {
-                    log.error("Error closing Statement", e);
-                }
+    private boolean checkCacheForTestDataSet() {
+        Collection<String> offerings = Configurator.getInstance().getCapabilitiesCacheController().getOfferings();
+        for (String offering : offerings) {
+            if (offering.startsWith(TEST_OFFERING_PREFIX)) {
+                return true;
             }
         }
+        return false;
     }
 
+    @ResponseBody
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE_EXECUTE, method = RequestMethod.POST)
-    public @ResponseBody String processQuery(@RequestBody String querySQL) {
+    public String processQuery(@RequestBody String querySQL) {
         try {
             String q = URLDecoder.decode(querySQL, "UTF-8");
             log.info("Query: {}", q);
             IGeneralQueryDao dao = daoServiceLoader.iterator().next();
             IGeneralQueryDao.QueryResult rs = dao.query(q);
-            
+
             JSONObject j = new JSONObject();
             if (rs.getMessage() != null) {
                 j.put(rs.isError() ? "error" : "message", rs.getMessage());
                 return j.toString();
             }
-            
+
             JSONArray names = new JSONArray(rs.getColumnNames());
             JSONArray rows = new JSONArray();
             for (IGeneralQueryDao.Row row : rs.getRows()) {
                 rows.put(new JSONArray(row.getValues()));
             }
-            
+
             return new JSONObject().put(ROWS, rows).put(NAMES, names).toString();
-        }
-        catch (UnsupportedEncodingException ex) {
+        } catch (UnsupportedEncodingException ex) {
             log.error("Could not decode String", ex);
             return "Could not decode String: " + ex.getMessage();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             log.error("Query unsuccesfull.", ex);
             return "Query unsuccesfull. Cause: " + ex.getMessage();
         }

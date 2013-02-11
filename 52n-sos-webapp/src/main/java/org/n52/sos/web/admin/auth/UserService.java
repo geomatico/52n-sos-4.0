@@ -49,6 +49,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class UserService implements AuthenticationProvider, Serializable {
 
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
+    private static final long serialVersionUID = 1L;
 
     @Autowired
     private ServletContext context;

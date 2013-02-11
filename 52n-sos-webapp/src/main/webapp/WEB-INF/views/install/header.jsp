@@ -86,9 +86,9 @@
 			</script>
 			<div class="container">  
 				<div id="content" class="span12">
-					<c:if test="${not empty sessionScope.error}">
+					<c:if test="${not empty error}">
 						<div class="alert alert-error">
-							<strong>Error!</strong> ${fn:escapeXml(sessionScope.error)}
+							<strong>Error!</strong> ${fn:escapeXml(error)}
 						</div>
 						<c:remove var="error" scope="session" />
 					</c:if>

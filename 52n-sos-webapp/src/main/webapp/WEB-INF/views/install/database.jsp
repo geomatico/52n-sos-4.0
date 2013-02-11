@@ -54,7 +54,8 @@
                     <input type="checkbox" name="overwrite_tables" />
                     <strong>Delete existing tables</strong> &mdash; This will delete all existing tables in the database.
                 </label>
-                <span style="display: none;" class="help-block"><span class="label label-important">Warning!</span> This will erase the entire database.</span>
+                <span style="display: none;" class="help-block"><span class="label label-important">Warning!</span> 
+                    This will erase the entire database.</span>
             </div>
         </div>
         <div class="control-group">
@@ -81,17 +82,20 @@
         var dialect = settings["jdbc_dialect"];
         var connectionPool = settings["connection_pool"];
         
-        <c:if test="${not empty sessionScope.jdbc_uri}">
-            jdbc_uri = "${sessionScope.jdbc_uri}";
-        </c:if>
-        <c:if test="${not empty sessionScope.driver}">
-            driver = "${sessionScope.driver}";
-        </c:if>
-        <c:if test="${not empty sessionScope.jdbc_dialect}">
-            dialect = "${sessionScope.jdbc_dialect}";
-        </c:if>
-        <c:if test="${not empty sessionScope.connection_pool}">
-            connectionPool = "${sessionScope.connection_pool}";
+        <c:if test="${not empty databaseSettings}">
+            <c:if test="${not empty databaseSettings['driver']}">
+                driver = "${databaseSettings['driver']}";
+            </c:if>
+            <c:if test="${not empty databaseSettings['jdbc_uri']}">
+                jdbc_uri = "${databaseSettings['jdbc_uri']}";
+            </c:if>
+            
+            <c:if test="${not empty databaseSettings['jdbc_dialect']}">
+                dialect = "${databaseSettings['jdbc_dialect']}";
+            </c:if>
+            <c:if test="${not empty databaseSettings['connection_pool']}">
+                connectionPool = "${databaseSettings['connection_pool']}";
+            </c:if>
         </c:if>
             
         $("input[name=connection_pool]").val(connectionPool);

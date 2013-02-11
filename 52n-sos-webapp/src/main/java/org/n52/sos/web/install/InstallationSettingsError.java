@@ -23,27 +23,27 @@
  */
 package org.n52.sos.web.install;
 
-import javax.servlet.http.HttpServletRequest;
+/**
+ * TODO JavaDoc
+ *
+ * @author Christian Autermann <c.autermann@52north.org>
+ */
+public class InstallationSettingsError extends Exception {
 
-import org.n52.sos.web.ControllerConstants;
-import org.n52.sos.web.install.InstallConstants.Step;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+    private static final long serialVersionUID = 1L;
+    private final InstallationConfiguration settings;
 
-@Controller
-@RequestMapping({ControllerConstants.Paths.INSTALL_ROOT, ControllerConstants.Paths.INSTALL_INDEX})
-public class InstallIndexController extends AbstractInstallController {
-
-    @RequestMapping(method = RequestMethod.GET)
-    public String get(HttpServletRequest req) {
-        /* create a session */
-        setComplete(req.getSession(true));
-        return ControllerConstants.Views.INSTALL_INDEX;
+    public InstallationSettingsError(InstallationConfiguration c, String message) {
+        super(message);
+        this.settings = c;
     }
 
-    @Override
-    protected Step getStep() {
-        return Step.WELCOME;
+    public InstallationSettingsError(InstallationConfiguration settings, String message, Throwable cause) {
+        super(message, cause);
+        this.settings = settings;
+    }
+
+    public InstallationConfiguration getSettings() {
+        return this.settings;
     }
 }

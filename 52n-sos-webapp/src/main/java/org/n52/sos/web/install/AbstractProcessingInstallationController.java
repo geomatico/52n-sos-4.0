@@ -23,27 +23,40 @@
  */
 package org.n52.sos.web.install;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
-import org.n52.sos.web.ControllerConstants;
-import org.n52.sos.web.install.InstallConstants.Step;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
 
+/**
+ * TODO JavaDoc
+ *
+ * @author Christian Autermann <c.autermann@52north.org>
+ */
 @Controller
-@RequestMapping({ControllerConstants.Paths.INSTALL_ROOT, ControllerConstants.Paths.INSTALL_INDEX})
-public class InstallIndexController extends AbstractInstallController {
+public abstract class AbstractProcessingInstallationController extends AbstractInstallController {
 
     @RequestMapping(method = RequestMethod.GET)
-    public String get(HttpServletRequest req) {
-        /* create a session */
-        setComplete(req.getSession(true));
-        return ControllerConstants.Views.INSTALL_INDEX;
+    public ModelAndView get(HttpServletRequest req) throws InstallationRedirectError {
+        return new ModelAndView(getStep().getView(), toModel(getSettings(checkPrevious(req))));
     }
 
-    @Override
-    protected Step getStep() {
-        return Step.WELCOME;
+    @RequestMapping(method = RequestMethod.POST)
+    public ModelAndView post(HttpServletRequest req, HttpServletResponse resp) throws InstallationSettingsError, InstallationRedirectError {
+        HttpSession session = checkPrevious(req);
+        InstallationConfiguration c = getSettings(session);
+        process(getParameters(req), c);
+        setSettings(session, c);
+        setComplete(session);
+        return redirect(getStep().getNext().getPath());
     }
+    
+    protected abstract void process(Map<String, String> parameters, InstallationConfiguration c) throws InstallationSettingsError;
+    
 }

@@ -26,11 +26,13 @@ package org.n52.sos.web.install;
 import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.n52.sos.web.ControllerConstants;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,16 +43,19 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @RequestMapping(ControllerConstants.Paths.INSTALL_LOAD_CONFIGURATION)
 public class InstallLoadSettingsController {
 
-    @RequestMapping(method = RequestMethod.POST, consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public void post(@RequestBody
-    String config, HttpServletRequest req) throws JSONException {
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void post(@RequestBody String config, HttpServletRequest req) throws JSONException {
+        final HttpSession session = req.getSession();
+        InstallationConfiguration c = AbstractInstallController.getSettings(session);
+        
         JSONObject settings = new JSONObject(config);
-        Iterator< ? > i = settings.keys();
+        Iterator< ?> i = settings.keys();
         while (i.hasNext()) {
             String key = (String) i.next();
             String value = settings.getString(key);
-            req.getSession().setAttribute(key, value);
+            c.setSetting(key, value);
         }
+        AbstractInstallController.setSettings(session, c);
     }
 }

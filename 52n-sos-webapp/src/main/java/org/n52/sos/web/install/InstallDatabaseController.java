@@ -36,218 +36,239 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.JdbcUrl;
 import org.n52.sos.web.MetaDataHandler;
+import org.n52.sos.web.install.InstallConstants.Step;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
-@RequestMapping(ControllerConstants.Paths.INSTALL_DATABASE_CONFIGURATION)
-public class InstallDatabaseController extends AbstractInstallController {
-
-    @RequestMapping(method = RequestMethod.GET)
-    public ModelAndView get(HttpServletRequest req) {
-        HttpSession session = req.getSession(false);
-        if (session == null) {
-            return new ModelAndView(new RedirectView(ControllerConstants.Paths.INSTALL_INDEX, true));
-        }
-        return new ModelAndView(ControllerConstants.Views.INSTALL_DATABASE, getSettings(session));
+@RequestMapping(ControllerConstants.Paths.INSTALL_DATABASE)
+public class InstallDatabaseController extends AbstractProcessingInstallationController  {
+    
+    @Override
+    protected Step getStep() {
+        return Step.DATABASE;
     }
-
-    @RequestMapping(method = RequestMethod.POST)
-    public ModelAndView post(HttpServletRequest req, HttpServletResponse resp) {
-        HttpSession session = req.getSession(false);
-        if (session == null) {
-            return new ModelAndView(new RedirectView(ControllerConstants.Paths.INSTALL_INDEX, true));
-        }
-        Map<String, Object> settings = process(getParameters(req), getSettings(session));
-        setSettings(session, settings);
-        if (wasSuccessfull(settings)) {
-            session.setAttribute(InstallConstants.DBCONFIG_COMPLETE, true);
-            return new ModelAndView(new RedirectView(ControllerConstants.Paths.INSTALL_SETTINGS, true));
-        }
-        else {
-            return new ModelAndView(ControllerConstants.Views.INSTALL_DATABASE, settings);
-        }
-    }
-
+    
     // TODO move user message text strings out of Java into properties file.
-    private Map<String, Object> process(Map<String, String> parameters, Map<String, Object> settings) {
+    @Override
+    protected void process(Map<String, String> parameters, InstallationConfiguration settings) throws InstallationSettingsError {
+        checkDriver(parameters, settings);
+        checkConnectionPool(parameters, settings);
+        checkDialect(parameters, settings);
+        String jdbc = checkJdbcUrl(parameters, settings);
+        boolean overwriteTables = checkOverwrite(parameters, settings);
+        boolean createTables = checkCreate(parameters, overwriteTables, settings);
+        boolean createTestData = checkCreateTestData(parameters, settings);
+        Connection con = null;
+        Statement st = null;
+        try {
+            con = DriverManager.getConnection(jdbc);
+            st = createStatement(con, settings);
+            if (createTables || createTestData) {
+                checkTableCreation(st, settings);
+            }
+            boolean alreadyExistent = checkAlreadyExistent(st);
+            checkTableConfiguration(createTables, overwriteTables, alreadyExistent, settings, st);
+            checkPostGis(st, settings);
+        } catch (SQLException ex) {
+            throw new InstallationSettingsError(settings, String.format(ErrorMessages.COULD_NOT_CONNECT_TO_DB_SERVER, ex.getMessage()), ex);
+        } finally {
+            close(st);
+            close(con);
+        }
+    }
 
+    protected void checkDriver(Map<String, String> parameters,
+                             InstallationConfiguration settings) throws InstallationSettingsError {
         String driver = parameters.get(InstallConstants.DRIVER_PARAMETER);
         if (driver == null) {
-            return error(settings, "no driver specified");
+            throw new InstallationSettingsError(settings, ErrorMessages.NO_DRIVER_SPECIFIED);
         }
-        settings.put(InstallConstants.DRIVER_PARAMETER, driver);
+        settings.setDatabaseSetting(InstallConstants.DRIVER_PARAMETER, driver);
         try {
             Class.forName(driver);
         } catch (Throwable ex) {
-            return error(settings, "Could not load Driver:" + ex.getMessage(), ex);
+            throw new InstallationSettingsError(settings, String.format(ErrorMessages.COULD_NOT_LOAD_DRIVER, ex.getMessage()), ex);
         }
+    }
 
+    protected void checkConnectionPool(Map<String, String> parameters,
+                                     InstallationConfiguration settings) throws InstallationSettingsError {
         String connectionPool = parameters.get(InstallConstants.CONNECTION_POOL_PARAMETER);
         if (connectionPool == null) {
-            return error(settings, "no connection pool specified");
+            throw new InstallationSettingsError(settings, ErrorMessages.NO_CONNECTION_POOL_SPECIFIED);
         }
-        settings.put(InstallConstants.CONNECTION_POOL_PARAMETER, connectionPool);
+        settings.setDatabaseSetting(InstallConstants.CONNECTION_POOL_PARAMETER, connectionPool);
         try {
             Class.forName(connectionPool);
         } catch (Throwable ex) {
-            return error(settings, "Could not load connection pool:" + ex.getMessage(), ex);
+            throw new InstallationSettingsError(settings, String.format(ErrorMessages.COULD_NOT_LOAD_CONNECTION_POOL, ex.getMessage()), ex);
         }
+    }
 
+    protected void checkDialect(Map<String, String> parameters,
+                              InstallationConfiguration settings) throws InstallationSettingsError {
         String dialect = parameters.get(InstallConstants.JDBC_DIALECT_PARAMETER);
         if (dialect == null) {
-            return error(settings, "no dialect specified");
+            throw new InstallationSettingsError(settings, ErrorMessages.NO_DIALECT_SPECIFIED);
         }
-        settings.put(InstallConstants.JDBC_DIALECT_PARAMETER, dialect);
+        settings.setDatabaseSetting(InstallConstants.JDBC_DIALECT_PARAMETER, dialect);
         try {
             Class.forName(dialect);
         } catch (Throwable ex) {
-            return error(settings, "Could not load dialect:" + ex.getMessage(), ex);
+            throw new InstallationSettingsError(settings, String.format(ErrorMessages.COULD_NOT_LOAD_DIALECT, ex.getMessage()), ex);
         }
-        
+    }
 
+    protected String checkJdbcUrl(Map<String, String> parameters,
+                                InstallationConfiguration settings) throws InstallationSettingsError {
         String jdbc = parameters.get(ControllerConstants.JDBC_PARAMETER);
         if (jdbc == null) {
-            return error(settings, "No JDBC URL specified.");
+            throw new InstallationSettingsError(settings, ErrorMessages.NO_JDBC_URL_SPECIFIED);
         }
         JdbcUrl url;
         try {
             url = new JdbcUrl(jdbc);
         } catch (URISyntaxException ex) {
-            return error(settings, "Invalid JDBC URL.", ex);
+            throw new InstallationSettingsError(settings, ErrorMessages.INVALID_JDBC_URL, ex);
         }
         String error = url.isValid();
         if (error != null) {
             url.correct();
-            settings.put(ControllerConstants.JDBC_PARAMETER, url.toString());
-            return error(settings, "Invalid JDBC URL: " + error);
+            settings.setDatabaseSetting(ControllerConstants.JDBC_PARAMETER, url.toString());
+            throw new InstallationSettingsError(settings, String.format(ErrorMessages.INVALID_JDBC_URL_WITH_ERROR_MESSAGE, error));
         }
-        settings.put(ControllerConstants.JDBC_PARAMETER, jdbc);
-        
+        settings.setDatabaseSetting(ControllerConstants.JDBC_PARAMETER, jdbc);
+        return jdbc;
+    }
+
+    protected boolean checkOverwrite(Map<String, String> parameters,
+                                   InstallationConfiguration settings) {
         boolean overwriteTables = false;
         Boolean overwriteTablesParameter = parseBoolean(parameters, InstallConstants.OVERWRITE_TABLES_PARAMETER);
         if (overwriteTablesParameter != null) {
             overwriteTables = overwriteTablesParameter.booleanValue();
         }
-        settings.put(InstallConstants.OVERWRITE_TABLES_PARAMETER, overwriteTables);
+        settings.setDatabaseSetting(InstallConstants.OVERWRITE_TABLES_PARAMETER, overwriteTables);
+        return overwriteTables;
+    }
 
+    protected boolean checkCreate(Map<String, String> parameters, boolean overwriteTables,
+                                InstallationConfiguration settings) {
         boolean createTables = true;
         Boolean createTablesParameter = parseBoolean(parameters, InstallConstants.CREATE_TABLES_PARAMETER);
         if (createTablesParameter != null) {
             createTables = (overwriteTables) ? overwriteTables : createTablesParameter.booleanValue();
         }
-        settings.put(InstallConstants.CREATE_TABLES_PARAMETER, createTables);
+        settings.setDatabaseSetting(InstallConstants.CREATE_TABLES_PARAMETER, createTables);
+        return createTables;
+    }
 
-        
-
+    protected boolean checkCreateTestData(Map<String, String> parameters,
+                                        InstallationConfiguration settings) {
         boolean createTestData = false;
         Boolean createTestDataParameter = parseBoolean(parameters, InstallConstants.CREATE_TEST_DATA_PARAMETER);
         if (createTestDataParameter != null) {
             createTestData = createTestDataParameter.booleanValue();
         }
-        settings.put(InstallConstants.CREATE_TEST_DATA_PARAMETER, createTestData);
+        settings.setDatabaseSetting(InstallConstants.CREATE_TEST_DATA_PARAMETER, createTestData);
+        return createTestData;
+    }
 
-        Connection con = null;
-        Statement st = null;
+    protected Statement createStatement(Connection con,
+                                      InstallationConfiguration settings) throws InstallationSettingsError {
         try {
-            con = DriverManager.getConnection(jdbc);
-            try {
-                st = con.createStatement();
-            } catch (SQLException e) {
-                return error(settings, "Cannot create Statement: " + e.getMessage(), e);
-            }
-            if (createTables || createTestData) {
-                try {
-                    st.execute(InstallConstants.CAN_CREATE_TABLES);
-                } catch (SQLException e) {
-                    return error(settings, "Cannot create tables: " + e.getMessage(), e);
-                }
-            }
-            boolean alreadyExistent = true;
-            try {
-                st.execute(InstallConstants.TABLES_ALREADY_EXISTENT);
-            } catch (SQLException e) {
-                alreadyExistent = false;
-            }
-
-            if (createTables) {
-                if (!overwriteTables && alreadyExistent) {
-                    return error(settings, "Tables already created, but should not overwrite. Please take a look at the 'Actions' section.");
-                }
-            } else if (!alreadyExistent) {
-                return error(settings, "No tables are present in the database and no tables should be created.");
-            } else {
-                /* check version, but for now do not fail on this one... */
-                String version = null;
-                String currentVersion = null;
-                ResultSet rs = null;
-                try {
-                    rs = st.executeQuery(InstallConstants.GET_VERSION_OF_DATABASE_INSTALLATION);
-                    if (rs.next()) {
-                        version = rs.getString(1);
-                    }
-                } catch (SQLException e) {
-                    log.error("Could not determine version of installed database schema.", e);
-                } finally {
-                    rs.close();
-                }
-                
-                try {
-                    currentVersion = getMetaDataHandler().get(MetaDataHandler.Metadata.VERSION);
-                } catch (ConfigurationException e) {
-                    log.error("Can not load version metadata property", e);
-                }
-                
-                if (currentVersion != null && !currentVersion.equals(version)) {
-                    /* TODO do some conversion? */
-                    log.warn("Installed database schema ({}) is not the current one ({}).", version, currentVersion);
-                }
-                
-                
-            }
-
-            try {
-                st.execute(InstallConstants.IS_POSTGIS_INSTALLED);
-            } catch (SQLException e) {
-                return error(settings, "PostGIS is not installed in the database.", e);
-            }
-
-            try {
-                st.execute(InstallConstants.CAN_READ_SPATIAL_REF_SYS);
-            } catch (SQLException e) {
-                return error(settings, "Cannot read 'spatial_ref_sys' table of PostGIS. Please revise your database configuration.", e);
-            }
-
+            return con.createStatement();
+        } catch (SQLException e) {
+            throw new InstallationSettingsError(settings, String.format(ErrorMessages.CANNOT_CREATE_STATEMENT, e.getMessage()), e);
         }
-        catch (SQLException ex) {
-            return error(settings, "Could not connect to DB server: " + ex.getMessage(), ex);
-        }
-        finally {
-            if (st != null) {
-                try {
-                    st.close();
-                } catch (SQLException ex) {
-                }
-            }
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException ex) {
-                }
-            }
-        }
+    }
 
-        return success(settings);
+    protected void checkTableCreation(Statement st,
+                                    InstallationConfiguration settings) throws InstallationSettingsError {
+        try {
+            st.execute(InstallConstants.CAN_CREATE_TABLES);
+        } catch (SQLException e) {
+            throw new InstallationSettingsError(settings, String.format(ErrorMessages.CANNOT_CREATE_TABLES, e.getMessage()), e);
+        }
+    }
+
+    protected boolean checkAlreadyExistent(Statement st) {
+        boolean alreadyExistent = true;
+        try {
+            st.execute(InstallConstants.TABLES_ALREADY_EXISTENT);
+        } catch (SQLException e) {
+            alreadyExistent = false;
+        }
+        return alreadyExistent;
+    }
+
+    protected void checkVersion(Statement st) throws SQLException {
+        /* check version, but for now do not fail on this one... */
+        String version = null;
+        String currentVersion = null;
+        ResultSet rs = null;
+        try {
+            rs = st.executeQuery(InstallConstants.GET_VERSION_OF_DATABASE_INSTALLATION);
+            if (rs.next()) {
+                version = rs.getString(1);
+            }
+        } catch (SQLException e) {
+            log.error("Could not determine version of installed database schema.", e);
+        } finally {
+            close(rs);
+        }
+        
+        try {
+            currentVersion = getMetaDataHandler().get(MetaDataHandler.Metadata.VERSION);
+        } catch (ConfigurationException e) {
+            log.error("Can not load version metadata property", e);
+        }
+        
+        if (currentVersion != null && !currentVersion.equals(version)) {
+            /* TODO do some conversion? */
+            log.warn("Installed database schema ({}) is not the current one ({}).", version, currentVersion);
+        }
+    }
+
+    protected void checkPostGis(Statement st,
+                              InstallationConfiguration settings) throws InstallationSettingsError {
+        checkPostGisInstallation(st, settings);
+        checkSpatialRefSys(st, settings);
+    }
+
+    protected void checkPostGisInstallation(Statement st,
+                                          InstallationConfiguration settings) throws InstallationSettingsError {
+        try {
+            st.execute(InstallConstants.IS_POSTGIS_INSTALLED);
+        } catch (SQLException e) {
+            throw new InstallationSettingsError(settings, ErrorMessages.POST_GIS_IS_NOT_INSTALLED_IN_THE_DATABASE, e);
+        }
+    }
+
+    protected void checkSpatialRefSys(Statement st,
+                                    InstallationConfiguration settings) throws InstallationSettingsError {
+        try {
+            st.execute(InstallConstants.CAN_READ_SPATIAL_REF_SYS);
+        } catch (SQLException e) {
+            throw new InstallationSettingsError(settings, ErrorMessages.CANNOT_READ_SPATIAL_REF_SYS_TABLE, e);
+        }
+    }
+
+    protected void checkTableConfiguration(boolean createTables, boolean overwriteTables, boolean alreadyExistent,
+                                         InstallationConfiguration settings, Statement st) throws InstallationSettingsError, SQLException {
+        if (createTables) {
+            if (!overwriteTables && alreadyExistent) {
+                throw new InstallationSettingsError(settings, ErrorMessages.TABLES_ALREADY_CREATED_BUT_SHOULD_NOT_OVERWRITE);
+            }
+        } else if (!alreadyExistent) {
+            throw new InstallationSettingsError(settings, ErrorMessages.NO_TABLES_AND_SHOULD_NOT_CREATE);
+        } else {
+            checkVersion(st);
+        }
     }
 }

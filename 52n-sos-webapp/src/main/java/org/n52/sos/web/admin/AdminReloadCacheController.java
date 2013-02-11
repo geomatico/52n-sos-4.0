@@ -46,21 +46,23 @@ public class AdminReloadCacheController extends AbstractController {
     public void reload() throws OwsExceptionReport, UnavailableException {
         log.debug("Reloading Capabilitities Cache");
         if (Configurator.getInstance() != null) {
-            Configurator.getInstance().getCapabilitiesCacheController().updateCacheFromDB();   
+            Configurator.getInstance().getCapabilitiesCacheController().updateCacheFromDB();
         } else {
             throw new UnavailableException("configurator is not available");
         }
     }
-    
+
+    @ResponseBody
     @ExceptionHandler(OwsExceptionReport.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public @ResponseBody String errorWhileRefreshing(OwsExceptionReport e) {
+    public String errorWhileRefreshing(OwsExceptionReport e) {
         return e.getMessage();
     }
-    
+
+    @ResponseBody
     @ExceptionHandler(UnavailableException.class)
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    public @ResponseBody String noConfigurator(UnavailableException e) {
+    public String noConfigurator(UnavailableException e) {
         return e.getMessage();
     }
 }
