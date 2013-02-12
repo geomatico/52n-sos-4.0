@@ -1018,6 +1018,61 @@
               <stringProp name="Argument.value">http://www.opengis.net/sensorML/1.0.1</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
+            <elementProp name="phenomenon_time_start" elementType="Argument">
+              <stringProp name="Argument.name">phenomenon_time_start</stringProp>
+              <stringProp name="Argument.value">1970-01-01T13:37:00.000+01:00</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="phenomenon_time_end" elementType="Argument">
+              <stringProp name="Argument.name">phenomenon_time_end</stringProp>
+              <stringProp name="Argument.value">2000-12-31T23:59:59.999+12:00</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="feature_x" elementType="Argument">
+              <stringProp name="Argument.name">feature_x</stringProp>
+              <stringProp name="Argument.value">10.401108</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="feature_y" elementType="Argument">
+              <stringProp name="Argument.name">feature_y</stringProp>
+              <stringProp name="Argument.value">52.512348</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="default_srs_name" elementType="Argument">
+              <stringProp name="Argument.name">default_srs_name</stringProp>
+              <stringProp name="Argument.value">http://www.opengis.net/def/crs/EPSG/0/4326</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="offering_identifier" elementType="Argument">
+              <stringProp name="Argument.name">offering_identifier</stringProp>
+              <stringProp name="Argument.value">test-offering-identifer</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="offering_name" elementType="Argument">
+              <stringProp name="Argument.name">offering_name</stringProp>
+              <stringProp name="Argument.value">test-offering-name</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="observable_property_start" elementType="Argument">
+              <stringProp name="Argument.name">observable_property_start</stringProp>
+              <stringProp name="Argument.value">test-observable-property-</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="observation_type" elementType="Argument">
+              <stringProp name="Argument.name">observation_type</stringProp>
+              <stringProp name="Argument.value">http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="feature_type" elementType="Argument">
+              <stringProp name="Argument.name">feature_type</stringProp>
+              <stringProp name="Argument.value">http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="observable_property" elementType="Argument">
+              <stringProp name="Argument.name">observable_property</stringProp>
+              <stringProp name="Argument.value">http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl#Discharge</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
           </collectionProp>
         </Arguments>
         <hashTree/>
@@ -1031,7 +1086,7 @@
 &lt;env:Envelope xmlns:env=&quot;http://www.w3.org/2003/05/soap-envelope&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://www.w3.org/2003/05/soap-envelope http://www.w3.org/2003/05/soap-envelope/soap-envelope.xsd&quot;&gt;&#xd;
 	&lt;env:Body&gt;&#xd;
 		&lt;swes:InsertSensor service=&quot;SOS&quot; version=&quot;2.0.0&quot; xmlns:swes=&quot;http://www.opengis.net/swes/2.0&quot; xmlns:sos=&quot;http://www.opengis.net/sos/2.0&quot; xmlns:swe=&quot;http://www.opengis.net/swe/1.0.1&quot; xmlns:sml=&quot;http://www.opengis.net/sensorML/1.0.1&quot; xmlns:gml=&quot;http://www.opengis.net/gml&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot; xsi:schemaLocation=&quot;http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0/sosInsertSensor.xsd     http://www.opengis.net/swes/2.0 http://schemas.opengis.net/swes/2.0/swes.xsd&quot;&gt;&#xd;
-			&lt;swes:procedureDescriptionFormat&gt;http://www.opengis.net/sensorML/1.0.1&lt;/swes:procedureDescriptionFormat&gt;&#xd;
+			&lt;swes:procedureDescriptionFormat&gt;${sensor_description_format}&lt;/swes:procedureDescriptionFormat&gt;&#xd;
 			&lt;swes:procedureDescription&gt;&#xd;
 				&lt;sml:SensorML version=&quot;1.0.1&quot;&gt;&#xd;
 					&lt;sml:member&gt;&#xd;
@@ -1047,38 +1102,24 @@
 							&lt;/sml:identification&gt;&#xd;
 							&lt;sml:identification xlink:title=&quot;offerings&quot;&gt;&#xd;
 								&lt;sml:IdentifierList&gt;&#xd;
-									&lt;sml:identifier name=&quot;Offering for Sensor ${sensor_id}&quot;&gt;&#xd;
+									&lt;sml:identifier name=&quot;${offering_name}&quot;&gt;&#xd;
 										&lt;sml:Term definition=&quot;urn:ogc:def:identifier:OGC:offeringID&quot;&gt;&#xd;
-											&lt;sml:value&gt;offering-${sensor_id}&lt;/sml:value&gt;&#xd;
+											&lt;sml:value&gt;${offering_identifier}&lt;/sml:value&gt;&#xd;
 										&lt;/sml:Term&gt;&#xd;
 									&lt;/sml:identifier&gt;&#xd;
 								&lt;/sml:IdentifierList&gt;&#xd;
 							&lt;/sml:identification&gt;&#xd;
-							&lt;sml:capabilities name=&quot;InsertionMetadata&quot;&gt;&#xd;
-								&lt;swe:SimpleDataRecord&gt;&#xd;
-									&lt;swe:field name=&quot;sos:ObservationType&quot;&gt;&#xd;
-										&lt;swe:Text&gt;&#xd;
-											&lt;swe:value&gt;http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement&lt;/swe:value&gt;&#xd;
-										&lt;/swe:Text&gt;&#xd;
-									&lt;/swe:field&gt;&#xd;
-									&lt;swe:field name=&quot;sos:FeatureOfInterestType&quot;&gt;&#xd;
-										&lt;swe:Text&gt;&#xd;
-											&lt;swe:value&gt;http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint&lt;/swe:value&gt;&#xd;
-										&lt;/swe:Text&gt;&#xd;
-									&lt;/swe:field&gt;&#xd;
-								&lt;/swe:SimpleDataRecord&gt;&#xd;
-							&lt;/sml:capabilities&gt;&#xd;
 							&lt;sml:inputs&gt;&#xd;
 								&lt;sml:InputList&gt;&#xd;
 									&lt;sml:input name=&quot;&quot;&gt;&#xd;
-										&lt;swe:ObservableProperty definition=&quot;http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl#Discharge&quot;/&gt;&#xd;
+										&lt;swe:ObservableProperty definition=&quot;${observable_property}&quot;/&gt;&#xd;
 									&lt;/sml:input&gt;&#xd;
 								&lt;/sml:InputList&gt;&#xd;
 							&lt;/sml:inputs&gt;&#xd;
 							&lt;sml:outputs&gt;&#xd;
 								&lt;sml:OutputList&gt;&#xd;
 									&lt;sml:output name=&quot;&quot; xlink:title=&quot;application/rdf+xml&quot;&gt;&#xd;
-										&lt;swe:Quantity definition=&quot;http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl#Discharge&quot;&gt;&#xd;
+										&lt;swe:Quantity definition=&quot;${observable_property}&quot;&gt;&#xd;
 											&lt;swe:uom code=&quot;NOT_DEFINED&quot;/&gt;&#xd;
 										&lt;/swe:Quantity&gt;&#xd;
 									&lt;/sml:output&gt;&#xd;
@@ -1088,17 +1129,15 @@
 					&lt;/sml:member&gt;&#xd;
 				&lt;/sml:SensorML&gt;&#xd;
 			&lt;/swes:procedureDescription&gt;&#xd;
-			&lt;!-- multiple values possible --&gt;&#xd;
-			&lt;swes:observableProperty&gt;test_observable_property_${sensor_id}_1&lt;/swes:observableProperty&gt;&#xd;
-			&lt;swes:observableProperty&gt;test_observable_property_${sensor_id}_2&lt;/swes:observableProperty&gt;&#xd;
-			&lt;swes:observableProperty&gt;test_observable_property_${sensor_id}_3&lt;/swes:observableProperty&gt;&#xd;
-			&lt;swes:observableProperty&gt;test_observable_property_${sensor_id}_4&lt;/swes:observableProperty&gt;&#xd;
-			&lt;swes:observableProperty&gt;test_observable_property_${sensor_id}_5&lt;/swes:observableProperty&gt;&#xd;
+			&lt;swes:observableProperty&gt;${observable_property_start}1&lt;/swes:observableProperty&gt;&#xd;
+			&lt;swes:observableProperty&gt;${observable_property_start}2&lt;/swes:observableProperty&gt;&#xd;
+			&lt;swes:observableProperty&gt;${observable_property_start}3&lt;/swes:observableProperty&gt;&#xd;
+			&lt;swes:observableProperty&gt;${observable_property_start}4&lt;/swes:observableProperty&gt;&#xd;
+			&lt;swes:observableProperty&gt;${observable_property_start}5&lt;/swes:observableProperty&gt;&#xd;
 			&lt;swes:metadata&gt;&#xd;
 				&lt;sos:SosInsertionMetadata&gt;&#xd;
-					&lt;sos:observationType&gt;http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation&lt;/sos:observationType&gt;&#xd;
-					&lt;!-- multiple values possible --&gt;&#xd;
-					&lt;sos:featureOfInterestType&gt;http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint&lt;/sos:featureOfInterestType&gt;&#xd;
+					&lt;sos:observationType&gt;${observation_type}&lt;/sos:observationType&gt;&#xd;
+					&lt;sos:featureOfInterestType&gt;${feature_type}&lt;/sos:featureOfInterestType&gt;&#xd;
 				&lt;/sos:SosInsertionMetadata&gt;&#xd;
 			&lt;/swes:metadata&gt;&#xd;
 		&lt;/swes:InsertSensor&gt;&#xd;
@@ -1179,7 +1218,7 @@
           <hashTree/>
           <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;ID" enabled="true">
             <boolProp name="XPath.negate">false</boolProp>
-            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:identifier[text()=&quot;offering-${sensor_id}&quot;]</stringProp>
+            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]</stringProp>
             <boolProp name="XPath.validate">false</boolProp>
             <boolProp name="XPath.whitespace">false</boolProp>
             <boolProp name="XPath.tolerant">false</boolProp>
@@ -1188,7 +1227,7 @@
           <hashTree/>
           <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;procedure" enabled="true">
             <boolProp name="XPath.negate">false</boolProp>
-            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:procedure[text()=&quot;${sensor_id}&quot;]</stringProp>
+            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../swes:procedure[text()=&quot;${sensor_id}&quot;]</stringProp>
             <boolProp name="XPath.validate">false</boolProp>
             <boolProp name="XPath.whitespace">false</boolProp>
             <boolProp name="XPath.tolerant">false</boolProp>
@@ -1197,7 +1236,7 @@
           <hashTree/>
           <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;Name" enabled="true">
             <boolProp name="XPath.negate">false</boolProp>
-            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:name[text()=&quot;Offering for Sensor ${sensor_id}&quot;]</stringProp>
+            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../swes:name[text()=&quot;${offering_name}&quot;]</stringProp>
             <boolProp name="XPath.validate">false</boolProp>
             <boolProp name="XPath.whitespace">false</boolProp>
             <boolProp name="XPath.tolerant">false</boolProp>
@@ -1206,7 +1245,7 @@
           <hashTree/>
           <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;Description Format" enabled="true">
             <boolProp name="XPath.negate">false</boolProp>
-            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:procedureDescriptionFormat[text()=&quot;${sensor_description_format}&quot;]</stringProp>
+            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../swes:procedureDescriptionFormat[text()=&quot;${sensor_description_format}&quot;]</stringProp>
             <boolProp name="XPath.validate">false</boolProp>
             <boolProp name="XPath.whitespace">false</boolProp>
             <boolProp name="XPath.tolerant">false</boolProp>
@@ -1215,7 +1254,7 @@
           <hashTree/>
           <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;Observable Property" enabled="true">
             <boolProp name="XPath.negate">false</boolProp>
-            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:observableProperty[contains(text(),&quot;test_observable_property_${sensor_id}&quot;)]</stringProp>
+            <stringProp name="XPath.xpath">count(//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../swes:observableProperty[contains(text(),&quot;${observable_property_start}&quot;)])=5</stringProp>
             <boolProp name="XPath.validate">false</boolProp>
             <boolProp name="XPath.whitespace">false</boolProp>
             <boolProp name="XPath.tolerant">false</boolProp>
@@ -1224,7 +1263,7 @@
           <hashTree/>
           <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;Feature Types &quot;../SF_SamplingPoint&quot;" enabled="true">
             <boolProp name="XPath.negate">false</boolProp>
-            <stringProp name="XPath.xpath">//sos:ObservationOffering/sos:featureOfInterestType[text()=&quot;http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint&quot;]</stringProp>
+            <stringProp name="XPath.xpath">count(//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../sos:featureOfInterestType[text()=&quot;http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint&quot;])=1</stringProp>
             <boolProp name="XPath.validate">false</boolProp>
             <boolProp name="XPath.whitespace">false</boolProp>
             <boolProp name="XPath.tolerant">false</boolProp>
@@ -1233,7 +1272,7 @@
           <hashTree/>
           <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;Observation Type" enabled="true">
             <boolProp name="XPath.negate">false</boolProp>
-            <stringProp name="XPath.xpath">//sos:ObservationOffering/sos:observationType[text()=&quot;http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation&quot;]</stringProp>
+            <stringProp name="XPath.xpath">count(//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../sos:observationType[text()=&quot;http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation&quot;])=1</stringProp>
             <boolProp name="XPath.validate">false</boolProp>
             <boolProp name="XPath.whitespace">false</boolProp>
             <boolProp name="XPath.tolerant">false</boolProp>
@@ -1241,7 +1280,7 @@
           </XPathAssertion>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="InsertObservation" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="InsertObservation" enabled="false">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
@@ -1269,9 +1308,10 @@
                 &lt;om:OM_Observation gml:id=&quot;o1&quot;&gt;&#xd;
                     &lt;om:type xlink:href=&quot;http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation&quot;/&gt;&#xd;
                     &lt;om:phenomenonTime&gt;&#xd;
-                        &lt;gml:TimeInstant gml:id=&quot;phenomenonTime&quot;&gt;&#xd;
-                            &lt;gml:timePosition&gt;2012-07-31T17:45:15.000+00:00&lt;/gml:timePosition&gt;&#xd;
-                        &lt;/gml:TimeInstant&gt;&#xd;
+                        &lt;gml:TimePeriod gml:id=&quot;phenomenonTime&quot;&gt;&#xd;
+				&lt;gml:beginPosition&gt;${phenomenon_time_start}&lt;/gml:beginPosition&gt;&#xd;
+				&lt;gml:endPosition&gt;${phenomenon_time_end}&lt;/gml:endPosition&gt;&#xd;
+			&lt;/gml:TimePeriod&gt;&#xd;
                     &lt;/om:phenomenonTime&gt;&#xd;
                     &lt;om:resultTime xlink:href=&quot;#phenomenonTime&quot;/&gt;&#xd;
                     &lt;om:procedure xlink:href=&quot;${sensor_id}&quot;/&gt;&#xd;
@@ -1283,7 +1323,7 @@
                             &lt;sf:sampledFeature xlink:href=&quot;test-feature-${sensor_id}&quot;/&gt;&#xd;
                             &lt;sams:shape&gt;&#xd;
                                 &lt;gml:Point gml:id=&quot;test-feature-${sensor_id}&quot;&gt;&#xd;
-                                    &lt;gml:pos srsName=&quot;http://www.opengis.net/def/crs/EPSG/0/4326&quot;&gt;52.512348 10.401108&lt;/gml:pos&gt;&#xd;
+                                    &lt;gml:pos srsName=&quot;http://www.opengis.net/def/crs/EPSG/0/4326&quot;&gt;${feature_x} ${feature_y}&lt;/gml:pos&gt;&#xd;
                                 &lt;/gml:Point&gt;&#xd;
                             &lt;/sams:shape&gt;&#xd;
                         &lt;/sams:SF_SpatialSamplingFeature&gt;&#xd;
@@ -1314,7 +1354,7 @@
           <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
         </HTTPSamplerProxy>
         <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="TODO: Test after InsertObseration: GetCapabilities" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="TODO: Test after InsertObseration: GetCapabilities" enabled="false">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
@@ -1332,7 +1372,6 @@
                 &lt;ows:Version&gt;2.0.0&lt;/ows:Version&gt;&#xd;
             &lt;/ows:AcceptVersions&gt;&#xd;
             &lt;ows:Sections&gt;&#xd;
-                &lt;ows:Section&gt;OperationsMetadata&lt;/ows:Section&gt;&#xd;
                 &lt;ows:Section&gt;Contents&lt;/ows:Section&gt;&#xd;
             &lt;/ows:Sections&gt;&#xd;
         &lt;/sos:GetCapabilities&gt;&#xd;
@@ -1358,18 +1397,36 @@
           <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="TODO: XPath: Global Temporal BBox-&gt;Start" enabled="true">
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Global Temporal BBox-&gt;Min" enabled="true">
             <boolProp name="XPath.negate">false</boolProp>
-            <stringProp name="XPath.xpath">//ows:Operation[@name=&apos;DescribeSensor&apos;]/ows:Parameter[@name=&apos;procedure&apos;]/ows:AllowedValues/ows:Value[text()=&quot;${sensor_id}&quot;]</stringProp>
+            <stringProp name="XPath.xpath">//ows:Operation[@name=&apos;GetObservation&apos;]/ows:Parameter[@name=&apos;temporalFilter&apos;]/ows:AllowedValues/ows:Range/ows:MinimumValue[text()=&quot;${phenomenon_time_start}&quot;]</stringProp>
             <boolProp name="XPath.validate">false</boolProp>
             <boolProp name="XPath.whitespace">false</boolProp>
             <boolProp name="XPath.tolerant">false</boolProp>
             <boolProp name="XPath.namespace">true</boolProp>
           </XPathAssertion>
           <hashTree/>
-          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="TODO: Global Temporal BBox-&gt;End" enabled="true">
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Global Temporal BBox-&gt;Max" enabled="true">
             <boolProp name="XPath.negate">false</boolProp>
-            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:identifier[text()=&quot;offering-${sensor_id}&quot;]</stringProp>
+            <stringProp name="XPath.xpath">//ows:Operation[@name=&apos;GetObservation&apos;]/ows:Parameter[@name=&apos;temporalFilter&apos;]/ows:AllowedValues/ows:Range/ows:MaximumValue[text()=&quot;${phenomenon_time_start}&quot;]</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Global Spatial BBox-&gt;Max" enabled="true">
+            <boolProp name="XPath.negate">false</boolProp>
+            <stringProp name="XPath.xpath">//ows:Operation[@name=&apos;GetObservation&apos;]/ows:Parameter[@name=&apos;spatialFilter&apos;]/ows:AllowedValues/ows:Range/ows:MaximumValue[text()=&quot;${feature_y} ${feature_x}&quot;]</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Global Spatial BBox-&gt;Min" enabled="true">
+            <boolProp name="XPath.negate">false</boolProp>
+            <stringProp name="XPath.xpath">//ows:Operation[@name=&apos;GetObservation&apos;]/ows:Parameter[@name=&apos;spatialFilter&apos;]/ows:AllowedValues/ows:Range/ows:MinimumValue[text()=&quot;${feature_y} ${feature_x}&quot;]</stringProp>
             <boolProp name="XPath.validate">false</boolProp>
             <boolProp name="XPath.whitespace">false</boolProp>
             <boolProp name="XPath.tolerant">false</boolProp>
@@ -1378,7 +1435,7 @@
           <hashTree/>
           <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="TODO XPath: Offering-&gt;bbox" enabled="true">
             <boolProp name="XPath.negate">false</boolProp>
-            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:procedure[text()=&quot;${sensor_id}&quot;]</stringProp>
+            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifer}&quot;]/../sos:observedArea/gml:Envelope[@srsName=&quot;${default_srs_name}&quot;]/gml:lowerCorner[text()=&quot;${feature_y} ${feature_x}&quot;]</stringProp>
             <boolProp name="XPath.validate">false</boolProp>
             <boolProp name="XPath.whitespace">false</boolProp>
             <boolProp name="XPath.tolerant">false</boolProp>
