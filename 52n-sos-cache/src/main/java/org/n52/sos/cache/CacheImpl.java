@@ -303,10 +303,7 @@ public class CacheImpl implements CapabilitiesCache{
      * @return List<String> containing the offerings of this SOS
      */
     protected Collection<String> getOfferings() {
-        if (kOfferingVName != null) {
-            return kOfferingVName.keySet();
-        }
-        return new ArrayList<String>();
+    	return kOfferingVProcedures.keySet();
     }
 
     /**
