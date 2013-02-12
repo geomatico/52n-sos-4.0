@@ -334,7 +334,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         for (RequestOperatorKeyType requestOperatorKeyType : requestOperators.keySet()) {
             if (requestOperatorKeyType.getServiceOperatorKeyType().getVersion().equals(version)) {
                 OWSOperation operationMetadata =
-                        requestOperators.get(requestOperatorKeyType).getOperationMetadata(service, version, session);
+                        requestOperators.get(requestOperatorKeyType).getOperationMetadata(service, version, session);  // FIXME session is not required because it is not used here!
                 if (operationMetadata != null) {
                     opsMetadata.add(operationMetadata);
                 }
