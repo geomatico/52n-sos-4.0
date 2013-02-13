@@ -53,7 +53,6 @@ import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.ICapabilitiesExtension;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.IMergableExtension;
@@ -683,24 +682,24 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         return resultModels;
     }
 
-    private String getRelatedFeatureID(String identifier, Session session, String version) throws OwsExceptionReport {
-        SosSamplingFeature feature =
-                (SosSamplingFeature) getConfigurator().getFeatureQueryHandler().getFeatureByID(identifier, session,
-                        version);
-        if (feature.getUrl() != null && !feature.getUrl().isEmpty()) {
-            return feature.getUrl();
-        } else {
-            // String urlPattern =
-            // SosHelper.getUrlPatternForHttpGetMethod(Configurator.getInstance().getBindingOperators().values(),
-            // SosConstants.Operations.GetFeatureOfInterest.name(), new
-            // DecoderKeyType(SosConstants.SOS,
-            // version));
-            // return SosHelper.createFoiGetUrl(identifier, version,
-            // Configurator.getInstance().getServiceURL(),
-            // urlPattern);
-            return identifier;
-        }
-    }
+//    private String getRelatedFeatureID(String identifier, Session session, String version) throws OwsExceptionReport {
+//        SosSamplingFeature feature =
+//                (SosSamplingFeature) getConfigurator().getFeatureQueryHandler().getFeatureByID(identifier, session,
+//                        version);
+//        if (feature.getUrl() != null && !feature.getUrl().isEmpty()) {
+//            return feature.getUrl();
+//        } else {
+//            // String urlPattern =
+//            // SosHelper.getUrlPatternForHttpGetMethod(Configurator.getInstance().getBindingOperators().values(),
+//            // SosConstants.Operations.GetFeatureOfInterest.name(), new
+//            // DecoderKeyType(SosConstants.SOS,
+//            // version));
+//            // return SosHelper.createFoiGetUrl(identifier, version,
+//            // Configurator.getInstance().getServiceURL(),
+//            // urlPattern);
+//            return identifier;
+//        }
+//    }
 
     private Collection<String> getObservationTypes(String offering) {
         Collection<String> allObservationTypes = getCache().getObservationTypes4Offering(offering);
