@@ -33,7 +33,6 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.ds.IDescribeSensorDAO;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
@@ -221,9 +220,9 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
         Collection<String> childProcedureIds = getCache().getChildProcedures(procID, false, false);
 
         if (childProcedureIds != null && !childProcedureIds.isEmpty()) {
-            String urlPattern =
-                    SosHelper.getUrlPatternForHttpGetMethod(new OperationDecoderKey(SosConstants.SOS, version,
-                            SosConstants.Operations.DescribeSensor.name()));
+//            String urlPattern =
+//                    SosHelper.getUrlPatternForHttpGetMethod(new OperationDecoderKey(SosConstants.SOS, version,
+//                            SosConstants.Operations.DescribeSensor.name()));
             for (String childProcID : childProcedureIds) {
                 Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(childProcID, session);
                 childProcedures.add(HibernateProcedureUtilities.createSosProcedureDescription(procedure, childProcID, outputFormat));
