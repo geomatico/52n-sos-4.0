@@ -45,6 +45,7 @@
 
 	<logger name="org.n52" level="${config.logger.level}" />
 	<logger name="org.hibernate.sql" level="WARN" />
+	<logger name="org.springframework" level="WARN" />
 
 	<root level="INFO">
 		<appender-ref ref="FILE" />
