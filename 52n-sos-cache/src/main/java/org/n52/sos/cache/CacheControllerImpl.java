@@ -642,7 +642,8 @@ public abstract class CacheControllerImpl extends ACapabilitiesCacheController {
 
     @Override
     public Collection<String> getObservationTypes4Offering(String offering) {
-        if (cache.getKOfferingVObservationTypes() != null) {
+        if (cache.getKOfferingVObservationTypes() != null && 
+        		cache.getKOfferingVObservationTypes().get(offering) != null) {
             return new ArrayList<String>(cache.getKOfferingVObservationTypes().get(offering));
         }
         return new ArrayList<String>(0);
