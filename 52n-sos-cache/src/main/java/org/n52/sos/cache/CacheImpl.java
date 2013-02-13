@@ -37,6 +37,8 @@ import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.util.SosHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This singleton class encapsulates HashMaps, which store relationships between
@@ -49,6 +51,8 @@ import org.n52.sos.util.SosHelper;
  * 
  */
 public class CacheImpl implements CapabilitiesCache{
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(CacheImpl.class);
 
     /**
      * contains the supported ids of SRS, which are supported by this SOS
@@ -960,7 +964,15 @@ public class CacheImpl implements CapabilitiesCache{
 
 	@Override
 	public void setGlobalEnvelope(SosEnvelope globalEnvelope) {
-		this.globalEnvelope = globalEnvelope;
+		if (globalEnvelope == null)
+		{
+			this.globalEnvelope = new SosEnvelope(null, getSrid());
+		}
+		else 
+		{
+			this.globalEnvelope = globalEnvelope;
+		}
+		LOGGER.debug("global envelope updated to '{}' with '{}'",this.globalEnvelope,globalEnvelope);
 	}
 
 	@Override

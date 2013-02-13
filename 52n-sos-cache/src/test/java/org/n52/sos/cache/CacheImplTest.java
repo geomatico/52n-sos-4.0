@@ -23,12 +23,17 @@
  */
 package org.n52.sos.cache;
 
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.*;
 
 import java.util.Collections;
 
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.n52.sos.ogc.sos.SosEnvelope;
 
 /**
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
@@ -37,42 +42,48 @@ import org.junit.Test;
 public class CacheImplTest{
 	
 	private static CacheImpl instance;
+	
+	@Before public void 
+	initInstance()
+	{
+		instance = new CacheImpl();
+	}
+	
+	@After public void
+	resetInstance()
+	{
+		instance = null;
+	}
 
-	@Test
-	public void defaultConstructorReturnsObject()
+	@Test public void 
+	defaultConstructorReturnsObject()
 	{
 		initInstance();
 		assertNotNull("instance is null", instance);
 		assertTrue("right class", instance instanceof CacheImpl);
 	}
 
-	@BeforeClass
-	public static void initInstance()
-	{
-		instance = new CacheImpl();
-	}
-	
-	@Test
-	public void equalsWithNewInstances()
+	@Test public void 
+	equalsWithNewInstances()
 	{
 		CacheImpl anotherInstance = new CacheImpl();
 		assertEquals("equals failed",instance,anotherInstance);
 	}
 	
-	@Test
-	public void equalsWithSelf()
+	@Test public void 
+	equalsWithSelf()
 	{
 		assertEquals("I am not equal with me",instance,instance);
 	}
 	
-	@Test
-	public void equalsWithNull()
+	@Test public void 
+	equalsWithNull()
 	{
 		assertNotEquals("equal with null", instance, null);
 	}
 	
-	@Test
-	public void equalWithOtherClass()
+	@Test public void 
+	equalWithOtherClass()
 	{
 		assertNotEquals("equal with Object", instance, new Object());
 	}
@@ -85,4 +96,13 @@ public class CacheImplTest{
 		assertNotEquals("hashCode() of different caches are equal",cache.hashCode(), new CacheImpl());
 	}
 	
+	@Test public void 
+	should_return_empty_global_envelope_when_setEnvelope_is_called_with_null_parameter()
+	{
+		instance.setGlobalEnvelope(null);
+		final SosEnvelope emptySosEnvelope = new SosEnvelope(null, instance.getDatabaseEPSGCode());
+		
+		assertThat(instance.getGlobalEnvelope(), not(nullValue()));
+		assertThat(instance.getGlobalEnvelope(), is(emptySosEnvelope));
+	}
 }
