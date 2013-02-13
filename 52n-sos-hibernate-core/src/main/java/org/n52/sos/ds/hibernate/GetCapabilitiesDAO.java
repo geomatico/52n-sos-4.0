@@ -840,10 +840,15 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
             }
         } else {
             List<String> role = Collections.singletonList("featureOfInterestID");
-            for (String foiID : getCache().getKOfferingVFeatures().get(offering)) {
-                if (getCache().getProcedures4FeatureOfInterest(foiID).contains(procedure)) {
-                    relatedFeatures.put(foiID, role);
-                }
+            if (getCache().getKOfferingVFeatures().containsKey(offering))
+            {
+            	for (String foiID : getCache().getKOfferingVFeatures().get(offering)) 
+            	{
+            		if (getCache().getProcedures4FeatureOfInterest(foiID).contains(procedure)) 
+            		{
+            			relatedFeatures.put(foiID, role);
+            		}
+            	}
             }
         }
         sosOffering.setRelatedFeatures(relatedFeatures);
