@@ -1068,15 +1068,127 @@
               <stringProp name="Argument.value">http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
-            <elementProp name="observable_property" elementType="Argument">
-              <stringProp name="Argument.name">observable_property</stringProp>
-              <stringProp name="Argument.value">http://sweet.jpl.nasa.gov/2.0/hydroSurface.owl#Discharge</stringProp>
-              <stringProp name="Argument.metadata">=</stringProp>
-            </elementProp>
           </collectionProp>
         </Arguments>
         <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="InsertSensor" enabled="false">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Test BEFORE InsertSensor: GetCapabilities" enabled="true">
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+&lt;env:Envelope&#xd;
+    xmlns:env=&quot;http://www.w3.org/2003/05/soap-envelope&quot;&#xd;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://www.w3.org/2003/05/soap-envelope http://www.w3.org/2003/05/soap-envelope/soap-envelope.xsd&quot;&gt;&#xd;
+    &lt;env:Body&gt;&#xd;
+        &lt;sos:GetCapabilities service=&quot;SOS&quot;&#xd;
+            xmlns:sos=&quot;http://www.opengis.net/sos/2.0&quot;&#xd;
+            xmlns:ows=&quot;http://www.opengis.net/ows/1.1&quot; xsi:schemaLocation=&quot;http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0.0/sosGetCapabilities.xsd&quot;&gt;&#xd;
+            &lt;ows:AcceptVersions&gt;&#xd;
+                &lt;ows:Version&gt;2.0.0&lt;/ows:Version&gt;&#xd;
+            &lt;/ows:AcceptVersions&gt;&#xd;
+            &lt;ows:Sections&gt;&#xd;
+                &lt;ows:Section&gt;OperationsMetadata&lt;/ows:Section&gt;&#xd;
+                &lt;ows:Section&gt;Contents&lt;/ows:Section&gt;&#xd;
+            &lt;/ows:Sections&gt;&#xd;
+        &lt;/sos:GetCapabilities&gt;&#xd;
+    &lt;/env:Body&gt;&#xd;
+&lt;/env:Envelope&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${sos_servlet_path}${url_pattern}</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Procedure identifier" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">//ows:Operation[@name=&apos;DescribeSensor&apos;]/ows:Parameter[@name=&apos;procedure&apos;]/ows:AllowedValues/ows:Value[text()=&quot;${sensor_id}&quot;]</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;ID" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;procedure" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../swes:procedure[text()=&quot;${sensor_id}&quot;]</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;Name" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../swes:name[text()=&quot;${offering_name}&quot;]</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;Description Format" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../swes:procedureDescriptionFormat[text()=&quot;${sensor_description_format}&quot;]</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;Observable Property" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">count(//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../swes:observableProperty[contains(text(),&quot;${observable_property_start}&quot;)])=5</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;Feature Types &quot;../SF_SamplingPoint&quot;" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">count(//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../sos:featureOfInterestType[text()=&quot;http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint&quot;])=1</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;Observation Type" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">count(//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../sos:observationType[text()=&quot;http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation&quot;])=1</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+        </hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="InsertSensor" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
@@ -1112,14 +1224,14 @@
 							&lt;sml:inputs&gt;&#xd;
 								&lt;sml:InputList&gt;&#xd;
 									&lt;sml:input name=&quot;&quot;&gt;&#xd;
-										&lt;swe:ObservableProperty definition=&quot;${observable_property}&quot;/&gt;&#xd;
+										&lt;swe:ObservableProperty definition=&quot;${observable_property_start}1&quot;/&gt;&#xd;
 									&lt;/sml:input&gt;&#xd;
 								&lt;/sml:InputList&gt;&#xd;
 							&lt;/sml:inputs&gt;&#xd;
 							&lt;sml:outputs&gt;&#xd;
 								&lt;sml:OutputList&gt;&#xd;
 									&lt;sml:output name=&quot;&quot; xlink:title=&quot;application/rdf+xml&quot;&gt;&#xd;
-										&lt;swe:Quantity definition=&quot;${observable_property}&quot;&gt;&#xd;
+										&lt;swe:Quantity definition=&quot;${observable_property_start}1&quot;&gt;&#xd;
 											&lt;swe:uom code=&quot;NOT_DEFINED&quot;/&gt;&#xd;
 										&lt;/swe:Quantity&gt;&#xd;
 									&lt;/sml:output&gt;&#xd;
@@ -1163,7 +1275,7 @@
           <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
         </HTTPSamplerProxy>
         <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Test after InsertSensor: GetCapabilities" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Test AFTER InsertSensor: GetCapabilities" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
