@@ -211,7 +211,7 @@ public abstract class InMemoryCacheUpdate implements Action {
 		SosEnvelope globalEnvelope = getCache().getGlobalEnvelope();
 		if (!globalEnvelope.isSetEnvelope()) {
 			// add new envelope
-			SosEnvelope newFeatureEnvelope = new SosEnvelope(observedFeatureEnvelope, getCache().getDatabaseEPSGCode());
+			SosEnvelope newFeatureEnvelope = new SosEnvelope(observedFeatureEnvelope, getCache().getDefaultEPSGCode());
 			getCache().setGlobalEnvelope(newFeatureEnvelope);
 		} else if (!globalEnvelope.getEnvelope().contains(observedFeatureEnvelope)) {
 			// extend envelope

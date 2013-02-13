@@ -428,7 +428,7 @@ public abstract class CacheControllerImpl extends ACapabilitiesCacheController {
      * @return int Srid of coordinates stored in SOS database
      */
     public int getSrid() {
-        return cache.getDatabaseEPSGCode();
+        return cache.getDefaultEPSGCode();
     }
 
     /**
@@ -468,11 +468,6 @@ public abstract class CacheControllerImpl extends ACapabilitiesCacheController {
         return new ArrayList<String>(cache.getOfferings4Phenomenon(phenID));
     }
 
-    /**
-     * Returns srids, which are supported by this SOS
-     *
-     * @return Returns srids, which are supported by this SOS
-     */
 	@Override
     public Collection<Integer> getSrids() {
         if (cache.getSrids() != null) {

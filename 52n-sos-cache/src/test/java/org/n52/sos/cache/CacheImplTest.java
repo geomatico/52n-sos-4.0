@@ -100,7 +100,7 @@ public class CacheImplTest{
 	should_return_empty_global_envelope_when_setEnvelope_is_called_with_null_parameter()
 	{
 		instance.setGlobalEnvelope(null);
-		final SosEnvelope emptySosEnvelope = new SosEnvelope(null, instance.getDatabaseEPSGCode());
+		final SosEnvelope emptySosEnvelope = new SosEnvelope(null, instance.getDefaultEPSGCode());
 		
 		assertThat(instance.getGlobalEnvelope(), not(nullValue()));
 		assertThat(instance.getGlobalEnvelope(), is(emptySosEnvelope));

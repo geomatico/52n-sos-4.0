@@ -103,7 +103,7 @@ public class ObservationInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate
 			}
 
 			// update features
-			int observedFeatureEnvelopeSRID = getCache().getDatabaseEPSGCode();
+			int observedFeatureEnvelopeSRID = getCache().getDefaultEPSGCode();
 			List<SosSamplingFeature> observedFeatures = sosFeaturesToList(sosObservation.getObservationConstellation().getFeatureOfInterest());
 
 			Envelope observedFeatureEnvelope = createEnvelopeFrom(observedFeatures);

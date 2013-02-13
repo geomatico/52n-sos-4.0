@@ -188,8 +188,8 @@ public class CacheImpl implements CapabilitiesCache{
     	phens4CompPhens = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
     	procedures = Collections.synchronizedList(new ArrayList<String>());
     	resultTemplates = Collections.synchronizedList(new ArrayList<String>());
-    	srid = -1;
     	srids = Collections.synchronizedList(new ArrayList<Integer>());
+    	srid = 4326; // default: WGS84 2D
     }
 
     protected Collection<String> getPhenomenons4Offering(String offering) {
@@ -742,15 +742,20 @@ public class CacheImpl implements CapabilitiesCache{
     }
 
     /**
-     * @deprecated use {@link #getDatabaseEPSGCode()}
+     * @deprecated use {@link #getDefaultEPSGCode()}
      */
     protected int getSrid() {
-        return getDatabaseEPSGCode();
+        return getDefaultEPSGCode();
     }
     
     @Override
-    public int getDatabaseEPSGCode() {
+    public int getDefaultEPSGCode() {
     	return srid;
+    }
+    
+    @Override
+    public void setDefaultEPSGCode(int dbEPSGCode) {
+    	this.srid = dbEPSGCode;
     }
 
     /**

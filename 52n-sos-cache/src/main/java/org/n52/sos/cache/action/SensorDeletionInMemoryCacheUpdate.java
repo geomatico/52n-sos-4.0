@@ -279,7 +279,7 @@ public class SensorDeletionInMemoryCacheUpdate extends InMemoryCacheUpdate
 
 	private void removeGlobalEnvelope()
 	{
-		getCache().setGlobalEnvelope(new SosEnvelope(null, getCache().getDatabaseEPSGCode()));
+		getCache().setGlobalEnvelope(new SosEnvelope(null, getCache().getDefaultEPSGCode()));
 		LOGGER.debug("global envelope: {}",getCache().getGlobalEnvelope());
 	}
 

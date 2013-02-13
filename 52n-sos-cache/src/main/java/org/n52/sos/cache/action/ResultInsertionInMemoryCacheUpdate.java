@@ -92,7 +92,7 @@ public class ResultInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
 		{
 			addOfferingToProcedureRelation(offeringIdentifier, getProcedureIdentifier(sosObservation));
 			addProcedureToOfferingRelation(getProcedureIdentifier(sosObservation), offeringIdentifier);
-			updateOfferingEnvelope(observedFeatureEnvelope, getCache().getDatabaseEPSGCode(), offeringIdentifier);
+			updateOfferingEnvelope(observedFeatureEnvelope, getCache().getDefaultEPSGCode(), offeringIdentifier);
 			updateTemporalBoundingBoxOf(offeringIdentifier, phenomenonTimeFrom(sosObservation));
 			// observable property
 			addObservablePropertiesToOfferingRelation(getObservablePropertyIdentifier(sosObservation), offeringIdentifier);

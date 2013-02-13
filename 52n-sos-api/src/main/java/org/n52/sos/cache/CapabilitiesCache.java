@@ -270,7 +270,7 @@ public interface CapabilitiesCache {
 	/**
      * @return the EPSG code of coordinates stored in SOS database
      */
-	public int getDatabaseEPSGCode();
+	public int getDefaultEPSGCode();
 
 	public Collection<String> getFeatureOfInterest();
 
@@ -295,5 +295,7 @@ public interface CapabilitiesCache {
 	public Map<String, Collection<String>> getKRelatedFeatureVRole();
 	
 	public Map<String, String> getKOfferingVName();
+
+	public void setDefaultEPSGCode(int defaultEPSGCode);
 
 }
