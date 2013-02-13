@@ -150,46 +150,58 @@ public class AbstractSensorML extends SosProcedureDescription {
         this.history = history;
     }
 
+    public void addIdentifier(SosSMLIdentifier identifier) {
+        this.identifications.add(identifier);
+    }
+    
     @Override
     public String getProcedureIdentifier() {
-        if (isSetIdentifications()) {
-            for (SosSMLIdentifier identification : identifications) {
-                if ((identification.getName() != null && identification.getName().equals(URN_UNIQUE_IDENTIFIER_END))
-                        || (identification.getDefinition() != null
-                                && (identification.getDefinition().equals(URN_UNIQUE_IDENTIFIER)
-                                || identification.getDefinition().equals(URN_IDENTIFIER_IDENTIFICATION) 
-                                || (identification.getDefinition().startsWith(URN_UNIQUE_IDENTIFIER_START) 
-                                		&& identification.getDefinition().contains(URN_UNIQUE_IDENTIFIER_END))
-                                ))) {
+        if (isSetIdentifications()) 
+        {
+            for (SosSMLIdentifier identification : identifications)
+            {
+                if (isIdentificationHoldingAnProcedureIdentifier(identification)) 
+                {
                     return identification.getValue();
                 }
             }
-        } else if (!isSetIdentifications() && this instanceof SensorML && ((SensorML)this).isWrapper()) {
-            for (AbstractProcess abstractProcess : ((SensorML)this).getMembers()) {
-                return abstractProcess.getProcedureIdentifier();
-            }
         }
         return null;
-    }
-    
-    public void addIdentifier(SosSMLIdentifier identifier) {
-        this.identifications.add(identifier);
     }
 
     @Override
     public List<SosOffering> getOfferingIdentifiers() {
         List<SosOffering> sosOfferings = new ArrayList<SosOffering>(0);
-        if (identifications != null) {
-            for (SosSMLIdentifier identification : identifications) {
-                if (identification.getDefinition() != null
-                        && (identification.getDefinition().equals(URN_OFFERING_ID)
-                                || identification.getDefinition().contains(ELEMENT_NAME_OFFERING))) {
+        if (isSetIdentifications()) 
+        {
+            for (SosSMLIdentifier identification : identifications)
+            {
+                if (isIdentificationHoldingAnOfferingId(identification)) 
+                {
                     sosOfferings.add(new SosOffering(identification.getValue(), identification.getName()));
                 }
             }
         }
         return sosOfferings;
     }
+    
+    private boolean isIdentificationHoldingAnProcedureIdentifier(SosSMLIdentifier identification)
+	{
+		return (identification.getName() != null && identification.getName().equals(URN_UNIQUE_IDENTIFIER_END))
+		        || (identification.getDefinition() != null
+		                && (identification.getDefinition().equals(URN_UNIQUE_IDENTIFIER)
+		                || identification.getDefinition().equals(URN_IDENTIFIER_IDENTIFICATION) 
+		                || (identification.getDefinition().startsWith(URN_UNIQUE_IDENTIFIER_START) 
+		                		&& identification.getDefinition().contains(URN_UNIQUE_IDENTIFIER_END))
+		                ));
+	}
+
+	private boolean isIdentificationHoldingAnOfferingId(SosSMLIdentifier identification)
+	{
+		return identification.getDefinition() != null
+		        && (identification.getDefinition().equals(URN_OFFERING_ID)
+		                || identification.getDefinition().contains(ELEMENT_NAME_OFFERING));
+	}
 
     public boolean isSetKeywords() {
         return keywords != null && !keywords.isEmpty();

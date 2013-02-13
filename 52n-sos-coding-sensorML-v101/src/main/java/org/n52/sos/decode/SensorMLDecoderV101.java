@@ -85,8 +85,8 @@ import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
 import org.n52.sos.ogc.swe.AbstractDataRecord;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
@@ -129,8 +129,11 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
         } else if (element instanceof ProcessModelType) {
             return parseProcessModel((ProcessModelType) element);
         } else {
-            //TODO create proper exception
-            throw Util4Exceptions.createNoApplicableCodeException(null, "");
+        	String errorMsg = String.format("Received XMLObject type '%s' is not supported by this '%s'.",
+        			element!=null?element.getClass().getName():element,
+        			this.getClass());
+        	LOGGER.error(errorMsg);
+            throw Util4Exceptions.createNoApplicableCodeException(new IllegalArgumentException(), errorMsg);
         }
     }
 

@@ -26,6 +26,8 @@ package org.n52.sos.ogc.sensorML;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.n52.sos.ogc.om.SosOffering;
+
 /**
  * SOS internal representation of a sensor description
  */
@@ -64,6 +66,10 @@ public class SensorML extends AbstractSensorML {
         members.add(member);
     }
     
+    /**
+     * @return <tt>true</tt>, if this instance contains only members and everything else is not set
+     */
+    // TODO please review this javadoc
     public boolean isWrapper() {
         return !isSetKeywords()
                 && !isSetIdentifications()
@@ -78,6 +84,38 @@ public class SensorML extends AbstractSensorML {
 
     public boolean isSetMembers() {
         return members != null && !members.isEmpty();
+    }
+    
+    public String getProcedureIdentifier()
+    {
+    	if (isWrapper() && getMembers() != null && !getMembers().isEmpty())
+        {
+        	return ( (AbstractProcess)((SensorML)this).getMembers().get(0) ).getProcedureIdentifier();
+        }
+    	return super.getProcedureIdentifier();
+    }
+    
+    @Override
+    public List<SosOffering> getOfferingIdentifiers() {
+        List<SosOffering> sosOfferings = super.getOfferingIdentifiers();
+        if (isWrapper() && getMembers() != null && !getMembers().isEmpty())
+        {
+        	for (AbstractProcess member : getMembers())
+        	{
+        		final List<SosOffering> offeringIdentifiers = member.getOfferingIdentifiers();
+				if (offeringIdentifiers != null && !offeringIdentifiers.isEmpty())
+        		{
+        			for (SosOffering sosOffering : offeringIdentifiers) 
+        			{
+						if (!sosOfferings.contains(sosOffering))
+						{
+							sosOfferings.add(sosOffering);
+						}
+					}
+        		}
+        	}
+        }
+        return sosOfferings;
     }
 
 }
