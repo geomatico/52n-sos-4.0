@@ -24,7 +24,6 @@
 package org.n52.sos.ogc.sensorML;
 
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.n52.sos.ogc.OGCConstants.URN_OFFERING_ID;
 
@@ -57,10 +56,11 @@ public class SensorMLTest {
 		system.setIdentifications(identifications);
 		sensorML.addMember(system);
 		
-		assertThat(sensorML.getOfferingIdentifiers().size(), is(equalTo(1)));
-		SosOffering sosOffering = sensorML.getOfferingIdentifiers().get(0);
-		assertThat(sosOffering.getOfferingIdentifier(), is(equalTo(offeringIdentifier)));
-		assertThat(sosOffering.getOfferingName(), is(equalTo(offeringName)));
+		final List<SosOffering> offeringIdentifiers = sensorML.getOfferingIdentifiers();
+		assertThat(offeringIdentifiers.size(), is(1));
+		SosOffering sosOffering = offeringIdentifiers.get(0);
+		assertThat(sosOffering.getOfferingIdentifier(), is(offeringIdentifier));
+		assertThat(sosOffering.getOfferingName(), is(offeringName));
 	}
 
 }
