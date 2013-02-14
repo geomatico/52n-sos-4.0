@@ -44,6 +44,7 @@ import net.opengis.sos.x10.GetObservationByIdDocument.GetObservationById;
 import net.opengis.sos.x10.GetObservationDocument;
 import net.opengis.sos.x10.GetObservationDocument.GetObservation;
 import net.opengis.sos.x10.GetObservationDocument.GetObservation.FeatureOfInterest;
+import net.opengis.sos.x10.ResponseModeType.Enum;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.filter.SpatialFilter;
@@ -340,7 +341,12 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
         GetObservationById getObsById = getObsByIdDoc.getGetObservationById();
         getObsByIdRequest.setService(getObsById.getService());
         getObsByIdRequest.setVersion(getObsById.getVersion());
-        // TODO weird expression though, add/put new List
+        getObsByIdRequest.setResponseFormat(getObsById.getResponseFormat());
+        Enum responseMode = getObsById.getResponseMode();
+        if (responseMode != null && responseMode.toString().equalsIgnoreCase(SosConstants.RESPONSE_MODE_INLINE)) {
+        	getObsByIdRequest.setResponseMode(SosConstants.RESPONSE_MODE_INLINE);
+        }
+        getObsByIdRequest.setResultModel(getObsById.getResultModel());
         getObsByIdRequest.setObservationIdentifier(Arrays.asList(getObsById.getObservationId()));
         return getObsByIdRequest;
     }

@@ -283,6 +283,57 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
         return xmlObject;
     }
     
+    private XmlObject createGetObservationResponseDocument(GetObservationResponse response) throws OwsExceptionReport {
+
+    	// create ObservationCollectionDocument and add Collection
+        ObservationCollectionDocument xb_obsColDoc = ObservationCollectionDocument.Factory.newInstance();
+        ObservationCollectionType xb_obsCol = xb_obsColDoc.addNewObservationCollection();
+        xb_obsCol.setId(SosConstants.OBS_COL_ID_PREFIX + new DateTime().getMillis());
+
+        Collection<SosObservation> observationCollection = null;
+
+        IEncoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
+        if (!(encoder instanceof IObservationEncoder)) {
+            String exceptionText = "Error while encoding GetObservation response, encoder is not of type IObservationEncoder!";
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        }
+        IObservationEncoder<XmlObject, SosObservation> iObservationEncoder
+                = (IObservationEncoder<XmlObject, SosObservation>) encoder;
+        if (iObservationEncoder.shouldObservationsWithSameXBeMerged()) {
+            response.mergeObservationsWithSameX();
+        }
+
+        observationCollection = response.getObservationCollection();
+
+        if (observationCollection != null) {
+        	if ( observationCollection.size() > 0) {
+	            // TODO setBoundedBy (not necessary apparently?)
+	
+		        for (SosObservation sosObservation : observationCollection) {
+		        	XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getResponseFormat(), sosObservation);
+		        	xb_obsCol.addNewMember().addNewObservation().set(xmlObject);
+		        }
+        	} else {
+                ObservationPropertyType xb_obs = xb_obsCol.addNewMember();
+                xb_obs.setHref( GMLConstants.NIL_INAPPLICABLE );
+            }
+        } else {
+            ObservationPropertyType xb_obs = xb_obsCol.addNewMember();
+            xb_obs.setHref( GMLConstants.NIL_INAPPLICABLE );
+        }
+
+        // set schema location
+        XmlHelper.makeGmlIdsUnique(xb_obsColDoc.getDomNode());
+        List<String> schemaLocations = new ArrayList<String>();
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS100());
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForOM100());
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSA100());
+        // schemaLocations.add(N52XmlHelper.getSchemaLocationForSWE101());
+        N52XmlHelper.setSchemaLocationsToDocument(xb_obsColDoc, schemaLocations);
+        return xb_obsColDoc;
+    }
+
     private XmlObject createGetFeatureOfInterestResponse(GetFeatureOfInterestResponse response) throws OwsExceptionReport {
 
     	// gml:featurecollection
@@ -372,57 +423,6 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
         return xbFeatColDoc;
     }
     
-    private XmlObject createGetObservationResponseDocument(GetObservationResponse response) throws OwsExceptionReport {
-
-    	// create ObservationCollectionDocument and add Collection
-        ObservationCollectionDocument xb_obsColDoc = ObservationCollectionDocument.Factory.newInstance();
-        ObservationCollectionType xb_obsCol = xb_obsColDoc.addNewObservationCollection();
-        xb_obsCol.setId(SosConstants.OBS_COL_ID_PREFIX + new DateTime().getMillis());
-
-        Collection<SosObservation> observationCollection = null;
-
-        IEncoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
-        if (!(encoder instanceof IObservationEncoder)) {
-            String exceptionText = "Error while encoding GetObservation response, encoder is not of type IObservationEncoder!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        }
-        IObservationEncoder<XmlObject, SosObservation> iObservationEncoder
-                = (IObservationEncoder<XmlObject, SosObservation>) encoder;
-        if (iObservationEncoder.shouldObservationsWithSameXBeMerged()) {
-            response.mergeObservationsWithSameX();
-        }
-
-        observationCollection = response.getObservationCollection();
-
-        if (observationCollection != null) {
-        	if ( observationCollection.size() > 0) {
-	            // TODO setBoundedBy (not necessary apparently?)
-	
-		        for (SosObservation sosObservation : observationCollection) {
-		        	XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getResponseFormat(), sosObservation);
-		        	xb_obsCol.addNewMember().addNewObservation().set(xmlObject);
-		        }
-        	} else {
-                ObservationPropertyType xb_obs = xb_obsCol.addNewMember();
-                xb_obs.setHref( GMLConstants.NIL_INAPPLICABLE );
-            }
-        } else {
-            ObservationPropertyType xb_obs = xb_obsCol.addNewMember();
-            xb_obs.setHref( GMLConstants.NIL_INAPPLICABLE );
-        }
-
-        // set schema location
-        XmlHelper.makeGmlIdsUnique(xb_obsColDoc.getDomNode());
-        List<String> schemaLocations = new ArrayList<String>();
-        schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS100());
-        schemaLocations.add(N52XmlHelper.getSchemaLocationForOM100());
-        schemaLocations.add(N52XmlHelper.getSchemaLocationForSA100());
-        // schemaLocations.add(N52XmlHelper.getSchemaLocationForSWE101());
-        N52XmlHelper.setSchemaLocationsToDocument(xb_obsColDoc, schemaLocations);
-        return xb_obsColDoc;
-    }
-
     private XmlObject createGetObservationByIdResponseDocument(GetObservationByIdResponse response) throws OwsExceptionReport {
 
     	// create ObservationCollectionDocument and add Collection

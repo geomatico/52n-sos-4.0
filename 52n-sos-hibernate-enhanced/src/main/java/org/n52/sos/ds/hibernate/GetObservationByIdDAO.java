@@ -74,18 +74,16 @@ public class GetObservationByIdDAO extends AbstractHibernateOperationDao impleme
             Session session = null;
             try {
                 session = getSession();
-                if (request.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
-                    throw Util4Exceptions.createMissingParameterValueException(GetObservationParams.observedProperty.name());
-                } else {
-                    List<Observation> observations = queryObservation(request, session);
-                    GetObservationByIdResponse response = new GetObservationByIdResponse();
-                    response.setService(request.getService());
-                    response.setVersion(request.getVersion());
-                    response.setResponseFormat(request.getResponseFormat());
-                    response.setObservationCollection(HibernateObservationUtilities.
-                            createSosObservationsFromObservations(observations, request.getVersion(), session));
-                    return response;
-                }
+                
+                List<Observation> observations = queryObservation(request, session);
+                GetObservationByIdResponse response = new GetObservationByIdResponse();
+                response.setService(request.getService());
+                response.setVersion(request.getVersion());
+                response.setResponseFormat(request.getResponseFormat());
+                response.setObservationCollection(HibernateObservationUtilities.
+                        createSosObservationsFromObservations(observations, request.getVersion(), session));
+                return response;
+                
             } catch (HibernateException he) {
                 String exceptionText = "Error while querying observation data!";
                 LOGGER.error(exceptionText, he);

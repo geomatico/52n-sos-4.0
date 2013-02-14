@@ -60,7 +60,7 @@ public class SosGetFeatureOfInterestOperatorV100 extends
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SosGetFeatureOfInterestOperatorV100.class.getName());
     private static final String OPERATION_NAME = SosConstants.Operations.GetFeatureOfInterest.name();
-    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton("http://www.opengis.net/spec/SOS/1.0/conf/extended");
+    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton("http://www.opengis.net/spec/SOS/1.0/conf/enhanced");
 
     /**
      * Constructor

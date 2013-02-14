@@ -188,6 +188,11 @@
                     "request": "static/examples/sos_v100/requests_xml/GetResult/GetObs4GetResult_FoiID.xml"
                 }
             },
+            "GetObservationById": {
+                "GetObservationById": {
+                    "request": "static/examples/sos_v100/requests_xml/GetObservationById/GetObservationById.xml"
+                }
+            },
             "GetResult": {
                 "GetResult": {
                     "request": "static/examples/sos_v100/requests_xml/GetResult/getResult.xml"

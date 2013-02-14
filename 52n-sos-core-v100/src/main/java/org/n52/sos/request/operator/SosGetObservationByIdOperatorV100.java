@@ -26,21 +26,20 @@ package org.n52.sos.request.operator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ds.IGetFeatureOfInterestDAO;
 import org.n52.sos.ds.IGetObservationByIdDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos1Constants;
-import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.request.GetObservationByIdRequest;
 import org.n52.sos.response.GetObservationByIdResponse;
 import org.n52.sos.response.ServiceResponse;
@@ -51,28 +50,50 @@ import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GetObservationByIdOperatorV100 extends
+public class SosGetObservationByIdOperatorV100 extends
 		AbstractV1RequestOperator <IGetObservationByIdDAO, GetObservationByIdRequest> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SosGetFeatureOfInterestOperatorV100.class.getName());
-    private static final String OPERATION_NAME = SosConstants.Operations.GetFeatureOfInterest.name();
-    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton("http://www.opengis.net/spec/SOS/1.0/conf/extended");
+    private static final String OPERATION_NAME = SosConstants.Operations.GetObservationById.name();
+    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton("http://www.opengis.net/spec/SOS/1.0/conf/en hanced");
 
     /**
      * Constructor
      *
      */
-    public GetObservationByIdOperatorV100() {
+    public SosGetObservationByIdOperatorV100() {
         super(OPERATION_NAME, GetObservationByIdRequest.class);
     }
     
 	private void checkRequestedParameters(GetObservationByIdRequest sosRequest) throws OwsExceptionReport {
-        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
-        try {
-            checkServiceParameter(sosRequest.getService());
-        } catch (OwsExceptionReport owse) {
-            exceptions.add(owse);
-        }
+        
+        checkServiceParameter(sosRequest.getService());
+        // check valid obs ids
+        Collection<String> validObservations = Configurator.getInstance().getCapabilitiesCacheController().getObservationIdentifiers();
+		checkObservationIDs(sosRequest.getObservationIdentifier(), validObservations, "ObservationId");
+        // check responseFormat!
+		String responseFormat = sosRequest.getResponseFormat();
+		if ((responseFormat == null) || !(responseFormat.length() > 0)) {
+			OwsExceptionReport owse = new OwsExceptionReport();
+        	String exceptionText = "No encoder for operation found!";
+            LOGGER.error(exceptionText, owse);
+            throw Util4Exceptions.createMissingMandatoryParameterException("responseFormat");
+		}
+        // srsName and resultModel (omObs, om:Meas, Swe:?, responseMode (inline only)
+		String responseMode = sosRequest.getResponseMode();
+		if (responseMode != null && !responseMode.equalsIgnoreCase("inline")) {
+			OwsExceptionReport owse = new OwsExceptionReport();
+        	String exceptionText = "Only responseMode inline is currently supported by this SOS 1.0.0 implementation";
+            LOGGER.error(exceptionText, owse);
+            throw Util4Exceptions.createNoApplicableCodeException(owse, exceptionText);
+		}
+		QName resultModel = sosRequest.getResultModel();
+		if (resultModel != null ) {
+			OwsExceptionReport owse = new OwsExceptionReport();
+        	String exceptionText = "resultModel is currently not supported by this SOS 1.0.0 implementation";
+            LOGGER.error(exceptionText, owse);
+            throw Util4Exceptions.createNoApplicableCodeException(owse, exceptionText);
+		}
 	}
 
 	@Override
