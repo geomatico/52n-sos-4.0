@@ -358,16 +358,26 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
         return sosSweDataRecord;
     }
 
-    private SosSweBoolean parseBoolean(XmlObject xbBoolean) throws OwsExceptionReport {
-        String exceptionText = "The Boolean is not supported";
-        LOGGER.debug(exceptionText);
-        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+    private SosSweBoolean parseBoolean(BooleanType xbBoolean) throws OwsExceptionReport {
+    	SosSweBoolean sosBoolean = new SosSweBoolean();
+    	if (xbBoolean.isSetValue())
+    	{
+    		sosBoolean.setValue(xbBoolean.getValue());
+    	}
+    	return sosBoolean;
     }
 
-    private SosSweCategory parseCategory(XmlObject xbCategory) throws OwsExceptionReport {
-        String exceptionText = "The Category is not supported";
-        LOGGER.debug(exceptionText);
-        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+    private SosSweCategory parseCategory(CategoryType xbCategory) throws OwsExceptionReport {
+    	SosSweCategory sosSweCategory = new SosSweCategory();
+    	if (xbCategory.isSetCodeSpace() && xbCategory.getCodeSpace().isSetHref())
+    	{
+    		sosSweCategory.setCodeSpace(xbCategory.getCodeSpace().getHref());
+    	}
+    	if (xbCategory.isSetValue())
+    	{
+    		sosSweCategory.setValue(xbCategory.getValue());
+    	}
+    	return sosSweCategory;
     }
 
     private SosSweCount parseCount(CountType count) throws OwsExceptionReport {
