@@ -162,12 +162,11 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
      */
     @Override
     public GetObservationResponse getObservation(GetObservationRequest request) throws OwsExceptionReport {
-        GetObservationRequest sosRequest = request;
         Session session = null;
         try {
             session = getSession();
-            if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION)
-                    && sosRequest.getObservedProperties().isEmpty()) {
+            if (request.getVersion().equals(Sos1Constants.SERVICEVERSION)
+                    && request.getObservedProperties().isEmpty()) {
                 throw Util4Exceptions.createMissingParameterValueException(GetObservationParams.observedProperty
                         .name());
             } else {
@@ -175,7 +174,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
                 response.setService(request.getService());
                 response.setVersion(request.getVersion());
                 response.setResponseFormat(request.getResponseFormat());
-                response.setObservationCollection(queryObservation(sosRequest, session));
+                response.setObservationCollection(queryObservation(request, session));
                 return response;
             }
         } catch (HibernateException he) {
