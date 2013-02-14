@@ -424,6 +424,9 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
                     } else if (samplingFeature.getFeatureType().equalsIgnoreCase(SFConstants.FT_SAMPLINGSURFACE)) {
                         featureType = SFConstants.FT_SAMPLINGSURFACE;
                         featureNamespace = SFConstants.NS_SA;
+                    } else if (samplingFeature.getFeatureType().equalsIgnoreCase(SFConstants.FT_SAMPLINGCURVE)) {
+                        featureType = SFConstants.FT_SAMPLINGCURVE;
+                        featureNamespace = SFConstants.NS_SA;
                     } else if (samplingFeature.getFeatureType().equalsIgnoreCase(
                             SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_POINT)) {
                         featureType = SFConstants.FT_SAMPLINGPOINT;
@@ -431,6 +434,10 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
                     } else if (samplingFeature.getFeatureType().equalsIgnoreCase(
                             SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_SURFACE)) {
                         featureType = SFConstants.FT_SAMPLINGSURFACE;
+                        featureNamespace = SFConstants.NS_SA;
+                    } else if (samplingFeature.getFeatureType().equalsIgnoreCase(
+                            SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_CURVE)) {
+                        featureType = SFConstants.FT_SAMPLINGCURVE;
                         featureNamespace = SFConstants.NS_SA;
                     } else {
                         OwsExceptionReport owse = new OwsExceptionReport();

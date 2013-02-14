@@ -27,17 +27,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import net.opengis.gml.AbstractFeatureCollectionType;
 import net.opengis.gml.AbstractTimeGeometricPrimitiveType;
 import net.opengis.gml.BoundingShapeType;
 import net.opengis.gml.CodeType;
 import net.opengis.gml.DirectPositionType;
 import net.opengis.gml.EnvelopeType;
+import net.opengis.gml.FeatureCollectionDocument;
+import net.opengis.gml.FeatureCollectionType;
 import net.opengis.gml.ReferenceType;
 import net.opengis.gml.TimePeriodType;
 import net.opengis.ogc.ComparisonOperatorType;
@@ -80,6 +84,10 @@ import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.om.features.SFConstants;
+import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.om.features.SosFeatureCollection;
+import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
@@ -92,12 +100,15 @@ import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.AbstractServiceResponse;
 import org.n52.sos.response.DescribeSensorResponse;
 import org.n52.sos.response.GetCapabilitiesResponse;
+import org.n52.sos.response.GetFeatureOfInterestResponse;
+import org.n52.sos.response.GetObservationByIdResponse;
 import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -192,12 +203,11 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
         	return createDescribeSensorResponse((DescribeSensorResponse) response);
         } else if (response instanceof GetObservationResponse) {
         	return createGetObservationResponseDocument((GetObservationResponse) response);
+        } else if (response instanceof GetFeatureOfInterestResponse) {
+            return createGetFeatureOfInterestResponse((GetFeatureOfInterestResponse) response);
+        } else if (response instanceof GetObservationByIdResponse) {
+            return createGetObservationByIdResponseDocument((GetObservationByIdResponse) response);
         }
-//        } else if (response instanceof GetFeatureOfInterestResponse) {
-//            return createGetFeatureOfInterestResponse((GetFeatureOfInterestResponse) response);
-//        } else if (response instanceof GetObservationByIdResponse) {
-//            return createGetObservationByIdResponse((GetObservationByIdResponse) response);
-//        }
 //        else if (response instanceof InsertObservationResponse) {
 //            return createInsertObservationResponse((InsertObservationResponse) response);
 //        } else if (response instanceof InsertResultTemplateResponse) {
@@ -272,7 +282,96 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
                 .singletonList(N52XmlHelper.getSchemaLocationForSWE101()));
         return xmlObject;
     }
+    
+    private XmlObject createGetFeatureOfInterestResponse(GetFeatureOfInterestResponse response) throws OwsExceptionReport {
 
+    	// gml:featurecollection
+    	// gml:featuremember
+    	// sa:SamplingXXX
+    	// gml:descr/name
+    	// sa:position
+    	SosSamplingFeature samplingFeature = null;
+    	FeatureCollectionDocument xbFeatColDoc = FeatureCollectionDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+    	AbstractFeatureCollectionType xbFeatCol = xbFeatColDoc.addNewFeatureCollection();
+    	StringBuilder builder = new StringBuilder();
+        builder.append("sfc_");
+        builder.append(JavaHelper.generateID(Long.toString(System.currentTimeMillis())));
+    	xbFeatCol.setId(builder.toString());
+    	
+    	if (response.getAbstractFeature() instanceof SosFeatureCollection) {
+    		
+    		SosFeatureCollection sosFeatCol = (SosFeatureCollection) response.getAbstractFeature();
+    		Map<String, SosAbstractFeature> members = sosFeatCol.getMembers();
+    		for ( String member : members.keySet()) {
+    			
+		        if (members.get(member) instanceof SosSamplingFeature) {
+		        	samplingFeature = (SosSamplingFeature) members.get(member);
+		            
+		            String featureType = null;
+                    String featureNamespace = null;
+                    if (samplingFeature.getFeatureType().equalsIgnoreCase(SFConstants.FT_SAMPLINGPOINT)) {
+                        featureType = SFConstants.FT_SAMPLINGPOINT;
+                        featureNamespace = SFConstants.NS_SA;
+                    } else if (samplingFeature.getFeatureType().equalsIgnoreCase(SFConstants.FT_SAMPLINGSURFACE)) {
+                        featureType = SFConstants.FT_SAMPLINGSURFACE;
+                        featureNamespace = SFConstants.NS_SA;
+                    } else if (samplingFeature.getFeatureType().equalsIgnoreCase(SFConstants.FT_SAMPLINGCURVE)) {
+                        featureType = SFConstants.FT_SAMPLINGCURVE;
+                        featureNamespace = SFConstants.NS_SA;
+                    } else if (samplingFeature.getFeatureType().equalsIgnoreCase(
+                            SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_POINT)) {
+                        featureType = SFConstants.FT_SAMPLINGPOINT;
+                        featureNamespace = SFConstants.NS_SA;
+                    } else if (samplingFeature.getFeatureType().equalsIgnoreCase(
+                            SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_SURFACE)) {
+                        featureType = SFConstants.FT_SAMPLINGSURFACE;
+                        featureNamespace = SFConstants.NS_SA;
+                    } else if (samplingFeature.getFeatureType().equalsIgnoreCase(
+                            SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_CURVE)) {
+                        featureType = SFConstants.FT_SAMPLINGCURVE;
+                        featureNamespace = SFConstants.NS_SA;
+                    } else {
+                        OwsExceptionReport owse = new OwsExceptionReport();
+                        String exceptionText = "Error while encoding featureOfInterest in om:Observation!";
+                        LOGGER.error(exceptionText, owse);
+                        throw Util4Exceptions
+                                .createInvalidParameterValueException("sa:SamplingFeature", exceptionText);
+                    }
+
+                    XmlObject xmlObject = CodingHelper.encodeObjectToXml(featureNamespace, samplingFeature);
+		            
+		            xbFeatCol.addNewFeatureMember().set(xmlObject);
+		            
+		        // SosFeatureCollection
+		        } else {
+		        	OwsExceptionReport owse = new OwsExceptionReport();
+		        	String message = "No encoder found for featuretype";
+		        	Util4Exceptions.createNoApplicableCodeException(owse, message);
+		        	throw owse;
+		        }
+    		}
+    	} else {
+    		
+    		OwsExceptionReport owse = new OwsExceptionReport();
+        	String message = "Unknown featuretype";
+        	Util4Exceptions.createNoApplicableCodeException(owse, message);
+        	throw owse;
+    	}
+    	XmlCursor cursor = xbFeatColDoc.newCursor();
+    	boolean isAFC = cursor.toChild(new QName(GMLConstants.NS_GML, GMLConstants.EN_ABSTRACT_FEATURE_COLLECTION));
+    	if (isAFC) {
+            cursor.setName(new QName(GMLConstants.NS_GML, GMLConstants.EN_FEATURE_COLLECTION));
+        }
+    	cursor.dispose();
+	    // set schema location
+        List<String> schemaLocations = new ArrayList<String>();
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS100());
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForGML311());
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSA100());
+        N52XmlHelper.setSchemaLocationsToDocument(xbFeatColDoc, schemaLocations);
+        return xbFeatColDoc;
+    }
+    
     private XmlObject createGetObservationResponseDocument(GetObservationResponse response) throws OwsExceptionReport {
 
     	// create ObservationCollectionDocument and add Collection
@@ -320,6 +419,57 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
         schemaLocations.add(N52XmlHelper.getSchemaLocationForOM100());
         schemaLocations.add(N52XmlHelper.getSchemaLocationForSA100());
         // schemaLocations.add(N52XmlHelper.getSchemaLocationForSWE101());
+        N52XmlHelper.setSchemaLocationsToDocument(xb_obsColDoc, schemaLocations);
+        return xb_obsColDoc;
+    }
+
+    private XmlObject createGetObservationByIdResponseDocument(GetObservationByIdResponse response) throws OwsExceptionReport {
+
+    	// create ObservationCollectionDocument and add Collection
+        ObservationCollectionDocument xb_obsColDoc = ObservationCollectionDocument.Factory.newInstance();
+        ObservationCollectionType xb_obsCol = xb_obsColDoc.addNewObservationCollection();
+        xb_obsCol.setId(SosConstants.OBS_COL_ID_PREFIX + new DateTime().getMillis());
+
+        Collection<SosObservation> observationCollection = null;
+
+        IEncoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
+        if (!(encoder instanceof IObservationEncoder)) {
+            String exceptionText = "Error while encoding GetObservation response, encoder is not of type IObservationEncoder!";
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        }
+        IObservationEncoder<XmlObject, SosObservation> iObservationEncoder
+                = (IObservationEncoder<XmlObject, SosObservation>) encoder;
+//        if (iObservationEncoder.shouldObservationsWithSameXBeMerged()) {
+//            response.mergeObservationsWithSameX();
+//        }
+
+        observationCollection = response.getObservationCollection();
+
+        if (observationCollection != null) {
+        	if ( observationCollection.size() > 0) {
+	            // TODO setBoundedBy (not necessary apparently?)
+	
+		        for (SosObservation sosObservation : observationCollection) {
+		        	XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getResponseFormat(), sosObservation);
+		        	xb_obsCol.addNewMember().addNewObservation().set(xmlObject);
+		        }
+        	} else {
+                ObservationPropertyType xb_obs = xb_obsCol.addNewMember();
+                xb_obs.setHref( GMLConstants.NIL_INAPPLICABLE );
+            }
+        } else {
+            ObservationPropertyType xb_obs = xb_obsCol.addNewMember();
+            xb_obs.setHref( GMLConstants.NIL_INAPPLICABLE );
+        }
+
+        // set schema location
+        XmlHelper.makeGmlIdsUnique(xb_obsColDoc.getDomNode());
+        List<String> schemaLocations = new ArrayList<String>();
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS100());
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForOM100());
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSA100());
+        schemaLocations.add(N52XmlHelper.getSchemaLocationForSWE101());
         N52XmlHelper.setSchemaLocationsToDocument(xb_obsColDoc, schemaLocations);
         return xb_obsColDoc;
     }

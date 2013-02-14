@@ -78,7 +78,8 @@ public class SamplingEncoderv100 implements IEncoder<XmlObject, SosAbstractFeatu
         CollectionHelper.set(
             OGCConstants.UNKNOWN,
             SFConstants.EN_SAMPLINGPOINT,
-            SFConstants.EN_SAMPLINGSURFACE
+            SFConstants.EN_SAMPLINGSURFACE,
+            SFConstants.EN_SAMPLINGCURVE
         )
     );
 

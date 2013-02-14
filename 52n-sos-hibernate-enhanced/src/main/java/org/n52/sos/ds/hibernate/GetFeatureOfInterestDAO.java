@@ -107,18 +107,38 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
             Session session = null;
             try {
                 session = getSession();
-                if (request.getVersion().equals(Sos1Constants.SERVICEVERSION)
-                        && ((request.getFeatureIdentifiers() != null && !request.getFeatureIdentifiers()
-                                .isEmpty()) || (request.getSpatialFilters() != null && !request
-                                .getSpatialFilters().isEmpty()))) {
-                    OwsExceptionReport owse =
+                if (request.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
+                	// sos 1.0.0 either or
+                	if ((request.getFeatureIdentifiers() != null && !request.getFeatureIdentifiers()
+                            .isEmpty()) && (request.getSpatialFilters() != null && !request .getSpatialFilters().isEmpty())) {
+                		String exceptionText = "Only one out of featureofinterestid or location possible";
+                		OwsExceptionReport owse = new OwsExceptionReport();
+                		Util4Exceptions.createNoApplicableCodeException(owse, exceptionText);
+                		throw owse;
+                	} else if ((request.getFeatureIdentifiers() != null && !request.getFeatureIdentifiers()
+                                .isEmpty()) || (request.getSpatialFilters() != null && !request .getSpatialFilters().isEmpty())) {
+                        // good
+                		Set<String> foiIDs = new HashSet<String>(queryFeatureIdentifiersForParameter(request, session));
+                        // feature of interest
+                        SosFeatureCollection featureCollection =
+                                new SosFeatureCollection(getConfigurator().getFeatureQueryHandler()
+                                        .getFeatures(new ArrayList<String>(foiIDs), request.getSpatialFilters(),
+                                                session, request.getVersion()));
+                        GetFeatureOfInterestResponse response = new GetFeatureOfInterestResponse();
+                        response.setService(request.getService());
+                        response.setVersion(request.getVersion());
+                        response.setAbstractFeature(featureCollection);
+                        return response;
+                	} else {
+                		OwsExceptionReport owse =
                             Util4Exceptions
                                     .createMissingParameterValueException(Sos1Constants.GetFeatureOfInterestParams.featureOfInterestID
                                             .name());
-                    owse.addOwsExceptionReport(Util4Exceptions
+                		owse.addOwsExceptionReport(Util4Exceptions
                             .createMissingParameterValueException(Sos1Constants.GetFeatureOfInterestParams.location
                                     .name()));
-                    throw owse;
+                		throw owse;
+                	}
                 } else {
                     Set<String> foiIDs = new HashSet<String>(queryFeatureIdentifiersForParameter(request, session));
                     // feature of interest

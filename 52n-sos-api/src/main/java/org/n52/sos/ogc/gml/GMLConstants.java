@@ -86,6 +86,8 @@ public class GMLConstants {
 	public static final String EN_ABSTRACT_FEATURE_32 = "AbstractFeature";
 
     public static final String EN_ABSTRACT_FEATURE_COLLECTION = "_FeatureCollection";
+    
+    public static final String EN_FEATURE_COLLECTION = "FeatureCollection";
 
     public static final String EN_ABSTRACT_GEOMETRY = "_Geometry";
 

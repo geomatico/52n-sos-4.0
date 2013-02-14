@@ -117,7 +117,9 @@ public class OgcDecoderv100 implements IDecoder<Object, XmlObject> {
         }
 		if (xmlObject instanceof BBOXTypeImpl) {
             return parseBBOXFilterType((BBOXTypeImpl) xmlObject);
-        } 
+        }
+		// TODO more spatial filters (contains, intersects, overlaps Point Linestring Polygon, not supported by this SOS yet
+		// return error message
         return null;
 	}
 

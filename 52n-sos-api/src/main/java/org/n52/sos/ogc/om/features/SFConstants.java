@@ -76,9 +76,13 @@ public class SFConstants {
 
     public static final String EN_SAMPLINGSURFACE = "SamplingSurface";
 
+    public static final String EN_SAMPLINGCURVE = "SamplingCurve";
+
     public static final String FT_SAMPLINGPOINT = NS_SA_PREFIX + ":" + EN_SAMPLINGPOINT;
 
     public static final String FT_SAMPLINGSURFACE = NS_SA_PREFIX + ":" + EN_SAMPLINGSURFACE;
+
+    public static final String FT_SAMPLINGCURVE = NS_SA_PREFIX + ":" + EN_SAMPLINGCURVE;
 
     private SFConstants() {
     }

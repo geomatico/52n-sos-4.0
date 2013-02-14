@@ -144,7 +144,8 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
             GetFeatureOfInterestDocument getFoiDoc = (GetFeatureOfInterestDocument) xmlObject;
             response = parseGetFeatureOfInterest(getFoiDoc);
         }
-
+        
+        // getObservationById request
         else if (xmlObject instanceof GetObservationByIdDocument) {
             GetObservationByIdDocument getObsByIdDoc = (GetObservationByIdDocument) xmlObject;
             response = parseGetObservationById(getObsByIdDoc);
@@ -277,7 +278,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
         GetObservationRequest getObsRequest = new GetObservationRequest();
 
         GetObservation getObs = getObsDoc.getGetObservation();
-        // TODO: check
+        
         getObsRequest.setService(getObs.getService());
         getObsRequest.setVersion(getObs.getVersion());
         getObsRequest.setOfferings(Arrays.asList(getObs.getOffering()));
@@ -289,7 +290,8 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
         getObsRequest.setSpatialFilter(parseSpatialFilter4GetObservation(getObs.getFeatureOfInterest()));
         
         getObsRequest.setFeatureIdentifiers(parseFeatureofInterestV100(getObs.getFeatureOfInterest()));
-
+        // TODO result filter, not supported by this SOS yet?
+        // return error message
         if (getObs.isSetResponseFormat()) {
             try {
                 String responseFormat = URLDecoder.decode(getObs.getResponseFormat(), "UTF-8");
@@ -428,9 +430,9 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
      */
     private List<SpatialFilter> parseSpatialFilters4GetFeatureOfInterest(
             Location location) throws OwsExceptionReport {
-    	// TODO I am not sure if that works here :-p
+    	
     	List<SpatialFilter> sosSpatialFilters = new ArrayList<SpatialFilter>();
-        if (location.getSpatialOps() != null) {
+        if (location != null && location.getSpatialOps() != null) {
             Object filter = CodingHelper.decodeXmlElement(location.getSpatialOps());
             if (filter != null && filter instanceof SpatialFilter) {
                 sosSpatialFilters.add((SpatialFilter) filter);
@@ -455,7 +457,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
             GetObservation.EventTime[] temporalFilters) throws OwsExceptionReport {
 
         List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>();
-        // TODO extend temporal filtering
+        
         for (GetObservation.EventTime temporalFilter : temporalFilters) {
             Object filter = CodingHelper.decodeXmlElement(temporalFilter.getTemporalOps());
             if (filter != null && filter instanceof TemporalFilter) {
