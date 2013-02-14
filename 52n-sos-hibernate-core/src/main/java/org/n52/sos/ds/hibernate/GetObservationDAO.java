@@ -161,21 +161,21 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
      * AbstractSosRequest)
      */
     @Override
-    public GetObservationResponse getObservation(GetObservationRequest request) throws OwsExceptionReport {
+    public GetObservationResponse getObservation(GetObservationRequest sosRequest) throws OwsExceptionReport {
         Session session = null;
         try {
             session = getSession();
-            if (request.getVersion().equals(Sos1Constants.SERVICEVERSION)
-                    && request.getObservedProperties().isEmpty()) {
+            if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION)
+                    && sosRequest.getObservedProperties().isEmpty()) {
                 throw Util4Exceptions.createMissingParameterValueException(GetObservationParams.observedProperty
                         .name());
             } else {
-                GetObservationResponse response = new GetObservationResponse();
-                response.setService(request.getService());
-                response.setVersion(request.getVersion());
-                response.setResponseFormat(request.getResponseFormat());
-                response.setObservationCollection(queryObservation(request, session));
-                return response;
+                GetObservationResponse sosResponse = new GetObservationResponse();
+                sosResponse.setService(sosRequest.getService());
+                sosResponse.setVersion(sosRequest.getVersion());
+                sosResponse.setResponseFormat(sosRequest.getResponseFormat());
+                sosResponse.setObservationCollection(queryObservation(sosRequest, session));
+                return sosResponse;
             }
         } catch (HibernateException he) {
             String exceptionText = "Error while querying data observation data!";
