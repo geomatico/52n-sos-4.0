@@ -271,5 +271,16 @@ public class SosObservationConstellation implements Serializable {
     public boolean isSetOfferings() {
         return offerings != null && !offerings.isEmpty();
     }
+    
+    public SosObservationConstellation clone() {
+        SosObservationConstellation clone = new SosObservationConstellation();
+        clone.setFeatureOfInterest(this.getFeatureOfInterest());
+        clone.setObservableProperty(this.getObservableProperty());
+        clone.setObservationType(this.getObservationType());
+        clone.setOfferings(new HashSet<String>(this.getOfferings()));
+        clone.setProcedure(this.getProcedure());
+        clone.setResultTemplate(this.getResultTemplate());
+        return clone;
+    }
 
 }
