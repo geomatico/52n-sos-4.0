@@ -41,6 +41,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.n52.sos.ds.ISettingsDao;
+import org.n52.sos.ds.hibernate.util.DefaultHibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.service.AdminUser;
 import org.n52.sos.service.ConfigurationException;
@@ -105,9 +106,9 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
     
     protected Properties createHibernateProperties(InstallationConfiguration c) throws InstallationSettingsError {
         Properties p = checkJdbcUrl(c).toProperties();
-        p.put(HibernateConstants.DRIVER_PROPERTY, (String) c.getDatabaseSetting(InstallConstants.DRIVER_PARAMETER));
-        p.put(HibernateConstants.CONNECTION_POOL_PROPERTY, (String) c.getDatabaseSetting(InstallConstants.CONNECTION_POOL_PARAMETER));
-        p.put(HibernateConstants.DIALECT_PROPERTY, (String) c.getDatabaseSetting(InstallConstants.JDBC_DIALECT_PARAMETER));
+        p.put(DefaultHibernateConstants.DRIVER_PROPERTY, (String) c.getDatabaseSetting(InstallConstants.DRIVER_PARAMETER));
+        p.put(DefaultHibernateConstants.CONNECTION_POOL_PROPERTY, (String) c.getDatabaseSetting(InstallConstants.CONNECTION_POOL_PARAMETER));
+        p.put(DefaultHibernateConstants.DIALECT_PROPERTY, (String) c.getDatabaseSetting(InstallConstants.JDBC_DIALECT_PARAMETER));
         return p;
     }
     
@@ -236,7 +237,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
 
     protected void loadDriver(Properties properties, InstallationConfiguration c) throws InstallationSettingsError {
         try {
-            Class.forName(properties.getProperty(HibernateConstants.DRIVER_PROPERTY));
+            Class.forName(properties.getProperty(DefaultHibernateConstants.DRIVER_PROPERTY));
         } catch (ClassNotFoundException e) {
             throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_CONNECT_TO_THE_DATABASE, e.getMessage()));
         }
@@ -244,8 +245,8 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
 
     private Connection createConnection(Properties properties) throws SQLException {
         return DriverManager.getConnection(
-             properties.getProperty(HibernateConstants.CONNECTION_STRING_PROPERTY),
-             properties.getProperty(HibernateConstants.USER_PROPERTY),
-             properties.getProperty(HibernateConstants.PASS_PROPERTY));
+             properties.getProperty(DefaultHibernateConstants.CONNECTION_STRING_PROPERTY),
+             properties.getProperty(DefaultHibernateConstants.USER_PROPERTY),
+             properties.getProperty(DefaultHibernateConstants.PASS_PROPERTY));
     }
 }

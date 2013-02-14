@@ -30,6 +30,7 @@ import java.util.Properties;
 
 import org.hibernate.Session;
 import org.n52.sos.ds.IInitializableDao;
+import org.n52.sos.ds.hibernate.util.DefaultHibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
@@ -55,10 +56,10 @@ public class AbstractSettingsDao implements IInitializableDao {
 	
 	@Override
 	public void initialize(Properties properties) {
-		initialize(properties.getProperty(HibernateConstants.DRIVER_PROPERTY), 
-				   properties.getProperty(HibernateConstants.CONNECTION_STRING_PROPERTY), 
-				   properties.getProperty(HibernateConstants.USER_PROPERTY),
-				   properties.getProperty(HibernateConstants.PASS_PROPERTY));
+		initialize(properties.getProperty(DefaultHibernateConstants.DRIVER_PROPERTY), 
+				   properties.getProperty(DefaultHibernateConstants.CONNECTION_STRING_PROPERTY), 
+				   properties.getProperty(DefaultHibernateConstants.USER_PROPERTY),
+				   properties.getProperty(DefaultHibernateConstants.PASS_PROPERTY));
 	}
 	
 	protected Object getConnection() throws SQLException {

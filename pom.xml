@@ -22,6 +22,7 @@
 	<modules>
 		<module>52n-sos-api</module>
 		<module>52n-sos-admin</module>
+		<module>52n-sos-hibernate-api</module>
 		<module>52n-sos-hibernate-common</module>
 		<module>52n-sos-hibernate-mappings</module>
 		<module>52n-sos-hibernate-dialect</module>
@@ -109,6 +110,11 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-core-v20</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>52n-sos-hibernate-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

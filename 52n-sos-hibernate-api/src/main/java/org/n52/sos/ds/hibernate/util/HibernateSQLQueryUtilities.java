@@ -43,22 +43,22 @@ public class HibernateSQLQueryUtilities {
     public static String getSelectDistinctFromQuery(List<String> properties, List<String> restrictions,
             String tableName) {
         StringBuilder query = new StringBuilder();
-        query.append(HibernateConstants.SELECT);
-        query.append(HibernateConstants.DISTINCT);
+        query.append(DefaultHibernateConstants.SELECT);
+        query.append(DefaultHibernateConstants.DISTINCT);
         for (String property : properties) {
             query.append(property);
             query.append(",");
         }
         query.delete(query.lastIndexOf(","), query.length());
-        query.append(HibernateConstants.FROM);
+        query.append(DefaultHibernateConstants.FROM);
         query.append(tableName);
         if (restrictions != null && !restrictions.isEmpty()) {
-            query.append(HibernateConstants.WHERE);
+            query.append(DefaultHibernateConstants.WHERE);
             for (String restriction : restrictions) {
                 query.append(restriction);
-                query.append(HibernateConstants.AND);
+                query.append(DefaultHibernateConstants.AND);
             }
-            query.delete(query.lastIndexOf(HibernateConstants.AND), query.length());
+            query.delete(query.lastIndexOf(DefaultHibernateConstants.AND), query.length());
         }
         query.append(";");
         return query.toString();

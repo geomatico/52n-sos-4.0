@@ -30,19 +30,6 @@ package org.n52.sos.ds.hibernate.util;
  */
 public class HibernateConstants {
 
-    // SQL query statements
-    public static final String SELECT = "SELECT ";
-
-    public static final String DISTINCT = " DISTINCT ";
-
-    public static final String FROM = " FROM ";
-
-    public static final String WHERE = " WHERE ";
-
-    public static final String AND = " AND ";
-
-    public static final String OR = " OR ";
-
     // table and column names
     // TODO: make this constants configurable
 	public static final String PARAMETER_SET_ID = "setId";
@@ -129,16 +116,5 @@ public class HibernateConstants {
 	public static final String ADMIN_PASSWORD_KEY = "admin_password";
 	public static final String TABLE_NAME_SETTINGS = "global_settings";
 	
-	/* dssos.config properties */
-	public static final String DRIVER_PROPERTY = "hibernate.connection.driver_class";
-	public static final String PASS_PROPERTY = "hibernate.connection.password";
-	public static final String USER_PROPERTY = "hibernate.connection.username";
-	public static final String CONNECTION_STRING_PROPERTY = "hibernate.connection.url";
-    public static final String CONNECTION_POOL_PROPERTY = "hibernate.connection.provider_class";
-    public static final String DIALECT_PROPERTY = "hibernate.dialect";
-
-    public static final String CLAZZ = "clazz";
-
-
 
 }

@@ -29,6 +29,7 @@ import java.util.Properties;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.n52.sos.ds.hibernate.util.DefaultHibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 
 public class JdbcUrl {
@@ -70,17 +71,17 @@ public class JdbcUrl {
 
     public Properties toProperties() {
         Properties properties = new Properties();
-        properties.put(HibernateConstants.CONNECTION_STRING_PROPERTY, getConnectionString());
-        properties.put(HibernateConstants.USER_PROPERTY, getUser());
-        properties.put(HibernateConstants.PASS_PROPERTY, getPassword());
+        properties.put(DefaultHibernateConstants.CONNECTION_STRING_PROPERTY, getConnectionString());
+        properties.put(DefaultHibernateConstants.USER_PROPERTY, getUser());
+        properties.put(DefaultHibernateConstants.PASS_PROPERTY, getPassword());
         return properties;
     }
 
     private static String toURI(Properties p) {
         StringBuilder sb = new StringBuilder();
-        sb.append(p.getProperty(HibernateConstants.CONNECTION_STRING_PROPERTY));
-        sb.append("?").append(QUERY_PARAMETER_USER).append("=").append(p.getProperty(HibernateConstants.USER_PROPERTY));
-        sb.append("&").append(QUERY_PARAMETER_PASSWORD).append("=").append(p.getProperty(HibernateConstants.PASS_PROPERTY));
+        sb.append(p.getProperty(DefaultHibernateConstants.CONNECTION_STRING_PROPERTY));
+        sb.append("?").append(QUERY_PARAMETER_USER).append("=").append(p.getProperty(DefaultHibernateConstants.USER_PROPERTY));
+        sb.append("&").append(QUERY_PARAMETER_PASSWORD).append("=").append(p.getProperty(DefaultHibernateConstants.PASS_PROPERTY));
         return sb.toString();
     }
 
