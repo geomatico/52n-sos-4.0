@@ -62,12 +62,11 @@ public abstract class SosAbstractFeature implements Serializable {
     public boolean equals(Object o) {
         if (o instanceof SosAbstractFeature) {
             SosAbstractFeature feature = (SosAbstractFeature) o;
-            if (feature.getIdentifier() != null && this.getIdentifier() != null && feature.getGmlId() != null
-                    && this.getGmlId() != null) {
+            if (feature.isSetIdentifier() && this.isSetIdentifier() && feature.isSetGmlID() && this.isSetGmlID()) {
                 if (feature.getIdentifier().equals(this.getIdentifier()) && feature.getGmlId().equals(this.getGmlId())) {
                     return true;
                 }
-            } else if (feature.getIdentifier() != null && this.getIdentifier() != null) {
+            } else if (feature.isSetIdentifier() && this.isSetIdentifier()) {
                 if (feature.getIdentifier().equals(this.getIdentifier())) {
                     return true;
                 }
@@ -110,7 +109,7 @@ public abstract class SosAbstractFeature implements Serializable {
     }
 
     public String getGmlId() {
-        return gmlId.replaceFirst("#", "");
+        return gmlId == null ? null : gmlId.replaceFirst("#", "");
     }
 
     public void setGmlId(String gmlId) {

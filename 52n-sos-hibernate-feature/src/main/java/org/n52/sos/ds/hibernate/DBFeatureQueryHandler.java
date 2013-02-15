@@ -42,6 +42,7 @@ import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateFeatureCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateFeatureCriteriaTransactionalUtilities;
+import org.n52.sos.ds.hibernate.util.HibernateFeatureUtilities;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
@@ -76,7 +77,7 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
         try {
             Criteria criteria = session.createCriteria(FeatureOfInterest.class);
             criteria.add(Restrictions.eq("identifier", featureID));
-            return createSosAbstractFeatureFromResult((FeatureOfInterest) criteria.uniqueResult(), version);
+            return HibernateFeatureUtilities.createSosAbstractFeatureFromResult((FeatureOfInterest) criteria.uniqueResult(), version);
         } catch (HibernateException he) {
             String exceptionText = "An error occurs while querying feature data for a featureOfInterest identifier!";
             LOGGER.error(exceptionText, he);
@@ -200,50 +201,10 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
             String version) throws OwsExceptionReport {
         Map<String, SosAbstractFeature> sosAbstractFois = new HashMap<String, SosAbstractFeature>();
         for (FeatureOfInterest feature : features) {
-            sosAbstractFois.put(feature.getIdentifier(), createSosAbstractFeatureFromResult(feature, version));
+            sosAbstractFois.put(feature.getIdentifier(), HibernateFeatureUtilities.createSosAbstractFeatureFromResult(feature, version));
         }
         // TODO if sampledFeatures are also in sosAbstractFois, reference them.
         return sosAbstractFois;
-    }
-
-    /**
-     * Creates a SOS feature from the FeatureOfInterest object
-     * 
-     * @param feature
-     *            FeatureOfInterest object
-     * @param version
-     *            SOS version
-     * @return SOS feature
-     * @throws OwsExceptionReport
-     *             If feature type is not supported
-     */
-    private SosAbstractFeature createSosAbstractFeatureFromResult(FeatureOfInterest feature, String version)
-            throws OwsExceptionReport {
-        String checkedFoiID = null;
-        if (SosHelper.checkFeatureOfInterestIdentifierForSosV2(feature.getIdentifier(), version)) {
-            checkedFoiID = feature.getIdentifier();
-        }
-        SosSamplingFeature sampFeat = new SosSamplingFeature(new CodeWithAuthority(checkedFoiID));
-        if (feature.getName() != null && !feature.getName().isEmpty()) {
-            sampFeat.setName(SosHelper.createCodeTypeListFromCSV(feature.getName()));
-        }
-        sampFeat.setDescription(null);
-        sampFeat.setGeometry(feature.getGeom());
-        if (feature.getGeom() != null) {
-            sampFeat.setEpsgCode(feature.getGeom().getSRID());
-        }
-        sampFeat.setFeatureType(feature.getFeatureOfInterestType().getFeatureOfInterestType());
-        sampFeat.setUrl(feature.getUrl());
-        sampFeat.setXmlDescription(feature.getDescriptionXml());
-        Set<FeatureOfInterest> parentFeatures = feature.getFeatureOfInterestsForParentFeatureId();
-        if (parentFeatures != null && !parentFeatures.isEmpty()) {
-            List<SosAbstractFeature> sampledFeatures = new ArrayList<SosAbstractFeature>(parentFeatures.size());
-            for (FeatureOfInterest parentFeature : parentFeatures) {
-                sampledFeatures.add(createSosAbstractFeatureFromResult(parentFeature, version));
-            }
-            sampFeat.setSampledFeatures(sampledFeatures);
-        }
-        return sampFeat;
     }
 
     /**

@@ -23,7 +23,6 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,26 +43,20 @@ import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
+import org.n52.sos.ds.hibernate.util.HibernateFeatureUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.AbstractSosPhenomenon;
-import org.n52.sos.ogc.om.IObservationValue;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosMultiObservationValues;
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
-import org.n52.sos.ogc.om.SosSingleObservationValue;
-import org.n52.sos.ogc.om.values.BooleanValue;
-import org.n52.sos.ogc.om.values.CategoryValue;
-import org.n52.sos.ogc.om.values.CountValue;
-import org.n52.sos.ogc.om.values.IValue;
-import org.n52.sos.ogc.om.values.QuantityValue;
+import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
-import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorML;
@@ -123,7 +116,9 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
             ResultTemplate resultTemplate =
                     HibernateCriteriaQueryUtilities.getResultTemplateObject(request.getTemplateIdentifier(), session);
             transaction = session.beginTransaction();
-            SosObservation singleObservation = getSingleObservationFromResultValues(resultTemplate, request.getResultValues());
+            SosObservation singleObservation = getSingleObservationFromResultValues(response.getVersion(),
+                                                                                    resultTemplate, 
+                                                                                    request.getResultValues());
             response.setObservation(singleObservation);
             List<SosObservation> observations = getSingleObservationsFromObservation(singleObservation);
             Set<ObservationConstellationOfferingObservationType> obsConstOffObsTypes = new HashSet<ObservationConstellationOfferingObservationType>(1);
@@ -156,7 +151,7 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
         return response;
     }
     
-    private SosObservation getSingleObservationFromResultValues(ResultTemplate resultTemplate, String resultValues) throws OwsExceptionReport {
+    private SosObservation getSingleObservationFromResultValues(String version, ResultTemplate resultTemplate, String resultValues) throws OwsExceptionReport {
         SosResultEncoding resultEncoding = new SosResultEncoding(resultTemplate.getResultEncoding());
         SosResultStructure resultStructure = new SosResultStructure(resultTemplate.getResultStructure());
         String[] blockValues = getBlockValues(resultValues, resultEncoding.getEncoding());
@@ -164,6 +159,8 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
                        getObservation(resultTemplate.getObservationConstellationOfferingObservationType(),
                                       blockValues,
                                       resultStructure.getResultStructure(), resultEncoding.getEncoding());
+        SosAbstractFeature ssf = HibernateFeatureUtilities.createSosAbstractFeatureFromResult(resultTemplate.getFeatureOfInterest(), version);
+        singleObservation.getObservationConstellation().setFeatureOfInterest(ssf);
         return singleObservation;
     }
     
@@ -277,95 +274,6 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
         return record;
     }
 
-    private IValue getValue(SWEConstants.SweSimpleType type, String value) throws OwsExceptionReport {
-        switch (type) {
-        case Boolean:
-            return new BooleanValue(Boolean.valueOf(value));
-        case Category:
-            return new CategoryValue(value);
-        case Text:
-            return new TextValue(value);
-        case Count:
-            try {
-                return new CountValue(Integer.valueOf(value));
-            } catch (NumberFormatException e) {
-                String exceptionText = "Error while parsing count value!";
-                LOGGER.error(exceptionText, e);
-                throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
-            }
-        case Quantity:
-            try {
-                return new QuantityValue(new BigDecimal(value));
-            } catch (NumberFormatException e) {
-                String exceptionText = "Error while parsing quantity value!";
-                LOGGER.error(exceptionText, e);
-                throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
-            }
-        case Time:
-            try {
-                // testing for validity
-                value = value.trim();
-                DateTimeHelper.parseIsoString2DateTime(value);
-                return new TextValue(value);
-            } catch (DateTimeException dte) {
-                String exceptionText = "Error while parsing time value!";
-                LOGGER.error(exceptionText, dte);
-                throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
-            }
-        case TimeRange:
-            try {
-                value = value.trim();
-                String[] times = value.split("/");
-                if (times.length != 2) {
-                    String exceptionText = "Error while parsing time range value!";
-                    LOGGER.error(exceptionText);
-                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-                }
-                DateTimeHelper.parseIsoString2DateTime(times[0].trim());
-                DateTimeHelper.parseIsoString2DateTime(times[1].trim());
-                return new TextValue(value);
-            } catch (DateTimeException dte) {
-                String exceptionText = "Error while parsing time range value!";
-                LOGGER.error(exceptionText, dte);
-                throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
-            }
-            // TODO case CountRange:
-            // TODO case QuantityRange:
-            // TODO case ObservableProperty:
-        default:
-            String exceptionText =
-                    new StringBuilder().append("SweSimpleType '").append(type).append("' currently not supported.")
-                            .toString();
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        }
-    }
-
-    private IObservationValue getValuesAsSingleStringValue(String[] singleValues,
-            SosSweAbstractDataComponent resultStructure, SosSweAbstractEncoding encoding) throws OwsExceptionReport {
-        int resultTimeIndex = ResultHandlingHelper.hasResultTime(resultStructure);
-        int phenomenonTimeIndex = ResultHandlingHelper.hasPhenomenonTime(resultStructure);
-        String tokenSeparator = ResultHandlingHelper.getTokenSeparator(encoding);
-        ITime phenomenonTime = null;
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < singleValues.length; i++) {
-            if (i == phenomenonTimeIndex) {
-                phenomenonTime = getPhenomenonTime(singleValues[i]);
-            } else if (i != phenomenonTimeIndex && i != resultTimeIndex) {
-                builder.append(singleValues[i]);
-                if (tokenSeparator != null) {
-                    builder.append(tokenSeparator);
-                }
-            }
-        }
-        if (tokenSeparator != null && builder.length() > 0) {
-            builder.delete(builder.lastIndexOf(tokenSeparator), builder.length());
-        }
-        TextValue textValue = new TextValue(builder.toString());
-        SosSingleObservationValue observation = new SosSingleObservationValue(phenomenonTime, textValue);
-        return observation;
-    }
-
     // TODO move to helper class
     private ITime getPhenomenonTime(String timeString) throws OwsExceptionReport {
         try {
@@ -382,19 +290,6 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
             return phenomenonTime;
         } catch (DateTimeException dte) {
             String exceptionText = "Error while parsing phenomenonTime!";
-            LOGGER.error(exceptionText, dte);
-            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
-        }
-    }
-
-    private TimeInstant getResultTime(String timeString) throws OwsExceptionReport {
-        try {
-            TimeInstant time = new TimeInstant();
-            DateTime dateTime = DateTimeHelper.parseIsoString2DateTime(timeString.trim());
-            time.setValue(dateTime);
-            return time;
-        } catch (DateTimeException dte) {
-            String exceptionText = "Error while parsing resultTime!";
             LOGGER.error(exceptionText, dte);
             throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
         }
