@@ -758,7 +758,7 @@
                                 <configuration>
                                     <tasks>
                                         <delete quiet="true" file="${sqliteSettingDatabaseTargetFile}"/>
-                                        <copy file="${sqliteSetticd ngDatabase}" tofile="${sqliteSettingDatabaseTargetFile}" />
+                                        <copy file="${sqliteSettingDatabase}" tofile="${sqliteSettingDatabaseTargetFile}" />
                                     </tasks>
                                 </configuration>
                             </execution>
