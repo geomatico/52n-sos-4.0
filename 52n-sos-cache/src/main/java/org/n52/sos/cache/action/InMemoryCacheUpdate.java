@@ -163,7 +163,7 @@ public abstract class InMemoryCacheUpdate implements Action {
 			getCache().getKProcedureVObservationIdentifiers().put(procedureIdentifier, value);
 		}
 		getCache().getKProcedureVObservationIdentifiers().get(procedureIdentifier).add(observationIdentifier);
-		LOGGER.debug("procedure \"{}\" to observation id \"{}\" relation added to cache? {}",
+		LOGGER.debug("procedure '{}' to observation id '{}' relation added to cache? {}",
 				procedureIdentifier,
 				observationIdentifier,
 				getCache().getKProcedureVObservationIdentifiers().get(procedureIdentifier).contains(observationIdentifier));
@@ -180,7 +180,7 @@ public abstract class InMemoryCacheUpdate implements Action {
 		} else {
 			String errorMessage = String.format("Feature Type \"%s\" not supported.", sosFeatureOfInterest != null ? sosFeatureOfInterest.getClass().getName() : sosFeatureOfInterest);
 			LOGGER.error(errorMessage);
-			throw new RuntimeException(errorMessage); // TODO change type of exception to OER?
+			throw new IllegalArgumentException(errorMessage); // TODO change type of exception to OER?
 		}
 	}
 	

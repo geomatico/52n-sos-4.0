@@ -152,7 +152,7 @@ public class AdminSettingsController extends AbstractController {
     private void logSettings(Collection<ISettingValue<?>> values) {
         if (log.isDebugEnabled()) {
             for (ISettingValue<?> value : values) {
-                log.info("Saving Setting: (\"{}\"({}) => \"{}\")", value.getKey(), value.getType(), value.getValue());
+                log.info("Saving Setting: ('{}'({}) => '{}')", value.getKey(), value.getType(), value.getValue());
             }
         }
     }

@@ -90,7 +90,7 @@ public class TestDataSqlScriptGenerator {
 			if ( fileExistsThanDeleteItAndCreateNew(file))
 			{
 				FileWriter fw = new FileWriter(file);
-				LOGGER.debug("Writing results to file \"{}\"",file.getAbsolutePath());
+				LOGGER.debug("Writing results to file '{}'",file.getAbsolutePath());
 				bw = new BufferedWriter(fw);
 				// add header to sql file
 				bw.write(createHeaderStatements());
