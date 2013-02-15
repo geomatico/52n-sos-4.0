@@ -47,6 +47,7 @@ public interface ControllerConstants {
         public static final String WSDL = "/wsdl";
         public static final String INDEX = "/index";
         public static final String CLIENT = "/client";
+        public static final String SETTING_DEFINITIONS = "/settingDefinitions.json";
         public static final String ADMIN_ROOT = "/admin";
         public static final String ADMIN_INDEX = "/admin/index";
         public static final String ADMIN_SETTINGS = "/admin/settings";
@@ -83,4 +84,8 @@ public interface ControllerConstants {
     public static final String REMOVE_TEST_DATA_SQL_FILE = "/sql/remove_test_data.sql";
     public static final String CREATE_DATAMODEL_SQL_FILE = "/sql/script_20_create.sql";
     public static final String CLEAR_DATABASE_SQL_FILE = "/sql/clear_database.sql";
+    
+    public static final String ADMIN_USERNAME_REQUEST_PARAMETER = "admin_username";
+    public static final String ADMIN_PASSWORD_REQUEST_PARAMETER = "admin_password";
+    public static final String ADMIN_CURRENT_PASSWORD_REQUEST_PARAMETER = "current_password";
 }

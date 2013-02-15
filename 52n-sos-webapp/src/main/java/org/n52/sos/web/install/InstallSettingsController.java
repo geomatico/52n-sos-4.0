@@ -25,8 +25,12 @@ package org.n52.sos.web.install;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Map.Entry;
 
-import org.n52.sos.service.Setting;
+import org.n52.sos.config.ISettingDefinition;
+import org.n52.sos.config.ISettingValue;
+import org.n52.sos.config.SettingsManager;
+import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.install.InstallConstants.Step;
 import org.springframework.stereotype.Controller;
@@ -45,8 +49,8 @@ public class InstallSettingsController extends AbstractProcessingInstallationCon
     protected void process(Map<String, String> parameters, InstallationConfiguration c) throws InstallationSettingsError {
         logSettings(parameters);
 
-        for (Setting p : Setting.values()) {
-            checkSetting(p, parameters.get(p.name()), c);
+        for (Entry<String, String> p : parameters.entrySet()) {
+            checkSetting(p.getKey(), p.getValue(), c);
         }
     }
 
@@ -62,24 +66,44 @@ public class InstallSettingsController extends AbstractProcessingInstallationCon
         }
     }
 
-    protected void checkSetting(Setting p, String value, InstallationConfiguration c) throws InstallationSettingsError {
-        if (p.isAllowedValue(value)) {
-            if (p.type() == Setting.Type.FILE && value != null && !value.isEmpty()) {
-                checkFileSetting(value, c, p);
-            } else {
-                c.setSetting(p.name(), p.parse(value));
-            }
-        } else {
-            /* TODO include longer name of parameter */
-            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_VALIDATE_PARAMETER, p.name(), value));
+    protected void checkSetting(String key, String stringValue, InstallationConfiguration c) throws
+            InstallationSettingsError {
+        SettingsManager sm;
+        try {
+            sm = SettingsManager.getInstance();
+        } catch (ConfigurationException ex) {
+            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_INSTANTIATE_SETTINGS_MANAGER,
+                                                                 ex.getMessage()), ex);
+        }
+        ISettingDefinition<?, ?> def = sm.getDefinitionByKey(key);
+        if (def == null) {
+            throw new InstallationSettingsError(c, String.format(ErrorMessages.NO_DEFINITON_FOUND, key));
+        }
+        ISettingValue<?> val = createSettingValue(sm, def, stringValue, c);
+        checkFileSetting(def, val, c);
+        c.setSetting(def, val);
+    }
+
+    protected ISettingValue<?> createSettingValue(SettingsManager sm, ISettingDefinition<?, ?> def, String stringValue,
+                                                InstallationConfiguration c) throws InstallationSettingsError {
+        try {
+            return sm.getSettingFactory().newSettingValue(def, stringValue);
+        } catch (Exception e) {
+            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_VALIDATE_PARAMETER, def
+                    .getTitle(), stringValue));
         }
     }
 
-    protected void checkFileSetting(String value, InstallationConfiguration c, Setting p) throws InstallationSettingsError {
-        if (new File(value).exists() || new File(getBasePath() + value).exists()) {
-            c.setSetting(p.name(), p.parse(value));
-        } else {
-            throw new InstallationSettingsError(c, String.format(ErrorMessages.CANNOT_FIND_FILE, getBasePath(), value, value));
+    @SuppressWarnings("unchecked")
+    protected void checkFileSetting(ISettingDefinition<?, ?> def, ISettingValue<?> val, InstallationConfiguration c)
+            throws InstallationSettingsError {
+        if (val.getValue() instanceof File) {
+            ISettingValue<File> fileSetting = (ISettingValue<File>) val;
+            File f = fileSetting.getValue();
+            if (!f.exists() && !def.isOptional()) {
+                throw new InstallationSettingsError(c, String
+                        .format(ErrorMessages.CANNOT_FIND_FILE, f.getAbsolutePath()));
+            }
         }
     }
 }

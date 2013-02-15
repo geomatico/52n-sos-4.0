@@ -26,6 +26,9 @@ package org.n52.sos.web.install;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.n52.sos.config.ISettingDefinition;
+import org.n52.sos.config.ISettingValue;
+
 /**
  * TODO JavaDoc
  *
@@ -33,7 +36,7 @@ import java.util.Map;
  */
 public class InstallationConfiguration {
 
-    private Map<String, String> settings = new HashMap<String, String>();
+    private Map<ISettingDefinition<?, ?>, ISettingValue<?>> settings = new HashMap<ISettingDefinition<?, ?>, ISettingValue<?>>();
     private Map<String, Object> databaseSettings = new HashMap<String, Object>();
     private String username;
     private String password;
@@ -41,11 +44,11 @@ public class InstallationConfiguration {
     public InstallationConfiguration() {
     }
 
-    public Map<String, String> getSettings() {
+    public Map<ISettingDefinition<?, ?>, ISettingValue<?>> getSettings() {
         return settings;
     }
 
-    public InstallationConfiguration setSettings(Map<String, String> settings) {
+    public InstallationConfiguration setSettings(Map<ISettingDefinition<?, ?>, ISettingValue<?>> settings) {
         this.settings = settings;
         return this;
     }
@@ -86,11 +89,11 @@ public class InstallationConfiguration {
         return this;
     }
 
-    public String getSetting(String o) {
-        return settings.get(o);
+    public ISettingValue<?> getSetting(ISettingDefinition<?, ?> k) {
+        return settings.get(k);
     }
 
-    public InstallationConfiguration setSetting(String k, String v) {
+    public InstallationConfiguration setSetting(ISettingDefinition<?, ?> k, ISettingValue<?> v) {
         settings.put(k, v);
         return this;
     }

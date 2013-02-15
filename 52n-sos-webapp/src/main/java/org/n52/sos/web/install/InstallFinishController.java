@@ -28,10 +28,10 @@ import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.ServiceLoader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,10 +40,10 @@ import javax.servlet.http.HttpSession;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.n52.sos.ds.ISettingsDao;
+import org.n52.sos.config.ISettingValue;
+import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.hibernate.util.DefaultHibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
-import org.n52.sos.service.AdminUser;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.ControllerConstants;
@@ -83,10 +83,16 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
     protected void process(Map<String, String> param, InstallationConfiguration c) throws InstallationSettingsError {
         checkUsername(param, c);
         checkPassword(param, c);
-
         Properties properties = createHibernateProperties(c);
-
         loadDriver(properties, c);
+        
+        try {
+            SettingsManager.getInstance().deleteAll();
+        } catch (Throwable e) {
+            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_DELETE_PREVIOUS_SETTINGS, e
+                    .getMessage()));
+        }
+        
         Connection con = null;
         try {
             con = createConnection(properties);
@@ -94,7 +100,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
             insertTestData(c, con);
             insertSettings(c, con);
             saveAdmin(c, properties);
-        } catch (SQLException e) {
+        } catch (Throwable e) {
             throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_CONNECT_TO_THE_DATABASE, e.getMessage()));
         } finally {
             SqlUtils.close(con);
@@ -113,7 +119,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
     }
     
     protected void checkUsername(Map<String, String> param, InstallationConfiguration c) throws InstallationSettingsError {
-        String username = param.get(HibernateConstants.ADMIN_USERNAME_KEY);
+        String username = param.get(ControllerConstants.ADMIN_USERNAME_REQUEST_PARAMETER);
         if (username == null || username.trim().isEmpty()) {
             throw new InstallationSettingsError(c, ErrorMessages.USERNAME_IS_INVALID);
         }
@@ -121,7 +127,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
     }
 
     protected void checkPassword(Map<String, String> param, InstallationConfiguration c) throws InstallationSettingsError {
-        String password = param.get(HibernateConstants.ADMIN_PASSWORD_KEY);
+        String password = param.get(ControllerConstants.ADMIN_PASSWORD_REQUEST_PARAMETER);
         if (password == null || password.trim().isEmpty()) {
             throw new InstallationSettingsError(c, ErrorMessages.PASSWORD_IS_INVALID);
         }
@@ -193,20 +199,21 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
     }
 
     protected void insertSettings(InstallationConfiguration c, Connection con) throws InstallationSettingsError {
-        /* insert properties into the database */
         try {
-            ISettingsDao dao = ServiceLoader.load(ISettingsDao.class).iterator().next();
-            Map<String, String> s = new HashMap<String, String>(c.getSettings());
-            try {
-                s.put(MetaDataHandler.Metadata.VERSION.name(),
-                      getMetaDataHandler().get(MetaDataHandler.Metadata.VERSION));
-            } catch (ConfigurationException ex) {
-                /* don't fail on this one... */
-                log.error("Could not load SOS version", ex);
+            
+            for (ISettingValue<?> e : c.getSettings().values()) {
+                SettingsManager.getInstance().changeSetting(e);
             }
+            
+//            try {
+//                s.put(MetaDataHandler.Metadata.VERSION.name(),
+//                      getMetaDataHandler().get(MetaDataHandler.Metadata.VERSION));
+//            } catch (ConfigurationException ex) {
+//                /* don't fail on this one... */
+//                log.error("Could not load SOS version", ex);
+//            }
 
-            dao.save(s, con);
-        } catch (SQLException e) {
+        } catch (ConfigurationException e) {
             throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_INSERT_SETTINGS, e.getMessage()), e);
         }
     }
@@ -214,7 +221,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
     protected void saveAdmin(InstallationConfiguration c, Properties properties) throws InstallationSettingsError {
         /* save admin credentials */
         try {
-            userService.saveAdmin(new AdminUser(c.getUsername(), c.getPassword()), properties);
+            userService.createAdmin(c.getUsername(), c.getPassword());
         } catch (Throwable e) {
             throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_SAVE_ADMIN_CREDENTIALS, e.getMessage()));
         }

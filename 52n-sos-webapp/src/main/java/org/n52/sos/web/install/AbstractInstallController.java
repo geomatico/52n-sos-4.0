@@ -31,7 +31,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.install.InstallConstants.Step;
@@ -61,8 +60,8 @@ public abstract class AbstractInstallController extends AbstractController {
         Map<String, Object> model = new HashMap<String, Object>(4);
         model.put(ControllerConstants.SETTINGS_MODEL_ATTRIBUTE, c.getSettings());
         model.put(ControllerConstants.DATABASE_SETTINGS_MODEL_ATTRIBUTE, c.getDatabaseSettings());
-        model.put(HibernateConstants.ADMIN_USERNAME_KEY, c.getUsername());
-        model.put(HibernateConstants.ADMIN_PASSWORD_KEY, c.getPassword());
+        model.put(ControllerConstants.ADMIN_USERNAME_REQUEST_PARAMETER, c.getUsername());
+        model.put(ControllerConstants.ADMIN_PASSWORD_REQUEST_PARAMETER, c.getPassword());
         return model;
     } 
 
@@ -106,12 +105,12 @@ public abstract class AbstractInstallController extends AbstractController {
         return session.getAttribute(step.getCompletionAttribute()) != null;
     }
     
-    @ExceptionHandler(value = InstallationRedirectError.class)
+    @ExceptionHandler(InstallationRedirectError.class)
     public ModelAndView onError(InstallationRedirectError e) {
         return redirect(e.getPath());
     }
 
-    @ExceptionHandler(value = InstallationSettingsError.class)
+    @ExceptionHandler(InstallationSettingsError.class)
     public ModelAndView onError(HttpSession session, InstallationSettingsError e) {
         if (e.getCause() != null) {
             log.error(e.getMessage(), e.getCause());

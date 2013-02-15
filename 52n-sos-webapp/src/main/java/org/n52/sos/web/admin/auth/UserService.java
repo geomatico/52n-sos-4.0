@@ -24,15 +24,14 @@
 package org.n52.sos.web.admin.auth;
 
 import java.io.Serializable;
-import java.sql.SQLException;
+import java.security.Principal;
 import java.util.Collections;
-import java.util.Properties;
-import java.util.ServiceLoader;
 
 import javax.servlet.ServletContext;
 
-import org.n52.sos.ds.IAdminUserDao;
-import org.n52.sos.service.AdminUser;
+import org.n52.sos.config.IAdministratorUser;
+import org.n52.sos.config.SettingsManager;
+import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.web.ControllerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,106 +46,85 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 /* TODO make this serializable */
 public class UserService implements AuthenticationProvider, Serializable {
-
-    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private static final long serialVersionUID = 1L;
-
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     @Autowired
     private ServletContext context;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private ServiceLoader<IAdminUserDao> daoServiceLoader = ServiceLoader.load(IAdminUserDao.class);
-
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    public UsernamePasswordAuthenticationToken authenticate(Authentication authentication) throws
+            AuthenticationException {
         UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) authentication;
-        String username = String.valueOf(auth.getPrincipal());
-        String password = String.valueOf(auth.getCredentials());
+        IAdministratorUser user = authenticate((String) auth.getPrincipal(), (String) auth.getCredentials());
+        return new UsernamePasswordAuthenticationToken(new AdministratorUserPrinciple(user), null, Collections
+                .singleton(new AdministratorAuthority()));
+    }
 
-        AdminUser user;
-        try {
-            user = getAdmin();
+    public IAdministratorUser authenticate(String username, String password) throws AuthenticationException {
+        IAdministratorUser user;
+        
+        if (username == null || password == null) {
+            throw new BadCredentialsException("Bad Credentials");
         }
-        catch (Exception ex) {
+
+        try {
+            user = SettingsManager.getInstance().getAdminUser(username);
+        } catch (Exception ex) {
             log.error("Error querying admin", ex);
             throw new BadCredentialsException("Bad Credentials");
         }
-
-        if ( !username.equals(user.getUsername()) || !getPasswordEncoder().matches(password, user.getPasswordHash())) {
+        
+        if (user == null) {
             throw new BadCredentialsException("Bad Credentials");
         }
 
-        GrantedAuthority grantedAuthority = new GrantedAuthority() {
-            private static final long serialVersionUID = 5103351149817795492L;
+        if (!username.equals(user.getUsername()) || !getPasswordEncoder().matches(password, user.getPassword())) {
+            throw new BadCredentialsException("Bad Credentials");
+        }
 
-            @Override
-            public String getAuthority() {
-                return ControllerConstants.ROLE_ADMIN;
-            }
-        };
-
-        return new UsernamePasswordAuthenticationToken(user, null, Collections.singleton(grantedAuthority));
+        return user;
     }
 
     @Override
-    public boolean supports(Class< ? > type) {
+    public boolean supports(Class<?> type) {
         return UsernamePasswordAuthenticationToken.class.isAssignableFrom(type);
     }
 
-    public void saveAdmin(AdminUser admin) {
+    public IAdministratorUser createAdmin(String username, String password) {
         try {
-            IAdminUserDao dao = daoServiceLoader.iterator().next();
-            dao.saveAdminUser(encode(admin));
-        }
-        catch (Exception ex) {
+            return SettingsManager.getInstance().createAdminUser(username, getPasswordEncoder().encode(password));
+        } catch (Exception ex) {
             log.error("Error saving admin", ex);
             throw new RuntimeException(ex);
         }
     }
 
-    private AdminUser encode(AdminUser admin) {
-        return new AdminUser(admin.getUsername(), getPasswordEncoder().encode(admin.getPasswordHash()));
-    }
-
-    public void saveAdmin(AdminUser admin, Properties properties) {
+    public void setAdminUserName(IAdministratorUser user, String name) {
         try {
-            IAdminUserDao dao = daoServiceLoader.iterator().next();
-            dao.initialize(properties);
-            dao.saveAdminUser(encode(admin));
-        }
-        catch (Exception ex) {
+            SettingsManager.getInstance().saveAdminUser(user.setUsername(name));
+        } catch (Exception ex) {
             log.error("Error saving admin", ex);
             throw new RuntimeException(ex);
         }
     }
 
-    public void setAdminUserName(String name) {
+    public void setAdminPassword(IAdministratorUser user, String password) {
         try {
-            IAdminUserDao dao = daoServiceLoader.iterator().next();
-            dao.setAdminUserName(name);
-        }
-        catch (Exception ex) {
+            SettingsManager.getInstance().saveAdminUser(user.setPassword(getPasswordEncoder().encode(password)));
+        } catch (Exception ex) {
             log.error("Error saving admin", ex);
             throw new RuntimeException(ex);
         }
     }
 
-    public void setAdminPassword(String password) {
-        try {
-            IAdminUserDao dao = daoServiceLoader.iterator().next();
-            dao.setAdminPassword(getPasswordEncoder().encode(password));
-        }
-        catch (Exception ex) {
-            log.error("Error saving admin", ex);
-            throw new RuntimeException(ex);
-        }
+    public IAdministratorUser getAdmin(String username) throws ConfigurationException {
+        return SettingsManager.getInstance().getAdminUser(username);
     }
 
-    public AdminUser getAdmin() throws SQLException {
-        IAdminUserDao dao = daoServiceLoader.iterator().next();
-        return dao.getAdminUser();
+    public IAdministratorUser getAdmin(Principal user) throws ConfigurationException {
+        return SettingsManager.getInstance().getAdminUser(user.getName());
     }
 
     public ServletContext getContext() {
@@ -163,5 +141,30 @@ public class UserService implements AuthenticationProvider, Serializable {
 
     public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
+    }
+
+    private static class AdministratorAuthority implements GrantedAuthority {
+
+        private static final long serialVersionUID = 5103351149817795492L;
+
+        @Override
+        public String getAuthority() {
+            return ControllerConstants.ROLE_ADMIN;
+        }
+    }
+    
+    private class AdministratorUserPrinciple implements Principal  {
+
+        private String username;
+        
+        AdministratorUserPrinciple(IAdministratorUser user) {
+            this.username = user.getUsername();
+        }
+        
+        @Override
+        public String getName() {
+            return this.username;
+        }
+        
     }
 }

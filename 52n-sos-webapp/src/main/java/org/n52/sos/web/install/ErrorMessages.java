@@ -54,9 +54,12 @@ public interface ErrorMessages {
     public static final String COULD_NOT_INSERT_SETTINGS = "Could not insert settings into the database: %s";
     public static final String NO_CONNECTION_POOL_SPECIFIED = "no connection pool specified";
     public static final String COULD_NOT_CREATE_SOS_TABLES = "Could not create sos tables: %s";
-    public static final String CANNOT_FIND_FILE = "Cannot find file '%s%s' or '%s'!";
+    public static final String CANNOT_FIND_FILE = "Cannot find file '%s'!";
     public static final String COULD_NOT_CONNECT_TO_DB_SERVER = "Could not connect to DB server: %s";
     public static final String CANNOT_CREATE_TABLES = "Cannot create tables: %s";
     public static final String NO_TABLES_AND_SHOULD_NOT_CREATE = "No tables are present in the database "
                                                                  + "and no tables should be created.";
+    public static final String COULD_NOT_INSTANTIATE_SETTINGS_MANAGER = "Could not instantiate Settings Manager: %s";
+    public static final String NO_DEFINITON_FOUND = "No definiton found for setting with key '%s'";
+    public static final String COULD_NOT_DELETE_PREVIOUS_SETTINGS = "Could not delete previous settings: %s";
 }

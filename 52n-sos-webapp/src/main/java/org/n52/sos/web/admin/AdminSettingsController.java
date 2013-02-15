@@ -23,30 +23,30 @@
  */
 package org.n52.sos.web.admin;
 
+import java.io.File;
+import java.net.URI;
+import java.security.Principal;
 import java.sql.SQLException;
-import java.util.EnumMap;
-import java.util.Enumeration;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.ServiceLoader;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.jettison.json.JSONObject;
-import org.n52.sos.ds.ISettingsDao;
-import org.n52.sos.ds.hibernate.util.HibernateConstants;
-import org.n52.sos.service.AdminUser;
+import org.n52.sos.config.IAdministratorUser;
+import org.n52.sos.config.ISettingDefinition;
+import org.n52.sos.config.ISettingValue;
+import org.n52.sos.config.SettingsManager;
 import org.n52.sos.service.ConfigurationException;
-import org.n52.sos.service.Configurator;
-import org.n52.sos.service.Setting;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
-import org.n52.sos.web.ControllerUtils;
 import org.n52.sos.web.admin.auth.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -56,13 +56,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+
 @Controller
 public class AdminSettingsController extends AbstractController {
 
-    private static final String CURRENT_PASSWORD_PARAMETER = "current_password";
     @Autowired
     private UserService userService;
-    private ServiceLoader<ISettingsDao> daoServiceLoader = ServiceLoader.load(ISettingsDao.class);
+    private SettingsManager sm;
 
     public UserService getUserService() {
         return userService;
@@ -72,15 +72,11 @@ public class AdminSettingsController extends AbstractController {
         this.userService = userService;
     }
 
-    public Map<String, String> getData() {
-        try {
-            ISettingsDao setting = daoServiceLoader.iterator().next();
-            return setting.get();
-        } catch (Exception ex) {
-            /* TODO error handling */
-            log.error("Error", ex);
-            throw new RuntimeException(ex);
-        }
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    public String unauthorized(BadCredentialsException ex) {
+        return ex.getMessage();
     }
 
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_SETTINGS, method = RequestMethod.GET)
@@ -90,18 +86,13 @@ public class AdminSettingsController extends AbstractController {
                                 getData());
     }
 
-    @ExceptionHandler(BadCredentialsException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ResponseBody
-    public String unauthorized(BadCredentialsException ex) {
-        return ex.getMessage();
-    }
+    
 
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_SETTINGS_UPDATE, method = RequestMethod.POST)
-    public void updateSettings(HttpServletRequest request, HttpServletResponse response) throws BadCredentialsException {
+    public void updateSettings(HttpServletRequest request, HttpServletResponse response, Principal user) throws AuthenticationException, ConfigurationException {
         log.info("Updating Settings");
         try {
-            updateAdminUser(request);
+            updateAdminUser(request, user);
             updateSettings(request);
         } catch (SQLException e) {
             log.error("Error saving settings", e);
@@ -114,106 +105,97 @@ public class AdminSettingsController extends AbstractController {
                     produces = "application/json; charset=UTF-8")
     public String dump() {
         try {
-            ISettingsDao dao = daoServiceLoader.iterator().next();
-            Map<String, String> settings = dao.get();
-            /* do not export the admin password */
-            settings.remove(HibernateConstants.ADMIN_PASSWORD_KEY);
-            return new JSONObject(settings).toString(4);
+            return new JSONObject(getData()).toString(4);
         } catch (Exception ex) {
             log.error("Could not load settings", ex);
             throw new RuntimeException(ex);
         }
     }
 
-    private void logSettings(Map<Setting, String> settings) {
+    public Map<String, Object> getData() {
+        try {
+            return toSimpleMap(getSettingsManager().getSettings());
+        } catch (Exception ex) {
+            log.error("Error reading settings", ex);
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private Map<String, Object> toSimpleMap(Map<ISettingDefinition<?, ?>, ISettingValue<?>> settings) throws
+            ConfigurationException {
+        Map<String, Object> simpleMap = new HashMap<String, Object>(settings.size());
+        for (Entry<ISettingDefinition<?, ?>, ISettingValue<?>> e : settings.entrySet()) {
+            simpleMap.put(e.getKey().getKey(), encodeValue(e.getValue()));
+        }
+        return simpleMap;
+    }
+
+    private Object encodeValue(ISettingValue<?> v) {
+        if (v == null || v.getValue() == null) {
+            return null;
+        }
+        switch (v.getType()) {
+        case INTEGER:
+        case NUMERIC:
+        case STRING:
+        case BOOLEAN:
+            return v.getValue();
+        case FILE:
+            return ((File) v.getValue()).getPath();
+        case URI:
+            return ((URI) v.getValue()).toString();
+        default:
+            throw new IllegalArgumentException(String.format("Type %s is not supported!", v.getType()));
+        }
+    }
+
+    private void logSettings(Collection<ISettingValue<?>> values) {
         if (log.isDebugEnabled()) {
-            for (Map.Entry<Setting, String> e : settings.entrySet()) {
-                log.info("Saving Setting: (\"{}\" => \"{}\")", e.getKey().name(), e.getValue());
+            for (ISettingValue<?> value : values) {
+                log.info("Saving Setting: (\"{}\"({}) => \"{}\")", value.getKey(), value.getType(), value.getValue());
             }
         }
     }
 
-    private void updateConfigurator(Map<Setting, String> settings) throws RuntimeException {
-        for (Setting setting : settings.keySet()) {
-            try {
-                Configurator.getInstance().changeSetting(setting, settings.get(setting));
-            } catch (ConfigurationException ex) {
-                log.error("Error applying settings", ex);
-                throw new RuntimeException(ex.getMessage());
-            }
+    private SettingsManager getSettingsManager() throws ConfigurationException {
+        return (sm == null) ? sm = SettingsManager.getInstance() : sm;
+    }
+    
+    private void updateSettings(HttpServletRequest request) throws RuntimeException, SQLException, ConfigurationException {
+        Map<ISettingDefinition<?, ?>, ISettingValue<?>> changedSettings = new HashMap<ISettingDefinition<?, ?>, ISettingValue<?>>();
+        for (ISettingDefinition<?, ?> def : getSettingsManager().getSettingDefinitions()) {
+            ISettingValue<?> newValue = getSettingsManager().getSettingFactory()
+                    .newSettingValue(def, request.getParameter(def.getKey()));
+            changedSettings.put(def, newValue);
+        }
+        logSettings(changedSettings.values());
+        for (ISettingValue<?> e : changedSettings.values()) {
+            getSettingsManager().changeSetting(e);
         }
     }
 
-    private Map<Setting, String> getChangedSettings(HttpServletRequest request,
-                                                    Map<String, String> currentSettings) {
-        Map<Setting, String> settings = new EnumMap<Setting, String>(Setting.class);
-        Enumeration< ?> names = request.getParameterNames();
-        while (names.hasMoreElements()) {
-            processSetting((String) names.nextElement(), request, currentSettings, settings);
-        }
-        logSettings(settings);
-        return settings;
+    private void updateAdminUser(HttpServletRequest request, Principal user) throws AuthenticationException,
+                                                                                    ConfigurationException {
+        String password = request.getParameter(ControllerConstants.ADMIN_PASSWORD_REQUEST_PARAMETER);
+        String username = request.getParameter(ControllerConstants.ADMIN_USERNAME_REQUEST_PARAMETER);
+        String currentPassword = request.getParameter(ControllerConstants.ADMIN_CURRENT_PASSWORD_REQUEST_PARAMETER);
+        updateAdminUser(password, username, currentPassword, user.getName());
     }
 
-    private void updateSettings(HttpServletRequest request) throws RuntimeException, SQLException {
-        ISettingsDao dao = daoServiceLoader.iterator().next();
-        Map<String, String> currentSettings = dao.get();
-        Map<Setting, String> changedSettings = getChangedSettings(request, currentSettings);
-        dao.save(ControllerUtils.toStringMap(changedSettings));
-        updateConfigurator(changedSettings);
-    }
-
-    private void updateAdminUser(HttpServletRequest request) throws AuthenticationException,
-                                                                    SQLException {
-        String password = request.getParameter(HibernateConstants.ADMIN_PASSWORD_KEY);
-        String username = request.getParameter(HibernateConstants.ADMIN_USERNAME_KEY);
-        String currentPassword = request.getParameter(CURRENT_PASSWORD_PARAMETER);
-        updateAdminUser(password, username, currentPassword);
-    }
-
-    private void updateAdminUser(String password, String username, String currentPassword) throws
-            AuthenticationException, SQLException {
-        AdminUser admin = userService.getAdmin();
-
-        if ((password != null && !password.isEmpty())
-            || (username != null && !username.isEmpty() && !username.equals(admin.getUsername()))) {
+    private void updateAdminUser(String newPassword, String newUsername, String currentPassword, String currentUsername)
+            throws AuthenticationException, ConfigurationException {
+        if ((newPassword != null && !newPassword.isEmpty()) 
+                || (newUsername != null && !newUsername.isEmpty() && !newUsername.equals(currentUsername))) {
             if (currentPassword == null) {
                 throw new BadCredentialsException("You have to submit your current password.");
             }
-
-            userService.authenticate(new UsernamePasswordAuthenticationToken(admin.getUsername(), currentPassword));
-
-            if (password != null && !password.isEmpty()) {
-                if (username != null && !username.isEmpty() && !username.equals(admin.getUsername())) {
-                    getUserService().saveAdmin(new AdminUser(username, password));
-                } else {
-                    getUserService().setAdminPassword(password);
-                }
-            } else {
-                getUserService().setAdminUserName(username);
+            IAdministratorUser loggedInAdmin = getUserService().authenticate(currentUsername, currentPassword);
+            if (newPassword != null && !newPassword.isEmpty() && !newPassword.equals(currentPassword)) {
+                getUserService().setAdminPassword(loggedInAdmin, newPassword);
             }
-
-        }
-    }
-
-    private void processSetting(String name, 
-                                HttpServletRequest request,
-                                Map<String, String> currentSettings,
-                                Map<Setting, String> settings) {
-        try {
-            Setting setting = Setting.valueOf(name);
-            String value = setting.parse(request.getParameter(setting.name()));
-            if (setting.isAllowedValue(value)) {
-                String currentValue = currentSettings.get(setting.name());
-                /* only update settings that changed */
-                if (currentValue == null || !currentValue.equals(value)) {
-                    settings.put(setting, value);
-                }
-            } else {
-                /* TODO throw 400 */
+            if (newUsername != null && !newUsername.isEmpty() && !newUsername.equals(currentUsername)) {
+                getUserService().setAdminUserName(loggedInAdmin, newUsername);
             }
-        } catch (IllegalArgumentException e) {
-            /* do not fail on additional parameters */
         }
     }
 }

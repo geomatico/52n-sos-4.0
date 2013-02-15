@@ -30,32 +30,52 @@ import javax.servlet.http.HttpSession;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.n52.sos.config.ISettingDefinition;
+import org.n52.sos.config.SettingsManager;
+import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.web.ControllerConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
 @RequestMapping(ControllerConstants.Paths.INSTALL_LOAD_CONFIGURATION)
 public class InstallLoadSettingsController {
 
+    private static final Logger log = LoggerFactory.getLogger(InstallLoadSettingsController.class);
+
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void post(@RequestBody String config, HttpServletRequest req) throws JSONException {
+    public void post(@RequestBody String config, HttpServletRequest req) throws JSONException, ConfigurationException {
         final HttpSession session = req.getSession();
         InstallationConfiguration c = AbstractInstallController.getSettings(session);
-        
+        SettingsManager sm = SettingsManager.getInstance();
         JSONObject settings = new JSONObject(config);
         Iterator< ?> i = settings.keys();
         while (i.hasNext()) {
             String key = (String) i.next();
             String value = settings.getString(key);
-            c.setSetting(key, value);
+            ISettingDefinition<?, ?> def = sm.getDefinitionByKey(key);
+            if (def == null) {
+                log.warn("No definition for setting with key {}", key);
+                continue;
+            }
+            c.setSetting(def, sm.getSettingFactory().newSettingValue(def, value));
         }
         AbstractInstallController.setSettings(session, c);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(ConfigurationException.class)
+    public String onConfigurationError(ConfigurationException e) {
+        return e.getMessage();
     }
 }

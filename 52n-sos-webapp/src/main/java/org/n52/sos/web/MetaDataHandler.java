@@ -25,6 +25,8 @@ package org.n52.sos.web;
 
 import javax.servlet.ServletContext;
 
+import org.n52.sos.util.AbstractEnumPropertiesFileHandler;
+
 public class MetaDataHandler extends AbstractEnumPropertiesFileHandler<MetaDataHandler.Metadata> {
 
     public enum Metadata {
