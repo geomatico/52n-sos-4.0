@@ -499,7 +499,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
                     setUpPhenomenaForOffering(offering, procedure, sosOffering);
                     setUpTimeForOffering(offering, session, ++phenTimeCounter, sosOffering);
-                    setUpFeaturesForOffering(offering, session, version, procedure, sosOffering);
+                    setUpFeaturesForOffering(offering, version, procedure, sosOffering);
                     setUpFeatureOfInterestTypesForOffering(offering, session, sosOffering);
                     setUpProcedureDescriptionFormatForOffering(sosOffering, session);
                     setUpResponseFormatForOffering(version, sosOffering);
@@ -816,26 +816,18 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     }
 
-    protected void setUpFeaturesForOffering(String offering, Session session, String version, String procedure,
+    protected void setUpFeaturesForOffering(String offering, String version, String procedure,
             SosOfferingsForContents sosOffering) throws OwsExceptionReport {
         Map<String, Collection<String>> relatedFeatures = new HashMap<String, Collection<String>>();
-        Map<String, Collection<String>> relatedFeaturesForOffering = getCache().getKOfferingVRelatedFeatures();
-        if (relatedFeaturesForOffering != null && !relatedFeaturesForOffering.isEmpty()) {
-            Collection<String> relatedFeatureMap = relatedFeaturesForOffering.get(offering);
-            for (String relatedFeature : relatedFeatureMap) {
+        Map<String, Collection<String>> relatedFeaturesForAllOfferings = getCache().getKOfferingVRelatedFeatures();
+        if (relatedFeaturesForAllOfferings != null && 
+        		!relatedFeaturesForAllOfferings.isEmpty() && 
+        		relatedFeaturesForAllOfferings.containsKey(offering))
+        {
+            Collection<String> relatedFeaturesForThisOffering = relatedFeaturesForAllOfferings.get(offering);
+            for (String relatedFeature : relatedFeaturesForThisOffering)
+            {
                 relatedFeatures.put(relatedFeature, getCache().getKRelatedFeaturesVRole().get(relatedFeature));
-                // if (relatedFeature.toLowerCase().contains("http")) {
-                // relatedFeatures.put(relatedFeature,
-                // getCache().getKRelatedFeaturesVRole().get(relatedFeature));
-                // } else {
-                //
-                // String relatedFeatureID = getRelatedFeatureID(relatedFeature,
-                // session, version);
-                // if (relatedFeatureID != null) {
-                // relatedFeatures.put(relatedFeatureID,
-                // getCache().getKRelatedFeaturesVRole().get(relatedFeature));
-                // }
-                // }
             }
         } else {
             List<String> role = Collections.singletonList("featureOfInterestID");
