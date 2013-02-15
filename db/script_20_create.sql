@@ -22,7 +22,6 @@
 -- visit the Free Software Foundation web page, http://www.fsf.org.
 --
 
-DROP TABLE IF EXISTS global_settings CASCADE;
 DROP TABLE IF EXISTS result_type CASCADE;
 DROP TABLE IF EXISTS spatial_filtering_profile CASCADE;
 DROP TABLE IF EXISTS sensor_system CASCADE;
@@ -132,12 +131,6 @@ CREATE SEQUENCE swe_type_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775
 CREATE SEQUENCE text_value_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE unit_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 CREATE SEQUENCE valid_procedure_time_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
-
-CREATE TABLE global_settings (
-  key VARCHAR(256) NOT NULL,
-  value TEXT,
-  PRIMARY KEY(key)
-);
 
 CREATE TABLE result_type (
   result_type_id bigint NOT NULL DEFAULT nextval('result_type_id_seq'),
