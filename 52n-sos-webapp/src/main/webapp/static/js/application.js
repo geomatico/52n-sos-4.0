@@ -108,7 +108,9 @@ function generateSettings(settings, container, tabbed) {
     function generateSetting(setting) {
         var $setting = $("<div>").addClass("control-group");
         switch (setting.type) {
+        //TODO add validation of parameters
         case "integer":
+        case "number":
         case "password":
         case "text":
         case "string":
@@ -129,7 +131,7 @@ function generateSettings(settings, container, tabbed) {
                 .attr("name", setting.id).addClass("span8");
                 break;
             }
-            if (setting["default"]) {
+            if (setting["default"] !== undefined && setting["default"] !== null) {
                 $input.val(setting["default"]);
             }
             var $description = $("<span>").addClass("help-block").html(setting.description);
@@ -151,7 +153,7 @@ function generateSettings(settings, container, tabbed) {
             $.each(setting.options, function(val, desc) {
                 $("<option>").attr("value", val).text(desc).appendTo($input);
             });
-            if (!setting["default"]) {
+            if (setting["default"] === undefined || setting["default"] === null) {
                 var $option = $("<option>").attr("value", "").attr("selected", true);
                 $input.prepend($option);
                 if (setting.required) {
@@ -178,7 +180,7 @@ function generateSettings(settings, container, tabbed) {
             var $label = $("<label>").addClass("checkbox").text(setting.title);
             var $description = $("<span>").addClass("help-block").html(setting.description);
             $setting.append($label).append($controls.append($label.prepend($input)).append($description));
-            if ((typeof setting["default"]) === "boolean") {
+            if (typeof setting["default"] === "boolean") {
                 $input.attr("checked", setting["default"]);
             }
             break;
@@ -233,8 +235,7 @@ function generateSettings(settings, container, tabbed) {
             generateSection(section, $container);
         });
     }
-    $container.find("input[type=text],input[type=password],textarea").trigger("input");
-    $container.find("select").trigger("change");
+    $container.find(":input").trigger("input change");
 }
 
 function setSetting(id, val, settings) {
@@ -244,20 +245,21 @@ function setSetting(id, val, settings) {
                 switch (settings.sections[section].settings[setting].type) {
                 case "integer":
                 case "string":
+                case "number":
                 case "password":
-                    $("input[name=" + setting + "]").val(val);
+                    $("input[name='" + setting + "']").val(val);
                     break;
                 case "text":
-                    $("textarea[name=" + setting + "]").val(val);
+                    $("textarea[name='" + setting + "']").val(val);
                     break;
                 case "choice":
-                    $("select[name=" + setting + "]").val(val);
+                    $("select[name='" + setting + "']").val(val);
                     break;
                 case "boolean":
                     if (val === "true" || val === true) {
-                        $("input[name=" + setting + "]").attr("checked", true);
+                        $("input[name='" + setting + "']").attr("checked", true);
                     } else {
-                        $("input[name=" + setting + "]").removeAttr("checked");
+                        $("input[name='" + setting + "']").removeAttr("checked");
                     }
                     
                     break;

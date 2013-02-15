@@ -34,15 +34,15 @@
 <hr/>
 <form action="<c:url value="/j_spring_security_check" />" method="POST" class="form-horizontal">
 	<div class="control-group">
-		<label class="control-label" for="j_username">Username</label>
+		<label class="control-label" for="username">Username</label>
 		<div class="controls">
-			<input class="input-xlarge" type="text" name="j_username" autocomplete="off"/>
+			<input class="input-xlarge" type="text" name="username" autocomplete="off"/>
 		</div>
 	</div>
 	<div class="control-group">
-		<label class="control-label" for="j_password">Password</label>
+		<label class="control-label" for="password">Password</label>
 		<div class="controls">
-			<input class="input-xlarge" type="password" name="j_password" autocomplete="off">
+			<input class="input-xlarge" type="password" name="password" autocomplete="off">
 				<span id="passwordReset" class="help-block">You can reset your admin password by executing the file <code>sql/reset_admin.sql</code> (located inside the SOS installation directory in the webapps folder of your application server) on your database.</span>
 			</input>
 		</div>

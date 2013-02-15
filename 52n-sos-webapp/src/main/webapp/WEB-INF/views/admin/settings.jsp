@@ -46,7 +46,7 @@
 </script>
 <script type="text/javascript">
     $(function(){
-        $.getJSON('<c:url value="/static/conf/sos-settings.json" />', function(settings) {
+        $.getJSON('<c:url value="/settingDefinitions.json" />', function(settings) {
             var $container = $("#settings");
 			
 			
@@ -93,8 +93,9 @@
             $("#service_identification .control-group:last").before("<legend>Extended Settings</legend>");
             $("#service_provider .control-group:last").before("<legend>Extended Settings</legend>");
             $("<div>").addClass("form-actions").append($button).appendTo($container);
+            
             function setSosUrl() {
-                $("input[name=SOS_URL]").val(window.location.toString()
+                $("input[name='service.sosUrl']").val(window.location.toString()
                     .replace(/admin\/settings.*/, "sos")).trigger("input");    
             }
             setSosUrl();
@@ -141,10 +142,11 @@
                 var section = $(".nav.nav-tabs li a[href=#" + activeId + "]").text();
                 var s = getSettings(section);
                 for (var key in s) {
-                    if (key === "SOS_URL") {
+                    if (key === "service.sosUrl") {
                         setSosUrl();
                     } else {
-                        setSetting(key, (s[key]["default"] !== undefined) ? s[key]["default"] : "", settings);    
+                        setSetting(key, (s[key]["default"] !== undefined 
+                            && s[key]["default"] !== null) ? s[key]["default"] : "", settings);    
                     }
                 }
                 $(".required").trigger("input").trigger("change");

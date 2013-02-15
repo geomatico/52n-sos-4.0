@@ -55,7 +55,7 @@
 <form action="<c:url value="/install/settings" />" method="POST" class="form-horizontal">
 	<div id="settings"></div>
 	<script type="text/javascript">
-	$.getJSON('<c:url value="/static/conf/sos-settings.json" />', function(settings) {
+	$.getJSON('<c:url value="/settingDefinitions.json" />', function(settings) {
  		var $container = $("#settings");
 
 		generateSettings(settings, $container, true);
@@ -63,7 +63,7 @@
 		$("#service_provider .control-group:first").before("<legend>Standard Settings</legend>");
 		$("#service_identification .control-group:last").before("<legend>Extended Settings</legend>");
 		$("#service_provider .control-group:last").before("<legend>Extended Settings</legend>");
-		$("input[name=SOS_URL]").val(window.location.toString()
+		$("input[name='service.sosUrl']").val(window.location.toString()
 			.replace(/install\/settings.*/, "sos")).trigger("input");		
 
 		overwriteDefaultSettings(settings);
