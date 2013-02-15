@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
+
 import org.n52.sos.service.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,17 +45,17 @@ public abstract class AbstractServiceLoaderRepository<T> {
 	private final boolean failIfEmpty;
 
 	protected AbstractServiceLoaderRepository(Class<T> type, boolean failIfEmpty) throws ConfigurationException {
-		log.debug("Loading Implementations for Class {}", type);
+		log.debug("Loading Implementations for {}", type);
 		this.type = type;
 		this.failIfEmpty = failIfEmpty;
 		this.serviceLoader = ServiceLoader.load(this.type);
-		log.debug("Implementations for Class {} loaded succesfull!", this.type);
+		log.debug("Implementations for {} loaded succesfull!", this.type);
 	}
 
 	public void update() throws ConfigurationException {
-		log.debug("Reloading Implementations for Class {}", this.type);
+		log.debug("Reloading Implementations for {}", this.type);
 		load(true);
-		log.debug("Implementations for Class {} reloaded succesfull!", this.type);
+		log.debug("Implementations for {} reloaded succesfull!", this.type);
 	}
 
 	protected final void load(boolean reload) throws ConfigurationException {
@@ -69,10 +70,12 @@ public abstract class AbstractServiceLoaderRepository<T> {
 		Iterator<T> iter = this.serviceLoader.iterator();
 		while (iter.hasNext()) {
 			try {
-				implementations.add(iter.next());
+                T t = iter.next();
+                log.debug("Found implementation: {}", t);
+				implementations.add(t);
 			} catch(ServiceConfigurationError e) {
 				// TODO add more details like which class with qualified name
-                log.warn(String.format("An implementation for class %s could not be loaded! Exception message: ", this.type), e);
+                log.warn(String.format("An implementation for %s could not be loaded! Exception message: ", this.type), e);
 			}
 		}
 		if (this.failIfEmpty && implementations.isEmpty()) {
@@ -80,6 +83,7 @@ public abstract class AbstractServiceLoaderRepository<T> {
             log.error(exceptionText);
             throw new ConfigurationException(exceptionText);
 		}
+        log.debug("Found {} implementations for {}", implementations.size(), this.type);
 		return new HashSet<T>(implementations);
 	}
 
