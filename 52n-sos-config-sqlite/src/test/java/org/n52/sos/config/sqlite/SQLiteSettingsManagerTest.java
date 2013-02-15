@@ -21,9 +21,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.config;
+package org.n52.sos.config.sqlite;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.n52.sos.config.sqlite.TestSettingDefinitionProvider.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,12 +39,16 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.n52.sos.config.entities.BooleanSettingValue;
-import org.n52.sos.config.entities.FileSettingValue;
-import org.n52.sos.config.entities.IntegerSettingValue;
-import org.n52.sos.config.entities.NumericSettingValue;
-import org.n52.sos.config.entities.StringSettingValue;
-import org.n52.sos.config.entities.UriSettingValue;
+import org.n52.sos.config.IAdministratorUser;
+import org.n52.sos.config.ISettingDefinition;
+import org.n52.sos.config.ISettingValue;
+import org.n52.sos.config.SettingsManager;
+import org.n52.sos.config.sqlite.entities.BooleanSettingValue;
+import org.n52.sos.config.sqlite.entities.FileSettingValue;
+import org.n52.sos.config.sqlite.entities.IntegerSettingValue;
+import org.n52.sos.config.sqlite.entities.NumericSettingValue;
+import org.n52.sos.config.sqlite.entities.StringSettingValue;
+import org.n52.sos.config.sqlite.entities.UriSettingValue;
 import org.n52.sos.config.settings.BooleanSettingDefinition;
 import org.n52.sos.config.settings.FileSettingDefinition;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
@@ -58,15 +66,9 @@ import org.slf4j.LoggerFactory;
  */
 public class SQLiteSettingsManagerTest {
 
-    private static final String URI_SETTING = "uri_setting";
-    private static final String DOUBLE_SETTING = "double_setting";
-    private static final String INTEGER_SETTING = "integer_setting";
-    private static final String FILE_SETTING = "file_setting";
-    private static final String STRING_SETTING = "string_setting";
-    private static final String BOOLEAN_SETTING = "boolean_setting";
+    private static final Logger log = LoggerFactory.getLogger(SQLiteSettingsManagerTest.class);
     private static final String USERNAME = "admin";
     private static final String PASSWORD = "password";
-    private static final Logger log = LoggerFactory.getLogger(SQLiteSettingsManagerTest.class);
     private static IConnectionProvider connectionProvider;
     private static File databaseFile;
     private SettingsManager settingsManager;
@@ -101,7 +103,7 @@ public class SQLiteSettingsManagerTest {
 
     @Test
     public void testBooleanSettings() throws ConfigurationException {
-        final ISettingDefinition<Boolean> settingDefinition = new BooleanSettingDefinition().setKey(BOOLEAN_SETTING);
+        final BooleanSettingDefinition settingDefinition = new BooleanSettingDefinition().setKey(BOOLEAN_SETTING);
         final ISettingValue<Boolean> settingValue = new BooleanSettingValue().setKey(BOOLEAN_SETTING).setValue(
                 Boolean.TRUE);
         final ISettingValue<Boolean> newSettingValue = new BooleanSettingValue().setKey(BOOLEAN_SETTING)
@@ -111,7 +113,7 @@ public class SQLiteSettingsManagerTest {
 
     @Test
     public void testStringSettings() throws ConfigurationException {
-        final ISettingDefinition<String> settingDefinition = new StringSettingDefinition().setKey(STRING_SETTING);
+        final StringSettingDefinition settingDefinition = new StringSettingDefinition().setKey(STRING_SETTING);
         final ISettingValue<String> settingValue = new StringSettingValue().setKey(STRING_SETTING).setValue("string1");
         final ISettingValue<String> newSettingValue = new StringSettingValue().setKey(STRING_SETTING)
                 .setValue("string2");
@@ -120,7 +122,7 @@ public class SQLiteSettingsManagerTest {
 
     @Test
     public void testFileSettings() throws ConfigurationException {
-        final ISettingDefinition<File> settingDefinition = new FileSettingDefinition().setKey(FILE_SETTING);
+        final FileSettingDefinition settingDefinition = new FileSettingDefinition().setKey(FILE_SETTING);
         final ISettingValue<File> settingValue = new FileSettingValue().setKey(FILE_SETTING).setValue(new File(
                 "/home/auti/sos1"));
         final ISettingValue<File> newSettingValue = new FileSettingValue().setKey(FILE_SETTING).setValue(new File(
@@ -130,7 +132,7 @@ public class SQLiteSettingsManagerTest {
 
     @Test
     public void testIntegerSettings() throws ConfigurationException {
-        final ISettingDefinition<Integer> settingDefinition = new IntegerSettingDefinition().setKey(INTEGER_SETTING);
+        final IntegerSettingDefinition settingDefinition = new IntegerSettingDefinition().setKey(INTEGER_SETTING);
         final ISettingValue<Integer> settingValue = new IntegerSettingValue().setKey(INTEGER_SETTING).setValue(12312);
         final ISettingValue<Integer> newSettingValue = new IntegerSettingValue().setKey(INTEGER_SETTING).setValue(12311);
         testSaveGetAndDelete(settingDefinition, settingValue, newSettingValue);
@@ -138,7 +140,7 @@ public class SQLiteSettingsManagerTest {
 
     @Test
     public void testNumericSettings() throws ConfigurationException {
-        final ISettingDefinition<Double> settingDefinition = new NumericSettingDefinition().setKey(DOUBLE_SETTING);
+        final NumericSettingDefinition settingDefinition = new NumericSettingDefinition().setKey(DOUBLE_SETTING);
         final ISettingValue<Double> settingValue = new NumericSettingValue().setKey(DOUBLE_SETTING).setValue(212.1213);
         final ISettingValue<Double> newSettingValue = new NumericSettingValue().setKey(DOUBLE_SETTING)
                 .setValue(212.1211);
@@ -147,7 +149,7 @@ public class SQLiteSettingsManagerTest {
 
     @Test
     public void testUriSettings() throws ConfigurationException {
-        final ISettingDefinition<URI> settingDefinition = new UriSettingDefinition().setKey(URI_SETTING);
+        final UriSettingDefinition settingDefinition = new UriSettingDefinition().setKey(URI_SETTING);
         final ISettingValue<URI> settingValue = new UriSettingValue().setKey(URI_SETTING).setValue(URI.create(
                 "http://localhost:8080/a"));
         final ISettingValue<URI> newSettingValue = new UriSettingValue().setKey(URI_SETTING).setValue(URI.create(
@@ -155,30 +157,22 @@ public class SQLiteSettingsManagerTest {
         testSaveGetAndDelete(settingDefinition, settingValue, newSettingValue);
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testChangedSettingsTypeForKey() throws ConfigurationException {
-        final ISettingDefinition<Boolean> booleanDefinition = new BooleanSettingDefinition().setKey(BOOLEAN_SETTING);
-        final ISettingDefinition<Double> doubleDefinition = new NumericSettingDefinition().setKey(BOOLEAN_SETTING);
-        final ISettingValue<Boolean> booleanValue = new BooleanSettingValue().setKey(BOOLEAN_SETTING).setValue(Boolean.TRUE);
         final ISettingValue<Double> doubleValue = new NumericSettingValue().setKey(BOOLEAN_SETTING).setValue(212.1213);
-        
-        settingsManager.changeSetting(doubleDefinition, doubleValue);
-        assertEquals(doubleValue, settingsManager.getSetting(doubleDefinition));
-
-        settingsManager.changeSetting(booleanDefinition, booleanValue);
-        assertEquals(booleanValue, settingsManager.getSetting(booleanDefinition));
+        settingsManager.changeSetting(doubleValue);
     }
 
     public <T> void testSaveGetAndDelete(
-            final ISettingDefinition<T> settingDefinition,
+            final ISettingDefinition<? extends ISettingDefinition<?, T>, T> settingDefinition,
             final ISettingValue<T> settingValue,
             final ISettingValue<T> newSettingValue) throws ConfigurationException {
 
         assertNotEquals(settingValue, newSettingValue);
-        settingsManager.changeSetting(settingDefinition, settingValue);
+        settingsManager.changeSetting(settingValue);
         assertEquals(settingValue, settingsManager.getSetting(settingDefinition));
 
-        settingsManager.changeSetting(settingDefinition, newSettingValue);
+        settingsManager.changeSetting(newSettingValue);
         final ISettingValue<T> value = settingsManager.getSetting(settingDefinition);
         assertEquals(newSettingValue, value);
         assertNotEquals(settingValue, value);
@@ -186,36 +180,36 @@ public class SQLiteSettingsManagerTest {
         settingsManager.deleteSetting(settingDefinition);
         assertNull(settingsManager.getSetting(settingDefinition));
     }
-    
+
     @Test
     public void createAdminUserTest() {
         IAdministratorUser au = settingsManager.createAdminUser(USERNAME, PASSWORD);
         assertNotNull(au);
         assertEquals(USERNAME, au.getUsername());
         assertEquals(PASSWORD, au.getPassword());
-        
+
         IAdministratorUser au2 = settingsManager.getAdminUser(USERNAME);
         assertNotNull(au2);
         assertEquals(au, au2);
     }
-    
+
     @Test(expected = HibernateException.class)
     public void createDuplicateAdminUser() {
         settingsManager.createAdminUser(USERNAME, PASSWORD);
         settingsManager.createAdminUser(USERNAME, PASSWORD);
     }
-    
+
     @Test
     public void deleteAdminUserTest() {
         IAdministratorUser au = settingsManager.getAdminUser(USERNAME);
         if (au == null) {
             au = settingsManager.createAdminUser(USERNAME, PASSWORD);
-            
+
         }
         assertNotNull(au);
         settingsManager.deleteAdminUser(au);
         assertNull(settingsManager.getAdminUser(USERNAME));
-        
+
         settingsManager.createAdminUser(USERNAME, PASSWORD);
         assertNotNull(settingsManager.getAdminUser(USERNAME));
         settingsManager.deleteAdminUser(USERNAME);
