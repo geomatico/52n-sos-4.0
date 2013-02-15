@@ -23,10 +23,18 @@
  */
 package org.n52.sos.ogc.ows;
 
+import static org.n52.sos.ogc.ows.SosServiceIdentificationSettingDefinitions.*;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.n52.sos.config.SettingsManager;
+import org.n52.sos.config.annotation.Configurable;
+import org.n52.sos.config.annotation.Setting;
+import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.LazyThreadSafeFactory;
 import org.n52.sos.util.XmlHelper;
@@ -34,6 +42,7 @@ import org.n52.sos.util.XmlHelper;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
+@Configurable
 public class SosServiceIdentificationFactory extends LazyThreadSafeFactory<SosServiceIdentification> {
 
     private File file;
@@ -44,16 +53,22 @@ public class SosServiceIdentificationFactory extends LazyThreadSafeFactory<SosSe
     private String fees;
     private String constraints;
 
+    public SosServiceIdentificationFactory() throws ConfigurationException {
+        SettingsManager.getInstance().configure(this);
+    }
+
+    @Setting(FILE)
     public void setFile(File file) {
         this.file = file;
         setRecreate();
     }
 
     public void setKeywords(String[] keywords) {
-        this.keywords = keywords;
+        this.keywords = Arrays.copyOf(keywords, keywords.length);
         setRecreate();
     }
 
+    @Setting(KEYWORDS)
     public void setKeywords(String keywords) {
         if (keywords != null) {
             String[] keywordArray = keywords.split(",");
@@ -70,36 +85,45 @@ public class SosServiceIdentificationFactory extends LazyThreadSafeFactory<SosSe
         }
     }
 
+    @Setting(TITLE)
     public void setTitle(String title) {
         this.title = title;
         setRecreate();
     }
 
+    @Setting(ABSTRACT)
     public void setAbstract(String description) {
         this.description = description;
         setRecreate();
     }
 
+    @Setting(SERVICE_TYPE)
     public void setServiceType(String serviceType) {
         this.serviceType = serviceType;
         setRecreate();
     }
 
+    @Setting(FEES)
     public void setFees(String fees) {
         this.fees = fees;
         setRecreate();
     }
 
+    @Setting(ACCESS_CONSTRAINTS)
     public void setConstraints(String constraints) {
         this.constraints = constraints;
         setRecreate();
     }
 
     @Override
-    protected SosServiceIdentification create() throws OwsExceptionReport {
+    protected SosServiceIdentification create() throws ConfigurationException {
         SosServiceIdentification serviceIdentification = new SosServiceIdentification();
         if (this.file != null) {
-            serviceIdentification.setServiceIdentification(XmlHelper.loadXmlDocumentFromFile(this.file));
+            try {
+                serviceIdentification.setServiceIdentification(XmlHelper.loadXmlDocumentFromFile(this.file));
+            } catch (OwsExceptionReport ex) {
+                throw new ConfigurationException(ex);
+            }
         } else {
             serviceIdentification.setAbstract(this.description);
             serviceIdentification.setAccessConstraints(this.constraints);

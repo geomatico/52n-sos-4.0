@@ -23,17 +23,11 @@
  */
 package org.n52.sos.ogc.ows;
 
-import java.io.File;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 import org.n52.sos.config.ISettingDefinition;
 import org.n52.sos.config.ISettingDefinitionProvider;
-import org.n52.sos.config.ISettingValue;
-import org.n52.sos.config.ServiceIdentificationSettingDefinitions;
-import org.n52.sos.service.ConfigurationException;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CollectionHelper;
 
 /**
@@ -43,49 +37,17 @@ import org.n52.sos.util.CollectionHelper;
  */
 public class SosServiceIdentificationSettingDefinitionProvider implements ISettingDefinitionProvider {
 
-    private static final Set<ISettingDefinition<?>> DEFINITIONS = CollectionHelper.<ISettingDefinition<?>>set(
-            ServiceIdentificationSettingDefinitions.TITLE,
-            ServiceIdentificationSettingDefinitions.ABSTRACT,
-            ServiceIdentificationSettingDefinitions.SERVICE_TYPE,
-            ServiceIdentificationSettingDefinitions.KEYWORDS,
-            ServiceIdentificationSettingDefinitions.FEES,
-            ServiceIdentificationSettingDefinitions.ACCESS_CONSTRAINTS,
-            ServiceIdentificationSettingDefinitions.FILE);
+    private static final Set<ISettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<ISettingDefinition<?, ?>>set(
+            SosServiceIdentificationSettingDefinitions.TITLE_DEFINITION,
+            SosServiceIdentificationSettingDefinitions.ABSTRACT_DEFINITION,
+            SosServiceIdentificationSettingDefinitions.SERVICE_TYPE_DEFINITION,
+            SosServiceIdentificationSettingDefinitions.KEYWORDS_DEFINITION,
+            SosServiceIdentificationSettingDefinitions.FEES_DEFINITION,
+            SosServiceIdentificationSettingDefinitions.ACCESS_CONSTRAINTS_DEFINITION,
+            SosServiceIdentificationSettingDefinitions.FILE_DEFINITION);
 
     @Override
-    public Set<ISettingDefinition<?>> getSettingDefinitions() {
+    public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
         return Collections.unmodifiableSet(DEFINITIONS);
-    }
-
-    @Override
-    public void setSettingValues(Map<ISettingDefinition<?>, ISettingValue<?>> settings) throws ConfigurationException {
-        for (Map.Entry<ISettingDefinition<?>, ISettingValue<?>> e : settings.entrySet()) {
-            changeSettingValue(e.getKey(), null, e.getValue());
-        }
-    }
-
-    @Override
-    public void changeSettingValue(ISettingDefinition<?> definition,
-                                   ISettingValue<?> oldValue,
-                                   ISettingValue<?> newValue) throws ConfigurationException {
-        if (Configurator.getInstance() != null && Configurator.getInstance().getServiceIdentificationFactory() != null) {
-            final SosServiceIdentificationFactory factory = Configurator.getInstance().getServiceIdentificationFactory();
-            if (definition.equals(ServiceIdentificationSettingDefinitions.TITLE)) {
-                factory.setTitle((String) newValue.getValue());
-            } else if (definition.equals(ServiceIdentificationSettingDefinitions.ABSTRACT)) {
-                factory.setAbstract((String) newValue.getValue());
-            } else if (definition.equals(ServiceIdentificationSettingDefinitions.SERVICE_TYPE)) {
-                factory.setServiceType((String) newValue.getValue());
-            } else if (definition.equals(ServiceIdentificationSettingDefinitions.KEYWORDS)) {
-                factory.setKeywords((String) newValue.getValue());
-            } else if (definition.equals(ServiceIdentificationSettingDefinitions.FEES)) {
-                factory.setFees((String) newValue.getValue());
-            } else if (definition.equals(ServiceIdentificationSettingDefinitions.ACCESS_CONSTRAINTS)) {
-                factory.setConstraints((String) newValue.getValue());
-            } else if (definition.equals(ServiceIdentificationSettingDefinitions.FILE)) {
-                factory.setFile((File) newValue.getValue());
-            }
-        }
-        throw new ConfigurationException("Unknown setting: " + definition);
     }
 }

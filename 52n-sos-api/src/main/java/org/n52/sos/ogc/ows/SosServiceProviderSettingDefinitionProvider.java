@@ -23,18 +23,11 @@
  */
 package org.n52.sos.ogc.ows;
 
-import java.io.File;
-import java.net.URI;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 import org.n52.sos.config.ISettingDefinition;
 import org.n52.sos.config.ISettingDefinitionProvider;
-import org.n52.sos.config.ISettingValue;
-import org.n52.sos.config.ServiceProviderSettingDefinitions;
-import org.n52.sos.service.ConfigurationException;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CollectionHelper;
 
 /**
@@ -44,65 +37,22 @@ import org.n52.sos.util.CollectionHelper;
  */
 public class SosServiceProviderSettingDefinitionProvider implements ISettingDefinitionProvider {
 
-    private static final Set<ISettingDefinition<?>> DEFINITIONS = CollectionHelper.<ISettingDefinition<?>>set(
-            ServiceProviderSettingDefinitions.NAME,
-            ServiceProviderSettingDefinitions.SITE,
-            ServiceProviderSettingDefinitions.INDIVIDUAL_NAME,
-            ServiceProviderSettingDefinitions.POSITION_NAME,
-            ServiceProviderSettingDefinitions.PHONE,
-            ServiceProviderSettingDefinitions.DELIVERY_POINT,
-            ServiceProviderSettingDefinitions.CITY,
-            ServiceProviderSettingDefinitions.POSTAL_CODE,
-            ServiceProviderSettingDefinitions.ADMINISTRATIVE_AREA,
-            ServiceProviderSettingDefinitions.COUNTRY,
-            ServiceProviderSettingDefinitions.MAIL_ADDRESS,
-            ServiceProviderSettingDefinitions.FILE);
+    private static final Set<ISettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<ISettingDefinition<?, ?>>set(
+            SosServiceProviderSettingDefinitions.NAME_DEFINITION,
+            SosServiceProviderSettingDefinitions.SITE_DEFINITION,
+            SosServiceProviderSettingDefinitions.INDIVIDUAL_NAME_DEFINITION,
+            SosServiceProviderSettingDefinitions.POSITION_NAME_DEFINITION,
+            SosServiceProviderSettingDefinitions.PHONE_DEFINITION,
+            SosServiceProviderSettingDefinitions.DELIVERY_POINT_DEFINITION,
+            SosServiceProviderSettingDefinitions.CITY_DEFINITION,
+            SosServiceProviderSettingDefinitions.POSTAL_CODE_DEFINITION,
+            SosServiceProviderSettingDefinitions.ADMINISTRATIVE_AREA_DEFINITION,
+            SosServiceProviderSettingDefinitions.COUNTRY_DEFINITION,
+            SosServiceProviderSettingDefinitions.MAIL_ADDRESS_DEFINITION,
+            SosServiceProviderSettingDefinitions.FILE_DEFINITION);
 
     @Override
-    public Set<ISettingDefinition<?>> getSettingDefinitions() {
+    public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
         return Collections.unmodifiableSet(DEFINITIONS);
-    }
-
-    @Override
-    public void setSettingValues(Map<ISettingDefinition<?>, ISettingValue<?>> settings) throws ConfigurationException {
-        for (Map.Entry<ISettingDefinition<?>, ISettingValue<?>> e : settings.entrySet()) {
-            changeSettingValue(e.getKey(), null, e.getValue());
-        }
-    }
-
-    @Override
-    public void changeSettingValue(ISettingDefinition<?> definition, ISettingValue<?> oldValue,
-                                   ISettingValue<?> newValue) throws ConfigurationException {
-        if (Configurator.getInstance() != null && Configurator.getInstance().getServiceProviderFactory() != null) {
-            SosServiceProviderFactory fac = Configurator.getInstance().getServiceProviderFactory();
-            if (definition.equals(ServiceProviderSettingDefinitions.NAME)) {
-                fac.setName((String) newValue.getValue());
-            } else if (definition.equals(ServiceProviderSettingDefinitions.SITE)) {
-                /* TODO change the site property to URI */
-                fac.setSite(((URI) newValue.getValue()).toString());
-            } else if (definition.equals(ServiceProviderSettingDefinitions.INDIVIDUAL_NAME)) {
-                fac.setIndividualName((String) newValue.getValue());
-            } else if (definition.equals(ServiceProviderSettingDefinitions.POSITION_NAME)) {
-                fac.setPositionName((String) newValue.getValue());
-            } else if (definition.equals(ServiceProviderSettingDefinitions.PHONE)) {
-                fac.setPhone((String) newValue.getValue());
-            } else if (definition.equals(ServiceProviderSettingDefinitions.DELIVERY_POINT)) {
-                fac.setDeliveryPoint((String) newValue.getValue());
-            } else if (definition.equals(ServiceProviderSettingDefinitions.CITY)) {
-                fac.setCity((String) newValue.getValue());
-            } else if (definition.equals(ServiceProviderSettingDefinitions.POSTAL_CODE)) {
-                fac.setPostalCode((String) newValue.getValue());
-            } else if (definition.equals(ServiceProviderSettingDefinitions.ADMINISTRATIVE_AREA)) {
-                fac.setAdministrativeArea((String) newValue.getValue());
-            } else if (definition.equals(ServiceProviderSettingDefinitions.COUNTRY)) {
-                fac.setCountry((String) newValue.getValue());
-            } else if (definition.equals(ServiceProviderSettingDefinitions.MAIL_ADDRESS)) {
-                fac.setMailAddress((String) newValue.getValue());
-            } else if (definition.equals(ServiceProviderSettingDefinitions.FILE)) {
-                fac.setFile((File) newValue.getValue());
-            }
-            throw new ConfigurationException("Unknown setting: " + definition);
-        }
-
     }
 }

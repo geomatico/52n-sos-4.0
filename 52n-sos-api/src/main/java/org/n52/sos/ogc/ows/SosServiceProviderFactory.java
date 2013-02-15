@@ -23,107 +23,138 @@
  */
 package org.n52.sos.ogc.ows;
 
-import java.io.File;
+import static org.n52.sos.ogc.ows.SosServiceProviderSettingDefinitions.*;
 
+import java.io.File;
+import java.net.URI;
+
+import org.n52.sos.config.SettingsManager;
+import org.n52.sos.config.annotation.Configurable;
+import org.n52.sos.config.annotation.Setting;
+import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.util.LazyThreadSafeFactory;
 import org.n52.sos.util.XmlHelper;
 
 /**
+ * 
+ * TODO generate Factory interface
+ * 
  * @author Christian Autermann <c.autermann@52north.org>
  */
+@Configurable
 public class SosServiceProviderFactory extends LazyThreadSafeFactory<SosServiceProvider> {
-	private File file;
-	private String name;
-	private String site;
-	private String individualName;
-	private String positionName;
-	private String phone;
-	private String deliveryPoint;
-	private String city;
-	private String postalCode;
-	private String country;
-	private String mailAddress;
-	private String administrativeArea;
 
-	public void setFile(File file) {
-		this.file = file;
-		setRecreate();
-	}
+    private File file;
+    private String name;
+    private URI site;
+    private String individualName;
+    private String positionName;
+    private String phone;
+    private String deliveryPoint;
+    private String city;
+    private String postalCode;
+    private String country;
+    private String mailAddress;
+    private String administrativeArea;
 
-	public void setName(String name) {
-		this.name = name;
-		setRecreate();
-	}
+    public SosServiceProviderFactory() throws ConfigurationException {
+        SettingsManager.getInstance().configure(this);
+    }
 
-	public void setSite(String site) {
-		this.site = site;
-		setRecreate();
-	}
+    @Setting(FILE)
+    public void setFile(File file) {
+        this.file = file;
+        setRecreate();
+    }
 
-	public void setIndividualName(String individualName) {
-		this.individualName = individualName;
-		setRecreate();
-	}
+    @Setting(NAME)
+    public void setName(String name) {
+        this.name = name;
+        setRecreate();
+    }
 
-	public void setPositionName(String positionName) {
-		this.positionName = positionName;
-		setRecreate();
-	}
+    @Setting(SITE)
+    public void setSite(URI site) {
+        this.site = site;
+        setRecreate();
+    }
 
-	public void setPhone(String phone) {
-		this.phone = phone;
-		setRecreate();
-	}
+    @Setting(INDIVIDUAL_NAME)
+    public void setIndividualName(String individualName) {
+        this.individualName = individualName;
+        setRecreate();
+    }
 
-	public void setDeliveryPoint(String deliveryPoint) {
-		this.deliveryPoint = deliveryPoint;
-		setRecreate();
-	}
+    @Setting(POSITION_NAME)
+    public void setPositionName(String positionName) {
+        this.positionName = positionName;
+        setRecreate();
+    }
 
-	public void setCity(String city) {
-		this.city = city;
-		setRecreate();
-	}
+    @Setting(PHONE)
+    public void setPhone(String phone) {
+        this.phone = phone;
+        setRecreate();
+    }
 
-	public void setPostalCode(String postalCode) {
-		this.postalCode = postalCode;
-		setRecreate();
-	}
+    @Setting(ADDRESS)
+    public void setDeliveryPoint(String deliveryPoint) {
+        this.deliveryPoint = deliveryPoint;
+        setRecreate();
+    }
 
-	public void setCountry(String country) {
-		this.country = country;
-		setRecreate();
-	}
+    @Setting(CITY)
+    public void setCity(String city) {
+        this.city = city;
+        setRecreate();
+    }
 
-	public void setMailAddress(String mailAddress) {
-		this.mailAddress = mailAddress;
-		setRecreate();
-	}
+    @Setting(POSTAL_CODE)
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+        setRecreate();
+    }
 
-	public void setAdministrativeArea(String administrativeArea) {
-		this.administrativeArea = administrativeArea;
-		setRecreate();
-	}
+    @Setting(COUNTRY)
+    public void setCountry(String country) {
+        this.country = country;
+        setRecreate();
+    }
 
+    @Setting(EMAIL)
+    public void setMailAddress(String mailAddress) {
+        this.mailAddress = mailAddress;
+        setRecreate();
+    }
 
-	@Override
-	protected SosServiceProvider create() throws OwsExceptionReport {
-		SosServiceProvider serviceProvider = new SosServiceProvider();
-		if (this.file != null) {
-			serviceProvider.setServiceProvider(XmlHelper.loadXmlDocumentFromFile(this.file));
-		} else {
-			serviceProvider.setAdministrativeArea(this.administrativeArea);
-			serviceProvider.setCity(this.city);
-			serviceProvider.setCountry(this.country);
-			serviceProvider.setDeliveryPoint(this.deliveryPoint);
-			serviceProvider.setIndividualName(this.individualName);
-			serviceProvider.setMailAddress(this.mailAddress);
-			serviceProvider.setName(this.name);
-			serviceProvider.setPhone(this.phone);
-			serviceProvider.setPositionName(this.positionName);
-			serviceProvider.setPostalCode(this.postalCode);
-			serviceProvider.setSite(this.site);
-		}
-		return serviceProvider;
-	}
+    @Setting(STATE)
+    public void setAdministrativeArea(String administrativeArea) {
+        this.administrativeArea = administrativeArea;
+        setRecreate();
+    }
+
+    @Override
+    protected SosServiceProvider create() throws ConfigurationException {
+        SosServiceProvider serviceProvider = new SosServiceProvider();
+        if (this.file != null) {
+            try {
+                serviceProvider.setServiceProvider(XmlHelper.loadXmlDocumentFromFile(this.file));
+            } catch (OwsExceptionReport ex) {
+                throw new ConfigurationException(ex);
+            }
+        } else {
+            serviceProvider.setAdministrativeArea(this.administrativeArea);
+            serviceProvider.setCity(this.city);
+            serviceProvider.setCountry(this.country);
+            serviceProvider.setDeliveryPoint(this.deliveryPoint);
+            serviceProvider.setIndividualName(this.individualName);
+            serviceProvider.setMailAddress(this.mailAddress);
+            serviceProvider.setName(this.name);
+            serviceProvider.setPhone(this.phone);
+            serviceProvider.setPositionName(this.positionName);
+            serviceProvider.setPostalCode(this.postalCode);
+            serviceProvider.setSite(this.site == null ? null : this.site.toString());
+        }
+        return serviceProvider;
+    }
 }
