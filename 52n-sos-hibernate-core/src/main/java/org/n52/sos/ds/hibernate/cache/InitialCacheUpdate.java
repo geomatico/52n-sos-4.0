@@ -23,18 +23,31 @@
  */
 package org.n52.sos.ds.hibernate.cache;
 
-import org.n52.sos.ds.hibernate.cache.base.OfferingCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.StaticCapabilitiesCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.CompositePhenomenonCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.RelatedFeaturesCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.FeatureOfInterestCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.ResultTemplateCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.ObservationIdentifiersCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.EventTimeCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.ProcedureCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.FeatureOfInterestCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.ObservablePropertiesCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.ObservationIdentifiersCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.OfferingCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.ProcedureCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.RelatedFeaturesCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.ResultTemplateCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.StaticCapabilitiesCacheUpdate;
 
 /**
+ *
+ * Fills the initial cache.
+ * <p/>
+ * @see CompositePhenomenonCacheUpdate
+ * @see EventTimeCacheUpdate
+ * @see FeatureOfInterestCacheUpdate
+ * @see ObservablePropertiesCacheUpdate
+ * @see ObservationIdentifiersCacheUpdate
+ * @see OfferingCacheUpdate
+ * @see ProcedureCacheUpdate
+ * @see RelatedFeaturesCacheUpdate
+ * @see ResultTemplateCacheUpdate
+ * @see StaticCapabilitiesCacheUpdate
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class InitialCacheUpdate extends CompositeCacheUpdate {
@@ -51,5 +64,4 @@ public class InitialCacheUpdate extends CompositeCacheUpdate {
               new ResultTemplateCacheUpdate(),
               new EventTimeCacheUpdate());
     }
-    
 }

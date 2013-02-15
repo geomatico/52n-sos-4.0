@@ -23,12 +23,16 @@
  */
 package org.n52.sos.ds.hibernate.cache;
 
-import org.n52.sos.ds.hibernate.cache.base.OfferingCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.FeatureOfInterestCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.EventTimeCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.FeatureOfInterestCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.OfferingCacheUpdate;
 
 /**
- *
+ * Updates the cache after a Observation was inserted.
+ * <p/>
+ * @see EventTimeCacheUpdate
+ * @see FeatureOfInterestCacheUpdate
+ * @see OfferingCacheUpdate
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class ObservationInsertionCacheUpdate extends CompositeCacheUpdate {
@@ -38,5 +42,4 @@ public class ObservationInsertionCacheUpdate extends CompositeCacheUpdate {
               new OfferingCacheUpdate(),
               new EventTimeCacheUpdate());
     }
-    
 }

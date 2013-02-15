@@ -27,7 +27,10 @@ import org.n52.sos.ds.hibernate.cache.base.OfferingCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.ProcedureCacheUpdate;
 
 /**
- *
+ * Updates the cache after a Sensor was deleted.
+ * <p/>
+ * @see OfferingCacheUpdate
+ * @see ProcedureCacheUpdate
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class SensorDeletionCacheUpdate extends CompositeCacheUpdate {
