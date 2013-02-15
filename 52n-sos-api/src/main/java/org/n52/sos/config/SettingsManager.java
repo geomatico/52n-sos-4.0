@@ -70,19 +70,35 @@ public abstract class SettingsManager {
         throw new ConfigurationException("No SettingsManager implementation loaded");
     }
 
-    public abstract Set<ISettingDefinition<?>> getSettingDefinitions();
-    public abstract <T> ISettingValue<T> getSetting(ISettingDefinition<T> key);
-    public abstract Map<ISettingDefinition<?>, ISettingValue<?>> getSettings();
-    public abstract void deleteSetting(ISettingDefinition<?> setting) throws ConfigurationException;
-    public abstract void changeSetting(ISettingDefinition<?> setting, ISettingValue<?> value) throws ConfigurationException;
+    public abstract void configure(Object o) throws ConfigurationException;
+
+    public abstract ISettingDefinition<?, ?> getDefinitionByKey(String key);
+    
+    public abstract Set<ISettingDefinition<?, ?>> getSettingDefinitions();
+
+    public abstract <T> ISettingValue<T> getSetting(ISettingDefinition<?, T> key);
+
+    public abstract Map<ISettingDefinition<?, ?>, ISettingValue<?>> getSettings();
+
+    public abstract void deleteSetting(ISettingDefinition<?, ?> setting) throws ConfigurationException;
+
+    public abstract void changeSetting(ISettingValue<?> value) throws ConfigurationException;
 
     public abstract ISettingValueFactory getSettingFactory();
     
+    public abstract Set<IAdministratorUser> getAdminUsers();
+    
     public abstract IAdministratorUser getAdminUser(String username);
+
     public abstract IAdministratorUser createAdminUser(String username, String password);
+
     public abstract void saveAdminUser(IAdministratorUser username);
+
     public abstract void deleteAdminUser(String username);
+
     public abstract void deleteAdminUser(IAdministratorUser user);
+    
+    public abstract void deleteAll();
 
-
+    public abstract void cleanup();
 }

@@ -27,7 +27,7 @@ package org.n52.sos.config;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class SettingDefinitionGroup {
+public class SettingDefinitionGroup extends AbstractOrdered<SettingDefinitionGroup> {
 
     private String title;
     private String description;

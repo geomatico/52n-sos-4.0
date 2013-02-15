@@ -23,17 +23,23 @@
  */
 package org.n52.sos.config.settings;
 
+import org.n52.sos.config.SettingType;
+
 /**
  * TODO JavaDoc
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class IntegerSettingDefinition extends AbstractSettingDefinition<Integer> {
+public class IntegerSettingDefinition extends AbstractSettingDefinition<IntegerSettingDefinition, Integer> {
 
     private Integer minimum;
     private Integer maximum;
     private boolean exclusiveMaximum = false;
     private boolean exclusiveMinimum = false;
+
+    public IntegerSettingDefinition() {
+        super(SettingType.INTEGER);
+    }
 
     /**
      * Get the value of minimum

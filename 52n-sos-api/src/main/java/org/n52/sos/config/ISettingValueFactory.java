@@ -29,6 +29,7 @@ import java.net.URI;
 import org.n52.sos.config.settings.BooleanSettingDefinition;
 import org.n52.sos.config.settings.FileSettingDefinition;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
+import org.n52.sos.config.settings.NumericSettingDefinition;
 import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.config.settings.UriSettingDefinition;
 
@@ -46,4 +47,8 @@ public interface ISettingValueFactory {
     public ISettingValue<File> newFileSettingValue(FileSettingDefinition setting, String stringValue);
 
     public ISettingValue<URI> newUriSettingValue(UriSettingDefinition setting, String stringValue);
+    
+    public ISettingValue<Double> newNumericSettingValue(NumericSettingDefinition setting, String value);
+    
+    public ISettingValue<?> newSettingValue(ISettingDefinition<?,?> setting, String value);
 }

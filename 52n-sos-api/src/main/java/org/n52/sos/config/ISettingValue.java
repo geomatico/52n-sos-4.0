@@ -35,4 +35,6 @@ public interface ISettingValue<T> {
     public ISettingValue<T> setKey(String key);
 
     public ISettingValue<T> setValue(T value);
+    
+    public SettingType getType();
 }

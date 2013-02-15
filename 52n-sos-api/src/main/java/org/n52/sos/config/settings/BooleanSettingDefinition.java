@@ -23,5 +23,13 @@
  */
 package org.n52.sos.config.settings;
 
+import org.n52.sos.config.SettingType;
 
-public class BooleanSettingDefinition extends AbstractSettingDefinition<Boolean> {}
+
+public class BooleanSettingDefinition extends AbstractSettingDefinition<BooleanSettingDefinition, Boolean> {
+
+    public BooleanSettingDefinition() {
+        super(SettingType.BOOLEAN);
+    }
+
+}

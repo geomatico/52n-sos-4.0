@@ -23,4 +23,11 @@
  */
 package org.n52.sos.config.settings;
 
-public class StringSettingDefinition extends AbstractSettingDefinition<String> {}
+import org.n52.sos.config.SettingType;
+
+public class StringSettingDefinition extends AbstractSettingDefinition<StringSettingDefinition, String> {
+
+    public StringSettingDefinition() {
+        super(SettingType.STRING);
+    }
+}

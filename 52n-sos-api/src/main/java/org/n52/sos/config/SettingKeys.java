@@ -23,42 +23,14 @@
  */
 package org.n52.sos.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
+ * TODO JavaDoc
+ *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public interface ISettingDefinition<S extends ISettingDefinition<S, T>, T> extends IOrdered<S> {
-
-    public String getKey();
-
-    public String getTitle();
-
-    public String getDescription();
-
-    public boolean isOptional();
-
-    public T getDefaultValue();
-
-    public SettingDefinitionGroup getGroup();
-
-    public boolean hasTitle();
-
-    public boolean hasDescription();
-
-    public boolean hasDefaultValue();
-
-    public boolean hasGroup();
-
-    public S setKey(String key);
-
-    public S setTitle(String title);
-
-    public S setDescription(String description);
-
-    public S setOptional(boolean optional);
-
-    public S setDefaultValue(T defaultValue);
-
-    public S setGroup(SettingDefinitionGroup group);
-    
-    public SettingType getType();
+public class SettingKeys {
+    private static final Logger log = LoggerFactory.getLogger(SettingKeys.class);
 }

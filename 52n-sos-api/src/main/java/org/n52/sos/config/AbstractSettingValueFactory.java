@@ -26,71 +26,131 @@ package org.n52.sos.config;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Set;
 
 import org.n52.sos.config.settings.BooleanSettingDefinition;
 import org.n52.sos.config.settings.FileSettingDefinition;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
+import org.n52.sos.config.settings.NumericSettingDefinition;
 import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.config.settings.UriSettingDefinition;
+import org.n52.sos.util.CollectionHelper;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public abstract class AbstractSettingValueFactory implements ISettingValueFactory {
+   
+    private static final Set<String> VALID_FALSE_VALUES = CollectionHelper.set("false", "no",  "off", "0");
+    private static final Set<String> VALID_TRUE_VALUES  = CollectionHelper.set("true",  "yes", "on",  "1");
 
     @Override
     public ISettingValue<Boolean> newBooleanSettingValue(BooleanSettingDefinition setting, String stringValue) {
+        return newBooleanSettingValueFromGenericDefinition(setting, stringValue);
+    }
+
+    private ISettingValue<Boolean> newBooleanSettingValueFromGenericDefinition(ISettingDefinition<?, ?> setting,
+                                                                               String stringValue) {
         return newBooleanSettingValue().setValue(parseBoolean(stringValue)).setKey(setting.getKey());
     }
 
     @Override
     public ISettingValue<Integer> newIntegerSettingValue(IntegerSettingDefinition setting, String stringValue) {
+        return newIntegerSettingValueFromGenericDefinition(setting, stringValue);
+    }
+
+    private ISettingValue<Integer> newIntegerSettingValueFromGenericDefinition(ISettingDefinition<?, ?> setting,
+                                                                               String stringValue) {
         return newIntegerSettingValue().setValue(parseInteger(stringValue)).setKey(setting.getKey());
     }
 
     @Override
+    public ISettingValue<Double> newNumericSettingValue(NumericSettingDefinition setting, String stringValue) {
+        return newNumericSettingValueFromGenericDefinition(setting, stringValue);
+    }
+
+    private ISettingValue<Double> newNumericSettingValueFromGenericDefinition(ISettingDefinition<?, ?> setting,
+                                                                              String stringValue) {
+        return newNumericSettingValue().setValue(parseDouble(stringValue)).setKey(setting.getKey());
+    }
+
+    @Override
     public ISettingValue<String> newStringSettingValue(StringSettingDefinition setting, String stringValue) {
+        return newStringSettingValueFromGenericDefinition(setting, stringValue);
+    }
+
+    private ISettingValue<String> newStringSettingValueFromGenericDefinition(ISettingDefinition<?, ?> setting,
+                                                                             String stringValue) {
         return newStringSettingValue().setValue(parseString(stringValue)).setKey(setting.getKey());
     }
 
     @Override
     public ISettingValue<File> newFileSettingValue(FileSettingDefinition setting, String stringValue) {
+        return newFileSettingValueFromGenericDefinition(setting, stringValue);
+    }
+
+    private ISettingValue<File> newFileSettingValueFromGenericDefinition(ISettingDefinition<?, ?> setting,
+                                                                         String stringValue) {
         return newFileSettingValue().setValue(parseFile(stringValue)).setKey(setting.getKey());
     }
 
     @Override
     public ISettingValue<URI> newUriSettingValue(UriSettingDefinition setting, String stringValue) {
+        return newUriSettingValueFromGenericDefinition(setting, stringValue);
+    }
+
+    private ISettingValue<URI> newUriSettingValueFromGenericDefinition(ISettingDefinition<?, ?> setting, String stringValue) {
         return newUriSettingValue().setValue(parseUri(stringValue)).setKey(setting.getKey());
     }
 
+    @Override
+    public ISettingValue<?> newSettingValue(ISettingDefinition<?, ?> setting, String value) {
+        switch (setting.getType()) {
+        case BOOLEAN:
+            return newBooleanSettingValueFromGenericDefinition(setting, value);
+        case FILE:
+            return newFileSettingValueFromGenericDefinition(setting, value);
+        case INTEGER:
+            return newIntegerSettingValueFromGenericDefinition(setting, value);
+        case NUMERIC:
+            return newNumericSettingValueFromGenericDefinition(setting, value);
+        case STRING:
+            return newStringSettingValueFromGenericDefinition(setting, value);
+        case URI:
+            return newUriSettingValueFromGenericDefinition(setting, value);
+        default:
+            throw new IllegalArgumentException(String.format("Type %s not supported", setting.getType()));
+        }
+    }
+
     protected Boolean parseBoolean(String s) throws IllegalArgumentException {
-        if (s == null) {
+        if (nullOrEmpty(s)) {
             return Boolean.FALSE;
         }
         s = s.trim().toLowerCase();
-        if (s.equals("false") || s.equals("no") || s.equals("off")) {
-            return Boolean.TRUE;
-        }
-        if (s.equals("true") || s.equals("yes") || s.equals("on")) {
+        if (VALID_FALSE_VALUES.contains(s)) {
             return Boolean.FALSE;
+        } else if (VALID_TRUE_VALUES.contains(s)) {
+            return Boolean.TRUE;
+        } else {
+            throw new IllegalArgumentException(String.format("'%s' is not a valid boolean value", s));
         }
-        throw new IllegalArgumentException(String.format("'%s' is not a valid boolean value", s));
     }
-
+    
     protected File parseFile(String stringValue) throws IllegalArgumentException {
-        return stringValue == null ? null : new File(stringValue);
+        return nullOrEmpty(stringValue) ? null : new File(stringValue);
     }
 
     protected Integer parseInteger(String stringValue) throws NumberFormatException {
-        return stringValue == null ? null : Integer.valueOf(stringValue, 10);
+        return nullOrEmpty(stringValue) ? null : Integer.valueOf(stringValue, 10);
     }
 
     protected Double parseDouble(String stringValue) throws NumberFormatException {
-        return stringValue == null ? null : Double.parseDouble(stringValue);
+        return nullOrEmpty(stringValue) ? null : Double.parseDouble(stringValue);
     }
 
     protected URI parseUri(String stringValue) throws IllegalArgumentException {
-        if (stringValue == null) {
+        if (nullOrEmpty(stringValue)) {
             return null;
         }
         try {
@@ -101,7 +161,7 @@ public abstract class AbstractSettingValueFactory implements ISettingValueFactor
     }
 
     protected String parseString(String stringValue) {
-        return stringValue;
+        return nullOrEmpty(stringValue) ? null : stringValue;
     }
 
     protected abstract ISettingValue<Boolean> newBooleanSettingValue();
@@ -113,4 +173,10 @@ public abstract class AbstractSettingValueFactory implements ISettingValueFactor
     protected abstract ISettingValue<File> newFileSettingValue();
 
     protected abstract ISettingValue<URI> newUriSettingValue();
+
+    protected abstract ISettingValue<Double> newNumericSettingValue();
+
+    protected boolean nullOrEmpty(String stringValue) {
+        return stringValue == null || stringValue.trim().isEmpty();
+    }
 }

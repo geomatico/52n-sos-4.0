@@ -41,19 +41,20 @@ import org.slf4j.LoggerFactory;
 public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRepository<ISettingDefinitionProvider> {
 
     private static final Logger log = LoggerFactory.getLogger(SettingDefinitionProviderRepository.class);
-    private Map<String, ISettingDefinition<?>> definitionsByKey = Collections.emptyMap();
-    private Set<ISettingDefinition<?>> settingDefinitions = Collections.emptySet();
-    private Map<ISettingDefinition<?>, Set<ISettingDefinitionProvider>> providersByDefinition = Collections.emptyMap();
+    private Map<String, ISettingDefinition<?, ?>> definitionsByKey = Collections.emptyMap();
+    private Set<ISettingDefinition<?, ?>> settingDefinitions = Collections.emptySet();
+    private Map<ISettingDefinition<?, ?>, Set<ISettingDefinitionProvider>> providersByDefinition = Collections.emptyMap();
 
-    SettingDefinitionProviderRepository() throws ConfigurationException {
+    public SettingDefinitionProviderRepository() throws ConfigurationException {
         super(ISettingDefinitionProvider.class, false);
+        super.load(false);
     }
 
-    public Set<ISettingDefinition<?>> getSettingDefinitions() {
+    public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
         return Collections.unmodifiableSet(this.settingDefinitions);
     }
 
-    public Set<ISettingDefinitionProvider> getProviders(ISettingDefinition<?> setting) {
+    public Set<ISettingDefinitionProvider> getProviders(ISettingDefinition<?, ?> setting) {
         Set<ISettingDefinitionProvider> set = this.providersByDefinition.get(setting);
         if (set == null) {
             return Collections.emptySet();
@@ -62,27 +63,30 @@ public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRe
         }
     }
     
-    public ISettingDefinition<?> getDefinition(String key) {
+    public ISettingDefinition<?, ?> getDefinition(String key) {
         return this.definitionsByKey.get(key);
     }
 
     @Override
     protected void processImplementations(Set<ISettingDefinitionProvider> implementations) throws ConfigurationException {
-        this.settingDefinitions = new HashSet<ISettingDefinition<?>>();
-        this.providersByDefinition = new HashMap<ISettingDefinition<?>, Set<ISettingDefinitionProvider>>();
-        this.definitionsByKey = new HashMap<String, ISettingDefinition<?>>();
+        this.settingDefinitions = new HashSet<ISettingDefinition<?, ?>>();
+        this.providersByDefinition = new HashMap<ISettingDefinition<?, ?>, Set<ISettingDefinitionProvider>>();
+        this.definitionsByKey = new HashMap<String, ISettingDefinition<?, ?>>();
+        
         for (ISettingDefinitionProvider provider : implementations) {
-            Set<ISettingDefinition<?>> requiredSettings = provider.getSettingDefinitions();
-            for (ISettingDefinition<?> definition : requiredSettings) {
-                ISettingDefinition<?> prev = definitionsByKey.put(definition.getKey(), definition);
+            log.debug("Processing IDefinitionProvider {}", provider);
+            Set<ISettingDefinition<?, ?>> requiredSettings = provider.getSettingDefinitions();
+            for (ISettingDefinition<?, ?> definition : requiredSettings) {
+                ISettingDefinition<?, ?> prev = definitionsByKey.put(definition.getKey(), definition);
                 if (prev != null && !prev.equals(definition)) {
                     log.warn("{} overwrites {} requested by [{}]", definition, prev,
                              StringHelper.join(", ", this.providersByDefinition.get(prev)));
                     this.providersByDefinition.remove(prev);
                 }
+                log.debug("Found Setting definition for key '{}'", definition.getKey());
             }
             this.settingDefinitions.addAll(requiredSettings);
-            for (ISettingDefinition<?> setting : requiredSettings) {
+            for (ISettingDefinition<?, ?> setting : requiredSettings) {
                 Set<ISettingDefinitionProvider> wanters = this.providersByDefinition.get(setting);
                 if (wanters == null) {
                     this.providersByDefinition.put(setting, wanters = new HashSet<ISettingDefinitionProvider>());

@@ -24,41 +24,28 @@
 package org.n52.sos.config;
 
 /**
+ * @param <T>
+ * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public interface ISettingDefinition<S extends ISettingDefinition<S, T>, T> extends IOrdered<S> {
+public class AbstractOrdered<T extends IOrdered<T>> implements IOrdered<T> {
 
-    public String getKey();
+    private float order;
 
-    public String getTitle();
+    @Override
+    public float getOrder() {
+        return this.order;
+    }
 
-    public String getDescription();
+    @Override
+    @SuppressWarnings("unchecked")
+    public T setOrder(float order) {
+        this.order = order;
+        return (T) this;
+    }
 
-    public boolean isOptional();
-
-    public T getDefaultValue();
-
-    public SettingDefinitionGroup getGroup();
-
-    public boolean hasTitle();
-
-    public boolean hasDescription();
-
-    public boolean hasDefaultValue();
-
-    public boolean hasGroup();
-
-    public S setKey(String key);
-
-    public S setTitle(String title);
-
-    public S setDescription(String description);
-
-    public S setOptional(boolean optional);
-
-    public S setDefaultValue(T defaultValue);
-
-    public S setGroup(SettingDefinitionGroup group);
-    
-    public SettingType getType();
+    @Override
+    public int compareTo(IOrdered<?> t) {
+        return Float.compare(getOrder(), t.getOrder());
+    }
 }

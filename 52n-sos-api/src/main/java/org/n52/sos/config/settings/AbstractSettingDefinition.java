@@ -23,21 +23,29 @@
  */
 package org.n52.sos.config.settings;
 
+import org.n52.sos.config.AbstractOrdered;
 import org.n52.sos.config.ISettingDefinition;
 import org.n52.sos.config.SettingDefinitionGroup;
+import org.n52.sos.config.SettingType;
 
 /**
  * @param <T>
  * @author Christian Autermann <c.autermann@52north.org>
  */
-abstract class AbstractSettingDefinition<T> implements ISettingDefinition<T> {
-
+abstract class AbstractSettingDefinition<S extends AbstractSettingDefinition<S,T>, T> extends AbstractOrdered<S>
+                                                        implements ISettingDefinition<S, T>  {
+    
     private boolean optional = false;
     private String identifier;
     private String title;
     private String description;
     private SettingDefinitionGroup group;
+    private final SettingType type;
     private T defaultValue;
+
+    protected AbstractSettingDefinition(SettingType type) {
+        this.type = type;
+    }
 
     @Override
     public String getKey() {
@@ -45,9 +53,10 @@ abstract class AbstractSettingDefinition<T> implements ISettingDefinition<T> {
     }
 
     @Override
-    public ISettingDefinition<T> setKey(String key) {
+    @SuppressWarnings("unchecked")
+    public S setKey(String key) {
         this.identifier = key;
-        return this;
+        return (S) this;
     }
 
     @Override
@@ -61,9 +70,10 @@ abstract class AbstractSettingDefinition<T> implements ISettingDefinition<T> {
     }
 
     @Override
-    public ISettingDefinition<T> setDescription(String description) {
+    @SuppressWarnings("unchecked")
+    public S setDescription(String description) {
         this.description = description;
-        return this;
+        return (S) this;
     }
 
     @Override
@@ -77,9 +87,10 @@ abstract class AbstractSettingDefinition<T> implements ISettingDefinition<T> {
     }
 
     @Override
-    public ISettingDefinition<T> setTitle(String title) {
+    @SuppressWarnings("unchecked")
+    public S setTitle(String title) {
         this.title = title;
-        return this;
+        return (S) this;
     }
 
     @Override
@@ -88,9 +99,10 @@ abstract class AbstractSettingDefinition<T> implements ISettingDefinition<T> {
     }
 
     @Override
-    public ISettingDefinition<T> setOptional(boolean optional) {
+    @SuppressWarnings("unchecked")
+    public S setOptional(boolean optional) {
         this.optional = optional;
-        return this;
+        return (S) this;
     }
     
     @Override
@@ -104,9 +116,9 @@ abstract class AbstractSettingDefinition<T> implements ISettingDefinition<T> {
     }
     
     @Override
-    public ISettingDefinition<T> setGroup(SettingDefinitionGroup group) {
+    public S setGroup(SettingDefinitionGroup group) {
         this.group = group;
-        return this;
+        return (S) this;
     }
 
     @Override
@@ -120,9 +132,10 @@ abstract class AbstractSettingDefinition<T> implements ISettingDefinition<T> {
     }
 
     @Override
-    public ISettingDefinition<T> setDefaultValue(T defaultValue) {
+    @SuppressWarnings("unchecked")
+    public S setDefaultValue(T defaultValue) {
         this.defaultValue = defaultValue;
-        return this;
+        return (S) this;
     }
     
     protected boolean hasStringProperty(String s) {
@@ -136,8 +149,9 @@ abstract class AbstractSettingDefinition<T> implements ISettingDefinition<T> {
 
     @Override
     public boolean equals(Object obj) {
+        //FIXME include other properties
         if (obj != null && obj instanceof AbstractSettingDefinition) {
-            AbstractSettingDefinition<?> other = (AbstractSettingDefinition<?>) obj;
+            AbstractSettingDefinition<?, ?> other = (AbstractSettingDefinition<?, ?>) obj;
             return getKey() == null ? other.getKey() == null : getKey().equals(other.getKey());
         }
         return true;
@@ -146,5 +160,10 @@ abstract class AbstractSettingDefinition<T> implements ISettingDefinition<T> {
     @Override
     public String toString() {
         return String.format("%s[key=%s]", getClass().getSimpleName(), getKey());
+    }
+    
+    @Override
+    public SettingType getType() {
+        return this.type;
     }
 }

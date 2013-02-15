@@ -23,5 +23,13 @@
  */
 package org.n52.sos.config.settings;
 
+import org.n52.sos.config.SettingType;
 
-public class NumericSettingDefinition extends AbstractSettingDefinition<Double> {}
+
+public class NumericSettingDefinition extends AbstractSettingDefinition<NumericSettingDefinition, Double> {
+
+    public NumericSettingDefinition() {
+        super(SettingType.NUMERIC);
+    }
+
+}

@@ -24,41 +24,23 @@
 package org.n52.sos.config;
 
 /**
+ * Generic class to implement a Order based on floating point numbers.
+ *
+ * @param <T> the type of the extending class
+ * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public interface ISettingDefinition<S extends ISettingDefinition<S, T>, T> extends IOrdered<S> {
+public interface IOrdered<T extends IOrdered<T>> extends Comparable<IOrdered<?>> {
 
-    public String getKey();
+    /**
+     * @return the order of this clas represented as a <code>float</code>
+     */
+    public float getOrder();
 
-    public String getTitle();
-
-    public String getDescription();
-
-    public boolean isOptional();
-
-    public T getDefaultValue();
-
-    public SettingDefinitionGroup getGroup();
-
-    public boolean hasTitle();
-
-    public boolean hasDescription();
-
-    public boolean hasDefaultValue();
-
-    public boolean hasGroup();
-
-    public S setKey(String key);
-
-    public S setTitle(String title);
-
-    public S setDescription(String description);
-
-    public S setOptional(boolean optional);
-
-    public S setDefaultValue(T defaultValue);
-
-    public S setGroup(SettingDefinitionGroup group);
-    
-    public SettingType getType();
+    /**
+     * @param order the order
+     * <p/>
+     * @return <code>this</code>
+     */
+    public T setOrder(float order);
 }

@@ -25,4 +25,13 @@ package org.n52.sos.config.settings;
 
 import java.io.File;
 
-public class FileSettingDefinition extends AbstractSettingDefinition<File> {}
+import org.n52.sos.config.SettingType;
+
+
+public class FileSettingDefinition extends AbstractSettingDefinition<FileSettingDefinition, File> {
+
+    public FileSettingDefinition() {
+        super(SettingType.FILE);
+    }
+
+}

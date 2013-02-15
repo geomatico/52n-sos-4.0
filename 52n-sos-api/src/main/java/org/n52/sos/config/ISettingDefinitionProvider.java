@@ -23,21 +23,12 @@
  */
 package org.n52.sos.config;
 
-import java.util.Map;
 import java.util.Set;
-
-import org.n52.sos.service.ConfigurationException;
 
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public interface ISettingDefinitionProvider {
-
-    public Set<ISettingDefinition<?>> getSettingDefinitions();
-
-    public void setSettingValues(Map<ISettingDefinition<?>, ISettingValue<?>> settings) throws ConfigurationException;
-
-    public void changeSettingValue(ISettingDefinition<?> definition, ISettingValue<?> oldValue,
-                                   ISettingValue<?> newValue) throws ConfigurationException;
+    public Set<ISettingDefinition<?, ?>> getSettingDefinitions();
 }

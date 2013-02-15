@@ -21,44 +21,37 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.config;
+package org.n52.sos.config.annotation;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
+ * Annotation that should be applied to a method that takes a single Setting as a parameter.
+ * <pre>
+ * &#064;Setting(MiscellaneousSettingDefinitions.TOKEN_SEPERATOR_KEY)
+ * public void setTokenSeperator(String seperator) {
+ *     this.seperator = seperator;
+ * }
+ * </pre>
+ * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0
  */
-public interface ISettingDefinition<S extends ISettingDefinition<S, T>, T> extends IOrdered<S> {
+@Inherited
+@Documented
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Setting {
 
-    public String getKey();
-
-    public String getTitle();
-
-    public String getDescription();
-
-    public boolean isOptional();
-
-    public T getDefaultValue();
-
-    public SettingDefinitionGroup getGroup();
-
-    public boolean hasTitle();
-
-    public boolean hasDescription();
-
-    public boolean hasDefaultValue();
-
-    public boolean hasGroup();
-
-    public S setKey(String key);
-
-    public S setTitle(String title);
-
-    public S setDescription(String description);
-
-    public S setOptional(boolean optional);
-
-    public S setDefaultValue(T defaultValue);
-
-    public S setGroup(SettingDefinitionGroup group);
-    
-    public SettingType getType();
+    /**
+     * The key of the setting.
+     * <p/>
+     * @return the key
+     */
+    public String value();
 }

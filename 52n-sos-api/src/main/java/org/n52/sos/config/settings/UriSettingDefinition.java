@@ -25,4 +25,11 @@ package org.n52.sos.config.settings;
 
 import java.net.URI;
 
-public class UriSettingDefinition extends AbstractSettingDefinition<URI> {}
+import org.n52.sos.config.SettingType;
+
+public class UriSettingDefinition extends AbstractSettingDefinition<UriSettingDefinition, URI> {
+
+    public UriSettingDefinition() {
+        super(SettingType.URI);
+    }
+}
