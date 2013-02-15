@@ -26,21 +26,23 @@ package org.n52.sos.util;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.service.ConfigurationException;
+
 
 /**
  * Thread safe factory that creates a object only if
  * it is null or if it should be recreated explicitly.
  * @param <T> the type to produce
+ * @since 4.0
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class LazyThreadSafeFactory<T> {
+public abstract class LazyThreadSafeFactory<T> implements IFactory<T> {
 
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 	private T object;
 	private boolean recreate = false;
 
-	private void recreate() throws OwsExceptionReport {
+	private void recreate() throws ConfigurationException {
 		this.object = create();
 		this.recreate = false;
 	}
@@ -58,7 +60,8 @@ public abstract class LazyThreadSafeFactory<T> {
 		}
 	}
 
-	public T get() throws OwsExceptionReport {
+    @Override
+	public T get() throws ConfigurationException {
 		lock.readLock().lock();
 		try {
 			if (!shouldRecreate()) {
@@ -79,5 +82,5 @@ public abstract class LazyThreadSafeFactory<T> {
 		}
 	}
 
-	protected abstract T create() throws OwsExceptionReport;
+	protected abstract T create() throws ConfigurationException;
 }
