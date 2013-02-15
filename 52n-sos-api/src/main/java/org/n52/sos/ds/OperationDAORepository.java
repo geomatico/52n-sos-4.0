@@ -27,17 +27,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import org.n52.sos.service.ConfigurationException;
-import org.n52.sos.util.AbstractServiceLoaderRepository;
+import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class OperationDaoRepository extends AbstractServiceLoaderRepository<IOperationDAO> {
+public class OperationDAORepository extends AbstractConfiguringServiceLoaderRepository<IOperationDAO> {
 
-	private static final Logger log = LoggerFactory.getLogger(OperationDaoRepository.class);
+	private static final Logger log = LoggerFactory.getLogger(OperationDAORepository.class);
 
 	/** Implemented ISosOperationDAO */
     private final Map<String, IOperationDAO> operationDaos = new HashMap<String, IOperationDAO>(0);
@@ -48,7 +49,7 @@ public class OperationDaoRepository extends AbstractServiceLoaderRepository<IOpe
      * @throws ConfigurationException
      *             If no operation dao is implemented
      */
-    public OperationDaoRepository() throws ConfigurationException {
+    public OperationDAORepository() throws ConfigurationException {
 		super(IOperationDAO.class, true);
 		load(false);
     }
@@ -61,7 +62,7 @@ public class OperationDaoRepository extends AbstractServiceLoaderRepository<IOpe
      *             If no operation dao is implemented
      */
 	@Override
-    protected void processImplementations(Set<IOperationDAO> daos) throws ConfigurationException {
+    protected void processConfiguredImplementations(Set<IOperationDAO> daos) throws ConfigurationException {
 		this.operationDaos.clear();
 		for (IOperationDAO dao : daos) {
 			this.operationDaos.put(dao.getOperationName(), dao);
