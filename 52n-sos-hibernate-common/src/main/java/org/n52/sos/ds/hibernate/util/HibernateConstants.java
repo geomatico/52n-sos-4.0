@@ -112,9 +112,5 @@ public class HibernateConstants {
 
 	public static final String PARAMETER_SETTING_VALUE = "value";
 	
-	public static final String ADMIN_USERNAME_KEY = "admin_username";
-	public static final String ADMIN_PASSWORD_KEY = "admin_password";
-	public static final String TABLE_NAME_SETTINGS = "global_settings";
-	
 
 }
