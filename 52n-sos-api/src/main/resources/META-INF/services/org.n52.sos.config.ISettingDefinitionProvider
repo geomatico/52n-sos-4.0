@@ -1,0 +1,3 @@
+org.n52.sos.ogc.ows.SosServiceIdentificationSettingDefinitionProvider
+org.n52.sos.ogc.ows.SosServiceProviderSettingDefinitionProvider
+org.n52.sos.service.ConfiguratorSettingDefinitionProvider
