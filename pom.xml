@@ -81,11 +81,6 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>52n-sos-config-properties</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>52n-sos-admin</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -1029,9 +1024,6 @@
                 <module>52n-sos-core-v100</module>
                 <module>52n-sos-coding-sos-v100</module>
             </modules>
-            <properties>
-                <settingsSqlFile>../db/insert-settings.sql</settingsSqlFile>
-            </properties>
         </profile>
         <profile>
             <id>enhancedV20</id>
