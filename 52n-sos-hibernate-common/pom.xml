@@ -14,13 +14,16 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>52n-sos-api</artifactId>
-			<optional>true</optional>
-		</dependency>
+            <artifactId>52n-sos-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>52n-sos-api</artifactId>
+            <classifier>tests</classifier>
+        </dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>52n-sos-hibernate-api</artifactId>
-			<optional>true</optional>
 		</dependency>
 		<!-- Hibernate Core Dependencies -->
 		<dependency>
@@ -60,6 +63,12 @@
 			<artifactId>hibernate-commons-annotations</artifactId>
 			<classifier>sources</classifier>
 		</dependency>
+	 <dependency>
+	  <groupId>junit</groupId>
+	  <artifactId>junit</artifactId>
+	  <version>4.10</version>
+	  <scope>test</scope>
+	 </dependency>
 	</dependencies>
 	<profiles>
 		<profile>
