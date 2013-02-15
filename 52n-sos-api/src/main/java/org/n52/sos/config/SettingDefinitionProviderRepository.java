@@ -36,24 +36,43 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Repository for {@code ISettingDefinitionProvider} implementations.
+ * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0
  */
 public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRepository<ISettingDefinitionProvider> {
 
     private static final Logger log = LoggerFactory.getLogger(SettingDefinitionProviderRepository.class);
     private Map<String, ISettingDefinition<?, ?>> definitionsByKey = Collections.emptyMap();
     private Set<ISettingDefinition<?, ?>> settingDefinitions = Collections.emptySet();
-    private Map<ISettingDefinition<?, ?>, Set<ISettingDefinitionProvider>> providersByDefinition = Collections.emptyMap();
+    private Map<ISettingDefinition<?, ?>, Set<ISettingDefinitionProvider>> providersByDefinition = Collections
+            .emptyMap();
 
+    /**
+     * Constructs a new repository.
+     * <p/>
+     * @throws ConfigurationException if there is a problem while loading implementations
+     */
     public SettingDefinitionProviderRepository() throws ConfigurationException {
         super(ISettingDefinitionProvider.class, false);
         super.load(false);
     }
 
+    /**
+     * @return all setting definitions
+     */
     public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
         return Collections.unmodifiableSet(this.settingDefinitions);
     }
 
+    /**
+     * Returns all providers that declared a specific setting.
+     * <p/>
+     * @param setting the setting
+     * <p/>
+     * @return the providers
+     */
     public Set<ISettingDefinitionProvider> getProviders(ISettingDefinition<?, ?> setting) {
         Set<ISettingDefinitionProvider> set = this.providersByDefinition.get(setting);
         if (set == null) {
@@ -62,7 +81,14 @@ public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRe
             return Collections.unmodifiableSet(set);
         }
     }
-    
+
+    /**
+     * Gets the definition for the specified key.
+     * <p/>
+     * @param key the key
+     * <p/>
+     * @return the definition or {@code null} if none is known
+     */
     public ISettingDefinition<?, ?> getDefinition(String key) {
         return this.definitionsByKey.get(key);
     }
@@ -72,7 +98,7 @@ public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRe
         this.settingDefinitions = new HashSet<ISettingDefinition<?, ?>>();
         this.providersByDefinition = new HashMap<ISettingDefinition<?, ?>, Set<ISettingDefinitionProvider>>();
         this.definitionsByKey = new HashMap<String, ISettingDefinition<?, ?>>();
-        
+
         for (ISettingDefinitionProvider provider : implementations) {
             log.debug("Processing IDefinitionProvider {}", provider);
             Set<ISettingDefinition<?, ?>> requiredSettings = provider.getSettingDefinitions();

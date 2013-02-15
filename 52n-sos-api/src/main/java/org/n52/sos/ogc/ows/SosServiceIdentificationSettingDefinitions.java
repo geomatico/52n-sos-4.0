@@ -87,7 +87,7 @@ public class SosServiceIdentificationSettingDefinitions {
             .setDefaultValue("OGC:SOS");
     public static final FileSettingDefinition FILE_DEFINITION = new FileSettingDefinition()
             .setGroup(GROUP)
-            .setOrder(100)
+            .setOrder(6)
             .setKey(FILE)
             .setTitle("Service Identification File")
             .setOptional(true)

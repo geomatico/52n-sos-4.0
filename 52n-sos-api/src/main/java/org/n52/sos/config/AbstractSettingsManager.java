@@ -44,9 +44,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TODO JavaDoc
- * 
+ * Abstract {@code SettingsManaeger} implementation that handles the loading of {@link ISettingDefinition}s and the
+ * configuration of objects.
+ * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0
  */
 public abstract class AbstractSettingsManager extends SettingsManager {
 
@@ -55,10 +57,18 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     private final Map<String, Set<ConfigurableObject>> configurableObjects = new HashMap<String, Set<ConfigurableObject>>();
     private final ReadWriteLock configurableObjectsLock = new ReentrantReadWriteLock();
 
+    /**
+     * Constructs a new instance.
+     * <p/>
+     * @throws ConfigurationException if loading of {@link ISettingDefinitionProvider} fails
+     */
     protected AbstractSettingsManager() throws ConfigurationException {
         settingDefinitionRepository = new SettingDefinitionProviderRepository();
     }
 
+    /**
+     * @return the repository holding the setting definitions
+     */
     protected SettingDefinitionProviderRepository getSettingDefinitionRepository() {
         return settingDefinitionRepository;
     }
@@ -68,6 +78,9 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         return getSettingDefinitionRepository().getSettingDefinitions();
     }
 
+    /**
+     * @return the keys for all definiions
+     */
     public Set<String> getKeys() {
         Set<ISettingDefinition<?, ?>> settings = getSettingDefinitions();
         HashSet<String> keys = new HashSet<String>(settings.size());
@@ -112,6 +125,15 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         SosEventBus.fire(new SettingsChangeEvent(setting, oldValue, null));
     }
 
+    /**
+     * Applies the a new setting to all {@code ConfiguredObject}s. If an error occurs the the old value is reapplied.
+     * <p/>
+     * @param setting the definition
+     * @param oldValue the old value (or {@code null} if there is none)
+     * @param newValue the new value (or {@code null} if there is none)
+     * <p/>
+     * @throws ConfigurationException if there is a error configuring the objects
+     */
     private void applySetting(ISettingDefinition<?, ?> setting,
                               ISettingValue<?> oldValue,
                               ISettingValue<?> newValue) throws ConfigurationException {
@@ -158,8 +180,8 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     @Override
     public Map<ISettingDefinition<?, ?>, ISettingValue<?>> getSettings() {
         Set<ISettingValue<?>> values = getSettingValues();
-        Map<ISettingDefinition<?, ?>, ISettingValue<?>> settingsByDefinition 
-                = new HashMap<ISettingDefinition<?, ?>, ISettingValue<?>>(values.size());
+        Map<ISettingDefinition<?, ?>, ISettingValue<?>> settingsByDefinition = new HashMap<ISettingDefinition<?, ?>, ISettingValue<?>>(values
+                .size());
         for (ISettingValue<?> value : values) {
             settingsByDefinition.put(getSettingDefinitionRepository().getDefinition(value.getKey()), value);
         }
@@ -169,14 +191,6 @@ public abstract class AbstractSettingsManager extends SettingsManager {
             settingsByDefinition.put(s, null);
         }
         return settingsByDefinition;
-    }
-
-    public static <K, V> HashMap<K, V> bla(Collection<K> keys, V value) {
-        HashMap<K, V> map = new HashMap<K, V>(keys.size());
-        for (K k : keys) {
-            map.put(k, value);
-        }
-        return map;
     }
 
     @Override
@@ -244,20 +258,36 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         private final Object target;
         private final String key;
 
+        /**
+         * Constructs a new {@code ConfigurableObject}
+         * <p/>
+         * @param method the method of the target
+         * @param target the target object
+         * @param key the settings key
+         */
         ConfigurableObject(Method method, Object target, String key) {
             this.method = method;
             this.target = target;
             this.key = key;
         }
 
+        /**
+         * @return the method
+         */
         public Method getMethod() {
             return method;
         }
 
+        /**
+         * @return the target object
+         */
         public Object getTarget() {
             return target;
         }
 
+        /**
+         * @return the settings key
+         */
         public String getKey() {
             return key;
         }
@@ -292,10 +322,24 @@ public abstract class AbstractSettingsManager extends SettingsManager {
             return true;
         }
 
+        /**
+         * Configures this object with the specified value.
+         * <p/>
+         * @param val the value
+         * <p/>
+         * @throws ConfigurationException if an error occurs
+         */
         public void configure(ISettingValue<?> val) throws ConfigurationException {
             configure(val.getValue());
         }
 
+        /**
+         * Configures this object with the specified value. Exceptions are wrapped in a {@code ConfigurationException}.
+         * <p/>
+         * @param val the value
+         * <p/>
+         * @throws ConfigurationException if an error occurs
+         */
         public void configure(Object val) throws ConfigurationException {
             try {
                 getMethod().invoke(getTarget(), val);
@@ -309,18 +353,38 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         }
 
         private void logAndThrowError(Object val, Throwable t) throws ConfigurationException {
-            String message = String.format("Error while setting value '%s' (%s) for property '%s' with method '%s'", 
+            String message = String.format("Error while setting value '%s' (%s) for property '%s' with method '%s'",
                                            val, val.getClass(), getKey(), getMethod());
             log.error(message);
             throw new ConfigurationException(message, t);
         }
     }
 
+    /**
+     * @return all saved setting values
+     */
     protected abstract Set<ISettingValue<?>> getSettingValues();
 
+    /**
+     * Returns the value of the specified setting or {@code null} if it does not exist.
+     * <p/>
+     * @param key the key
+     * <p/>
+     * @return the value
+     */
     protected abstract ISettingValue<?> getSettingValue(String key);
 
+    /**
+     * Deletes the setting with the specified key.
+     * <p/>
+     * @param key the key
+     */
     protected abstract void deleteSettingValue(String key);
 
+    /**
+     * Saves the setting value.
+     * <p/>
+     * @param setting the value
+     */
     protected abstract void saveSettingValue(ISettingValue<?> setting);
 }

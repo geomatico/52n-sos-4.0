@@ -24,10 +24,14 @@
 package org.n52.sos.config;
 
 /**
- * TODO JavaDoc
+ * Enum to describe the type of a {@code ISettingDefinition} and {@code ISettingValue}.
  *
+ * @see ISettingDefinition
+ * @see ISettingValue
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0
  */
 public enum SettingType {
+
     BOOLEAN, INTEGER, FILE, NUMERIC, STRING, URI;
 }

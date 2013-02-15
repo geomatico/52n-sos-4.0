@@ -25,8 +25,17 @@ package org.n52.sos.config.settings;
 
 import org.n52.sos.config.SettingType;
 
+/**
+ * {@link ISettingDefinition} for {@code String}s
+ * <p/>
+ * @since 4.0
+ * @author Christian Autermann <c.autermann@52north.org>
+ */
 public class StringSettingDefinition extends AbstractSettingDefinition<StringSettingDefinition, String> {
 
+    /**
+     * Constructs a new {@code StringSettingDefinition}
+     */
     public StringSettingDefinition() {
         super(SettingType.STRING);
     }

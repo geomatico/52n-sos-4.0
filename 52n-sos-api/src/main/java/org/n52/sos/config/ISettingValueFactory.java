@@ -34,21 +34,80 @@ import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.config.settings.UriSettingDefinition;
 
 /**
+ * Factory to construct implementation specific {@link ISettingvalue}s.
+ * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0
  */
 public interface ISettingValueFactory {
 
+    /**
+     * Constructs a new {@code Boolean} setting value from the supplied definition and string value.
+     * <p/>
+     * @param setting the setting definition
+     * @param stringValue the value as string
+     * <p/>
+     * @return the implementation specific {@code ISettingValue}
+     */
     public ISettingValue<Boolean> newBooleanSettingValue(BooleanSettingDefinition setting, String stringValue);
 
+    /**
+     * Constructs a new {@code Integer} setting value from the supplied definition and string value.
+     * <p/>
+     * @param setting the setting definition
+     * @param stringValue the value as string
+     * <p/>
+     * @return the implementation specific {@code ISettingValue}
+     */
     public ISettingValue<Integer> newIntegerSettingValue(IntegerSettingDefinition setting, String stringValue);
 
+    /**
+     * Constructs a new {@code String} setting value from the supplied definition and string value.
+     * <p/>
+     * @param setting the setting definition
+     * @param stringValue the value as string
+     * <p/>
+     * @return the implementation specific {@code ISettingValue}
+     */
     public ISettingValue<String> newStringSettingValue(StringSettingDefinition setting, String stringValue);
 
+    /**
+     * Constructs a new {@code File} setting value from the supplied definition and string value.
+     * <p/>
+     * @param setting the setting definition
+     * @param stringValue the value as string
+     * <p/>
+     * @return the implementation specific {@code ISettingValue}
+     */
     public ISettingValue<File> newFileSettingValue(FileSettingDefinition setting, String stringValue);
 
+    /**
+     * Constructs a new {@code URI} setting value from the supplied definition and string value.
+     * <p/>
+     * @param setting the setting definition
+     * @param stringValue the value as string
+     * <p/>
+     * @return the implementation specific {@code ISettingValue}
+     */
     public ISettingValue<URI> newUriSettingValue(UriSettingDefinition setting, String stringValue);
-    
-    public ISettingValue<Double> newNumericSettingValue(NumericSettingDefinition setting, String value);
-    
-    public ISettingValue<?> newSettingValue(ISettingDefinition<?,?> setting, String value);
+
+    /**
+     * Constructs a new {@code Double} setting value from the supplied definition and string value.
+     * <p/>
+     * @param setting the setting definition
+     * @param stringValue the value as string
+     * <p/>
+     * @return the implementation specific {@code ISettingValue}
+     */
+    public ISettingValue<Double> newNumericSettingValue(NumericSettingDefinition setting, String stringValue);
+
+    /**
+     * Constructs a new generic setting value from the supplied definition and string value.
+     * <p/>
+     * @param setting the setting definition
+     * @param stringValue the value as string
+     * <p/>
+     * @return the implementation specific {@code ISettingValue}
+     */
+    public ISettingValue<?> newSettingValue(ISettingDefinition<?, ?> setting, String stringValue);
 }

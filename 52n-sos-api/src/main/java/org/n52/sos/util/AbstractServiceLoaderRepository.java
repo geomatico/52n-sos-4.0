@@ -44,7 +44,7 @@ public abstract class AbstractServiceLoaderRepository<T> {
 	private final Class<T> type;
 	private final boolean failIfEmpty;
 
-	protected AbstractServiceLoaderRepository(Class<T> type, boolean failIfEmpty) throws ConfigurationException {
+	protected AbstractServiceLoaderRepository(Class<T> type, boolean failIfEmpty) {
 		log.debug("Loading Implementations for {}", type);
 		this.type = type;
 		this.failIfEmpty = failIfEmpty;

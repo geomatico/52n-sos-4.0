@@ -29,12 +29,18 @@ import org.n52.sos.config.SettingDefinitionGroup;
 import org.n52.sos.config.SettingType;
 
 /**
- * @param <T>
+ * Generic implementation of
+ * <code>ISettingDefinition</code>.
+ * <p/>
+ * @param <S> the type of the class extending this class
+ * @param <T> the type of the value
+ * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0
  */
-abstract class AbstractSettingDefinition<S extends AbstractSettingDefinition<S,T>, T> extends AbstractOrdered<S>
-                                                        implements ISettingDefinition<S, T>  {
-    
+abstract class AbstractSettingDefinition<S extends AbstractSettingDefinition<S, T>, T> extends AbstractOrdered<S>
+        implements ISettingDefinition<S, T> {
+
     private boolean optional = false;
     private String identifier;
     private String title;
@@ -43,6 +49,9 @@ abstract class AbstractSettingDefinition<S extends AbstractSettingDefinition<S,T
     private final SettingType type;
     private T defaultValue;
 
+    /**
+     * @param type the <code>SettingType</code> of this setting definition
+     */
     protected AbstractSettingDefinition(SettingType type) {
         this.type = type;
     }
@@ -104,17 +113,17 @@ abstract class AbstractSettingDefinition<S extends AbstractSettingDefinition<S,T
         this.optional = optional;
         return (S) this;
     }
-    
+
     @Override
     public SettingDefinitionGroup getGroup() {
         return group;
     }
-    
+
     @Override
     public boolean hasGroup() {
         return getGroup() != null;
     }
-    
+
     @Override
     public S setGroup(SettingDefinitionGroup group) {
         this.group = group;
@@ -137,7 +146,7 @@ abstract class AbstractSettingDefinition<S extends AbstractSettingDefinition<S,T
         this.defaultValue = defaultValue;
         return (S) this;
     }
-    
+
     protected boolean hasStringProperty(String s) {
         return s != null && !s.isEmpty();
     }
@@ -161,7 +170,7 @@ abstract class AbstractSettingDefinition<S extends AbstractSettingDefinition<S,T
     public String toString() {
         return String.format("%s[key=%s]", getClass().getSimpleName(), getKey());
     }
-    
+
     @Override
     public SettingType getType() {
         return this.type;

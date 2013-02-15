@@ -24,11 +24,13 @@
 package org.n52.sos.config;
 
 /**
- * @param <T>
+ * Abstract, generic implementation of {@code IOrdered}.
+ * <p/>
+ * @param <T> the type of the class extending this class
  * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class AbstractOrdered<T extends IOrdered<T>> implements IOrdered<T> {
+public abstract class AbstractOrdered<T extends IOrdered<T>> implements IOrdered<T> {
 
     private float order;
 

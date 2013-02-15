@@ -29,6 +29,7 @@ package org.n52.sos.config;
  * @param <T> the type of the extending class
  * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0
  */
 public interface IOrdered<T extends IOrdered<T>> extends Comparable<IOrdered<?>> {
 

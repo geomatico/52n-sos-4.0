@@ -111,7 +111,7 @@ public class MiscSettingDefinitions {
             .setDescription("The character encoding used for responses.");
     public static final StringSettingDefinition EPSG_CODES_WITH_REVERSED_AXIS_ORDER_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
-            .setOrder(100)
+            .setOrder(6)
             .setKey(EPSG_CODES_WITH_REVERSED_AXIS_ORDER)
             .setOptional(true)
             .setDefaultValue("2044-2045;2081-2083;2085-2086;2093;2096-2098;2105-2132;2169-2170;2176-2180;"

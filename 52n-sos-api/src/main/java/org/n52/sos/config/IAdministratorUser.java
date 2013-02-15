@@ -24,7 +24,10 @@
 package org.n52.sos.config;
 
 /**
+ * Interface for users that are allowed to administer the SOS. Implementations are {@link SettingsManager} specific.
+ * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0
  */
 public interface IAdministratorUser {
 

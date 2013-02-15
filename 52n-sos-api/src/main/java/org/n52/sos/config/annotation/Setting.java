@@ -30,14 +30,30 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.n52.sos.config.ISettingDefinition;
+import org.n52.sos.config.ISettingDefinitionProvider;
+import org.n52.sos.config.SettingsManager;
+
 /**
- * Annotation that should be applied to a method that takes a single Setting as a parameter.
+ * Annotation that should be applied to a method that takes a single Setting as a parameter. The parameter of
+ * this method should be of the same type as the {@link ISettingDefinition} declared with the same {@code key} in a
+ * {@code ISettingDefnitionProvider}.
+ * <p/>
+ * It is needed to apply the {@code Configurable} annotation to a class with a mehtod annotated with this annotations
+ * for the {@code SettingsManager} to recognize it.
+ * <p/>
+ * <b>Example usage:</b>
  * <pre>
  * &#064;Setting(MiscellaneousSettingDefinitions.TOKEN_SEPERATOR_KEY)
  * public void setTokenSeperator(String seperator) {
  *     this.seperator = seperator;
  * }
  * </pre>
+ * <p/>
+ * @see Configurable
+ * @see ISettingDefinition
+ * @see ISettingDefinitionProvider
+ * @see SettingsManager
  * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
  * @since 4.0

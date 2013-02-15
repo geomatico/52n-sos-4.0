@@ -23,9 +23,20 @@
  */
 package org.n52.sos.config;
 
+import org.n52.sos.ogc.ows.SosServiceIdentificationSettingDefinitions;
+import org.n52.sos.ogc.ows.SosServiceProviderSettingDefinitions;
+import org.n52.sos.service.MiscSettingDefinitions;
+import org.n52.sos.service.ServiceSettingDefinitions;
+
 /**
- *
+ * Class to group ISettingDefinitions. Not needed by the service but only for representation in the GUI.
+ * <p/>
+ * @see ServiceSettingDefinitions#GROUP
+ * @see MiscSettingDefinitions#GROUP
+ * @see SosServiceProviderSettingDefinitions#GROUP
+ * @see SosServiceIdentificationSettingDefinitions#GROUP
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0
  */
 public class SettingDefinitionGroup extends AbstractOrdered<SettingDefinitionGroup> {
 

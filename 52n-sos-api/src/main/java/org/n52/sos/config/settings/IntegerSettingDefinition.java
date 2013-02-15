@@ -26,8 +26,9 @@ package org.n52.sos.config.settings;
 import org.n52.sos.config.SettingType;
 
 /**
- * TODO JavaDoc
- *
+ * {@link ISettingDefinition} for {@code Integer}s
+ * <p/>
+ * @since 4.0
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class IntegerSettingDefinition extends AbstractSettingDefinition<IntegerSettingDefinition, Integer> {
@@ -37,6 +38,9 @@ public class IntegerSettingDefinition extends AbstractSettingDefinition<IntegerS
     private boolean exclusiveMaximum = false;
     private boolean exclusiveMinimum = false;
 
+    /**
+     * Constructs a new {@code IntegerSettingDefinition}
+     */
     public IntegerSettingDefinition() {
         super(SettingType.INTEGER);
     }

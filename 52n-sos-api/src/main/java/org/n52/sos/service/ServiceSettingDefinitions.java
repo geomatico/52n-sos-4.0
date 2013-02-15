@@ -23,9 +23,6 @@
  */
 package org.n52.sos.service;
 
-import java.net.URI;
-
-import org.n52.sos.config.ISettingDefinition;
 import org.n52.sos.config.SettingDefinitionGroup;
 import org.n52.sos.config.settings.BooleanSettingDefinition;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
@@ -131,7 +128,7 @@ public class ServiceSettingDefinitions {
             .setDescription("Skip duplicate observations silently when inserted by batch.");
     public static final StringSettingDefinition CONFIGURATION_FILES_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
-            .setOrder(100)
+            .setOrder(10)
             .setKey(CONFIGURATION_FILES)
             .setOptional(true)
             .setTitle("Configuration Files")

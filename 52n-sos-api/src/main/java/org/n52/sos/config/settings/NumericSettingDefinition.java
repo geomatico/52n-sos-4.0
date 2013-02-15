@@ -25,11 +25,17 @@ package org.n52.sos.config.settings;
 
 import org.n52.sos.config.SettingType;
 
-
+/**
+ * {@link ISettingDefinition} for {@code Double}s
+ * <p/>
+ * @since 4.0
+ * @author Christian Autermann <c.autermann@52north.org>
+ */
 public class NumericSettingDefinition extends AbstractSettingDefinition<NumericSettingDefinition, Double> {
-
+    /**
+     * Constructs a new {@code BooleanSettingDefinitio}
+     */
     public NumericSettingDefinition() {
         super(SettingType.NUMERIC);
     }
-
 }

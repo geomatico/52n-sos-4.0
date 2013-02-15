@@ -23,8 +23,33 @@
  */
 package org.n52.sos.config;
 
+import org.n52.sos.config.settings.BooleanSettingDefinition;
+import org.n52.sos.config.settings.FileSettingDefinition;
+import org.n52.sos.config.settings.IntegerSettingDefinition;
+import org.n52.sos.config.settings.NumericSettingDefinition;
+import org.n52.sos.config.settings.StringSettingDefinition;
+import org.n52.sos.config.settings.UriSettingDefinition;
+
 /**
+ *
+ * Interface for setting definitions that can be used within the Service. Defined settings will be presented in the
+ * administrator and installer view.
+ * <p/>
+ * @see ISettingDefinitionProvider
+ * @see SettingDefinitionGroup
+ * @see SettingsManager
+ * @see FileSettingDefinition
+ * @see BooleanSettingDefinition
+ * @see IntegerSettingDefinition
+ * @see NumericSettingDefinition
+ * @see StringSettingDefinition
+ * @see UriSettingDefinition
+ * <p/>
+ * @param <S> The type of the implementing class
+ * @param <T> The type of the value
+ * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0
  */
 public interface ISettingDefinition<S extends ISettingDefinition<S, T>, T> extends IOrdered<S> {
 
@@ -59,6 +84,6 @@ public interface ISettingDefinition<S extends ISettingDefinition<S, T>, T> exten
     public S setDefaultValue(T defaultValue);
 
     public S setGroup(SettingDefinitionGroup group);
-    
+
     public SettingType getType();
 }

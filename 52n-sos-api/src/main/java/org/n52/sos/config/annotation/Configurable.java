@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
 /**
  * Indicates that this class has one or more methods to configure the class.
  * <p/>
- * @see org.n52.sos.config.annotation.Setting
+ * @see Setting
  * @author Christian Autermann <c.autermann@52north.org>
  * @since 4.0
  */

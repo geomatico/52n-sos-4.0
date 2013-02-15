@@ -24,17 +24,41 @@
 package org.n52.sos.config;
 
 /**
+ * Holder for generic settings. Implementations are {@link SettingsManager} specific.
+ * <p/>
+ * @param <T> the value type
+ * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0
  */
 public interface ISettingValue<T> {
 
+    /**
+     * @return the key of this setting
+     */
     public String getKey();
 
+    /**
+     * @return the value
+     */
     public T getValue();
 
+    /**
+     * @param key the key of this setting
+     * <p/>
+     * @return <code>this</code>
+     */
     public ISettingValue<T> setKey(String key);
 
+    /**
+     * @param value the value of this setting
+     * <p/>
+     * @return <code>this</code>
+     */
     public ISettingValue<T> setValue(T value);
-    
+
+    /**
+     * @return the {@code SettingType} of this value
+     */
     public SettingType getType();
 }

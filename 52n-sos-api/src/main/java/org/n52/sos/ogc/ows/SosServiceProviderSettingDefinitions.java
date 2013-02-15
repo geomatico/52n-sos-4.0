@@ -134,7 +134,7 @@ public class SosServiceProviderSettingDefinitions {
     
     public static final FileSettingDefinition FILE_DEFINITION = new FileSettingDefinition()
             .setGroup(GROUP)
-            .setOrder(100)
+            .setOrder(11)
             .setKey(FILE)
             .setTitle("Service Provider File")
             .setDescription("The path to a file containing an ows:ServiceProvider "

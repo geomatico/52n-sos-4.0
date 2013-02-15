@@ -27,11 +27,18 @@ import java.io.File;
 
 import org.n52.sos.config.SettingType;
 
-
+/**
+ * {@link ISettingDefinition} for {@code File}s
+ * <p/>
+ * @since 4.0
+ * @author Christian Autermann <c.autermann@52north.org>
+ */
 public class FileSettingDefinition extends AbstractSettingDefinition<FileSettingDefinition, File> {
 
+    /**
+     * Constructs a new {@code FileSettingDefinition}
+     */
     public FileSettingDefinition() {
         super(SettingType.FILE);
     }
-
 }

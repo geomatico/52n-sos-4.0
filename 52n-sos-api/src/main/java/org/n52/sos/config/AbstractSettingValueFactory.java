@@ -37,12 +37,15 @@ import org.n52.sos.config.settings.UriSettingDefinition;
 import org.n52.sos.util.CollectionHelper;
 
 /**
+ * Abstract implementation that does everything exept object instantiation.
+ * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0
  */
 public abstract class AbstractSettingValueFactory implements ISettingValueFactory {
-   
-    private static final Set<String> VALID_FALSE_VALUES = CollectionHelper.set("false", "no",  "off", "0");
-    private static final Set<String> VALID_TRUE_VALUES  = CollectionHelper.set("true",  "yes", "on",  "1");
+
+    private static final Set<String> VALID_FALSE_VALUES = CollectionHelper.set("false", "no", "off", "0");
+    private static final Set<String> VALID_TRUE_VALUES = CollectionHelper.set("true", "yes", "on", "1");
 
     @Override
     public ISettingValue<Boolean> newBooleanSettingValue(BooleanSettingDefinition setting, String stringValue) {
@@ -99,7 +102,8 @@ public abstract class AbstractSettingValueFactory implements ISettingValueFactor
         return newUriSettingValueFromGenericDefinition(setting, stringValue);
     }
 
-    private ISettingValue<URI> newUriSettingValueFromGenericDefinition(ISettingDefinition<?, ?> setting, String stringValue) {
+    private ISettingValue<URI> newUriSettingValueFromGenericDefinition(ISettingDefinition<?, ?> setting,
+                                                                       String stringValue) {
         return newUriSettingValue().setValue(parseUri(stringValue)).setKey(setting.getKey());
     }
 
@@ -123,32 +127,77 @@ public abstract class AbstractSettingValueFactory implements ISettingValueFactor
         }
     }
 
-    protected Boolean parseBoolean(String s) throws IllegalArgumentException {
-        if (nullOrEmpty(s)) {
+    /**
+     * Parses the a string to a {@code Boolean}.
+     * <p/>
+     * @param stringValue the string value
+     * <p/>
+     * @return the parsed value
+     * <p/>
+     * @throws IllegalArgumentException if the string value is invalid
+     */
+    protected Boolean parseBoolean(String stringValue) throws IllegalArgumentException {
+        if (nullOrEmpty(stringValue)) {
             return Boolean.FALSE;
         }
-        s = s.trim().toLowerCase();
-        if (VALID_FALSE_VALUES.contains(s)) {
+        stringValue = stringValue.trim().toLowerCase();
+        if (VALID_FALSE_VALUES.contains(stringValue)) {
             return Boolean.FALSE;
-        } else if (VALID_TRUE_VALUES.contains(s)) {
+        } else if (VALID_TRUE_VALUES.contains(stringValue)) {
             return Boolean.TRUE;
         } else {
-            throw new IllegalArgumentException(String.format("'%s' is not a valid boolean value", s));
+            throw new IllegalArgumentException(String.format("'%s' is not a valid boolean value", stringValue));
         }
     }
-    
+
+    /**
+     * Parses the a string to a {@code File}.
+     * <p/>
+     * @param stringValue the string value
+     * <p/>
+     * @return the parsed value
+     * <p/>
+     * @throws IllegalArgumentException if the string value is invalid
+     */
     protected File parseFile(String stringValue) throws IllegalArgumentException {
         return nullOrEmpty(stringValue) ? null : new File(stringValue);
     }
 
+    /**
+     * Parses the a string to a {@code Integer}.
+     * <p/>
+     * @param stringValue the string value
+     * <p/>
+     * @return the parsed value
+     * <p/>
+     * @throws IllegalArgumentException if the string value is invalid
+     */
     protected Integer parseInteger(String stringValue) throws NumberFormatException {
         return nullOrEmpty(stringValue) ? null : Integer.valueOf(stringValue, 10);
     }
 
+    /**
+     * Parses the a string to a {@code Double}.
+     * <p/>
+     * @param stringValue the string value
+     * <p/>
+     * @return the parsed value
+     * <p/>
+     * @throws IllegalArgumentException if the string value is invalid
+     */
     protected Double parseDouble(String stringValue) throws NumberFormatException {
         return nullOrEmpty(stringValue) ? null : Double.parseDouble(stringValue);
     }
 
+    /**
+     * Parses the a string to a {@code URI}.
+     * <p/>
+     * @param stringValue the string value
+     * <p/>
+     * @return the parsed value
+     * <p/>
+     * @throws IllegalArgumentException if the string value is invalid
+     */
     protected URI parseUri(String stringValue) throws IllegalArgumentException {
         if (nullOrEmpty(stringValue)) {
             return null;
@@ -160,22 +209,54 @@ public abstract class AbstractSettingValueFactory implements ISettingValueFactor
         }
     }
 
+    /**
+     * Parses the a string to a {@code String}.
+     * <p/>
+     * @param stringValue the string value
+     * <p/>
+     * @return the parsed value
+     * <p/>
+     * @throws IllegalArgumentException if the string value is invalid
+     */
     protected String parseString(String stringValue) {
         return nullOrEmpty(stringValue) ? null : stringValue;
     }
 
+    /**
+     * @return a implementation specific instance
+     */
     protected abstract ISettingValue<Boolean> newBooleanSettingValue();
 
+    /**
+     * @return a implementation specific instance
+     */
     protected abstract ISettingValue<Integer> newIntegerSettingValue();
 
+    /**
+     * @return a implementation specific instance
+     */
     protected abstract ISettingValue<String> newStringSettingValue();
 
+    /**
+     * @return a implementation specific instance
+     */
     protected abstract ISettingValue<File> newFileSettingValue();
 
+    /**
+     * @return a implementation specific instance
+     */
     protected abstract ISettingValue<URI> newUriSettingValue();
 
+    /**
+     * @return a implementation specific instance
+     */
     protected abstract ISettingValue<Double> newNumericSettingValue();
 
+    /**
+     * @param stringValue
+     * <p/>
+     * @return <code>stringValue == null || stringValue.trim().isEmpty()</code>
+     */
     protected boolean nullOrEmpty(String stringValue) {
         return stringValue == null || stringValue.trim().isEmpty();
     }
