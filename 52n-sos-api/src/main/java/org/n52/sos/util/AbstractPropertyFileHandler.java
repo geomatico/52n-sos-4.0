@@ -32,9 +32,7 @@ import java.io.OutputStream;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.servlet.ServletContext;
 import org.n52.sos.service.ConfigurationException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,8 +50,8 @@ public class AbstractPropertyFileHandler {
         return null;
     }
 
-    protected AbstractPropertyFileHandler(ServletContext ctx, String name) {
-        this.propertiesFile = new File(ctx.getRealPath(name));
+    protected AbstractPropertyFileHandler(String name) {
+        this.propertiesFile = new File(name);
     }
 
     private Properties load() throws IOException {
@@ -104,13 +102,25 @@ public class AbstractPropertyFileHandler {
         try {
             return load().getProperty(m);
         } catch (IOException e) {
-            String message = "Error reading properties";
-            throw new ConfigurationException(message, e);
+            throw new ConfigurationException("Error reading properties", e);
         } finally {
             lock.readLock().unlock();
         }
     }
 
+    public void delete(String m) throws ConfigurationException {
+        lock.writeLock().lock();
+        try {
+            Properties p = load();
+            p.remove(m);
+            save(p);
+        } catch (IOException e) {
+            throw new ConfigurationException("Error writing properties", e);
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+    
     public void save(String m, String value) throws ConfigurationException {
         lock.writeLock().lock();
         try {
@@ -118,8 +128,7 @@ public class AbstractPropertyFileHandler {
             p.setProperty(m, value);
             save(p);
         } catch (IOException e) {
-            String message = "Error writing properties";
-            throw new ConfigurationException(message, e);
+            throw new ConfigurationException("Error writing properties", e);
         } finally {
             lock.writeLock().unlock();
         }
@@ -134,8 +143,7 @@ public class AbstractPropertyFileHandler {
             }
             save(p);
         } catch (IOException e) {
-            String message = "Error writing properties";
-            throw new ConfigurationException(message, e);
+            throw new ConfigurationException("Error writing properties", e);
         } finally {
             lock.writeLock().unlock();
         }
@@ -146,8 +154,7 @@ public class AbstractPropertyFileHandler {
         try {
             return copyOf(load());
         } catch (IOException e) {
-            String message = "Error reading properties";
-            throw new ConfigurationException(message, e);
+            throw new ConfigurationException("Error reading properties", e);
         } finally {
             lock.readLock().unlock();
         }
