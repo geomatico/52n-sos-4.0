@@ -25,11 +25,6 @@ package org.n52.sos.event.events;
 
 import org.n52.sos.config.ISettingDefinition;
 import org.n52.sos.config.ISettingValue;
-import org.n52.sos.config.settings.BooleanSettingDefinition;
-import org.n52.sos.config.settings.FileSettingDefinition;
-import org.n52.sos.config.settings.IntegerSettingDefinition;
-import org.n52.sos.config.settings.NumericSettingDefinition;
-import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.event.SosEvent;
 
 /**
@@ -37,17 +32,17 @@ import org.n52.sos.event.SosEvent;
  */
 public class SettingsChangeEvent implements SosEvent {
 
-    private ISettingDefinition<?> setting;
+    private ISettingDefinition<?, ?> setting;
     private ISettingValue<?> oldValue;
     private ISettingValue<?> newValue;
 
-    public SettingsChangeEvent(ISettingDefinition<?> setting, ISettingValue<?> oldValue, ISettingValue<?> newValue) {
+    public SettingsChangeEvent(ISettingDefinition<?, ?> setting, ISettingValue<?> oldValue, ISettingValue<?> newValue) {
         this.setting = setting;
         this.oldValue = oldValue;
         this.newValue = newValue;
     }
 
-    public ISettingDefinition<?> getSetting() {
+    public ISettingDefinition<?, ?> getSetting() {
         return setting;
     }
 

@@ -27,15 +27,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
-import org.n52.sos.util.AbstractServiceLoaderRepository;
+import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class RequestOperatorRepository extends AbstractServiceLoaderRepository<IRequestOperator> {
+public class RequestOperatorRepository extends AbstractConfiguringServiceLoaderRepository<IRequestOperator> {
 
 	private final Map<RequestOperatorKeyType, IRequestOperator> requestOperators =
 			new HashMap<RequestOperatorKeyType, IRequestOperator>(0);
@@ -46,7 +47,7 @@ public class RequestOperatorRepository extends AbstractServiceLoaderRepository<I
 	}
 
 	@Override
-	protected void processImplementations(Set<IRequestOperator> requestOperators) throws ConfigurationException {
+	protected void processConfiguredImplementations(Set<IRequestOperator> requestOperators) throws ConfigurationException {
 		this.requestOperators.clear();
 		for (IRequestOperator aRequestOperator : requestOperators) {
 				this.requestOperators.put(aRequestOperator.getRequestOperatorKeyType(), aRequestOperator);

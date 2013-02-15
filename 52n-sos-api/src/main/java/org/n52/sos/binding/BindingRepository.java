@@ -29,14 +29,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.n52.sos.service.ConfigurationException;
-import org.n52.sos.util.AbstractServiceLoaderRepository;
+import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class BindingRepository extends AbstractServiceLoaderRepository<Binding> {
+public class BindingRepository extends AbstractConfiguringServiceLoaderRepository<Binding> {
 	private static final Logger log = LoggerFactory.getLogger(BindingRepository.class);
     private final Map<String, Binding> bindings = new HashMap<String, Binding>(0);
 
@@ -53,7 +53,7 @@ public class BindingRepository extends AbstractServiceLoaderRepository<Binding> 
     }
 
 	@Override
-	protected void processImplementations(Set<Binding> bindings) throws ConfigurationException {
+	protected void processConfiguredImplementations(Set<Binding> bindings) throws ConfigurationException {
 		this.bindings.clear();
         for (Binding iBindingOperator : bindings) {
 			this.bindings.put(iBindingOperator.getUrlPattern(), iBindingOperator);

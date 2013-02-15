@@ -26,14 +26,15 @@ package org.n52.sos.convert;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import org.n52.sos.service.ConfigurationException;
-import org.n52.sos.util.AbstractServiceLoaderRepository;
+import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
 
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class ConverterRepository extends AbstractServiceLoaderRepository<IConverter> {
+public class ConverterRepository extends AbstractConfiguringServiceLoaderRepository<IConverter> {
 	private final Map<ConverterKeyType, IConverter<?, ?>> converter = new HashMap<ConverterKeyType, IConverter<?, ?>>(0);
 
 	public ConverterRepository() throws ConfigurationException {
@@ -42,7 +43,7 @@ public class ConverterRepository extends AbstractServiceLoaderRepository<IConver
 	}
 
 	@Override
-	protected void processImplementations(Set<IConverter> converter) throws ConfigurationException {
+	protected void processConfiguredImplementations(Set<IConverter> converter) throws ConfigurationException {
 		this.converter.clear();
 		for (IConverter<?, ?> aConverter : converter) {
 			for (ConverterKeyType converterKeyType : aConverter.getConverterKeyTypes()) {
