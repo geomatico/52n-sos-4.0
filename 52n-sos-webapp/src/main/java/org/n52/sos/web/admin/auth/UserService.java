@@ -153,7 +153,8 @@ public class UserService implements AuthenticationProvider, Serializable {
         }
     }
     
-    private class AdministratorUserPrinciple implements Principal  {
+    private class AdministratorUserPrinciple implements Principal, Serializable {
+        private static final long serialVersionUID = 1L;
 
         private String username;
         
