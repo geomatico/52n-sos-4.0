@@ -21,35 +21,28 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.hibernate.userType;
+package org.n52.sos.config.sqlite;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import org.hibernate.HibernateException;
-import org.hibernate.TypeMismatchException;
+import java.io.File;
 
 /**
  * TODO JavaDoc
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class UriType extends AbstractStringBasedUserType<URI> {
+public class HIbernateFileType extends AbstractStringBasedHIbernateUserType<File> {
 
-    public UriType() {
-        super(URI.class);
+    public HIbernateFileType() {
+        super(File.class);
     }
 
     @Override
-    protected URI decode(String s) throws HibernateException {
-        try {
-            return new URI(s);
-        } catch (URISyntaxException e) {
-            throw new TypeMismatchException(e);
-        }
+    protected File decode(String s) {
+        return new File(s);
     }
 
     @Override
-    protected String encode(URI t) throws HibernateException {
-        return t.toString();
+    protected String encode(File t) {
+        return t.getPath();
     }
 }

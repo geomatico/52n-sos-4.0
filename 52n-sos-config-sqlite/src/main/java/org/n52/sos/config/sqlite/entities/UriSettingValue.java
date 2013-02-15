@@ -21,27 +21,36 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.config.entities;
+package org.n52.sos.config.sqlite.entities;
+
+import java.net.URI;
 
 import javax.persistence.Entity;
 
+import org.n52.sos.config.ISettingValue;
+import org.n52.sos.config.SettingType;
+
 /**
- *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-@Entity(name = "numeric_settings")
-public class NumericSettingValue extends AbstractSettingValue<Double> {
+@Entity(name = "uri_settings")
+public class UriSettingValue extends AbstractSettingValue<URI> {
 
-    private Double value;
+    private URI value;
     
     @Override
-    public Double getValue() {
+    public URI getValue() {
         return this.value;
     }
 
     @Override
-    public NumericSettingValue setValue(Double value) {
+    public ISettingValue<URI> setValue(URI value) {
         this.value = value;
         return this;
+    }
+
+    @Override
+    public SettingType getType() {
+        return SettingType.URI;
     }
 }

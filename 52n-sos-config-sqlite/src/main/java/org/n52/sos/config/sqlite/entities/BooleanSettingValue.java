@@ -21,28 +21,30 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.config.entities;
+package org.n52.sos.config.sqlite.entities;
 
-import java.io.File;
 import javax.persistence.Entity;
 
-/**
- *
- * @author Christian Autermann <c.autermann@52north.org>
- */
-@Entity(name = "file_settings")
-public class FileSettingValue extends AbstractSettingValue<File> {
+import org.n52.sos.config.SettingType;
 
-    private File value;
-    
+@Entity(name = "boolean_settings")
+public class BooleanSettingValue extends AbstractSettingValue<Boolean> {
+
+    private Boolean value;
+
     @Override
-    public File getValue() {
+    public Boolean getValue() {
         return this.value;
     }
 
     @Override
-    public FileSettingValue setValue(File value) {
+    public BooleanSettingValue setValue(Boolean value) {
         this.value = value;
         return this;
+    }
+
+    @Override
+    public SettingType getType() {
+        return SettingType.BOOLEAN;
     }
 }

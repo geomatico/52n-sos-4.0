@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.hibernate.userType;
+package org.n52.sos.config.sqlite;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,15 +36,15 @@ import org.hibernate.engine.spi.SessionImplementor;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class AbstractStringBasedUserType<T> extends AbstractUserType {
+public abstract class AbstractStringBasedHIbernateUserType<T> extends AbstractHibernateUserType {
 
-    public AbstractStringBasedUserType(Class<T> clazz) {
+    public AbstractStringBasedHIbernateUserType(Class<T> clazz) {
         super(clazz);
     }
 
     @Override
     public int[] sqlTypes() {
-        return new int[] { Types.VARBINARY };
+        return new int[] { Types.VARCHAR };
     }
 
     @Override

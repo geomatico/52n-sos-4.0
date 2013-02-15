@@ -21,26 +21,34 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.config.entities;
+package org.n52.sos.config.sqlite.entities;
 
 import javax.persistence.Entity;
 
+import org.n52.sos.config.SettingType;
+
 /**
+ *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-@Entity(name = "string_settings")
-public class StringSettingValue extends AbstractSettingValue<String>{
+@Entity(name = "numeric_settings")
+public class NumericSettingValue extends AbstractSettingValue<Double> {
 
-    private String value;
+    private Double value;
     
     @Override
-    public String getValue() {
+    public Double getValue() {
         return this.value;
     }
 
     @Override
-    public StringSettingValue setValue(String value) {
+    public NumericSettingValue setValue(Double value) {
         this.value = value;
         return this;
+    }
+
+    @Override
+    public SettingType getType() {
+        return SettingType.NUMERIC;
     }
 }

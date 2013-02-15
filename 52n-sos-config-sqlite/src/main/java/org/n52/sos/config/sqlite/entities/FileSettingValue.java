@@ -21,28 +21,37 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.hibernate.userType;
+package org.n52.sos.config.sqlite.entities;
 
 import java.io.File;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+
+import org.n52.sos.config.SettingType;
+
 /**
- * TODO JavaDoc
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class FileType extends AbstractStringBasedUserType<File> {
+@Entity(name = "file_settings")
+public class FileSettingValue extends AbstractSettingValue<File> {
 
-    public FileType() {
-        super(File.class);
+    private File value;
+    
+    @Override
+    public File getValue() {
+        return this.value;
     }
 
     @Override
-    protected File decode(String s) {
-        return new File(s);
+    public FileSettingValue setValue(File value) {
+        this.value = value;
+        return this;
     }
 
     @Override
-    protected String encode(File t) {
-        return t.getPath();
+    public SettingType getType() {
+        return SettingType.FILE;
     }
 }

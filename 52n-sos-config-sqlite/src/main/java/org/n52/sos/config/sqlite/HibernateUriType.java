@@ -21,28 +21,35 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.config.entities;
+package org.n52.sos.config.sqlite;
 
 import java.net.URI;
-import javax.persistence.Entity;
-import org.n52.sos.config.ISettingValue;
+import java.net.URISyntaxException;
+import org.hibernate.HibernateException;
+import org.hibernate.TypeMismatchException;
 
 /**
+ * TODO JavaDoc
+ *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-@Entity(name = "uri_settings")
-public class UriSettingValue extends AbstractSettingValue<URI> {
+public class HibernateUriType extends AbstractStringBasedHIbernateUserType<URI> {
 
-    private URI value;
-    
-    @Override
-    public URI getValue() {
-        return this.value;
+    public HibernateUriType() {
+        super(URI.class);
     }
 
     @Override
-    public ISettingValue<URI> setValue(URI value) {
-        this.value = value;
-        return this;
+    protected URI decode(String s) throws HibernateException {
+        try {
+            return new URI(s);
+        } catch (URISyntaxException e) {
+            throw new TypeMismatchException(e);
+        }
+    }
+
+    @Override
+    protected String encode(URI t) throws HibernateException {
+        return t.toString();
     }
 }

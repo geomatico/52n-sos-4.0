@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.hibernate.userType;
+package org.n52.sos.config.sqlite;
 
 import java.io.Serializable;
 
@@ -33,11 +33,11 @@ import org.hibernate.usertype.UserType;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class AbstractUserType implements UserType {
+public abstract class AbstractHibernateUserType implements UserType {
 
     private Class<?> clazz;
 
-    public AbstractUserType(Class<?> clazz) {
+    public AbstractHibernateUserType(Class<?> clazz) {
         this.clazz = clazz;
     }
 
