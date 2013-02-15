@@ -27,15 +27,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import org.n52.sos.service.ConfigurationException;
-import org.n52.sos.util.AbstractServiceLoaderRepository;
+import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class AdminRequestOperatorRepository extends AbstractServiceLoaderRepository<IAdminRequestOperator> {
+public class AdminRequestOperatorRepository extends AbstractConfiguringServiceLoaderRepository<IAdminRequestOperator> {
 
 	private static final Logger log = LoggerFactory.getLogger(AdminRequestOperatorRepository.class);
 	private Map<String, IAdminRequestOperator> operators = new HashMap<String, IAdminRequestOperator>(0);
@@ -54,7 +55,7 @@ public class AdminRequestOperatorRepository extends AbstractServiceLoaderReposit
 	}
 
 	@Override
-	protected void processImplementations(Set<IAdminRequestOperator> requestOperators) {
+	protected void processConfiguredImplementations(Set<IAdminRequestOperator> requestOperators) {
 		this.operators.clear();
 		for (IAdminRequestOperator operator : requestOperators) {
 				this.operators.put(operator.getKey(), operator);

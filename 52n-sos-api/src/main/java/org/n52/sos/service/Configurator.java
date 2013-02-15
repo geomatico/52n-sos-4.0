@@ -23,30 +23,32 @@
  */
 package org.n52.sos.service;
 
+import static org.n52.sos.service.MiscSettingDefinitions.*;
+import static org.n52.sos.service.ServiceSettingDefinitions.*;
+
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.ServiceConfigurationError;
-import java.util.ServiceLoader;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.n52.sos.binding.BindingRepository;
 import org.n52.sos.cache.ACapabilitiesCacheController;
+import org.n52.sos.config.SettingsManager;
+import org.n52.sos.config.annotation.Configurable;
+import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.convert.ConverterRepository;
 import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IDataSourceInitializator;
 import org.n52.sos.ds.IFeatureQueryHandler;
-import org.n52.sos.ds.ISettingsDao;
-import org.n52.sos.ds.OperationDaoRepository;
+import org.n52.sos.ds.OperationDAORepository;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.ows.SosServiceIdentificationFactory;
@@ -61,8 +63,10 @@ import org.n52.sos.service.profile.DefaultProfileHandler;
 import org.n52.sos.service.profile.IProfile;
 import org.n52.sos.service.profile.IProfileHandler;
 import org.n52.sos.tasking.Tasking;
+import org.n52.sos.util.ConfiguringSingletonServiceLoader;
 import org.n52.sos.util.DateTimeHelper;
-import org.n52.sos.util.SettingsHelper;
+import org.n52.sos.util.IFactory;
+import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,236 +75,204 @@ import org.slf4j.LoggerFactory;
  * Singleton class reads the configFile and builds the RequestOperator and DAO;
  * configures the logger.
  */
+@Configurable
 public class Configurator {
 
-    /** logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(Configurator.class);
-
-    /** base path for configuration files */
-    private String basepath;
-
-    /** Capabilities Cache Controller */
-    private ACapabilitiesCacheController capabilitiesCacheController;
-
-//    /**
-//     * property indicates whether SOS encodes the complete child procedure
-//     * System within a parent's DescribeSensor response or just the id and link
-//     */
-//    private boolean childProceduresEncodedInParentsDescribeSensor = false;
-
     /**
-     * se Implementation of ICacheFeederDAO
+     * instance attribut, due to the singleton pattern.
      */
-    private ICacheFeederDAO cacheFeederDAO;
-
-    /** character encoding for responses */
-    private String characterEncoding;
-
+    private static Configurator instance = null;
+    private static final Lock initLock = new ReentrantLock();
     /**
-     * Map with indicator and name of additional config files for modules
+     * base path for configuration files.
+     */
+    private String basepath;
+    /**
+     * character encoding for responses.
+     */
+    private String characterEncoding;
+    /**
+     * Map with indicator and name of additional config files for modules.
      */
     private Map<String, String> configFileMap = new HashMap<String, String>(0);
-
     /**
-     * Implementation of IConnectionProvider
-     */
-    private IConnectionProvider connectionProvider;
-
-    private IDataSourceInitializator dataSourceInitializator;
-
-    /**
-     * default EPSG code of stored geometries
+     * default EPSG code of stored geometries.
      */
     private int defaultEPSG;
-
-    /**ad
-     * default offering identifier prefix, used for auto generation
+    /**
+     * default offering identifier prefix, used for auto generation.
      */
     private String defaultOfferingPrefix;
-
     /**
-     * default procedure identifier prefix, used for auto generation
+     * default procedure identifier prefix, used for auto generation.
      */
     private String defaultProcedurePrefix;
-
-    /** decimal separator for result element */
-    private String decimalSeparator;
-
     /**
-     * Implementation of IFeatureQueryHandler
+     * date format of gml.
      */
-    private IFeatureQueryHandler featureQueryHandler;
-
-//    /**
-//     * boolean, indicates if foi IDs should be included in capabilities
-//     */
-//    private boolean foiListedInOfferings = true;
-
-    /** date format of gml */
     private String gmlDateFormat;
-
-    /** instance attribut, due to the singleton pattern */
-    private static Configurator instance = null;
-
-    /** lease for getResult template in minutes */
+    /**
+     * lease for getResult template in minutes.
+     */
     private int lease;
-
-    /** maximum number of GetObservation results */
+    /**
+     * maximum number of GetObservation results.
+     */
     private int maxGetObsResults;
-
-//    /** tuple seperator for result element */
-//    private String noDataValue;
-    
-    private IProfileHandler profileHandler;
-    
-    private ServiceLoader<IProfileHandler> serviceLoaderProfileHandler;
-    
-    /** directory of sensor descriptions in SensorML format */
-    private File sensorDir;
-
-    private ServiceLoader<IAdminServiceOperator> serviceLoaderAdminServiceOperator;
-
-    /** ServiceLoader for ICacheFeederDAO */
-    private ServiceLoader<ICacheFeederDAO> serviceLoaderCacheFeederDAO;
-
-    /** ServiceLoader for ACapabilitiesCacheController */
-    private ServiceLoader<ACapabilitiesCacheController> serviceLoaderCapabilitiesCacheController;
-
-    private ServiceLoader<IDataSourceInitializator> serviceLoaderDataSourceInitializator;
-
-    /** ServiceLoader for IFeatureQueryHandler */
-    private ServiceLoader<IFeatureQueryHandler> serviceLoaderFeatureQueryHandler;
-
+    /**
+     * minimum size to gzip responses.
+     */
     private int minimumGzipSize;
-
-    /** URL of this service */
+    /**
+     * URL of this service.
+     */
     private String serviceURL;
-
-//    /**
-//     * boolean, indicates if possible values for operation parameters should be
-//     * included in capabilities
-//     */
-//    private boolean showFullOperationsMetadata = true;
-//
-//    /**
-//     * boolean indicates, whether SOS shows the full OperationsMetadata for
-//     * observation.
-//     */
-//    private boolean showFullOperationsMetadata4Observations = false;
-
     /**
      * boolean, indicates if duplicate observation should be silently ignored
      * during insertion If set to false, duplicate observations trigger an
-     * exception
+     * exception.
      */
     private boolean skipDuplicateObservations = false;
-
     /**
-     * Implementation of ASosAdminRequestOperator
+     * directory of sensor descriptions in SensorML format.
      */
-    private IAdminServiceOperator adminServiceOperator;
-
-    private CodingRepository codingRepository;
-	private ServiceOperatorRepository serviceOperatorRepository;
-	private OperationDaoRepository operationDaoRepository;
-	private RequestOperatorRepository requestOperatorRepository;
-	private BindingRepository bindingRepository;
-	private ConverterRepository converterRepository;
-	private AdminRequestOperatorRepository adminRequestOperatorRepository;
-	private SosServiceIdentificationFactory serviceIdentificationFactory;
-    private SosServiceProviderFactory serviceProviderFactory;
-	private Tasking tasking;
-
+    private File sensorDir;
     /**
-	 * Defines the number of threads available in the thread pool of the cache
-	 * update executor service.
-	 */
+     * Defines the number of threads available in the thread pool of the cache
+     * update executor service.
+     */
     private int cacheThreadCount = 5;
-
-
     /**
-     * prefix URN for the spatial reference system
+     * Prefix URN for the spatial reference system.
      */
     private String srsNamePrefix;
-
     /**
-     * prefix URN for the spatial reference system
+     * prefix URN for the spatial reference system.
      */
     private String srsNamePrefixSosV2;
-
     /**
      * boolean indicates, whether SOS supports quality information in
-     * observations
+     * observations.
      */
     private boolean supportsQuality = true;
-
-    /** boolean indicates the order of x and y components of coordinates */
+    /**
+     * boolean indicates the order of x and y components of coordinates.
+     */
     private List<Range> epsgsWithReversedAxisOrder;
-
-    /** token seperator for result element */
+    /**
+     * token seperator for result element.
+     */
     private String tokenSeperator;
-
-    /** tuple seperator for result element */
+    /**
+     * tuple seperator for result element.
+     */
     private String tupleSeperator;
-
-    /** update interval for capabilities cache */
-    private long updateIntervall;
-
+    /**
+     * decimal separator for result element.
+     */
+    private String decimalSeparator;
+    /**
+     * update interval for capabilities cache.
+     */
+    private long capabiltiesCacheUpdateInterval;
     private Properties connectionProviderProperties;
+    /**
+     * Implementation of IFeatureQueryHandler.
+     */
+    private IFeatureQueryHandler featureQueryHandler;
+    /**
+     * Implementation of IConnectionProvider.
+     */
+    private IConnectionProvider connectionProvider;
+    /**
+     * Implementation of
+     * <code>IDataSourceInitializator</code>.
+     */
+    private IDataSourceInitializator dataSourceInitializator;
+    /**
+     * Capabilities Cache Controller.
+     */
+    private ACapabilitiesCacheController capabilitiesCacheController;
+    /**
+     * Implementation of ICacheFeederDAO.
+     */
+    private ICacheFeederDAO cacheFeederDAO;
+    /**
+     * Implementation of
+     * <code>IProfileHandler</code>.
+     */
+    private IProfileHandler profileHandler;
+    /**
+     * Implementation of IAdminServiceOperator.
+     */
+    private IAdminServiceOperator adminServiceOperator;
+    private CodingRepository codingRepository;
+    private ServiceOperatorRepository serviceOperatorRepository;
+    private OperationDAORepository operationDaoRepository;
+    private RequestOperatorRepository requestOperatorRepository;
+    private BindingRepository bindingRepository;
+    private ConverterRepository converterRepository;
+    private AdminRequestOperatorRepository adminRequestOperatorRepository;
+    private IFactory<SosServiceIdentification> serviceIdentificationFactory;
+    private IFactory<SosServiceProvider> serviceProviderFactory;
+    private Tasking tasking;
 
     /**
      * @return Returns the instance of the SosConfigurator. Null will be
-     *         returned if the parameterized getInstance method was not invoked
-     *         before. Usually this will be done in the SOS.
+     * returned if the parameterized getInstance method was not invoked
+     * before. Usually this will be done in the SOS.
+     * <p/>
      * @see Configurator#createInstance(Properties, String)
      */
     public static Configurator getInstance() {
-    	INITIALIZE_LOCK.lock();
-    	try {
-    		return instance;
-    	} finally {
-    		INITIALIZE_LOCK.unlock();
-    	}
+        initLock.lock();
+        try {
+            return instance;
+        } finally {
+            initLock.unlock();
+        }
     }
 
     /**
      * @param connectionProviderConfig
      * @param basepath
+     * <p/>
      * @return Returns an instance of the SosConfigurator. This method is used
-     *         to implement the singelton pattern
+     * to implement the singelton pattern
      *
      * @throws ConfigurationException
-     *             if the initialization failed
+     * if the initialization failed
      */
     public static Configurator createInstance(Properties connectionProviderConfig, String basepath)
             throws ConfigurationException {
-    	if (instance == null) {
-    		boolean initialize = false;
-        	INITIALIZE_LOCK.lock();
-        	try {
-        		if (instance == null) {
-            		try {
-            			instance = new Configurator(connectionProviderConfig, basepath);
-            			initialize = true;
-            		} catch (RuntimeException t) {
+        if (instance == null) {
+            boolean initialize = false;
+            initLock.lock();
+            try {
+                if (instance == null) {
+                    try {
+                        instance = new Configurator(connectionProviderConfig, basepath);
+                        initialize = true;
+                    } catch (RuntimeException t) {
                         cleanUpAndThrow(t);
                     } catch (ConfigurationException t) {
                         cleanUpAndThrow(t);
                     }
-        		}
-        	} finally {
-        		INITIALIZE_LOCK.unlock();
-        	}
-        	if (initialize) {
-        		try {
+                }
+            } finally {
+                initLock.unlock();
+            }
+            if (initialize) {
+                try {
                     instance.initialize();
                 } catch (RuntimeException t) {
                     cleanUpAndThrow(t);
                 } catch (ConfigurationException t) {
                     cleanUpAndThrow(t);
                 }
-    		}
-    	}
+            }
+        }
         return instance;
     }
 
@@ -308,13 +280,14 @@ public class Configurator {
      * private constructor due to the singelton pattern.
      *
      * @param configis
-     *            InputStream of the configfile
+     * InputStream of the configfile
      * @param dbconfigis
-     *            InputStream of the dbconfigfile
+     * InputStream of the dbconfigfile
      * @param basepath
-     *            base path for configuration files
+     * base path for configuration files
+     * <p/>
      * @throws OwsExceptionReport
-     *             if the
+     * if the
      * @throws IOException
      */
     private Configurator(Properties connectionProviderConfig, String basepath) throws ConfigurationException {
@@ -332,572 +305,305 @@ public class Configurator {
         this.basepath = basepath;
         this.connectionProviderProperties = connectionProviderConfig;
         LOGGER.info("Configurator initialized: [basepath={}]",
-                this.basepath, this.connectionProviderProperties);
+                    this.basepath, this.connectionProviderProperties);
     }
 
-    public void changeSetting(Setting setting, String newValue) throws ConfigurationException {
-        setSetting(setting, newValue, false);
+    private static void notNullOrEmpty(String name, String val) throws ConfigurationException {
+        notNull(name, val);
+        if (val.isEmpty()) {
+            throw new ConfigurationException(String.format("%s can not be empty!", name));
+        }
     }
 
-    private void setSetting(Setting setting, String value, boolean initial) throws ConfigurationException {
-        /* TODO check what has to be re-initialized when settings change */
-        switch (setting) {
-        case CAPABILITIES_CACHE_UPDATE_INTERVAL:
-            int capCacheUpdateIntervall = SettingsHelper.parseInteger(setting, value);
-            if (this.updateIntervall != capCacheUpdateIntervall) {
-                this.updateIntervall = capCacheUpdateIntervall;
-            }
-            if (!initial) {
+    private static void notNull(String name, Object val) throws ConfigurationException {
+        if (val == null) {
+            throw new ConfigurationException(String.format("%s can not be null!", name));
+        }
+    }
+
+    private static void greaterZero(String name, int i) throws ConfigurationException {
+        if (i <= 0) {
+            throw new ConfigurationException(String.format("%s can not be smaller or equal zero (was %d)!", name, i));
+        }
+    }
+
+    /**
+     * @return the updateInterval in milli seconds
+     */
+    public long getUpdateIntervallInMillis() {
+        return this.capabiltiesCacheUpdateInterval * 60000;
+    }
+
+    @Setting(CAPABILITIES_CACHE_UPDATE_INTERVAL)
+    public void setCapabilitiesCacheUpdateInterval(int interval) throws ConfigurationException {
+        greaterZero("Cache update interval", interval);
+        if (this.capabiltiesCacheUpdateInterval != interval) {
+            this.capabiltiesCacheUpdateInterval = interval;
+            if (this.capabilitiesCacheController != null) {
                 this.capabilitiesCacheController.reschedule();
             }
-            break;
-        case CHARACTER_ENCODING:
-            if (value == null || value.isEmpty()) {
-                String exceptionText = "No characterEnoding is defined in the config file!";
-                LOGGER.error(exceptionText);
-                throw new ConfigurationException(exceptionText);
+        }
+    }
+
+    /**
+     * @return the characterEncoding
+     */
+    public String getCharacterEncoding() {
+        return this.characterEncoding;
+    }
+
+    @Setting(CHARACTER_ENCODING)
+    public void setCharacterEncoding(String encoding) throws ConfigurationException {
+        notNullOrEmpty("Character Encoding", encoding);
+        this.characterEncoding = encoding;
+        XmlOptionsHelper.getInstance(this.characterEncoding, true);
+    }
+
+    public int getCacheThreadCount() {
+        return cacheThreadCount;
+    }
+
+    @Setting(CACHE_THREAD_COUNT)
+    public void setCacheThreadCount(int threads) throws ConfigurationException {
+        if (threads <= 0) {
+            throw new ConfigurationException(String.format("Invalid cache thread count %d", threads));
+        }
+        this.cacheThreadCount = threads;
+    }
+
+    /**
+     * @return the configFileMap
+     */
+    public Map<String, String> getConfigFileMap() {
+        return Collections.unmodifiableMap(configFileMap);
+    }
+
+    @Setting(CONFIGURATION_FILES)
+    public void setConfigurationFiles(String configurationFiles) {
+        if (configurationFiles != null && !configurationFiles.isEmpty()) {
+            for (String kvp : configurationFiles.split(";")) {
+                String[] keyValue = kvp.split(" ");
+                this.configFileMap.put(keyValue[0], keyValue[1]);
             }
-            this.characterEncoding = value;
-            XmlOptionsHelper.getInstance(this.characterEncoding, true);
-            break;
-        case CACHE_THREAD_COUNT:
-            this.cacheThreadCount = SettingsHelper.parseInteger(setting, value);
-            break;
-        case CONFIGURATION_FILES:
-            String configFileMapString = SettingsHelper.parseString(setting, value, true);
-            if (configFileMapString != null && !configFileMapString.isEmpty()) {
-                for (String kvp : configFileMapString.split(";")) {
-                    String[] keyValue = kvp.split(" ");
-                    this.configFileMap.put(keyValue[0], keyValue[1]);
-                }
-            }
-            break;
-//        case CHILD_PROCEDURES_ENCODED_IN_PARENTS_DESCRIBE_SENSOR:
-//            this.childProceduresEncodedInParentsDescribeSensor = SettingsHelper.parseBoolean(setting, value);
-//            break;
-        case DEFAULT_OFFERING_PREFIX:
-            this.defaultOfferingPrefix = SettingsHelper.parseString(setting, value, true);
-            break;
-        case DEFAULT_PROCEDURE_PREFIX:
-            this.defaultProcedurePrefix = SettingsHelper.parseString(setting, value, true);
-            break;
-//        case FOI_LISTED_IN_OFFERINGS:
-//            this.foiListedInOfferings = SettingsHelper.parseBoolean(setting, value);
-//            break;
-        case GML_DATE_FORMAT:
-            this.gmlDateFormat = SettingsHelper.parseString(setting, value, true);
-            if (this.gmlDateFormat != null && !this.gmlDateFormat.isEmpty()) {
-                DateTimeHelper.setResponseFormat(this.gmlDateFormat);
-            }
-            break;
-        case LEASE:
-            if (value == null | value.isEmpty()) {
-                String exceptionText =
-                        "No lease is defined in the config file! Please set the lease property on an integer value!";
-                LOGGER.error(exceptionText);
-                throw new ConfigurationException(exceptionText);
-            }
-            this.lease = Integer.valueOf(value).intValue();
-            break;
-        case MAX_GET_OBSERVATION_RESULTS:
-            this.maxGetObsResults = SettingsHelper.parseInteger(setting, value);
-            break;
-//        case NO_DATA_VALUE:
-//            this.noDataValue = SettingsHelper.parseString(setting, value, false);
-//            break;
-        case SENSOR_DIRECTORY:
-            this.sensorDir = SettingsHelper.parseFile(setting, value, true);
-            break;
-//        case SHOW_FULL_OPERATIONS_METADATA:
-//            this.showFullOperationsMetadata = SettingsHelper.parseBoolean(setting, value);
-//            break;
-//        case SHOW_FULL_OPERATIONS_METADATA_FOR_OBSERVATIONS:
-//            this.showFullOperationsMetadata4Observations = SettingsHelper.parseBoolean(setting, value);
-//            break;
-        case SKIP_DUPLICATE_OBSERVATIONS:
-            this.skipDuplicateObservations = SettingsHelper.parseBoolean(setting, value);
-            break;
-        case SOS_URL:
-            setServiceURL(SettingsHelper.parseString(setting, value, false));
-            break;
-        case SUPPORTS_QUALITY:
-            this.supportsQuality = SettingsHelper.parseBoolean(setting, value);
-            break;
-        case DEFAULT_EPSG:
-            this.defaultEPSG = SettingsHelper.parseInteger(setting, value);
-            break;
-        case SRS_NAME_PREFIX_SOS_V1:
-            String srsPrefixV1 = SettingsHelper.parseString(setting, value, true);
-            if (!srsPrefixV1.endsWith(":") && srsPrefixV1.length() != 0) {
-                srsPrefixV1 += ":";
-            }
-            this.srsNamePrefix = srsPrefixV1;
-            break;
-        case SRS_NAME_PREFIX_SOS_V2:
-            String srsPrefixV2 = SettingsHelper.parseString(setting, value, true);
-            if (!srsPrefixV2.endsWith("/") && srsPrefixV2.length() != 0) {
-                srsPrefixV2 += "/";
-            }
-            this.srsNamePrefixSosV2 = srsPrefixV2;
-            break;
-        case SWITCH_COORDINATES_FOR_EPSG_CODES:
-            String[] switchCoordinatesForEPSGStrings = SettingsHelper.parseString(setting, value, true).split(";");
-            this.epsgsWithReversedAxisOrder = new ArrayList<Range>(switchCoordinatesForEPSGStrings.length);
-            for (String switchCoordinatesForEPSGEntry : switchCoordinatesForEPSGStrings) {
-                String[] splittedSwitchCoordinatesForEPSGEntry = switchCoordinatesForEPSGEntry.split("-");
-                if (splittedSwitchCoordinatesForEPSGEntry.length == 1) {
-                    Range r =
-                            new Range(Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[0]),
-                                    Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[0]));
-                    epsgsWithReversedAxisOrder.add(r);
-                } else if (splittedSwitchCoordinatesForEPSGEntry.length == 2) {
-                    Range r =
-                            new Range(Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[0]),
-                                    Integer.parseInt(splittedSwitchCoordinatesForEPSGEntry[1]));
-                    epsgsWithReversedAxisOrder.add(r);
-                } else {
-                    StringBuilder exceptionText = new StringBuilder();
-                    exceptionText.append("Invalid format of entry in 'switchCoordinatesForEPSG': ");
-                    exceptionText.append(switchCoordinatesForEPSGEntry);
-                    LOGGER.error(exceptionText.toString());
-                    throw new ConfigurationException(exceptionText.toString());
-                }
-            }
-            break;
-        case TOKEN_SEPERATOR:
-            this.tokenSeperator = SettingsHelper.parseString(setting, value, false);
-            break;
-        case DECIMAL_SEPARATOR:
-            this.decimalSeparator = SettingsHelper.parseString(setting, value, false);
-            break;
-        case TUPLE_SEPERATOR:
-            this.tupleSeperator = SettingsHelper.parseString(setting, value, false);
-            break;
-        case SERVICE_PROVIDER_FILE:
-			getServiceProviderFactory().setFile(SettingsHelper.parseFile(setting, value, true));
-            break;
-        case SERVICE_PROVIDER_NAME:
-            getServiceProviderFactory().setName(SettingsHelper.parseString(setting, value, true));
-            break;
-        case SERVICE_PROVIDER_SITE:
-            getServiceProviderFactory().setSite(SettingsHelper.parseString(setting, value, true));
-            break;
-        case SERVICE_PROVIDER_INDIVIDUAL_NAME:
-            getServiceProviderFactory().setIndividualName(SettingsHelper.parseString(setting, value, true));
-            break;
-        case SERVICE_PROVIDER_POSITION_NAME:
-            getServiceProviderFactory().setPositionName(SettingsHelper.parseString(setting, value, true));
-            break;
-        case SERVICE_PROVIDER_PHONE:
-            getServiceProviderFactory().setPhone(SettingsHelper.parseString(setting, value, true));
-            break;
-        case SERVICE_PROVIDER_ADDRESS:
-            getServiceProviderFactory().setDeliveryPoint(SettingsHelper.parseString(setting, value, true));
-            break;
-        case SERVICE_PROVIDER_CITY:
-            getServiceProviderFactory().setCity(SettingsHelper.parseString(setting, value, true));
-            break;
-        case SERVICE_PROVIDER_ZIP:
-            getServiceProviderFactory().setPostalCode(SettingsHelper.parseString(setting, value, true));
-            break;
-        case SERVICE_PROVIDER_STATE:
-            getServiceProviderFactory().setAdministrativeArea(SettingsHelper.parseString(setting, value, true));
-            break;
-        case SERVICE_PROVIDER_COUNTRY:
-            getServiceProviderFactory().setCountry(SettingsHelper.parseString(setting, value, true));
-            break;
-        case SERVICE_PROVIDER_EMAIL:
-            getServiceProviderFactory().setMailAddress(SettingsHelper.parseString(setting, value, true));
-            break;
-        case SERVICE_IDENTIFICATION_FILE:
-            getServiceIdentificationFactory().setFile(SettingsHelper.parseFile(setting, value, true));
-            break;
-        case SERVICE_IDENTIFICATION_KEYWORDS:
-            getServiceIdentificationFactory().setKeywords(SettingsHelper.parseString(setting, value, true));
-            break;
-        case SERVICE_IDENTIFICATION_SERVICE_TYPE:
-            getServiceIdentificationFactory().setServiceType(SettingsHelper.parseString(setting, value, true));
-            break;
-        case SERVICE_IDENTIFICATION_TITLE:
-            getServiceIdentificationFactory().setTitle(SettingsHelper.parseString(setting, value, true));
-            break;
-        case SERVICE_IDENTIFICATION_ABSTRACT:
-            getServiceIdentificationFactory().setAbstract(SettingsHelper.parseString(setting, value, true));
-            break;
-        case SERVICE_IDENTIFICATION_FEES:
-            getServiceIdentificationFactory().setFees(SettingsHelper.parseString(setting, value, true));
-            break;
-        case SERVICE_IDENTIFICATION_ACCESS_CONSTRAINTS:
-            getServiceIdentificationFactory().setConstraints(SettingsHelper.parseString(setting, value, true));
-            break;
-        case MINIMUM_GZIP_SIZE:
-            this.minimumGzipSize = SettingsHelper.parseInteger(setting, value);
-            break;
-        default:
-            String message = "Can not decode setting '" + setting.name() + "'!";
-            LOGGER.error(message);
+        } else {
+            this.configFileMap.clear();
         }
     }
 
     /**
-     * Initialize this class. Since this initialization is not done in the
-     * constructor, dependent classes can use the SosConfigurator already when
-     * called from here.
+     * Returns the default token seperator for results.
+     * <p/>
+     * @return the tokenSeperator.
      */
-    private void initialize() throws ConfigurationException {
+    public String getTokenSeperator() {
+        return this.tokenSeperator;
+    }
 
-    	LOGGER.info("\n******\n Configurator initialization started\n******\n");
-
-        /* do this first as we need access to the database */
-        initializeConnectionProvider();
-		this.codingRepository = new CodingRepository();
-		this.serviceIdentificationFactory = new SosServiceIdentificationFactory();
-		this.serviceProviderFactory = new SosServiceProviderFactory();
-
-
-        Iterator<ISettingsDao> i = ServiceLoader.load(ISettingsDao.class).iterator();
-        if (!i.hasNext()) {
-            throw new ConfigurationException("No ISettingsDao implementation is present");
-        }
-        ISettingsDao settingsDao = i.next();
-
-        Map<String, String> settings;
-        try {
-            settings = settingsDao.get();
-        } catch (SQLException ex) {
-            throw new ConfigurationException("Can not load settings from database", ex);
-        }
-
-        /* set settings */
-        for (Setting setting : Setting.values()) {
-            String value = settings.get(setting.name());
-            if (value == null) {
-                LOGGER.warn("Setting {} is not present.", setting.name());
-            }
-            setSetting(setting, value, true);
-        }
-
-        this.operationDaoRepository = new OperationDaoRepository();
-        this.serviceOperatorRepository = new ServiceOperatorRepository();
-        initalizeFeatureQueryHandler();
-        initalizeCacheFeederDAO();
-        this.converterRepository = new ConverterRepository();
-        this.requestOperatorRepository = new RequestOperatorRepository();
-		this.bindingRepository = new BindingRepository();
-        initializeAdminServiceOperator();
-		this.adminRequestOperatorRepository = new AdminRequestOperatorRepository();
-        initializeDataSource();
-        initializeCapabilitiesCacheController();
-        this.tasking = new Tasking();
-        initializeProfileHandler();
-        LOGGER.info("\n******\n Configurator initialization finished\n******\n");
+    @Setting(TOKEN_SEPERATOR)
+    public void setTokenSeperator(String seperator) throws ConfigurationException {
+        notNullOrEmpty("Token seperator", seperator);
+        this.tokenSeperator = seperator;
     }
 
     /**
-     * Eventually cleanup everything created by the constructor
+     * Returns the default tuple seperator for results.
+     * <p/>
+     * @return the tupleSeperator.
      */
-    public synchronized void cleanup() {
-        if (connectionProvider != null) {
-            connectionProvider.cleanup();
-        }
-        if (capabilitiesCacheController != null) {
-            capabilitiesCacheController.cancel();
-            capabilitiesCacheController = null;
-        }
-		if (this.tasking != null) {
-			this.tasking.cancel();
-		}
-        instance = null;
+    public String getTupleSeperator() {
+        return this.tupleSeperator;
     }
 
-    private static void cleanUpAndThrow(ConfigurationException t) throws ConfigurationException {
-		if (instance != null) {
-			instance.cleanup();
-			instance = null;
-		}
-		throw t;
-	}
-
-	private static void cleanUpAndThrow(RuntimeException t) {
-		if (instance != null) {
-			instance.cleanup();
-			instance = null;
-		}
-		throw t;
-	}
-
-    private static final Lock INITIALIZE_LOCK = new ReentrantLock();
-
-    /**
-     * reads the requestListeners from the configFile and returns a
-     * RequestOperator containing the requestListeners
-     *
-     * @return RequestOperators with requestListeners
-     * @throws OwsExceptionReport
-     *             if initialization of a RequestListener failed
-     */
-    private void initializeAdminServiceOperator() throws ConfigurationException {
-        serviceLoaderAdminServiceOperator = ServiceLoader.load(IAdminServiceOperator.class);
-        Iterator<IAdminServiceOperator> iter = serviceLoaderAdminServiceOperator.iterator();
-        try {
-            this.adminServiceOperator = iter.hasNext() ? iter.next() : null;
-        } catch (ServiceConfigurationError sce) {
-            LOGGER.warn("An IAdminServiceOperator implementation could not be loaded!", sce);
-        }
-        if (this.adminServiceOperator == null) {
-            String exceptionText = "No IAdminServiceOperator implementation is loaded!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
-        LOGGER.info("\n******\n IAdminServiceOperator loaded successfully!\n******\n");
+    @Setting(TUPLE_SEPERATOR)
+    public void setTupleSeperator(String seperator) throws ConfigurationException {
+        notNullOrEmpty("Tuple seperator", seperator);
+        this.tupleSeperator = seperator;
     }
 
     /**
-     * Load implemented cache feeder dao
-     *
-     * @throws OwsExceptionReport
-     *             If no cache feeder dao is implemented
+     * Returns the default decimal seperator for results.
+     * <p/>
+     * @return decimal separator.
      */
-    private void initalizeCacheFeederDAO() throws ConfigurationException {
-        serviceLoaderCacheFeederDAO = ServiceLoader.load(ICacheFeederDAO.class);
-        setCacheFeederDAO();
-        LOGGER.info("\n******\n CacheFeederDAO loaded successfully!\n******\n");
+    public String getDecimalSeparator() {
+        return this.decimalSeparator;
+    }
+
+    @Setting(DECIMAL_SEPARATOR)
+    public void setDecimalSeperator(String seperator) throws ConfigurationException {
+        notNullOrEmpty("Decimal seperator", seperator);
+        this.decimalSeparator = seperator;
     }
 
     /**
-     * intializes the CapabilitiesCache
-     *
-     * @throws OwsExceptionReport
-     *             if initializing the CapabilitiesCache failed
+     * Returns the minimum size a response has to hvae to be compressed.
+     * <p/>
+     * @return the minimum threshold
      */
-    private void initializeCapabilitiesCacheController() throws ConfigurationException {
-        serviceLoaderCapabilitiesCacheController = ServiceLoader.load(ACapabilitiesCacheController.class);
-        Iterator<ACapabilitiesCacheController> iter = serviceLoaderCapabilitiesCacheController.iterator();
-        try {
-            this.capabilitiesCacheController = iter.hasNext() ? iter.next() : null;
-        } catch (ServiceConfigurationError sce) {
-            LOGGER.warn("An ACapabilitiesCacheController implementation could not be loaded!", sce);
-        }
-        if (this.capabilitiesCacheController == null) {
-            String exceptionText = "No ACapabilitiesCacheController implementation is loaded!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
-        LOGGER.info("\n******\n ACapabilitiesCacheController loaded successfully!\n******\n");
+    public int getMinimumGzipSize() {
+        return this.minimumGzipSize;
     }
 
-    /**
-     * Load the connection provider implementation
-     *
-     * @throws OwsExceptionReport
-     *             If no connection provider is implemented
-     */
-    private void initializeConnectionProvider() throws ConfigurationException {
-        Iterator<IConnectionProvider> iter = ServiceLoader.load(IConnectionProvider.class).iterator();
-        try {
-            this.connectionProvider = iter.hasNext() ? iter.next() : null;
-        } catch (ServiceConfigurationError sce) {
-            LOGGER.warn("No IConnectionProvider implementation could be loaded!", sce);
-        }
-        if (this.connectionProvider == null) {
-            String exceptionText = "No IConnectionProvider implementation is loaded!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
-        this.connectionProvider.initialize(this.connectionProviderProperties);
-        LOGGER.info("\n******\n ConnectionProvider loaded successfully!\n******\n");
-    }
-
-    private void initializeDataSource() throws ConfigurationException {
-        serviceLoaderDataSourceInitializator = ServiceLoader.load(IDataSourceInitializator.class);
-        Iterator<IDataSourceInitializator> iter = serviceLoaderDataSourceInitializator.iterator();
-        try {
-            this.dataSourceInitializator = iter.hasNext() ? iter.next() : null;
-        } catch (ServiceConfigurationError sce) {
-            LOGGER.warn("An IDataSourceInitializator implementation could not be loaded!", sce);
-        }
-        if (this.dataSourceInitializator == null) {
-            String exceptionText = "No IDataSourceInitializator implementation is loaded!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
-        LOGGER.info("\n******\n IDataSourceInitializator loaded successfully!\n******\n");
-        try {
-            this.dataSourceInitializator.initializeDataSource();
-        } catch (OwsExceptionReport owse) {
-            throw new ConfigurationException(owse);
-        }
-    }
-
-    /**
-     * Load implemented feature query handler
-     *
-     * @throws OwsExceptionReport
-     *             If no feature query handler is implemented
-     */
-    private void initalizeFeatureQueryHandler() throws ConfigurationException {
-        serviceLoaderFeatureQueryHandler = ServiceLoader.load(IFeatureQueryHandler.class);
-        setFeatureQueryHandler();
-        LOGGER.info("\n******\n FeatureQueryHandler loaded successfully!\n******\n");
-    }
-
-    private void initializeProfileHandler() {
-        serviceLoaderProfileHandler = ServiceLoader.load(IProfileHandler.class);
-        setProfileHandler();
-        LOGGER.info("\n******\n ProfileHandler loaded successfully!\n******\n");
-    }
-
-    /**
-     * Load the implemented cache feeder dao and add them to a map with
-     * operation name as key
-     *
-     * @throws OwsExceptionReport
-     *             If no cache feeder dao is implemented
-     */
-    private void setCacheFeederDAO() throws ConfigurationException {
-        Iterator<ICacheFeederDAO> iter = serviceLoaderCacheFeederDAO.iterator();
-        try {
-            this.cacheFeederDAO = iter.hasNext() ? iter.next() : null;
-        } catch (ServiceConfigurationError sce) {
-            LOGGER.warn("An ICacheFeederDAO implementation could not be loaded!", sce);
-        }
-        if (this.cacheFeederDAO == null) {
-            String exceptionText = "No ICacheFeederDAO implementations is loaded!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
-    }
-
-    /**
-     * Load the implemented feature query handler and add them to a map with
-     * operation name as key
-     *
-     * @throws OwsExceptionReport
-     *             If no feature query handler is implemented
-     */
-    private void setFeatureQueryHandler() throws ConfigurationException {
-        Iterator<IFeatureQueryHandler> iter = serviceLoaderFeatureQueryHandler.iterator();
-        try {
-            this.featureQueryHandler = iter.hasNext() ? iter.next() : null;
-        } catch (ServiceConfigurationError sce) {
-            LOGGER.warn("No IFeatureQueryHandler implementation could be loaded!", sce);
-        }
-        if (this.featureQueryHandler == null) {
-            String exceptionText = "No IFeatureQueryHandler implementations is loaded!";
-            LOGGER.error(exceptionText);
-            throw new ConfigurationException(exceptionText);
-        }
-    }
-    
-    /**
-     * Load the implemented profile handler and add them to a map with
-     * operation name as key
-     *
-     * @throws OwsExceptionReport
-     *             If no profile handler is implemented
-     */
-    private void setProfileHandler() {
-        Iterator<IProfileHandler> iter = serviceLoaderProfileHandler.iterator();
-        try {
-            this.profileHandler = iter.hasNext() ? iter.next() : null;
-        } catch (ServiceConfigurationError sce) {
-            LOGGER.warn("No IProfileHandler implementation could be loaded!", sce);
-        }
-        if (this.profileHandler == null) {
-            this.profileHandler = new DefaultProfileHandler();
-            LOGGER.info("No IProfileHandler implementations is loaded! DefaultHandler is used!");
-            
-        }
-    }
-
-    /**
-     * @return Returns the service identification
-     * @throws OwsExceptionReport
-     */
-    public SosServiceIdentification getServiceIdentification() throws OwsExceptionReport {
-		return getServiceIdentificationFactory().get();
-    }
-
-    /**
-     * @return Returns the service provider
-     * @throws OwsExceptionReport
-     */
-    public SosServiceProvider getServiceProvider() throws OwsExceptionReport {
-        return getServiceProviderFactory().get();
-    }
-
-    /**
-     * @return Returns the sensor description directory
-     */
-    public File getSensorDir() {
-        return sensorDir;
+    @Setting(MINIMUM_GZIP_SIZE)
+    public void setMinimumGzipSize(int size) {
+        this.minimumGzipSize = size;
     }
 
     /**
      * @return maxGetObsResults
      */
     public int getMaxGetObsResults() {
-        return maxGetObsResults;
+        return this.maxGetObsResults;
+    }
+
+    @Setting(MAX_GET_OBSERVATION_RESULTS)
+    public void setMaxGetObservationResults(int maxResults) {
+        this.maxGetObsResults = maxResults;
+    }
+
+    public String getDefaultOfferingPrefix() {
+        return this.defaultOfferingPrefix;
+    }
+
+    @Setting(DEFAULT_OFFERING_PREFIX)
+    public void setDefaultOfferingPrefix(String prefix) {
+        this.defaultOfferingPrefix = prefix;
+    }
+
+    public String getDefaultProcedurePrefix() {
+        return this.defaultProcedurePrefix;
+    }
+
+    @Setting(DEFAULT_PROCEDURE_PREFIX)
+    public void setDefaultProcedurePrefix(String prefix) {
+        this.defaultProcedurePrefix = prefix;
     }
 
     /**
      * @return Returns the lease for the getResult template (in minutes).
      */
     public int getLease() {
-        return lease;
+        return this.lease;
+    }
+
+    @Setting(LEASE)
+    public void setLease(int lease) throws ConfigurationException {
+        greaterZero("Lease", lease);
+        this.lease = lease;
+    }
+
+    public int getDefaultEPSG() {
+        return this.defaultEPSG;
+    }
+
+    @Setting(DEFAULT_EPSG)
+    public void setDefaultEpsg(int epsgCode) throws ConfigurationException {
+        greaterZero("Default EPSG Code", epsgCode);
+        this.defaultEPSG = epsgCode;
     }
 
     /**
-     * @return Returns the tokenSeperator.
+     * @return true if duplicate observations should be skipped during insertion
      */
-    public String getTokenSeperator() {
-        return tokenSeperator;
+    public boolean isSkipDuplicateObservations() {
+        return this.skipDuplicateObservations;
+    }
+
+    @Setting(SKIP_DUPLICATE_OBSERVATIONS)
+    public void setSkipDuplicateObservations(boolean skip) {
+        this.skipDuplicateObservations = skip;
     }
 
     /**
-     * @return the minimum threshold for gzipping responses
+     * @return the supportsQuality
      */
-    public int getMinimumGzipSize() {
-        return minimumGzipSize;
+    public boolean isSupportsQuality() {
+        return this.supportsQuality;
     }
 
-    /**
-     * @return Returns the tupleSeperator.
-     */
-    public String getTupleSeperator() {
-        return tupleSeperator;
-    }
-
-    /**
-     * @return Returns decimal separator.
-     */
-    public String getDecimalSeparator() {
-        return decimalSeparator;
+    @Setting(SUPPORTS_QUALITY)
+    public void setSupportsQuality(boolean supportsQuality) {
+        this.supportsQuality = supportsQuality;
     }
 
     /**
      * @return Returns the gmlDateFormat.
      */
     public String getGmlDateFormat() {
-        return gmlDateFormat;
+        return this.gmlDateFormat;
     }
 
-//    /**
-//     * @return Returns the noDataValue.
-//     */
-//    public String getNoDataValue() {
-//        return noDataValue;
-//    }
+    @Setting(GML_DATE_FORMAT)
+    public void setGmlDateFormat(String format) {
+        // TODO remove variable?
+        this.gmlDateFormat = format;
+        DateTimeHelper.setResponseFormat(this.gmlDateFormat);
+    }
 
     /**
-     * @return the supportsQuality
+     * @return Returns the sensor description directory
      */
-    public boolean isSupportsQuality() {
-        return supportsQuality;
+    public File getSensorDir() {
+        return this.sensorDir;
+    }
+
+    @Setting(SENSOR_DIRECTORY)
+    public void setSensorDirectory(File sensorDirectory) {
+        this.sensorDir = sensorDirectory;
+    }
+
+    /**
+     * Get service URL.
+     *
+     * @return the service URL
+     */
+    public String getServiceURL() {
+        return this.serviceURL;
+    }
+
+    @Setting(SERVICE_URL)
+    public void setServiceURL(URI serviceURL) throws ConfigurationException {
+        notNull("Service URL", serviceURL);
+        String url = serviceURL.toString();
+        if (url.contains("?")) {
+            url = url.split("[?]")[0];
+        }
+        this.serviceURL = url;
+    }
+
+    /**
+     * @return prefix URN for the spatial reference system
+     */
+    public String getSrsNamePrefix() {
+        return this.srsNamePrefix;
+    }
+
+    @Setting(SRS_NAME_PREFIX_SOS_V1)
+    public void setSrsNamePrefixForSosV1(String prefix) {
+        if (!prefix.endsWith(":") && !prefix.isEmpty()) {
+            prefix += ":";
+        }
+        this.srsNamePrefix = prefix;
+    }
+
+    /**
+     * @return prefix URN for the spatial reference system
+     */
+    public String getSrsNamePrefixSosV2() {
+        return this.srsNamePrefixSosV2;
+    }
+
+    @Setting(SRS_NAME_PREFIX_SOS_V2)
+    public void setSrsNamePrefixForSosV2(String prefix) {
+        if (!prefix.endsWith("/") && !prefix.isEmpty()) {
+            prefix += "/";
+        }
+        this.srsNamePrefixSosV2 = prefix;
     }
 
     /**
      * @param epsgCode
+     * <p/>
      * @return boolean indicating if coordinates have to be switched
      */
     public boolean reversedAxisOrderRequired(int epsgCode) {
@@ -909,62 +615,157 @@ public class Configurator {
         return false;
     }
 
-//    /**
-//     * @return foiIncludedInCapabilities
-//     */
-//    public boolean isFoiListedInOfferings() {
-//        return foiListedInOfferings;
-//    }
-//
-//    /**
-//     * @return boolean indicating if child procedures should be fully encoded in
-//     *         parents' DescribeSensor resposnes
-//     */
-//    public boolean isChildProceduresEncodedInParentsDescribeSensor() {
-//        return childProceduresEncodedInParentsDescribeSensor;
-//    }
-
-    /**
-     * @return true if duplicate observations should be skipped during insertion
-     */
-    public boolean isSkipDuplicateObservations() {
-        return skipDuplicateObservations;
-    }
-
-//    /**
-//     * @return boolean indicating the show full OperationsMetadata for
-//     *         observations
-//     */
-//    public boolean isShowFullOperationsMetadata4Observations() {
-//        return showFullOperationsMetadata4Observations;
-//    }
-//
-//    /**
-//     * @return showFullOperationsMetadata
-//     */
-//    public boolean isShowFullOperationsMetadata() {
-//        return showFullOperationsMetadata;
-//    }
-
-    /**
-     * @return the characterEncoding
-     */
-    public String getCharacterEncoding() {
-        return characterEncoding;
+    @Setting(EPSG_CODES_WITH_REVERSED_AXIS_ORDER)
+    public void setEpsgCodesWithReversedAxisOrder(String codes) throws ConfigurationException {
+        notNullOrEmpty("EPSG Codes to switch coordinates for", codes);
+        String[] splitted = codes.split(";");
+        this.epsgsWithReversedAxisOrder = new ArrayList<Range>(splitted.length);
+        for (String entry : splitted) {
+            String[] splittedEntry = entry.split("-");
+            Range r = null;
+            if (splittedEntry.length == 1) {
+                r = new Range(Integer.parseInt(splittedEntry[0]), Integer.parseInt(splittedEntry[0]));
+            } else if (splittedEntry.length == 2) {
+                r = new Range(Integer.parseInt(splittedEntry[0]), Integer.parseInt(splittedEntry[1]));
+            } else {
+                throw new ConfigurationException(String.format(
+                        "Invalid format of entry in 'switchCoordinatesForEPSG': %s", entry));
+            }
+            this.epsgsWithReversedAxisOrder.add(r);
+        }
     }
 
     /**
-     * @return prefix URN for the spatial reference system
+     * Initialize this class. Since this initialization is not done in the
+     * constructor, dependent classes can use the SosConfigurator already when
+     * called from here.
      */
-    public String getSrsNamePrefix() {
-        return srsNamePrefix;
+    private void initialize() throws ConfigurationException {
+        LOGGER.info("\n******\n Configurator initialization started\n******\n");
+        SettingsManager.getInstance().configure(this);
+        initializeConnectionProvider();
+        this.codingRepository = new CodingRepository();
+        this.serviceIdentificationFactory = new SosServiceIdentificationFactory();
+        this.serviceProviderFactory = new SosServiceProviderFactory();
+        this.operationDaoRepository = new OperationDAORepository();
+        this.serviceOperatorRepository = new ServiceOperatorRepository();
+        initalizeFeatureQueryHandler();
+        initalizeCacheFeederDAO();
+        this.converterRepository = new ConverterRepository();
+        this.requestOperatorRepository = new RequestOperatorRepository();
+        this.bindingRepository = new BindingRepository();
+        initializeAdminServiceOperator();
+        this.adminRequestOperatorRepository = new AdminRequestOperatorRepository();
+        initializeDataSource();
+        initializeCapabilitiesCacheController();
+        this.tasking = new Tasking();
+        initializeProfileHandler();
+        LOGGER.info("\n******\n Configurator initialization finished\n******\n");
     }
 
     /**
-     * @return prefix URN for the spatial reference system
+     * reads the requestListeners from the configFile and returns a
+     * RequestOperator containing the requestListeners
+     *
+     * @return RequestOperators with requestListeners
+     * <p/>
+     * @throws ConfigurationException if initialization of a RequestListener failed
      */
-    public String getSrsNamePrefixSosV2() {
-        return srsNamePrefixSosV2;
+    private void initializeAdminServiceOperator() throws ConfigurationException {
+        this.adminServiceOperator = new ConfiguringSingletonServiceLoader<IAdminServiceOperator>(
+                IAdminServiceOperator.class, true).get();
+    }
+
+    /**
+     * Load implemented cache feeder dao
+     *
+     * @throws ConfigurationException If no cache feeder dao is implemented
+     */
+    private void initalizeCacheFeederDAO() throws ConfigurationException {
+        this.cacheFeederDAO = new ConfiguringSingletonServiceLoader<ICacheFeederDAO>(ICacheFeederDAO.class, true).get();
+    }
+
+    /**
+     * intializes the CapabilitiesCache
+     *
+     * @throws ConfigurationException if initializing the CapabilitiesCache failed
+     */
+    private void initializeCapabilitiesCacheController() throws ConfigurationException {
+        this.capabilitiesCacheController = new ConfiguringSingletonServiceLoader<ACapabilitiesCacheController>(
+                ACapabilitiesCacheController.class, true).get();
+    }
+
+    /**
+     * Load the connection provider implementation
+     *
+     * @throws ConfigurationException If no connection provider is implemented
+     */
+    private void initializeConnectionProvider() throws ConfigurationException {
+        this.connectionProvider = new ConfiguringSingletonServiceLoader<IConnectionProvider>(IConnectionProvider.class,
+                                                                                             true).get();
+        this.connectionProvider.initialize(this.connectionProviderProperties);
+    }
+
+    private void initializeDataSource() throws ConfigurationException {
+        this.dataSourceInitializator = new ConfiguringSingletonServiceLoader<IDataSourceInitializator>(
+                IDataSourceInitializator.class, true).get();
+        try {
+            this.dataSourceInitializator.initializeDataSource();
+        } catch (OwsExceptionReport owse) {
+            throw new ConfigurationException(owse);
+        }
+    }
+
+    /**
+     * Load implemented feature query handler
+     *
+     * @throws ConfigurationException If no feature query handler is implemented
+     */
+    private void initalizeFeatureQueryHandler() throws ConfigurationException {
+        this.featureQueryHandler = new ConfiguringSingletonServiceLoader<IFeatureQueryHandler>(
+                IFeatureQueryHandler.class, true).get();
+    }
+
+    private void initializeProfileHandler() throws ConfigurationException {
+        this.profileHandler = new ConfiguringSingletonServiceLoader<IProfileHandler>(IProfileHandler.class, false).get();
+        if (this.profileHandler == null) {
+            this.profileHandler = new DefaultProfileHandler();
+            LOGGER.info("No IProfileHandler implementations is loaded! DefaultHandler is used!");
+        }
+    }
+
+    /**
+     * @return Returns the service identification
+     * <p/>
+     * @throws OwsExceptionReport
+     */
+    public SosServiceIdentification getServiceIdentification() throws OwsExceptionReport {
+        try {
+            return this.serviceIdentificationFactory.get();
+        } catch (ConfigurationException e) {
+            if (e.getCause() != null && e.getCause() instanceof OwsExceptionReport) {
+                throw (OwsExceptionReport) e.getCause();
+            } else {
+                throw Util4Exceptions.createNoApplicableCodeException(e, "Could not generate ServiceIdentification");
+            }
+        }
+    }
+
+    /**
+     * @return Returns the service provider
+     * <p/>
+     * @throws OwsExceptionReport
+     */
+    public SosServiceProvider getServiceProvider() throws OwsExceptionReport {
+        try {
+            return this.serviceProviderFactory.get();
+        } catch (ConfigurationException e) {
+            if (e.getCause() != null && e.getCause() instanceof OwsExceptionReport) {
+                throw (OwsExceptionReport) e.getCause();
+            } else {
+                throw Util4Exceptions.createNoApplicableCodeException(e, "Could not generate ServiceProvider");
+            }
+        }
     }
 
     /**
@@ -979,53 +780,6 @@ public class Configurator {
      */
     public ACapabilitiesCacheController getCapabilitiesCacheController() {
         return capabilitiesCacheController;
-    }
-
-    /**
-     * @return the updateInterval in milli seconds
-     */
-    public long getUpdateIntervallInMillis() {
-        return updateIntervall * 60000;
-    }
-
-    /**
-     * Get service URL.
-     *
-     * @return
-     */
-    public String getServiceURL() {
-        return serviceURL;
-    }
-
-    /**
-     * Set service URL.
-     *
-     * @param serviceURL
-     */
-    public void setServiceURL(String serviceURL) {
-        String url;
-        if (serviceURL.contains("?")) {
-            String[] split = serviceURL.split("[?]");
-            url = split[0];
-        } else {
-            url = serviceURL;
-        }
-        this.serviceURL = url;
-    }
-
-    public String getDefaultOfferingPrefix() {
-        return defaultOfferingPrefix;
-    }
-
-    public String getDefaultProcedurePrefix() {
-        return defaultProcedurePrefix;
-    }
-
-    /**
-     * @return the configFileMap
-     */
-    public Map<String, String> getConfigFileMap() {
-        return Collections.unmodifiableMap(configFileMap);
     }
 
     /**
@@ -1056,94 +810,110 @@ public class Configurator {
         return adminServiceOperator;
     }
 
-    public int getDefaultEPSG() {
-        return defaultEPSG;
-    }
-
-    public int getCacheThreadCount() {
-        return cacheThreadCount;
-    }
-
     public void updateConfiguration() throws ConfigurationException {
-		// TODO update converters
+        // TODO update converters
         updateBindings();
-		updateOperationDaos();
+        updateOperationDaos();
         updateDecoder();
         updateEncoder();
-		updateServiceOperators();
+        updateServiceOperators();
         updateRequestOperator();
     }
-	public RequestOperatorRepository getRequestOperatorRepository() {
-		return this.requestOperatorRepository;
-	}
 
-	public CodingRepository getCodingRepository() {
-		return this.codingRepository;
-	}
-
-	public OperationDaoRepository getOperationDaoRepository() {
-		return this.operationDaoRepository;
-	}
-
-	public ServiceOperatorRepository getServiceOperatorRepository() {
-		return this.serviceOperatorRepository;
-	}
-
-	public BindingRepository getBindingRepository() {
-		return this.bindingRepository;
-	}
-
-	public ConverterRepository getConverterRepository() {
-		return this.converterRepository;
-	}
-
-	public AdminRequestOperatorRepository getAdminRequestOperatorRepository() {
-		return this.adminRequestOperatorRepository;
-	}
-
-	public void updateDecoder() throws ConfigurationException {
-		getCodingRepository().updateDecoders();
-	}
-
-	public void updateEncoder() throws ConfigurationException {
-		getCodingRepository().updateEncoders();
-	}
-
-	public void updateOperationDaos() throws ConfigurationException {
-		getOperationDaoRepository().update();
-	}
-
-	public void updateServiceOperators() throws ConfigurationException {
-		getServiceOperatorRepository().update();
-	}
-
-	public void updateBindings() throws ConfigurationException {
-		getBindingRepository().update();
-	}
-
-	public void updateConverter() throws ConfigurationException {
-		getConverterRepository().update();
-	}
-
-	public void updateRequestOperator() throws ConfigurationException {
-		getRequestOperatorRepository().update();
-	}
-
-        public IProfileHandler getProfileHandler() {
-            return this.profileHandler;
-        }
-        
-        public IProfile getActiveProfile() {
-            return getProfileHandler().getActiveProfile();
-    
-        }
-
-    public SosServiceIdentificationFactory getServiceIdentificationFactory() {
-        return this.serviceIdentificationFactory;
+    public RequestOperatorRepository getRequestOperatorRepository() {
+        return this.requestOperatorRepository;
     }
 
-    public SosServiceProviderFactory getServiceProviderFactory() {
-        return this.serviceProviderFactory;
+    public CodingRepository getCodingRepository() {
+        return this.codingRepository;
     }
 
+    public OperationDAORepository getOperationDaoRepository() {
+        return this.operationDaoRepository;
+    }
+
+    public ServiceOperatorRepository getServiceOperatorRepository() {
+        return this.serviceOperatorRepository;
+    }
+
+    public BindingRepository getBindingRepository() {
+        return this.bindingRepository;
+    }
+
+    public ConverterRepository getConverterRepository() {
+        return this.converterRepository;
+    }
+
+    public AdminRequestOperatorRepository getAdminRequestOperatorRepository() {
+        return this.adminRequestOperatorRepository;
+    }
+
+    public void updateDecoder() throws ConfigurationException {
+        getCodingRepository().updateDecoders();
+    }
+
+    public void updateEncoder() throws ConfigurationException {
+        getCodingRepository().updateEncoders();
+    }
+
+    public void updateOperationDaos() throws ConfigurationException {
+        getOperationDaoRepository().update();
+    }
+
+    public void updateServiceOperators() throws ConfigurationException {
+        getServiceOperatorRepository().update();
+    }
+
+    public void updateBindings() throws ConfigurationException {
+        getBindingRepository().update();
+    }
+
+    public void updateConverter() throws ConfigurationException {
+        getConverterRepository().update();
+    }
+
+    public void updateRequestOperator() throws ConfigurationException {
+        getRequestOperatorRepository().update();
+    }
+
+    public IProfileHandler getProfileHandler() {
+        return this.profileHandler;
+    }
+
+    public IProfile getActiveProfile() {
+        return getProfileHandler().getActiveProfile();
+    }
+
+    /**
+     * Eventually cleanup everything created by the constructor
+     */
+    public synchronized void cleanup() {
+        if (connectionProvider != null) {
+            connectionProvider.cleanup();
+        }
+        if (capabilitiesCacheController != null) {
+            capabilitiesCacheController.cancel();
+            capabilitiesCacheController = null;
+        }
+        if (this.tasking != null) {
+            this.tasking.cancel();
+        }
+        instance = null;
+    }
+
+    private static void cleanUpAndThrow(ConfigurationException t) throws ConfigurationException {
+        if (instance != null) {
+            instance.cleanup();
+            instance = null;
+        }
+        throw t;
+    }
+
+    private static void cleanUpAndThrow(RuntimeException t) {
+        if (instance != null) {
+            instance.cleanup();
+            instance = null;
+        }
+        throw t;
+    }
 }

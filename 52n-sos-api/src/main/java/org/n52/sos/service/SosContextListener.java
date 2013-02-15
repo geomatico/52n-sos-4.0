@@ -26,57 +26,104 @@ package org.n52.sos.service;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.util.Enumeration;
+import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.n52.sos.config.SettingsManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SosContextListener implements ServletContextListener {
-	
-	private static final Logger log = LoggerFactory.getLogger(SosContextListener.class);
 
-	@Override
-	public void contextInitialized(ServletContextEvent sce) {
-		if (Configurator.getInstance() == null) {
-			ServletContext context = sce.getServletContext();
-            DatabaseSettingsHandler dbsh = DatabaseSettingsHandler.getInstance(context);
-			if (dbsh.exists()) {
-				try {
-					log.debug("Initialising Configurator ({},{})", 
-                            dbsh.getPath(), context.getRealPath("/"));
-					Configurator.createInstance(dbsh.getAll(), context.getRealPath("/"));
-				} catch (ConfigurationException ce) {
-					String message = "Configurator initialization failed!";
-					log.error(message, ce);
-					throw new RuntimeException(message, ce);
-				}
-			} else {
-				log.warn("Can not initialize Configurator; config file is not present: {}", 
-                        dbsh.getPath());
-			}
-		} else {
-			log.warn("Configurator already instantiated.");
-		}
-	}
+    private static final Logger log = LoggerFactory.getLogger(SosContextListener.class);
+    private static String path = null;
 
-	@Override
-	public void contextDestroyed(ServletContextEvent sce) {
-		if (Configurator.getInstance() != null) {
-			Configurator.getInstance().cleanup();
-		}
-		Enumeration<Driver> drivers = DriverManager.getDrivers();
-		while (drivers.hasMoreElements()) {
-			Driver driver = drivers.nextElement();
-			try {
-				DriverManager.deregisterDriver(driver);
-				log.info("Deregistering jdbc driver: {}", driver);
-			} catch (Exception e) {
-				log.error("Error deregistering driver " + driver, e);
-			}
+    public static String getPath() {
+        return SosContextListener.path;
+    }
 
-		}
-	}
+    public static boolean hasPath() {
+        return SosContextListener.path != null;
+    }
+
+    public static void setPath(String path) {
+        SosContextListener.path = path;
+    }
+
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        setPath(sce.getServletContext().getRealPath("/"));
+        if (Configurator.getInstance() == null) {
+            instantiateConfigurator(sce.getServletContext());
+        } else {
+            log.error("Configurator already instantiated.");
+        }
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        cleanUpConfigurator();
+        cleanUpSettingsManager();
+        unloadDrivers();
+    }
+
+    protected void unloadDrivers() {
+        Enumeration<Driver> drivers = DriverManager.getDrivers();
+        while (drivers.hasMoreElements()) {
+            Driver driver = drivers.nextElement();
+            try {
+                DriverManager.deregisterDriver(driver);
+                log.info("Deregistering jdbc driver: {}", driver);
+            } catch (Exception e) {
+                log.error("Error deregistering driver " + driver, e);
+            }
+        }
+    }
+
+    protected void cleanUpSettingsManager() {
+        try {
+            if (SettingsManager.getInstance() != null) {
+                SettingsManager.getInstance().cleanup();
+            }
+        } catch (Throwable ex) {
+            log.error("Error while SettingsManager clean up", ex);
+        }
+    }
+
+    protected void cleanUpConfigurator() {
+        try {
+            if (Configurator.getInstance() != null) {
+                Configurator.getInstance().cleanup();
+            }
+        } catch (Throwable ex) {
+            log.error("Error while Configurator clean up", ex);
+        }
+    }
+
+    protected void instantiateConfigurator(ServletContext context) throws RuntimeException {
+        DatabaseSettingsHandler dbsh = DatabaseSettingsHandler.getInstance(context);
+        if (dbsh.exists()) {
+            log.debug("Initialising Configurator ({},{})", dbsh.getPath(), getPath());
+            try {
+                instantiateConfigurator(dbsh.getAll());
+            } catch (ConfigurationException ex) {
+                log.error("Error reading database properties", ex);
+            }
+        } else {
+            log.warn("Can not initialize Configurator; config file is not present: {}", dbsh.getPath());
+        }
+    }
+
+    protected void instantiateConfigurator(Properties p) {
+        try {
+            Configurator.createInstance(p, getPath());
+        } catch (ConfigurationException ce) {
+            String message = "Configurator initialization failed!";
+            log.error(message, ce);
+            throw new RuntimeException(message, ce);
+        }
+    }
 }

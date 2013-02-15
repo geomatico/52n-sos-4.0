@@ -23,10 +23,11 @@
  */
 package org.n52.sos.service;
 
-import org.n52.sos.util.AbstractPropertyFileHandler;
 import javax.servlet.ServletContext;
 
-public class DatabaseSettingsHandler extends AbstractPropertyFileHandler {
+import org.n52.sos.util.AbstractServletContextPropertyFileHandler;
+
+public class DatabaseSettingsHandler extends AbstractServletContextPropertyFileHandler {
 
     public static final String INIT_PARAM_DATA_SOURCE_CONFIG_LOCATION = "datasourceConfigLocation";
     private static DatabaseSettingsHandler instance;

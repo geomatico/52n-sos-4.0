@@ -28,17 +28,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.util.AbstractServiceLoaderRepository;
+import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class ServiceOperatorRepository extends AbstractServiceLoaderRepository<IServiceOperator> {
+public class ServiceOperatorRepository extends AbstractConfiguringServiceLoaderRepository<IServiceOperator> {
 	private static final Logger log = LoggerFactory.getLogger(ServiceOperatorRepository.class);
 
 	/** Implemented IServiceOperator */
@@ -66,10 +67,11 @@ public class ServiceOperatorRepository extends AbstractServiceLoaderRepository<I
      * Load the implemented request listener and add them to a map with
      * operation name as key
      *
-     * @throws OwsExceptionReport
+     * @throws ConfigurationException
      *             If no request listener is implemented
      */
-    protected void processImplementations(Set<IServiceOperator> implementations) throws ConfigurationException {
+    @Override
+    protected void processConfiguredImplementations(Set<IServiceOperator> implementations) throws ConfigurationException {
 		this.serviceOperators.clear();
 		this.supportedServices.clear();
 		this.supportedVersions.clear();
