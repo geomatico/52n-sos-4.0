@@ -23,7 +23,8 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.*;
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getFeatureOfInterestObjects;
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getProceduresForFeatureOfInterest;
 
 import java.util.ArrayList;
 import java.util.Collection;

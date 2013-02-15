@@ -72,7 +72,7 @@ public class OfferingCacheUpdate extends CacheUpdate {
     protected ThreadLocalSessionFactory getSessionFactory() {
         return sessionFactory;
     }
-
+    
     @Override
     public void execute() {
         List<Offering> offerings = getOfferingObjects(getSession());

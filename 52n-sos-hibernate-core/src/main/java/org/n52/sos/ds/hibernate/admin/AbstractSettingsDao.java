@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 
 public class AbstractSettingsDao implements IInitializableDao {
 	protected static final Logger log = LoggerFactory.getLogger(AbstractSettingsDao.class);
-	protected static final String TABLE = HibernateConstants.TABLE_NAME_SETTINGS;
 	protected static final String KEY = HibernateConstants.PARAMETER_SETTING_KEY;
 	protected static final String VALUE = HibernateConstants.PARAMETER_SETTING_VALUE;
 	
