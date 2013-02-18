@@ -168,10 +168,13 @@ public abstract class SettingsManager {
      */
     public abstract void changeSetting(ISettingValue<?> value) throws ConfigurationException;
 
+    /* TODO JavaDoc */
     public abstract ISettingValueFactory getSettingFactory();
 
+    /* TODO JavaDoc */
     public abstract Set<IAdministratorUser> getAdminUsers();
 
+    /* TODO JavaDoc */
     public abstract IAdministratorUser getAdminUser(String username);
 
     /**
