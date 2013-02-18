@@ -112,6 +112,9 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
             }
             throw e;
         } catch (ConnectionProviderException cpe) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             throw cpe;
         } finally {
             getConnectionProvider().returnConnection(session);
@@ -277,7 +280,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    public boolean isActive(final RequestOperatorKeyType requestOperatorKeyType) {
+    public boolean isActive(final RequestOperatorKeyType requestOperatorKeyType) throws ConnectionProviderException {
         return execute(new HibernateAction<Boolean> () {
             @Override
             protected Boolean call(Session session) {
@@ -288,7 +291,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    public void setActive(final RequestOperatorKeyType requestOperatorKeyType, final boolean active) {
+    public void setActive(final RequestOperatorKeyType requestOperatorKeyType, final boolean active) throws ConnectionProviderException {
         execute(new VoidHibernateAction() {
             @Override
             protected void run(Session session) {

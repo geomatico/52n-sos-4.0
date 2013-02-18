@@ -42,7 +42,9 @@ import org.n52.sos.config.sqlite.entities.NumericSettingValue;
 import org.n52.sos.config.sqlite.entities.Operation;
 import org.n52.sos.config.sqlite.entities.StringSettingValue;
 import org.n52.sos.config.sqlite.entities.UriSettingValue;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.IConnectionProvider;
+import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.SosContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,7 +153,7 @@ public class SQLiteSessionFactory implements IConnectionProvider {
     }
 
     @Override
-    public Session getConnection() {
+    public Session getConnection()throws ConnectionProviderException {
         return getSessionFactory().getCurrentSession();
     }
 
@@ -186,7 +188,7 @@ public class SQLiteSessionFactory implements IConnectionProvider {
     }
 
     @Override
-    public void initialize(Properties properties) {
+    public void initialize(Properties properties) throws ConfigurationException {
         lock.lock();
         try {
             this.sessionFactory = createSessionFactory(properties);
