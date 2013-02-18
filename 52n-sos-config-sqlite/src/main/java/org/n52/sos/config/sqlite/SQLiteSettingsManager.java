@@ -45,10 +45,13 @@ import org.n52.sos.config.sqlite.entities.BooleanSettingValue;
 import org.n52.sos.config.sqlite.entities.FileSettingValue;
 import org.n52.sos.config.sqlite.entities.IntegerSettingValue;
 import org.n52.sos.config.sqlite.entities.NumericSettingValue;
+import org.n52.sos.config.sqlite.entities.Operation;
+import org.n52.sos.config.sqlite.entities.OperationKey;
 import org.n52.sos.config.sqlite.entities.StringSettingValue;
 import org.n52.sos.config.sqlite.entities.UriSettingValue;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.IConnectionProvider;
+import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -271,6 +274,34 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     @Override
     public void cleanup() {
         getConnectionProvider().cleanup();
+    }
+
+    @Override
+    public boolean isActive(final RequestOperatorKeyType requestOperatorKeyType) {
+        return execute(new HibernateAction<Boolean> () {
+            @Override
+            protected Boolean call(Session session) {
+                Operation o = (Operation) session.get(Operation.class, new OperationKey(requestOperatorKeyType));
+                return (o == null) ? true : o.isActive();
+            }
+        }).booleanValue();
+    }
+
+    @Override
+    public void setActive(final RequestOperatorKeyType requestOperatorKeyType, final boolean active) {
+        execute(new VoidHibernateAction() {
+            @Override
+            protected void run(Session session) {
+                Operation o = (Operation) session.get(Operation.class, new OperationKey(requestOperatorKeyType));
+                if (o != null) {
+                    if (active != o.isActive()) {
+                        session.update(o.setActive(active));
+                    }
+                } else {
+                    session.save(new Operation(requestOperatorKeyType).setActive(active));
+                }
+            }
+        });
     }
     
     private static class SqliteSettingFactory extends AbstractSettingValueFactory {

@@ -23,9 +23,7 @@
  */
 package org.n52.sos.config.sqlite;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNull;
 import static org.n52.sos.config.sqlite.TestSettingDefinitionProvider.*;
 
@@ -34,6 +32,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
 
+import static org.hamcrest.core.Is.*;
 import org.hibernate.HibernateException;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -57,7 +56,11 @@ import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.config.settings.UriSettingDefinition;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.IConnectionProvider;
+import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -215,5 +218,20 @@ public class SQLiteSettingsManagerTest {
         assertNotNull(settingsManager.getAdminUser(USERNAME));
         settingsManager.deleteAdminUser(USERNAME);
         assertNull(settingsManager.getAdminUser(USERNAME));
+    }
+    
+    @Test
+    public void testActiveOperations() {
+        RequestOperatorKeyType key = new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS,
+                                                                                           Sos2Constants.SERVICEVERSION),
+                                                                SosConstants.Operations.GetCapabilities.name());
+        
+        
+        assertThat(settingsManager.isActive(key), is(true));
+        settingsManager.setActive(key, true);
+        assertThat(settingsManager.isActive(key), is(true));
+        settingsManager.setActive(key, false);
+        assertThat(settingsManager.isActive(key), is(false));
+        
     }
 }

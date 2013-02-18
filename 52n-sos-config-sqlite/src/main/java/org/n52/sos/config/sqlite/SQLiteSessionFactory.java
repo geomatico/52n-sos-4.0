@@ -39,12 +39,15 @@ import org.n52.sos.config.sqlite.entities.BooleanSettingValue;
 import org.n52.sos.config.sqlite.entities.FileSettingValue;
 import org.n52.sos.config.sqlite.entities.IntegerSettingValue;
 import org.n52.sos.config.sqlite.entities.NumericSettingValue;
+import org.n52.sos.config.sqlite.entities.Operation;
 import org.n52.sos.config.sqlite.entities.StringSettingValue;
 import org.n52.sos.config.sqlite.entities.UriSettingValue;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.service.SosContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import sun.management.OperatingSystemImpl;
 
 /**
  *
@@ -132,7 +135,8 @@ public class SQLiteSessionFactory implements IConnectionProvider {
                 .addAnnotatedClass(NumericSettingValue.class)
                 .addAnnotatedClass(StringSettingValue.class)
                 .addAnnotatedClass(UriSettingValue.class)
-                .addAnnotatedClass(AdministratorUser.class);
+                .addAnnotatedClass(AdministratorUser.class)
+                .addAnnotatedClass(Operation.class);
         
         cfg.registerTypeOverride(new HIbernateFileType(), new String[] { "file", File.class.getName() });
         cfg.registerTypeOverride(new HibernateUriType(), new String[] { "uri", URI.class.getName() });

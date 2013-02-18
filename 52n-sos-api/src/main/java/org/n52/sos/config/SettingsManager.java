@@ -33,6 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.ConnectionProviderException;
+import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
@@ -112,7 +113,7 @@ public abstract class SettingsManager {
      * @param o the object to configure
      * <p/>
      * @throws ConfigurationException if there is a problem configuring the object
-     * @throws ConnectionProviderException 
+     * @throws ConnectionProviderException
      * @see Configurable
      * @see Setting
      */
@@ -141,7 +142,8 @@ public abstract class SettingsManager {
      * @param key the definition of the setting
      * <p/>
      * @return the value of the setting
-     * @throws ConnectionProviderException 
+     * <p/>
+     * @throws ConnectionProviderException
      */
     public abstract <T> ISettingValue<T> getSetting(ISettingDefinition<?, T> key) throws ConnectionProviderException;
 
@@ -149,7 +151,8 @@ public abstract class SettingsManager {
      * Gets all values for all definitions. If there is no value for a definition {@code null} is added to the map.
      * <p/>
      * @return all values by definition
-     * @throws ConnectionProviderException 
+     * <p/>
+     * @throws ConnectionProviderException
      */
     public abstract Map<ISettingDefinition<?, ?>, ISettingValue<?>> getSettings() throws ConnectionProviderException;
 
@@ -159,9 +162,10 @@ public abstract class SettingsManager {
      * @param setting the definition
      * <p/>
      * @throws ConfigurationException if there is a problem deleting the setting
-     * @throws ConnectionProviderException 
+     * @throws ConnectionProviderException
      */
-    public abstract void deleteSetting(ISettingDefinition<?, ?> setting) throws ConfigurationException, ConnectionProviderException;
+    public abstract void deleteSetting(ISettingDefinition<?, ?> setting) throws ConfigurationException,
+                                                                                ConnectionProviderException;
 
     /**
      * Changes a setting. The change is propagated to all Objects that are configured. If the change fails for one of
@@ -170,9 +174,10 @@ public abstract class SettingsManager {
      * @param value the new value of the setting
      * <p/>
      * @throws ConfigurationException if there is a problem changing the setting.
-     * @throws ConnectionProviderException 
+     * @throws ConnectionProviderException
      */
-    public abstract void changeSetting(ISettingValue<?> value) throws ConfigurationException, ConnectionProviderException;
+    public abstract void changeSetting(ISettingValue<?> value) throws ConfigurationException,
+                                                                      ConnectionProviderException;
 
     /* TODO JavaDoc */
     public abstract ISettingValueFactory getSettingFactory();
@@ -190,17 +195,20 @@ public abstract class SettingsManager {
      * @param password the proposed (hashed) password
      * <p/>
      * @return the created user
-     * @throws ConnectionProviderException 
-     * @throws HibernateException 
+     * <p/>
+     * @throws ConnectionProviderException
+     * @throws HibernateException
      */
-    public abstract IAdministratorUser createAdminUser(String username, String password) throws ConnectionProviderException;
+    public abstract IAdministratorUser createAdminUser(String username, String password) throws
+            ConnectionProviderException;
 
     /**
      * Saves a user previously returned by {@link #getAdminUser(java.lang.String)} or {@link #getAdminUsers()}.
      * <p/>
      * @param user the user to change
-     * @throws ConnectionProviderException 
-     * @throws HibernateException 
+     * <p/>
+     * @throws ConnectionProviderException
+     * @throws HibernateException
      */
     public abstract void saveAdminUser(IAdministratorUser user) throws ConnectionProviderException;
 
@@ -208,8 +216,9 @@ public abstract class SettingsManager {
      * Deletes the user with the specified username.
      * <p/>
      * @param username the username
-     * @throws ConnectionProviderException 
-     * @throws HibernateException 
+     * <p/>
+     * @throws ConnectionProviderException
+     * @throws HibernateException
      */
     public abstract void deleteAdminUser(String username) throws ConnectionProviderException;
 
@@ -217,13 +226,15 @@ public abstract class SettingsManager {
      * Deletes the user previously returned by {@link #getAdminUser(java.lang.String)} or {@link #getAdminUsers()}.
      * <p/>
      * @param user
-     * @throws ConnectionProviderException 
+     * <p/>
+     * @throws ConnectionProviderException
      */
     public abstract void deleteAdminUser(IAdministratorUser user) throws ConnectionProviderException;
 
     /**
      * Deletes all settings and users.
-     * @throws ConnectionProviderException 
+     * <p/>
+     * @throws ConnectionProviderException
      */
     public abstract void deleteAll() throws ConnectionProviderException;
 
@@ -231,4 +242,26 @@ public abstract class SettingsManager {
      * Clean up this SettingsManager. All subsequent calls to this class are undefined.
      */
     public abstract void cleanup();
+
+    /**
+     * Returns if a operation is active and should be offered by this SOS.
+     * <p/>
+     * @param requestOperatorKeyType the key identifying the operation
+     * <p/>
+     * @return {@code true} if the operation is active in this SOS
+     * <p/>
+     * @throws ConnectionProviderException
+     */
+    public abstract boolean isActive(RequestOperatorKeyType requestOperatorKeyType) throws ConnectionProviderException;
+
+    /**
+     * Sets the status of an operation.
+     * <p/>
+     * @param requestOperatorKeyType the key identifying the operation
+     * @param active whether the operation is active or not
+     * <p/>
+     * @throws ConnectionProviderException
+     */
+    public abstract void setActive(RequestOperatorKeyType requestOperatorKeyType, boolean active) throws
+            ConnectionProviderException;
 }

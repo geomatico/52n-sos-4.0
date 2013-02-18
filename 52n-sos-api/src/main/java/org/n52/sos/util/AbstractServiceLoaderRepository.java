@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public abstract class AbstractServiceLoaderRepository<T> {
-	private static final Logger log = LoggerFactory.getLogger(AbstractServiceLoaderRepository.class);
+	protected static final Logger log = LoggerFactory.getLogger(AbstractServiceLoaderRepository.class);
 	private final ServiceLoader<T> serviceLoader;
 	private final Class<T> type;
 	private final boolean failIfEmpty;
