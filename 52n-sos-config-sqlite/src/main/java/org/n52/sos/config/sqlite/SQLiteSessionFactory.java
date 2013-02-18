@@ -140,7 +140,7 @@ public class SQLiteSessionFactory implements IConnectionProvider {
                 .addAnnotatedClass(AdministratorUser.class)
                 .addAnnotatedClass(Operation.class);
         
-        cfg.registerTypeOverride(new HIbernateFileType(), new String[] { "file", File.class.getName() });
+        cfg.registerTypeOverride(new HibernateFileType(), new String[] { "file", File.class.getName() });
         cfg.registerTypeOverride(new HibernateUriType(), new String[] { "uri", URI.class.getName() });
         
         if (properties != null) {
