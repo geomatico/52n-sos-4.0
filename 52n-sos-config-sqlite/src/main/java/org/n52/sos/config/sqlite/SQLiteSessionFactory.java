@@ -153,8 +153,12 @@ public class SQLiteSessionFactory implements IConnectionProvider {
     }
 
     @Override
-    public Session getConnection()throws ConnectionProviderException {
-        return getSessionFactory().getCurrentSession();
+    public Session getConnection() throws ConnectionProviderException {
+        try {
+            return getSessionFactory().getCurrentSession();
+        } catch (HibernateException e) {
+            throw new ConnectionProviderException(e);
+        }
     }
 
     @Override
