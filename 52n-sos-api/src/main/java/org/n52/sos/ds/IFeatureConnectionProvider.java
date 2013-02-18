@@ -23,6 +23,13 @@
  */
 package org.n52.sos.ds;
 
+/**
+ * Interface for feature  connection provider
+ * 
+ * @author Carsten Hollmann <c.hollmann@62north.org>
+ * @since 4.0.0
+ *
+ */
 public interface IFeatureConnectionProvider extends IConnectionProvider {
 
 }

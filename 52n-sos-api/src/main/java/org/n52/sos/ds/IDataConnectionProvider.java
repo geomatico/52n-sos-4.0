@@ -23,6 +23,14 @@
  */
 package org.n52.sos.ds;
 
+
+/**
+ * Interface for data connection provider
+ * 
+ * @author Carsten Hollmann <c.hollmann@62north.org>
+ * @since 4.0.0
+ *
+ */
 public interface IDataConnectionProvider extends IConnectionProvider {
 
 }

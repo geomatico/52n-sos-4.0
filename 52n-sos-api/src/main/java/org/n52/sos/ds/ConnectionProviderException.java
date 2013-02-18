@@ -23,6 +23,12 @@
  */
 package org.n52.sos.ds;
 
+
+/**
+ * @author CarstenHollmann
+ * @since 4.0.0
+ *
+ */
 public class ConnectionProviderException extends Exception {
 
     
