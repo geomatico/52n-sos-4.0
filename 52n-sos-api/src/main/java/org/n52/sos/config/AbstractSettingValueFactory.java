@@ -172,7 +172,7 @@ public abstract class AbstractSettingValueFactory implements ISettingValueFactor
      * <p/>
      * @throws IllegalArgumentException if the string value is invalid
      */
-    protected Integer parseInteger(String stringValue) throws NumberFormatException {
+    protected Integer parseInteger(String stringValue) throws IllegalArgumentException {
         return nullOrEmpty(stringValue) ? null : Integer.valueOf(stringValue, 10);
     }
 
@@ -185,7 +185,7 @@ public abstract class AbstractSettingValueFactory implements ISettingValueFactor
      * <p/>
      * @throws IllegalArgumentException if the string value is invalid
      */
-    protected Double parseDouble(String stringValue) throws NumberFormatException {
+    protected Double parseDouble(String stringValue) throws IllegalArgumentException {
         return nullOrEmpty(stringValue) ? null : Double.parseDouble(stringValue);
     }
 
