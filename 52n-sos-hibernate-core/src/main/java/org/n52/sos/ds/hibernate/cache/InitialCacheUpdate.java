@@ -52,8 +52,8 @@ import org.n52.sos.ds.hibernate.cache.base.StaticCapabilitiesCacheUpdate;
  */
 public class InitialCacheUpdate extends CompositeCacheUpdate {
 
-    public InitialCacheUpdate() {
-        super(new OfferingCacheUpdate(),
+    public InitialCacheUpdate(int threads) {
+        super(new OfferingCacheUpdate(threads),
               new ProcedureCacheUpdate(),
               new ObservablePropertiesCacheUpdate(),
               new FeatureOfInterestCacheUpdate(),

@@ -54,13 +54,17 @@ public class OfferingCacheUpdate extends CacheUpdate {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OfferingCacheUpdate.class);
 
     private static final String THREAD_GROUP_NAME = "offering-cache-update";
-    private final int threadCount = Configurator.getInstance().getCacheThreadCount();
+    
     private final ThreadFactory threadFactory = new GroupedAndNamedThreadFactory(THREAD_GROUP_NAME);
-    private final ExecutorService executor = Executors.newFixedThreadPool(threadCount, threadFactory);
     private final IConnectionProvider connectionProvider = Configurator.getInstance().getDataConnectionProvider();
     private final ThreadLocalSessionFactory sessionFactory = new ThreadLocalSessionFactory(connectionProvider);
+    private final ExecutorService executor;
     private List<OwsExceptionReport> errors;
     private CountDownLatch offeringThreadsRunning;
+    
+    public OfferingCacheUpdate(int threads) {
+        this.executor = Executors.newFixedThreadPool(threads, threadFactory);;
+    }
 
     protected CountDownLatch getCountDownLatch() {
         return offeringThreadsRunning;

@@ -43,8 +43,8 @@ import org.n52.sos.ds.hibernate.cache.base.RelatedFeaturesCacheUpdate;
  */
 public class SensorInsertionCacheUpdate extends CompositeCacheUpdate {
 
-    public SensorInsertionCacheUpdate() {
-        super(new OfferingCacheUpdate(),
+    public SensorInsertionCacheUpdate(int threads) {
+        super(new OfferingCacheUpdate(threads),
               new ProcedureCacheUpdate(),
               new ObservablePropertiesCacheUpdate(),
               new FeatureOfInterestCacheUpdate(),

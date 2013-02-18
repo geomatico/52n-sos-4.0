@@ -141,11 +141,6 @@ public class Configurator {
      */
     private File sensorDir;
     /**
-     * Defines the number of threads available in the thread pool of the cache
-     * update executor service.
-     */
-    private int cacheThreadCount = 5;
-    /**
      * Prefix URN for the spatial reference system.
      */
     private String srsNamePrefix;
@@ -369,18 +364,6 @@ public class Configurator {
         notNullOrEmpty("Character Encoding", encoding);
         this.characterEncoding = encoding;
         XmlOptionsHelper.getInstance(this.characterEncoding, true);
-    }
-
-    public int getCacheThreadCount() {
-        return cacheThreadCount;
-    }
-
-    @Setting(CACHE_THREAD_COUNT)
-    public void setCacheThreadCount(int threads) throws ConfigurationException {
-        if (threads <= 0) {
-            throw new ConfigurationException(String.format("Invalid cache thread count %d", threads));
-        }
-        this.cacheThreadCount = threads;
     }
 
     /**

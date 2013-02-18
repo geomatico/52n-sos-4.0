@@ -44,7 +44,6 @@ public class ServiceSettingDefinitions {
     public static final String SUPPORTS_QUALITY = "service.supportsQuality";
     public static final String CAPABILITIES_CACHE_UPDATE_INTERVAL = "service.capabilitiesCacheUpdateInterval";
     public static final String SENSOR_DIRECTORY = "service.sensorDirectory";
-    public static final String CACHE_THREAD_COUNT = "service.cacheThreadCount";
     public static final String SKIP_DUPLICATE_OBSERVATIONS = "service.skipDuplicateObservations";
     public static final String CONFIGURATION_FILES = "service.configurationFiles";
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
@@ -112,13 +111,6 @@ public class ServiceSettingDefinitions {
             .setDescription("The path to a directory with the sensor descriptions in SensorML format. "
                             + "It can be either an absolute path (like <code>/home/user/sosconfig/sensors</code>) "
                             + "or a path relative to the web application directory (e.g. <code>WEB-INF/sensors</code>).");
-    public static final IntegerSettingDefinition CACHE_THREAD_COUNT_DEFINITION = new IntegerSettingDefinition()
-            .setGroup(GROUP)
-            .setOrder(8)
-            .setKey(CACHE_THREAD_COUNT)
-            .setDefaultValue(5)
-            .setTitle("Cache Feeder Threads")
-            .setDescription("The number of threads used to fill the capabilities cache.");
     public static final BooleanSettingDefinition SKIP_DUPLICATE_OBSERVATIONS_DEFINITION = new BooleanSettingDefinition()
             .setGroup(GROUP)
             .setOrder(9)

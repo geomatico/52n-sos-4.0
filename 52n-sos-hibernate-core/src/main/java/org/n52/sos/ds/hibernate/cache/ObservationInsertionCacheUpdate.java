@@ -37,9 +37,9 @@ import org.n52.sos.ds.hibernate.cache.base.OfferingCacheUpdate;
  */
 public class ObservationInsertionCacheUpdate extends CompositeCacheUpdate {
 
-    public ObservationInsertionCacheUpdate() {
+    public ObservationInsertionCacheUpdate(int threads) {
         super(new FeatureOfInterestCacheUpdate(),
-              new OfferingCacheUpdate(),
+              new OfferingCacheUpdate(threads),
               new EventTimeCacheUpdate());
     }
 }

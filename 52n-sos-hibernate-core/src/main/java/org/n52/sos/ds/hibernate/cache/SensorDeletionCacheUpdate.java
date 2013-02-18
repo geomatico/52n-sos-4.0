@@ -35,8 +35,8 @@ import org.n52.sos.ds.hibernate.cache.base.ProcedureCacheUpdate;
  */
 public class SensorDeletionCacheUpdate extends CompositeCacheUpdate {
 
-    public SensorDeletionCacheUpdate() {
-        super(new OfferingCacheUpdate(),
+    public SensorDeletionCacheUpdate(int threads) {
+        super(new OfferingCacheUpdate(threads),
               new ProcedureCacheUpdate());
     }
 }

@@ -56,7 +56,6 @@ public class ConfiguratorSettingDefinitionProvider implements ISettingDefinition
             ServiceSettingDefinitions.SUPPORTS_QUALITY_DEFINITION,
             ServiceSettingDefinitions.CAPABILITIES_CACHE_UPDATE_INTERVAL_DEFINITION,
             ServiceSettingDefinitions.SENSOR_DIRECTORY_DEFINITION,
-            ServiceSettingDefinitions.CACHE_THREAD_COUNT_DEFINITION,
             ServiceSettingDefinitions.SKIP_DUPLICATE_OBSERVATIONS_DEFINITION,
             ServiceSettingDefinitions.CONFIGURATION_FILES_DEFINITION);
 

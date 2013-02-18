@@ -23,13 +23,17 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import static org.n52.sos.util.Util4Exceptions.*;
+import static org.n52.sos.ds.hibernate.CacheFeederSettingDefinitionProvider.CACHE_THREAD_COUNT;
+import static org.n52.sos.util.Util4Exceptions.createNoApplicableCodeException;
+import static org.n52.sos.util.Util4Exceptions.mergeAndThrowExceptions;
 
 import java.util.LinkedList;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.n52.sos.cache.CapabilitiesCache;
+import org.n52.sos.config.annotation.Configurable;
+import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.cache.InitialCacheUpdate;
@@ -39,6 +43,7 @@ import org.n52.sos.ds.hibernate.cache.ResultTemplateInsertionCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.SensorDeletionCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.SensorInsertionCacheUpdate;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.service.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,33 +51,52 @@ import org.slf4j.LoggerFactory;
  * Implementation of the interface ICacheFeederDAO
  *
  */
+@Configurable
 public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFeederDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SosCacheFeederDAO.class);
+    
+    /**
+     * Defines the number of threads available in the thread pool of the cache
+     * update executor service.
+     */
+    private int cacheThreadCount;
+
+    public int getCacheThreadCount() {
+        return cacheThreadCount;
+    }
+
+    @Setting(CACHE_THREAD_COUNT)
+    public void setCacheThreadCount(int threads) throws ConfigurationException {
+        if (threads <= 0) {
+            throw new ConfigurationException(String.format("Invalid cache thread count %d", threads));
+        }
+        this.cacheThreadCount = threads;
+    }
 
     @Override
     public void updateCache(CapabilitiesCache cache) throws OwsExceptionReport {
-        update(cache, new InitialCacheUpdate());
+        update(cache, new InitialCacheUpdate(getCacheThreadCount()));
     }
 
     @Override
     public void updateAfterSensorInsertion(CapabilitiesCache cache) throws OwsExceptionReport {
-        update(cache, new SensorInsertionCacheUpdate());
+        update(cache, new SensorInsertionCacheUpdate(getCacheThreadCount()));
     }
 
     @Override
     public void updateAfterSensorDeletion(CapabilitiesCache cache) throws OwsExceptionReport {
-        update(cache, new SensorDeletionCacheUpdate());
+        update(cache, new SensorDeletionCacheUpdate(getCacheThreadCount()));
     }
 
     @Override
     public void updateAfterObservationInsertion(CapabilitiesCache cache) throws OwsExceptionReport {
-        update(cache, new ObservationInsertionCacheUpdate());
+        update(cache, new ObservationInsertionCacheUpdate(getCacheThreadCount()));
     }
 
     @Override
     public void updateAfterObservationDeletion(CapabilitiesCache cache) throws OwsExceptionReport {
-        update(cache, new ObservationDeletionCacheUpdate());
+        update(cache, new ObservationDeletionCacheUpdate(getCacheThreadCount()));
     }
 
     @Override
