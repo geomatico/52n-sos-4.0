@@ -23,12 +23,10 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -52,7 +50,6 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.JavaHelper;
-import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +68,7 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(DBFeatureQueryHandler.class);
 
     @Override
-    public SosAbstractFeature getFeatureByID(String featureID, Object connection, String version)
+    public SosAbstractFeature getFeatureByID(String featureID, Object connection, String version, int responeSrid)
             throws OwsExceptionReport {
         Session session = getSessionFromConnection(connection);
         try {
@@ -107,7 +104,7 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
 
     @Override
     public Map<String, SosAbstractFeature> getFeatures(List<String> featureIDs, List<SpatialFilter> spatialFilters,
-            Object connection, String version) throws OwsExceptionReport {
+            Object connection, String version, int responeSrid) throws OwsExceptionReport {
         Session session = getSessionFromConnection(connection);
         HibernateQueryObject queryObject = new HibernateQueryObject();
         try {

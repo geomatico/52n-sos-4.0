@@ -176,7 +176,7 @@ public class HibernateObservationUtilities {
                 if (!features.containsKey(foiID)) {
                     SosAbstractFeature featureByID =
                             Configurator.getInstance().getFeatureQueryHandler()
-                                    .getFeatureByID(foiID, session, version);
+                                    .getFeatureByID(foiID, session, version, -1);
                     features.put(foiID, featureByID);
                 }
 
@@ -296,7 +296,7 @@ public class HibernateObservationUtilities {
             for (String featureIdentifier : featureOfInterestIdentifiers) {
                 SosAbstractFeature feature =
                         Configurator.getInstance().getFeatureQueryHandler()
-                                .getFeatureByID(featureIdentifier, session, version);
+                                .getFeatureByID(featureIdentifier, session, version, -1);
 
                 final SosObservationConstellation obsConst =
                         new SosObservationConstellation(procedure, obsProp, null, feature, null);

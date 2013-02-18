@@ -123,7 +123,7 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
                         SosFeatureCollection featureCollection =
                                 new SosFeatureCollection(getConfigurator().getFeatureQueryHandler()
                                         .getFeatures(new ArrayList<String>(foiIDs), request.getSpatialFilters(),
-                                                session, request.getVersion()));
+                                                session, request.getVersion(), -1));
                         GetFeatureOfInterestResponse response = new GetFeatureOfInterestResponse();
                         response.setService(request.getService());
                         response.setVersion(request.getVersion());
@@ -145,7 +145,7 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
                     SosFeatureCollection featureCollection =
                             new SosFeatureCollection(getConfigurator().getFeatureQueryHandler()
                                     .getFeatures(new ArrayList<String>(foiIDs), request.getSpatialFilters(),
-                                            session, request.getVersion()));
+                                            session, request.getVersion(), -1));
                     GetFeatureOfInterestResponse response = new GetFeatureOfInterestResponse();
                     response.setService(request.getService());
                     response.setVersion(request.getVersion());

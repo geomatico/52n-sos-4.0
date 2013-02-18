@@ -38,7 +38,7 @@ import org.n52.sos.ogc.sos.SosEnvelope;
  * 
  */
 public interface IFeatureQueryHandler {
-
+    
     /**
      * Query feature data from data source for an identifier
      * 
@@ -48,10 +48,12 @@ public interface IFeatureQueryHandler {
      *            Data source connection
      * @param version
      *            SOS version
+     * @param responseSrid
+     *            response srid for feature geometry, if negative not transformation  
      * @return SOS representation of the FOI
      * @throws OwsExceptionReport
      */
-    public SosAbstractFeature getFeatureByID(String featureID, Object connection, String version)
+    public SosAbstractFeature getFeatureByID(String featureID, Object connection, String version, int responseSrid)
             throws OwsExceptionReport;
 
     /**
@@ -77,11 +79,13 @@ public interface IFeatureQueryHandler {
      *            Data source connection
      * @param version
      *            SOS version
+     * @param responseSrid
+     *            response srid for feature geometry, if negative not transformation       
      * @return Map of identifier and SOS FOI representation
      * @throws OwsExceptionReport
      */
     public Map<String, SosAbstractFeature> getFeatures(List<String> foiIDs, List<SpatialFilter> list,
-            Object connection, String version) throws OwsExceptionReport;
+            Object connection, String version, int responseSrid) throws OwsExceptionReport;
 
     /**
      * Query the envelope for feature ids
