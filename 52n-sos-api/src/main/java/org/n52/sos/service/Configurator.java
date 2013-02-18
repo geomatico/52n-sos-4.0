@@ -69,6 +69,7 @@ import org.n52.sos.util.ConfiguringSingletonServiceLoader;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.IFactory;
 import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.Validation;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -315,25 +316,6 @@ public class Configurator {
                     this.basepath, this.dataConnectionProviderProperties);
     }
 
-    private static void notNullOrEmpty(String name, String val) throws ConfigurationException {
-        notNull(name, val);
-        if (val.isEmpty()) {
-            throw new ConfigurationException(String.format("%s can not be empty!", name));
-        }
-    }
-
-    private static void notNull(String name, Object val) throws ConfigurationException {
-        if (val == null) {
-            throw new ConfigurationException(String.format("%s can not be null!", name));
-        }
-    }
-
-    private static void greaterZero(String name, int i) throws ConfigurationException {
-        if (i <= 0) {
-            throw new ConfigurationException(String.format("%s can not be smaller or equal zero (was %d)!", name, i));
-        }
-    }
-
     /**
      * @return the updateInterval in milli seconds
      */
@@ -343,7 +325,7 @@ public class Configurator {
 
     @Setting(CAPABILITIES_CACHE_UPDATE_INTERVAL)
     public void setCapabilitiesCacheUpdateInterval(int interval) throws ConfigurationException {
-        greaterZero("Cache update interval", interval);
+        Validation.greaterZero("Cache update interval", interval);
         if (this.capabiltiesCacheUpdateInterval != interval) {
             this.capabiltiesCacheUpdateInterval = interval;
             if (this.capabilitiesCacheController != null) {
@@ -361,7 +343,7 @@ public class Configurator {
 
     @Setting(CHARACTER_ENCODING)
     public void setCharacterEncoding(String encoding) throws ConfigurationException {
-        notNullOrEmpty("Character Encoding", encoding);
+        Validation.notNullOrEmpty("Character Encoding", encoding);
         this.characterEncoding = encoding;
         XmlOptionsHelper.getInstance(this.characterEncoding, true);
     }
@@ -396,7 +378,7 @@ public class Configurator {
 
     @Setting(TOKEN_SEPERATOR)
     public void setTokenSeperator(String seperator) throws ConfigurationException {
-        notNullOrEmpty("Token seperator", seperator);
+        Validation.notNullOrEmpty("Token seperator", seperator);
         this.tokenSeperator = seperator;
     }
 
@@ -411,7 +393,7 @@ public class Configurator {
 
     @Setting(TUPLE_SEPERATOR)
     public void setTupleSeperator(String seperator) throws ConfigurationException {
-        notNullOrEmpty("Tuple seperator", seperator);
+        Validation.notNullOrEmpty("Tuple seperator", seperator);
         this.tupleSeperator = seperator;
     }
 
@@ -426,7 +408,7 @@ public class Configurator {
 
     @Setting(DECIMAL_SEPARATOR)
     public void setDecimalSeperator(String seperator) throws ConfigurationException {
-        notNullOrEmpty("Decimal seperator", seperator);
+        Validation.notNullOrEmpty("Decimal seperator", seperator);
         this.decimalSeparator = seperator;
     }
 
@@ -483,7 +465,7 @@ public class Configurator {
 
     @Setting(LEASE)
     public void setLease(int lease) throws ConfigurationException {
-        greaterZero("Lease", lease);
+        Validation.greaterZero("Lease", lease);
         this.lease = lease;
     }
 
@@ -493,7 +475,7 @@ public class Configurator {
 
     @Setting(DEFAULT_EPSG)
     public void setDefaultEpsg(int epsgCode) throws ConfigurationException {
-        greaterZero("Default EPSG Code", epsgCode);
+        Validation.greaterZero("Default EPSG Code", epsgCode);
         this.defaultEPSG = epsgCode;
     }
 
@@ -558,7 +540,7 @@ public class Configurator {
 
     @Setting(SERVICE_URL)
     public void setServiceURL(URI serviceURL) throws ConfigurationException {
-        notNull("Service URL", serviceURL);
+        Validation.notNull("Service URL", serviceURL);
         String url = serviceURL.toString();
         if (url.contains("?")) {
             url = url.split("[?]")[0];
@@ -612,7 +594,7 @@ public class Configurator {
 
     @Setting(EPSG_CODES_WITH_REVERSED_AXIS_ORDER)
     public void setEpsgCodesWithReversedAxisOrder(String codes) throws ConfigurationException {
-        notNullOrEmpty("EPSG Codes to switch coordinates for", codes);
+        Validation.notNullOrEmpty("EPSG Codes to switch coordinates for", codes);
         String[] splitted = codes.split(";");
         this.epsgsWithReversedAxisOrder = new ArrayList<Range>(splitted.length);
         for (String entry : splitted) {

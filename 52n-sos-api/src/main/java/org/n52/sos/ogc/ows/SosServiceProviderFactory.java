@@ -33,6 +33,7 @@ import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.util.LazyThreadSafeFactory;
+import org.n52.sos.util.Validation;
 import org.n52.sos.util.XmlHelper;
 
 /**
@@ -68,7 +69,7 @@ public class SosServiceProviderFactory extends LazyThreadSafeFactory<SosServiceP
     }
 
     @Setting(NAME)
-    public void setName(String name) {
+    public void setName(String name) throws ConfigurationException {
         this.name = name;
         setRecreate();
     }

@@ -44,6 +44,7 @@ import org.n52.sos.ds.hibernate.cache.SensorDeletionCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.SensorInsertionCacheUpdate;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.util.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
      * Defines the number of threads available in the thread pool of the cache
      * update executor service.
      */
-    private int cacheThreadCount;
+    private int cacheThreadCount = 5;
 
     public int getCacheThreadCount() {
         return cacheThreadCount;
@@ -68,9 +69,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
 
     @Setting(CACHE_THREAD_COUNT)
     public void setCacheThreadCount(int threads) throws ConfigurationException {
-        if (threads <= 0) {
-            throw new ConfigurationException(String.format("Invalid cache thread count %d", threads));
-        }
+        Validation.greaterZero("Cache Thread Count", threads);
         this.cacheThreadCount = threads;
     }
 

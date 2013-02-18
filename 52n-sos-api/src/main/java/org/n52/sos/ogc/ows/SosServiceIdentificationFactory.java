@@ -37,6 +37,7 @@ import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.LazyThreadSafeFactory;
+import org.n52.sos.util.Validation;
 import org.n52.sos.util.XmlHelper;
 
 /**
@@ -64,7 +65,7 @@ public class SosServiceIdentificationFactory extends LazyThreadSafeFactory<SosSe
     }
 
     public void setKeywords(String[] keywords) {
-        this.keywords = Arrays.copyOf(keywords, keywords.length);
+        this.keywords = keywords == null ? new String[0] : Arrays.copyOf(keywords, keywords.length);
         setRecreate();
     }
 
@@ -86,31 +87,36 @@ public class SosServiceIdentificationFactory extends LazyThreadSafeFactory<SosSe
     }
 
     @Setting(TITLE)
-    public void setTitle(String title) {
+    public void setTitle(String title) throws ConfigurationException {
+        Validation.notNullOrEmpty("Service Identification Title", title);
         this.title = title;
         setRecreate();
     }
 
     @Setting(ABSTRACT)
-    public void setAbstract(String description) {
+    public void setAbstract(String description) throws ConfigurationException {
+        Validation.notNullOrEmpty("Service Identification Abstract", description);
         this.description = description;
         setRecreate();
     }
 
     @Setting(SERVICE_TYPE)
-    public void setServiceType(String serviceType) {
+    public void setServiceType(String serviceType) throws ConfigurationException {
+        Validation.notNullOrEmpty("Service Identification Service Type", serviceType);
         this.serviceType = serviceType;
         setRecreate();
     }
 
     @Setting(FEES)
-    public void setFees(String fees) {
+    public void setFees(String fees) throws ConfigurationException {
+        Validation.notNullOrEmpty("Service Identification Fees", title);
         this.fees = fees;
         setRecreate();
     }
 
     @Setting(ACCESS_CONSTRAINTS)
-    public void setConstraints(String constraints) {
+    public void setConstraints(String constraints) throws ConfigurationException {
+        Validation.notNullOrEmpty("Service Identification Access Constraints", constraints);
         this.constraints = constraints;
         setRecreate();
     }
