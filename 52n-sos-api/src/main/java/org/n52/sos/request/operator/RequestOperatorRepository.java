@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.n52.sos.config.SettingsManager;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
@@ -55,11 +56,15 @@ public class RequestOperatorRepository extends AbstractConfiguringServiceLoaderR
         this.requestOperators.clear();
         SettingsManager sm = SettingsManager.getInstance();
         for (IRequestOperator aRequestOperator : requestOperators) {
-            if (sm.isActive(aRequestOperator.getRequestOperatorKeyType())) {
-                log.info("Registered IRequestOperator for {}", aRequestOperator.getRequestOperatorKeyType());
-                this.requestOperators.put(aRequestOperator.getRequestOperatorKeyType(), aRequestOperator);
-            } else {
-                log.info("{} is inactive", aRequestOperator.getRequestOperatorKeyType());
+            try {
+                if (sm.isActive(aRequestOperator.getRequestOperatorKeyType())) {
+                    log.info("Registered IRequestOperator for {}", aRequestOperator.getRequestOperatorKeyType());
+                    this.requestOperators.put(aRequestOperator.getRequestOperatorKeyType(), aRequestOperator);
+                } else {
+                    log.info("{} is inactive", aRequestOperator.getRequestOperatorKeyType());
+                }
+            } catch (ConnectionProviderException cpe) {
+               throw new ConfigurationException("Error while checking RequestOperators", cpe);
             }
         }
     }

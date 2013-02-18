@@ -221,7 +221,7 @@ public class SQLiteSettingsManagerTest {
     }
     
     @Test
-    public void testActiveOperations() {
+    public void testActiveOperations() throws ConnectionProviderException {
         RequestOperatorKeyType key = new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS,
                                                                                            Sos2Constants.SERVICEVERSION),
                                                                 SosConstants.Operations.GetCapabilities.name());
