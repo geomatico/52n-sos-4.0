@@ -60,47 +60,46 @@ public abstract class AbstractRequestOperator<D extends IOperationDAO, R extends
     private final RequestOperatorKeyType requestOperatorKeyType;
     private final Class<R> requestType;
 
-    public AbstractRequestOperator(String service, String version, String operatioName, Class<R> requestType) {
-        this.operationName = operatioName;
+    public AbstractRequestOperator(String service, String version, String operationName, Class<R> requestType) {
+        this.operationName = operationName;
         this.requestOperatorKeyType = new RequestOperatorKeyType(new ServiceOperatorKeyType(service, version), operationName);
         this.requestType = requestType;
         this.dao = (D) Configurator.getInstance().getOperationDaoRepository().getOperationDAO(operationName);
         LOGGER.info("{} initialized successfully!", getClass().getSimpleName());
-
     }
 
-    protected final D getDao() {
-        return dao;
+    protected D getDao() {
+        return this.dao;
     }
 
     @Override
-    public final IExtension getExtension(Object connection) throws OwsExceptionReport {
+    public IExtension getExtension(Object connection) throws OwsExceptionReport {
         return getDao().getExtension(connection);
     }
 
     @Override
-    public final OWSOperation getOperationMetadata(String service, String version, Object connection) throws OwsExceptionReport {
+    public OWSOperation getOperationMetadata(String service, String version, Object connection) throws OwsExceptionReport {
         return getDao().getOperationsMetadata(service, version, connection);
     }
 
-    protected final String getOperationName() {
+    protected String getOperationName() {
         return this.operationName;
     }
 
     @Override
-    public final boolean hasImplementedDAO() {
+    public boolean hasImplementedDAO() {
         return getDao() != null;
     }
 
     @Override
-    public final RequestOperatorKeyType getRequestOperatorKeyType() {
+    public RequestOperatorKeyType getRequestOperatorKeyType() {
         return requestOperatorKeyType;
     }
 
     protected abstract ServiceResponse receive(R request) throws OwsExceptionReport;
 
     @Override
-    public final ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
+    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
 		SosEventBus.fire(new RequestEvent(request));
         if (requestType.isAssignableFrom(request.getClass())) {
             return receive(requestType.cast(request));
@@ -176,7 +175,6 @@ public abstract class AbstractRequestOperator<D extends IOperationDAO, R extends
      *
      * @param request
      *            the request
-     * @param set
      * @throws OwsExceptionReport
      *             if this SOS does not support the requested versions
      */
