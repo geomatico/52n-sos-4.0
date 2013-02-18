@@ -34,7 +34,7 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
 import org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider;
 import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
-import org.n52.sos.ds.IConnectionProvider;
+import org.n52.sos.ds.IDataConnectionProvider;
 import org.n52.sos.service.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * Implementation of the SessionFactory.
  *
  */
-public class SessionFactoryProvider implements IConnectionProvider {
+public class SessionFactoryProvider implements IDataConnectionProvider {
 
     /**
      * logger

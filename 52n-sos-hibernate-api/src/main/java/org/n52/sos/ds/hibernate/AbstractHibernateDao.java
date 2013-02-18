@@ -38,7 +38,7 @@ public abstract class AbstractHibernateDao {
     private final IConnectionProvider connectionProvider;
 
     public AbstractHibernateDao() {
-        this.connectionProvider = Configurator.getInstance().getConnectionProvider();
+        this.connectionProvider = Configurator.getInstance().getDataConnectionProvider();
     }
 
     protected Session getSession() throws OwsExceptionReport {

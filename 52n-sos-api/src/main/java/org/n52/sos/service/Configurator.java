@@ -46,7 +46,9 @@ import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.convert.ConverterRepository;
 import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ds.IConnectionProvider;
+import org.n52.sos.ds.IDataConnectionProvider;
 import org.n52.sos.ds.IDataSourceInitializator;
+import org.n52.sos.ds.IFeatureConnectionProvider;
 import org.n52.sos.ds.IFeatureQueryHandler;
 import org.n52.sos.ds.OperationDAORepository;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -176,15 +178,25 @@ public class Configurator {
      * update interval for capabilities cache.
      */
     private long capabiltiesCacheUpdateInterval;
-    private Properties connectionProviderProperties;
+    
+    private Properties dataConnectionProviderProperties;
+    
+    private Properties featureConnectionProviderProperties;
     /**
      * Implementation of IFeatureQueryHandler.
      */
     private IFeatureQueryHandler featureQueryHandler;
+    
     /**
-     * Implementation of IConnectionProvider.
+     * Implementation of IDataConnectionProvider.
      */
-    private IConnectionProvider connectionProvider;
+    private IConnectionProvider dataConnectionProvider;
+    
+    /**
+     * Implementation of IFeatureConnectionProvider.
+     */
+    private IConnectionProvider featureConnectionProvider;
+    
     /**
      * Implementation of
      * <code>IDataSourceInitializator</code>.
@@ -303,9 +315,9 @@ public class Configurator {
         }
 
         this.basepath = basepath;
-        this.connectionProviderProperties = connectionProviderConfig;
+        this.dataConnectionProviderProperties = connectionProviderConfig;
         LOGGER.info("Configurator initialized: [basepath={}]",
-                    this.basepath, this.connectionProviderProperties);
+                    this.basepath, this.dataConnectionProviderProperties);
     }
 
     private static void notNullOrEmpty(String name, String val) throws ConfigurationException {
@@ -643,7 +655,8 @@ public class Configurator {
     private void initialize() throws ConfigurationException {
         LOGGER.info("\n******\n Configurator initialization started\n******\n");
         SettingsManager.getInstance().configure(this);
-        initializeConnectionProvider();
+        initializeDataConnectionProvider();
+        initializeFeatureConnectionProvider();
         this.codingRepository = new CodingRepository();
         this.serviceIdentificationFactory = new SosServiceIdentificationFactory();
         this.serviceProviderFactory = new SosServiceProviderFactory();
@@ -700,10 +713,25 @@ public class Configurator {
      *
      * @throws ConfigurationException If no connection provider is implemented
      */
-    private void initializeConnectionProvider() throws ConfigurationException {
-        this.connectionProvider = new ConfiguringSingletonServiceLoader<IConnectionProvider>(IConnectionProvider.class,
+    private void initializeDataConnectionProvider() throws ConfigurationException {
+        this.dataConnectionProvider = new ConfiguringSingletonServiceLoader<IDataConnectionProvider>(IDataConnectionProvider.class,
                                                                                              true).get();
-        this.connectionProvider.initialize(this.connectionProviderProperties);
+        this.dataConnectionProvider.initialize(this.dataConnectionProviderProperties);
+    }
+    
+    /**
+     * Load the connection provider implementation
+     *
+     * @throws ConfigurationException If no connection provider is implemented
+     */
+    private void initializeFeatureConnectionProvider() throws ConfigurationException {
+        this.featureConnectionProvider = new ConfiguringSingletonServiceLoader<IFeatureConnectionProvider>(IFeatureConnectionProvider.class,
+                                                                                             false).get();
+        if (featureConnectionProvider != null) {
+        this.featureConnectionProvider.initialize(this.featureConnectionProviderProperties);
+        } else {
+            this.featureConnectionProvider = this.dataConnectionProvider;
+        }
     }
 
     private void initializeDataSource() throws ConfigurationException {
@@ -790,10 +818,17 @@ public class Configurator {
     }
 
     /**
-     * @return the implemented connection provider
+     * @return the implemented data connection provider
      */
-    public IConnectionProvider getConnectionProvider() {
-        return connectionProvider;
+    public IConnectionProvider getDataConnectionProvider() {
+        return dataConnectionProvider;
+    }
+    
+    /**
+     * @return the implemented feature connection provider
+     */
+    public IConnectionProvider getFeatureConnectionProvider() {
+        return featureConnectionProvider;
     }
 
     /**
@@ -888,8 +923,11 @@ public class Configurator {
      * Eventually cleanup everything created by the constructor
      */
     public synchronized void cleanup() {
-        if (connectionProvider != null) {
-            connectionProvider.cleanup();
+        if (dataConnectionProvider != null) {
+            dataConnectionProvider.cleanup();
+        }
+        if (featureConnectionProvider != null) {
+            featureConnectionProvider.cleanup();
         }
         if (capabilitiesCacheController != null) {
             capabilitiesCacheController.cancel();

@@ -50,7 +50,7 @@ public class HibernateCriteriaQueryUtilitiesTest extends AbstractSosTestCase {
 	@Test
 	public void getGlobalTemporalBoundingBoxEndBeforeStartOrEqual()
 	{
-		Session session = (Session)Configurator.getInstance().getConnectionProvider().getConnection();
+		Session session = (Session)Configurator.getInstance().getDataConnectionProvider().getConnection();
 		TimePeriod temporalBBox = HibernateCriteriaQueryUtilities.getGlobalTemporalBoundingBox(session);
 		assertNotNull("global temporal bounding box",temporalBBox);
 		assertNotNull("temporal bbox start",temporalBBox.getStart());
@@ -75,7 +75,7 @@ public class HibernateCriteriaQueryUtilitiesTest extends AbstractSosTestCase {
 	@Test
 	public void getTemporalBoundingBoxForOfferingsContainsNoNullElements()
 	{
-		Session session = (Session)Configurator.getInstance().getConnectionProvider().getConnection();
+		Session session = (Session)Configurator.getInstance().getDataConnectionProvider().getConnection();
 		Map<String,TimePeriod> tempBBoxMap = HibernateCriteriaQueryUtilities.getTemporalBoundingBoxesForOfferings(session);
 		assertFalse("map is empty", tempBBoxMap.isEmpty());
 		for (String offeringId : tempBBoxMap.keySet())
@@ -93,7 +93,7 @@ public class HibernateCriteriaQueryUtilitiesTest extends AbstractSosTestCase {
 	public void runtimeComparisonGetGlobalTemporalBoundingBoxes()
 	{
 		long startOldWay, startNewWay, endOldWay, endNewWay;
-		Session session = (Session)Configurator.getInstance().getConnectionProvider().getConnection();
+		Session session = (Session)Configurator.getInstance().getDataConnectionProvider().getConnection();
 		startOldWay = System.currentTimeMillis();
 		HibernateCriteriaQueryUtilities.getMinObservationTime(session);
 		HibernateCriteriaQueryUtilities.getMaxObservationTime(session);

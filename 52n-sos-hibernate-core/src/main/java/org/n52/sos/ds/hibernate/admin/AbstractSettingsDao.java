@@ -64,7 +64,7 @@ public class AbstractSettingsDao implements IInitializableDao {
 	protected Object getConnection() throws SQLException {
 		if (Configurator.getInstance() != null) {
 			log.debug("Configurator is present. Using ConnectionProvider");
-			return Configurator.getInstance().getConnectionProvider().getConnection();
+			return Configurator.getInstance().getDataConnectionProvider().getConnection();
 		}
 		
 		try {
@@ -77,7 +77,7 @@ public class AbstractSettingsDao implements IInitializableDao {
 	
 	protected void returnConnection(Object o) {
 		if (o instanceof Session) {
-			Configurator.getInstance().getConnectionProvider().returnConnection(o);
+			Configurator.getInstance().getDataConnectionProvider().returnConnection(o);
 		} else if (o instanceof Connection) {
 			try {
 				if (o != null) {

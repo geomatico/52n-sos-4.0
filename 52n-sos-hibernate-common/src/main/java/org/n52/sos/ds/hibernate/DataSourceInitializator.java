@@ -53,7 +53,7 @@ public class DataSourceInitializator implements IDataSourceInitializator {
     private IConnectionProvider connectionProvider;
 
     public DataSourceInitializator() {
-        this.connectionProvider = Configurator.getInstance().getConnectionProvider();
+        this.connectionProvider = Configurator.getInstance().getDataConnectionProvider();
     }
 
 	@Override

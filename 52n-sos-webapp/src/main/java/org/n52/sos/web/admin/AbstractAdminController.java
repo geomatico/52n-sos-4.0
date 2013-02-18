@@ -45,7 +45,7 @@ public abstract class AbstractAdminController extends AbstractController {
         if (!f.exists()) {
             throw new FileNotFoundException(f.getAbsolutePath() + " not found.");
         }
-        IConnectionProvider p = Configurator.getInstance().getConnectionProvider();
+        IConnectionProvider p = Configurator.getInstance().getDataConnectionProvider();
         Object con = null;
         try {
             con = p.getConnection();

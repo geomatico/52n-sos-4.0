@@ -80,7 +80,7 @@ public class HibernateObservationUtilitiesTest extends AbstractSosTestCase{
 	{
 		// PREPARE
 		// get connection provider to get session
-		Session session = (Session) Configurator.getInstance().getConnectionProvider().getConnection();
+		Session session = (Session) Configurator.getInstance().getDataConnectionProvider().getConnection();
 		AbstractServiceRequest request = new GetObservationByIdRequest();
 		request.setVersion(Sos2Constants.SERVICEVERSION);
 		Procedure p = new Procedure();
