@@ -40,7 +40,7 @@ public interface IConnectionProvider {
      * 
      * @return Connection to the data source
      */
-    public Object getConnection();
+    public Object getConnection() throws ConnectionProviderException;
 
     /**
      * Return the connection to the provider

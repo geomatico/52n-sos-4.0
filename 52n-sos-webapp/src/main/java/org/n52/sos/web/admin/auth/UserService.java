@@ -31,6 +31,7 @@ import javax.servlet.ServletContext;
 
 import org.n52.sos.config.IAdministratorUser;
 import org.n52.sos.config.SettingsManager;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.web.ControllerConstants;
 import org.slf4j.Logger;
@@ -120,11 +121,19 @@ public class UserService implements AuthenticationProvider, Serializable {
     }
 
     public IAdministratorUser getAdmin(String username) throws ConfigurationException {
-        return SettingsManager.getInstance().getAdminUser(username);
+        try {
+            return SettingsManager.getInstance().getAdminUser(username);
+        } catch (ConnectionProviderException e) {
+           throw new ConfigurationException(e);
+        }
     }
 
     public IAdministratorUser getAdmin(Principal user) throws ConfigurationException {
-        return SettingsManager.getInstance().getAdminUser(user.getName());
+        try {
+            return SettingsManager.getInstance().getAdminUser(user.getName());
+        } catch (ConnectionProviderException e) {
+            throw new ConfigurationException(e);
+        }
     }
 
     public ServletContext getContext() {

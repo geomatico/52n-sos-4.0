@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.hibernate.Session;
 import org.junit.Test;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.test.AbstractSosTestCase;
@@ -48,7 +49,7 @@ public class HibernateCriteriaQueryUtilitiesTest extends AbstractSosTestCase {
 	}
 	
 	@Test
-	public void getGlobalTemporalBoundingBoxEndBeforeStartOrEqual()
+	public void getGlobalTemporalBoundingBoxEndBeforeStartOrEqual() throws ConnectionProviderException
 	{
 		Session session = (Session)Configurator.getInstance().getDataConnectionProvider().getConnection();
 		TimePeriod temporalBBox = HibernateCriteriaQueryUtilities.getGlobalTemporalBoundingBox(session);
@@ -73,7 +74,7 @@ public class HibernateCriteriaQueryUtilitiesTest extends AbstractSosTestCase {
 	}
 	
 	@Test
-	public void getTemporalBoundingBoxForOfferingsContainsNoNullElements()
+	public void getTemporalBoundingBoxForOfferingsContainsNoNullElements() throws ConnectionProviderException
 	{
 		Session session = (Session)Configurator.getInstance().getDataConnectionProvider().getConnection();
 		Map<String,TimePeriod> tempBBoxMap = HibernateCriteriaQueryUtilities.getTemporalBoundingBoxesForOfferings(session);
@@ -90,7 +91,7 @@ public class HibernateCriteriaQueryUtilitiesTest extends AbstractSosTestCase {
 	}
 	
 	@Test
-	public void runtimeComparisonGetGlobalTemporalBoundingBoxes()
+	public void runtimeComparisonGetGlobalTemporalBoundingBoxes() throws ConnectionProviderException
 	{
 		long startOldWay, startNewWay, endOldWay, endNewWay;
 		Session session = (Session)Configurator.getInstance().getDataConnectionProvider().getConnection();

@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.hibernate.ThreadLocalSessionFactory;
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
@@ -94,7 +95,11 @@ public class OfferingCacheUpdate extends CacheUpdate {
             // save all information in cache
             offeringCache.save(getCache());
         } finally {
-            getSessionFactory().close();
+            try {
+                getSessionFactory().close();
+            } catch (ConnectionProviderException cpe) {
+               LOGGER.error("Error while closing SessionFactory", cpe);
+            }
         }
     }
 

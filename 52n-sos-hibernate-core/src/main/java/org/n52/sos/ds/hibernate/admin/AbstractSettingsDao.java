@@ -29,6 +29,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import org.hibernate.Session;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.IInitializableDao;
 import org.n52.sos.ds.hibernate.util.DefaultHibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
@@ -61,7 +62,7 @@ public class AbstractSettingsDao implements IInitializableDao {
 				   properties.getProperty(DefaultHibernateConstants.PASS_PROPERTY));
 	}
 	
-	protected Object getConnection() throws SQLException {
+	protected Object getConnection() throws SQLException, ConnectionProviderException {
 		if (Configurator.getInstance() != null) {
 			log.debug("Configurator is present. Using ConnectionProvider");
 			return Configurator.getInstance().getDataConnectionProvider().getConnection();

@@ -33,6 +33,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.jdbc.Work;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.AbstractController;
@@ -40,7 +41,7 @@ import org.n52.sos.web.SqlUtils;
 
 public abstract class AbstractAdminController extends AbstractController {
 
-    protected void executeSqlFile(String path) throws SQLException, FileNotFoundException {
+    protected void executeSqlFile(String path) throws SQLException, FileNotFoundException, ConnectionProviderException {
         final File f = new File(getContext().getRealPath(path));
         if (!f.exists()) {
             throw new FileNotFoundException(f.getAbsolutePath() + " not found.");

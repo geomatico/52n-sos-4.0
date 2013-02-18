@@ -26,6 +26,7 @@ package org.n52.sos.web.admin;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.ControllerConstants;
@@ -41,7 +42,7 @@ public class AdminDatabaseClearController extends AbstractAdminController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(method = RequestMethod.POST)
-    public void createTestData() throws SQLException, OwsExceptionReport, FileNotFoundException {
+    public void createTestData() throws SQLException, OwsExceptionReport, FileNotFoundException, ConnectionProviderException {
         log.info("Clearing database contents.");
         executeSqlFile(ControllerConstants.CLEAR_DATABASE_SQL_FILE);
         Configurator.getInstance().getCapabilitiesCacheController().updateCacheFromDB();

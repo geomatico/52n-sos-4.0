@@ -55,6 +55,7 @@ import org.n52.sos.config.settings.IntegerSettingDefinition;
 import org.n52.sos.config.settings.NumericSettingDefinition;
 import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.config.settings.UriSettingDefinition;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.service.ConfigurationException;
 import org.slf4j.Logger;
@@ -102,7 +103,7 @@ public class SQLiteSettingsManagerTest {
     }
 
     @Test
-    public void testBooleanSettings() throws ConfigurationException {
+    public void testBooleanSettings() throws ConfigurationException, ConnectionProviderException {
         final BooleanSettingDefinition settingDefinition = new BooleanSettingDefinition().setKey(BOOLEAN_SETTING);
         final ISettingValue<Boolean> settingValue = new BooleanSettingValue().setKey(BOOLEAN_SETTING).setValue(
                 Boolean.TRUE);
@@ -112,7 +113,7 @@ public class SQLiteSettingsManagerTest {
     }
 
     @Test
-    public void testStringSettings() throws ConfigurationException {
+    public void testStringSettings() throws ConfigurationException, ConnectionProviderException {
         final StringSettingDefinition settingDefinition = new StringSettingDefinition().setKey(STRING_SETTING);
         final ISettingValue<String> settingValue = new StringSettingValue().setKey(STRING_SETTING).setValue("string1");
         final ISettingValue<String> newSettingValue = new StringSettingValue().setKey(STRING_SETTING)
@@ -121,7 +122,7 @@ public class SQLiteSettingsManagerTest {
     }
 
     @Test
-    public void testFileSettings() throws ConfigurationException {
+    public void testFileSettings() throws ConfigurationException, ConnectionProviderException {
         final FileSettingDefinition settingDefinition = new FileSettingDefinition().setKey(FILE_SETTING);
         final ISettingValue<File> settingValue = new FileSettingValue().setKey(FILE_SETTING).setValue(new File(
                 "/home/auti/sos1"));
@@ -131,7 +132,7 @@ public class SQLiteSettingsManagerTest {
     }
 
     @Test
-    public void testIntegerSettings() throws ConfigurationException {
+    public void testIntegerSettings() throws ConfigurationException, ConnectionProviderException {
         final IntegerSettingDefinition settingDefinition = new IntegerSettingDefinition().setKey(INTEGER_SETTING);
         final ISettingValue<Integer> settingValue = new IntegerSettingValue().setKey(INTEGER_SETTING).setValue(12312);
         final ISettingValue<Integer> newSettingValue = new IntegerSettingValue().setKey(INTEGER_SETTING).setValue(12311);
@@ -139,7 +140,7 @@ public class SQLiteSettingsManagerTest {
     }
 
     @Test
-    public void testNumericSettings() throws ConfigurationException {
+    public void testNumericSettings() throws ConfigurationException, ConnectionProviderException {
         final NumericSettingDefinition settingDefinition = new NumericSettingDefinition().setKey(DOUBLE_SETTING);
         final ISettingValue<Double> settingValue = new NumericSettingValue().setKey(DOUBLE_SETTING).setValue(212.1213);
         final ISettingValue<Double> newSettingValue = new NumericSettingValue().setKey(DOUBLE_SETTING)
@@ -148,7 +149,7 @@ public class SQLiteSettingsManagerTest {
     }
 
     @Test
-    public void testUriSettings() throws ConfigurationException {
+    public void testUriSettings() throws ConfigurationException, ConnectionProviderException {
         final UriSettingDefinition settingDefinition = new UriSettingDefinition().setKey(URI_SETTING);
         final ISettingValue<URI> settingValue = new UriSettingValue().setKey(URI_SETTING).setValue(URI.create(
                 "http://localhost:8080/a"));
@@ -158,7 +159,7 @@ public class SQLiteSettingsManagerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testChangedSettingsTypeForKey() throws ConfigurationException {
+    public void testChangedSettingsTypeForKey() throws ConfigurationException, ConnectionProviderException {
         final ISettingValue<Double> doubleValue = new NumericSettingValue().setKey(BOOLEAN_SETTING).setValue(212.1213);
         settingsManager.changeSetting(doubleValue);
     }
@@ -166,7 +167,7 @@ public class SQLiteSettingsManagerTest {
     public <T> void testSaveGetAndDelete(
             final ISettingDefinition<? extends ISettingDefinition<?, T>, T> settingDefinition,
             final ISettingValue<T> settingValue,
-            final ISettingValue<T> newSettingValue) throws ConfigurationException {
+            final ISettingValue<T> newSettingValue) throws ConfigurationException, ConnectionProviderException {
 
         assertNotEquals(settingValue, newSettingValue);
         settingsManager.changeSetting(settingValue);
@@ -182,7 +183,7 @@ public class SQLiteSettingsManagerTest {
     }
 
     @Test
-    public void createAdminUserTest() {
+    public void createAdminUserTest() throws ConnectionProviderException {
         IAdministratorUser au = settingsManager.createAdminUser(USERNAME, PASSWORD);
         assertNotNull(au);
         assertEquals(USERNAME, au.getUsername());
@@ -194,13 +195,13 @@ public class SQLiteSettingsManagerTest {
     }
 
     @Test(expected = HibernateException.class)
-    public void createDuplicateAdminUser() {
+    public void createDuplicateAdminUser() throws ConnectionProviderException {
         settingsManager.createAdminUser(USERNAME, PASSWORD);
         settingsManager.createAdminUser(USERNAME, PASSWORD);
     }
 
     @Test
-    public void deleteAdminUserTest() {
+    public void deleteAdminUserTest() throws ConnectionProviderException {
         IAdministratorUser au = settingsManager.getAdminUser(USERNAME);
         if (au == null) {
             au = settingsManager.createAdminUser(USERNAME, PASSWORD);

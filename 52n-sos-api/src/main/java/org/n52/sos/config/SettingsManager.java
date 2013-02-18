@@ -32,6 +32,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
@@ -111,6 +112,7 @@ public abstract class SettingsManager {
      * @param o the object to configure
      * <p/>
      * @throws ConfigurationException if there is a problem configuring the object
+     * @throws ConnectionProviderException 
      * @see Configurable
      * @see Setting
      */
@@ -139,15 +141,17 @@ public abstract class SettingsManager {
      * @param key the definition of the setting
      * <p/>
      * @return the value of the setting
+     * @throws ConnectionProviderException 
      */
-    public abstract <T> ISettingValue<T> getSetting(ISettingDefinition<?, T> key);
+    public abstract <T> ISettingValue<T> getSetting(ISettingDefinition<?, T> key) throws ConnectionProviderException;
 
     /**
      * Gets all values for all definitions. If there is no value for a definition {@code null} is added to the map.
      * <p/>
      * @return all values by definition
+     * @throws ConnectionProviderException 
      */
-    public abstract Map<ISettingDefinition<?, ?>, ISettingValue<?>> getSettings();
+    public abstract Map<ISettingDefinition<?, ?>, ISettingValue<?>> getSettings() throws ConnectionProviderException;
 
     /**
      * Deletes the setting defined by {@code setting}.
@@ -155,8 +159,9 @@ public abstract class SettingsManager {
      * @param setting the definition
      * <p/>
      * @throws ConfigurationException if there is a problem deleting the setting
+     * @throws ConnectionProviderException 
      */
-    public abstract void deleteSetting(ISettingDefinition<?, ?> setting) throws ConfigurationException;
+    public abstract void deleteSetting(ISettingDefinition<?, ?> setting) throws ConfigurationException, ConnectionProviderException;
 
     /**
      * Changes a setting. The change is propagated to all Objects that are configured. If the change fails for one of
@@ -165,17 +170,18 @@ public abstract class SettingsManager {
      * @param value the new value of the setting
      * <p/>
      * @throws ConfigurationException if there is a problem changing the setting.
+     * @throws ConnectionProviderException 
      */
-    public abstract void changeSetting(ISettingValue<?> value) throws ConfigurationException;
+    public abstract void changeSetting(ISettingValue<?> value) throws ConfigurationException, ConnectionProviderException;
 
     /* TODO JavaDoc */
     public abstract ISettingValueFactory getSettingFactory();
 
     /* TODO JavaDoc */
-    public abstract Set<IAdministratorUser> getAdminUsers();
+    public abstract Set<IAdministratorUser> getAdminUsers() throws ConnectionProviderException;
 
     /* TODO JavaDoc */
-    public abstract IAdministratorUser getAdminUser(String username);
+    public abstract IAdministratorUser getAdminUser(String username) throws ConnectionProviderException;
 
     /**
      * Creates a new {@code IAdministratorUser}. This method will fail if the username is already used by another user.
@@ -184,34 +190,42 @@ public abstract class SettingsManager {
      * @param password the proposed (hashed) password
      * <p/>
      * @return the created user
+     * @throws ConnectionProviderException 
+     * @throws HibernateException 
      */
-    public abstract IAdministratorUser createAdminUser(String username, String password);
+    public abstract IAdministratorUser createAdminUser(String username, String password) throws ConnectionProviderException;
 
     /**
      * Saves a user previously returned by {@link #getAdminUser(java.lang.String)} or {@link #getAdminUsers()}.
      * <p/>
      * @param user the user to change
+     * @throws ConnectionProviderException 
+     * @throws HibernateException 
      */
-    public abstract void saveAdminUser(IAdministratorUser user);
+    public abstract void saveAdminUser(IAdministratorUser user) throws ConnectionProviderException;
 
     /**
      * Deletes the user with the specified username.
      * <p/>
      * @param username the username
+     * @throws ConnectionProviderException 
+     * @throws HibernateException 
      */
-    public abstract void deleteAdminUser(String username);
+    public abstract void deleteAdminUser(String username) throws ConnectionProviderException;
 
     /**
      * Deletes the user previously returned by {@link #getAdminUser(java.lang.String)} or {@link #getAdminUsers()}.
      * <p/>
      * @param user
+     * @throws ConnectionProviderException 
      */
-    public abstract void deleteAdminUser(IAdministratorUser user);
+    public abstract void deleteAdminUser(IAdministratorUser user) throws ConnectionProviderException;
 
     /**
      * Deletes all settings and users.
+     * @throws ConnectionProviderException 
      */
-    public abstract void deleteAll();
+    public abstract void deleteAll() throws ConnectionProviderException;
 
     /**
      * Clean up this SettingsManager. All subsequent calls to this class are undefined.

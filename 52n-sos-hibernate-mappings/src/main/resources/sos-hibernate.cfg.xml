@@ -17,6 +17,7 @@
         <property name="hibernate.connection.autoReconnect">true</property>
         <property name="hibernate.connection.autoReconnectForPools">true</property>
         <property name="hibernate.connection.testOnBorrow">true</property>
+        <property name="hibernate.max_fetch_depth">1</property>
         <!-- <property name="hibernate.connection.oracle.jdbc.V8Compatible">true</property> -->
 <!-- No sql output in std out.
         <property name="hibernate.show_sql">true</property>

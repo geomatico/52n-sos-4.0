@@ -36,6 +36,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.n52.sos.decode.IDecoder;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IDataSourceInitializator;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
@@ -80,8 +81,12 @@ public class DataSourceInitializator implements IDataSourceInitializator {
             String exceptionText = "Error while initializing DataSource!";
             LOGGER.debug(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+        } catch (ConnectionProviderException cpe) {
+            String exceptionText = "Error while initializing DataSource!";
+            LOGGER.debug(exceptionText, cpe);
+            throw Util4Exceptions.createNoApplicableCodeException(cpe, exceptionText);
         } finally {
-            connectionProvider.returnConnection(session);
+                connectionProvider.returnConnection(session);
         }
         LOGGER.info("\n******\n DataSource initialized successfully!\n******\n");
 

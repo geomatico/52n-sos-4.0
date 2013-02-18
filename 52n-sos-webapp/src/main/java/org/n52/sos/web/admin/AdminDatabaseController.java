@@ -37,6 +37,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Session;
 import org.hibernate.jdbc.ReturningWork;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IGeneralQueryDao;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -110,7 +111,7 @@ public class AdminDatabaseController extends AbstractAdminController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE_REMOVE_TEST_DATA, method = RequestMethod.POST)
-    public void removeTestData() throws SQLException, OwsExceptionReport, FileNotFoundException {
+    public void removeTestData() throws SQLException, OwsExceptionReport, FileNotFoundException, ConnectionProviderException {
         log.info("Removing test data set.");
         executeSqlFile(ControllerConstants.REMOVE_TEST_DATA_SQL_FILE);
         Configurator.getInstance().getCapabilitiesCacheController().updateCacheFromDB();
@@ -118,7 +119,7 @@ public class AdminDatabaseController extends AbstractAdminController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE_CREATE_TEST_DATA, method = RequestMethod.POST)
-    public void createTestData() throws SQLException, OwsExceptionReport, FileNotFoundException {
+    public void createTestData() throws SQLException, OwsExceptionReport, FileNotFoundException, ConnectionProviderException {
         log.info("Inserting test data set.");
         executeSqlFile(ControllerConstants.INSERT_TEST_DATA_SQL_FILE);
         Configurator.getInstance().getCapabilitiesCacheController().updateCacheFromDB();

@@ -40,6 +40,7 @@ import org.n52.sos.config.IAdministratorUser;
 import org.n52.sos.config.ISettingDefinition;
 import org.n52.sos.config.ISettingValue;
 import org.n52.sos.config.SettingsManager;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
@@ -97,6 +98,9 @@ public class AdminSettingsController extends AbstractController {
         } catch (SQLException e) {
             log.error("Error saving settings", e);
             throw new RuntimeException(e.getMessage());
+        } catch (ConnectionProviderException e1) {
+            log.error("Error saving settings", e1);
+            throw new RuntimeException(e1.getMessage());
         }
     }
 
@@ -161,7 +165,7 @@ public class AdminSettingsController extends AbstractController {
         return (sm == null) ? sm = SettingsManager.getInstance() : sm;
     }
     
-    private void updateSettings(HttpServletRequest request) throws RuntimeException, SQLException, ConfigurationException {
+    private void updateSettings(HttpServletRequest request) throws RuntimeException, SQLException, ConfigurationException, ConnectionProviderException {
         Map<ISettingDefinition<?, ?>, ISettingValue<?>> changedSettings = new HashMap<ISettingDefinition<?, ?>, ISettingValue<?>>();
         for (ISettingDefinition<?, ?> def : getSettingsManager().getSettingDefinitions()) {
             ISettingValue<?> newValue = getSettingsManager().getSettingFactory()

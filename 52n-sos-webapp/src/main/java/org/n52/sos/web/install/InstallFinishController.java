@@ -42,6 +42,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.n52.sos.config.ISettingValue;
 import org.n52.sos.config.SettingsManager;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.hibernate.util.DefaultHibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.service.ConfigurationException;
@@ -215,6 +216,8 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
 
         } catch (ConfigurationException e) {
             throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_INSERT_SETTINGS, e.getMessage()), e);
+        } catch (ConnectionProviderException e1) {
+            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_INSERT_SETTINGS, e1.getMessage()), e1);
         }
     }
 

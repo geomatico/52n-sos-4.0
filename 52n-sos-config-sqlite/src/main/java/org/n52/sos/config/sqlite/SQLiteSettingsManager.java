@@ -47,6 +47,7 @@ import org.n52.sos.config.sqlite.entities.IntegerSettingValue;
 import org.n52.sos.config.sqlite.entities.NumericSettingValue;
 import org.n52.sos.config.sqlite.entities.StringSettingValue;
 import org.n52.sos.config.sqlite.entities.UriSettingValue;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.service.ConfigurationException;
 import org.slf4j.Logger;
@@ -92,7 +93,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
         }
     }
     
-     protected <T> T execute(HibernateAction<T> action) {
+     protected <T> T execute(HibernateAction<T> action) throws ConnectionProviderException {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -107,6 +108,8 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
                 transaction.rollback();
             }
             throw e;
+        } catch (ConnectionProviderException cpe) {
+            throw cpe;
         } finally {
             getConnectionProvider().returnConnection(session);
         }
@@ -118,7 +121,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    public ISettingValue<?> getSettingValue(final String key) throws HibernateException {
+    public ISettingValue<?> getSettingValue(final String key) throws HibernateException, ConnectionProviderException {
         return execute(new HibernateAction<ISettingValue<?>>() {
             @Override
             protected ISettingValue<?> call(Session session) {
@@ -128,7 +131,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    public void saveSettingValue(final ISettingValue<?> setting) throws HibernateException {
+    public void saveSettingValue(final ISettingValue<?> setting) throws HibernateException, ConnectionProviderException {
         log.debug("Saving Setting {}", setting);
         try {
             execute(new VoidHibernateAction() {
@@ -159,7 +162,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Set<ISettingValue<?>> getSettingValues() throws HibernateException {
+    public Set<ISettingValue<?>> getSettingValues() throws HibernateException, ConnectionProviderException {
         return execute(new HibernateAction<Set<ISettingValue<?>>>() {
             @Override protected Set<ISettingValue<?>> call(Session session) {
                 return new HashSet<ISettingValue<?>>(session
@@ -170,7 +173,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    public IAdministratorUser getAdminUser(final String username) throws HibernateException {
+    public IAdministratorUser getAdminUser(final String username) throws HibernateException, ConnectionProviderException {
         return execute(new HibernateAction<IAdministratorUser>() {
             @Override protected IAdministratorUser call(Session session) {
                 return (IAdministratorUser) session.createCriteria(AdministratorUser.class)
@@ -180,7 +183,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    protected void deleteSettingValue(final String setting) throws HibernateException {
+    protected void deleteSettingValue(final String setting) throws HibernateException, ConnectionProviderException {
         execute(new VoidHibernateAction() {
             @Override protected void run(Session session) {
                 AbstractSettingValue<?> hSetting = (AbstractSettingValue<?>) session.get(
@@ -198,7 +201,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    public IAdministratorUser createAdminUser(final String username, final String password) throws HibernateException {
+    public IAdministratorUser createAdminUser(final String username, final String password) throws HibernateException, ConnectionProviderException {
         return execute(new HibernateAction<IAdministratorUser>() {
             @Override protected IAdministratorUser call(Session session) {
                 IAdministratorUser user = new AdministratorUser().setUsername(username).setPassword(password);
@@ -210,7 +213,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    public void saveAdminUser(final IAdministratorUser user) throws HibernateException {
+    public void saveAdminUser(final IAdministratorUser user) throws HibernateException, ConnectionProviderException {
         execute(new VoidHibernateAction() {
             @Override protected void run(Session session) {
                 log.debug("Updating AdministratorUser {}", user);
@@ -220,7 +223,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    public void deleteAdminUser(final String username) throws HibernateException {
+    public void deleteAdminUser(final String username) throws HibernateException, ConnectionProviderException {
         execute(new VoidHibernateAction() {
             @Override protected void run(Session session) {
                 IAdministratorUser au = (IAdministratorUser) session.createCriteria(AdministratorUser.class)
@@ -234,7 +237,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void deleteAll() {
+    public void deleteAll() throws ConnectionProviderException{
         execute(new VoidHibernateAction() {
             @Override protected void run(Session session) {
                 List<IAdministratorUser> users = session.createCriteria(AdministratorUser.class)
@@ -253,7 +256,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Set<IAdministratorUser> getAdminUsers() {
+    public Set<IAdministratorUser> getAdminUsers() throws ConnectionProviderException{
         return execute(new HibernateAction<Set<IAdministratorUser>>() {
             @Override
             protected Set<IAdministratorUser> call(Session session) {

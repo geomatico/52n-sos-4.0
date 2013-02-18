@@ -26,7 +26,6 @@ package org.n52.sos.config;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -37,6 +36,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.SettingsChangeEvent;
 import org.n52.sos.service.ConfigurationException;
@@ -91,7 +91,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     }
 
     @Override
-    public void changeSetting(ISettingValue<?> newValue) throws ConfigurationException {
+    public void changeSetting(ISettingValue<?> newValue) throws ConfigurationException, ConnectionProviderException {
         if (newValue == null) {
             throw new NullPointerException("newValue can not be null");
         }
@@ -115,7 +115,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     }
 
     @Override
-    public void deleteSetting(ISettingDefinition<?, ?> setting) throws ConfigurationException {
+    public void deleteSetting(ISettingDefinition<?, ?> setting) throws ConfigurationException, ConnectionProviderException {
         ISettingValue<?> oldValue = getSettingValue(setting.getKey());
         if (oldValue != null) {
             applySetting(setting, oldValue, null);
@@ -173,12 +173,12 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     }
 
     @Override
-    public <T> ISettingValue<T> getSetting(ISettingDefinition<?, T> key) {
+    public <T> ISettingValue<T> getSetting(ISettingDefinition<?, T> key) throws ConnectionProviderException {
         return (ISettingValue<T>) getSettingValue(key.getKey());
     }
 
     @Override
-    public Map<ISettingDefinition<?, ?>, ISettingValue<?>> getSettings() {
+    public Map<ISettingDefinition<?, ?>, ISettingValue<?>> getSettings() throws ConnectionProviderException {
         Set<ISettingValue<?>> values = getSettingValues();
         Map<ISettingDefinition<?, ?>, ISettingValue<?>> settingsByDefinition = new HashMap<ISettingDefinition<?, ?>, ISettingValue<?>>(values
                 .size());
@@ -194,7 +194,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     }
 
     @Override
-    public void deleteAdminUser(IAdministratorUser user) {
+    public void deleteAdminUser(IAdministratorUser user) throws ConnectionProviderException {
         deleteAdminUser(user.getUsername());
     }
 
@@ -241,7 +241,11 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         } finally {
             configurableObjectsLock.writeLock().unlock();
         }
-        co.configure(getSettingValue(co.getKey()));
+        try {
+            co.configure(getSettingValue(co.getKey()));
+        } catch (ConnectionProviderException cpe) {
+            throw new ConfigurationException(cpe);
+        }
     }
 
     @Override
@@ -362,8 +366,10 @@ public abstract class AbstractSettingsManager extends SettingsManager {
 
     /**
      * @return all saved setting values
+     * @throws ConnectionProviderException 
+     * @throws HibernateException 
      */
-    protected abstract Set<ISettingValue<?>> getSettingValues();
+    protected abstract Set<ISettingValue<?>> getSettingValues() throws ConnectionProviderException;
 
     /**
      * Returns the value of the specified setting or {@code null} if it does not exist.
@@ -371,20 +377,23 @@ public abstract class AbstractSettingsManager extends SettingsManager {
      * @param key the key
      * <p/>
      * @return the value
+     * @throws ConnectionProviderException 
      */
-    protected abstract ISettingValue<?> getSettingValue(String key);
+    protected abstract ISettingValue<?> getSettingValue(String key) throws ConnectionProviderException;
 
     /**
      * Deletes the setting with the specified key.
      * <p/>
      * @param key the key
+     * @throws ConnectionProviderException 
      */
-    protected abstract void deleteSettingValue(String key);
+    protected abstract void deleteSettingValue(String key) throws ConnectionProviderException;
 
     /**
      * Saves the setting value.
      * <p/>
      * @param setting the value
+     * @throws ConnectionProviderException 
      */
-    protected abstract void saveSettingValue(ISettingValue<?> setting);
+    protected abstract void saveSettingValue(ISettingValue<?> setting) throws ConnectionProviderException;
 }

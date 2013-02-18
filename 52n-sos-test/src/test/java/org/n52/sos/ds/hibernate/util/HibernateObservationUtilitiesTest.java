@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.hibernate.Session;
 import org.junit.Test;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.NumericObservation;
 import org.n52.sos.ds.hibernate.entities.NumericValue;
@@ -76,7 +77,7 @@ public class HibernateObservationUtilitiesTest extends AbstractSosTestCase{
 	}
 	
 	@Test
-	public void createSubObservationOfSweArrayObservationViaGetObservationById() throws OwsExceptionReport
+	public void createSubObservationOfSweArrayObservationViaGetObservationById() throws OwsExceptionReport, ConnectionProviderException
 	{
 		// PREPARE
 		// get connection provider to get session

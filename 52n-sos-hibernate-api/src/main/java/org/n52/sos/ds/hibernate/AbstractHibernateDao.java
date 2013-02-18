@@ -24,6 +24,7 @@
 package org.n52.sos.ds.hibernate;
 
 import org.hibernate.Session;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
@@ -42,7 +43,12 @@ public abstract class AbstractHibernateDao {
     }
 
     protected Session getSession() throws OwsExceptionReport {
-        return getSession(connectionProvider.getConnection());
+        try {
+            return getSession(connectionProvider.getConnection());
+        } catch (ConnectionProviderException cpe) {
+           String exceptionText = "Error while getting new Session!";
+           throw Util4Exceptions.createNoApplicableCodeException(cpe, exceptionText);
+        }
     }
 
     protected void returnSession(Session session) {

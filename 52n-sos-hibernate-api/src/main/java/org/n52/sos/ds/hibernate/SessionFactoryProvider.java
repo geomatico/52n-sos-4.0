@@ -34,6 +34,7 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
 import org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider;
 import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.IDataConnectionProvider;
 import org.n52.sos.service.ConfigurationException;
 import org.slf4j.Logger;
@@ -70,11 +71,19 @@ public class SessionFactoryProvider implements IDataConnectionProvider {
      * @see org.n52.sos.ds.IConnectionProvider#getConnection()
      */
     @Override
-    public Session getConnection() {
-		if (sessionFactory == null) {
-			return null;
-		}
-		return sessionFactory.openSession();
+    public Session getConnection() throws ConnectionProviderException {
+        try {
+            if (sessionFactory == null) {
+                return null;
+        }
+        return sessionFactory.openSession();
+        } catch (HibernateException he) {
+            String exceptionText = "Error while getting connection!";
+            LOGGER.error(exceptionText, he);
+            ConnectionProviderException cpe = new ConnectionProviderException(exceptionText, he);
+            throw cpe;
+        }
+		
     }
 
     /*
@@ -85,15 +94,20 @@ public class SessionFactoryProvider implements IDataConnectionProvider {
      */
     @Override
     public void returnConnection(Object connection) {
-        if (connection != null) {
-            if (connection instanceof Session) {
-                Session session = (Session) connection;
-                if (session.isOpen()) {
-                    session.clear();
-                    session.close();
+        try {
+            if (connection != null) {
+                if (connection instanceof Session) {
+                    Session session = (Session) connection;
+                    if (session.isOpen()) {
+                        session.clear();
+                        session.close();
+                    }
                 }
             }
+        } catch (HibernateException he) {
+            LOGGER.error("Error while returning connection!", he);
         }
+        
     }
 
     /*

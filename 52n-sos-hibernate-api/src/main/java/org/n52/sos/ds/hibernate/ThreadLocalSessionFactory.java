@@ -26,15 +26,21 @@ package org.n52.sos.ds.hibernate;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
 import org.hibernate.Session;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.util.CollectionHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class ThreadLocalSessionFactory {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThreadLocalSessionFactory.class);
     private final IConnectionProvider connectionProvider;
     private final Lock lock = new ReentrantLock();
     private final Set<Session> createdSessions = CollectionHelper.synchronizedSet();
@@ -43,7 +49,12 @@ public class ThreadLocalSessionFactory {
     private ThreadLocal<Session> threadLocal = new ThreadLocal<Session>() {
         @Override
         protected Session initialValue() {
-            return (Session) getConnectionProvider().getConnection();
+            try {
+                return (Session) getConnectionProvider().getConnection();
+            } catch (ConnectionProviderException cpe) {
+                LOGGER.error("Error while getting initialValue for ThreadLocalSessionFactory!", cpe);
+            }
+            return null;
         }
     };
 
@@ -65,7 +76,7 @@ public class ThreadLocalSessionFactory {
         }
     }
 
-    public void close() {
+    public void close() throws ConnectionProviderException {
         setClosed();
         returnSessions();
     }
@@ -96,7 +107,7 @@ public class ThreadLocalSessionFactory {
         }
     }
 
-    protected void returnSessions() {
+    protected void returnSessions() throws ConnectionProviderException {
         for (Session s : getCreatedSessions()) {
             getConnectionProvider().returnConnection(s);
         }
