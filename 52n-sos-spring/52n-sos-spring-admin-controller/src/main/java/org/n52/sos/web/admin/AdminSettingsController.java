@@ -83,10 +83,11 @@ public class AdminSettingsController extends AbstractController {
     }
 
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_SETTINGS, method = RequestMethod.GET)
-    public ModelAndView displaySettings() {
-        return new ModelAndView(ControllerConstants.Views.ADMIN_SETTINGS,
-                                ControllerConstants.SETTINGS_MODEL_ATTRIBUTE,
-                                getData());
+    public ModelAndView displaySettings(Principal user) {
+        Map<String, Object> model = new HashMap<String, Object>(2);
+        model.put(ControllerConstants.SETTINGS_MODEL_ATTRIBUTE, getData());
+        model.put(ControllerConstants.ADMIN_USERNAME_REQUEST_PARAMETER, user.getName());
+        return new ModelAndView(ControllerConstants.Views.ADMIN_SETTINGS, model);
     }
 
     

@@ -47,20 +47,19 @@
 <script type="text/javascript">
     $(function(){
         $.getJSON('<c:url value="/settingDefinitions.json" />', function(settings) {
-            var $container = $("#settings");
-			
-			
-            var $button = $("<button>").attr("type", "button")
-                .addClass("btn btn-info").text("Save").click(function() {
-                    $.post("<c:url value="/admin/settings" />", $container.serializeArray())
+            var $container = $("#settings"),
+                $button = $("<button>").attr("type", "button").addClass("btn btn-info").text("Save");
+            
+            $button.click(function() {
+                $.post('<c:url value="/admin/settings" />', $container.serializeArray())
                 .fail(function(e) {
                     showError("Failed to save settings: " + e.status + " " + e.statusText);
-					$("input#admin_password_facade,input[name=admin_password],input[name=current_password]").val("");
+                    $("input#admin_password_facade,input[name=admin_password],input[name=current_password]").val("");
                 })
                 .done(function() {
                     $("html,body").animate({ "scrollTop": 0}, "fast");
                     showSuccess("Settings saved!");
-					$("input#admin_password_facade,input[name=admin_password],input[name=current_password]").val("");
+                    $("input#admin_password_facade,input[name=admin_password],input[name=current_password]").val("");
                 });
             });
 
@@ -73,7 +72,7 @@
                         "title": "Admin name",
                         "description": "The new administrator user name.",
                         "required": true,
-                        "default": "admin"
+                        "default": "${admin_username}"
                     },
 					"current_password": {
 						"type": "password",
