@@ -92,6 +92,10 @@ public class SosSamplingFeature extends SosAbstractFeature {
     public String getXmlDescription() {
         return xmlDescription;
     }
+    
+    public boolean isSetXmlDescription() {
+        return xmlDescription != null && !xmlDescription.isEmpty();
+    }
 
     public void setXmlDescription(String xmlDescription) {
         this.xmlDescription = xmlDescription;
@@ -120,6 +124,10 @@ public class SosSamplingFeature extends SosAbstractFeature {
     public void setFeatureType(String featureType) {
         this.featureType = featureType;
     }
+    
+    public boolean isSetFeatureType() {
+        return featureType != null && !featureType.isEmpty();
+    }
 
     public String getUrl() {
         return url;
@@ -137,7 +145,7 @@ public class SosSamplingFeature extends SosAbstractFeature {
         if (isSetSampledFeatures()) {
             return Collections.unmodifiableList(sampledFeatures);
         }
-        return new ArrayList<SosAbstractFeature>(0);
+        return Collections.emptyList();
     }
 
     public boolean isSetNames() {
