@@ -153,7 +153,7 @@ LANGUAGE 'sql';
 CREATE OR REPLACE FUNCTION insert_feature_of_interest(text, numeric, numeric) RETURNS bigint AS
 $$
 	INSERT INTO feature_of_interest(feature_of_interest_type_id, identifier, name, geom, description_xml) 
-	SELECT get_spatial_sampling_feature_type('Point'), $1, $1, ST_GeomFromText('POINT(' || $2 || $3 || ')', 4326), 
+	SELECT get_spatial_sampling_feature_type('Point'), $1, $1, ST_GeomFromText('POINT(' || $2 || ' ' || $3 || ')', 4326), 
 '<sams:SF_SpatialSamplingFeature 
 	xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns:sams="http://www.opengis.net/samplingSpatial/2.0" 
@@ -492,23 +492,12 @@ SELECT insert_observable_property('test_observable_property_5');
 SELECT insert_observable_property('test_observable_property_6');
 
 -- PROCEDURES
-SELECT insert_procedure('http://www.example.org/sensors/101', '2012-11-19 13:00', 
-	'test_observable_property_1', 20.401108, 49.594538, 0.0);
-
-SELECT insert_procedure('http://www.example.org/sensors/102', '2012-11-19 13:00', 
-	'test_observable_property_2',  8.401108, 52.980090, 0.0);
-
-SELECT insert_procedure('http://www.example.org/sensors/103', '2012-11-19 13:00', 
-	'test_observable_property_3', 10.401108, 52.512348, 0.0);
-
-SELECT insert_procedure('http://www.example.org/sensors/104', '2012-11-19 13:00', 
-	'test_observable_property_4',  2.401108, 51.594538, 0.0);
-
-SELECT insert_procedure('http://www.example.org/sensors/105', '2012-11-19 13:00', 
-	'test_observable_property_5', 21.401108, 52.127812, 0.0);
-
-SELECT insert_procedure('http://www.example.org/sensors/106', '2012-11-19 13:00', 
-	'test_observable_property_6', 12.412312, 53.123212, 0.0);
+SELECT insert_procedure('http://www.example.org/sensors/101', '2012-11-19 13:00', 'test_observable_property_1', 20.401108, 49.594538, 0.0);
+SELECT insert_procedure('http://www.example.org/sensors/102', '2012-11-19 13:00', 'test_observable_property_2',  8.401108, 52.980090, 0.0);
+SELECT insert_procedure('http://www.example.org/sensors/103', '2012-11-19 13:00', 'test_observable_property_3', 10.401108, 52.512348, 0.0);
+SELECT insert_procedure('http://www.example.org/sensors/104', '2012-11-19 13:00', 'test_observable_property_4',  2.401108, 51.594538, 0.0);
+SELECT insert_procedure('http://www.example.org/sensors/105', '2012-11-19 13:00', 'test_observable_property_5', 21.401108, 52.127812, 0.0);
+SELECT insert_procedure('http://www.example.org/sensors/106', '2012-11-19 13:00', 'test_observable_property_6', 12.412312, 53.123212, 0.0);
 
 -- OBSERVATION_CONSTELLATION
 SELECT insert_observation_constellation('http://www.example.org/sensors/101', 'test_observable_property_1');
