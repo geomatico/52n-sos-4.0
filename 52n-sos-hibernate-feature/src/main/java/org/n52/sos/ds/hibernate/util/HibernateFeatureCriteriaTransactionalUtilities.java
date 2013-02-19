@@ -26,8 +26,6 @@ package org.n52.sos.ds.hibernate.util;
 import org.hibernate.Session;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
-import org.n52.sos.service.Configurator;
-import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.SosHelper;
 
 public class HibernateFeatureCriteriaTransactionalUtilities {
@@ -43,26 +41,24 @@ public class HibernateFeatureCriteriaTransactionalUtilities {
             if (samplingFeature.isSetNames()) {
                 feature.setName(SosHelper.createCSVFromCodeTypeList(samplingFeature.getName()));
             }
-            if (samplingFeature.getGeometry() != null && !samplingFeature.getGeometry().isEmpty()) {
-                // TODO: transform to default EPSG
-                if (Configurator.getInstance().reversedAxisOrderRequired(samplingFeature.getGeometry().getSRID())) {
-                    feature.setGeom(JTSHelper.switchCoordinate4Geometry(samplingFeature.getGeometry()));
-                } else {
-                    feature.setGeom(samplingFeature.getGeometry());
-                }
+            if (samplingFeature.isSetGeometry()) {
+                feature.setGeom(samplingFeature.getGeometry());
             }
-            if (samplingFeature.getXmlDescription() != null && !samplingFeature.getXmlDescription().isEmpty()) {
+            if (samplingFeature.isSetXmlDescription()) {
                 feature.setDescriptionXml(samplingFeature.getXmlDescription());
             }
-            if (samplingFeature.getFeatureType() != null && !samplingFeature.getFeatureType().isEmpty()) {
+            if (samplingFeature.isSetFeatureType()) {
                 feature.setFeatureOfInterestType(HibernateCriteriaQueryUtilities.getFeatureOfInterestTypeObject(samplingFeature.getFeatureType(), session));
             }
-            if (samplingFeature.getSampledFeatures() != null && !samplingFeature.getSampledFeatures().isEmpty()) {
+            if (samplingFeature.isSetSampledFeatures()) {
                 // TODO: create relationship
             }
             session.save(feature);
             session.flush();
         }
+    }
+
+    private HibernateFeatureCriteriaTransactionalUtilities() {
     }
 
 }

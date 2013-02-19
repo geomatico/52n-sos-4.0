@@ -23,14 +23,16 @@
  */
 package org.n52.sos.decode.kvp.v2;
 
-import com.vividsolutions.jts.geom.Geometry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.RandomAccess;
 import java.util.Set;
+
 import org.joda.time.DateTime;
 import org.n52.sos.decode.DecoderException;
 import org.n52.sos.decode.IDecoder;
@@ -77,6 +79,9 @@ public abstract class AbstractKvpDecoder implements IDecoder<AbstractServiceRequ
     protected SpatialFilter parseSpatialFilter(List<String> parameterValues, String parameterName)
             throws OwsExceptionReport {
         if (!parameterValues.isEmpty()) {
+            if (!(parameterValues instanceof RandomAccess)) {
+                parameterValues = new ArrayList<String>(parameterValues);
+            }
             SpatialFilter spatialFilter = new SpatialFilter();
 
             boolean hasSrid = false;
@@ -103,20 +108,9 @@ public abstract class AbstractKvpDecoder implements IDecoder<AbstractServiceRequ
                 throw Util4Exceptions.createInvalidParameterValueException(parameterName,
                         "The parameter value is not valid!");
             }
-            String lowerCorner;
-            String upperCorner;
-
-            if (Configurator.getInstance().reversedAxisOrderRequired(srid)) {
-                lowerCorner = coordinates.get(1) + " " + coordinates.get(0);
-                upperCorner = coordinates.get(3) + " " + coordinates.get(2);
-            } else {
-                lowerCorner = coordinates.get(0) + " " + coordinates.get(1);
-                upperCorner = coordinates.get(2) + " " + coordinates.get(3);
-            }
-            Geometry geom =
-                    JTSHelper.createGeometryFromWKT(JTSHelper.createWKTPolygonFromEnvelope(lowerCorner, upperCorner));
-            geom.setSRID(srid);
-            spatialFilter.setGeometry(geom);
+            String lowerCorner = String.format(Locale.US, "%f %f", coordinates.get(0), coordinates.get(1));
+            String upperCorner = String.format(Locale.US, "%f %f", coordinates.get(2), coordinates.get(3));
+            spatialFilter.setGeometry(JTSHelper.createGeometryFromWKT(JTSHelper.createWKTPolygonFromEnvelope(lowerCorner, upperCorner), srid));
             spatialFilter.setOperator(SpatialOperator.BBOX);
             return spatialFilter;
         }

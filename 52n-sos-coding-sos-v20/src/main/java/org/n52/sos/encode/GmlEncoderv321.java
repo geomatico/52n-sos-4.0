@@ -73,7 +73,9 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
+import org.n52.sos.util.MinMax;
 import org.n52.sos.util.OMHelper;
+import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -229,39 +231,13 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
     private XmlObject createEnvelope(SosEnvelope sosEnvelope) {
         Envelope envelope = sosEnvelope.getEnvelope();
         int srid = sosEnvelope.getSrid();
-        double minx = envelope.getMinX();
-        double maxx = envelope.getMaxX();
-        double miny = envelope.getMinY();
-        double maxy = envelope.getMaxY();
-        @SuppressWarnings("unused")
-        String minz = null;
-        @SuppressWarnings("unused")
-        String maxz = null;
-
         EnvelopeType envelopeType = EnvelopeType.Factory.newInstance();
-
-        // set lower corner
-        // TODO for full 3D support add minz to parameter in setStringValue
+        MinMax<String> minmax = SosHelper.getMinMaxFromEnvelope(envelope, srid);
         DirectPositionType lowerCorner = envelopeType.addNewLowerCorner();
         DirectPositionType upperCorner = envelopeType.addNewUpperCorner();
-        if (srid > 0) {
-            if (!Configurator.getInstance().reversedAxisOrderRequired(srid)) {
-                lowerCorner.setStringValue(minx + " " + miny);
-            } else {
-                lowerCorner.setStringValue(miny + " " + minx);
-            }
-
-            // set upper corner
-            // TODO for full 3D support add maxz to parameter in setStringValue
-            if (!Configurator.getInstance().reversedAxisOrderRequired(srid)) {
-                upperCorner.setStringValue(maxx + " " + maxy);
-            } else {
-                upperCorner.setStringValue(maxy + " " + maxx);
-            }
-            // set SRS
-            envelopeType.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + srid);
-        }
-
+        lowerCorner.setStringValue(minmax.getMinimum());
+        upperCorner.setStringValue(minmax.getMaximum());
+        envelopeType.setSrsName(getSrsName(srid));
         return envelopeType;
     }
 
@@ -393,7 +369,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
         }
     }
 
-    private XmlObject createPosition(Geometry geom, String foiId) {
+    private XmlObject createPosition(Geometry geom, String foiId) throws OwsExceptionReport {
 
         if (geom instanceof Point) {
             PointType xbPoint = PointType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
@@ -427,16 +403,10 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
      * @param xbPoint
      *            XML Point
      */
-    private void createPointFromJtsGeometry(Point jtsPoint, PointType xbPoint) {
+    private void createPointFromJtsGeometry(Point jtsPoint, PointType xbPoint) throws OwsExceptionReport {
         DirectPositionType xbPos = xbPoint.addNewPos();
-        xbPos.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + jtsPoint.getSRID());
-        String coords;
-        if (Configurator.getInstance().reversedAxisOrderRequired(jtsPoint.getSRID())) {
-            coords = JTSHelper.switchCoordinates4String(jtsPoint);
-        } else {
-            coords = JTSHelper.getCoordinates4String(jtsPoint);
-        }
-        xbPos.setStringValue(coords);
+        xbPos.setSrsName(getSrsName(jtsPoint));
+        xbPos.setStringValue(JTSHelper.getCoordinatesString(jtsPoint));
     }
 
     /**
@@ -447,19 +417,12 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
      * @param xbLst
      *            XML LinetSring
      */
-    private void createLineStringFromJtsGeometry(LineString jtsLineString, LineStringType xbLst) {
-        xbLst.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2()
-                + Integer.toString(jtsLineString.getSRID()));
+    private void createLineStringFromJtsGeometry(LineString jtsLineString, LineStringType xbLst) throws OwsExceptionReport {
+        final String srsName = getSrsName(jtsLineString);
+        xbLst.setSrsName(srsName);
         DirectPositionListType xbPosList = xbLst.addNewPosList();
-        xbPosList.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + jtsLineString.getSRID());
-        String coords;
-        // switch coordinates
-        if (Configurator.getInstance().reversedAxisOrderRequired(jtsLineString.getSRID())) {
-            coords = JTSHelper.switchCoordinates4String(jtsLineString);
-        } else {
-            coords = JTSHelper.getCoordinates4String(jtsLineString);
-        }
-        xbPosList.setStringValue(coords);
+        xbPosList.setSrsName(srsName);
+        xbPosList.setStringValue(JTSHelper.getCoordinatesString(jtsLineString));
 
     }
 
@@ -471,8 +434,10 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
      * @param xbPolType
      *            XML Polygon
      */
-    private void createPolygonFromJtsGeometry(Polygon jtsPolygon, PolygonType xbPolType) {
+    private void createPolygonFromJtsGeometry(Polygon jtsPolygon, PolygonType xbPolType) throws OwsExceptionReport {
         List<?> jtsPolygons = PolygonExtracter.getPolygons(jtsPolygon);
+        final String srsName = getSrsName(jtsPolygon);
+        
         for (int i = 0; i < jtsPolygons.size(); i++) {
 
             Polygon pol = (Polygon) jtsPolygons.get(i);
@@ -484,23 +449,16 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
 
             // Exterior ring
             LineString ring = pol.getExteriorRing();
-            String coords;
             DirectPositionListType xbPosList = xbLrt.addNewPosList();
-            xbPosList.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + jtsPolygon.getSRID());
-            // switch coordinates
-            if (Configurator.getInstance().reversedAxisOrderRequired(jtsPolygon.getSRID())) {
-                coords = JTSHelper.switchCoordinates4String(ring);
-            } else {
-                coords = JTSHelper.getCoordinates4String(ring);
-            }
-            xbPosList.setStringValue(coords);
+            
+            xbPosList.setSrsName(srsName);
+            xbPosList.setStringValue(JTSHelper.getCoordinatesString(ring, jtsPolygon.getSRID()));
             xbArt.set(xbLrt);
 
             // Rename element name for output
-            XmlCursor cursor2 = xbArpt.newCursor();
-            boolean hasChild2 = cursor2.toChild(GMLConstants.QN_ABSTRACT_RING_32);
-            if (hasChild2) {
-                cursor2.setName(GMLConstants.QN_LINEAR_RING_32);
+            XmlCursor cursor = xbArpt.newCursor();
+            if (cursor.toChild(GMLConstants.QN_ABSTRACT_RING_32)) {
+                cursor.setName(GMLConstants.QN_LINEAR_RING_32);
             }
 
             // Interior ring
@@ -514,21 +472,14 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
                 ring = pol.getInteriorRingN(ringNumber);
 
                 xbPosList = xbLrt.addNewPosList();
-                xbPosList.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + jtsPolygon.getSRID());
-                // switch coordinates
-                if (Configurator.getInstance().reversedAxisOrderRequired(jtsPolygon.getSRID())) {
-                    coords = JTSHelper.switchCoordinates4String(ring);
-                } else {
-                    coords = JTSHelper.getCoordinates4String(ring);
-                }
-                xbPosList.setStringValue(coords);
+                xbPosList.setSrsName(srsName);
+                xbPosList.setStringValue(JTSHelper.getCoordinatesString(ring, jtsPolygon.getSRID()));
                 xbArt.set(xbLrt);
 
                 // Rename element name for output
-                cursor2 = xbArpt.newCursor();
-                hasChild2 = cursor2.toChild(GMLConstants.QN_ABSTRACT_RING_32);
-                if (hasChild2) {
-                    cursor2.setName(GMLConstants.QN_LINEAR_RING_32);
+                cursor = xbArpt.newCursor();
+                if (cursor.toChild(GMLConstants.QN_ABSTRACT_RING_32)) {
+                    cursor.setName(GMLConstants.QN_LINEAR_RING_32);
                 }
             }
         }
@@ -615,4 +566,11 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
         return measureType;
     }
 
+    protected String getSrsName(Geometry geom) {
+        return getSrsName(geom.getSRID());
+    }
+
+    protected String getSrsName(int srid) {
+        return Configurator.getInstance().getSrsNamePrefixSosV2() + srid;
+    }
 }

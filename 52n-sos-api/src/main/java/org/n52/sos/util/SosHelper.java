@@ -33,7 +33,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -77,6 +76,49 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  */
 public class SosHelper {
+   
+    /**
+     * Class to encapsulate all calls to the {@link Configurator}. Can be overwritten by tests.
+     */
+    protected static class Configuration {
+
+        protected Collection<String> getObservationTypes() {
+            return Configurator.getInstance().getCapabilitiesCacheController().getObservationTypes();
+        }
+
+        protected boolean reversedAxisOrderRequired(int srid) {
+            return Configurator.getInstance().reversedAxisOrderRequired(srid);
+        }
+
+        protected int getDefaultEPSG() {
+            return Configurator.getInstance().getDefaultEPSG();
+        }
+
+        protected String getSrsNamePrefix() {
+            return Configurator.getInstance().getSrsNamePrefix();
+        }
+
+        protected String getSrsNamePrefixSosV2() {
+            return Configurator.getInstance().getSrsNamePrefixSosV2();
+        }
+
+        protected Set<IEncoder<?, ?>> getEncoders() {
+            return Configurator.getInstance().getCodingRepository().getEncoders();
+        }
+
+        protected Collection<Binding> getBindings() {
+            return Configurator.getInstance().getBindingRepository().getBindings().values();
+        }
+    }
+    
+    private static Configuration config = new Configuration();
+    
+    protected static Configuration getConfig() {
+        return config;
+    }
+    protected static void setConfig(Configuration config) {
+        SosHelper.config = config;
+    }
 
     /**
      * logger
@@ -86,8 +128,7 @@ public class SosHelper {
     /**
      * Hide utility constructor
      */
-    private SosHelper() {
-        super();
+    protected SosHelper() {
     }
 
     /**
@@ -233,8 +274,8 @@ public class SosHelper {
     public static int parseSrsName(String srsName) throws OwsExceptionReport {
         int srid = -1;
         if (srsName != null && !srsName.isEmpty() && !srsName.equalsIgnoreCase("NOT_SET")) {
-            String urnSrsPrefix = Configurator.getInstance().getSrsNamePrefix();
-            String urlSrsPrefix = Configurator.getInstance().getSrsNamePrefixSosV2();
+            String urnSrsPrefix = getConfig().getSrsNamePrefix();
+            String urlSrsPrefix = getConfig().getSrsNamePrefixSosV2();
             try {
                 srid = Integer.valueOf(srsName.replace(urnSrsPrefix, "").replace(urlSrsPrefix, ""));
             } catch (NumberFormatException nfe) {
@@ -381,7 +422,7 @@ public class SosHelper {
 
     public static String getUrlPatternForHttpGetMethod(OperationDecoderKey decoderKey) throws OwsExceptionReport {
         try {
-            for (Binding binding : Configurator.getInstance().getBindingRepository().getBindings().values()) {
+            for (Binding binding : getConfig().getBindings()) {
                 if (binding.checkOperationHttpGetSupported(decoderKey)) {
                     return binding.getUrlPattern();
                 }
@@ -633,17 +674,31 @@ public class SosHelper {
      * @see Configurator#reversedAxisOrderRequired(int)
      * @see Configurator#getDefaultEPSG()
      */
-    public static MinMax<String> getMinMaxMapFromEnvelope(Envelope envelope) {
-        if (Configurator.getInstance().reversedAxisOrderRequired(Configurator.getInstance().getDefaultEPSG())) {
-            return new MinMax<String>()
-                    .setMaximum(String.format("%f %f", envelope.getMaxY(), envelope.getMaxX()))
-                    .setMinimum(String.format("%f %f", envelope.getMinY(), envelope.getMinX()));
+    public static MinMax<String> getMinMaxFromEnvelope(Envelope envelope) {
+        return getMinMaxFromEnvelope(envelope, getConfig().getDefaultEPSG());
+    }
+    
+    public static MinMax<String> getMinMaxFromEnvelope(Envelope envelope, int srid) {
+        // TODO for full 3D support add minz to parameter in setStringValue
+        if (getConfig().reversedAxisOrderRequired(srid <= 0 ? getConfig().getDefaultEPSG() : srid)) {
+            return getReversedMinMaxFromEnvelope(envelope);
         } else {
-            return new MinMax<String>()
-                    .setMaximum(String.format("%f %f", envelope.getMaxX(), envelope.getMaxY()))
-                    .setMinimum(String.format("%f %f", envelope.getMinX(), envelope.getMinY()));
+            return getNotReversedMinMaxFromEnvelope(envelope);
         }
     }
+    
+    protected static MinMax<String> getReversedMinMaxFromEnvelope(Envelope envelope) {
+        return new MinMax<String>()
+                .setMaximum(envelope.getMaxY() + " " + envelope.getMaxX())
+                .setMinimum(envelope.getMinY() + " " + envelope.getMinX());
+    }
+
+    protected static MinMax<String> getNotReversedMinMaxFromEnvelope(Envelope envelope) {
+        return new MinMax<String>()
+                .setMaximum(envelope.getMaxX() + " " + envelope.getMaxY())
+                .setMinimum(envelope.getMinX() + " " + envelope.getMinY());
+    }
+    
 
     public static SosObservableProperty createSosOberavablePropertyFromSosSMLIo(SosSMLIo<?> output) {
         SosSweAbstractSimpleType<?> ioValue = output.getIoValue();
@@ -695,14 +750,14 @@ public class SosHelper {
 
     public static Collection<String> getSupportedResponseFormats(String service, String version) {
         Set<String> responseFormats = new HashSet<String>();
-        for (IEncoder<?, ?> iEncoder : Configurator.getInstance().getCodingRepository().getEncoders()) {
+        for (IEncoder<?, ?> iEncoder : getConfig().getEncoders()) {
             if (iEncoder instanceof IObservationEncoder) {
                 responseFormats.addAll(((IObservationEncoder) iEncoder).getSupportedResponseFormats(service, version));
             }
         }
         return responseFormats;
     }
-
+    
     public static Object duplicateObject(Object objectToDuplicate) throws OwsExceptionReport {
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -753,8 +808,7 @@ public class SosHelper {
     }
 
     public static void checkObservationType(String observationType, String parameterName) throws OwsExceptionReport {
-        Collection<String> validObservationTypes =
-                Configurator.getInstance().getCapabilitiesCacheController().getObservationTypes();
+        Collection<String> validObservationTypes = getConfig().getObservationTypes();
         if (observationType.isEmpty()) {
             throw Util4Exceptions.createMissingParameterValueException(parameterName);
         } else {
@@ -815,5 +869,4 @@ public class SosHelper {
         }
         return filters;
     }
-
 }

@@ -94,7 +94,7 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
         }
         
         if (envelope != null) {
-            opsMeta.addRangeParameterValue(parameterName, SosHelper.getMinMaxMapFromEnvelope(envelope.getEnvelope()));
+            opsMeta.addRangeParameterValue(parameterName, SosHelper.getMinMaxFromEnvelope(envelope.getEnvelope()));
         } else {
             opsMeta.addAnyParameterValue(parameterName);
         }
@@ -200,7 +200,6 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
             queryObject.addCriterion(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(sosRequest.getTemporalFilters()));
         }
         queryObject.setAliases(aliases);
-        return HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(queryObject,
-                session);
+        return HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(queryObject, session);
     }
 }

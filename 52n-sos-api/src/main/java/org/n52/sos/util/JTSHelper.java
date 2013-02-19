@@ -23,23 +23,25 @@
  */
 package org.n52.sos.util;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
@@ -49,26 +51,33 @@ import com.vividsolutions.jts.io.WKTReader;
  */
 public class JTSHelper {
 
-    /**
-     * logger
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(JTSHelper.class);
+    public static final char C_BLANK = ' ';
+    public static final char COMMA = ',';
+    public static final String S_BLANK = " ";
 
     /**
-     * Creates a JTS Geometry from an WKT representation.
-     * 
-     * @param wktString
-     *            WKT representation of the geometry
+     * Creates a JTS Geometry from an WKT representation. Switches the coordinate order if needed.
+     * <p/>
+     * @param wkt
+     * WKT representation of the geometry
+     * @param srid the SRID of the newly created geometry
+     * <p/>
      * @return JTS Geometry object
+     * <p/>
      * @throws OwsExceptionReport
-     *             If an error occurs
+     * If an error occurs
+     * @see Configurator#reversedAxisOrderRequired(int)
      */
-    public static Geometry createGeometryFromWKT(String wktString) throws OwsExceptionReport {
-        WKTReader wktReader = new WKTReader();
-        Geometry geom = null;
+    public static Geometry createGeometryFromWKT(String wkt, int srid) throws OwsExceptionReport {
+        WKTReader wktReader = getWKTReaderForSRID(srid);
         try {
-            LOGGER.debug("FOI Geometry: " + wktString);
-            geom = wktReader.read(wktString);
+            LOGGER.debug("FOI Geometry: {}", wkt);
+            Geometry geom = wktReader.read(wkt);
+            if (Configurator.getInstance().reversedAxisOrderRequired(srid)) {
+                geom = reverseCoordinates(geom);
+            }
+            return geom;
         } catch (ParseException pe) {
             String exceptionText = "Error while parsing the geometry of featureOfInterest parameter";
             LOGGER.error(exceptionText, pe);
@@ -76,155 +85,134 @@ public class JTSHelper {
             se.addCodedException(OwsExceptionCode.InvalidParameterValue, null, exceptionText, pe);
             throw se;
         }
-
-        return geom;
     }
-
+    
     /**
      * Switches the coordinates of a JTS Geometry
      * 
-     * @param sourceGeom
+     * @param geom
      *            Geometry to switch coordinates.
      * @return Geometry with switched coordinatas
      */
-    public static Geometry switchCoordinate4Geometry(Geometry sourceGeom) {
+    protected static Geometry reverseCoordinates(Geometry geom) {
+        GeometryFactory factory = geom.getFactory();
 
-        GeometryFactory geomFac = new GeometryFactory();
-        Geometry switchedGeom = null;
-
-        if (sourceGeom instanceof MultiPolygon) {
-            Polygon[] switchedPolygons = new Polygon[sourceGeom.getNumGeometries()];
-            for (int i = 0; i < sourceGeom.getNumGeometries(); i++) {
-                switchedPolygons[i] = (Polygon) switchCoordinate4Geometry(sourceGeom.getGeometryN(i));
+        if (geom instanceof GeometryCollection) {
+            Geometry[] reversed = new Geometry[geom.getNumGeometries()];
+            for (int i = 0; i < geom.getNumGeometries(); i++) {
+                reversed[i] = reverseCoordinates(geom.getGeometryN(i));
             }
-            switchedGeom = geomFac.createMultiPolygon(switchedPolygons);
-        } else {
-
-            // switch coordinates
-            Coordinate[] coordArraySource = sourceGeom.getCoordinates();
-            List<Coordinate> coordList = new ArrayList<Coordinate>(coordArraySource.length);
-            for (Coordinate coordinate : coordArraySource) {
-                if (Double.doubleToLongBits(coordinate.z) == Double.doubleToLongBits(Double.NaN)) {
-                    coordList.add(new Coordinate(coordinate.y, coordinate.x, coordinate.z));
-                }
-                // else if(Double.doubleToLongBits(coordinate.z) ==
-                // Double.doubleToLongBits(Double.NaN)) {
-                // coordList.add(new Coordinate(coordinate.y, coordinate.x,
-                // coordinate.z));
-                // }
-                else {
-                    coordList.add(new Coordinate(coordinate.y, coordinate.x));
-                }
-            }
-            Coordinate[] coordArraySwitched = coordList.toArray(coordArraySource);
-            CoordinateArraySequence coordSeqArray = new CoordinateArraySequence(coordArraySwitched);
-
-            // create new geometry with switched coordinates.
-            if (sourceGeom instanceof Point) {
-                Point point = new Point(coordSeqArray, geomFac);
-                switchedGeom = point;
-            } else if (sourceGeom instanceof LineString) {
-                LineString line = new LineString(coordSeqArray, geomFac);
-                switchedGeom = line;
-            } else if (sourceGeom instanceof Polygon) {
-                Polygon polygon = new Polygon(new LinearRing(coordSeqArray, geomFac), null, geomFac);
-                switchedGeom = polygon;
-            } else if (sourceGeom instanceof MultiPoint) {
-                MultiPoint multiPoint = geomFac.createMultiPoint(coordArraySource);
-                switchedGeom = multiPoint;
-            }
-        }
-        if (switchedGeom != null) {
-            switchedGeom.setSRID(sourceGeom.getSRID());
+            return factory.createGeometryCollection(reversed);
         }
 
-        return switchedGeom;
+        if (geom instanceof MultiPolygon) {
+            Polygon[] reversed = new Polygon[geom.getNumGeometries()];
+            for (int i = 0; i < geom.getNumGeometries(); i++) {
+                reversed[i] = (Polygon) reverseCoordinates(geom.getGeometryN(i));
+            }
+            return factory.createMultiPolygon(reversed);
+        }
+
+        if (geom instanceof MultiPoint) {
+            Point[] reversed = new Point[geom.getNumGeometries()];
+            for (int i = 0; i < geom.getNumGeometries(); i++) {
+                reversed[i] = (Point) reverseCoordinates(geom.getGeometryN(i));
+            }
+            return factory.createMultiPoint(reversed);
+        }
+
+        if (geom instanceof MultiLineString) {
+            LineString[] reversed = new LineString[geom.getNumGeometries()];
+            for (int i = 0; i < geom.getNumGeometries(); i++) {
+                reversed[i] = (LineString) reverseCoordinates(geom.getGeometryN(i));
+            }
+            return factory.createMultiLineString(reversed);
+        }
+
+        // switch coordinates
+        Coordinate[] coordinates = geom.getCoordinates();
+
+        for (int i = 0; i < coordinates.length; ++i) {
+            coordinates[i] = new Coordinate(coordinates[i].y, coordinates[i].x, coordinates[i].z);
+        }
+        
+        CoordinateArraySequence reversed = new CoordinateArraySequence(coordinates);
+
+        if (geom instanceof Point) {
+            return factory.createPoint(reversed);
+        }
+        if (geom instanceof LineString) {
+            return factory.createLineString(reversed);
+        }
+        if (geom instanceof Polygon) {
+            LinearRing shell = factory.createLinearRing(reversed);
+            return factory.createPolygon(shell, null);
+        }
+       
+        //TODO throw exception? log warning?
+        return null;
     }
 
     /**
-     * Switches the coordinates of a Geometry and returns it as a String.
-     * 
-     * @param sourceGeom
-     *            sourceGeom Geometry to switch coordinates.
-     * @return Switched coordinates as a String
-     */
-    public static String switchCoordinates4String(Geometry sourceGeom) {
-        StringBuilder switchedCoords = new StringBuilder();
-        Coordinate[] sourceCoords = sourceGeom.getCoordinates();
-
-        for (Coordinate coordinate : sourceCoords) {
-            switchedCoords.append(coordinate.y);
-            switchedCoords.append(" ");
-            switchedCoords.append(coordinate.x);
-            if (Double.isNaN(coordinate.z)) {
-                switchedCoords.append(" ");
-            } else {
-                switchedCoords.append(" ");
-                switchedCoords.append(coordinate.z).append(" ");
-            }
-        }
-
-        if (switchedCoords.toString().endsWith(" ")) {
-            switchedCoords.delete(switchedCoords.toString().length() - 1, switchedCoords.toString().length());
-        }
-        return switchedCoords.toString();
-    }
-
-    /**
-     * Get the coordinates of a Geometry as String
-     * 
-     * @param sourceGeom
-     *            Geometry to get coordinates
+     * Get the coordinates of a Geometry as String. Switches the coordinate order if needed (SRID is taken from the
+     * geometry).
+     * <p/>
+     * @param geom Geometry to get coordinates
+     * <p/>
      * @return Coordinates as String
+     * <p/>
+     * @throws OwsExceptionReport if the SRID is <= 0
+     * @see Configurator#reversedAxisOrderRequired(int)
      */
-    public static String getCoordinates4String(Geometry sourceGeom) {
-        StringBuilder stringCoords = new StringBuilder();
-        Coordinate[] sourceCoords = sourceGeom.getCoordinates();
+    public static String getCoordinatesString(Geometry geom) throws OwsExceptionReport {
+        return getCoordinatesString(geom, geom.getSRID());
+    }
 
-        for (Coordinate coordinate : sourceCoords) {
-            stringCoords.append(coordinate.x);
-            stringCoords.append(" ");
-            stringCoords.append(coordinate.y);
-            if (Double.isNaN(coordinate.z)) {
-                stringCoords.append(" ");
-            } else {
-                stringCoords.append(" ");
-                stringCoords.append(coordinate.z).append(" ");
-            }
+    /**
+     * Get the coordinates of a Geometry as String. Switches the coordinate order if needed.
+     * <p/>
+     * @param geom Geometry to get coordinates
+     * @param srid the SRID of the geometry
+     * <p/>
+     * @return Coordinates as String
+     * <p/>
+     * @throws OwsExceptionReport if the SRID is <= 0
+     * @see Configurator#reversedAxisOrderRequired(int)
+     */
+    public static String getCoordinatesString(Geometry geom, int srid) throws OwsExceptionReport {
+        if (srid <= 0) {
+            throw Util4Exceptions.createNoApplicableCodeException(null, "SRID may not be <= 0");
         }
-
-        if (stringCoords.toString().endsWith(" ")) {
-            stringCoords.delete(stringCoords.toString().length() - 1, stringCoords.toString().length());
+        if (Configurator.getInstance().reversedAxisOrderRequired(srid)) {
+            return getSwitchedCoordinatesString(geom);
+        } else {
+            return getNotSwitchedCoordinatesString(geom);
         }
-        return stringCoords.toString();
     }
 
     /**
      * switches the order of coordinates contained in a string, e.g. from String
-     * '3.5 4.4' to '4.4 3.5'
-     * 
-     * NOTE: ACTUALLY checks, whether dimension is 2D, otherwise throws
-     * Exception!!
-     * 
-     * @param coordsString
-     *            contains coordinates, which should be switched
+     * '3.5 4.4' to '4.4 3.5' or '3.5 4.4 2.1' to '4.4 3.5 2.1'.
+     * <p/>
+     * @param coordinateString the coordinate, which should be switched
+     * <p/>
      * @return Returns String contained coordinates in switched order
+     * <p/>
      * @throws OwsExceptionReport
      */
-    public static String switchCoordinatesInString(String coordsString) throws OwsExceptionReport {
-        String switchedCoordString = null;
-        String[] coordsArray = coordsString.split(" ");
-        if (coordsArray.length != 2) {
+    private static String switchCoordinate(String coordinateString) throws OwsExceptionReport {
+        String[] coordsArray = coordinateString.split(S_BLANK);
+        if (coordsArray.length == 2) {
+            return String.format("%f %f", coordsArray[1], coordsArray[0]);
+        } else if (coordsArray.length == 3) {
+            return String.format("%f %f %f", coordsArray[1], coordsArray[0], coordsArray[2]);
+        } else {
             OwsExceptionReport se = new OwsExceptionReport();
             se.addCodedException(OwsExceptionCode.InvalidParameterValue, null,
                     "An error occurred, while switching coordinates. Only a pair with two coordinates are supported!");
-            LOGGER.error("Error while  switching coordinates. Only a pair with two coordinates are supported! "
-                    + se.getMessage());
+            LOGGER.error("Error while  switching coordinates. Only a pair with two coordinates are supported! {}", se.getMessage());
             throw se;
-        } else {
-            switchedCoordString = coordsArray[1] + " " + coordsArray[0];
         }
-        return switchedCoordString;
     }
 
     /**
@@ -237,20 +225,76 @@ public class JTSHelper {
      * @return WKT Polygon
      */
     public static String createWKTPolygonFromEnvelope(String lowerCorner, String upperCorner) {
-        String minX = lowerCorner.split(" ")[0];
-        String minY = lowerCorner.split(" ")[1];
-        String maxX = upperCorner.split(" ")[0];
-        String maxY = upperCorner.split(" ")[1];
+        final String[] splittedLowerCorner = lowerCorner.split(S_BLANK);
+        final String[] splittedUpperCorner = upperCorner.split(S_BLANK);
+        final String minX = splittedLowerCorner[0];
+        final String minY = splittedLowerCorner[1];
+        final String maxX = splittedUpperCorner[0];
+        final String maxY = splittedUpperCorner[1];
         StringBuilder sb = new StringBuilder();
         sb.append(JTSConstants.WKT_POLYGON).append(" ((");
-        sb.append(minX).append(" ").append(minY).append(",");
-        sb.append(minX).append(" ").append(maxY).append(",");
-        sb.append(maxX).append(" ").append(maxY).append(",");
-        sb.append(maxX).append(" ").append(minY).append(",");
-        sb.append(minX).append(" ").append(minY).append("))");
+        sb.append(minX).append(C_BLANK).append(minY).append(COMMA);
+        sb.append(minX).append(C_BLANK).append(maxY).append(COMMA);
+        sb.append(maxX).append(C_BLANK).append(maxY).append(COMMA);
+        sb.append(maxX).append(C_BLANK).append(minY).append(COMMA);
+        sb.append(minX).append(C_BLANK).append(minY).append("))");
         return sb.toString();
     }
 
     private JTSHelper() {
     }
+
+    protected static String getNotSwitchedCoordinatesString(Geometry geom) {
+        StringBuilder builder = new StringBuilder();
+        Coordinate[] sourceCoords = geom.getCoordinates();
+        if (sourceCoords.length > 0) {
+            getNotSwitchedCoordinateString(builder, sourceCoords[0]);
+            for (int i = 1; i < sourceCoords.length; ++i) {
+                getNotSwitchedCoordinateString(builder.append(C_BLANK), sourceCoords[i]);
+            }
+        }
+        return builder.toString();
+    }
+
+    protected static String getSwitchedCoordinatesString(Geometry geom) {
+        StringBuilder builder = new StringBuilder();
+        Coordinate[] sourceCoords = geom.getCoordinates();
+        if (sourceCoords.length > 0) {
+            getSwitchedCoordinateString(builder, sourceCoords[0]);
+            for (int i = 1; i < sourceCoords.length; ++i) {
+                getSwitchedCoordinateString(builder.append(C_BLANK), sourceCoords[i]);
+            }
+        }
+        return builder.toString();
+    }
+
+    protected static StringBuilder getSwitchedCoordinateString(StringBuilder builder, Coordinate coordinate) {
+        builder.append(coordinate.y);
+        builder.append(C_BLANK);
+        builder.append(coordinate.x);
+        return appendZCoordinate(builder, coordinate);
+    }
+
+    protected static StringBuilder getNotSwitchedCoordinateString(StringBuilder builder, Coordinate coordinate) {
+        builder.append(coordinate.x);
+        builder.append(C_BLANK);
+        builder.append(coordinate.y);
+        return appendZCoordinate(builder, coordinate);
+    }
+
+    protected static StringBuilder appendZCoordinate(StringBuilder builder, Coordinate coordinate) {
+        if (!Double.isNaN(coordinate.z)) {
+            builder.append(C_BLANK);
+            builder.append(coordinate.z);
+        }
+        return builder;
+    }
+
+    protected static WKTReader getWKTReaderForSRID(int srid) throws OwsExceptionReport {
+        if (srid <= 0) {
+            throw Util4Exceptions.createNoApplicableCodeException(null, "SRID may not be <= 0");
+        }
+        return new WKTReader(new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), srid));
+    }
+    
 }

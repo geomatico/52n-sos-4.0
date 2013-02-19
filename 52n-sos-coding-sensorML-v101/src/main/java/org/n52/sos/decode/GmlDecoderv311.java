@@ -68,12 +68,6 @@ public class GmlDecoderv311 implements IDecoder<Object, XmlObject> {
             EnvelopeDocument.class, TimeInstantType.class, TimePeriodType.class, TimeInstantDocument.class,
             TimePeriodDocument.class, CodeType.class);
 
-    private static final String CS = ",";
-
-    private static final String DECIMAL = ".";
-
-    private static final String TS = " ";
-
     public GmlDecoderv311() {
         LOGGER.debug("Decoder for the following keys initialized successfully: {}!",
                 StringHelper.join(", ", DECODER_KEYS));
@@ -114,33 +108,14 @@ public class GmlDecoderv311 implements IDecoder<Object, XmlObject> {
         return null;
     }
 
-    private Object getGeometry4BBOX(EnvelopeDocument xb_bbox) throws OwsExceptionReport {
-        Geometry result = null;
-
+    private Geometry getGeometry4BBOX(EnvelopeDocument xb_bbox) throws OwsExceptionReport {
         EnvelopeType xb_envelope = xb_bbox.getEnvelope();
-
         // parse srid; if not set, throw exception!
         int srid = SosHelper.parseSrsName(xb_envelope.getSrsName());
-
-        DirectPositionType xb_lowerCorner = xb_envelope.getLowerCorner();
-        DirectPositionType xb_upperCorner = xb_envelope.getUpperCorner();
-
-        String lower = xb_lowerCorner.getStringValue();
-        String upper = xb_upperCorner.getStringValue();
-
-        String geomWKT = null;
-
-        // FIXME dont know how to handle
-        if (Configurator.getInstance().reversedAxisOrderRequired(srid)) {
-            lower = JTSHelper.switchCoordinatesInString(lower);
-            upper = JTSHelper.switchCoordinatesInString(upper);
-        }
-
-        geomWKT = "MULTIPOINT(" + lower + ", " + upper + ")";
-
-        result = JTSHelper.createGeometryFromWKT(geomWKT).getEnvelope();
-        result.setSRID(srid);
-        return result;
+        String lower = xb_envelope.getLowerCorner().getStringValue();
+        String upper = xb_envelope.getUpperCorner().getStringValue();
+        String geomWKT = String.format("MULTIPOINT(%s, %s)", lower, upper);
+        return JTSHelper.createGeometryFromWKT(geomWKT, srid).getEnvelope();
     }
 
     private Object parseTimePeriod(TimePeriodType xbTimePeriod) throws OwsExceptionReport {
@@ -185,7 +160,7 @@ public class GmlDecoderv311 implements IDecoder<Object, XmlObject> {
         ti.setGmlId(xbTimeIntant.getId());
         TimePositionType xbTimePositionType = xbTimeIntant.getTimePosition();
         String timeString = xbTimePositionType.getStringValue();
-        if (timeString != null && !timeString.equals("")) {
+        if (timeString != null && !timeString.isEmpty()) {
             if ((FirstLatest.contains(timeString))) {
                 ti.setIndeterminateValue(timeString);
             } else {

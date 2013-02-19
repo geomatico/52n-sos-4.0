@@ -131,7 +131,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
             }
             if (envelope != null) {
                 opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.spatialFilter,
-                        SosHelper.getMinMaxMapFromEnvelope(envelope.getEnvelope()));
+                        SosHelper.getMinMaxFromEnvelope(envelope.getEnvelope()));
             }
         } else if (version.equals(Sos1Constants.SERVICEVERSION)) {
             // SOS 1.0.0 parameter

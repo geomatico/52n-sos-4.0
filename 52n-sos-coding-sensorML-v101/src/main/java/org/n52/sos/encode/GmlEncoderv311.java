@@ -29,23 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.opengis.gml.AbstractRingPropertyType;
-import net.opengis.gml.AbstractRingType;
-import net.opengis.gml.CodeType;
-import net.opengis.gml.DirectPositionListType;
-import net.opengis.gml.DirectPositionType;
-import net.opengis.gml.LineStringType;
-import net.opengis.gml.LinearRingType;
-import net.opengis.gml.MeasureType;
-import net.opengis.gml.PointType;
-import net.opengis.gml.PolygonType;
-import net.opengis.gml.ReferenceType;
-import net.opengis.gml.TimeInstantDocument;
-import net.opengis.gml.TimeInstantType;
-import net.opengis.gml.TimePeriodDocument;
-import net.opengis.gml.TimePeriodType;
-import net.opengis.gml.TimePositionType;
-
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlRuntimeException;
@@ -73,6 +56,23 @@ import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.opengis.gml.AbstractRingPropertyType;
+import net.opengis.gml.AbstractRingType;
+import net.opengis.gml.CodeType;
+import net.opengis.gml.DirectPositionListType;
+import net.opengis.gml.DirectPositionType;
+import net.opengis.gml.LineStringType;
+import net.opengis.gml.LinearRingType;
+import net.opengis.gml.MeasureType;
+import net.opengis.gml.PointType;
+import net.opengis.gml.PolygonType;
+import net.opengis.gml.ReferenceType;
+import net.opengis.gml.TimeInstantDocument;
+import net.opengis.gml.TimeInstantType;
+import net.opengis.gml.TimePeriodDocument;
+import net.opengis.gml.TimePeriodType;
+import net.opengis.gml.TimePositionType;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
@@ -292,24 +292,18 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
         }
     }
 
-    private XmlObject createPosition(Geometry geom, String foiId) {
-
+    private XmlObject createPosition(Geometry geom, String foiId) throws OwsExceptionReport {
         if (geom instanceof Point) {
             PointType xbPoint = PointType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             xbPoint.setId("point_" + foiId);
             createPointFromJtsGeometry((Point) geom, xbPoint);
             return xbPoint;
-        }
-
-        else if (geom instanceof LineString) {
-            LineStringType xbLineString =
-                    LineStringType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        } else if (geom instanceof LineString) {
+            LineStringType xbLineString = LineStringType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             xbLineString.setId("lineString_" + foiId);
             createLineStringFromJtsGeometry((LineString) geom, xbLineString);
             return xbLineString;
-        }
-
-        else if (geom instanceof Polygon) {
+        } else if (geom instanceof Polygon) {
             PolygonType xbPolygon = PolygonType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             xbPolygon.setId("polygon_" + foiId);
             createPolygonFromJtsGeometry((Polygon) geom, xbPolygon);
@@ -326,19 +320,10 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
      * @param xbPoint
      *            XML Point
      */
-    private void createPointFromJtsGeometry(Point jtsPoint, PointType xbPoint) {
+    private void createPointFromJtsGeometry(Point jtsPoint, PointType xbPoint) throws OwsExceptionReport {
         DirectPositionType xbPos = xbPoint.addNewPos();
-        // FIXME find better place for this constant
-        // xbPos.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + jtsPoint.getSRID());
-        final String srsPrefixSosV1 = "urn:ogc:def:crs:EPSG::";
-        xbPos.setSrsName(srsPrefixSosV1 + jtsPoint.getSRID());
-        String coords;
-        if (Configurator.getInstance().reversedAxisOrderRequired(jtsPoint.getSRID())) {
-            coords = JTSHelper.switchCoordinates4String(jtsPoint);
-        } else {
-            coords = JTSHelper.getCoordinates4String(jtsPoint);
-        }
-        xbPos.setStringValue(coords);
+        xbPos.setSrsName(getSrsName(jtsPoint));
+        xbPos.setStringValue(JTSHelper.getCoordinatesString(jtsPoint));
     }
 
     /**
@@ -349,23 +334,10 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
      * @param xbLst
      *            XML LinetSring
      */
-    private void createLineStringFromJtsGeometry(LineString jtsLineString, LineStringType xbLst) {
-    	// FIXME find better place for this constant
-        // xbPos.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + jtsPoint.getSRID());
-        final String srsPrefixSosV1 = "urn:ogc:def:crs:EPSG::";
-        xbLst.setSrsName(srsPrefixSosV1
-                + Integer.toString(jtsLineString.getSRID()));
+    private void createLineStringFromJtsGeometry(LineString jtsLineString, LineStringType xbLst) throws OwsExceptionReport {
         DirectPositionListType xbPosList = xbLst.addNewPosList();
-        xbPosList.setSrsName(srsPrefixSosV1 + jtsLineString.getSRID());
-        String coords;
-        // switch coordinates
-        if (Configurator.getInstance().reversedAxisOrderRequired(jtsLineString.getSRID())) {
-            coords = JTSHelper.switchCoordinates4String(jtsLineString);
-        } else {
-            coords = JTSHelper.getCoordinates4String(jtsLineString);
-        }
-        xbPosList.setStringValue(coords);
-
+        xbPosList.setSrsName(getSrsName(jtsLineString));
+        xbPosList.setStringValue(JTSHelper.getCoordinatesString(jtsLineString));
     }
 
     /**
@@ -376,11 +348,8 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
      * @param xbPolType
      *            XML Polygon
      */
-    private void createPolygonFromJtsGeometry(Polygon jtsPolygon, PolygonType xbPolType) {
+    private void createPolygonFromJtsGeometry(Polygon jtsPolygon, PolygonType xbPolType) throws OwsExceptionReport {
         List<?> jtsPolygons = PolygonExtracter.getPolygons(jtsPolygon);
-     // FIXME find better place for this constant
-        // xbPos.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + jtsPoint.getSRID());
-        final String srsPrefixSosV1 = "urn:ogc:def:crs:EPSG::";
         for (int i = 0; i < jtsPolygons.size(); i++) {
 
             Polygon pol = (Polygon) jtsPolygons.get(i);
@@ -392,23 +361,17 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
 
             // Exterior ring
             LineString ring = pol.getExteriorRing();
-            String coords;
+            String coords = JTSHelper.getCoordinatesString(ring, jtsPolygon.getSRID());
             DirectPositionListType xbPosList = xbLrt.addNewPosList();
-            xbPosList.setSrsName(srsPrefixSosV1 + jtsPolygon.getSRID());
+            xbPosList.setSrsName(getSrsName(jtsPolygon));
             // switch coordinates
-            if (Configurator.getInstance().reversedAxisOrderRequired(jtsPolygon.getSRID())) {
-                coords = JTSHelper.switchCoordinates4String(ring);
-            } else {
-                coords = JTSHelper.getCoordinates4String(ring);
-            }
             xbPosList.setStringValue(coords);
             xbArt.set(xbLrt);
 
             // Rename element name for output
-            XmlCursor cursor2 = xbArpt.newCursor();
-            boolean hasChild2 = cursor2.toChild(GMLConstants.QN_ABSTRACT_RING);
-            if (hasChild2) {
-                cursor2.setName(GMLConstants.QN_LINEAR_RING);
+            XmlCursor cursor = xbArpt.newCursor();
+            if (cursor.toChild(GMLConstants.QN_ABSTRACT_RING)) {
+                cursor.setName(GMLConstants.QN_LINEAR_RING);
             }
 
             // Interior ring
@@ -422,21 +385,14 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
                 ring = pol.getInteriorRingN(ringNumber);
 
                 xbPosList = xbLrt.addNewPosList();
-                xbPosList.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + jtsPolygon.getSRID());
-                // switch coordinates
-                if (Configurator.getInstance().reversedAxisOrderRequired(jtsPolygon.getSRID())) {
-                    coords = JTSHelper.switchCoordinates4String(ring);
-                } else {
-                    coords = JTSHelper.getCoordinates4String(ring);
-                }
-                xbPosList.setStringValue(coords);
+                xbPosList.setSrsName(getSrsName(jtsPolygon));
+                xbPosList.setStringValue(JTSHelper.getCoordinatesString(ring, jtsPolygon.getSRID()));
                 xbArt.set(xbLrt);
 
                 // Rename element name for output
-                cursor2 = xbArpt.newCursor();
-                hasChild2 = cursor2.toChild(GMLConstants.QN_ABSTRACT_RING);
-                if (hasChild2) {
-                    cursor2.setName(GMLConstants.QN_LINEAR_RING);
+                cursor = xbArpt.newCursor();
+                if (cursor.toChild(GMLConstants.QN_ABSTRACT_RING)) {
+                    cursor.setName(GMLConstants.QN_LINEAR_RING);
                 }
             }
         }
@@ -498,7 +454,7 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
         } else {
             measureType.setUom("");
         }
-        if (!quantityValue.getValue().equals(Double.NaN)) {
+        if (quantityValue.getValue() != null) {
             measureType.setDoubleValue(quantityValue.getValue().doubleValue());
         } else {
             measureType.setNil();
@@ -506,4 +462,7 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
         return measureType;
     }
 
+    protected String getSrsName(Geometry geom) {
+        return Configurator.getInstance().getSrsNamePrefix() + geom.getSRID();
+    }
 }

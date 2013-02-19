@@ -444,23 +444,11 @@ public class ITRequestEncoder {
                                                                        error);
         }
 
-        Point lower = (Point) mp.getGeometryN(0);
-        Point upper = (Point) mp.getGeometryN(1);
         int srid = mp.getSRID();
-
-        String lowerStr = lower.getX() + " " + lower.getY();
-        String upperStr = upper.getX() + " " + upper.getY();
-
-        if (Configurator.getInstance().reversedAxisOrderRequired(srid)) {
-            JTSHelper.switchCoordinatesInString(lowerStr);
-            JTSHelper.switchCoordinatesInString(upperStr);
-        }
-
         EnvelopeType xb_env = xb_bbox.addNewEnvelope();
         xb_env.setSrsName(Configurator.getInstance().getSrsNamePrefix() + srid);
-
-        xb_env.addNewLowerCorner().setStringValue(lowerStr);
-        xb_env.addNewUpperCorner().setStringValue(upperStr);
+        xb_env.addNewLowerCorner().setStringValue(JTSHelper.getCoordinatesString((Point) mp.getGeometryN(0), srid));
+        xb_env.addNewUpperCorner().setStringValue(JTSHelper.getCoordinatesString((Point) mp.getGeometryN(1), srid));
 
         return xb_bbox;
     }

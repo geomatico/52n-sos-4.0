@@ -30,31 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.opengis.gml.x32.AbstractRingPropertyType;
-import net.opengis.gml.x32.AbstractRingType;
-import net.opengis.gml.x32.AbstractSurfaceType;
-import net.opengis.gml.x32.CodeType;
-import net.opengis.gml.x32.CodeWithAuthorityType;
-import net.opengis.gml.x32.CompositeSurfaceType;
-import net.opengis.gml.x32.CoordinatesType;
-import net.opengis.gml.x32.DirectPositionListType;
-import net.opengis.gml.x32.DirectPositionType;
-import net.opengis.gml.x32.EnvelopeDocument;
-import net.opengis.gml.x32.EnvelopeType;
-import net.opengis.gml.x32.FeaturePropertyType;
-import net.opengis.gml.x32.LineStringType;
-import net.opengis.gml.x32.LinearRingType;
-import net.opengis.gml.x32.MeasureType;
-import net.opengis.gml.x32.PointType;
-import net.opengis.gml.x32.PolygonType;
-import net.opengis.gml.x32.ReferenceType;
-import net.opengis.gml.x32.SurfacePropertyType;
-import net.opengis.gml.x32.TimeInstantDocument;
-import net.opengis.gml.x32.TimeInstantType;
-import net.opengis.gml.x32.TimePeriodDocument;
-import net.opengis.gml.x32.TimePeriodType;
-import net.opengis.gml.x32.TimePositionType;
-
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
@@ -82,6 +57,31 @@ import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.opengis.gml.x32.AbstractRingPropertyType;
+import net.opengis.gml.x32.AbstractRingType;
+import net.opengis.gml.x32.AbstractSurfaceType;
+import net.opengis.gml.x32.CodeType;
+import net.opengis.gml.x32.CodeWithAuthorityType;
+import net.opengis.gml.x32.CompositeSurfaceType;
+import net.opengis.gml.x32.CoordinatesType;
+import net.opengis.gml.x32.DirectPositionListType;
+import net.opengis.gml.x32.DirectPositionType;
+import net.opengis.gml.x32.EnvelopeDocument;
+import net.opengis.gml.x32.EnvelopeType;
+import net.opengis.gml.x32.FeaturePropertyType;
+import net.opengis.gml.x32.LineStringType;
+import net.opengis.gml.x32.LinearRingType;
+import net.opengis.gml.x32.MeasureType;
+import net.opengis.gml.x32.PointType;
+import net.opengis.gml.x32.PolygonType;
+import net.opengis.gml.x32.ReferenceType;
+import net.opengis.gml.x32.SurfacePropertyType;
+import net.opengis.gml.x32.TimeInstantDocument;
+import net.opengis.gml.x32.TimeInstantType;
+import net.opengis.gml.x32.TimePeriodDocument;
+import net.opengis.gml.x32.TimePeriodType;
+import net.opengis.gml.x32.TimePositionType;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -242,10 +242,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
             lowerCorner = switchCoordinatesInString(lowerCorner);
             upperCorner = switchCoordinatesInString(upperCorner);
         }
-        Geometry geom =
-                JTSHelper.createGeometryFromWKT(JTSHelper.createWKTPolygonFromEnvelope(lowerCorner, upperCorner));
-        geom.setSRID(srid);
-        return geom;
+        return JTSHelper.createGeometryFromWKT(JTSHelper.createWKTPolygonFromEnvelope(lowerCorner, upperCorner), srid);
     }
 
     // /**
@@ -446,10 +443,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
         }
         
-        Geometry geom = JTSHelper.createGeometryFromWKT(geomWKT);
-        geom.setSRID(srid);
-
-        return geom;
+        return JTSHelper.createGeometryFromWKT(geomWKT, srid);
     }
 
     private Object parseLineStringType(LineStringType xbLineStringType) throws OwsExceptionReport {
@@ -471,17 +465,13 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
 
         checkSrid(srid);
 
-        Geometry geom = JTSHelper.createGeometryFromWKT(geomWKT);
-        geom.setSRID(srid);
-
-        return geom;
+        return JTSHelper.createGeometryFromWKT(geomWKT, srid);
     }
 
     private Object parsePolygonType(PolygonType xbPolygonType) throws OwsExceptionReport {
         int srid = -1;
         if (xbPolygonType.getSrsName() != null) {
-            srid =
-                    SosHelper.parseSrsName(xbPolygonType.getSrsName());
+            srid = SosHelper.parseSrsName(xbPolygonType.getSrsName());
         }
         String exteriorCoordString = null;
         StringBuilder geomWKT = new StringBuilder();
@@ -513,7 +503,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
                 }
             }
         }
-
+        
         geomWKT.append("POLYGON(");
         geomWKT.append(exteriorCoordString);
         if (interiorCoordString != null) {
@@ -522,9 +512,7 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
         geomWKT.append(")");
 
         checkSrid(srid);
-        Geometry geom = JTSHelper.createGeometryFromWKT(geomWKT.toString());
-        geom.setSRID(srid);
-        return geom;
+        return JTSHelper.createGeometryFromWKT(geomWKT.toString(), srid);
     }
 
     private Geometry parseCompositeSurfaceType(CompositeSurfaceType xbCompositeSurface) throws OwsExceptionReport {
