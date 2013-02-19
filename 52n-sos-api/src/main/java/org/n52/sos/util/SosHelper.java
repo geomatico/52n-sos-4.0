@@ -52,7 +52,6 @@ import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
-import org.n52.sos.ogc.ows.OWSConstants.MinMax;
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -624,22 +623,29 @@ public class SosHelper {
         return featureIDs;
     }
 
-    public static Map<MinMax, String> getMinMaxMapFromEnvelope(Envelope envelope) {
-        Map<MinMax, String> map = new EnumMap<MinMax, String>(MinMax.class);
-        String minValue, maxValue;
+    /**
+     * Creates the minimum and maximum values of this envelope in the default EPSG. Coordinates are switched if needed.
+     * <p/>
+     * @param envelope the envelope
+     * <p/>
+     * @return the {@code MinMax} describing the envelope
+     * <p/>
+     * @see Configurator#reversedAxisOrderRequired(int)
+     * @see Configurator#getDefaultEPSG()
+     */
+    public static MinMax<String> getMinMaxMapFromEnvelope(Envelope envelope) {
         if (Configurator.getInstance().reversedAxisOrderRequired(Configurator.getInstance().getDefaultEPSG())) {
-            minValue = envelope.getMinY() + " " + envelope.getMinX();
-            maxValue = envelope.getMaxY() + " " + envelope.getMaxX();
+            return new MinMax<String>()
+                    .setMaximum(String.format("%f %f", envelope.getMaxY(), envelope.getMaxX()))
+                    .setMinimum(String.format("%f %f", envelope.getMinY(), envelope.getMinX()));
         } else {
-            minValue = envelope.getMinX() + " " + envelope.getMinY();
-            maxValue = envelope.getMaxX() + " " + envelope.getMaxY();
+            return new MinMax<String>()
+                    .setMaximum(String.format("%f %f", envelope.getMaxX(), envelope.getMaxY()))
+                    .setMinimum(String.format("%f %f", envelope.getMinX(), envelope.getMinY()));
         }
-        map.put(MinMax.MIN, minValue);
-        map.put(MinMax.MAX, maxValue);
-        return map;
     }
 
-    public static SosObservableProperty createSosOberavablePropertyFromSosSMLIo(SosSMLIo output) {
+    public static SosObservableProperty createSosOberavablePropertyFromSosSMLIo(SosSMLIo<?> output) {
         SosSweAbstractSimpleType<?> ioValue = output.getIoValue();
         String identifier = ioValue.getDefinition();
         String description = ioValue.getDescription();

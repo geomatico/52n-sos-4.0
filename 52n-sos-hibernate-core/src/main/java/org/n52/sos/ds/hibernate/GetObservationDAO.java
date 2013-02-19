@@ -26,9 +26,9 @@ package org.n52.sos.ds.hibernate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,7 +50,6 @@ import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.ows.OWSConstants.MinMax;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
@@ -64,6 +63,7 @@ import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
+import org.n52.sos.util.MinMax;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
@@ -124,7 +124,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
 
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
             // SOS 2.0 parameter
-            opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.temporalFilter, getEventTime(session));
+            opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.temporalFilter, getEventTime());
             SosEnvelope envelope = null;
             if (featureIDs != null && !featureIDs.isEmpty()) {
                 envelope = getCache().getGlobalEnvelope();
@@ -135,7 +135,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
             }
         } else if (version.equals(Sos1Constants.SERVICEVERSION)) {
             // SOS 1.0.0 parameter
-            opsMeta.addRangeParameterValue(Sos1Constants.GetObservationParams.eventTime, getEventTime(session));
+            opsMeta.addRangeParameterValue(Sos1Constants.GetObservationParams.eventTime, getEventTime());
             opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.srsName);
             opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.result);
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.resultModel, getResultModels());
@@ -255,7 +255,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
         }
 
         observationQueryObject.setAliases(observationAliases);
-        List<SosObservation> sosObservations = new ArrayList<SosObservation>();
+        List<SosObservation> sosObservations = new LinkedList<SosObservation>();
 
         // temporal filters
         List<FirstLatest> firstLatestTemporalFilter = null;
@@ -331,16 +331,13 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
      * @throws OwsExceptionReport
      *             If an error occurs.
      */
-    private Map<MinMax, String> getEventTime(Session session) throws OwsExceptionReport {
+    private MinMax<String> getEventTime() throws OwsExceptionReport {
         try {
-            Map<MinMax, String> eventTime = new EnumMap<MinMax, String>(MinMax.class);
             DateTime minDate = getCache().getMinEventTime();
             DateTime maxDate = getCache().getMaxEventTime();
-            if (minDate != null && maxDate != null) {
-                eventTime.put(MinMax.MIN, DateTimeHelper.formatDateTime2ResponseString(minDate));
-                eventTime.put(MinMax.MAX, DateTimeHelper.formatDateTime2ResponseString(maxDate));
-            }
-            return eventTime;
+            return new MinMax<String>()
+                    .setMinimum(minDate != null ? DateTimeHelper.formatDateTime2ResponseString(minDate) : null)
+                    .setMaximum(maxDate != null ? DateTimeHelper.formatDateTime2ResponseString(maxDate) : null);
         } catch (DateTimeException dte) {
             String exceptionText = "Error while getting min/max time for OwsMetadata!";
             LOGGER.error(exceptionText, dte);

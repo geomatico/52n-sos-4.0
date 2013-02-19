@@ -50,7 +50,6 @@ public class SosEnvelope {
      *            SRID
      */
     public SosEnvelope(Envelope envelope, int srid) {
-        super();
         this.envelope = envelope;
         this.srid = srid;
     }
@@ -94,7 +93,7 @@ public class SosEnvelope {
     }
     
     public boolean isSetEnvelope() {
-        return envelope != null && !envelope.isNull();
+        return getEnvelope() != null && !getEnvelope().isNull();
     }
 
 	@Override
@@ -102,35 +101,28 @@ public class SosEnvelope {
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((envelope == null) ? 0 : envelope.hashCode());
-		result = prime * result + srid;
+		result = prime * result + ((getEnvelope() == null) ? 0 : getEnvelope().hashCode());
+		result = prime * result + getSrid();
 		return result;
-	}
+    }
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof SosEnvelope))
-			return false;
-		SosEnvelope other = (SosEnvelope) obj;
-		if (envelope == null) {
-			if (other.envelope != null)
-				return false;
-		} else if (!envelope.equals(other.envelope))
-			return false;
-		if (srid != other.srid)
-			return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof SosEnvelope) {
+            final SosEnvelope other = (SosEnvelope) obj;
+            return getSrid() == other.getSrid()
+                   && getEnvelope() == null
+                   ? other.getEnvelope() == null
+                   : getEnvelope().equals(other.getEnvelope());
+
+        }
+        return false;
+    }
 
 	@Override
 	public String toString()
 	{
-		return String.format("SosEnvelope [envelope=%s, srid=%s]", envelope, srid);
+		return String.format("SosEnvelope[envelope=%s, srid=%s]", getEnvelope(), getSrid());
 	}
 	
 }

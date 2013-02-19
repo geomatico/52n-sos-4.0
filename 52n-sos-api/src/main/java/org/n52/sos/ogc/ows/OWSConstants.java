@@ -116,10 +116,6 @@ public class OWSConstants {
         }
     }
 
-    public enum MinMax {
-        MIN, MAX
-    }
-
     /**
      * ExceptionCodes as defined in the OWS Common Implementation Specification
      * 1.1.0

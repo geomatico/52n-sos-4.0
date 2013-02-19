@@ -30,6 +30,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.n52.sos.util.MinMax;
+
 /**
  * Class represents a OperationMetadata. Used in SosCapabilities.
  * 
@@ -116,7 +118,7 @@ public class OWSOperation {
     /**
      * Set parameter and value map
      * 
-     * @param parameterValuesrValues
+     * @param parameterValues
      *            Parameter value map
      */
     public void setParameterValues(Map<String, List<IOWSParameterValue>> parameterValues) {
@@ -128,7 +130,7 @@ public class OWSOperation {
      * 
      * @param parameterName
      *            parameter name
-     * @param allowedValues
+     * @param value
      *            values to add
      */
     public void addParameterValue(String parameterName, IOWSParameterValue value) {
@@ -178,11 +180,11 @@ public class OWSOperation {
         addRangeParameterValue(parameterName.name(), min, max);
     }
     
-    public void addRangeParameterValue(String parameterName, Map<OWSConstants.MinMax,String> minMax) {
-        addParameterValue(parameterName, new OWSParameterValueRange(minMax));
+    public void addRangeParameterValue(String parameterName, MinMax<String> minMax) {
+        addRangeParameterValue(parameterName, minMax.getMinimum(), minMax.getMaximum());
     }
-
-    public <E extends Enum<E>> void addRangeParameterValue(E parameterName, Map<OWSConstants.MinMax,String> minMax) {
+    
+    public <E extends Enum<E>> void addRangeParameterValue(E parameterName, MinMax<String> minMax) {
         addRangeParameterValue(parameterName.name(), minMax);
     }
     

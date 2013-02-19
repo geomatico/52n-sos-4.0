@@ -43,21 +43,13 @@ import com.vividsolutions.jts.geom.Geometry;
 public class SosSamplingFeature extends SosAbstractFeature {
     
     private static final long serialVersionUID = 4660755526492323288L;
-
     private List<CodeType> name = new LinkedList<CodeType>();
-
     private String description;
-
     private String xmlDescription;
-
     private Geometry geometry;
-
     private int epsgCode;
-
     private String featureType = OGCConstants.UNKNOWN;
-
     private String url;
-
     private List<SosAbstractFeature> sampledFeatures;
 
     /**
