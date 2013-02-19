@@ -109,7 +109,7 @@ public class SosServiceIdentificationFactory extends LazyThreadSafeFactory<SosSe
 
     @Setting(FEES)
     public void setFees(String fees) throws ConfigurationException {
-        Validation.notNullOrEmpty("Service Identification Fees", title);
+        Validation.notNullOrEmpty("Service Identification Fees", fees);
         this.fees = fees;
         setRecreate();
     }
