@@ -146,7 +146,7 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
             try {
                 Criteria criteria = session.createCriteria(FeatureOfInterest.class);
                 criteria.add(Restrictions.in(HibernateConstants.PARAMETER_IDENTIFIER, featureIDs));
-                criteria.setProjection(SpatialProjections.extent("geom"));
+                criteria.setProjection(SpatialProjections.extent(HibernateConstants.PARAMETER_GEOMETRY));
                 Geometry geom = (Geometry) criteria.uniqueResult();
                 if (geom != null) {
                     return new SosEnvelope(geom.getEnvelopeInternal(),getDefaultEPSGCode());
