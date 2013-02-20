@@ -24,7 +24,11 @@
 							<gml:endPosition>2012-07-17T13:44:00+02:00</gml:endPosition>
 						</gml:TimePeriod>
 					</om:phenomenonTime>
-					<om:resultTime xlink:href="#phenomenonTime"/>
+					<om:resultTime>
+						<gml:TimeInstant gml:id="resultTime">
+							<gml:timePosition>2012-07-17T13:44:00+02:00</gml:timePosition>
+						</gml:TimeInstant>
+					</om:resultTime>
 					<om:procedure xlink:href="http://www.example.org/sensors/106"/>
 					<om:observedProperty xlink:href="test_observable_property_6"/>
 					<om:featureOfInterest>
