@@ -969,15 +969,16 @@ public class CacheImpl implements CapabilitiesCache{
 
 	@Override
 	public void setGlobalEnvelope(SosEnvelope globalEnvelope) {
+		LOGGER.debug("Global envelope now: '{}'",this.globalEnvelope);
 		if (globalEnvelope == null)
 		{
-			this.globalEnvelope = new SosEnvelope(null, getSrid());
+			this.globalEnvelope = new SosEnvelope(null, getDefaultEPSGCode());
 		}
 		else 
 		{
 			this.globalEnvelope = globalEnvelope;
 		}
-		LOGGER.debug("global envelope updated to '{}' with '{}'",this.globalEnvelope,globalEnvelope);
+		LOGGER.debug("Global envelope updated to '{}' with '{}'",this.globalEnvelope,globalEnvelope);
 	}
 
 	@Override
