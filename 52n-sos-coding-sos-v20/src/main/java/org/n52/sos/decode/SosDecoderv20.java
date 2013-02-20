@@ -66,6 +66,7 @@ import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
+import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
@@ -650,7 +651,7 @@ public class SosDecoderv20 implements IDecoder<AbstractServiceCommunicationObjec
     }
 
     private void checkReferencedElements(List<SosObservation> observations, Map<String, ITime> phenomenonTimes,
-            Map<String, TimeInstant> resultTimes, Map<String, SosAbstractFeature> features) {
+            Map<String, TimeInstant> resultTimes, Map<String, SosAbstractFeature> features) throws OwsExceptionReport {
         for (SosObservation observation : observations) {
             // phenomenonTime
             ITime phenomenonTime = observation.getPhenomenonTime();
@@ -663,7 +664,18 @@ public class SosDecoderv20 implements IDecoder<AbstractServiceCommunicationObjec
                 if (resultTimes.containsKey(resultTime.getGmlId())) {
                     observation.setResultTime(resultTimes.get(resultTime.getGmlId()));
                 } else if (phenomenonTimes.containsKey(resultTime.getGmlId())) {
-                    observation.setResultTime((TimeInstant)phenomenonTimes.get(resultTime.getGmlId()));
+                    ITime iTime = phenomenonTimes.get(resultTime.getGmlId());
+                    if (iTime instanceof TimeInstant) {
+                        observation.setResultTime((TimeInstant)iTime);
+                    } else if (iTime instanceof TimePeriod) {
+                        TimePeriod timePeriod = (TimePeriod) iTime;
+                        observation.setResultTime(new TimeInstant(timePeriod.getEnd()));
+                    } else {
+                        String exceptionText = "The time value type is not supported";
+                        LOGGER.error(exceptionText);
+                        throw Util4Exceptions.createInvalidParameterValueException("observation.resultTime", exceptionText);
+                    }
+                        
                 }
             }
             // featureOfInterest
