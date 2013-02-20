@@ -149,15 +149,15 @@ public class JTSHelper {
      * @throws OwsExceptionReport
      * <p/>
      */
-    @SuppressWarnings("unchecked")
     public static <G extends Geometry> G switchCoordinateAxisOrder(G geometry) throws OwsExceptionReport {
         if (geometry == null) {
             return null;
         }
-        Geometry geom = (Geometry) geometry.clone();
+        @SuppressWarnings("unchecked")
+        G geom = (G) geometry.clone();
         geom.apply(new CoordinateSwitchingFilter());
         geom.geometryChanged();
-        return (G) geom;
+        return geom;
     }
 
     public static GeometryFactory getGeometryFactory(Geometry geometry) {
