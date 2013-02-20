@@ -94,23 +94,27 @@ public class DBFeatureQueryHandlerTest extends DBFeatureQueryHandler {
         GeometryFactory factory = JTSHelper.getGeometryFactoryForSRID(4326);
         Geometry geometry = factory.createPoint(JTSHelperTest.randomCoordinate());
         Geometry switched = switchCoordinateAxisOrderIfNeeded(geometry);
+
         assertThat(isAxisOrderSwitchRequired(4326), is(true));
         assertThat(switched, is(notNullValue()));
         assertThat(switched, is(instanceOf(geometry.getClass())));
         assertThat(switched, is(not(sameInstance(geometry))));
         assertThat(switched, is(reverseOf(geometry)));
     }
-    
+
     @Test
     public void shouldSwitchCoordinatesForSosAbstractFeature() throws OwsExceptionReport {
         GeometryFactory factory = JTSHelper.getGeometryFactoryForSRID(4326);
         Geometry geometry = factory.createPoint(JTSHelperTest.randomCoordinate());
         FeatureOfInterest feature = create(1, "id", geometry, "name", "url", createFeatureOfInterestType(1, "type"));
         SosAbstractFeature sosFeature = createSosAbstractFeature(feature, Sos2Constants.SERVICEVERSION);
+
         assertThat(isAxisOrderSwitchRequired(4326), is(true));
         assertThat(sosFeature, is(notNullValue()));
         assertThat(sosFeature, is(instanceOf(SosSamplingFeature.class)));
+
         SosSamplingFeature ssf = (SosSamplingFeature) sosFeature;
+
         assertThat(ssf.getGeometry(), is(notNullValue()));
         assertThat(ssf.getGeometry(), is(instanceOf(geometry.getClass())));
         assertThat(ssf.getGeometry(), is(not(sameInstance(geometry))));
@@ -122,27 +126,30 @@ public class DBFeatureQueryHandlerTest extends DBFeatureQueryHandler {
         GeometryFactory factory = JTSHelper.getGeometryFactoryForSRID(2181);
         Geometry geometry = factory.createPoint(JTSHelperTest.randomCoordinate());
         Geometry switched = switchCoordinateAxisOrderIfNeeded(geometry);
+
         assertThat(isAxisOrderSwitchRequired(2181), is(false));
         assertThat(switched, is(notNullValue()));
         assertThat(switched, is(instanceOf(geometry.getClass())));
         assertThat(switched, is(sameInstance(geometry)));
         assertThat(switched, is(not(reverseOf(geometry))));
     }
-    
+
     @Test
     public void shouldNotSwitchCoordinatesForSosAbstractFeature() throws OwsExceptionReport {
         GeometryFactory factory = JTSHelper.getGeometryFactoryForSRID(2181);
         Geometry geometry = factory.createPoint(JTSHelperTest.randomCoordinate());
-        Geometry switched = switchCoordinateAxisOrderIfNeeded(geometry);
+
         assertThat(isAxisOrderSwitchRequired(2181), is(false));
-        
+
         FeatureOfInterest feature = create(1, "id", geometry, "name", "url", createFeatureOfInterestType(1, "type"));
         SosAbstractFeature sosFeature = createSosAbstractFeature(feature, Sos2Constants.SERVICEVERSION);
+
         assertThat(isAxisOrderSwitchRequired(4326), is(true));
         assertThat(sosFeature, is(notNullValue()));
         assertThat(sosFeature, is(instanceOf(SosSamplingFeature.class)));
+
         SosSamplingFeature ssf = (SosSamplingFeature) sosFeature;
-        
+
         assertThat(ssf.getGeometry(), is(notNullValue()));
         assertThat(ssf.getGeometry(), is(instanceOf(geometry.getClass())));
         assertThat(ssf.getGeometry(), is(sameInstance(geometry)));
