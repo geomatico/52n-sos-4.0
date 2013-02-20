@@ -42,7 +42,7 @@ public class SosServiceIdentificationSettingDefinitions {
     public static final String FEES = "serviceIdentification.fees";
     
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
-            .setTitle("Service identification");
+            .setTitle("Service Identification").setOrder(1);
     public static final StringSettingDefinition TITLE_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(0)

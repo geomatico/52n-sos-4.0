@@ -62,7 +62,9 @@ public class SettingDefinitionEncoder {
 
     public JSONObject encode(Map<SettingDefinitionGroup, Set<ISettingDefinition<?, ?>>> grouped) throws JSONException {
         JSONArray sections = new JSONArray();
-        for (SettingDefinitionGroup group : grouped.keySet()) {
+        List<SettingDefinitionGroup> sortedGroups = new ArrayList<SettingDefinitionGroup>(grouped.keySet());
+        Collections.sort(sortedGroups);
+        for (SettingDefinitionGroup group : sortedGroups) {
             sections.put(new JSONObject()
                     .put(TITLE_KEY, group.getTitle())
                     .put(DESCRIPTION_KEY, group.getDescription())

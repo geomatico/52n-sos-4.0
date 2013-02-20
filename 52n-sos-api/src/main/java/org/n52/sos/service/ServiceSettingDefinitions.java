@@ -46,7 +46,7 @@ public class ServiceSettingDefinitions {
     public static final String SKIP_DUPLICATE_OBSERVATIONS = "service.skipDuplicateObservations";
     public static final String CONFIGURATION_FILES = "service.configurationFiles";
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
-            .setTitle("Service settings");
+            .setTitle("Service Settings").setOrder(2);
     
     public static final UriSettingDefinition SERVICE_URL_DEFINITION = new UriSettingDefinition()
             .setGroup(GROUP)

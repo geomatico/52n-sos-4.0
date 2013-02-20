@@ -51,7 +51,7 @@ public class SosServiceProviderSettingDefinitions {
     public static final String COUNTRY = "serviceProvider.country";
 
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
-            .setTitle("Service Provider");
+            .setTitle("Service Provider").setOrder(0);
     
     public static final StringSettingDefinition NAME_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)

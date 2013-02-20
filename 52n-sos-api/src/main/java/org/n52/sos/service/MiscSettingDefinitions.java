@@ -44,7 +44,7 @@ public class MiscSettingDefinitions {
     public static final String CHARACTER_ENCODING = "misc.characterEncoding";
     
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
-            .setTitle("Miscellaneous settings");
+            .setTitle("Miscellaneous Settings").setOrder(3);
     public static final StringSettingDefinition TOKEN_SEPERATOR_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(0)
