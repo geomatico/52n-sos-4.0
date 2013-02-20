@@ -119,7 +119,7 @@ public class HibernateCriteriaTransactionalUtilities {
         session.flush();
     }
 
-    public static Offering getAndUpdateOrNewInsertNewOffering(String offeringIdentifier, String offeringName,
+    public static Offering getAndUpdateOrInsertNewOffering(String offeringIdentifier, String offeringName,
             List<RelatedFeature> relatedFeatures, List<ObservationType> observationTypes,
             List<FeatureOfInterestType> featureOfInterestTypes, Session session) {
 

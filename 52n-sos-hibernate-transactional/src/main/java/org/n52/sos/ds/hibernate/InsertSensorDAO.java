@@ -128,7 +128,7 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
                         getOrInsertNewObservableProperties(request.getObservableProperty(), session);
                 for (SosOffering assignedOffering : request.getAssignedOfferings()) {
                     Offering offering =
-                            getAndUpdateOrNewInsertNewOffering(assignedOffering, request.getRelatedFeatures(), observationTypes,
+                            getAndUpdateOrInsertNewOffering(assignedOffering, request.getRelatedFeatures(), observationTypes,
                                     featureOfInterestTypes, session);
                     for (ObservableProperty observableProperty : obsProps) {
                         ObservationConstellation obsConst =
@@ -163,7 +163,7 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
         return response;
     }
 
-    private Offering getAndUpdateOrNewInsertNewOffering(SosOffering assignedOffering, List<SosFeatureRelationship> relatedFeatures,
+    private Offering getAndUpdateOrInsertNewOffering(SosOffering assignedOffering, List<SosFeatureRelationship> relatedFeatures,
             List<ObservationType> observationTypes, List<FeatureOfInterestType> featureOfInterestTypes, Session session)
             throws OwsExceptionReport {
         List<RelatedFeature> hRelatedFeatures = new LinkedList<RelatedFeature>();
@@ -176,7 +176,7 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
                         relatedFeature.getFeature(), relatedFeatureRoles, session));
             }
         }
-        return HibernateCriteriaTransactionalUtilities.getAndUpdateOrNewInsertNewOffering(assignedOffering.getOfferingIdentifier(),
+        return HibernateCriteriaTransactionalUtilities.getAndUpdateOrInsertNewOffering(assignedOffering.getOfferingIdentifier(),
                 assignedOffering.getOfferingName(), hRelatedFeatures, observationTypes, featureOfInterestTypes,
                 session);
     }
