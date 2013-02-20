@@ -23,36 +23,9 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
-import static org.hibernate.criterion.Projections.distinct;
-import static org.hibernate.criterion.Projections.property;
-import static org.hibernate.criterion.Restrictions.eq;
-import static org.hibernate.criterion.Restrictions.in;
-import static org.hibernate.criterion.Restrictions.ne;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.DELETED;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_FEATURE_OF_INTEREST;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_FEATURE_OF_INTEREST_TYPE;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_FEATURE_OF_INTEREST_TYPES;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_IDENTIFIER;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVABLE_PROPERTY;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVATIONS;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATIONS;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPE;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPES;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVATION_TYPE;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OFFERING;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OFFERINGS;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_PHENOMENON_TIME_END;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_PHENOMENON_TIME_START;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_PROCEDURE;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_PROCEDURES;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_PROCEDURE_DESCRIPTION_FORMAT;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_RELATED_FEATURES;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_RELATED_FEATURE_ROLE;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_RESULT_TYPE;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_UNIT;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_VALUE;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_VALUE_TYPE;
+import static org.hibernate.criterion.Projections.*;
+import static org.hibernate.criterion.Restrictions.*;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.*;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -1231,10 +1204,20 @@ public class HibernateCriteriaQueryUtilities {
         return (ResultTemplate) criteria.uniqueResult();
     }
 
-    public static List<ResultTemplate> getResultTemplateObjects(Session session) {
-        Criteria criteria = session.createCriteria(ResultTemplate.class);
-        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        return (List<ResultTemplate>) criteria.list();
+    @SuppressWarnings("unchecked")
+	public static List<ResultTemplate> getResultTemplateObjects(Session session) {
+        Map<String, String> aliases = new HashMap<String, String>();
+        String obsConstOffObsTypAlias = addObservationConstellationOfferingObservationTypeAliasToMap(aliases, null);
+        
+        HibernateQueryObject query = new HibernateQueryObject();
+        query.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		query.setAliases(aliases);
+		query.addCriterion(
+				getEqualRestriction(
+						getParameterWithPrefix(DELETED, obsConstOffObsTypAlias),
+						false));
+        
+        return (List<ResultTemplate>) getObjectList(query, session, ResultTemplate.class);
     }
 
     public static List<ResultTemplate> getResultTemplateObjectsForObservationConstellation(
