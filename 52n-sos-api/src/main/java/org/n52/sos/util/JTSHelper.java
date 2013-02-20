@@ -45,6 +45,14 @@ public class JTSHelper {
     public static final char C_BLANK = ' ';
     public static final char COMMA = ',';
     public static final String S_BLANK = " ";
+    public static final CoordinateFilter COORDINATE_SWITCHING_FILTER = new CoordinateFilter() {
+        @Override 
+        public void filter(Coordinate coord) {
+            double tmp = coord.x;
+            coord.x = coord.y;
+            coord.y = tmp;
+        }
+    };
 
     /**
      * Creates a JTS Geometry from an WKT representation. Switches the coordinate order if needed.
@@ -155,7 +163,7 @@ public class JTSHelper {
         }
         @SuppressWarnings("unchecked")
         G geom = (G) geometry.clone();
-        geom.apply(new CoordinateSwitchingFilter());
+        geom.apply(COORDINATE_SWITCHING_FILTER);
         geom.geometryChanged();
         return geom;
     }
@@ -173,15 +181,5 @@ public class JTSHelper {
     }
 
     protected JTSHelper() {
-    }
-
-    private static class CoordinateSwitchingFilter implements CoordinateFilter {
-
-        @Override
-        public void filter(Coordinate coord) {
-            double tmp = coord.x;
-            coord.x = coord.y;
-            coord.y = tmp;
-        }
     }
 }
