@@ -232,11 +232,9 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
         Envelope envelope = sosEnvelope.getEnvelope();
         int srid = sosEnvelope.getSrid();
         EnvelopeType envelopeType = EnvelopeType.Factory.newInstance();
-        MinMax<String> minmax = SosHelper.getMinMaxFromEnvelope(envelope, srid);
-        DirectPositionType lowerCorner = envelopeType.addNewLowerCorner();
-        DirectPositionType upperCorner = envelopeType.addNewUpperCorner();
-        lowerCorner.setStringValue(minmax.getMinimum());
-        upperCorner.setStringValue(minmax.getMaximum());
+        MinMax<String> minmax = SosHelper.getMinMaxFromEnvelope(envelope);
+        envelopeType.addNewLowerCorner().setStringValue(minmax.getMinimum());
+        envelopeType.addNewUpperCorner().setStringValue(minmax.getMaximum());
         envelopeType.setSrsName(getSrsName(srid));
         return envelopeType;
     }
@@ -452,7 +450,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
             DirectPositionListType xbPosList = xbLrt.addNewPosList();
             
             xbPosList.setSrsName(srsName);
-            xbPosList.setStringValue(JTSHelper.getCoordinatesString(ring, jtsPolygon.getSRID()));
+            xbPosList.setStringValue(JTSHelper.getCoordinatesString(ring));
             xbArt.set(xbLrt);
 
             // Rename element name for output
@@ -473,7 +471,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
 
                 xbPosList = xbLrt.addNewPosList();
                 xbPosList.setSrsName(srsName);
-                xbPosList.setStringValue(JTSHelper.getCoordinatesString(ring, jtsPolygon.getSRID()));
+                xbPosList.setStringValue(JTSHelper.getCoordinatesString(ring));
                 xbArt.set(xbLrt);
 
                 // Rename element name for output

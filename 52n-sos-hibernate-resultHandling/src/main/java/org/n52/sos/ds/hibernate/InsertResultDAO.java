@@ -36,14 +36,15 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.joda.time.DateTime;
+import org.n52.sos.ds.IFeatureQueryHandler;
 import org.n52.sos.ds.IInsertResultDAO;
+import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
-import org.n52.sos.ds.hibernate.util.HibernateFeatureUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
 import org.n52.sos.ogc.gml.time.ITime;
@@ -76,6 +77,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.request.InsertResultRequest;
 import org.n52.sos.response.InsertResultResponse;
+import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -116,12 +118,12 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
             ResultTemplate resultTemplate =
                     HibernateCriteriaQueryUtilities.getResultTemplateObject(request.getTemplateIdentifier(), session);
             transaction = session.beginTransaction();
-            SosObservation singleObservation = getSingleObservationFromResultValues(response.getVersion(),
-                                                                                    resultTemplate, 
-                                                                                    request.getResultValues());
-            response.setObservation(singleObservation);
-            List<SosObservation> observations = getSingleObservationsFromObservation(singleObservation);
-            Set<ObservationConstellationOfferingObservationType> obsConstOffObsTypes = new HashSet<ObservationConstellationOfferingObservationType>(1);
+            SosObservation o = getSingleObservationFromResultValues(response.getVersion(), resultTemplate,
+                                                                    request.getResultValues(), session);
+            response.setObservation(o);
+            List<SosObservation> observations = getSingleObservationsFromObservation(o);
+            Set<ObservationConstellationOfferingObservationType> obsConstOffObsTypes 
+                    = new HashSet<ObservationConstellationOfferingObservationType>(1);
             obsConstOffObsTypes.add(resultTemplate.getObservationConstellationOfferingObservationType());
             int insertion = 0, size = observations.size();
             LOGGER.debug("Start saving {} observations.", size);
@@ -150,32 +152,41 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
         }
         return response;
     }
-    
-    private SosObservation getSingleObservationFromResultValues(String version, ResultTemplate resultTemplate, String resultValues) throws OwsExceptionReport {
+
+    private SosObservation getSingleObservationFromResultValues(String version, ResultTemplate resultTemplate,
+                                                                String resultValues, Session session) 
+                                                                throws OwsExceptionReport {
         SosResultEncoding resultEncoding = new SosResultEncoding(resultTemplate.getResultEncoding());
         SosResultStructure resultStructure = new SosResultStructure(resultTemplate.getResultStructure());
         String[] blockValues = getBlockValues(resultValues, resultEncoding.getEncoding());
         SosObservation singleObservation =
                        getObservation(resultTemplate.getObservationConstellationOfferingObservationType(),
-                                      blockValues,
-                                      resultStructure.getResultStructure(), resultEncoding.getEncoding());
-        SosAbstractFeature ssf = HibernateFeatureUtilities.createSosAbstractFeatureFromResult(resultTemplate.getFeatureOfInterest(), version);
-        singleObservation.getObservationConstellation().setFeatureOfInterest(ssf);
+                                      blockValues, resultStructure.getResultStructure(), resultEncoding.getEncoding());
+        SosAbstractFeature feature = getSosAbstractFeature(resultTemplate.getFeatureOfInterest(), version, session);
+        singleObservation.getObservationConstellation().setFeatureOfInterest(feature);
         return singleObservation;
     }
+
+    protected SosAbstractFeature getSosAbstractFeature(FeatureOfInterest featureOfInterest, String version,
+                                                       Session session) throws OwsExceptionReport {
+        final IFeatureQueryHandler featureQueryHandler = Configurator.getInstance().getFeatureQueryHandler();
+        return featureQueryHandler.getFeatureByID(featureOfInterest.getIdentifier(), session, version, -1);
+    }
     
-     private List<SosObservation> getSingleObservationsFromObservation(SosObservation observation) throws OwsExceptionReport {
+    protected List<SosObservation> getSingleObservationsFromObservation(SosObservation observation) throws
+            OwsExceptionReport {
         try {
             return HibernateObservationUtilities.unfoldObservation(observation);
         } catch (Exception e) {
             String exceptionText = "The resultValues format does not comply to the resultStructure of the resultTemplate!";
             LOGGER.debug(exceptionText, e);
-            throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.InsertResultParams.resultValues.name(),
-                    exceptionText);
+            throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.InsertResultParams.resultValues
+                                                                       .name(), exceptionText);
         }
     }
 
-    private SosObservationConstellation getSosObservationConstellation(ObservationConstellationOfferingObservationType observationConstellationOfferingObservationType) {
+    private SosObservationConstellation getSosObservationConstellation(
+            ObservationConstellationOfferingObservationType observationConstellationOfferingObservationType) {
         ObservationConstellation observationConstellation = observationConstellationOfferingObservationType.getObservationConstellation();
         SosProcedureDescription procedure = createProcedure(observationConstellation.getProcedure());
         Set<String> offerings = Collections.singleton(observationConstellationOfferingObservationType.getOffering().getIdentifier());

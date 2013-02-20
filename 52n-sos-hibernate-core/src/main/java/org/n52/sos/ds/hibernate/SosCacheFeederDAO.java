@@ -79,16 +79,19 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
     }
 
     @Override
+    @Deprecated
     public void updateAfterSensorInsertion(CapabilitiesCache cache) throws OwsExceptionReport {
         update(cache, new SensorInsertionCacheUpdate(getCacheThreadCount()));
     }
 
     @Override
+    @Deprecated
     public void updateAfterSensorDeletion(CapabilitiesCache cache) throws OwsExceptionReport {
         update(cache, new SensorDeletionCacheUpdate(getCacheThreadCount()));
     }
 
     @Override
+    @Deprecated
     public void updateAfterObservationInsertion(CapabilitiesCache cache) throws OwsExceptionReport {
         update(cache, new ObservationInsertionCacheUpdate(getCacheThreadCount()));
     }
@@ -99,6 +102,7 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
     }
 
     @Override
+    @Deprecated
     public void updateAfterResultTemplateInsertion(CapabilitiesCache cache) throws OwsExceptionReport {
         update(cache, new ResultTemplateInsertionCacheUpdate());
     }

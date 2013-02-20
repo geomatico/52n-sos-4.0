@@ -447,9 +447,8 @@ public class ITRequestEncoder {
         int srid = mp.getSRID();
         EnvelopeType xb_env = xb_bbox.addNewEnvelope();
         xb_env.setSrsName(Configurator.getInstance().getSrsNamePrefix() + srid);
-        xb_env.addNewLowerCorner().setStringValue(JTSHelper.getCoordinatesString((Point) mp.getGeometryN(0), srid));
-        xb_env.addNewUpperCorner().setStringValue(JTSHelper.getCoordinatesString((Point) mp.getGeometryN(1), srid));
-
+        xb_env.addNewLowerCorner().setStringValue(JTSHelper.getCoordinatesString((Point) mp.getGeometryN(0)));
+        xb_env.addNewUpperCorner().setStringValue(JTSHelper.getCoordinatesString((Point) mp.getGeometryN(1)));
         return xb_bbox;
     }
 }

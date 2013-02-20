@@ -384,7 +384,7 @@ public class HibernateCriteriaQueryUtilities {
      * @param objectClass
      * @return Result objects
      */
-    protected static List<?> getObjectList(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
+    public static List<?> getObjectList(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
         Criteria criteria = session.createCriteria(objectClass);
         if (queryObject.isSetAliases()) {
             addAliasesToCriteria(criteria, queryObject.getAliases());
@@ -603,9 +603,7 @@ public class HibernateCriteriaQueryUtilities {
      * @return filter restriction
      */
     public static Criterion getDisjunctionCriterionForStringList(String propertyName, List<String> list) {
-        Disjunction disjunction = Restrictions.disjunction();
-        disjunction.add(Restrictions.in(propertyName, list));
-        return disjunction;
+        return Restrictions.disjunction().add(Restrictions.in(propertyName, list));
     }
 
     // OR

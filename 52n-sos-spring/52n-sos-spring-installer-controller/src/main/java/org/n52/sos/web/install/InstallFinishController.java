@@ -133,7 +133,6 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
     }
 
     protected void instantiateConfigurator(Properties properties, InstallationConfiguration c) throws InstallationSettingsError {
-        /* instantiate sos configurator */
         if (Configurator.getInstance() == null) {
             log.info("Instantiating Configurator...");
             try {
@@ -173,8 +172,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         Boolean createTables = (Boolean) c.getDatabaseSetting(InstallConstants.CREATE_TABLES_PARAMETER);
         if (createTables.booleanValue()) {
             try {
-                SqlUtils.executeSQLFile(con,
-                                        new File(getContext().getRealPath(
+                SqlUtils.executeSQLFile(con, new File(getContext().getRealPath(
                         ControllerConstants.CREATE_DATAMODEL_SQL_FILE)));
             } catch (Exception e) {
                 throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_CREATE_SOS_TABLES, e.getMessage()));

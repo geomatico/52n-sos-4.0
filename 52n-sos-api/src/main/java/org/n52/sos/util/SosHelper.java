@@ -79,19 +79,12 @@ public class SosHelper {
    
     /**
      * Class to encapsulate all calls to the {@link Configurator}. Can be overwritten by tests.
+     * @see SosHelper#setConfiguration(org.n52.sos.util.SosHelper.Configuration) 
      */
     protected static class Configuration {
 
         protected Collection<String> getObservationTypes() {
             return Configurator.getInstance().getCapabilitiesCacheController().getObservationTypes();
-        }
-
-        protected boolean reversedAxisOrderRequired(int srid) {
-            return Configurator.getInstance().reversedAxisOrderRequired(srid);
-        }
-
-        protected int getDefaultEPSG() {
-            return Configurator.getInstance().getDefaultEPSG();
         }
 
         protected String getSrsNamePrefix() {
@@ -113,10 +106,10 @@ public class SosHelper {
     
     private static Configuration config = new Configuration();
     
-    protected static Configuration getConfig() {
+    protected static Configuration getConfiguration() {
         return config;
     }
-    protected static void setConfig(Configuration config) {
+    protected static void setConfiguration(Configuration config) {
         SosHelper.config = config;
     }
 
@@ -274,8 +267,8 @@ public class SosHelper {
     public static int parseSrsName(String srsName) throws OwsExceptionReport {
         int srid = -1;
         if (srsName != null && !srsName.isEmpty() && !srsName.equalsIgnoreCase("NOT_SET")) {
-            String urnSrsPrefix = getConfig().getSrsNamePrefix();
-            String urlSrsPrefix = getConfig().getSrsNamePrefixSosV2();
+            String urnSrsPrefix = getConfiguration().getSrsNamePrefix();
+            String urlSrsPrefix = getConfiguration().getSrsNamePrefixSosV2();
             try {
                 srid = Integer.valueOf(srsName.replace(urnSrsPrefix, "").replace(urlSrsPrefix, ""));
             } catch (NumberFormatException nfe) {
@@ -422,7 +415,7 @@ public class SosHelper {
 
     public static String getUrlPatternForHttpGetMethod(OperationDecoderKey decoderKey) throws OwsExceptionReport {
         try {
-            for (Binding binding : getConfig().getBindings()) {
+            for (Binding binding : getConfiguration().getBindings()) {
                 if (binding.checkOperationHttpGetSupported(decoderKey)) {
                     return binding.getUrlPattern();
                 }
@@ -665,41 +658,20 @@ public class SosHelper {
     }
 
     /**
-     * Creates the minimum and maximum values of this envelope in the default EPSG. Coordinates are switched if needed.
+     * Creates the minimum and maximum values of this envelope in the default EPSG.
      * <p/>
      * @param envelope the envelope
      * <p/>
      * @return the {@code MinMax} describing the envelope
      * <p/>
-     * @see Configurator#reversedAxisOrderRequired(int)
-     * @see Configurator#getDefaultEPSG()
      */
     public static MinMax<String> getMinMaxFromEnvelope(Envelope envelope) {
-        return getMinMaxFromEnvelope(envelope, getConfig().getDefaultEPSG());
-    }
-    
-    public static MinMax<String> getMinMaxFromEnvelope(Envelope envelope, int srid) {
         // TODO for full 3D support add minz to parameter in setStringValue
-        if (getConfig().reversedAxisOrderRequired(srid <= 0 ? getConfig().getDefaultEPSG() : srid)) {
-            return getReversedMinMaxFromEnvelope(envelope);
-        } else {
-            return getNotReversedMinMaxFromEnvelope(envelope);
-        }
-    }
-    
-    protected static MinMax<String> getReversedMinMaxFromEnvelope(Envelope envelope) {
-        return new MinMax<String>()
-                .setMaximum(envelope.getMaxY() + " " + envelope.getMaxX())
-                .setMinimum(envelope.getMinY() + " " + envelope.getMinX());
-    }
-
-    protected static MinMax<String> getNotReversedMinMaxFromEnvelope(Envelope envelope) {
         return new MinMax<String>()
                 .setMaximum(envelope.getMaxX() + " " + envelope.getMaxY())
                 .setMinimum(envelope.getMinX() + " " + envelope.getMinY());
     }
     
-
     public static SosObservableProperty createSosOberavablePropertyFromSosSMLIo(SosSMLIo<?> output) {
         SosSweAbstractSimpleType<?> ioValue = output.getIoValue();
         String identifier = ioValue.getDefinition();
@@ -750,7 +722,7 @@ public class SosHelper {
 
     public static Collection<String> getSupportedResponseFormats(String service, String version) {
         Set<String> responseFormats = new HashSet<String>();
-        for (IEncoder<?, ?> iEncoder : getConfig().getEncoders()) {
+        for (IEncoder<?, ?> iEncoder : getConfiguration().getEncoders()) {
             if (iEncoder instanceof IObservationEncoder) {
                 responseFormats.addAll(((IObservationEncoder) iEncoder).getSupportedResponseFormats(service, version));
             }
@@ -808,7 +780,7 @@ public class SosHelper {
     }
 
     public static void checkObservationType(String observationType, String parameterName) throws OwsExceptionReport {
-        Collection<String> validObservationTypes = getConfig().getObservationTypes();
+        Collection<String> validObservationTypes = getConfiguration().getObservationTypes();
         if (observationType.isEmpty()) {
             throw Util4Exceptions.createMissingParameterValueException(parameterName);
         } else {

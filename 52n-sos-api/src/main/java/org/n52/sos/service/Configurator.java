@@ -29,10 +29,8 @@ import static org.n52.sos.service.ServiceSettingDefinitions.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
@@ -56,7 +54,6 @@ import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.ows.SosServiceIdentificationFactory;
 import org.n52.sos.ogc.ows.SosServiceProvider;
 import org.n52.sos.ogc.ows.SosServiceProviderFactory;
-import org.n52.sos.ogc.sos.Range;
 import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.service.admin.operator.IAdminServiceOperator;
 import org.n52.sos.service.admin.request.operator.AdminRequestOperatorRepository;
@@ -99,10 +96,6 @@ public class Configurator {
      * Map with indicator and name of additional config files for modules.
      */
     private Map<String, String> configFileMap = new HashMap<String, String>(0);
-    /**
-     * default EPSG code of stored geometries.
-     */
-    private int defaultEPSG;
     /**
      * default offering identifier prefix, used for auto generation.
      */
@@ -154,10 +147,7 @@ public class Configurator {
      * observations.
      */
     private boolean supportsQuality = true;
-    /**
-     * boolean indicates the order of x and y components of coordinates.
-     */
-    private List<Range> epsgsWithReversedAxisOrder;
+
     /**
      * token seperator for result element.
      */
@@ -469,16 +459,6 @@ public class Configurator {
         this.lease = lease;
     }
 
-    public int getDefaultEPSG() {
-        return this.defaultEPSG;
-    }
-
-    @Setting(DEFAULT_EPSG)
-    public void setDefaultEpsg(int epsgCode) throws ConfigurationException {
-        Validation.greaterZero("Default EPSG Code", epsgCode);
-        this.defaultEPSG = epsgCode;
-    }
-
     /**
      * @return true if duplicate observations should be skipped during insertion
      */
@@ -579,40 +559,6 @@ public class Configurator {
     }
 
     /**
-     * @param epsgCode
-     * <p/>
-     * @return boolean indicating if coordinates have to be switched
-     */
-    public boolean reversedAxisOrderRequired(int epsgCode) {
-        for (Range r : epsgsWithReversedAxisOrder) {
-            if (r.contains(epsgCode)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Setting(EPSG_CODES_WITH_REVERSED_AXIS_ORDER)
-    public void setEpsgCodesWithReversedAxisOrder(String codes) throws ConfigurationException {
-        Validation.notNullOrEmpty("EPSG Codes to switch coordinates for", codes);
-        String[] splitted = codes.split(";");
-        this.epsgsWithReversedAxisOrder = new ArrayList<Range>(splitted.length);
-        for (String entry : splitted) {
-            String[] splittedEntry = entry.split("-");
-            Range r = null;
-            if (splittedEntry.length == 1) {
-                r = new Range(Integer.parseInt(splittedEntry[0]), Integer.parseInt(splittedEntry[0]));
-            } else if (splittedEntry.length == 2) {
-                r = new Range(Integer.parseInt(splittedEntry[0]), Integer.parseInt(splittedEntry[1]));
-            } else {
-                throw new ConfigurationException(String.format(
-                        "Invalid format of entry in 'switchCoordinatesForEPSG': %s", entry));
-            }
-            this.epsgsWithReversedAxisOrder.add(r);
-        }
-    }
-
-    /**
      * Initialize this class. Since this initialization is not done in the
      * constructor, dependent classes can use the SosConfigurator already when
      * called from here.
@@ -693,7 +639,7 @@ public class Configurator {
         this.featureConnectionProvider = new ConfiguringSingletonServiceLoader<IFeatureConnectionProvider>(IFeatureConnectionProvider.class,
                                                                                              false).get();
         if (featureConnectionProvider != null) {
-        this.featureConnectionProvider.initialize(this.featureConnectionProviderProperties);
+            this.featureConnectionProvider.initialize(this.featureConnectionProviderProperties);
         } else {
             this.featureConnectionProvider = this.dataConnectionProvider;
         }

@@ -37,7 +37,6 @@ import org.n52.sos.config.settings.UriSettingDefinition;
 public class ServiceSettingDefinitions {
 
     public static final String SERVICE_URL = "service.sosUrl";
-    public static final String DEFAULT_EPSG = "service.defaultEpsg";
     public static final String LEASE = "service.lease";
     public static final String MINIMUM_GZIP_SIZE = "service.minimumGzipSize";
     public static final String MAX_GET_OBSERVATION_RESULTS = "service.maxGetObservationResults";
@@ -57,13 +56,6 @@ public class ServiceSettingDefinitions {
             .setDescription("The endpoint URL of this sos which will be shown in the GetCapabilities response "
                             + "(e.g. <code>http://localhost:8080/52nSOS/sos</code>). The path to a specific "
                             + "binding (like <code>/soap</code>) will appended to this URL.");
-    public static final IntegerSettingDefinition DEFAULT_EPSG_DEFINITION = new IntegerSettingDefinition()
-            .setGroup(GROUP)
-            .setOrder(1)
-            .setKey(DEFAULT_EPSG)
-            .setDefaultValue(4326)
-            .setTitle("Default EPSG Code")
-            .setDescription("The EPSG code in which the geometries are stored.");
     public static final IntegerSettingDefinition LEASE_DEFINITION = new IntegerSettingDefinition()
             .setGroup(GROUP)
             .setOrder(2)

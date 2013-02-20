@@ -23,7 +23,6 @@
  */
 package org.n52.sos.ogc.om.features.samplingFeatures;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,7 +46,6 @@ public class SosSamplingFeature extends SosAbstractFeature {
     private String description;
     private String xmlDescription;
     private Geometry geometry;
-    private int epsgCode;
     private String featureType = OGCConstants.UNKNOWN;
     private String url;
     private List<SosAbstractFeature> sampledFeatures;
@@ -106,15 +104,10 @@ public class SosSamplingFeature extends SosAbstractFeature {
     }
 
     public void setGeometry(Geometry geometry) {
+        if (geometry != null && geometry.getSRID() == 0) {
+            throw new RuntimeException("No SRID specified!");
+        }
         this.geometry = geometry;
-    }
-
-    public int getEpsgCode() {
-        return epsgCode;
-    }
-
-    public void setEpsgCode(int epsgCode) {
-        this.epsgCode = epsgCode;
     }
 
     public String getFeatureType() {
@@ -174,8 +167,9 @@ public class SosSamplingFeature extends SosAbstractFeature {
     @Override
 	public String toString()
 	{
-		return String.format("SosSamplingFeature [name=%s, description=%s, geometry=%s, epsgCode=%s, featureType=%s, url=%s, sampledFeatures=%s]", 
-				name, description, geometry, epsgCode, featureType,	url, sampledFeatures);
+		return String.format(
+                "SosSamplingFeature [name=%s, description=%s, geometry=%s, featureType=%s, url=%s, sampledFeatures=%s]",
+                             name, description, geometry, featureType, url, sampledFeatures);
 	}
     
 }

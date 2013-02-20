@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<parent>
-		<artifactId>52n-sos</artifactId>
-		<groupId>org.n52.sensorweb.sos</groupId>
-		<version>4.0.0-SNAPSHOT</version>
-	</parent>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>52n-sos-hibernate-common</artifactId>
-	<packaging>jar</packaging>
-	<name>52North SOS Hibernate common</name>
-	<description>52North Sensor Observation Service Hibernate common module</description>
-	<dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>52n-sos</artifactId>
+        <groupId>org.n52.sensorweb.sos</groupId>
+        <version>4.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>52n-sos-hibernate-common</artifactId>
+    <packaging>jar</packaging>
+    <name>52North SOS Hibernate common</name>
+    <description>52North Sensor Observation Service Hibernate common module</description>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>52n-sos-api</artifactId>
         </dependency>
         <dependency>
@@ -21,69 +21,63 @@
             <artifactId>52n-sos-api</artifactId>
             <classifier>tests</classifier>
         </dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>52n-sos-hibernate-api</artifactId>
-		</dependency>
-		<!-- Hibernate Core Dependencies -->
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-core</artifactId>
-			<classifier>sources</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-c3p0</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-c3p0</artifactId>
-			<classifier>sources</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-spatial</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-spatial</artifactId>
-			<classifier>sources</classifier>
-		</dependency>
-		<dependency>
-			<groupId>c3p0</groupId>
-			<artifactId>c3p0</artifactId>
-			<classifier>sources</classifier>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate.common</groupId>
-			<artifactId>hibernate-commons-annotations</artifactId>
-			<classifier>sources</classifier>
-		</dependency>
-	 <dependency>
-	  <groupId>junit</groupId>
-	  <artifactId>junit</artifactId>
-	  <version>4.10</version>
-	  <scope>test</scope>
-	 </dependency>
-	</dependencies>
-	<profiles>
-		<profile>
-			<id>postgresql</id>
-			<dependencies>
-				<dependency>
-					<groupId>postgresql</groupId>
-					<artifactId>postgresql</artifactId>
-				</dependency>
-				<dependency>
-					<groupId>org.postgis</groupId>
-					<artifactId>postgis-jdbc</artifactId>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>52n-sos-hibernate-api</artifactId>
+        </dependency>
+        <!-- Hibernate Core Dependencies -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <classifier>sources</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+            <classifier>sources</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-spatial</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-spatial</artifactId>
+            <classifier>sources</classifier>
+        </dependency>
+        <dependency>
+            <groupId>c3p0</groupId>
+            <artifactId>c3p0</artifactId>
+            <classifier>sources</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.common</groupId>
+            <artifactId>hibernate-commons-annotations</artifactId>
+            <classifier>sources</classifier>
+        </dependency>
+    </dependencies>
+    <profiles>
+        <profile>
+            <id>postgresql</id>
+            <dependencies>
+                <dependency>
+                    <groupId>postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.postgis</groupId>
+                    <artifactId>postgis-jdbc</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
 </project>

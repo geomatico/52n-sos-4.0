@@ -27,6 +27,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.util.JTSHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +88,7 @@ public class SamplingFeatureBuilder {
 		}
 		if (xCoord != Integer.MIN_VALUE && yCoord != Integer.MIN_VALUE && epsgCode != Integer.MIN_VALUE)
 		{
-			GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), epsgCode);
+			GeometryFactory geometryFactory = JTSHelper.getGeometryFactoryForSRID(epsgCode);
 			Geometry geom = geometryFactory.createPoint(new Coordinate(xCoord, yCoord));
 			feature.setGeometry(geom);
 		}

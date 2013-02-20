@@ -361,7 +361,7 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
 
             // Exterior ring
             LineString ring = pol.getExteriorRing();
-            String coords = JTSHelper.getCoordinatesString(ring, jtsPolygon.getSRID());
+            String coords = JTSHelper.getCoordinatesString(ring);
             DirectPositionListType xbPosList = xbLrt.addNewPosList();
             xbPosList.setSrsName(getSrsName(jtsPolygon));
             // switch coordinates
@@ -386,7 +386,7 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
 
                 xbPosList = xbLrt.addNewPosList();
                 xbPosList.setSrsName(getSrsName(jtsPolygon));
-                xbPosList.setStringValue(JTSHelper.getCoordinatesString(ring, jtsPolygon.getSRID()));
+                xbPosList.setStringValue(JTSHelper.getCoordinatesString(ring));
                 xbArt.set(xbLrt);
 
                 // Rename element name for output

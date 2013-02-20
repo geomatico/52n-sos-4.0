@@ -28,6 +28,7 @@ package org.n52.sos.ds.hibernate.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.n52.sos.ds.IFeatureQueryHandler;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -50,8 +51,6 @@ public class FeatureOfInterest implements java.io.Serializable {
     private String descriptionXml;
 
     private String url;
-
-//    private Set<Observation> observations = new HashSet<Observation>(0);
 
     private Set<FeatureOfInterest> featureOfInterestsForChildFeatureId = new HashSet<FeatureOfInterest>(0);
 
@@ -92,6 +91,13 @@ public class FeatureOfInterest implements java.io.Serializable {
         this.name = name;
     }
 
+    /**
+     * DO NOT ACCESS THE GEOMETRY OF THIS OBJECT DIRECTLY.
+     * <p/>
+     * Instead use
+     * {@link IFeatureQueryHandler#getFeatureByID(java.lang.String, java.lang.Object, java.lang.String, int)} to
+     * retrieve the Geometry.
+     */
     public Geometry getGeom() {
         return this.geom;
     }

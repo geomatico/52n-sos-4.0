@@ -234,14 +234,9 @@ public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
      */
     private Geometry getGeometry4BBOX(EnvelopeDocument envelopeDocument) throws OwsExceptionReport {
         EnvelopeType envelopeType = envelopeDocument.getEnvelope();
-        int srid =
-                SosHelper.parseSrsName(envelopeType.getSrsName());
+        int srid = SosHelper.parseSrsName(envelopeType.getSrsName());
         String lowerCorner = envelopeType.getLowerCorner().getStringValue();
         String upperCorner = envelopeType.getUpperCorner().getStringValue();
-        if (Configurator.getInstance().reversedAxisOrderRequired(srid)) {
-            lowerCorner = switchCoordinatesInString(lowerCorner);
-            upperCorner = switchCoordinatesInString(upperCorner);
-        }
         return JTSHelper.createGeometryFromWKT(JTSHelper.createWKTPolygonFromEnvelope(lowerCorner, upperCorner), srid);
     }
 

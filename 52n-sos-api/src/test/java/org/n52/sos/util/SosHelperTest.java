@@ -40,26 +40,25 @@ public class SosHelperTest extends SosHelper {
     
     @BeforeClass
     public static void setUp() {
-        setConfig(new TestableConfiguration());
+        setConfiguration(new TestableConfiguration());
     }
-    
+
     @Test
     public void envelopeForEpsg4326() {
         double maxY = 52.15034, maxX = 8.05847;
         double minY = 51.95104, minX = 7.61353;
-        Envelope e = new Envelope(new Coordinate(minX, minY), 
-                                  new Coordinate(maxX, maxY));
-        checkMinMax(getMinMaxFromEnvelope(e, EPSG4326), minY, minX, maxY, maxX);
-        checkMinMax(getMinMaxFromEnvelope(e)          , minY, minX, maxY, maxX);
+        Envelope e = new Envelope(new Coordinate(minY, minX),
+                                  new Coordinate(maxY, maxX));
+        checkMinMax(getMinMaxFromEnvelope(e), minY, minX, maxY, maxX);
     }
 
     @Test
     public void envelopeForEpsg31466() {
         double maxX = 3435628, maxY = 5780049;
         double minX = 3404751, minY = 5758364;
-        Envelope e = new Envelope(new Coordinate(minX, minY), 
+        Envelope e = new Envelope(new Coordinate(minX, minY),
                                   new Coordinate(maxX, maxY));
-        checkMinMax(getMinMaxFromEnvelope(e, EPSG31466), minX, minY, maxX, maxY);        
+        checkMinMax(getMinMaxFromEnvelope(e), minX, minY, maxX, maxY);
     }
 
     protected void checkMinMax(MinMax<String> minmax, double minY, double minX, double maxY, double maxX) {
@@ -69,22 +68,6 @@ public class SosHelperTest extends SosHelper {
     }
 
     private static class TestableConfiguration extends Configuration {
-
-        @Override
-        protected boolean reversedAxisOrderRequired(int srid) {
-            if (srid == EPSG4326) {
-                return true;
-            }
-            if (srid == EPSG31466) {
-                return false;
-            }
-            return false;
-        }
-
-        @Override
-        protected int getDefaultEPSG() {
-            return DEFAULT_EPSG;
-        }
     }
     
 }

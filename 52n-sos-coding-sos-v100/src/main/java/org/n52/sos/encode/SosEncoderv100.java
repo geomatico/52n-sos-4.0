@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,7 +40,6 @@ import net.opengis.gml.CodeType;
 import net.opengis.gml.DirectPositionType;
 import net.opengis.gml.EnvelopeType;
 import net.opengis.gml.FeatureCollectionDocument;
-import net.opengis.gml.FeatureCollectionType;
 import net.opengis.gml.ReferenceType;
 import net.opengis.gml.TimePeriodType;
 import net.opengis.ogc.ComparisonOperatorType;
@@ -109,7 +107,9 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.JavaHelper;
+import org.n52.sos.util.MinMax;
 import org.n52.sos.util.N52XmlHelper;
+import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
@@ -868,40 +868,11 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
      *             if query of the BBOX failed
      */
     private EnvelopeType getBBOX4Offering(Envelope envelope, int srsID) throws OwsExceptionReport {
-
-        double minx = envelope.getMinX();
-        double maxx = envelope.getMaxX();
-        double miny = envelope.getMinY();
-        double maxy = envelope.getMaxY();
-        @SuppressWarnings("unused")
-        String minz = null;
-        @SuppressWarnings("unused")
-        String maxz = null;
-
         EnvelopeType envelopeType = EnvelopeType.Factory.newInstance();
-
-        // set lower corner
-        // TODO for full 3D support add minz to parameter in setStringValue
-        DirectPositionType lowerCorner = envelopeType.addNewLowerCorner();
-        DirectPositionType upperCorner = envelopeType.addNewUpperCorner();
-        if (srsID > 0) {
-            if (!Configurator.getInstance().reversedAxisOrderRequired(srsID)) {
-                lowerCorner.setStringValue(minx + " " + miny);
-            } else {
-                lowerCorner.setStringValue(miny + " " + minx);
-            }
-
-            // set upper corner
-            // TODO for full 3D support add maxz to parameter in setStringValue
-            if (!Configurator.getInstance().reversedAxisOrderRequired(srsID)) {
-                upperCorner.setStringValue(maxx + " " + maxy);
-            } else {
-                upperCorner.setStringValue(maxy + " " + maxx);
-            }
-            // set SRS
-            envelopeType.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + srsID);
-        }
-
+        MinMax<String> minmax = SosHelper.getMinMaxFromEnvelope(envelope);
+        envelopeType.addNewLowerCorner().setStringValue(minmax.getMinimum());
+        envelopeType.addNewUpperCorner().setStringValue(minmax.getMaximum());
+        envelopeType.setSrsName(Configurator.getInstance().getSrsNamePrefixSosV2() + srsID);
         return envelopeType;
     }
 
