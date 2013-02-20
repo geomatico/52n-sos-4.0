@@ -75,9 +75,6 @@ import org.slf4j.LoggerFactory;
  */
 public class GetObservationDAO extends AbstractHibernateOperationDao implements IGetObservationDAO {
 
-    /**
-     * logger
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(GetObservationDAO.class);
 
     /**
@@ -85,23 +82,11 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
      */
     private static final String OPERATION_NAME = SosConstants.Operations.GetObservation.name();
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.ds.ISosOperationDAO#getOperationName()
-     */
     @Override
     public String getOperationName() {
         return OPERATION_NAME;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.sos.ds.hibernate.AbstractHibernateOperationDao#getOperationsMetadata
-     * (java.lang.String, org.hibernate.Session)
-     */
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session)
             throws OwsExceptionReport {
@@ -153,13 +138,6 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
         return resultModelsList;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.sos.ds.IGetObservationDAO#getObservation(org.n52.sos.request.
-     * AbstractSosRequest)
-     */
     @Override
     public GetObservationResponse getObservation(GetObservationRequest sosRequest) throws OwsExceptionReport {
         Session session = null;
