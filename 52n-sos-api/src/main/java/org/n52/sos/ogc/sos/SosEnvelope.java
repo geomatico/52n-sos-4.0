@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Class for internal Envelope representation
- * 
+ * TODO should this class offer merging capabilities like SosEnvelope.expandTo(SosEnvelope) considering coordinate transformations?
  */
 public class SosEnvelope {
 
