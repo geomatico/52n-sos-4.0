@@ -211,11 +211,14 @@ public abstract class InMemoryCacheUpdate implements Action {
 		SosEnvelope globalEnvelope = getCache().getGlobalEnvelope();
 		if (!globalEnvelope.isSetEnvelope()) {
 			// add new envelope
-			SosEnvelope newFeatureEnvelope = new SosEnvelope(observedFeatureEnvelope, getCache().getDefaultEPSGCode());
+			SosEnvelope newFeatureEnvelope = new SosEnvelope(new Envelope(observedFeatureEnvelope), getCache().getDefaultEPSGCode());
 			getCache().setGlobalEnvelope(newFeatureEnvelope);
 		} else if (!globalEnvelope.getEnvelope().contains(observedFeatureEnvelope)) {
 			// extend envelope
 			globalEnvelope.getEnvelope().expandToInclude(observedFeatureEnvelope);
+			LOGGER.debug("Global envelope extended by '{}' resulting in '{}'",
+					observedFeatureEnvelope,
+					getCache().getGlobalEnvelope());
 		}
 	}
 	
@@ -353,20 +356,36 @@ public abstract class InMemoryCacheUpdate implements Action {
 		if (!getCache().getKOfferingVMaxTime().containsKey(offeringIdentifier))
 		{
 			getCache().getKOfferingVMaxTime().put(offeringIdentifier, observationEventTime.getEnd());
+			LOGGER.debug("New max time '{}' added for offering '{}'? {}",
+					observationEventTime.getEnd(),
+					offeringIdentifier,
+					getCache().getKOfferingVMaxTime().get(offeringIdentifier).equals(observationEventTime.getEnd()));
 		} 
 		else if (getCache().getKOfferingVMaxTime().get(offeringIdentifier).isBefore(observationEventTime.getEnd())) 
 		{
 			getCache().getKOfferingVMaxTime().put(offeringIdentifier, observationEventTime.getEnd());
+			LOGGER.debug("Max time of offering '{}' updated with '{}'? {}",
+					offeringIdentifier,
+					observationEventTime.getEnd(),
+					getCache().getKOfferingVMaxTime().get(offeringIdentifier).equals(observationEventTime.getEnd()));
 		}
 		// offering-mintime
 		// check and update if before
 		if (!getCache().getKOfferingVMinTime().containsKey(offeringIdentifier))
 		{
 			getCache().getKOfferingVMinTime().put(offeringIdentifier, observationEventTime.getStart());
+			LOGGER.debug("New min time '{}' added for offering '{}'? {}",
+					observationEventTime.getStart(),
+					offeringIdentifier,
+					getCache().getKOfferingVMinTime().get(offeringIdentifier).equals(observationEventTime.getStart()));
 		}
 		if (getCache().getKOfferingVMinTime().get(offeringIdentifier).isAfter(observationEventTime.getStart()))
 		{
 			getCache().getKOfferingVMinTime().put(offeringIdentifier, observationEventTime.getStart());
+			LOGGER.debug("Min time of offering '{}' updated with '{}'? {}",
+					offeringIdentifier,
+					observationEventTime.getStart(),
+					getCache().getKOfferingVMinTime().get(offeringIdentifier).equals(observationEventTime.getStart()));
 		}
 		LOGGER.debug("temporal boundingbox of offering '{}' set to: {}",
 				offeringIdentifier,
