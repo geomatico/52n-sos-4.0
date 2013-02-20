@@ -41,11 +41,9 @@ import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * When executing this &auml;ction (see {@link Action}), the following relations are added, settings are updated in cache:<ul>
- * <li>Procedure</li>
  * <li>Observation Type</li>
  * <li>Observation identifier (OPTIONAL)</li>
  * <li>Procedure &rarr; Observation identifier (OPTIONAL)</li>
- * <li>Observable Property &harr; Procedure</li>
  * <li>Global spatiakl bounding box</li>
  * <li>Feature identifier</li>
  * <li>Feature types</li>
@@ -88,10 +86,6 @@ public class ObservationInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate
 		// Always update the javadoc when changing this method!
 		for (SosObservation sosObservation : sosRequest.getObservations())
 		{
-			addProcedureToCache(getProcedureIdentifier(sosObservation));
-			addObservablePropertyToProcedureRelation(getObservablePropertyIdentifier(sosObservation), getProcedureIdentifier(sosObservation));
-			addProcedureToObservablePropertyRelation(getProcedureIdentifier(sosObservation), getObservablePropertyIdentifier(sosObservation));
-
 			updateGlobalTemporalBBoxUsingNew(phenomenonTimeFrom(sosObservation));
 
 			addObservationTypeToCache(sosObservation);

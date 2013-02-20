@@ -146,7 +146,7 @@ public class InMemoryCacheControllerTest
 	@Test public void
 	should_contain_procedure_after_InsertObservation()
 			throws OwsExceptionReport {
-		updateCacheWithSingleObservation(PROCEDURE);
+		insertObservationPreparation();
 		
 		assertTrue("procedure NOT in cache",
 				controller.getProcedures().contains(getSensorIdFromInsertObservation()));
@@ -163,6 +163,12 @@ public class InMemoryCacheControllerTest
 		assertTrue("procedure -> offering relation NOT in cache",
 				controller.getOfferings4Procedure(getSensorIdFromInsertObservation()).contains(getFirstOffering()));
 		
+	}
+
+	private void insertObservationPreparation() throws OwsExceptionReport
+	{
+		updateCacheWithInsertSensor(PROCEDURE);
+		updateCacheWithSingleObservation(PROCEDURE);
 	}
 
 	@Test public void 
@@ -278,8 +284,7 @@ public class InMemoryCacheControllerTest
 	@Test public void 
 	should_contain_observation_id_to_offering_relation_after_InsertObservation()
 			throws OwsExceptionReport {
-		updateCacheWithInsertSensor(PROCEDURE);
-		updateCacheWithSingleObservation(PROCEDURE);
+		insertObservationPreparation();
 		
 		assertTrue("procedure -> observation-identifier relation NOT in cache", 
 				controller.getCache().getKProcedureVObservationIdentifiers()
@@ -1000,8 +1005,7 @@ public class InMemoryCacheControllerTest
 	private void 
 	deleteSensorPreparation()
 			throws OwsExceptionReport{
-		updateCacheWithInsertSensor(PROCEDURE);
-		updateCacheWithSingleObservation(PROCEDURE);
+		insertObservationPreparation();
 		updateCacheWithDeleteSensor();
 	}
 	
