@@ -36,7 +36,7 @@
 		<meta name="author" content="c.autermann@52north.org" />
 		<meta name="Date-Creation-yyyymmdd" content="20120306" />
 		<meta name="Date-Revision-yyyymmdd" content="20120307" />
-		<link href="<c:url value="/static/images/favicon.ico" />" rel="shortcut icon" type="image/x-icon" />		
+		<link href="<c:url value="/static/images/favicon.ico" />" rel="shortcut icon" type="image/x-icon" />        
 		<link rel="stylesheet" href="<c:url value="/static/css/52n.css" />" type="text/css" />
 		<link rel="stylesheet" href="<c:url value="/static/css/52n.cssmenu.css" />" type="text/css"/>
 		<link rel="stylesheet" href="<c:url value="/static/lib/bootstrap-2.1.1.min.css" />" type="text/css" />
@@ -83,25 +83,28 @@
 											</script>
 											<ul>
 												<li>
-													<a class="first-item"  href="<c:url value="/admin/settings" />">
+													<a class="first-item havesubchild"  href="<c:url value="/admin/settings" />">
 														<span class="menu-title">Settings</span>
 													</a>
-												</li>
-                                                <li>
-													<a href="<c:url value="/admin/logging" />">
-														<span class="menu-title">Logging Settings</span>
-													</a>
+													<ul>
+														<li>
+															<a  class="first-item" href="<c:url value="/admin/logging" />">
+																<span class="menu-title">Logging</span>
+															</a>
+														</li>
+														<li>
+															<a href="<c:url value="/admin/database/settings" />">
+																<span class="menu-title">Database</span>
+															</a>
+														</li>
+													</ul>
 												</li>
 												<li>
 													<a href="<c:url value="/admin/database" />">
-														<span class="menu-title">Database</span>
+														<span class="menu-title">Database Maintenance</span>
 													</a>
 												</li>
-												<li>
-													<a href="<c:url value="/admin/database/settings" />">
-														<span class="menu-title">Database Settings</span>
-													</a>
-												</li>
+												
 												<li>
 													<a href="<c:url value="/admin/reset" />">
 														<span class="menu-title">Reset</span>
@@ -117,7 +120,7 @@
 											</a>
 										</li>
 									</sec:authorize>
-								</ul>                                	
+								</ul>                                   
 							</div>
 						</div>
 					</div>
