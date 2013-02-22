@@ -21,38 +21,36 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ogc.ows;
+package org.n52.sos.cache;
 
 import java.util.Collections;
 import java.util.Set;
 
 import org.n52.sos.config.ISettingDefinition;
 import org.n52.sos.config.ISettingDefinitionProvider;
-import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.config.settings.IntegerSettingDefinition;
+import org.n52.sos.service.ServiceSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TODO JavaDoc
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class SosServiceProviderSettingDefinitionProvider implements ISettingDefinitionProvider {
-
-    private static final Set<ISettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<ISettingDefinition<?, ?>>set(
-            SosServiceProviderSettingDefinitions.NAME_DEFINITION,
-            SosServiceProviderSettingDefinitions.SITE_DEFINITION,
-            SosServiceProviderSettingDefinitions.INDIVIDUAL_NAME_DEFINITION,
-            SosServiceProviderSettingDefinitions.POSITION_NAME_DEFINITION,
-            SosServiceProviderSettingDefinitions.PHONE_DEFINITION,
-            SosServiceProviderSettingDefinitions.DELIVERY_POINT_DEFINITION,
-            SosServiceProviderSettingDefinitions.CITY_DEFINITION,
-            SosServiceProviderSettingDefinitions.POSTAL_CODE_DEFINITION,
-            SosServiceProviderSettingDefinitions.ADMINISTRATIVE_AREA_DEFINITION,
-            SosServiceProviderSettingDefinitions.COUNTRY_DEFINITION,
-            SosServiceProviderSettingDefinitions.MAIL_ADDRESS_DEFINITION,
-            SosServiceProviderSettingDefinitions.FILE_DEFINITION);
+public class CacheControllerSettings implements ISettingDefinitionProvider {
+    public static final String CAPABILITIES_CACHE_UPDATE_INTERVAL = "service.capabilitiesCacheUpdateInterval";
+    public static final IntegerSettingDefinition CACHE_UPDATE_INTERVAL_DEFINITION = new IntegerSettingDefinition()
+            .setGroup(ServiceSettings.GROUP)
+            .setOrder(6)
+            .setKey(CAPABILITIES_CACHE_UPDATE_INTERVAL)
+            .setDefaultValue(5)
+            .setMinimum(0)
+            .setTitle("Capabilities cache update interval")
+            .setDescription("The update interval of the capabilities cache in minutes.");
 
     @Override
     public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
-        return Collections.unmodifiableSet(DEFINITIONS);
+        return Collections.<ISettingDefinition<?, ?>>singleton(CACHE_UPDATE_INTERVAL_DEFINITION);
     }
 }

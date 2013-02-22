@@ -29,7 +29,7 @@ import java.util.Set;
 import org.n52.sos.config.ISettingDefinition;
 import org.n52.sos.config.ISettingDefinitionProvider;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
-import org.n52.sos.service.ServiceSettingDefinitions;
+import org.n52.sos.service.ServiceSettings;
 import org.n52.sos.util.CollectionHelper;
 
 /**
@@ -40,7 +40,7 @@ public class CacheFeederSettingDefinitionProvider implements ISettingDefinitionP
     public static final String CACHE_THREAD_COUNT = "service.cacheThreadCount";
     
     public static final IntegerSettingDefinition CACHE_THREAD_COUNT_DEFINITION = new IntegerSettingDefinition()
-            .setGroup(ServiceSettingDefinitions.GROUP)
+            .setGroup(ServiceSettings.GROUP)
             .setOrder(8)
             .setKey(CACHE_THREAD_COUNT)
             .setDefaultValue(5)

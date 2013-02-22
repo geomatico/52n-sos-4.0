@@ -30,8 +30,8 @@ import org.n52.sos.config.ISettingDefinition;
 import org.n52.sos.config.ISettingDefinitionProvider;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
 import org.n52.sos.config.settings.StringSettingDefinition;
-import org.n52.sos.service.MiscSettingDefinitions;
-import org.n52.sos.service.ServiceSettingDefinitions;
+import org.n52.sos.service.MiscSettings;
+import org.n52.sos.service.ServiceSettings;
 import org.n52.sos.util.CollectionHelper;
 
 /**
@@ -45,7 +45,7 @@ public class FeatureQuerySettingsProvider implements ISettingDefinitionProvider 
     public static final String DEFAULT_EPSG = "service.defaultEpsg";
     
     public static final StringSettingDefinition EPSG_CODES_WITH_REVERSED_AXIS_ORDER_DEFINITION = new StringSettingDefinition()
-            .setGroup(MiscSettingDefinitions.GROUP)
+            .setGroup(MiscSettings.GROUP)
             .setOrder(6)
             .setKey(EPSG_CODES_WITH_REVERSED_AXIS_ORDER)
             .setOptional(true)
@@ -61,7 +61,7 @@ public class FeatureQuerySettingsProvider implements ISettingDefinitionProvider 
     
     
     public static final IntegerSettingDefinition DEFAULT_EPSG_DEFINITION = new IntegerSettingDefinition()
-            .setGroup(ServiceSettingDefinitions.GROUP)
+            .setGroup(ServiceSettings.GROUP)
             .setOrder(1)
             .setKey(DEFAULT_EPSG)
             .setDefaultValue(4326)

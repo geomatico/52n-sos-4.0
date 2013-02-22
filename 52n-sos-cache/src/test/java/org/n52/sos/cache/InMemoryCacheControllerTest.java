@@ -107,7 +107,7 @@ public class InMemoryCacheControllerTest
 	initControllerAndStopTimer() 
 	{
 		controller = new TestableInMemoryCacheController();
-		controller.cancel(); // <-- we don't want no timer to run!
+		controller.cleanup(); // <-- we don't want no timer to run!
 	}
 
 	@After public void 

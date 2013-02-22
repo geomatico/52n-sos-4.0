@@ -23,28 +23,33 @@
  */
 package org.n52.sos.service;
 
+import java.util.Collections;
+import java.util.Set;
+
+import org.n52.sos.config.ISettingDefinition;
+import org.n52.sos.config.ISettingDefinitionProvider;
 import org.n52.sos.config.SettingDefinitionGroup;
 import org.n52.sos.config.settings.BooleanSettingDefinition;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
 import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.config.settings.UriSettingDefinition;
+import org.n52.sos.util.CollectionHelper;
 
 /**
  * TODO JavaDoc
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class ServiceSettingDefinitions {
+public class ServiceSettings implements ISettingDefinitionProvider {
 
     public static final String SERVICE_URL = "service.sosUrl";
-    public static final String LEASE = "service.lease";
     public static final String MINIMUM_GZIP_SIZE = "service.minimumGzipSize";
-    public static final String MAX_GET_OBSERVATION_RESULTS = "service.maxGetObservationResults";
     public static final String SUPPORTS_QUALITY = "service.supportsQuality";
-    public static final String CAPABILITIES_CACHE_UPDATE_INTERVAL = "service.capabilitiesCacheUpdateInterval";
     public static final String SENSOR_DIRECTORY = "service.sensorDirectory";
-    public static final String SKIP_DUPLICATE_OBSERVATIONS = "service.skipDuplicateObservations";
-    public static final String CONFIGURATION_FILES = "service.configurationFiles";
+    @Deprecated public static final String LEASE = "service.lease";
+    @Deprecated public static final String MAX_GET_OBSERVATION_RESULTS = "service.maxGetObservationResults";
+    @Deprecated public static final String SKIP_DUPLICATE_OBSERVATIONS = "service.skipDuplicateObservations";
+    @Deprecated public static final String CONFIGURATION_FILES = "service.configurationFiles";
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
             .setTitle("Service Settings").setOrder(2);
     
@@ -56,6 +61,7 @@ public class ServiceSettingDefinitions {
             .setDescription("The endpoint URL of this sos which will be shown in the GetCapabilities response "
                             + "(e.g. <code>http://localhost:8080/52nSOS/sos</code>). The path to a specific "
                             + "binding (like <code>/soap</code>) will appended to this URL.");
+    @Deprecated
     public static final IntegerSettingDefinition LEASE_DEFINITION = new IntegerSettingDefinition()
             .setGroup(GROUP)
             .setOrder(2)
@@ -71,6 +77,7 @@ public class ServiceSettingDefinitions {
             .setDefaultValue(1048576)
             .setTitle("GZIP Threshold")
             .setDescription("The size (in byte) the SOS starts to gzip responses (if the client supports it).");
+    @Deprecated
     public static final IntegerSettingDefinition MAX_GET_OBSERVATION_RESULTS_DEFINITION = new IntegerSettingDefinition()
             .setGroup(GROUP)
             .setOrder(4)
@@ -86,14 +93,6 @@ public class ServiceSettingDefinitions {
             .setDefaultValue(true)
             .setTitle("Supports quality")
             .setDescription("Support quality information in observations.");
-    public static final IntegerSettingDefinition CAPABILITIES_CACHE_UPDATE_INTERVAL_DEFINITION = new IntegerSettingDefinition()
-            .setGroup(GROUP)
-            .setOrder(6)
-            .setKey(CAPABILITIES_CACHE_UPDATE_INTERVAL)
-            .setDefaultValue(5)
-            .setMinimum(0)
-            .setTitle("Capabilities cache update interval")
-            .setDescription("The update interval of the capabilities cache in minutes.");
     public static final StringSettingDefinition SENSOR_DIRECTORY_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(7)
@@ -103,6 +102,7 @@ public class ServiceSettingDefinitions {
             .setDescription("The path to a directory with the sensor descriptions in SensorML format. "
                             + "It can be either an absolute path (like <code>/home/user/sosconfig/sensors</code>) "
                             + "or a path relative to the web application directory (e.g. <code>WEB-INF/sensors</code>).");
+    @Deprecated
     public static final BooleanSettingDefinition SKIP_DUPLICATE_OBSERVATIONS_DEFINITION = new BooleanSettingDefinition()
             .setGroup(GROUP)
             .setOrder(9)
@@ -110,6 +110,7 @@ public class ServiceSettingDefinitions {
             .setDefaultValue(true)
             .setTitle("Skip duplicate observations")
             .setDescription("Skip duplicate observations silently when inserted by batch.");
+    @Deprecated
     public static final StringSettingDefinition CONFIGURATION_FILES_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(10)
@@ -119,6 +120,19 @@ public class ServiceSettingDefinitions {
             .setDescription(
             "Configuration files and their file identifier (List: IDENTIFIER FILENAME;IDENTIFIER2 FILENAME2; ...).");
 
-    private ServiceSettingDefinitions() {
+    
+    private static final Set<ISettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<ISettingDefinition<?,?>>set(
+            ServiceSettings.SERVICE_URL_DEFINITION,
+            ServiceSettings.LEASE_DEFINITION,
+            ServiceSettings.MINIMUM_GZIP_SIZE_DEFINITION,
+            ServiceSettings.MAX_GET_OBSERVATION_RESULTS_DEFINITION,
+            ServiceSettings.SUPPORTS_QUALITY_DEFINITION,
+            ServiceSettings.SENSOR_DIRECTORY_DEFINITION,
+            ServiceSettings.SKIP_DUPLICATE_OBSERVATIONS_DEFINITION,
+            ServiceSettings.CONFIGURATION_FILES_DEFINITION);
+
+    @Override
+    public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
+        return Collections.unmodifiableSet(DEFINITIONS);
     }
 }

@@ -27,13 +27,14 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.Timer;
 import org.n52.sos.tasking.ASosTasking;
+import org.n52.sos.util.Cleanupable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class Tasking {
+public class Tasking implements Cleanupable {
 
 	private static final Logger log = LoggerFactory.getLogger(Tasking.class);
 	private final ServiceLoader<ASosTasking> serviceLoader = ServiceLoader.load(ASosTasking.class);
@@ -43,7 +44,8 @@ public class Tasking {
 		load();
 	}
 
-	public void cancel() {
+    @Override
+	public void cleanup() {
 		if (taskingExecutor != null) {
 			taskingExecutor.cancel();
 			taskingExecutor = null;

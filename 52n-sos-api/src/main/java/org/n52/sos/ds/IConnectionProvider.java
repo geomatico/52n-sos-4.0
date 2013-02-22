@@ -26,6 +26,7 @@ package org.n52.sos.ds;
 import java.util.Properties;
 
 import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.util.Cleanupable;
 
 /**
  * Interface for a connection provider that handles the connection to the
@@ -33,12 +34,13 @@ import org.n52.sos.service.ConfigurationException;
  * contain a ConnectionPool.
  * 
  */
-public interface IConnectionProvider {
+public interface IConnectionProvider extends Cleanupable{
 
     /**
      * Get a data source connection
      * 
      * @return Connection to the data source
+     * @throws ConnectionProviderException  
      */
     public Object getConnection() throws ConnectionProviderException;
 
@@ -50,12 +52,6 @@ public interface IConnectionProvider {
      */
     public void returnConnection(Object connection);
 
-    /**
-     * Cleanup the connection provider when stopping the server, e.g. close all
-     * connection.
-     */
-    public void cleanup();
-	
 	/**
 	 * Initializes the connection provider.
 	 * 

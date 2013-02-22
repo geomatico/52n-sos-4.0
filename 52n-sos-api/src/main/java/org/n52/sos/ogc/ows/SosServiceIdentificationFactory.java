@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.ows;
 
-import static org.n52.sos.ogc.ows.SosServiceIdentificationSettingDefinitions.*;
+import static org.n52.sos.ogc.ows.SosServiceIdentificationFactorySettings.*;
 
 import java.io.File;
 import java.util.ArrayList;

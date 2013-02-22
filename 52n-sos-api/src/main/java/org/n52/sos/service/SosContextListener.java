@@ -33,6 +33,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.n52.sos.config.SettingsManager;
+import org.n52.sos.util.Cleanupable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,12 +66,12 @@ public class SosContextListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        cleanUpConfigurator();
-        cleanUpSettingsManager();
-        unloadDrivers();
+        cleanupConfigurator();
+        cleanupSettingsManager();
+        cleanupDrivers();
     }
 
-    protected void unloadDrivers() {
+    protected void cleanupDrivers() {
         Enumeration<Driver> drivers = DriverManager.getDrivers();
         while (drivers.hasMoreElements()) {
             Driver driver = drivers.nextElement();
@@ -83,7 +84,7 @@ public class SosContextListener implements ServletContextListener {
         }
     }
 
-    protected void cleanUpSettingsManager() {
+    protected void cleanupSettingsManager() {
         try {
             if (SettingsManager.getInstance() != null) {
                 SettingsManager.getInstance().cleanup();
@@ -93,7 +94,7 @@ public class SosContextListener implements ServletContextListener {
         }
     }
 
-    protected void cleanUpConfigurator() {
+    protected void cleanupConfigurator() {
         try {
             if (Configurator.getInstance() != null) {
                 Configurator.getInstance().cleanup();

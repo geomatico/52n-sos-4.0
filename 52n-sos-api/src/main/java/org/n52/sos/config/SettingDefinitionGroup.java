@@ -23,18 +23,18 @@
  */
 package org.n52.sos.config;
 
-import org.n52.sos.ogc.ows.SosServiceIdentificationSettingDefinitions;
-import org.n52.sos.ogc.ows.SosServiceProviderSettingDefinitions;
-import org.n52.sos.service.MiscSettingDefinitions;
-import org.n52.sos.service.ServiceSettingDefinitions;
+import org.n52.sos.ogc.ows.SosServiceIdentificationFactorySettings;
+import org.n52.sos.ogc.ows.SosServiceProviderFactorySettings;
+import org.n52.sos.service.MiscSettings;
+import org.n52.sos.service.ServiceSettings;
 
 /**
  * Class to group ISettingDefinitions. Not needed by the service but only for representation in the GUI.
  * <p/>
- * @see ServiceSettingDefinitions#GROUP
- * @see MiscSettingDefinitions#GROUP
- * @see SosServiceProviderSettingDefinitions#GROUP
- * @see SosServiceIdentificationSettingDefinitions#GROUP
+ * @see ServiceSettings#GROUP
+ * @see MiscSettings#GROUP
+ * @see SosServiceProviderFactorySettings#GROUP
+ * @see SosServiceIdentificationFactorySettings#GROUP
  * @author Christian Autermann <c.autermann@52north.org>
  * @since 4.0
  */

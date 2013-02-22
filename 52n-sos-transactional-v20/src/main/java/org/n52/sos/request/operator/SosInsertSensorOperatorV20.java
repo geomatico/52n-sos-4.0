@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.config.annotation.Configurable;
+import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.IInsertSensorDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.event.SosEventBus;
@@ -60,6 +62,7 @@ import org.n52.sos.wsdl.WSDLOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Configurable
 public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInsertSensorDAO, InsertSensorRequest> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SosInsertSensorOperatorV20.class);
 
@@ -68,10 +71,22 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInser
     private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(
             ConformanceClasses.SOS_V2_INSERTION_CAPABILITIES, ConformanceClasses.SOS_V2_SENSOR_INSERTION);
 
+    private String defaultProcedurePrefix;
+    
+    
     public SosInsertSensorOperatorV20() {
         super(OPERATION_NAME, InsertSensorRequest.class);
     }
+    
+    public String getDefaultProcedurePrefix() {
+        return this.defaultProcedurePrefix;
+    }
 
+    @Setting(TransactionalOperatorSettings.DEFAULT_PROCEDURE_PREFIX)
+    public void setDefaultProcedurePrefix(String prefix) {
+        this.defaultProcedurePrefix = prefix;
+    }
+    
     @Override
     public Set<String> getConformanceClasses() {
         return Collections.unmodifiableSet(CONFORMANCE_CLASSES);
@@ -85,7 +100,6 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInser
     @Override
     public ServiceResponse receive(InsertSensorRequest request) throws OwsExceptionReport {
         checkRequestedParameter(request);
-
         InsertSensorResponse response = getDao().insertSensor(request);
         SosEventBus.fire(new SensorInsertion(request, response));
         String contentType = SosConstants.CONTENT_TYPE_XML;
@@ -223,7 +237,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInser
 
     private void checkAndSetAssignedProcedureID(InsertSensorRequest request) {
         String procedureIdentifier = null;
-        String procedurePrefix = Configurator.getInstance().getDefaultProcedurePrefix();
+        String procedurePrefix = getDefaultProcedurePrefix();
         // if procedureDescription is SensorML
         if (request.getProcedureDescription() instanceof SensorML) {
             SensorML sensorML = (SensorML) request.getProcedureDescription();

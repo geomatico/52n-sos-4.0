@@ -1,3 +1,5 @@
-org.n52.sos.ogc.ows.SosServiceIdentificationSettingDefinitionProvider
-org.n52.sos.ogc.ows.SosServiceProviderSettingDefinitionProvider
-org.n52.sos.service.ConfiguratorSettingDefinitionProvider
+org.n52.sos.ogc.ows.SosServiceProviderFactorySettings
+org.n52.sos.ogc.ows.SosServiceIdentificationFactorySettings
+org.n52.sos.service.MiscSettings
+org.n52.sos.service.ServiceSettings
+org.n52.sos.cache.CacheControllerSettings

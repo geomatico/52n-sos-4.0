@@ -31,6 +31,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.joda.time.DateTime;
+import org.n52.sos.config.annotation.Configurable;
+import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
@@ -40,7 +42,10 @@ import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.response.InsertSensorResponse;
+import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.Cleanupable;
+import org.n52.sos.util.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +54,8 @@ import org.slf4j.LoggerFactory;
  *
  *
  */
-public abstract class ACapabilitiesCacheController {
+@Configurable
+public abstract class ACapabilitiesCacheController implements Cleanupable {
 
 	private class UpdateTimerTask extends TimerTask {
 
@@ -69,9 +75,15 @@ public abstract class ACapabilitiesCacheController {
 		}
 	}
 
-    protected enum Case{
-		OBSERVATION_INSERTION,SENSOR_INSERTION,RESULT_TEMPLATE_INSERTION,RESULT_INSERTION,SENSOR_DELETION,OBSERVATION_DELETION
-	}
+    @Deprecated
+    protected enum Case {
+        OBSERVATION_INSERTION,
+        SENSOR_INSERTION,
+        RESULT_TEMPLATE_INSERTION,
+        RESULT_INSERTION,
+        SENSOR_DELETION,
+        OBSERVATION_DELETION
+    }
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ACapabilitiesCacheController.class);
 
@@ -82,7 +94,8 @@ public abstract class ACapabilitiesCacheController {
     private final Condition updateFree = updateLock.newCondition();
     private boolean initialized = false;
     private boolean updateIsFree = true;
-	private final Timer timer = new Timer("52n-sos-capabilities-cache-controller");
+    private long updateInterval;
+	private final Timer timer = new Timer("52n-sos-capabilities-cache-controller", true);
 	private TimerTask current = null;
 
 	/**
@@ -91,7 +104,7 @@ public abstract class ACapabilitiesCacheController {
 	protected final void schedule() {
 		/*
 		 * Timers can not be rescheduled.
-		 * To make the interval changeable schedule a anonymous timer.
+		 * To make the interval changeable reschedule a new timer.
 		 */
 		current = new UpdateTimerTask();
 		long delay = getUpdateInterval();
@@ -105,32 +118,52 @@ public abstract class ACapabilitiesCacheController {
 		}
 	}
 
+    @Setting(CacheControllerSettings.CAPABILITIES_CACHE_UPDATE_INTERVAL)
+    public void setUpdateInterval(int interval) throws ConfigurationException {
+        Validation.greaterZero("Cache update interval", interval);
+        if (this.updateInterval != interval) {
+            this.updateInterval = interval;
+            reschedule();
+        }
+    }
 
-	protected long getUpdateInterval()
-	{
-		return Configurator.getInstance().getUpdateIntervallInMillis();
-	}
-
+    private long getUpdateInterval() {
+        return this.updateInterval * 60000;
+    }
 
 	/**
 	 * Stops the current task, if available and starts a new {@link TimerTask}.
-	 * @see {@link #schedule()}
+	 * @see #schedule()
 	 */
-	public void reschedule() {
-		if (current != null) {
-			current.cancel();
-		}
+	protected void reschedule() {
+        cancelCurrent();
 		schedule();
 	}
+    
+    protected void cancelCurrent() {
+        if (this.current != null) {
+            this.current.cancel();
+            LOGGER.debug("Current {} canceled", UpdateTimerTask.class.getSimpleName());
+        }
+    }
+    
+     protected void cancelTimer() {
+        if (this.timer != null) {
+            this.timer.cancel();
+            LOGGER.debug("Cache Update timer canceled.");
+        }
+    }
 
-	public void cancel() {
-		timer.cancel();
+    @Override
+	public void cleanup() {
+        cancelCurrent(); 
+        cancelTimer();
 	}
 
     @Override
     protected void finalize() {
         try {
-			cancel();
+			cleanup();
             super.finalize();
         } catch (Throwable e) {
             LOGGER.error("Could not finalize CapabilitiesCacheController! " + e.getMessage());
@@ -179,17 +212,13 @@ public abstract class ACapabilitiesCacheController {
 
     public abstract void updateAfterSensorInsertion(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse);
 
-
 	public abstract void updateAfterObservationInsertion(InsertObservationRequest sosRequest);
 
-
 	public abstract void updateAfterSensorDeletion(DeleteSensorRequest sosRequest);
-
 
 	public abstract void updateAfterObservationDeletion() throws OwsExceptionReport;
 
     public abstract void updateAfterResultTemplateInsertion(InsertResultTemplateRequest sosRequest, InsertResultTemplateResponse sosResponse);
-
 
 	public abstract void updateAfterResultInsertion(SosObservation sosObservation);
 

@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.ows;
 
-import static org.n52.sos.ogc.ows.SosServiceProviderSettingDefinitions.*;
+import static org.n52.sos.ogc.ows.SosServiceProviderFactorySettings.*;
 
 import java.io.File;
 import java.net.URI;

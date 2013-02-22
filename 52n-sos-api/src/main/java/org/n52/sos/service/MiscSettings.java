@@ -23,28 +23,43 @@
  */
 package org.n52.sos.service;
 
+import java.util.Collections;
+import java.util.Set;
+
+import org.n52.sos.config.ISettingDefinition;
+import org.n52.sos.config.ISettingDefinitionProvider;
 import org.n52.sos.config.SettingDefinitionGroup;
 import org.n52.sos.config.settings.StringSettingDefinition;
+import org.n52.sos.util.CollectionHelper;
 
 /**
  * TODO JavaDoc
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class MiscSettingDefinitions {
+public class MiscSettings implements ISettingDefinitionProvider {
 
     public static final String TOKEN_SEPERATOR = "misc.tokenSeperator";
     public static final String TUPLE_SEPERATOR = "misc.tupleSeperator";
-    public static final String DECIMAL_SEPARATOR = "misc.decimalSeperator";
+    public static final String CHARACTER_ENCODING = "misc.characterEncoding";
     public static final String GML_DATE_FORMAT = "misc.gmlDateFormat";
     public static final String SRS_NAME_PREFIX_SOS_V1 = "misc.srsNamePrefixSosV1";
     public static final String SRS_NAME_PREFIX_SOS_V2 = "misc.srsNamePrefixSosV2";
-    public static final String DEFAULT_OFFERING_PREFIX = "misc.defaultOfferingPrefix";
-    public static final String DEFAULT_PROCEDURE_PREFIX = "misc.defaultProcedurePrefix";
-    public static final String CHARACTER_ENCODING = "misc.characterEncoding";
+    
+    @Deprecated public static final String DEFAULT_OFFERING_PREFIX = "misc.defaultOfferingPrefix";
+    @Deprecated public static final String DECIMAL_SEPARATOR = "misc.decimalSeperator";
     
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
             .setTitle("Miscellaneous Settings").setOrder(3);
+    
+    @Deprecated
+    public static final StringSettingDefinition DEFAULT_OFFERING_PREFIX_DEFINITION = new StringSettingDefinition()
+            .setGroup(MiscSettings.GROUP)
+            .setOrder(4)
+            .setKey(DEFAULT_OFFERING_PREFIX)
+            .setDefaultValue("OFFERING_")
+            .setTitle("Default Offering Prefix")
+            .setDescription("The default prefix for generated offerings (if not defined in RegisterSensor requests).");
     public static final StringSettingDefinition TOKEN_SEPERATOR_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(0)
@@ -59,6 +74,7 @@ public class MiscSettingDefinitions {
             .setDefaultValue(";")
             .setTitle("Tuple separator")
             .setDescription("Tuple separator in result element (a character)");
+    @Deprecated
     public static final StringSettingDefinition DECIMAL_SEPARATOR_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(0)
@@ -87,20 +103,6 @@ public class MiscSettingDefinitions {
             .setDefaultValue("http://www.opengis.net/def/crs/EPSG/0/")
             .setTitle("SOSv2 SRS Prefix")
             .setDescription("Prefix for the SRS name in SOS v2.0.0.");
-    public static final StringSettingDefinition DEFAULT_OFFERING_PREFIX_DEFINITION = new StringSettingDefinition()
-            .setGroup(GROUP)
-            .setOrder(4)
-            .setKey(DEFAULT_OFFERING_PREFIX)
-            .setDefaultValue("OFFERING_")
-            .setTitle("Default Offering Prefix")
-            .setDescription("The default prefix for generated offerings (if not defined in RegisterSensor requests).");
-    public static final StringSettingDefinition DEFAULT_PROCEDURE_PREFIX_DEFINITION = new StringSettingDefinition()
-            .setGroup(GROUP)
-            .setOrder(4)
-            .setKey(DEFAULT_PROCEDURE_PREFIX)
-            .setDefaultValue("urn:ogc:object:feature:Sensor:")
-            .setTitle("Default Procedure Prefix")
-            .setDescription("The default prefix for generated procedures (if not defined in RegisterSensor requests).");
     public static final StringSettingDefinition CHARACTER_ENCODING_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(5)
@@ -109,6 +111,19 @@ public class MiscSettingDefinitions {
             .setTitle("Character Encoding")
             .setDescription("The character encoding used for responses.");
 
-    private MiscSettingDefinitions() {
+    
+    private static final Set<ISettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<ISettingDefinition<?,?>>set(
+            MiscSettings.TOKEN_SEPERATOR_DEFINITION,
+            MiscSettings.TUPLE_SEPERATOR_DEFINITION,
+            MiscSettings.DECIMAL_SEPARATOR_DEFINITION,
+            MiscSettings.GML_DATE_FORMAT_DEFINITION,
+            MiscSettings.SRS_NAME_PREFIX_SOS_V1_DEFINITION,
+            MiscSettings.SRS_NAME_PREFIX_SOS_V2_DEFINITION,
+            MiscSettings.DEFAULT_OFFERING_PREFIX_DEFINITION,
+            MiscSettings.CHARACTER_ENCODING_DEFINITION);
+
+    @Override
+    public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
+        return Collections.unmodifiableSet(DEFINITIONS);
     }
 }

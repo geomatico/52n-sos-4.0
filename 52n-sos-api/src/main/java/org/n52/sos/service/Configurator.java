@@ -23,8 +23,8 @@
  */
 package org.n52.sos.service;
 
-import static org.n52.sos.service.MiscSettingDefinitions.*;
-import static org.n52.sos.service.ServiceSettingDefinitions.*;
+import static org.n52.sos.service.MiscSettings.*;
+import static org.n52.sos.service.ServiceSettings.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,6 +62,7 @@ import org.n52.sos.service.profile.DefaultProfileHandler;
 import org.n52.sos.service.profile.IProfile;
 import org.n52.sos.service.profile.IProfileHandler;
 import org.n52.sos.tasking.Tasking;
+import org.n52.sos.util.Cleanupable;
 import org.n52.sos.util.ConfiguringSingletonServiceLoader;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.IFactory;
@@ -76,7 +77,7 @@ import org.slf4j.LoggerFactory;
  * configures the logger.
  */
 @Configurable
-public class Configurator {
+public class Configurator implements Cleanupable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Configurator.class);
     /**
@@ -95,27 +96,14 @@ public class Configurator {
     /**
      * Map with indicator and name of additional config files for modules.
      */
-    private Map<String, String> configFileMap = new HashMap<String, String>(0);
-    /**
-     * default offering identifier prefix, used for auto generation.
-     */
-    private String defaultOfferingPrefix;
-    /**
-     * default procedure identifier prefix, used for auto generation.
-     */
-    private String defaultProcedurePrefix;
+    @Deprecated private Map<String, String> configFileMap = new HashMap<String, String>(0);
+    @Deprecated private String defaultOfferingPrefix;
     /**
      * date format of gml.
      */
     private String gmlDateFormat;
-    /**
-     * lease for getResult template in minutes.
-     */
-    private int lease;
-    /**
-     * maximum number of GetObservation results.
-     */
-    private int maxGetObsResults;
+    @Deprecated private int lease;
+    @Deprecated private int maxGetObsResults;
     /**
      * minimum size to gzip responses.
      */
@@ -129,11 +117,11 @@ public class Configurator {
      * during insertion If set to false, duplicate observations trigger an
      * exception.
      */
-    private boolean skipDuplicateObservations = false;
+    @Deprecated private boolean skipDuplicateObservations = false;
     /**
      * directory of sensor descriptions in SensorML format.
      */
-    private File sensorDir;
+    private File sensorDirectory;
     /**
      * Prefix URN for the spatial reference system.
      */
@@ -159,11 +147,7 @@ public class Configurator {
     /**
      * decimal separator for result element.
      */
-    private String decimalSeparator;
-    /**
-     * update interval for capabilities cache.
-     */
-    private long capabiltiesCacheUpdateInterval;
+    @Deprecated private String decimalSeparator;
     
     private Properties dataConnectionProviderProperties;
     
@@ -307,57 +291,6 @@ public class Configurator {
     }
 
     /**
-     * @return the updateInterval in milli seconds
-     */
-    public long getUpdateIntervallInMillis() {
-        return this.capabiltiesCacheUpdateInterval * 60000;
-    }
-
-    @Setting(CAPABILITIES_CACHE_UPDATE_INTERVAL)
-    public void setCapabilitiesCacheUpdateInterval(int interval) throws ConfigurationException {
-        Validation.greaterZero("Cache update interval", interval);
-        if (this.capabiltiesCacheUpdateInterval != interval) {
-            this.capabiltiesCacheUpdateInterval = interval;
-            if (this.capabilitiesCacheController != null) {
-                this.capabilitiesCacheController.reschedule();
-            }
-        }
-    }
-
-    /**
-     * @return the characterEncoding
-     */
-    public String getCharacterEncoding() {
-        return this.characterEncoding;
-    }
-
-    @Setting(CHARACTER_ENCODING)
-    public void setCharacterEncoding(String encoding) throws ConfigurationException {
-        Validation.notNullOrEmpty("Character Encoding", encoding);
-        this.characterEncoding = encoding;
-        XmlOptionsHelper.getInstance(this.characterEncoding, true);
-    }
-
-    /**
-     * @return the configFileMap
-     */
-    public Map<String, String> getConfigFileMap() {
-        return Collections.unmodifiableMap(configFileMap);
-    }
-
-    @Setting(CONFIGURATION_FILES)
-    public void setConfigurationFiles(String configurationFiles) {
-        if (configurationFiles != null && !configurationFiles.isEmpty()) {
-            for (String kvp : configurationFiles.split(";")) {
-                String[] keyValue = kvp.split(" ");
-                this.configFileMap.put(keyValue[0], keyValue[1]);
-            }
-        } else {
-            this.configFileMap.clear();
-        }
-    }
-
-    /**
      * Returns the default token seperator for results.
      * <p/>
      * @return the tokenSeperator.
@@ -366,7 +299,7 @@ public class Configurator {
         return this.tokenSeperator;
     }
 
-    @Setting(TOKEN_SEPERATOR)
+    @Setting(MiscSettings.TOKEN_SEPERATOR)
     public void setTokenSeperator(String seperator) throws ConfigurationException {
         Validation.notNullOrEmpty("Token seperator", seperator);
         this.tokenSeperator = seperator;
@@ -381,10 +314,46 @@ public class Configurator {
         return this.tupleSeperator;
     }
 
-    @Setting(TUPLE_SEPERATOR)
+    @Setting(MiscSettings.TUPLE_SEPERATOR)
     public void setTupleSeperator(String seperator) throws ConfigurationException {
         Validation.notNullOrEmpty("Tuple seperator", seperator);
         this.tupleSeperator = seperator;
+    }
+
+    /**
+     * @return the characterEncoding
+     */
+    @Deprecated
+    public String getCharacterEncoding() {
+        return this.characterEncoding;
+    }
+
+    @Setting(CHARACTER_ENCODING)
+    public void setCharacterEncoding(String encoding) throws ConfigurationException {
+        Validation.notNullOrEmpty("Character Encoding", encoding);
+        this.characterEncoding = encoding;
+        XmlOptionsHelper.getInstance(this.characterEncoding, true);
+    }
+
+    /**
+     * @return the configFileMap
+     */
+    @Deprecated
+    public Map<String, String> getConfigFileMap() {
+        return Collections.unmodifiableMap(configFileMap);
+    }
+    
+    @Deprecated
+    @Setting(CONFIGURATION_FILES)
+    public void setConfigurationFiles(String configurationFiles) {
+        if (configurationFiles != null && !configurationFiles.isEmpty()) {
+            for (String kvp : configurationFiles.split(";")) {
+                String[] keyValue = kvp.split(" ");
+                this.configFileMap.put(keyValue[0], keyValue[1]);
+            }
+        } else {
+            this.configFileMap.clear();
+        }
     }
 
     /**
@@ -392,10 +361,11 @@ public class Configurator {
      * <p/>
      * @return decimal separator.
      */
+    @Deprecated
     public String getDecimalSeparator() {
         return this.decimalSeparator;
     }
-
+    @Deprecated
     @Setting(DECIMAL_SEPARATOR)
     public void setDecimalSeperator(String seperator) throws ConfigurationException {
         Validation.notNullOrEmpty("Decimal seperator", seperator);
@@ -406,6 +376,9 @@ public class Configurator {
      * Returns the minimum size a response has to hvae to be compressed.
      * <p/>
      * @return the minimum threshold
+     */
+    /*
+     * SosServlet
      */
     public int getMinimumGzipSize() {
         return this.minimumGzipSize;
@@ -419,40 +392,37 @@ public class Configurator {
     /**
      * @return maxGetObsResults
      */
+    @Deprecated
     public int getMaxGetObsResults() {
         return this.maxGetObsResults;
     }
 
+    @Deprecated
     @Setting(MAX_GET_OBSERVATION_RESULTS)
     public void setMaxGetObservationResults(int maxResults) {
         this.maxGetObsResults = maxResults;
     }
-
+    
+    @Deprecated
     public String getDefaultOfferingPrefix() {
         return this.defaultOfferingPrefix;
     }
-
+    
+    @Deprecated
     @Setting(DEFAULT_OFFERING_PREFIX)
     public void setDefaultOfferingPrefix(String prefix) {
         this.defaultOfferingPrefix = prefix;
     }
 
-    public String getDefaultProcedurePrefix() {
-        return this.defaultProcedurePrefix;
-    }
-
-    @Setting(DEFAULT_PROCEDURE_PREFIX)
-    public void setDefaultProcedurePrefix(String prefix) {
-        this.defaultProcedurePrefix = prefix;
-    }
-
     /**
      * @return Returns the lease for the getResult template (in minutes).
      */
+    @Deprecated
     public int getLease() {
         return this.lease;
     }
-
+    
+    @Deprecated
     @Setting(LEASE)
     public void setLease(int lease) throws ConfigurationException {
         Validation.greaterZero("Lease", lease);
@@ -462,10 +432,12 @@ public class Configurator {
     /**
      * @return true if duplicate observations should be skipped during insertion
      */
+    @Deprecated
     public boolean isSkipDuplicateObservations() {
         return this.skipDuplicateObservations;
     }
 
+    @Deprecated
     @Setting(SKIP_DUPLICATE_OBSERVATIONS)
     public void setSkipDuplicateObservations(boolean skip) {
         this.skipDuplicateObservations = skip;
@@ -474,6 +446,7 @@ public class Configurator {
     /**
      * @return the supportsQuality
      */
+    //HibernateObservationUtilities
     public boolean isSupportsQuality() {
         return this.supportsQuality;
     }
@@ -486,6 +459,7 @@ public class Configurator {
     /**
      * @return Returns the gmlDateFormat.
      */
+    @Deprecated
     public String getGmlDateFormat() {
         return this.gmlDateFormat;
     }
@@ -500,13 +474,14 @@ public class Configurator {
     /**
      * @return Returns the sensor description directory
      */
+    //HibernateProcedureUtilities
     public File getSensorDir() {
-        return this.sensorDir;
+        return this.sensorDirectory;
     }
 
     @Setting(SENSOR_DIRECTORY)
     public void setSensorDirectory(File sensorDirectory) {
-        this.sensorDir = sensorDirectory;
+        this.sensorDirectory = sensorDirectory;
     }
 
     /**
@@ -531,6 +506,12 @@ public class Configurator {
     /**
      * @return prefix URN for the spatial reference system
      */
+    /*
+     * SosHelper
+     * AbstractKvpDecoder
+     * GmlEncoderv311
+     * ITRequestEncoder
+     */
     public String getSrsNamePrefix() {
         return this.srsNamePrefix;
     }
@@ -545,6 +526,12 @@ public class Configurator {
 
     /**
      * @return prefix URN for the spatial reference system
+     */
+    /*
+     * SosHelper
+     * GmlEncoderv321
+     * AbstractKvpDecoder
+     * SosEncoderv100
      */
     public String getSrsNamePrefixSosV2() {
         return this.srsNamePrefixSosV2;
@@ -710,6 +697,7 @@ public class Configurator {
     /**
      * @return the base path for configuration files
      */
+    @Deprecated
     public String getBasePath() {
         return basepath;
     }
@@ -833,19 +821,23 @@ public class Configurator {
     /**
      * Eventually cleanup everything created by the constructor
      */
+    @Override
     public synchronized void cleanup() {
-        if (dataConnectionProvider != null) {
-            dataConnectionProvider.cleanup();
+        if (this.dataConnectionProvider != null) {
+            this.dataConnectionProvider.cleanup();
+            this.dataConnectionProvider = null;
         }
-        if (featureConnectionProvider != null) {
-            featureConnectionProvider.cleanup();
+        if (this.featureConnectionProvider != null) {
+            this.featureConnectionProvider.cleanup();
+            this.featureConnectionProvider = null;
         }
-        if (capabilitiesCacheController != null) {
-            capabilitiesCacheController.cancel();
-            capabilitiesCacheController = null;
+        if (this.capabilitiesCacheController != null) {
+            this.capabilitiesCacheController.cleanup();
+            this.capabilitiesCacheController = null;
         }
         if (this.tasking != null) {
-            this.tasking.cancel();
+            this.tasking.cleanup();
+            this.tasking = null;
         }
         instance = null;
     }

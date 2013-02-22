@@ -21,13 +21,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ogc.ows;
+package org.n52.sos.request.operator;
 
 import java.util.Collections;
 import java.util.Set;
 
 import org.n52.sos.config.ISettingDefinition;
 import org.n52.sos.config.ISettingDefinitionProvider;
+import org.n52.sos.config.settings.StringSettingDefinition;
+import org.n52.sos.service.MiscSettings;
 import org.n52.sos.util.CollectionHelper;
 
 /**
@@ -35,16 +37,18 @@ import org.n52.sos.util.CollectionHelper;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class SosServiceIdentificationSettingDefinitionProvider implements ISettingDefinitionProvider {
+public class TransactionalOperatorSettings implements ISettingDefinitionProvider {
 
+    public static final String DEFAULT_PROCEDURE_PREFIX = "misc.defaultProcedurePrefix";
+    public static final StringSettingDefinition DEFAULT_PROCEDURE_PREFIX_DEFINITION = new StringSettingDefinition()
+            .setGroup(MiscSettings.GROUP)
+            .setOrder(4)
+            .setKey(DEFAULT_PROCEDURE_PREFIX)
+            .setDefaultValue("urn:ogc:object:feature:Sensor:")
+            .setTitle("Default Procedure Prefix")
+            .setDescription("The default prefix for generated procedures (if not defined in RegisterSensor requests).");
     private static final Set<ISettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<ISettingDefinition<?, ?>>set(
-            SosServiceIdentificationSettingDefinitions.TITLE_DEFINITION,
-            SosServiceIdentificationSettingDefinitions.ABSTRACT_DEFINITION,
-            SosServiceIdentificationSettingDefinitions.SERVICE_TYPE_DEFINITION,
-            SosServiceIdentificationSettingDefinitions.KEYWORDS_DEFINITION,
-            SosServiceIdentificationSettingDefinitions.FEES_DEFINITION,
-            SosServiceIdentificationSettingDefinitions.ACCESS_CONSTRAINTS_DEFINITION,
-            SosServiceIdentificationSettingDefinitions.FILE_DEFINITION);
+            DEFAULT_PROCEDURE_PREFIX_DEFINITION);
 
     @Override
     public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {

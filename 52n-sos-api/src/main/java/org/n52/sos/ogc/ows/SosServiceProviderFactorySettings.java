@@ -24,18 +24,23 @@
 package org.n52.sos.ogc.ows;
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.Set;
 
+import org.n52.sos.config.ISettingDefinition;
+import org.n52.sos.config.ISettingDefinitionProvider;
 import org.n52.sos.config.SettingDefinitionGroup;
 import org.n52.sos.config.settings.FileSettingDefinition;
 import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.config.settings.UriSettingDefinition;
+import org.n52.sos.util.CollectionHelper;
 
 /**
  * TODO JavaDoc
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class SosServiceProviderSettingDefinitions {
+public class SosServiceProviderFactorySettings implements ISettingDefinitionProvider {
     
     public static final String FILE = "serviceProvider.file";
     public static final String STATE = "serviceProvider.state";
@@ -143,6 +148,13 @@ public class SosServiceProviderSettingDefinitions {
                             + "or a path relative to the web application directory (e.g. "
                             + "<code>WEB-INF/provider.xml</code>).")
             .setOptional(true);
-    private SosServiceProviderSettingDefinitions() {
+    private static final Set<ISettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<ISettingDefinition<?, ?>>set(
+            NAME_DEFINITION, SITE_DEFINITION, INDIVIDUAL_NAME_DEFINITION, POSITION_NAME_DEFINITION, PHONE_DEFINITION,
+            DELIVERY_POINT_DEFINITION, CITY_DEFINITION, POSTAL_CODE_DEFINITION, ADMINISTRATIVE_AREA_DEFINITION,
+            COUNTRY_DEFINITION, MAIL_ADDRESS_DEFINITION, FILE_DEFINITION);
+    
+    @Override
+    public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
+        return Collections.unmodifiableSet(DEFINITIONS);
     }
 }
