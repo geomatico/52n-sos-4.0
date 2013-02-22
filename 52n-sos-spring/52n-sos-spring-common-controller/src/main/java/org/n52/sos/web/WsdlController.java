@@ -29,7 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.wsdl.WSDLException;
 import org.apache.commons.io.IOUtils;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.wsdl.WSDLProvider;
+import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.wsdl.WSDLFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,9 +47,9 @@ public class WsdlController extends AbstractController {
     
     @ResponseBody
     @RequestMapping(method = RequestMethod.GET)
-    public void get(HttpServletRequest req, HttpServletResponse res) throws OwsExceptionReport, WSDLException, IOException {
+    public void get(HttpServletRequest req, HttpServletResponse res) throws IOException, ConfigurationException {
         res.setContentType(MediaType.APPLICATION_XML_VALUE);
         res.setCharacterEncoding("UTF-8");
-        IOUtils.write(new WSDLProvider().getWSDL(), res.getOutputStream());
+        IOUtils.write(new WSDLFactory().get(), res.getOutputStream());
     }
 }

@@ -33,78 +33,6 @@ import javax.xml.namespace.QName;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class WSDLOperation {
-
-    public static class WSDLOperationBuilder {
-
-        private String name;
-        private String version;
-        private URI requestAction;
-        private URI responseAction;
-        private QName request;
-        private QName response;
-        private Collection<WSDLFault> faults;
-
-        private WSDLOperationBuilder() {
-        }
-
-        public WSDLOperationBuilder setName(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public WSDLOperationBuilder setRequestAction(URI requestAction) {
-            this.requestAction = requestAction;
-            return this;
-        }
-
-        public WSDLOperationBuilder setResponseAction(URI responseAction) {
-            this.responseAction = responseAction;
-            return this;
-        }
-
-        public WSDLOperationBuilder setRequest(QName request) {
-            this.request = request;
-            return this;
-        }
-        public WSDLOperationBuilder setVersion(String version) {
-            this.version = version;
-            return this;
-        }
-
-        public WSDLOperationBuilder setRequest(String namespace, String localpart) {
-            return setRequest(new QName(namespace, localpart));
-        }
-
-        public WSDLOperationBuilder setResponse(QName response) {
-            this.response = response;
-            return this;
-        }
-
-        public WSDLOperationBuilder setResponse(String namespace, String localpart) {
-            return setResponse(new QName(namespace, localpart));
-        }
-
-        public WSDLOperationBuilder addFault(WSDLFault fault) {
-            if (this.faults == null) {
-                this.faults = new LinkedList<WSDLFault>();
-            }
-            this.faults.add(fault);
-            return this;
-        }
-        
-        public WSDLOperationBuilder setFaults(Collection<WSDLFault> faults) {
-            this.faults = new LinkedList<WSDLFault>(faults);
-            return this;
-        }
-
-        public WSDLOperationBuilder addFault(String name, URI action) {
-            return addFault(new WSDLFault(name, action));
-        }
-
-        public WSDLOperation build() {
-            return new WSDLOperation(name, version, requestAction, responseAction, request, response, faults);
-        }
-    }
     
     private String name;
     private String version;
@@ -114,7 +42,7 @@ public class WSDLOperation {
     private QName response;
     private Collection<WSDLFault> faults;
 
-    public static WSDLOperationBuilder newBuilder() {
+    public static WSDLOperationBuilder newWSDLOperation() {
         return new WSDLOperationBuilder();
     }
     

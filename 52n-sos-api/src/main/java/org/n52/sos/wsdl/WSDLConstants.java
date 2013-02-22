@@ -152,7 +152,7 @@ public class WSDLConstants {
     }
     
     public static final class Operations {
-        public static final WSDLOperation DELETE_SENSOR = WSDLOperation.newBuilder()
+        public static final WSDLOperation DELETE_SENSOR = WSDLOperation.newWSDLOperation()
                 .setName(Sos2Constants.Operations.DeleteSensor.name())
                 .setVersion(Sos2Constants.SERVICEVERSION)
                 .setRequest(SWEConstants.QN_DELETE_SENSOR)
@@ -161,7 +161,7 @@ public class WSDLConstants {
                 .setResponseAction(SoapResponseActionUris.DELETE_SENSOR)
                 .setFaults(WSDLFault.DEFAULT_FAULTS)
                 .build();
-        public static final WSDLOperation DESCRIBE_SENSOR = WSDLOperation.newBuilder()
+        public static final WSDLOperation DESCRIBE_SENSOR = WSDLOperation.newWSDLOperation()
                 .setName(SosConstants.Operations.DescribeSensor.name())
                 .setVersion(Sos2Constants.SERVICEVERSION)
                 .setRequest(SWEConstants.QN_DESCRIBE_SENSOR)
@@ -170,7 +170,7 @@ public class WSDLConstants {
                 .setResponseAction(SoapResponseActionUris.DESCRIBE_SENSOR)
                 .setFaults(WSDLFault.DEFAULT_FAULTS)
                 .build();
-        public static final WSDLOperation GET_CAPABILITIES = WSDLOperation.newBuilder()
+        public static final WSDLOperation GET_CAPABILITIES = WSDLOperation.newWSDLOperation()
                 .setName(SosConstants.Operations.GetCapabilities.name())
                 .setVersion(Sos2Constants.SERVICEVERSION)
                 .setRequest(Sos2Constants.QN_GET_CAPABILITIES)
@@ -181,7 +181,7 @@ public class WSDLConstants {
                 .addFault(WSDLFault.VERSION_NEGOTIATION_FAILED_EXCEPTION)
                 .addFault(WSDLFault.INVALID_UPDATE_SEQUENCE_EXCEPTION)
                 .build();
-        public static final WSDLOperation GET_FEATURE_OF_INTEREST = WSDLOperation.newBuilder()
+        public static final WSDLOperation GET_FEATURE_OF_INTEREST = WSDLOperation.newWSDLOperation()
                 .setName(SosConstants.Operations.GetFeatureOfInterest.name())
                 .setVersion(Sos2Constants.SERVICEVERSION)
                 .setRequest(Sos2Constants.QN_GET_FEATURE_OF_INTEREST)
@@ -190,7 +190,7 @@ public class WSDLConstants {
                 .setResponseAction(SoapResponseActionUris.GET_FEATURE_OF_INTEREST)
                 .setFaults(WSDLFault.DEFAULT_FAULTS)
                 .build();
-        public static final WSDLOperation GET_OBSERVATION = WSDLOperation.newBuilder()
+        public static final WSDLOperation GET_OBSERVATION = WSDLOperation.newWSDLOperation()
                 .setName(SosConstants.Operations.GetObservation.name())
                 .setVersion(Sos2Constants.SERVICEVERSION)
                 .setRequest(Sos2Constants.QN_GET_OBSERVATION)
@@ -199,7 +199,7 @@ public class WSDLConstants {
                 .setResponseAction(SoapResponseActionUris.INSERT_OBSERVATION)
                 .setFaults(WSDLFault.DEFAULT_FAULTS)
                 .build();
-        public static final WSDLOperation GET_OBSERVATION_BY_ID = WSDLOperation.newBuilder()
+        public static final WSDLOperation GET_OBSERVATION_BY_ID = WSDLOperation.newWSDLOperation()
                 .setName(SosConstants.Operations.GetObservationById.name())
                 .setVersion(Sos2Constants.SERVICEVERSION)
                 .setRequest(Sos2Constants.QN_GET_OBSERVATION_BY_ID)
@@ -208,7 +208,7 @@ public class WSDLConstants {
                 .setResponseAction(SoapResponseActionUris.GET_OBSERVATION_BY_ID)
                 .setFaults(WSDLFault.DEFAULT_FAULTS)
                 .build();
-        public static final WSDLOperation GET_RESULT = WSDLOperation.newBuilder()
+        public static final WSDLOperation GET_RESULT = WSDLOperation.newWSDLOperation()
                 .setName(SosConstants.Operations.GetResult.name())
                 .setVersion(Sos2Constants.SERVICEVERSION)
                 .setRequest(Sos2Constants.QN_GET_RESULT)
@@ -217,7 +217,7 @@ public class WSDLConstants {
                 .setResponseAction(SoapResponseActionUris.GET_RESULT)
                 .setFaults(WSDLFault.DEFAULT_FAULTS)
                 .build();
-        public static final WSDLOperation GET_RESULT_TEMPLATE = WSDLOperation.newBuilder()
+        public static final WSDLOperation GET_RESULT_TEMPLATE = WSDLOperation.newWSDLOperation()
                 .setName(Sos2Constants.Operations.GetResultTemplate.name())
                 .setVersion(Sos2Constants.SERVICEVERSION)
                 .setRequest(Sos2Constants.QN_GET_RESULT_TEMPLATE)
@@ -226,7 +226,7 @@ public class WSDLConstants {
                 .setResponseAction(SoapResponseActionUris.GET_RESULT_TEMPLATE)
                 .setFaults(WSDLFault.DEFAULT_FAULTS)
                 .build();
-        public static final WSDLOperation INSERT_OBSERVATION = WSDLOperation.newBuilder()
+        public static final WSDLOperation INSERT_OBSERVATION = WSDLOperation.newWSDLOperation()
                 .setName(SosConstants.Operations.InsertObservation.name())
                 .setVersion(Sos2Constants.SERVICEVERSION)
                 .setRequest(Sos2Constants.QN_INSERT_OBSERVATION)
@@ -235,7 +235,7 @@ public class WSDLConstants {
                 .setResponseAction(SoapResponseActionUris.INSERT_OBSERVATION)
                 .setFaults(WSDLFault.DEFAULT_FAULTS)
                 .build();
-        public static final WSDLOperation INSERT_RESULT = WSDLOperation.newBuilder()
+        public static final WSDLOperation INSERT_RESULT = WSDLOperation.newWSDLOperation()
                 .setName(Sos2Constants.Operations.InsertResult.name())
                 .setVersion(Sos2Constants.SERVICEVERSION)
                 .setRequest(Sos2Constants.QN_INSERT_RESULT)
@@ -244,7 +244,7 @@ public class WSDLConstants {
                 .setResponseAction(SoapResponseActionUris.INSERT_RESULT)
                 .setFaults(WSDLFault.DEFAULT_FAULTS)
                 .build();
-        public static final WSDLOperation INSERT_RESULT_TEMPLATE = WSDLOperation.newBuilder()
+        public static final WSDLOperation INSERT_RESULT_TEMPLATE = WSDLOperation.newWSDLOperation()
                 .setName(Sos2Constants.Operations.InsertResultTemplate.name())
                 .setVersion(Sos2Constants.SERVICEVERSION)
                 .setRequest(Sos2Constants.QN_INSERT_RESULT_TEMPLATE)
@@ -253,7 +253,7 @@ public class WSDLConstants {
                 .setResponseAction(SoapResponseActionUris.INSERT_RESULT_TEMPLATE)
                 .setFaults(WSDLFault.DEFAULT_FAULTS)
                 .build();
-        public static final WSDLOperation INSERT_SENSOR = WSDLOperation.newBuilder()
+        public static final WSDLOperation INSERT_SENSOR = WSDLOperation.newWSDLOperation()
                 .setName(Sos2Constants.Operations.InsertSensor.name())
                 .setVersion(Sos2Constants.SERVICEVERSION)
                 .setRequest(SWEConstants.QN_INSERT_SENSOR)
@@ -262,7 +262,7 @@ public class WSDLConstants {
                 .setResponseAction(SoapResponseActionUris.INSERT_SENSOR)
                 .setFaults(WSDLFault.DEFAULT_FAULTS)
                 .build();
-        public static final WSDLOperation UPDATE_SENSOR_DESCRIPTION = WSDLOperation.newBuilder()
+        public static final WSDLOperation UPDATE_SENSOR_DESCRIPTION = WSDLOperation.newWSDLOperation()
                 .setName(Sos2Constants.Operations.UpdateSensorDescription.name())
                 .setVersion(Sos2Constants.SERVICEVERSION)
                 .setRequest(SWEConstants.QN_UPDATE_SENSOR_DESCRIPTION)

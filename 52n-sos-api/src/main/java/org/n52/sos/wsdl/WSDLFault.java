@@ -33,22 +33,27 @@ import org.n52.sos.util.CollectionHelper;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class WSDLFault {
-    public static final WSDLFault REQUEST_EXTENSION_NOT_SUPPORTED_EXCEPTION = new WSDLFault("RequestExtensionNotSupportedException", WSDLConstants.SWES_EXCEPTION_ACTION);
-    public static final WSDLFault INVALID_REQUEST_EXCEPTION = new WSDLFault("InvalidRequestException", WSDLConstants.SWES_EXCEPTION_ACTION);
-    public static final WSDLFault NO_APPLICABLE_CODE_EXCEPTION = new WSDLFault("NoApplicableCodeException", WSDLConstants.OWS_EXCEPTION_ACTION);
-    public static final WSDLFault INVALID_UPDATE_SEQUENCE_EXCEPTION = new WSDLFault("InvalidUpdateSequenceException", WSDLConstants.OWS_EXCEPTION_ACTION);
-    public static final WSDLFault VERSION_NEGOTIATION_FAILED_EXCEPTION = new WSDLFault("VersionNegotiationFailedException", WSDLConstants.OWS_EXCEPTION_ACTION);
-    public static final WSDLFault MISSING_PARAMETER_VALUE_EXCEPTION = new WSDLFault("MissingParameterValueException", WSDLConstants.OWS_EXCEPTION_ACTION);
-    public static final WSDLFault INVALID_PARAMETER_VALUE_EXCEPTION = new WSDLFault("InvalidParameterValueException", WSDLConstants.OWS_EXCEPTION_ACTION);
-    public static final WSDLFault OPERATION_NOT_SUPPORTED_EXCEPTION = new WSDLFault("OperationNotSupportedException", WSDLConstants.OWS_EXCEPTION_ACTION);
-    public static final Collection<WSDLFault> DEFAULT_FAULTS = Collections.unmodifiableCollection(CollectionHelper.collection(
-        WSDLFault.MISSING_PARAMETER_VALUE_EXCEPTION,
-        WSDLFault.INVALID_PARAMETER_VALUE_EXCEPTION,
-        WSDLFault.OPERATION_NOT_SUPPORTED_EXCEPTION,
-        WSDLFault.NO_APPLICABLE_CODE_EXCEPTION,
-        WSDLFault.INVALID_REQUEST_EXCEPTION,
-        WSDLFault.REQUEST_EXTENSION_NOT_SUPPORTED_EXCEPTION
-    ));
+
+    public static final WSDLFault REQUEST_EXTENSION_NOT_SUPPORTED_EXCEPTION = new WSDLFault(
+            "RequestExtensionNotSupportedException", WSDLConstants.SWES_EXCEPTION_ACTION);
+    public static final WSDLFault INVALID_REQUEST_EXCEPTION = new WSDLFault(
+            "InvalidRequestException", WSDLConstants.SWES_EXCEPTION_ACTION);
+    public static final WSDLFault NO_APPLICABLE_CODE_EXCEPTION = new WSDLFault(
+            "NoApplicableCodeException", WSDLConstants.OWS_EXCEPTION_ACTION);
+    public static final WSDLFault INVALID_UPDATE_SEQUENCE_EXCEPTION = new WSDLFault(
+            "InvalidUpdateSequenceException", WSDLConstants.OWS_EXCEPTION_ACTION);
+    public static final WSDLFault VERSION_NEGOTIATION_FAILED_EXCEPTION = new WSDLFault(
+            "VersionNegotiationFailedException", WSDLConstants.OWS_EXCEPTION_ACTION);
+    public static final WSDLFault MISSING_PARAMETER_VALUE_EXCEPTION = new WSDLFault(
+            "MissingParameterValueException", WSDLConstants.OWS_EXCEPTION_ACTION);
+    public static final WSDLFault INVALID_PARAMETER_VALUE_EXCEPTION = new WSDLFault(
+            "InvalidParameterValueException", WSDLConstants.OWS_EXCEPTION_ACTION);
+    public static final WSDLFault OPERATION_NOT_SUPPORTED_EXCEPTION = new WSDLFault(
+            "OperationNotSupportedException", WSDLConstants.OWS_EXCEPTION_ACTION);
+    public static final Collection<WSDLFault> DEFAULT_FAULTS = Collections.unmodifiableCollection(CollectionHelper
+            .collection(MISSING_PARAMETER_VALUE_EXCEPTION, INVALID_PARAMETER_VALUE_EXCEPTION,
+                        OPERATION_NOT_SUPPORTED_EXCEPTION, NO_APPLICABLE_CODE_EXCEPTION, INVALID_REQUEST_EXCEPTION,
+                        REQUEST_EXTENSION_NOT_SUPPORTED_EXCEPTION));
     private final String name;
     private final URI action;
 

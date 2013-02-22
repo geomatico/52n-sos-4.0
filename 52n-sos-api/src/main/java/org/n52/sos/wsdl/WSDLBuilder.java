@@ -23,11 +23,24 @@
  */
 package org.n52.sos.wsdl;
 
+import static org.n52.sos.ogc.ows.OWSConstants.NS_OWS;
+import static org.n52.sos.ogc.ows.OWSConstants.NS_OWS_PREFIX;
+import static org.n52.sos.ogc.ows.OWSConstants.QN_EXCEPTION;
+import static org.n52.sos.ogc.ows.OWSConstants.SCHEMA_LOCATION_OWS;
+import static org.n52.sos.ogc.sos.Sos2Constants.NS_SOS_20;
+import static org.n52.sos.ogc.sos.Sos2Constants.SCHEMA_LOCATION_SOS;
+import static org.n52.sos.ogc.sos.SosConstants.NS_SOS_PREFIX;
+import static org.n52.sos.ogc.swe.SWEConstants.NS_SWES_20;
+import static org.n52.sos.ogc.swe.SWEConstants.NS_SWES_PREFIX;
+import static org.n52.sos.ogc.swe.SWEConstants.SCHEMA_LOCATION_SWES_200;
+import static org.n52.sos.wsdl.WSDLConstants.*;
+
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import javax.wsdl.Binding;
 import javax.wsdl.BindingFault;
 import javax.wsdl.BindingInput;
@@ -65,10 +78,7 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.swe.SWEConstants;
+
 import org.n52.sos.wsdl.WSDLConstants.Operations;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -84,7 +94,6 @@ public class WSDLBuilder {
     private static final String SOS_SOAP_PORT = "SosSoapPort";
     private static final String SOS_KVP_PORT = "SosKvpPort";
     private static final String SOS_POX_PORT = "SosPoxPort";
-    
     private final WSDLFactory factory;
     private final ExtensionRegistry extensionRegistry;
     private final Definition definitions;
@@ -103,7 +112,7 @@ public class WSDLBuilder {
         this.setDefaultNamespaces();
         this.setDefaultImports();
     }
-    
+
     private WSDLFactory getFactory() {
         return this.factory;
     }
@@ -118,7 +127,7 @@ public class WSDLBuilder {
 
     private Input createInput(URI action, Message message) {
         Input input = getDefinitions().createInput();
-        input.setExtensionAttribute(WSDLConstants.QN_WSAM_ACTION, action.toString());
+        input.setExtensionAttribute(QN_WSAM_ACTION, action.toString());
         input.setName(message.getQName().getLocalPart());
         input.setMessage(message);
         return input;
@@ -126,7 +135,7 @@ public class WSDLBuilder {
 
     private Output createOutput(URI action, Message message) {
         Output output = getDefinitions().createOutput();
-        output.setExtensionAttribute(WSDLConstants.QN_WSAM_ACTION, action.toString());
+        output.setExtensionAttribute(QN_WSAM_ACTION, action.toString());
         output.setName(message.getQName().getLocalPart());
         output.setMessage(message);
         return output;
@@ -134,7 +143,7 @@ public class WSDLBuilder {
 
     private Fault createFault(String name, URI action, Message message) {
         Fault fault = getDefinitions().createFault();
-        fault.setExtensionAttribute(WSDLConstants.QN_WSAM_ACTION, action.toString());
+        fault.setExtensionAttribute(QN_WSAM_ACTION, action.toString());
         fault.setName(name);
         fault.setMessage(message);
         return fault;
@@ -148,15 +157,17 @@ public class WSDLBuilder {
         return createFault(name, action, getFaultMessage());
     }
 
-    private Operation addPostOperation(String name, QName request, QName response, URI requestAction, URI responseAction, Collection<Fault> faults) {
+    private Operation addPostOperation(String name, QName request, QName response, URI requestAction, URI responseAction,
+                                       Collection<Fault> faults) {
         Message requestMessage = createMessage(name + REQUEST_SUFFIX, request);
         Message responseMessage = createMessage(name + RESPONSE_SUFFIX, response);
         Input input = createInput(requestAction, requestMessage);
         Output output = createOutput(responseAction, responseMessage);
         return addOperation(getPostPortType(), name, input, output, faults);
     }
-    
-    private Operation addGetOperation(String name, QName request, QName response, URI requestAction, URI responseAction, Collection<Fault> faults) {
+
+    private Operation addGetOperation(String name, QName request, QName response, URI requestAction, URI responseAction,
+                                      Collection<Fault> faults) {
         Message requestMessage = createMessage(name + REQUEST_SUFFIX, request);
         Message responseMessage = createMessage(name + RESPONSE_SUFFIX, response);
         Input input = createInput(requestAction, requestMessage);
@@ -183,17 +194,17 @@ public class WSDLBuilder {
     private PortType getPostPortType() {
         if (this.postPortType == null) {
             this.postPortType = getDefinitions().createPortType();
-            this.postPortType.setQName(WSDLConstants.QN_SOSW_POST_PORT_TYPE);
+            this.postPortType.setQName(QN_SOSW_POST_PORT_TYPE);
             this.postPortType.setUndefined(false);
             getDefinitions().addPortType(this.postPortType);
         }
         return this.postPortType;
     }
-    
+
     private PortType getGetPortType() {
         if (this.getPortType == null) {
             this.getPortType = getDefinitions().createPortType();
-            this.getPortType.setQName(WSDLConstants.QN_SOSW_GET_PORT_TYPE);
+            this.getPortType.setQName(QN_SOSW_GET_PORT_TYPE);
             this.getPortType.setUndefined(false);
             getDefinitions().addPortType(this.getPortType);
         }
@@ -211,16 +222,16 @@ public class WSDLBuilder {
     private Service getService() {
         if (this.service == null) {
             this.service = getDefinitions().createService();
-            this.service.setQName(WSDLConstants.QN_SOSW_SERVICE);
+            this.service.setQName(QN_SOSW_SERVICE);
             getDefinitions().addService(this.service);
         }
         return this.service;
     }
 
     private void setDefaultImports() throws WSDLException {
-        addSchemaImport(Sos2Constants.NS_SOS_20, Sos2Constants.SCHEMA_LOCATION_SOS);
-        addSchemaImport(OWSConstants.NS_OWS, OWSConstants.SCHEMA_LOCATION_OWS);
-        addSchemaImport(SWEConstants.NS_SWES_20, SWEConstants.SCHEMA_LOCATION_SWES_200);
+        addSchemaImport(NS_SOS_20, SCHEMA_LOCATION_SOS);
+        addSchemaImport(NS_OWS, SCHEMA_LOCATION_OWS);
+        addSchemaImport(NS_SWES_20, SCHEMA_LOCATION_SWES_200);
     }
 
     public WSDLBuilder addSchemaImport(String namespace, String schemaLocation) throws WSDLException {
@@ -229,17 +240,17 @@ public class WSDLBuilder {
     }
 
     private void setDefaultNamespaces() {
-        getDefinitions().setTargetNamespace(WSDLConstants.NS_SOSW);
-        addNamespace(WSDLConstants.NS_SOSW_PREFIX, WSDLConstants.NS_SOSW);
-        addNamespace(WSDLConstants.NS_XSD_PREFIX, WSDLConstants.NS_XSD);
-        addNamespace(WSDLConstants.NS_WSDL_PREFIX, WSDLConstants.NS_WSDL);
-        addNamespace(WSDLConstants.NS_SOAP_PREFIX, WSDLConstants.NS_SOAP);
-        addNamespace(WSDLConstants.NS_WSAM_PREFIX, WSDLConstants.NS_WSAM);
-        addNamespace(WSDLConstants.NS_MIME_PREFIX, WSDLConstants.NS_MIME);
-        addNamespace(WSDLConstants.NS_HTTP_PREFIX, WSDLConstants.NS_HTTP);
-        addNamespace(OWSConstants.NS_OWS_PREFIX, OWSConstants.NS_OWS);
-        addNamespace(SosConstants.NS_SOS_PREFIX, Sos2Constants.NS_SOS_20);
-        addNamespace(SWEConstants.NS_SWES_PREFIX, SWEConstants.NS_SWES_20);
+        getDefinitions().setTargetNamespace(NS_SOSW);
+        addNamespace(NS_SOSW_PREFIX, NS_SOSW);
+        addNamespace(NS_XSD_PREFIX, NS_XSD);
+        addNamespace(NS_WSDL_PREFIX, NS_WSDL);
+        addNamespace(NS_SOAP_PREFIX, NS_SOAP);
+        addNamespace(NS_WSAM_PREFIX, NS_WSAM);
+        addNamespace(NS_MIME_PREFIX, NS_MIME);
+        addNamespace(NS_HTTP_PREFIX, NS_HTTP);
+        addNamespace(NS_OWS_PREFIX, NS_OWS);
+        addNamespace(NS_SOS_PREFIX, NS_SOS_20);
+        addNamespace(NS_SWES_PREFIX, NS_SWES_20);
     }
 
     public WSDLBuilder addNamespace(String prefix, String namespace) {
@@ -251,9 +262,9 @@ public class WSDLBuilder {
         Message message = getDefinitions().createMessage();
         Part part = getDefinitions().createPart();
         part.setElementName(qname);
-        part.setName(WSDLConstants.MESSAGE_PART);
+        part.setName(MESSAGE_PART);
         message.addPart(part);
-        message.setQName(new QName(WSDLConstants.NS_SOSW, name));
+        message.setQName(new QName(NS_SOSW, name));
         message.setUndefined(false);
         getDefinitions().addMessage(message);
         return message;
@@ -263,10 +274,10 @@ public class WSDLBuilder {
         if (this.faultMessage == null) {
             this.faultMessage = getDefinitions().createMessage();
             Part part = getDefinitions().createPart();
-            part.setElementName(OWSConstants.QN_EXCEPTION);
+            part.setElementName(QN_EXCEPTION);
             part.setName("fault");
             this.faultMessage.addPart(part);
-            this.faultMessage.setQName(new QName(WSDLConstants.NS_SOSW, "ExceptionMessage"));
+            this.faultMessage.setQName(new QName(NS_SOSW, "ExceptionMessage"));
             this.faultMessage.setUndefined(false);
             getDefinitions().addMessage(this.faultMessage);
         }
@@ -274,12 +285,12 @@ public class WSDLBuilder {
     }
 
     private ExtensibilityElement createSchemaImport(String namespace, String schemaLocation) throws WSDLException {
-        Schema schema = (Schema) getExtensionRegistry().createExtension(Types.class, WSDLConstants.QN_XSD_SCHEMA);
+        Schema schema = (Schema) getExtensionRegistry().createExtension(Types.class, QN_XSD_SCHEMA);
         SchemaReference ref = schema.createInclude();
         ref.setReferencedSchema(schema);
         ref.setSchemaLocationURI(schemaLocation);
         ref.setId(namespace);
-        schema.setElementType(WSDLConstants.QN_XSD_SCHEMA);
+        schema.setElementType(QN_XSD_SCHEMA);
         schema.setElement(buildSchemaImport(namespace, schemaLocation));
         schema.addInclude(ref);
         return schema;
@@ -290,13 +301,13 @@ public class WSDLBuilder {
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = documentFactory.newDocumentBuilder();
             Document document = builder.newDocument();
-            Element schema = document.createElementNS(WSDLConstants.NS_XSD, WSDLConstants.EN_XSD_SCHEMA);
-            Element include = document.createElementNS(WSDLConstants.NS_XSD, WSDLConstants.EN_XSD_INCLUDE);
-            include.setAttribute(WSDLConstants.AN_XSD_SCHEMA_LOCATION, schemaLocation);
-            include.setPrefix(WSDLConstants.NS_XSD_PREFIX);
-            schema.setAttribute(WSDLConstants.AN_XSD_TARGET_NAMESPACE, namespace);
-            schema.setAttribute(WSDLConstants.AN_XSD_ELEMENT_FORM_DEFAULT, WSDLConstants.QUALIFIED_ELEMENT_FORM_DEFAULT);
-            schema.setPrefix(WSDLConstants.NS_XSD_PREFIX);
+            Element schema = document.createElementNS(NS_XSD, EN_XSD_SCHEMA);
+            Element include = document.createElementNS(NS_XSD, EN_XSD_INCLUDE);
+            include.setAttribute(AN_XSD_SCHEMA_LOCATION, schemaLocation);
+            include.setPrefix(NS_XSD_PREFIX);
+            schema.setAttribute(AN_XSD_TARGET_NAMESPACE, namespace);
+            schema.setAttribute(AN_XSD_ELEMENT_FORM_DEFAULT, QUALIFIED_ELEMENT_FORM_DEFAULT);
+            schema.setPrefix(NS_XSD_PREFIX);
             schema.appendChild(include);
             return schema;
         } catch (ParserConfigurationException ex) {
@@ -337,7 +348,7 @@ public class WSDLBuilder {
     private URI getPoxEndpoint() {
         return this.poxEndpoint;
     }
-    
+
     private String getName(WSDLOperation o) {
         return o.getName() + ((o.getVersion() != null) ? o.getVersion().replace(".", "") : "");
     }
@@ -348,7 +359,7 @@ public class WSDLBuilder {
             faults.add(createFault(f));
         }
         return addPoxOperation(getName(o), o.getRequest(), o.getResponse(), o.getRequestAction(),
-                o.getResponseAction(), faults);
+                               o.getResponseAction(), faults);
     }
 
     public WSDLBuilder addKvpOperation(WSDLOperation o) throws WSDLException {
@@ -356,8 +367,8 @@ public class WSDLBuilder {
         for (WSDLFault f : o.getFaults()) {
             faults.add(createFault(f));
         }
-        return addKvpOperation(getName(o), o.getRequest(), o.getResponse(), o.getRequestAction(),
-                o.getResponseAction(), faults);
+        return addKvpOperation(getName(o), o.getRequest(), o.getResponse(), o.getRequestAction(), o.getResponseAction(),
+                               faults);
     }
 
     public WSDLBuilder addSoapOperation(WSDLOperation o) throws WSDLException {
@@ -366,27 +377,27 @@ public class WSDLBuilder {
             faults.add(createFault(f));
         }
         return addSoapOperation(getName(o), o.getRequest(), o.getResponse(),
-                o.getRequestAction(), o.getResponseAction(), faults);
+                                o.getRequestAction(), o.getResponseAction(), faults);
     }
 
-    private WSDLBuilder addSoapOperation(String name, QName request, QName response, URI requestAction, 
-            URI responseAction, Collection<Fault> faults) throws WSDLException {
+    private WSDLBuilder addSoapOperation(String name, QName request, QName response, URI requestAction,
+                                         URI responseAction, Collection<Fault> faults) throws WSDLException {
         Operation operation = addPostOperation(name, request, response, requestAction, responseAction, faults);
         addSoapBindingOperation(name, operation, requestAction, faults);
         addSoapPort();
         return this;
     }
 
-    private WSDLBuilder addPoxOperation(String name, QName request, QName response, URI requestAction, 
-            URI responseAction, Collection<Fault> faults) throws WSDLException {
+    private WSDLBuilder addPoxOperation(String name, QName request, QName response, URI requestAction,
+                                        URI responseAction, Collection<Fault> faults) throws WSDLException {
         Operation operation = addPostOperation(name, request, response, requestAction, responseAction, faults);
         addPoxBindingOperation(name, operation, faults);
         addPoxPort();
         return this;
     }
 
-    private WSDLBuilder addKvpOperation(String name, QName request, QName response, URI requestAction, 
-            URI responseAction, Collection<Fault> faults) throws WSDLException {
+    private WSDLBuilder addKvpOperation(String name, QName request, QName response, URI requestAction,
+                                        URI responseAction, Collection<Fault> faults) throws WSDLException {
         Operation operation = addGetOperation(name, request, response, requestAction, responseAction, faults);
         addKvpBindingOperation(name, operation, faults);
         addKvpPort();
@@ -399,7 +410,7 @@ public class WSDLBuilder {
             this.soapPort.setBinding(getSoapBinding());
             this.soapPort.setName(SOS_SOAP_PORT);
             SOAPAddress soapAddress = (SOAPAddress) getExtensionRegistry()
-                    .createExtension(Port.class, WSDLConstants.QN_SOAP_ADDRESS);
+                    .createExtension(Port.class, QN_SOAP_ADDRESS);
             soapAddress.setLocationURI(getSoapEndpoint().toString());
             this.soapPort.addExtensibilityElement(soapAddress);
             getService().addPort(this.soapPort);
@@ -412,7 +423,7 @@ public class WSDLBuilder {
             this.poxPort.setBinding(getPoxBinding());
             this.poxPort.setName(SOS_POX_PORT);
             HTTPAddress httpAddress = (HTTPAddress) getExtensionRegistry()
-                    .createExtension(Port.class, WSDLConstants.QN_HTTP_ADDRESS);
+                    .createExtension(Port.class, QN_HTTP_ADDRESS);
             httpAddress.setLocationURI(getPoxEndpoint().toString());
             this.poxPort.addExtensibilityElement(httpAddress);
             getService().addPort(this.poxPort);
@@ -425,20 +436,21 @@ public class WSDLBuilder {
             this.kvpPort.setBinding(getKvpBinding());
             this.kvpPort.setName(SOS_KVP_PORT);
             HTTPAddress httpAddress = (HTTPAddress) getExtensionRegistry()
-                    .createExtension(Port.class, WSDLConstants.QN_HTTP_ADDRESS);
+                    .createExtension(Port.class, QN_HTTP_ADDRESS);
             httpAddress.setLocationURI(getKvpEndpoint().toString());
             this.kvpPort.addExtensibilityElement(httpAddress);
             getService().addPort(this.kvpPort);
         }
     }
 
-    private BindingOperation addSoapBindingOperation(String name, Operation operation, URI action, Collection<Fault> faults) throws WSDLException {
+    private BindingOperation addSoapBindingOperation(String name, Operation operation, URI action,
+                                                     Collection<Fault> faults) throws WSDLException {
         BindingOperation bindingOperation = getDefinitions().createBindingOperation();
         bindingOperation.setName(name);
 
         SOAPOperation soapOperation = (SOAPOperation) getExtensionRegistry().
-                createExtension(BindingOperation.class, WSDLConstants.QN_SOAP_OPERATION);
-        soapOperation.setStyle(WSDLConstants.SOAP_DOCUMENT_STYLE);
+                createExtension(BindingOperation.class, QN_SOAP_OPERATION);
+        soapOperation.setStyle(SOAP_DOCUMENT_STYLE);
         soapOperation.setSoapActionURI(action.toString());
         bindingOperation.addExtensibilityElement(soapOperation);
 
@@ -446,14 +458,14 @@ public class WSDLBuilder {
 
         BindingInput bindingInput = getDefinitions().createBindingInput();
         SOAPBody bindingInputSoapBody = (SOAPBody) getExtensionRegistry()
-                .createExtension(BindingInput.class, WSDLConstants.QN_SOAP_BODY);
+                .createExtension(BindingInput.class, QN_SOAP_BODY);
         bindingInputSoapBody.setUse(SOAP_LITERAL_USE);
         bindingInput.addExtensibilityElement(bindingInputSoapBody);
         bindingOperation.setBindingInput(bindingInput);
 
         BindingOutput bindingOutput = getDefinitions().createBindingOutput();
         SOAPBody bindingOutputSoapBody = (SOAPBody) getExtensionRegistry()
-                .createExtension(BindingInput.class, WSDLConstants.QN_SOAP_BODY);
+                .createExtension(BindingInput.class, QN_SOAP_BODY);
         bindingOutputSoapBody.setUse(SOAP_LITERAL_USE);
         bindingOutput.addExtensibilityElement(bindingOutputSoapBody);
         bindingOperation.setBindingOutput(bindingOutput);
@@ -462,30 +474,31 @@ public class WSDLBuilder {
             BindingFault bindingFault = getDefinitions().createBindingFault();
             bindingFault.setName(fault.getName());
             SOAPFault soapFault = (SOAPFault) getExtensionRegistry()
-                    .createExtension(BindingFault.class, WSDLConstants.QN_SOAP_FAULT);
+                    .createExtension(BindingFault.class, QN_SOAP_FAULT);
             soapFault.setUse(SOAP_LITERAL_USE);
             soapFault.setName(fault.getName());
-            bindingFault.addExtensibilityElement(soapFault);    
+            bindingFault.addExtensibilityElement(soapFault);
             bindingOperation.addBindingFault(bindingFault);
         }
-        
+
         getSoapBinding().addBindingOperation(bindingOperation);
         return bindingOperation;
     }
 
-    private BindingOperation addPoxBindingOperation(String name, Operation operation, Collection<Fault> faults) throws WSDLException {
+    private BindingOperation addPoxBindingOperation(String name, Operation operation, Collection<Fault> faults) throws
+            WSDLException {
         BindingOperation bindingOperation = getDefinitions().createBindingOperation();
         bindingOperation.setName(name);
         bindingOperation.setOperation(operation);
 
         HTTPOperation httpOperation = (HTTPOperation) getExtensionRegistry().
-                createExtension(BindingOperation.class, WSDLConstants.QN_HTTP_OPERATION);
+                createExtension(BindingOperation.class, QN_HTTP_OPERATION);
         httpOperation.setLocationURI("");
         bindingOperation.addExtensibilityElement(httpOperation);
 
         BindingInput bindingInput = getDefinitions().createBindingInput();
         MIMEMimeXml inputmime = (MIMEMimeXml) getExtensionRegistry()
-                .createExtension(BindingInput.class, WSDLConstants.QN_MIME_MIME_XML);
+                .createExtension(BindingInput.class, QN_MIME_MIME_XML);
         bindingInput.addExtensibilityElement(inputmime);
 
         bindingOperation.setBindingInput(bindingInput);
@@ -493,35 +506,35 @@ public class WSDLBuilder {
         BindingOutput bindingOutput = getDefinitions().createBindingOutput();
 
         MIMEMimeXml outputmime = (MIMEMimeXml) getExtensionRegistry()
-                .createExtension(BindingInput.class, WSDLConstants.QN_MIME_MIME_XML);
+                .createExtension(BindingInput.class, QN_MIME_MIME_XML);
         bindingOutput.addExtensibilityElement(outputmime);
 
         bindingOperation.setBindingOutput(bindingOutput);
 
-                
         for (Fault fault : faults) {
             BindingFault bindingFault = getDefinitions().createBindingFault();
             bindingFault.setName(fault.getName());
             bindingOperation.addBindingFault(bindingFault);
         }
-        
+
         getPoxBinding().addBindingOperation(bindingOperation);
         return bindingOperation;
     }
 
-    private BindingOperation addKvpBindingOperation(String name, Operation operation, Collection<Fault> faults) throws WSDLException {
+    private BindingOperation addKvpBindingOperation(String name, Operation operation, Collection<Fault> faults) throws
+            WSDLException {
         BindingOperation bindingOperation = getDefinitions().createBindingOperation();
         bindingOperation.setName(name);
         bindingOperation.setOperation(operation);
 
         HTTPOperation httpOperation = (HTTPOperation) getExtensionRegistry().
-                createExtension(BindingOperation.class, WSDLConstants.QN_HTTP_OPERATION);
+                createExtension(BindingOperation.class, QN_HTTP_OPERATION);
         httpOperation.setLocationURI("");
         bindingOperation.addExtensibilityElement(httpOperation);
 
         BindingInput bindingInput = getDefinitions().createBindingInput();
         HTTPUrlEncoded urlEncoded = (HTTPUrlEncoded) getExtensionRegistry()
-                .createExtension(BindingInput.class, WSDLConstants.QN_HTTP_URL_ENCODED);
+                .createExtension(BindingInput.class, QN_HTTP_URL_ENCODED);
         bindingInput.addExtensibilityElement(urlEncoded);
 
         bindingOperation.setBindingInput(bindingInput);
@@ -529,11 +542,11 @@ public class WSDLBuilder {
         BindingOutput bindingOutput = getDefinitions().createBindingOutput();
 
         MIMEMimeXml mimeXml = (MIMEMimeXml) getExtensionRegistry()
-                .createExtension(BindingInput.class, WSDLConstants.QN_MIME_MIME_XML);
+                .createExtension(BindingInput.class, QN_MIME_MIME_XML);
         bindingOutput.addExtensibilityElement(mimeXml);
 
         bindingOperation.setBindingOutput(bindingOutput);
-        
+
         for (Fault fault : faults) {
             BindingFault bindingFault = getDefinitions().createBindingFault();
             bindingFault.setName(fault.getName());
@@ -548,12 +561,12 @@ public class WSDLBuilder {
         if (this.soapBinding == null) {
             this.soapBinding = getDefinitions().createBinding();
             SOAPBinding sb = (SOAPBinding) getExtensionRegistry()
-                    .createExtension(Binding.class, WSDLConstants.QN_SOAP_BINDING);
-            sb.setStyle(WSDLConstants.SOAP_DOCUMENT_STYLE);
-            sb.setTransportURI(WSDLConstants.SOAP_BINDING_HTTP_TRANSPORT);
+                    .createExtension(Binding.class, QN_SOAP_BINDING);
+            sb.setStyle(SOAP_DOCUMENT_STYLE);
+            sb.setTransportURI(SOAP_BINDING_HTTP_TRANSPORT);
             this.soapBinding.addExtensibilityElement(sb);
             this.soapBinding.setPortType(getPostPortType());
-            this.soapBinding.setQName(WSDLConstants.QN_SOSW_SOAP_BINDING);
+            this.soapBinding.setQName(QN_SOSW_SOAP_BINDING);
             this.soapBinding.setUndefined(false);
 
             getDefinitions().addBinding(this.soapBinding);
@@ -565,11 +578,11 @@ public class WSDLBuilder {
         if (this.poxBinding == null) {
             this.poxBinding = getDefinitions().createBinding();
             this.poxBinding.setPortType(getPostPortType());
-            this.poxBinding.setQName(WSDLConstants.QN_SOSW_POX_BINDING);
+            this.poxBinding.setQName(QN_SOSW_POX_BINDING);
             this.poxBinding.setUndefined(false);
             HTTPBinding hb = (HTTPBinding) getExtensionRegistry()
-                    .createExtension(Binding.class, WSDLConstants.QN_HTTP_BINDING);
-            hb.setVerb(WSDLConstants.POX_HTTP_VERB);
+                    .createExtension(Binding.class, QN_HTTP_BINDING);
+            hb.setVerb(POX_HTTP_VERB);
             this.poxBinding.addExtensibilityElement(hb);
             getDefinitions().addBinding(this.poxBinding);
         }
@@ -580,11 +593,11 @@ public class WSDLBuilder {
         if (this.kvpBinding == null) {
             this.kvpBinding = getDefinitions().createBinding();
             this.kvpBinding.setPortType(getGetPortType());
-            this.kvpBinding.setQName(WSDLConstants.QN_SOSW_KVP_BINDING);
+            this.kvpBinding.setQName(QN_SOSW_KVP_BINDING);
             this.kvpBinding.setUndefined(false);
             HTTPBinding hb = (HTTPBinding) getExtensionRegistry()
-                    .createExtension(Binding.class, WSDLConstants.QN_HTTP_BINDING);
-            hb.setVerb(WSDLConstants.KVP_HTTP_VERB);
+                    .createExtension(Binding.class, QN_HTTP_BINDING);
+            hb.setVerb(KVP_HTTP_VERB);
             this.kvpBinding.addExtensibilityElement(hb);
             getDefinitions().addBinding(this.kvpBinding);
         }

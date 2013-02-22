@@ -26,26 +26,42 @@ package org.n52.sos.wsdl;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
+
 import javax.wsdl.WSDLException;
+
 import org.n52.sos.binding.Binding;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.operator.IRequestOperator;
 import org.n52.sos.request.operator.IWSDLAwareRequestOperator;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
+import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.IFactory;
 
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class WSDLProvider {
+public class WSDLFactory implements IFactory<String> {
 
     private static final String SOAP_BINDING_ENDPOINT = "/soap";
     private static final String POX_BINDING_ENDPOINT = "/pox";
     private static final String KVP_BINDING_ENDPOINT = "/kvp";
 
-    public String getWSDL() throws OwsExceptionReport, WSDLException {
+    
+    @Override
+    public String get() throws ConfigurationException {
+        try {
+            return getWSDL();
+        } catch (OwsExceptionReport ex) {
+            throw new ConfigurationException(ex);
+        } catch (WSDLException ex) {
+            throw new ConfigurationException(ex);
+        }
+    }
+    
+    private String getWSDL() throws OwsExceptionReport, WSDLException {
         WSDLBuilder builder = new WSDLBuilder();
         if (Configurator.getInstance() != null) {
             Map<String, Binding> bindings = Configurator.getInstance()
