@@ -23,6 +23,7 @@
  */
 package org.n52.sos.config;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -259,7 +260,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     private class ConfigurableObject {
 
         private final Method method;
-        private final Object target;
+        private final WeakReference<Object> target;
         private final String key;
 
         /**
@@ -271,7 +272,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
          */
         ConfigurableObject(Method method, Object target, String key) {
             this.method = method;
-            this.target = target;
+            this.target = new WeakReference<Object>(target);
             this.key = key;
         }
 
@@ -285,7 +286,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         /**
          * @return the target object
          */
-        public Object getTarget() {
+        public WeakReference<Object> getTarget() {
             return target;
         }
 
@@ -346,7 +347,9 @@ public abstract class AbstractSettingsManager extends SettingsManager {
          */
         public void configure(Object val) throws ConfigurationException {
             try {
-                getMethod().invoke(getTarget(), val);
+                if (getTarget().get() != null) {
+                    getMethod().invoke(getTarget().get(), val);
+                }
             } catch (IllegalAccessException ex) {
                 logAndThrowError(val, ex);
             } catch (IllegalArgumentException ex) {
