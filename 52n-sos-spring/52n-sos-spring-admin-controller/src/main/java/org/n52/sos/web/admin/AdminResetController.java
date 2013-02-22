@@ -1,5 +1,3 @@
-package org.n52.sos.web.admin;
-
 /**
  * Copyright (C) 2013
  * by 52 North Initiative for Geospatial Open Source Software GmbH
@@ -23,8 +21,11 @@ package org.n52.sos.web.admin;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
+package org.n52.sos.web.admin;
 
-
+import org.n52.sos.config.SettingsManager;
+import org.n52.sos.ds.ConnectionProviderException;
+import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
@@ -44,13 +45,14 @@ public class AdminResetController extends AbstractController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public View post() {
+    public View post() throws ConfigurationException, ConnectionProviderException {
         log.debug("Resetting Service.");
         if (Configurator.getInstance() != null) {
             log.debug("Resetting configurator.");
             Configurator.getInstance().cleanup();
         }
         getDatabaseSettingsHandler().delete();
+        SettingsManager.getInstance().deleteAll();
         return new RedirectView(ControllerConstants.Paths.LOGOUT, true);
     }
 }
