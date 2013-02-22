@@ -124,15 +124,42 @@ $$
 $$
 LANGUAGE 'sql';
 
+CREATE OR REPLACE FUNCTION insert_allowed_observation_types_for_offering(bigint, bigint) RETURNS VOID AS
+$$
+	INSERT INTO offering_has_allowed_observation_type (offering_id, observation_type_id) 
+	SELECT $1, $2
+	WHERE $1 NOT IN (
+		SELECT offering_id 
+		FROM offering_has_allowed_observation_type 
+		WHERE offering_id = $1 
+		  AND observation_type_id = $2
+	);
+$$
+LANGUAGE 'sql';
+
 CREATE OR REPLACE FUNCTION insert_allowed_observation_types_for_offering(text, text) RETURNS VOID AS
 $$
-	INSERT INTO offering_has_allowed_observation_type (offering_id, observation_type_id) VALUES (get_offering($1), get_observation_type($2));
+	SELECT insert_allowed_observation_types_for_offering(get_offering($1), get_observation_type($2));
+$$
+LANGUAGE 'sql';
+
+CREATE OR REPLACE FUNCTION insert_allowed_feature_of_interest_types_for_offering(bigint, bigint) RETURNS VOID AS
+$$
+	INSERT INTO offering_has_allowed_feature_of_interest_type (offering_id, feature_of_interest_type_id) 
+	SELECT $1, $2 
+	WHERE $1 NOT in (
+		SELECT offering_id 
+		FROM offering_has_allowed_feature_of_interest_type 
+		WHERE offering_id = $1 
+		  AND feature_of_interest_type_id = $2
+		);
+	
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insert_allowed_feature_of_interest_types_for_offering(text, text) RETURNS VOID AS
 $$
-	INSERT INTO offering_has_allowed_feature_of_interest_type (offering_id, feature_of_interest_type_id) VALUES (get_offering($1), get_spatial_sampling_feature_type($2));
+	SELECT insert_allowed_feature_of_interest_types_for_offering(get_offering($1), get_spatial_sampling_feature_type($2));
 $$
 LANGUAGE 'sql';
 
@@ -261,12 +288,23 @@ $$
 $$
 LANGUAGE 'sql';
 
--- OBSERVATION CONSTELLATION FUNCTIONS
-CREATE OR REPLACE FUNCTION insert_observation_constellation(bigint,bigint) RETURNS bigint AS
+CREATE OR REPLACE FUNCTION get_observation_constellation(bigint,bigint) RETURNS bigint AS
 $$
-	INSERT INTO observation_constellation(procedure_id, observable_property_id) VALUES ($1,$2);
 	SELECT observation_constellation_id FROM observation_constellation  
 		WHERE procedure_id = $1 AND observable_property_id = $2;
+$$
+LANGUAGE 'sql';
+
+CREATE OR REPLACE FUNCTION insert_observation_constellation(bigint,bigint) RETURNS bigint AS
+$$
+	INSERT INTO observation_constellation(procedure_id, observable_property_id)
+	SELECT $1, $2 WHERE $1 NOT IN (
+		SELECT procedure_id
+		FROM observation_constellation  
+		WHERE procedure_id = $1 
+		  AND observable_property_id = $2
+		);
+	SELECT get_observation_constellation($1, $2);
 $$
 LANGUAGE 'sql';
 
@@ -276,23 +314,23 @@ $$
 $$
 LANGUAGE 'sql';
 
-CREATE OR REPLACE FUNCTION get_observation_constellation(bigint,bigint) RETURNS bigint AS
-$$
-	SELECT observation_constellation_id FROM observation_constellation  
-		WHERE procedure_id = $1 AND observable_property_id = $2;
-$$
-LANGUAGE 'sql';
-
 CREATE OR REPLACE FUNCTION get_observation_constellation(text,text) RETURNS bigint AS
 $$
 	SELECT get_observation_constellation(get_procedure($1), get_observable_property($2));
 $$
 LANGUAGE 'sql';
 
--- OBSERVATION CONSTELLATION OFFERING OBSERVATION TYPE
+
 CREATE OR REPLACE FUNCTION insert_observation_constellation_offering_observation_type(bigint,bigint,bigint) RETURNS VOID AS
 $$
-	INSERT INTO observation_constellation_offering_observation_type(observation_constellation_id, offering_id, observation_type_id) VALUES ($1,$2,$3);
+	INSERT INTO observation_constellation_offering_observation_type(observation_constellation_id, offering_id, observation_type_id)
+	SELECT $1,$2,$3 WHERE $1 NOT IN (
+		SELECT observation_constellation_id
+		FROM observation_constellation_offering_observation_type
+		WHERE observation_constellation_id = $1
+		  AND offering_id = $2
+		  AND observation_type_id = $3
+	);
 $$
 LANGUAGE 'sql';
 
@@ -317,7 +355,14 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insert_observation_observation_constellation_offering_observation_type(bigint,bigint) RETURNS VOID AS
 $$
-	INSERT INTO observation_relates_to_obs_const_off_obs_type(observation_id, observation_constellation_offering_observation_type_id) VALUES ($1,$2);
+	INSERT INTO observation_relates_to_obs_const_off_obs_type(observation_id, observation_constellation_offering_observation_type_id)
+	SELECT $1,$2 WHERE $1 NOT IN (
+		SELECT observation_id
+		FROM observation_relates_to_obs_const_off_obs_type
+		WHERE observation_id = $1
+		  AND observation_constellation_offering_observation_type_id = $2
+	);
+		
 $$
 LANGUAGE 'sql';
 
@@ -364,13 +409,25 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insert_boolean_observation(bigint, boolean) RETURNS VOID AS
 $$ 
- 	INSERT INTO observation_has_boolean_value(observation_id, value) VALUES ($1,$2);
+ 	INSERT INTO observation_has_boolean_value(observation_id, value)
+	SELECT $1,$2 WHERE $1 NOT IN (
+		SELECT observation_id
+		FROM observation_has_boolean_value
+		WHERE observation_id = $1
+		  AND value = $2
+	);
 $$
 LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insert_count_observation(bigint, int) RETURNS VOID AS
 $$ 
- 	INSERT INTO observation_has_count_value(observation_id, value) VALUES ($1,$2);
+ 	INSERT INTO observation_has_count_value(observation_id, value)
+ 	SELECT $1, $2 WHERE $1 NOT IN (
+		SELECT observation_id
+		FROM observation_has_count_value
+		WHERE observation_id = $1
+		  AND value = $2
+		);
 $$
 LANGUAGE 'sql';
 
@@ -804,6 +861,7 @@ DROP FUNCTION insert_unit(text);
 DROP FUNCTION insert_result_template(text,text,text,text,text,text);
 DROP FUNCTION insert_result_template(bigint,bigint,text,text,text);
 DROP FUNCTION insert_allowed_observation_types_for_offering(text,text);
+DROP FUNCTION insert_allowed_observation_types_for_offering(bigint,bigint);
 DROP FUNCTION insert_allowed_feature_of_interest_types_for_offering(text,text);
 DROP FUNCTION insert_observation_constellation_offering_observation_type(bigint,bigint,bigint);
 DROP FUNCTION insert_observation_constellation_offering_observation_type(text,text,text,text);
