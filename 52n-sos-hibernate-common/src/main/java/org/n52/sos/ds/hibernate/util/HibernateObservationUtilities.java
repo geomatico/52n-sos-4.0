@@ -36,6 +36,8 @@ import java.util.Set;
 
 import org.hibernate.Session;
 import org.joda.time.DateTime;
+import org.n52.sos.cache.ACapabilitiesCacheController;
+import org.n52.sos.ds.IFeatureQueryHandler;
 import org.n52.sos.ds.hibernate.entities.BlobObservation;
 import org.n52.sos.ds.hibernate.entities.BlobValue;
 import org.n52.sos.ds.hibernate.entities.BooleanObservation;
@@ -94,6 +96,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.profile.IProfile;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -104,8 +107,68 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class HibernateObservationUtilities {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateObservationUtilities.class);
+    protected static class Configuration {
 
+        public String getTupleSeperator() {
+            return Configurator.getInstance().getTupleSeperator();
+        }
+
+        public String getTokenSeperator() {
+            return Configurator.getInstance().getTokenSeperator();
+        }
+
+        public ACapabilitiesCacheController getCache() {
+            return Configurator.getInstance().getCapabilitiesCacheController();
+        }
+
+        public IProfile getActiveProfile() {
+            return Configurator.getInstance().getActiveProfile();
+        }
+
+        public IFeatureQueryHandler getFeatureQueryHandler() {
+            return Configurator.getInstance().getFeatureQueryHandler();
+        }
+
+        public boolean isSupportsQuality() {
+            return Configurator.getInstance().isSupportsQuality();
+        }
+    }
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateObservationUtilities.class);
+    private static Configuration configuration;
+
+    public static Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public static void setConfiguration(Configuration configuration) {
+        HibernateObservationUtilities.configuration = configuration;
+    }
+
+    public static ACapabilitiesCacheController getCache() {
+        return getConfiguration().getCache();
+    }
+
+    public static IProfile getActiveProfile() {
+        return getConfiguration().getActiveProfile();
+    }
+
+    public static String getTokenSeperator() {
+        return getConfiguration().getTokenSeperator();
+    }
+
+    public static String getTupleSeperator() {
+        return getConfiguration().getTupleSeperator();
+    }
+
+    public static IFeatureQueryHandler getFeatureQueryHandler() {
+        return getConfiguration().getFeatureQueryHandler();
+    }
+
+    public static boolean isSupportsQuality() {
+        return getConfiguration().isSupportsQuality();
+    }
+    
     /**
      * Create SOS internal observation from Observation objects
      * 
@@ -175,7 +238,7 @@ public class HibernateObservationUtilities {
                 String foiID = hFeatureOfInterest.getIdentifier();
                 if (!features.containsKey(foiID)) {
                     SosAbstractFeature featureByID =
-                            Configurator.getInstance().getFeatureQueryHandler()
+                            getConfiguration().getFeatureQueryHandler()
                                     .getFeatureByID(foiID, session, version, -1);
                     features.put(foiID, featureByID);
                 }
@@ -202,7 +265,7 @@ public class HibernateObservationUtilities {
 
                 // create quality
                 ArrayList<SosQuality> qualityList = null;
-                if (Configurator.getInstance().isSupportsQuality()) {
+                if (isSupportsQuality()) {
                     hObservation.getQualities();
                     for (Quality hQuality : hObservation.getQualities()) {
                         String qualityTypeString = hQuality.getSweType().getSweType();
@@ -228,10 +291,9 @@ public class HibernateObservationUtilities {
                 /* get the offerings to find the templates */
                 if (obsConst.getOfferings() == null) {
                     Set<String> offerings =
-                            new HashSet<String>(Configurator.getInstance().getCapabilitiesCacheController()
+                            new HashSet<String>(getCache()
                                     .getOfferings4Procedure(obsConst.getProcedure().getProcedureIdentifier()));
-                    offerings.retainAll(new HashSet<String>(Configurator.getInstance()
-                            .getCapabilitiesCacheController()
+                    offerings.retainAll(new HashSet<String>(getCache()
                             .getOfferings4Procedure(obsConst.getProcedure().getProcedureIdentifier())));
                     obsConst.setOfferings(offerings);
                 }
@@ -295,26 +357,23 @@ public class HibernateObservationUtilities {
 
             for (String featureIdentifier : featureOfInterestIdentifiers) {
                 SosAbstractFeature feature =
-                        Configurator.getInstance().getFeatureQueryHandler()
+                        getFeatureQueryHandler()
                                 .getFeatureByID(featureIdentifier, session, version, -1);
 
                 final SosObservationConstellation obsConst =
                         new SosObservationConstellation(procedure, obsProp, null, feature, null);
                 /* get the offerings to find the templates */
                 if (obsConst.getOfferings() == null) {
-                    Set<String> offerings =
-                            new HashSet<String>(Configurator.getInstance().getCapabilitiesCacheController()
-                                    .getOfferings4Procedure(obsConst.getProcedure().getProcedureIdentifier()));
-                    offerings.retainAll(new HashSet<String>(Configurator.getInstance()
-                            .getCapabilitiesCacheController()
-                            .getOfferings4Procedure(obsConst.getProcedure().getProcedureIdentifier())));
+                    Set<String> offerings = new HashSet<String>(getCache().getOfferings4Procedure(
+                            obsConst.getProcedure().getProcedureIdentifier()));
+                    offerings.retainAll(new HashSet<String>(getCache().getOfferings4Procedure(
+                            obsConst.getProcedure().getProcedureIdentifier())));
                     obsConst.setOfferings(offerings);
                 }
                 SosObservation sosObservation = new SosObservation();
-                sosObservation.setNoDataValue(Configurator.getInstance().getActiveProfile()
-                        .getResponseNoDataPlaceholder());
-                sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
-                sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
+                sosObservation.setNoDataValue(getActiveProfile().getResponseNoDataPlaceholder());
+                sosObservation.setTokenSeparator(getTokenSeperator());
+                sosObservation.setTupleSeparator(getTupleSeperator());
                 sosObservation.setObservationConstellation(obsConst);
                 NilTemplateValue value = new NilTemplateValue();
                 sosObservation.setValue(new SosSingleObservationValue(new TimeInstant(), value,
@@ -334,9 +393,9 @@ public class HibernateObservationUtilities {
                 && !hObservation.getIdentifier().startsWith(SosConstants.GENERATED_IDENTIFIER_PREFIX)) {
             sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
         }
-        sosObservation.setNoDataValue(Configurator.getInstance().getActiveProfile().getResponseNoDataPlaceholder());
-        sosObservation.setTokenSeparator(Configurator.getInstance().getTokenSeperator());
-        sosObservation.setTupleSeparator(Configurator.getInstance().getTupleSeperator());
+        sosObservation.setNoDataValue(getActiveProfile().getResponseNoDataPlaceholder());
+        sosObservation.setTokenSeparator(getTokenSeperator());
+        sosObservation.setTupleSeparator(getTupleSeperator());
         sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
         sosObservation.setResultTime(new TimeInstant(new DateTime(hObservation.getResultTime())));
         sosObservation.setValue(new SosSingleObservationValue(getPhenomenonTime(hObservation), value, qualityList));
@@ -659,5 +718,5 @@ public class HibernateObservationUtilities {
         newObservation.setValue(value);
         return newObservation;
     }
-
+    
 }
