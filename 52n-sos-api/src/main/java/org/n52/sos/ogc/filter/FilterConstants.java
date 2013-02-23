@@ -25,19 +25,16 @@ package org.n52.sos.ogc.filter;
 
 /**
  * Constants class for filter
- * 
+ * <p/>
  */
 public class FilterConstants {
 
     public static final String NS_FES_2 = "http://www.opengis.net/fes/2.0";
-
     public static final String NS_FES_2_PREFIX = "fes";
-
     /**
      * element name TEquals
      */
     public static final String EN_TEQUALS = "TEquals";
-
     /**
      * element name ValueReference
      */
@@ -45,42 +42,100 @@ public class FilterConstants {
 
     /**
      * Enumeration for conformance class constraint names
-     * 
+     * <p/>
      */
     public enum ConformanceClassConstraintNames {
-        ImplementsQuery, ImplementsAdHocQuery, ImplementsFunctions, ImplementsResourceld, ImplementsMinStandardFilter, ImplementsStandardFilter, ImplementsMinSpatialFilter, ImplementsSpatialFilter, ImplementsMinTemporalFilter, ImplementsTemporalFilter, ImplementsVersionNav, ImplementsSorting, ImplementsExtendedOperators, ImplementsMinimumXPath, ImplementsSchemaElementFunc
+        ImplementsQuery,
+        ImplementsAdHocQuery,
+        ImplementsFunctions,
+        ImplementsResourceld,
+        ImplementsMinStandardFilter,
+        ImplementsStandardFilter,
+        ImplementsMinSpatialFilter,
+        ImplementsSpatialFilter,
+        ImplementsMinTemporalFilter,
+        ImplementsTemporalFilter,
+        ImplementsVersionNav,
+        ImplementsSorting,
+        ImplementsExtendedOperators,
+        ImplementsMinimumXPath,
+        ImplementsSchemaElementFunc
     }
 
     /**
      * Enumeration for temporal operators
-     * 
+     * <p/>
      */
     public enum TimeOperator {
-        TM_Before, TM_After, TM_Begins, TM_Ends, TM_EndedBy, TM_BegunBy, TM_During, TM_Equals, TM_Contains, TM_Overlaps, TM_Meets, TM_MetBy, TM_OverlappedBy
+        TM_Before,
+        TM_After,
+        TM_Begins,
+        TM_Ends,
+        TM_EndedBy,
+        TM_BegunBy,
+        TM_During,
+        TM_Equals,
+        TM_Contains,
+        TM_Overlaps,
+        TM_Meets,
+        TM_MetBy,
+        TM_OverlappedBy
     }
 
     /**
      * Enumeration for FES 2.0 temporal operators
-     * 
+     * <p/>
      */
     public enum TimeOperator2 {
-        Before, After, Begins, Ends, EndedBy, BegunBy, During, TEquals, Contains, Overlaps, Meets, MetBy, OverlappedBy
+        Before,
+        After,
+        Begins,
+        Ends,
+        EndedBy,
+        BegunBy,
+        During,
+        TEquals,
+        Contains,
+        Overlaps,
+        Meets,
+        MetBy,
+        OverlappedBy
     }
 
     /**
      * Enumeration for spatial operators
-     * 
+     * <p/>
      */
     public enum SpatialOperator {
-        Equals, Disjoint, Touches, Within, Overlaps, Crosses, Intersects, Contains, DWithin, Beyond, BBOX
+        Equals,
+        Disjoint,
+        Touches, Within,
+        Overlaps,
+        Crosses,
+        Intersects,
+        Contains,
+        DWithin,
+        Beyond,
+        BBOX
     }
 
     /**
      * Enumeration for comparison operators
-     * 
+     * <p/>
      */
     public enum ComparisonOperator {
-        PropertyIsEqualTo, PropertyIsNotEqualTo, PropertyIsLessThan, PropertyIsGreaterThan, PropertyIsLessThanOrEqualTo, PropertyIsGreaterThanOrEqualTo, PropertyIsLike, PropertyIsNil, PropertyIsNull, PropertyIsBetween
+        PropertyIsEqualTo,
+        PropertyIsNotEqualTo,
+        PropertyIsLessThan,
+        PropertyIsGreaterThan,
+        PropertyIsLessThanOrEqualTo,
+        PropertyIsGreaterThanOrEqualTo,
+        PropertyIsLike,
+        PropertyIsNil,
+        PropertyIsNull,
+        PropertyIsBetween
     }
 
+    private FilterConstants() {
+    }
 }

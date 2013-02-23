@@ -54,7 +54,7 @@ public final class Sos1Constants {
      * versions
      */
     public enum Operations {
-        GetFeatureOfInterestTime, DescribeFeatureType, DescribeObservtionType, DescribeResultModel, RegisterSensor;
+        GetFeatureOfInterestTime, DescribeFeatureType, DescribeObservationType, DescribeResultModel, RegisterSensor;
 
         public static boolean contains(String s) {
             for (Operations o : values()) {

@@ -32,9 +32,9 @@ import org.n52.sos.ogc.sos.Sos1Constants;
 public class SosDescribeObservationTypeRequest extends AbstractServiceRequest {
 
     /**
-     * DescribeObservtionType operation name
+     * DescribeObservationType operation name
      */
-    private final String operationName = Sos1Constants.Operations.DescribeObservtionType.name();
+    private final String operationName = Sos1Constants.Operations.DescribeObservationType.name();
 
     /*
      * (non-Javadoc)

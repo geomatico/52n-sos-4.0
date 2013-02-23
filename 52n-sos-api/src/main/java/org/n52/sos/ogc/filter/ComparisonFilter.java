@@ -79,40 +79,40 @@ public class ComparisonFilter {
     /**
      * constructor
      * 
-     * @param operatorp
+     * @param operator
      *            Filter operator
-     * @param propertyNamep
+     * @param propertyName
      *            property name
-     * @param valuep
+     * @param value
      *            value
      */
-    public ComparisonFilter(ComparisonOperator operatorp, String propertyNamep, String valuep) {
-        this.operator = operatorp;
-        this.value = valuep;
-        this.propertyName = propertyNamep;
+    public ComparisonFilter(ComparisonOperator operator, String propertyName, String value) {
+        this.operator = operator;
+        this.value = value;
+        this.propertyName = propertyName;
     }
 
     /**
      * constructor
      * 
-     * @param operatorp
+     * @param operator
      *            Filter operator
-     * @param propertyNamep
+     * @param propertyName
      *            property name
-     * @param valuep
+     * @param value
      *            value
-     * @param valueUpperp
+     * @param valueUpper
      *            upper value for between filter
      * @throws OwsExceptionReport
      *             If the constructor is not valid for operator
      */
-    public ComparisonFilter(ComparisonOperator operatorp, String propertyNamep, String valuep, String valueUpperp)
+    public ComparisonFilter(ComparisonOperator operator, String propertyName, String value, String valueUpper)
             throws OwsExceptionReport {
-        if (operatorp == ComparisonOperator.PropertyIsBetween) {
-            this.operator = operatorp;
-            this.value = valuep;
-            this.valueUpper = valueUpperp;
-            this.propertyName = propertyNamep;
+        if (operator == ComparisonOperator.PropertyIsBetween) {
+            this.operator = operator;
+            this.value = value;
+            this.valueUpper = valueUpper;
+            this.propertyName = propertyName;
         } else {
             String exceptionText =
                     "Use other constructor for ComparisonFilter! This constructor could only"
@@ -127,27 +127,27 @@ public class ComparisonFilter {
     /**
      * constructor
      * 
-     * @param operatorp
+     * @param operator
      *            Filter operator
-     * @param propertyNamep
+     * @param propertyName
      *            property name
-     * @param valuep
+     * @param value
      *            value
-     * @param valueUpperp
+     * @param valueUpper
      *            upper value for between filter
-     * @param escapeStringp
+     * @param escapeString
      *            Escape characters
      * @throws OwsExceptionReport
      *             If the constructor is not valid for operator
      */
-    public ComparisonFilter(ComparisonOperator operatorp, String propertyNamep, String valuep, String valueUpperp,
-            String escapeStringp) throws OwsExceptionReport {
-        if (operatorp == ComparisonOperator.PropertyIsLike) {
-            this.operator = operatorp;
-            this.value = valuep;
-            this.valueUpper = valueUpperp;
-            this.propertyName = propertyNamep;
-            this.escapeString = escapeStringp;
+    public ComparisonFilter(ComparisonOperator operator, String propertyName, String value, String valueUpper,
+            String escapeString) throws OwsExceptionReport {
+        if (operator == ComparisonOperator.PropertyIsLike) {
+            this.operator = operator;
+            this.value = value;
+            this.valueUpper = valueUpper;
+            this.propertyName = propertyName;
+            this.escapeString = escapeString;
         } else {
             String exceptionText =
                     "Use other constructor for ComparisonFilter! This constructor could only"
@@ -207,7 +207,7 @@ public class ComparisonFilter {
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        String result = "Spatial filter: ";
+        String result = "ComparisonFilter: ";
         if (valueUpper != null) {
             return result + propertyName + " " + value + " " + operator.name() + " " + valueUpper;
         } else {
