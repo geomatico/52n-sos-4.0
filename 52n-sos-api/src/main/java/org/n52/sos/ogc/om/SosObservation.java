@@ -31,7 +31,6 @@ import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.values.TVPValue;
-import org.n52.sos.ogc.swe.SosSweDataRecord;
 
 /**
  * Class represents a SOS observation
@@ -85,9 +84,6 @@ public class SosObservation implements Serializable {
     /** separator of value tuples, which are contained in the resulte element */
     private String tupleSeparator;
 
-	/** a predefined resultStructure */
-	private SosSweDataRecord resultStructure;
-	
     /**
      * constructor
      */
