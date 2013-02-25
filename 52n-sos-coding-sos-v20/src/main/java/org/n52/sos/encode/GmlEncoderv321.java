@@ -73,6 +73,7 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
+import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.MinMax;
 import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.SosHelper;
@@ -283,6 +284,8 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
             }
             if (timePeriod.getGmlId() != null && !timePeriod.getGmlId().isEmpty()) {
                 timePeriodType.setId(timePeriod.getGmlId());
+            } else {
+                timePeriodType.setId("tp_" + JavaHelper.generateID(timePeriod.toString() + System.currentTimeMillis()));
             }
             // beginPosition
             TimePositionType xbTimePositionBegin = TimePositionType.Factory.newInstance();
@@ -342,6 +345,8 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
             }
             if (timeInstant.isSetGmlId()) {
                 timeInstantType.setId(timeInstant.getGmlId());
+            } else {
+                timeInstantType.setId("ti_" + JavaHelper.generateID(timeInstantType.toString() + System.currentTimeMillis()));
             }
             TimePositionType xb_posType = timeInstantType.addNewTimePosition();
 
