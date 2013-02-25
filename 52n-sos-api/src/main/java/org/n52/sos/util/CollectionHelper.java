@@ -148,4 +148,10 @@ public class CollectionHelper {
 
     private CollectionHelper() {
     }
+
+	public static List<String> createStringListWithValue(String value) {
+	    List<String> list = new ArrayList<String>(1);
+	    list.add(value);
+	    return list;
+	}
 }

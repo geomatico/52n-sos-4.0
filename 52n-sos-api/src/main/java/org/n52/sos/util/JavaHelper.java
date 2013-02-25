@@ -25,7 +25,6 @@ package org.n52.sos.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.joda.time.DateTime;
@@ -89,16 +88,17 @@ public class JavaHelper {
     }
     
     public static void appendTextToStringBuilderWithLineBreak(StringBuilder stringBuilder, String message) {
-        if (message != null && !message.isEmpty()) {
+        if (stringBuilder != null && message != null && !message.isEmpty()) {
             stringBuilder.append(message);
             stringBuilder.append("\n");
         }
      }
 
     
-    public static List<String> createStringListWithValue(String value) {
-        List<String> list = new ArrayList<String>(1);
-        list.add(value);
-        return list;
-    }
+    /**
+	 * @deprecated Use {@link CollectionHelper#createStringListWithValue(String)} instead
+	 */
+	public static List<String> createStringListWithValue(String value) {
+		return CollectionHelper.createStringListWithValue(value);
+	}
 }
