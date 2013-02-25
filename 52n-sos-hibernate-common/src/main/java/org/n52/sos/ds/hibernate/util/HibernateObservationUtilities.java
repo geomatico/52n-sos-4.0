@@ -107,44 +107,71 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class HibernateObservationUtilities {
 
+    /**
+     * Class to make this Helper more testable. Test cases may overwrite methods to decouple this class from the
+     * Configurator.
+     */
     protected static class Configuration {
 
-        public String getTupleSeperator() {
+        /**
+         * @see Configurator#getTupleSeperator()
+         */
+        protected String getTupleSeperator() {
             return Configurator.getInstance().getTupleSeperator();
         }
 
-        public String getTokenSeperator() {
+        /**
+         * @see Configurator#getTokenSeperator()
+         */
+        protected String getTokenSeperator() {
             return Configurator.getInstance().getTokenSeperator();
         }
 
-        public ACapabilitiesCacheController getCache() {
+        /**
+         * @see Configurator#getCapabilitiesCacheController()
+         */
+        protected ACapabilitiesCacheController getCache() {
             return Configurator.getInstance().getCapabilitiesCacheController();
         }
 
-        public IProfile getActiveProfile() {
+        /**
+         * @see Configurator#getActiveProfile()
+         */
+        protected IProfile getActiveProfile() {
             return Configurator.getInstance().getActiveProfile();
         }
 
-        public IFeatureQueryHandler getFeatureQueryHandler() {
+        /**
+         * @see Configurator#getFeatureQueryHandler()
+         */
+        protected IFeatureQueryHandler getFeatureQueryHandler() {
             return Configurator.getInstance().getFeatureQueryHandler();
         }
 
-        public boolean isSupportsQuality() {
+        /**
+         * @see Configurator#isSupportsQuality()
+         */
+        protected boolean isSupportsQuality() {
             return Configurator.getInstance().isSupportsQuality();
         }
     }
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateObservationUtilities.class);
     private static Configuration configuration;
 
-    public static Configuration getConfiguration() {
+    protected static Configuration getConfiguration() {
         if (configuration == null) {
             configuration = new Configuration();
         }
         return configuration;
     }
 
-    public static void setConfiguration(Configuration configuration) {
+    /**
+     * Set the configuration for this Helper to decouple it from the Configurator.
+     *
+     * @param configuration the configuration
+     */
+    protected static void setConfiguration(Configuration configuration) {
         HibernateObservationUtilities.configuration = configuration;
     }
 
