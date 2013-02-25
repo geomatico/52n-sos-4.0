@@ -108,8 +108,8 @@ class OfferingCacheUpdateTask extends RunnableAction {
         // Spatial Envelope
         getOfferingCache().setEnvelope(offeringId, getEnvelopeForOffering(offeringId, session));
         // Features of Interest
-        List<String> featureOfInterestIdentifiers = HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(getOffering().getName(), session);
-        getOfferingCache().setFeaturesOfInterest(getOffering().getName(), featureOfInterestIdentifiers);
+        List<String> featureOfInterestIdentifiers = HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(getOffering().getIdentifier(), session);
+        getOfferingCache().setFeaturesOfInterest(getOffering().getIdentifier(), featureOfInterestIdentifiers);
         // Temporal Envelope
         getOfferingCache().setMinTime(offeringId, HibernateCriteriaQueryUtilities.getMinDate4Offering(offeringId, session));
         getOfferingCache().setMaxTime(offeringId, HibernateCriteriaQueryUtilities.getMaxDate4Offering(offeringId, session));
