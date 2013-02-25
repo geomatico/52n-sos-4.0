@@ -40,6 +40,7 @@ import net.opengis.swe.x20.CategoryType;
 import net.opengis.swe.x20.CountType;
 import net.opengis.swe.x20.DataArrayPropertyType;
 import net.opengis.swe.x20.DataArrayType;
+import net.opengis.swe.x20.DataArrayType.ElementType;
 import net.opengis.swe.x20.DataRecordType;
 import net.opengis.swe.x20.DataRecordType.Field;
 import net.opengis.swe.x20.QuantityType;
@@ -273,12 +274,15 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
                 xbDataArray.addNewElementCount().setCount(createCount(sosDataArray.getElementCount()));
             }
             if (sosDataArray.isSetElementTyp()) {
-                xbDataArray.addNewElementType().addNewAbstractDataComponent();
-                xbDataArray.getElementType().getAbstractDataComponent()
-                        .set(createDataRecord((SosSweDataRecord) sosDataArray.getElementType()));
-                xbDataArray
-                        .getElementType()
-                        .getAbstractDataComponent()
+                 ElementType elementType = xbDataArray.addNewElementType();
+                 if (sosDataArray.getElementType().isSetDefinition()) {
+                     elementType.setName(sosDataArray.getElementType().getDefinition());
+                 } else {
+                     elementType.setName("Components");
+                 }
+                 AbstractDataComponentType abstractDataComponent = elementType.addNewAbstractDataComponent();
+                 abstractDataComponent.set(createDataRecord((SosSweDataRecord) sosDataArray.getElementType()));
+                 abstractDataComponent
                         .substitute(
                                 new QName(SWEConstants.NS_SWE_20, SWEConstants.EN_DATA_RECORD,
                                         SWEConstants.NS_SWE_PREFIX), DataRecordType.type);
