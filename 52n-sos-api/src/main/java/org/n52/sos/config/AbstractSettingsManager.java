@@ -243,7 +243,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
             configurableObjectsLock.writeLock().unlock();
         }
         try {
-            co.configure(getSettingValue(co.getKey()));
+            co.configure(getNotNullSettingValue(co));
         } catch (ConnectionProviderException cpe) {
             throw new ConfigurationException(cpe);
         }
@@ -252,6 +252,27 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     @Override
     public ISettingDefinition<?, ?> getDefinitionByKey(String key) {
         return getSettingDefinitionRepository().getDefinition(key);
+    }
+
+    private ISettingValue<Object> getNotNullSettingValue(ConfigurableObject co) throws ConnectionProviderException, ConfigurationException {
+        ISettingValue<Object> val = (ISettingValue<Object>) getSettingValue(co.getKey());
+        if (val == null) {
+            ISettingDefinition<?,?> def = getDefinitionByKey(co.getKey());
+            if (def == null) {
+                throw new ConfigurationException(String.format("No SettingDefinition found for key %s", co.getKey()));
+            }
+            val =(ISettingValue<Object>) getSettingFactory().newSettingValue(def, null);
+            if (def.isOptional()) {
+                log.debug("No value found for optional setting {}", co.getKey());
+                saveSettingValue(val);
+            } else if (def.hasDefaultValue()) {
+                log.debug("Using default value '{}' for required setting {}", def.getDefaultValue(), co.getKey());
+                saveSettingValue(val.setValue(def.getDefaultValue()));
+            } else {
+                throw new ConfigurationException(String.format("No value found for required Setting '%s' with no default value.", co.getKey()));
+            }
+        }
+        return val;
     }
 
     /*
