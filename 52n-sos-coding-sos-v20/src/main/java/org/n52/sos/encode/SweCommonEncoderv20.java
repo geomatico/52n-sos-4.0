@@ -26,6 +26,7 @@ package org.n52.sos.encode;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -79,6 +80,7 @@ import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
+import org.omg.CosNaming.IstringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,7 +154,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         } else if (sosSweType instanceof SosSweAbstractEncoding) {
             return createAbstractEncoding((SosSweAbstractEncoding) sosSweType);
         } else if (sosSweType instanceof SosSweAbstractDataComponent) {
-            return createAbstractDataComponent((SosSweAbstractDataComponent) sosSweType);
+            return createAbstractDataComponent((SosSweAbstractDataComponent) sosSweType, additionalValues);
 //        } else if (sosSweType instanceof SosMultiObservationValues) {
 //            SosMultiObservationValues sosObservationValue = (SosMultiObservationValues) sosSweType;
 //            if (sosObservationValue.getValue() != null && sosObservationValue.getValue() instanceof SweDataArrayValue
@@ -190,7 +192,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
         return null;
     }
 
-    private XmlObject createAbstractDataComponent(SosSweAbstractDataComponent sosSweAbstractDataComponent)
+    private XmlObject createAbstractDataComponent(SosSweAbstractDataComponent sosSweAbstractDataComponent, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
         try {
             AbstractDataComponentType abstractDataComponentType = null;
@@ -222,6 +224,11 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
                     abstractDataComponentType.setLabel(sosSweAbstractDataComponent.getLabel());
                 }
             }
+            if (abstractDataComponentType instanceof DataArrayType && additionalValues.containsKey(HelperValues.FOR_OBSERVATION)) {
+                    DataArrayPropertyType dataArrayProperty = DataArrayPropertyType.Factory.newInstance();
+                    dataArrayProperty.setDataArray1((DataArrayType)abstractDataComponentType);
+                    return dataArrayProperty;
+                }
             return abstractDataComponentType;
         } catch (XmlException e) {
             String exceptionText = "Error while encoding AbstractDataComponent!";
@@ -263,7 +270,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
             DataArrayType xbDataArray =
                     DataArrayType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             if (sosDataArray.isSetElementCount()) {
-                xbDataArray.addNewElementCount().set(createCount(sosDataArray.getElementCount()));
+                xbDataArray.addNewElementCount().setCount(createCount(sosDataArray.getElementCount()));
             }
             if (sosDataArray.isSetElementTyp()) {
                 xbDataArray.addNewElementType().addNewAbstractDataComponent();
@@ -331,7 +338,7 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
             xbField.setName(sweField.getName());
         }
         AbstractDataComponentType xbDCD = xbField.addNewAbstractDataComponent();
-        xbDCD.set(createAbstractDataComponent(sosElement));
+        xbDCD.set(createAbstractDataComponent(sosElement, new HashMap<SosConstants.HelperValues, String>(0)));
         if (sosElement instanceof SosSweBoolean)
         {
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_BOOLEAN_SWE_200, BooleanType.type);
