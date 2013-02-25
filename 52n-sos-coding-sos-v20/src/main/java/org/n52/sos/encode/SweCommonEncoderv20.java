@@ -280,9 +280,11 @@ public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
                  } else {
                      elementType.setName("Components");
                  }
-                 AbstractDataComponentType abstractDataComponent = elementType.addNewAbstractDataComponent();
-                 abstractDataComponent.set(createDataRecord((SosSweDataRecord) sosDataArray.getElementType()));
-                 abstractDataComponent
+                 
+                 elementType.addNewAbstractDataComponent()
+                        .set(createDataRecord((SosSweDataRecord) sosDataArray.getElementType()));
+                elementType
+                        .getAbstractDataComponent()
                         .substitute(
                                 new QName(SWEConstants.NS_SWE_20, SWEConstants.EN_DATA_RECORD,
                                         SWEConstants.NS_SWE_PREFIX), DataRecordType.type);
