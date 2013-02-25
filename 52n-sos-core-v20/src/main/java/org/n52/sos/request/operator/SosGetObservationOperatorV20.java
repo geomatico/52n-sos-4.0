@@ -222,6 +222,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
 
         // check if parameters are set, if not throw ResponseExceedsSizeLimit
         // exception
+        // TODO remove after finishing CITE tests
         if (sosRequest.isEmpty()) {
             String exceptionText = "The response exceeds the size limit! Please define some filtering parameters.";
             throw Util4Exceptions.createResponseExceedsSizeLimitException(exceptionText);
