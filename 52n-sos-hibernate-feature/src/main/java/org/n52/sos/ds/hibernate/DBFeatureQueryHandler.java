@@ -361,7 +361,8 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
         return false;
     }
 
-    protected int getDefaultEPSG() {
+    @Override
+    public int getDefaultEPSG() {
         return this.defaultEPSG;
     }
 

@@ -101,4 +101,5 @@ public interface IFeatureQueryHandler {
     
     public String insertFeature(SosSamplingFeature samplingFeature, Object connection) throws OwsExceptionReport;
 
+    public int getDefaultEPSG();
 }
