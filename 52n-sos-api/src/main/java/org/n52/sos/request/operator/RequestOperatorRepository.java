@@ -35,8 +35,6 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
 
-import sun.util.logging.resources.logging;
-
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
