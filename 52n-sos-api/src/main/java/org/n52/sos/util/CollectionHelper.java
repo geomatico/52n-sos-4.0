@@ -154,4 +154,31 @@ public class CollectionHelper {
 	    list.add(value);
 	    return list;
 	}
+
+	/**
+	 * @param collectionOfCollection a Collection&lt;Collection&lt;String>>
+	 * @return a Collection&lt;String> containing all values of all Collections&lt;String> without any duplicates
+	 */
+	public static Collection<String> unionOfListOfLists(final Collection<Collection<String>> collectionOfCollection)
+	{
+		if (collectionOfCollection == null || collectionOfCollection.isEmpty())
+		{
+			return new ArrayList<String>(0);
+		}
+		Collection<String> union = new ArrayList<String>();
+		for (Collection<String> col : collectionOfCollection)
+		{
+			if (col != null && !col.isEmpty())
+			{
+				for (String string : col)
+				{
+					if (string != null && !string.isEmpty() && !union.contains(string))
+					{
+						union.add(string);
+					}
+				}
+			}
+		}
+		return union;
+	}
 }
