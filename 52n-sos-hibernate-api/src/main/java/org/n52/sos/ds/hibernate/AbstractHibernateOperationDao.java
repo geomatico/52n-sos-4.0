@@ -46,16 +46,16 @@ public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractHibernateOperationDao.class);
 
     @Override
-    public final OWSOperation getOperationsMetadata(String service, String version, Object connection) throws OwsExceptionReport {
-        return getOperationsMetadata(service, version, getSession(connection));
+    public final OWSOperation getOperationsMetadata(String service, String version) throws OwsExceptionReport {
+        return getOperationsMetadata(service, version);
     }
 
     @Override
-    public final IExtension getExtension(Object connection) throws OwsExceptionReport {
-        return getExtension(getSession(connection));
+    public final IExtension getExtension() throws OwsExceptionReport {
+        return getExtensionHelper();
     }
 
-    protected ACapabilitiesCacheController getCache() {
+    protected ACapabilitiesCacheController getCacheController() {
         return Configurator.getInstance().getCapabilitiesCacheController();
     }
 
@@ -63,9 +63,9 @@ public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao
         return Configurator.getInstance();
     }
 
-    /* provide a default implemenation for extension-less DAO's */
-    protected IExtension getExtension(Session session) throws OwsExceptionReport {
-        return null;
+    /* provide a default implementation for extension-less DAO's */
+    protected IExtension getExtensionHelper() throws OwsExceptionReport {
+    	return null;
     }
 
     protected OWSOperation getOperationsMetadata(String service, String version, Session session) throws OwsExceptionReport {
@@ -78,7 +78,7 @@ public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao
         OWSOperation operation = new OWSOperation();
         operation.setDcp(dcp);
         operation.setOperationName(getOperationName());
-        setOperationsMetadata(operation, service, version, session);
+        setOperationsMetadata(operation, service, version);
         return operation;
     }
 
@@ -142,5 +142,5 @@ public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao
         return dcp;
     }
 
-    protected abstract void setOperationsMetadata(OWSOperation operation, String service, String version, Session session) throws OwsExceptionReport;
+    protected abstract void setOperationsMetadata(OWSOperation operation, String service, String version) throws OwsExceptionReport;
 }

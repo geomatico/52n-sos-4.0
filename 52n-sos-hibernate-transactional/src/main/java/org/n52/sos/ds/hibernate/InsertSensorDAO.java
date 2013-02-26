@@ -78,7 +78,7 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
     }
 
     @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session)
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
             throws OwsExceptionReport {
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             opsMeta.addAnyParameterValue(Sos1Constants.RegisterSensorParams.SensorDescription);
@@ -86,7 +86,7 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
         } else {
             opsMeta.addAnyParameterValue(Sos2Constants.InsertSensorParams.procedureDescription);
             opsMeta.addPossibleValuesParameter(Sos2Constants.InsertSensorParams.procedureDescriptionFormat,
-                    HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatIdentifiers(session));
+                    getCacheController().getProcedureDescriptionFormats());
             opsMeta.addAnyParameterValue(Sos2Constants.InsertSensorParams.observableProperty);
             opsMeta.addAnyParameterValue(Sos2Constants.InsertSensorParams.metadata);
             opsMeta.addDataTypeParameter(Sos2Constants.InsertSensorParams.metadata,
@@ -212,19 +212,11 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
     }
 
     @Override
-    public IExtension getExtension(Session session) throws OwsExceptionReport {
+    public IExtension getExtensionHelper() throws OwsExceptionReport {
         SosInsertionCapabilities insertionCapabilities = new SosInsertionCapabilities();
-        try {
-            insertionCapabilities.addFeatureOfInterestTypes(HibernateCriteriaQueryUtilities
-                    .getFeatureOfInterestTypes(session));
-            insertionCapabilities.addObservationTypes(HibernateCriteriaQueryUtilities.getObservationTypes(session));
-            insertionCapabilities.addProcedureDescriptionFormats(HibernateCriteriaQueryUtilities
-                    .getProcedureDescriptionFormatIdentifiers(session));
-        } catch (HibernateException he) {
-            String exceptionText = "Error while querying data for InsertionCapabilities!";
-            LOGGER.error(exceptionText, he);
-            Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
-        }
+        insertionCapabilities.addFeatureOfInterestTypes(getCacheController().getFeatureOfInterestTypes());
+        insertionCapabilities.addObservationTypes(getCacheController().getObservationTypes());
+        insertionCapabilities.addProcedureDescriptionFormats(getCacheController().getProcedureDescriptionFormats());
 
         return insertionCapabilities;
     }

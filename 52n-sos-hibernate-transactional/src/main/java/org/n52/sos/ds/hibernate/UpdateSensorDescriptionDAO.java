@@ -34,12 +34,8 @@ import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
-import org.n52.sos.ogc.gml.time.ITime;
-import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sensorML.AbstractSensorML;
-import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.request.UpdateSensorRequest;
@@ -66,11 +62,11 @@ public class UpdateSensorDescriptionDAO extends AbstractHibernateOperationDao im
     }
     
     @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
-        opsMeta.addPossibleValuesParameter(Sos2Constants.UpdateSensorDescriptionParams.procedure, getCache().getProcedures());
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
+        opsMeta.addPossibleValuesParameter(Sos2Constants.UpdateSensorDescriptionParams.procedure, getCacheController().getProcedures());
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
             opsMeta.addPossibleValuesParameter(Sos2Constants.UpdateSensorDescriptionParams.procedureDescriptionFormat,
-                    HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatIdentifiers(session));
+                    getCacheController().getProcedureDescriptionFormats());
         }
         opsMeta.addAnyParameterValue(Sos2Constants.UpdateSensorDescriptionParams.description);
     }
@@ -121,17 +117,17 @@ public class UpdateSensorDescriptionDAO extends AbstractHibernateOperationDao im
         }
     }
 
-    private ITime getValidTimeForProcedure(SosProcedureDescription procedureDescription) {
-        if (procedureDescription instanceof AbstractSensorML) {
-            if (((AbstractSensorML) procedureDescription).getValidTime() != null) {
-                return ((AbstractSensorML) procedureDescription).getValidTime();
-            } else if (procedureDescription instanceof SensorML
-                    && ((SensorML) procedureDescription).getMembers().size() == 1) {
-                if (((SensorML) procedureDescription).getMembers().get(0).getValidTime() != null) {
-                    return ((SensorML) procedureDescription).getMembers().get(0).getValidTime();
-                }
-            }
-        }
-        return new TimePeriod(new DateTime(), null);
-    }
+//    private ITime getValidTimeForProcedure(SosProcedureDescription procedureDescription) {
+//        if (procedureDescription instanceof AbstractSensorML) {
+//            if (((AbstractSensorML) procedureDescription).getValidTime() != null) {
+//                return ((AbstractSensorML) procedureDescription).getValidTime();
+//            } else if (procedureDescription instanceof SensorML
+//                    && ((SensorML) procedureDescription).getMembers().size() == 1) {
+//                if (((SensorML) procedureDescription).getMembers().get(0).getValidTime() != null) {
+//                    return ((SensorML) procedureDescription).getMembers().get(0).getValidTime();
+//                }
+//            }
+//        }
+//        return new TimePeriod(new DateTime(), null);
+//    }
 }

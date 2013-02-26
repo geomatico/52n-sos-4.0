@@ -43,7 +43,6 @@ import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.response.InsertSensorResponse;
 import org.n52.sos.service.ConfigurationException;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.util.Cleanupable;
 import org.n52.sos.util.Validation;
 import org.slf4j.Logger;
@@ -220,7 +219,7 @@ public abstract class ACapabilitiesCacheController implements Cleanupable {
 
     public abstract void updateAfterResultTemplateInsertion(InsertResultTemplateRequest sosRequest, InsertResultTemplateResponse sosResponse);
 
-	public abstract void updateAfterResultInsertion(SosObservation sosObservation);
+	public abstract void updateAfterResultInsertion(String templateIdentifier, SosObservation sosObservation);
 
 	/**
      * Returns the observedProperties (phenomenons) for the requested offering
@@ -494,4 +493,24 @@ public abstract class ACapabilitiesCacheController implements Cleanupable {
 	public abstract DateTime getMaxEventTime();
 
 	protected abstract CapabilitiesCache getCache();
+
+	/**
+	 * @return a Collection&ltString&gt; of currently supported procedure description formats
+	 */
+	public abstract Collection<String> getProcedureDescriptionFormats();
+
+	/**
+	 * @return a Map&lt;String, Collection&ltString&gt;&gt; of currently available result templates for offerings
+	 */
+	public abstract Map<String, Collection<String>> getKOfferingVResultTemplates();
+
+	/**
+	 * @return a Map&lt;String, Collection&ltString&gt;&gt; of currently available observed properties per result template
+	 */
+	public abstract Map<String, Collection<String>> getKResultTemplateVObservedProperties();
+
+	/**
+	 * @return a Map&lt;String, Collection&ltString&gt;&gt; of currently available features per result template
+	 */
+	public abstract Map<String, Collection<String>> getKResultTemplateVFeaturesOfInterest();
 }

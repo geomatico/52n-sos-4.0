@@ -40,15 +40,12 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.n52.sos.ds.IInsertObservationDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateUtilities;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.IEncoder;
-import org.n52.sos.event.SosEventBus;
-import org.n52.sos.event.events.ObservationInsertion;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosMultiObservationValues;
 import org.n52.sos.ogc.om.SosObservation;
@@ -89,9 +86,9 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
     }
 
     @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session)
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
             throws OwsExceptionReport {
-        opsMeta.addPossibleValuesParameter(Sos2Constants.InsertObservationParams.offering, getCache().getOfferings());
+        opsMeta.addPossibleValuesParameter(Sos2Constants.InsertObservationParams.offering, getCacheController().getOfferings());
         opsMeta.addAnyParameterValue(Sos2Constants.InsertObservationParams.observation);
         opsMeta.addDataTypeParameter(Sos2Constants.InsertObservationParams.observation,
                 OMConstants.SCHEMA_LOCATION_OM_2_OM_OBSERVATION);

@@ -89,9 +89,9 @@ public class InMemoryCacheController extends CacheControllerImpl {
 	}
 
 	@Override
-	public void updateAfterResultInsertion(SosObservation sosObservation)
+	public void updateAfterResultInsertion(String templateIdentifier, SosObservation sosObservation)
 	{
-		update(new ResultInsertionInMemoryCacheUpdate(sosObservation));
+		update(new ResultInsertionInMemoryCacheUpdate(templateIdentifier,sosObservation));
 	}
 
 	/**
@@ -132,5 +132,5 @@ public class InMemoryCacheController extends CacheControllerImpl {
 			}
 		}
 	}
-	
+
 }

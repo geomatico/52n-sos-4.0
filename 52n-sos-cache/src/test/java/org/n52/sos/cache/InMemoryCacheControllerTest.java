@@ -696,11 +696,30 @@ public class InMemoryCacheControllerTest
 		assertThat(controller.getGlobalEnvelope(),is(offering2Envelope));
 	}
 	
+	@Test public void 
+	should_not_contain_result_template_to_feature_relations_after_DeleteSensor()
+			throws OwsExceptionReport{
+		updateCacheWithInsertSensor(PROCEDURE);
+		updateCacheWithInsertResultTemplate(RESULT_TEMPLATE_IDENTIFIER);
+		insertResultPreparation();
+		deleteSensorPreparation();
+		
+		assertThat(controller.getCache().getKResultTemplateVFeaturesOfInterest().containsKey(RESULT_TEMPLATE_IDENTIFIER),is(false));
+	}
 	
+	@Test public void 
+	should_not_contain_result_template_to_observable_property_relation_after_DeleteSensor()
+			throws OwsExceptionReport{
+		updateCacheWithInsertSensor(PROCEDURE);
+		updateCacheWithInsertResultTemplate(RESULT_TEMPLATE_IDENTIFIER);
+		insertResultPreparation();
+		deleteSensorPreparation();
+		
+		assertThat(controller.getCache().getKResultTemplateVObservedProperties().containsKey(RESULT_TEMPLATE_IDENTIFIER),is(false));
+	}
 	
 	/* Update after InsertResultTemplate */
 	
-
 	@Test public void 
 	should_contain_resulttemplate_identifier_after_InsertResultTemplate()
 			throws OwsExceptionReport{
@@ -726,7 +745,9 @@ public class InMemoryCacheControllerTest
 	@Test(expected=IllegalArgumentException.class) public void
 	should_throw_IllegalArgumentException_when_receiving_null_parameter_after_InsertResult() 
 			throws OwsExceptionReport {
-		controller.updateAfterResultInsertion(null);
+		controller.updateAfterResultInsertion(null,null);
+		controller.updateAfterResultInsertion("",null);
+		controller.updateAfterResultInsertion(null, new SosObservation());
 	}
 	
 	@Test public void
@@ -892,6 +913,26 @@ public class InMemoryCacheControllerTest
 				.contains( OBSERVATION_ID ));
 	}
 	
+	@Test public void 
+	should_contain_result_template_to_observed_property_relation_after_InsertResult()
+	throws OwsExceptionReport{
+		updateCacheWithInsertSensor(PROCEDURE);
+		insertResultPreparation();
+		final boolean CONTAINED = true;
+		
+		assertThat(controller.getCache().getKResultTemplateVObservedProperties().get(RESULT_TEMPLATE_IDENTIFIER).contains(OBSERVABLE_PROPERTY), is(CONTAINED));
+	}
+	
+	@Test public void 
+	should_contain_result_template_to_feature_relation_after_InsertResult()
+			throws OwsExceptionReport{
+		updateCacheWithInsertSensor(PROCEDURE);
+		insertResultPreparation();
+		final boolean CONTAINED = true;
+		
+		assertThat(controller.getCache().getKResultTemplateVFeaturesOfInterest().get(RESULT_TEMPLATE_IDENTIFIER).contains(FEATURE), is(CONTAINED));
+	}
+	
 	/* HELPER */
 
 	private void 
@@ -954,7 +995,7 @@ public class InMemoryCacheControllerTest
 				.setIdentifier(CODESPACE, OBSERVATION_ID)
 				.build();
 		
-		controller.updateAfterResultInsertion(observation);
+		controller.updateAfterResultInsertion(RESULT_TEMPLATE_IDENTIFIER,observation);
 	}
 	
 	private void 

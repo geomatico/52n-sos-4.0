@@ -90,7 +90,7 @@ public class ContentModificationListener implements SosEventListener {
             } 
             else if (event instanceof ResultInsertion)
             {
-            	getCacheController().updateAfterResultInsertion( 
+            	getCacheController().updateAfterResultInsertion( ((ResultInsertion)event).getRequest().getTemplateIdentifier(),
             			((ResultInsertion)event).getResponse().getObservation() );
             }
             else {

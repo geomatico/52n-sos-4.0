@@ -67,14 +67,14 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
     }
     
     @Override
-    public void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session connection)
+    public void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
             throws OwsExceptionReport {
         
-        Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeatureOfInterest(), version);
+        Collection<String> featureIDs = SosHelper.getFeatureIDs(getCacheController().getFeatureOfInterest(), version);
         
         if (getConfigurator().getActiveProfile().isShowFullOperationsMetadataForObservations()) {
-            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());
-            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCache().getObservableProperties());
+            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCacheController().getProcedures());
+            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCacheController().getObservableProperties());
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.featureOfInterest, featureIDs);
         } else {
             opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.procedure);
@@ -90,7 +90,7 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
 
         SosEnvelope envelope = null;
         if (featureIDs != null && !featureIDs.isEmpty()) {
-            envelope = getCache().getGlobalEnvelope();
+            envelope = getCacheController().getGlobalEnvelope();
         }
         
         if (envelope != null) {

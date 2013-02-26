@@ -59,7 +59,7 @@ public class InsertResultTemplateDAO extends AbstractHibernateOperationDao imple
     }
 
     @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
         opsMeta.addAnyParameterValue(Sos2Constants.InsertResultTemplateParams.proposedTemplate);
     }
 

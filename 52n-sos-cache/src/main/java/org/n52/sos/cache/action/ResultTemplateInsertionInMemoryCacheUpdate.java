@@ -23,9 +23,10 @@
  */
 package org.n52.sos.cache.action;
 
+import static java.util.Collections.synchronizedList;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 import org.n52.sos.request.InsertResultTemplateRequest;
@@ -85,7 +86,7 @@ public class ResultTemplateInsertionInMemoryCacheUpdate extends InMemoryCacheUpd
 	{
 		if (offeringToResultTemplatesMap().get(offeringId()) == null)
 		{
-			offeringToResultTemplatesMap().put(offeringId(), Collections.synchronizedList(new ArrayList<String>()));
+			offeringToResultTemplatesMap().put(offeringId(), synchronizedList(new ArrayList<String>()));
 		}
 		if (!offeringToResultTemplatesMap().get(offeringId()).contains(resultTemplateId()))
 		{

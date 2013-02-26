@@ -23,7 +23,10 @@
  */
 package org.n52.sos.ds.hibernate;
 
+import static org.n52.sos.util.CollectionHelper.unionOfListOfLists;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,8 +38,6 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.IGetResultDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
@@ -73,26 +74,16 @@ public class GetResultDAO extends AbstractHibernateOperationDao implements IGetR
     }
     
     @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session)
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
             throws OwsExceptionReport {
-        List<ResultTemplate> resultTemplates = HibernateCriteriaQueryUtilities.getResultTemplateObjects(session);
-        Set<String> offerings = null;
-        Set<String> observableProperties = null;
-        Set<String> featureOfInterest = null;
-        Set<String> templateIdentifiers;
-        if (resultTemplates != null && !resultTemplates.isEmpty()) {
-            offerings = new HashSet<String>(0);
-            observableProperties = new HashSet<String>(0);
-            featureOfInterest = new HashSet<String>(0);
-            templateIdentifiers = new HashSet<String>(0);
-            for (ResultTemplate resultTemplate : resultTemplates) {
-                templateIdentifiers.add(resultTemplate.getIdentifier());
-                ObservationConstellationOfferingObservationType observationConstellationOfferingObservationType =
-                        resultTemplate.getObservationConstellationOfferingObservationType();
-                ObservationConstellation observationConstellation = observationConstellationOfferingObservationType.getObservationConstellation();
-                offerings.add(observationConstellationOfferingObservationType.getOffering().getIdentifier());
-                observableProperties.add(observationConstellation.getObservableProperty().getIdentifier());
-            }
+        List<String> resultTemplateIdentifier = (List<String>) getCacheController().getResultTemplates();
+        Set<String> offerings = new HashSet<String>(0);
+        Collection<String> observableProperties = new ArrayList<String>(0);
+        Collection<String> featureOfInterest = new ArrayList<String>(0);
+        if (resultTemplateIdentifier != null && !resultTemplateIdentifier.isEmpty()) {
+            offerings = getCacheController().getKOfferingVResultTemplates().keySet();
+            observableProperties = unionOfListOfLists(getCacheController().getKResultTemplateVObservedProperties().values());
+            featureOfInterest = unionOfListOfLists(getCacheController().getKResultTemplateVFeaturesOfInterest().values());
         }
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             // TODO set parameter for SOS 1.0

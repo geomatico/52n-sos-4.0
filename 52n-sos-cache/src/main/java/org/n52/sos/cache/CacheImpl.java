@@ -23,6 +23,8 @@
  */
 package org.n52.sos.cache;
 
+import static java.util.Collections.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -155,40 +157,49 @@ public class CacheImpl implements CapabilitiesCache{
 	
 	private TimePeriod globalTemporalBoundingBox;
 
+	private Collection<String> procedureDescriptionFormats;
+
+	private Map<String, Collection<String>> kResultTemplateVObservedProperties;
+
+	private Map<String, Collection<String>> kResultTemplateVFeaturesOfInterest;
+
 	public CacheImpl() {
-    	allowedKOfferingVObservationType = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	childFeatures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	childProcs = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	featureOfInterestIdentifiers = Collections.synchronizedList(new ArrayList<String>());
-    	featureOfInterestTypes = Collections.synchronizedList(new ArrayList<String>());
+    	allowedKOfferingVObservationType = synchronizedMap(new HashMap<String, Collection<String>>());
+    	childFeatures = synchronizedMap(new HashMap<String, Collection<String>>());
+    	childProcs = synchronizedMap(new HashMap<String, Collection<String>>());
+    	featureOfInterestIdentifiers = synchronizedList(new ArrayList<String>());
+    	featureOfInterestTypes = synchronizedList(new ArrayList<String>());
     	globalEnvelope = new SosEnvelope(null, getSrid());
-    	kFeatureOfInterestVProcedures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	kObservablePropertyVProcedures = Collections.synchronizedMap(new HashMap<String, List<String>>());
-    	kObservablePropertyVOfferings = Collections.synchronizedMap(new HashMap<String, List<String>>());
-    	kOfferingVCompositePhenomenon = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	kOfferingVEnvelope = Collections.synchronizedMap(new HashMap<String, SosEnvelope>());
-    	kOfferingVFeaturesOfInterest = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	kOfferingVMaxTime = Collections.synchronizedMap(new HashMap<String, DateTime>());
-    	kOfferingVMinTime = Collections.synchronizedMap(new HashMap<String, DateTime>());
-    	setkOfferingVResultTemplates(Collections.synchronizedMap(new HashMap<String, Collection<String>>()));
-    	kOfferingVObservableProperties = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	kProcedureVObservationIdentifiers = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	kOfferingVObservationTypes = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	kOfferingVProcedures = Collections.synchronizedMap(new HashMap<String, List<String>>());
-    	kOfferingVRelatedFeatures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	kProcedureVObservableProperties = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	kProcedureVOfferings = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	kRelatedFeatureVRole = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	observationIdentifiers = Collections.synchronizedList(new ArrayList<String>());
-    	observationTypes = Collections.synchronizedList(new ArrayList<String>());
-    	kOfferingVName = Collections.synchronizedMap(new HashMap<String, String>());
-    	parentFeatures = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	parentProcs = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
+    	kFeatureOfInterestVProcedures = synchronizedMap(new HashMap<String, Collection<String>>());
+    	kObservablePropertyVProcedures = synchronizedMap(new HashMap<String, List<String>>());
+    	kObservablePropertyVOfferings = synchronizedMap(new HashMap<String, List<String>>());
+    	kOfferingVCompositePhenomenon = synchronizedMap(new HashMap<String, Collection<String>>());
+    	kOfferingVEnvelope = synchronizedMap(new HashMap<String, SosEnvelope>());
+    	kOfferingVFeaturesOfInterest = synchronizedMap(new HashMap<String, Collection<String>>());
+    	kOfferingVMaxTime = synchronizedMap(new HashMap<String, DateTime>());
+    	kOfferingVMinTime = synchronizedMap(new HashMap<String, DateTime>());
+    	setkOfferingVResultTemplates(synchronizedMap(new HashMap<String, Collection<String>>()));
+    	kOfferingVObservableProperties = synchronizedMap(new HashMap<String, Collection<String>>());
+    	kProcedureVObservationIdentifiers = synchronizedMap(new HashMap<String, Collection<String>>());
+    	kOfferingVObservationTypes = synchronizedMap(new HashMap<String, Collection<String>>());
+    	kOfferingVProcedures = synchronizedMap(new HashMap<String, List<String>>());
+    	kOfferingVRelatedFeatures = synchronizedMap(new HashMap<String, Collection<String>>());
+    	kProcedureVObservableProperties = synchronizedMap(new HashMap<String, Collection<String>>());
+    	kProcedureVOfferings = synchronizedMap(new HashMap<String, Collection<String>>());
+    	kRelatedFeatureVRole = synchronizedMap(new HashMap<String, Collection<String>>());
+    	kResultTemplateVObservedProperties = synchronizedMap(new HashMap<String, Collection<String>>());
+    	kResultTemplateVFeaturesOfInterest = synchronizedMap(new HashMap<String, Collection<String>>());
+    	observationIdentifiers = synchronizedList(new ArrayList<String>());
+    	observationTypes = synchronizedList(new ArrayList<String>());
+    	kOfferingVName = synchronizedMap(new HashMap<String, String>());
+    	parentFeatures = synchronizedMap(new HashMap<String, Collection<String>>());
+    	parentProcs = synchronizedMap(new HashMap<String, Collection<String>>());
+    	procedureDescriptionFormats = synchronizedList(new ArrayList<String>());
     	globalTemporalBoundingBox = new TimePeriod();
-    	phens4CompPhens = Collections.synchronizedMap(new HashMap<String, Collection<String>>());
-    	procedures = Collections.synchronizedList(new ArrayList<String>());
-    	resultTemplates = Collections.synchronizedList(new ArrayList<String>());
-    	srids = Collections.synchronizedList(new ArrayList<Integer>());
+    	phens4CompPhens = synchronizedMap(new HashMap<String, Collection<String>>());
+    	procedures = synchronizedList(new ArrayList<String>());
+    	resultTemplates = synchronizedList(new ArrayList<String>());
+    	srids = synchronizedList(new ArrayList<Integer>());
     	srid = 4326; // default: WGS84 2D
     }
 
@@ -1009,6 +1020,18 @@ public class CacheImpl implements CapabilitiesCache{
 	}
 
 	@Override
+	public void setProcedureDescriptionFormats(Collection<String> procedureDescriptionFormats)
+	{
+		this.procedureDescriptionFormats = procedureDescriptionFormats;
+	}
+
+	@Override
+	public Collection<String> getProcedureDescriptionFormats()
+	{
+		return procedureDescriptionFormats;
+	}
+
+	@Override
 	public int hashCode()
 	{
 		final int prime = 31;
@@ -1033,6 +1056,7 @@ public class CacheImpl implements CapabilitiesCache{
 		result = prime * result + ((kOfferingVObservationTypes == null) ? 0 : kOfferingVObservationTypes.hashCode());
 		result = prime * result + ((kOfferingVProcedures == null) ? 0 : kOfferingVProcedures.hashCode());
 		result = prime * result + ((kOfferingVRelatedFeatures == null) ? 0 : kOfferingVRelatedFeatures.hashCode());
+		result = prime * result + ((kOfferingVResultTemplates == null) ? 0 : kOfferingVResultTemplates.hashCode());
 		result = prime * result + ((kProcedureVObservableProperties == null) ? 0 : kProcedureVObservableProperties.hashCode());
 		result = prime * result + ((kProcedureVObservationIdentifiers == null) ? 0 : kProcedureVObservationIdentifiers.hashCode());
 		result = prime * result + ((kProcedureVOfferings == null) ? 0 : kProcedureVOfferings.hashCode());
@@ -1042,6 +1066,7 @@ public class CacheImpl implements CapabilitiesCache{
 		result = prime * result + ((parentFeatures == null) ? 0 : parentFeatures.hashCode());
 		result = prime * result + ((parentProcs == null) ? 0 : parentProcs.hashCode());
 		result = prime * result + ((phens4CompPhens == null) ? 0 : phens4CompPhens.hashCode());
+		result = prime * result + ((procedureDescriptionFormats == null) ? 0 : procedureDescriptionFormats.hashCode());
 		result = prime * result + ((procedures == null) ? 0 : procedures.hashCode());
 		result = prime * result + ((resultTemplates == null) ? 0 : resultTemplates.hashCode());
 		result = prime * result + srid;
@@ -1159,6 +1184,11 @@ public class CacheImpl implements CapabilitiesCache{
 				return false;
 		} else if (!kOfferingVRelatedFeatures.equals(other.kOfferingVRelatedFeatures))
 			return false;
+		if (kOfferingVResultTemplates == null) {
+			if (other.kOfferingVResultTemplates != null)
+				return false;
+		} else if (!kOfferingVResultTemplates.equals(other.kOfferingVResultTemplates))
+			return false;
 		if (kProcedureVObservableProperties == null) {
 			if (other.kProcedureVObservableProperties != null)
 				return false;
@@ -1204,6 +1234,11 @@ public class CacheImpl implements CapabilitiesCache{
 				return false;
 		} else if (!phens4CompPhens.equals(other.phens4CompPhens))
 			return false;
+		if (procedureDescriptionFormats == null) {
+			if (other.procedureDescriptionFormats != null)
+				return false;
+		} else if (!procedureDescriptionFormats.equals(other.procedureDescriptionFormats))
+			return false;
 		if (procedures == null) {
 			if (other.procedures != null)
 				return false;
@@ -1224,4 +1259,15 @@ public class CacheImpl implements CapabilitiesCache{
 		return true;
 	}
 
+	@Override
+	public Map<String, Collection<String>> getKResultTemplateVObservedProperties()
+	{
+		return kResultTemplateVObservedProperties;
+	}
+
+	@Override
+	public Map<String, Collection<String>> getKResultTemplateVFeaturesOfInterest()
+	{
+		return kResultTemplateVFeaturesOfInterest;
+	}
 }

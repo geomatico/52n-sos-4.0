@@ -257,8 +257,6 @@ public interface CapabilitiesCache {
 
 	public void setkOfferingVResultTemplates(Map<String, Collection<String>> kOfferingVResultTemplates);
 
-	public Map<String, Collection<String>> getKOfferingVResultTemplates();
-
 	public Collection<String> getProcedures();
 
 	public Map<String, List<String>> getKObservablePropertyVProcedures();
@@ -297,5 +295,30 @@ public interface CapabilitiesCache {
 	public Map<String, String> getKOfferingVName();
 
 	public void setDefaultEPSGCode(int defaultEPSGCode);
+
+	/**
+	 * @return a Collection&ltString&gt; of currently supported procedure description formats
+	 */
+	Collection<String> getProcedureDescriptionFormats();
+
+	/**
+	 * @param procDescTypes the Set&lt;String&gt; of currently supported procedure description formats
+	 */
+	public void setProcedureDescriptionFormats(Collection<String> procDescTypes);
+
+	/**
+	 * @return a Map&lt;String, Collection&ltString&gt;&gt; of currently available result templates for offerings
+	 */
+	public abstract Map<String, Collection<String>> getKOfferingVResultTemplates();
+
+	/**
+	 * @return a Map&lt;String, Collection&ltString&gt;&gt; of currently available observed properties per result template
+	 */
+	public abstract Map<String, Collection<String>> getKResultTemplateVObservedProperties();
+
+	/**
+	 * @return a Map&lt;String, Collection&ltString&gt;&gt; of currently available features per result template
+	 */
+	public abstract Map<String, Collection<String>> getKResultTemplateVFeaturesOfInterest();
 
 }

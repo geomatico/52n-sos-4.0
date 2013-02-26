@@ -729,4 +729,28 @@ public abstract class CacheControllerImpl extends ACapabilitiesCacheController {
 		return cache;
 	}
 
+	@Override
+	public Collection<String> getProcedureDescriptionFormats()
+	{
+		return cache.getProcedureDescriptionFormats();
+	}
+	
+	@Override
+	public Map<String, Collection<String>> getKOfferingVResultTemplates()
+	{
+		return getCache().getKOfferingVResultTemplates();
+	}
+
+	@Override
+	public Map<String, Collection<String>> getKResultTemplateVObservedProperties()
+	{
+		return getCache().getKResultTemplateVObservedProperties();
+	}
+
+	@Override
+	public Map<String, Collection<String>> getKResultTemplateVFeaturesOfInterest()
+	{
+		return getCache().getKResultTemplateVFeaturesOfInterest();
+	}
+
 }

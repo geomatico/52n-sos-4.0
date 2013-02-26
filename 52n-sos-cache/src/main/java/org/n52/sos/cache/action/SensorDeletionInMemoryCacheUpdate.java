@@ -97,7 +97,17 @@ public class SensorDeletionInMemoryCacheUpdate extends InMemoryCacheUpdate
 
 				removeOfferingToObservablePropertyRelation(offeringId);
 
-				removeOfferintgToResultTemplatesRelation(offeringId);
+				Collection<String> resultTemplatesToRemove = removeOfferingToResultTemplatesRelation(offeringId);
+				
+				if (resultTemplatesToRemove != null && !resultTemplatesToRemove.isEmpty())
+				{
+					for (String resultTemplateIdentifier : resultTemplatesToRemove)
+					{
+						removeResultTemplateToFeatureOfInterestRelations(resultTemplateIdentifier);
+						
+						removeResultTemplateToObservablePropertyRelations(resultTemplateIdentifier);
+					}
+				}
 			}
 
 		}
@@ -134,6 +144,28 @@ public class SensorDeletionInMemoryCacheUpdate extends InMemoryCacheUpdate
 	
 	/* HELPER */
 	
+	private void removeResultTemplateToObservablePropertyRelations(String resultTemplateIdentifier)
+	{
+		if (resultTemplateIdentifier != null && !resultTemplateIdentifier.isEmpty())
+		{
+			getCache().getKResultTemplateVObservedProperties().remove(resultTemplateIdentifier);
+			LOGGER.debug("Removed all relations from result template to observable properties map for result template '{}'? {}",
+					resultTemplateIdentifier,
+					!getCache().getKResultTemplateVObservedProperties().containsKey(resultTemplateIdentifier));
+		}
+	}
+
+	private void removeResultTemplateToFeatureOfInterestRelations(String resultTemplateIdentifier)
+	{
+		if (resultTemplateIdentifier != null && !resultTemplateIdentifier.isEmpty())
+		{
+			getCache().getKResultTemplateVFeaturesOfInterest().remove(resultTemplateIdentifier);
+			LOGGER.debug("Removed all relations from result template to features map for result template '{}'? {}",
+					resultTemplateIdentifier,
+					!getCache().getKResultTemplateVFeaturesOfInterest().containsKey(resultTemplateIdentifier));
+		}
+	}
+
 	private void resetGlobalSpatialBoundingBox()
 	{
 		// iterate over all envelopes
@@ -200,7 +232,7 @@ public class SensorDeletionInMemoryCacheUpdate extends InMemoryCacheUpdate
 		}
 	}
 
-	private void removeOfferintgToResultTemplatesRelation(String offeringId)
+	private Collection<String> removeOfferingToResultTemplatesRelation(String offeringId)
 	{
 		Collection<String> resultTemplateIdentifiersToRemove = getCache().getKOfferingVResultTemplates().remove(offeringId);
 		LOGGER.debug("Offering '{}' to result templates removed from map? {}",
@@ -217,6 +249,7 @@ public class SensorDeletionInMemoryCacheUpdate extends InMemoryCacheUpdate
 						!getCache().getResultTemplates().contains(resultTemplateIdentiferToRemove));
 			}
 		}
+		return resultTemplateIdentifiersToRemove;
 	}
 
 	private void removeRemovedObservationIdentifiers()

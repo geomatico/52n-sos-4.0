@@ -48,14 +48,16 @@ public interface IOperationDAO {
      *            OGC service identfier
      * @param version
      *            SOS version
-     * @param connection
-     *            Data source connection
      * @return OperationsMetadata for the operation
      * @throws OwsExceptionReport
      *             If an error occurs.
      */
-    public OWSOperation getOperationsMetadata(String service, String version, Object connection)
+    public OWSOperation getOperationsMetadata(String service, String version)
             throws OwsExceptionReport;
     
-    public IExtension getExtension(Object connection) throws OwsExceptionReport;
+    /**
+     * @return the operation specific extension information (&larr; should be available from cache or from code)
+     * @throws OwsExceptionReport
+     */
+    public IExtension getExtension() throws OwsExceptionReport;
 }

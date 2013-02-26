@@ -41,8 +41,8 @@ public interface IRequestOperator extends IConformanceClass {
 
     public RequestOperatorKeyType getRequestOperatorKeyType();
 
-    public OWSOperation getOperationMetadata(String service, String version, Object connection)
+    public OWSOperation getOperationMetadata(String service, String version)
             throws OwsExceptionReport;
     
-    public IExtension getExtension(Object connection) throws OwsExceptionReport;
+    public IExtension getExtension() throws OwsExceptionReport;
 }

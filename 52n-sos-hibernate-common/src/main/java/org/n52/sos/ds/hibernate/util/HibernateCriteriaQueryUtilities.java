@@ -883,18 +883,6 @@ public class HibernateCriteriaQueryUtilities {
         return (ProcedureDescriptionFormat) criteria.uniqueResult();
     }
 
-    public static Collection<String> getProcedureDescriptionFormatIdentifiers(Session session) {
-        Criteria criteria = session.createCriteria(ProcedureDescriptionFormat.class);
-        List<ProcedureDescriptionFormat> procedureDescriptionFormats = criteria.list();
-        Set<String> procDescTypes = new HashSet<String>(0);
-        if (procedureDescriptionFormats != null) {
-            for (ProcedureDescriptionFormat procedureDescriptionFormat : procedureDescriptionFormats) {
-                procDescTypes.add(procedureDescriptionFormat.getProcedureDescriptionFormat());
-            }
-        }
-        return procDescTypes;
-    }
-
     /**
      * Get FOI identifiers
      * 

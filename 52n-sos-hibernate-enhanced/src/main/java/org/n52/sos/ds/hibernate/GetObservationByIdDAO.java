@@ -23,6 +23,8 @@
  */
 package org.n52.sos.ds.hibernate;
 
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.*;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,7 +34,6 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.IGetObservationByIdDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.*;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
 import org.n52.sos.ogc.ows.OWSOperation;
@@ -63,8 +64,8 @@ public class GetObservationByIdDAO extends AbstractHibernateOperationDao impleme
     }
     
     @Override
-    public void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session) throws OwsExceptionReport {
-        opsMeta.addPossibleValuesParameter(Sos2Constants.GetObservationByIdParams.observation, getCache().getObservationIdentifiers());
+    public void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
+        opsMeta.addPossibleValuesParameter(Sos2Constants.GetObservationByIdParams.observation, getCacheController().getObservationIdentifiers());
     }
 
     @Override

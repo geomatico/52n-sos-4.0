@@ -23,15 +23,14 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import java.util.HashSet;
+import static org.n52.sos.util.CollectionHelper.unionOfListOfLists;
+
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.n52.sos.ds.IGetResultTemplateDAO;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
-import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
@@ -62,20 +61,14 @@ public class GetResultTemplateDAO extends AbstractHibernateOperationDao implemen
     }
     
     @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version, Session session)
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
             throws OwsExceptionReport {
-        // Get data from data source
-        List<ResultTemplate> resultTemplates = HibernateCriteriaQueryUtilities.getResultTemplateObjects(session);
-        Set<String> offerings = null;
-        Set<String> observableProperties = null;
+        List<String> resultTemplates = (List<String>) getCacheController().getResultTemplates();
+        Collection<String> offerings = null;
+        Collection<String> observableProperties = null;
         if (resultTemplates != null && !resultTemplates.isEmpty()) {
-            offerings = new HashSet<String>(0);
-            observableProperties = new HashSet<String>(0);
-            for (ResultTemplate rt : resultTemplates) {
-                ObservationConstellationOfferingObservationType ocoot = rt.getObservationConstellationOfferingObservationType();
-                offerings.add(ocoot.getOffering().getIdentifier());
-                observableProperties.add(ocoot.getObservationConstellation().getObservableProperty().getIdentifier());
-            }
+            offerings = getCacheController().getKOfferingVResultTemplates().keySet();;
+            observableProperties = unionOfListOfLists(getCacheController().getKResultTemplateVObservedProperties().values());
         }
         opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultTemplateParams.offering, offerings);
         opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultTemplateParams.observedProperty, observableProperties);
