@@ -115,6 +115,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
                 envelope = getCache().getGlobalEnvelope();
             }
             if (envelope != null) {
+                // TODO constraint allowed srid!
                 opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.spatialFilter,
                         SosHelper.getMinMaxFromEnvelope(envelope.getEnvelope()));
             }

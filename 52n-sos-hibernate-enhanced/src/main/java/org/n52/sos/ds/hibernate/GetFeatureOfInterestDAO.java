@@ -82,7 +82,7 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
             opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.featureOfInterest);
         }
         
-        
+        // TODO constraint srid
         String parameterName = Sos2Constants.GetFeatureOfInterestParams.spatialFilter.name();
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             parameterName = Sos1Constants.GetFeatureOfInterestParams.location.name();
