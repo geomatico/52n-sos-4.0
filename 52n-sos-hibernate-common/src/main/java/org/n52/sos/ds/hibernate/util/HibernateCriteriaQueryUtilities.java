@@ -1027,18 +1027,6 @@ public class HibernateCriteriaQueryUtilities {
         return (ObservationType) criteria.uniqueResult();
     }
 
-    public static Collection<String> getObservationTypes(Session session) {
-        Criteria criteria = session.createCriteria(ObservationType.class);
-        List<ObservationType> observationTypes = criteria.list();
-        List<String> obsTypes = new ArrayList<String>(0);
-        if (observationTypes != null) {
-            for (ObservationType observationType : observationTypes) {
-                obsTypes.add(observationType.getObservationType());
-            }
-        }
-        return obsTypes;
-    }
-
     public static ResultType getResultType(String resultType, Session session) {
         Criteria criteria = session.createCriteria(ResultType.class);
         criteria.add(eq(PARAMETER_RESULT_TYPE, resultType));

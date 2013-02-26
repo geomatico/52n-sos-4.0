@@ -23,18 +23,38 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getObservationTypes;
+import static java.util.Collections.synchronizedList;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.Criteria;
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
+import org.n52.sos.ds.hibernate.entities.ObservationType;
+import org.n52.sos.util.Action;
 
 /**
+ * When executing this &auml;ction (see {@link Action}), the following relations are added, settings are updated in cache:<ul>
+ * <li>Observation Type</li></ul>
  *
  * @author Christian Autermann <c.autermann@52north.org>
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * 
+ * @since 4.0.0
  */
 public class ObservationTypeCacheUpdate extends CacheUpdate {
 
     @Override
     public void execute() {
-        getCache().setObservationTypes(getObservationTypes(getSession()));
+    	Criteria hObservationTypes = getSession().createCriteria(ObservationType.class);
+		List<ObservationType> observationTypes = hObservationTypes.list();
+        List<String> obsTypes = synchronizedList(new ArrayList<String>(0));
+        if (observationTypes != null) {
+            for (ObservationType observationType : observationTypes) {
+                obsTypes.add(observationType.getObservationType());
+            }
+        }
+        getCache().setObservationTypes(obsTypes);
     }
+    
 }
