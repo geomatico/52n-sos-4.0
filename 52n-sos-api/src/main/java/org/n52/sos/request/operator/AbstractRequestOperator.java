@@ -74,12 +74,18 @@ public abstract class AbstractRequestOperator<D extends IOperationDAO, R extends
 
     @Override
     public IExtension getExtension(Object connection) throws OwsExceptionReport {
-        return getDao().getExtension(connection);
+        if (hasImplementedDAO()) {
+            return getDao().getExtension(connection);
+        }
+        return null;
     }
 
     @Override
     public OWSOperation getOperationMetadata(String service, String version, Object connection) throws OwsExceptionReport {
-        return getDao().getOperationsMetadata(service, version, connection);
+        if (hasImplementedDAO()) {
+            return getDao().getOperationsMetadata(service, version, connection);
+        }
+        return null;
     }
 
     protected String getOperationName() {
