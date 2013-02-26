@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.entities.SpatialRefSys;
+import org.n52.sos.service.Configurator;
 
 /**
  *
@@ -39,11 +40,15 @@ public class SridCacheUpdate extends CacheUpdate {
 
     @Override
     public void execute() {
-        List<SpatialRefSys> spatialRefSyss = getSpatialRefSysObjects(getSession());
-        List<Integer> srids = new ArrayList<Integer>(spatialRefSyss.size());
-        for (SpatialRefSys spatialRefSys : spatialRefSyss) {
-            srids.add(spatialRefSys.getSrid());
-        }
+        // TODO change if transformation is supported
+//        List<SpatialRefSys> spatialRefSyss = getSpatialRefSysObjects(getSession());
+//        List<Integer> srids = new ArrayList<Integer>(spatialRefSyss.size());
+//        for (SpatialRefSys spatialRefSys : spatialRefSyss) {
+//            srids.add(spatialRefSys.getSrid());
+//        }
+//        getCache().setSrids(srids);
+        List<Integer> srids = new ArrayList<Integer>(0);
+        srids.add(new Integer(Configurator.getInstance().getFeatureQueryHandler().getDefaultEPSG()));
         getCache().setSrids(srids);
     }
     
