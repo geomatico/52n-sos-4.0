@@ -100,7 +100,7 @@ public abstract class ACapabilitiesCacheController implements Cleanupable {
 	/**
 	 * Starts a new timer task
 	 */
-	protected final void schedule() {
+    private final void schedule() {
 		/*
 		 * Timers can not be rescheduled.
 		 * To make the interval changeable reschedule a new timer.
@@ -134,19 +134,19 @@ public abstract class ACapabilitiesCacheController implements Cleanupable {
 	 * Stops the current task, if available and starts a new {@link TimerTask}.
 	 * @see #schedule()
 	 */
-	protected void reschedule() {
+    private void reschedule() {
         cancelCurrent();
 		schedule();
 	}
     
-    protected void cancelCurrent() {
+    private void cancelCurrent() {
         if (this.current != null) {
             this.current.cancel();
             LOGGER.debug("Current {} canceled", UpdateTimerTask.class.getSimpleName());
         }
     }
     
-     protected void cancelTimer() {
+    private void cancelTimer() {
         if (this.timer != null) {
             this.timer.cancel();
             LOGGER.debug("Cache Update timer canceled.");

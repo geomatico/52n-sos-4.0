@@ -62,7 +62,6 @@ public abstract class CacheControllerImpl extends ACapabilitiesCacheController {
     public CacheControllerImpl() {
         cache = new CacheImpl();
         cacheFeederDAO = getCacheDAO();
-		schedule();
     }
 
 	protected ICacheFeederDAO getCacheDAO()
