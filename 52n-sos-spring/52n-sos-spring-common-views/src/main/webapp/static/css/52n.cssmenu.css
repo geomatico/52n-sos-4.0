@@ -156,3 +156,6 @@
 	color: #fff;
 }
 
+li.ja-firstitem {
+    background: none !important;
+}
