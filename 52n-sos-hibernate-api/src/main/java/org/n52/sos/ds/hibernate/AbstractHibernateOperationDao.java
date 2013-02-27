@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.Session;
 import org.n52.sos.binding.Binding;
 import org.n52.sos.cache.ACapabilitiesCacheController;
 import org.n52.sos.decode.OperationDecoderKey;
@@ -46,7 +45,7 @@ public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractHibernateOperationDao.class);
 
     @Override
-    public final OWSOperation getOperationsMetadata(String service, String version) throws OwsExceptionReport {
+    public OWSOperation getOperationsMetadata(String service, String version) throws OwsExceptionReport {
         Map<String, List<String>> dcp =  getDCP(new OperationDecoderKey(service, version, getOperationName()));
         if (dcp == null || dcp.isEmpty()) {
             LOGGER.debug("Operation {} not available due to empty DCP map.", getOperationName());
@@ -60,26 +59,17 @@ public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao
     }
 
     @Override
-    public final IExtension getExtension() throws OwsExceptionReport {
-        return getExtensionHelper();
+    /* provide a default implementation for extension-less DAO's */
+    public IExtension getExtension() throws OwsExceptionReport {
+        return null;
     }
 
     protected ACapabilitiesCacheController getCacheController() {
-        return Configurator.getInstance().getCapabilitiesCacheController();
+        return getConfigurator().getCapabilitiesCacheController();
     }
 
     protected Configurator getConfigurator() {
         return Configurator.getInstance();
-    }
-
-    /* provide a default implementation for extension-less DAO's */
-    protected IExtension getExtensionHelper() throws OwsExceptionReport {
-    	return null;
-    }
-
-    @Deprecated
-    protected OWSOperation getOperationsMetadata(String service, String version, Session session) throws OwsExceptionReport {
-        return getOperationsMetadata(service, version);
     }
 
 	/**

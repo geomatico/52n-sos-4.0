@@ -212,12 +212,11 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
     }
 
     @Override
-    public IExtension getExtensionHelper() throws OwsExceptionReport {
+    public IExtension getExtension() throws OwsExceptionReport {
         SosInsertionCapabilities insertionCapabilities = new SosInsertionCapabilities();
         insertionCapabilities.addFeatureOfInterestTypes(getCacheController().getFeatureOfInterestTypes());
         insertionCapabilities.addObservationTypes(getCacheController().getObservationTypes());
         insertionCapabilities.addProcedureDescriptionFormats(getCacheController().getProcedureDescriptionFormats());
-
         return insertionCapabilities;
     }
 
