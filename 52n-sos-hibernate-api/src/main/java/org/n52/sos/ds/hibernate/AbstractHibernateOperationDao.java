@@ -40,6 +40,14 @@ import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author Carsten Hollmann
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * @author Christian Autermann <c.autermann@52north.org>
+ * 
+ * @since 4.0.0
+ *
+ */
 public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao implements IOperationDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractHibernateOperationDao.class);
