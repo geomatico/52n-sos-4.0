@@ -275,6 +275,43 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         return val;
     }
 
+    /**
+     * @return all saved setting values
+     *
+     * @throws ConnectionProviderException
+     * @throws HibernateException
+     */
+    protected abstract Set<ISettingValue<?>> getSettingValues() throws ConnectionProviderException;
+
+    /**
+     * Returns the value of the specified setting or {@code null} if it does not exist.
+     * <p/>
+     * @param key the key
+     * <p/>
+     * @return the value
+     *
+     * @throws ConnectionProviderException
+     */
+    protected abstract ISettingValue<?> getSettingValue(String key) throws ConnectionProviderException;
+
+    /**
+     * Deletes the setting with the specified key.
+     * <p/>
+     * @param key the key
+     *
+     * @throws ConnectionProviderException
+     */
+    protected abstract void deleteSettingValue(String key) throws ConnectionProviderException;
+
+    /**
+     * Saves the setting value.
+     * <p/>
+     * @param setting the value
+     *
+     * @throws ConnectionProviderException
+     */
+    protected abstract void saveSettingValue(ISettingValue<?> setting) throws ConnectionProviderException;
+
     /*
      * TODO handle the references as WeakReferences
      */
@@ -387,37 +424,4 @@ public abstract class AbstractSettingsManager extends SettingsManager {
             throw new ConfigurationException(message, t);
         }
     }
-
-    /**
-     * @return all saved setting values
-     * @throws ConnectionProviderException 
-     * @throws HibernateException 
-     */
-    protected abstract Set<ISettingValue<?>> getSettingValues() throws ConnectionProviderException;
-
-    /**
-     * Returns the value of the specified setting or {@code null} if it does not exist.
-     * <p/>
-     * @param key the key
-     * <p/>
-     * @return the value
-     * @throws ConnectionProviderException 
-     */
-    protected abstract ISettingValue<?> getSettingValue(String key) throws ConnectionProviderException;
-
-    /**
-     * Deletes the setting with the specified key.
-     * <p/>
-     * @param key the key
-     * @throws ConnectionProviderException 
-     */
-    protected abstract void deleteSettingValue(String key) throws ConnectionProviderException;
-
-    /**
-     * Saves the setting value.
-     * <p/>
-     * @param setting the value
-     * @throws ConnectionProviderException 
-     */
-    protected abstract void saveSettingValue(ISettingValue<?> setting) throws ConnectionProviderException;
 }
