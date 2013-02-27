@@ -121,7 +121,7 @@ public class Configurator implements Cleanupable {
     /**
      * directory of sensor descriptions in SensorML format.
      */
-    private File sensorDirectory;
+    private String sensorDirectory;
     /**
      * Prefix URN for the spatial reference system.
      */
@@ -475,12 +475,12 @@ public class Configurator implements Cleanupable {
      * @return Returns the sensor description directory
      */
     //HibernateProcedureUtilities
-    public File getSensorDir() {
+    public String getSensorDir() {
         return this.sensorDirectory;
     }
 
     @Setting(SENSOR_DIRECTORY)
-    public void setSensorDirectory(File sensorDirectory) {
+    public void setSensorDirectory(String sensorDirectory) {
         this.sensorDirectory = sensorDirectory;
     }
 
