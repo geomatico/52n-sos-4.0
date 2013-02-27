@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jmeterTestPlan version="1.2" properties="2.4" jmeter="2.9 r1437961">
+<jmeterTestPlan version="1.2" properties="2.3" jmeter="2.8 r1393162">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname=" SOS" enabled="true">
       <stringProp name="TestPlan.comments">Various test for the  SOS implementation of 52°North</stringProp>
@@ -9,7 +9,7 @@
         <collectionProp name="Arguments.arguments">
           <elementProp name="sos_servlet_path" elementType="Argument">
             <stringProp name="Argument.name">sos_servlet_path</stringProp>
-            <stringProp name="Argument.value">52n-sos-webapp/sos</stringProp>
+            <stringProp name="Argument.value">sos-4.0/sos</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -1237,6 +1237,15 @@
             <boolProp name="XPath.namespace">true</boolProp>
           </XPathAssertion>
           <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Result template relations" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">//ows:Operation[@name=&quot;GetResultTemplate&quot;]/ows:Parameter[@name=&quot;offering&quot;]/ows:AllowedValues/ows:Value[text()=&quot;${offering_identifier}&quot;]/../../../ows:Parameter[@name=&quot;observedProperty&quot;]/ows:AllowedValues/ows:Value[text()=&quot;${observable_property_start}1&quot;]</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
         </hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="InsertSensor" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
@@ -2147,6 +2156,59 @@
           </XPathAssertion>
           <hashTree/>
         </hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Test AFTER InsertResultTemplate: GetCapabilities" enabled="true">
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+&lt;env:Envelope&#xd;
+    xmlns:env=&quot;http://www.w3.org/2003/05/soap-envelope&quot;&#xd;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://www.w3.org/2003/05/soap-envelope http://www.w3.org/2003/05/soap-envelope/soap-envelope.xsd&quot;&gt;&#xd;
+    &lt;env:Body&gt;&#xd;
+        &lt;sos:GetCapabilities service=&quot;SOS&quot;&#xd;
+            xmlns:sos=&quot;http://www.opengis.net/sos/2.0&quot;&#xd;
+            xmlns:ows=&quot;http://www.opengis.net/ows/1.1&quot; xsi:schemaLocation=&quot;http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0.0/sosGetCapabilities.xsd&quot;&gt;&#xd;
+            &lt;ows:AcceptVersions&gt;&#xd;
+                &lt;ows:Version&gt;2.0.0&lt;/ows:Version&gt;&#xd;
+            &lt;/ows:AcceptVersions&gt;&#xd;
+            &lt;ows:Sections&gt;&#xd;
+                &lt;ows:Section&gt;OperationsMetadata&lt;/ows:Section&gt;&#xd;
+            &lt;/ows:Sections&gt;&#xd;
+        &lt;/sos:GetCapabilities&gt;&#xd;
+    &lt;/env:Body&gt;&#xd;
+&lt;/env:Envelope&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${sos_servlet_path}${url_pattern}</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Result template relations" enabled="true">
+            <boolProp name="XPath.negate">false</boolProp>
+            <stringProp name="XPath.xpath">//ows:Operation[@name=&quot;GetResultTemplate&quot;]/ows:Parameter[@name=&quot;offering&quot;]/ows:AllowedValues/ows:Value[text()=&quot;${offering_identifier}&quot;]</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+        </hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Test AFTER InsertResultTemplate: GetResultTemplate" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
@@ -2455,6 +2517,59 @@
             <boolProp name="XPath.tolerant">false</boolProp>
             <boolProp name="XPath.namespace">true</boolProp>
             <stringProp name="TestPlan.comments">Result should contain one element of sos:InsertResultResponse</stringProp>
+          </XPathAssertion>
+          <hashTree/>
+        </hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Test AFTER InsertResult: GetCapabilities" enabled="true">
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+&lt;env:Envelope&#xd;
+    xmlns:env=&quot;http://www.w3.org/2003/05/soap-envelope&quot;&#xd;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://www.w3.org/2003/05/soap-envelope http://www.w3.org/2003/05/soap-envelope/soap-envelope.xsd&quot;&gt;&#xd;
+    &lt;env:Body&gt;&#xd;
+        &lt;sos:GetCapabilities service=&quot;SOS&quot;&#xd;
+            xmlns:sos=&quot;http://www.opengis.net/sos/2.0&quot;&#xd;
+            xmlns:ows=&quot;http://www.opengis.net/ows/1.1&quot; xsi:schemaLocation=&quot;http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0.0/sosGetCapabilities.xsd&quot;&gt;&#xd;
+            &lt;ows:AcceptVersions&gt;&#xd;
+                &lt;ows:Version&gt;2.0.0&lt;/ows:Version&gt;&#xd;
+            &lt;/ows:AcceptVersions&gt;&#xd;
+            &lt;ows:Sections&gt;&#xd;
+                &lt;ows:Section&gt;OperationsMetadata&lt;/ows:Section&gt;&#xd;
+            &lt;/ows:Sections&gt;&#xd;
+        &lt;/sos:GetCapabilities&gt;&#xd;
+    &lt;/env:Body&gt;&#xd;
+&lt;/env:Envelope&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${sos_servlet_path}${url_pattern}</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Result template relations" enabled="true">
+            <boolProp name="XPath.negate">false</boolProp>
+            <stringProp name="XPath.xpath">//ows:Operation[@name=&quot;GetResultTemplate&quot;]/ows:Parameter[@name=&quot;offering&quot;]/ows:AllowedValues/ows:Value[text()=&quot;${offering_identifier}&quot;]</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
           </XPathAssertion>
           <hashTree/>
         </hashTree>
@@ -3507,6 +3622,358 @@
           <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Global Temporal BBox-&gt;Min" enabled="true">
             <boolProp name="XPath.negate">false</boolProp>
             <stringProp name="XPath.xpath">//ows:Operation[@name=&apos;GetObservation&apos;]/ows:Parameter[@name=&apos;temporalFilter&apos;]/ows:AllowedValues/ows:Range/ows:MinimumValue[text()=&quot;${phenomenon_time_start_2}&quot;]</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+        </hashTree>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="Response" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>true</xml>
+              <fieldNames>false</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="GraphVisualizer" testclass="ResultCollector" testname="Response Time Graph" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>true</xml>
+              <fieldNames>false</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="Response Table" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>true</xml>
+              <fieldNames>false</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="GetCapabilities performance test" enabled="false">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Schleifen-Controller (Loop Controller)" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">10</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">0</stringProp>
+        <longProp name="ThreadGroup.start_time">1333103506000</longProp>
+        <longProp name="ThreadGroup.end_time">1333103506000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="specific settings" enabled="true">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="default_srs_name" elementType="Argument">
+              <stringProp name="Argument.name">default_srs_name</stringProp>
+              <stringProp name="Argument.value">http://www.opengis.net/def/crs/EPSG/0/4326</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="feature_id" elementType="Argument">
+              <stringProp name="Argument.name">feature_id</stringProp>
+              <stringProp name="Argument.value">test-feature-identifier</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="feature_type" elementType="Argument">
+              <stringProp name="Argument.name">feature_type</stringProp>
+              <stringProp name="Argument.value">http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="feature_x" elementType="Argument">
+              <stringProp name="Argument.name">feature_x</stringProp>
+              <stringProp name="Argument.value">111.0</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="feature_y" elementType="Argument">
+              <stringProp name="Argument.name">feature_y</stringProp>
+              <stringProp name="Argument.value">30.0</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="insert_result_date_1" elementType="Argument">
+              <stringProp name="Argument.name">insert_result_date_1</stringProp>
+              <stringProp name="Argument.value">1980-08-08T13:37:00.000+01:00</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="insert_result_date_2" elementType="Argument">
+              <stringProp name="Argument.name">insert_result_date_2</stringProp>
+              <stringProp name="Argument.value">1990-09-09T13:37:00.000+01:00</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="insert_result_date_3" elementType="Argument">
+              <stringProp name="Argument.name">insert_result_date_3</stringProp>
+              <stringProp name="Argument.value">2000-10-10T13:37:00.000+01:00</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="observable_property_start" elementType="Argument">
+              <stringProp name="Argument.name">observable_property_start</stringProp>
+              <stringProp name="Argument.value">test-observable-property-</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="observation_type" elementType="Argument">
+              <stringProp name="Argument.name">observation_type</stringProp>
+              <stringProp name="Argument.value">http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="observation_identifier" elementType="Argument">
+              <stringProp name="Argument.name">observation_identifier</stringProp>
+              <stringProp name="Argument.value">test-observation-identifier</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="offering_identifier" elementType="Argument">
+              <stringProp name="Argument.name">offering_identifier</stringProp>
+              <stringProp name="Argument.value">test-offering-identifier</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="offering_name" elementType="Argument">
+              <stringProp name="Argument.name">offering_name</stringProp>
+              <stringProp name="Argument.value">test-offering-name</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="phenomenon_time_start" elementType="Argument">
+              <stringProp name="Argument.name">phenomenon_time_start</stringProp>
+              <stringProp name="Argument.value">1970-01-01T13:37:00.000+01:00</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="phenomenon_time_end" elementType="Argument">
+              <stringProp name="Argument.name">phenomenon_time_end</stringProp>
+              <stringProp name="Argument.value">2000-12-31T20:11:11.111+01:00</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="sensor_id" elementType="Argument">
+              <stringProp name="Argument.name">sensor_id</stringProp>
+              <stringProp name="Argument.value">test-sensor</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="sensor_description_format" elementType="Argument">
+              <stringProp name="Argument.name">sensor_description_format</stringProp>
+              <stringProp name="Argument.value">http://www.opengis.net/sensorML/1.0.1</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="template_identifier" elementType="Argument">
+              <stringProp name="Argument.name">template_identifier</stringProp>
+              <stringProp name="Argument.value">test-result-template-identifier</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="url_pattern" elementType="Argument">
+              <stringProp name="Argument.name">url_pattern</stringProp>
+              <stringProp name="Argument.value">/soap</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="feature_2_x" elementType="Argument">
+              <stringProp name="Argument.name">feature_2_x</stringProp>
+              <stringProp name="Argument.value">-108.0</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="feature_2_y" elementType="Argument">
+              <stringProp name="Argument.name">feature_2_y</stringProp>
+              <stringProp name="Argument.value">-17.0</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="phenomenon_time_start_2" elementType="Argument">
+              <stringProp name="Argument.name">phenomenon_time_start_2</stringProp>
+              <stringProp name="Argument.value">3000-01-01T13:30:00.000+01:00</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="phenomenon_time_end_2" elementType="Argument">
+              <stringProp name="Argument.name">phenomenon_time_end_2</stringProp>
+              <stringProp name="Argument.value">3500-12-31T22:00:00.000+01:00</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+          </collectionProp>
+        </Arguments>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GetCapabilities" enabled="true">
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+&lt;env:Envelope&#xd;
+    xmlns:env=&quot;http://www.w3.org/2003/05/soap-envelope&quot;&#xd;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:schemaLocation=&quot;http://www.w3.org/2003/05/soap-envelope http://www.w3.org/2003/05/soap-envelope/soap-envelope.xsd&quot;&gt;&#xd;
+    &lt;env:Body&gt;&#xd;
+        &lt;sos:GetCapabilities service=&quot;SOS&quot;&#xd;
+            xmlns:sos=&quot;http://www.opengis.net/sos/2.0&quot;&#xd;
+            xmlns:ows=&quot;http://www.opengis.net/ows/1.1&quot; xsi:schemaLocation=&quot;http://www.opengis.net/sos/2.0 http://schemas.opengis.net/sos/2.0.0/sosGetCapabilities.xsd&quot;&gt;&#xd;
+            &lt;ows:AcceptVersions&gt;&#xd;
+                &lt;ows:Version&gt;2.0.0&lt;/ows:Version&gt;&#xd;
+            &lt;/ows:AcceptVersions&gt;&#xd;
+            &lt;ows:Sections&gt;&#xd;
+                &lt;ows:Section&gt;OperationsMetadata&lt;/ows:Section&gt;&#xd;
+                &lt;ows:Section&gt;ServiceIdentification&lt;/ows:Section&gt;&#xd;
+                &lt;ows:Section&gt;ServiceProvider&lt;/ows:Section&gt;&#xd;
+                &lt;ows:Section&gt;FilterCapabilities&lt;/ows:Section&gt;&#xd;
+                &lt;ows:Section&gt;Contents&lt;/ows:Section&gt;&#xd;
+            &lt;/ows:Sections&gt;&#xd;
+        &lt;/sos:GetCapabilities&gt;&#xd;
+    &lt;/env:Body&gt;&#xd;
+&lt;/env:Envelope&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain"></stringProp>
+          <stringProp name="HTTPSampler.port"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">${sos_servlet_path}${url_pattern}</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <boolProp name="HTTPSampler.monitor">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Procedure identifier" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">//ows:Operation[@name=&apos;DescribeSensor&apos;]/ows:Parameter[@name=&apos;procedure&apos;]/ows:AllowedValues/ows:Value[text()=&quot;${sensor_id}&quot;]</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;ID" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;procedure" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../swes:procedure[text()=&quot;${sensor_id}&quot;]</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;Name" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../swes:name[text()=&quot;${offering_name}&quot;]</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;Description Format" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../swes:procedureDescriptionFormat[text()=&quot;${sensor_description_format}&quot;]</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;Observable Property" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">count(//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../swes:observableProperty[contains(text(),&quot;${observable_property_start}&quot;)])=5</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;Feature Types &quot;../SF_SamplingPoint&quot;" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">count(//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../sos:featureOfInterestType[text()=&quot;http://www.opengis.net/def/samplingFeatureType/OGC-OM/2.0/SF_SamplingPoint&quot;])=1</stringProp>
+            <boolProp name="XPath.validate">false</boolProp>
+            <boolProp name="XPath.whitespace">false</boolProp>
+            <boolProp name="XPath.tolerant">false</boolProp>
+            <boolProp name="XPath.namespace">true</boolProp>
+          </XPathAssertion>
+          <hashTree/>
+          <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="XPath: Offering-&gt;Observation Type" enabled="true">
+            <boolProp name="XPath.negate">true</boolProp>
+            <stringProp name="XPath.xpath">count(//sos:ObservationOffering/swes:identifier[text()=&quot;${offering_identifier}&quot;]/../sos:observationType[text()=&quot;http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation&quot;])=1</stringProp>
             <boolProp name="XPath.validate">false</boolProp>
             <boolProp name="XPath.whitespace">false</boolProp>
             <boolProp name="XPath.tolerant">false</boolProp>
