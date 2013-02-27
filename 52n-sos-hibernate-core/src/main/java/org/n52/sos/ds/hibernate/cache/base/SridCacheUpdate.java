@@ -23,13 +23,10 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getSpatialRefSysObjects;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
-import org.n52.sos.ds.hibernate.entities.SpatialRefSys;
 import org.n52.sos.service.Configurator;
 
 /**
