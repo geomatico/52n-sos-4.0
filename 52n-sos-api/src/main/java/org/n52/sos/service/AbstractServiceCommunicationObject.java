@@ -62,7 +62,7 @@ public abstract class AbstractServiceCommunicationObject {
     
     @Override
 	public String toString() {
-		return String.format("%s[service=%s, verion=%s]",
+		return String.format("%s[service=%s, version=%s]",
 				getClass().getName(), getService(), getVersion());
 	}
 }
