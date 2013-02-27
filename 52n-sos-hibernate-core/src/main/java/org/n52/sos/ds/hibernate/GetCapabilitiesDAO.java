@@ -137,47 +137,76 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
     public GetCapabilitiesResponse getCapabilities(GetCapabilitiesRequest request) throws OwsExceptionReport {
     	GetCapabilitiesResponse response = new GetCapabilitiesResponse();
     	response.setService(SosConstants.SOS);
-    	if (request.getVersion() == null) {
-    		if (request.getAcceptVersions() != null) {
-    			String[] acceptedVersion = request.getAcceptVersions();
-    			for (int i = 0; i < acceptedVersion.length; i++) {
-    				if (getConfigurator().getServiceOperatorRepository()
-    						.isVersionSupported(acceptedVersion[i])) {
-    					response.setVersion(acceptedVersion[i]);
-    					break;
-    				}
-    			}
-    		} else {
-    			for (String supportedVersion : getConfigurator().getServiceOperatorRepository()
-    					.getSupportedVersions()) {
-    				response.setVersion(supportedVersion);
-    				break;
-    			}
-    		}
-    	} else {
-    		response.setVersion(request.getVersion());
-    	}
-    	if (response.getVersion() == null) {
-    		String exceptionText =
-    				String.format("The requested '%s' values are not supported by this service!",
-    						SosConstants.GetCapabilitiesParams.AcceptVersions.name());
-    		LOGGER.error(exceptionText);
-    		throw Util4Exceptions.createVersionNegotiationFailedException(exceptionText);
-    	}
+    	response.setVersion(getVersionParameter(request));
 
     	Set<String> availableExtensionSections = getExtensionSections();
     	Set<String> requestedExtensionSections = new HashSet<String>(availableExtensionSections.size());
-    	// section flags
-    	int sections = 0;
+    	int requestedSections = 0;
+    	identifyRequestedSections(request, response, availableExtensionSections, requestedExtensionSections, requestedSections);
 
-    	// handle sections array and set requested sections flag
+    	SosCapabilities sosCapabilities = new SosCapabilities();
+    	addSectionSpecificContent(response, requestedExtensionSections, requestedSections, sosCapabilities);
+    	response.setCapabilities(sosCapabilities);
+    	
+    	return response;
+    }
+
+	private void addSectionSpecificContent(GetCapabilitiesResponse response,
+			Set<String> requestedExtensionSections,
+			int sections,
+			SosCapabilities sosCapabilities) throws OwsExceptionReport
+	{
+		if (isServiceIdentificationSectionRequested(sections)) 
+    	{
+    		sosCapabilities.setServiceIdentification(getServiceIdentification(response.getVersion()));
+    	}
+    	if (isServiceProviderSectionRequested(sections))
+    	{
+    		sosCapabilities.setServiceProvider(getConfigurator().getServiceProvider());
+    	}
+    	if (isOperationsMetadataSectionRequested(sections))
+    	{
+    		sosCapabilities.setOperationsMetadata(getOperationsMetadataForOperations(response.getService(),
+    				response.getVersion()));
+    	}
+    	if (isFilterCapabilitiesSectionRequested(sections))
+    	{
+    		sosCapabilities.setFilterCapabilities(getFilterCapabilities(response.getVersion()));
+    	}
+    	if (isContentsSectionRequested(sections))
+    	{
+    		if (isVersionSos2(response))
+    		{
+    			sosCapabilities.setContents(getContentsForSosV2(response.getVersion()));
+    		}
+    		else
+    		{
+    			sosCapabilities.setContents(getContents());
+    		}
+    	}
+
+    	if (isVersionSos2(response)) {
+    		if (sections == ALL) {
+    			sosCapabilities.setExensions(getAndMergeExtensions());
+    		} else if (!requestedExtensionSections.isEmpty()) {
+    			sosCapabilities.setExensions(getExtensions(requestedExtensionSections));
+    		}
+    	}
+	}
+
+	private int identifyRequestedSections(GetCapabilitiesRequest request,
+			GetCapabilitiesResponse response,
+			Set<String> availableExtensionSections,
+			Set<String> requestedExtensionSections, 
+			int sections) throws OwsExceptionReport
+	{
+		// handle sections array and set requested sections flag
     	if (request.getSections() == null) {
     		sections = ALL;
     	} else {
     		for (String section : request.getSections()) {
     			if (section.isEmpty()) {
-    				// TODO empty section does not result in an exception
-    				// report?
+    				// TODO empty section does not result in an exception - report? <-- should be done by decoder
     				continue;
     			}
     			if (section.equals(SosConstants.CapabilitiesSections.All.name())) {
@@ -191,13 +220,12 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
     				sections |= OPERATIONS_METADATA;
     			} else if ((section.equals(Sos1Constants.CapabilitiesSections.Filter_Capabilities.name()) && response
     					.getVersion().equals(Sos1Constants.SERVICEVERSION))
-    					|| (section.equals(Sos2Constants.CapabilitiesSections.FilterCapabilities.name()) && response
-    							.getVersion().equals(Sos2Constants.SERVICEVERSION))) {
+    					|| (section.equals(Sos2Constants.CapabilitiesSections.FilterCapabilities.name()) && isVersionSos2(response))) {
     				sections |= FILTER_CAPABILITIES;
     			} else if (section.equals(SosConstants.CapabilitiesSections.Contents.name())) {
     				sections |= CONTENTS;
     			} else if (availableExtensionSections.contains(section)
-    					&& response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
+    					&& isVersionSos2(response)) {
     				requestedExtensionSections.add(section);
     			} else {
     				String exceptionText =
@@ -209,40 +237,36 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
     			}
     		}
     	}
+		return sections;
+	}
 
-    	SosCapabilities sosCapabilities = new SosCapabilities();
-
-    	if ((sections & SERVICE_IDENTIFICATION) != 0) {
-    		sosCapabilities.setServiceIdentification(getServiceIdentification(response.getVersion()));
-    	}
-    	if ((sections & SERVICE_PROVIDER) != 0) {
-    		sosCapabilities.setServiceProvider(getConfigurator().getServiceProvider());
-    	}
-    	if ((sections & OPERATIONS_METADATA) != 0) {
-    		sosCapabilities.setOperationsMetadata(getOperationsMetadataForOperations(response.getService(),
-    				response.getVersion()));
-    	}
-    	if ((sections & FILTER_CAPABILITIES) != 0) {
-    		sosCapabilities.setFilterCapabilities(getFilterCapabilities(response.getVersion()));
-    	}
-    	if ((sections & CONTENTS) != 0) {
-    		if (response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
-    			sosCapabilities.setContents(getContentsForSosV2(response.getVersion()));
+	private String getVersionParameter(GetCapabilitiesRequest request) throws OwsExceptionReport
+	{
+		if (request.getVersion() == null) {
+    		if (request.getAcceptVersions() != null) {
+    			String[] acceptedVersion = request.getAcceptVersions();
+    			for (int i = 0; i < acceptedVersion.length; i++) {
+    				if (getConfigurator().getServiceOperatorRepository()
+    						.isVersionSupported(acceptedVersion[i])) {
+    					return acceptedVersion[i];
+    				}
+    			}
     		} else {
-    			sosCapabilities.setContents(getContents());
+    			for (String supportedVersion : getConfigurator().getServiceOperatorRepository()
+    					.getSupportedVersions()) {
+    				return supportedVersion;
+    			}
     		}
+    	} else {
+    		return request.getVersion();
     	}
 
-    	if (response.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
-    		if (sections == ALL) {
-    			sosCapabilities.setExensions(getAndMergeExtensions());
-    		} else if (!requestedExtensionSections.isEmpty()) {
-    			sosCapabilities.setExensions(getExtensions(requestedExtensionSections));
-    		}
-    	}
-    	response.setCapabilities(sosCapabilities);
-    	return response;
-    }
+		String exceptionText =
+				String.format("The requested '%s' values are not supported by this service!",
+						SosConstants.GetCapabilitiesParams.AcceptVersions.name());
+		LOGGER.error(exceptionText);
+		throw Util4Exceptions.createVersionNegotiationFailedException(exceptionText);
+	}
 
     private SosServiceIdentification getServiceIdentification(String version) throws OwsExceptionReport {
         SosServiceIdentification serviceIdentification = getConfigurator().getServiceIdentification();
@@ -680,7 +704,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
      * @return Extensions
      * @throws OwsExceptionReport
      */
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private List<IExtension> getAndMergeExtensions() throws OwsExceptionReport {
         Map<RequestOperatorKeyType, IRequestOperator> requestOperators = getConfigurator()
 				.getRequestOperatorRepository().getRequestOperator();
@@ -799,13 +823,11 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         Collection<String> responseFormats = SosHelper.getSupportedResponseFormats(SosConstants.SOS, version);
         sosOffering.setResponseFormats(responseFormats);
         // TODO set as property
-        if (true) {
-            responseFormats.add(SosConstants.CONTENT_TYPE_ZIP);
-        }
+        responseFormats.add(SosConstants.CONTENT_TYPE_ZIP);
     }
 
     protected void setUpProcedureDescriptionFormatForOffering(SosOfferingsForContents sosOffering) {
-        // TODO: set procDescFormat
+        // TODO: set procDescFormat <-- what is required here?
         sosOffering.setProcedureDescriptionFormat(getCacheController().getProcedureDescriptionFormats());
     }
 
@@ -821,4 +843,34 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         }
         return procedures;
     }
+    
+    private boolean isVersionSos2(GetCapabilitiesResponse response)
+	{
+		return response.getVersion().equals(Sos2Constants.SERVICEVERSION);
+	}
+
+	private boolean isContentsSectionRequested(int sections)
+	{
+		return (sections & CONTENTS) != 0;
+	}
+
+	private boolean isFilterCapabilitiesSectionRequested(int sections)
+	{
+		return (sections & FILTER_CAPABILITIES) != 0;
+	}
+
+	private boolean isOperationsMetadataSectionRequested(int sections)
+	{
+		return (sections & OPERATIONS_METADATA) != 0;
+	}
+
+	private boolean isServiceProviderSectionRequested(int sections)
+	{
+		return (sections & SERVICE_PROVIDER) != 0;
+	}
+
+	private boolean isServiceIdentificationSectionRequested(int sections)
+	{
+		return (sections & SERVICE_IDENTIFICATION) != 0;
+	}
 }
