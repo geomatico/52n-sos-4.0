@@ -86,11 +86,12 @@ public class SensorML extends AbstractSensorML {
         return members != null && !members.isEmpty();
     }
     
+    @Override
     public String getProcedureIdentifier()
     {
     	if (isWrapper() && getMembers() != null && !getMembers().isEmpty())
         {
-        	return ( (AbstractProcess)((SensorML)this).getMembers().get(0) ).getProcedureIdentifier();
+        	return this.getMembers().get(0).getProcedureIdentifier();
         }
     	return super.getProcedureIdentifier();
     }
