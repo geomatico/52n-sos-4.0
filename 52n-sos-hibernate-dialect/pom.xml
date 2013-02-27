@@ -29,12 +29,5 @@
 			<groupId>org.postgis</groupId>
 			<artifactId>postgis-jdbc</artifactId>
 		</dependency>
-		<!-- we have to include the sources as 
-		     the lib is licensed under LGPLv2.1 -->
-		<dependency>
-			<groupId>org.postgis</groupId>
-			<artifactId>postgis-jdbc</artifactId>
-			<classifier>sources</classifier>
-		</dependency>
 	</dependencies>
 </project>

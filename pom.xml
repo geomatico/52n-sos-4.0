@@ -301,20 +301,6 @@
                 <version>${logback.version}</version>
             </dependency>
             <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <classifier>sources</classifier>
-                <version>${logback.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-core</artifactId>
-                <classifier>sources</classifier>
-                <version>${logback.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-            <dependency>
                 <groupId>com.vividsolutions</groupId>
                 <artifactId>jts</artifactId>
                 <version>1.12</version>
@@ -343,13 +329,6 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-core</artifactId>
-                <classifier>sources</classifier>
-                <version>${hibernate.version}</version>
-                <scope>runtime</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-c3p0</artifactId>
                 <version>${hibernate.version}</version>
                 <exclusions>
@@ -365,23 +344,6 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-c3p0</artifactId>
-                <version>${hibernate.version}</version>
-                <classifier>sources</classifier>
-                <exclusions>
-                    <exclusion>
-                        <groupId>postgresql</groupId>
-                        <artifactId>postgresql</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-api</artifactId>
-                    </exclusion>
-                </exclusions>
-                <scope>runtime</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-spatial</artifactId>
                 <version>${hibernate.spatial.version}</version>
                 <exclusions>
@@ -394,43 +356,6 @@
                         <artifactId>postgresql</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-spatial</artifactId>
-                <classifier>sources</classifier>
-                <version>${hibernate.spatial.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.postgis</groupId>
-                        <artifactId>postgis-jdbc</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>postgresql</groupId>
-                        <artifactId>postgresql</artifactId>
-                    </exclusion>
-                </exclusions>
-                <scope>runtime</scope>
-            </dependency>
-            <dependency>
-                <groupId>c3p0</groupId>
-                <artifactId>c3p0</artifactId>
-                <classifier>sources</classifier>
-                <version>0.9.1</version>
-                <scope>runtime</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.common</groupId>
-                <artifactId>hibernate-commons-annotations</artifactId>
-                <classifier>sources</classifier>
-                <version>4.0.1.Final</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-api</artifactId>
-                    </exclusion>
-                </exclusions>
-                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>postgresql</groupId>
@@ -441,13 +366,6 @@
                 <groupId>org.postgis</groupId>
                 <artifactId>postgis-jdbc</artifactId>
                 <version>${postgis.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.postgis</groupId>
-                <artifactId>postgis-jdbc</artifactId>
-                <version>${postgis.version}</version>
-                <scope>runtime</scope>
-                <classifier>sources</classifier>
             </dependency>
             <dependency>
                 <groupId>org.xerial</groupId>
