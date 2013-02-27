@@ -23,7 +23,7 @@
  */
 package org.n52.sos.cache.action;
 
-import static org.n52.sos.util.CollectionHelper.synchronizedArrayList;
+import static org.n52.sos.util.CollectionHelper.synchronizedList;
 
 import java.util.Collection;
 import java.util.List;
@@ -125,7 +125,7 @@ public class ResultInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
 	{
 		if(!getCache().getKResultTemplateVFeaturesOfInterest().containsKey(resultTemplateIdentifier))
 		{
-			Collection<String> featureOfInterestIdentifiers = synchronizedArrayList(1);
+			Collection<String> featureOfInterestIdentifiers = synchronizedList(1);
 			getCache().getKResultTemplateVFeaturesOfInterest().put(resultTemplateIdentifier, featureOfInterestIdentifiers);
 		}
 		getCache().getKResultTemplateVFeaturesOfInterest().get(resultTemplateIdentifier).add(featureOfInterestIdentifier);
@@ -143,7 +143,7 @@ public class ResultInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
 	{
 		if(!getCache().getKResultTemplateVObservedProperties().containsKey(resultTemplateIdentifier))
 		{
-			Collection<String> observedPropertyIdentifiers = synchronizedArrayList(1);
+			Collection<String> observedPropertyIdentifiers = synchronizedList(1);
 			getCache().getKResultTemplateVObservedProperties().put(resultTemplateIdentifier, observedPropertyIdentifiers);
 		}
 		getCache().getKResultTemplateVObservedProperties().get(resultTemplateIdentifier).add(observablePropertyIdentifier);

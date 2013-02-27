@@ -24,7 +24,7 @@
 package org.n52.sos.ds.hibernate.cache.base;
 
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getResultTemplateObjects;
-import static org.n52.sos.util.CollectionHelper.synchronizedArrayList;
+import static org.n52.sos.util.CollectionHelper.synchronizedList;
 
 import java.util.Collection;
 import java.util.List;
@@ -75,7 +75,7 @@ public class ResultTemplateCacheUpdate extends CacheUpdate {
 	{
 		if(!getCache().getKResultTemplateVFeaturesOfInterest().containsKey(resultTemplateIdentifier))
 		{
-			Collection<String> featureOfInterestIdentifiers = synchronizedArrayList(1);
+            Collection<String> featureOfInterestIdentifiers = synchronizedList(1);
 			getCache().getKResultTemplateVFeaturesOfInterest().put(resultTemplateIdentifier, featureOfInterestIdentifiers);
 		}
 		getCache().getKResultTemplateVObservedProperties().get(resultTemplateIdentifier).add(featureOfInterestIdentifier);
@@ -90,7 +90,7 @@ public class ResultTemplateCacheUpdate extends CacheUpdate {
 	{
 		if(!getCache().getKResultTemplateVObservedProperties().containsKey(resultTemplateIdentifier))
 		{
-			Collection<String> observedPropertyIdentifiers = synchronizedArrayList(1);
+			Collection<String> observedPropertyIdentifiers = synchronizedList(1);
 			getCache().getKResultTemplateVObservedProperties().put(resultTemplateIdentifier, observedPropertyIdentifiers);
 		}
 		getCache().getKResultTemplateVObservedProperties().get(resultTemplateIdentifier).add(observablePropertyIdentifier);
@@ -105,7 +105,7 @@ public class ResultTemplateCacheUpdate extends CacheUpdate {
 	{
 		if (!getCache().getKOfferingVResultTemplates().containsKey(offeringIdentifier))
 		{
-			Collection<String> resultTemplateIdentifiers = synchronizedArrayList(1);
+			Collection<String> resultTemplateIdentifiers = synchronizedList(1);
 			getCache().getKOfferingVResultTemplates().put(offeringIdentifier, resultTemplateIdentifiers);
 		}
 		getCache().getKOfferingVResultTemplates().get(offeringIdentifier).add(resultTemplateIdentifier);

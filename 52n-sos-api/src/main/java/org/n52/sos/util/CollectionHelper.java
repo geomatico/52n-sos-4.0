@@ -35,11 +35,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class CollectionHelper {
-
     public static <T> Set<T> set(final T... elements) {
         HashSet<T> set = new HashSet<T>(elements.length);
         Collections.addAll(set, elements);
@@ -50,7 +48,7 @@ public class CollectionHelper {
         return new HashSet<T>();
     }
 
-    public static <K,V> Map<K,V> map() {
+    public static <K, V> Map<K, V> map() {
         return new HashMap<K, V>();
     }
 
@@ -61,6 +59,7 @@ public class CollectionHelper {
     public static <T> Collection<T> collection() {
         return list();
     }
+
     public static <T> Collection<T> collection(T... elements) {
         return list(elements);
     }
@@ -82,8 +81,8 @@ public class CollectionHelper {
 
     public static <T> Set<T> asSet(final Iterable<? extends T> iterable) {
         return (iterable instanceof Collection)
-                ? new HashSet<T>((Collection<? extends T>) iterable)
-                : new HashSet<T>() {
+               ? new HashSet<T>((Collection<? extends T>) iterable)
+               : new HashSet<T>() {
             {
                 for (T t : iterable) {
                     add(t);
@@ -109,19 +108,18 @@ public class CollectionHelper {
     }
 
     public static <T> List<T> asList(final T t, final T... ts) {
-        ArrayList<T> list = new ArrayList<T>(ts.length+1);
+        ArrayList<T> list = new ArrayList<T>(ts.length + 1);
         list.add(t);
         Collections.addAll(list, ts);
         return list;
     }
 
-	 public static <T> List<T> conjunctCollections(
-            Collection<T> list1, Collection<T> list2) {
-		HashSet<T> s1 = new HashSet<T>(list1);
-		s1.retainAll(list2);
-		return new ArrayList<T>(s1);
-	}
-     
+    public static <T> List<T> conjunctCollections(Collection<T> list1, Collection<T> list2) {
+        HashSet<T> s1 = new HashSet<T>(list1);
+        s1.retainAll(list2);
+        return new ArrayList<T>(s1);
+    }
+
     public static <K, V> Map<K, V> synchronizedInitialSizeMapWithLoadFactor1(final int capacity) {
         return CollectionHelper.synchronizedMap(capacity, 1.0F);
     }
@@ -129,31 +127,54 @@ public class CollectionHelper {
     public static <K, V> Map<K, V> synchronizedMap(int initialCapacity) {
         return Collections.synchronizedMap(new HashMap<K, V>(initialCapacity));
     }
-    
+
     protected static <K, V> Map<K, V> synchronizedMap(int initialCapacity, float loadFactor) {
         return Collections.synchronizedMap(new HashMap<K, V>(initialCapacity, loadFactor));
     }
-    
+
+    /**
+     * Constructs a new synchronized {@code Set} based on a {@link HashSet}.
+     *
+     * @return a synchronized Set
+     */
     public static <T> Set<T> synchronizedSet() {
         return Collections.synchronizedSet(new HashSet<T>());
     }
-    
-    public static <E> List<E> synchronizedLinkedList() {
+
+    /**
+     * Constructs a new synchronized {@code Set} based on a {@link HashSet} with the specified {@code initialCapacity}.
+     *
+     * @param initialCapacity the initial capacity of the set
+     *
+     * @return a synchronized Set
+     */
+    public static <T> Set<T> synchronizedSet(int initialCapacity) {
+        return Collections.synchronizedSet(new HashSet<T>(initialCapacity));
+    }
+
+    /**
+     * Constructs a new synchronized {@code List} based on a {@link LinkedList}.
+     *
+     * @return a synchronized List
+     */
+    public static <E> List<E> synchronizedList() {
         return Collections.synchronizedList(new LinkedList<E>());
     }
-    
-    public static <E> List<E> synchronizedArrayList(int initialCapacity) {
+
+    /**
+     * Constructs a new synchronized {@code List} based on a {@link ArrayList} with the specified
+     * {@code initialCapacity}.
+     *
+     * @param initialCapacity the initial capacity of the array list
+     *
+     * @return a synchronized List
+     */
+    public static <E> List<E> synchronizedList(int initialCapacity) {
         return Collections.synchronizedList(new ArrayList<E>(initialCapacity));
     }
 
     private CollectionHelper() {
     }
-
-	public static List<String> createStringListWithValue(String value) {
-	    List<String> list = new ArrayList<String>(1);
-	    list.add(value);
-	    return list;
-	}
 
 	/**
 	 * @param collectionOfCollection a Collection&lt;Collection&lt;String>>

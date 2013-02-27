@@ -92,13 +92,12 @@ public class JavaHelper {
             stringBuilder.append(message);
             stringBuilder.append("\n");
         }
-     }
+    }
 
-    
     /**
-	 * @deprecated Use {@link CollectionHelper#createStringListWithValue(String)} instead
-	 */
-	public static List<String> createStringListWithValue(String value) {
-		return CollectionHelper.createStringListWithValue(value);
-	}
+     * @deprecated Use {@link CollectionHelper#asList(T, T[]) } instead
+     */
+    public static List<String> createStringListWithValue(String value) {
+        return CollectionHelper.asList(value);
+    }
 }

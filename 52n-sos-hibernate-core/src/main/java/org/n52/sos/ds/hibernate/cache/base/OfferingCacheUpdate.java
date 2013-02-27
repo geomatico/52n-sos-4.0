@@ -86,7 +86,7 @@ public class OfferingCacheUpdate extends CacheUpdate {
         LOGGER.debug("multithreading init");
         
         offeringThreadsRunning = new CountDownLatch(offerings.size());
-        errors = CollectionHelper.synchronizedLinkedList();
+        errors = CollectionHelper.synchronizedList();
 
         try {
             queueTasks(offerings, offeringCache);
