@@ -84,7 +84,7 @@ public abstract class AbstractServiceRequest extends AbstractServiceCommunicatio
 
 	@Override
 	public String toString() {
-		return String.format("%s[service=%s, verion=%s, operation=%s]",
+		return String.format("%s[service=%s, version=%s, operation=%s]",
 				getClass().getName(),
 				getService(), getVersion(), getOperationName());
 	}
