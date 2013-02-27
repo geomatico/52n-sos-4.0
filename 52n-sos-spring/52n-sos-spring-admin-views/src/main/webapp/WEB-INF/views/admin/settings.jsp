@@ -27,10 +27,25 @@
 <jsp:include page="../common/header.jsp">
     <jsp:param name="activeMenu" value="admin" />
 </jsp:include>
-<jsp:include page="../common/logotitle.jsp">
-	<jsp:param name="title" value="Change SOS Configuration" />
-	<jsp:param name="leadParagraph" value="You can download the current configuration <a href=\"settings.json\" target=\"_blank\">here</a> to backup or use it for a new SOS installation." />
-</jsp:include>
+
+<div class="row">
+    <div class="span9">
+        <h2>Change SOS Configuration</h2>
+        <p class="lead">You can change the current SOS settings or export the settings to back them up and use them in another installation.</p>
+    </div>
+    <div class="span3 header-img-span">
+        <div class="row">
+            <div class="span3">
+                <img src="/52n-sos-webapp/static/images/52n-logo-220x80.png" />    
+            </div>
+        </div>
+        <div class="row">
+            <div class="span3">
+                <a id="export" class="btn btn-block btn-info" href="settings.json" target="_blank">Export Settings</a>    
+            </div>
+        </div>
+    </div>
+</div>
 
 <form id="settings" class="form-horizontal"></form>
 <script type="text/javascript">
