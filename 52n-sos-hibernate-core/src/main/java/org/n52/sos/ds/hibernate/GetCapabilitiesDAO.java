@@ -141,8 +141,8 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     	Set<String> availableExtensionSections = getExtensionSections();
     	Set<String> requestedExtensionSections = new HashSet<String>(availableExtensionSections.size());
-    	int requestedSections = 0;
-    	identifyRequestedSections(request, response, availableExtensionSections, requestedExtensionSections, requestedSections);
+        int requestedSections =
+            identifyRequestedSections(request, response, availableExtensionSections, requestedExtensionSections);
 
     	SosCapabilities sosCapabilities = new SosCapabilities();
     	addSectionSpecificContent(response, requestedExtensionSections, requestedSections, sosCapabilities);
@@ -197,9 +197,9 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 	private int identifyRequestedSections(GetCapabilitiesRequest request,
 			GetCapabilitiesResponse response,
 			Set<String> availableExtensionSections,
-			Set<String> requestedExtensionSections, 
-			int sections) throws OwsExceptionReport
-	{
+			Set<String> requestedExtensionSections) throws OwsExceptionReport
+    {
+        int sections = 0;
 		// handle sections array and set requested sections flag
     	if (request.getSections() == null) {
     		sections = ALL;
