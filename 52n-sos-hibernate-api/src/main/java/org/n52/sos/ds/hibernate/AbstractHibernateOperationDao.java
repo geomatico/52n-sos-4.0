@@ -47,7 +47,16 @@ public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao
 
     @Override
     public final OWSOperation getOperationsMetadata(String service, String version) throws OwsExceptionReport {
-        return getOperationsMetadata(service, version);
+        Map<String, List<String>> dcp =  getDCP(new OperationDecoderKey(service, version, getOperationName()));
+        if (dcp == null || dcp.isEmpty()) {
+            LOGGER.debug("Operation {} not available due to empty DCP map.", getOperationName());
+            return null;
+        }
+        OWSOperation operation = new OWSOperation();
+        operation.setDcp(dcp);
+        operation.setOperationName(getOperationName());
+        setOperationsMetadata(operation, service, version);
+        return operation;
     }
 
     @Override
@@ -68,18 +77,9 @@ public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao
     	return null;
     }
 
+    @Deprecated
     protected OWSOperation getOperationsMetadata(String service, String version, Session session) throws OwsExceptionReport {
-
-        Map<String, List<String>> dcp =  getDCP(new OperationDecoderKey(service, version, getOperationName()));
-        if (dcp == null || dcp.isEmpty()) {
-            LOGGER.debug("Operation {} not available due to empty DCP map.", getOperationName());
-            return null;
-        }
-        OWSOperation operation = new OWSOperation();
-        operation.setDcp(dcp);
-        operation.setOperationName(getOperationName());
-        setOperationsMetadata(operation, service, version);
-        return operation;
+        return getOperationsMetadata(service, version);
     }
 
 	/**
