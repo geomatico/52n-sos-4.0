@@ -184,7 +184,12 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         Map<ISettingDefinition<?, ?>, ISettingValue<?>> settingsByDefinition = new HashMap<ISettingDefinition<?, ?>, ISettingValue<?>>(values
                 .size());
         for (ISettingValue<?> value : values) {
-            settingsByDefinition.put(getSettingDefinitionRepository().getDefinition(value.getKey()), value);
+            final ISettingDefinition<?, ?> definition = getSettingDefinitionRepository().getDefinition(value.getKey());
+            if (definition != null) {
+                log.warn("No definition for '{}' found.", value.getKey());
+            } else {
+                settingsByDefinition.put(definition, value);
+            }
         }
         HashSet<ISettingDefinition<?, ?>> nullValues = new HashSet<ISettingDefinition<?, ?>>(getSettingDefinitions());
         nullValues.removeAll(settingsByDefinition.keySet());
