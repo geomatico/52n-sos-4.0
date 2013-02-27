@@ -485,7 +485,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
                     setUpPhenomenaForOffering(offering, procedure, sosOffering);
                     setUpTimeForOffering(offering, ++phenTimeCounter, sosOffering);
-                    setUpFeaturesForOffering(offering, version, procedure, sosOffering);
+                    setUpRelatedFeaturesForOffering(offering, version, procedure, sosOffering);
                     setUpFeatureOfInterestTypesForOffering(offering, sosOffering);
                     setUpProcedureDescriptionFormatForOffering(sosOffering);
                     setUpResponseFormatForOffering(version, sosOffering);
@@ -774,7 +774,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     }
 
-    protected void setUpFeaturesForOffering(String offering, String version, String procedure,
+    protected void setUpRelatedFeaturesForOffering(String offering, String version, String procedure,
             SosOfferingsForContents sosOffering) throws OwsExceptionReport {
         Map<String, Collection<String>> relatedFeatures = new HashMap<String, Collection<String>>();
         Map<String, Collection<String>> relatedFeaturesForAllOfferings = getCacheController().getKOfferingVRelatedFeatures();
@@ -810,13 +810,18 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         sosOffering.setTime(new TimePeriod(minDate, maxDate, phenTimeId));
     }
 
+    // if no foi contained, set allowed foitypes
     protected void setUpFeatureOfInterestTypesForOffering(String offering, SosOfferingsForContents sosOffering) {
-        // if no foi contained, set allowed foitypes
-    	Collection<String> featuresOrFeatureTypes = getCacheController().getKOfferingVFeatures().get(offering);
-        if (featuresOrFeatureTypes == null || featuresOrFeatureTypes.isEmpty()) {
-        	featuresOrFeatureTypes = getCacheController().getFeatureOfInterestTypes();
+        Collection<String> features = getCacheController().getKOfferingVFeatures().get(offering);
+        if (features == null || features.isEmpty()) {
+        	sosOffering.setFeatureOfInterestTypes(getCacheController().getFeatureOfInterestTypes());
         }
-        sosOffering.setFeatureOfInterestTypes(featuresOrFeatureTypes);
+        else
+        {
+        	// TODO reduce list of feature types to the really available in this offering -> requires additional map in cache
+        	sosOffering.setFeatureOfInterestTypes(getCacheController().getFeatureOfInterestTypes());
+        	sosOffering.setFeatureOfInterest(features);  // TODO seems to be useless somehow
+        }
     }
 
     protected void setUpResponseFormatForOffering(String version, SosOfferingsForContents sosOffering) {

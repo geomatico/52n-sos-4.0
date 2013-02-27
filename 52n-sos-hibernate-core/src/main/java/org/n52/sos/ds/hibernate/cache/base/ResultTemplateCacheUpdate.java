@@ -78,8 +78,7 @@ public class ResultTemplateCacheUpdate extends CacheUpdate {
             Collection<String> featureOfInterestIdentifiers = synchronizedList(1);
 			getCache().getKResultTemplateVFeaturesOfInterest().put(resultTemplateIdentifier, featureOfInterestIdentifiers);
 		}
-        getCache().getKResultTemplateVFeaturesOfInterest().get(resultTemplateIdentifier)
-                .add(featureOfInterestIdentifier);
+		getCache().getKResultTemplateVFeaturesOfInterest().get(resultTemplateIdentifier).add(featureOfInterestIdentifier);
 		LOGGER.debug("Result Template '{}' to feature of interest '{}' relation added to cache? {}",
 				resultTemplateIdentifier,
 				featureOfInterestIdentifier,
