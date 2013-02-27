@@ -65,23 +65,24 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
     public String getOperationName() {
         return OPERATION_NAME;
     }
-    
+
     @Override
-    public void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
-            throws OwsExceptionReport {
-        
+    public void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
+
         Collection<String> featureIDs = SosHelper.getFeatureIDs(getCacheController().getFeatureOfInterest(), version);
-        
+
         if (getConfigurator().getActiveProfile().isShowFullOperationsMetadataForObservations()) {
-            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCacheController().getProcedures());
-            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCacheController().getObservableProperties());
+            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCacheController()
+                    .getProcedures());
+            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty,
+                    getCacheController().getObservableProperties());
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.featureOfInterest, featureIDs);
         } else {
             opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.procedure);
             opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.observedProperty);
             opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.featureOfInterest);
         }
-        
+
         // TODO constraint srid
         String parameterName = Sos2Constants.GetFeatureOfInterestParams.spatialFilter.name();
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
@@ -92,7 +93,7 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
         if (featureIDs != null && !featureIDs.isEmpty()) {
             envelope = getCacheController().getGlobalEnvelope();
         }
-        
+
         if (envelope != null) {
             opsMeta.addRangeParameterValue(parameterName, SosHelper.getMinMaxFromEnvelope(envelope.getEnvelope()));
         } else {
@@ -103,77 +104,73 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
     @Override
     public GetFeatureOfInterestResponse getFeatureOfInterest(GetFeatureOfInterestRequest request)
             throws OwsExceptionReport {
-        if (request instanceof GetFeatureOfInterestRequest) {
-            Session session = null;
-            try {
-                session = getSession();
-                if (request.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
-                	// sos 1.0.0 either or
-                	if ((request.getFeatureIdentifiers() != null && !request.getFeatureIdentifiers()
-                            .isEmpty()) && (request.getSpatialFilters() != null && !request .getSpatialFilters().isEmpty())) {
-                		String exceptionText = "Only one out of featureofinterestid or location possible";
-                		OwsExceptionReport owse = new OwsExceptionReport();
-                		Util4Exceptions.createNoApplicableCodeException(owse, exceptionText);
-                		throw owse;
-                	} else if ((request.getFeatureIdentifiers() != null && !request.getFeatureIdentifiers()
-                                .isEmpty()) || (request.getSpatialFilters() != null && !request .getSpatialFilters().isEmpty())) {
-                        // good
-                		Set<String> foiIDs = new HashSet<String>(queryFeatureIdentifiersForParameter(request, session));
-                        // feature of interest
-                        SosFeatureCollection featureCollection =
-                                new SosFeatureCollection(getConfigurator().getFeatureQueryHandler()
-                                        .getFeatures(new ArrayList<String>(foiIDs), request.getSpatialFilters(),
-                                                session, request.getVersion(), -1));
-                        GetFeatureOfInterestResponse response = new GetFeatureOfInterestResponse();
-                        response.setService(request.getService());
-                        response.setVersion(request.getVersion());
-                        response.setAbstractFeature(featureCollection);
-                        return response;
-                	} else {
-                		OwsExceptionReport owse =
-                            Util4Exceptions
-                                    .createMissingParameterValueException(Sos1Constants.GetFeatureOfInterestParams.featureOfInterestID
-                                            .name());
-                		owse.addOwsExceptionReport(Util4Exceptions
-                            .createMissingParameterValueException(Sos1Constants.GetFeatureOfInterestParams.location
-                                    .name()));
-                		throw owse;
-                	}
-                } else {
+        Session session = null;
+        try {
+            session = getSession();
+            if (request.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
+                // sos 1.0.0 either or
+                if ((request.getFeatureIdentifiers() != null && !request.getFeatureIdentifiers().isEmpty())
+                        && (request.getSpatialFilters() != null && !request.getSpatialFilters().isEmpty())) {
+                    String exceptionText = "Only one out of featureofinterestid or location possible";
+                    OwsExceptionReport owse = new OwsExceptionReport();
+                    Util4Exceptions.createNoApplicableCodeException(owse, exceptionText);
+                    throw owse;
+                } else if ((request.getFeatureIdentifiers() != null && !request.getFeatureIdentifiers().isEmpty())
+                        || (request.getSpatialFilters() != null && !request.getSpatialFilters().isEmpty())) {
+                    // good
                     Set<String> foiIDs = new HashSet<String>(queryFeatureIdentifiersForParameter(request, session));
                     // feature of interest
                     SosFeatureCollection featureCollection =
-                            new SosFeatureCollection(getConfigurator().getFeatureQueryHandler()
-                                    .getFeatures(new ArrayList<String>(foiIDs), request.getSpatialFilters(),
-                                            session, request.getVersion(), -1));
+                            new SosFeatureCollection(getConfigurator().getFeatureQueryHandler().getFeatures(
+                                    new ArrayList<String>(foiIDs), request.getSpatialFilters(), session,
+                                    request.getVersion(), -1));
                     GetFeatureOfInterestResponse response = new GetFeatureOfInterestResponse();
                     response.setService(request.getService());
                     response.setVersion(request.getVersion());
                     response.setAbstractFeature(featureCollection);
                     return response;
+                } else {
+                    OwsExceptionReport owse =
+                            Util4Exceptions
+                                    .createMissingParameterValueException(Sos1Constants.GetFeatureOfInterestParams.featureOfInterestID
+                                            .name());
+                    owse.addOwsExceptionReport(Util4Exceptions
+                            .createMissingParameterValueException(Sos1Constants.GetFeatureOfInterestParams.location
+                                    .name()));
+                    throw owse;
                 }
-            } catch (HibernateException he) {
-                String exceptionText = "Error while querying feature of interest data!";
-                LOGGER.error(exceptionText, he);
-                throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
-            } finally {
-                returnSession(session);
+            } else {
+                Set<String> foiIDs = new HashSet<String>(queryFeatureIdentifiersForParameter(request, session));
+                // feature of interest
+                SosFeatureCollection featureCollection =
+                        new SosFeatureCollection(getConfigurator().getFeatureQueryHandler().getFeatures(
+                                new ArrayList<String>(foiIDs), request.getSpatialFilters(), session,
+                                request.getVersion(), -1));
+                GetFeatureOfInterestResponse response = new GetFeatureOfInterestResponse();
+                response.setService(request.getService());
+                response.setVersion(request.getVersion());
+                response.setAbstractFeature(featureCollection);
+                return response;
             }
-        } else {
-            String exceptionText = "The SOS request is not a SosGetObservationRequest!";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        } catch (HibernateException he) {
+            String exceptionText = "Error while querying feature of interest data!";
+            LOGGER.error(exceptionText, he);
+            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+        } finally {
+            returnSession(session);
         }
     }
 
     private List<String> queryFeatureIdentifiersForParameter(GetFeatureOfInterestRequest sosRequest, Session session)
             throws OwsExceptionReport {
-        // TODO get foi ids from foi table. Else only fois returned which relates to observations.
+        // TODO get foi ids from foi table. Else only fois returned which
+        // relates to observations.
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
-//        String obsAlias = HibernateCriteriaQueryUtilities.addObservationAliasToMap(aliases, null);
-        String obsConstAlias =
-                HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
+        // String obsAlias =
+        // HibernateCriteriaQueryUtilities.addObservationAliasToMap(aliases,
+        // null);
+        String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
         // featureOfInterest identifiers
         if (sosRequest.isSetFeatureOfInterestIdentifiers()) {
             String foiAlias = HibernateCriteriaQueryUtilities.addFeatureOfInterestAliasToMap(aliases, null);
@@ -197,7 +194,8 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
         }
         // temporal filters
         if (sosRequest.isSetTemporalFilters()) {
-            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(sosRequest.getTemporalFilters()));
+            queryObject.addCriterion(HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(sosRequest
+                    .getTemporalFilters()));
         }
         queryObject.setAliases(aliases);
         return HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(queryObject, session);
