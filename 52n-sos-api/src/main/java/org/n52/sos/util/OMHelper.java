@@ -43,6 +43,10 @@ public class OMHelper {
                 || featureType.equals(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_CURVE)
                 || featureType.equals(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_SURFACE)) {
             return SFConstants.NS_SAMS;
+        } else if (featureType.equals(SFConstants.FT_SAMPLINGPOINT)
+                || featureType.equals(SFConstants.FT_SAMPLINGCURVE)
+                || featureType.equals(SFConstants.FT_SAMPLINGSURFACE)) {
+            return SFConstants.NS_SA;
         }
         return null;
     }
@@ -56,24 +60,19 @@ public class OMHelper {
         }
         return true;
     }
-    
+
     public static String getObservationTypeFromValue(Object value) {
         if (value instanceof BooleanValue) {
             return OMConstants.OBS_TYPE_TRUTH_OBSERVATION;
-        }
-        else if (value instanceof CategoryValue) {
+        } else if (value instanceof CategoryValue) {
             return OMConstants.OBS_TYPE_CATEGORY_OBSERVATION;
-        }
-        else if (value instanceof CountValue) {
+        } else if (value instanceof CountValue) {
             return OMConstants.OBS_TYPE_COUNT_OBSERVATION;
-        }
-        else if (value instanceof QuantityValue) {
+        } else if (value instanceof QuantityValue) {
             return OMConstants.OBS_TYPE_MEASUREMENT;
-        }
-        else if (value instanceof TextValue){
+        } else if (value instanceof TextValue) {
             return OMConstants.OBS_TYPE_TEXT_OBSERVATION;
-        }
-        else if (value instanceof SweDataArrayValue) {
+        } else if (value instanceof SweDataArrayValue) {
             return OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION;
         }
         return null;
