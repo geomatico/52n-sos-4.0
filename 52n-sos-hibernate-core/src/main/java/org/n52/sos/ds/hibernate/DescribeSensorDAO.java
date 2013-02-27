@@ -108,7 +108,7 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
             
             Collection<String> features = getFeatureOfInterestIDsForProcedure(request.getProcedure(), request.getVersion(), session);
             if (features != null && !features.isEmpty()) {
-                result.addFeatureOfInterst(new HashSet<String>(features), request.getProcedure());
+                result.addFeatureOfInterest(new HashSet<String>(features), request.getProcedure());
             }
 
             // parent procs

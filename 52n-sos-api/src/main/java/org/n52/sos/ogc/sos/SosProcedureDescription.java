@@ -72,7 +72,7 @@ public abstract class SosProcedureDescription {
         featureOfInterestForProcedure.putAll(features);
     }
     
-    public void addFeatureOfInterst(Set<String> feature, String procedureIdentifier) {
+    public void addFeatureOfInterest(Set<String> feature, String procedureIdentifier) {
         if (isSetFeatureOfInterest(procedureIdentifier)) {
             Set<String> set = featureOfInterestForProcedure.get(procedureIdentifier);
             set.addAll(feature);
@@ -82,7 +82,7 @@ public abstract class SosProcedureDescription {
         }
     }
     
-    public void addFeatureOfInterst(String featureIdentifier, String procedureIdentifier) {
+    public void addFeatureOfInterest(String featureIdentifier, String procedureIdentifier) {
         if (isSetFeatureOfInterest(procedureIdentifier)) {
             Set<String> set = featureOfInterestForProcedure.get(procedureIdentifier);
             set.add(featureIdentifier);
