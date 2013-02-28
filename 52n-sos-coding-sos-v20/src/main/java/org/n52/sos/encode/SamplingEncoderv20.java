@@ -175,7 +175,8 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
             // TODO: CHECK
             if (sampFeat.getSampledFeatures() != null && !sampFeat.getSampledFeatures().isEmpty()) {
                 for (SosAbstractFeature sampledFeature : sampFeat.getSampledFeatures()) {
-                    xbSampFeature.addNewSampledFeature().set(createFeature(sampledFeature));
+                    XmlObject encodeObjectToXml = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, sampledFeature);
+                    xbSampFeature.addNewSampledFeature().set(encodeObjectToXml);
                 }
             } else {
                 xbSampFeature.addNewSampledFeature().setHref(GMLConstants.NIL_UNKNOWN);
@@ -187,9 +188,9 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
                     Configurator.getInstance().getCodingRepository()
                             .getEncoder(CodingHelper.getEncoderKey(GMLConstants.NS_GML_32, sampFeat.getGeometry()));
             if (encoder != null) {
-                Map<HelperValues, String> additionalValues = new EnumMap<HelperValues, String>(HelperValues.class);
-                additionalValues.put(HelperValues.GMLID, absFeature.getGmlId());
-                XmlObject xmlObject = encoder.encode(sampFeat.getGeometry(), additionalValues);
+                Map<HelperValues, String> gmlAdditionalValues = new EnumMap<HelperValues, String>(HelperValues.class);
+                gmlAdditionalValues.put(HelperValues.GMLID, absFeature.getGmlId());
+                XmlObject xmlObject = encoder.encode(sampFeat.getGeometry(), gmlAdditionalValues);
                 xbShape.addNewAbstractGeometry().set(xmlObject);
                 XmlHelper.substituteElement(xbShape.getAbstractGeometry(), xmlObject);
                 // encoder.substitute(xbShape.getAbstractGeometry(), xmlObject);

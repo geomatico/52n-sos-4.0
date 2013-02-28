@@ -172,15 +172,23 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
 
     private XmlObject createFeaturePropertyType(SosAbstractFeature feature, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         FeaturePropertyType featurePropertyType = FeaturePropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-        SosSamplingFeature samplingFeature = (SosSamplingFeature) feature;
-        if ((additionalValues.containsKey(HelperValues.ENCODE) && additionalValues.get(HelperValues.ENCODE).equals("false")) || !(feature instanceof SosSamplingFeature)) {
+        if (!(feature instanceof SosSamplingFeature)) {
             featurePropertyType.setHref(feature.getIdentifier().getValue());
             return featurePropertyType;
         } else {
+            SosSamplingFeature samplingFeature = (SosSamplingFeature) feature;
             if (samplingFeature.isSetGmlID()) {
                 featurePropertyType.setHref("#" + samplingFeature.getGmlId());
                 return featurePropertyType;
             } else {
+                if (additionalValues.containsKey(HelperValues.ENCODE) && additionalValues.get(HelperValues.ENCODE).equals("false") || !samplingFeature.isEncode()) {
+                    featurePropertyType.setHref(feature.getIdentifier().getValue());
+                    if (feature instanceof SosSamplingFeature) {
+                        if (samplingFeature.isSetNames()) {
+                            featurePropertyType.setTitle(samplingFeature.getFirstName().getValue());
+                        }
+                    } 
+                }
                 if (!samplingFeature.isSetGeometry()) {
                     featurePropertyType.setHref(samplingFeature.getIdentifier().getValue());
                     if (samplingFeature.isSetNames()) {

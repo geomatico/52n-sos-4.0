@@ -49,6 +49,7 @@ public class SosSamplingFeature extends SosAbstractFeature {
     private String featureType = OGCConstants.UNKNOWN;
     private String url;
     private List<SosAbstractFeature> sampledFeatures;
+    private boolean encode = true;
 
     /**
      * constructor
@@ -162,6 +163,14 @@ public class SosSamplingFeature extends SosAbstractFeature {
 
     public boolean isSetGeometry() {
         return geometry != null && !geometry.isEmpty();
+    }
+
+    public boolean isEncode() {
+        return encode;
+    }
+
+    public void setEncode(boolean encode) {
+        this.encode = encode;
     }
 
     @Override
