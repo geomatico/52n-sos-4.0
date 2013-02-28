@@ -55,6 +55,6 @@ public class GetInvolvedController extends AbstractController {
         }
 
         return new ModelAndView(ControllerConstants.Views.GET_INVOLVED, SERVICE_URL_MODEL_ATTRIBUTE,
-                                (setting == null) ? "" : setting.getValue());
+                                (setting == null) ? "" : setting.getValue() == null ? "" : setting.getValue());
     }
 }
