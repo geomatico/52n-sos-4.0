@@ -185,7 +185,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
                 .size());
         for (ISettingValue<?> value : values) {
             final ISettingDefinition<?, ?> definition = getSettingDefinitionRepository().getDefinition(value.getKey());
-            if (definition != null) {
+            if (definition == null) {
                 log.warn("No definition for '{}' found.", value.getKey());
             } else {
                 settingsByDefinition.put(definition, value);
