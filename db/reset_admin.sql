@@ -23,6 +23,6 @@
 --
 
 -- sets the password to 'password'
-UPDATE global_settings 
-SET value = '$2a$10$vbp9aXCDMP/fXwEsqe/1.eon44mMdUyC4ub2JfOrkPfaer5ciLOly' 
-WHERE key = 'admin_password';
+UPDATE administrator_user 
+SET password = '$2a$10$vbp9aXCDMP/fXwEsqe/1.eon44mMdUyC4ub2JfOrkPfaer5ciLOly' 
+WHERE username = 'admin';
