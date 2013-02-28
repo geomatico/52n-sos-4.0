@@ -52,19 +52,19 @@
 			<td><a href='http://opensource.org/licenses/mit-license.php'>MIT</a></td>
 		</tr>
 		<tr>
-			<td><a href='http://jquery.com/'>Codemirror</a></td>
+			<td><a href='http://jquery.com/'>JQuery</a></td>
 			<td>2.34</td>
-			<td><a href='http://opensource.org/licenses/mit-license.php'>MIT</a></td>
+			<td><a href='http://jquery.org/license/'>MIT</a></td>
 		</tr>
 		<tr>
-			<td><a href='http://blog.stevenlevithan.com/'>JQuery</a></td>
+			<td><a href='http://blog.stevenlevithan.com/'>parseuri</a></td>
 			<td>1.8.2</td>
 			<td><a href='http://opensource.org/licenses/mit-license.php'>MIT</a></td>
 		</tr>
 		<tr>
-			<td><a href='http://code.google.com/p/google-code-prettify/'>parseuri</a></td>
+			<td><a href='http://code.google.com/p/google-code-prettify/'>Google Code Prettify</a></td>
 			<td>1.2.2</td>
-			<td><a href='http://www.gnu.org/licenses/lgpl-2.1.html'>LGPLv2.1</a></td>
+			<td><a href='http://www.apache.org/licenses/LICENSE-2.0.html'>Apache</a></td>
 		</tr>
 		<tr>
 			<td><a href='http://code.google.com/p/vkbeautify/'>vkbeautify</a></td>
