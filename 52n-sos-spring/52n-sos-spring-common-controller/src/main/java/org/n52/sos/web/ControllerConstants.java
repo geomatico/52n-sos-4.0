@@ -29,6 +29,7 @@ public interface ControllerConstants {
         public static final String INDEX = "index";
         public static final String CLIENT = "client";
         public static final String LICENSE = "license";
+        public static final String GET_INVOLVED = "get-involved";
         public static final String ADMIN_INDEX = "admin/index";
         public static final String ADMIN_DATABASE = "admin/database";
         public static final String ADMIN_DATABASE_SETTINGS = "admin/database-settings";
@@ -49,6 +50,7 @@ public interface ControllerConstants {
         public static final String INDEX = "/index";
         public static final String LICENSE = "/license";
         public static final String CLIENT = "/client";
+        public static final String GET_INVOLVED = "/get-involved";
         public static final String SETTING_DEFINITIONS = "/settingDefinitions.json";
         public static final String ADMIN_ROOT = "/admin";
         public static final String ADMIN_INDEX = "/admin/index";

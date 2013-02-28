@@ -66,11 +66,7 @@
 	<hr/>
 	
 	 <p>Clicking 'Install' will persist all settings in the database and (depending on your configuration) create or delete tables and insert test data.</p>
-
-	 <p>If your SOS instance is publically available please consider informing the community on <a href="mailto:sensorweb@52north.org">sensorweb@52north.org</a> so that many people can profit from your hard work. If you like, your SOS can also be listed in our <a href="https://wiki.52north.org/bin/view/SensorWeb/SosExampleServices">Wiki</a> as an example.</p>
 	 
-	 <p>Thanks for using the 52&deg;North SOS and thank you for your support of the Sensor Web community!</p>
-
 	<div>
 		<a href="<c:url value="/install/settings" />" class="btn">Back</a>
 		<button class="btn btn-info pull-right" type="submit">Install</button>

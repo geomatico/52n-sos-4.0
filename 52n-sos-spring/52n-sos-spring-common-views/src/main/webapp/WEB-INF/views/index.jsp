@@ -40,14 +40,4 @@
 
 <br/>
 
-<script type="text/javascript">
-	$(function() {
-		if ($.queryParam["install"] === "finished")  {
-			window.setTimeout(function() {
-				showSuccess("Installation completed!");
-			}, 1000);
-		}	
-	});
-</script>
-
 <jsp:include page="common/footer.jsp" />

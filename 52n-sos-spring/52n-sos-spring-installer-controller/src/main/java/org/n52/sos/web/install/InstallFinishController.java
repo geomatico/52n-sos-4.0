@@ -74,7 +74,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         HttpSession session = checkPrevious(req);
         process(getParameters(req), getSettings(session));
         session.invalidate();
-        return redirect(ControllerConstants.Paths.INDEX + "?install=finished");
+        return redirect(ControllerConstants.Paths.GET_INVOLVED + "?install=finished");
     }
     
     @Override
