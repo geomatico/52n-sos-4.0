@@ -20,6 +20,14 @@
             <artifactId>52n-sos-spring-common-views</artifactId>
             <type>war</type>
         </dependency>
+        <dependency>
+            <groupId>jstl</groupId>
+            <artifactId>jstl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jsp-api</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
