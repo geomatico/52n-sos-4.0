@@ -28,9 +28,33 @@ import javax.servlet.ServletContext;
 import org.n52.sos.service.DatabaseSettingsHandler;
 
 public class JstlFunctions {
-    
+    public static final boolean HAS_INSTALLER = hasClass("org.n52.sos.web.install.InstallIndexController");
+    public static final boolean HAS_CLIENT = hasClass("org.n52.sos.web.ClientController");
+    public static final boolean HAS_ADMIN = hasClass("org.n52.sos.web.admin.AdminIndexController");
+
     public static boolean configurated(ServletContext ctx) {
         return DatabaseSettingsHandler.getInstance(ctx).exists();
+    }
+
+    public static boolean hasClient() {
+        return HAS_CLIENT;
+    }
+
+    public static boolean hasInstaller() {
+        return HAS_INSTALLER;
+    }
+
+    public static boolean hasAdministrator() {
+        return HAS_ADMIN;
+    }
+
+    private static boolean hasClass(String c) {
+        try {
+            Class.forName(c);
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+        return true;
     }
 
     private JstlFunctions() {

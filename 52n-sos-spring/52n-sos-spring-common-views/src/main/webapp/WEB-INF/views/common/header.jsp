@@ -47,8 +47,8 @@
 		<script type="text/javascript" src="<c:url value="/static/js/application.js" />"></script>
 		<title>52&deg;North Sensor Observation Service</title>
 		
-		<c:if test="${not sos:configurated(pageContext.servletContext)}">
-			<script type="text/javascript">
+        <c:if test="${sos:hasInstaller() and not sos:configurated(pageContext.servletContext)}">
+            <script type="text/javascript">
 				$(function() { 
 					showMessage('You first have to complete the installation process! Click <a href="<c:url value="/install/index" />"><strong>here</strong></a> to start it.', "error"); 
 				});
@@ -67,53 +67,57 @@
 										<a id="home-menuitem" class="menu-item0" href="<c:url value="/index" />">
 											<span class="menu-title">Home</span>
 										</a>
-									</li>
-									<li>
-										<a id="client-menuitem" class="menu-item1" href="<c:url value="/client" />">
-											<span class="menu-title">Test Client</span>
-										</a>
-									</li>
-									<li>
-										<a id="admin-menuitem" class="menu-item2" href="<c:url value="/admin/index" />">
-											<span class="menu-title">Admin</span>
-										</a>
-										<sec:authorize access="hasRole('ROLE_ADMIN')">
-											<script type="text/javascript">
-												$("#admin-menuitem").addClass("havechild")
-											</script>
-											<ul>
-												<li>
-													<a class="first-item havesubchild"  href="<c:url value="/admin/settings" />">
-														<span class="menu-title">Settings</span>
-													</a>
-													<ul>
-														<li>
-															<a  class="first-item" href="<c:url value="/admin/logging" />">
-																<span class="menu-title">Logging</span>
-															</a>
-														</li>
-														<li>
-															<a href="<c:url value="/admin/database/settings" />">
-																<span class="menu-title">Database</span>
-															</a>
-														</li>
-													</ul>
-												</li>
-												<li>
-													<a href="<c:url value="/admin/database" />">
-														<span class="menu-title">Database Maintenance</span>
-													</a>
-												</li>
-												
-												<li>
-													<a href="<c:url value="/admin/reset" />">
-														<span class="menu-title">Reset</span>
-													</a>
-												</li>
-											</ul>
-										</sec:authorize>
-									</li>
-									<sec:authorize access="hasRole('ROLE_ADMIN')">
+                                    </li>
+                                    <c:if test="${sos:hasClient()}">
+                                        <li>
+                                            <a id="client-menuitem" class="menu-item1" href="<c:url value="/client" />">
+                                                <span class="menu-title">Test Client</span>
+                                            </a>
+                                        </li>
+                                    </c:if>
+                                    <c:if test="${sos:hasAdministrator()}">
+                                        <li>
+                                            <a id="admin-menuitem" class="menu-item2" href="<c:url value="/admin/index" />">
+                                                <span class="menu-title">Admin</span>
+                                            </a>
+                                            <sec:authorize access="hasRole('ROLE_ADMIN')">
+                                                <script type="text/javascript">
+                                                    $("#admin-menuitem").addClass("havechild")
+                                                </script>
+                                                <ul>
+                                                    <li>
+                                                        <a class="first-item havesubchild"  href="<c:url value="/admin/settings" />">
+                                                            <span class="menu-title">Settings</span>
+                                                        </a>
+                                                        <ul>
+                                                            <li>
+                                                                <a  class="first-item" href="<c:url value="/admin/logging" />">
+                                                                    <span class="menu-title">Logging</span>
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="<c:url value="/admin/database/settings" />">
+                                                                    <span class="menu-title">Database</span>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                    <li>
+                                                        <a href="<c:url value="/admin/database" />">
+                                                            <span class="menu-title">Database Maintenance</span>
+                                                        </a>
+                                                    </li>
+
+                                                        <li>
+                                                            <a href="<c:url value="/admin/reset" />">
+                                                                <span class="menu-title">Reset</span>
+                                                            </a>
+                                                        </li>
+                                                </ul>
+                                            </sec:authorize>
+                                        </li>
+                                    </c:if>
+                                    <sec:authorize access="hasRole('ROLE_ADMIN')">
 										<li style="float: right;">
 											<a id="logout-menuitem" class="menu-item3" href="<c:url value="/j_spring_security_logout" />">
 												<span class="menu-title">Logout</span>

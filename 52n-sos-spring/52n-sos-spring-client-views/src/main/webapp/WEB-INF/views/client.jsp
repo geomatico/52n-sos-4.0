@@ -213,7 +213,7 @@
 			function onBindingChange() {
 				var oldBinding = binding;
 				binding = $binding.val();
-				if (binding && binding != oldBinding) {
+				if (binding && binding !== oldBinding) {
 					$request.children("option").remove()
 					editor.setValue("");
 					appendDefaultRequestOption();
@@ -229,7 +229,7 @@
 			function onRequestChange() {
 				var oldRequest = request;
 				request = $request.val();
-				if (request && request != oldRequest) {
+				if (request && request !== oldRequest) {
 					var def = requests[version][binding][request];
 					var url = sosUrl + binding;
 					if (def.param) {
@@ -251,7 +251,7 @@
 			function onVersionChange() {
 				var oldVersion = version;
 				version = $version.val();
-				if (version && version != oldVersion) {
+				if (version && version !== oldVersion) {
 					$binding.children("option").remove();
 					appendDefaultBindingOption();
 					appendDefaultRequestOption();

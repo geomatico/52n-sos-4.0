@@ -27,6 +27,7 @@
     XXX keep in sync with Ann and http://52north.org/about/get-involved/
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="sos" uri="http://52north.org/communities/sensorweb/sos/tags" %>
 <jsp:include page="common/header.jsp">
     <jsp:param name="activeMenu" value="home" />
 </jsp:include>
@@ -75,7 +76,7 @@
         })
 		if ($.queryParam["install"] === "finished")  {
 			window.setTimeout(function() {
-				showSuccess("Installation completed! <a href='<c:url value="/client"/>'>Test it.</a>");
+				showSuccess("Installation completed!<c:if test="${sos:hasClient()}"><a href='<c:url value="/client"/>'>Test it.</a></c:if>");
 			}, 1000);
 		}	
     });
