@@ -36,7 +36,7 @@
     <div class="span3 header-img-span">
         <div class="row">
             <div class="span3">
-                <img src="/52n-sos-webapp/static/images/52n-logo-220x80.png" />    
+                <img src="<c:url value="/static/images/52n-logo-220x80.png"/>" />    
             </div>
         </div>
         <div class="row">
