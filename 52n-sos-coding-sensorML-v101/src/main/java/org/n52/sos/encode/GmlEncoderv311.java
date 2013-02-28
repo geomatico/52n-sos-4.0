@@ -201,7 +201,7 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
                 timePeriodType.setId(timePeriod.getGmlId());
             }
             // beginPosition
-            TimePositionType xbTimePositionBegin = TimePositionType.Factory.newInstance();
+            TimePositionType xbTimePositionBegin = TimePositionType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             String beginString = DateTimeHelper.formatDateTime2ResponseString(timePeriod.getStart());
 
             // concat minutes for timeZone offset, because gml requires
@@ -211,7 +211,7 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
             xbTimePositionBegin.setStringValue(beginString);
 
             // endPosition
-            TimePositionType xbTimePositionEnd = TimePositionType.Factory.newInstance();
+            TimePositionType xbTimePositionEnd = TimePositionType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             String endString = DateTimeHelper.formatDateTime2ResponseString(timePeriod.getEnd());
 
             // concat minutes for timeZone offset, because gml requires
@@ -357,7 +357,7 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
             AbstractRingPropertyType xbArpt = xbPolType.addNewExterior();
             AbstractRingType xbArt = xbArpt.addNewRing();
 
-            LinearRingType xbLrt = LinearRingType.Factory.newInstance();
+            LinearRingType xbLrt = LinearRingType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
 
             // Exterior ring
             LineString ring = pol.getExteriorRing();
@@ -380,7 +380,7 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
                 xbArpt = xbPolType.addNewInterior();
                 xbArt = xbArpt.addNewRing();
 
-                xbLrt = LinearRingType.Factory.newInstance();
+                xbLrt = LinearRingType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
 
                 ring = pol.getInteriorRingN(ringNumber);
 
@@ -414,7 +414,7 @@ public class GmlEncoderv311 implements IEncoder<XmlObject, Object> {
     
     private XmlObject createReferencType(org.n52.sos.ogc.gml.ReferenceType sosReferenceType) {
         if (sosReferenceType.isSetHref()) {
-            ReferenceType referenceType = ReferenceType.Factory.newInstance();
+            ReferenceType referenceType = ReferenceType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             referenceType.setHref(sosReferenceType.getHref());
             if (sosReferenceType.isSetTitle()) {
                 referenceType.setTitle(sosReferenceType.getTitle());

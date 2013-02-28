@@ -32,13 +32,22 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import net.opengis.swe.x101.AbstractDataComponentType;
+import net.opengis.swe.x101.AbstractDataRecordType;
 import net.opengis.swe.x101.AbstractEncodingType;
 import net.opengis.swe.x101.BlockEncodingPropertyType;
+import net.opengis.swe.x101.BooleanPropertyType;
+import net.opengis.swe.x101.CategoryPropertyType;
+import net.opengis.swe.x101.CountPropertyType;
 import net.opengis.swe.x101.DataArrayDocument;
 import net.opengis.swe.x101.DataArrayType;
 import net.opengis.swe.x101.DataComponentPropertyType;
+import net.opengis.swe.x101.DataRecordDocument;
 import net.opengis.swe.x101.DataRecordType;
 import net.opengis.swe.x101.DataValuePropertyType;
+import net.opengis.swe.x101.QuantityPropertyType;
+import net.opengis.swe.x101.TextPropertyType;
+import net.opengis.swe.x101.TimePropertyType;
+import net.opengis.swe.x101.TimeRangePropertyType;
 import net.opengis.swe.x101.CategoryDocument.Category;
 import net.opengis.swe.x101.CountDocument.Count;
 import net.opengis.swe.x101.ObservablePropertyDocument.ObservableProperty;
@@ -54,6 +63,7 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.apache.xmlbeans.impl.values.XmlValueDisconnectedException;
+import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
@@ -74,6 +84,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweQuantityRange;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
+import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.StringHelper;
@@ -372,11 +383,12 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
     }
     
  // TODO check types for SWE101
-    private DataRecordType createDataRecord(SosSweDataRecord sosDataRecord) throws OwsExceptionReport {
+    private DataRecordDocument createDataRecord(SosSweDataRecord sosDataRecord) throws OwsExceptionReport {
     	
         List<SosSweField> sosFields = sosDataRecord.getFields();
         
-        DataRecordType xbDataRecord = DataRecordType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        DataRecordDocument xbDataRecordDoc = DataRecordDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        DataRecordType xbDataRecord = xbDataRecordDoc.addNewDataRecord();
         
         if (sosFields != null) {
         	DataComponentPropertyType[] xbFields = new DataComponentPropertyType[sosFields.size()];
@@ -388,7 +400,7 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
             }
             xbDataRecord.setFieldArray(xbFields);
         }
-        return xbDataRecord;
+        return xbDataRecordDoc;
     }
     
     private DataArrayDocument createDataArray(SosSweDataArray sosDataArray) throws OwsExceptionReport {
@@ -404,28 +416,20 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
             }
             
             if (sosDataArray.getElementType() != null) {
-                xbDataArray.addNewElementType().addNewAbstractDataRecord();
-                xbDataArray.getElementType().setName("Components");
-                
-                xbDataArray.getElementType().getAbstractDataRecord()
-                        .set(createDataRecord((SosSweDataRecord) sosDataArray.getElementType()));
-            
-                xbDataArray
-                        .getElementType()
-                        .getAbstractDataRecord()
-                        .substitute(
-                                new QName(SWEConstants.NS_SWE, SWEConstants.EN_DATA_RECORD,
-                                        SWEConstants.NS_SWE_PREFIX), DataRecordType.type);
+            	DataComponentPropertyType xbElementType = xbDataArray.addNewElementType();
+            	xbDataArray.getElementType().setName("Components");
+            	
+            	DataRecordDocument xbDataRecordDoc = createDataRecord((SosSweDataRecord) sosDataArray.getElementType());
+            	xbElementType.set(xbDataRecordDoc);
             }
             
             if (sosDataArray.getEncoding() != null) {
             	
-            	xbDataArray.addNewEncoding();
-            	
-            	xbDataArray.getEncoding().set(createBlockEncoding(sosDataArray.getEncoding()));
-            	xbDataArray.getEncoding().substitute(
-                                new QName(SWEConstants.NS_SWE, SWEConstants.EN_TEXT_ENCODING,
-                                        SWEConstants.NS_SWE_PREFIX), TextBlock.type);
+            	BlockEncodingPropertyType xbEncoding = xbDataArray.addNewEncoding();
+            	xbEncoding.set(createBlockEncoding(sosDataArray.getEncoding()));
+//            	xbDataArray.getEncoding().substitute(
+//                                new QName(SWEConstants.NS_SWE, SWEConstants.EN_TEXT_ENCODING,
+//                                        SWEConstants.NS_SWE_PREFIX), TextBlock.type);
             }
             DataValuePropertyType xb_values = xbDataArray.addNewValues();
 //            if (absObs.getObservationTemplateIDs() == null
@@ -444,6 +448,8 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
         // TODO How to deal with the decimal separator - is it an issue here?
         StringBuilder valueStringBuilder = new StringBuilder(256);
         SosSweTextEncoding textEncoding = (SosSweTextEncoding) encoding;
+        // would also work, hmm
+        // Configurator.getInstance().getDecimalSeparator();
         String tokenSeparator = textEncoding.getTokenSeparator();
         String blockSeparator = textEncoding.getBlockSeparator();
         for (List<String> block : values) {

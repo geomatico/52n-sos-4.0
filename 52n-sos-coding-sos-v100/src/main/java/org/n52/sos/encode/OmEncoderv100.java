@@ -35,7 +35,10 @@ import java.util.Set;
 
 import net.opengis.gml.FeaturePropertyType;
 import net.opengis.gml.MeasureType;
+import net.opengis.om.x10.MeasurementDocument;
+import net.opengis.om.x10.MeasurementType;
 import net.opengis.om.x10.ObservationType;
+import net.opengis.swe.x101.DataArrayDocument;
 import net.opengis.swe.x101.TimeObjectPropertyType;
 
 import org.apache.xmlbeans.XmlBoolean;
@@ -43,6 +46,8 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlInteger;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
+import org.apache.xmlbeans.XmlRuntimeException;
+import org.apache.xmlbeans.impl.values.XmlValueDisconnectedException;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -178,12 +183,81 @@ public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
 
     @Override
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
-        if (element instanceof SosObservation) {
-            return createObservation((SosObservation) element, additionalValues);
+    	if (element instanceof SosObservation) {
+        	SosObservation sosObs = (SosObservation) element;
+        	if (sosObs.getResultType() != null && sosObs.getResultType().equalsIgnoreCase(OMConstants.EN_MEASUREMENT)){
+        		return createMeasurement(sosObs, additionalValues);
+        	} else {
+        		return createObservation(sosObs, additionalValues);
+        	}
+            
         }
         return null;
     }
 
+    private XmlObject createMeasurement(SosObservation sosObservation, Map<HelperValues, String> additionalValues)
+            throws OwsExceptionReport {
+    	
+//      MeasurementType xbObs = MeasurementType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        MeasurementDocument xbObsDoc = MeasurementDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        MeasurementType xbObs = xbObsDoc.addNewMeasurement();
+        
+        xbObs.setId("o_" + Long.toString(System.currentTimeMillis()));
+        String observationID;
+        if (sosObservation.getObservationID() != null) {
+            observationID = sosObservation.getObservationID();
+        } else {
+            observationID = xbObs.getId().replace("o_", "");
+        }
+        if (sosObservation.getIdentifier() != null && sosObservation.getIdentifier().isSetValue()) {
+        	// I reckon that might cause problems in SOS / OM 1.0 I get XmlValueDisconnectedExceptions 
+        	// either here or with the addSamplingTime for TimePeriod
+            // xbObs.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML, sosObservation.getIdentifier()));
+        }
+
+        String observationType = sosObservation.getObservationConstellation().getObservationType();
+        // FIXME, was addNewName - not here actually necessary 
+        // OGC-OM/2.0/OM_SWEArrayObservation won't be used for the om:Observation OM1
+        // xbObs.addNewParameter().setHref(observationType);
+        /* SosMultiObservationValues will generate always a new ITime... */
+        ITime samplingTime = sosObservation.getPhenomenonTime();
+        // set phenomenonTime
+        if (samplingTime.getGmlId() == null) {
+            samplingTime.setGmlId(OMConstants.PHENOMENON_TIME_NAME + "_" + observationID);
+        }
+        
+    	addSamplingTime(xbObs.addNewSamplingTime(), samplingTime);
+        
+        // set resultTime not in OM1, ?
+        // xbObs.addNewResultTime().setHref("#" + phenomenonTime.getId());
+        // set procedure
+        xbObs.addNewProcedure().setHref(
+                sosObservation.getObservationConstellation().getProcedure().getProcedureIdentifier());
+        // set observedProperty (phenomenon)
+        List<SosObservableProperty> phenComponents = null;
+        if (sosObservation.getObservationConstellation().getObservableProperty() instanceof SosObservableProperty) {
+            xbObs.addNewObservedProperty().setHref(
+                    sosObservation.getObservationConstellation().getObservableProperty().getIdentifier());
+            phenComponents = new ArrayList<SosObservableProperty>(1);
+            phenComponents.add((SosObservableProperty) sosObservation.getObservationConstellation()
+                    .getObservableProperty());
+        } else if (sosObservation.getObservationConstellation().getObservableProperty() instanceof SosCompositePhenomenon) {
+            SosCompositePhenomenon compPhen =
+                    (SosCompositePhenomenon) sosObservation.getObservationConstellation().getObservableProperty();
+            xbObs.addNewObservedProperty().setHref(compPhen.getIdentifier());
+            phenComponents = compPhen.getPhenomenonComponents();
+        }
+        // set feature
+        encodeFeatureOfInterest(xbObs, sosObservation.getObservationConstellation().getFeatureOfInterest());
+
+        // set result
+        addResultToObservation(xbObs.addNewResult(), sosObservation, phenComponents, observationID);
+        // TODO use devMode to switch on
+        // XmlHelper.validateDocument(xbObs);
+        return xbObsDoc;
+
+    }
+    
     private XmlObject createObservation(SosObservation sosObservation, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
 

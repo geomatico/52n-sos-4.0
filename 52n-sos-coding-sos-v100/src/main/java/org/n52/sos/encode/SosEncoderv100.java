@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,9 +57,11 @@ import net.opengis.ogc.TemporalOperandsType;
 import net.opengis.ogc.TemporalOperatorNameType;
 import net.opengis.ogc.TemporalOperatorType;
 import net.opengis.ogc.TemporalOperatorsType;
+import net.opengis.om.x10.MeasurementType;
 import net.opengis.om.x10.ObservationCollectionDocument;
 import net.opengis.om.x10.ObservationCollectionType;
 import net.opengis.om.x10.ObservationPropertyType;
+import net.opengis.om.x10.ObservationType;
 import net.opengis.ows.x11.MimeType;
 import net.opengis.ows.x11.OperationsMetadataDocument.OperationsMetadata;
 import net.opengis.ows.x11.ServiceIdentificationDocument.ServiceIdentification;
@@ -81,6 +84,7 @@ import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
+import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
@@ -286,7 +290,7 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
     private XmlObject createGetObservationResponseDocument(GetObservationResponse response) throws OwsExceptionReport {
 
     	// create ObservationCollectionDocument and add Collection
-        ObservationCollectionDocument xb_obsColDoc = ObservationCollectionDocument.Factory.newInstance();
+        ObservationCollectionDocument xb_obsColDoc = ObservationCollectionDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         ObservationCollectionType xb_obsCol = xb_obsColDoc.addNewObservationCollection();
         xb_obsCol.setId(SosConstants.OBS_COL_ID_PREFIX + new DateTime().getMillis());
 
@@ -300,6 +304,10 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
         }
         IObservationEncoder<XmlObject, SosObservation> iObservationEncoder
                 = (IObservationEncoder<XmlObject, SosObservation>) encoder;
+        /* here separate by resultModel either not set then implicit SWE
+         * if set only om:Measurement
+         * also om:Observation valid? or take observationType from DB as given
+         */
         if (iObservationEncoder.shouldObservationsWithSameXBeMerged()) {
             response.mergeObservationsWithSameX();
         }
@@ -308,11 +316,20 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
 
         if (observationCollection != null) {
         	if ( observationCollection.size() > 0) {
-	            // TODO setBoundedBy (not necessary apparently?)
+        		xb_obsCol.addNewBoundedBy();
+                xb_obsCol.setBoundedBy(createBoundedBy(observationCollection));
 	
-		        for (SosObservation sosObservation : observationCollection) {
-		        	XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getResponseFormat(), sosObservation);
-		        	xb_obsCol.addNewMember().addNewObservation().set(xmlObject);
+                for (SosObservation sosObservation : observationCollection) {
+		        	
+		        	if (sosObservation.getResultType() != null && sosObservation.getResultType().equalsIgnoreCase(OMConstants.EN_MEASUREMENT)) {
+		        		XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getResponseFormat(), sosObservation);
+		        		xb_obsCol.addNewMember().set(xmlObject);
+		        	} else {
+		        		XmlObject xmlObject = CodingHelper.encodeObjectToXml(response.getResponseFormat(), sosObservation);
+			        	xb_obsCol.addNewMember().addNewObservation().set(xmlObject);
+		        	}
+		        	
+		        	
 		        }
         	} else {
                 ObservationPropertyType xb_obs = xb_obsCol.addNewMember();
@@ -333,6 +350,30 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
         N52XmlHelper.setSchemaLocationsToDocument(xb_obsColDoc, schemaLocations);
         return xb_obsColDoc;
     }
+    
+    private BoundingShapeType createBoundedBy(
+			Collection<SosObservation> observationCollection) {
+    	// -77.83021 166.66086
+    	Envelope envelope = new Envelope(160, 178, -80, -60);
+    	
+    	for (SosObservation sosObservation : observationCollection) {
+    		sosObservation.getObservationConstellation().getFeatureOfInterest();
+    		SosSamplingFeature samplingFeature = (SosSamplingFeature) sosObservation.getObservationConstellation().getFeatureOfInterest();
+    		envelope.expandToInclude(samplingFeature.getGeometry().getEnvelopeInternal());
+    	}
+    	
+    	
+    	BoundingShapeType xb_boundingShape = BoundingShapeType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        EnvelopeType xb_envelope = xb_boundingShape.addNewEnvelope();
+        DirectPositionType xb_lowerCorner = xb_envelope.addNewLowerCorner();
+        int srid = 4326;
+		xb_lowerCorner.setStringValue(envelope.getMinY() + " " + envelope.getMinX());
+        DirectPositionType xb_upperCorner = xb_envelope.addNewUpperCorner();
+        xb_upperCorner.setStringValue(envelope.getMaxY() + " " + envelope.getMaxX());
+        
+        xb_envelope.setSrsName( "urn:ogc:def:crs:EPSG::" + srid );
+        return xb_boundingShape;
+	}
 
     private XmlObject createGetFeatureOfInterestResponse(GetFeatureOfInterestResponse response) throws OwsExceptionReport {
 
@@ -426,7 +467,7 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
     private XmlObject createGetObservationByIdResponseDocument(GetObservationByIdResponse response) throws OwsExceptionReport {
 
     	// create ObservationCollectionDocument and add Collection
-        ObservationCollectionDocument xb_obsColDoc = ObservationCollectionDocument.Factory.newInstance();
+        ObservationCollectionDocument xb_obsColDoc = ObservationCollectionDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         ObservationCollectionType xb_obsCol = xb_obsColDoc.addNewObservationCollection();
         xb_obsCol.setId(SosConstants.OBS_COL_ID_PREFIX + new DateTime().getMillis());
 
@@ -868,7 +909,7 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
      *             if query of the BBOX failed
      */
     private EnvelopeType getBBOX4Offering(Envelope envelope, int srsID) throws OwsExceptionReport {
-        EnvelopeType envelopeType = EnvelopeType.Factory.newInstance();
+        EnvelopeType envelopeType = EnvelopeType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         MinMax<String> minmax = SosHelper.getMinMaxFromEnvelope(envelope);
         envelopeType.addNewLowerCorner().setStringValue(minmax.getMinimum());
         envelopeType.addNewUpperCorner().setStringValue(minmax.getMaximum());

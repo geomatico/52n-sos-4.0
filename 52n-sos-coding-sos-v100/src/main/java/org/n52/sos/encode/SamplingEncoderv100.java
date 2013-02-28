@@ -130,12 +130,12 @@ public class SamplingEncoderv100 implements IEncoder<XmlObject, SosAbstractFeatu
     private XmlObject createFeature(SosAbstractFeature absFeature) throws OwsExceptionReport {
         SosSamplingFeature sampFeat = (SosSamplingFeature) absFeature;
         if (absFeature.isSetGmlID()) {
-            FeaturePropertyType featureProperty = FeaturePropertyType.Factory.newInstance();
+            FeaturePropertyType featureProperty = FeaturePropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             featureProperty.setHref("#" + absFeature.getGmlId());
             return featureProperty;
         } else {
             if (!sampFeat.isSetGeometry()) {
-                FeaturePropertyType featureProperty = FeaturePropertyType.Factory.newInstance();
+                FeaturePropertyType featureProperty = FeaturePropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
                 featureProperty.setHref(absFeature.getIdentifier().getValue());
                 if (sampFeat.isSetNames()) {
                     featureProperty.setTitle(sampFeat.getFirstName().getValue());
