@@ -508,8 +508,9 @@ public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
     // return sosSMLPosition;
     // }
 
-    private List<SosSweCoordinate> parseCoordinates(Coordinate[] coordinateArray) throws OwsExceptionReport {
-        List<SosSweCoordinate> sosCoordinates = new ArrayList<SosSweCoordinate>(coordinateArray.length);
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private List<SosSweCoordinate<?>> parseCoordinates(Coordinate[] coordinateArray) throws OwsExceptionReport {
+        List<SosSweCoordinate<?>> sosCoordinates = new ArrayList<SosSweCoordinate<?>>(coordinateArray.length);
         for (Coordinate xbCoordinate : coordinateArray) {
             if (xbCoordinate.isSetQuantity()) {
                 sosCoordinates.add(new SosSweCoordinate(checkCoordinateName(xbCoordinate.getName()),

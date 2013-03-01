@@ -67,7 +67,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class SamplingEncoderv100 implements IEncoder<XmlObject, SosAbstractFeature> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SamplingEncoderv100.class);
-
+    @SuppressWarnings("unchecked")
     private static final Set<EncoderKey> ENCODER_KEYS = CollectionHelper.union(
         CodingHelper.encoderKeysForElements(SFConstants.NS_SA, SosAbstractFeature.class)
     );
@@ -152,7 +152,7 @@ public class SamplingEncoderv100 implements IEncoder<XmlObject, SosAbstractFeatu
                             .getXmlOptions());
             // ignore for now, we are in the 1.0 encoder
             // if (sampFeat.getXmlDescription() != null) {
-            SamplingFeatureType xbSampFeature = (SamplingFeatureType) xbSampFeatDoc.addNewSamplingFeature();
+            SamplingFeatureType xbSampFeature = xbSampFeatDoc.addNewSamplingFeature();
             // TODO: CHECK for all fields
             // set gml:id
             xbSampFeature.setId(absFeature.getGmlId());

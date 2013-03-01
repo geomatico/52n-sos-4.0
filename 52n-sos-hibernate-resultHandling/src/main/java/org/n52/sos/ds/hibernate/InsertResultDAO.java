@@ -221,7 +221,7 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
         for (SosSweField swefield : record.getFields()) {
             if (j != resultTimeIndex && j != phenomenonTimeIndex) {
                 Integer index = Integer.valueOf(j);
-                SosSweAbstractSimpleType sweAbstractSimpleType = (SosSweAbstractSimpleType) swefield.getElement();
+                SosSweAbstractSimpleType<?> sweAbstractSimpleType = (SosSweAbstractSimpleType) swefield.getElement();
                 if (sweAbstractSimpleType instanceof SosSweQuantity) {
                     /* TODO units for other SosSweSimpleTypes? */
                     units.put(index, ((SosSweQuantity) sweAbstractSimpleType).getUom());

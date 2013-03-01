@@ -375,7 +375,7 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
      * @param coordinate
      *            SOS internal representation
      */
-    private Coordinate addValuesToCoordinate(SosSweCoordinate coordinate) {
+    private Coordinate addValuesToCoordinate(SosSweCoordinate<?> coordinate) {
         Coordinate xbCoordinate = Coordinate.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         xbCoordinate.setName(coordinate.getName().name());
         xbCoordinate.setQuantity(createQuantity((SosSweQuantity) coordinate.getValue()));
@@ -525,7 +525,7 @@ public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
             xbTextEncoding.setTokenSeparator(sosTextEncoding.getTokenSeparator());
         }
         // wont cast !!! net.opengis.swe.x101.impl.BlockEncodingPropertyTypeImpl cannot be cast to net.opengis.swe.x101.AbstractEncodingType
-        return (BlockEncodingPropertyType) xbTextEncodingType;
+        return xbTextEncodingType;
     }
 
 }

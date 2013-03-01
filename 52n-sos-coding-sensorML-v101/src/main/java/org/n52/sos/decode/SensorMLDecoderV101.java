@@ -521,6 +521,7 @@ public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject
      * @throws OwsExceptionReport
      *             if an error occurs
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private SosSMLIo<?> parseIoComponentPropertyType(IoComponentPropertyType xbIoCompPropType) throws OwsExceptionReport {
         SosSMLIo<?> sosIo = new SosSMLIo();
         sosIo.setIoName(xbIoCompPropType.getName());

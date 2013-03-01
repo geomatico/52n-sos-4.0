@@ -211,7 +211,7 @@ public class HibernateUtilities {
         }
     }
 
-    public static Observation createObservationFromValue(IValue value, Session session) {
+    public static Observation createObservationFromValue(IValue<?> value, Session session) {
         if (value instanceof BooleanValue) {
             BooleanObservation observation = new BooleanObservation();
             org.n52.sos.ds.hibernate.entities.BooleanValue booleanValue = new org.n52.sos.ds.hibernate.entities.BooleanValue();

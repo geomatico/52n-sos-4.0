@@ -361,11 +361,13 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
      *            Hibernate session
      * @return Observation objects
      */
+    @SuppressWarnings("unchecked")
     public static List<Observation> getObservations(HibernateQueryObject queryObject, Session session) {
         queryObject.addCriterion(getEqualRestriction(HibernateConstants.DELETED, false));
         return (List<Observation>) getObjectList(queryObject, session, Observation.class);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Observation> getAllObservations(HibernateQueryObject queryObject, Session session) {
         return (List<Observation>) getObjectList(queryObject, session, Observation.class);
     }
@@ -763,6 +765,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
      *            FOI object
      * @return Related procedure identifiers
      */
+    @SuppressWarnings("unchecked")
     public static List<String> getProceduresForFeatureOfInterest(Session session, FeatureOfInterest featureOfInterest) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
@@ -776,6 +779,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return (List<String>) getObjectList(queryObject, session, Observation.class);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<String> getObservationIdentifiers(Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         queryObject.addCriterion(ne(getIdentifierParameter(null), "null"));
@@ -802,6 +806,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
      *            Hibernate session
      * @return FOI identifiers
      */
+    @SuppressWarnings("unchecked")
     public static List<String> getFeatureOfInterestIdentifier(HibernateQueryObject queryObject, Session session) {
 
         String foiAliases =
@@ -811,6 +816,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return (List<String>) getObjectList(queryObject, session, Observation.class);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<FeatureOfInterest> getFeatureOfInterestObject(Collection<String> featureOfInterestIDs,
             Session session) {
         if (featureOfInterestIDs != null && !featureOfInterestIDs.isEmpty()) {
@@ -821,6 +827,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return new ArrayList<FeatureOfInterest>(0);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<FeatureOfInterest> getFeatureOfInterestObjectsForOffering(String offeringID, Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
@@ -840,6 +847,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
      *            Hibernate session
      * @return FOI identifiers for offering
      */
+    @SuppressWarnings("unchecked")
     public static List<String> getFeatureOfInterestIdentifiersForOffering(String offeringID, Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
@@ -853,6 +861,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return (List<String>) getObjectList(queryObject, session, Observation.class);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<String> getFeatureOfInterestIdentifiersForObservationConstellation(
             ObservationConstellation observationConstellation, Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
@@ -866,8 +875,9 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return (List<String>) getObjectList(queryObject, session, Observation.class);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<FeatureOfInterestType> getFeatureOfInterestTypeObjects(List<String> featureOfInterestType,
-            Session session) {
+                                                                              Session session) {
         Criteria criteria = session.createCriteria(FeatureOfInterestType.class);
         criteria.add(in(PARAMETER_FEATURE_OF_INTEREST_TYPE, featureOfInterestType));
         return criteria.list();
@@ -879,6 +889,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return (FeatureOfInterestType) criteria.uniqueResult();
     }
 
+    @SuppressWarnings("unchecked")
     public static List<String> getFeatureOfInterestTypes(Session session) {
         Criteria criteria = session.createCriteria(FeatureOfInterestType.class);
         criteria.add(ne(PARAMETER_FEATURE_OF_INTEREST_TYPE, OGCConstants.UNKNOWN));
@@ -909,6 +920,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return featureOfInterestTypes;
     }
 
+    @SuppressWarnings("unchecked")
     public static List<ObservationType> getObservationTypeObjects(List<String> observationTypes, Session session) {
         Criteria criteria = session.createCriteria(ObservationType.class);
         criteria.add(in(HibernateConstants.PARAMETER_OBSERVATION_TYPE, observationTypes));
@@ -939,6 +951,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return (Unit) criteria.uniqueResult();
     }
 
+    @SuppressWarnings("unchecked")
     public static List<RelatedFeatureRole> getRelatedFeatureRole(String role, Session session) {
         Criteria criteria = session.createCriteria(RelatedFeatureRole.class);
         criteria.add(getEqualRestriction(
@@ -946,6 +959,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return (List<RelatedFeatureRole>) criteria.list();
     }
 
+    @SuppressWarnings("unchecked")
     public static List<RelatedFeature> getRelatedFeatures(String targetIdentifier, Session session) {
         Criteria criteria = session.createCriteria(RelatedFeature.class);
         Map<String, String> aliases = new HashMap<String, String>();
@@ -956,6 +970,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return (List<RelatedFeature>) criteria.list();
     }
 
+    @SuppressWarnings("unchecked")
     public static List<ObservableProperty> getObservableProperties(List<String> identifiers, Session session) {
         Criteria criteria = session.createCriteria(ObservableProperty.class);
         criteria.add(in(getIdentifierParameter(null), identifiers));
@@ -1025,6 +1040,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return (TextValue) criteria.uniqueResult();
     }
 
+    @SuppressWarnings("unchecked")
     public static List<RelatedFeature> getRelatedFeatureForOffering(String offeringID, Session session) {
         Criteria criteria = session.createCriteria(RelatedFeature.class);
         Map<String, String> aliases = new HashMap<String, String>();
@@ -1034,18 +1050,22 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return criteria.list();
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Procedure> getProcedureObjects(Session session) {
         return (List<Procedure>) getObjectList(new HibernateQueryObject(), session, Procedure.class);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<FeatureOfInterest> getFeatureOfInterestObjects(Session session) {
         return (List<FeatureOfInterest>) getObjectList(new HibernateQueryObject(), session, FeatureOfInterest.class);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<RelatedFeature> getRelatedFeatureObjects(Session session) {
         return (List<RelatedFeature>) getObjectList(new HibernateQueryObject(), session, RelatedFeature.class);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Offering> getOfferingObjects(Session session) {
         return (List<Offering>) getObjectList(new HibernateQueryObject(), session, Offering.class);
     }
@@ -1056,6 +1076,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return (Offering) getObject(queryObject, session, Offering.class);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<ObservableProperty> getObservablePropertyObjects(Session session) {
         return (List<ObservableProperty>) getObjectList(new HibernateQueryObject(), session, ObservableProperty.class);
     }
@@ -1067,11 +1088,13 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return criteria.list();
     }
 
+    @SuppressWarnings("unchecked")
     public static List<CompositePhenomenon> getCompositePhenomenonObjects(Session session) {
         return (List<CompositePhenomenon>) getObjectList(new HibernateQueryObject(), session,
                 CompositePhenomenon.class);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<SpatialRefSys> getSpatialRefSysObjects(Session session) {
         return (List<SpatialRefSys>) getObjectList(new HibernateQueryObject(), session, SpatialRefSys.class);
     }
@@ -1100,6 +1123,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return (List<ResultTemplate>) getObjectList(query, session, ResultTemplate.class);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<ResultTemplate> getResultTemplateObjectsForObservationConstellation(
             ObservationConstellation observationConstellation, Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
@@ -1113,6 +1137,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return (List<ResultTemplate>) getObjectList(queryObject, session, ResultTemplate.class);
     }
 
+    @SuppressWarnings("unchecked")
     public static ResultTemplate getResultTemplateObject(String offering, String observedProperty, Session session) {
         // Criteria criteria = session.createCriteria(ResultTemplate.class);
         Map<String, String> aliases = new HashMap<String, String>();
@@ -1136,8 +1161,9 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return (templates.isEmpty()) ? null : templates.iterator().next();
     }
 
+    @SuppressWarnings("unchecked")
     public static List<ResultTemplate> getResultTemplateObject(String offering, String observedProperty,
-            Collection<String> featureOfInterest, Session session) {
+                                                               Collection<String> featureOfInterest, Session session) {
         // Criteria criteria = session.createCriteria(ResultTemplate.class);
         Map<String, String> aliases = new HashMap<String, String>();
         String obsConstOffObsTypeAlias = addObservationConstellationOfferingObservationTypeAliasToMap(aliases, null);
@@ -1163,8 +1189,9 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return (List<ResultTemplate>) getObjectList(queryObject, session, ResultTemplate.class);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<ObservationConstellation> getObservationConstellations(HibernateQueryObject queryObject,
-            Session session) {
+                                                                              Session session) {
         return (List<ObservationConstellation>) getObjectList(queryObject, session, ObservationConstellation.class);
     }
 
@@ -1177,6 +1204,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public static List<ObservationConstellationOfferingObservationType> getObservationConstellationOfferingObservationType(
             HibernateQueryObject queryObject, Session session) {
         return (List<ObservationConstellationOfferingObservationType>) getObjectList(queryObject, session,

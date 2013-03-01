@@ -90,7 +90,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GmlDecoderv321.class);
-
+    @SuppressWarnings("unchecked")
     private static final Set<DecoderKey> DECODER_KEYS = CollectionHelper.union(
         CodingHelper.decoderKeysForElements(GMLConstants.NS_GML_32,
             EnvelopeDocument.class,

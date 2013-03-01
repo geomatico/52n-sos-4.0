@@ -34,6 +34,7 @@ import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
+@SuppressWarnings("rawtypes")
 public class ConverterRepository extends AbstractConfiguringServiceLoaderRepository<IConverter> {
 	private final Map<ConverterKeyType, IConverter<?, ?>> converter = new HashMap<ConverterKeyType, IConverter<?, ?>>(0);
 
@@ -42,14 +43,15 @@ public class ConverterRepository extends AbstractConfiguringServiceLoaderReposit
 		load(false);
 	}
 
-	@Override
+    @Override
+    @SuppressWarnings("rawtypes")
 	protected void processConfiguredImplementations(Set<IConverter> converter) throws ConfigurationException {
 		this.converter.clear();
 		for (IConverter<?, ?> aConverter : converter) {
 			for (ConverterKeyType converterKeyType : aConverter.getConverterKeyTypes()) {
-				this.converter.put(converterKeyType, aConverter);
-			}
-		}
+                this.converter.put(converterKeyType, aConverter);
+            }
+        }
 		// TODO check for encoder/decoder used by converter
 	}
 
@@ -57,6 +59,7 @@ public class ConverterRepository extends AbstractConfiguringServiceLoaderReposit
         return getConverter(new ConverterKeyType(fromNamespace, toNamespace));
     }
 
+    @SuppressWarnings("unchecked")
     public <T,F> IConverter<T,F> getConverter(ConverterKeyType key) {
         return (IConverter<T,F>) converter.get(key);
     }

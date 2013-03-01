@@ -80,7 +80,7 @@ public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObjec
         ConformanceClasses.OM_V2_SAMPLING_POINT, 
         ConformanceClasses.OM_V2_SAMPLING_CURVE, 
         ConformanceClasses.OM_V2_SAMPLING_SURFACE);
-    
+    @SuppressWarnings("unchecked")
     private static final Set<DecoderKey> DECODER_KEYS = CollectionHelper.union(
             CodingHelper.decoderKeysForElements(SFConstants.NS_SF,
                 SFSpatialSamplingFeatureDocument.class,

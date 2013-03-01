@@ -125,6 +125,7 @@ abstract class AbstractSettingDefinition<S extends AbstractSettingDefinition<S, 
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public S setGroup(SettingDefinitionGroup group) {
         this.group = group;
         return (S) this;

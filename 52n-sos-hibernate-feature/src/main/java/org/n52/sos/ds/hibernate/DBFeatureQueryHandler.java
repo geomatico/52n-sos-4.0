@@ -242,6 +242,7 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
      * <p/>
      * @return FeatureOfInterest objects
      */
+    @SuppressWarnings("unchecked")
     protected List<FeatureOfInterest> getFeatureOfInterests(HibernateQueryObject queryObject, Session session) {
         return (List<FeatureOfInterest>) HibernateCriteriaQueryUtilities.getObjectList(queryObject, session,
                                                                                        FeatureOfInterest.class);
@@ -255,6 +256,7 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
         return (FeatureOfInterest) q.uniqueResult();
     }
 
+    @SuppressWarnings("unchecked")
     protected List<String> getFeatureOfInterestIdentifier(HibernateQueryObject queryObject, Session session) {
         queryObject.addProjection(HibernateCriteriaQueryUtilities.getDistinctProjection(HibernateCriteriaQueryUtilities
                 .getIdentifierParameter(null)));

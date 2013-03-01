@@ -147,7 +147,7 @@ public class ResultHandlingHelper {
         for (int i = 0; i < fields.size(); i++) {
             SosSweAbstractDataComponent element = fields.get(i).getElement();
             if (element instanceof SosSweAbstractSimpleType) {
-                SosSweAbstractSimpleType simpleType = (SosSweAbstractSimpleType) element;
+                SosSweAbstractSimpleType<?> simpleType = (SosSweAbstractSimpleType) element;
                 if (simpleType.isSetDefinition()) {
                     addValueToValueOrderMap(valueOrder, i, simpleType.getDefinition());
                 }
@@ -258,7 +258,7 @@ public class ResultHandlingHelper {
 		for (SosSweField f : fields) {
 			SosSweAbstractDataComponent element = f.getElement();
             if (element instanceof SosSweAbstractSimpleType) {
-                SosSweAbstractSimpleType simpleType = (SosSweAbstractSimpleType) element;
+                SosSweAbstractSimpleType<?> simpleType = (SosSweAbstractSimpleType) element;
                 if (simpleType.isSetDefinition() && simpleType.getDefinition().equals(definition)) {
                     return i;
                 }

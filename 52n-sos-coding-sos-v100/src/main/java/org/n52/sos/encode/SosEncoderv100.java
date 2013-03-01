@@ -130,7 +130,7 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
      * file
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosEncoderv100.class);
-
+    @SuppressWarnings("unchecked")
     private static final Set<EncoderKey> ENCODER_KEYS = CollectionHelper.union(
         CodingHelper.encoderKeysForElements(Sos1Constants.NS_SOS,
             AbstractServiceRequest.class,

@@ -228,7 +228,9 @@ public class CodingRepository {
     }
 
     private static final Logger log = LoggerFactory.getLogger(CodingRepository.class);
-	private final ServiceLoader<IDecoder> serviceLoaderDecoder;
+    @SuppressWarnings("rawtypes")
+    private final ServiceLoader<IDecoder> serviceLoaderDecoder;
+    @SuppressWarnings("rawtypes")
     private final ServiceLoader<IEncoder> serviceLoaderEncoder;
     private final Set<IDecoder<?, ?>> decoders;
     private final Set<IEncoder<?, ?>> encoders;

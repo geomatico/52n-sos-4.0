@@ -436,6 +436,7 @@ public class SweCommonDecoderV101 implements IDecoder<Object, Object> {
         return sosSMLPosition;
     }
 
+    @SuppressWarnings("unchecked")
     private List<SosSweCoordinate<?>> parseCoordinates(Coordinate[] coordinateArray) throws OwsExceptionReport {
         List<SosSweCoordinate<?>> sosCoordinates = new ArrayList<SosSweCoordinate<?>>(coordinateArray.length);
         for (Coordinate xbCoordinate : coordinateArray) {

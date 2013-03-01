@@ -720,6 +720,7 @@ public class SosHelper {
         return new SosObservableProperty(identifier, description, unit, valueType);
     }
 
+    @SuppressWarnings("unchecked")
     public static Collection<String> getSupportedResponseFormats(String service, String version) {
         Set<String> responseFormats = new HashSet<String>();
         for (IEncoder<?, ?> iEncoder : getConfiguration().getEncoders()) {

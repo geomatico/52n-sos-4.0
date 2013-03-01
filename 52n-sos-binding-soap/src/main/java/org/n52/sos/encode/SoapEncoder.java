@@ -87,7 +87,7 @@ import org.w3c.dom.Node;
 public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
 
     private static Logger LOGGER = LoggerFactory.getLogger(SoapEncoder.class);
-
+    @SuppressWarnings("unchecked")
     private static final Set<EncoderKey> ENCODER_KEYS = CollectionHelper.union(
             CodingHelper.encoderKeysForElements(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE, SoapResponse.class),
             CodingHelper.encoderKeysForElements(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE, SoapResponse.class));

@@ -79,6 +79,7 @@ public class SwesDecoderv20 implements IDecoder<AbstractServiceCommunicationObje
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SwesDecoderv20.class);
     
+    @SuppressWarnings("unchecked")
     private Set<DecoderKey> DECODER_KEYS = CollectionHelper.union(
         CodingHelper.decoderKeysForElements(SWEConstants.NS_SWES_20,
             DescribeSensorDocument.class,

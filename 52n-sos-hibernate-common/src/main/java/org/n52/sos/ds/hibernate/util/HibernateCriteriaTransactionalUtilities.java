@@ -530,8 +530,8 @@ public class HibernateCriteriaTransactionalUtilities {
         Iterator<ObservationConstellationOfferingObservationType> iterator =
                 observationConstellationOfferingObservationTypes.iterator();
         while (iterator.hasNext()) {
-            ObservationConstellationOfferingObservationType observationConstellationOfferingObservationType =
-                    (ObservationConstellationOfferingObservationType) iterator.next();
+            ObservationConstellationOfferingObservationType observationConstellationOfferingObservationType = iterator
+                    .next();
             hObservation.setObservationConstellation(observationConstellationOfferingObservationType
                     .getObservationConstellation());
             break;

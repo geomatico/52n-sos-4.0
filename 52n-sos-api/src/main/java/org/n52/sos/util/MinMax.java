@@ -83,6 +83,7 @@ public class MinMax<T> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean equals(Object obj) {
         if (obj != null && obj.getClass() == getClass()) {
             final MinMax<T> other = (MinMax<T>) obj;

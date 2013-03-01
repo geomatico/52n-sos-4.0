@@ -87,10 +87,9 @@ public class CacheImpl implements CapabilitiesCache{
 
     /** hash map containing the features of interest for each offering */
     private Map<String, Collection<String>> kOfferingVFeaturesOfInterest;
-
+    // TODO merge next two maps
     private Map<String, DateTime> kOfferingVMaxTime;
-
-	// TODO merge next two maps
+	
 	private Map<String, DateTime> kOfferingVMinTime;
 
 	private Map<String, SosEnvelope> kOfferingVEnvelope;
@@ -432,6 +431,7 @@ public class CacheImpl implements CapabilitiesCache{
     }
     
     @Override
+    @Deprecated
 	public void setAllFeatureOfInterests(Collection<String> featuresOfInterest) {
         this.featureOfInterestIdentifiers = featuresOfInterest;
     }

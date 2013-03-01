@@ -77,7 +77,7 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
      * file
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosDecoderv100.class);
-
+    @SuppressWarnings("unchecked")
     private static final  Set<DecoderKey> DECODER_KEYS = CollectionHelper.union(
         CodingHelper.decoderKeysForElements(Sos1Constants.NS_SOS,
             GetCapabilitiesDocument.class,

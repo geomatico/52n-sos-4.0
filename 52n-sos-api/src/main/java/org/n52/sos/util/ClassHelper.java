@@ -82,6 +82,7 @@ public class ClassHelper {
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected static <T> Set<Class<? extends T>> flattenPartialHierachy(Set<Class<? extends T>> alreadyFoundClasses, Class<T> limitingClass, Class<?> currentClass) {
         if (limitingClass.isAssignableFrom(currentClass)) {
             alreadyFoundClasses.add((Class<? extends T>) currentClass);

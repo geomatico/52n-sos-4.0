@@ -33,6 +33,7 @@ import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 public class PGGeometryTypeDescriptor52N implements SqlTypeDescriptor {
 
     public static final SqlTypeDescriptor INSTANCE = new PGGeometryTypeDescriptor52N();
+    private static final long serialVersionUID = 1L;
 
     @Override
     public int getSqlType() {
@@ -45,11 +46,13 @@ public class PGGeometryTypeDescriptor52N implements SqlTypeDescriptor {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <X> ValueBinder<X> getBinder(final JavaTypeDescriptor<X> javaTypeDescriptor) {
         return (ValueBinder<X>) new PGGeometryValueBinder();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <X> ValueExtractor<X> getExtractor(final JavaTypeDescriptor<X> javaTypeDescriptor) {
         return (ValueExtractor<X>) new PGGeometryValueExtractor52N();
     }

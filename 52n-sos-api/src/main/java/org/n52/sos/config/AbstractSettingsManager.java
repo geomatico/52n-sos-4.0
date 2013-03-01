@@ -174,6 +174,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> ISettingValue<T> getSetting(ISettingDefinition<?, T> key) throws ConnectionProviderException {
         return (ISettingValue<T>) getSettingValue(key.getKey());
     }
@@ -259,6 +260,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         return getSettingDefinitionRepository().getDefinition(key);
     }
 
+    @SuppressWarnings("unchecked")
     private ISettingValue<Object> getNotNullSettingValue(ConfigurableObject co) throws ConnectionProviderException, ConfigurationException {
         ISettingValue<Object> val = (ISettingValue<Object>) getSettingValue(co.getKey());
         if (val == null) {

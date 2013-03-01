@@ -54,9 +54,8 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public abstract class InMemoryCacheUpdate implements Action {
 
-	private CapabilitiesCache cache;
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryCacheUpdate.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryCacheUpdate.class);
+    private CapabilitiesCache cache;
 
 	public CapabilitiesCache getCache()
 	{
@@ -186,8 +185,8 @@ public abstract class InMemoryCacheUpdate implements Action {
 	
 	private List<SosSamplingFeature> getAllFeaturesFrom(SosFeatureCollection sosFeatureOfInterest)
 	{
-		List<SosSamplingFeature> allFeatures = new ArrayList<SosSamplingFeature>(((SosFeatureCollection) sosFeatureOfInterest).getMembers().size());
-		for (Entry<String, SosAbstractFeature> entry : ((SosFeatureCollection) sosFeatureOfInterest).getMembers().entrySet()) {
+		List<SosSamplingFeature> allFeatures = new ArrayList<SosSamplingFeature>(sosFeatureOfInterest.getMembers().size());
+		for (Entry<String, SosAbstractFeature> entry : sosFeatureOfInterest.getMembers().entrySet()) {
 			if (entry.getValue() instanceof SosSamplingFeature) {
 				allFeatures.add((SosSamplingFeature) entry.getValue());
 			} else if (entry.getValue() instanceof SosFeatureCollection) {

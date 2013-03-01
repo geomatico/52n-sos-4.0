@@ -70,7 +70,7 @@ import org.w3c.dom.Document;
 public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
 
     private static Logger LOGGER = LoggerFactory.getLogger(SoapDecoder.class);
-
+    @SuppressWarnings("unchecked")
     private static final Set<DecoderKey> DECODER_KEYS = CollectionHelper.union(
         CodingHelper.decoderKeysForElements(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE, XmlObject.class),
         CodingHelper.decoderKeysForElements(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE, XmlObject.class)

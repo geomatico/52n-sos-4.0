@@ -77,6 +77,7 @@ public class AdminLoggingController extends AbstractController {
     public ModelAndView save(HttpServletRequest req) {
         
         
+        @SuppressWarnings("unchecked")
         Set<String> parameters = new HashSet<String>(
                 Collections.list((Enumeration<String>)req.getParameterNames()));
                 

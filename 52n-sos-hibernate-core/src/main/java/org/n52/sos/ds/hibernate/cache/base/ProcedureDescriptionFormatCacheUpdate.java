@@ -40,7 +40,8 @@ import org.n52.sos.util.Action;
  */
 public class ProcedureDescriptionFormatCacheUpdate extends CacheUpdate {
 
-	@Override
+    @Override
+    @SuppressWarnings("unchecked")
 	public void execute()
 	{
 		Criteria hProcedureDescriptionFormats = getSession().createCriteria(ProcedureDescriptionFormat.class);

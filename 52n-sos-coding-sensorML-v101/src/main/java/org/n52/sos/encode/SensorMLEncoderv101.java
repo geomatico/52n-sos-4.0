@@ -180,7 +180,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
         	String procDescXMLString = ((SosProcedureDescription) response).getSensorDescriptionXmlString();
         	AbstractSensorML sensorDesc = new AbstractSensorML();
         	sensorDesc.setSensorDescriptionXmlString(procDescXMLString);
-            return createSensorDescriptionFromString((AbstractSensorML) sensorDesc);
+            return createSensorDescriptionFromString(sensorDesc);
         }
         
         return null;
@@ -470,61 +470,67 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
      */
     private Capabilities[] createCapabilities(AbstractProcessType abstractProcess, List<SosSMLCapabilities> smlCapabilities)
             throws OwsExceptionReport {
-        List<Capabilities> capabilitiesList = new ArrayList<Capabilities>(smlCapabilities.size());
-        if (abstractProcess != null || smlCapabilities != null) {
-            if (isCapabilitiesArrayAlreadyAvailable(abstractProcess)) {
-                capabilitiesList.addAll(Arrays.asList(abstractProcess.getCapabilitiesArray()));
-            }
-            for (SosSMLCapabilities capabilities : smlCapabilities) {
-                if (capabilities != null && capabilities.isSetAbstractDataRecord()) { // List could contain null elements
-                    Capabilities xbCapabilities =
-                            Capabilities.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-                    if (capabilities.getName() != null) {
-                        xbCapabilities.setName(capabilities.getName());
-                    }
-                    if (capabilities.getDataRecord() instanceof SosSweSimpleDataRecord) {
-                        SimpleDataRecordType xbSimpleDataRecord =
-                                (SimpleDataRecordType) xbCapabilities.addNewAbstractDataRecord().substitute(
-                                        SWEConstants.QN_SIMPLEDATARECORD_SWE_101, SimpleDataRecordType.type);
-                        if (capabilities.getDataRecord().isSetFields()) {
-                            for (SosSweField field : capabilities.getDataRecord().getFields()) {
-                                AnyScalarPropertyType xbField = xbSimpleDataRecord.addNewField();
-                                xbField.setName(field.getName());
-                                addSweSimpleTypeToField(xbField, field.getElement());
-                            }
+        if (smlCapabilities == null) {
+            return new Capabilities[0];
+        } else {
+            List<Capabilities> capabilitiesList = new ArrayList<Capabilities>(smlCapabilities.size());
+            if (abstractProcess != null) {
+                if (isCapabilitiesArrayAlreadyAvailable(abstractProcess)) {
+                    capabilitiesList.addAll(Arrays.asList(abstractProcess.getCapabilitiesArray()));
+                }
+                for (SosSMLCapabilities capabilities : smlCapabilities) {
+                    if (capabilities != null && capabilities.isSetAbstractDataRecord()) { // List could contain null elements
+                        Capabilities xbCapabilities =
+                                     Capabilities.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                        if (capabilities.getName() != null) {
+                            xbCapabilities.setName(capabilities.getName());
                         }
-                        if (capabilities.getMetaDataProperties() != null) {
-                            for (SosGmlMetaDataProperty metadata : capabilities.getMetaDataProperties()) {
-                                MetaDataPropertyType xb_metaData = xbSimpleDataRecord.addNewMetaDataProperty();
-                                if (metadata.getTitle() != null) {
-                                    xb_metaData.setTitle(metadata.getTitle());
-                                }
-                                if (metadata.getRole() != null) {
-                                    xb_metaData.setRole(metadata.getRole());
-                                }
-                                if (metadata.getHref() != null) {
-                                    xb_metaData.setHref(metadata.getHref());
+                        if (capabilities.getDataRecord() instanceof SosSweSimpleDataRecord) {
+                            SimpleDataRecordType xbSimpleDataRecord =
+                                                 (SimpleDataRecordType) xbCapabilities.addNewAbstractDataRecord()
+                                    .substitute(
+                                    SWEConstants.QN_SIMPLEDATARECORD_SWE_101, SimpleDataRecordType.type);
+                            if (capabilities.getDataRecord().isSetFields()) {
+                                for (SosSweField field : capabilities.getDataRecord().getFields()) {
+                                    AnyScalarPropertyType xbField = xbSimpleDataRecord.addNewField();
+                                    xbField.setName(field.getName());
+                                    addSweSimpleTypeToField(xbField, field.getElement());
                                 }
                             }
+                            if (capabilities.getMetaDataProperties() != null) {
+                                for (SosGmlMetaDataProperty metadata : capabilities.getMetaDataProperties()) {
+                                    MetaDataPropertyType xb_metaData = xbSimpleDataRecord.addNewMetaDataProperty();
+                                    if (metadata.getTitle() != null) {
+                                        xb_metaData.setTitle(metadata.getTitle());
+                                    }
+                                    if (metadata.getRole() != null) {
+                                        xb_metaData.setRole(metadata.getRole());
+                                    }
+                                    if (metadata.getHref() != null) {
+                                        xb_metaData.setHref(metadata.getHref());
+                                    }
+                                }
+                            }
+                        } else if (capabilities.getDataRecord() instanceof SosSweDataRecord) {
+                            String exceptionText =
+                                   "The SWE capabilities type '" + SweAggregateType.DataRecord.name()
+                                   + "' is not supported by this SOS for SensorML!";
+                            LOGGER.debug(exceptionText);
+                            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                        } else {
+                            String exceptionText =
+                                   "The SWE capabilities type '" + SweAggregateType.DataRecord.name()
+                                   + "' is not supported by this SOS for SensorML!";
+                            LOGGER.debug(exceptionText);
+                            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
                         }
-                    } else if (capabilities.getDataRecord() instanceof SosSweDataRecord) {
-                        String exceptionText =
-                                "The SWE capabilities type '" + SweAggregateType.DataRecord.name()
-                                        + "' is not supported by this SOS for SensorML!";
-                        LOGGER.debug(exceptionText);
-                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-                    } else {
-                        String exceptionText =
-                                "The SWE capabilities type '" + SweAggregateType.DataRecord.name()
-                                        + "' is not supported by this SOS for SensorML!";
-                        LOGGER.debug(exceptionText);
-                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                        capabilitiesList.add(xbCapabilities);
                     }
-                    capabilitiesList.add(xbCapabilities);
                 }
             }
+
+            return capabilitiesList.toArray(new Capabilities[capabilitiesList.size()]);
         }
-        return capabilitiesList.toArray(new Capabilities[capabilitiesList.size()]);
     }
 
     private boolean isCapabilitiesArrayAlreadyAvailable(AbstractProcessType abstractProcess) {
@@ -846,43 +852,43 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
         switch (sosSMLIO.getIoValue().getSimpleType()) {
         case Boolean:
             ioComponentPopertyType.addNewBoolean().set(
-                    (XmlObject) CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweBoolean) sosSMLIO.getIoValue()));
+                    CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweBoolean) sosSMLIO.getIoValue()));
             break;
         case Category:
             ioComponentPopertyType.addNewCategory().set(
-                    (XmlObject) CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweCategory) sosSMLIO.getIoValue()));
+                    CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweCategory) sosSMLIO.getIoValue()));
             break;
         case Count:
             ioComponentPopertyType.addNewCount().set(
-                    (XmlObject) CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweCount) sosSMLIO.getIoValue()));
+                    CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweCount) sosSMLIO.getIoValue()));
             break;
         case CountRange:
             ioComponentPopertyType.addNewCountRange().set(
-                    (XmlObject) CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweCountRange) sosSMLIO.getIoValue()));
+                    CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweCountRange) sosSMLIO.getIoValue()));
             break;
         case ObservableProperty:
             ioComponentPopertyType.addNewObservableProperty().set(
-                    (XmlObject) CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweObservableProperty) sosSMLIO.getIoValue()));
+                    CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweObservableProperty) sosSMLIO.getIoValue()));
             break;
         case Quantity:
                 ioComponentPopertyType.addNewQuantity().set(
-                        (XmlObject) CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweQuantity) sosSMLIO.getIoValue()));
+                    CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweQuantity) sosSMLIO.getIoValue()));
             break;
         case QuantityRange:
             ioComponentPopertyType.addNewQuantityRange().set(
-                    (XmlObject) CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweQuantityRange) sosSMLIO.getIoValue()));
+                    CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweQuantityRange) sosSMLIO.getIoValue()));
             break;
         case Text:
             ioComponentPopertyType.addNewText().set(
-                    (XmlObject) CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweText) sosSMLIO.getIoValue()));
+                    CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweText) sosSMLIO.getIoValue()));
             break;
         case Time:
             ioComponentPopertyType.addNewTime().set(
-                    (XmlObject) CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweTime) sosSMLIO.getIoValue()));
+                    CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweTime) sosSMLIO.getIoValue()));
             break;
         case TimeRange:
             ioComponentPopertyType.addNewTimeRange().set(
-                    (XmlObject) CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweTimeRange) sosSMLIO.getIoValue()));
+                    CodingHelper.encodeObjectToXml(SWEConstants.NS_SWE, (SosSweTimeRange) sosSMLIO.getIoValue()));
             break;
         default:
             String exceptionTextDefault =

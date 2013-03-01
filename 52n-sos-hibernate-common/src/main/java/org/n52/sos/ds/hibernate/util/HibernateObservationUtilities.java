@@ -107,55 +107,6 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class HibernateObservationUtilities {
 
-    /**
-     * Class to make this Helper more testable. Test cases may overwrite methods to decouple this class from the
-     * Configurator.
-     */
-    protected static class Configuration {
-
-        /**
-         * @see Configurator#getTupleSeperator()
-         */
-        protected String getTupleSeperator() {
-            return Configurator.getInstance().getTupleSeperator();
-        }
-
-        /**
-         * @see Configurator#getTokenSeperator()
-         */
-        protected String getTokenSeperator() {
-            return Configurator.getInstance().getTokenSeperator();
-        }
-
-        /**
-         * @see Configurator#getCapabilitiesCacheController()
-         */
-        protected ACapabilitiesCacheController getCache() {
-            return Configurator.getInstance().getCapabilitiesCacheController();
-        }
-
-        /**
-         * @see Configurator#getActiveProfile()
-         */
-        protected IProfile getActiveProfile() {
-            return Configurator.getInstance().getActiveProfile();
-        }
-
-        /**
-         * @see Configurator#getFeatureQueryHandler()
-         */
-        protected IFeatureQueryHandler getFeatureQueryHandler() {
-            return Configurator.getInstance().getFeatureQueryHandler();
-        }
-
-        /**
-         * @see Configurator#isSupportsQuality()
-         */
-        protected boolean isSupportsQuality() {
-            return Configurator.getInstance().isSupportsQuality();
-        }
-    }
-
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateObservationUtilities.class);
     private static Configuration configuration;
 
@@ -214,8 +165,9 @@ public class HibernateObservationUtilities {
      * @throws OwsExceptionReport
      *             If an error occurs
      */
+    @SuppressWarnings("unchecked")
     public static List<SosObservation> createSosObservationsFromObservations(Collection<Observation> observations,
-            String version, Session session) throws OwsExceptionReport {
+                                                                             String version, Session session) throws OwsExceptionReport {
         List<SosObservation> observationCollection = new ArrayList<SosObservation>(0);
 
         Map<String, SosAbstractFeature> features = new HashMap<String, SosAbstractFeature>(0);
@@ -239,8 +191,7 @@ public class HibernateObservationUtilities {
                 ObservationConstellationOfferingObservationType hObservationConstellationOfferingObservationType =
                         null;
                 while (iterator.hasNext()) {
-                    hObservationConstellationOfferingObservationType =
-                            (ObservationConstellationOfferingObservationType) iterator.next();
+                    hObservationConstellationOfferingObservationType = iterator.next();
                     break;
                 }
 
@@ -250,7 +201,7 @@ public class HibernateObservationUtilities {
                 // TODO get full description
                 Procedure hProcedure = hObservationConstellation.getProcedure();
                 String procedureIdentifier = hProcedure.getIdentifier();
-                SosProcedureDescription procedure = null;
+                SosProcedureDescription procedure;
                 if (procedures.containsKey(procedureIdentifier)) {
                     procedure = procedures.get(procedureIdentifier);
                 } else {
@@ -261,6 +212,7 @@ public class HibernateObservationUtilities {
                     procedures.put(procedureIdentifier, procedure);
                 }
 
+                //FIXME possible NPE
                 String observationType =
                         hObservationConstellationOfferingObservationType.getObservationType().getObservationType();
 
@@ -302,7 +254,7 @@ public class HibernateObservationUtilities {
                         String qualityUnit = hQuality.getUnit().getUnit();
                         String qualityName = hQuality.getName();
                         String qualityValue = hQuality.getValue();
-                        qualityList = new ArrayList<SosQuality>();
+                        qualityList = new ArrayList<SosQuality>(1);
                         if (qualityValue != null) {
                             QualityType qualityType = QualityType.valueOf(qualityTypeString);
                             SosQuality quality = new SosQuality(qualityName, qualityUnit, qualityValue, qualityType);
@@ -310,7 +262,7 @@ public class HibernateObservationUtilities {
                         }
                     }
                 }
-                IValue value = getValueFromObservation(hObservation);
+                IValue<?> value = getValueFromObservation(hObservation);
                 if (hObservation.getUnit() != null) {
                     value.setUnit(hObservation.getUnit().getUnit());
                 }
@@ -367,6 +319,7 @@ public class HibernateObservationUtilities {
         return observationCollection;
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static Collection<? extends SosObservation> createSosObservationFromObservationConstellation(
             ObservationConstellation observationConstellation, List<String> featureOfInterestIdentifiers,
             String version, Session session) throws OwsExceptionReport {
@@ -415,9 +368,10 @@ public class HibernateObservationUtilities {
         return observations;
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private static SosObservation createNewObservation(
             Map<Integer, SosObservationConstellation> observationConstellations, Observation hObservation,
-            ArrayList<SosQuality> qualityList, IValue value, int obsConstHash) {
+            ArrayList<SosQuality> qualityList, IValue<?> value, int obsConstHash) {
         SosObservation sosObservation = new SosObservation();
         sosObservation.setObservationID(Long.toString(hObservation.getObservationId()));
         if (hObservation.getIdentifier() != null && !hObservation.getIdentifier().isEmpty()
@@ -436,7 +390,7 @@ public class HibernateObservationUtilities {
     private static ITime getPhenomenonTime(Observation hObservation) {
         // create time element
         DateTime phenStartTime = new DateTime(hObservation.getPhenomenonTimeStart());
-        DateTime phenEndTime = null;
+        DateTime phenEndTime;
         if (hObservation.getPhenomenonTimeEnd() != null) {
             phenEndTime = new DateTime(hObservation.getPhenomenonTimeEnd());
         } else {
@@ -467,7 +421,7 @@ public class HibernateObservationUtilities {
      *            Observation object
      * @return Observation value
      */
-    private static IValue getValueFromObservation(Observation hObservation) {
+    private static IValue<?> getValueFromObservation(Observation hObservation) {
         if (hObservation instanceof NumericObservation) {
             return new QuantityValue(getNumericValueTable(((NumericObservation) hObservation).getValue()));
         } else if (hObservation instanceof BooleanObservation) {
@@ -633,10 +587,10 @@ public class HibernateObservationUtilities {
             for (List<String> block : values) {
                 int tokenIndex = 0;
                 ITime phenomenonTime = null;
-                List<IValue> observedValues = new ArrayList<IValue>();
+                List<IValue<?>> observedValues = new ArrayList<IValue<?>>();
                 // map to store the observed properties
-                Map<IValue, String> definitionsForObservedValues = new HashMap<IValue, String>();
-                IValue observedValue = null;
+                Map<IValue<?>, String> definitionsForObservedValues = new HashMap<IValue<?>, String>();
+                IValue<?> observedValue = null;
                 for (String token : block) {
                     // get values from block via definition in
                     // SosSweDataArray#getElementType
@@ -715,7 +669,7 @@ public class HibernateObservationUtilities {
                     }
                     tokenIndex++;
                 }
-                for (IValue iValue : observedValues) {
+                for (IValue<?> iValue : observedValues) {
                     SosObservation newObservation =
                             createSingleValueObservation(multiObservation, phenomenonTime, iValue);
                     observationCollection.add(newObservation);
@@ -725,9 +679,10 @@ public class HibernateObservationUtilities {
         }
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private static SosObservation createSingleValueObservation(SosObservation multiObservation, ITime phenomenonTime,
-            IValue iValue) {
-        IObservationValue value = new SosSingleObservationValue(phenomenonTime, iValue);
+                                                               IValue<?> iValue) {
+        IObservationValue<?> value = new SosSingleObservationValue(phenomenonTime, iValue);
         SosObservation newObservation = new SosObservation();
         newObservation.setNoDataValue(multiObservation.getNoDataValue());
         /*
@@ -748,6 +703,54 @@ public class HibernateObservationUtilities {
         newObservation.setResultType(multiObservation.getResultType());
         newObservation.setValue(value);
         return newObservation;
+    }
+
+    /**
+     * Class to make this Helper more testable. Test cases may overwrite methods to decouple this class from the
+     * Configurator.
+     */
+    protected static class Configuration {
+        /**
+         * @see Configurator#getTupleSeperator()
+         */
+        protected String getTupleSeperator() {
+            return Configurator.getInstance().getTupleSeperator();
+        }
+
+        /**
+         * @see Configurator#getTokenSeperator()
+         */
+        protected String getTokenSeperator() {
+            return Configurator.getInstance().getTokenSeperator();
+        }
+
+        /**
+         * @see Configurator#getCapabilitiesCacheController()
+         */
+        protected ACapabilitiesCacheController getCache() {
+            return Configurator.getInstance().getCapabilitiesCacheController();
+        }
+
+        /**
+         * @see Configurator#getActiveProfile()
+         */
+        protected IProfile getActiveProfile() {
+            return Configurator.getInstance().getActiveProfile();
+        }
+
+        /**
+         * @see Configurator#getFeatureQueryHandler()
+         */
+        protected IFeatureQueryHandler getFeatureQueryHandler() {
+            return Configurator.getInstance().getFeatureQueryHandler();
+        }
+
+        /**
+         * @see Configurator#isSupportsQuality()
+         */
+        protected boolean isSupportsQuality() {
+            return Configurator.getInstance().isSupportsQuality();
+        }
     }
     
 }

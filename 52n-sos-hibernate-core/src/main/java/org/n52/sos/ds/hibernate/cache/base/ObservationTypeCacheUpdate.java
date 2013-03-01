@@ -45,6 +45,7 @@ import org.n52.sos.util.Action;
 public class ObservationTypeCacheUpdate extends CacheUpdate {
 
     @Override
+    @SuppressWarnings("unchecked")
     public void execute() {
     	Criteria hObservationTypes = getSession().createCriteria(ObservationType.class);
 		List<ObservationType> observationTypes = hObservationTypes.list();
