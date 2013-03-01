@@ -113,7 +113,6 @@ public abstract class SettingsManager {
      * @param o the object to configure
      * <p/>
      * @throws ConfigurationException if there is a problem configuring the object
-     * @throws ConnectionProviderException
      * @see Configurable
      * @see Setting
      */
@@ -197,7 +196,6 @@ public abstract class SettingsManager {
      * @return the created user
      * <p/>
      * @throws ConnectionProviderException
-     * @throws HibernateException
      */
     public abstract IAdministratorUser createAdminUser(String username, String password) throws
             ConnectionProviderException;
@@ -208,7 +206,6 @@ public abstract class SettingsManager {
      * @param user the user to change
      * <p/>
      * @throws ConnectionProviderException
-     * @throws HibernateException
      */
     public abstract void saveAdminUser(IAdministratorUser user) throws ConnectionProviderException;
 
@@ -218,7 +215,6 @@ public abstract class SettingsManager {
      * @param username the username
      * <p/>
      * @throws ConnectionProviderException
-     * @throws HibernateException
      */
     public abstract void deleteAdminUser(String username) throws ConnectionProviderException;
 
