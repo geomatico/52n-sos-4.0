@@ -32,6 +32,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.ISOPeriodFormat;
 import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.ogc.gml.time.ITime.TimeFormat;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.slf4j.Logger;
@@ -52,6 +53,12 @@ public class DateTimeHelper {
      * response format for time
      */
     private static String responseFormat;
+
+    private static String ymdResponseFormat = "yyyy-MM-dd";
+
+    private static String ymResponseFormat = "yyyy-MM";
+
+    private static String yResponseFormat = "yyyy";
 
     /**
      * lease value
@@ -102,30 +109,29 @@ public class DateTimeHelper {
             throw new DateTimeException("The requested time has no ISO 8601 format!");
         }
     }
-    
+
     /**
      * Formats the given ITime to ISO 8601 string.
-     * @param time an {@link ITime} object to be formatted
+     * 
+     * @param time
+     *            an {@link ITime} object to be formatted
      * @return an ISO 8601 conform {@link String}.
-     * @throws IllegalArgumentException in the case of receiving <tt>null</tt> or not supported types.
+     * @throws IllegalArgumentException
+     *             in the case of receiving <tt>null</tt> or not supported
+     *             types.
      * @see {@link #formatDateTime2IsoString}
      */
-    public static String format(ITime time)
-    {
-        if (time != null)
-        {
-            if (time instanceof TimeInstant)
-            {
+    public static String format(ITime time) {
+        if (time != null) {
+            if (time instanceof TimeInstant) {
                 return formatDateTime2IsoString(((TimeInstant) time).getValue());
-            }
-            else if (time instanceof TimePeriod)
-            {
-                return String.format("%s/%s",
-                        formatDateTime2IsoString(((TimePeriod) time).getStart()),
+            } else if (time instanceof TimePeriod) {
+                return String.format("%s/%s", formatDateTime2IsoString(((TimePeriod) time).getStart()),
                         formatDateTime2IsoString(((TimePeriod) time).getEnd()));
             }
         }
-        String exceptionMsg = String.format("Given ITime object is not valid: %s", time!=null?time.getClass().getName():"null");
+        String exceptionMsg =
+                String.format("Given ITime object is not valid: %s", time != null ? time.getClass().getName() : "null");
         LOGGER.debug(exceptionMsg);
         throw new IllegalArgumentException(exceptionMsg);
     }
@@ -157,6 +163,19 @@ public class DateTimeHelper {
         return formatDateTime2FormattedString(dateTime, responseFormat);
     }
 
+    public static String formatDateTime2String(DateTime dateTime, TimeFormat timeFormat) throws DateTimeException {
+        switch (timeFormat) {
+        case Y:
+            return formatDateTime2YearDateString(dateTime);
+        case YM:
+            return formatDateTime2YearMonthDateString(dateTime);
+        case YMD:
+            return formatDateTime2YearMonthDayDateStringYMD(dateTime);
+        default:
+            return formatDateTime2ResponseString(dateTime);
+        }
+    }
+
     /**
      * Formats a DateTime to a String using specified format
      * 
@@ -177,6 +196,78 @@ public class DateTimeHelper {
                 }
                 return dateTime.toString(DateTimeFormat.forPattern(dateFormat)).replace("Z", "+00:00");
             }
+        } catch (IllegalArgumentException iae) {
+            String exceptionText = "Error while parse time String to DateTime!";
+            LOGGER.error(exceptionText, iae);
+            throw new DateTimeException(exceptionText, iae);
+        }
+    }
+
+    /**
+     * formats a DateTime to a string with year-month-day.
+     * 
+     * @param dateTime
+     *            The DateTime.
+     * @return Returns formatted time String.
+     * @throws DateTimeException 
+     */
+    public static String formatDateTime2YearMonthDayDateStringYMD(DateTime dateTime) throws DateTimeException {
+        try {
+            DateTime result = null;
+            if (dateTime == null) {
+                result = new DateTime(0000, 01, 01, 00, 00, 00, 000, DateTimeZone.UTC);
+            } else {
+                result = new DateTime(dateTime.getMillis(), DateTimeZone.UTC);
+            }
+            return result.toString(DateTimeFormat.forPattern(ymdResponseFormat));
+        } catch (IllegalArgumentException iae) {
+            String exceptionText = "Error while parse time String to DateTime!";
+            LOGGER.error(exceptionText, iae);
+            throw new DateTimeException(exceptionText, iae);
+        }
+    }
+
+    /**
+     * formats a DateTime to a string with year-month.
+     * 
+     * @param dateTime
+     *            The DateTime.
+     * @return Returns formatted time String.
+     * @throws DateTimeException 
+     */
+    public static String formatDateTime2YearMonthDateString(DateTime dateTime) throws DateTimeException {
+        try {
+            DateTime result = null;
+            if (dateTime == null) {
+                result = new DateTime(0000, 01, 01, 00, 00, 00, 000, DateTimeZone.UTC);
+            } else {
+                result = new DateTime(dateTime.getMillis(), DateTimeZone.UTC);
+            }
+            return result.toString(DateTimeFormat.forPattern(ymResponseFormat));
+        } catch (IllegalArgumentException iae) {
+            String exceptionText = "Error while parse time String to DateTime!";
+            LOGGER.error(exceptionText, iae);
+            throw new DateTimeException(exceptionText, iae);
+        }
+    }
+
+    /**
+     * formats a DateTime to a string with year.
+     * 
+     * @param dateTime
+     *            The DateTime.
+     * @return Returns formatted time String.
+     * @throws DateTimeException 
+     */
+    public static String formatDateTime2YearDateString(DateTime dateTime) throws DateTimeException {
+        try {
+            DateTime result = null;
+            if (dateTime == null) {
+                result = new DateTime(0000, 01, 01, 00, 00, 00, 000, DateTimeZone.UTC);
+            } else {
+                result = new DateTime(dateTime.getMillis(), DateTimeZone.UTC);
+            }
+            return result.toString(DateTimeFormat.forPattern(yResponseFormat));
         } catch (IllegalArgumentException iae) {
             String exceptionText = "Error while parse time String to DateTime!";
             LOGGER.error(exceptionText, iae);
