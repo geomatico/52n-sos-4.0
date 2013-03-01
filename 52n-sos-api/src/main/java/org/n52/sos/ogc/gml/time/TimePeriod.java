@@ -37,9 +37,9 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class TimePeriod extends ITime {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(TimePeriod.class);
-    
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimePeriod.class);
+
     private static final long serialVersionUID = 1L;
 
     /** start Date of timePeriod */
@@ -59,7 +59,6 @@ public class TimePeriod extends ITime {
 
     /** interval value */
     private String interval = null; // ISO8601 format
-
 
     /**
      * default constructor
@@ -232,61 +231,86 @@ public class TimePeriod extends ITime {
      * 
      * @param sosTime
      */
-    public void extendToContain( Collection<ITime> times ){
-        for( ITime time : times ){
-            extendToContain( time );
+    public void extendToContain(Collection<ITime> times) {
+        for (ITime time : times) {
+            extendToContain(time);
         }
     }
-    
+
     /**
      * Extend TimePeriod to contain ISosTime
      * 
      * @param sosTime
      */
-    public void extendToContain( ITime time ){
-        if( time instanceof TimeInstant ){
-            extendToContain( (TimeInstant) time );
-        } else if( time instanceof TimePeriod ){
-            extendToContain( (TimePeriod) time );
+    public void extendToContain(ITime time) {
+        if (time instanceof TimeInstant) {
+            extendToContain((TimeInstant) time);
+        } else if (time instanceof TimePeriod) {
+            extendToContain((TimePeriod) time);
         } else {
-        	String errorMsg = String.format("Received ITime type \"%s\" unknown.", time!=null?time.getClass().getName():time);
-        	LOGGER.error(errorMsg);
-        	throw new IllegalArgumentException(errorMsg);
+            String errorMsg =
+                    String.format("Received ITime type \"%s\" unknown.", time != null ? time.getClass().getName()
+                            : time);
+            LOGGER.error(errorMsg);
+            throw new IllegalArgumentException(errorMsg);
         }
+
     }
-    
+
     /**
      * Extend TimePeriod to contain another TimePeriod
      * 
      * @param period
      */
-    public void extendToContain( TimePeriod period ){
-        extendToContain( period.getStart() );
-        extendToContain( period.getEnd() );
-    }    
+    public void extendToContain(TimePeriod period) {
+        extendToContain(period.getStart());
+        extendToContain(period.getEnd());
+        checkTimeFormat(period.getTimeFormat());
+    }
 
     /**
      * Extend TimePeriod to contain TimeInstant
+     * 
      * @param instant
      */
-    public void extendToContain( TimeInstant instant ){
-        if( instant != null ){
-            extendToContain( instant.getValue() );
+    public void extendToContain(TimeInstant instant) {
+        if (instant != null) {
+            extendToContain(instant.getValue());
+            checkTimeFormat(instant.getTimeFormat());
         }
     }
-    
+
     /**
-     * Extend TimePeriod to contain DateTime. Used by other extendToContain methods.
+     * Extend TimePeriod to contain DateTime. Used by other extendToContain
+     * methods.
      * 
      * @param time
      */
-    public void extendToContain( DateTime time ){
-        if( time != null ){
-            if( !isSetStart() || time.isBefore( start ) ){
+    public void extendToContain(DateTime time) {
+        if (time != null) {
+            if (!isSetStart() || time.isBefore(start)) {
                 start = time;
             }
-            if( !isSetEnd() || time.isAfter( end ) ){
+            if (!isSetEnd() || time.isAfter(end)) {
                 end = time;
+            }
+        }
+    }
+
+    private void checkTimeFormat(TimeFormat timeFormat) {
+        if (this.getTimeFormat().equals(TimeFormat.NOT_SET)) {
+            this.setTimeFormat(timeFormat);
+        } else {
+            if (!this.getTimeFormat().equals(timeFormat)) {
+                if (timeFormat.equals(TimeFormat.ISO8601)) {
+                    this.setTimeFormat(timeFormat);
+                } else if (timeFormat.equals(TimeFormat.YMD)
+                        && (this.getTimeFormat().equals(TimeFormat.Y) || this.getTimeFormat().equals(TimeFormat.Y))) {
+                    this.setTimeFormat(timeFormat);
+                } else if (timeFormat.equals(TimeFormat.YM)
+                        && this.getTimeFormat().equals(TimeFormat.Y)) {
+                    this.setTimeFormat(timeFormat);
+                }
             }
         }
     }
@@ -324,15 +348,14 @@ public class TimePeriod extends ITime {
         }
         return 0;
     }
-    
+
     /**
      * @return <tt>true</tt>, if start and end are NOT set
      * @see #isSetStart()
      * @see #isSetEnd()
      */
-    public boolean isEmpty()
-    {
-    	return !isSetEnd() && !isSetStart();
+    public boolean isEmpty() {
+        return !isSetEnd() && !isSetStart();
     }
 
     /**
@@ -340,76 +363,72 @@ public class TimePeriod extends ITime {
      * @see #isEmpty()
      * @see #isSetEnd()
      */
-    public boolean isSetStart()
-	{
-		return start != null;
-	}
+    public boolean isSetStart() {
+        return start != null;
+    }
 
     /**
      * @return <tt>true</tt>, if end is set
      * @see #isSetStart()
      * @see #isEmpty()
      */
-    public boolean isSetEnd()
-	{
-		return end != null;
-	}
+    public boolean isSetEnd() {
+        return end != null;
+    }
 
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((duration == null) ? 0 : duration.hashCode());
-		result = prime * result + ((end == null) ? 0 : end.hashCode());
-		result = prime * result + ((endIndet == null) ? 0 : endIndet.hashCode());
-		result = prime * result + ((interval == null) ? 0 : interval.hashCode());
-		result = prime * result + ((start == null) ? 0 : start.hashCode());
-		result = prime * result + ((startIndet == null) ? 0 : startIndet.hashCode());
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((duration == null) ? 0 : duration.hashCode());
+        result = prime * result + ((end == null) ? 0 : end.hashCode());
+        result = prime * result + ((endIndet == null) ? 0 : endIndet.hashCode());
+        result = prime * result + ((interval == null) ? 0 : interval.hashCode());
+        result = prime * result + ((start == null) ? 0 : start.hashCode());
+        result = prime * result + ((startIndet == null) ? 0 : startIndet.hashCode());
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof TimePeriod))
-			return false;
-		TimePeriod other = (TimePeriod) obj;
-		if (duration == null) {
-			if (other.duration != null)
-				return false;
-		} else if (!duration.equals(other.duration))
-			return false;
-		if (end == null) {
-			if (other.end != null)
-				return false;
-		} else if (!end.equals(other.end))
-			return false;
-		if (endIndet == null) {
-			if (other.endIndet != null)
-				return false;
-		} else if (!endIndet.equals(other.endIndet))
-			return false;
-		if (interval == null) {
-			if (other.interval != null)
-				return false;
-		} else if (!interval.equals(other.interval))
-			return false;
-		if (start == null) {
-			if (other.start != null)
-				return false;
-		} else if (!start.equals(other.start))
-			return false;
-		if (startIndet == null) {
-			if (other.startIndet != null)
-				return false;
-		} else if (!startIndet.equals(other.startIndet))
-			return false;
-		return true;
-	}
-    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof TimePeriod))
+            return false;
+        TimePeriod other = (TimePeriod) obj;
+        if (duration == null) {
+            if (other.duration != null)
+                return false;
+        } else if (!duration.equals(other.duration))
+            return false;
+        if (end == null) {
+            if (other.end != null)
+                return false;
+        } else if (!end.equals(other.end))
+            return false;
+        if (endIndet == null) {
+            if (other.endIndet != null)
+                return false;
+        } else if (!endIndet.equals(other.endIndet))
+            return false;
+        if (interval == null) {
+            if (other.interval != null)
+                return false;
+        } else if (!interval.equals(other.interval))
+            return false;
+        if (start == null) {
+            if (other.start != null)
+                return false;
+        } else if (!start.equals(other.start))
+            return false;
+        if (startIndet == null) {
+            if (other.startIndet != null)
+                return false;
+        } else if (!startIndet.equals(other.startIndet))
+            return false;
+        return true;
+    }
+
 }

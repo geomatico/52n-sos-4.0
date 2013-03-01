@@ -37,6 +37,8 @@ public abstract class ITime implements Comparable<ITime>, Serializable {
     
     private String indeterminateValue;
     
+    private TimeFormat timeFormat = TimeFormat.NOT_SET;
+    
     public ITime() {
     }
 
@@ -84,5 +86,17 @@ public abstract class ITime implements Comparable<ITime>, Serializable {
     
     public boolean isReferenced() {
         return isSetGmlId() && gmlId.startsWith("#");
+    }
+    
+    public TimeFormat getTimeFormat() {
+        return timeFormat;
+    }
+
+    public void setTimeFormat(TimeFormat timeFormat) {
+        this.timeFormat = timeFormat;
+    }
+
+    public enum TimeFormat {
+        ISO8601, YMD, YM, Y, NOT_SET
     }
 }
