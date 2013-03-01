@@ -113,6 +113,13 @@ public class CollectionHelper {
         Collections.addAll(list, ts);
         return list;
     }
+    
+    public static <T> Set<T> asSet(final T t, final T... ts) {
+        Set<T> set = new HashSet<T>(ts.length + 1);
+        set.add(t);
+        Collections.addAll(set, ts);
+        return set;
+    }
 
     public static <T> List<T> conjunctCollections(Collection<T> list1, Collection<T> list2) {
         HashSet<T> s1 = new HashSet<T>(list1);
