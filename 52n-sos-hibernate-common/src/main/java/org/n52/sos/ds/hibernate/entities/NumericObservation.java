@@ -24,6 +24,7 @@
 package org.n52.sos.ds.hibernate.entities;
 
 public class NumericObservation extends Observation {
+    private static final long serialVersionUID = 1L;
     
     private NumericValue value;
 

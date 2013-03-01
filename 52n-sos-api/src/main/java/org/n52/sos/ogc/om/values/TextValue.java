@@ -24,6 +24,7 @@
 package org.n52.sos.ogc.om.values;
 
 public class TextValue implements IValue<String> {
+    private static final long serialVersionUID = 1L;
     
     private String value;
     

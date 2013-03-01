@@ -24,6 +24,7 @@
 package org.n52.sos.ogc.om.values;
 
 public class UnknownValue implements IValue<Object> {
+    private static final long serialVersionUID = 1L;
     
     private Object value;
     

@@ -29,6 +29,7 @@ package org.n52.sos.ogc.om;
  * 
  */
 public class SosObservableProperty extends AbstractSosPhenomenon {
+    private static final long serialVersionUID = 1L;
 
     /** unit of the values of the phenomenons observations */
     private String unit;

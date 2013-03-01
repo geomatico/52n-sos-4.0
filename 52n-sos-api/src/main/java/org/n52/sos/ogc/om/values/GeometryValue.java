@@ -26,6 +26,7 @@ package org.n52.sos.ogc.om.values;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeometryValue implements IValue<Geometry> {
+    private static final long serialVersionUID = 1L;
     
     private Geometry value;
     

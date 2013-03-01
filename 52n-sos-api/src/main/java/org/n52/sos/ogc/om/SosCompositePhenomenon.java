@@ -31,6 +31,7 @@ import java.util.List;
  * 
  */
 public class SosCompositePhenomenon extends AbstractSosPhenomenon {
+    private static final long serialVersionUID = 1L;
 
     /** the components of the composite phenomenon */
     private List<SosObservableProperty> phenomenonComponents;
