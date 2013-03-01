@@ -309,7 +309,7 @@ public final class Sos2Constants {
     }
 
     public enum DeleteSensorParams {
-        service, version, procedure, procedureDescriptionFormat;
+        service, version, procedure;
 
         public static boolean contains(String s) {
             for (Enum<?> p : values()) {
