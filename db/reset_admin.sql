@@ -22,7 +22,6 @@
 -- visit the Free Software Foundation web page, http://www.fsf.org.
 --
 
--- sets the password to 'password'
-UPDATE administrator_user 
-SET password = '$2a$10$vbp9aXCDMP/fXwEsqe/1.eon44mMdUyC4ub2JfOrkPfaer5ciLOly' 
-WHERE username = 'admin';
+-- sets the username to 'admin' and the password to 'password' for the user with id 1
+INSERT OR REPLACE INTO administrator_user(id, username, password)
+VALUES (1, 'admin', '$2a$10$vbp9aXCDMP/fXwEsqe/1.eon44mMdUyC4ub2JfOrkPfaer5ciLOly');
