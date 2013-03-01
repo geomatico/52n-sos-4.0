@@ -60,11 +60,16 @@ public abstract class AbstractRequestOperator<D extends IOperationDAO, R extends
     private final RequestOperatorKeyType requestOperatorKeyType;
     private final Class<R> requestType;
 
+    @SuppressWarnings("unchecked")
     public AbstractRequestOperator(String service, String version, String operationName, Class<R> requestType) {
         this.operationName = operationName;
         this.requestOperatorKeyType = new RequestOperatorKeyType(new ServiceOperatorKeyType(service, version), operationName);
         this.requestType = requestType;
         this.dao = (D) Configurator.getInstance().getOperationDaoRepository().getOperationDAO(operationName);
+        if (this.dao == null) {
+            throw new NullPointerException(String
+                    .format("IOperationDao for Operation %s has no implementation!", operationName));
+        }
         LOGGER.info("{} initialized successfully!", getClass().getSimpleName());
     }
 
