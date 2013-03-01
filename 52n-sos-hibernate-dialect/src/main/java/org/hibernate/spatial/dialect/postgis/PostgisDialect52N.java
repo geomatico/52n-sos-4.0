@@ -41,14 +41,16 @@ import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
  * 
  * @author Karel Maesen
  */
+//TODO review super class: PostgreSQL82Dialect instead of PostgreSQLDialect?
 public class PostgisDialect52N extends PostgreSQLDialect implements SpatialDialect {
+    private static final long serialVersionUID = 1L;
 
     public PostgisDialect52N() {
         super();
         registerTypesAndFunctions();
     }
 
-    protected void registerTypesAndFunctions() {
+    protected final void registerTypesAndFunctions() {
 
         registerColumnType(java.sql.Types.STRUCT, "geometry");
         // registering OGC functions
