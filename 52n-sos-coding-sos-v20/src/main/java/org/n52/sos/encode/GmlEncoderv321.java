@@ -52,7 +52,6 @@ import net.opengis.gml.x32.TimePositionType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
-import org.joda.time.DateTime;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.GMLConstants;
@@ -65,8 +64,8 @@ import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
+import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
@@ -297,7 +296,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
             }
             // beginPosition
             TimePositionType xbTimePositionBegin = TimePositionType.Factory.newInstance();
-            String beginString = DateTimeHelper.formatDateTime2ResponseString(timePeriod.getStart());
+            String beginString =  DateTimeHelper.formatDateTime2String(timePeriod.getStart(), timePeriod.getTimeFormat());
 
             // concat minutes for timeZone offset, because gml requires
             // xs:dateTime, which needs minutes in
@@ -307,7 +306,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
 
             // endPosition
             TimePositionType xbTimePositionEnd = TimePositionType.Factory.newInstance();
-            String endString = DateTimeHelper.formatDateTime2ResponseString(timePeriod.getEnd());
+            String endString =  DateTimeHelper.formatDateTime2String(timePeriod.getEnd(), timePeriod.getTimeFormat());
 
             // concat minutes for timeZone offset, because gml requires
             // xs:dateTime, which needs minutes in
@@ -361,8 +360,7 @@ public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
             String timeString = OGCConstants.UNKNOWN;
             if(timeInstant.isSetValue()) {
                 // parse db date string and format into GML format
-                DateTime date = timeInstant.getValue();
-                timeString = DateTimeHelper.formatDateTime2ResponseString(date);
+                timeString =  DateTimeHelper.formatDateTime2String(timeInstant.getValue(), timeInstant.getTimeFormat());
                 // concat minutes for timeZone offset, because gml requires
                 // xs:dateTime,
                 // which needs minutes in
