@@ -307,7 +307,7 @@
             "GetCapabilities": {
                 "GetCapabilities": {
                     "param": {
-                        "service:": "SOS",
+                        "service": "SOS",
                         "request": "GetCapabilities",
                         "AcceptVersions": "1.0.0"
                     }
