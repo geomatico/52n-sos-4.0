@@ -33,7 +33,7 @@ import org.hibernate.TypeMismatchException;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class HibernateUriType extends AbstractStringBasedHIbernateUserType<URI> {
+public class HibernateUriType extends AbstractStringBasedHibernateUserType<URI> {
 
     public HibernateUriType() {
         super(URI.class);

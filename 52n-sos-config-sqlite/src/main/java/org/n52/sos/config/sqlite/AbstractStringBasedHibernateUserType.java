@@ -32,13 +32,13 @@ import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
 
 /**
- * TODO JavaDoc
+ * @param <T> the type that is serialized to a string
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class AbstractStringBasedHIbernateUserType<T> extends AbstractHibernateUserType {
+public abstract class AbstractStringBasedHibernateUserType<T> extends AbstractHibernateUserType {
 
-    public AbstractStringBasedHIbernateUserType(Class<T> clazz) {
+    public AbstractStringBasedHibernateUserType(Class<T> clazz) {
         super(clazz);
     }
 
@@ -55,6 +55,7 @@ public abstract class AbstractStringBasedHIbernateUserType<T> extends AbstractHi
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void nullSafeSet(PreparedStatement st, Object value, int index, SessionImplementor session) throws
             HibernateException, SQLException {
         if (value == null) {
@@ -65,6 +66,7 @@ public abstract class AbstractStringBasedHIbernateUserType<T> extends AbstractHi
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Object deepCopy(Object value) throws HibernateException {
         return (value == null) ? null : decode(encode((T) value));
     }

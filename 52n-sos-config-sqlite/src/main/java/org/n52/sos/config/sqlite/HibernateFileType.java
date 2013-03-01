@@ -30,7 +30,7 @@ import java.io.File;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class HibernateFileType extends AbstractStringBasedHIbernateUserType<File> {
+public class HibernateFileType extends AbstractStringBasedHibernateUserType<File> {
 
     public HibernateFileType() {
         super(File.class);
