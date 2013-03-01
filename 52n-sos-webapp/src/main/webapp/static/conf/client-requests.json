@@ -583,6 +583,16 @@
                     }
                 }
             },
+            "DeleteSensor": {
+                "DeleteSensor": {
+                    "param": {
+                        "service": "SOS",
+                        "version": "2.0.0",
+                        "request": "DeleteSensor",
+                        "procedure": "http://www.example.org/sensors/107"
+                    }
+                }
+            },
             "GetResult": {
                 "GetResult": {
                     "param": {

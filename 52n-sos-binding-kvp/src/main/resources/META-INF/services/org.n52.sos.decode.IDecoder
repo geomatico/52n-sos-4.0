@@ -1,4 +1,5 @@
 org.n52.sos.decode.kvp.v2.DescribeSensorKvpDecoder
+org.n52.sos.decode.kvp.v2.DeleteSensorKvpDecoder
 org.n52.sos.decode.kvp.v2.GetCapabilitiesKvpDecoder
 org.n52.sos.decode.kvp.v2.GetFeatureOfInterestKvpDecoder
 org.n52.sos.decode.kvp.v2.GetObservationKvpDecoder
