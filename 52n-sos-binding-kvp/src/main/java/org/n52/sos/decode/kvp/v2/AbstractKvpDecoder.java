@@ -89,10 +89,8 @@ public abstract class AbstractKvpDecoder implements IDecoder<AbstractServiceRequ
             spatialFilter.setValueReference(parameterValues.get(0));
 
             int srid = 4326;
-            if (parameterValues.get(parameterValues.size() - 1).startsWith(
-                    Configurator.getInstance().getSrsNamePrefixSosV2())
-                    || parameterValues.get(parameterValues.size() - 1).startsWith(
-                            Configurator.getInstance().getSrsNamePrefix())) {
+            if (parameterValues.get(parameterValues.size() - 1).startsWith(getSrsNamePrefixSosV2())
+                    || parameterValues.get(parameterValues.size() - 1).startsWith(getSrsNamePrefix())) {
                 hasSrid = true;
                 srid = SosHelper.parseSrsName(parameterValues.get(parameterValues.size() - 1));
             }
@@ -197,6 +195,14 @@ public abstract class AbstractKvpDecoder implements IDecoder<AbstractServiceRequ
             throw new DecoderException(String.format("The paramter value '%s' is invalid!", value));
         }
         return temporalFilter;
+    }
+
+    protected String getSrsNamePrefix() {
+        return Configurator.getInstance().getSrsNamePrefix();
+    }
+
+    protected String getSrsNamePrefixSosV2() {
+        return Configurator.getInstance().getSrsNamePrefixSosV2();
     }
 
 }
