@@ -47,8 +47,8 @@ public class KvpOperationDecoderKeyTest {
             new KvpOperationDecoderKey(SosConstants.SOS, null, SosConstants.Operations.GetCapabilities.name()).hashCode(),
             new KvpOperationDecoderKey(SosConstants.SOS, null, SosConstants.Operations.GetCapabilities.name()).hashCode());
         assertEquals(
-            new KvpOperationDecoderKey(SosConstants.SOS, Sos2Constants.SERVICEVERSION, null).hashCode(),
-            new KvpOperationDecoderKey(SosConstants.SOS, Sos2Constants.SERVICEVERSION, null).hashCode());
+                new KvpOperationDecoderKey(SosConstants.SOS, Sos2Constants.SERVICEVERSION, (String) null).hashCode(),
+                new KvpOperationDecoderKey(SosConstants.SOS, Sos2Constants.SERVICEVERSION, (String) null).hashCode());
     }
     
      @Test
@@ -63,7 +63,7 @@ public class KvpOperationDecoderKeyTest {
             new KvpOperationDecoderKey(SosConstants.SOS, null, SosConstants.Operations.GetCapabilities.name()),
             new KvpOperationDecoderKey(SosConstants.SOS, null, SosConstants.Operations.GetCapabilities.name()));
         assertEquals(
-            new KvpOperationDecoderKey(SosConstants.SOS, Sos2Constants.SERVICEVERSION, null),
-            new KvpOperationDecoderKey(SosConstants.SOS, Sos2Constants.SERVICEVERSION, null));
+                 new KvpOperationDecoderKey(SosConstants.SOS, Sos2Constants.SERVICEVERSION, (String) null),
+                 new KvpOperationDecoderKey(SosConstants.SOS, Sos2Constants.SERVICEVERSION, (String) null));
      }
 }
