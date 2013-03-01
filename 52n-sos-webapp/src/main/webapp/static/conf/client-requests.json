@@ -239,7 +239,7 @@
                 }
             },
             "RegisterSensor": {
-               "RegisterSensor - CategoryObservation": {
+                "RegisterSensor - CategoryObservation": {
                     "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_categoryObservation.xml"
                 },
                 "RegisterSensor - Measurement": {
@@ -262,7 +262,7 @@
                 },
                 "RegisterSensor - Observation - No ID's": {
                     "request": "static/examples/sos_v100/requests_xml/RegisterSensor/RegisterSensor_Observation_noIDs.xml"
-                } 
+                }
             }
         },
         "/soap": {
@@ -300,7 +300,7 @@
             "RegisterSensor": {
                 "RegisterSensor (SOAP 1.2)": {
                     "request": "static/examples/sos_v100/requests_soap/RegisterSensor_soap_12.xml"
-                }    
+                }
             }
         },
         "/kvp": {
@@ -309,7 +309,7 @@
                     "param": {
                         "service:": "SOS",
                         "request": "GetCapabilities",
-                        "AcceptVersions": "1.0.0"    
+                        "AcceptVersions": "1.0.0"
                     }
                 }
             }
@@ -387,9 +387,9 @@
                         "service": "SOS",
                         "version": "2.0.0",
                         "request": "GetObservation",
-                        "offering":  [ 
-                            "test_offering_1", 
-                            "test_offering_3" 
+                        "offering": [
+                            "test_offering_1",
+                            "test_offering_3"
                         ]
                     }
                 },
@@ -425,7 +425,7 @@
                         "service": "SOS",
                         "version": "2.0.0",
                         "request": "GetObservation",
-                        "observedProperty": [ 
+                        "observedProperty": [
                             "test_observable_property_1",
                             "test_observable_property_3"
                         ]
@@ -444,7 +444,10 @@
                         "service": "SOS",
                         "version": "2.0.0",
                         "request": "GetObservation",
-                        "featureOfInterest": [ "test_feature_1", "test_feature_3" ]
+                        "featureOfInterest": [
+                            "test_feature_1",
+                            "test_feature_3"
+                        ]
                     }
                 },
                 "GetObservation (spatial filter, URN)": {
@@ -455,8 +458,8 @@
                         "namespaces": [
                             "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
                             "xmlns(om,http://www.opengis.net/om/2.0)"
-                         ],
-                         "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,urn:ogc:def:crs:EPSG::4326"
+                        ],
+                        "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,urn:ogc:def:crs:EPSG::4326"
                     }
                 },
                 "GetObservation (spatial filter, URL)": {
@@ -512,7 +515,7 @@
                         "version": "2.0.0",
                         "request": "GetFeatureOfInterest",
                         "procedure": [
-                            "http://www.example.org/sensors/101", 
+                            "http://www.example.org/sensors/101",
                             "http://www.example.org/sensors/102"
                         ]
                     }
@@ -550,7 +553,7 @@
                         "version": "2.0.0",
                         "request": "GetFeatureOfInterest",
                         "featureOfInterest": [
-                            "test_feature_1", 
+                            "test_feature_1",
                             "test_feature_2"
                         ]
                     }
@@ -563,8 +566,8 @@
                         "namespaces": [
                             "xmlns(sams,http://www.opengis.net/samplingSpatial/2.0)",
                             "xmlns(om,http://www.opengis.net/om/2.0)"
-                         ],
-                         "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,urn:ogc:def:crs:EPSG::4326"
+                        ],
+                        "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,urn:ogc:def:crs:EPSG::4326"
                     }
                 },
                 "GetFeatureOfInterest (spatial filter, URL)": {
@@ -578,27 +581,49 @@
                         ],
                         "spatialFilter": "om:featureOfInterest/*/sams:shape,0.0,0.0,60.0,60.0,http://www.opengis.net/def/crs/EPSG/0/4326"
                     }
-                }  
+                }
+            },
+            "GetResult": {
+                "GetResult": {
+                    "param": {
+                        "service": "SOS",
+                        "version": "2.0.0",
+                        "request": "GetResult",
+                        "offering": "test_offering_7",
+                        "observedProperty": "test_observable_property_7_3"
+                    }
+                }
+            },
+            "GetResultTemplate": {
+                "GetResultTemplate": {
+                    "param": {
+                        "service": "SOS",
+                        "version": "2.0.0",
+                        "request": "GetResult",
+                        "offering": "test_offering_7",
+                        "observedProperty": "test_observable_property_7_3"
+                    }
+                }
             },
             "GetDataAvailability": {
                 "GetDataAvailability (minimal)": {
                     "param": {
                         "service": "SOS",
-                        "version": "2.0.0", 
+                        "version": "2.0.0",
                         "request": "GetDataAvailability"
                     }
                 },
                 "GetDataAvailability": {
                     "param": {
                         "service": "SOS",
-                        "version": "2.0.0", 
+                        "version": "2.0.0",
                         "request": "GetDataAvailability",
                         "observedProperty": [
                             "test_observable_property_1",
                             "test_observable_property_3"
                         ],
                         "procedure": [
-                            "http://www.example.org/sensors/101", 
+                            "http://www.example.org/sensors/101",
                             "http://www.example.org/sensors/103"
                         ],
                         "featureOfInterest": [
