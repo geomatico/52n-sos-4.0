@@ -119,7 +119,10 @@ LANGUAGE 'sql';
 
 CREATE OR REPLACE FUNCTION insert_offering(text) RETURNS bigint AS
 $$
-	INSERT INTO offering(identifier, name) SELECT $1, $1 WHERE $1 NOT IN (SELECT identifier FROM offering);
+	INSERT INTO offering(identifier, name) 
+		SELECT $1, $1 || '_name'::text
+		WHERE $1 NOT IN (
+			SELECT identifier FROM offering);
 	SELECT offering_id FROM offering WHERE identifier = $1;
 $$
 LANGUAGE 'sql';
