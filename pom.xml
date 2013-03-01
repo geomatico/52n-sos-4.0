@@ -18,6 +18,10 @@
         <url>https://bugzilla.52north.org/</url>
     </issueManagement>
     <packaging>pom</packaging>
+    <ciManagement>
+        <system>hudson</system>
+        <url>http://build.dev.52north.org:8080/job/52n-sos-dev/</url>
+    </ciManagement>
     <modules>
         <module>52n-sos-api</module>
         <module>52n-sos-config-sqlite</module>
