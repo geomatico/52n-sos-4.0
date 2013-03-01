@@ -73,10 +73,10 @@
             $(this).attr("href", $(this).attr("href") 
                 + "?subject=" + encodeURIComponent(subject) 
                 + "&body=" + encodeURIComponent(body));
-        })
+        });
 		if ($.queryParam["install"] === "finished")  {
 			window.setTimeout(function() {
-				showSuccess("Installation completed!<c:if test="${sos:hasClient()}"><a href='<c:url value="/client"/>'>Test it.</a></c:if>");
+				showSuccess("Installation completed!<c:if test="${sos:hasClient()}"> <a href='<c:url value="/client"/>'>Test it.</a></c:if>");
 			}, 1000);
 		}	
     });
