@@ -20,6 +20,7 @@ public class DeleteSensorKvpDecoderTest extends DeleteSensorKvpDecoder {
     private static final String SERVICE = SosConstants.SOS;
     private static final String VERSION = Sos2Constants.SERVICEVERSION;
     private static final String ADDITIONAL_PARAMETER = "additionalParameter";
+    private static final String EMPTY_STRING = "";
 
     @Test
     public void correctMap() throws OwsExceptionReport {
@@ -61,19 +62,19 @@ public class DeleteSensorKvpDecoderTest extends DeleteSensorKvpDecoder {
     @Test(expected = OwsExceptionReport.class)
     public void emptyService() throws OwsExceptionReport {
         DeleteSensorKvpDecoder decoder = new DeleteSensorKvpDecoder();
-        decoder.decode(createMap("", VERSION, PROCEDURE));
+        decoder.decode(createMap(EMPTY_STRING, VERSION, PROCEDURE));
     }
 
     @Test(expected = OwsExceptionReport.class)
     public void emptyVersion() throws OwsExceptionReport {
         DeleteSensorKvpDecoder decoder = new DeleteSensorKvpDecoder();
-        decoder.decode(createMap(SERVICE, "", PROCEDURE));
+        decoder.decode(createMap(SERVICE, EMPTY_STRING, PROCEDURE));
     }
 
     @Test(expected = OwsExceptionReport.class)
     public void emptyProcedure() throws OwsExceptionReport {
         DeleteSensorKvpDecoder decoder = new DeleteSensorKvpDecoder();
-        decoder.decode(createMap(SERVICE, VERSION, ""));
+        decoder.decode(createMap(SERVICE, VERSION, EMPTY_STRING));
     }
 
     private Map<String, String> createMap(String service, String version, String procedure) {
