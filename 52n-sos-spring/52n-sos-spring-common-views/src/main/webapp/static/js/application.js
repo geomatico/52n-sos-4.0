@@ -21,18 +21,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-if (typeof String.prototype.startsWith != "function") {
+if (typeof String.prototype.startsWith !== "function") {
     String.prototype.startsWith = function(str) {
         "use strict";
-        if (this == null) throw new TypeError();
+        if (this === null)
+            throw new TypeError();
         return this.slice(0, str.length) === str;
     };
 }
 
-if (typeof String.prototype.endsWith != "function") {
+if (typeof String.prototype.endsWith !== "function") {
     String.prototype.endsWith = function(str) {
         "use strict";
-        if (this == null) throw new TypeError();
+        if (this === null)
+            throw new TypeError();
         return this.slice(-str.length) === str;
     };
 }
@@ -40,7 +42,8 @@ if (typeof String.prototype.endsWith != "function") {
 if (!String.prototype.matches) {
     String.prototype.matches = function(regexp) {
         "use strict";
-        if (this == null) throw new TypeError();
+        if (this === null)
+            throw new TypeError();
         return this.match(regexp) ? true : false;
     };
 }
@@ -53,7 +56,8 @@ if (!String.prototype.matches) {
         var b = {};
         for (var i = 0; i < a.length; ++i) {
             var p = a[i].split('=');
-            if (p.length != 2) continue;
+            if (p.length !== 2)
+                continue;
             b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
         }
         return b;
@@ -80,7 +84,7 @@ function showMessage(text, type, autoclose) {
     if (autoclose) {
         window.setTimeout(function() {
             closeAlert($alert);
-        }, (typeof(autoclose) == "number") ? autoclose : 5000);
+        }, (typeof(autoclose) === "number") ? autoclose : 5000);
     }
 }
 
@@ -274,7 +278,7 @@ var jdbc = {};
 
 function buildJdbcString(j) {
     var string = j.host;
-    if (j.port != undefined) {
+    if (j.port !== undefined) {
         string += ":" + j.port;
     }
     string += "/" + encodeURIComponent(j.db);
@@ -313,5 +317,14 @@ function setJdbcInputs() {
     jdbc = parseJdbcString($(this).val());
     for (key in jdbc) {
         $("#" + key + "-input").val(jdbc[key]);
+    }
+}
+
+function warnIfNotHttps() {
+    if (!document.location.protocol.matches("^https")) {
+        showMessage(
+                "<b>Warning!</b> The password will be transferred in clear text. "
+                + "Use this site only in safe environments (i.e. <b>NOT</b> on "
+                + "public Wi-Fi or internet caf&eacute;s)!");
     }
 }

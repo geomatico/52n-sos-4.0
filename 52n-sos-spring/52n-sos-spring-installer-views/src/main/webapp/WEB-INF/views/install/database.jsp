@@ -76,6 +76,7 @@
 
 
 <script type="text/javascript">
+    warnIfNotHttps();
     $.getJSON("<c:url value="/static/conf/default-database-values.json" />", function(settings) {
         var jdbc_uri = settings["jdbc_uri"];
         var driver = settings["driver"];
@@ -103,12 +104,12 @@
                 
         jdbc_uri = jdbc_uri.replace("jdbc:postgresql://","");
         $("#driver").val(driver);
-        $(".jdbccomponent").bind("keyup input", setJdbcString)
+        $(".jdbccomponent").bind("keyup input", setJdbcString);
         $("#jdbc-input").val(jdbc_uri).bind("keyup input", setJdbcInputs).trigger("input");
 
         $("input[type=text],input[type=password],textarea").trigger("input");
         $("#next").click(function() {
-            $("input[name=jdbc_uri]").val("jdbc:postgresql://" + $("#jdbc-input").val())
+            $("input[name=jdbc_uri]").val("jdbc:postgresql://" + $("#jdbc-input").val());
             $(this).parents("form").submit();
         });
         $("input[name=overwrite_tables]").click(function(){
@@ -121,11 +122,11 @@
             $(this).find(".control-group").wrapAll($("<div>").addClass("control-wrap"));
         });
         $("div.control-wrap").hide();
-        $legend.wrapInner($("<a>").attr("href", "#"))
+        $legend.wrapInner($("<a>").attr("href", "#"));
         $legend.children("a").prepend($("<i>").addClass("icon-chevron-right"));
         $legend.click(function(e) {
             e.preventDefault();
-            $(this).find("i").toggleClass("icon-chevron-right icon-chevron-down")
+            $(this).find("i").toggleClass("icon-chevron-right icon-chevron-down");
             $(this).next().slideToggle();
         });
 
@@ -141,7 +142,7 @@
                 $create_tables.attr({ 
                     "checked": "checked", 
                     "disabled": true })
-                .parent("label").addClass("muted")
+                .parent("label").addClass("muted");
             } else {
                 $create_tables.removeAttr("disabled")
                     .parent("label").removeClass("muted");

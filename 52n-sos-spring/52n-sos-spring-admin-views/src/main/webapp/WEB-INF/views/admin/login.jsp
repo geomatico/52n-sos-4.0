@@ -53,6 +53,7 @@
 </form>
 <script type="text/javascript">
 	$(function(){
+        warnIfNotHttps();
 		$("#passwordReset").hide();
 		if ($.queryParam["error"]) {
 			showError("Incorrect username/password. Please try again!");
