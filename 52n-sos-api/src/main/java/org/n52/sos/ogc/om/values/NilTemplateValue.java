@@ -27,6 +27,7 @@ package org.n52.sos.ogc.om.values;
 public class NilTemplateValue implements IValue<String> {
 
     private static final long serialVersionUID = -3751934124688213692L;
+    private String unit;
     
     @Override
     public void setValue(String value) {
@@ -39,17 +40,18 @@ public class NilTemplateValue implements IValue<String> {
 
     @Override
     public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     @Override
     public String getUnit() {
-        return null;
+        return unit;
     }
 
 	@Override
 	public String toString()
 	{
-		return String.format("NilTemplateValue [value=%s, unit=null]", getValue());
+		return String.format("NilTemplateValue [value=%s, unit=%s]", getValue(), getUnit());
 	}
 
     @Override
