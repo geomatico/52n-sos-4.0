@@ -406,6 +406,7 @@ public class HibernateObservationUtilities {
                 sosObservation.setTupleSeparator(getTupleSeperator());
                 sosObservation.setObservationConstellation(obsConst);
                 NilTemplateValue value = new NilTemplateValue();
+                value.setUnit(obsProp.getUnit());
                 sosObservation.setValue(new SosSingleObservationValue(new TimeInstant(), value,
                         new ArrayList<SosQuality>(0)));
                 observations.add(sosObservation);
