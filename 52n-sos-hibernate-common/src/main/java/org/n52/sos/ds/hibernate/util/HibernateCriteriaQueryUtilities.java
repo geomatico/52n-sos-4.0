@@ -94,7 +94,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * Utility class for Hiberntate Criteria queries.
  * 
  */
-public class HibernateCriteriaQueryUtilities {
+public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQueryUtilities {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateCriteriaQueryUtilities.class);
 
@@ -384,67 +384,7 @@ public class HibernateCriteriaQueryUtilities {
      * @param objectClass
      * @return Result objects
      */
-    public static List<?> getObjectList(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
-        Criteria criteria = session.createCriteria(objectClass);
-        if (queryObject.isSetAliases()) {
-            addAliasesToCriteria(criteria, queryObject.getAliases());
-        }
-        if (queryObject.isSetCriterions()) {
-            Conjunction conjunction = Restrictions.conjunction();
-            for (Criterion criterion : queryObject.getCriterions()) {
-                conjunction.add(criterion);
-            }
-            criteria.add(conjunction);
-        }
-        if (queryObject.isSetProjections()) {
-            ProjectionList projectionList = Projections.projectionList();
-            for (Projection projection : queryObject.getProjections()) {
-                projectionList.add(projection);
-            }
-            criteria.setProjection(projectionList);
-        }
-        if (queryObject.isSetOrder()) {
-            criteria.addOrder(queryObject.getOrder());
-        }
-        if (queryObject.isSetMaxResults()) {
-            criteria.setMaxResults(queryObject.getMaxResult());
-        }
-        if (queryObject.isSetResultTransformer()) {
-            criteria.setResultTransformer(queryObject.getResultTransformer());
-        } else {
-            criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        }
-        return criteria.list();
-    }
     
-    protected static Object getObject(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
-        Criteria criteria = session.createCriteria(objectClass);
-        if (queryObject.isSetAliases()) {
-            addAliasesToCriteria(criteria, queryObject.getAliases());
-        }
-        if (queryObject.isSetCriterions()) {
-            Conjunction conjunction = Restrictions.conjunction();
-            for (Criterion criterion : queryObject.getCriterions()) {
-                conjunction.add(criterion);
-            }
-            criteria.add(conjunction);
-        }
-        if (queryObject.isSetProjections()) {
-            ProjectionList projectionList = Projections.projectionList();
-            for (Projection projection : queryObject.getProjections()) {
-                projectionList.add(projection);
-            }
-            criteria.setProjection(projectionList);
-        }
-        if (queryObject.isSetOrder()) {
-            criteria.addOrder(queryObject.getOrder());
-        }
-        if (queryObject.isSetMaxResults()) {
-            criteria.setMaxResults(queryObject.getMaxResult());
-        }
-        criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        return criteria.uniqueResult();
-    }
 
     /**
      * Get temporal filter restrictions
@@ -622,40 +562,6 @@ public class HibernateCriteriaQueryUtilities {
             conjunction.add(criterion);
         }
         return conjunction;
-    }
-
-    /**
-     * Add aliases to a Hibernate Criteria
-     * 
-     * @param criteria
-     *            Hibernate Criteria
-     * @param aliases
-     *            Aliases for query between tables
-     */
-    public static void addAliasesToCriteria(Criteria criteria, Map<String, String> aliases) {
-        for (String aliasKey : aliases.keySet()) {
-            criteria.createAlias(aliasKey, aliases.get(aliasKey));
-        }
-    }
-
-    /**
-     * Add a alias to aliases map
-     * 
-     * @param aliases
-     *            Aliases for query between tables
-     * @param prefix
-     *            Alias prefix
-     * @param parameter
-     *            Alias column name
-     * @param alias
-     *            previously defined alias, can be null
-     */
-    private static void addAliasToMap(Map<String, String> aliases, String prefix, String parameter, String alias) {
-        if (prefix != null && !prefix.isEmpty()) {
-            aliases.put(prefix + "." + parameter, alias);
-        } else {
-            aliases.put(parameter, alias);
-        }
     }
 
     /**

@@ -34,19 +34,19 @@ import org.hibernate.criterion.Projection;
 import org.hibernate.transform.ResultTransformer;
 
 public class HibernateQueryObject implements Cloneable {
-    
+
     private Map<String, String> aliases = new HashMap<String, String>(0);
-    
+
     private List<Criterion> criterions = new ArrayList<Criterion>(0);
-    
+
     private List<Projection> projections = new ArrayList<Projection>(0);
-    
-    private Order order;
-    
+
+    private List<Order> order = new ArrayList<Order>(0);
+
     private int maxResult = -1;
-    
+
     private ResultTransformer resultTransformer;
-    
+
     public Map<String, String> getAliases() {
         return aliases;
     }
@@ -59,22 +59,22 @@ public class HibernateQueryObject implements Cloneable {
         return projections;
     }
 
-    public Order getOrder() {
+    public List<Order> getOrder() {
         return order;
     }
 
     public int getMaxResult() {
         return maxResult;
     }
-    
+
     public void setAliases(Map<String, String> aliases) {
-       this.aliases.putAll(aliases);
+        this.aliases.putAll(aliases);
     }
 
     public void setCriterions(List<Criterion> criterions) {
         this.criterions.addAll(criterions);
     }
-    
+
     public void addCriterion(Criterion criterion) {
         this.criterions.add(criterion);
     }
@@ -82,19 +82,19 @@ public class HibernateQueryObject implements Cloneable {
     public void setProjections(List<Projection> projections) {
         this.projections.addAll(projections);
     }
-    
+
     public void addProjection(Projection projection) {
         this.projections.add(projection);
     }
 
-    public void setOrder(Order order) {
-        this.order = order;
+    public void addOrder(Order order) {
+        this.order.add(order);
     }
 
     public void setMaxResult(int maxResult) {
         this.maxResult = maxResult;
     }
-    
+
     public boolean isSetAliases() {
         return aliases != null && !aliases.isEmpty();
     }
@@ -102,15 +102,15 @@ public class HibernateQueryObject implements Cloneable {
     public boolean isSetCriterions() {
         return criterions != null && !criterions.isEmpty();
     }
-    
+
     public boolean isSetProjections() {
         return projections != null && !projections.isEmpty();
     }
-    
+
     public boolean isSetOrder() {
-        return order != null;
+        return order != null && !order.isEmpty();
     }
-    
+
     public boolean isSetMaxResults() {
         return maxResult > 0;
     }
@@ -126,24 +126,27 @@ public class HibernateQueryObject implements Cloneable {
         return copy;
     }
 
-	@Override
-	public String toString()
-	{
-		return String.format("HibernateQueryObject [aliases=%s, criterions=%s, projections=%s, order=%s, maxResult=%s]", 
-				aliases, criterions, projections, order, maxResult);
-	}
+    private void setOrder(List<Order> order) {
+        this.order = order;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "HibernateQueryObject [aliases=%s, criterions=%s, projections=%s, order=%s, maxResult=%s]", aliases,
+                criterions, projections, order, maxResult);
+    }
 
     public void setResultTransformer(ResultTransformer resultTransformer) {
         this.resultTransformer = resultTransformer;
     }
-    
 
     public ResultTransformer getResultTransformer() {
         return resultTransformer;
     }
-   
+
     public boolean isSetResultTransformer() {
         return resultTransformer != null;
     }
-    
+
 }

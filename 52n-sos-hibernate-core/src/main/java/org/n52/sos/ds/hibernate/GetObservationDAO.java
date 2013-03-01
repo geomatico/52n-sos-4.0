@@ -265,7 +265,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
                 if (firstLatestTemporalFilter != null && !firstLatestTemporalFilter.isEmpty()) {
                     for (FirstLatest firstLatest : firstLatestTemporalFilter) {
                         HibernateQueryObject firstLatestQueryObject = defaultQueryObject.clone();
-                        firstLatestQueryObject.setOrder(HibernateCriteriaQueryUtilities.getOrderForEnum(firstLatest));
+                        firstLatestQueryObject.addOrder(HibernateCriteriaQueryUtilities.getOrderForEnum(firstLatest));
                         firstLatestQueryObject.setMaxResult(1);
                         observations.addAll(HibernateCriteriaQueryUtilities.getObservations(firstLatestQueryObject,
                                 session));
