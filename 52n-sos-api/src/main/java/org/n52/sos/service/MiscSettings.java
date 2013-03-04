@@ -45,13 +45,22 @@ public class MiscSettings implements ISettingDefinitionProvider {
     public static final String GML_DATE_FORMAT = "misc.gmlDateFormat";
     public static final String SRS_NAME_PREFIX_SOS_V1 = "misc.srsNamePrefixSosV1";
     public static final String SRS_NAME_PREFIX_SOS_V2 = "misc.srsNamePrefixSosV2";
-    
-    @Deprecated public static final String DEFAULT_OFFERING_PREFIX = "misc.defaultOfferingPrefix";
-    @Deprecated public static final String DECIMAL_SEPARATOR = "misc.decimalSeperator";
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
+    @Deprecated
+    public static final String DEFAULT_OFFERING_PREFIX = "misc.defaultOfferingPrefix";
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
+    @Deprecated
+    public static final String DECIMAL_SEPARATOR = "misc.decimalSeperator";
     
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
             .setTitle("Miscellaneous Settings").setOrder(3);
-    
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
     @Deprecated
     public static final StringSettingDefinition DEFAULT_OFFERING_PREFIX_DEFINITION = new StringSettingDefinition()
             .setGroup(MiscSettings.GROUP)
@@ -74,6 +83,9 @@ public class MiscSettings implements ISettingDefinitionProvider {
             .setDefaultValue(";")
             .setTitle("Tuple separator")
             .setDescription("Tuple separator in result element (a character)");
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
     @Deprecated
     public static final StringSettingDefinition DECIMAL_SEPARATOR_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)

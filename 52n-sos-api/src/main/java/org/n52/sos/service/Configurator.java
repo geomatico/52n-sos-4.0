@@ -95,14 +95,27 @@ public class Configurator implements Cleanupable {
     private String characterEncoding;
     /**
      * Map with indicator and name of additional config files for modules.
+     *
+     * @deprecated not used by any code, check for external use or remove
      */
-    @Deprecated private Map<String, String> configFileMap = new HashMap<String, String>(0);
+    @Deprecated
+    private Map<String, String> configFileMap = new HashMap<String, String>(0);
+    /**
+     * @deprecated@deprecated not used by any code, check for external use or remove
+     */
     @Deprecated private String defaultOfferingPrefix;
     /**
      * date format of gml.
      */
     private String gmlDateFormat;
-    @Deprecated private int lease;
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
+    @Deprecated
+    private int lease;
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
     @Deprecated private int maxGetObsResults;
     /**
      * minimum size to gzip responses.
@@ -115,7 +128,9 @@ public class Configurator implements Cleanupable {
     /**
      * boolean, indicates if duplicate observation should be silently ignored
      * during insertion If set to false, duplicate observations trigger an
-     * exception.
+ exception.
+     *
+     * @deprecated not used by any code, check for external use or remove
      */
     @Deprecated private boolean skipDuplicateObservations = false;
     /**
@@ -146,6 +161,8 @@ public class Configurator implements Cleanupable {
     private String tupleSeperator;
     /**
      * decimal separator for result element.
+     *
+     * @deprecated not used by any code, check for external use or remove
      */
     @Deprecated private String decimalSeparator;
     
@@ -322,6 +339,8 @@ public class Configurator implements Cleanupable {
 
     /**
      * @return the characterEncoding
+     *
+     * @deprecated not used by any code, check for external use or remove
      */
     @Deprecated
     public String getCharacterEncoding() {
@@ -337,12 +356,17 @@ public class Configurator implements Cleanupable {
 
     /**
      * @return the configFileMap
+     *
+     * @deprecated not used by any code, check for external use or remove
      */
     @Deprecated
     public Map<String, String> getConfigFileMap() {
         return Collections.unmodifiableMap(configFileMap);
     }
-    
+
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
     @Deprecated
     @Setting(CONFIGURATION_FILES)
     public void setConfigurationFiles(String configurationFiles) {
@@ -360,11 +384,17 @@ public class Configurator implements Cleanupable {
      * Returns the default decimal seperator for results.
      * <p/>
      * @return decimal separator.
+     *
+     * @deprecated not used by any code, check for external use or remove
      */
     @Deprecated
     public String getDecimalSeparator() {
         return this.decimalSeparator;
     }
+
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
     @Deprecated
     @Setting(DECIMAL_SEPARATOR)
     public void setDecimalSeperator(String seperator) throws ConfigurationException {
@@ -384,30 +414,42 @@ public class Configurator implements Cleanupable {
         return this.minimumGzipSize;
     }
 
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
     @Setting(MINIMUM_GZIP_SIZE)
     public void setMinimumGzipSize(int size) {
         this.minimumGzipSize = size;
     }
 
     /**
-     * @return maxGetObsResults
+     * @deprecated not used by any code, check for external use or remove
      */
     @Deprecated
     public int getMaxGetObsResults() {
         return this.maxGetObsResults;
     }
 
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
     @Deprecated
     @Setting(MAX_GET_OBSERVATION_RESULTS)
     public void setMaxGetObservationResults(int maxResults) {
         this.maxGetObsResults = maxResults;
     }
-    
+
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
     @Deprecated
     public String getDefaultOfferingPrefix() {
         return this.defaultOfferingPrefix;
     }
-    
+
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
     @Deprecated
     @Setting(DEFAULT_OFFERING_PREFIX)
     public void setDefaultOfferingPrefix(String prefix) {
@@ -416,12 +458,16 @@ public class Configurator implements Cleanupable {
 
     /**
      * @return Returns the lease for the getResult template (in minutes).
+     *
+     * @deprecated not used by any code, check for external use or remove
      */
     @Deprecated
     public int getLease() {
         return this.lease;
     }
-    
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
     @Deprecated
     @Setting(LEASE)
     public void setLease(int lease) throws ConfigurationException {
@@ -431,12 +477,17 @@ public class Configurator implements Cleanupable {
 
     /**
      * @return true if duplicate observations should be skipped during insertion
+     *
+     * @deprecated not used by any code, check for external use or remove
      */
     @Deprecated
     public boolean isSkipDuplicateObservations() {
         return this.skipDuplicateObservations;
     }
 
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
     @Deprecated
     @Setting(SKIP_DUPLICATE_OBSERVATIONS)
     public void setSkipDuplicateObservations(boolean skip) {
@@ -458,6 +509,8 @@ public class Configurator implements Cleanupable {
 
     /**
      * @return Returns the gmlDateFormat.
+     *
+     * @deprecated not used by any code, check for external use or remove
      */
     @Deprecated
     public String getGmlDateFormat() {
@@ -696,6 +749,8 @@ public class Configurator implements Cleanupable {
 
     /**
      * @return the base path for configuration files
+     *
+     * @deprecated not used by any code, check for external use or remove
      */
     @Deprecated
     public String getBasePath() {

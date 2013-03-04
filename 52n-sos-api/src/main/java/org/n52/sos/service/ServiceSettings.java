@@ -46,9 +46,24 @@ public class ServiceSettings implements ISettingDefinitionProvider {
     public static final String MINIMUM_GZIP_SIZE = "service.minimumGzipSize";
     public static final String SUPPORTS_QUALITY = "service.supportsQuality";
     public static final String SENSOR_DIRECTORY = "service.sensorDirectory";
-    @Deprecated public static final String LEASE = "service.lease";
-    @Deprecated public static final String MAX_GET_OBSERVATION_RESULTS = "service.maxGetObservationResults";
-    @Deprecated public static final String SKIP_DUPLICATE_OBSERVATIONS = "service.skipDuplicateObservations";
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
+    @Deprecated
+    public static final String LEASE = "service.lease";
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
+    @Deprecated
+    public static final String MAX_GET_OBSERVATION_RESULTS = "service.maxGetObservationResults";
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
+    @Deprecated
+    public static final String SKIP_DUPLICATE_OBSERVATIONS = "service.skipDuplicateObservations";
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
     @Deprecated public static final String CONFIGURATION_FILES = "service.configurationFiles";
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
             .setTitle("Service Settings").setOrder(2);
@@ -61,6 +76,9 @@ public class ServiceSettings implements ISettingDefinitionProvider {
             .setDescription("The endpoint URL of this sos which will be shown in the GetCapabilities response "
                             + "(e.g. <code>http://localhost:8080/52nSOS/sos</code>). The path to a specific "
                             + "binding (like <code>/soap</code>) will appended to this URL.");
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
     @Deprecated
     public static final IntegerSettingDefinition LEASE_DEFINITION = new IntegerSettingDefinition()
             .setGroup(GROUP)
@@ -77,6 +95,9 @@ public class ServiceSettings implements ISettingDefinitionProvider {
             .setDefaultValue(1048576)
             .setTitle("GZIP Threshold")
             .setDescription("The size (in byte) the SOS starts to gzip responses (if the client supports it).");
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
     @Deprecated
     public static final IntegerSettingDefinition MAX_GET_OBSERVATION_RESULTS_DEFINITION = new IntegerSettingDefinition()
             .setGroup(GROUP)
@@ -102,6 +123,9 @@ public class ServiceSettings implements ISettingDefinitionProvider {
             .setDescription("The path to a directory with the sensor descriptions in SensorML format. "
                             + "It can be either an absolute path (like <code>/home/user/sosconfig/sensors</code>) "
                             + "or a path relative to the web application directory (e.g. <code>WEB-INF/sensors</code>).");
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
     @Deprecated
     public static final BooleanSettingDefinition SKIP_DUPLICATE_OBSERVATIONS_DEFINITION = new BooleanSettingDefinition()
             .setGroup(GROUP)
@@ -110,6 +134,9 @@ public class ServiceSettings implements ISettingDefinitionProvider {
             .setDefaultValue(true)
             .setTitle("Skip duplicate observations")
             .setDescription("Skip duplicate observations silently when inserted by batch.");
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
     @Deprecated
     public static final StringSettingDefinition CONFIGURATION_FILES_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
