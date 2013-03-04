@@ -82,7 +82,6 @@
 
 <script type="text/javascript">
     $(function() {
-        warnIfNotHttps();
         var testDataInstalled = ${IS_TEST_DATA_SET_INSTALLED_MODEL_ATTRIBUTE};
         var $button = $("#testdata");
         

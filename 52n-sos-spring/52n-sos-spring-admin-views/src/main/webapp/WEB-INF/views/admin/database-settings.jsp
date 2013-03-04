@@ -49,6 +49,7 @@
 
 <script type="text/javascript">
     $(function(){
+        warnIfNotHttps();
         if ('${error}' !== '')  {
             showError('${error}');
         }
