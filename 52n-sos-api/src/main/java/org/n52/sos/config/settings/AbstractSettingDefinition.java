@@ -154,7 +154,7 @@ abstract class AbstractSettingDefinition<S extends AbstractSettingDefinition<S, 
 
     @Override
     public int hashCode() {
-        return (getKey() == null) ? 0 : getKey().hashCode();
+        return (getKey() != null) ? getKey().hashCode() : 0;
     }
 
     @Override

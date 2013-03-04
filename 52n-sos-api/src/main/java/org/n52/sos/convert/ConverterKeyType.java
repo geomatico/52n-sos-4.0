@@ -65,13 +65,10 @@ public class ConverterKeyType implements Comparable<ConverterKeyType> {
 
     @Override
     public int hashCode() {
+        final int prime = 31;
         int hash = 7;
-        if (fromNamespace != null) {
-            hash = 31 * hash + fromNamespace.hashCode();
-        }
-        if (toNamespace != null) {
-            hash += 31 * hash + toNamespace.hashCode();
-        }
+        hash = prime * hash + (this.fromNamespace != null ? this.fromNamespace.hashCode() : 0);
+        hash = prime * hash + (this.toNamespace != null ? this.toNamespace.hashCode() : 0);
         return hash;
     }
 

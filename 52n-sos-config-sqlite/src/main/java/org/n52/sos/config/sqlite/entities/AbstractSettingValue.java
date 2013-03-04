@@ -63,9 +63,10 @@ public abstract class AbstractSettingValue<T> implements ISettingValue<T>, Seria
 
     @Override
     public int hashCode() {
+        final int prime = 79;
         int hash = 7;
-        hash = 79 * hash + (this.getKey() != null ? this.getKey().hashCode() : 0);
-        hash = 79 * hash + (this.getValue() != null ? this.getValue().hashCode() : 0);
+        hash = prime * hash + (this.getKey() != null ? this.getKey().hashCode() : 0);
+        hash = prime * hash + (this.getValue() != null ? this.getValue().hashCode() : 0);
         return hash;
     }
 

@@ -69,7 +69,7 @@ public abstract class AbstractHibernateUserType implements UserType {
 
     @Override
     public int hashCode(Object x) throws HibernateException {
-        return (x == null) ? 0 : x.hashCode();
+        return (x != null) ? x.hashCode() : 0;
     }
 
     @Override

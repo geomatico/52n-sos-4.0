@@ -79,9 +79,10 @@ public class AdministratorUser implements Serializable, IAdministratorUser {
 
     @Override
     public int hashCode() {
+        final int prime = 67;
         int hash = 5;
-        hash = 67 * hash + (this.id != null ? this.id.hashCode() : 0);
-        hash = 67 * hash + (this.username != null ? this.username.hashCode() : 0);
+        hash = prime * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = prime * hash + (this.username != null ? this.username.hashCode() : 0);
         return hash;
     }
 

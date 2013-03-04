@@ -364,10 +364,11 @@ public abstract class AbstractSettingsManager extends SettingsManager {
 
         @Override
         public int hashCode() {
+            final int prime = 45;
             int hash = 5;
-            hash = 41 * hash + (getMethod() != null ? getMethod().hashCode() : 0);
-            hash = 41 * hash + (getTarget() != null ? getTarget().hashCode() : 0);
-            hash = 41 * hash + (getKey() != null ? getKey().hashCode() : 0);
+            hash = prime * hash + (getMethod() != null ? getMethod().hashCode() : 0);
+            hash = prime * hash + (getTarget() != null ? getTarget().hashCode() : 0);
+            hash = prime * hash + (getKey() != null ? getKey().hashCode() : 0);
             return hash;
         }
 

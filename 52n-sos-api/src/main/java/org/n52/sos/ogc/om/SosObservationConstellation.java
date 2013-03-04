@@ -224,14 +224,15 @@ public class SosObservationConstellation implements Serializable {
      */
     @Override
     public int hashCode() {
+        final int prime = 31;
         int hash = 7;
-        hash = (procedure == null) ? 0 : 31 * hash + procedure.hashCode();
-        hash = (observableProperty == null) ? 0 : 31 * hash + observableProperty.hashCode();
-        hash = (featureOfInterest == null) ? 0 : 31 * hash + featureOfInterest.hashCode();
-        hash = (observationType == null) ? 0 : 31 * hash + observationType.hashCode();
+        hash = prime * hash + (this.procedure != null ? this.procedure.hashCode() : 0);
+        hash = prime * hash + (this.observableProperty != null ? this.observableProperty.hashCode() : 0);
+        hash = prime * hash + (this.offerings != null ? this.offerings.hashCode() : 0);
+        hash = prime * hash + (this.featureOfInterest != null ? this.featureOfInterest.hashCode() : 0);
+        hash = prime * hash + (this.observationType != null ? this.observationType.hashCode() : 0);
         return hash;
     }
-
     /**
      * Check if constellations are equal excluding observableProperty
      * 
