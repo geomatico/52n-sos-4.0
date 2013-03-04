@@ -106,8 +106,8 @@ public abstract class AbstractKvpDecoder implements IDecoder<AbstractServiceRequ
                 throw Util4Exceptions.createInvalidParameterValueException(parameterName,
                         "The parameter value is not valid!");
             }
-            String lowerCorner = String.format(Locale.US, "%f %f", coordinates.get(0), coordinates.get(1));
-            String upperCorner = String.format(Locale.US, "%f %f", coordinates.get(2), coordinates.get(3));
+            String lowerCorner = String.format(Locale.US, "%f %f", new Float(coordinates.get(0)), new Float(coordinates.get(1)));
+            String upperCorner = String.format(Locale.US, "%f %f", new Float(coordinates.get(2)), new Float(coordinates.get(3)));
             spatialFilter.setGeometry(JTSHelper.createGeometryFromWKT(JTSHelper.createWKTPolygonFromEnvelope(lowerCorner, upperCorner), srid));
             spatialFilter.setOperator(SpatialOperator.BBOX);
             return spatialFilter;
