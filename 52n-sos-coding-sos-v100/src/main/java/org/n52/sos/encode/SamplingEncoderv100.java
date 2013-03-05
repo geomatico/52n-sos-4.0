@@ -143,7 +143,7 @@ public class SamplingEncoderv100 implements IEncoder<XmlObject, SosAbstractFeatu
                 return featureProperty;
             }
             StringBuilder builder = new StringBuilder();
-            builder.append("foi_");
+            builder.append("sf_");
             builder.append(JavaHelper.generateID(absFeature.getIdentifier().getValue()));
             absFeature.setGmlId(builder.toString());
 
