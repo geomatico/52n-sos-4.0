@@ -24,30 +24,25 @@
 package org.n52.sos.ds.hibernate;
 
 
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities.*;
+import static org.n52.sos.util.Util4Exceptions.createNoApplicableCodeException;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.n52.sos.ds.IDeleteSensorDAO;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.response.DeleteSensorResponse;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DeleteSensorDAO extends AbstractHibernateOperationDao implements IDeleteSensorDAO {
 
-    /**
-     * logger
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(DeleteSensorDAO.class);
 
-    /**
-     * supported SOS operation
-     */
     private static final String OPERATION_NAME = Sos2Constants.Operations.DeleteSensor.name();
 
     @Override
@@ -70,8 +65,8 @@ public class DeleteSensorDAO extends AbstractHibernateOperationDao implements ID
         try {
             session = getSession();
             transaction = session.beginTransaction();
-            HibernateCriteriaTransactionalUtilities.setDeleteSensorFlag(request.getProcedureIdentifier(), true, session);
-            HibernateCriteriaTransactionalUtilities.setValidProcedureDescriptionEndTime(request.getProcedureIdentifier(), session);
+            setDeleteSensorFlag(request.getProcedureIdentifier(), true, session);
+            setValidProcedureDescriptionEndTime(request.getProcedureIdentifier(), session);
             // TODO set all obs to deleted
             transaction.commit();
             response.setDeletedProcedure(request.getProcedureIdentifier());
@@ -81,7 +76,7 @@ public class DeleteSensorDAO extends AbstractHibernateOperationDao implements ID
             }
             String exceptionText = "Error while updateing deleted sensor flag data!";
             LOGGER.error(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+            throw createNoApplicableCodeException(he, exceptionText);
         } finally {
             returnSession(session);
         }
