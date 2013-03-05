@@ -39,8 +39,8 @@ import org.n52.sos.util.CollectionHelper;
  */
 public class MiscSettings implements ISettingDefinitionProvider {
 
-    public static final String TOKEN_SEPERATOR = "misc.tokenSeperator";
-    public static final String TUPLE_SEPERATOR = "misc.tupleSeperator";
+    public static final String TOKEN_SEPARATOR = "misc.tokenSeparator";
+    public static final String TUPLE_SEPARATOR = "misc.tupleSeparator";
     public static final String CHARACTER_ENCODING = "misc.characterEncoding";
     public static final String GML_DATE_FORMAT = "misc.gmlDateFormat";
     public static final String SRS_NAME_PREFIX_SOS_V1 = "misc.srsNamePrefixSosV1";
@@ -72,14 +72,14 @@ public class MiscSettings implements ISettingDefinitionProvider {
     public static final StringSettingDefinition TOKEN_SEPERATOR_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(0)
-            .setKey(TOKEN_SEPERATOR)
+            .setKey(TOKEN_SEPARATOR)
             .setDefaultValue(",")
             .setTitle("Token separator")
             .setDescription("Token separator in result element (a character)");
     public static final StringSettingDefinition TUPLE_SEPERATOR_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(0)
-            .setKey(TUPLE_SEPERATOR)
+            .setKey(TUPLE_SEPARATOR)
             .setDefaultValue(";")
             .setTitle("Tuple separator")
             .setDescription("Tuple separator in result element (a character)");

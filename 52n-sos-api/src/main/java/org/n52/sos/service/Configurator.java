@@ -152,13 +152,13 @@ public class Configurator implements Cleanupable {
     private boolean supportsQuality = true;
 
     /**
-     * token seperator for result element.
+     * token separator for result element.
      */
-    private String tokenSeperator;
+    private String tokenSeparator;
     /**
-     * tuple seperator for result element.
+     * tuple separator for result element.
      */
-    private String tupleSeperator;
+    private String tupleSeparator;
     /**
      * decimal separator for result element.
      *
@@ -312,14 +312,31 @@ public class Configurator implements Cleanupable {
      * <p/>
      * @return the tokenSeperator.
      */
+    @Deprecated
     public String getTokenSeperator() {
-        return this.tokenSeperator;
+        return this.tokenSeparator;
     }
 
-    @Setting(MiscSettings.TOKEN_SEPERATOR)
+    @Deprecated
+//    @Setting(MiscSettings.TOKEN_SEPERATOR)
     public void setTokenSeperator(String seperator) throws ConfigurationException {
         Validation.notNullOrEmpty("Token seperator", seperator);
-        this.tokenSeperator = seperator;
+        this.tokenSeparator = seperator;
+    }
+    
+    /**
+     * Returns the default token seperator for results.
+     * <p/>
+     * @return the tokenSeperator.
+     */
+    public String getTokenSeparator() {
+        return this.tokenSeparator;
+    }
+
+    @Setting(MiscSettings.TOKEN_SEPARATOR)
+    public void setTokenSeparator(String separator) throws ConfigurationException {
+        Validation.notNullOrEmpty("Token separator", separator);
+        this.tokenSeparator = separator;
     }
 
     /**
@@ -327,14 +344,26 @@ public class Configurator implements Cleanupable {
      * <p/>
      * @return the tupleSeperator.
      */
+    @Deprecated
     public String getTupleSeperator() {
-        return this.tupleSeperator;
+        return this.tupleSeparator;
     }
 
-    @Setting(MiscSettings.TUPLE_SEPERATOR)
+    @Deprecated
+//    @Setting(MiscSettings.TUPLE_SEPERATOR)
     public void setTupleSeperator(String seperator) throws ConfigurationException {
         Validation.notNullOrEmpty("Tuple seperator", seperator);
-        this.tupleSeperator = seperator;
+        this.tupleSeparator = seperator;
+    }
+    
+    public String getTupleSeparator() {
+        return this.tupleSeparator;
+    }
+
+    @Setting(MiscSettings.TUPLE_SEPARATOR)
+    public void setTupleSeparator(String separator) throws ConfigurationException {
+        Validation.notNullOrEmpty("Tuple separator", separator);
+        this.tupleSeparator = separator;
     }
 
     /**
