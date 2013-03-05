@@ -383,4 +383,12 @@ public class SosObservation implements Serializable {
     public boolean isSetObservationID() {
         return observationID != null && !observationID.isEmpty();
     }
+
+    public boolean isSetTupleSeparator() {
+        return tupleSeparator != null && !tupleSeparator.isEmpty();
+    }
+
+    public boolean isSetTokenSeparator() {
+        return tokenSeparator != null && !tokenSeparator.isEmpty();
+    }
 }
