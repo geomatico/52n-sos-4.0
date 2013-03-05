@@ -56,6 +56,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweObservableProperty;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,10 +178,27 @@ public class SweHelper {
         return null;
     }
 
+    /**
+     * Create a TextEncoding object for token and tuple separators from
+     * SosObservation. If separators not set, definitions from Configurator are
+     * used.
+     * 
+     * @param sosObservation
+     *            SosObservation with token and tuple separator
+     * @return TextEncoding
+     */
     private static SosSweAbstractEncoding createTextEncoding(SosObservation sosObservation) {
         SosSweTextEncoding sosTextEncoding = new SosSweTextEncoding();
-        sosTextEncoding.setBlockSeparator(sosObservation.getTupleSeparator());
-        sosTextEncoding.setTokenSeparator(sosObservation.getTokenSeparator());
+        if (sosObservation.isSetTupleSeparator()) {
+            sosTextEncoding.setBlockSeparator(sosObservation.getTupleSeparator());
+        } else {
+            sosTextEncoding.setBlockSeparator(Configurator.getInstance().getTupleSeperator());
+        }
+        if (sosObservation.isSetTokenSeparator()) {
+            sosTextEncoding.setBlockSeparator(sosObservation.getTupleSeparator());
+        } else {
+            sosTextEncoding.setBlockSeparator(Configurator.getInstance().getTokenSeperator());
+        }
         return sosTextEncoding;
     }
 
