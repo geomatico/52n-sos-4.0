@@ -35,7 +35,7 @@ public abstract class DecoderKey {
     protected static int hash(int initial, int increment, Object... a) {
         int hashCode = initial;
         for (Object o : a) {
-            hashCode = increment * hashCode + (o == null ? 0 : o.hashCode());
+            hashCode = increment * hashCode + (o != null ? o.hashCode() : 0);
         }
         return hashCode;
     }

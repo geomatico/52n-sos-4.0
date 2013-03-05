@@ -165,7 +165,7 @@ public class TimeInstant extends ITime {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 31 * hash + value.hashCode();
+        hash = 31 * hash + ((value != null) ? value.hashCode() : 0);
         return hash;
     }
     

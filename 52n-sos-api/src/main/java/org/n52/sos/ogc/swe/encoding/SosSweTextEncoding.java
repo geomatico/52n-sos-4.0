@@ -71,11 +71,12 @@ public class SosSweTextEncoding extends SosSweAbstractEncoding {
 
     @Override
     public int hashCode() {
+        final int prime = 37;
         int hash = 5;
-        hash = 37 * hash + (this.getBlockSeparator() != null ? this.getBlockSeparator().hashCode() : 0);
-        hash = 37 * hash + (this.getTokenSeparator() != null ? this.getTokenSeparator().hashCode() : 0);
-        hash = 37 * hash + (this.getDecimalSeparator() != null ? this.getDecimalSeparator().hashCode() : 0);
-        hash = 37 * hash + (this.collapseWhiteSpaces != null ? this.collapseWhiteSpaces.hashCode() : 0);
+        hash = prime * hash + (this.getBlockSeparator() != null ? this.getBlockSeparator().hashCode() : 0);
+        hash = prime * hash + (this.getTokenSeparator() != null ? this.getTokenSeparator().hashCode() : 0);
+        hash = prime * hash + (this.getDecimalSeparator() != null ? this.getDecimalSeparator().hashCode() : 0);
+        hash = prime * hash + (this.collapseWhiteSpaces != null ? this.collapseWhiteSpaces.hashCode() : 0);
         return hash;
     }
 

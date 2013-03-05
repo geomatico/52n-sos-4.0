@@ -143,11 +143,12 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
 
     @Override
     public int hashCode() {
+        final int prime = 23;
         int hash = 7;
-        hash = 23 * hash + super.hashCode();
-        hash = 23 * hash + (this.getValues() != null ? this.getValues().hashCode() : 0);
-        hash = 23 * hash + (this.getElementType() != null ? this.getElementType().hashCode() : 0);
-        hash = 23 * hash + (this.getEncoding() != null ? this.getEncoding().hashCode() : 0);
+        hash = prime * hash + super.hashCode();
+        hash = prime * hash + (this.getValues() != null ? this.getValues().hashCode() : 0);
+        hash = prime * hash + (this.getElementType() != null ? this.getElementType().hashCode() : 0);
+        hash = prime * hash + (this.getEncoding() != null ? this.getEncoding().hashCode() : 0);
         return hash;
     }
 

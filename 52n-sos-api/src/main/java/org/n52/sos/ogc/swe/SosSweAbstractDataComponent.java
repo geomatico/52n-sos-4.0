@@ -109,10 +109,11 @@ public abstract class SosSweAbstractDataComponent {
 
     @Override
     public int hashCode() {
+        final int prime = 31;
         int hash = 7;
-        hash = 31 * hash + (getDefinition() != null ? getDefinition().hashCode() : 0);
-        hash = 31 * hash + (getDescription() != null ? getDescription().hashCode() : 0);
-        hash = 31 * hash + (getIdentifier() != null ? getIdentifier().hashCode() : 0);
+        hash = prime * hash + (getDefinition() != null ? getDefinition().hashCode() : 0);
+        hash = prime * hash + (getDescription() != null ? getDescription().hashCode() : 0);
+        hash = prime * hash + (getIdentifier() != null ? getIdentifier().hashCode() : 0);
         return hash;
     }
 

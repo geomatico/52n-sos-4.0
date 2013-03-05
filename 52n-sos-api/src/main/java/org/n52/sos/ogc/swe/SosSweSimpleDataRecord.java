@@ -52,9 +52,10 @@ public class SosSweSimpleDataRecord extends SosSweAbstractDataComponent implemen
 
     @Override
     public int hashCode() {
+        final int prime = 53;
         int hash = 7;
-        hash = 53 * hash + super.hashCode();
-        hash = 53 * hash + (this.getFields() != null ? this.getFields().hashCode() : 0);
+        hash = prime * hash + super.hashCode();
+        hash = prime * hash + (this.getFields() != null ? this.getFields().hashCode() : 0);
         return hash;
     }
 

@@ -87,9 +87,10 @@ public class ServiceOperatorKeyType implements Comparable<ServiceOperatorKeyType
      */
     @Override
     public int hashCode() {
+        final int prime = 31;
         int hash = 7;
-        hash = 31 * hash + service.hashCode();
-        hash += 31 * hash + version.hashCode();
+        hash = prime * hash + ((this.service != null) ? this.service.hashCode() : 0);
+        hash = prime * hash + ((this.version != null) ? this.version.hashCode() : 0);
         return hash;
     }
 

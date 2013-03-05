@@ -91,9 +91,10 @@ public class RequestOperatorKeyType implements Comparable<RequestOperatorKeyType
      */
     @Override
     public int hashCode() {
+        final int prime = 31;
         int hash = 7;
-        hash = 31 * hash + serviceOperatorKeyType.hashCode();
-        hash += 31 * hash + operationName.hashCode();
+        hash = prime * hash + ((this.serviceOperatorKeyType != null) ? this.serviceOperatorKeyType.hashCode() : 0);
+        hash = prime * hash + ((this.operationName != null) ? this.operationName.hashCode() : 0);
         return hash;
     }
 

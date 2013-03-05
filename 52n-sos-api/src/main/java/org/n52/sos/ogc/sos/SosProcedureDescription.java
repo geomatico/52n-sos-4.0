@@ -209,7 +209,7 @@ public abstract class SosProcedureDescription {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = (getProcedureIdentifier() == null) ? 0 : 31 * hash + getProcedureIdentifier().hashCode();
+        hash =  31 * hash + ((getProcedureIdentifier() != null) ? getProcedureIdentifier().hashCode() : 0);
         return hash;
     }
 

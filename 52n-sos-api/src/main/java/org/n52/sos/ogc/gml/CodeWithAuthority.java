@@ -64,9 +64,9 @@ public class CodeWithAuthority {
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((codeSpace == null) ? 0 : codeSpace.hashCode());
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
-		return result;
+		result = prime * result + ((codeSpace != null) ? codeSpace.hashCode() : 0);
+		result = prime * result + ((value != null) ? value.hashCode() : 0);
+		return result; 
 	}
 
 	@Override

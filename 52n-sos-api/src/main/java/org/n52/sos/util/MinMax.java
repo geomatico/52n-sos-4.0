@@ -95,9 +95,10 @@ public class MinMax<T> {
 
     @Override
     public int hashCode() {
+        final int prime = 97;
         int hash = 7;
-        hash = 97 * hash + (getMinimum() != null ? getMinimum().hashCode() : 0);
-        hash = 97 * hash + (getMaximum() != null ? getMaximum().hashCode() : 0);
+        hash = prime * hash + (getMinimum() != null ? getMinimum().hashCode() : 0);
+        hash = prime * hash + (getMaximum() != null ? getMaximum().hashCode() : 0);
         return hash;
     }
 

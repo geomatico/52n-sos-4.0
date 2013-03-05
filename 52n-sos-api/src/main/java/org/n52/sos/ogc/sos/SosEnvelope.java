@@ -101,7 +101,7 @@ public class SosEnvelope {
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((getEnvelope() == null) ? 0 : getEnvelope().hashCode());
+		result = prime * result + ((getEnvelope() != null) ? getEnvelope().hashCode() : 0);
 		result = prime * result + getSrid();
 		return result;
     }

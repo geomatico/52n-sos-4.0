@@ -380,12 +380,13 @@ public class TimePeriod extends ITime {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((duration == null) ? 0 : duration.hashCode());
-        result = prime * result + ((end == null) ? 0 : end.hashCode());
-        result = prime * result + ((endIndet == null) ? 0 : endIndet.hashCode());
-        result = prime * result + ((interval == null) ? 0 : interval.hashCode());
-        result = prime * result + ((start == null) ? 0 : start.hashCode());
-        result = prime * result + ((startIndet == null) ? 0 : startIndet.hashCode());
+        
+        result = prime * result + ((duration != null) ? duration.hashCode() : 0);
+        result = prime * result + ((end != null) ? end.hashCode() : 0);
+        result = prime * result + ((endIndet != null) ? endIndet.hashCode() : 0);
+        result = prime * result + ((interval != null) ? interval.hashCode() : 0);
+        result = prime * result + ((start != null) ? start.hashCode() : 0);
+        result = prime * result + ((startIndet != null) ? startIndet.hashCode() : 0);
         return result;
     }
 

@@ -86,10 +86,11 @@ public class SosSweField extends SosSweAbstractDataComponent{
 
     @Override
     public int hashCode() {
+        final int prime = 67;
         int hash = 3;
-        hash = 67 * hash + super.hashCode();
-        hash = 67 * hash + (this.getName() != null ? this.getName().hashCode() : 0);
-        hash = 67 * hash + (this.getElement() != null ? this.getElement().hashCode() : 0);
+        hash = prime * hash + super.hashCode();
+        hash = prime * hash + (this.getName() != null ? this.getName().hashCode() : 0);
+        hash = prime * hash + (this.getElement() != null ? this.getElement().hashCode() : 0);
         return hash;
     }
 

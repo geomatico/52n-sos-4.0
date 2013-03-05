@@ -91,9 +91,10 @@ public class SosSweQuantityRange extends SosSweAbstractUomType<RangeValue<Double
 
 	    @Override
 	    public int hashCode() {
+	        final int prime = 97;
 	        int hash = 7;
-	        hash = 97 * hash + super.hashCode();
-	        hash = 97 * hash + (this.axisID != null ? this.axisID.hashCode() : 0);
+	        hash = prime * hash + super.hashCode();
+	        hash = prime * hash + (this.axisID != null ? this.axisID.hashCode() : 0);
 	        return hash;
 	    }
 

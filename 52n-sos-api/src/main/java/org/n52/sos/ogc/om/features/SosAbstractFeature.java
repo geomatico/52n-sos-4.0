@@ -79,8 +79,8 @@ public abstract class SosAbstractFeature implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((identifier == null) ? 0 : identifier.hashCode());
-        result = prime * result + ((gmlId == null) ? 0 : gmlId.hashCode());
+        result = prime * result + ((identifier != null) ? identifier.hashCode() : 0);
+        result = prime * result + ((gmlId != null) ? gmlId.hashCode() : 0);
         return result;
     }
 

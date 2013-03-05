@@ -124,7 +124,7 @@ public class AbstractSosPhenomenon implements Serializable {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 31 * hash + identifier.hashCode();
+        hash = 31 * hash + ((identifier != null) ? identifier.hashCode() : 0);
         return hash;
     }
 }
