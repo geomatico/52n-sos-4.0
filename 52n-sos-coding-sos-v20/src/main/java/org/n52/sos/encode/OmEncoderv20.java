@@ -456,9 +456,6 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
         Map<HelperValues, String> additionalValues = new HashMap<SosConstants.HelperValues, String>(1);
         IProfile activeProfile = Configurator.getInstance().getActiveProfile();
         additionalValues.put(HelperValues.ENCODE, Boolean.toString(activeProfile.isEncodeFeatureOfInterestInObservations()));
-        if (activeProfile.isSetEncodeFeatureOfInterestNamespace()) {
-            additionalValues.put(HelperValues.ENCODE_NAMESPACE, activeProfile.getEncodingNamespaceForFeatureOfInterest());
-        }
         XmlObject encodeObjectToXml = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, feature, additionalValues);
         observation.addNewFeatureOfInterest().set(encodeObjectToXml);
      
