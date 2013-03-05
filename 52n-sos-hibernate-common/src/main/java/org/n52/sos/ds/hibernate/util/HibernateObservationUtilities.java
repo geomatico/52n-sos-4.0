@@ -134,12 +134,22 @@ public class HibernateObservationUtilities {
         return getConfiguration().getActiveProfile();
     }
 
+    @Deprecated
     public static String getTokenSeperator() {
         return getConfiguration().getTokenSeperator();
     }
 
+    @Deprecated
     public static String getTupleSeperator() {
         return getConfiguration().getTupleSeperator();
+    }
+    
+    public static String getTokenSeparator() {
+        return getConfiguration().getTokenSeparator();
+    }
+
+    public static String getTupleSeparator() {
+        return getConfiguration().getTupleSeparator();
     }
 
     public static IFeatureQueryHandler getFeatureQueryHandler() {
@@ -355,8 +365,8 @@ public class HibernateObservationUtilities {
                 }
                 SosObservation sosObservation = new SosObservation();
                 sosObservation.setNoDataValue(getActiveProfile().getResponseNoDataPlaceholder());
-                sosObservation.setTokenSeparator(getTokenSeperator());
-                sosObservation.setTupleSeparator(getTupleSeperator());
+                sosObservation.setTokenSeparator(getTokenSeparator());
+                sosObservation.setTupleSeparator(getTupleSeparator());
                 sosObservation.setObservationConstellation(obsConst);
                 NilTemplateValue value = new NilTemplateValue();
                 value.setUnit(obsProp.getUnit());
@@ -379,8 +389,8 @@ public class HibernateObservationUtilities {
             sosObservation.setIdentifier(new CodeWithAuthority(hObservation.getIdentifier()));
         }
         sosObservation.setNoDataValue(getActiveProfile().getResponseNoDataPlaceholder());
-        sosObservation.setTokenSeparator(getTokenSeperator());
-        sosObservation.setTupleSeparator(getTupleSeperator());
+        sosObservation.setTokenSeparator(getTokenSeparator());
+        sosObservation.setTupleSeparator(getTupleSeparator());
         sosObservation.setObservationConstellation(observationConstellations.get(obsConstHash));
         sosObservation.setResultTime(new TimeInstant(new DateTime(hObservation.getResultTime())));
         sosObservation.setValue(new SosSingleObservationValue(getPhenomenonTime(hObservation), value, qualityList));
@@ -713,6 +723,7 @@ public class HibernateObservationUtilities {
         /**
          * @see Configurator#getTupleSeperator()
          */
+        @Deprecated
         protected String getTupleSeperator() {
             return Configurator.getInstance().getTupleSeperator();
         }
@@ -720,8 +731,24 @@ public class HibernateObservationUtilities {
         /**
          * @see Configurator#getTokenSeperator()
          */
+        @Deprecated
         protected String getTokenSeperator() {
             return Configurator.getInstance().getTokenSeperator();
+        }
+        
+        
+        /**
+         * @see Configurator#getTupleSeparator()
+         */
+        protected String getTupleSeparator() {
+            return Configurator.getInstance().getTupleSeparator();
+        }
+
+        /**
+         * @see Configurator#getTokenSeparator()
+         */
+        protected String getTokenSeparator() {
+            return Configurator.getInstance().getTokenSeparator();
         }
 
         /**
