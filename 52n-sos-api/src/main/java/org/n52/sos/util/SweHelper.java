@@ -192,12 +192,12 @@ public class SweHelper {
         if (sosObservation.isSetTupleSeparator()) {
             sosTextEncoding.setBlockSeparator(sosObservation.getTupleSeparator());
         } else {
-            sosTextEncoding.setBlockSeparator(Configurator.getInstance().getTupleSeperator());
+            sosTextEncoding.setBlockSeparator(Configurator.getInstance().getTupleSeparator());
         }
         if (sosObservation.isSetTokenSeparator()) {
-            sosTextEncoding.setBlockSeparator(sosObservation.getTokenSeparator());
+            sosTextEncoding.setTokenSeparator(sosObservation.getTokenSeparator());
         } else {
-            sosTextEncoding.setBlockSeparator(Configurator.getInstance().getTokenSeperator());
+            sosTextEncoding.setTokenSeparator(Configurator.getInstance().getTokenSeparator());
         }
         return sosTextEncoding;
     }
