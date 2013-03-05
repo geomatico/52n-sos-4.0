@@ -195,7 +195,7 @@ public class SweHelper {
             sosTextEncoding.setBlockSeparator(Configurator.getInstance().getTupleSeperator());
         }
         if (sosObservation.isSetTokenSeparator()) {
-            sosTextEncoding.setBlockSeparator(sosObservation.getTupleSeparator());
+            sosTextEncoding.setBlockSeparator(sosObservation.getTokenSeparator());
         } else {
             sosTextEncoding.setBlockSeparator(Configurator.getInstance().getTokenSeperator());
         }
