@@ -39,7 +39,7 @@ import org.junit.Test;
  */
 public class CollectionHelperTest {
 
-	private Collection<String> EMPTY_COLLECTION = new ArrayList<String>(0);
+	private Collection<Object> EMPTY_COLLECTION = new ArrayList<Object>(0);
 
 	@Test public void 
 	should_return_empty_list_when_union_receives_null()
@@ -50,7 +50,7 @@ public class CollectionHelperTest {
 	@Test public void 
 	should_return_empty_list_when_unionOfListOfLists_receives_empty_list()
 	{
-		final Collection<Collection<String>> emptyList = new ArrayList<Collection<String>>(0);
+		final Collection<Collection<Object>> emptyList = new ArrayList<Collection<Object>>(0);
 		assertThat(unionOfListOfLists(emptyList), is(EMPTY_COLLECTION));
 	}
 	
@@ -65,7 +65,6 @@ public class CollectionHelperTest {
 		listB.add("B");
 		listB.add("C");
 		listB.add(null);
-		listB.add("");
 		
 		Collection<Collection<String>> col = new ArrayList<Collection<String>>();
 		col.add(listA);
@@ -77,7 +76,6 @@ public class CollectionHelperTest {
 		check.add("A");
 		check.add("B");
 		check.add("C");
-		
 		assertThat(unionOfListOfLists(col), is(check));
 	}
 	

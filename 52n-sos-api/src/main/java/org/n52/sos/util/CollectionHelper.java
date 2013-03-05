@@ -23,6 +23,8 @@
  */
 package org.n52.sos.util;
 
+import static java.util.Collections.emptyList;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -186,25 +188,25 @@ public class CollectionHelper {
     }
 
 	/**
-	 * @param collectionOfCollection a Collection&lt;Collection&lt;String>>
-	 * @return a Collection&lt;String> containing all values of all Collections&lt;String> without any duplicates
+	 * @param collectionOfCollection a Collection&lt;Collection&lt;T>>
+	 * @return a Collection&lt;T> containing all values of all Collections&lt;T> without any duplicates
 	 */
-	public static Collection<String> unionOfListOfLists(final Collection<Collection<String>> collectionOfCollection)
+	public static <T> Collection<T> unionOfListOfLists(final Collection<? extends Collection<T>> collectionOfCollection)
 	{
 		if (collectionOfCollection == null || collectionOfCollection.isEmpty())
 		{
-			return new ArrayList<String>(0);
+			return emptyList();
 		}
-		Collection<String> union = new ArrayList<String>();
-		for (Collection<String> col : collectionOfCollection)
+		Collection<T> union = new ArrayList<T>();
+		for (Collection<T> col : collectionOfCollection)
 		{
 			if (col != null && !col.isEmpty())
 			{
-				for (String string : col)
+				for (T t : col)
 				{
-					if (string != null && !string.isEmpty() && !union.contains(string))
+					if (t != null && !union.contains(t))
 					{
-						union.add(string);
+						union.add(t);
 					}
 				}
 			}
