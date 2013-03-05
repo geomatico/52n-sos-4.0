@@ -643,6 +643,16 @@
                         ]
                     }
                 }
+            },
+            "DeleteObservation":{
+                "DeleteObservation":{
+                    "param":{
+                        "service": "SOS",
+                        "version": "2.0.0",
+                        "request": "DeleteObservation",
+                        "observation": "PLEASE CHANGE TO EXISTING OBSERVATION ID"
+                    }
+                }
             }
         },
         "/soap": {
@@ -733,6 +743,11 @@
                 "GetDataAvailability": {
                     "request": "static/examples/sos_v20/requests_soap/GetDataAvailability.xml"
                 }
+            },
+            "DeleteObservation":{
+                "DeleteObservation":{
+                    "request": "static/examples/sos_v20/requests_soap/DeleteObservation.xml"
+                }
             }
         },
         "/pox": {
@@ -816,6 +831,11 @@
             "GetDataAvailability": {
                 "GetDataAvailability": {
                     "request": "static/examples/sos_v20/requests_xml/GetDataAvailability.xml"
+                }
+            },
+            "DeleteObservation":{
+                "DeleteObservation":{
+                    "request": "static/examples/sos_v20/requests_xml/DeleteObservation.xml"
                 }
             }
         }
