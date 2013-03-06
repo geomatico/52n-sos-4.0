@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
 
 import org.apache.xmlbeans.SchemaType;
+import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
@@ -65,6 +66,9 @@ public class XmlHelper {
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlHelper.class);
+
+    private XmlHelper() {
+    }
 
     /**
      * Parse XML document from HTTP-Post request
@@ -510,20 +514,29 @@ public class XmlHelper {
         }
     }
 
-    private XmlHelper() {
-    }
-
     public static XmlObject substituteElement(XmlObject elementToSubstitute, XmlObject substitutionElement) {
         Node domNode = substitutionElement.getDomNode();
         QName name = null;
         if (domNode.getNamespaceURI() != null && domNode.getLocalName() != null) {
-            name = new QName(domNode.getNamespaceURI(), domNode.getLocalName());
+            String prefix = getPrefixForNamespace(elementToSubstitute, domNode.getNamespaceURI());
+            if (prefix != null && !prefix.isEmpty()) {
+                name = new QName(domNode.getNamespaceURI(), domNode.getLocalName(), prefix);
+            } else {
+                name = new QName(domNode.getNamespaceURI(), domNode.getLocalName());
+            }
         } else {
             QName nameOfElement = substitutionElement.schemaType().getName();
             String localPart = nameOfElement.getLocalPart().replace("Type", "");
-            name = new QName(nameOfElement.getNamespaceURI(), localPart, nameOfElement.getPrefix());
+            name = new QName(nameOfElement.getNamespaceURI(), localPart, getPrefixForNamespace(elementToSubstitute, nameOfElement.getNamespaceURI()));
         }
         return substituteElement(elementToSubstitute, substitutionElement.schemaType(), name);
+    }
+    
+    public static String getPrefixForNamespace(XmlObject element, String namespace) {
+        XmlCursor cursor = element.newCursor();
+        String prefix = cursor.prefixForNamespace(namespace);
+        cursor.dispose();
+        return prefix;
     }
     
     public static XmlObject substituteElement(XmlObject elementToSubstitute, SchemaType schemaType, QName name) {
