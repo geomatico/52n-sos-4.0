@@ -28,11 +28,8 @@ import static org.hibernate.criterion.Restrictions.in;
 import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION;
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,42 +47,42 @@ import org.n52.sos.ds.hibernate.entities.Procedure;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class ProcedureCacheUpdate extends CacheUpdate {
-
-    protected Collection<String> getObservablePropertyIdentifierFromObservationConstellation(Set<ObservationConstellation> set) {
+    protected Set<String> getObservableProperties(Set<ObservationConstellation> set) {
         Set<String> observableProperties = new HashSet<String>(set.size());
         for (ObservationConstellation observationConstellation : set) {
             observableProperties.add(observationConstellation.getObservableProperty().getIdentifier());
         }
-        return new ArrayList<String>(observableProperties);
+        return observableProperties;
     }
 
-    protected Collection<String> getProcedureIDsFromProcedures(Set<Procedure> proceduresForChildSensorId) {
-        List<String> procedureIDs = new ArrayList<String>(proceduresForChildSensorId.size());
-        for (Procedure procedure : proceduresForChildSensorId) {
-            procedureIDs.add(procedure.getIdentifier());
+    protected Set<String> getProcedureIdentifiers(Set<Procedure> procedures) {
+        Set<String> identifiers = new HashSet<String>(procedures.size());
+        for (Procedure procedure : procedures) {
+            identifiers.add(procedure.getIdentifier());
         }
-        return procedureIDs;
+        return identifiers;
     }
 
-    protected Collection<String> getObservationIdentifiersForProcedure(Session session, String procedureIdentifier) {
+    protected Set<String> getObservationIdentifiers(Session session, String procedureIdentifier) {
         Map<String, String> observationConstellationAliases = new HashMap<String, String>();
-        HibernateQueryObject observationConstellationQueryObject = new HibernateQueryObject();
+        HibernateQueryObject ocQuery = new HibernateQueryObject();
 
         Map<String, String> observationAliases = new HashMap<String, String>();
-        HibernateQueryObject observationQueryObject = new HibernateQueryObject();
+        HibernateQueryObject oQuery = new HibernateQueryObject();
         String obsConstAlias = addObservationConstallationAliasToMap(observationAliases, null);
 
-        observationConstellationQueryObject.addCriterion(getCriterionForProcedures(observationConstellationAliases, null, procedureIdentifier));
-        observationQueryObject.addCriterion(getCriterionForProcedures(observationAliases, obsConstAlias, procedureIdentifier));
+        ocQuery.addCriterion(getCriterionForProcedures(observationConstellationAliases, null, procedureIdentifier));
+        oQuery.addCriterion(getCriterionForProcedures(observationAliases, obsConstAlias, procedureIdentifier));
 
-        observationConstellationQueryObject.setAliases(observationConstellationAliases);
-        List<ObservationConstellation> observationConstellations = getObservationConstellations(observationConstellationQueryObject, session);
+        ocQuery.setAliases(observationConstellationAliases);
+        List<ObservationConstellation> observationConstellations =
+                                       getObservationConstellations(ocQuery, session);
 
-        observationQueryObject.setAliases(observationAliases);
+        oQuery.setAliases(observationAliases);
 
         Set<Observation> allObservations = new HashSet<Observation>(0);
         for (ObservationConstellation observationConstellation : observationConstellations) {
-            HibernateQueryObject defaultQueryObject = observationQueryObject.clone();
+            HibernateQueryObject defaultQueryObject = oQuery.clone();
 
             String id = getParameterWithPrefix(PARAMETER_OBSERVATION_CONSTELLATION, null);
             defaultQueryObject.addCriterion(getEqualRestriction(id, observationConstellation));
@@ -93,16 +90,16 @@ public class ProcedureCacheUpdate extends CacheUpdate {
             allObservations.addAll(getObservations(defaultQueryObject, session));
         }
 
-        List<String> observationIdentifier = new LinkedList<String>();
+        Set<String> observationIdentifier = new HashSet<String>();
         for (Observation observation : allObservations) {
             if (observation.getIdentifier() != null
-                    && !observation.getIdentifier().isEmpty()
-                    && !observationIdentifier.contains(observation.getIdentifier())) {
+                && !observation.getIdentifier().isEmpty()
+                && !observationIdentifier.contains(observation.getIdentifier())) {
                 observationIdentifier.add(observation.getIdentifier());
             }
             if (observation.getSetId() != null
-                    && !observation.getSetId().isEmpty()
-                    && !observationIdentifier.contains(observation.getSetId())) {
+                && !observation.getSetId().isEmpty()
+                && !observationIdentifier.contains(observation.getSetId())) {
                 observationIdentifier.add(observation.getSetId());
             }
         }
@@ -117,23 +114,16 @@ public class ProcedureCacheUpdate extends CacheUpdate {
     @Override
     public void execute() {
         List<Procedure> hProcedures = getProcedureObjects(getSession());
-        Set<String> procedures = new HashSet<String>(hProcedures.size());
-        Map<String, Collection<String>> kProcedureVOffering = new HashMap<String, Collection<String>>(hProcedures.size());
-        Map<String, Collection<String>> kProcedureVObservableProperties = new HashMap<String, Collection<String>>(hProcedures.size());
-        Map<String, Collection<String>> kProcedureVObservationIdentifiers = new HashMap<String, Collection<String>>(hProcedures.size());
-        Map<String, Collection<String>> parentProcs = new HashMap<String, Collection<String>>(hProcedures.size());
-        for (Procedure hProcedure : hProcedures) {
-            if (!hProcedure.isDeleted()) {
-                procedures.add(hProcedure.getIdentifier());
-                kProcedureVOffering.put(hProcedure.getIdentifier(), getAllOfferingIdentifiersFrom(hProcedure.getObservationConstellations()));
-                kProcedureVObservableProperties.put(hProcedure.getIdentifier(), getObservablePropertyIdentifierFromObservationConstellation(hProcedure.getObservationConstellations()));
-                parentProcs.put(hProcedure.getIdentifier(), getProcedureIDsFromProcedures(hProcedure.getProceduresForChildSensorId()));
-                kProcedureVObservationIdentifiers.put(hProcedure.getIdentifier(), getObservationIdentifiersForProcedure(getSession(), hProcedure.getIdentifier()));
+        for (Procedure p : hProcedures) {
+            if (!p.isDeleted()) {
+                final String id = p.getIdentifier();
+                final Set<ObservationConstellation> ocs = p.getObservationConstellations();
+                getCache().addProcedure(id);
+                getCache().setOfferingsForProcedure(id, getAllOfferingIdentifiersFrom(ocs));
+                getCache().setObservablePropertiesForProcedure(id, getObservableProperties(ocs));
+                getCache().addParentProcedures(id, getProcedureIdentifiers(p.getProceduresForChildSensorId()));
+                getCache().setObservationIdentifiersForProcedure(id, getObservationIdentifiers(getSession(), id));
             }
         }
-        getCache().setProcedures(procedures);
-        getCache().setKProcedureVOfferings(kProcedureVOffering);
-        getCache().setProcPhens(kProcedureVObservableProperties);
-        getCache().setProcedureHierarchies(parentProcs);
     }
 }

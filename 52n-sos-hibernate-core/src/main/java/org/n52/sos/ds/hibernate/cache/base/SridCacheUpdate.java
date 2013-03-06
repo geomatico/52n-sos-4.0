@@ -23,8 +23,8 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.service.Configurator;
@@ -34,7 +34,6 @@ import org.n52.sos.service.Configurator;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class SridCacheUpdate extends CacheUpdate {
-
     @Override
     public void execute() {
         // TODO change if transformation is supported
@@ -44,9 +43,8 @@ public class SridCacheUpdate extends CacheUpdate {
 //            srids.add(spatialRefSys.getSrid());
 //        }
 //        getCache().setSrids(srids);
-        List<Integer> srids = new ArrayList<Integer>(0);
+        Set<Integer> srids = new HashSet<Integer>(1);
         srids.add(new Integer(Configurator.getInstance().getFeatureQueryHandler().getDefaultEPSG()));
-        getCache().setSrids(srids);
+        getCache().addEpsgCodes(srids);
     }
-    
 }

@@ -48,7 +48,7 @@ public class AdminReloadCacheController extends AbstractController {
     public void reload() throws OwsExceptionReport, UnavailableException {
         log.debug("Reloading Capabilitities Cache");
         if (Configurator.getInstance() != null) {
-            Configurator.getInstance().getCapabilitiesCacheController().updateCacheFromDB();
+            Configurator.getInstance().getCacheController().updateCacheFromDatasource();
         } else {
             throw new UnavailableException("configurator is not available");
         }

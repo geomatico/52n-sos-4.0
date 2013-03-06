@@ -102,7 +102,7 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
     
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
-        opsMeta.addPossibleValuesParameter(Sos2Constants.InsertResultParams.template, getCacheController().getResultTemplates());
+        opsMeta.addPossibleValuesParameter(Sos2Constants.InsertResultParams.template, getCache().getResultTemplates());
         opsMeta.addAnyParameterValue(Sos2Constants.InsertResultParams.resultValues);
     }
     

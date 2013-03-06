@@ -58,7 +58,7 @@ public class SosSamplingFeature extends SosAbstractFeature {
 
     private List<SosAbstractFeature> sampledFeatures = new LinkedList<SosAbstractFeature>();
 
-    private List<NamedValue> parameters = new LinkedList<NamedValue>();
+    private List<NamedValue<?>> parameters = new LinkedList<NamedValue<?>>();
 
     private boolean encode = true;
 
@@ -173,15 +173,15 @@ public class SosSamplingFeature extends SosAbstractFeature {
         return geometry != null && !geometry.isEmpty();
     }
 
-    public void addParameter(NamedValue namedValue) {
+    public void addParameter(NamedValue<?> namedValue) {
         this.parameters.add(namedValue);
     }
     
-    public void setParameters(List<NamedValue> parameters) {
+    public void setParameters(List<NamedValue<?>> parameters) {
         this.parameters.addAll(parameters);
     }
 
-    public List<NamedValue> getParameters() {
+    public List<NamedValue<?>> getParameters() {
         return parameters;
     }
 

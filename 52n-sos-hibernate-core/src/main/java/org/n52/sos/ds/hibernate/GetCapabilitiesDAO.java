@@ -360,12 +360,12 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
      *             If an error occurs
      */
     private List<SosOfferingsForContents> getContents() throws OwsExceptionReport {
-        Collection<String> offerings = getCacheController().getOfferings();
+        Collection<String> offerings = getCache().getOfferings();
         List<SosOfferingsForContents> sosOfferings = new ArrayList<SosOfferingsForContents>(offerings.size());
         for (String offering : offerings) {
 
-            SosEnvelope envelopeForOffering = getCacheController().getEnvelopeForOffering(offering);
-            List<String> featuresForoffering = getFOI4offering(offering);
+            SosEnvelope envelopeForOffering = getCache().getEnvelopeForOffering(offering);
+            Set<String> featuresForoffering = getFOI4offering(offering);
             Collection<String> responseFormats = SosHelper.getSupportedResponseFormats(SosConstants.SOS, "1.0.0");
             if (checkOfferingValues(envelopeForOffering, featuresForoffering, responseFormats)) {
                 SosOfferingsForContents sosOffering = new SosOfferingsForContents();
@@ -377,7 +377,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 // only if fois are contained for the offering set the values of
                 // the
                 // envelope
-                sosOffering.setObservedArea(getCacheController().getEnvelopeForOffering(offering));
+                sosOffering.setObservedArea(getCache().getEnvelopeForOffering(offering));
                 // SosEnvelope sosEnvelope = getBBOX4Offering(offering,
                 // session);
                 // sosOffering.setBoundeBy(sosEnvelope.getEnvelope());
@@ -387,22 +387,23 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 // xb_oo.addIntendedApplication("");
 
                 // add offering name
-                sosOffering.setOfferingName(getCacheController().getOfferingName(offering));
+                sosOffering.setOfferingName(getCache().getNameForOffering(offering));
 
                 // set up phenomena
-                sosOffering.setObservableProperties(getCacheController().getObservablePropertiesForOffering(offering));
-                sosOffering.setCompositePhenomena(getCacheController().getKOfferingVCompositePhenomenons().get(offering));
+                sosOffering.setObservableProperties(getCache().getObservablePropertiesForOffering(offering));
+                sosOffering.setCompositePhenomena(getCache().getCompositePhenomenonsForOffering(offering));
                 Map<String, Collection<String>> phens4CompPhens = new HashMap<String, Collection<String>>();
-                if (getCacheController().getKOfferingVCompositePhenomenons().get(offering) != null) {
-                    for (String compositePhenomenon : getCacheController().getKOfferingVCompositePhenomenons().get(offering)) {
-                        phens4CompPhens.put(compositePhenomenon, getCacheController().getKCompositePhenomenonVObservableProperty().get(compositePhenomenon));
+                if (getCache().getCompositePhenomenonsForOffering(offering) != null) {
+                    for (String compositePhenomenon : getCache().getCompositePhenomenonsForOffering(offering)) {
+                        phens4CompPhens.put(compositePhenomenon, getCache()
+                                .getObservablePropertiesForCompositePhenomenon(compositePhenomenon));
                     }
                 }
                 sosOffering.setPhens4CompPhens(phens4CompPhens);
 
                 // set up time
-                DateTime minDate = getCacheController().getMinTimeForOffering(offering);
-                DateTime maxDate = getCacheController().getMaxTimeForOffering(offering);
+                DateTime minDate = getCache().getMinTimeForOffering(offering);
+                DateTime maxDate = getCache().getMaxTimeForOffering(offering);
                 sosOffering.setTime(new TimePeriod(minDate, maxDate));
 
                 // add feature of interests
@@ -411,7 +412,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 }
 
                 // set procedures
-                Collection<String> procedures = getCacheController().getProcedures4Offering(offering);
+                Collection<String> procedures = getCache().getProceduresForOffering(offering);
                 if (procedures == null || procedures.isEmpty()) {
                     String exceptionText = String.format(
                             "No procedures are contained in the database for the offering: %s! Please contact the admin of this SOS.", offering);
@@ -421,7 +422,8 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 sosOffering.setProcedures(procedures);
 
                 // insert result models
-                Collection<QName> resultModels = getQNamesForResultModel(getCacheController().getResultModels4Offering(offering));
+                Collection<QName> resultModels = getQNamesForResultModel(getCache()
+                        .getObservationTypesForOffering(offering));
                 sosOffering.setResultModels(resultModels);
 
                 // set response format
@@ -438,10 +440,10 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         return sosOfferings;
     }
 
-    private boolean checkOfferingValues(SosEnvelope envelopeForOffering, List<String> featuresForoffering,
-            Collection<String> responseFormats) {
-        return envelopeForOffering != null && envelopeForOffering.isSetEnvelope() && featuresForoffering != null
-                && !featuresForoffering.isEmpty() && responseFormats != null && !responseFormats.isEmpty();
+    private boolean checkOfferingValues(SosEnvelope envelopeForOffering, Set<String> featuresForOffering,
+                                        Collection<String> responseFormats) {
+        return envelopeForOffering != null && envelopeForOffering.isSetEnvelope() && featuresForOffering != null
+                && !featuresForOffering.isEmpty() && responseFormats != null && !responseFormats.isEmpty();
     }
 
     /**
@@ -459,7 +461,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
             throws OwsExceptionReport {
         // TODO shouldn't this be part of the encoder?
         int phenTimeCounter = 0;
-        Collection<String> offerings = getCacheController().getOfferings();
+        Collection<String> offerings = getCache().getOfferings();
         List<SosOfferingsForContents> sosOfferings = new ArrayList<SosOfferingsForContents>(offerings.size());
 
         for (String offering : offerings) {
@@ -474,14 +476,14 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                     // insert observationTypes
                     sosOffering.setObservationTypes(observationTypes);
 
-                    sosOffering.setObservedArea(getCacheController().getEnvelopeForOffering(offering));
+                    sosOffering.setObservedArea(getCache().getEnvelopeForOffering(offering));
 
                     sosOffering.setProcedures(Collections.singletonList(procedure));
 
                     // TODO: add intended application
 
                     // add offering name
-                    sosOffering.setOfferingName(getCacheController().getOfferingName(offering));
+                    sosOffering.setOfferingName(getCache().getNameForOffering(offering));
 
                     setUpPhenomenaForOffering(offering, procedure, sosOffering);
                     setUpTimeForOffering(offering, ++phenTimeCounter, sosOffering);
@@ -623,10 +625,9 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    private List<String> getFOI4offering(String offering) throws OwsExceptionReport {
-        List<String> featureIDs = new ArrayList<String>(0);
-        Collection<String> features =
-                getConfigurator().getCapabilitiesCacheController().getKOfferingVFeatures().get(offering);
+    private Set<String> getFOI4offering(String offering) throws OwsExceptionReport {
+        Set<String> featureIDs = new HashSet<String>(0);
+        Set<String> features = getConfigurator().getCache().getFeaturesOfInterestForOffering(offering);
         if (!getConfigurator().getActiveProfile().isListFeatureOfInterestsInOfferings() || features == null) {
             featureIDs.add(OGCConstants.UNKNOWN);
         } else {
@@ -669,7 +670,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
     }
 
     private Collection<String> getObservationTypes(String offering) {
-        Collection<String> allObservationTypes = getCacheController().getObservationTypes4Offering(offering);
+        Collection<String> allObservationTypes = getCache().getObservationTypesForOffering(offering);
         List<String> observationTypes = new ArrayList<String>(allObservationTypes.size());
 
         for (String observationType : allObservationTypes) {
@@ -678,7 +679,7 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
             }
         }
         if (observationTypes.isEmpty()) {
-            for (String observationType : getCacheController().getAllowedObservationTypes4Offering(offering)) {
+            for (String observationType : getCache().getAllowedObservationTypesForOffering(offering)) {
                 if (!observationType.equals(SosConstants.NOT_DEFINED)) {
                     observationTypes.add(observationType);
                 }
@@ -746,25 +747,23 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     protected void setUpPhenomenaForOffering(String offering, String procedure, SosOfferingsForContents sosOffering) {
         Collection<String> phenomenons = new LinkedList<String>();
-        Map<String, Collection<String>> phenProcs = getCacheController().getKObservablePropertyVProcedures();
-        Collection<String> phens4Off = getCacheController().getObservablePropertiesForOffering(offering);
-        for (String phenID : phens4Off) {
-            if (phenProcs.get(phenID).contains(procedure)) {
-                phenomenons.add(phenID);
+        Collection<String> observablePropertiesForOffering = getCache().getObservablePropertiesForOffering(offering);
+        for (String observableProperty : observablePropertiesForOffering) {
+            if (getCache().getProceduresForObservableProperty(observableProperty).contains(procedure)) {
+                phenomenons.add(observableProperty);
             }
         }
         sosOffering.setObservableProperties(phenomenons);
-        sosOffering.setCompositePhenomena(getCacheController().getKOfferingVCompositePhenomenons().get(offering));
+        sosOffering.setCompositePhenomena(getCache().getCompositePhenomenonsForOffering(offering));
 
-        Collection<String> compositePhenomenonsForOffering =
-                getCacheController().getKOfferingVCompositePhenomenons().get(offering);
+        Collection<String> compositePhenomenonsForOffering = getCache().getCompositePhenomenonsForOffering(offering);
 
         if (compositePhenomenonsForOffering != null) {
             Map<String, Collection<String>> phens4CompPhens =
                     new HashMap<String, Collection<String>>(compositePhenomenonsForOffering.size());
             for (String compositePhenomenon : compositePhenomenonsForOffering) {
                 Collection<String> phenomenonsForComposite =
-                        getCacheController().getKCompositePhenomenonVObservableProperty().get(compositePhenomenon);
+                                   getCache().getObservablePropertiesForCompositePhenomenon(compositePhenomenon);
                 phens4CompPhens.put(compositePhenomenon, phenomenonsForComposite);
             }
             sosOffering.setPhens4CompPhens(phens4CompPhens);
@@ -775,26 +774,19 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
     }
 
     protected void setUpRelatedFeaturesForOffering(String offering, String version, String procedure,
-            SosOfferingsForContents sosOffering) throws OwsExceptionReport {
-        Map<String, Collection<String>> relatedFeatures = new HashMap<String, Collection<String>>();
-        Map<String, Collection<String>> relatedFeaturesForAllOfferings = getCacheController().getKOfferingVRelatedFeatures();
-        if (relatedFeaturesForAllOfferings != null && 
-        		!relatedFeaturesForAllOfferings.isEmpty() && 
-        		relatedFeaturesForAllOfferings.containsKey(offering))
-        {
-            Collection<String> relatedFeaturesForThisOffering = relatedFeaturesForAllOfferings.get(offering);
-            for (String relatedFeature : relatedFeaturesForThisOffering)
-            {
-                relatedFeatures.put(relatedFeature, getCacheController().getKRelatedFeaturesVRole().get(relatedFeature));
+                                                   SosOfferingsForContents sosOffering) throws OwsExceptionReport {
+        Map<String, Set<String>> relatedFeatures = new HashMap<String, Set<String>>();
+        Set<String> relatedFeaturesForThisOffering = getCache().getRelatedFeaturesForOffering(offering);
+        if (relatedFeaturesForThisOffering != null && !relatedFeaturesForThisOffering.isEmpty()) {
+            for (String relatedFeature : relatedFeaturesForThisOffering) {
+                relatedFeatures.put(relatedFeature, getCache().getRolesForRelatedFeature(relatedFeature));
             }
         } else {
-            List<String> role = Collections.singletonList("featureOfInterestID");
-            if (getCacheController().getKOfferingVFeatures().containsKey(offering))
-            {
-            	for (String foiID : getCacheController().getKOfferingVFeatures().get(offering)) 
-            	{
-            		if (getCacheController().getProcedures4FeatureOfInterest(foiID).contains(procedure)) 
-            		{
+            Set<String> role = Collections.singleton("featureOfInterestID");
+            Set<String> featuresForOffering = getCache().getFeaturesOfInterestForOffering(offering);
+            if (featuresForOffering != null) {
+                for (String foiID : featuresForOffering) {
+                    if (getCache().getProceduresForFeatureOfInterest(foiID).contains(procedure)) {
             			relatedFeatures.put(foiID, role);
             		}
             	}
@@ -804,23 +796,21 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
     }
 
     protected void setUpTimeForOffering(String offering, int id, SosOfferingsForContents sosOffering) {
-        DateTime minDate = getCacheController().getMinTimeForOffering(offering);
-        DateTime maxDate = getCacheController().getMaxTimeForOffering(offering);
+        DateTime minDate = getCache().getMinTimeForOffering(offering);
+        DateTime maxDate = getCache().getMaxTimeForOffering(offering);
         String phenTimeId = Sos2Constants.EN_PHENOMENON_TIME + "_" + id;
         sosOffering.setTime(new TimePeriod(minDate, maxDate, phenTimeId));
     }
 
     // if no foi contained, set allowed foitypes
     protected void setUpFeatureOfInterestTypesForOffering(String offering, SosOfferingsForContents sosOffering) {
-        Collection<String> features = getCacheController().getKOfferingVFeatures().get(offering);
+        Set<String> features = getCache().getFeaturesOfInterestForOffering(offering);
         if (features == null || features.isEmpty()) {
-        	sosOffering.setFeatureOfInterestTypes(getCacheController().getFeatureOfInterestTypes());
-        }
-        else
-        {
-        	// TODO reduce list of feature types to the really available in this offering -> requires additional map in cache
-        	sosOffering.setFeatureOfInterestTypes(getCacheController().getFeatureOfInterestTypes());
-        	sosOffering.setFeatureOfInterest(features);  // TODO seems to be useless somehow
+            sosOffering.setFeatureOfInterestTypes(getCache().getFeatureOfInterestTypes());
+        } else {
+            // TODO reduce list of feature types to the really available in this offering -> requires additional map in cache
+            sosOffering.setFeatureOfInterestTypes(getCache().getFeatureOfInterestTypes());
+            sosOffering.setFeatureOfInterest(features);  // TODO seems to be useless somehow
         }
     }
 
@@ -833,12 +823,12 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     protected void setUpProcedureDescriptionFormatForOffering(SosOfferingsForContents sosOffering) {
         // TODO: set procDescFormat <-- what is required here?
-        sosOffering.setProcedureDescriptionFormat(getCacheController().getProcedureDescriptionFormats());
+        sosOffering.setProcedureDescriptionFormat(getCache().getProcedureDescriptionFormats());
     }
 
     private Collection<String> getProceduresForOffering(String offering) throws OwsExceptionReport {
-        Collection<String> procedures = getCacheController().getProcedures4Offering(offering);
-        if (procedures == null || procedures.isEmpty()) {
+        Collection<String> procedures = getCache().getProceduresForOffering(offering);
+        if (procedures.isEmpty()) {
             String exceptionText =
                     String.format(
                             "No procedures are contained in the database for the offering '%s'! Please contact the admin of this SOS.",

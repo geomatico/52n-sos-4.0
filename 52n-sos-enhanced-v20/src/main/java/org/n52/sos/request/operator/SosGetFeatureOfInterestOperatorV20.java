@@ -45,8 +45,8 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
-import org.n52.sos.wsdl.WSDLOperation;
 import org.n52.sos.wsdl.WSDLConstants;
+import org.n52.sos.wsdl.WSDLOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,8 +118,8 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
         }
         try {
             checkObservedProperties(sosRequest.getObservedProperties(), Configurator.getInstance()
-                    .getCapabilitiesCacheController().getObservableProperties(),
-                    Sos2Constants.GetFeatureOfInterestParams.observedProperty.name());
+                    .getCache().getObservableProperties(),
+                                    Sos2Constants.GetFeatureOfInterestParams.observedProperty.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -131,8 +131,8 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
         }
         try {
             checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
-                    .getCapabilitiesCacheController().getFeatureOfInterest(),
-                    Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name());
+                    .getCache().getFeaturesOfInterest(),
+                                              Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }

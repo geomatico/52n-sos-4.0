@@ -80,7 +80,7 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
             throws OwsExceptionReport {
-        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCacheController().getProcedures());
+        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());
         // FIXME: getTypes from Decoder
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             opsMeta.addPossibleValuesParameter(Sos1Constants.DescribeSensorParams.outputFormat,
@@ -175,8 +175,8 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
      *            The parent procedures to add
      * @throws OwsExceptionReport
      */
-    private Collection<String> getParentProcedures(String procID, String version) throws OwsExceptionReport {
-        return getCacheController().getParentProcedures(procID, false, false);
+    private Set<String> getParentProcedures(String procID, String version) throws OwsExceptionReport {
+        return getCache().getParentProcedures(procID, false, false);
         // if (parentProcedureIds != null && !parentProcedureIds.isEmpty()) {
         // SosSMLCapabilities capabilities = new SosSMLCapabilities();
         // capabilities.setName(SosConstants.SYS_CAP_PARENT_PROCEDURES_NAME);
@@ -217,7 +217,7 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
     private Set<SosProcedureDescription> getChildProcedures(String procID, String outputFormat, String version,
             Session session) throws OwsExceptionReport {
         Set<SosProcedureDescription> childProcedures = new HashSet<SosProcedureDescription>(0);
-        Collection<String> childProcedureIds = getCacheController().getChildProcedures(procID, false, false);
+        Collection<String> childProcedureIds = getCache().getChildProcedures(procID, false, false);
 
         if (childProcedureIds != null && !childProcedureIds.isEmpty()) {
 //            String urlPattern =

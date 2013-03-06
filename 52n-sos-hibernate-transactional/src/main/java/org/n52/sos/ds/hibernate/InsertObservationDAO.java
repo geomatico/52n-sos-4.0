@@ -88,7 +88,7 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
             throws OwsExceptionReport {
-        opsMeta.addPossibleValuesParameter(Sos2Constants.InsertObservationParams.offering, getCacheController().getOfferings());
+        opsMeta.addPossibleValuesParameter(Sos2Constants.InsertObservationParams.offering, getCache().getOfferings());
         opsMeta.addAnyParameterValue(Sos2Constants.InsertObservationParams.observation);
         opsMeta.addDataTypeParameter(Sos2Constants.InsertObservationParams.observation,
                 OMConstants.SCHEMA_LOCATION_OM_2_OM_OBSERVATION);

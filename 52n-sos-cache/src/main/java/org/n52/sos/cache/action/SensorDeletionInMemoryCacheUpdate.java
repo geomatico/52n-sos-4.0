@@ -23,487 +23,89 @@
  */
 package org.n52.sos.cache.action;
 
+import java.util.Set;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map.Entry;
-
-import org.joda.time.DateTime;
-import org.n52.sos.ogc.sos.SosEnvelope;
+import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.util.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Envelope;
-
 /**
- * When executing this &auml;ction (see {@link Action}), the following relations are deleted, settings are updated in cache:<ul>
+ * When executing this &auml;ction (see {@link Action}), the following relations are deleted, settings are updated in
+ * cache:<ul>
  * <li>Result template</li>
  * <li>Offering &rarr; Result template</li></ul>
- * 
+ *
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @since 4.0
  */
-public class SensorDeletionInMemoryCacheUpdate extends InMemoryCacheUpdate
-{
-	private static final Logger LOGGER = LoggerFactory.getLogger(SensorDeletionInMemoryCacheUpdate.class);
-	
-	private final DeleteSensorRequest sosRequest;
+public class SensorDeletionInMemoryCacheUpdate extends InMemoryCacheUpdate {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SensorDeletionInMemoryCacheUpdate.class);
+    private final DeleteSensorRequest request;
 
-	public SensorDeletionInMemoryCacheUpdate(DeleteSensorRequest sosRequest)
-	{
-		if (sosRequest == null)
-		{
-			String msg = String.format("Missing argument: '{}': {}", 
-					DeleteSensorRequest.class.getName(),
-					sosRequest);
-			LOGGER.error(msg);
-			throw new IllegalArgumentException(msg);
-		}
-		this.sosRequest = sosRequest;
-	}
+    public SensorDeletionInMemoryCacheUpdate(DeleteSensorRequest response) {
+        if (response == null) {
+            String msg = String.format("Missing argument: '{}': {}",
+                                       DeleteSensorRequest.class.getName(),
+                                       response);
+            LOGGER.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        this.request = response;
+    }
 
-	@Override
-	public void execute()
-	{
-		removeProcedureFromCache(sosRequest.getProcedureIdentifier());
-		
-		removeFeatureToProcedureRelationsFromCache(sosRequest.getProcedureIdentifier());
-		
-		removeOfferingsToProcedureRelation(sosRequest.getProcedureIdentifier());
-		
-		removeProcedureToObservationIdentifierRelations(sosRequest.getProcedureIdentifier());
-		
-		Collection<String> offeringsForProcedure = getCache().getKProcedureVOffering().get(sosRequest.getProcedureIdentifier());
+    @Override
+    public void execute() {
+        final WritableContentCache cache = getCache();
+        final String procedure = request.getProcedureIdentifier();
 
-		if (offeringsForProcedure != null)
-		{
+        cache.removeProcedure(procedure);
+        for (String feature : cache.getFeaturesOfInterest()) {
+            cache.removeProcedureForFeatureOfInterest(feature, procedure);
+            if (cache.getProceduresForFeatureOfInterest(feature).isEmpty()) {
+                cache.removeProceduresForFeatureOfInterest(feature);
+            }
+        }
 
-			for (String offeringId : offeringsForProcedure)
-			{
-				removeTemporalBoundingBoxFromCache(offeringId);
+        final Set<String> observationIdentifiers = cache.getObservationIdentifiersForProcedure(procedure);
+        cache.removeObservationIdentifiersForProcedure(procedure);
+        cache.removeObservationIdentifiers(observationIdentifiers);
 
-				removeOfferingName(offeringId);
+        for (String offering : cache.getOfferingsForProcedure(procedure)) {
+            cache.removeMaxTimeForOffering(offering);
+            cache.removeMinTimeForOffering(offering);
+            cache.removeNameForOffering(offering);
+            cache.removeFeaturesOfInterestForOffering(offering);
+            cache.removeRelatedFeaturesForOffering(offering);
+            cache.removeObservationTypesForOffering(offering);
+            cache.removeEnvelopeForOffering(offering);
+            for (String observableProperty : cache.getObservablePropertiesForOffering(offering)) {
+                cache.removeOfferingForObservableProperty(observableProperty, offering);
+            }
+            cache.removeObservablePropertiesForOffering(offering);
+            Set<String> resultTemplatesToRemove = cache.getResultTemplatesForOffering(offering);
+            cache.removeResultTemplatesForOffering(offering);
+            cache.removeResultTemplates(resultTemplatesToRemove);
+            for (String resultTemplate : resultTemplatesToRemove) {
+                cache.removeFeaturesOfInterestForResultTemplate(resultTemplate);
+                cache.removeObservablePropertiesForResultTemplate(resultTemplate);
+            }
+            cache.removeOfferingForProcedure(procedure, offering);
+            cache.removeProcedureForOffering(offering, procedure);
+        }
 
-				removeOfferingToFeaturesRelations(offeringId);
+        cache.removeRolesForRelatedFeatureNotIn(cache.getRelatedFeatures());
+        cache.setFeaturesOfInterest(cache.getFeaturesOfInterestWithOffering());
 
-				removeOfferingToRelatedFeaturesRelations(offeringId);
-
-				removeOfferingToObservationTypesRelations(offeringId);
-
-				removeOfferingEnvelope(offeringId);
-
-				removeOfferingToObservablePropertyRelation(offeringId);
-
-				Collection<String> resultTemplatesToRemove = removeOfferingToResultTemplatesRelation(offeringId);
-				
-				if (resultTemplatesToRemove != null && !resultTemplatesToRemove.isEmpty())
-				{
-					for (String resultTemplateIdentifier : resultTemplatesToRemove)
-					{
-						removeResultTemplateToFeatureOfInterestRelations(resultTemplateIdentifier);
-						
-						removeResultTemplateToObservablePropertyRelations(resultTemplateIdentifier);
-					}
-				}
-			}
-
-		}
-		
-		removeRemovedRelatedFeaturesFromRoleMap();
-		
-		removeRemovedFeaturesFromCache();
-		
-		removeRemovedObservationIdentifiers();
-		
-		if (areOfferingToTimeLimitMapsEmpty())
-		{
-			removeGlobalTemporalBoundingBox();
-		}
-		else
-		{
-			resetGlobalTemporalBoundingBox();
-		}
-		
-		if (getCache().getKOfferingVEnvelope().isEmpty())
-		{
-			removeGlobalEnvelope();
-		}
-		else
-		{
-			resetGlobalSpatialBoundingBox();
-		}
-		// observable property relations
-		removeObservablePropertyRelations(sosRequest.getProcedureIdentifier());
-		
-		// At the latest
-		removeProcedureToOfferingsRelation(sosRequest.getProcedureIdentifier());
-	}
-	
-	/* HELPER */
-	
-	private void removeResultTemplateToObservablePropertyRelations(String resultTemplateIdentifier)
-	{
-		if (resultTemplateIdentifier != null && !resultTemplateIdentifier.isEmpty())
-		{
-			getCache().getKResultTemplateVObservedProperties().remove(resultTemplateIdentifier);
-			LOGGER.debug("Removed all relations from result template to observable properties map for result template '{}'? {}",
-					resultTemplateIdentifier,
-					!getCache().getKResultTemplateVObservedProperties().containsKey(resultTemplateIdentifier));
-		}
-	}
-
-	private void removeResultTemplateToFeatureOfInterestRelations(String resultTemplateIdentifier)
-	{
-		if (resultTemplateIdentifier != null && !resultTemplateIdentifier.isEmpty())
-		{
-			getCache().getKResultTemplateVFeaturesOfInterest().remove(resultTemplateIdentifier);
-			LOGGER.debug("Removed all relations from result template to features map for result template '{}'? {}",
-					resultTemplateIdentifier,
-					!getCache().getKResultTemplateVFeaturesOfInterest().containsKey(resultTemplateIdentifier));
-		}
-	}
-
-	private void resetGlobalSpatialBoundingBox()
-	{
-		// iterate over all envelopes
-		// get first as start
-		boolean isFirst = true;
-		// while has next extent to
-		SosEnvelope globalEnvelope = null;
-		for (SosEnvelope offeringEnvelope : getCache().getKOfferingVEnvelope().values())
-		{
-			if (isFirst)
-			{
-				isFirst = false;
-				globalEnvelope = new SosEnvelope(new Envelope(offeringEnvelope.getEnvelope()), offeringEnvelope.getSrid());
-				LOGGER.debug("First envelope '{}' used as starting point",globalEnvelope);
-			}
-			else
-			{
-				globalEnvelope.getEnvelope().expandToInclude(offeringEnvelope.getEnvelope());
-				LOGGER.debug("Envelope expanded to include '{}' resulting in '{}'",offeringEnvelope,globalEnvelope);
-			}
-		}
-		if (globalEnvelope == null)
-		{
-			LOGGER.error("Global envelope could not be resetted");
-		}
-		else
-		{
-			getCache().setGlobalEnvelope(globalEnvelope);
-			LOGGER.debug("Spatial envelope finally set to '{}'",getCache().getGlobalEnvelope());
-		}
-	}
-
-	private void resetGlobalTemporalBoundingBox()
-	{
-		DateTime globalMax = null, globalMin = null;
-		// get max from all max values
-		for (String offeringId : getCache().getKOfferingVMaxTime().keySet())
-		{
-			DateTime offeringMax = getCache().getKOfferingVMaxTime().get(offeringId);
-			if ( offeringMax != null && (globalMax == null || offeringMax.isAfter(globalMax)) )
-			{
-				globalMax = offeringMax;
-			}
-		}
-		// get min from all min values
-		for (String offeringId : getCache().getKOfferingVMinTime().keySet())
-		{
-			DateTime offeringMin = getCache().getKOfferingVMinTime().get(offeringId);
-			if (offeringMin != null && (globalMin == null || offeringMin.isBefore(globalMin)) )
-			{
-				globalMin = offeringMin;
-			}
-		}
-		// reset temporal bbox
-		if (globalMin == null || globalMax == null)
-		{
-			LOGGER.error("Error in cache! Reset of global temporal bounding box failed. Max: '{}'); Min: '{}'", globalMax,globalMin);
-		}
-		else
-		{
-			getCache().setMaxEventTime(globalMax);
-			getCache().setMinEventTime(globalMin);
-			LOGGER.debug("Global temporal bounding box reset done. Min: '{}'); Max: '{}'", getCache().getMinEventTime(), getCache().getMaxEventTime());
-		}
-	}
-
-	private Collection<String> removeOfferingToResultTemplatesRelation(String offeringId)
-	{
-		Collection<String> resultTemplateIdentifiersToRemove = getCache().getKOfferingVResultTemplates().remove(offeringId);
-		LOGGER.debug("Offering '{}' to result templates removed from map? {}",
-				offeringId,
-				!getCache().getKOfferingVResultTemplates().containsKey(offeringId));
-		
-		if (resultTemplateIdentifiersToRemove != null)
-		{
-			for (String resultTemplateIdentiferToRemove : resultTemplateIdentifiersToRemove)
-			{
-				getCache().getResultTemplates().remove(resultTemplateIdentiferToRemove);
-				LOGGER.debug("Removed result template identifier '{}' from cache? {}",
-						resultTemplateIdentiferToRemove,
-						!getCache().getResultTemplates().contains(resultTemplateIdentiferToRemove));
-			}
-		}
-		return resultTemplateIdentifiersToRemove;
-	}
-
-	private void removeRemovedObservationIdentifiers()
-	{
-		List<String> allowedObservationIdentifiers = getAllowedEntries(getCache().getKProcedureVObservationIdentifiers().values());
-		List<String> featuresToRemove = getEntriesToRemove(allowedObservationIdentifiers,getCache().getObservationIdentifiers());
-		removeEntries(featuresToRemove,getCache().getObservationIdentifiers());
-	}
-	
-	private void removeOfferingToObservablePropertyRelation(String offeringId)
-	{
-		getCache().getKOfferingVObservableProperties().remove(offeringId);
-		LOGGER.debug("Offering '{}' to observable properties relations removed? {}",
-				offeringId,
-				!getCache().getKOfferingVObservableProperties().containsKey(offeringId));
-	}
-
-	private void removeProcedureToObservationIdentifierRelations(String procedureIdentifier)
-	{
-		getCache().getKProcedureVObservationIdentifiers().remove(procedureIdentifier);
-		LOGGER.debug("Observation identifiers removed for procedure '{}'? {}",
-				procedureIdentifier,
-				!getCache().getKProcedureVObservationIdentifiers().containsKey(procedureIdentifier));
-	}
-
-	private void removeFeatureToProcedureRelationsFromCache(String procedureIdentifier)
-	{
-		List<String> featuresToRemove = new ArrayList<String>();
-		for (String feature : getCache().getKFeatureOfInterestVProcedures().keySet())
-		{
-			if (getCache().getKFeatureOfInterestVProcedures().get(feature).contains(procedureIdentifier))
-			{
-				getCache().getKFeatureOfInterestVProcedures().get(feature).remove(procedureIdentifier);
-				LOGGER.debug("Removed feature '{}' -> procedure '{}' relation from cache? {}",
-						feature,
-						procedureIdentifier,
-						!getCache().getKFeatureOfInterestVProcedures().get(feature).contains(procedureIdentifier));
-			}
-			if (getCache().getKFeatureOfInterestVProcedures().get(feature) == null ||
-					getCache().getKFeatureOfInterestVProcedures().get(feature).isEmpty())
-			{
-				featuresToRemove.add(feature);
-				LOGGER.debug("Feature '{}' has no procedure mappings left. Added to list for complete removal from the feature->procedure map",feature);
-			}
-		}
-		for (String featureToRemove : featuresToRemove) {
-			getCache().getKFeatureOfInterestVProcedures().remove(featureToRemove);
-			LOGGER.debug("Removed feature '{}' from feature -> procedure map? {}",
-					featureToRemove,
-					!getCache().getKFeatureOfInterestVProcedures().containsKey(featureToRemove));
-		}
-	}
-
-	private void removeOfferingToObservationTypesRelations(String offeringId)
-	{
-		getCache().getKOfferingVObservationTypes().remove(offeringId);
-		LOGGER.debug("Observation types removed for offering '{}'? {}",
-				offeringId,
-				!getCache().getKOfferingVObservationTypes().containsKey(offeringId));
-	}
-
-	private void removeOfferingToFeaturesRelations(String offeringId)
-	{
-		getCache().getKOfferingVFeaturesOfInterest().remove(offeringId);
-		LOGGER.debug("Features removed for offering '{}'? {}",
-				offeringId,
-				!getCache().getKOfferingVFeaturesOfInterest().containsKey(offeringId));
-	}
-	
-	private void removeRemovedFeaturesFromCache()
-	{
-		List<String> allowedFeatures = getAllowedEntries(getCache().getKOfferingVFeaturesOfInterest().values());
-		List<String> featuresToRemove = getEntriesToRemove(allowedFeatures,getCache().getFeatureOfInterest());
-		removeEntries(featuresToRemove,getCache().getFeatureOfInterest());
-	}
-
-	private void removeEntries(List<String> entriesToRemove, Collection<String> listToRemoveFrom)
-	{
-		for (String entryToRemove : entriesToRemove)
-		{
-			listToRemoveFrom.remove(entryToRemove);
-			LOGGER.debug("Entry '{}' removed from list in cache? {}",
-					entryToRemove,
-					!listToRemoveFrom.contains(entryToRemove));
-		}
-	}
-
-	private List<String> getEntriesToRemove(List<String> allowedEntries, Collection<String> currentEntries)
-	{
-		List<String> entriesToRemove = new ArrayList<String>();
-		for (String entry : currentEntries) 
-		{
-			if (!allowedEntries.contains(entry))
-			{
-				entriesToRemove.add(entry);
-			}
-		}
-		return entriesToRemove;
-	}
-
-	private void removeOfferingName(String offeringId)
-	{
-		getCache().getKOfferingVName().remove(offeringId);
-		LOGGER.debug("Offering name removed for offering '{}'? {}",
-				offeringId,
-				!getCache().getKOfferingVName().containsKey(offeringId));
-	}
-	
-	private List<String> getAllowedRelatedFeatures()
-	{
-		return getAllowedEntries(getCache().getKOfferingVRelatedFeatures().values());
-	}
-
-	private void removeRemovedRelatedFeaturesFromRoleMap()
-	{
-		List<String> allowedRelatedFeatures = getAllowedRelatedFeatures();
-		List<String> featuresToRemove = getEntriesToRemove(allowedRelatedFeatures, 
-				getCache().getKRelatedFeatureVRole().keySet());
-		removeEntries(featuresToRemove, getCache().getKRelatedFeatureVRole().keySet());
-	}
-
-	private List<String> getAllowedEntries(Collection<Collection<String>> values)
-	{
-		List<String> allowedEntries = new ArrayList<String>();
-		for (Collection<String> entries : values)
-		{
-			for (String entry : entries)
-			{
-				if (!allowedEntries.contains(entry))
-				{
-					allowedEntries.add(entry);
-				}
-			}
-		}
-		return allowedEntries;
-	}
-
-	private void removeOfferingToRelatedFeaturesRelations(String offeringId)
-	{
-		getCache().getKOfferingVRelatedFeatures().remove(offeringId);
-		LOGGER.debug("Related features removed for offering '{}'? {}",
-				offeringId,
-				!getCache().getKOfferingVRelatedFeatures().containsKey(offeringId));
-	}
-
-	private void removeGlobalEnvelope()
-	{
-		getCache().setGlobalEnvelope(new SosEnvelope(null, getCache().getDefaultEPSGCode()));
-		LOGGER.debug("Global envelope: {}",getCache().getGlobalEnvelope());
-	}
-
-	private boolean areOfferingToTimeLimitMapsEmpty()
-	{
-		return getCache().getKOfferingVMinTime().isEmpty() &&
-				getCache().getKOfferingVMaxTime().isEmpty();
-	}
-
-	private void removeGlobalTemporalBoundingBox()
-	{
-		getCache().setMaxEventTime(null);
-		getCache().setMinEventTime(null);
-		LOGGER.debug("Global temporal bounding box: max time: {}, min time: {}",
-				getCache().getMaxEventTime(),
-				getCache().getMinEventTime());
-	}
-
-	private void removeTemporalBoundingBoxFromCache(String offeringId)
-	{
-		getCache().getKOfferingVMaxTime().remove(offeringId);
-		getCache().getKOfferingVMinTime().remove(offeringId);
-		LOGGER.debug("Temporal boundingbox removed for offering '{}'? max time: {}; min time: {}",
-				offeringId,
-				!getCache().getKOfferingVMaxTime().containsKey(offeringId),
-				!getCache().getKOfferingVMinTime().containsKey(offeringId));
-	}
-
-	private void removeOfferingEnvelope(String offeringId)
-	{
-		getCache().getKOfferingVEnvelope().remove(offeringId);
-		LOGGER.debug("Envelope removed for offering '{}'? {}",
-				offeringId,
-				!getCache().getKOfferingVEnvelope().containsKey(offeringId));
-	}
-	
-	private void removeObservablePropertyRelations(String procedureIdentifier)
-	{
-		for (String observableProperty : getCache().getKProcedureVObservableProperties().get(procedureIdentifier)) {
-			removeObservablePropertyToProcedureRelation(observableProperty, procedureIdentifier);
-			removeProcedureToObservablePropertyRelations(procedureIdentifier);
-		}
-	}
-
-	private void removeProcedureToObservablePropertyRelations(String procedureIdentifier)
-	{
-		getCache().getKProcedureVObservableProperties().remove(procedureIdentifier);
-		LOGGER.debug("Removed procedure to observable properties relations from cache for procedure '{}'? {}",
-				procedureIdentifier,
-				!getCache().getKProcedureVObservableProperties().containsKey(procedureIdentifier));
-	}
-
-	private void removeObservablePropertyToProcedureRelation(String observableProperty,
-			String procedureIdentifier)
-	{
-		if (getCache().getKObservablePropertyVProcedures().get(observableProperty).remove(procedureIdentifier))
-		{
-			LOGGER.debug("Removed observable property '{}' -> procedure '{}' relation from cache",
-					observableProperty,procedureIdentifier);
-			if (getCache().getKObservablePropertyVProcedures().get(observableProperty) != null &&
-					getCache().getKObservablePropertyVProcedures().get(observableProperty).isEmpty() &&
-					getCache().getKObservablePropertyVProcedures().remove(observableProperty) == null)
-			{
-				LOGGER.debug("Removed entry for observable property '{}' from cache map",observableProperty);
-			}
-		}
-	}
-
-	private void removeOfferingsToProcedureRelation(String procedureIdentifier)
-	{
-		List<String> offeringsToRemove = new ArrayList<String>();
-		for (Entry<String, List<String>> offeringToProcedureRelation : getCache().getKOfferingVProcedures().entrySet()) {
-			if (offeringToProcedureRelation.getValue().remove(procedureIdentifier))
-			{
-				LOGGER.debug("Procedure to offering relation removed for '{}'->'{}'",
-						procedureIdentifier,
-						offeringToProcedureRelation.getKey());
-				if (offeringToProcedureRelation.getValue().isEmpty())
-				{
-					offeringsToRemove.add(offeringToProcedureRelation.getKey());
-				}
-			}
-		}
-		// this to by-pass concurrent modification exceptions
-		for (String offeringToRemove : offeringsToRemove) {
-			getCache().getKOfferingVProcedures().remove(offeringToRemove);
-			LOGGER.debug("Offering '{}' removed from offering->procedure map ? {}",
-					offeringsToRemove,
-					!getCache().getKOfferingVProcedures().containsKey(offeringToRemove));
-		}
-	}
-
-	private void removeProcedureToOfferingsRelation(String procedureIdentifer)
-	{
-		getCache().getKProcedureVOffering().remove(procedureIdentifer);
-		LOGGER.debug("Procedure to offerings relation removed from cache for procedure '{}'? {}",
-					procedureIdentifer,
-					!getCache().getKProcedureVOffering().containsKey(procedureIdentifer));
-	}
-
-	private void removeProcedureFromCache(String procedureIdentifier)
-	{
-		getCache().getProcedures().remove(procedureIdentifier);
-		LOGGER.debug("Procedure '{}' removed from list of procedures? {}",
-				procedureIdentifier,
-				!getCache().getProcedures().contains(procedureIdentifier));
-	}
-
+        // observable property relations
+        for (String observableProperty : cache.getObservablePropertiesForProcedure(procedure)) {
+            cache.removeProcedureForObservableProperty(observableProperty, procedure);
+            cache.removeObservablePropertyForProcedure(procedure, observableProperty);
+        }
+        // At the latest
+        cache.removeOfferingsForProcedure(procedure);
+        cache.recalculateEventTime();
+        cache.recalculateGlobalEnvelope();
+    }
 }

@@ -43,94 +43,87 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk
- *         J&uuml;rrens</a>
- * @since 4.0 
+ * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
+ * @since 4.0
  */
-public class InMemoryCacheController extends CacheControllerImpl {
+public class InMemoryCacheController extends AbstractFeederDAOCacheController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryCacheController.class);
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryCacheController.class);
+    /**
+     * @see SensorInsertionInMemoryCacheUpdate
+     */
+    @Override
+    public void updateAfterSensorInsertion(InsertSensorRequest sosRequest,
+                                           InsertSensorResponse sosResponse) {
+        update(new SensorInsertionInMemoryCacheUpdate(sosRequest, sosResponse));
+    }
 
-	/**
-	 * @see SensorInsertionInMemoryCacheUpdate 
-	 */
-	@Override
-	public void updateAfterSensorInsertion(InsertSensorRequest sosRequest,
-			InsertSensorResponse sosResponse)
-	{
-		update(new SensorInsertionInMemoryCacheUpdate(sosRequest, sosResponse));
-	}
+    /**
+     * @see ObservationInsertionInMemoryCacheUpdate
+     */
+    @Override
+    public void updateAfterObservationInsertion(InsertObservationRequest sosRequest) {
+        update(new ObservationInsertionInMemoryCacheUpdate(sosRequest));
+    }
 
-	/**
-	 * @see ObservationInsertionInMemoryCacheUpdate
-	 */
-	@Override
-	public void updateAfterObservationInsertion(InsertObservationRequest sosRequest)
-	{
-		update(new ObservationInsertionInMemoryCacheUpdate(sosRequest));
-	}
+    /**
+     * @see SensorDeletionInMemoryCacheUpdate
+     */
+    @Override
+    public void updateAfterSensorDeletion(DeleteSensorRequest sosRequest) {
+        update(new SensorDeletionInMemoryCacheUpdate(sosRequest));
+    }
 
-	/**
-	 * @see SensorDeletionInMemoryCacheUpdate
-	 */
-	@Override
-	public void updateAfterSensorDeletion(DeleteSensorRequest sosRequest)
-	{
-		update(new SensorDeletionInMemoryCacheUpdate(sosRequest));
-	}
+    /**
+     * @see ResultTemplateInsertionInMemoryCacheUpdate
+     */
+    @Override
+    public void updateAfterResultTemplateInsertion(InsertResultTemplateRequest sosRequest,
+                                                   InsertResultTemplateResponse sosResponse) {
+        update(new ResultTemplateInsertionInMemoryCacheUpdate(sosRequest, sosResponse));
+    }
 
-	/**
-	 * @see ResultTemplateInsertionInMemoryCacheUpdate 
-	 */
-	@Override
-	public void updateAfterResultTemplateInsertion(InsertResultTemplateRequest sosRequest, InsertResultTemplateResponse sosResponse)
-	{
-		update(new ResultTemplateInsertionInMemoryCacheUpdate(sosRequest,sosResponse));
-	}
+    @Override
+    public void updateAfterResultInsertion(String templateIdentifier, SosObservation sosObservation) {
+        update(new ResultInsertionInMemoryCacheUpdate(templateIdentifier, sosObservation));
+    }
 
-	@Override
-	public void updateAfterResultInsertion(String templateIdentifier, SosObservation sosObservation)
-	{
-		update(new ResultInsertionInMemoryCacheUpdate(templateIdentifier,sosObservation));
-	}
+    /**
+     * TODO Eike: test removal of locking mechanisms
+     */
+    private void update(InMemoryCacheUpdate cacheUpdate) {
+        if (cacheUpdate == null) {
+            String errorMsg = String.format("Missing argument: InMemoryCacheUpdate: '%s'",
+                                            cacheUpdate);
+            LOGGER.warn(errorMsg);
+            throw new IllegalArgumentException(errorMsg);
+        }
+        boolean timeNotElapsed = true;
+        try {
+            // thread safe updating of the cache map
+            timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
 
-	/**
-	 * TODO Eike: test removal of locking mechanisms
-	 */
-	private void update(InMemoryCacheUpdate cacheUpdate)
-	{
-		if (cacheUpdate == null ) {
-			String errorMsg = String.format("Missing argument: InMemoryCacheUpdate: '%s'",
-					cacheUpdate);
-			LOGGER.warn(errorMsg);
-			throw new IllegalArgumentException(errorMsg);
-		}
-		boolean timeNotElapsed = true;
-		try {
-			// thread safe updating of the cache map
-			timeNotElapsed = getUpdateLock().tryLock(SosConstants.UPDATE_TIMEOUT, TimeUnit.MILLISECONDS);
-
-			// has waiting for lock got a time out?
-			if (!timeNotElapsed) {
-				LOGGER.warn("\n******\n{} not successful because of time out while waiting for update lock." + "\nWaited {} milliseconds.\n******\n", 
-						cacheUpdate, 
-						SosConstants.UPDATE_TIMEOUT);
-				return;
-			}
-			while (!isUpdateIsFree()) {
-				getUpdateFree().await();
-			}
-			setUpdateIsFree(false);
-			cacheUpdate.setCache(getCache());
-			cacheUpdate.execute();
-		} catch (InterruptedException e) {
-			LOGGER.error("Problem while threadsafe capabilities cache update", e);
-		} finally {
-			if (timeNotElapsed) {
-				getUpdateLock().unlock();
-				setUpdateIsFree(true);
-			}
-		}
-	}
-
+            // has waiting for lock got a time out?
+            if (!timeNotElapsed) {
+                LOGGER.warn("\n******\n{} not successful because of time out while waiting for update lock."
+                            + "\nWaited {} milliseconds.\n******\n",
+                            cacheUpdate,
+                            SosConstants.UPDATE_TIMEOUT);
+                return;
+            }
+            while (!isUpdateIsFree()) {
+                getUpdateFree().await();
+            }
+            setUpdateIsFree(false);
+            cacheUpdate.setCache(getCache());
+            cacheUpdate.execute();
+        } catch (InterruptedException e) {
+            LOGGER.error("Problem while threadsafe capabilities cache update", e);
+        } finally {
+            if (timeNotElapsed) {
+                getUpdateLock().unlock();
+                setUpdateIsFree(true);
+            }
+        }
+    }
 }

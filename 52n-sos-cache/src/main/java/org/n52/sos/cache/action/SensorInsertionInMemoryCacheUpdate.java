@@ -23,10 +23,9 @@
  */
 package org.n52.sos.cache.action;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
+import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.swe.SosFeatureRelationship;
 import org.n52.sos.request.InsertSensorRequest;
@@ -36,7 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * When executing this &auml;ction (see {@link Action}), the following relations are added and some settings are updated in cache:<ul>
+ * When executing this &auml;ction (see {@link Action}), the following relations are added and some settings are updated
+ * in cache:<ul>
  * <li>Procedure</li>
  * <li>Offering &harr; procedure</li>
  * <li>Offering &rarr; name</li></ul>
@@ -45,125 +45,65 @@ import org.slf4j.LoggerFactory;
  * <li>Related features &rarr; role</li>
  * <li>Observable Property &harr; Procedure</li>
  * <li>Offering &harr; observable property</li>
- * 
+ *
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @since 4.0
  *
  */
 public class SensorInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SensorInsertionInMemoryCacheUpdate.class);
+    private final InsertSensorResponse response;
+    private final InsertSensorRequest request;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SensorInsertionInMemoryCacheUpdate.class);
-	
-	private final InsertSensorResponse sosResponse;
-	private final InsertSensorRequest sosRequest;
+    public SensorInsertionInMemoryCacheUpdate(InsertSensorRequest request, InsertSensorResponse response) {
+        if (request == null || response == null) {
+            String msg = String.format("Missing argument: '{}': {}; '{}': {}",
+                                       InsertSensorRequest.class.getName(),
+                                       request,
+                                       InsertSensorResponse.class.getName(),
+                                       response);
+            LOGGER.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        this.response = response;
+        this.request = request;
+    }
 
-	public SensorInsertionInMemoryCacheUpdate(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse) {
-		if (sosRequest == null || sosResponse == null)
-		{
-			String msg = String.format("Missing argument: '{}': {}; '{}': {}", 
-					InsertSensorRequest.class.getName(),
-					sosRequest,
-					InsertSensorResponse.class.getName(),
-					sosResponse);
-			LOGGER.error(msg);
-			throw new IllegalArgumentException(msg);
-		}
-		this.sosResponse = sosResponse;
-		this.sosRequest = sosRequest;
-	}
+    @Override
+    public void execute() {
+        final WritableContentCache cache = getCache();
+        final String procedure = response.getAssignedProcedure();
+        final String offering = response.getAssignedOffering();
 
-	@Override
-	public void execute()
-	{
-		// procedure relations
-		addProcedureToCache(sosResponse.getAssignedProcedure());
-		addOfferingToProcedureRelation(sosResponse.getAssignedOffering(), sosResponse.getAssignedProcedure());
-		addProcedureToOfferingRelation(sosResponse.getAssignedProcedure(), sosResponse.getAssignedOffering());
+        // procedure relations
+        cache.addProcedure(procedure);
+        cache.addProcedureForOffering(offering, procedure);
+        cache.addOfferingForProcedure(procedure, offering);
 
-		// offering name
-		for (SosOffering sosOffering : sosRequest.getProcedureDescription().getOfferingIdentifiers()) {
-			addOfferingNameToCache(sosOffering);
-		}
+        // offering name
+        for (SosOffering sosOffering : request.getProcedureDescription().getOfferingIdentifiers()) {
+            cache.setNameForOffering(sosOffering.getOfferingIdentifier(), sosOffering.getOfferingName());
+        }
 
-		// allowed observation types
-		addAllowedObservationTypes(sosResponse.getAssignedOffering(), sosRequest.getMetadata().getObservationTypes());
+        // allowed observation types
+        cache.addAllowedObservationTypesForOffering(offering, request.getMetadata().getObservationTypes());
 
-		// related features
-		addRelatedFeatures(sosRequest.getRelatedFeatures(), sosResponse.getAssignedOffering());
-		addRelatedFeatureRoles(sosRequest.getRelatedFeatures());
+        // related features
+        final Collection<SosFeatureRelationship> relatedFeatures = request.getRelatedFeatures();
+        if (relatedFeatures != null && !relatedFeatures.isEmpty()) {
+            for (SosFeatureRelationship relatedFeature : relatedFeatures) {
+                final String identifier = relatedFeature.getFeature().getIdentifier().getValue();
+                cache.addRelatedFeatureForOffering(offering, identifier);
+                cache.addRoleForRelatedFeature(identifier, relatedFeature.getRole());
+            }
+        }
 
-		// observable property relations
-		for (String observableProperty : sosRequest.getObservableProperty()) {
-			addObservablePropertyToProcedureRelation(observableProperty, sosResponse.getAssignedProcedure());
-			addProcedureToObservablePropertyRelation(sosResponse.getAssignedProcedure(), observableProperty);
-			addObservablePropertiesToOfferingRelation(observableProperty, sosResponse.getAssignedOffering());
-			addOfferingToObservablePropertyRelation(sosResponse.getAssignedOffering(), observableProperty);
-		}
-	}
-	
-	private void addRelatedFeatures(List<SosFeatureRelationship> relatedFeatures,
-			String offeringId)
-	{
-		if (relatedFeatures != null && !relatedFeatures.isEmpty()) {
-			if (getCache().getKOfferingVRelatedFeatures().get(offeringId) == null) {
-				Collection<String> relatedFeatureIdentifiers = new ArrayList<String>(relatedFeatures.size());
-				for (SosFeatureRelationship sosFeatureRelationship : relatedFeatures) {
-					relatedFeatureIdentifiers.add(getFeatureIdentifier(sosFeatureRelationship));
-				}
-				getCache().getKOfferingVRelatedFeatures().put(offeringId, relatedFeatureIdentifiers);
-			} else {
-				for (SosFeatureRelationship sosFeatureRelationship : relatedFeatures) {
-					if (!getCache().getKOfferingVRelatedFeatures().get(offeringId).contains(getFeatureIdentifier(sosFeatureRelationship))) {
-						getCache().getKOfferingVRelatedFeatures().get(offeringId).add(getFeatureIdentifier(sosFeatureRelationship));
-					}
-				}
-			}
-		}
-	}
-	
-	private String getFeatureIdentifier(SosFeatureRelationship sosFeatureRelationship)
-	{
-		return sosFeatureRelationship.getFeature().getIdentifier().getValue();
-	}
-	
-	private void addAllowedObservationTypes(String assignedOffering,
-			List<String> observationTypes)
-	{
-		if (!getCache().getAllowedKOfferingVObservationType().containsKey(assignedOffering)) {
-			getCache().getAllowedKOfferingVObservationType().put(assignedOffering, observationTypes);
-		} else {
-			for (String observationType : observationTypes) {
-				getCache().getAllowedKOfferingVObservationType().get(assignedOffering).add(observationType);
-			}
-		}
-	}
-	
-	private void addRelatedFeatureRoles(List<SosFeatureRelationship> relatedFeatures)
-	{
-		if (relatedFeatures != null && !relatedFeatures.isEmpty()) {
-			for (SosFeatureRelationship featureRelation : relatedFeatures) {
-				// add new
-				if (!getCache().getKRelatedFeatureVRole().containsKey(getFeatureIdentifier(featureRelation))) {
-					List<String> roles = new ArrayList<String>(1);
-					roles.add(featureRelation.getRole());
-					getCache().getKRelatedFeatureVRole().put(getFeatureIdentifier(featureRelation), roles);
-				}
-				// update
-				else if (!getCache().getKRelatedFeatureVRole().get(getFeatureIdentifier(featureRelation)).contains(featureRelation.getRole())) {
-					getCache().getKRelatedFeatureVRole().get(getFeatureIdentifier(featureRelation)).add(featureRelation.getRole());
-				}
-			}
-		}
-	}
-	
-	private void addOfferingNameToCache(SosOffering sosOffering)
-	{
-		if (!getCache().getKOfferingVName().containsKey(sosOffering.getOfferingIdentifier())) {
-			getCache().getKOfferingVName().put(sosOffering.getOfferingIdentifier(), sosOffering.getOfferingName());
-			LOGGER.debug("Added offering '{}' to name '{}' relation to cache? {}",
-					sosOffering.getOfferingIdentifier(),
-					sosOffering.getOfferingName());
-		}
-	}
-
+        // observable property relations
+        for (String observableProperty : request.getObservableProperty()) {
+            cache.addProcedureForObservableProperty(observableProperty, procedure);
+            cache.addObservablePropertyForProcedure(procedure, observableProperty);
+            cache.addOfferingForObservableProperty(observableProperty, offering);
+            cache.addObservablePropertyForOffering(offering, observableProperty);
+        }
+    }
 }

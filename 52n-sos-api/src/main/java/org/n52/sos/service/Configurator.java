@@ -26,7 +26,6 @@ package org.n52.sos.service;
 import static org.n52.sos.service.MiscSettings.*;
 import static org.n52.sos.service.ServiceSettings.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
@@ -37,7 +36,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.n52.sos.binding.BindingRepository;
-import org.n52.sos.cache.ACapabilitiesCacheController;
+import org.n52.sos.cache.ContentCache;
+import org.n52.sos.cache.IContentCacheController;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
@@ -190,9 +190,9 @@ public class Configurator implements Cleanupable {
      */
     private IDataSourceInitializator dataSourceInitializator;
     /**
-     * Capabilities Cache Controller.
+     * Content Cache Controller.
      */
-    private ACapabilitiesCacheController capabilitiesCacheController;
+    private IContentCacheController capabilitiesCacheController;
     /**
      * Implementation of ICacheFeederDAO.
      */
@@ -650,7 +650,7 @@ public class Configurator implements Cleanupable {
         initializeAdminServiceOperator();
         this.adminRequestOperatorRepository = new AdminRequestOperatorRepository();
         initializeDataSource();
-        initializeCapabilitiesCacheController();
+        initializeContentCacheController();
         this.tasking = new Tasking();
         initializeProfileHandler();
         LOGGER.info("\n******\n Configurator initialization finished\n******\n");
@@ -683,9 +683,9 @@ public class Configurator implements Cleanupable {
      *
      * @throws ConfigurationException if initializing the CapabilitiesCache failed
      */
-    private void initializeCapabilitiesCacheController() throws ConfigurationException {
-        this.capabilitiesCacheController = new ConfiguringSingletonServiceLoader<ACapabilitiesCacheController>(
-                ACapabilitiesCacheController.class, true).get();
+    private void initializeContentCacheController() throws ConfigurationException {
+        this.capabilitiesCacheController =
+        new ConfiguringSingletonServiceLoader<IContentCacheController>(IContentCacheController.class, true).get();
     }
 
     /**
@@ -789,8 +789,31 @@ public class Configurator implements Cleanupable {
     /**
      * @return the current capabilitiesCacheController
      */
-    public ACapabilitiesCacheController getCapabilitiesCacheController() {
+    public ContentCache getCache() {
+        return getCacheController().getCache();
+    }
+
+    /**
+     * @deprecated use {@link #getCache()}
+     */
+    @Deprecated
+    public ContentCache getCapabilitiesCache() {
+        return getCache();
+    }
+
+    /**
+     * @return the current capabilitiesCacheController
+     */
+    public IContentCacheController getCacheController() {
         return capabilitiesCacheController;
+    }
+
+    /**
+     * @deprecated use {@link getCacheController()}
+     */
+    @Deprecated
+    public IContentCacheController getCapabilitiesCacheController() {
+        return getCacheController();
     }
 
     /**

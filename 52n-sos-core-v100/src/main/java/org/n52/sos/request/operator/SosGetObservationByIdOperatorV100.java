@@ -69,7 +69,7 @@ public class SosGetObservationByIdOperatorV100 extends
         
         checkServiceParameter(sosRequest.getService());
         // check valid obs ids
-        Collection<String> validObservations = Configurator.getInstance().getCapabilitiesCacheController().getObservationIdentifiers();
+        Collection<String> validObservations = Configurator.getInstance().getCache().getObservationIdentifiers();
 		checkObservationIDs(sosRequest.getObservationIdentifier(), validObservations, "ObservationId");
         // check responseFormat!
 		String responseFormat = sosRequest.getResponseFormat();

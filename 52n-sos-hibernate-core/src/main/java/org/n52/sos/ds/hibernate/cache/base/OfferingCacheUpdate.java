@@ -50,20 +50,17 @@ import org.slf4j.LoggerFactory;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class OfferingCacheUpdate extends CacheUpdate {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(OfferingCacheUpdate.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(OfferingCacheUpdate.class);
     private static final String THREAD_GROUP_NAME = "offering-cache-update";
-    
     private final ThreadFactory threadFactory = new GroupedAndNamedThreadFactory(THREAD_GROUP_NAME);
     private final IConnectionProvider connectionProvider = Configurator.getInstance().getDataConnectionProvider();
     private final ThreadLocalSessionFactory sessionFactory = new ThreadLocalSessionFactory(connectionProvider);
     private final ExecutorService executor;
     private List<OwsExceptionReport> errors;
     private CountDownLatch offeringThreadsRunning;
-    
+
     public OfferingCacheUpdate(int threads) {
-        this.executor = Executors.newFixedThreadPool(threads, threadFactory);;
+        this.executor = Executors.newFixedThreadPool(threads, threadFactory);
     }
 
     protected CountDownLatch getCountDownLatch() {
@@ -77,32 +74,28 @@ public class OfferingCacheUpdate extends CacheUpdate {
     protected ThreadLocalSessionFactory getSessionFactory() {
         return sessionFactory;
     }
-    
+
     @Override
     public void execute() {
         List<Offering> offerings = getOfferingObjects(getSession());
-        OfferingCache offeringCache = new OfferingCache(offerings);
 
         LOGGER.debug("multithreading init");
-        
+
         offeringThreadsRunning = new CountDownLatch(offerings.size());
         errors = CollectionHelper.synchronizedList();
 
         try {
-            queueTasks(offerings, offeringCache);
+            queueTasks(offerings);
             waitForTaskCompletion();
             LOGGER.debug("Finished waiting for other threads");
             if (!errors.isEmpty()) {
                 getErrors().addAll(errors);
-                return;
             }
-            // save all information in cache
-            offeringCache.save(getCache());
         } finally {
             try {
                 getSessionFactory().close();
             } catch (ConnectionProviderException cpe) {
-               LOGGER.error("Error while closing SessionFactory", cpe);
+                LOGGER.error("Error while closing SessionFactory", cpe);
             }
         }
     }
@@ -114,16 +107,17 @@ public class OfferingCacheUpdate extends CacheUpdate {
         return true;
     }
 
-    protected void queueTasks(List<Offering> hOfferings, OfferingCache offeringCache) {
+    protected void queueTasks(List<Offering> hOfferings) {
         for (Offering offering : hOfferings) {
-            queueTask(offering, offeringCache);
+            queueTask(offering);
         }
     }
 
-    protected void queueTask(Offering offering, OfferingCache offeringCache) {
+    protected void queueTask(Offering offering) {
         if (!containsDeletedProcedure(offering.getObservationConstellationOfferingObservationTypes())) {
             // create runnable for offeringId
-            Runnable task = new OfferingCacheUpdateTask(getCountDownLatch(), getSessionFactory(), offeringCache, offering, errors);
+            Runnable task =
+                     new OfferingCacheUpdateTask(getCountDownLatch(), getSessionFactory(), getCache(), offering, errors);
             // put runnable in executor service
             getExecutor().submit(task);
         } else {

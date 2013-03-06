@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.n52.sos.binding.Binding;
-import org.n52.sos.cache.ACapabilitiesCacheController;
+import org.n52.sos.cache.ContentCache;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.ds.IOperationDAO;
 import org.n52.sos.ogc.ows.IExtension;
@@ -72,8 +72,8 @@ public abstract class AbstractHibernateOperationDao extends AbstractHibernateDao
         return null;
     }
 
-    protected ACapabilitiesCacheController getCacheController() {
-        return getConfigurator().getCapabilitiesCacheController();
+    protected ContentCache getCache() {
+        return getConfigurator().getCache();
     }
 
     protected Configurator getConfigurator() {

@@ -123,7 +123,7 @@ public class SosDeleteSensorOperatorV20 extends AbstractV2RequestOperator<IDelet
 
     private void checkProcedureIdentifier(String procedureIdentifier) throws OwsExceptionReport {
         if (procedureIdentifier != null && !procedureIdentifier.isEmpty()) {
-            if (!Configurator.getInstance().getCapabilitiesCacheController().getProcedures().contains(procedureIdentifier)){
+            if (!Configurator.getInstance().getCache().getProcedures().contains(procedureIdentifier)){
                 String exceptionText = "The requested procedure identifier (" + procedureIdentifier + ") is not provided by this service!";
                 throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.DeleteSensorParams.procedure.name(), exceptionText);
             }

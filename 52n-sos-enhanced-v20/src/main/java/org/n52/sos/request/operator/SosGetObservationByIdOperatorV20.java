@@ -147,7 +147,7 @@ public class SosGetObservationByIdOperatorV20 extends AbstractV2RequestOperator<
         }
         try {
             checkObservationIDs(sosRequest.getObservationIdentifier(),
-                    Configurator.getInstance().getCapabilitiesCacheController().getObservationIdentifiers(),
+                    Configurator.getInstance().getCache().getObservationIdentifiers(),
                     Sos2Constants.GetObservationByIdParams.observation.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);

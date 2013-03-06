@@ -23,36 +23,30 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.hibernate.Criteria;
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat;
 import org.n52.sos.util.Action;
 
 /**
- * When executing this &auml;ction (see {@link Action}), the following relations are added, settings are updated in cache:<ul>
+ * When executing this &auml;ction (see {@link Action}), the following relations are added, settings are updated in
+ * cache:<ul>
  * <li>Procedure Description Formats</li></ul>
+ *
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @since 4.0.0
  */
 public class ProcedureDescriptionFormatCacheUpdate extends CacheUpdate {
-
     @Override
     @SuppressWarnings("unchecked")
-	public void execute()
-	{
-		Criteria hProcedureDescriptionFormats = getSession().createCriteria(ProcedureDescriptionFormat.class);
-        List<ProcedureDescriptionFormat> procedureDescriptionFormats = hProcedureDescriptionFormats.list();
-        Set<String> procDescTypes = new HashSet<String>(0);
+    public void execute() {
+        List<ProcedureDescriptionFormat> procedureDescriptionFormats = getSession()
+                .createCriteria(ProcedureDescriptionFormat.class).list();
         if (procedureDescriptionFormats != null) {
             for (ProcedureDescriptionFormat procedureDescriptionFormat : procedureDescriptionFormats) {
-                procDescTypes.add(procedureDescriptionFormat.getProcedureDescriptionFormat());
+                getCache().addProcedureDescriptionFormat(procedureDescriptionFormat.getProcedureDescriptionFormat());
             }
         }
-		getCache().setProcedureDescriptionFormats(procDescTypes);
-	}
-
+    }
 }

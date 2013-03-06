@@ -63,10 +63,10 @@ public class UpdateSensorDescriptionDAO extends AbstractHibernateOperationDao im
     
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
-        opsMeta.addPossibleValuesParameter(Sos2Constants.UpdateSensorDescriptionParams.procedure, getCacheController().getProcedures());
+        opsMeta.addPossibleValuesParameter(Sos2Constants.UpdateSensorDescriptionParams.procedure, getCache().getProcedures());
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
             opsMeta.addPossibleValuesParameter(Sos2Constants.UpdateSensorDescriptionParams.procedureDescriptionFormat,
-                    getCacheController().getProcedureDescriptionFormats());
+                    getCache().getProcedureDescriptionFormats());
         }
         opsMeta.addAnyParameterValue(Sos2Constants.UpdateSensorDescriptionParams.description);
     }

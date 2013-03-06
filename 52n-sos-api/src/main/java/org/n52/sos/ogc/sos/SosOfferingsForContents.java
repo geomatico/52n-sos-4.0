@@ -25,6 +25,7 @@ package org.n52.sos.ogc.sos;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -81,12 +82,12 @@ public class SosOfferingsForContents {
     /**
      * All featuresOfinterest contained in the offering
      */
-    private Collection<String> featureOfInterest;
+    private Set<String> featureOfInterest;
 
     /**
      * All related features contained in the offering
      */
-    private Map<String, Collection<String>> relatedFeatures;
+    private Map<String, Set<String>> relatedFeatures;
 
     /**
      * All procedures contained in the offering
@@ -237,7 +238,7 @@ public class SosOfferingsForContents {
     /**
      * @param featureOfInterest
      */
-    public void setFeatureOfInterest(Collection<String> featureOfInterest) {
+    public void setFeatureOfInterest(Set<String> featureOfInterest) {
         this.featureOfInterest = featureOfInterest;
     }
 
@@ -251,14 +252,14 @@ public class SosOfferingsForContents {
     /**
      * @param relatedFeatures
      */
-    public void setRelatedFeatures(Map<String, Collection<String>> relatedFeatures) {
+    public void setRelatedFeatures(Map<String, Set<String>> relatedFeatures) {
         this.relatedFeatures = relatedFeatures;
     }
 
     /**
      * @return
      */
-    public Map<String, Collection<String>> getRelatedFeatures() {
+    public Map<String, Set<String>> getRelatedFeatures() {
         return relatedFeatures;
     }
 

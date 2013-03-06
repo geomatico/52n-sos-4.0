@@ -25,11 +25,7 @@ package org.n52.sos.ds.hibernate.cache.base;
 
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getCompositePhenomenonObjects;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
@@ -40,26 +36,18 @@ import org.n52.sos.ds.hibernate.entities.ObservableProperty;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class CompositePhenomenonCacheUpdate extends CacheUpdate {
-
     @Override
     public void execute() {
-        List<CompositePhenomenon> compositePhenomenons =
-                getCompositePhenomenonObjects(getSession());
-        Map<String, Collection<String>> kCompositePhenomenonVObservableProperty =
-                new HashMap<String, Collection<String>>(compositePhenomenons.size());
-
-        for (CompositePhenomenon compositePhenomenon : compositePhenomenons) {
-            kCompositePhenomenonVObservableProperty.put(compositePhenomenon.getIdentifier(),
-                    getObservablePropertyIdentifierFromObservableProperties(compositePhenomenon
-                    .getObservableProperties()));
+        for (CompositePhenomenon cp : getCompositePhenomenonObjects(getSession())) {
+            getCache().setObservablePropertiesForCompositePhenomenon(
+                    cp.getIdentifier(),
+                    getObservablePropertyIdentifiers(cp.getObservableProperties()));
         }
-        getCache().setKOfferingVCompositePhenomenon(null);
-        getCache().setKCompositePhenomenonVObservableProperties(kCompositePhenomenonVObservableProperty);
+        // FIXME: getCache().setCompositePhenomenonsForOfferings(null);
     }
 
-    protected List<String> getObservablePropertyIdentifierFromObservableProperties(
-            Set<ObservableProperty> observableProperties) {
-        List<String> observablePropertyIdentifiers = new ArrayList<String>(observableProperties.size());
+    protected Set<String> getObservablePropertyIdentifiers(Set<ObservableProperty> observableProperties) {
+        Set<String> observablePropertyIdentifiers = new HashSet<String>(observableProperties.size());
         for (ObservableProperty observableProperty : observableProperties) {
             observablePropertyIdentifiers.add(observableProperty.getIdentifier());
         }

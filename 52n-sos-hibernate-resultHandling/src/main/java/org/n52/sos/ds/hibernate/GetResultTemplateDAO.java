@@ -23,10 +23,8 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import static org.n52.sos.util.CollectionHelper.unionOfListOfLists;
-
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -63,12 +61,12 @@ public class GetResultTemplateDAO extends AbstractHibernateOperationDao implemen
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
             throws OwsExceptionReport {
-        List<String> resultTemplates = (List<String>) getCacheController().getResultTemplates();
+        Set<String> resultTemplates = getCache().getResultTemplates();
         Collection<String> offerings = null;
         Collection<String> observableProperties = null;
         if (resultTemplates != null && !resultTemplates.isEmpty()) {
-            offerings = getCacheController().getKOfferingVResultTemplates().keySet();;
-            observableProperties = unionOfListOfLists(getCacheController().getKResultTemplateVObservedProperties().values());
+            offerings = getCache().getOfferingsWithResultTemplate();
+            observableProperties = getCache().getObservablePropertiesWithResultTemplate();
         }
         opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultTemplateParams.offering, offerings);
         opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultTemplateParams.observedProperty, observableProperties);

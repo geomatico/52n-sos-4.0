@@ -52,7 +52,7 @@ public class DeleteSensorDAO extends AbstractHibernateOperationDao implements ID
     
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
-        opsMeta.addPossibleValuesParameter(Sos2Constants.DeleteSensorParams.procedure, getCacheController().getProcedures());
+        opsMeta.addPossibleValuesParameter(Sos2Constants.DeleteSensorParams.procedure, getCache().getProcedures());
     }
 
     @Override

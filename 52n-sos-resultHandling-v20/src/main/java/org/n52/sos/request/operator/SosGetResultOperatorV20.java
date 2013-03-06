@@ -109,14 +109,14 @@ public class SosGetResultOperatorV20 extends AbstractV2RequestOperator<IGetResul
             exceptions.add(owse);
         }
         try {
-            checkOffering(request.getOffering(), Configurator.getInstance().getCapabilitiesCacheController()
+            checkOffering(request.getOffering(), Configurator.getInstance().getCache()
                     .getOfferings(), Sos2Constants.GetResultTemplateParams.offering.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
             checkObservedProperty(request.getObservedProperty(), Configurator.getInstance()
-                    .getCapabilitiesCacheController().getObservableProperties(),
+                    .getCache().getObservableProperties(),
                     Sos2Constants.GetResultTemplateParams.observedProperty.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);

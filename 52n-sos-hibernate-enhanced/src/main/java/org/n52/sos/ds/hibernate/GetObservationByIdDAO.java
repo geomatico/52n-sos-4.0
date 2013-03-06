@@ -65,7 +65,7 @@ public class GetObservationByIdDAO extends AbstractHibernateOperationDao impleme
     
     @Override
     public void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
-        opsMeta.addPossibleValuesParameter(Sos2Constants.GetObservationByIdParams.observation, getCacheController().getObservationIdentifiers());
+        opsMeta.addPossibleValuesParameter(Sos2Constants.GetObservationByIdParams.observation, getCache().getObservationIdentifiers());
     }
 
     @Override

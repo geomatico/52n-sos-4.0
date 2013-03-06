@@ -36,7 +36,7 @@ import java.util.Set;
 
 import org.hibernate.Session;
 import org.joda.time.DateTime;
-import org.n52.sos.cache.ACapabilitiesCacheController;
+import org.n52.sos.cache.ContentCache;
 import org.n52.sos.ds.IFeatureQueryHandler;
 import org.n52.sos.ds.hibernate.entities.BlobObservation;
 import org.n52.sos.ds.hibernate.entities.BlobValue;
@@ -126,7 +126,7 @@ public class HibernateObservationUtilities {
         HibernateObservationUtilities.configuration = configuration;
     }
 
-    public static ACapabilitiesCacheController getCache() {
+    public static ContentCache getCache() {
         return getConfiguration().getCache();
     }
 
@@ -282,11 +282,10 @@ public class HibernateObservationUtilities {
                                 observationType);
                 /* get the offerings to find the templates */
                 if (obsConst.getOfferings() == null) {
-                    Set<String> offerings =
-                            new HashSet<String>(getCache()
-                                    .getOfferings4Procedure(obsConst.getProcedure().getProcedureIdentifier()));
-                    offerings.retainAll(new HashSet<String>(getCache()
-                            .getOfferings4Procedure(obsConst.getProcedure().getProcedureIdentifier())));
+                    HashSet<String> offerings = new HashSet<String>(getCache()
+                            .getOfferingsForObservableProperty(obsConst.getObservableProperty().getIdentifier()));
+                    offerings.retainAll(getCache().getOfferingsForProcedure(obsConst.getProcedure()
+                            .getProcedureIdentifier()));
                     obsConst.setOfferings(offerings);
                 }
                 int obsConstHash = obsConst.hashCode();
@@ -357,9 +356,9 @@ public class HibernateObservationUtilities {
                         new SosObservationConstellation(procedure, obsProp, null, feature, null);
                 /* get the offerings to find the templates */
                 if (obsConst.getOfferings() == null) {
-                    Set<String> offerings = new HashSet<String>(getCache().getOfferings4Procedure(
+                    Set<String> offerings = new HashSet<String>(getCache().getOfferingsForProcedure(
                             obsConst.getProcedure().getProcedureIdentifier()));
-                    offerings.retainAll(new HashSet<String>(getCache().getOfferings4Procedure(
+                    offerings.retainAll(new HashSet<String>(getCache().getOfferingsForProcedure(
                             obsConst.getProcedure().getProcedureIdentifier())));
                     obsConst.setOfferings(offerings);
                 }
@@ -754,8 +753,8 @@ public class HibernateObservationUtilities {
         /**
          * @see Configurator#getCapabilitiesCacheController()
          */
-        protected ACapabilitiesCacheController getCache() {
-            return Configurator.getInstance().getCapabilitiesCacheController();
+        protected ContentCache getCache() {
+            return Configurator.getInstance().getCache();
         }
 
         /**
@@ -779,5 +778,4 @@ public class HibernateObservationUtilities {
             return Configurator.getInstance().isSupportsQuality();
         }
     }
-    
 }

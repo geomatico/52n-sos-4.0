@@ -26,11 +26,8 @@ package org.n52.sos.ds.hibernate.cache.base;
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getFeatureOfInterestObjects;
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getProceduresForFeatureOfInterest;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
@@ -42,38 +39,27 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class FeatureOfInterestCacheUpdate extends CacheUpdate {
-
-    protected List<String> getFeatureIdentifier(List<FeatureOfInterest> featuresOfInterest) {
-        List<String> featureList = new ArrayList<String>(featuresOfInterest.size());
+    protected Set<String> getFeatureIdentifiers(Collection<FeatureOfInterest> featuresOfInterest) {
+        Set<String> featureList = new HashSet<String>(featuresOfInterest.size());
         for (FeatureOfInterest featureOfInterest : featuresOfInterest) {
             featureList.add(featureOfInterest.getIdentifier());
         }
         return featureList;
     }
 
-    protected Collection<String> getFeatureIDsFromFeatures(Set<FeatureOfInterest> featureOfInterestsForChildFeatureId) {
-        List<String> featureIDs = new ArrayList<String>(featureOfInterestsForChildFeatureId.size());
-        for (FeatureOfInterest feature : featureOfInterestsForChildFeatureId) {
-            featureIDs.add(feature.getIdentifier());
-        }
-        return featureIDs;
-    }
-
     @Override
     public void execute() {
-        List<FeatureOfInterest> hFeaturesOfInterest = getFeatureOfInterestObjects(getSession());
-        Map<String, Collection<String>> kFeatureOfInterestVProcedure = new HashMap<String, Collection<String>>(hFeaturesOfInterest.size());
-        Map<String, Collection<String>> parentFeatures = new HashMap<String, Collection<String>>(hFeaturesOfInterest.size());
-        for (FeatureOfInterest featureOfInterest : hFeaturesOfInterest) {
-            kFeatureOfInterestVProcedure.put(featureOfInterest.getIdentifier(), getProceduresForFeatureOfInterest(getSession(), featureOfInterest));
-            parentFeatures.put(featureOfInterest.getIdentifier(), getFeatureIDsFromFeatures(featureOfInterest.getFeatureOfInterestsForChildFeatureId()));
+        for (FeatureOfInterest featureOfInterest : getFeatureOfInterestObjects(getSession())) {
+            getCache().addFeatureOfInterest(featureOfInterest.getIdentifier());
+            getCache()
+                    .setProceduresForFeatureOfInterest(featureOfInterest.getIdentifier(),
+                                                       getProceduresForFeatureOfInterest(getSession(), featureOfInterest));
+            getCache().setFeatureHierarchy(featureOfInterest.getIdentifier(),getFeatureIdentifiers(
+                    featureOfInterest.getFeatureOfInterestsForChildFeatureId()));
         }
-        List<String> identifiers = getFeatureIdentifier(hFeaturesOfInterest);
-        getCache().setFeatureOfInterest(identifiers);
-        getCache().setKFeatureOfInterestVProcedures(kFeatureOfInterestVProcedure);
-        getCache().setFeatureHierarchies(parentFeatures);
         try {
-            getCache().setGlobalEnvelope(getFeatureQueryHandler().getEnvelopeForFeatureIDs(identifiers, getSession()));
+            getCache().setGlobalEnvelope(getFeatureQueryHandler().getEnvelopeForFeatureIDs(getCache()
+                    .getFeaturesOfInterest(), getSession()));
         } catch (OwsExceptionReport ex) {
             getErrors().add(ex);
         }

@@ -24,9 +24,6 @@
 package org.n52.sos.ds.hibernate.cache.base;
 
 import org.n52.sos.ds.hibernate.cache.CompositeCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.FeatureOfInterestTypeCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.ObservationTypeCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.SridCacheUpdate;
 
 /**
  *

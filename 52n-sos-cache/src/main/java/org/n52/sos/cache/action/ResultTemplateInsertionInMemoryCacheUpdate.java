@@ -23,12 +23,7 @@
  */
 package org.n52.sos.cache.action;
 
-import static java.util.Collections.synchronizedList;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-
+import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.util.Action;
@@ -36,81 +31,41 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * When executing this &auml;ction (see {@link Action}), the following relations are added, settings are updated in cache:<ul>
+ * When executing this &auml;ction (see {@link Action}), the following relations are added, settings are updated in
+ * cache:<ul>
  * <li>Result template</li>
  * <li>Offering &rarr; Result template</li></ul>
- * 
+ *
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @since 4.0
  */
-public class ResultTemplateInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate{
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(ResultTemplateInsertionInMemoryCacheUpdate.class);
+public class ResultTemplateInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResultTemplateInsertionInMemoryCacheUpdate.class);
+    private final InsertResultTemplateResponse response;
+    private final InsertResultTemplateRequest request;
 
-	private final InsertResultTemplateResponse sosResponse;
+    public ResultTemplateInsertionInMemoryCacheUpdate(InsertResultTemplateRequest request,
+                                                      InsertResultTemplateResponse response) {
+        if (request == null || response == null) {
+            String msg = String.format("Missing argument: '{}': {}; '{}': {}",
+                                       InsertResultTemplateRequest.class.getName(),
+                                       request,
+                                       InsertResultTemplateResponse.class.getName(),
+                                       response);
+            LOGGER.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        this.response = response;
+        this.request = request;
+    }
 
-	private final InsertResultTemplateRequest sosRequest;
-	
-	public ResultTemplateInsertionInMemoryCacheUpdate(InsertResultTemplateRequest sosRequest, InsertResultTemplateResponse sosResponse) 
-	{
-		if (sosRequest == null || sosResponse == null)
-		{
-			String msg = String.format("Missing argument: '{}': {}; '{}': {}", 
-					InsertResultTemplateRequest.class.getName(),
-					sosRequest,
-					InsertResultTemplateResponse.class.getName(),
-					sosResponse);
-			LOGGER.error(msg);
-			throw new IllegalArgumentException(msg);
-		}
-		this.sosResponse = sosResponse;
-		this.sosRequest = sosRequest;
-	}
-
-	@Override
-	public void execute()
-	{
-		addResultTemplateIdentifierToCache();
-		addOfferingToResultTemplateRelationToCache();
-	}
-
-	private void addResultTemplateIdentifierToCache()
-	{
-		getCache().getResultTemplates().add(resultTemplateId());
-		LOGGER.debug("added result template identifier '{}' to cache? {}",
-				resultTemplateId(),
-				getCache().getResultTemplates().contains(resultTemplateId()));
-	}
-	
-	private void addOfferingToResultTemplateRelationToCache()
-	{
-		if (offeringToResultTemplatesMap().get(offeringId()) == null)
-		{
-			offeringToResultTemplatesMap().put(offeringId(), synchronizedList(new ArrayList<String>()));
-		}
-		if (!offeringToResultTemplatesMap().get(offeringId()).contains(resultTemplateId()))
-		{
-			offeringToResultTemplatesMap().get(offeringId()).add(resultTemplateId());
-		}
-		LOGGER.debug("offering '{}' to result template '{}' relation in cache? {}",
-				offeringId(),
-				resultTemplateId(),
-				offeringToResultTemplatesMap().get(offeringId()).contains(resultTemplateId()));
-	}
-
-	private Map<String, Collection<String>> offeringToResultTemplatesMap()
-	{
-		return getCache().getKOfferingVResultTemplates();
-	}
-
-	private String resultTemplateId()
-	{
-		return sosResponse.getAcceptedTemplate();
-	}
-
-	private String offeringId()
-	{
-		return sosRequest.getObservationTemplate().getOfferings().iterator().next();
-	}
-
+    @Override
+    public void execute() {
+        final WritableContentCache cache = getCache();
+        final String resultTemplate = response.getAcceptedTemplate();
+        cache.addResultTemplate(resultTemplate);
+        for (String offering : request.getObservationTemplate().getOfferings()) {
+            cache.addResultTemplateForOffering(offering, resultTemplate);
+        }
+    }
 }

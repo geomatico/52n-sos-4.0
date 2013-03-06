@@ -151,7 +151,7 @@ public class SosDescribeSensorOperatorV20 extends AbstractV2RequestOperator<IDes
             exceptions.add(owse);
         }
         try {
-            checkProcedureID(sosRequest.getProcedure(), Configurator.getInstance().getCapabilitiesCacheController()
+            checkProcedureID(sosRequest.getProcedure(), Configurator.getInstance().getCache()
                     .getProcedures(), SosConstants.DescribeSensorParams.procedure.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);

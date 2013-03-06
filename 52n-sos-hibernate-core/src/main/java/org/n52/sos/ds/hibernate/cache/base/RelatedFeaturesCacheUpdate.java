@@ -25,11 +25,8 @@ package org.n52.sos.ds.hibernate.cache.base;
 
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getRelatedFeatureObjects;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
@@ -45,15 +42,12 @@ public class RelatedFeaturesCacheUpdate extends CacheUpdate {
     public void execute() {
         // TODO Carsten: use RelatedFeatures and query...
         List<RelatedFeature> relatedFeatures = getRelatedFeatureObjects(getSession());
-        Map<String, Collection<String>> relatedFeatureList =
-                new HashMap<String, Collection<String>>(relatedFeatures.size());
         for (RelatedFeature relatedFeature : relatedFeatures) {
             Set<String> roles = new HashSet<String>(relatedFeature.getRelatedFeatureRoles().size());
             for (RelatedFeatureRole relatedFeatureRole : relatedFeature.getRelatedFeatureRoles()) {
                 roles.add(relatedFeatureRole.getRelatedFeatureRole());
             }
-            relatedFeatureList.put(relatedFeature.getFeatureOfInterest().getIdentifier(), roles);
+            getCache().setRolesForRelatedFeature(relatedFeature.getFeatureOfInterest().getIdentifier(), roles);
         }
-        getCache().setKRelatedFeaturesVRole(relatedFeatureList);
     }
 }

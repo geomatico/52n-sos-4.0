@@ -29,7 +29,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Session;
-import org.n52.sos.cache.CapabilitiesCache;
+import org.n52.sos.cache.ContentCache;
+import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ds.IFeatureQueryHandler;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
@@ -44,7 +45,7 @@ import org.n52.sos.util.Action;
 public abstract class CacheUpdate implements Action {
     
     private Session session;
-    private CapabilitiesCache cache;
+    private WritableContentCache cache;
     private List<OwsExceptionReport> errors;
 
     public List<OwsExceptionReport> getErrors() {
@@ -59,7 +60,7 @@ public abstract class CacheUpdate implements Action {
         this.session = session;
     }
 
-    public void setCache(CapabilitiesCache cache) {
+    public void setCache(WritableContentCache cache) {
         this.cache = cache;
     }
 
@@ -67,11 +68,11 @@ public abstract class CacheUpdate implements Action {
         return session;
     }
 
-    protected CapabilitiesCache getCache() {
+    protected WritableContentCache getCache() {
         return cache;
     }
 
-    protected List<String> getAllOfferingIdentifiersFrom(Set<ObservationConstellation> observationConstellations) {
+    protected Set<String> getAllOfferingIdentifiersFrom(Set<ObservationConstellation> observationConstellations) {
         Set<String> offerings = new HashSet<String>(observationConstellations.size());
         for (ObservationConstellation oc : observationConstellations) {
             for (ObservationConstellationOfferingObservationType ocoot : oc
@@ -79,7 +80,7 @@ public abstract class CacheUpdate implements Action {
                 offerings.add(ocoot.getOffering().getIdentifier());
             }
         }
-        return new ArrayList<String>(offerings);
+        return offerings;
     }
     
     protected IFeatureQueryHandler getFeatureQueryHandler() {

@@ -117,8 +117,8 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
         // check offering
         try {
             checkOfferings(request.getObservationTemplate().getOfferings(), Configurator.getInstance()
-                    .getCapabilitiesCacheController().getOfferings(),
-                    Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
+                    .getCache().getOfferings(),
+                           Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
             try {
                 checkObservationType(request);
             } catch (OwsExceptionReport owse) {
@@ -129,12 +129,12 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
         }
         // check procedure
             checkProcedureID(request.getObservationTemplate().getProcedure().getProcedureIdentifier(), Configurator
-                    .getInstance().getCapabilitiesCacheController().getProcedures(),
-                    Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
+                    .getInstance().getCache().getProcedures(),
+                             Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
         // check observedProperty
         try {
             checkObservedProperty(request.getObservationTemplate().getObservableProperty()
-                    .getIdentifier(), Configurator.getInstance().getCapabilitiesCacheController()
+                    .getIdentifier(), Configurator.getInstance().getCache()
                     .getObservableProperties(), Sos2Constants.InsertResultTemplateParams.proposedTemplate.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
@@ -208,7 +208,7 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
     }
 
     private void checkResultTemplateIdentifier(String identifier) throws OwsExceptionReport {
-        if (Configurator.getInstance().getCapabilitiesCacheController().getResultTemplates().contains(identifier)) {
+        if (Configurator.getInstance().getCache().getResultTemplates().contains(identifier)) {
             //TODO correct rerror message
             String exceptionText = String.format("The requested template identifier (%s) still contains in this service!", identifier);
             throw Util4Exceptions.createInvalidParameterValueException(
@@ -227,8 +227,8 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
                 Sos2Constants.InsertResultTemplateParams.observationType.name());
         Set<String> validObservationTypesForOffering = new HashSet<String>(0);
         for (String offering : observationConstellation.getOfferings()) {
-            validObservationTypesForOffering.addAll(Configurator.getInstance().getCapabilitiesCacheController()
-                    .getAllowedObservationTypes4Offering(offering));
+            validObservationTypesForOffering.addAll(Configurator.getInstance().getCache()
+                    .getAllowedObservationTypesForOffering(offering));
         }
         // check if observation type is valid for offering
         if (!validObservationTypesForOffering.contains(observationConstellation.getObservationType())) {

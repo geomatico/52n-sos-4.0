@@ -30,8 +30,6 @@ import org.n52.sos.config.ISettingDefinition;
 import org.n52.sos.config.ISettingDefinitionProvider;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
 import org.n52.sos.service.ServiceSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * TODO JavaDoc

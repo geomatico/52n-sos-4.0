@@ -91,15 +91,15 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
             throws OwsExceptionReport {
 
-        Collection<String> featureIDs = SosHelper.getFeatureIDs(getCacheController().getFeatureOfInterest(), version);
+        Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeaturesOfInterest(), version);
 
-        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.offering, getCacheController().getOfferings());
-        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCacheController().getProcedures());
+        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.offering, getCache().getOfferings());
+        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());
         opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.responseFormat,
                 SosHelper.getSupportedResponseFormats(SosConstants.SOS, version));
 
         if (getConfigurator().getActiveProfile().isShowFullOperationsMetadataForObservations()) {
-            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCacheController()
+            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCache()
                     .getObservableProperties());
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.featureOfInterest, featureIDs);
         } else {
@@ -112,7 +112,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
             opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.temporalFilter, getEventTime());
             SosEnvelope envelope = null;
             if (featureIDs != null && !featureIDs.isEmpty()) {
-                envelope = getCacheController().getGlobalEnvelope();
+                envelope = getCache().getGlobalEnvelope();
             }
             if (envelope != null) {
                 opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.spatialFilter,
@@ -311,8 +311,8 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
      */
     private MinMax<String> getEventTime() throws OwsExceptionReport {
         try {
-            DateTime minDate = getCacheController().getMinEventTime();
-            DateTime maxDate = getCacheController().getMaxEventTime();
+            DateTime minDate = getCache().getMinEventTime();
+            DateTime maxDate = getCache().getMaxEventTime();
             return new MinMax<String>()
                     .setMinimum(minDate != null ? DateTimeHelper.formatDateTime2ResponseString(minDate) : null)
                     .setMaximum(maxDate != null ? DateTimeHelper.formatDateTime2ResponseString(maxDate) : null);

@@ -124,7 +124,7 @@ public class SosGetResultTemplateOperatorV20 extends AbstractV2RequestOperator<I
     private void checkOffering(String offering) throws OwsExceptionReport {
         if (offering == null || offering.isEmpty()) {
             throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.GetResultTemplateParams.offering.name());
-        } else if (!Configurator.getInstance().getCapabilitiesCacheController().getOfferings().contains(offering)) {
+        } else if (!Configurator.getInstance().getCache().getOfferings().contains(offering)) {
             String exceptionText = String.format("The requested offering (%s) is not supported by this server!", offering);
             throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.GetResultTemplateParams.offering.name(), exceptionText);
         }
@@ -134,7 +134,7 @@ public class SosGetResultTemplateOperatorV20 extends AbstractV2RequestOperator<I
     private void checkObservedProperty(String observedProperty) throws OwsExceptionReport {
         if (observedProperty == null || observedProperty.isEmpty()) {
             throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.GetResultTemplateParams.observedProperty.name());
-        } else if (!Configurator.getInstance().getCapabilitiesCacheController().getObservableProperties().contains(observedProperty)) {
+        } else if (!Configurator.getInstance().getCache().getObservableProperties().contains(observedProperty)) {
             String exceptionText = String.format("The requested observedProperty (%s) is not supported by this server!", observedProperty);
             throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.GetResultTemplateParams.observedProperty.name(), exceptionText);
         }

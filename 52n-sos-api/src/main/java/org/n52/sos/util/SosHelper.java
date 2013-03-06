@@ -84,7 +84,7 @@ public class SosHelper {
     protected static class Configuration {
 
         protected Collection<String> getObservationTypes() {
-            return Configurator.getInstance().getCapabilitiesCacheController().getObservationTypes();
+            return Configurator.getInstance().getCache().getObservationTypes();
         }
 
         protected String getSrsNamePrefix() {
@@ -438,14 +438,14 @@ public class SosHelper {
      * 
      * @param hierarchy
      *            map to invert
-     * @return inverted mapf
+     * @return inverted map
      */
-    public static Map<String, Collection<String>> invertHierarchy(Map<String, Collection<String>> hierarchy) {
-        Map<String, Collection<String>> invertedHierarchy = new HashMap<String, Collection<String>>();
-        for (String key : hierarchy.keySet()) {
-            for (String value : hierarchy.get(key)) {
+    public static <K, V> Map<V, Set<K>> invertHierarchy(Map<K, Set<V>> hierarchy) {
+        Map<V, Set<K>> invertedHierarchy = new HashMap<V, Set<K>>();
+        for (K key : hierarchy.keySet()) {
+            for (V value : hierarchy.get(key)) {
                 if (invertedHierarchy.get(value) == null) {
-                    invertedHierarchy.put(value, new HashSet<String>());
+                    invertedHierarchy.put(value, new HashSet<K>());
                 }
                 invertedHierarchy.get(value).add(key);
             }
@@ -466,9 +466,9 @@ public class SosHelper {
      *            whether to include the passed key in the result collection
      * @return collection of the full hierarchy
      */
-    public static Collection<String> getHierarchy(Map<String, Collection<String>> hierarchy, String key,
-            boolean fullHierarchy, boolean includeStartKey) {
-        Collection<String> hierarchyValues = new HashSet<String>();
+    public static Set<String> getHierarchy(Map<String, Set<String>> hierarchy, String key,
+                                           boolean fullHierarchy, boolean includeStartKey) {
+        Set<String> hierarchyValues = new HashSet<String>();
         if (includeStartKey) {
             hierarchyValues.add(key);
         }
@@ -487,9 +487,26 @@ public class SosHelper {
             }
         }
 
-        List<String> hvList = new ArrayList<String>(hierarchyValues);
-        Collections.sort(hvList);
-        return hvList;
+        return hierarchyValues;
+    }
+
+    /**
+     * get collection of hierarchy values for a set of keys
+     *
+     * @param hierarchy        map to example
+     * @param keys             start key
+     * @param fullHierarchy    whether to traverse down the full hierarchy
+     * @param includeStartKeys whether to include the passed keys in the result collection
+     *
+     * @return collection of the full hierarchy
+     */
+    public static Set<String> getHierarchy(Map<String, Set<String>> hierarchy, Set<String> keys,
+                                           boolean fullHierarchy, boolean includeStartKeys) {
+        Set<String> parents = new HashSet<String>();
+        for (String key : keys) {
+            parents.addAll(getHierarchy(hierarchy, key, fullHierarchy, includeStartKeys));
+        }
+        return parents;
     }
 
     /**

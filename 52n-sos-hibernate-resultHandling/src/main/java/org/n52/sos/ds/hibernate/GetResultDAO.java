@@ -23,8 +23,6 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import static org.n52.sos.util.CollectionHelper.unionOfListOfLists;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -76,14 +74,14 @@ public class GetResultDAO extends AbstractHibernateOperationDao implements IGetR
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
             throws OwsExceptionReport {
-        List<String> resultTemplateIdentifier = (List<String>) getCacheController().getResultTemplates();
+        Set<String> resultTemplateIdentifier = getCache().getResultTemplates();
         Set<String> offerings = new HashSet<String>(0);
         Collection<String> observableProperties = new ArrayList<String>(0);
         Collection<String> featureOfInterest = new ArrayList<String>(0);
         if (resultTemplateIdentifier != null && !resultTemplateIdentifier.isEmpty()) {
-            offerings = getCacheController().getKOfferingVResultTemplates().keySet();
-            observableProperties = unionOfListOfLists(getCacheController().getKResultTemplateVObservedProperties().values());
-            featureOfInterest = unionOfListOfLists(getCacheController().getKResultTemplateVFeaturesOfInterest().values());
+            offerings = getCache().getOfferingsWithResultTemplate();
+            observableProperties = getCache().getObservablePropertiesWithResultTemplate();
+            featureOfInterest = getCache().getFeaturesOfInterestWithResultTemplate();
         }
         if (version.equals(Sos1Constants.SERVICEVERSION)) {
             // TODO set parameter for SOS 1.0

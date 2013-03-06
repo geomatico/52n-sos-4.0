@@ -24,102 +24,44 @@
 package org.n52.sos.ds.hibernate.cache.base;
 
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getResultTemplateObjects;
-import static org.n52.sos.util.CollectionHelper.synchronizedList;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.util.Action;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * When executing this &auml;ction (see {@link Action}), the following relations are added, settings are updated in cache:<ul>
+ * When executing this &auml;ction (see {@link Action}), the following relations are added, settings are updated in
+ * cache:<ul>
  * <li>Result template identifier</li>
  * <li>Procedure &rarr; 'Result template identifier' relation</li>
  * <li>'Result template identifier' &rarr; 'observable property' relation</li>
  * <li>'Result template identifier' &rarr; 'feature of interest' relation</li>
  * </ul>
+ *
  * @author Christian Autermann <c.autermann@52north.org>
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @since 4.0.0
  */
 public class ResultTemplateCacheUpdate extends CacheUpdate {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(ResultTemplateCacheUpdate.class);
 
     @Override
-    public void execute()
-    {
-        List<ResultTemplate> resultTemplateObjects = getResultTemplateObjects(getSession());
-        for (ResultTemplate resultTemplateObject : resultTemplateObjects)
-        {
-            String resultTemplateIdentifier = resultTemplateObject.getIdentifier();
-            addIdentifierToCache(resultTemplateIdentifier);
-            
-            String offeringIdentifier = resultTemplateObject.getObservationConstellationOfferingObservationType().getOffering().getIdentifier();
-            addOfferingToResultTemplateRelationToCache(resultTemplateIdentifier, offeringIdentifier);
-
-            String observablePropertyIdentifier = resultTemplateObject.getObservationConstellationOfferingObservationType().getObservationConstellation().getObservableProperty().getIdentifier();
-            addResultTemplateToObservablePropertyIdentifierToCache(resultTemplateIdentifier,observablePropertyIdentifier);
-            
-            String featureOfInterestIdentifier = resultTemplateObject.getFeatureOfInterest().getIdentifier();
-            addResultTemplateToFeatureOfInterestRelationToCache(resultTemplateIdentifier,featureOfInterestIdentifier);
+    public void execute() {
+        List<ResultTemplate> resultTemplates = getResultTemplateObjects(getSession());
+        for (ResultTemplate resultTemplate : resultTemplates) {
+            String id = resultTemplate.getIdentifier();
+            getCache().addResultTemplate(id);
+            getCache().addResultTemplateForOffering(resultTemplate.getObservationConstellationOfferingObservationType()
+                    .getOffering().getIdentifier(), id);
+            getCache().addObservablePropertyForResultTemplate(id, resultTemplate
+                    .getObservationConstellationOfferingObservationType()
+                    .getObservationConstellation()
+                    .getObservableProperty()
+                    .getIdentifier());
+            getCache().addFeatureOfInterestForResultTemplate(id, resultTemplate
+                    .getFeatureOfInterest()
+                    .getIdentifier());
         }
     }
-
-	private void addResultTemplateToFeatureOfInterestRelationToCache(String resultTemplateIdentifier,
-			String featureOfInterestIdentifier)
-	{
-		if(!getCache().getKResultTemplateVFeaturesOfInterest().containsKey(resultTemplateIdentifier))
-		{
-            Collection<String> featureOfInterestIdentifiers = synchronizedList(1);
-			getCache().getKResultTemplateVFeaturesOfInterest().put(resultTemplateIdentifier, featureOfInterestIdentifiers);
-		}
-		getCache().getKResultTemplateVFeaturesOfInterest().get(resultTemplateIdentifier).add(featureOfInterestIdentifier);
-		LOGGER.debug("Result Template '{}' to feature of interest '{}' relation added to cache? {}",
-				resultTemplateIdentifier,
-				featureOfInterestIdentifier,
-				getCache().getKResultTemplateVFeaturesOfInterest().get(resultTemplateIdentifier).contains(featureOfInterestIdentifier));
-	}
-
-	private void addResultTemplateToObservablePropertyIdentifierToCache(String resultTemplateIdentifier,
-			String observablePropertyIdentifier)
-	{
-		if(!getCache().getKResultTemplateVObservedProperties().containsKey(resultTemplateIdentifier))
-		{
-			Collection<String> observedPropertyIdentifiers = synchronizedList(1);
-			getCache().getKResultTemplateVObservedProperties().put(resultTemplateIdentifier, observedPropertyIdentifiers);
-		}
-		getCache().getKResultTemplateVObservedProperties().get(resultTemplateIdentifier).add(observablePropertyIdentifier);
-		LOGGER.debug("Result Template '{}' to observable property '{}' relation added to cache? {}",
-				resultTemplateIdentifier,
-				observablePropertyIdentifier,
-				getCache().getKResultTemplateVObservedProperties().get(resultTemplateIdentifier).contains(observablePropertyIdentifier));
-	}
-
-	private void addOfferingToResultTemplateRelationToCache(String resultTemplateIdentifier,
-			String offeringIdentifier)
-	{
-		if (!getCache().getKOfferingVResultTemplates().containsKey(offeringIdentifier))
-		{
-			Collection<String> resultTemplateIdentifiers = synchronizedList(1);
-			getCache().getKOfferingVResultTemplates().put(offeringIdentifier, resultTemplateIdentifiers);
-		}
-		getCache().getKOfferingVResultTemplates().get(offeringIdentifier).add(resultTemplateIdentifier);
-		LOGGER.debug("Offering '{}' to result template '{}' relation added to cache? {}",
-				offeringIdentifier,
-				resultTemplateIdentifier,
-				getCache().getKOfferingVResultTemplates().get(offeringIdentifier).contains(resultTemplateIdentifier));
-	}
-
-	private void addIdentifierToCache(String resultTemplateIdentifier)
-	{
-		getCache().getResultTemplates().add(resultTemplateIdentifier);
-		LOGGER.debug("ResultTemplate identifier '{}' added to cache? {}",
-				resultTemplateIdentifier,
-				getCache().getResultTemplates().contains(resultTemplateIdentifier));
-	}
 }

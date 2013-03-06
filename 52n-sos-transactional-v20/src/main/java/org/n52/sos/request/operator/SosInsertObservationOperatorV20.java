@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.cache.ACapabilitiesCacheController;
+import org.n52.sos.cache.ContentCache;
 import org.n52.sos.ds.IInsertObservationDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.event.SosEventBus;
@@ -52,8 +52,8 @@ import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
-import org.n52.sos.wsdl.WSDLOperation;
 import org.n52.sos.wsdl.WSDLConstants;
+import org.n52.sos.wsdl.WSDLOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,7 +145,7 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<I
                     throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertObservationParams.offering
                             .name());
                 }
-                if (!Configurator.getInstance().getCapabilitiesCacheController().getOfferings().contains(offering)) {
+                if (!Configurator.getInstance().getCache().getOfferings().contains(offering)) {
                     StringBuilder exceptionText = new StringBuilder();
                     exceptionText.append("The requested offering (");
                     exceptionText.append(offering);
@@ -163,8 +163,8 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<I
     }
 
     private void checkObservations(List<SosObservation> observations) throws OwsExceptionReport {
-        ACapabilitiesCacheController capsController = Configurator.getInstance().getCapabilitiesCacheController();
-        if (observations == null || (observations != null && observations.isEmpty())) {
+        ContentCache cache = Configurator.getInstance().getCache();
+        if (observations == null || observations.isEmpty()) {
             throw Util4Exceptions
                     .createMissingParameterValueException(Sos2Constants.InsertObservationParams.observation.name());
         } else {
@@ -174,7 +174,7 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<I
                 checkObservationConstellationParameter(obsConstallation);
                 // Requirement 67
                 checkOrSetObservationType(observation);
-                if (!capsController.getObservationTypes().contains(obsConstallation.getObservationType())) {
+                if (!cache.getObservationTypes().contains(obsConstallation.getObservationType())) {
                     StringBuilder exceptionText = new StringBuilder();
                     exceptionText.append("The requested observationType (");
                     exceptionText.append(observation.getObservationConstellation().getObservationType());
@@ -184,10 +184,8 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<I
                 } else if (obsConstallation.isSetOfferings()) {
                     for (String offeringID : obsConstallation.getOfferings()) {
                         Collection<String> allowedObservationTypes =
-                                capsController.getAllowedObservationTypes4Offering(offeringID);
-                        if (allowedObservationTypes == null
-                                || (allowedObservationTypes != null && !allowedObservationTypes
-                                        .contains(obsConstallation.getObservationType()))) {
+                                           cache.getAllowedObservationTypesForOffering(offeringID);
+                        if (allowedObservationTypes == null || !allowedObservationTypes.contains(obsConstallation.getObservationType())) {
                             StringBuilder exceptionText = new StringBuilder();
                             exceptionText.append("The requested observationType (");
                             exceptionText.append(obsConstallation.getObservationType());
@@ -206,9 +204,11 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<I
     }
 
     private void checkObservationConstellationParameter(SosObservationConstellation obsConstallation) throws OwsExceptionReport {
-        ACapabilitiesCacheController capabilitiesCacheController = Configurator.getInstance().getCapabilitiesCacheController();
-        checkProcedureID(obsConstallation.getProcedure().getProcedureIdentifier(), capabilitiesCacheController.getProcedures(), Sos2Constants.InsertObservationParams.procedure.name());
-        checkObservedProperty(obsConstallation.getObservableProperty().getIdentifier(), capabilitiesCacheController.getObservableProperties(), Sos2Constants.InsertObservationParams.observedProperty.name());
+        ContentCache cache = Configurator.getInstance().getCache();
+        checkProcedureID(obsConstallation.getProcedure().getProcedureIdentifier(), cache.getProcedures(), Sos2Constants.InsertObservationParams.procedure
+                .name());
+        checkObservedProperty(obsConstallation.getObservableProperty().getIdentifier(), cache.getObservableProperties(), Sos2Constants.InsertObservationParams.observedProperty
+                .name());
     }
 
 

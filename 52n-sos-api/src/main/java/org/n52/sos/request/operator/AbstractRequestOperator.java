@@ -29,7 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.n52.sos.cache.ACapabilitiesCacheController;
+import org.n52.sos.cache.ContentCache;
 import org.n52.sos.ds.IOperationDAO;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.RequestEvent;
@@ -121,8 +121,8 @@ public abstract class AbstractRequestOperator<D extends IOperationDAO, R extends
         }
     }
     
-    protected ACapabilitiesCacheController getCache() {
-        return Configurator.getInstance().getCapabilitiesCacheController();
+    protected ContentCache getCache() {
+        return Configurator.getInstance().getCache();
     }
 
 	 /**
@@ -317,7 +317,7 @@ public abstract class AbstractRequestOperator<D extends IOperationDAO, R extends
 
 	protected void checkProcedureIDs(Collection<String> procedureIDs, String parameterName) throws OwsExceptionReport {
 		checkProcedureIDs(procedureIDs, parameterName, Configurator.getInstance()
-                    .getCapabilitiesCacheController().getProcedures());
+                .getCache().getProcedures());
 	}
 
     protected void checkProcedureIDs(Collection<String> procedureIDs, String parameterName, Collection<String> validProcedures) throws OwsExceptionReport {
@@ -521,8 +521,7 @@ public abstract class AbstractRequestOperator<D extends IOperationDAO, R extends
         if (resultTemplate == null || (resultTemplate != null && resultTemplate.isEmpty())) {
             throw Util4Exceptions.createMissingParameterValueException(parameterName);
         } else if (resultTemplate != null
-                && !Configurator.getInstance().getCapabilitiesCacheController().getResultTemplates()
-                        .contains(resultTemplate)) {
+            && !Configurator.getInstance().getCache().getResultTemplates()                        .contains(resultTemplate)) {
             StringBuilder exceptionText = new StringBuilder();
             exceptionText.append("The requested template identifier (");
             exceptionText.append(resultTemplate);

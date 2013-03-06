@@ -183,8 +183,8 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
         }
         try {
             checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
-                    .getCapabilitiesCacheController().getFeatureOfInterest(),
-                    SosConstants.GetObservationParams.featureOfInterest.name());
+                    .getCache().getFeaturesOfInterest(),
+                                              SosConstants.GetObservationParams.featureOfInterest.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -246,7 +246,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
         if (observedProperties != null) {
             List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             Collection<String> validObservedProperties =
-                    Configurator.getInstance().getCapabilitiesCacheController().getObservableProperties();
+                               Configurator.getInstance().getCache().getObservableProperties();
             for (String obsProp : observedProperties) {
                 if (obsProp.isEmpty()) {
                     exceptions.add(Util4Exceptions
@@ -279,7 +279,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
      */
     private void checkOfferingId(List<String> offeringIds) throws OwsExceptionReport {
         if (offeringIds != null) {
-            Collection<String> offerings = Configurator.getInstance().getCapabilitiesCacheController().getOfferings();
+            Collection<String> offerings = Configurator.getInstance().getCache().getOfferings();
             List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             for (String offeringId : offeringIds) {
                 if (offeringId == null || (offeringId != null && offeringId.isEmpty())) {
@@ -289,8 +289,8 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGet
                 if (offeringId.contains(SosConstants.SEPARATOR_4_OFFERINGS)) {
                     String[] offArray = offeringId.split(SosConstants.SEPARATOR_4_OFFERINGS);
                     if (!offerings.contains(offArray[0])
-                            || !Configurator.getInstance().getCapabilitiesCacheController()
-                                    .getProcedures4Offering(offArray[0]).contains(offArray[1])) {
+                        || !Configurator.getInstance().getCache()
+                            .getProceduresForOffering(offArray[0]).contains(offArray[1])) {
                         String exceptionText =
                                 String.format("The value (%s) of the parameter '%s' is invalid", offeringId,
                                         SosConstants.GetObservationParams.offering.toString());

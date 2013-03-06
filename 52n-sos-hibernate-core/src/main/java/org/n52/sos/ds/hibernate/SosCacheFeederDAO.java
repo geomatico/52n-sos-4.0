@@ -31,7 +31,8 @@ import java.util.LinkedList;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.n52.sos.cache.CapabilitiesCache;
+import org.n52.sos.cache.ContentCache;
+import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.ICacheFeederDAO;
@@ -74,40 +75,40 @@ public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFee
     }
 
     @Override
-    public void updateCache(CapabilitiesCache cache) throws OwsExceptionReport {
+    public void updateCache(WritableContentCache cache) throws OwsExceptionReport {
         update(cache, new InitialCacheUpdate(getCacheThreadCount()));
     }
 
     @Override
     @Deprecated
-    public void updateAfterSensorInsertion(CapabilitiesCache cache) throws OwsExceptionReport {
+    public void updateAfterSensorInsertion(WritableContentCache cache) throws OwsExceptionReport {
         update(cache, new SensorInsertionCacheUpdate(getCacheThreadCount()));
     }
 
     @Override
     @Deprecated
-    public void updateAfterSensorDeletion(CapabilitiesCache cache) throws OwsExceptionReport {
+    public void updateAfterSensorDeletion(WritableContentCache cache) throws OwsExceptionReport {
         update(cache, new SensorDeletionCacheUpdate(getCacheThreadCount()));
     }
 
     @Override
     @Deprecated
-    public void updateAfterObservationInsertion(CapabilitiesCache cache) throws OwsExceptionReport {
+    public void updateAfterObservationInsertion(WritableContentCache cache) throws OwsExceptionReport {
         update(cache, new ObservationInsertionCacheUpdate(getCacheThreadCount()));
     }
 
     @Override
-    public void updateAfterObservationDeletion(CapabilitiesCache cache) throws OwsExceptionReport {
+    public void updateAfterObservationDeletion(WritableContentCache cache) throws OwsExceptionReport {
         update(cache, new ObservationDeletionCacheUpdate(getCacheThreadCount()));
     }
 
     @Override
     @Deprecated
-    public void updateAfterResultTemplateInsertion(CapabilitiesCache cache) throws OwsExceptionReport {
+    public void updateAfterResultTemplateInsertion(WritableContentCache cache) throws OwsExceptionReport {
         update(cache, new ResultTemplateInsertionCacheUpdate());
     }
 
-    protected void update(CapabilitiesCache cache, CacheUpdate action) throws OwsExceptionReport {
+    protected void update(WritableContentCache cache, CacheUpdate action) throws OwsExceptionReport {
         if (cache == null) {
             String errorMsg = "CapabilitiesCache object is null";
             IllegalArgumentException e = new IllegalArgumentException(errorMsg);

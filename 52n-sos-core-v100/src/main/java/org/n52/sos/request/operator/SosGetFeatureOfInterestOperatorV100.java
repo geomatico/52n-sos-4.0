@@ -90,7 +90,7 @@ public class SosGetFeatureOfInterestOperatorV100 extends
 		boolean applyZIPcomp = false;
 
         checkRequestedParameters(sosRequest);
-        Collection<String> validFois = Configurator.getInstance().getCapabilitiesCacheController().getFeatureOfInterest();
+        Collection<String> validFois = Configurator.getInstance().getCache().getFeaturesOfInterest();
         checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), validFois, "FeatureOfInterestId");
         
         try {

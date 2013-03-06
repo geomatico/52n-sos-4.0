@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -158,8 +159,12 @@ public class HibernateCriteriaTransactionalUtilities {
             List<RelatedFeatureRole> roles, Session session) throws OwsExceptionReport {
         // TODO: create featureOfInterest and link to relatedFeature
         List<RelatedFeature> relFeats =
-                HibernateCriteriaQueryUtilities.getRelatedFeatures(feature.getIdentifier().getValue(), session);
-        if (relFeats == null || (relFeats != null && relFeats.isEmpty())) {
+                             HibernateCriteriaQueryUtilities
+                .getRelatedFeatures(feature.getIdentifier().getValue(), session);
+        if (relFeats == null) {
+            relFeats = new LinkedList<RelatedFeature>();
+        }
+        if (relFeats.isEmpty()) {
             RelatedFeature relFeat = new RelatedFeature();
             String identifier = feature.getIdentifier().getValue();
             String url = null;
@@ -180,7 +185,10 @@ public class HibernateCriteriaTransactionalUtilities {
 
     public static List<RelatedFeatureRole> getOrInsertRelatedFeatureRole(String role, Session session) {
         List<RelatedFeatureRole> relFeatRoles = HibernateCriteriaQueryUtilities.getRelatedFeatureRole(role, session);
-        if (relFeatRoles == null || (relFeatRoles != null && relFeatRoles.isEmpty())) {
+        if (relFeatRoles == null) {
+            relFeatRoles = new LinkedList<RelatedFeatureRole>();
+        }
+        if (relFeatRoles.isEmpty()) {
             RelatedFeatureRole relFeatRole = new RelatedFeatureRole();
             relFeatRole.setRelatedFeatureRole(role);
             session.save(relFeatRole);
@@ -263,7 +271,7 @@ public class HibernateCriteriaTransactionalUtilities {
                 HibernateCriteriaQueryUtilities.getObservationConstellationOfferingObservationType(queryObject,
                         session);
         ObservationConstellationOfferingObservationType obsConstOffObsType = null;
-        if (obsConstOffObsTypes == null || (obsConstOffObsTypes != null && obsConstOffObsTypes.isEmpty())) {
+        if (obsConstOffObsTypes == null || obsConstOffObsTypes.isEmpty()) {
             obsConstOffObsType = new ObservationConstellationOfferingObservationType();
             obsConstOffObsType.setObservationConstellation(obsConst);
             obsConstOffObsType.setOffering(offering);
@@ -303,7 +311,7 @@ public class HibernateCriteriaTransactionalUtilities {
             session.save(feature);
             session.flush();
         } else if (feature.getUrl() != null && !feature.getUrl().isEmpty() && url != null && !url.isEmpty()) {
-            if (url != null && !url.isEmpty()) {
+            if (!url.isEmpty()) {
                 feature.setUrl(url);
                 session.saveOrUpdate(feature);
                 session.flush();
@@ -593,9 +601,6 @@ public class HibernateCriteriaTransactionalUtilities {
         return antiSubsettingId;
     }
 
-    private HibernateCriteriaTransactionalUtilities() {
-    }
-
     public static void setValidProcedureDescriptionEndTime(String procedureIdentifier, Session session) {
         Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(procedureIdentifier, session);
         Set<ValidProcedureTime> validProcedureTimes = procedure.getValidProcedureTimes();
@@ -642,4 +647,6 @@ public class HibernateCriteriaTransactionalUtilities {
         }
     }
 
+    private HibernateCriteriaTransactionalUtilities() {
+    }
 }

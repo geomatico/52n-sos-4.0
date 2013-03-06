@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ds;
 
-import org.n52.sos.cache.CapabilitiesCache;
+import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
 /**
@@ -33,28 +33,29 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
  */
 public interface ICacheFeederDAO {
 
-    public void updateCache(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
+    public void updateCache(WritableContentCache capabilitiesCache) throws OwsExceptionReport;
 
     /**
      * @deprecated should be deleted after successful test of InMemoryCacheController 
      */
-    public void updateAfterSensorInsertion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
+    public void updateAfterSensorInsertion(WritableContentCache capabilitiesCache) throws OwsExceptionReport;
 
     /**
      * @deprecated should be deleted after successful test of InMemoryCacheController 
      */
-    public void updateAfterObservationInsertion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
+    public void updateAfterObservationInsertion(WritableContentCache capabilitiesCache) throws OwsExceptionReport;
 
     /**
      * @deprecated should be deleted after successful test of InMemoryCacheController 
      */
-    public void updateAfterSensorDeletion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
+    public void updateAfterSensorDeletion(WritableContentCache capabilitiesCache) throws OwsExceptionReport;
 
     /**
      * @deprecated should be deleted after successful test of InMemoryCacheController 
      */
-    public void updateAfterResultTemplateInsertion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
+    public void updateAfterResultTemplateInsertion(WritableContentCache capabilitiesCache) throws
+            OwsExceptionReport;
 
-    public void updateAfterObservationDeletion(CapabilitiesCache capabilitiesCache) throws OwsExceptionReport;
+    public void updateAfterObservationDeletion(WritableContentCache capabilitiesCache) throws OwsExceptionReport;
     
 }

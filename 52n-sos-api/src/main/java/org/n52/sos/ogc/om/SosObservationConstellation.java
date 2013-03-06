@@ -217,11 +217,6 @@ public class SosObservationConstellation implements Serializable {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -233,6 +228,7 @@ public class SosObservationConstellation implements Serializable {
         hash = prime * hash + (this.observationType != null ? this.observationType.hashCode() : 0);
         return hash;
     }
+
     /**
      * Check if constellations are equal excluding observableProperty
      * 
@@ -283,5 +279,4 @@ public class SosObservationConstellation implements Serializable {
         clone.setResultTemplate(this.getResultTemplate());
         return clone;
     }
-
 }

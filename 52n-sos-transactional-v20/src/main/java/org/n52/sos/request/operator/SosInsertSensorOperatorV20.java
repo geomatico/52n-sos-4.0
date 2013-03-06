@@ -197,7 +197,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInser
         if (featureOfInterestTypes != null) {
             List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             Collection<String> validFeatureOfInterestTypes =
-                    Configurator.getInstance().getCapabilitiesCacheController().getFeatureOfInterestTypes();
+                    Configurator.getInstance().getCache().getFeatureOfInterestTypes();
             for (String featureOfInterestType : featureOfInterestTypes) {
                 if (featureOfInterestType.isEmpty()) {
                     exceptions

@@ -86,7 +86,7 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
         } else {
             opsMeta.addAnyParameterValue(Sos2Constants.InsertSensorParams.procedureDescription);
             opsMeta.addPossibleValuesParameter(Sos2Constants.InsertSensorParams.procedureDescriptionFormat,
-                    getCacheController().getProcedureDescriptionFormats());
+                    getCache().getProcedureDescriptionFormats());
             opsMeta.addAnyParameterValue(Sos2Constants.InsertSensorParams.observableProperty);
             opsMeta.addAnyParameterValue(Sos2Constants.InsertSensorParams.metadata);
             opsMeta.addDataTypeParameter(Sos2Constants.InsertSensorParams.metadata,
@@ -214,9 +214,9 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
     @Override
     public IExtension getExtension() throws OwsExceptionReport {
         SosInsertionCapabilities insertionCapabilities = new SosInsertionCapabilities();
-        insertionCapabilities.addFeatureOfInterestTypes(getCacheController().getFeatureOfInterestTypes());
-        insertionCapabilities.addObservationTypes(getCacheController().getObservationTypes());
-        insertionCapabilities.addProcedureDescriptionFormats(getCacheController().getProcedureDescriptionFormats());
+        insertionCapabilities.addFeatureOfInterestTypes(getCache().getFeatureOfInterestTypes());
+        insertionCapabilities.addObservationTypes(getCache().getObservationTypes());
+        insertionCapabilities.addProcedureDescriptionFormats(getCache().getProcedureDescriptionFormats());
         return insertionCapabilities;
     }
 

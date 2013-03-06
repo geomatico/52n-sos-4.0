@@ -26,7 +26,7 @@ package org.n52.sos.ds.hibernate;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.n52.sos.cache.CacheImpl;
-import org.n52.sos.cache.CapabilitiesCache;
+import org.n52.sos.cache.WritableCapabilitiesCache;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.test.AbstractSosTestCase;
 
@@ -56,7 +56,7 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 	@Test public void 
 	updateCacheFillsCapabilitiesCache() 
 			throws OwsExceptionReport {
-		CapabilitiesCache cache = new CacheImpl();
+        WritableCapabilitiesCache cache = new CacheImpl();
 		instance.updateCache(cache);
 		testCacheResult(cache);
 	}
@@ -69,15 +69,14 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 	
 	/* HELPER */
 	
-	private void testCacheResult(CapabilitiesCache cache)
-	{
+    private void testCacheResult(WritableCapabilitiesCache cache)	{
 		assertNotNull("cache is null", cache);
 		assertNotNull("envelope of features is null",cache.getGlobalEnvelope());
 		assertNotNull("feature types is null",cache.getFeatureOfInterestTypes());
 		assertFalse("feature types is empty",cache.getFeatureOfInterestTypes().isEmpty());
-		assertNotNull("offering envelopes map is null",cache.getKOfferingVEnvelope());
-		assertNotNull("offering max times map is null",cache.getKOfferingVMaxTime());
-		assertNotNull("offering min times map is null",cache.getKOfferingVMinTime());
+		assertNotNull("offering envelopes map is null",cache.getEnvelopeForOfferings());
+		assertNotNull("offering max times map is null",cache.getMaxTimeForOfferings());
+		assertNotNull("offering min times map is null",cache.getMinTimeForOfferings());
 		assertNotNull("max event time is null",cache.getMaxEventTime());
 		assertNotNull("min event time is null",cache.getMinEventTime());
 		assertNotNull("observation types is null",cache.getObservationTypes());

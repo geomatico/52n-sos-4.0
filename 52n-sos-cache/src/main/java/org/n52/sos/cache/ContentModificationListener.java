@@ -44,59 +44,48 @@ import org.slf4j.LoggerFactory;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class ContentModificationListener implements SosEventListener {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentModificationListener.class);
-    private static final Set<Class<? extends SosEvent>> TYPES = Collections.<Class<? extends SosEvent>>singleton(SosContentChangeEvent.class);
-    
+    private static final Set<Class<? extends SosEvent>> TYPES = Collections
+            .<Class<? extends SosEvent>>singleton(SosContentChangeEvent.class);
+
     @Override
     public Set<Class<? extends SosEvent>> getTypes() {
         return Collections.unmodifiableSet(TYPES);
     }
 
-    private ACapabilitiesCacheController getCacheController() {
-        return Configurator.getInstance().getCapabilitiesCacheController();
+    private IContentCacheController getContentCacheController() {
+        return Configurator.getInstance().getCacheController();
     }
 
     @Override
     public void handle(SosEvent event) {
         try {
             LOGGER.debug("Updating Cache after content modification: {}", event);
-            if (event instanceof SensorInsertion) 
-            {
-                getCacheController().updateAfterSensorInsertion(
-                		((SensorInsertion) event).getRequest(),
-                		((SensorInsertion) event).getResponse());
-            } 
-            else if (event instanceof ObservationInsertion)
-            {
-                getCacheController().updateAfterObservationInsertion(
-                		((ObservationInsertion) event).getRequest());
-            }
-            else if (event instanceof ObservationDeletion)
-            {
-            	// this update will always be performed based on database information
-                getCacheController().updateAfterObservationDeletion();
-            }
-            else if (event instanceof ResultTemplateInsertion)
-            {
-                getCacheController().updateAfterResultTemplateInsertion(
-                		((ResultTemplateInsertion) event).getRequest(),
-                		((ResultTemplateInsertion) event).getResponse());
-            }
-            else if (event instanceof SensorDeletion)
-            {
-                getCacheController().updateAfterSensorDeletion(
-                		((SensorDeletion) event).getRequest());
-            } 
-            else if (event instanceof ResultInsertion)
-            {
-            	getCacheController().updateAfterResultInsertion( ((ResultInsertion)event).getRequest().getTemplateIdentifier(),
-            			((ResultInsertion)event).getResponse().getObservation() );
-            }
-            else {
+            if (event instanceof SensorInsertion) {
+                getContentCacheController().updateAfterSensorInsertion(
+                        ((SensorInsertion) event).getRequest(),
+                        ((SensorInsertion) event).getResponse());
+            } else if (event instanceof ObservationInsertion) {
+                getContentCacheController().updateAfterObservationInsertion(
+                        ((ObservationInsertion) event).getRequest());
+            } else if (event instanceof ObservationDeletion) {
+                // this update will always be performed based on database information
+                getContentCacheController().updateAfterObservationDeletion();
+            } else if (event instanceof ResultTemplateInsertion) {
+                getContentCacheController().updateAfterResultTemplateInsertion(
+                        ((ResultTemplateInsertion) event).getRequest(),
+                        ((ResultTemplateInsertion) event).getResponse());
+            } else if (event instanceof SensorDeletion) {
+                getContentCacheController().updateAfterSensorDeletion(
+                        ((SensorDeletion) event).getRequest());
+            } else if (event instanceof ResultInsertion) {
+                getContentCacheController().updateAfterResultInsertion(
+                        ((ResultInsertion) event).getRequest().getTemplateIdentifier(),
+                        ((ResultInsertion) event).getResponse().getObservation());
+            } else {
                 LOGGER.warn("Can not handle modification event: {}", event);
             }
-            
+
         } catch (OwsExceptionReport ex) {
             LOGGER.error("Error processing Event", ex);
         }

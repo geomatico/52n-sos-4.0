@@ -23,10 +23,11 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static java.util.Collections.synchronizedList;
+import static java.util.Collections.synchronizedSet;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.Criteria;
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
@@ -49,7 +50,7 @@ public class ObservationTypeCacheUpdate extends CacheUpdate {
     public void execute() {
     	Criteria hObservationTypes = getSession().createCriteria(ObservationType.class);
 		List<ObservationType> observationTypes = hObservationTypes.list();
-        List<String> obsTypes = synchronizedList(new ArrayList<String>(0));
+        Set<String> obsTypes = synchronizedSet(new HashSet<String>());
         if (observationTypes != null) {
             for (ObservationType observationType : observationTypes) {
                 obsTypes.add(observationType.getObservationType());

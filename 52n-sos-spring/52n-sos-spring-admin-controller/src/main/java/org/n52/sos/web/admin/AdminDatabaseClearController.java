@@ -47,6 +47,6 @@ public class AdminDatabaseClearController extends AbstractAdminController {
     public void createTestData() throws SQLException, OwsExceptionReport, FileNotFoundException, ConnectionProviderException {
         log.info("Clearing database contents.");
         executeSqlFile(ControllerConstants.CLEAR_DATABASE_SQL_FILE);
-        Configurator.getInstance().getCapabilitiesCacheController().updateCacheFromDB();
+        Configurator.getInstance().getCacheController().updateCacheFromDatasource();
     }
 }

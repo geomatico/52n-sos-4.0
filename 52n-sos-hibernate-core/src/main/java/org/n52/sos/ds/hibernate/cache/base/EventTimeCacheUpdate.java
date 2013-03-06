@@ -23,7 +23,8 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.*;
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getMaxObservationTime;
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getMinObservationTime;
 
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 
