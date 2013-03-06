@@ -107,7 +107,7 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
     }
 
     @Override
-    public Map<String, SosAbstractFeature> getFeatures(List<String> featureIDs, List<SpatialFilter> spatialFilters,
+    public Map<String, SosAbstractFeature> getFeatures(Collection<String> featureIDs, List<SpatialFilter> spatialFilters,
                                                        Object connection, String version, int responeSrid) throws
             OwsExceptionReport {
         Session session = getSessionFromConnection(connection);
@@ -143,7 +143,8 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
     }
 
     @Override
-    public SosEnvelope getEnvelopeForFeatureIDs(List<String> featureIDs, Object connection) throws OwsExceptionReport {
+    public SosEnvelope getEnvelopeForFeatureIDs(Collection<String> featureIDs, Object connection) throws
+            OwsExceptionReport {
         Session session = getSessionFromConnection(connection);
         if (featureIDs != null && !featureIDs.isEmpty()) {
             try {

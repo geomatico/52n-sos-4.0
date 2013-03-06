@@ -84,8 +84,8 @@ public interface IFeatureQueryHandler {
      * @return Map of identifier and SOS FOI representation
      * @throws OwsExceptionReport
      */
-    public Map<String, SosAbstractFeature> getFeatures(List<String> foiIDs, List<SpatialFilter> list,
-            Object connection, String version, int responseSrid) throws OwsExceptionReport;
+    public Map<String, SosAbstractFeature> getFeatures(Collection<String> foiIDs, List<SpatialFilter> list,
+                                                       Object connection, String version, int responseSrid) throws OwsExceptionReport;
 
     /**
      * Query the envelope for feature ids
@@ -97,7 +97,8 @@ public interface IFeatureQueryHandler {
      * @return Envelope of requested FOI identifiers
      * @throws OwsExceptionReport
      */
-    public SosEnvelope getEnvelopeForFeatureIDs(List<String> featureIDs, Object connection) throws OwsExceptionReport;
+    public SosEnvelope getEnvelopeForFeatureIDs(Collection<String> featureIDs, Object connection) throws
+            OwsExceptionReport;
     
     public String insertFeature(SosSamplingFeature samplingFeature, Object connection) throws OwsExceptionReport;
 

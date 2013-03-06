@@ -544,7 +544,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
      *            restricted values
      * @return filter restriction
      */
-    public static Criterion getDisjunctionCriterionForStringList(String propertyName, List<String> list) {
+    public static Criterion getDisjunctionCriterionForStringList(String propertyName, Collection<String> list) {
         return Restrictions.disjunction().add(Restrictions.in(propertyName, list));
     }
 
