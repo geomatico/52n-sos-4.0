@@ -89,7 +89,7 @@ public class ObservationInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate
             final String procedure = observation.getObservationConstellation().getProcedure().getProcedureIdentifier();
             final ITime phenomenonTime = observation.getPhenomenonTime();
 
-            cache.updateEventTime(phenomenonTime);
+            cache.updatePhenomenonTime(phenomenonTime);
 
             cache.addObservationType(observationType);
 
@@ -135,7 +135,7 @@ public class ObservationInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate
                 // observation type
                 cache.addObservationTypesForOffering(offering, observationType);
                 // envelopes/bounding boxes (spatial and temporal)
-                cache.updateEventTimeForOffering(offering, phenomenonTime);
+                cache.updatePhenomenonTimeForOffering(offering, phenomenonTime);
                 cache.updateEnvelopeForOffering(offering, envelope);
             }
 

@@ -346,9 +346,9 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void setEventTime(DateTime minEventTime, DateTime maxEventTime) {
-        setMinEventTime(minEventTime);
-        setMaxEventTime(maxEventTime);
+    public void setPhenomenonTime(DateTime minEventTime, DateTime maxEventTime) {
+        setMinPhenomenonTime(minEventTime);
+        setMaxPhenomenonTime(maxEventTime);
     }
 
     @Override
@@ -373,16 +373,16 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void setMaxTimeForOffering(String offering, DateTime maxTime) {
+    public void setMaxPhenomenonTimeForOffering(String offering, DateTime maxTime) {
         notNullOrEmpty("offering", offering);
         log.trace("Setting maximal EventTime for Offering {} to {}", offering, maxTime);
-        getMaxTimeForOfferingsMap().put(offering, maxTime);
+        getMaxPhenomenonTimeForOfferingsMap().put(offering, maxTime);
     }
 
     @Override
-    public void setMinTimeForOffering(String offering, DateTime minTime) {
+    public void setMinPhenomenonTimeForOffering(String offering, DateTime minTime) {
         log.trace("Setting minimal EventTime for Offering {} to {}", offering, minTime);
-        getMinTimeForOfferingsMap().put(offering, minTime);
+        getMinPhenomenonTimeForOfferingsMap().put(offering, minTime);
     }
 
     @Override
@@ -669,17 +669,17 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void removeMaxTimeForOffering(String offering) {
+    public void removeMaxPhenomenonTimeForOffering(String offering) {
         notNullOrEmpty("offering", offering);
         log.trace("Removing maxEventTime for offering {}", offering);
-        getMaxTimeForOfferingsMap().remove(offering);
+        getMaxPhenomenonTimeForOfferingsMap().remove(offering);
     }
 
     @Override
-    public void removeMinTimeForOffering(String offering) {
+    public void removeMinPhenomenonTimeForOffering(String offering) {
         notNullOrEmpty("offering", offering);
         log.trace("Removing minEventTime for offering {}", offering);
-        getMinTimeForOfferingsMap().remove(offering);
+        getMinPhenomenonTimeForOfferingsMap().remove(offering);
     }
 
     @Override
@@ -976,15 +976,15 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void setMaxEventTime(DateTime maxEventTime) {
+    public void setMaxPhenomenonTime(DateTime maxEventTime) {
         log.trace("Setting Maximal EventTime to {}", maxEventTime);
-        getGlobalEventTimeEnvelope().setEnd(maxEventTime);
+        getGlobalPhenomenonTimeEnvelope().setEnd(maxEventTime);
     }
 
     @Override
-    public void setMinEventTime(DateTime minEventTime) {
+    public void setMinPhenomenonTime(DateTime minEventTime) {
         log.trace("Setting Minimal EventTime to {}", minEventTime);
-        getGlobalEventTimeEnvelope().setStart(minEventTime);
+        getGlobalPhenomenonTimeEnvelope().setStart(minEventTime);
     }
 
     @Override
@@ -1101,15 +1101,15 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void updateEventTime(ITime eventTime) {
+    public void updatePhenomenonTime(ITime eventTime) {
         notNull("eventTime", eventTime);
         TimePeriod tp = toTimePeriod(eventTime);
         log.trace("Expanding global EventTime to include {}", tp);
-        if (!hasMinEventTime() || getMinEventTime().isAfter(tp.getStart())) {
-            setMinEventTime(tp.getStart());
+        if (!hasMinPhenomenonTime() || getMinPhenomenonTime().isAfter(tp.getStart())) {
+            setMinPhenomenonTime(tp.getStart());
         }
-        if (!hasMaxEventTime() || getMaxEventTime().isBefore(tp.getEnd())) {
-            setMaxEventTime(tp.getEnd());
+        if (!hasMaxPhenomenonTime() || getMaxPhenomenonTime().isBefore(tp.getEnd())) {
+            setMaxPhenomenonTime(tp.getEnd());
         }
     }
 
@@ -1125,18 +1125,18 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void updateEventTimeForOffering(String offering, ITime eventTime) {
+    public void updatePhenomenonTimeForOffering(String offering, ITime eventTime) {
         notNullOrEmpty("offering", offering);
         notNull("eventTime", eventTime);
         TimePeriod tp = toTimePeriod(eventTime);
         log.trace("Expanding EventTime of offering {} to include {}", offering, tp);
-        if (!hasMaxTimeForOffering(offering)
-            || getMaxTimeForOffering(offering).isBefore(tp.getEnd())) {
-            setMaxTimeForOffering(offering, tp.getEnd());
+        if (!hasMaxPhenomenonTimeForOffering(offering)
+            || getMaxPhenomenonTimeForOffering(offering).isBefore(tp.getEnd())) {
+            setMaxPhenomenonTimeForOffering(offering, tp.getEnd());
         }
-        if (!hasMinTimeForOffering(offering)
-            || getMinTimeForOffering(offering).isAfter(tp.getStart())) {
-            setMinTimeForOffering(offering, tp.getStart());
+        if (!hasMinPhenomenonTimeForOffering(offering)
+            || getMinPhenomenonTimeForOffering(offering).isAfter(tp.getStart())) {
+            setMinPhenomenonTimeForOffering(offering, tp.getStart());
         }
     }
 
@@ -1170,19 +1170,19 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void recalculateEventTime() {
+    public void recalculatePhenomenonTime() {
         log.trace("Recalculating global event time based on offerings");
         DateTime globalMax = null, globalMin = null;
         if (!getOfferings().isEmpty()) {
             for (String offering : getOfferings()) {
-                if (hasMaxTimeForOffering(offering)) {
-                    DateTime offeringMax = getMaxTimeForOffering(offering);
+                if (hasMaxPhenomenonTimeForOffering(offering)) {
+                    DateTime offeringMax = getMaxPhenomenonTimeForOffering(offering);
                     if (globalMax == null || offeringMax.isAfter(globalMax)) {
                         globalMax = offeringMax;
                     }
                 }
-                if (hasMinTimeForOffering(offering)) {
-                    DateTime offeringMin = getMinTimeForOffering(offering);
+                if (hasMinPhenomenonTimeForOffering(offering)) {
+                    DateTime offeringMin = getMinPhenomenonTimeForOffering(offering);
                     if (globalMin == null || offeringMin.isBefore(globalMin)) {
                         globalMin = offeringMin;
                     }
@@ -1193,8 +1193,8 @@ public class WritableCache extends ReadableCache implements WritableContentCache
                           globalMax, globalMin);
             }
         }
-        setEventTime(globalMin, globalMax);
+        setPhenomenonTime(globalMin, globalMax);
         log.trace("Global temporal bounding box reset done. Min: '{}'); Max: '{}'",
-                  getMinEventTime(), getMaxEventTime());
+                  getMinPhenomenonTime(), getMaxPhenomenonTime());
     }
 }

@@ -36,8 +36,8 @@ public class EventTimeCacheUpdate extends CacheUpdate {
 
     @Override
     public void execute() {
-        getCache().setMinEventTime(getMinObservationTime(getSession()));
-        getCache().setMaxEventTime(getMaxObservationTime(getSession()));
+        getCache().setMinPhenomenonTime(getMinObservationTime(getSession()));
+        getCache().setMaxPhenomenonTime(getMaxObservationTime(getSession()));
     }
     
 }

@@ -40,12 +40,12 @@ public interface ContentCache {
     /**
      * @return the maximal phenomenon time for all observations
      */
-    DateTime getMaxEventTime();
+    DateTime getMaxPhenomenonTime();
 
     /**
      * @return if the maximal phenomenon time is set
      */
-    boolean hasMaxEventTime();
+    boolean hasMaxPhenomenonTime();
 
     /**
      * Returns the maximal phenomenon time for the specified offering.
@@ -54,7 +54,7 @@ public interface ContentCache {
      *
      * @return the maximal phenomenon time for or null if it is not set
      */
-    DateTime getMaxTimeForOffering(String offering);
+    DateTime getMaxPhenomenonTimeForOffering(String offering);
 
     /**
      * Returns the whether or not the maximal phenomenon time for the specified offering is set.
@@ -63,17 +63,17 @@ public interface ContentCache {
      *
      * @return if the maximal phenomenon time is set
      */
-    boolean hasMaxTimeForOffering(String offering);
+    boolean hasMaxPhenomenonTimeForOffering(String offering);
 
     /**
      * @return the minimal phenomenon time for all observations
      */
-    DateTime getMinEventTime();
+    DateTime getMinPhenomenonTime();
 
     /**
      * @return if the minimal phenomenon time is set
      */
-    boolean hasMinEventTime();
+    boolean hasMinPhenomenonTime();
 
     /**
      * Returns the minimal phenomenon time for the specified offering.
@@ -82,7 +82,7 @@ public interface ContentCache {
      *
      * @return the minimal phenomenon time for or null if it is not set
      */
-    DateTime getMinTimeForOffering(String offering);
+    DateTime getMinPhenomenonTimeForOffering(String offering);
 
     /**
      * Returns the whether or not the minimal phenomenon time for the specified offering is set.
@@ -91,7 +91,7 @@ public interface ContentCache {
      *
      * @return if the minimal phenomenon time is set
      */
-    boolean hasMinTimeForOffering(String offering);
+    boolean hasMinPhenomenonTimeForOffering(String offering);
 
     /**
      * @return the default EPSG code

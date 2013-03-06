@@ -73,8 +73,8 @@ public class SensorDeletionInMemoryCacheUpdate extends InMemoryCacheUpdate {
         cache.removeObservationIdentifiers(observationIdentifiers);
 
         for (String offering : cache.getOfferingsForProcedure(procedure)) {
-            cache.removeMaxTimeForOffering(offering);
-            cache.removeMinTimeForOffering(offering);
+            cache.removeMaxPhenomenonTimeForOffering(offering);
+            cache.removeMinPhenomenonTimeForOffering(offering);
             cache.removeNameForOffering(offering);
             cache.removeFeaturesOfInterestForOffering(offering);
             cache.removeRelatedFeaturesForOffering(offering);
@@ -105,7 +105,7 @@ public class SensorDeletionInMemoryCacheUpdate extends InMemoryCacheUpdate {
         }
         // At the latest
         cache.removeOfferingsForProcedure(procedure);
-        cache.recalculateEventTime();
+        cache.recalculatePhenomenonTime();
         cache.recalculateGlobalEnvelope();
     }
 }

@@ -469,14 +469,14 @@ public interface WritableContentCache extends ContentCache {
      *
      * @param offering the offering
      */
-    void removeMaxTimeForOffering(String offering);
+    void removeMaxPhenomenonTimeForOffering(String offering);
 
     /**
      * Remove the minimal phenomenon time for the specified offering.
      *
      * @param offering the offering
      */
-    void removeMinTimeForOffering(String offering);
+    void removeMinPhenomenonTimeForOffering(String offering);
 
     /**
      * Remove the name for the specified offering.
@@ -817,19 +817,19 @@ public interface WritableContentCache extends ContentCache {
      * @param min the minimal phenomenon time
      * @param max the maximal phenomenon time
      */
-    void setEventTime(DateTime min, DateTime max);
+    void setPhenomenonTime(DateTime min, DateTime max);
 
     /**
      * Update the global phenomenon time by extending the global envelope to include the specified {@code ITime}.
      *
      * @param eventTime the time to include
      */
-    void updateEventTime(ITime eventTime);
+    void updatePhenomenonTime(ITime eventTime);
 
     /**
      * Recalculates the global phenomenon time envelope based on the current offering phenomenon time envelopes.
      */
-    void recalculateEventTime();
+    void recalculatePhenomenonTime();
 
     /**
      * Sets the parent features for the specified feature of interest and update the child features of the specified
@@ -886,7 +886,7 @@ public interface WritableContentCache extends ContentCache {
      *
      * @param maxEventTime the max phenomenon time
      */
-    void setMaxEventTime(DateTime maxEventTime);
+    void setMaxPhenomenonTime(DateTime maxEventTime);
 
     /**
      * Sets the maximal phenomenon time for the specified offering to the specified time.
@@ -894,14 +894,14 @@ public interface WritableContentCache extends ContentCache {
      * @param offering the offering
      * @param maxTime  the max phenomenon time
      */
-    void setMaxTimeForOffering(String offering, DateTime maxTime);
+    void setMaxPhenomenonTimeForOffering(String offering, DateTime maxTime);
 
     /**
      * Sets the global minimal phenomenon time.
      *
      * @param minEventTime the min phenomenon time
      */
-    void setMinEventTime(DateTime minEventTime);
+    void setMinPhenomenonTime(DateTime minEventTime);
 
     /**
      * Sets the minimal phenomenon time for the specified offering to the specified time.
@@ -909,7 +909,7 @@ public interface WritableContentCache extends ContentCache {
      * @param offering the offering
      * @param minTime  the min phenomenon time
      */
-    void setMinTimeForOffering(String offering, DateTime minTime);
+    void setMinPhenomenonTimeForOffering(String offering, DateTime minTime);
 
     /**
      * Updates the phenomenon time envelope of the specified offering to include the specified event time.
@@ -917,7 +917,7 @@ public interface WritableContentCache extends ContentCache {
      * @param offering  the offering
      * @param eventTime the time to include
      */
-    void updateEventTimeForOffering(String offering, ITime eventTime);
+    void updatePhenomenonTimeForOffering(String offering, ITime eventTime);
 
     /**
      * Sets the name of the specified offering.

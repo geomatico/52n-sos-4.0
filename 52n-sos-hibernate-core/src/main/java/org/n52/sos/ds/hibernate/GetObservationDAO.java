@@ -109,7 +109,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
 
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
             // SOS 2.0 parameter
-            opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.temporalFilter, getEventTime());
+            opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.temporalFilter, getPhenomenonTime());
             SosEnvelope envelope = null;
             if (featureIDs != null && !featureIDs.isEmpty()) {
                 envelope = getCache().getGlobalEnvelope();
@@ -120,7 +120,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
             }
         } else if (version.equals(Sos1Constants.SERVICEVERSION)) {
             // SOS 1.0.0 parameter
-            opsMeta.addRangeParameterValue(Sos1Constants.GetObservationParams.eventTime, getEventTime());
+            opsMeta.addRangeParameterValue(Sos1Constants.GetObservationParams.eventTime, getPhenomenonTime());
             opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.srsName);
             opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.result);
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.resultModel, getResultModels());
@@ -309,10 +309,10 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
      * @throws OwsExceptionReport
      *             If an error occurs.
      */
-    private MinMax<String> getEventTime() throws OwsExceptionReport {
+    private MinMax<String> getPhenomenonTime() throws OwsExceptionReport {
         try {
-            DateTime minDate = getCache().getMinEventTime();
-            DateTime maxDate = getCache().getMaxEventTime();
+            DateTime minDate = getCache().getMinPhenomenonTime();
+            DateTime maxDate = getCache().getMaxPhenomenonTime();
             return new MinMax<String>()
                     .setMinimum(minDate != null ? DateTimeHelper.formatDateTime2ResponseString(minDate) : null)
                     .setMaximum(maxDate != null ? DateTimeHelper.formatDateTime2ResponseString(maxDate) : null);

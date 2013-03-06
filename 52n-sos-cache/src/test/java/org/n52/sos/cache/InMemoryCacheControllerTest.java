@@ -132,10 +132,10 @@ public class InMemoryCacheControllerTest {
                 .getPhenomenonTime()).getValue();
 
         assertEquals("maxtime",
-                     getCache().getMaxEventTime(), phenomenonTime);
+                     getCache().getMaxPhenomenonTime(), phenomenonTime);
 
         assertEquals("mintime",
-                     getCache().getMinEventTime(), phenomenonTime);
+                     getCache().getMinPhenomenonTime(), phenomenonTime);
     }
 
     @Test
@@ -231,13 +231,13 @@ public class InMemoryCacheControllerTest {
         updateCacheWithSingleObservation(PROCEDURE);
 
         assertTrue("temporal envelope of does NOT contain observation timestamp",
-                   (getCache().getMinTimeForOffering(getFirstOffering())
+                   (getCache().getMinPhenomenonTimeForOffering(getFirstOffering())
                 .isBefore(getPhenomenonTimeFromObservation())
-                    || getCache().getMinTimeForOffering(getFirstOffering())
+                    || getCache().getMinPhenomenonTimeForOffering(getFirstOffering())
                 .isEqual(getPhenomenonTimeFromObservation()))
-                   && (getCache().getMaxTimeForOffering(getFirstOffering())
+                   && (getCache().getMaxPhenomenonTimeForOffering(getFirstOffering())
                 .isAfter(getPhenomenonTimeFromObservation())
-                       || getCache().getMaxTimeForOffering(getFirstOffering())
+                       || getCache().getMaxPhenomenonTimeForOffering(getFirstOffering())
                 .isEqual(getPhenomenonTimeFromObservation())));
     }
 
@@ -498,8 +498,8 @@ public class InMemoryCacheControllerTest {
         deleteSensorPreparation();
 
         assertTrue("temporal bounding box STILL in cache",
-                   getCache().getMaxTimeForOffering(getProcedureIdentifier() + OFFERING_IDENTIFIER_EXTENSION) == null
-                   && getCache().getMinTimeForOffering(getProcedureIdentifier() + OFFERING_IDENTIFIER_EXTENSION) == null);
+                   getCache().getMaxPhenomenonTimeForOffering(getProcedureIdentifier() + OFFERING_IDENTIFIER_EXTENSION) == null
+                   && getCache().getMinPhenomenonTimeForOffering(getProcedureIdentifier() + OFFERING_IDENTIFIER_EXTENSION) == null);
     }
 
     @Test
@@ -509,8 +509,8 @@ public class InMemoryCacheControllerTest {
         deleteSensorPreparation();
 
         assertTrue("global temporal bounding box still in cache after deletion of last sensor",
-                   getCache().getMaxEventTime() == null
-                   && getCache().getMinEventTime() == null);
+                   getCache().getMaxPhenomenonTime() == null
+                   && getCache().getMinPhenomenonTime() == null);
     }
 
     @Test
@@ -642,8 +642,8 @@ public class InMemoryCacheControllerTest {
 
         deleteSensorPreparation();
 
-        assertThat(getCache().getMaxEventTime(), is(dateTime));
-        assertThat(getCache().getMinEventTime(), is(dateTime));
+        assertThat(getCache().getMaxPhenomenonTime(), is(dateTime));
+        assertThat(getCache().getMinPhenomenonTime(), is(dateTime));
     }
 
     @Test
@@ -724,11 +724,11 @@ public class InMemoryCacheControllerTest {
         insertResultPreparation();
 
         assertEquals("maxtime",
-                     getCache().getMaxEventTime(),
+                     getCache().getMaxPhenomenonTime(),
                      ((TimePeriod) observation.getPhenomenonTime()).getEnd());
 
         assertEquals("mintime",
-                     getCache().getMinEventTime(),
+                     getCache().getMinPhenomenonTime(),
                      ((TimePeriod) observation.getPhenomenonTime()).getStart());
     }
 
@@ -807,8 +807,8 @@ public class InMemoryCacheControllerTest {
         insertResultPreparation();
         final DateTime end = ((TimePeriod) observation.getPhenomenonTime()).getEnd();
         final DateTime start = ((TimePeriod) observation.getPhenomenonTime()).getStart();
-        final DateTime minTimeForOffering = getCache().getMinTimeForOffering(OFFERING);
-        final DateTime maxTimeForOffering = getCache().getMaxTimeForOffering(OFFERING);
+        final DateTime minTimeForOffering = getCache().getMinPhenomenonTimeForOffering(OFFERING);
+        final DateTime maxTimeForOffering = getCache().getMaxPhenomenonTimeForOffering(OFFERING);
 
         assertNotNull("minTimeForOffering is null", minTimeForOffering);
         assertNotNull("maxTimeForOffering is null", maxTimeForOffering);

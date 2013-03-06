@@ -116,9 +116,9 @@ class OfferingCacheUpdateTask extends RunnableAction {
         getCache()
                 .setFeaturesOfInterestForOffering(getOffering().getIdentifier(), new HashSet<String>(featureOfInterestIdentifiers));
         // Temporal Envelope
-        getCache().setMinTimeForOffering(offeringId, HibernateCriteriaQueryUtilities
+        getCache().setMinPhenomenonTimeForOffering(offeringId, HibernateCriteriaQueryUtilities
                 .getMinDate4Offering(offeringId, session));
-        getCache().setMaxTimeForOffering(offeringId, HibernateCriteriaQueryUtilities
+        getCache().setMaxPhenomenonTimeForOffering(offeringId, HibernateCriteriaQueryUtilities
                 .getMaxDate4Offering(offeringId, session));
     }
 

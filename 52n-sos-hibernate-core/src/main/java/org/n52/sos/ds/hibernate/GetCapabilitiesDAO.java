@@ -402,8 +402,8 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 sosOffering.setPhens4CompPhens(phens4CompPhens);
 
                 // set up time
-                DateTime minDate = getCache().getMinTimeForOffering(offering);
-                DateTime maxDate = getCache().getMaxTimeForOffering(offering);
+                DateTime minDate = getCache().getMinPhenomenonTimeForOffering(offering);
+                DateTime maxDate = getCache().getMaxPhenomenonTimeForOffering(offering);
                 sosOffering.setTime(new TimePeriod(minDate, maxDate));
 
                 // add feature of interests
@@ -796,8 +796,8 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
     }
 
     protected void setUpTimeForOffering(String offering, int id, SosOfferingsForContents sosOffering) {
-        DateTime minDate = getCache().getMinTimeForOffering(offering);
-        DateTime maxDate = getCache().getMaxTimeForOffering(offering);
+        DateTime minDate = getCache().getMinPhenomenonTimeForOffering(offering);
+        DateTime maxDate = getCache().getMaxPhenomenonTimeForOffering(offering);
         String phenTimeId = Sos2Constants.EN_PHENOMENON_TIME + "_" + id;
         sosOffering.setTime(new TimePeriod(minDate, maxDate, phenTimeId));
     }

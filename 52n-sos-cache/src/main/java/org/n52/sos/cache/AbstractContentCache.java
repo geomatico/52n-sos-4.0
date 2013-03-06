@@ -352,8 +352,8 @@ public abstract class AbstractContentCache implements ContentCache {
         }
     }
     private int defaultEpsgCode = 4326;
-    private Map<String, DateTime> maxTimeForOfferings = synchronizedMap();
-    private Map<String, DateTime> minTimeForOfferings = synchronizedMap();
+    private Map<String, DateTime> maxPhenomenonTimeForOfferings = synchronizedMap();
+    private Map<String, DateTime> minPhenomenonTimeForOfferings = synchronizedMap();
     private Map<String, Set<String>> allowedObservationTypeForOfferings = synchronizedMap();
     private Map<String, Set<String>> childFeaturesForFeatureOfInterest = synchronizedMap();
     private Map<String, Set<String>> childProceduresForProcedures = synchronizedMap();
@@ -387,20 +387,20 @@ public abstract class AbstractContentCache implements ContentCache {
     private Set<String> procedures = synchronizedSet();
     private Set<String> resultTemplates = synchronizedSet();
     private SosEnvelope globalEnvelope = new SosEnvelope(null, defaultEpsgCode);
-    private TimePeriod globalEventTimeBoundingBox = new TimePeriod();
+    private TimePeriod globalPhenomenonTimeEnvelope = new TimePeriod();
 
     /**
      * @return the relating offering -> max phenomenon time
      */
-    protected Map<String, DateTime> getMaxTimeForOfferingsMap() {
-        return this.maxTimeForOfferings;
+    protected Map<String, DateTime> getMaxPhenomenonTimeForOfferingsMap() {
+        return this.maxPhenomenonTimeForOfferings;
     }
 
     /**
      * @return the relating offering -> min phenomenon time
      */
-    protected Map<String, DateTime> getMinTimeForOfferingsMap() {
-        return this.minTimeForOfferings;
+    protected Map<String, DateTime> getMinPhenomenonTimeForOfferingsMap() {
+        return this.minPhenomenonTimeForOfferings;
     }
 
     /**
@@ -630,8 +630,8 @@ public abstract class AbstractContentCache implements ContentCache {
     /**
      * @return the global event time envelope
      */
-    protected TimePeriod getGlobalEventTimeEnvelope() {
-        return this.globalEventTimeBoundingBox;
+    protected TimePeriod getGlobalPhenomenonTimeEnvelope() {
+        return this.globalPhenomenonTimeEnvelope;
     }
 
     /**
@@ -667,8 +667,8 @@ public abstract class AbstractContentCache implements ContentCache {
     public int hashCode() {
         return hash(7, 41,
                     defaultEpsgCode,
-                    maxTimeForOfferings,
-                    minTimeForOfferings,
+                    maxPhenomenonTimeForOfferings,
+                    minPhenomenonTimeForOfferings,
                     allowedObservationTypeForOfferings,
                     childFeaturesForFeatureOfInterest,
                     childProceduresForProcedures,
@@ -702,7 +702,7 @@ public abstract class AbstractContentCache implements ContentCache {
                     procedures,
                     resultTemplates,
                     globalEnvelope,
-                    globalEventTimeBoundingBox);
+                    globalPhenomenonTimeEnvelope);
     }
 
     @Override
@@ -714,10 +714,10 @@ public abstract class AbstractContentCache implements ContentCache {
         if (!eq(this.defaultEpsgCode, other.defaultEpsgCode)) {
             return false;
         }
-        if (!eq(this.maxTimeForOfferings, other.maxTimeForOfferings)) {
+        if (!eq(this.maxPhenomenonTimeForOfferings, other.maxPhenomenonTimeForOfferings)) {
             return false;
         }
-        if (!eq(this.minTimeForOfferings, other.minTimeForOfferings)) {
+        if (!eq(this.minPhenomenonTimeForOfferings, other.minPhenomenonTimeForOfferings)) {
             return false;
         }
         if (!eq(this.allowedObservationTypeForOfferings, other.allowedObservationTypeForOfferings)) {
@@ -819,7 +819,7 @@ public abstract class AbstractContentCache implements ContentCache {
         if (!eq(this.globalEnvelope, other.globalEnvelope)) {
             return false;
         }
-        if (!eq(this.globalEventTimeBoundingBox, other.globalEventTimeBoundingBox)) {
+        if (!eq(this.globalPhenomenonTimeEnvelope, other.globalPhenomenonTimeEnvelope)) {
             return false;
         }
         return true;

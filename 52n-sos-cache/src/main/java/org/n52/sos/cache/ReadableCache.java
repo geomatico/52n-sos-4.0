@@ -37,13 +37,13 @@ import org.n52.sos.util.CollectionHelper;
  */
 public class ReadableCache extends AbstractContentCache implements ContentCache {
     @Override
-    public DateTime getMaxEventTime() {
-        return getGlobalEventTimeEnvelope().getEnd();
+    public DateTime getMaxPhenomenonTime() {
+        return getGlobalPhenomenonTimeEnvelope().getEnd();
     }
 
     @Override
-    public DateTime getMinEventTime() {
-        return getGlobalEventTimeEnvelope().getStart();
+    public DateTime getMinPhenomenonTime() {
+        return getGlobalPhenomenonTimeEnvelope().getStart();
     }
 
     @Override
@@ -157,13 +157,13 @@ public class ReadableCache extends AbstractContentCache implements ContentCache 
     }
 
     @Override
-    public DateTime getMaxTimeForOffering(String offering) {
-        return getMaxTimeForOfferingsMap().get(offering);
+    public DateTime getMaxPhenomenonTimeForOffering(String offering) {
+        return getMaxPhenomenonTimeForOfferingsMap().get(offering);
     }
 
     @Override
-    public DateTime getMinTimeForOffering(String offering) {
-        return getMinTimeForOfferingsMap().get(offering);
+    public DateTime getMinPhenomenonTimeForOffering(String offering) {
+        return getMinPhenomenonTimeForOfferingsMap().get(offering);
     }
 
     @Override
@@ -315,13 +315,13 @@ public class ReadableCache extends AbstractContentCache implements ContentCache 
     }
 
     @Override
-    public boolean hasMaxTimeForOffering(String offering) {
-        return getMaxTimeForOffering(offering) != null;
+    public boolean hasMaxPhenomenonTimeForOffering(String offering) {
+        return getMaxPhenomenonTimeForOffering(offering) != null;
     }
 
     @Override
-    public boolean hasMinTimeForOffering(String offering) {
-        return getMinTimeForOffering(offering) != null;
+    public boolean hasMinPhenomenonTimeForOffering(String offering) {
+        return getMinPhenomenonTimeForOffering(offering) != null;
     }
 
     @Override
@@ -331,13 +331,13 @@ public class ReadableCache extends AbstractContentCache implements ContentCache 
     }
 
     @Override
-    public boolean hasMaxEventTime() {
-        return getMaxEventTime() != null;
+    public boolean hasMaxPhenomenonTime() {
+        return getMaxPhenomenonTime() != null;
     }
 
     @Override
-    public boolean hasMinEventTime() {
-        return getMinEventTime() != null;
+    public boolean hasMinPhenomenonTime() {
+        return getMinPhenomenonTime() != null;
     }
 
     @Override
