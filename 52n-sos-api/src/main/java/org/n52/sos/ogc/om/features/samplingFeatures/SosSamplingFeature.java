@@ -30,6 +30,7 @@ import java.util.List;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
+import org.n52.sos.ogc.om.NamedValue;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -40,15 +41,25 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  */
 public class SosSamplingFeature extends SosAbstractFeature {
-    
+
     private static final long serialVersionUID = 4660755526492323288L;
+
     private List<CodeType> name = new LinkedList<CodeType>();
+
     private String description;
+
     private String xmlDescription;
+
     private Geometry geometry;
+
     private String featureType = OGCConstants.UNKNOWN;
+
     private String url;
-    private List<SosAbstractFeature> sampledFeatures;
+
+    private List<SosAbstractFeature> sampledFeatures = new LinkedList<SosAbstractFeature>();
+
+    private List<NamedValue> parameters = new LinkedList<NamedValue>();
+
     private boolean encode = true;
 
     /**
@@ -62,7 +73,7 @@ public class SosSamplingFeature extends SosAbstractFeature {
     }
 
     public SosSamplingFeature(CodeWithAuthority featureIdentifier, String gmlId) {
-       super(featureIdentifier, gmlId);
+        super(featureIdentifier, gmlId);
     }
 
     public List<CodeType> getName() {
@@ -70,13 +81,10 @@ public class SosSamplingFeature extends SosAbstractFeature {
     }
 
     public void setName(List<CodeType> name) {
-        this.name = name;
+        this.name.addAll(name);
     }
-    
+
     public void addName(CodeType name) {
-        if (this.name == null) {
-            this.name = new LinkedList<CodeType>();
-        }
         this.name.add(name);
     }
 
@@ -91,7 +99,7 @@ public class SosSamplingFeature extends SosAbstractFeature {
     public String getXmlDescription() {
         return xmlDescription;
     }
-    
+
     public boolean isSetXmlDescription() {
         return xmlDescription != null && !xmlDescription.isEmpty();
     }
@@ -118,7 +126,7 @@ public class SosSamplingFeature extends SosAbstractFeature {
     public void setFeatureType(String featureType) {
         this.featureType = featureType;
     }
-    
+
     public boolean isSetFeatureType() {
         return featureType != null && !featureType.isEmpty();
     }
@@ -132,7 +140,7 @@ public class SosSamplingFeature extends SosAbstractFeature {
     }
 
     public void setSampledFeatures(List<SosAbstractFeature> sampledFeatures) {
-        this.sampledFeatures = sampledFeatures;
+        this.sampledFeatures.addAll(sampledFeatures);
     }
 
     public List<SosAbstractFeature> getSampledFeatures() {
@@ -145,24 +153,40 @@ public class SosSamplingFeature extends SosAbstractFeature {
     public boolean isSetNames() {
         return name != null && !name.isEmpty();
     }
-    
+
     public CodeType getFirstName() {
         if (isSetNames()) {
             return name.get(0);
         }
         return null;
     }
-    
+
     public boolean isSetSampledFeatures() {
         return sampledFeatures != null && !sampledFeatures.isEmpty();
     }
-    
+
     public boolean isSetUrl() {
         return url != null && !url.isEmpty();
     }
 
     public boolean isSetGeometry() {
         return geometry != null && !geometry.isEmpty();
+    }
+
+    public void addParameter(NamedValue namedValue) {
+        this.parameters.add(namedValue);
+    }
+    
+    public void setParameters(List<NamedValue> parameters) {
+        this.parameters.addAll(parameters);
+    }
+
+    public List<NamedValue> getParameters() {
+        return parameters;
+    }
+
+    public boolean isSetParameter() {
+        return parameters != null && !parameters.isEmpty();
     }
 
     public boolean isEncode() {
@@ -174,11 +198,10 @@ public class SosSamplingFeature extends SosAbstractFeature {
     }
 
     @Override
-	public String toString()
-	{
-		return String.format(
-                "SosSamplingFeature [name=%s, description=%s, geometry=%s, featureType=%s, url=%s, sampledFeatures=%s]",
-                             name, description, geometry, featureType, url, sampledFeatures);
-	}
-    
+    public String toString() {
+        return String
+                .format("SosSamplingFeature [name=%s, description=%s, geometry=%s, featureType=%s, url=%s, sampledFeatures=%s]",
+                        name, description, geometry, featureType, url, sampledFeatures);
+    }
+
 }

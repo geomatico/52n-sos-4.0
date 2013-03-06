@@ -24,12 +24,13 @@
 package org.n52.sos.ogc.om;
 
 import org.n52.sos.ogc.gml.ReferenceType;
+import org.n52.sos.ogc.om.values.IValue;
 
-public class NamedValuePair {
+public class NamedValue<T> {
     
     private ReferenceType name;
     
-    private String value;
+    private IValue<T> value;
 
     public ReferenceType getName() {
         return name;
@@ -39,11 +40,11 @@ public class NamedValuePair {
         this.name = name;
     }
 
-    public String getValue() {
+    public IValue<T> getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(IValue<T> value) {
         this.value = value;
     }
 
@@ -52,6 +53,6 @@ public class NamedValuePair {
     }
     
     public boolean isSetValue() {
-        return value != null && !value.isEmpty();
+        return value != null && value.isSetValue();
     }
 }

@@ -42,6 +42,8 @@ import org.joda.time.DateTime;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.GMLConstants;
+import org.n52.sos.ogc.om.NamedValue;
+import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
@@ -181,6 +183,10 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
             } else {
                 xbSampFeature.addNewSampledFeature().setHref(GMLConstants.NIL_UNKNOWN);
             }
+            
+            if (sampFeat.isSetParameter()) {
+                addParameter(xbSampFeature, sampFeat);
+            }
 
             // set position
             ShapeType xbShape = xbSampFeature.addNewShape();
@@ -201,6 +207,15 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
             }
         }
         return xbSampFeatDoc;
+    }
+
+    private void addParameter(SFSpatialSamplingFeatureType xbSampFeature, SosSamplingFeature sampFeat) throws OwsExceptionReport {
+        for (NamedValue<?> namedValuePair : sampFeat.getParameters()) {
+            XmlObject encodeObjectToXml = CodingHelper.encodeObjectToXml(OMConstants.NS_OM_2, namedValuePair);
+            if (encodeObjectToXml != null) {
+                xbSampFeature.addNewParameter().addNewNamedValue().set(encodeObjectToXml);
+            }
+        }
     }
 
     private XmlObject createFeatureCollection(List<SosAbstractFeature> features, boolean forObservation)
