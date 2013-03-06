@@ -63,6 +63,14 @@ public class SosEnvelope {
         return envelope;
     }
 
+    public void expandToInclude(Envelope e) {
+        if (getEnvelope() != null) {
+            getEnvelope().expandToInclude(e);
+        } else {
+            setEnvelope(e);
+        }
+    }
+
     /**
      * Set envelope
      * 
