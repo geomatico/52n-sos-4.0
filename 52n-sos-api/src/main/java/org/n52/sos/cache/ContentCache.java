@@ -94,6 +94,62 @@ public interface ContentCache {
     boolean hasMinPhenomenonTimeForOffering(String offering);
 
     /**
+     * @return the maximal result time for all observations
+     */
+    DateTime getMaxResultTime();
+
+    /**
+     * @return if the maximal result time is set
+     */
+    boolean hasMaxResultTime();
+
+    /**
+     * Returns the maximal result time for the specified offering.
+     *
+     * @param offering the offering identifier
+     *
+     * @return the maximal result time for or null if it is not set
+     */
+    DateTime getMaxResultTimeForOffering(String offering);
+
+    /**
+     * Returns the whether or not the maximal result time for the specified offering is set.
+     *
+     * @param offering the offering identifier
+     *
+     * @return if the maximal result time is set
+     */
+    boolean hasMaxResultTimeForOffering(String offering);
+
+    /**
+     * @return the minimal result time for all observations
+     */
+    DateTime getMinResultTime();
+
+    /**
+     * @return if the minimal result time is set
+     */
+    boolean hasMinResultTime();
+
+    /**
+     * Returns the minimal result time for the specified offering.
+     *
+     * @param offering the offering identifier
+     *
+     * @return the minimal result time for or null if it is not set
+     */
+    DateTime getMinResultTimeForOffering(String offering);
+
+    /**
+     * Returns the whether or not the minimal result time for the specified offering is set.
+     *
+     * @param offering the offering identifier
+     *
+     * @return if the minimal result time is set
+     */
+    boolean hasMinResultTimeForOffering(String offering);
+
+    /**
      * @return the default EPSG code
      */
     int getDefaultEPSGCode();

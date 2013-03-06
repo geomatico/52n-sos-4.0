@@ -345,4 +345,44 @@ public class ReadableCache extends AbstractContentCache implements ContentCache 
         final SosEnvelope e = getGlobalEnvelope();
         return e != null && e.isSetEnvelope();
     }
+
+    @Override
+    public DateTime getMaxResultTime() {
+        return getGlobalResultTimeEnvelope().getEnd();
+    }
+
+    @Override
+    public boolean hasMaxResultTime() {
+        return getMaxResultTime() != null;
+    }
+
+    @Override
+    public DateTime getMaxResultTimeForOffering(String offering) {
+        return getMaxResultTimeForOfferingsMap().get(offering);
+    }
+
+    @Override
+    public boolean hasMaxResultTimeForOffering(String offering) {
+        return getMaxResultTimeForOffering(offering) != null;
+    }
+
+    @Override
+    public DateTime getMinResultTime() {
+        return getGlobalResultTimeEnvelope().getStart();
+    }
+
+    @Override
+    public boolean hasMinResultTime() {
+        return getMinResultTime() != null;
+    }
+
+    @Override
+    public DateTime getMinResultTimeForOffering(String offering) {
+        return getMinResultTimeForOfferingsMap().get(offering);
+    }
+
+    @Override
+    public boolean hasMinResultTimeForOffering(String offering) {
+        return getMinPhenomenonTimeForOffering(offering) != null;
+    }
 }

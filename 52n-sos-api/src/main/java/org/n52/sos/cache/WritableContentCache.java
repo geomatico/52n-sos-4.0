@@ -479,6 +479,20 @@ public interface WritableContentCache extends ContentCache {
     void removeMinPhenomenonTimeForOffering(String offering);
 
     /**
+     * Remove the maximal result time for the specified offering.
+     *
+     * @param offering the offering
+     */
+    void removeMaxResultTimeForOffering(String offering);
+
+    /**
+     * Remove the minimal result time for the specified offering.
+     *
+     * @param offering the offering
+     */
+    void removeMinResultTimeForOffering(String offering);
+
+    /**
      * Remove the name for the specified offering.
      *
      * @param offering the offering
@@ -832,6 +846,26 @@ public interface WritableContentCache extends ContentCache {
     void recalculatePhenomenonTime();
 
     /**
+     * Sets the new global result envelope.
+     *
+     * @param min the minimal result time
+     * @param max the maximal result time
+     */
+    void setResultTime(DateTime min, DateTime max);
+
+    /**
+     * Update the global result time by extending the global envelope to include the specified {@code ITime}.
+     *
+     * @param eventTime the time to include
+     */
+    void updateResultTime(ITime eventTime);
+
+    /**
+     * Recalculates the global result time envelope based on the current offering result time envelopes.
+     */
+    void recalculateResultTime();
+
+    /**
      * Sets the parent features for the specified feature of interest and update the child features of the specified
      * parent features.
      *
@@ -918,6 +952,44 @@ public interface WritableContentCache extends ContentCache {
      * @param eventTime the time to include
      */
     void updatePhenomenonTimeForOffering(String offering, ITime eventTime);
+
+    /**
+     * Sets the global maximal result time.
+     *
+     * @param maxResultTime the max result time
+     */
+    void setMaxResultTime(DateTime maxResultTime);
+
+    /**
+     * Sets the maximal result time for the specified offering to the specified time.
+     *
+     * @param offering the offering
+     * @param maxTime  the max result time
+     */
+    void setMaxResultTimeForOffering(String offering, DateTime maxTime);
+
+    /**
+     * Sets the global minimal result time.
+     *
+     * @param minResultTime the min result time
+     */
+    void setMinResultTime(DateTime minResultTime);
+
+    /**
+     * Sets the minimal result time for the specified offering to the specified time.
+     *
+     * @param offering the offering
+     * @param minTime  the min result time
+     */
+    void setMinResultTimeForOffering(String offering, DateTime minTime);
+
+    /**
+     * Updates the result time envelope of the specified offering to include the specified result time.
+     *
+     * @param offering   the offering
+     * @param resultTime the time to include
+     */
+    void updateResultTimeForOffering(String offering, ITime resultTime);
 
     /**
      * Sets the name of the specified offering.

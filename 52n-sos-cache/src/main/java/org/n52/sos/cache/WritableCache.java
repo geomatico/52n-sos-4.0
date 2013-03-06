@@ -23,6 +23,7 @@
  */
 package org.n52.sos.cache;
 
+import static org.n52.sos.cache.AbstractContentCache.notNullOrEmpty;
 import static org.n52.sos.cache.AbstractContentCache.synchronizedSet;
 
 import java.util.Collection;
@@ -251,7 +252,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         final Set<String> newValue = synchronizedSet(observableProperties);
         log.trace("Setting ObservableProperties for CompositePhenomenon {} to {}", compositePhenomenon, newValue);
         getObservablePropertiesForCompositePhenomenonsMap().put(compositePhenomenon, newValue);
-}
+    }
 
     @Override
     public void setObservablePropertiesForOffering(String offering, Collection<String> observableProperties) {
@@ -294,7 +295,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         final Set<String> newValue = synchronizedSet(proceduresForFeatureOfInterest);
         log.trace("Setting Procedures for FeatureOfInterest {} to {}", featureOfInterest, newValue);
         getProceduresForFeaturesOfInterestMap().put(featureOfInterest, newValue);
-}
+    }
 
     @Override
     public void setProceduresForObservableProperty(String observableProperty, Collection<String> procedures) {
@@ -1196,5 +1197,109 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         setPhenomenonTime(globalMin, globalMax);
         log.trace("Global temporal bounding box reset done. Min: '{}'); Max: '{}'",
                   getMinPhenomenonTime(), getMaxPhenomenonTime());
+    }
+
+    @Override
+    public void removeMaxResultTimeForOffering(String offering) {
+        notNullOrEmpty("offering", offering);
+        log.trace("Removing maxResultTime for offering {}", offering);
+        getMaxResultTimeForOfferingsMap().remove(offering);
+    }
+
+    @Override
+    public void removeMinResultTimeForOffering(String offering) {
+        notNullOrEmpty("offering", offering);
+        log.trace("Removing minResultTime for offering {}", offering);
+        getMinResultTimeForOfferingsMap().remove(offering);
+    }
+
+    @Override
+    public void setResultTime(DateTime min, DateTime max) {
+        setMinResultTime(min);
+        setMaxResultTime(max);
+    }
+
+    @Override
+    public void updateResultTime(ITime resultTime) {
+        notNull("resultTime", resultTime);
+        TimePeriod tp = toTimePeriod(resultTime);
+        log.trace("Expanding global ResultTime to include {}", tp);
+        if (!hasMinResultTime() || getMinResultTime().isAfter(tp.getStart())) {
+            setMinResultTime(tp.getStart());
+        }
+        if (!hasMaxResultTime() || getMaxResultTime().isBefore(tp.getEnd())) {
+            setMaxResultTime(tp.getEnd());
+        }
+    }
+
+    @Override
+    public void recalculateResultTime() {
+        log.trace("Recalculating global result time based on offerings");
+        DateTime globalMax = null, globalMin = null;
+        if (!getOfferings().isEmpty()) {
+            for (String offering : getOfferings()) {
+                if (hasMaxResultTimeForOffering(offering)) {
+                    DateTime offeringMax = getMaxResultTimeForOffering(offering);
+                    if (globalMax == null || offeringMax.isAfter(globalMax)) {
+                        globalMax = offeringMax;
+                    }
+                }
+                if (hasMinResultTimeForOffering(offering)) {
+                    DateTime offeringMin = getMinResultTimeForOffering(offering);
+                    if (globalMin == null || offeringMin.isBefore(globalMin)) {
+                        globalMin = offeringMin;
+                    }
+                }
+            }
+            if (globalMin == null || globalMax == null) {
+                log.error("Error in cache! Reset of global result time bounding box failed. Max: '{}'); Min: '{}'",
+                          globalMax, globalMin);
+            }
+        }
+        setResultTime(globalMin, globalMax);
+        log.trace("Global result time bounding box reset done. Min: '{}'); Max: '{}'",
+                  getMinResultTime(), getMaxResultTime());
+    }
+
+    @Override
+    public void setMaxResultTime(DateTime maxResultTime) {
+        log.trace("Setting Maximal ResultTime to {}", maxResultTime);
+        getGlobalPhenomenonTimeEnvelope().setEnd(maxResultTime);
+    }
+
+    @Override
+    public void setMaxResultTimeForOffering(String offering, DateTime maxTime) {
+        notNullOrEmpty("offering", offering);
+        log.trace("Setting maximal ResultTime for Offering {} to {}", offering, maxTime);
+        getMaxResultTimeForOfferingsMap().put(offering, maxTime);
+    }
+
+    @Override
+    public void setMinResultTime(DateTime minResultTime) {
+        log.trace("Setting Minimal ResultTime to {}", minResultTime);
+        getGlobalPhenomenonTimeEnvelope().setStart(minResultTime);
+    }
+
+    @Override
+    public void setMinResultTimeForOffering(String offering, DateTime minTime) {
+        notNullOrEmpty("offering", offering);
+        log.trace("Setting minimal ResultTime for Offering {} to {}", offering, minTime);
+        getMinResultTimeForOfferingsMap().put(offering, minTime);
+    }
+
+    @Override
+    public void updateResultTimeForOffering(String offering, ITime resultTime) {
+        notNullOrEmpty("offering", offering);
+        notNull("resultTime", resultTime);
+        TimePeriod tp = toTimePeriod(resultTime);
+        log.trace("Expanding EventTime of offering {} to include {}", offering, tp);
+        if (!hasMaxResultTimeForOffering(offering)
+            || getMaxResultTimeForOffering(offering).isBefore(tp.getEnd())) {
+            setMaxResultTimeForOffering(offering, tp.getEnd());
+        }
+        if (!hasMinResultTimeForOffering(offering)
+            || getMinResultTimeForOffering(offering).isAfter(tp.getStart())) {
+            setMinResultTimeForOffering(offering, tp.getStart());
+        }
     }
 }

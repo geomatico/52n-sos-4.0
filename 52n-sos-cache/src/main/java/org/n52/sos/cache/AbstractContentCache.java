@@ -354,6 +354,8 @@ public abstract class AbstractContentCache implements ContentCache {
     private int defaultEpsgCode = 4326;
     private Map<String, DateTime> maxPhenomenonTimeForOfferings = synchronizedMap();
     private Map<String, DateTime> minPhenomenonTimeForOfferings = synchronizedMap();
+    private Map<String, DateTime> maxResultTimeForOfferings = synchronizedMap();
+    private Map<String, DateTime> minResultTimeForOfferings = synchronizedMap();
     private Map<String, Set<String>> allowedObservationTypeForOfferings = synchronizedMap();
     private Map<String, Set<String>> childFeaturesForFeatureOfInterest = synchronizedMap();
     private Map<String, Set<String>> childProceduresForProcedures = synchronizedMap();
@@ -388,6 +390,7 @@ public abstract class AbstractContentCache implements ContentCache {
     private Set<String> resultTemplates = synchronizedSet();
     private SosEnvelope globalEnvelope = new SosEnvelope(null, defaultEpsgCode);
     private TimePeriod globalPhenomenonTimeEnvelope = new TimePeriod();
+    private TimePeriod globalResultTimeEnvelope = new TimePeriod();
 
     /**
      * @return the relating offering -> max phenomenon time
@@ -401,6 +404,20 @@ public abstract class AbstractContentCache implements ContentCache {
      */
     protected Map<String, DateTime> getMinPhenomenonTimeForOfferingsMap() {
         return this.minPhenomenonTimeForOfferings;
+    }
+
+    /**
+     * @return the relating offering -> max result time
+     */
+    protected Map<String, DateTime> getMaxResultTimeForOfferingsMap() {
+        return this.maxResultTimeForOfferings;
+    }
+
+    /**
+     * @return the relating offering -> min result time
+     */
+    protected Map<String, DateTime> getMinResultTimeForOfferingsMap() {
+        return this.minResultTimeForOfferings;
     }
 
     /**
@@ -628,9 +645,16 @@ public abstract class AbstractContentCache implements ContentCache {
     }
 
     /**
-     * @return the global event time envelope
+     * @return the global phenomenon time envelope
      */
     protected TimePeriod getGlobalPhenomenonTimeEnvelope() {
+        return this.globalPhenomenonTimeEnvelope;
+    }
+
+    /**
+     * @return the global result time envelope
+     */
+    protected TimePeriod getGlobalResultTimeEnvelope() {
         return this.globalPhenomenonTimeEnvelope;
     }
 
@@ -669,6 +693,8 @@ public abstract class AbstractContentCache implements ContentCache {
                     defaultEpsgCode,
                     maxPhenomenonTimeForOfferings,
                     minPhenomenonTimeForOfferings,
+                    maxResultTimeForOfferings,
+                    minResultTimeForOfferings,
                     allowedObservationTypeForOfferings,
                     childFeaturesForFeatureOfInterest,
                     childProceduresForProcedures,
@@ -702,6 +728,7 @@ public abstract class AbstractContentCache implements ContentCache {
                     procedures,
                     resultTemplates,
                     globalEnvelope,
+                    globalResultTimeEnvelope,
                     globalPhenomenonTimeEnvelope);
     }
 
@@ -718,6 +745,12 @@ public abstract class AbstractContentCache implements ContentCache {
             return false;
         }
         if (!eq(this.minPhenomenonTimeForOfferings, other.minPhenomenonTimeForOfferings)) {
+            return false;
+        }
+        if (!eq(this.maxResultTimeForOfferings, other.maxResultTimeForOfferings)) {
+            return false;
+        }
+        if (!eq(this.minResultTimeForOfferings, other.minResultTimeForOfferings)) {
             return false;
         }
         if (!eq(this.allowedObservationTypeForOfferings, other.allowedObservationTypeForOfferings)) {
@@ -820,6 +853,9 @@ public abstract class AbstractContentCache implements ContentCache {
             return false;
         }
         if (!eq(this.globalPhenomenonTimeEnvelope, other.globalPhenomenonTimeEnvelope)) {
+            return false;
+        }
+        if (!eq(this.globalResultTimeEnvelope, other.globalResultTimeEnvelope)) {
             return false;
         }
         return true;
