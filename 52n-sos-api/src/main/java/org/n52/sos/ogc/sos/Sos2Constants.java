@@ -101,6 +101,7 @@ public final class Sos2Constants {
     public static final String EN_OBSERVED_AREA = "observedArea";
 
     public static final String EN_PHENOMENON_TIME = "phenomenonTime";
+    public static final String EN_RESULT_TIME = "resultTime";
 
     public static final String EN_RESPONSE_FORMAT = "responseFormat";
 

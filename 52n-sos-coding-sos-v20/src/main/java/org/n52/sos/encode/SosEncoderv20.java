@@ -507,10 +507,11 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             }
 
             // set up phenomenon time [0..1]
-            if (offering.getTime() instanceof TimePeriod) {
-                TimePeriod tp = (TimePeriod) offering.getTime();
+            if (offering.getPhenomenonTime() instanceof TimePeriod) {
+                TimePeriod tp = (TimePeriod) offering.getPhenomenonTime();
                 if (!tp.isEmpty()) {
-                    XmlObject xmlObject = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, offering.getTime());
+                    XmlObject xmlObject = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, offering
+                            .getPhenomenonTime());
                         xbObsOff.addNewPhenomenonTime().addNewTimePeriod().set(xmlObject);
                         xbObsOff.getPhenomenonTime().substitute(
                                 new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_PHENOMENON_TIME,
@@ -519,6 +520,17 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
             }
 
             // set resultTime [0..1]
+            if (offering.getResultTime() instanceof TimePeriod) {
+                TimePeriod tp = (TimePeriod) offering.getResultTime();
+                if (tp.isSetEnd() && tp.isSetStart()) {
+                    XmlObject xmlObject = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, offering
+                            .getResultTime());
+                    xbObsOff.addNewResultTime().addNewTimePeriod().set(xmlObject);
+                    xbObsOff.getResultTime().substitute(
+                            new QName(Sos2Constants.NS_SOS_20, Sos2Constants.EN_RESULT_TIME,
+                                      SosConstants.NS_SOS_PREFIX), xbObsOff.getResultTime().schemaType());
+                }
+            }
 
             // set responseFormat [0..*]
             if (offering.getResponseFormats() != null) {

@@ -75,6 +75,8 @@ public class SensorDeletionInMemoryCacheUpdate extends InMemoryCacheUpdate {
         for (String offering : cache.getOfferingsForProcedure(procedure)) {
             cache.removeMaxPhenomenonTimeForOffering(offering);
             cache.removeMinPhenomenonTimeForOffering(offering);
+            cache.removeMaxResultTimeForOffering(offering);
+            cache.removeMinResultTimeForOffering(offering);
             cache.removeNameForOffering(offering);
             cache.removeFeaturesOfInterestForOffering(offering);
             cache.removeRelatedFeaturesForOffering(offering);
@@ -106,6 +108,7 @@ public class SensorDeletionInMemoryCacheUpdate extends InMemoryCacheUpdate {
         // At the latest
         cache.removeOfferingsForProcedure(procedure);
         cache.recalculatePhenomenonTime();
+        cache.recalculateResultTime();
         cache.recalculateGlobalEnvelope();
     }
 }

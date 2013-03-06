@@ -598,12 +598,12 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
             }
 
             // set up time
-            if (offering.getTime() instanceof TimePeriod) {
+            if (offering.getPhenomenonTime() instanceof TimePeriod) {
                 TimeGeometricPrimitivePropertyType xb_time = xb_oo.addNewTime();
-                TimePeriod tp = (TimePeriod) offering.getTime();
+                TimePeriod tp = (TimePeriod) offering.getPhenomenonTime();
                 if (tp.getStart() != null && tp.getEnd() != null) {
                         AbstractTimeGeometricPrimitiveType xb_gp = xb_time.addNewTimeGeometricPrimitive();
-                        xb_gp.set((TimePeriodType) CodingHelper.encodeObjectToXml(GMLConstants.NS_GML, offering.getTime()));
+                        xb_gp.set((TimePeriodType) CodingHelper.encodeObjectToXml(GMLConstants.NS_GML, offering.getPhenomenonTime()));
                 }
                 // TODO check GML 311 rename nodename of geometric primitive to gml:timePeriod
                 XmlCursor timeCursor = xb_time.newCursor();

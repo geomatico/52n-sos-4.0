@@ -376,18 +376,22 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void setMaxPhenomenonTimeForOffering(String offering, DateTime maxTime) {
         notNullOrEmpty("offering", offering);
+        notNull("maxTime", maxTime);
         log.trace("Setting maximal EventTime for Offering {} to {}", offering, maxTime);
         getMaxPhenomenonTimeForOfferingsMap().put(offering, maxTime);
     }
 
     @Override
     public void setMinPhenomenonTimeForOffering(String offering, DateTime minTime) {
+        notNull("minTime", minTime);
         log.trace("Setting minimal EventTime for Offering {} to {}", offering, minTime);
         getMinPhenomenonTimeForOfferingsMap().put(offering, minTime);
     }
 
     @Override
     public void setNameForOffering(String offering, String name) {
+        notNullOrEmpty("offering", offering);
+        notNullOrEmpty("name", name);
         log.trace("Setting Name of Offering {} to {}", offering, name);
         getNameForOfferingsMap().put(offering, name);
 
@@ -1221,7 +1225,9 @@ public class WritableCache extends ReadableCache implements WritableContentCache
 
     @Override
     public void updateResultTime(ITime resultTime) {
-        notNull("resultTime", resultTime);
+        if (resultTime == null) {
+            return;
+        }
         TimePeriod tp = toTimePeriod(resultTime);
         log.trace("Expanding global ResultTime to include {}", tp);
         if (!hasMinResultTime() || getMinResultTime().isAfter(tp.getStart())) {
@@ -1251,10 +1257,6 @@ public class WritableCache extends ReadableCache implements WritableContentCache
                     }
                 }
             }
-            if (globalMin == null || globalMax == null) {
-                log.error("Error in cache! Reset of global result time bounding box failed. Max: '{}'); Min: '{}'",
-                          globalMax, globalMin);
-            }
         }
         setResultTime(globalMin, globalMax);
         log.trace("Global result time bounding box reset done. Min: '{}'); Max: '{}'",
@@ -1270,6 +1272,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void setMaxResultTimeForOffering(String offering, DateTime maxTime) {
         notNullOrEmpty("offering", offering);
+        notNull("maxTime", maxTime);
         log.trace("Setting maximal ResultTime for Offering {} to {}", offering, maxTime);
         getMaxResultTimeForOfferingsMap().put(offering, maxTime);
     }
@@ -1283,6 +1286,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void setMinResultTimeForOffering(String offering, DateTime minTime) {
         notNullOrEmpty("offering", offering);
+        notNull("minTime", minTime);
         log.trace("Setting minimal ResultTime for Offering {} to {}", offering, minTime);
         getMinResultTimeForOfferingsMap().put(offering, minTime);
     }
@@ -1290,7 +1294,9 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     @Override
     public void updateResultTimeForOffering(String offering, ITime resultTime) {
         notNullOrEmpty("offering", offering);
-        notNull("resultTime", resultTime);
+        if (resultTime == null) {
+            return;
+        }
         TimePeriod tp = toTimePeriod(resultTime);
         log.trace("Expanding EventTime of offering {} to include {}", offering, tp);
         if (!hasMaxResultTimeForOffering(offering)

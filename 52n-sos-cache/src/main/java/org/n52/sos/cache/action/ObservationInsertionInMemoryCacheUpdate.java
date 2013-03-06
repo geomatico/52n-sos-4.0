@@ -23,9 +23,7 @@
  */
 package org.n52.sos.cache.action;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ogc.gml.time.ITime;
@@ -88,8 +86,10 @@ public class ObservationInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate
             final String observationType = observation.getObservationConstellation().getObservationType();
             final String procedure = observation.getObservationConstellation().getProcedure().getProcedureIdentifier();
             final ITime phenomenonTime = observation.getPhenomenonTime();
+            final ITime resultTime = observation.getResultTime();
 
             cache.updatePhenomenonTime(phenomenonTime);
+            cache.updateResultTime(resultTime);
 
             cache.addObservationType(observationType);
 
@@ -136,6 +136,7 @@ public class ObservationInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate
                 cache.addObservationTypesForOffering(offering, observationType);
                 // envelopes/bounding boxes (spatial and temporal)
                 cache.updatePhenomenonTimeForOffering(offering, phenomenonTime);
+                cache.updateResultTimeForOffering(offering, resultTime);
                 cache.updateEnvelopeForOffering(offering, envelope);
             }
 

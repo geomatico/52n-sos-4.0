@@ -99,13 +99,13 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateCriteriaQueryUtilities.class);
 
     /**
-     * Get min time from observations
-     * 
+     * Get min phenomenon time from observations
+      * 
      * @param session
      *            Hibernate session
      * @return min time
      */
-    public static DateTime getMinObservationTime(Session session) {
+    public static DateTime getMinPhenomenonTime(Session session) {
         Object min =
                 session.createCriteria(Observation.class)
                         .setProjection(Projections.min(PARAMETER_PHENOMENON_TIME_START))
@@ -114,6 +114,42 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
             return new DateTime(min);
         }
         return null;
+    }
+
+    /**
+     * Get min result time from observations
+     *
+     * @param session Hibernate session
+     *
+     * @return min time
+     */
+    public static DateTime getMinResultTime(Session session) {
+        Object min = session.createCriteria(Observation.class)
+                .setProjection(Projections.min(PARAMETER_RESULT_TIME))
+                .add(Restrictions.eq(DELETED, false)).uniqueResult();
+        if (min != null) {
+            return new DateTime(min);
+        }
+        return null;
+    }
+
+    /**
+     * Get max phenomenon from observations
+     *
+     * @param session Hibernate session
+     *
+     * @return max time
+     */
+    public static DateTime getMaxResultTime(Session session) {
+        Object max =
+               session.createCriteria(Observation.class)
+                .setProjection(Projections.max(PARAMETER_RESULT_TIME))
+                .add(Restrictions.eq(DELETED, false)).uniqueResult();
+        if (max == null) {
+            return null;
+        } else {
+            return new DateTime(max);
+        }
     }
 
     /**
@@ -223,13 +259,13 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     }
 
     /**
-     * Get max time from observations
-     * 
+     * Get max phenomenon from observations
+      * 
      * @param session
      *            Hibernate session
      * @return max time
      */
-    public static DateTime getMaxObservationTime(Session session) {
+    public static DateTime getMaxPhenomenonTime(Session session) {
         Object maxStart =
                 session.createCriteria(Observation.class)
                         .setProjection(Projections.max(PARAMETER_PHENOMENON_TIME_START))
@@ -279,6 +315,31 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
     }
 
     /**
+     * Get min result time from observations for offering
+     *
+     * @param offering Offering identifier
+     * @param session Hibernate session
+     *
+     * @return min result time for offering
+     */
+    public static DateTime getMinResultTime4Offering(String offering, Session session) {
+        Criteria criteria = session.createCriteria(Observation.class);
+        Map<String, String> aliases = new HashMap<String, String>();
+        String obsConstOffObsTypeAlias = addObservationConstellationOfferingObservationTypesAliasToMap(aliases, null);
+        String offeringAlias = addOfferingAliasToMap(aliases, obsConstOffObsTypeAlias);
+        addAliasesToCriteria(criteria, aliases);
+        criteria.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering)).add(
+                getEqualRestriction(DELETED, false));
+        Object min =
+               criteria.setProjection(Projections.min(PARAMETER_RESULT_TIME))
+                .uniqueResult();
+        if (min != null) {
+            return new DateTime(min);
+        }
+        return null;
+    }
+
+    /**
      * Get max time from observations for offering
      * 
      * @param offering
@@ -316,6 +377,30 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
                 }
             }
             return start;
+        }
+    }
+
+    /**
+     * Get max result time from observations for offering
+     *
+     * @param offering Offering identifier
+     * @param session Hibernate session
+     *
+     * @return max result time for offering
+     */
+    public static DateTime getMaxResultTime4Offering(String offering, Session session) {
+        Criteria criteriaStart = session.createCriteria(Observation.class);
+        Map<String, String> aliases = new HashMap<String, String>();
+        String obsConstOffObsTypeAlias = addObservationConstellationOfferingObservationTypesAliasToMap(aliases, null);
+        String offeringAlias = addOfferingAliasToMap(aliases, obsConstOffObsTypeAlias);
+        addAliasesToCriteria(criteriaStart, aliases);
+        criteriaStart.add(getEqualRestriction(getIdentifierParameter(offeringAlias), offering))
+                .add(Restrictions.eq(DELETED, false));
+        Object maxStart = criteriaStart.setProjection(Projections.max(PARAMETER_RESULT_TIME)).uniqueResult();
+        if (maxStart == null) {
+            return null;
+        } else {
+            return new DateTime(maxStart);
         }
     }
 

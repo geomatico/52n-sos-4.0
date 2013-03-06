@@ -120,6 +120,10 @@ class OfferingCacheUpdateTask extends RunnableAction {
                 .getMinDate4Offering(offeringId, session));
         getCache().setMaxPhenomenonTimeForOffering(offeringId, HibernateCriteriaQueryUtilities
                 .getMaxDate4Offering(offeringId, session));
+        getCache().setMinResultTimeForOffering(offeringId, HibernateCriteriaQueryUtilities
+                .getMinResultTime4Offering(offeringId, session));
+        getCache().setMaxResultTimeForOffering(offeringId, HibernateCriteriaQueryUtilities
+                .getMaxResultTime4Offering(offeringId, session));
     }
 
     protected Set<String> getProcedureIdentifierFrom(Set<ObservationConstellationOfferingObservationType> set) {

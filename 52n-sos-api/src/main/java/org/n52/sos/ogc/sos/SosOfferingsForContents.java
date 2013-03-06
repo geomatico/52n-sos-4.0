@@ -49,16 +49,6 @@ public class SosOfferingsForContents {
 
     private SosEnvelope observedArea;
     
-//    /**
-//     * Envelope of the offering
-//     */
-//    private Envelope boundeBy;
-//
-//    /**
-//     * SRS id of the offerng
-//     */
-//    private int srid;
-
     /**
      * All observableProperties contained in the offering
      */
@@ -77,7 +67,8 @@ public class SosOfferingsForContents {
     /**
      * TimePeriod of data in the offering
      */
-    private ITime time;
+    private ITime phenomenonTime;
+    private ITime resultTime;
 
     /**
      * All featuresOfinterest contained in the offering
@@ -151,34 +142,6 @@ public class SosOfferingsForContents {
         this.offeringName = offeringName;
     }
 
-//    /**
-//     * @return
-//     */
-//    public Envelope getBoundeBy() {
-//        return boundeBy;
-//    }
-//
-//    /**
-//     * @param boundeBy
-//     */
-//    public void setBoundeBy(Envelope boundeBy) {
-//        this.boundeBy = boundeBy;
-//    }
-//
-//    /**
-//     * @return
-//     */
-//    public int getSrid() {
-//        return srid;
-//    }
-//
-//    /**
-//     * @param srid
-//     */
-//    public void setSrid(int srid) {
-//        this.srid = srid;
-//    }
-
     /**
      * @return
      */
@@ -222,17 +185,31 @@ public class SosOfferingsForContents {
     }
 
     /**
-     * @param time
+     * @param phenomenonTime the phenomenon time
      */
-    public void setTime(ITime time) {
-        this.time = time;
+    public void setPhenomenonTime(ITime phenomenonTime) {
+        this.phenomenonTime = phenomenonTime;
     }
 
     /**
-     * @return
+     * @return the phenomenon time
      */
-    public ITime getTime() {
-        return time;
+    public ITime getPhenomenonTime() {
+        return phenomenonTime;
+    }
+
+    /**
+     * @param resultTime the result time
+     */
+    public void setResultTime(ITime resultTime) {
+        this.resultTime = resultTime;
+    }
+
+    /**
+     * @return the result time
+     */
+    public ITime getResultTime() {
+        return resultTime;
     }
 
     /**

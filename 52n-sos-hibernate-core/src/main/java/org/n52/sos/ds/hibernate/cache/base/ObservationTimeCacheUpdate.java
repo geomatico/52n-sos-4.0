@@ -23,8 +23,7 @@
  */
 package org.n52.sos.ds.hibernate.cache.base;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getMaxObservationTime;
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getMinObservationTime;
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.*;
 
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 
@@ -32,12 +31,14 @@ import org.n52.sos.ds.hibernate.cache.CacheUpdate;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class EventTimeCacheUpdate extends CacheUpdate {
+public class ObservationTimeCacheUpdate extends CacheUpdate {
 
     @Override
     public void execute() {
-        getCache().setMinPhenomenonTime(getMinObservationTime(getSession()));
-        getCache().setMaxPhenomenonTime(getMaxObservationTime(getSession()));
+        getCache().setMinPhenomenonTime(getMinPhenomenonTime(getSession()));
+        getCache().setMaxPhenomenonTime(getMaxPhenomenonTime(getSession()));
+        getCache().setMinResultTime(getMinResultTime(getSession()));
+        getCache().setMaxResultTime(getMaxResultTime(getSession()));
     }
     
 }

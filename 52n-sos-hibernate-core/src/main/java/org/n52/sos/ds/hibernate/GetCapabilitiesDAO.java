@@ -402,9 +402,10 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
                 sosOffering.setPhens4CompPhens(phens4CompPhens);
 
                 // set up time
-                DateTime minDate = getCache().getMinPhenomenonTimeForOffering(offering);
-                DateTime maxDate = getCache().getMaxPhenomenonTimeForOffering(offering);
-                sosOffering.setTime(new TimePeriod(minDate, maxDate));
+                sosOffering.setPhenomenonTime(new TimePeriod(getCache().getMinPhenomenonTimeForOffering(offering),
+                                                             getCache().getMaxPhenomenonTimeForOffering(offering)));
+                sosOffering.setResultTime(new TimePeriod(getCache().getMinResultTimeForOffering(offering),
+                                                         getCache().getMaxResultTimeForOffering(offering)));
 
                 // add feature of interests
                 if (getConfigurator().getActiveProfile().isListFeatureOfInterestsInOfferings()) {
@@ -796,10 +797,13 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
     }
 
     protected void setUpTimeForOffering(String offering, int id, SosOfferingsForContents sosOffering) {
-        DateTime minDate = getCache().getMinPhenomenonTimeForOffering(offering);
-        DateTime maxDate = getCache().getMaxPhenomenonTimeForOffering(offering);
-        String phenTimeId = Sos2Constants.EN_PHENOMENON_TIME + "_" + id;
-        sosOffering.setTime(new TimePeriod(minDate, maxDate, phenTimeId));
+        sosOffering.setPhenomenonTime(new TimePeriod(getCache().getMinPhenomenonTimeForOffering(offering),
+                                                     getCache().getMaxPhenomenonTimeForOffering(offering),
+                                                     Sos2Constants.EN_PHENOMENON_TIME + "_" + id));
+        sosOffering.setResultTime(new TimePeriod(getCache().getMinResultTimeForOffering(offering),
+                                                 getCache().getMaxResultTimeForOffering(offering),
+                                                 Sos2Constants.EN_RESULT_TIME + "_" + id));
+
     }
 
     // if no foi contained, set allowed foitypes

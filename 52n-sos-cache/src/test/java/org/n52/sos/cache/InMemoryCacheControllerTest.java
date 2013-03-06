@@ -23,7 +23,7 @@
  */
 package org.n52.sos.cache;
 
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.n52.sos.ogc.om.OMConstants.OBS_TYPE_MEASUREMENT;
 import static org.n52.sos.ogc.om.OMConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION;
@@ -498,8 +498,10 @@ public class InMemoryCacheControllerTest {
         deleteSensorPreparation();
 
         assertTrue("temporal bounding box STILL in cache",
-                   getCache().getMaxPhenomenonTimeForOffering(getProcedureIdentifier() + OFFERING_IDENTIFIER_EXTENSION) == null
-                   && getCache().getMinPhenomenonTimeForOffering(getProcedureIdentifier() + OFFERING_IDENTIFIER_EXTENSION) == null);
+                   getCache().getMaxPhenomenonTimeForOffering(getProcedureIdentifier() + OFFERING_IDENTIFIER_EXTENSION)
+                   == null
+                   && getCache().getMinPhenomenonTimeForOffering(getProcedureIdentifier()
+                                                                 + OFFERING_IDENTIFIER_EXTENSION) == null);
     }
 
     @Test
@@ -635,15 +637,17 @@ public class InMemoryCacheControllerTest {
             throws OwsExceptionReport {
 
         long phenomenonTime = 0l;
-        DateTime dateTime = new DateTime(phenomenonTime);
 
         updateCacheWithInsertSensor(PROCEDURE_2);
         updateCacheWithSingleObservation(PROCEDURE_2, phenomenonTime);
 
+        assertThat(getCache().getMaxPhenomenonTime(), is(notNullValue()));
+        assertThat(getCache().getMinPhenomenonTime(), is(notNullValue()));
+
         deleteSensorPreparation();
 
-        assertThat(getCache().getMaxPhenomenonTime(), is(dateTime));
-        assertThat(getCache().getMinPhenomenonTime(), is(dateTime));
+        assertThat(getCache().getMaxPhenomenonTime(), is(nullValue()));
+        assertThat(getCache().getMinPhenomenonTime(), is(nullValue()));
     }
 
     @Test

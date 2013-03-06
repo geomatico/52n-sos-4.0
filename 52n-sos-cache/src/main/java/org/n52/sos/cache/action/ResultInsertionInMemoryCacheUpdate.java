@@ -71,9 +71,10 @@ public class ResultInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
         final String procedure = observation.getObservationConstellation().getProcedure().getProcedureIdentifier();
         final String observableProperty = observation.getObservationConstellation().getObservableProperty().getIdentifier();
         final ITime phenomenonTime = observation.getPhenomenonTime();
+        final ITime resultTime = observation.getResultTime();
 
         cache.updatePhenomenonTime(phenomenonTime);
-
+        cache.updateResultTime(resultTime);
 
         cache.addObservationType(observationType);
         cache.addProcedure(procedure);
@@ -110,6 +111,7 @@ public class ResultInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
             cache.addOfferingForProcedure(procedure, offering);
             cache.updateEnvelopeForOffering(offering, envelope);
             cache.updatePhenomenonTimeForOffering(offering, phenomenonTime);
+            cache.updateResultTimeForOffering(offering, resultTime);
             // observable property
             cache.addOfferingForObservableProperty(observableProperty, offering);
             cache.addObservablePropertyForOffering(offering, observableProperty);

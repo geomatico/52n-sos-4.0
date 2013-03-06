@@ -23,14 +23,14 @@
  */
 package org.n52.sos.ds.hibernate.cache;
 
-import org.n52.sos.ds.hibernate.cache.base.EventTimeCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.ObservationTimeCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.FeatureOfInterestCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.OfferingCacheUpdate;
 
 /**
  * Updates the cache after a Observation was deleted.
  * <p/>
- * @see EventTimeCacheUpdate
+ * @see ObservationTimeCacheUpdate
  * @see FeatureOfInterestCacheUpdate
  * @see OfferingCacheUpdate
  * @author Christian Autermann <c.autermann@52north.org>
@@ -40,6 +40,6 @@ public class ObservationDeletionCacheUpdate extends CompositeCacheUpdate {
     public ObservationDeletionCacheUpdate(int threads) {
         super(new FeatureOfInterestCacheUpdate(),
               new OfferingCacheUpdate(threads),
-              new EventTimeCacheUpdate());
+              new ObservationTimeCacheUpdate());
     }
 }
