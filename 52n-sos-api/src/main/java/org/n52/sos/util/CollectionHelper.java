@@ -23,8 +23,6 @@
  */
 package org.n52.sos.util;
 
-import static java.util.Collections.emptyList;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -135,6 +133,10 @@ public class CollectionHelper {
         return CollectionHelper.synchronizedMap(capacity, 1.0F);
     }
 
+    public static <K, V> Map<K, V> synchronizedMap() {
+        return Collections.synchronizedMap(new HashMap<K, V>());
+    }
+
     public static <K, V> Map<K, V> synchronizedMap(int initialCapacity) {
         return Collections.synchronizedMap(new HashMap<K, V>(initialCapacity));
     }
@@ -187,30 +189,26 @@ public class CollectionHelper {
     private CollectionHelper() {
     }
 
-	/**
-	 * @param collectionOfCollection a Collection&lt;Collection&lt;T>>
-	 * @return a Collection&lt;T> containing all values of all Collections&lt;T> without any duplicates
-	 */
-	public static <T> Collection<T> unionOfListOfLists(final Collection<? extends Collection<T>> collectionOfCollection)
-	{
-		if (collectionOfCollection == null || collectionOfCollection.isEmpty())
-		{
-			return emptyList();
-		}
-		Collection<T> union = new ArrayList<T>();
-		for (Collection<T> col : collectionOfCollection)
-		{
-			if (col != null && !col.isEmpty())
-			{
-				for (T t : col)
-				{
-					if (t != null && !union.contains(t))
-					{
-						union.add(t);
-					}
-				}
-			}
-		}
-		return union;
+    /**
+     * @param collectionOfCollection a Collection&lt;Collection&lt;T>>
+     *
+     * @return a Set&lt;T> containing all values of all Collections&lt;T> without any duplicates
+     */
+    public static <T> Set<T> unionOfListOfLists(
+            final Collection<? extends Collection<T>> collectionOfCollection) {
+        if (collectionOfCollection == null || collectionOfCollection.isEmpty()) {
+            return new HashSet<T>(0);
+        }
+        HashSet<T> union = new HashSet<T>();
+        for (Collection<T> col : collectionOfCollection) {
+            if (col != null) {
+                for (T t : col) {
+                    if (t != null) {
+                        union.add(t);
+                    }
+                }
+            }
+        }
+        return union;
 	}
 }
