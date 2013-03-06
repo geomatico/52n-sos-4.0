@@ -27,15 +27,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.joda.time.DateTime;
 import org.n52.sos.cache.WritableContentCache;
-import org.n52.sos.ogc.gml.time.ITime;
-import org.n52.sos.ogc.gml.time.TimeInstant;
-import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.SosFeatureCollection;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
-import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.util.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,14 +48,27 @@ public abstract class InMemoryCacheUpdate implements Action {
     private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryCacheUpdate.class);
     private WritableContentCache cache;
 
+    /**
+     * @return the writable cache of this action
+     */
     public WritableContentCache getCache() {
         return cache;
     }
 
+    /**
+     * @param cache the writable cache for this action
+     */
     public void setCache(WritableContentCache cache) {
         this.cache = cache;
     }
 
+    /**
+     * Get a list of all SosSamplingFeatures contained in the abstract feature.
+     *
+     * @param abstractFeature the abstract feature
+     *
+     * @return a list of all sampling features
+     */
     protected List<SosSamplingFeature> sosFeaturesToList(SosAbstractFeature abstractFeature) {
         if (abstractFeature instanceof SosFeatureCollection) {
             return getAllFeaturesFrom((SosFeatureCollection) abstractFeature);
@@ -88,6 +96,13 @@ public abstract class InMemoryCacheUpdate implements Action {
         return features;
     }
 
+    /**
+     * Creates the Envelope for all passed sampling features.
+     *
+     * @param samplingFeatures the sampling features
+     *
+     * @return the envelope for all features
+     */
     protected Envelope createEnvelopeFrom(List<SosSamplingFeature> samplingFeatures) {
         Envelope featureEnvelope = new Envelope();
         for (SosSamplingFeature samplingFeature : samplingFeatures) {

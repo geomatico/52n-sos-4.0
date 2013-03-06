@@ -103,7 +103,7 @@ public class ObservationInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate
             List<SosSamplingFeature> observedFeatures = sosFeaturesToList(observation.getObservationConstellation()
                     .getFeatureOfInterest());
 
-            Envelope envelope = createEnvelopeFrom(observedFeatures);
+            final Envelope envelope = createEnvelopeFrom(observedFeatures);
             cache.updateGlobalEnvelope(envelope);
 
             for (SosSamplingFeature sosSamplingFeature : observedFeatures) {
@@ -112,19 +112,23 @@ public class ObservationInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate
                 cache.addFeatureOfInterest(featureOfInterest);
                 cache.addFeatureOfInterestType(sosSamplingFeature.getFeatureType());
                 cache.addProcedureForFeatureOfInterest(featureOfInterest, procedure);
-                updateInterFeatureRelations(sosSamplingFeature);
+                if (sosSamplingFeature.isSetSampledFeatures()) {
+                    for (SosAbstractFeature parentFeature : sosSamplingFeature.getSampledFeatures()) {
+                        getCache().addParentFeature(sosSamplingFeature.getIdentifier().getValue(),
+                                                    parentFeature.getIdentifier().getValue());
+                    }
+                }
                 for (String offering : request.getOfferings()) {
                     cache.addRelatedFeatureForOffering(offering, featureOfInterest);
                     cache.addFeatureOfInterestForOffering(offering, featureOfInterest);
                 }
             }
-            
+
             // update offerings
             for (String offering : request.getOfferings()) {
                 // procedure
                 cache.addProcedureForOffering(offering, procedure);
                 cache.addOfferingForProcedure(procedure, offering);
-
                 // observable property
                 cache.addOfferingForObservableProperty(observableProperty, offering);
                 cache.addObservablePropertyForOffering(offering, observableProperty);
@@ -136,23 +140,5 @@ public class ObservationInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate
             }
 
         }
-    }
-
-    private void updateInterFeatureRelations(SosSamplingFeature sosSamplingFeature) {
-        // add foi-foi relations
-        // sampledFeatures are parentFeatures
-        if (sosSamplingFeature.isSetSampledFeatures()) {
-            getCache()
-                    .addParentFeatures(sosSamplingFeature.getIdentifier().getValue(), getFeatureIdentifiers(sosSamplingFeature
-                    .getSampledFeatures()));
-        }
-    }
-
-    protected Set<String> getFeatureIdentifiers(List<SosAbstractFeature> features) {
-        Set<String> identifiers = new HashSet<String>(features.size());
-        for (SosAbstractFeature feature : features) {
-            identifiers.add(feature.getIdentifier().getValue());
-        }
-        return identifiers;
     }
 }
