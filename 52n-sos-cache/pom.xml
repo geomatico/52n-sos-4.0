@@ -1,36 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.n52.sensorweb.sos</groupId>
-    <artifactId>52n-sos</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
-  </parent>
-  <artifactId>52n-sos-cache</artifactId>
-  <name>52North SOS Cache</name>
-  <dependencies>
-    <!-- external -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>joda-time</groupId>
-    	<artifactId>joda-time</artifactId>
-    </dependency>
-    <!-- internal -->
-    <dependency>
-    	<groupId>${project.groupId}</groupId>
-    	<artifactId>52n-sos-api</artifactId>
-    	<classifier>tests</classifier>
-    </dependency>
-    <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>52n-sos-api</artifactId>
-    </dependency>
-  </dependencies>
-  <description>This module provides the default cache implementations.</description>
-  <inceptionYear>2013</inceptionYear>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.n52.sensorweb.sos</groupId>
+        <artifactId>52n-sos</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>52n-sos-cache</artifactId>
+    <name>52North SOS Cache</name>
+    <dependencies>
+        <!-- external -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+        <!-- internal -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>52n-sos-api</artifactId>
+            <classifier>tests</classifier>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>52n-sos-api</artifactId>
+        </dependency>
+    </dependencies>
+    <description>This module provides the default cache implementations.</description>
+    <inceptionYear>2013</inceptionYear>
 </project>
