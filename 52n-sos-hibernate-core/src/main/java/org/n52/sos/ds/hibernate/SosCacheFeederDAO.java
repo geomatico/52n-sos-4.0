@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 @Configurable
-public class SosCacheFeederDAO extends AbstractHibernateDao implements ICacheFeederDAO {
+public class SosCacheFeederDAO extends HibernateSessionHolder implements ICacheFeederDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SosCacheFeederDAO.class);
     

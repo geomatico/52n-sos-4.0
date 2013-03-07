@@ -32,13 +32,13 @@ import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractHibernateDao {
+public class HibernateSessionHolder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractHibernateDao.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateSessionHolder.class);
     
     private final IConnectionProvider connectionProvider;
 
-    public AbstractHibernateDao() {
+    public HibernateSessionHolder() {
         this.connectionProvider = Configurator.getInstance().getDataConnectionProvider();
     }
 

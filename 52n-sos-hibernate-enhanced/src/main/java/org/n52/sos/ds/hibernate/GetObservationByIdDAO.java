@@ -57,6 +57,7 @@ public class GetObservationByIdDAO extends AbstractHibernateOperationDao impleme
      * supported SOS operation
      */
     private static final String OPERATION_NAME = SosConstants.Operations.GetObservationById.name();
+    private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
     @Override
     public String getOperationName() {
@@ -73,7 +74,7 @@ public class GetObservationByIdDAO extends AbstractHibernateOperationDao impleme
         if (request instanceof GetObservationByIdRequest) {
             Session session = null;
             try {
-                session = getSession();
+                session = sessionHolder.getSession();
                 
                 List<Observation> observations = queryObservation(request, session);
                 GetObservationByIdResponse response = new GetObservationByIdResponse();
@@ -89,7 +90,7 @@ public class GetObservationByIdDAO extends AbstractHibernateOperationDao impleme
                 LOGGER.error(exceptionText, he);
                 throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
             } finally {
-                returnSession(session);
+                sessionHolder.returnSession(session);
             }
         } else {
             String exceptionText = "The SOS request is not a SosGetObservationByIdRequest!";
