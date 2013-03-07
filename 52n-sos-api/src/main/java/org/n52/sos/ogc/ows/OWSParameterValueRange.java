@@ -36,10 +36,10 @@ public class OWSParameterValueRange implements IOWSParameterValue {
         this.maxValue = maxValue;
     }
     
-    public OWSParameterValueRange(String minValue, String maxValue, String valueRefernce) {
+    public OWSParameterValueRange(String minValue, String maxValue, String valueReference) {
         this.minValue = minValue;
         this.maxValue = maxValue;
-        this.setValueReference(valueRefernce);
+        this.valueReference = valueReference;
     }
 
     public OWSParameterValueRange(MinMax<String> mm) {
