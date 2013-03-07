@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.cache.action;
+package org.n52.sos.cache.ctrl.action;
 
 import java.util.List;
 
@@ -52,7 +52,7 @@ public class ResultInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
 
     public ResultInsertionInMemoryCacheUpdate(String templateIdentifier, SosObservation observation) {
         if (observation == null || templateIdentifier == null || templateIdentifier.isEmpty()) {
-            String msg = String.format("Missing argument: '{}': {}; template identifier: '{}'",
+            String msg = String.format("Missing argument: '%s': %s; template identifier: '%s'",
                                        SosObservation.class.getName(),
                                        observation,
                                        templateIdentifier);

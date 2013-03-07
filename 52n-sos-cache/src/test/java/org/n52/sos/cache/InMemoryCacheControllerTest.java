@@ -53,6 +53,7 @@ import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.n52.sos.cache.ctrl.InMemoryCacheController;
 import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
@@ -195,16 +196,6 @@ public class InMemoryCacheControllerTest {
     }
 
     @Test
-    public void should_contain_feature_type_after_InsertObservation()
-            throws OwsExceptionReport {
-        updateCacheWithSingleObservation(PROCEDURE);
-
-        assertTrue("feature type of observation is NOT in cache",
-                   getCache().getFeatureOfInterestTypes().contains(
-                FT_SAMPLINGPOINT));
-    }
-
-    @Test
     public void should_contain_envelopes_after_InsertObservation()
             throws OwsExceptionReport {
         updateCacheWithSingleObservation(PROCEDURE);
@@ -259,9 +250,6 @@ public class InMemoryCacheControllerTest {
     public void should_contain_offering_observation_type_relation_after_InsertObservation()
             throws OwsExceptionReport {
         updateCacheWithSingleObservation(PROCEDURE);
-
-        assertTrue("observation type NOT in cache",
-                   getCache().getObservationTypes().contains(getObservationTypeFromFirstObservation()));
 
         assertTrue("offering -> observation type relation NOT in cache",
                    getCache().getObservationTypesForOffering(getFirstOffering())
@@ -775,15 +763,6 @@ public class InMemoryCacheControllerTest {
     }
 
     @Test
-    public void should_contain_feature_type_after_InsertResult()
-            throws OwsExceptionReport {
-        insertResultPreparation();
-
-        assertTrue("feature type of observation is NOT in cache",
-                   getCache().getFeatureOfInterestTypes().contains(FT_SAMPLINGPOINT));
-    }
-
-    @Test
     public void should_contain_envelopes_after_InsertResult()
             throws OwsExceptionReport {
         insertResultPreparation();
@@ -844,9 +823,6 @@ public class InMemoryCacheControllerTest {
     public void should_contain_offering_observation_type_relation_after_InsertResult()
             throws OwsExceptionReport {
         insertResultPreparation();
-
-        assertTrue("observation type NOT in cache",
-                   getCache().getObservationTypes().contains(OBS_TYPE_SWE_ARRAY_OBSERVATION));
 
         assertTrue("offering -> observation type relation NOT in cache",
                    getCache().getObservationTypesForOffering(OFFERING)
@@ -960,9 +936,6 @@ public class InMemoryCacheControllerTest {
 
     private boolean onlyValidRelatedFeaturesAreInRoleMap() {
         Set<String> allowedRelatedFeatures = getCache().getRelatedFeatures();
-
-
-
         for (String relatedFeatureWithRole : ((WritableCache) getCache())
                 .getRolesForRelatedFeaturesMap().keySet()) {
             if (!allowedRelatedFeatures.contains(relatedFeatureWithRole)) {

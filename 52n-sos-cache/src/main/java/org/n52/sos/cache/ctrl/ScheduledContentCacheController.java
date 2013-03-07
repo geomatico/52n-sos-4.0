@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.cache;
+package org.n52.sos.cache.ctrl;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -29,6 +29,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.joda.time.DateTime;
+import org.n52.sos.cache.ContentCacheController;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -38,14 +39,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Abstract class for capabilities cache controller implementations.
- *
- *
+ * Abstract class for capabilities cache controller implementations that schedules a complete cache update at a
+ * configured interval.
  */
 @Configurable
-public abstract class AbstractScheduledCapabilitiesCacheController implements ContentCacheController {
+public abstract class ScheduledContentCacheController implements ContentCacheController {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractScheduledCapabilitiesCacheController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledContentCacheController.class);
     private final ReentrantLock updateLock = new ReentrantLock(true);
     private final Condition updateFree = updateLock.newCondition();
     private boolean initialized = false;
@@ -74,7 +74,7 @@ public abstract class AbstractScheduledCapabilitiesCacheController implements Co
 		}
 	}
 
-    @Setting(CacheControllerSettings.CAPABILITIES_CACHE_UPDATE_INTERVAL)
+    @Setting(ScheduledContentCacheControllerSettings.CAPABILITIES_CACHE_UPDATE_INTERVAL)
     public void setUpdateInterval(int interval) throws ConfigurationException {
         Validation.greaterZero("Cache update interval", interval);
         if (this.updateInterval != interval) {

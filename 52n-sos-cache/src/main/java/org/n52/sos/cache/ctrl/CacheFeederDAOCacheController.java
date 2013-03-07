@@ -21,10 +21,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.cache;
+package org.n52.sos.cache.ctrl;
 
 import java.util.concurrent.TimeUnit;
 
+import org.n52.sos.cache.WritableCache;
+import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ds.ICacheFeederDAO;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -36,12 +38,12 @@ import org.slf4j.LoggerFactory;
  * CacheControllerImpl implements all methods to request all objects and relationships from a standard datasource
  *
  */
-public abstract class AbstractFeederDAOCacheController extends AbstractScheduledCapabilitiesCacheController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractFeederDAOCacheController.class);
+public abstract class CacheFeederDAOCacheController extends ScheduledContentCacheController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CacheFeederDAOCacheController.class);
     private WritableContentCache cache;
     private ICacheFeederDAO cacheFeederDAO;
 
-    public AbstractFeederDAOCacheController() {
+    public CacheFeederDAOCacheController() {
         cache = new WritableCache();
         cacheFeederDAO = getCacheDAO();
     }

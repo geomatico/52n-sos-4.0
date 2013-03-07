@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.cache;
+package org.n52.sos.cache.ctrl;
 
 import java.util.Collections;
 import java.util.Set;
@@ -32,11 +32,11 @@ import org.n52.sos.config.settings.IntegerSettingDefinition;
 import org.n52.sos.service.ServiceSettings;
 
 /**
- * TODO JavaDoc
+ * Settings for the {@link ScheduledContentCacheController}.
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class CacheControllerSettings implements ISettingDefinitionProvider {
+public class ScheduledContentCacheControllerSettings implements ISettingDefinitionProvider {
     public static final String CAPABILITIES_CACHE_UPDATE_INTERVAL = "service.capabilitiesCacheUpdateInterval";
     public static final IntegerSettingDefinition CACHE_UPDATE_INTERVAL_DEFINITION = new IntegerSettingDefinition()
             .setGroup(ServiceSettings.GROUP)

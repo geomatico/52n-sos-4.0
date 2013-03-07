@@ -21,11 +21,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.cache;
+package org.n52.sos.cache.ctrl;
 
 import java.util.Collections;
 import java.util.Set;
 
+import org.n52.sos.cache.ContentCacheController;
 import org.n52.sos.event.SosEvent;
 import org.n52.sos.event.SosEventListener;
 import org.n52.sos.event.events.ObservationDeletion;

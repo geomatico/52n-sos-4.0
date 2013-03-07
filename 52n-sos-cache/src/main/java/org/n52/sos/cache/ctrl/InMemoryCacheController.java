@@ -21,16 +21,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.cache;
+package org.n52.sos.cache.ctrl;
 
 import java.util.concurrent.TimeUnit;
 
-import org.n52.sos.cache.action.InMemoryCacheUpdate;
-import org.n52.sos.cache.action.ObservationInsertionInMemoryCacheUpdate;
-import org.n52.sos.cache.action.ResultInsertionInMemoryCacheUpdate;
-import org.n52.sos.cache.action.ResultTemplateInsertionInMemoryCacheUpdate;
-import org.n52.sos.cache.action.SensorDeletionInMemoryCacheUpdate;
-import org.n52.sos.cache.action.SensorInsertionInMemoryCacheUpdate;
+import org.n52.sos.cache.ctrl.action.InMemoryCacheUpdate;
+import org.n52.sos.cache.ctrl.action.ObservationInsertionInMemoryCacheUpdate;
+import org.n52.sos.cache.ctrl.action.ResultInsertionInMemoryCacheUpdate;
+import org.n52.sos.cache.ctrl.action.ResultTemplateInsertionInMemoryCacheUpdate;
+import org.n52.sos.cache.ctrl.action.SensorDeletionInMemoryCacheUpdate;
+import org.n52.sos.cache.ctrl.action.SensorInsertionInMemoryCacheUpdate;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.DeleteSensorRequest;
@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @since 4.0
  */
-public class InMemoryCacheController extends AbstractFeederDAOCacheController {
+public class InMemoryCacheController extends CacheFeederDAOCacheController {
     private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryCacheController.class);
 
     /**

@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.cache.action;
+package org.n52.sos.cache.ctrl.action;
 
 import java.util.Set;
 
@@ -46,7 +46,7 @@ public class SensorDeletionInMemoryCacheUpdate extends InMemoryCacheUpdate {
 
     public SensorDeletionInMemoryCacheUpdate(DeleteSensorRequest response) {
         if (response == null) {
-            String msg = String.format("Missing argument: '{}': {}",
+            String msg = String.format("Missing argument: '%s': %s",
                                        DeleteSensorRequest.class.getName(),
                                        response);
             LOGGER.error(msg);
