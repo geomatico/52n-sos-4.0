@@ -24,6 +24,7 @@
 package org.n52.sos.request.operator;
 
 import java.util.Map;
+
 import org.n52.sos.ds.IOperationDAO;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
