@@ -31,8 +31,6 @@ import java.util.Set;
 
 import org.n52.sos.util.AbstractServiceLoaderRepository;
 import org.n52.sos.util.StringHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Repository for {@code SettingDefinitionProvider} implementations.
@@ -42,7 +40,6 @@ import org.slf4j.LoggerFactory;
  */
 public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRepository<SettingDefinitionProvider> {
 
-    private static final Logger log = LoggerFactory.getLogger(SettingDefinitionProviderRepository.class);
     private Map<String, SettingDefinition<?, ?>> definitionsByKey = Collections.emptyMap();
     private Set<SettingDefinition<?, ?>> settingDefinitions = Collections.emptySet();
     private Map<SettingDefinition<?, ?>, Set<SettingDefinitionProvider>> providersByDefinition = Collections

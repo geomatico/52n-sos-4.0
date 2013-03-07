@@ -34,7 +34,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.jdbc.ReturningWork;
-import org.n52.sos.ds.IGeneralQueryDAO;
+import org.n52.sos.ds.IGeneralQueryDAO_OLD;
 
 /**
  * class that deals with crud operations related to SOS DB.
@@ -42,7 +42,7 @@ import org.n52.sos.ds.IGeneralQueryDAO;
  * @author Shubham Sachdeva
  *
  */
-public class GeneralQueryDAO extends AbstractSettingsDAO implements IGeneralQueryDAO {
+public class GeneralQueryDAO_OLD extends AbstractSettingsDAO_OLD implements IGeneralQueryDAO_OLD {
 
 	/**
 	 * Method which query the SOS DB

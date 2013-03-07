@@ -32,6 +32,10 @@ package org.n52.sos.config;
  * @since 4.0
  */
 public enum SettingType {
-
-    BOOLEAN, INTEGER, FILE, NUMERIC, STRING, URI;
+    BOOLEAN,
+    INTEGER,
+    FILE,
+    NUMERIC,
+    STRING,
+    URI;
 }
