@@ -25,8 +25,6 @@ package org.n52.sos.ds.hibernate;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.n52.sos.cache.CacheImpl;
-import org.n52.sos.cache.WritableCapabilitiesCache;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.test.AbstractSosTestCase;
 
