@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ds.IGetCapabilitiesDAO;
+import org.n52.sos.ds.AbstractGetCapabilitiesDAO;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -43,7 +43,7 @@ import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosGetCapabilitiesOperatorV100 extends AbstractV1RequestOperator<IGetCapabilitiesDAO, GetCapabilitiesRequest> {
+public class SosGetCapabilitiesOperatorV100 extends AbstractV1RequestOperator<AbstractGetCapabilitiesDAO, GetCapabilitiesRequest> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SosGetCapabilitiesOperatorV100.class);
     // TODO check for SOS 1.0.0

@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ds.IGetObservationDAO;
+import org.n52.sos.ds.AbstractGetObservationDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.IObservationEncoder;
 import org.n52.sos.ogc.om.OMConstants;
@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
  * Database, class encodes the ObservationResponse (thru using the IOMEncoder)
  *
  */
-public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<IGetObservationDAO, GetObservationRequest> {
+public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<AbstractGetObservationDAO, GetObservationRequest> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SosGetObservationOperatorV100.class.getName());
     private static final String OPERATION_NAME = SosConstants.Operations.GetObservation.name();

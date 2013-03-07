@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ds.IDescribeSensorDAO;
+import org.n52.sos.ds.AbstractDescribeSensorDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
  * class handles the DescribeSensor request
  *
  */
-public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<IDescribeSensorDAO, DescribeSensorRequest> {
+public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<AbstractDescribeSensorDAO, DescribeSensorRequest> {
 
     private static final String OPERATION_NAME = SosConstants.Operations.DescribeSensor.name();
     private static final Logger LOGGER = LoggerFactory.getLogger(SosDescribeSensorOperatorV100.class);
