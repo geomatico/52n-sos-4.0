@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ds.IGetFeatureOfInterestDAO;
+import org.n52.sos.ds.AbstractGetFeatureOfInterestDAO;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
@@ -50,7 +50,7 @@ import org.n52.sos.wsdl.WSDLOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperator<IGetFeatureOfInterestDAO, GetFeatureOfInterestRequest> {
+public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperator<AbstractGetFeatureOfInterestDAO, GetFeatureOfInterestRequest> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SosGetFeatureOfInterestOperatorV20.class.getName());
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_FEATURE_OF_INTEREST_RETRIEVAL);

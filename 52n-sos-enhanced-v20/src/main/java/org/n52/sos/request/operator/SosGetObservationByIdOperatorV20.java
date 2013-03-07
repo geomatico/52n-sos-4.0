@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ds.IGetObservationByIdDAO;
+import org.n52.sos.ds.AbstractGetObservationByIdDAO;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -51,7 +51,7 @@ import org.n52.sos.wsdl.WSDLOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosGetObservationByIdOperatorV20 extends AbstractV2RequestOperator<IGetObservationByIdDAO, GetObservationByIdRequest> {
+public class SosGetObservationByIdOperatorV20 extends AbstractV2RequestOperator<AbstractGetObservationByIdDAO, GetObservationByIdRequest> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SosGetObservationByIdOperatorV20.class);
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_OBSERVATION_BY_ID_RETRIEVAL);
