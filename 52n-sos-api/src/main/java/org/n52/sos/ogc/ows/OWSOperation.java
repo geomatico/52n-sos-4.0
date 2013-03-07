@@ -143,7 +143,7 @@ public class OWSOperation {
         }
         list.add(value);
     }
-    
+
     public <E extends Enum<E>> void addParameterValue(E parameterName, IOWSParameterValue value) {
         addParameterValue(parameterName.name(), value);
     }
@@ -151,11 +151,11 @@ public class OWSOperation {
     public <E extends Enum<E>> void addPossibleValuesParameter(E parameterName, Collection<String> values) {
         addPossibleValuesParameter(parameterName.name(), values);
     }
-    
+
     public <E extends Enum<E>> void addPossibleValuesParameter(E parameterName, String value) {
         addPossibleValuesParameter(parameterName.name(), value);
     }
-    
+
     public void addPossibleValuesParameter(String parameterName, Collection<String> values) {
         addParameterValue(parameterName, new OWSParameterValuePossibleValues(values));
     }
@@ -163,15 +163,15 @@ public class OWSOperation {
     public void addPossibleValuesParameter(String parameterName, String value) {
         addParameterValue(parameterName, new OWSParameterValuePossibleValues(value));
     }
-    
+
     public void addAnyParameterValue(String paramterName) {
-        addPossibleValuesParameter(paramterName, Collections.<String>emptyList());
+        addPossibleValuesParameter(paramterName, Collections.<String> emptyList());
     }
-    
-    public  <E extends Enum<E>> void addAnyParameterValue(E parameterName) {
+
+    public <E extends Enum<E>> void addAnyParameterValue(E parameterName) {
         addAnyParameterValue(parameterName.name());
     }
-    
+
     public void addRangeParameterValue(String parameterName, String min, String max) {
         addParameterValue(parameterName, new OWSParameterValueRange(min, max));
     }
@@ -179,20 +179,24 @@ public class OWSOperation {
     public <E extends Enum<E>> void addRangeParameterValue(E parameterName, String min, String max) {
         addRangeParameterValue(parameterName.name(), min, max);
     }
-    
+
     public void addRangeParameterValue(String parameterName, MinMax<String> minMax) {
         addRangeParameterValue(parameterName, minMax.getMinimum(), minMax.getMaximum());
     }
-    
+
     public <E extends Enum<E>> void addRangeParameterValue(E parameterName, MinMax<String> minMax) {
         addRangeParameterValue(parameterName.name(), minMax);
     }
-    
+
     public void addDataTypeParameter(String parameterName, String value) {
         addParameterValue(parameterName, new OWSParameterDataType(value));
     }
 
     public <E extends Enum<E>> void addDataTypeParameter(E parameterName, String value) {
         addDataTypeParameter(parameterName.name(), value);
+    }
+
+    public <E extends Enum<E>> void addRangeParameterValue(E parameterName, OWSParameterValueRange value) {
+        addParameterValue(parameterName.name(), value);
     }
 }
