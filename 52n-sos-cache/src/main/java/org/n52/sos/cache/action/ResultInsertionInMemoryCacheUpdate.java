@@ -76,7 +76,6 @@ public class ResultInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
         cache.updatePhenomenonTime(phenomenonTime);
         cache.updateResultTime(resultTime);
 
-        cache.addObservationType(observationType);
         cache.addProcedure(procedure);
 
         cache.addProcedureForObservableProperty(observableProperty, procedure);
@@ -101,7 +100,6 @@ public class ResultInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate {
             cache.addFeatureOfInterest(featureOfInterest);
             cache.addFeatureOfInterestForResultTemplate(templateIdentifier, featureOfInterest);
             cache.addProcedureForFeatureOfInterest(featureOfInterest, procedure);
-            cache.addFeatureOfInterestType(sosSamplingFeature.getFeatureType());
             for (String offering : observation.getObservationConstellation().getOfferings()) {
                 cache.addFeatureOfInterestForOffering(offering, featureOfInterest);
             }

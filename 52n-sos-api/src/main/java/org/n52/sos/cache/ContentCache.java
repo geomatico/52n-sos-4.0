@@ -169,6 +169,11 @@ public interface ContentCache {
     Set<String> getFeatureOfInterestTypes();
 
     /**
+     * @return all SweTypes types
+     */
+    Set<String> getSweTypes();
+
+    /**
      * Checks whether or not the specified feature is contained in this cache.
      *
      * @param featureOfInterest the feature

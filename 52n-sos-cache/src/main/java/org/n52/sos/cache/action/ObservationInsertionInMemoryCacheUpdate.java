@@ -91,8 +91,6 @@ public class ObservationInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate
             cache.updatePhenomenonTime(phenomenonTime);
             cache.updateResultTime(resultTime);
 
-            cache.addObservationType(observationType);
-
             if (observation.getIdentifier() != null) {
                 final String identifier = observation.getIdentifier().getValue();
                 cache.addObservationIdentifier(identifier);
@@ -110,7 +108,6 @@ public class ObservationInsertionInMemoryCacheUpdate extends InMemoryCacheUpdate
                 String featureOfInterest = sosSamplingFeature.getIdentifier().getValue();
 
                 cache.addFeatureOfInterest(featureOfInterest);
-                cache.addFeatureOfInterestType(sosSamplingFeature.getFeatureType());
                 cache.addProcedureForFeatureOfInterest(featureOfInterest, procedure);
                 if (sosSamplingFeature.isSetSampledFeatures()) {
                     for (SosAbstractFeature parentFeature : sosSamplingFeature.getSampledFeatures()) {

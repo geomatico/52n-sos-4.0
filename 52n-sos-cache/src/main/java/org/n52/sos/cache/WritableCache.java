@@ -47,6 +47,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * supported.
  *
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0.0
  */
 public class WritableCache extends ReadableCache implements WritableContentCache {
     private static final Logger log = LoggerFactory.getLogger(WritableCache.class);
@@ -75,24 +76,10 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void addObservationType(String observationType) {
-        notNullOrEmpty("observationType", observationType);
-        log.trace("Adding ObservationType {}", observationType);
-        getObservationTypesSet().add(observationType);
-    }
-
-    @Override
     public void addEpsgCode(Integer epsgCode) {
         greaterZero("epsgCode", epsgCode);
         log.trace("Adding EpsgCode {}", epsgCode);
         getEpsgCodesSet().add(epsgCode);
-    }
-
-    @Override
-    public void addFeatureOfInterestType(String featureOfInterestType) {
-        notNullOrEmpty("featureOfInterestType", featureOfInterestType);
-        log.trace("Adding FeatureOfInterestType {}", featureOfInterestType);
-        getFeatureOfInterestTypesSet().add(featureOfInterestType);
     }
 
     @Override
@@ -107,13 +94,6 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("observationIdentifier", observationIdentifier);
         log.trace("Adding ObservationIdentifier {}", observationIdentifier);
         getObservationIdentifiersSet().add(observationIdentifier);
-    }
-
-    @Override
-    public void addProcedureDescriptionFormat(String procedureDescriptionFormat) {
-        notNullOrEmpty("procedureDescriptionFormat", procedureDescriptionFormat);
-        log.trace("Adding ProcedureDescriptionFormat {}", procedureDescriptionFormat);
-        getProcedureDescriptionFormatsSet().add(procedureDescriptionFormat);
     }
 
     @Override
@@ -139,26 +119,10 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void addObservationTypes(Collection<String> observationTypes) {
-        noNullValues("observationTypes", observationTypes);
-        for (String observationType : observationTypes) {
-            addObservationType(observationType);
-        }
-    }
-
-    @Override
     public void addEpsgCodes(Collection<Integer> epsgCodes) {
         noNullValues("epsgCodes", epsgCodes);
         for (Integer epsgCode : epsgCodes) {
             addEpsgCode(epsgCode);
-        }
-    }
-
-    @Override
-    public void addFeatureOfInterestTypes(Collection<String> featureOfInterestTypes) {
-        noNullValues("featureOfInterestTypes", featureOfInterestTypes);
-        for (String featureOfInterestType : featureOfInterestTypes) {
-            addFeatureOfInterestType(featureOfInterestType);
         }
     }
 
@@ -175,14 +139,6 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         noNullValues("observationIdentifiers", observationIdentifiers);
         for (String observationIdentifier : observationIdentifiers) {
             addObservationIdentifier(observationIdentifier);
-        }
-    }
-
-    @Override
-    public void addProcedureDescriptionFormats(Collection<String> procedureDescriptionFormats) {
-        noNullValues("procedureDescriptionFormat", procedureDescriptionFormats);
-        for (String procedureDescriptionFormat : procedureDescriptionFormats) {
-            addProcedureDescriptionFormat(procedureDescriptionFormat);
         }
     }
 
@@ -333,13 +289,6 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void setFeatureOfInterestTypes(Collection<String> featureOfInterestTypes) {
-        log.trace("Clearing FeatureOfInterestTypes");
-        getFeatureOfInterestTypesSet().clear();
-        addFeatureOfInterestTypes(featureOfInterestTypes);
-    }
-
-    @Override
     public void setFeaturesOfInterest(Collection<String> featuresOfInterest) {
         log.trace("Clearing FeaturesOfInterest");
         getFeaturesOfInterestSet().clear();
@@ -357,13 +306,6 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         log.trace("Clearing ObservationIdentifiers");
         getObservationIdentifiersSet().clear();
         addObservationIdentifiers(observationIdentifiers);
-    }
-
-    @Override
-    public void setObservationTypes(Collection<String> observationTypes) {
-        log.trace("Clearing ObservationTypes");
-        getObservationTypesSet().clear();
-        addObservationTypes(observationTypes);
     }
 
     @Override
@@ -645,21 +587,6 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void removeFeatureOfInterestType(String featureOfInterestType) {
-        notNullOrEmpty("featureOfInterestType", featureOfInterestType);
-        log.trace("Removing featureOfInterestType {}", featureOfInterestType);
-        getFeatureOfInterestTypesSet().remove(featureOfInterestType);
-    }
-
-    @Override
-    public void removeFeatureOfInterestTypes(Collection<String> featureOfInterestTypes) {
-        noNullValues("featureOfInterestTypes", featureOfInterestTypes);
-        for (String featureOfInterestType : featureOfInterestTypes) {
-            removeFeatureOfInterestType(featureOfInterestType);
-        }
-    }
-
-    @Override
     public void removeFeaturesOfInterestForOffering(String offering) {
         notNullOrEmpty("offering", offering);
         log.trace("Removing featuresOfInterest for offering {}", offering);
@@ -770,26 +697,11 @@ public class WritableCache extends ReadableCache implements WritableContentCache
     }
 
     @Override
-    public void removeObservationType(String observationType) {
-        notNullOrEmpty("observationType", observationType);
-        log.trace("Removing observationType {}", observationType);
-        getObservationTypesSet().remove(observationType);
-    }
-
-    @Override
     public void removeObservationTypeForOffering(String offering, String observationType) {
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("observationType", observationType);
         log.trace("Removing observationType {} from offering {}", observationType, offering);
         removeElementFromMap(getObservationTypesForOfferingsMap(), offering, observationType);
-    }
-
-    @Override
-    public void removeObservationTypes(Collection<String> observationTypes) {
-        notNull("observationTypes", observationTypes);
-        for (String observationType : observationTypes) {
-            removeObservationType(observationType);
-        }
     }
 
     @Override
@@ -827,21 +739,6 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("procedure", procedure);
         log.trace("Removing offering for procedure {}", procedure);
         getOfferingsForProceduresMap().remove(procedure);
-    }
-
-    @Override
-    public void removeProcedureDescriptionFormat(String procedureDescriptionFormat) {
-        notNullOrEmpty("procedureDescriptionFormat", procedureDescriptionFormat);
-        log.trace("Removing procedureDescriptionFormat {}", procedureDescriptionFormat);
-        getProcedureDescriptionFormatsSet().remove(procedureDescriptionFormat);
-    }
-
-    @Override
-    public void removeProcedureDescriptionFormats(Collection<String> procedureDescriptionFormats) {
-        notNull("procedureDescriptionFormats", procedureDescriptionFormats);
-        for (String procedureDescriptionFormat : procedureDescriptionFormats) {
-            removeProcedureDescriptionFormat(procedureDescriptionFormat);
-        }
     }
 
     @Override

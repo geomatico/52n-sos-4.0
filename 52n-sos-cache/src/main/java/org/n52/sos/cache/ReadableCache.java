@@ -34,8 +34,11 @@ import org.n52.sos.util.CollectionHelper;
 /**
  * {@code ContentCache} implementation that offers a readable interface to the cache. All methods return unmodifiable
  * views of the cache.
+ *
+ * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0.0
  */
-public class ReadableCache extends AbstractContentCache implements ContentCache {
+public class ReadableCache extends AbstractContentCache {
     @Override
     public DateTime getMaxPhenomenonTime() {
         return getGlobalPhenomenonTimeEnvelope().getEnd();
@@ -52,11 +55,6 @@ public class ReadableCache extends AbstractContentCache implements ContentCache 
     }
 
     @Override
-    public Set<String> getFeatureOfInterestTypes() {
-        return copyOf(getFeatureOfInterestTypesSet());
-    }
-
-    @Override
     public Set<String> getFeaturesOfInterest() {
         return copyOf(getFeaturesOfInterestSet());
     }
@@ -66,15 +64,7 @@ public class ReadableCache extends AbstractContentCache implements ContentCache 
         return copyOf(getObservationIdentifiersSet());
     }
 
-    @Override
-    public Set<String> getObservationTypes() {
-        return copyOf(getObservationTypesSet());
-    }
-
-    @Override
-    public Set<String> getProcedureDescriptionFormats() {
-        return copyOf(getProcedureDescriptionFormatsSet());
-    }
+   
 
     @Override
     public Set<String> getProcedures() {

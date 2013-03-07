@@ -42,8 +42,9 @@ import com.vividsolutions.jts.geom.Envelope;
  * Abstract {@code ContentCache} implementation that encapsulates the needed {@code Map}s.
  *
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0.0
  */
-public abstract class AbstractContentCache implements ContentCache {
+public abstract class AbstractContentCache extends AbstractStaticContentCache {
     /**
      * Convenient function to check if two objects are equal (including null values).
      *
@@ -381,11 +382,8 @@ public abstract class AbstractContentCache implements ContentCache {
     private Map<String, SosEnvelope> envelopeForOfferings = synchronizedMap();
     private Map<String, String> nameForOfferings = synchronizedMap();
     private Set<Integer> epsgCodes = synchronizedSet();
-    private Set<String> featureOfInterestTypes = synchronizedSet();
     private Set<String> featuresOfInterest = synchronizedSet();
     private Set<String> observationIdentifiers = synchronizedSet();
-    private Set<String> observationTypes = synchronizedSet();
-    private Set<String> procedureDescriptionFormats = synchronizedSet();
     private Set<String> procedures = synchronizedSet();
     private Set<String> resultTemplates = synchronizedSet();
     private SosEnvelope globalEnvelope = new SosEnvelope(null, defaultEpsgCode);
@@ -596,13 +594,6 @@ public abstract class AbstractContentCache implements ContentCache {
     }
 
     /**
-     * @return the feature of interest types
-     */
-    protected Set<String> getFeatureOfInterestTypesSet() {
-        return this.featureOfInterestTypes;
-    }
-
-    /**
      * @return the features of interest
      */
     protected Set<String> getFeaturesOfInterestSet() {
@@ -614,20 +605,6 @@ public abstract class AbstractContentCache implements ContentCache {
      */
     protected Set<String> getObservationIdentifiersSet() {
         return this.observationIdentifiers;
-    }
-
-    /**
-     * @return the observation types
-     */
-    protected Set<String> getObservationTypesSet() {
-        return this.observationTypes;
-    }
-
-    /**
-     * @return the procedure description formats
-     */
-    protected Set<String> getProcedureDescriptionFormatsSet() {
-        return this.procedureDescriptionFormats;
     }
 
     /**
@@ -720,11 +697,8 @@ public abstract class AbstractContentCache implements ContentCache {
                     envelopeForOfferings,
                     nameForOfferings,
                     epsgCodes,
-                    featureOfInterestTypes,
                     featuresOfInterest,
                     observationIdentifiers,
-                    observationTypes,
-                    procedureDescriptionFormats,
                     procedures,
                     resultTemplates,
                     globalEnvelope,
@@ -828,19 +802,10 @@ public abstract class AbstractContentCache implements ContentCache {
         if (!eq(this.epsgCodes, other.epsgCodes)) {
             return false;
         }
-        if (!eq(this.featureOfInterestTypes, other.featureOfInterestTypes)) {
-            return false;
-        }
         if (!eq(this.featuresOfInterest, other.featuresOfInterest)) {
             return false;
         }
         if (!eq(this.observationIdentifiers, other.observationIdentifiers)) {
-            return false;
-        }
-        if (!eq(this.observationTypes, other.observationTypes)) {
-            return false;
-        }
-        if (!eq(this.procedureDescriptionFormats, other.procedureDescriptionFormats)) {
             return false;
         }
         if (!eq(this.procedures, other.procedures)) {

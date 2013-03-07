@@ -105,20 +105,6 @@ public interface WritableContentCache extends ContentCache {
     void addFeatureOfInterestForResultTemplate(String resultTemplate, String featureOfInterest);
 
     /**
-     * Add the specified feature of interest type.
-     *
-     * @param featureOfInterestType the feature of interest typs
-     */
-    void addFeatureOfInterestType(String featureOfInterestType);
-
-    /**
-     * Add the specified feature of interest types.
-     *
-     * @param featureOfInterestType the feature of interest types
-     */
-    void addFeatureOfInterestTypes(Collection<String> featureOfInterestType);
-
-    /**
      * Add the specified feature of interest.
      *
      * @param featureOfInterest the feature of interest
@@ -188,20 +174,6 @@ public interface WritableContentCache extends ContentCache {
     void addObservationIdentifiers(Collection<String> observationIdentifier);
 
     /**
-     * Add the specified observation type.
-     *
-     * @param observationType the observation type
-     */
-    void addObservationType(String observationType);
-
-    /**
-     * Add the specified observation types.
-     *
-     * @param observationTypes the observation types
-     */
-    void addObservationTypes(Collection<String> observationTypes);
-
-    /**
      * Associate the specified observation type with the specified offering.
      *
      * @param offering        the offering
@@ -263,20 +235,6 @@ public interface WritableContentCache extends ContentCache {
      * @param procedure the procedure
      */
     void addProcedure(String procedure);
-
-    /**
-     * Add the specified procedure description format.
-     *
-     * @param procedureDescriptionFormat the procedure description format
-     */
-    void addProcedureDescriptionFormat(String procedureDescriptionFormat);
-
-    /**
-     * Add the specified procedure description formats.
-     *
-     * @param procedureDescriptionFormats the procedure description formats
-     */
-    void addProcedureDescriptionFormats(Collection<String> procedureDescriptionFormats);
 
     /**
      * Associate the specified procedure with the specified feature of interest.
@@ -430,20 +388,6 @@ public interface WritableContentCache extends ContentCache {
     void removeFeatureOfInterestForResultTemplate(String resultTemplate, String featureOfInterest);
 
     /**
-     * Remove the specified feature of interest type.
-     *
-     * @param featureOfInterestType the feature of interest type
-     */
-    void removeFeatureOfInterestType(String featureOfInterestType);
-
-    /**
-     * Remove the specified feature of interest types.
-     *
-     * @param featureOfInterestTypes the feature of interest types
-     */
-    void removeFeatureOfInterestTypes(Collection<String> featureOfInterestTypes);
-
-    /**
      * Remove the specified features of interest.
      *
      * @param featuresOfInterest the features of interest
@@ -589,26 +533,12 @@ public interface WritableContentCache extends ContentCache {
     void removeObservationIdentifiersForProcedure(String procedure);
 
     /**
-     * Remove the specified observation type.
-     *
-     * @param observationType the observation type
-     */
-    void removeObservationType(String observationType);
-
-    /**
      * Dissociate the specified observation type with the specified offering.
      *
      * @param offering        the offering
      * @param observationType the observation type
      */
     void removeObservationTypeForOffering(String offering, String observationType);
-
-    /**
-     * Remove the specified observation types.
-     *
-     * @param observationType the observation types
-     */
-    void removeObservationTypes(Collection<String> observationType);
 
     /**
      * Dissociate all observation types with the specified offering.
@@ -653,20 +583,6 @@ public interface WritableContentCache extends ContentCache {
      * @param procedure the procedure
      */
     void removeProcedure(String procedure);
-
-    /**
-     * Remove the specified procedure description format.
-     *
-     * @param procedureDescriptionFormat the procedure description format
-     */
-    void removeProcedureDescriptionFormat(String procedureDescriptionFormat);
-
-    /**
-     * Remove the specified procedure description formats.
-     *
-     * @param procedureDescriptionFormat the procedure description format
-     */
-    void removeProcedureDescriptionFormats(Collection<String> procedureDescriptionFormat);
 
     /**
      * Dissociate the specified procedure with the specified feature of interest.
@@ -875,13 +791,6 @@ public interface WritableContentCache extends ContentCache {
     void setFeatureHierarchy(String featureOfInterest, Collection<String> parentFeatures);
 
     /**
-     * Sets the feature of interest typs.
-     *
-     * @param featureOfInterestTypes the feature of interest types
-     */
-    void setFeatureOfInterestTypes(Collection<String> featureOfInterestTypes);
-
-    /**
      * Sets the features of interest.
      *
      * @param featuresOfInterest the features of interest
@@ -1046,13 +955,6 @@ public interface WritableContentCache extends ContentCache {
      * @param observationIdentifiers the observation identifiers
      */
     void setObservationIdentifiersForProcedure(String procedure, Collection<String> observationIdentifiers);
-
-    /**
-     * Sets the observation types.
-     *
-     * @param observationTypes the observation types
-     */
-    void setObservationTypes(Collection<String> observationTypes);
 
     /**
      * Sets the observation types for the specified offering.

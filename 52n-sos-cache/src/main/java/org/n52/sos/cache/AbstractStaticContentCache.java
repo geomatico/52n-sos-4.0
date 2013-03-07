@@ -21,21 +21,36 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ds.hibernate.cache.base;
+package org.n52.sos.cache;
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.getFeatureOfInterestTypes;
+import java.util.Set;
 
-import org.n52.sos.ds.hibernate.cache.CacheUpdate;
+import org.n52.sos.service.Configurator;
 
 /**
+ * Readable content cache that gets static information from the configurator (or its delegates).
  *
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0.0
  */
-public class FeatureOfInterestTypeCacheUpdate extends CacheUpdate {
+public abstract class AbstractStaticContentCache implements ContentCache {
+    @Override
+    public Set<String> getObservationTypes() {
+        return Configurator.getInstance().getCodingRepository().getObservationTypes();
+    }
 
     @Override
-    public void execute() {
-        getCache().setFeatureOfInterestTypes(getFeatureOfInterestTypes(getSession()));
+    public Set<String> getProcedureDescriptionFormats() {
+        return Configurator.getInstance().getCodingRepository().getProcedureDescriptionFormats();
     }
-    
+
+    @Override
+    public Set<String> getSweTypes() {
+        return Configurator.getInstance().getCodingRepository().getSweTypes();
+    }
+
+    @Override
+    public Set<String> getFeatureOfInterestTypes() {
+        return Configurator.getInstance().getCodingRepository().getFeatureOfInterestTypes();
+    }
 }

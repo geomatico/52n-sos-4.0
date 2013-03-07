@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0.0
  */
 public class ContentModificationListener implements SosEventListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentModificationListener.class);

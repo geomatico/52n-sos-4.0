@@ -32,8 +32,6 @@ import org.n52.sos.ds.hibernate.cache.CompositeCacheUpdate;
 public class StaticCapabilitiesCacheUpdate extends CompositeCacheUpdate {
 
     public StaticCapabilitiesCacheUpdate() {
-        super(new SridCacheUpdate(), 
-              new ObservationTypeCacheUpdate(), 
-              new FeatureOfInterestTypeCacheUpdate());
+        super(new SridCacheUpdate());
     }
 }

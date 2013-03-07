@@ -24,13 +24,12 @@
 package org.n52.sos.ds.hibernate.cache;
 
 import org.n52.sos.ds.hibernate.cache.base.CompositePhenomenonCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.ObservationTimeCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.FeatureOfInterestCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.ObservablePropertiesCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.ObservationIdentifiersCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.ObservationTimeCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.OfferingCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.ProcedureCacheUpdate;
-import org.n52.sos.ds.hibernate.cache.base.ProcedureDescriptionFormatCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.RelatedFeaturesCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.ResultTemplateCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.StaticCapabilitiesCacheUpdate;
@@ -63,7 +62,6 @@ public class InitialCacheUpdate extends CompositeCacheUpdate {
               new StaticCapabilitiesCacheUpdate(),
               new ObservationIdentifiersCacheUpdate(),
               new ResultTemplateCacheUpdate(),
-              new ObservationTimeCacheUpdate(),
-              new ProcedureDescriptionFormatCacheUpdate());
+              new ObservationTimeCacheUpdate());
     }
 }
