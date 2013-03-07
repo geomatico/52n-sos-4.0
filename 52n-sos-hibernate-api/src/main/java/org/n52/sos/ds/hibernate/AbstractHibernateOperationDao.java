@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
  * @since 4.0.0
  *
  */
+@Deprecated
 public abstract class AbstractHibernateOperationDao implements IOperationDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractHibernateOperationDao.class);
