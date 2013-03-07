@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ds.IGetObservationDAO;
+import org.n52.sos.ds.AbstractGetObservationDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.encode.IObservationEncoder;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
@@ -64,7 +64,7 @@ import org.slf4j.LoggerFactory;
  * Database, class encodes the ObservationResponse (thru using the IOMEncoder)
  * 
  */
-public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<IGetObservationDAO, GetObservationRequest> {
+public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<AbstractGetObservationDAO, GetObservationRequest> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SosGetObservationOperatorV20.class.getName());
 
