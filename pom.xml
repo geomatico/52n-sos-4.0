@@ -35,6 +35,7 @@
 		<module>52n-sos-hibernate-core</module>
 		<module>52n-sos-cache</module>
 		<module>52n-sos-core-v20</module>
+		<module>52n-sos-core-gc-dao</module>
 		<module>52n-sos-coding-ows-v110</module>
 		<module>52n-sos-coding-sensorML-v101</module>
 		<module>52n-sos-coding-sos-v20</module>
@@ -121,6 +122,11 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>52n-sos-core-v20</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>52n-sos-core-gc-dao</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
