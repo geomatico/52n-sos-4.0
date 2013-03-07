@@ -30,15 +30,8 @@ import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.response.InsertResultTemplateResponse;
 
 public abstract class AbstractInsertResultTemplateDAO extends AbstractOperationDAO {
-    
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = Sos2Constants.Operations.InsertResultTemplate.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
+    public AbstractInsertResultTemplateDAO() {
+        super(Sos2Constants.Operations.InsertResultTemplate.name());
     }
 
     @Override

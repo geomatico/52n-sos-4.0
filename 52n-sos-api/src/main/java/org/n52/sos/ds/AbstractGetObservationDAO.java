@@ -57,15 +57,9 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractGetObservationDAO.class);
-    
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = SosConstants.Operations.GetObservation.name();
 
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
+    public AbstractGetObservationDAO() {
+        super(SosConstants.Operations.GetObservation.name());
     }
 
     @Override

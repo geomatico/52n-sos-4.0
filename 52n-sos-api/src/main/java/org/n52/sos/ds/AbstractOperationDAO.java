@@ -42,6 +42,16 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractOperationDAO implements IOperationDAO {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOperationDAO.class);
+    private final String operationName;
+
+    public AbstractOperationDAO(String operationName) {
+        this.operationName = operationName;
+    }
+
+    @Override
+    public String getOperationName() {
+        return this.operationName;
+    }
 
     @Override
     public OWSOperation getOperationsMetadata(String service, String version) throws OwsExceptionReport {

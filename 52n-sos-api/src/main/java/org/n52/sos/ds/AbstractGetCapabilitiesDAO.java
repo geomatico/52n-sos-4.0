@@ -41,12 +41,8 @@ import org.n52.sos.response.GetCapabilitiesResponse;
  * the data source
  */
 public abstract class AbstractGetCapabilitiesDAO extends AbstractOperationDAO {
-    
-    private static final String OPERATION_NAME = SosConstants.Operations.GetCapabilities.name();
-    
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
+    public AbstractGetCapabilitiesDAO() {
+        super(SosConstants.Operations.GetCapabilities.name());
     }
 
     @Override

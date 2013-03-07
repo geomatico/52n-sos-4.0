@@ -34,17 +34,10 @@ import org.n52.sos.response.GetResultTemplateResponse;
 
 
 public abstract class AbstractGetResultTemplateDAO extends AbstractOperationDAO {
-    
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = Sos2Constants.Operations.GetResultTemplate.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
+    public AbstractGetResultTemplateDAO() {
+        super(Sos2Constants.Operations.GetResultTemplate.name());
     }
-    
+
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
             throws OwsExceptionReport {

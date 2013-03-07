@@ -30,16 +30,10 @@ import org.n52.sos.request.InsertResultRequest;
 import org.n52.sos.response.InsertResultResponse;
 
 public abstract class AbstractInsertResultDAO extends AbstractOperationDAO {
-    
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = Sos2Constants.Operations.InsertResult.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
+    public AbstractInsertResultDAO() {
+        super(Sos2Constants.Operations.InsertResult.name());
     }
+
     
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {

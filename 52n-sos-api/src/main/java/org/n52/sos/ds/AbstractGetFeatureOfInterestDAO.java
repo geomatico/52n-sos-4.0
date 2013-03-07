@@ -36,15 +36,8 @@ import org.n52.sos.response.GetFeatureOfInterestResponse;
 import org.n52.sos.util.SosHelper;
 
 public abstract class AbstractGetFeatureOfInterestDAO extends AbstractOperationDAO {
-    
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = SosConstants.Operations.GetFeatureOfInterest.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
+    public AbstractGetFeatureOfInterestDAO() {
+        super(SosConstants.Operations.GetFeatureOfInterest.name());
     }
 
     @Override

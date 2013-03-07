@@ -31,17 +31,10 @@ import org.n52.sos.request.GetObservationByIdRequest;
 import org.n52.sos.response.GetObservationByIdResponse;
 
 public abstract class AbstractGetObservationByIdDAO extends AbstractOperationDAO {
-
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = SosConstants.Operations.GetObservationById.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
+    public AbstractGetObservationByIdDAO() {
+        super(SosConstants.Operations.GetObservationById.name());
     }
-    
+
     @Override
     public void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
         opsMeta.addPossibleValuesParameter(Sos2Constants.GetObservationByIdParams.observation, getCache().getObservationIdentifiers());

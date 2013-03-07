@@ -33,14 +33,8 @@ import org.n52.sos.response.InsertObservationResponse;
 
 public abstract class AbstractInsertObservationDAO extends AbstractOperationDAO {
 
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = SosConstants.Operations.InsertObservation.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
+    public AbstractInsertObservationDAO() {
+        super(SosConstants.Operations.InsertObservation.name());
     }
 
     @Override

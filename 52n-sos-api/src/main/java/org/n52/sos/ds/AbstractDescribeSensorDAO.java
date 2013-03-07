@@ -38,20 +38,8 @@ import org.n52.sos.response.DescribeSensorResponse;
  * 
  */
 public abstract class AbstractDescribeSensorDAO extends AbstractOperationDAO {
-    
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = SosConstants.Operations.DescribeSensor.name();
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.ds.ISosOperationDAO#getOperationName()
-     */
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
+    public AbstractDescribeSensorDAO() {
+        super(SosConstants.Operations.DescribeSensor.name());
     }
 
     @Override

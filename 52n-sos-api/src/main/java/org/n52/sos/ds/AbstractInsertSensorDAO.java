@@ -32,14 +32,8 @@ import org.n52.sos.response.InsertSensorResponse;
 
 public abstract class AbstractInsertSensorDAO extends AbstractOperationDAO {
 
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = Sos2Constants.Operations.InsertSensor.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
+    public AbstractInsertSensorDAO() {
+        super(Sos2Constants.Operations.InsertSensor.name());
     }
 
     @Override

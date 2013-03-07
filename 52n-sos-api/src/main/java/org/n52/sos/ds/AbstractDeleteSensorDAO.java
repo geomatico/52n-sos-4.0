@@ -31,13 +31,10 @@ import org.n52.sos.response.DeleteSensorResponse;
 
 public abstract class AbstractDeleteSensorDAO extends AbstractOperationDAO {
 
-    private static final String OPERATION_NAME = Sos2Constants.Operations.DeleteSensor.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
+    public AbstractDeleteSensorDAO() {
+        super(Sos2Constants.Operations.DeleteSensor.name());
     }
-    
+
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
         opsMeta.addPossibleValuesParameter(Sos2Constants.DeleteSensorParams.procedure, getCache().getProcedures());

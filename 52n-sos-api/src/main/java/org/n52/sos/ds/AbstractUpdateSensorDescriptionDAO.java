@@ -31,16 +31,10 @@ import org.n52.sos.response.UpdateSensorResponse;
 
 public abstract class AbstractUpdateSensorDescriptionDAO extends AbstractOperationDAO {
 
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = Sos2Constants.Operations.UpdateSensorDescription.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
+    public AbstractUpdateSensorDescriptionDAO() {
+        super(Sos2Constants.Operations.UpdateSensorDescription.name());
     }
-    
+
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
         opsMeta.addPossibleValuesParameter(Sos2Constants.UpdateSensorDescriptionParams.procedure, getCache().getProcedures());

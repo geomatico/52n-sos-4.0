@@ -37,17 +37,10 @@ import org.n52.sos.request.GetResultRequest;
 import org.n52.sos.response.GetResultResponse;
 
 public abstract class AbstractGetResultDAO extends AbstractOperationDAO {
-
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = SosConstants.Operations.GetResult.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
+    public AbstractGetResultDAO() {
+        super(SosConstants.Operations.GetResult.name());
     }
-    
+
     @Override
     protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
             throws OwsExceptionReport {
