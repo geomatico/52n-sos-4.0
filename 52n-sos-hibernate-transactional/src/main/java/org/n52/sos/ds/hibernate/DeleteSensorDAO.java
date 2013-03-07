@@ -24,7 +24,8 @@
 package org.n52.sos.ds.hibernate;
 
 
-import static org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities.*;
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities.setDeleteSensorFlag;
+import static org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities.setValidProcedureDescriptionEndTime;
 import static org.n52.sos.util.Util4Exceptions.createNoApplicableCodeException;
 
 import org.hibernate.HibernateException;
