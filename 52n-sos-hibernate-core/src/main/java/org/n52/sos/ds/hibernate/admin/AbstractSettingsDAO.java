@@ -37,8 +37,8 @@ import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AbstractSettingsDAO_OLD implements IInitializableDAO {
-    protected static final Logger log = LoggerFactory.getLogger(AbstractSettingsDAO_OLD.class);
+public class AbstractSettingsDAO implements IInitializableDAO {
+    protected static final Logger log = LoggerFactory.getLogger(AbstractSettingsDAO.class);
     protected static final String KEY = HibernateConstants.PARAMETER_SETTING_KEY;
     protected static final String VALUE = HibernateConstants.PARAMETER_SETTING_VALUE;
     private String driver;

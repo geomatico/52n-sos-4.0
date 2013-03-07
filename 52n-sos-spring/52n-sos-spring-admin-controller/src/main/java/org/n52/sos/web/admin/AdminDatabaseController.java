@@ -33,7 +33,7 @@ import java.util.ServiceLoader;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.ds.IGeneralQueryDAO_OLD;
+import org.n52.sos.ds.IGeneralQueryDAO;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.ControllerConstants;
@@ -53,7 +53,7 @@ public class AdminDatabaseController extends AbstractAdminController {
     private static final String ROWS = "rows";
     private static final String NAMES = "names";
     private static final String IS_TEST_DATA_SET_INSTALLED_MODEL_ATTRIBUTE = "IS_TEST_DATA_SET_INSTALLED_MODEL_ATTRIBUTE";
-    private ServiceLoader<IGeneralQueryDAO_OLD> daoServiceLoader = ServiceLoader.load(IGeneralQueryDAO_OLD.class);
+    private ServiceLoader<IGeneralQueryDAO> daoServiceLoader = ServiceLoader.load(IGeneralQueryDAO.class);
 
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE)
     public ModelAndView index() throws SQLException {
@@ -78,8 +78,8 @@ public class AdminDatabaseController extends AbstractAdminController {
         try {
             String q = URLDecoder.decode(querySQL, "UTF-8");
             log.info("Query: {}", q);
-            IGeneralQueryDAO_OLD dao = daoServiceLoader.iterator().next();
-            IGeneralQueryDAO_OLD.QueryResult rs = dao.query(q);
+            IGeneralQueryDAO dao = daoServiceLoader.iterator().next();
+            IGeneralQueryDAO.QueryResult rs = dao.query(q);
 
             JSONObject j = new JSONObject();
             if (rs.getMessage() != null) {
@@ -89,7 +89,7 @@ public class AdminDatabaseController extends AbstractAdminController {
 
             JSONArray names = new JSONArray(rs.getColumnNames());
             JSONArray rows = new JSONArray();
-            for (IGeneralQueryDAO_OLD.Row row : rs.getRows()) {
+            for (IGeneralQueryDAO.Row row : rs.getRows()) {
                 rows.put(new JSONArray(row.getValues()));
             }
 
