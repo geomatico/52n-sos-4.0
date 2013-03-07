@@ -33,6 +33,7 @@ import org.n52.sos.config.SettingType;
  */
 @Entity(name = "numeric_settings")
 public class NumericSettingValue extends AbstractSettingValue<Double> {
+    private static final long serialVersionUID = 1L;
 
     private Double value;
     

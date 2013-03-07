@@ -32,6 +32,7 @@ import org.n52.sos.config.SettingType;
  */
 @Entity(name = "string_settings")
 public class StringSettingValue extends AbstractSettingValue<String>{
+    private static final long serialVersionUID = 1L;
 
     private String value;
     

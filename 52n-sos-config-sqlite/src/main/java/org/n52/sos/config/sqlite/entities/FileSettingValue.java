@@ -36,6 +36,7 @@ import org.n52.sos.config.SettingType;
  */
 @Entity(name = "file_settings")
 public class FileSettingValue extends AbstractSettingValue<File> {
+    private static final long serialVersionUID = 1L;
 
     private File value;
     

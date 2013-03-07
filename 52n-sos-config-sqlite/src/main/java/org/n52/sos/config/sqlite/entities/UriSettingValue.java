@@ -27,14 +27,15 @@ import java.net.URI;
 
 import javax.persistence.Entity;
 
-import org.n52.sos.config.SettingValue;
 import org.n52.sos.config.SettingType;
+import org.n52.sos.config.SettingValue;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
 @Entity(name = "uri_settings")
 public class UriSettingValue extends AbstractSettingValue<URI> {
+    private static final long serialVersionUID = 1L;
 
     private URI value;
     

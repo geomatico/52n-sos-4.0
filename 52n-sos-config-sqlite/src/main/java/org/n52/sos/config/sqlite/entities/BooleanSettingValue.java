@@ -29,6 +29,7 @@ import org.n52.sos.config.SettingType;
 
 @Entity(name = "boolean_settings")
 public class BooleanSettingValue extends AbstractSettingValue<Boolean> {
+    private static final long serialVersionUID = 1L;
 
     private Boolean value;
 
