@@ -1008,5 +1008,12 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>do</id>
+            <!--  Requires svn:externals definition for 52n-sos-ext-do -->
+            <modules>
+                <module>52n-sos-ext-do</module>
+            </modules>
+        </profile>
     </profiles>
 </project>
