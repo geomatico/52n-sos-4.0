@@ -43,7 +43,7 @@ import org.n52.sos.ds.hibernate.cache.ResultTemplateInsertionCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.SensorDeletionCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.SensorInsertionCacheUpdate;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.util.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

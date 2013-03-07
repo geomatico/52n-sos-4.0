@@ -40,7 +40,6 @@ import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.SettingsChangeEvent;
-import org.n52.sos.service.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -35,37 +35,6 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractLoggingConfigurator {
     protected static final Logger log = LoggerFactory.getLogger(AbstractLoggingConfigurator.class);
-
-    public static enum Level {
-        TRACE, DEBUG, INFO, WARN, ERROR;
-        
-        public static Level[] getValues() {
-            return values();
-        }
-    }
-
-    public enum Appender {
-        FILE("FILE"), CONSOLE("STDOUT");
-        
-        public final String name;
-
-        private Appender(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return this.name;
-        }
-        
-        public static Appender byName(String name) {
-            for (Appender a : values()) {
-                if (a.name.equals(name)) {
-                    return a;
-                }
-            }
-            return null;
-        }
-    }
     
     private static AbstractLoggingConfigurator instance = null;;
     
@@ -112,4 +81,39 @@ public abstract class AbstractLoggingConfigurator {
     public abstract String getMaxFileSize();
     
     public abstract boolean setMaxFileSize(String maxFileSize);
+
+    public static enum Level {
+        TRACE,
+        DEBUG,
+        INFO,
+        WARN,
+        ERROR;
+
+        public static Level[] getValues() {
+            return values();
+        }
+    }
+
+    public enum Appender {
+        FILE("FILE"),
+        CONSOLE("STDOUT");
+        public final String name;
+
+        private Appender(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public static Appender byName(String name) {
+            for (Appender a : values()) {
+                if (a.name.equals(name)) {
+                    return a;
+                }
+            }
+            return null;
+        }
+    }
 }

@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
 
 /**

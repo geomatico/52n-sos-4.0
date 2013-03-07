@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.n52.sos.ds.hibernate.util.DefaultHibernateConstants;
-import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;

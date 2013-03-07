@@ -23,6 +23,7 @@
  */
 package org.n52.sos.service;
 
+import org.n52.sos.config.ConfigurationException;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.util.Enumeration;

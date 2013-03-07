@@ -25,7 +25,7 @@ package org.n52.sos.web.admin;
 
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;

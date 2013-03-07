@@ -36,7 +36,7 @@ import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.JTSHelperTest;
 import org.n52.sos.util.builder.SamplingFeatureBuilder;

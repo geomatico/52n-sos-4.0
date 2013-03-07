@@ -36,7 +36,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 
-import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.JdbcUrl;
 import org.n52.sos.web.MetaDataHandler;

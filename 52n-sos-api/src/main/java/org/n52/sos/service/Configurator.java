@@ -23,6 +23,7 @@
  */
 package org.n52.sos.service;
 
+import org.n52.sos.config.ConfigurationException;
 import static org.n52.sos.service.MiscSettings.*;
 import static org.n52.sos.service.ServiceSettings.*;
 

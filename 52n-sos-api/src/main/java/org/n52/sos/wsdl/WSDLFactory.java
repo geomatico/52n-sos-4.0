@@ -35,7 +35,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.operator.IRequestOperator;
 import org.n52.sos.request.operator.IWSDLAwareRequestOperator;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
-import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.IFactory;
 

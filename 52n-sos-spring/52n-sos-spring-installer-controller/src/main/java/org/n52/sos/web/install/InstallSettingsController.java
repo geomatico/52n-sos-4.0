@@ -30,7 +30,7 @@ import java.util.Map.Entry;
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingValue;
 import org.n52.sos.config.SettingsManager;
-import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.install.InstallConstants.Step;
 import org.springframework.stereotype.Controller;

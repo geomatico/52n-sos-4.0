@@ -28,7 +28,7 @@ package org.n52.sos.web.admin;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.MetaDataHandler;

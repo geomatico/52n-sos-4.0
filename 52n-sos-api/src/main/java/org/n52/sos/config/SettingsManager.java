@@ -34,7 +34,6 @@ import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
-import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
 import org.n52.sos.util.ConfiguringSingletonServiceLoader;

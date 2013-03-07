@@ -23,6 +23,7 @@
  */
 package org.n52.sos.service;
 
+import org.n52.sos.config.ConfigurationException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

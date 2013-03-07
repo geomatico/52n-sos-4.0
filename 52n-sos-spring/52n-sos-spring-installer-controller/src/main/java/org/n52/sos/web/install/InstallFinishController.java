@@ -42,7 +42,7 @@ import org.n52.sos.config.SettingValue;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.hibernate.util.DefaultHibernateConstants;
-import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.JdbcUrl;

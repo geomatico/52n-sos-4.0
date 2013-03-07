@@ -34,7 +34,7 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.service.profile.DefaultProfile;
 import org.n52.sos.service.profile.IProfile;
 import org.n52.sos.service.profile.IProfileHandler;

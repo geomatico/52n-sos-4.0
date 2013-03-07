@@ -32,7 +32,7 @@ import java.io.OutputStream;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.config.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

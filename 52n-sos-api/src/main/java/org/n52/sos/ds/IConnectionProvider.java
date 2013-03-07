@@ -25,7 +25,7 @@ package org.n52.sos.ds;
 
 import java.util.Properties;
 
-import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.util.Cleanupable;
 
 /**

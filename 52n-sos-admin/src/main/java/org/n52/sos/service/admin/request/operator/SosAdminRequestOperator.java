@@ -45,7 +45,7 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.ConfigurationException;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.admin.AdministratorConstants.AdministratorParams;
 import org.n52.sos.service.admin.request.AdminRequest;
