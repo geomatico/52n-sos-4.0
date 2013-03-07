@@ -25,6 +25,6 @@ package org.n52.sos.ds;
 
 import java.util.Properties;
 
-public interface IInitializableDao {
+public interface IInitializableDAO {
 	void initialize(Properties properties);
 }

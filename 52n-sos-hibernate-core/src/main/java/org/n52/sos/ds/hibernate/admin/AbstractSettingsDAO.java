@@ -30,15 +30,15 @@ import java.util.Properties;
 
 import org.hibernate.Session;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.ds.IInitializableDao;
+import org.n52.sos.ds.IInitializableDAO;
 import org.n52.sos.ds.hibernate.util.DefaultHibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AbstractSettingsDao implements IInitializableDao {
-	protected static final Logger log = LoggerFactory.getLogger(AbstractSettingsDao.class);
+public class AbstractSettingsDAO implements IInitializableDAO {
+	protected static final Logger log = LoggerFactory.getLogger(AbstractSettingsDAO.class);
 	protected static final String KEY = HibernateConstants.PARAMETER_SETTING_KEY;
 	protected static final String VALUE = HibernateConstants.PARAMETER_SETTING_VALUE;
 	

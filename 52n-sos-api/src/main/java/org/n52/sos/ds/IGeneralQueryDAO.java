@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public interface IGeneralQueryDao extends IInitializableDao {
+public interface IGeneralQueryDAO extends IInitializableDAO {
 
     public static class QueryResult {
 
