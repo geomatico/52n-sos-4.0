@@ -48,6 +48,7 @@ import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Deprecated
 public class DataSourceInitializator implements IDataSourceInitializator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSourceInitializator.class);

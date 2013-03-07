@@ -43,6 +43,7 @@ import org.n52.sos.ds.IFeatureQueryHandler;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
+import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
@@ -323,8 +324,8 @@ public class DBFeatureQueryHandler implements IFeatureQueryHandler {
                 feature.setDescriptionXml(samplingFeature.getXmlDescription());
             }
             if (samplingFeature.isSetFeatureType()) {
-                feature.setFeatureOfInterestType(HibernateCriteriaQueryUtilities
-                        .getFeatureOfInterestTypeObject(samplingFeature.getFeatureType(), session));
+                feature.setFeatureOfInterestType(HibernateCriteriaTransactionalUtilities
+                        .getOrInsertFeatureOfInterestType(samplingFeature.getFeatureType(), session));
             }
             if (samplingFeature.isSetSampledFeatures()) {
                 // TODO: create relationship

@@ -23,7 +23,11 @@
  */
 package org.n52.sos.ogc.swe;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+
+import org.n52.sos.util.CollectionHelper;
 
 /**
  * SOS internal representation of SOS insertion metadata
@@ -34,12 +38,12 @@ public class SosMetadata {
     /**
      * list of valid feature types
      */
-    private List<String> featureOfInterestTypes;
+    private Set<String> featureOfInterestTypes;
 
     /**
      * list of valid observation types
      */
-    private List<String> observationTypes;
+    private Set<String> observationTypes;
 
     /**
      * constructor
@@ -51,7 +55,7 @@ public class SosMetadata {
     /**
      * @return the featureOfInterestTypes
      */
-    public List<String> getFeatureOfInterestTypes() {
+    public Set<String> getFeatureOfInterestTypes() {
         return featureOfInterestTypes;
     }
 
@@ -59,14 +63,14 @@ public class SosMetadata {
      * @param featureOfInterestTypes
      *            the featureOfInterestTypes to set
      */
-    public void setFeatureOfInterestTypes(List<String> featureOfInterestTypes) {
-        this.featureOfInterestTypes = featureOfInterestTypes;
+    public void setFeatureOfInterestTypes(Collection<String> featureOfInterestTypes) {
+        this.featureOfInterestTypes = CollectionHelper.asSet(featureOfInterestTypes);
     }
 
     /**
      * @return the observationTypes
      */
-    public List<String> getObservationTypes() {
+    public Set<String> getObservationTypes() {
         return observationTypes;
     }
 
@@ -74,7 +78,7 @@ public class SosMetadata {
      * @param observationTypes
      *            the observationTypes to set
      */
-    public void setObservationTypes(List<String> observationTypes) {
-        this.observationTypes = observationTypes;
+    public void setObservationTypes(Collection<String> observationTypes) {
+        this.observationTypes = CollectionHelper.asSet(observationTypes);
     }
 }

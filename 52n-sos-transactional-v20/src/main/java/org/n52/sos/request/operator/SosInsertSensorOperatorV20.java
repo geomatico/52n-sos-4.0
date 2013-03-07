@@ -193,7 +193,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
         }
     }
 
-    private void checkFeatureOfInterestTypes(List<String> featureOfInterestTypes) throws OwsExceptionReport {
+    private void checkFeatureOfInterestTypes(Set<String> featureOfInterestTypes) throws OwsExceptionReport {
         if (featureOfInterestTypes != null) {
             List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             Collection<String> validFeatureOfInterestTypes =
@@ -220,7 +220,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
         }
     }
 
-    private void checkObservationTypes(List<String> observationTypes) throws OwsExceptionReport {
+    private void checkObservationTypes(Set<String> observationTypes) throws OwsExceptionReport {
         if (observationTypes != null) {
             List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             for (String observationType : observationTypes) {

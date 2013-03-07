@@ -650,7 +650,7 @@ public class Configurator implements Cleanupable {
         bindingRepository = new BindingRepository();
         initializeAdminServiceOperator();
         adminRequestOperatorRepository = new AdminRequestOperatorRepository();
-        initializeDataSource();
+//        initializeDataSource();
         initializeContentCacheController();
         tasking = new Tasking();
         initializeProfileHandler();
@@ -715,6 +715,7 @@ public class Configurator implements Cleanupable {
         }
     }
 
+    @Deprecated
     private void initializeDataSource() throws ConfigurationException {
         dataSourceInitializator = new ConfiguringSingletonServiceLoader<IDataSourceInitializator>(
                 IDataSourceInitializator.class, true).get();

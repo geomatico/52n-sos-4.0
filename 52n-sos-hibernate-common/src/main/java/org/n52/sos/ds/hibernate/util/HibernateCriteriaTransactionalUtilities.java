@@ -159,8 +159,7 @@ public class HibernateCriteriaTransactionalUtilities {
             List<RelatedFeatureRole> roles, Session session) throws OwsExceptionReport {
         // TODO: create featureOfInterest and link to relatedFeature
         List<RelatedFeature> relFeats =
-                             HibernateCriteriaQueryUtilities
-                .getRelatedFeatures(feature.getIdentifier().getValue(), session);
+                HibernateCriteriaQueryUtilities.getRelatedFeatures(feature.getIdentifier().getValue(), session);
         if (relFeats == null) {
             relFeats = new LinkedList<RelatedFeature>();
         }
@@ -319,7 +318,7 @@ public class HibernateCriteriaTransactionalUtilities {
         }
         return feature;
     }
-    
+
     public static BlobValue getOrInsertBlobValue(Object value, Session session) {
         BlobValue blobValue = HibernateCriteriaQueryUtilities.getBlobValue(value, session);
         if (blobValue == null) {
@@ -399,44 +398,87 @@ public class HibernateCriteriaTransactionalUtilities {
         return textValue;
     }
 
+    /**
+     * Use {@link #getOrInsertFeatureOfInterestTypes(Set, Session)} or {@link #getOrInsertFeatureOfInterestType(String, Session)}
+     */
+    @Deprecated
     public static void insertFeatureOfInterestTypes(Set<String> featureTypes, Session session) {
         for (String featureType : featureTypes) {
-            FeatureOfInterestType featureOfInterestType =
-                    HibernateCriteriaQueryUtilities.getFeatureOfInterestTypeObject(featureType, session);
-            if (featureOfInterestType == null) {
-                featureOfInterestType = new FeatureOfInterestType();
-                featureOfInterestType.setFeatureOfInterestType(featureType);
-                session.save(featureOfInterestType);
-            }
+            getOrInsertFeatureOfInterestType(featureType, session);
         }
-        session.flush();
     }
 
+    public static List<FeatureOfInterestType> getOrInsertFeatureOfInterestTypes(Set<String> featureOfInterestTypes,
+            Session session) {
+        List<FeatureOfInterestType> featureTypes = new LinkedList<FeatureOfInterestType>();
+        for (String featureType : featureOfInterestTypes) {
+            featureTypes.add(getOrInsertFeatureOfInterestType(featureType, session));
+        }
+        return featureTypes;
+    }
+
+    public static FeatureOfInterestType getOrInsertFeatureOfInterestType(String featureType, Session session) {
+        FeatureOfInterestType featureOfInterestType =
+                HibernateCriteriaQueryUtilities.getFeatureOfInterestTypeObject(featureType, session);
+        if (featureOfInterestType == null) {
+            featureOfInterestType = new FeatureOfInterestType();
+            featureOfInterestType.setFeatureOfInterestType(featureType);
+            session.save(featureOfInterestType);
+            session.flush();
+        }
+        return featureOfInterestType;
+    }
+
+    /**
+     * Use {@link #getOrInsertObservationType(String, Session)} or {@link #getOrInsertObservationTypes(Set, Session)}
+     */
+    @Deprecated
     public static void insertObservationTypes(Set<String> obsTypes, Session session) {
         for (String obsType : obsTypes) {
-            ObservationType observationType =
-                    HibernateCriteriaQueryUtilities.getObservationTypeObject(obsType, session);
-            if (observationType == null) {
-                observationType = new ObservationType();
-                observationType.setObservationType(obsType);
-                session.save(observationType);
-            }
+            getOrInsertObservationType(obsType, session);
         }
-        session.flush();
     }
 
+    public static ObservationType getOrInsertObservationType(String obsType, Session session) {
+        ObservationType observationType = HibernateCriteriaQueryUtilities.getObservationTypeObject(obsType, session);
+        if (observationType == null) {
+            observationType = new ObservationType();
+            observationType.setObservationType(obsType);
+            session.save(observationType);
+            session.flush();
+        }
+        return observationType;
+    }
+
+    public static List<ObservationType> getOrInsertObservationTypes(Set<String> observationTypes, Session session) {
+        List<ObservationType> obsTypes = new LinkedList<ObservationType>();
+        for (String observationType : observationTypes) {
+            obsTypes.add(getOrInsertObservationType(observationType, session));
+        }
+        return obsTypes;
+    }
+
+    /**
+     * Use {@link #getOrInsertProcedureDescriptionFormat(String, Session)}.
+     */
+    @Deprecated
     public static void insertProcedureDescriptionsFormats(Set<String> procDescFormats, Session session) {
         for (String procDescFormat : procDescFormats) {
-            ProcedureDescriptionFormat procedureDescriptionFormat =
-                    HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatObject(procDescFormat, session);
-            if (procedureDescriptionFormat == null) {
-                procedureDescriptionFormat = new ProcedureDescriptionFormat();
-                procedureDescriptionFormat.setProcedureDescriptionFormat(procDescFormat);
-                session.save(procedureDescriptionFormat);
-
-            }
+            getOrInsertProcedureDescriptionFormat(procDescFormat, session);
         }
-        session.flush();
+    }
+
+    public static ProcedureDescriptionFormat getOrInsertProcedureDescriptionFormat(String procDescFormat,
+            Session session) {
+        ProcedureDescriptionFormat procedureDescriptionFormat =
+                HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatObject(procDescFormat, session);
+        if (procedureDescriptionFormat == null) {
+            procedureDescriptionFormat = new ProcedureDescriptionFormat();
+            procedureDescriptionFormat.setProcedureDescriptionFormat(procDescFormat);
+            session.save(procedureDescriptionFormat);
+            session.flush();
+        }
+        return procedureDescriptionFormat;
     }
 
     public static void insertFeatureOfInterestRelationShip(FeatureOfInterest parentFeature,
@@ -527,7 +569,7 @@ public class HibernateCriteriaTransactionalUtilities {
             Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes,
             FeatureOfInterest feature, SosObservation sosObservation, String setId, Session session) {
         SosSingleObservationValue<?> value = (SosSingleObservationValue) sosObservation.getValue();
-        Observation hObservation =  HibernateUtilities.createObservationFromValue(value.getValue(), session);
+        Observation hObservation = HibernateUtilities.createObservationFromValue(value.getValue(), session);
         hObservation.setDeleted(false);
         if (sosObservation.isSetIdentifier()) {
             hObservation.setIdentifier(sosObservation.getIdentifier().getValue());
@@ -538,8 +580,8 @@ public class HibernateCriteriaTransactionalUtilities {
         Iterator<ObservationConstellationOfferingObservationType> iterator =
                 observationConstellationOfferingObservationTypes.iterator();
         while (iterator.hasNext()) {
-            ObservationConstellationOfferingObservationType observationConstellationOfferingObservationType = iterator
-                    .next();
+            ObservationConstellationOfferingObservationType observationConstellationOfferingObservationType =
+                    iterator.next();
             hObservation.setObservationConstellation(observationConstellationOfferingObservationType
                     .getObservationConstellation());
             break;
@@ -547,13 +589,14 @@ public class HibernateCriteriaTransactionalUtilities {
         hObservation.setFeatureOfInterest(feature);
         HibernateUtilities.addPhenomeonTimeAndResultTimeToObservation(hObservation,
                 sosObservation.getPhenomenonTime(), sosObservation.getResultTime());
-       
+
         if (value.getValue().getUnit() != null) {
             hObservation.setUnit(HibernateCriteriaTransactionalUtilities.getOrInsertUnit(value.getValue().getUnit(),
                     session));
         }
-        
-        // TODO if this observation is a deleted=true, how to set deleted=false instead of insert
+
+        // TODO if this observation is a deleted=true, how to set deleted=false
+        // instead of insert
         hObservation
                 .setObservationConstellationOfferingObservationTypes(observationConstellationOfferingObservationTypes);
         session.saveOrUpdate(hObservation);

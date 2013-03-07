@@ -41,7 +41,6 @@ import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
-import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.om.SosOffering;
@@ -79,13 +78,13 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
             session = sessionHolder.getSession();
             transaction = session.beginTransaction();
             ProcedureDescriptionFormat procedureDescriptionFormat =
-                    HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatObject(
+                    HibernateCriteriaTransactionalUtilities.getOrInsertProcedureDescriptionFormat(
                             request.getProcedureDescriptionFormat(), session);
             List<ObservationType> observationTypes =
-                    HibernateCriteriaQueryUtilities.getObservationTypeObjects(request.getMetadata()
+                    HibernateCriteriaTransactionalUtilities.getOrInsertObservationTypes(request.getMetadata()
                             .getObservationTypes(), session);
             List<FeatureOfInterestType> featureOfInterestTypes =
-                    HibernateCriteriaQueryUtilities.getFeatureOfInterestTypeObjects(request.getMetadata()
+                    HibernateCriteriaTransactionalUtilities.getOrInsertFeatureOfInterestTypes(request.getMetadata()
                             .getFeatureOfInterestTypes(), session);
             if (procedureDescriptionFormat != null && observationTypes != null && featureOfInterestTypes != null) {
                 Procedure procedure =
