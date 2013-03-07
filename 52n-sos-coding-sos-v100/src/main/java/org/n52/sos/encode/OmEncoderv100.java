@@ -38,7 +38,6 @@ import net.opengis.gml.MeasureType;
 import net.opengis.om.x10.MeasurementDocument;
 import net.opengis.om.x10.MeasurementType;
 import net.opengis.om.x10.ObservationType;
-import net.opengis.swe.x101.DataArrayDocument;
 import net.opengis.swe.x101.TimeObjectPropertyType;
 
 import org.apache.xmlbeans.XmlBoolean;
@@ -46,8 +45,6 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlInteger;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
-import org.apache.xmlbeans.XmlRuntimeException;
-import org.apache.xmlbeans.impl.values.XmlValueDisconnectedException;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
