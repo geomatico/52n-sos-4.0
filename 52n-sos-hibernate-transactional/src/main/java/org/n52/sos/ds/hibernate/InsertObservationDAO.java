@@ -38,7 +38,7 @@ import org.apache.xmlbeans.XmlObject;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.n52.sos.ds.IInsertObservationDAO;
+import org.n52.sos.ds.AbstractInsertObservationDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
@@ -52,10 +52,8 @@ import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
-import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweDataArray;
@@ -68,32 +66,15 @@ import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InsertObservationDAO extends AbstractHibernateOperationDao implements IInsertObservationDAO {
+public class InsertObservationDAO extends AbstractInsertObservationDAO {
 
     /**
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(InsertObservationDAO.class);
 
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = SosConstants.Operations.InsertObservation.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
-    }
-
-    @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
-            throws OwsExceptionReport {
-        opsMeta.addPossibleValuesParameter(Sos2Constants.InsertObservationParams.offering, getCache().getOfferings());
-        opsMeta.addAnyParameterValue(Sos2Constants.InsertObservationParams.observation);
-        opsMeta.addDataTypeParameter(Sos2Constants.InsertObservationParams.observation,
-                OMConstants.SCHEMA_LOCATION_OM_2_OM_OBSERVATION);
-    }
-
+    private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    
     @Override
     public synchronized InsertObservationResponse insertObservation(InsertObservationRequest request)
             throws OwsExceptionReport {
@@ -104,7 +85,7 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
         Transaction transaction = null;
         // TODO: check unit and set if available and not defined in DB
         try {
-            session = getSession();
+            session = sessionHolder.getSession();
             transaction = session.beginTransaction();
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
             for (SosObservation sosObservation : request.getObservations()) {
@@ -165,7 +146,7 @@ public class InsertObservationDAO extends AbstractHibernateOperationDao implemen
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            returnSession(session);
+            sessionHolder.returnSession(session);
         }
         // TODO: ... all the DS insertion stuff
         // Requirement 68

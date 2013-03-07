@@ -31,7 +31,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.joda.time.DateTime;
-import org.n52.sos.ds.IInsertSensorDAO;
+import org.n52.sos.ds.AbstractInsertSensorDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
@@ -46,11 +46,8 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.ows.IExtension;
-import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorML;
-import org.n52.sos.ogc.sos.Sos1Constants;
-import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosInsertionCapabilities;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SosFeatureRelationship;
@@ -60,39 +57,14 @@ import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InsertSensorDAO extends AbstractHibernateOperationDao implements IInsertSensorDAO {
+public class InsertSensorDAO extends AbstractInsertSensorDAO {
 
     /**
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(InsertSensorDAO.class);
-
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = Sos2Constants.Operations.InsertSensor.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
-    }
-
-    @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
-            throws OwsExceptionReport {
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            opsMeta.addAnyParameterValue(Sos1Constants.RegisterSensorParams.SensorDescription);
-            opsMeta.addAnyParameterValue(Sos1Constants.RegisterSensorParams.ObservationTemplate);
-        } else {
-            opsMeta.addAnyParameterValue(Sos2Constants.InsertSensorParams.procedureDescription);
-            opsMeta.addPossibleValuesParameter(Sos2Constants.InsertSensorParams.procedureDescriptionFormat,
-                    getCache().getProcedureDescriptionFormats());
-            opsMeta.addAnyParameterValue(Sos2Constants.InsertSensorParams.observableProperty);
-            opsMeta.addAnyParameterValue(Sos2Constants.InsertSensorParams.metadata);
-            opsMeta.addDataTypeParameter(Sos2Constants.InsertSensorParams.metadata,
-                    Sos2Constants.SCHEMA_LOCATION_INSERTION_CAPABILITIES);
-        }
-    }
+    
+    private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
     @Override
     public synchronized InsertSensorResponse insertSensor(InsertSensorRequest request) throws OwsExceptionReport {
@@ -104,7 +76,7 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
         Session session = null;
         Transaction transaction = null;
         try {
-            session = getSession();
+            session = sessionHolder.getSession();
             transaction = session.beginTransaction();
             ProcedureDescriptionFormat procedureDescriptionFormat =
                     HibernateCriteriaQueryUtilities.getProcedureDescriptionFormatObject(
@@ -158,7 +130,7 @@ public class InsertSensorDAO extends AbstractHibernateOperationDao implements II
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            returnSession(session);
+            sessionHolder.returnSession(session);
         }
         return response;
     }

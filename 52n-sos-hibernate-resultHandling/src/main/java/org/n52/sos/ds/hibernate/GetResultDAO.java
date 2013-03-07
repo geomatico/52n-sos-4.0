@@ -24,9 +24,7 @@
 package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,18 +32,14 @@ import java.util.Set;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-import org.n52.sos.ds.IGetResultDAO;
+import org.n52.sos.ds.AbstractGetResultDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
-import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.Sos1Constants;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosResultEncoding;
 import org.n52.sos.ogc.sos.SosResultStructure;
 import org.n52.sos.request.GetResultRequest;
@@ -54,56 +48,20 @@ import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GetResultDAO extends AbstractHibernateOperationDao implements IGetResultDAO {
+public class GetResultDAO extends AbstractGetResultDAO {
 
     /**
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(GetResultDAO.class);
-
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = SosConstants.Operations.GetResult.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
-    }
     
-    @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
-            throws OwsExceptionReport {
-        Set<String> resultTemplateIdentifier = getCache().getResultTemplates();
-        Set<String> offerings = new HashSet<String>(0);
-        Collection<String> observableProperties = new ArrayList<String>(0);
-        Collection<String> featureOfInterest = new ArrayList<String>(0);
-        if (resultTemplateIdentifier != null && !resultTemplateIdentifier.isEmpty()) {
-            offerings = getCache().getOfferingsWithResultTemplate();
-            observableProperties = getCache().getObservablePropertiesWithResultTemplate();
-            featureOfInterest = getCache().getFeaturesOfInterestWithResultTemplate();
-        }
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            // TODO set parameter for SOS 1.0
-        } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
-            opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultParams.offering, offerings);
-            opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultParams.observedProperty, observableProperties);
-            opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultParams.featureOfInterest, featureOfInterest);
-            // TODO get the values for temporal and spatial filtering
-            // set param temporalFilter
-            // opsMeta.addParameterValue(Sos2Constants.GetResultParams.temporalFilter.name(),
-            // new OWSParameterValuePossibleValues(null));
-            // // set param spatialFilter
-            // opsMeta.addParameterValue(Sos2Constants.GetResultParams.spatialFilter.name(),
-            // new OWSParameterValuePossibleValues(null));
-        }
-    }
+    private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
     @Override
     public GetResultResponse getResult(GetResultRequest request) throws OwsExceptionReport {
         Session session = null;
         try {
-            session = getSession();
+            session = sessionHolder.getSession();
             GetResultResponse response = new GetResultResponse();
             response.setService(request.getService());
             response.setVersion(request.getVersion());
@@ -126,7 +84,7 @@ public class GetResultDAO extends AbstractHibernateOperationDao implements IGetR
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            returnSession(session);
+            sessionHolder.returnSession(session);
         }
     }
 

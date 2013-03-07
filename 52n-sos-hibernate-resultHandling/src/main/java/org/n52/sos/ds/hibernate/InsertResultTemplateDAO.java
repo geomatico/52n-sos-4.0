@@ -26,13 +26,12 @@ package org.n52.sos.ds.hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.n52.sos.ds.IInsertResultTemplateDAO;
+import org.n52.sos.ds.AbstractInsertResultTemplateDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateUtilities;
 import org.n52.sos.ogc.om.SosObservationConstellation;
-import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.request.InsertResultTemplateRequest;
@@ -41,27 +40,14 @@ import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InsertResultTemplateDAO extends AbstractHibernateOperationDao implements IInsertResultTemplateDAO {
+public class InsertResultTemplateDAO extends AbstractInsertResultTemplateDAO {
 
     /**
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(InsertResultTemplateDAO.class);
-
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = Sos2Constants.Operations.InsertResultTemplate.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
-    }
-
-    @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
-        opsMeta.addAnyParameterValue(Sos2Constants.InsertResultTemplateParams.proposedTemplate);
-    }
+    
+    private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
     @Override
     public InsertResultTemplateResponse insertResultTemplate(InsertResultTemplateRequest request)
@@ -73,7 +59,7 @@ public class InsertResultTemplateDAO extends AbstractHibernateOperationDao imple
         Session session = null;
         Transaction transaction = null;
         try {
-            session = getSession();
+            session = sessionHolder.getSession();
             transaction = session.beginTransaction();
             SosObservationConstellation sosObsConst = request.getObservationTemplate();
 //            if (request.getResultStructure().getResultStructure() instanceof SosSweDataArray
@@ -116,7 +102,7 @@ public class InsertResultTemplateDAO extends AbstractHibernateOperationDao imple
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            returnSession(session);
+            sessionHolder.returnSession(session);
         }
         return response;
     }

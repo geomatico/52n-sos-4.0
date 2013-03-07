@@ -23,60 +23,33 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import java.util.Collection;
-import java.util.Set;
-
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.n52.sos.ds.IGetResultTemplateDAO;
+import org.n52.sos.ds.AbstractGetResultTemplateDAO;
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
-import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.request.GetResultTemplateRequest;
 import org.n52.sos.response.GetResultTemplateResponse;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GetResultTemplateDAO extends AbstractHibernateOperationDao implements IGetResultTemplateDAO {
+public class GetResultTemplateDAO extends AbstractGetResultTemplateDAO {
 
     /**
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(InsertResultDAO.class);
-
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = Sos2Constants.Operations.GetResultTemplate.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
-    }
     
-    @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
-            throws OwsExceptionReport {
-        Set<String> resultTemplates = getCache().getResultTemplates();
-        Collection<String> offerings = null;
-        Collection<String> observableProperties = null;
-        if (resultTemplates != null && !resultTemplates.isEmpty()) {
-            offerings = getCache().getOfferingsWithResultTemplate();
-            observableProperties = getCache().getObservablePropertiesWithResultTemplate();
-        }
-        opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultTemplateParams.offering, offerings);
-        opsMeta.addPossibleValuesParameter(Sos2Constants.GetResultTemplateParams.observedProperty, observableProperties);
-    }
+    private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
     @Override
     public GetResultTemplateResponse getResultTemplate(GetResultTemplateRequest request) throws OwsExceptionReport {
         Session session = null;
         try {
-            session = getSession();
+            session = sessionHolder.getSession();
             ResultTemplate resultTemplate =
                     HibernateCriteriaQueryUtilities.getResultTemplateObject(request.getOffering(),
                             request.getObservedProperty(), session);
@@ -100,7 +73,7 @@ public class GetResultTemplateDAO extends AbstractHibernateOperationDao implemen
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            returnSession(session);
+            sessionHolder.returnSession(session);
         }
     }
 

@@ -36,8 +36,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.joda.time.DateTime;
+import org.n52.sos.ds.AbstractInsertResultDAO;
 import org.n52.sos.ds.IFeatureQueryHandler;
-import org.n52.sos.ds.IInsertResultDAO;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
@@ -58,7 +58,6 @@ import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
-import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
@@ -84,27 +83,13 @@ import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InsertResultDAO extends AbstractHibernateOperationDao implements IInsertResultDAO {
+public class InsertResultDAO extends AbstractInsertResultDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InsertResultDAO.class);
 
     private static final int FLUSH_THRESHOLD = 50;
     
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = Sos2Constants.Operations.InsertResult.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
-    }
-    
-    @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
-        opsMeta.addPossibleValuesParameter(Sos2Constants.InsertResultParams.template, getCache().getResultTemplates());
-        opsMeta.addAnyParameterValue(Sos2Constants.InsertResultParams.resultValues);
-    }
+    private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
     
     @Override
     public InsertResultResponse insertResult(InsertResultRequest request) throws OwsExceptionReport {
@@ -114,7 +99,7 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
         Session session = null;
         Transaction transaction = null;
         try {
-            session = getSession();
+            session = sessionHolder.getSession();
             ResultTemplate resultTemplate =
                     HibernateCriteriaQueryUtilities.getResultTemplateObject(request.getTemplateIdentifier(), session);
             transaction = session.beginTransaction();
@@ -148,7 +133,7 @@ public class InsertResultDAO extends AbstractHibernateOperationDao implements II
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            returnSession(session);
+            sessionHolder.returnSession(session);
         }
         return response;
     }

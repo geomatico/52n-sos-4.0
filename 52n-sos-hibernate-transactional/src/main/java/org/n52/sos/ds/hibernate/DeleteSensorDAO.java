@@ -31,30 +31,18 @@ import static org.n52.sos.util.Util4Exceptions.createNoApplicableCodeException;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.n52.sos.ds.IDeleteSensorDAO;
-import org.n52.sos.ogc.ows.OWSOperation;
+import org.n52.sos.ds.AbstractDeleteSensorDAO;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.response.DeleteSensorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DeleteSensorDAO extends AbstractHibernateOperationDao implements IDeleteSensorDAO {
+public class DeleteSensorDAO extends AbstractDeleteSensorDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeleteSensorDAO.class);
 
-    private static final String OPERATION_NAME = Sos2Constants.Operations.DeleteSensor.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
-    }
-    
-    @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
-        opsMeta.addPossibleValuesParameter(Sos2Constants.DeleteSensorParams.procedure, getCache().getProcedures());
-    }
+   private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
     @Override
     public synchronized DeleteSensorResponse deleteSensor(DeleteSensorRequest request) throws OwsExceptionReport {
@@ -64,7 +52,7 @@ public class DeleteSensorDAO extends AbstractHibernateOperationDao implements ID
         Session session = null;
         Transaction transaction = null;
         try {
-            session = getSession();
+            session = sessionHolder.getSession();
             transaction = session.beginTransaction();
             setDeleteSensorFlag(request.getProcedureIdentifier(), true, session);
             setValidProcedureDescriptionEndTime(request.getProcedureIdentifier(), session);
@@ -79,7 +67,7 @@ public class DeleteSensorDAO extends AbstractHibernateOperationDao implements ID
             LOGGER.error(exceptionText, he);
             throw createNoApplicableCodeException(he, exceptionText);
         } finally {
-            returnSession(session);
+            sessionHolder.returnSession(session);
         }
         return response;
     }

@@ -23,7 +23,9 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.*;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.DELETED;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_IDENTIFIER;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_SET_ID;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -32,42 +34,25 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
-import org.n52.sos.ds.IGetObservationByIdDAO;
+import org.n52.sos.ds.AbstractGetObservationByIdDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
-import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetObservationByIdRequest;
 import org.n52.sos.response.GetObservationByIdResponse;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GetObservationByIdDAO extends AbstractHibernateOperationDao implements IGetObservationByIdDAO {
+public class GetObservationByIdDAO extends AbstractGetObservationByIdDAO {
 
     /**
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(GetObservationByIdDAO.class);
 
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = SosConstants.Operations.GetObservationById.name();
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
-    }
-    
-    @Override
-    public void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
-        opsMeta.addPossibleValuesParameter(Sos2Constants.GetObservationByIdParams.observation, getCache().getObservationIdentifiers());
-    }
 
     @Override
     public GetObservationByIdResponse getObservationById(GetObservationByIdRequest request) throws OwsExceptionReport {

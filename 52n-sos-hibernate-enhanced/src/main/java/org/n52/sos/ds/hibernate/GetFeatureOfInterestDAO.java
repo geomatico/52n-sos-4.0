@@ -24,7 +24,6 @@
 package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -33,80 +32,32 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.n52.sos.ds.IGetFeatureOfInterestDAO;
+import org.n52.sos.ds.AbstractGetFeatureOfInterestDAO;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ogc.om.features.SosFeatureCollection;
-import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.request.GetFeatureOfInterestRequest;
 import org.n52.sos.response.GetFeatureOfInterestResponse;
-import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao implements IGetFeatureOfInterestDAO {
+public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
 
     /**
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(GetFeatureOfInterestDAO.class);
-
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = SosConstants.Operations.GetFeatureOfInterest.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
-    }
-
-    @Override
-    public void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
-
-        Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeaturesOfInterest(), version);
-
-        if (getConfigurator().getActiveProfile().isShowFullOperationsMetadataForObservations()) {
-            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache()
-                    .getProcedures());
-            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty,
-                    getCache().getObservableProperties());
-            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.featureOfInterest, featureIDs);
-        } else {
-            opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.procedure);
-            opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.observedProperty);
-            opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.featureOfInterest);
-        }
-
-        // TODO constraint srid
-        String parameterName = Sos2Constants.GetFeatureOfInterestParams.spatialFilter.name();
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            parameterName = Sos1Constants.GetFeatureOfInterestParams.location.name();
-        }
-
-        SosEnvelope envelope = null;
-        if (featureIDs != null && !featureIDs.isEmpty()) {
-            envelope = getCache().getGlobalEnvelope();
-        }
-
-        if (envelope != null) {
-            opsMeta.addRangeParameterValue(parameterName, SosHelper.getMinMaxFromEnvelope(envelope.getEnvelope()));
-        } else {
-            opsMeta.addAnyParameterValue(parameterName);
-        }
-    }
+    
+    private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
     @Override
     public GetFeatureOfInterestResponse getFeatureOfInterest(GetFeatureOfInterestRequest request)
             throws OwsExceptionReport {
         Session session = null;
         try {
-            session = getSession();
+            session = sessionHolder.getSession();
             if (request.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
                 // sos 1.0.0 either or
                 if ((request.getFeatureIdentifiers() != null && !request.getFeatureIdentifiers().isEmpty())
@@ -157,7 +108,7 @@ public class GetFeatureOfInterestDAO extends AbstractHibernateOperationDao imple
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            returnSession(session);
+            sessionHolder.returnSession(session);
         }
     }
 
