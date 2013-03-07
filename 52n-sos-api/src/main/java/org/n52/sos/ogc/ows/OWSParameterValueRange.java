@@ -23,22 +23,31 @@
  */
 package org.n52.sos.ogc.ows;
 
-import java.util.Map;
-
 import org.n52.sos.util.MinMax;
 
 public class OWSParameterValueRange implements IOWSParameterValue {
 
     private String minValue;
     private String maxValue;
+    private String valueReference;
 
     public OWSParameterValueRange(String minValue, String maxValue) {
         this.minValue = minValue;
         this.maxValue = maxValue;
     }
+    
+    public OWSParameterValueRange(String minValue, String maxValue, String valueRefernce) {
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+        this.setValueReference(valueRefernce);
+    }
 
     public OWSParameterValueRange(MinMax<String> mm) {
         this(mm.getMinimum(), mm.getMaximum());
+    }
+    
+    public OWSParameterValueRange(MinMax<String> mm, String valueRefernce) {
+        this(mm.getMinimum(), mm.getMaximum(), valueRefernce);
     }
 
     public String getMinValue() {
@@ -56,4 +65,17 @@ public class OWSParameterValueRange implements IOWSParameterValue {
     public void setMaxValue(String maxValue) {
         this.maxValue = maxValue;
     }
+
+    public String getValueReference() {
+        return valueReference;
+    }
+
+    public void setValueReference(String valueReference) {
+        this.valueReference = valueReference;
+    }
+    
+    public boolean isSetValueReference() {
+        return valueReference != null && !valueReference.isEmpty();
+    }
+    
 }
