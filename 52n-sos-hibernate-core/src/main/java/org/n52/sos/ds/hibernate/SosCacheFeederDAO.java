@@ -31,7 +31,6 @@ import java.util.LinkedList;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.n52.sos.cache.ContentCache;
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;

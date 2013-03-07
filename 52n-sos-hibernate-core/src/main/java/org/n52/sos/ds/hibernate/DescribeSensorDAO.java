@@ -33,16 +33,11 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.n52.sos.ds.IDescribeSensorDAO;
+import org.n52.sos.ds.AbstractDescribeSensorDAO;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateProcedureUtilities;
-import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sensorML.SensorMLConstants;
-import org.n52.sos.ogc.sos.Sos1Constants;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.response.DescribeSensorResponse;
@@ -55,41 +50,14 @@ import org.slf4j.LoggerFactory;
  * Implementation of the interface IDescribeSensorDAO
  * 
  */
-public class DescribeSensorDAO extends AbstractHibernateOperationDao implements IDescribeSensorDAO {
+public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
 
     /**
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(DescribeSensorDAO.class);
-
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = SosConstants.Operations.DescribeSensor.name();
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.n52.sos.ds.ISosOperationDAO#getOperationName()
-     */
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
-    }
-
-    @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
-            throws OwsExceptionReport {
-        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());
-        // FIXME: getTypes from Decoder
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            opsMeta.addPossibleValuesParameter(Sos1Constants.DescribeSensorParams.outputFormat,
-                    SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE);
-        } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
-            opsMeta.addPossibleValuesParameter(Sos2Constants.DescribeSensorParams.procedureDescriptionFormat,
-                    SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
-        }
-    }
+    
+    private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
     /*
      * (non-Javadoc)
@@ -103,7 +71,7 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
         // sensorDocument which should be returned
         Session session = null;
         try {
-            session = getSession();
+            session = sessionHolder.getSession();
             SosProcedureDescription result = queryProcedure(request, session);
             
             Collection<String> features = getFeatureOfInterestIDsForProcedure(request.getProcedure(), request.getVersion(), session);
@@ -135,7 +103,7 @@ public class DescribeSensorDAO extends AbstractHibernateOperationDao implements 
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            returnSession(session);
+            sessionHolder.returnSession(session);
         }
     }
 

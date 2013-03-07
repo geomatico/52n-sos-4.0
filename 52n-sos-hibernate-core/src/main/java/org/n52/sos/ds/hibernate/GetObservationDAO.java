@@ -24,8 +24,6 @@
 package org.n52.sos.ds.hibernate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -33,14 +31,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
-import org.joda.time.DateTime;
-import org.n52.sos.ds.IGetObservationDAO;
+import org.n52.sos.ds.AbstractGetObservationDAO;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
@@ -48,23 +43,14 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
 import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.ogc.filter.TemporalFilter;
-import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosObservation;
-import org.n52.sos.ogc.ows.OWSOperation;
-import org.n52.sos.ogc.ows.OWSParameterValueRange;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.ogc.sos.SosConstants.GetObservationParams;
-import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.util.CollectionHelper;
-import org.n52.sos.util.DateTimeException;
-import org.n52.sos.util.DateTimeHelper;
-import org.n52.sos.util.MinMax;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
@@ -74,77 +60,17 @@ import org.slf4j.LoggerFactory;
  * Implementation of the interface IGetObservationDAO
  * 
  */
-public class GetObservationDAO extends AbstractHibernateOperationDao implements IGetObservationDAO {
+public class GetObservationDAO extends AbstractGetObservationDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GetObservationDAO.class);
-
-    /**
-     * supported SOS operation
-     */
-    private static final String OPERATION_NAME = SosConstants.Operations.GetObservation.name();
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
-    }
-
-    @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
-            throws OwsExceptionReport {
-
-        Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeaturesOfInterest(), version);
-
-        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.offering, getCache().getOfferings());
-        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());
-        opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.responseFormat,
-                SosHelper.getSupportedResponseFormats(SosConstants.SOS, version));
-
-        if (getConfigurator().getActiveProfile().isShowFullOperationsMetadataForObservations()) {
-            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCache()
-                    .getObservableProperties());
-            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.featureOfInterest, featureIDs);
-        } else {
-            opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.observedProperty);
-            opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.featureOfInterest);
-        }
-
-        if (version.equals(Sos2Constants.SERVICEVERSION)) {
-            // SOS 2.0 parameter
-            OWSParameterValueRange temporalFilter = new OWSParameterValueRange(getPhenomenonTime(), "om:phenomenonTime");
-            opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.temporalFilter, temporalFilter);
-            SosEnvelope envelope = null;
-            if (featureIDs != null && !featureIDs.isEmpty()) {
-                envelope = getCache().getGlobalEnvelope();
-            }
-            if (envelope != null) {
-                opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.spatialFilter,
-                        SosHelper.getMinMaxFromEnvelope(envelope.getEnvelope()));
-            }
-        } else if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            // SOS 1.0.0 parameter
-            opsMeta.addRangeParameterValue(Sos1Constants.GetObservationParams.eventTime, getPhenomenonTime());
-            opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.srsName);
-            opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.result);
-            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.resultModel, getResultModels());
-            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.responseMode,
-                    Arrays.asList(SosConstants.getResponseModes()));
-        }
-    }
-
-    private List<String> getResultModels() {
-        QName[] resultModels = OMConstants.getResultModels();
-        List<String> resultModelsList = new ArrayList<String>(resultModels.length);
-        for (QName qname : resultModels) {
-            resultModelsList.add(qname.getPrefix() + ":" + qname.getLocalPart());
-        }
-        return resultModelsList;
-    }
+    
+    private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
     @Override
     public GetObservationResponse getObservation(GetObservationRequest sosRequest) throws OwsExceptionReport {
         Session session = null;
         try {
-            session = getSession();
+            session = sessionHolder.getSession();
             if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION)
                     && sosRequest.getObservedProperties().isEmpty()) {
                 throw Util4Exceptions.createMissingParameterValueException(GetObservationParams.observedProperty
@@ -162,7 +88,7 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
             LOGGER.error(exceptionText, he);
             throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
         } finally {
-            returnSession(session);
+            sessionHolder.returnSession(session);
         }
     }
 
@@ -302,47 +228,6 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
         return sosObservations;
     }
 
-    /**
-     * Get the min/max phenomenon time of contained observations
-     * 
-     * @return min/max phenomenon time
-     * @throws OwsExceptionReport
-     *             If an error occurs.
-     */
-    private MinMax<String> getPhenomenonTime() throws OwsExceptionReport {
-        try {
-            DateTime minDate = getCache().getMinPhenomenonTime();
-            DateTime maxDate = getCache().getMaxPhenomenonTime();
-            return new MinMax<String>()
-                    .setMinimum(minDate != null ? DateTimeHelper.formatDateTime2ResponseString(minDate) : null)
-                    .setMaximum(maxDate != null ? DateTimeHelper.formatDateTime2ResponseString(maxDate) : null);
-        } catch (DateTimeException dte) {
-            String exceptionText = "Error while getting min/max phenomenon time for OwsMetadata!";
-            LOGGER.error(exceptionText, dte);
-            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
-        }
-    }
-    
-    /**
-     * Get the min/max result time of contained observations
-     * 
-     * @return min/max result time
-     * @throws OwsExceptionReport
-     *             If an error occurs.
-     */
-    private MinMax<String> getResultTime() throws OwsExceptionReport {
-        try {
-            DateTime minDate = getCache().getMinResultTime();
-            DateTime maxDate = getCache().getMaxResultTime();
-            return new MinMax<String>()
-                    .setMinimum(minDate != null ? DateTimeHelper.formatDateTime2ResponseString(minDate) : null)
-                    .setMaximum(maxDate != null ? DateTimeHelper.formatDateTime2ResponseString(maxDate) : null);
-        } catch (DateTimeException dte) {
-            String exceptionText = "Error while getting min/max result time for OwsMetadata!";
-            LOGGER.error(exceptionText, dte);
-            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
-        }
-    }
 
     private List<String> getAndCheckFeatureOfInterest(ObservationConstellation observationConstellation,
             Set<String> featureIdentifier, Session session) {
