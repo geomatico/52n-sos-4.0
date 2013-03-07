@@ -101,7 +101,7 @@ public class Configurator implements Cleanupable {
     @Deprecated
     private Map<String, String> configFileMap = new HashMap<String, String>(0);
     /**
-     * @deprecated@deprecated not used by any code, check for external use or remove
+     * @deprecated not used by any code, check for external use or remove
      */
     @Deprecated private String defaultOfferingPrefix;
     /**
@@ -637,21 +637,21 @@ public class Configurator implements Cleanupable {
         SettingsManager.getInstance().configure(this);
         initializeDataConnectionProvider();
         initializeFeatureConnectionProvider();
-        this.codingRepository = new CodingRepository();
-        this.serviceIdentificationFactory = new SosServiceIdentificationFactory();
-        this.serviceProviderFactory = new SosServiceProviderFactory();
-        this.operationDaoRepository = new OperationDAORepository();
-        this.serviceOperatorRepository = new ServiceOperatorRepository();
+        codingRepository = new CodingRepository();
+        serviceIdentificationFactory = new SosServiceIdentificationFactory();
+        serviceProviderFactory = new SosServiceProviderFactory();
+        operationDaoRepository = new OperationDAORepository();
+        serviceOperatorRepository = new ServiceOperatorRepository();
         initalizeFeatureQueryHandler();
         initalizeCacheFeederDAO();
-        this.converterRepository = new ConverterRepository();
-        this.requestOperatorRepository = new RequestOperatorRepository();
-        this.bindingRepository = new BindingRepository();
+        converterRepository = new ConverterRepository();
+        requestOperatorRepository = new RequestOperatorRepository();
+        bindingRepository = new BindingRepository();
         initializeAdminServiceOperator();
-        this.adminRequestOperatorRepository = new AdminRequestOperatorRepository();
+        adminRequestOperatorRepository = new AdminRequestOperatorRepository();
         initializeDataSource();
         initializeContentCacheController();
-        this.tasking = new Tasking();
+        tasking = new Tasking();
         initializeProfileHandler();
         LOGGER.info("\n******\n Configurator initialization finished\n******\n");
     }
@@ -665,7 +665,7 @@ public class Configurator implements Cleanupable {
      * @throws ConfigurationException if initialization of a RequestListener failed
      */
     private void initializeAdminServiceOperator() throws ConfigurationException {
-        this.adminServiceOperator = new ConfiguringSingletonServiceLoader<IAdminServiceOperator>(
+        adminServiceOperator = new ConfiguringSingletonServiceLoader<IAdminServiceOperator>(
                 IAdminServiceOperator.class, true).get();
     }
 
@@ -675,7 +675,7 @@ public class Configurator implements Cleanupable {
      * @throws ConfigurationException If no cache feeder dao is implemented
      */
     private void initalizeCacheFeederDAO() throws ConfigurationException {
-        this.cacheFeederDAO = new ConfiguringSingletonServiceLoader<ICacheFeederDAO>(ICacheFeederDAO.class, true).get();
+        cacheFeederDAO = new ConfiguringSingletonServiceLoader<ICacheFeederDAO>(ICacheFeederDAO.class, true).get();
     }
 
     /**
@@ -684,7 +684,7 @@ public class Configurator implements Cleanupable {
      * @throws ConfigurationException if initializing the CapabilitiesCache failed
      */
     private void initializeContentCacheController() throws ConfigurationException {
-        this.capabilitiesCacheController =
+        capabilitiesCacheController =
         new ConfiguringSingletonServiceLoader<ContentCacheController>(ContentCacheController.class, true).get();
     }
 
@@ -694,9 +694,9 @@ public class Configurator implements Cleanupable {
      * @throws ConfigurationException If no connection provider is implemented
      */
     private void initializeDataConnectionProvider() throws ConfigurationException {
-        this.dataConnectionProvider = new ConfiguringSingletonServiceLoader<IDataConnectionProvider>(IDataConnectionProvider.class,
+        dataConnectionProvider = new ConfiguringSingletonServiceLoader<IDataConnectionProvider>(IDataConnectionProvider.class,
                                                                                              true).get();
-        this.dataConnectionProvider.initialize(this.dataConnectionProviderProperties);
+        dataConnectionProvider.initialize(this.dataConnectionProviderProperties);
     }
     
     /**
@@ -705,20 +705,20 @@ public class Configurator implements Cleanupable {
      * @throws ConfigurationException If no connection provider is implemented
      */
     private void initializeFeatureConnectionProvider() throws ConfigurationException {
-        this.featureConnectionProvider = new ConfiguringSingletonServiceLoader<IFeatureConnectionProvider>(IFeatureConnectionProvider.class,
+        featureConnectionProvider = new ConfiguringSingletonServiceLoader<IFeatureConnectionProvider>(IFeatureConnectionProvider.class,
                                                                                              false).get();
         if (featureConnectionProvider != null) {
-            this.featureConnectionProvider.initialize(this.featureConnectionProviderProperties);
+            featureConnectionProvider.initialize(featureConnectionProviderProperties);
         } else {
-            this.featureConnectionProvider = this.dataConnectionProvider;
+            featureConnectionProvider = dataConnectionProvider;
         }
     }
 
     private void initializeDataSource() throws ConfigurationException {
-        this.dataSourceInitializator = new ConfiguringSingletonServiceLoader<IDataSourceInitializator>(
+        dataSourceInitializator = new ConfiguringSingletonServiceLoader<IDataSourceInitializator>(
                 IDataSourceInitializator.class, true).get();
         try {
-            this.dataSourceInitializator.initializeDataSource();
+            dataSourceInitializator.initializeDataSource();
         } catch (OwsExceptionReport owse) {
             throw new ConfigurationException(owse);
         }
@@ -730,14 +730,14 @@ public class Configurator implements Cleanupable {
      * @throws ConfigurationException If no feature query handler is implemented
      */
     private void initalizeFeatureQueryHandler() throws ConfigurationException {
-        this.featureQueryHandler = new ConfiguringSingletonServiceLoader<IFeatureQueryHandler>(
+        featureQueryHandler = new ConfiguringSingletonServiceLoader<IFeatureQueryHandler>(
                 IFeatureQueryHandler.class, true).get();
     }
 
     private void initializeProfileHandler() throws ConfigurationException {
-        this.profileHandler = new ConfiguringSingletonServiceLoader<IProfileHandler>(IProfileHandler.class, false).get();
-        if (this.profileHandler == null) {
-            this.profileHandler = new DefaultProfileHandler();
+        profileHandler = new ConfiguringSingletonServiceLoader<IProfileHandler>(IProfileHandler.class, false).get();
+        if (profileHandler == null) {
+            profileHandler = new DefaultProfileHandler();
             LOGGER.info("No IProfileHandler implementations is loaded! DefaultHandler is used!");
         }
     }
@@ -749,7 +749,7 @@ public class Configurator implements Cleanupable {
      */
     public SosServiceIdentification getServiceIdentification() throws OwsExceptionReport {
         try {
-            return this.serviceIdentificationFactory.get();
+            return serviceIdentificationFactory.get();
         } catch (ConfigurationException e) {
             if (e.getCause() != null && e.getCause() instanceof OwsExceptionReport) {
                 throw (OwsExceptionReport) e.getCause();
@@ -766,7 +766,7 @@ public class Configurator implements Cleanupable {
      */
     public SosServiceProvider getServiceProvider() throws OwsExceptionReport {
         try {
-            return this.serviceProviderFactory.get();
+            return serviceProviderFactory.get();
         } catch (ConfigurationException e) {
             if (e.getCause() != null && e.getCause() instanceof OwsExceptionReport) {
                 throw (OwsExceptionReport) e.getCause();
@@ -862,31 +862,31 @@ public class Configurator implements Cleanupable {
     }
 
     public RequestOperatorRepository getRequestOperatorRepository() {
-        return this.requestOperatorRepository;
+        return requestOperatorRepository;
     }
 
     public CodingRepository getCodingRepository() {
-        return this.codingRepository;
+        return codingRepository;
     }
 
     public OperationDAORepository getOperationDaoRepository() {
-        return this.operationDaoRepository;
+        return operationDaoRepository;
     }
 
     public ServiceOperatorRepository getServiceOperatorRepository() {
-        return this.serviceOperatorRepository;
+        return serviceOperatorRepository;
     }
 
     public BindingRepository getBindingRepository() {
-        return this.bindingRepository;
+        return bindingRepository;
     }
 
     public ConverterRepository getConverterRepository() {
-        return this.converterRepository;
+        return converterRepository;
     }
 
     public AdminRequestOperatorRepository getAdminRequestOperatorRepository() {
-        return this.adminRequestOperatorRepository;
+        return adminRequestOperatorRepository;
     }
 
     public void updateDecoder() throws ConfigurationException {
@@ -918,7 +918,7 @@ public class Configurator implements Cleanupable {
     }
 
     public IProfileHandler getProfileHandler() {
-        return this.profileHandler;
+        return profileHandler;
     }
 
     public IProfile getActiveProfile() {
@@ -930,21 +930,21 @@ public class Configurator implements Cleanupable {
      */
     @Override
     public synchronized void cleanup() {
-        if (this.dataConnectionProvider != null) {
-            this.dataConnectionProvider.cleanup();
-            this.dataConnectionProvider = null;
+        if (dataConnectionProvider != null) {
+            dataConnectionProvider.cleanup();
+            dataConnectionProvider = null;
         }
-        if (this.featureConnectionProvider != null) {
-            this.featureConnectionProvider.cleanup();
-            this.featureConnectionProvider = null;
+        if (featureConnectionProvider != null) {
+            featureConnectionProvider.cleanup();
+            featureConnectionProvider = null;
         }
-        if (this.capabilitiesCacheController != null) {
-            this.capabilitiesCacheController.cleanup();
-            this.capabilitiesCacheController = null;
+        if (capabilitiesCacheController != null) {
+            capabilitiesCacheController.cleanup();
+            capabilitiesCacheController = null;
         }
-        if (this.tasking != null) {
-            this.tasking.cleanup();
-            this.tasking = null;
+        if (tasking != null) {
+            tasking.cleanup();
+            tasking = null;
         }
         instance = null;
     }
