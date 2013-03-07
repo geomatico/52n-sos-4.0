@@ -35,11 +35,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ *
+ * Abstract class to encapsulate the loading of implementations that are registered with the ServiceLoader interface.
+ *
  * @param <T> the type that should be loaded
+
+ *
  * @author Christian Autermann <c.autermann@52north.org>
+ * @since 4.0
  */
 public abstract class AbstractServiceLoaderRepository<T> {
-	protected static final Logger log = LoggerFactory.getLogger(AbstractServiceLoaderRepository.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractServiceLoaderRepository.class);
 	private final ServiceLoader<T> serviceLoader;
 	private final Class<T> type;
 	private final boolean failIfEmpty;

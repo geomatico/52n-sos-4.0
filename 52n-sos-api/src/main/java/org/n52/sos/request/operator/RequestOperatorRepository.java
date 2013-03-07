@@ -28,18 +28,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class RequestOperatorRepository extends AbstractConfiguringServiceLoaderRepository<IRequestOperator> {
-
+    private static final Logger log = LoggerFactory.getLogger(RequestOperatorRepository.class);
     private final Map<RequestOperatorKeyType, IRequestOperator> requestOperators =
                                                                 new HashMap<RequestOperatorKeyType, IRequestOperator>(0);
 
