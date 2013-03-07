@@ -30,6 +30,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.util.CollectionHelper;
 
 /**
  * Class which represents a ObservationOffering. Used in the SosCapabilities.
@@ -230,7 +231,23 @@ public class SosOfferingsForContents {
      * @param relatedFeatures
      */
     public void setRelatedFeatures(Map<String, Set<String>> relatedFeatures) {
-        this.relatedFeatures = relatedFeatures;
+        this.relatedFeatures.putAll(relatedFeatures);
+    }
+    
+    public void addRelatedFeature(String identifier, String role) {
+        if (this.relatedFeatures.containsKey(identifier)) {
+            this.relatedFeatures.get(identifier).add(role);
+        } else {
+            this.relatedFeatures.put(identifier, CollectionHelper.asSet(role));
+        }
+    }
+    
+    public void addRelatedFeature(String identifier, Set<String> roles) {
+        if (this.relatedFeatures.containsKey(identifier)) {
+            this.relatedFeatures.get(identifier).addAll(roles);
+        } else {
+            this.relatedFeatures.put(identifier, roles);
+        }
     }
 
     /**
