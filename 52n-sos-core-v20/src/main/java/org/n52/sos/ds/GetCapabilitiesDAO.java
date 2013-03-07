@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.ds.hibernate;
+package org.n52.sos.ds;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,10 +37,8 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-import org.joda.time.DateTime;
 import org.n52.sos.binding.Binding;
 import org.n52.sos.decode.IDecoder;
-import org.n52.sos.ds.IGetCapabilitiesDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.filter.FilterCapabilities;
@@ -78,11 +76,9 @@ import org.slf4j.LoggerFactory;
  * Implementation of the interface IGetCapabilitiesDAO
  *
  */
-public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements IGetCapabilitiesDAO {
+public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GetCapabilitiesDAO.class);
-
-    private static final String OPERATION_NAME = SosConstants.Operations.GetCapabilities.name();
 
     /* section flags (values are powers of 2) */
     private static final int SERVICE_IDENTIFICATION = 0x01;
@@ -97,41 +93,6 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
 
     private static final int ALL = 0x20 | SERVICE_IDENTIFICATION | SERVICE_PROVIDER | OPERATIONS_METADATA
             | FILTER_CAPABILITIES | CONTENTS;
-
-    @Override
-    public String getOperationName() {
-        return OPERATION_NAME;
-    }
-
-    @Override
-    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
-            throws OwsExceptionReport {
-        // set param Sections
-        List<String> sectionsValues = new LinkedList<String>();
-        /* common sections */
-        sectionsValues.add(SosConstants.CapabilitiesSections.ServiceIdentification.name());
-        sectionsValues.add(SosConstants.CapabilitiesSections.ServiceProvider.name());
-        sectionsValues.add(SosConstants.CapabilitiesSections.OperationsMetadata.name());
-        sectionsValues.add(SosConstants.CapabilitiesSections.Contents.name());
-        sectionsValues.add(SosConstants.CapabilitiesSections.All.name());
-
-        if (version.equals(Sos1Constants.SERVICEVERSION)) {
-            sectionsValues.add(Sos1Constants.CapabilitiesSections.Filter_Capabilities.name());
-        } else if (version.equals(Sos2Constants.SERVICEVERSION)) {
-            sectionsValues.add(Sos2Constants.CapabilitiesSections.FilterCapabilities.name());
-            /* sections of extension points */
-            for (String section : getExtensionSections()) {
-                sectionsValues.add(section);
-            }
-        }
-
-        opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.Sections, sectionsValues);
-        opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptFormats,
-                Arrays.asList(SosConstants.getAcceptFormats()));
-        opsMeta.addPossibleValuesParameter(SosConstants.GetCapabilitiesParams.AcceptVersions,
-				getConfigurator().getServiceOperatorRepository().getSupportedVersions());
-        opsMeta.addAnyParameterValue(SosConstants.GetCapabilitiesParams.updateSequence);
-    }
 
     @Override
     public GetCapabilitiesResponse getCapabilities(GetCapabilitiesRequest request) throws OwsExceptionReport {
@@ -688,8 +649,9 @@ public class GetCapabilitiesDAO extends AbstractHibernateOperationDao implements
         }
         return observationTypes;
     }
-
-    private Set<String> getExtensionSections() throws OwsExceptionReport {
+    
+    @Override
+    protected Set<String> getExtensionSections() throws OwsExceptionReport {
         Collection<IExtension> extensions = getAndMergeExtensions();
         HashSet<String> sections = new HashSet<String>(extensions.size());
         for (IExtension e : extensions) {
