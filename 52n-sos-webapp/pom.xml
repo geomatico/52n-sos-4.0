@@ -550,6 +550,23 @@
             </dependencies>
         </profile>
         <profile>
+            <id>do</id>
+            <dependencies>
+            	<dependency>
+                	<groupId>${project.groupId}</groupId>
+                	<artifactId>52n-sos-ext-do-xml</artifactId>
+           		</dependency>
+	            <dependency>
+    	            <groupId>${project.groupId}</groupId>
+        	        <artifactId>52n-sos-ext-do-code</artifactId>
+            	</dependency>
+	            <dependency>
+    	            <groupId>${project.groupId}</groupId>
+        	        <artifactId>52n-sos-ext-do-code-kvp</artifactId>
+            	</dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>diagram</id>
             <dependencies>
                 <dependency>
