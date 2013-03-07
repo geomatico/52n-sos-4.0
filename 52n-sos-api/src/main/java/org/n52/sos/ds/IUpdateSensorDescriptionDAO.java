@@ -27,6 +27,11 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.UpdateSensorRequest;
 import org.n52.sos.response.UpdateSensorResponse;
 
+/**
+ * Use {@link AbstractUpdateSensorDescriptionDAO}
+ *
+ */
+@Deprecated
 public interface IUpdateSensorDescriptionDAO extends IOperationDAO {
     
    public UpdateSensorResponse updateSensorDescription(UpdateSensorRequest request) throws OwsExceptionReport;

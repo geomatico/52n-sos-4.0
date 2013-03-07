@@ -27,6 +27,11 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.InsertResultRequest;
 import org.n52.sos.response.InsertResultResponse;
 
+/**
+ * Use {@link AbstractInsertResultDAO}
+ *
+ */
+@Deprecated
 public interface IInsertResultDAO extends IOperationDAO {
     
     public InsertResultResponse insertResult(InsertResultRequest request) throws OwsExceptionReport;

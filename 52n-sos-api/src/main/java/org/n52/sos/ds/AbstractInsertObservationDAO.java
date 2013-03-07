@@ -23,17 +23,36 @@
  */
 package org.n52.sos.ds;
 
+import org.n52.sos.ogc.om.OMConstants;
+import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.response.InsertObservationResponse;
 
-/**
- * Use {@link AbstractInsertObservationDAO}
- *
- */
-@Deprecated
-public interface IInsertObservationDAO extends IOperationDAO {
+public abstract class AbstractInsertObservationDAO extends AbstractOperationDAO {
 
-    public InsertObservationResponse insertObservation(InsertObservationRequest request) throws OwsExceptionReport;
+    /**
+     * supported SOS operation
+     */
+    private static final String OPERATION_NAME = SosConstants.Operations.InsertObservation.name();
+
+    @Override
+    public String getOperationName() {
+        return OPERATION_NAME;
+    }
+
+    @Override
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version)
+            throws OwsExceptionReport {
+        opsMeta.addPossibleValuesParameter(Sos2Constants.InsertObservationParams.offering, getCache().getOfferings());
+        opsMeta.addAnyParameterValue(Sos2Constants.InsertObservationParams.observation);
+        opsMeta.addDataTypeParameter(Sos2Constants.InsertObservationParams.observation,
+                OMConstants.SCHEMA_LOCATION_OM_2_OM_OBSERVATION);
+    }
+    
+    public abstract InsertObservationResponse insertObservation(InsertObservationRequest request)
+            throws OwsExceptionReport;
 
 }

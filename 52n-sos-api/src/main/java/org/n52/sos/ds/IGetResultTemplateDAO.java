@@ -27,6 +27,10 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.GetResultTemplateRequest;
 import org.n52.sos.response.GetResultTemplateResponse;
 
+/**
+ * Use {@link AbstractGetResultTemplateDAO}
+ */
+@Deprecated
 public interface IGetResultTemplateDAO extends IOperationDAO {
     
     public GetResultTemplateResponse getResultTemplate(GetResultTemplateRequest request) throws OwsExceptionReport;

@@ -31,7 +31,9 @@ import org.n52.sos.response.GetObservationResponse;
  * interface for getting observations for a passed getObservation request from
  * the data source
  * 
+ * Use {@link AbstractGetObservationDAO}
  */
+@Deprecated
 public interface IGetObservationDAO extends IOperationDAO {
 
     /**

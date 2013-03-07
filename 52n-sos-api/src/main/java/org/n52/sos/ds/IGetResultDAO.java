@@ -31,7 +31,9 @@ import org.n52.sos.response.GetResultResponse;
  * interface for the specific DAOFactories, offers methods to create the
  * matching DAOs for the operations (e.g. GetCapabilitiesDAO)
  * 
+ * Use {@link AbstractGetResultDAO}
  */
+@Deprecated
 public interface IGetResultDAO extends IOperationDAO {
 
     /**

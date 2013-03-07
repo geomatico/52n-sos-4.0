@@ -31,7 +31,9 @@ import org.n52.sos.response.GetObservationByIdResponse;
  * interface for getting observations for a passed getObservationById request
  * from the datasource
  * 
+ * Use {@link AbstractGetObservationByIdDAO}
  */
+@Deprecated
 public interface IGetObservationByIdDAO extends IOperationDAO {
 
     /**

@@ -23,28 +23,30 @@
  */
 package org.n52.sos.ds;
 
+import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.request.GetCapabilitiesRequest;
-import org.n52.sos.response.GetCapabilitiesResponse;
+import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosConstants;
+import org.n52.sos.request.GetObservationByIdRequest;
+import org.n52.sos.response.GetObservationByIdResponse;
 
-/**
- * interface for getting capabilities for a passed GetCapabilities request from
- * the data source
- * 
- * Use {@link AbstractGetCapabilitiesDAO}
- */
-@Deprecated
-public interface IGetCapabilitiesDAO extends IOperationDAO {
+public abstract class AbstractGetObservationByIdDAO extends AbstractOperationDAO {
 
     /**
-     * Get the SOS capabilities
-     * 
-     * @param request
-     *            GetCapabilities request
-     * @return internal SOS capabilities representation
-     * @throws OwsExceptionReport
-     *             If an error occurs.
+     * supported SOS operation
      */
-    public GetCapabilitiesResponse getCapabilities(GetCapabilitiesRequest request) throws OwsExceptionReport;
+    private static final String OPERATION_NAME = SosConstants.Operations.GetObservationById.name();
+
+    @Override
+    public String getOperationName() {
+        return OPERATION_NAME;
+    }
+    
+    @Override
+    public void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
+        opsMeta.addPossibleValuesParameter(Sos2Constants.GetObservationByIdParams.observation, getCache().getObservationIdentifiers());
+    }
+    
+    public abstract GetObservationByIdResponse getObservationById(GetObservationByIdRequest request) throws OwsExceptionReport;
 
 }

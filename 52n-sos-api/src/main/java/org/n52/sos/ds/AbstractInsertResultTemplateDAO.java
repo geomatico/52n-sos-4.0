@@ -23,28 +23,29 @@
  */
 package org.n52.sos.ds;
 
+import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.request.GetCapabilitiesRequest;
-import org.n52.sos.response.GetCapabilitiesResponse;
+import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.request.InsertResultTemplateRequest;
+import org.n52.sos.response.InsertResultTemplateResponse;
 
-/**
- * interface for getting capabilities for a passed GetCapabilities request from
- * the data source
- * 
- * Use {@link AbstractGetCapabilitiesDAO}
- */
-@Deprecated
-public interface IGetCapabilitiesDAO extends IOperationDAO {
-
+public abstract class AbstractInsertResultTemplateDAO extends AbstractOperationDAO {
+    
     /**
-     * Get the SOS capabilities
-     * 
-     * @param request
-     *            GetCapabilities request
-     * @return internal SOS capabilities representation
-     * @throws OwsExceptionReport
-     *             If an error occurs.
+     * supported SOS operation
      */
-    public GetCapabilitiesResponse getCapabilities(GetCapabilitiesRequest request) throws OwsExceptionReport;
+    private static final String OPERATION_NAME = Sos2Constants.Operations.InsertResultTemplate.name();
 
+    @Override
+    public String getOperationName() {
+        return OPERATION_NAME;
+    }
+
+    @Override
+    protected void setOperationsMetadata(OWSOperation opsMeta, String service, String version) throws OwsExceptionReport {
+        opsMeta.addAnyParameterValue(Sos2Constants.InsertResultTemplateParams.proposedTemplate);
+    }
+
+    public abstract InsertResultTemplateResponse insertResultTemplate(InsertResultTemplateRequest request)
+            throws OwsExceptionReport;
 }
