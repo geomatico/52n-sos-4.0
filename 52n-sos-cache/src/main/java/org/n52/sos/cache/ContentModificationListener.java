@@ -53,7 +53,7 @@ public class ContentModificationListener implements SosEventListener {
         return Collections.unmodifiableSet(TYPES);
     }
 
-    private IContentCacheController getContentCacheController() {
+    private ContentCacheController getContentCacheController() {
         return Configurator.getInstance().getCacheController();
     }
 

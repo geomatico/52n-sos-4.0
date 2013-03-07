@@ -37,7 +37,7 @@ import org.n52.sos.util.Cleanupable;
  * TODO JavaDoc
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public interface IContentCacheController extends Cleanupable {
+public interface ContentCacheController extends Cleanupable {
 
     ContentCache getCache();
 

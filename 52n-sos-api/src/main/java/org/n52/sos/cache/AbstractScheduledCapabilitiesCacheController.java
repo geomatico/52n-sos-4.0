@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 @Configurable
-public abstract class AbstractScheduledCapabilitiesCacheController implements IContentCacheController {
+public abstract class AbstractScheduledCapabilitiesCacheController implements ContentCacheController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractScheduledCapabilitiesCacheController.class);
     private final ReentrantLock updateLock = new ReentrantLock(true);

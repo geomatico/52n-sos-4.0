@@ -37,7 +37,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.n52.sos.binding.BindingRepository;
 import org.n52.sos.cache.ContentCache;
-import org.n52.sos.cache.IContentCacheController;
+import org.n52.sos.cache.ContentCacheController;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
@@ -192,7 +192,7 @@ public class Configurator implements Cleanupable {
     /**
      * Content Cache Controller.
      */
-    private IContentCacheController capabilitiesCacheController;
+    private ContentCacheController capabilitiesCacheController;
     /**
      * Implementation of ICacheFeederDAO.
      */
@@ -685,7 +685,7 @@ public class Configurator implements Cleanupable {
      */
     private void initializeContentCacheController() throws ConfigurationException {
         this.capabilitiesCacheController =
-        new ConfiguringSingletonServiceLoader<IContentCacheController>(IContentCacheController.class, true).get();
+        new ConfiguringSingletonServiceLoader<ContentCacheController>(ContentCacheController.class, true).get();
     }
 
     /**
@@ -804,7 +804,7 @@ public class Configurator implements Cleanupable {
     /**
      * @return the current capabilitiesCacheController
      */
-    public IContentCacheController getCacheController() {
+    public ContentCacheController getCacheController() {
         return capabilitiesCacheController;
     }
 
@@ -812,7 +812,7 @@ public class Configurator implements Cleanupable {
      * @deprecated use {@link getCacheController()}
      */
     @Deprecated
-    public IContentCacheController getCapabilitiesCacheController() {
+    public ContentCacheController getCapabilitiesCacheController() {
         return getCacheController();
     }
 
