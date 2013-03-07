@@ -51,6 +51,7 @@ import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OWSOperation;
+import org.n52.sos.ogc.ows.OWSParameterValueRange;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -109,7 +110,8 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
 
         if (version.equals(Sos2Constants.SERVICEVERSION)) {
             // SOS 2.0 parameter
-            opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.temporalFilter, getPhenomenonTime());
+            OWSParameterValueRange temporalFilter = new OWSParameterValueRange(getPhenomenonTime(), "om:phenomenonTime");
+            opsMeta.addRangeParameterValue(Sos2Constants.GetObservationParams.temporalFilter, temporalFilter);
             SosEnvelope envelope = null;
             if (featureIDs != null && !featureIDs.isEmpty()) {
                 envelope = getCache().getGlobalEnvelope();
@@ -301,11 +303,9 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
     }
 
     /**
-     * Get the min/max time of contained observations
+     * Get the min/max phenomenon time of contained observations
      * 
-     * @param session
-     *            Hibernate session
-     * @return min/max observation time
+     * @return min/max phenomenon time
      * @throws OwsExceptionReport
      *             If an error occurs.
      */
@@ -317,7 +317,28 @@ public class GetObservationDAO extends AbstractHibernateOperationDao implements 
                     .setMinimum(minDate != null ? DateTimeHelper.formatDateTime2ResponseString(minDate) : null)
                     .setMaximum(maxDate != null ? DateTimeHelper.formatDateTime2ResponseString(maxDate) : null);
         } catch (DateTimeException dte) {
-            String exceptionText = "Error while getting min/max time for OwsMetadata!";
+            String exceptionText = "Error while getting min/max phenomenon time for OwsMetadata!";
+            LOGGER.error(exceptionText, dte);
+            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+        }
+    }
+    
+    /**
+     * Get the min/max result time of contained observations
+     * 
+     * @return min/max result time
+     * @throws OwsExceptionReport
+     *             If an error occurs.
+     */
+    private MinMax<String> getResultTime() throws OwsExceptionReport {
+        try {
+            DateTime minDate = getCache().getMinResultTime();
+            DateTime maxDate = getCache().getMaxResultTime();
+            return new MinMax<String>()
+                    .setMinimum(minDate != null ? DateTimeHelper.formatDateTime2ResponseString(minDate) : null)
+                    .setMaximum(maxDate != null ? DateTimeHelper.formatDateTime2ResponseString(maxDate) : null);
+        } catch (DateTimeException dte) {
+            String exceptionText = "Error while getting min/max result time for OwsMetadata!";
             LOGGER.error(exceptionText, dte);
             throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
         }
