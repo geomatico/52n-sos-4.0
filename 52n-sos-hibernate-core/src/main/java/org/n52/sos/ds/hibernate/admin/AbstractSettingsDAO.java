@@ -38,53 +38,52 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AbstractSettingsDAO implements IInitializableDAO {
-	protected static final Logger log = LoggerFactory.getLogger(AbstractSettingsDAO.class);
-	protected static final String KEY = HibernateConstants.PARAMETER_SETTING_KEY;
-	protected static final String VALUE = HibernateConstants.PARAMETER_SETTING_VALUE;
-	
-	private String driver;
-	private String connectionString;
-	private String user;
-	private String pass;
-	
-	public void initialize(String driver, String connectionString, String user, String pass) {
-		this.driver = driver;
-		this.connectionString = connectionString;
-		this.user = user;
-		this.pass = pass;
-	}
-	
-	@Override
-	public void initialize(Properties properties) {
-		initialize(properties.getProperty(DefaultHibernateConstants.DRIVER_PROPERTY), 
-				   properties.getProperty(DefaultHibernateConstants.CONNECTION_STRING_PROPERTY), 
-				   properties.getProperty(DefaultHibernateConstants.USER_PROPERTY),
-				   properties.getProperty(DefaultHibernateConstants.PASS_PROPERTY));
-	}
-	
-	protected Object getConnection() throws SQLException, ConnectionProviderException {
-		if (Configurator.getInstance() != null) {
-			log.debug("Configurator is present. Using ConnectionProvider");
-			return Configurator.getInstance().getDataConnectionProvider().getConnection();
-		}
-		
-		try {
-			Class.forName(this.driver);
-			return DriverManager.getConnection(this.connectionString, this.user, this.pass);
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		} 
-	}
-	
-	protected void returnConnection(Object o) {
-		if (o instanceof Session) {
-			Configurator.getInstance().getDataConnectionProvider().returnConnection(o);
-		} else if (o instanceof Connection) {
-			try {
-				if (o != null) {
-					((Connection) o).close();
-				}
-			} catch (SQLException e) {}
-		}
-	} 
+    protected static final Logger log = LoggerFactory.getLogger(AbstractSettingsDAO.class);
+    protected static final String KEY = HibernateConstants.PARAMETER_SETTING_KEY;
+    protected static final String VALUE = HibernateConstants.PARAMETER_SETTING_VALUE;
+    private String driver;
+    private String connectionString;
+    private String user;
+    private String pass;
+
+    public void initialize(String driver, String connectionString, String user, String pass) {
+        this.driver = driver;
+        this.connectionString = connectionString;
+        this.user = user;
+        this.pass = pass;
+    }
+
+    @Override
+    public void initialize(Properties properties) {
+        initialize(properties.getProperty(DefaultHibernateConstants.DRIVER_PROPERTY),
+                   properties.getProperty(DefaultHibernateConstants.CONNECTION_STRING_PROPERTY),
+                   properties.getProperty(DefaultHibernateConstants.USER_PROPERTY),
+                   properties.getProperty(DefaultHibernateConstants.PASS_PROPERTY));
+    }
+
+    protected Object getConnection() throws SQLException, ConnectionProviderException {
+        if (Configurator.getInstance() != null) {
+            log.debug("Configurator is present. Using ConnectionProvider");
+            return Configurator.getInstance().getDataConnectionProvider().getConnection();
+        }
+
+        try {
+            Class.forName(this.driver);
+            return DriverManager.getConnection(this.connectionString, this.user, this.pass);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected void returnConnection(Object o) {
+        if (o instanceof Session) {
+            Configurator.getInstance().getDataConnectionProvider().returnConnection(o);
+        } else if (o instanceof Connection) {
+            try {
+                ((Connection) o).close();
+            } catch (SQLException e) {
+                log.error("Error closing connection", e);
+            }
+        }
+    }
 }
