@@ -23,8 +23,8 @@
  */
 package org.n52.sos.ds.hibernate.cache;
 
-import org.n52.sos.ds.hibernate.cache.base.ObservationTimeCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.FeatureOfInterestCacheUpdate;
+import org.n52.sos.ds.hibernate.cache.base.ObservationTimeCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.base.OfferingCacheUpdate;
 
 /**

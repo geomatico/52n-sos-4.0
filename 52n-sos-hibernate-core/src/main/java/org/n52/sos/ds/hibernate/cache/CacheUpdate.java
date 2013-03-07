@@ -23,13 +23,11 @@
  */
 package org.n52.sos.ds.hibernate.cache;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Session;
-import org.n52.sos.cache.ContentCache;
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ds.IFeatureQueryHandler;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
