@@ -450,6 +450,9 @@ public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
         } else {
             domainType.addNewNoValues();
         }
+        if (parameterValue.isSetValueReference()) {
+            domainType.addNewValuesReference().setReference(parameterValue.getValueReference());
+        }
     }
 
 }
