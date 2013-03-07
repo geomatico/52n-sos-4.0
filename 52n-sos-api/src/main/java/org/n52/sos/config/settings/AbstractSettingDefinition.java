@@ -24,13 +24,13 @@
 package org.n52.sos.config.settings;
 
 import org.n52.sos.config.AbstractOrdered;
-import org.n52.sos.config.ISettingDefinition;
+import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingDefinitionGroup;
 import org.n52.sos.config.SettingType;
 
 /**
  * Generic implementation of
- * <code>ISettingDefinition</code>.
+ * <code>SettingDefinition</code>.
  * <p/>
  * @param <S> the type of the class extending this class
  * @param <T> the type of the value
@@ -39,7 +39,7 @@ import org.n52.sos.config.SettingType;
  * @since 4.0
  */
 abstract class AbstractSettingDefinition<S extends AbstractSettingDefinition<S, T>, T> extends AbstractOrdered<S>
-        implements ISettingDefinition<S, T> {
+        implements SettingDefinition<S, T> {
 
     private boolean optional = false;
     private String identifier;

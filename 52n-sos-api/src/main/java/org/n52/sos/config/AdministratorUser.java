@@ -24,24 +24,42 @@
 package org.n52.sos.config;
 
 /**
- * Generic class to implement a Order based on floating point numbers.
- *
- * @param <T> the type of the extending class
+ * Interface for users that are allowed to administer the SOS. Implementations are {@link SettingsManager} specific.
  * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
  * @since 4.0
  */
-public interface IOrdered<T extends IOrdered<T>> extends Comparable<IOrdered<?>> {
+public interface AdministratorUser {
 
     /**
-     * @return the order of this clas represented as a <code>float</code>
-     */
-    public float getOrder();
-
-    /**
-     * @param order the order
+     * Get the value of password
      * <p/>
-     * @return <code>this</code>
+     * @return the value of password
      */
-    public T setOrder(float order);
+    public String getPassword();
+
+    /**
+     * Get the value of username
+     * <p/>
+     * @return the value of username
+     */
+    public String getUsername();
+
+    /**
+     * Set the value of password
+     * <p/>
+     * @param password new value of password
+     * <p/>
+     * @return this
+     */
+    public AdministratorUser setPassword(String password);
+
+    /**
+     * Set the value of username
+     * <p/>
+     * @param username new value of username
+     * <p/>
+     * @return this
+     */
+    public AdministratorUser setUsername(String username);
 }

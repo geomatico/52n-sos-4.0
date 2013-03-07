@@ -27,7 +27,7 @@ import java.net.URI;
 
 import javax.persistence.Entity;
 
-import org.n52.sos.config.ISettingValue;
+import org.n52.sos.config.SettingValue;
 import org.n52.sos.config.SettingType;
 
 /**
@@ -44,7 +44,7 @@ public class UriSettingValue extends AbstractSettingValue<URI> {
     }
 
     @Override
-    public ISettingValue<URI> setValue(URI value) {
+    public SettingValue<URI> setValue(URI value) {
         this.value = value;
         return this;
     }

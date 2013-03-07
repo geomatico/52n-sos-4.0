@@ -26,8 +26,8 @@ package org.n52.sos.request.operator;
 import java.util.Collections;
 import java.util.Set;
 
-import org.n52.sos.config.ISettingDefinition;
-import org.n52.sos.config.ISettingDefinitionProvider;
+import org.n52.sos.config.SettingDefinition;
+import org.n52.sos.config.SettingDefinitionProvider;
 import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.service.MiscSettings;
 import org.n52.sos.util.CollectionHelper;
@@ -37,7 +37,7 @@ import org.n52.sos.util.CollectionHelper;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class TransactionalOperatorSettings implements ISettingDefinitionProvider {
+public class TransactionalOperatorSettings implements SettingDefinitionProvider {
 
     public static final String DEFAULT_PROCEDURE_PREFIX = "misc.defaultProcedurePrefix";
     public static final StringSettingDefinition DEFAULT_PROCEDURE_PREFIX_DEFINITION = new StringSettingDefinition()
@@ -47,11 +47,11 @@ public class TransactionalOperatorSettings implements ISettingDefinitionProvider
             .setDefaultValue("urn:ogc:object:feature:Sensor:")
             .setTitle("Default Procedure Prefix")
             .setDescription("The default prefix for generated procedures (if not defined in RegisterSensor requests).");
-    private static final Set<ISettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<ISettingDefinition<?, ?>>set(
+    private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?, ?>>set(
             DEFAULT_PROCEDURE_PREFIX_DEFINITION);
 
     @Override
-    public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
+    public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
         return Collections.unmodifiableSet(DEFINITIONS);
     }
 }

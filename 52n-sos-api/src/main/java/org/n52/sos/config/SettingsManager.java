@@ -50,10 +50,10 @@ import org.slf4j.LoggerFactory;
  * automatically done for all classes loaded by the {@link Configurator}. All other classes have to call
  * {@code configure(java.lang.Object)} manually.
  * <p/>
- * @see IAdministratorUser
- * @see ISettingDefinition
+ * @see AdministratorUser
+ * @see SettingDefinition
  * @see ISettingDefinitionProvider
- * @see ISettingValue
+ * @see SettingValue
  * @see Configurable
  * @see ConfiguringSingletonServiceLoader
  * @see AbstractConfiguringServiceLoaderRepository
@@ -125,14 +125,14 @@ public abstract class SettingsManager {
      * <p/>
      * @return the definition or {@code null} if there is no definition for the key
      */
-    public abstract ISettingDefinition<?, ?> getDefinitionByKey(String key);
+    public abstract SettingDefinition<?, ?> getDefinitionByKey(String key);
 
     /**
-     * Gets all {@code ISettingDefinition}s known by this class.
+     * Gets all {@code SettingDefinition}s known by this class.
      * <p/>
      * @return the defnitions
      */
-    public abstract Set<ISettingDefinition<?, ?>> getSettingDefinitions();
+    public abstract Set<SettingDefinition<?, ?>> getSettingDefinitions();
 
     /**
      * Gets the value of the setting defined by {@code key}.
@@ -144,7 +144,7 @@ public abstract class SettingsManager {
      * <p/>
      * @throws ConnectionProviderException
      */
-    public abstract <T> ISettingValue<T> getSetting(ISettingDefinition<?, T> key) throws ConnectionProviderException;
+    public abstract <T> SettingValue<T> getSetting(SettingDefinition<?, T> key) throws ConnectionProviderException;
 
     /**
      * Gets all values for all definitions. If there is no value for a definition {@code null} is added to the map.
@@ -153,7 +153,7 @@ public abstract class SettingsManager {
      * <p/>
      * @throws ConnectionProviderException
      */
-    public abstract Map<ISettingDefinition<?, ?>, ISettingValue<?>> getSettings() throws ConnectionProviderException;
+    public abstract Map<SettingDefinition<?, ?>, SettingValue<?>> getSettings() throws ConnectionProviderException;
 
     /**
      * Deletes the setting defined by {@code setting}.
@@ -163,7 +163,7 @@ public abstract class SettingsManager {
      * @throws ConfigurationException if there is a problem deleting the setting
      * @throws ConnectionProviderException
      */
-    public abstract void deleteSetting(ISettingDefinition<?, ?> setting) throws ConfigurationException,
+    public abstract void deleteSetting(SettingDefinition<?, ?> setting) throws ConfigurationException,
                                                                                 ConnectionProviderException;
 
     /**
@@ -175,20 +175,20 @@ public abstract class SettingsManager {
      * @throws ConfigurationException if there is a problem changing the setting.
      * @throws ConnectionProviderException
      */
-    public abstract void changeSetting(ISettingValue<?> value) throws ConfigurationException,
+    public abstract void changeSetting(SettingValue<?> value) throws ConfigurationException,
                                                                       ConnectionProviderException;
 
     /* TODO JavaDoc */
-    public abstract ISettingValueFactory getSettingFactory();
+    public abstract SettingValueFactory getSettingFactory();
 
     /* TODO JavaDoc */
-    public abstract Set<IAdministratorUser> getAdminUsers() throws ConnectionProviderException;
+    public abstract Set<AdministratorUser> getAdminUsers() throws ConnectionProviderException;
 
     /* TODO JavaDoc */
-    public abstract IAdministratorUser getAdminUser(String username) throws ConnectionProviderException;
+    public abstract AdministratorUser getAdminUser(String username) throws ConnectionProviderException;
 
     /**
-     * Creates a new {@code IAdministratorUser}. This method will fail if the username is already used by another user.
+     * Creates a new {@code AdministratorUser}. This method will fail if the username is already used by another user.
      * <p/>
      * @param username the proposed username
      * @param password the proposed (hashed) password
@@ -197,7 +197,7 @@ public abstract class SettingsManager {
      * <p/>
      * @throws ConnectionProviderException
      */
-    public abstract IAdministratorUser createAdminUser(String username, String password) throws
+    public abstract AdministratorUser createAdminUser(String username, String password) throws
             ConnectionProviderException;
 
     /**
@@ -207,7 +207,7 @@ public abstract class SettingsManager {
      * <p/>
      * @throws ConnectionProviderException
      */
-    public abstract void saveAdminUser(IAdministratorUser user) throws ConnectionProviderException;
+    public abstract void saveAdminUser(AdministratorUser user) throws ConnectionProviderException;
 
     /**
      * Deletes the user with the specified username.
@@ -225,7 +225,7 @@ public abstract class SettingsManager {
      * <p/>
      * @throws ConnectionProviderException
      */
-    public abstract void deleteAdminUser(IAdministratorUser user) throws ConnectionProviderException;
+    public abstract void deleteAdminUser(AdministratorUser user) throws ConnectionProviderException;
 
     /**
      * Deletes all settings and users.

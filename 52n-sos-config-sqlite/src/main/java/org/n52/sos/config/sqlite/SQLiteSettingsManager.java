@@ -36,11 +36,11 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.config.AbstractSettingValueFactory;
 import org.n52.sos.config.AbstractSettingsManager;
-import org.n52.sos.config.IAdministratorUser;
-import org.n52.sos.config.ISettingValue;
-import org.n52.sos.config.ISettingValueFactory;
+import org.n52.sos.config.AdministratorUser;
+import org.n52.sos.config.SettingValue;
+import org.n52.sos.config.SettingValueFactory;
 import org.n52.sos.config.sqlite.entities.AbstractSettingValue;
-import org.n52.sos.config.sqlite.entities.AdministratorUser;
+import org.n52.sos.config.sqlite.entities.AdminUser;
 import org.n52.sos.config.sqlite.entities.BooleanSettingValue;
 import org.n52.sos.config.sqlite.entities.FileSettingValue;
 import org.n52.sos.config.sqlite.entities.IntegerSettingValue;
@@ -60,7 +60,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     private static final Logger log = LoggerFactory.getLogger(SQLiteSettingsManager.class);
     private static final Pattern SETTINGS_TYPE_CHANGED = Pattern.compile(
             ".*Abort due to constraint violation \\(column .* is not unique\\)");
-    public static final ISettingValueFactory SQLITE_SETTING_FACTORY = new SqliteSettingFactory();
+    public static final SettingValueFactory SQLITE_SETTING_FACTORY = new SqliteSettingFactory();
     private IConnectionProvider connectionProvider;
     private final ReentrantLock lock = new ReentrantLock();
 
@@ -121,17 +121,17 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    public ISettingValueFactory getSettingFactory() {
+    public SettingValueFactory getSettingFactory() {
         return SQLITE_SETTING_FACTORY;
     }
 
     @Override
-    public ISettingValue<?> getSettingValue(final String key) throws HibernateException, ConnectionProviderException {
+    public SettingValue<?> getSettingValue(final String key) throws HibernateException, ConnectionProviderException {
         return execute(new GetSettingValueAction(key));
     }
 
     @Override
-    public void saveSettingValue(final ISettingValue<?> setting) throws HibernateException, ConnectionProviderException {
+    public void saveSettingValue(final SettingValue<?> setting) throws HibernateException, ConnectionProviderException {
         log.debug("Saving Setting {}", setting);
         try {
             execute(new SaveSettingValueAction(setting));
@@ -146,12 +146,12 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    public Set<ISettingValue<?>> getSettingValues() throws HibernateException, ConnectionProviderException {
+    public Set<SettingValue<?>> getSettingValues() throws HibernateException, ConnectionProviderException {
         return execute(new GetSettingValuesAction());
     }
 
     @Override
-    public IAdministratorUser getAdminUser(String username) throws HibernateException, ConnectionProviderException {
+    public AdministratorUser getAdminUser(String username) throws HibernateException, ConnectionProviderException {
         return execute(new GetAdminUserAction(username));
     }
 
@@ -165,13 +165,12 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    public IAdministratorUser createAdminUser(String username, String password) throws HibernateException,
-                                                                                       ConnectionProviderException {
+    public AdministratorUser createAdminUser(String username, String password) throws HibernateException,                                                                                       ConnectionProviderException {
         return execute(new CreateAdminUserAction(username, password));
     }
 
     @Override
-    public void saveAdminUser(IAdministratorUser user) throws HibernateException, ConnectionProviderException {
+    public void saveAdminUser(AdministratorUser user) throws HibernateException, ConnectionProviderException {
         execute(new SaveAdminUserAction(user));
     }
 
@@ -186,7 +185,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    public Set<IAdministratorUser> getAdminUsers() throws ConnectionProviderException {
+    public Set<AdministratorUser> getAdminUsers() throws ConnectionProviderException {
         return execute(new GetAdminUsersAction());
     }
 
@@ -233,7 +232,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
         }
 
         @Override
-        protected ISettingValue<Double> newNumericSettingValue() {
+        protected SettingValue<Double> newNumericSettingValue() {
             return new NumericSettingValue();
         }
     }
@@ -288,11 +287,11 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
         }
     }
 
-    private class GetAdminUsersAction extends HibernateAction<Set<IAdministratorUser>> {
+    private class GetAdminUsersAction extends HibernateAction<Set<AdministratorUser>> {
         @Override
         @SuppressWarnings("unchecked")
-        protected Set<IAdministratorUser> call(Session session) {
-            return new HashSet<IAdministratorUser>(
+        protected Set<AdministratorUser> call(Session session) {
+            return new HashSet<AdministratorUser>(
                     session.createCriteria(AdministratorUser.class)
                     .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                     .list());
@@ -303,14 +302,14 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
         @Override
         @SuppressWarnings("unchecked")
         protected void run(Session session) {
-            List<IAdministratorUser> users = session.createCriteria(AdministratorUser.class)
+            List<AdministratorUser> users = session.createCriteria(AdministratorUser.class)
                     .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();
-            for (IAdministratorUser u : users) {
+            for (AdministratorUser u : users) {
                 session.delete(u);
             }
             List<AbstractSettingValue<?>> settings = session.createCriteria(AbstractSettingValue.class)
                     .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list();
-            for (ISettingValue<?> v : settings) {
+            for (SettingValue<?> v : settings) {
                 session.delete(v);
             }
         }
@@ -325,8 +324,8 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
 
         @Override
         protected void run(Session session) {
-            IAdministratorUser au = (IAdministratorUser) session.createCriteria(AdministratorUser.class)
-                    .add(Restrictions.eq(AdministratorUser.USERNAME_PROPERTY, username)).uniqueResult();
+            AdministratorUser au = (AdministratorUser) session.createCriteria(AdministratorUser.class)
+                    .add(Restrictions.eq(AdminUser.USERNAME_PROPERTY, username)).uniqueResult();
             if (au != null) {
                 session.delete(au);
             }
@@ -334,9 +333,9 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     private class SaveAdminUserAction extends VoidHibernateAction {
-        private final IAdministratorUser user;
+        private final AdministratorUser user;
 
-        SaveAdminUserAction(IAdministratorUser user) {
+        SaveAdminUserAction(AdministratorUser user) {
             this.user = user;
         }
 
@@ -347,7 +346,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
         }
     }
 
-    private class CreateAdminUserAction extends HibernateAction<IAdministratorUser> {
+    private class CreateAdminUserAction extends HibernateAction<AdminUser> {
         private final String username;
         private final String password;
 
@@ -357,8 +356,8 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
         }
 
         @Override
-        protected IAdministratorUser call(Session session) {
-            IAdministratorUser user = new AdministratorUser().setUsername(username).setPassword(password);
+        protected AdminUser call(Session session) {
+            AdminUser user = new AdminUser().setUsername(username).setPassword(password);
             log.debug("Creating AdministratorUser {}", user);
             session.save(user);
             return user;
@@ -383,7 +382,7 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
         }
     }
 
-    private class GetAdminUserAction extends HibernateAction<IAdministratorUser> {
+    private class GetAdminUserAction extends HibernateAction<AdminUser> {
         private final String username;
 
         GetAdminUserAction(String username) {
@@ -391,13 +390,13 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
         }
 
         @Override
-        protected IAdministratorUser call(Session session) {
-            return (IAdministratorUser) session.createCriteria(AdministratorUser.class)
-                    .add(Restrictions.eq(AdministratorUser.USERNAME_PROPERTY, username)).uniqueResult();
+        protected AdminUser call(Session session) {
+            return (AdminUser) session.createCriteria(AdminUser.class)
+                    .add(Restrictions.eq(AdminUser.USERNAME_PROPERTY, username)).uniqueResult();
         }
     }
 
-    private class GetSettingValueAction extends HibernateAction<ISettingValue<?>> {
+    private class GetSettingValueAction extends HibernateAction<SettingValue<?>> {
         private final String key;
 
         GetSettingValueAction(String key) {
@@ -405,15 +404,15 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
         }
 
         @Override
-        protected ISettingValue<?> call(Session session) {
-            return (ISettingValue<?>) session.get(AbstractSettingValue.class, key);
+        protected SettingValue<?> call(Session session) {
+            return (SettingValue<?>) session.get(AbstractSettingValue.class, key);
         }
     }
 
     private class SaveSettingValueAction extends VoidHibernateAction {
-        private final ISettingValue<?> setting;
+        private final SettingValue<?> setting;
 
-        SaveSettingValueAction(ISettingValue<?> setting) {
+        SaveSettingValueAction(SettingValue<?> setting) {
             this.setting = setting;
         }
 
@@ -424,9 +423,9 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     private class DeleteAndSaveValueAction extends VoidHibernateAction {
-        private final ISettingValue<?> setting;
+        private final SettingValue<?> setting;
 
-        DeleteAndSaveValueAction(ISettingValue<?> setting) {
+        DeleteAndSaveValueAction(SettingValue<?> setting) {
             this.setting = setting;
         }
 
@@ -443,11 +442,11 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
         }
     }
 
-    private class GetSettingValuesAction extends HibernateAction<Set<ISettingValue<?>>> {
+    private class GetSettingValuesAction extends HibernateAction<Set<SettingValue<?>>> {
         @Override
         @SuppressWarnings("unchecked")
-        protected Set<ISettingValue<?>> call(Session session) {
-            return new HashSet<ISettingValue<?>>(session
+        protected Set<SettingValue<?>> call(Session session) {
+            return new HashSet<SettingValue<?>>(session
                     .createCriteria(AbstractSettingValue.class)
                     .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY).list());
         }

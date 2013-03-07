@@ -26,8 +26,8 @@ package org.n52.sos.ds.hibernate;
 import java.util.Collections;
 import java.util.Set;
 
-import org.n52.sos.config.ISettingDefinition;
-import org.n52.sos.config.ISettingDefinitionProvider;
+import org.n52.sos.config.SettingDefinition;
+import org.n52.sos.config.SettingDefinitionProvider;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
 import org.n52.sos.service.ServiceSettings;
 import org.n52.sos.util.CollectionHelper;
@@ -35,7 +35,7 @@ import org.n52.sos.util.CollectionHelper;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class CacheFeederSettingDefinitionProvider implements ISettingDefinitionProvider {
+public class CacheFeederSettingDefinitionProvider implements SettingDefinitionProvider {
 
     public static final String CACHE_THREAD_COUNT = "service.cacheThreadCount";
     
@@ -46,11 +46,11 @@ public class CacheFeederSettingDefinitionProvider implements ISettingDefinitionP
             .setDefaultValue(5)
             .setTitle("Cache Feeder Threads")
             .setDescription("The number of threads used to fill the capabilities cache.");
-    private static final Set<ISettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<ISettingDefinition<?, ?>>set(
+    private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?, ?>>set(
             CACHE_THREAD_COUNT_DEFINITION);
 
     @Override
-    public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
+    public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
         return Collections.unmodifiableSet(DEFINITIONS);
     }
 }

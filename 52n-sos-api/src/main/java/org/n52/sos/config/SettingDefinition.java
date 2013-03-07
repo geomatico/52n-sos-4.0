@@ -51,7 +51,7 @@ import org.n52.sos.config.settings.UriSettingDefinition;
  * @author Christian Autermann <c.autermann@52north.org>
  * @since 4.0
  */
-public interface ISettingDefinition<S extends ISettingDefinition<S, T>, T> extends IOrdered<S> {
+public interface SettingDefinition<S extends SettingDefinition<S, T>, T> extends Ordered<S> {
 
     public String getKey();
 

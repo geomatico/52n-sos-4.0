@@ -42,73 +42,73 @@ import org.n52.sos.util.CollectionHelper;
  * @author Christian Autermann <c.autermann@52north.org>
  * @since 4.0
  */
-public abstract class AbstractSettingValueFactory implements ISettingValueFactory {
+public abstract class AbstractSettingValueFactory implements SettingValueFactory {
 
     private static final Set<String> VALID_FALSE_VALUES = CollectionHelper.set("false", "no", "off", "0");
     private static final Set<String> VALID_TRUE_VALUES = CollectionHelper.set("true", "yes", "on", "1");
 
     @Override
-    public ISettingValue<Boolean> newBooleanSettingValue(BooleanSettingDefinition setting, String stringValue) {
+    public SettingValue<Boolean> newBooleanSettingValue(BooleanSettingDefinition setting, String stringValue) {
         return newBooleanSettingValueFromGenericDefinition(setting, stringValue);
     }
 
-    private ISettingValue<Boolean> newBooleanSettingValueFromGenericDefinition(ISettingDefinition<?, ?> setting,
+    private SettingValue<Boolean> newBooleanSettingValueFromGenericDefinition(SettingDefinition<?, ?> setting,
                                                                                String stringValue) {
         return newBooleanSettingValue().setValue(parseBoolean(stringValue)).setKey(setting.getKey());
     }
 
     @Override
-    public ISettingValue<Integer> newIntegerSettingValue(IntegerSettingDefinition setting, String stringValue) {
+    public SettingValue<Integer> newIntegerSettingValue(IntegerSettingDefinition setting, String stringValue) {
         return newIntegerSettingValueFromGenericDefinition(setting, stringValue);
     }
 
-    private ISettingValue<Integer> newIntegerSettingValueFromGenericDefinition(ISettingDefinition<?, ?> setting,
+    private SettingValue<Integer> newIntegerSettingValueFromGenericDefinition(SettingDefinition<?, ?> setting,
                                                                                String stringValue) {
         return newIntegerSettingValue().setValue(parseInteger(stringValue)).setKey(setting.getKey());
     }
 
     @Override
-    public ISettingValue<Double> newNumericSettingValue(NumericSettingDefinition setting, String stringValue) {
+    public SettingValue<Double> newNumericSettingValue(NumericSettingDefinition setting, String stringValue) {
         return newNumericSettingValueFromGenericDefinition(setting, stringValue);
     }
 
-    private ISettingValue<Double> newNumericSettingValueFromGenericDefinition(ISettingDefinition<?, ?> setting,
+    private SettingValue<Double> newNumericSettingValueFromGenericDefinition(SettingDefinition<?, ?> setting,
                                                                               String stringValue) {
         return newNumericSettingValue().setValue(parseDouble(stringValue)).setKey(setting.getKey());
     }
 
     @Override
-    public ISettingValue<String> newStringSettingValue(StringSettingDefinition setting, String stringValue) {
+    public SettingValue<String> newStringSettingValue(StringSettingDefinition setting, String stringValue) {
         return newStringSettingValueFromGenericDefinition(setting, stringValue);
     }
 
-    private ISettingValue<String> newStringSettingValueFromGenericDefinition(ISettingDefinition<?, ?> setting,
+    private SettingValue<String> newStringSettingValueFromGenericDefinition(SettingDefinition<?, ?> setting,
                                                                              String stringValue) {
         return newStringSettingValue().setValue(parseString(stringValue)).setKey(setting.getKey());
     }
 
     @Override
-    public ISettingValue<File> newFileSettingValue(FileSettingDefinition setting, String stringValue) {
+    public SettingValue<File> newFileSettingValue(FileSettingDefinition setting, String stringValue) {
         return newFileSettingValueFromGenericDefinition(setting, stringValue);
     }
 
-    private ISettingValue<File> newFileSettingValueFromGenericDefinition(ISettingDefinition<?, ?> setting,
+    private SettingValue<File> newFileSettingValueFromGenericDefinition(SettingDefinition<?, ?> setting,
                                                                          String stringValue) {
         return newFileSettingValue().setValue(parseFile(stringValue)).setKey(setting.getKey());
     }
 
     @Override
-    public ISettingValue<URI> newUriSettingValue(UriSettingDefinition setting, String stringValue) {
+    public SettingValue<URI> newUriSettingValue(UriSettingDefinition setting, String stringValue) {
         return newUriSettingValueFromGenericDefinition(setting, stringValue);
     }
 
-    private ISettingValue<URI> newUriSettingValueFromGenericDefinition(ISettingDefinition<?, ?> setting,
+    private SettingValue<URI> newUriSettingValueFromGenericDefinition(SettingDefinition<?, ?> setting,
                                                                        String stringValue) {
         return newUriSettingValue().setValue(parseUri(stringValue)).setKey(setting.getKey());
     }
 
     @Override
-    public ISettingValue<?> newSettingValue(ISettingDefinition<?, ?> setting, String value) {
+    public SettingValue<?> newSettingValue(SettingDefinition<?, ?> setting, String value) {
         switch (setting.getType()) {
         case BOOLEAN:
             return newBooleanSettingValueFromGenericDefinition(setting, value);
@@ -225,32 +225,32 @@ public abstract class AbstractSettingValueFactory implements ISettingValueFactor
     /**
      * @return a implementation specific instance
      */
-    protected abstract ISettingValue<Boolean> newBooleanSettingValue();
+    protected abstract SettingValue<Boolean> newBooleanSettingValue();
 
     /**
      * @return a implementation specific instance
      */
-    protected abstract ISettingValue<Integer> newIntegerSettingValue();
+    protected abstract SettingValue<Integer> newIntegerSettingValue();
 
     /**
      * @return a implementation specific instance
      */
-    protected abstract ISettingValue<String> newStringSettingValue();
+    protected abstract SettingValue<String> newStringSettingValue();
 
     /**
      * @return a implementation specific instance
      */
-    protected abstract ISettingValue<File> newFileSettingValue();
+    protected abstract SettingValue<File> newFileSettingValue();
 
     /**
      * @return a implementation specific instance
      */
-    protected abstract ISettingValue<URI> newUriSettingValue();
+    protected abstract SettingValue<URI> newUriSettingValue();
 
     /**
      * @return a implementation specific instance
      */
-    protected abstract ISettingValue<Double> newNumericSettingValue();
+    protected abstract SettingValue<Double> newNumericSettingValue();
 
     /**
      * @param stringValue

@@ -29,7 +29,7 @@ import java.util.Collections;
 
 import javax.servlet.ServletContext;
 
-import org.n52.sos.config.IAdministratorUser;
+import org.n52.sos.config.AdministratorUser;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.service.ConfigurationException;
@@ -58,13 +58,13 @@ public class UserService implements AuthenticationProvider, Serializable {
     public UsernamePasswordAuthenticationToken authenticate(Authentication authentication) throws
             AuthenticationException {
         UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) authentication;
-        IAdministratorUser user = authenticate((String) auth.getPrincipal(), (String) auth.getCredentials());
+        AdministratorUser user = authenticate((String) auth.getPrincipal(), (String) auth.getCredentials());
         return new UsernamePasswordAuthenticationToken(new AdministratorUserPrinciple(user), null, Collections
                 .singleton(new AdministratorAuthority()));
     }
 
-    public IAdministratorUser authenticate(String username, String password) throws AuthenticationException {
-        IAdministratorUser user;
+    public AdministratorUser authenticate(String username, String password) throws AuthenticationException {
+        AdministratorUser user;
         
         if (username == null || password == null) {
             throw new BadCredentialsException("Bad Credentials");
@@ -93,7 +93,7 @@ public class UserService implements AuthenticationProvider, Serializable {
         return UsernamePasswordAuthenticationToken.class.isAssignableFrom(type);
     }
 
-    public IAdministratorUser createAdmin(String username, String password) {
+    public AdministratorUser createAdmin(String username, String password) {
         try {
             return SettingsManager.getInstance().createAdminUser(username, getPasswordEncoder().encode(password));
         } catch (Exception ex) {
@@ -102,7 +102,7 @@ public class UserService implements AuthenticationProvider, Serializable {
         }
     }
 
-    public void setAdminUserName(IAdministratorUser user, String name) {
+    public void setAdminUserName(AdministratorUser user, String name) {
         try {
             SettingsManager.getInstance().saveAdminUser(user.setUsername(name));
         } catch (Exception ex) {
@@ -111,7 +111,7 @@ public class UserService implements AuthenticationProvider, Serializable {
         }
     }
 
-    public void setAdminPassword(IAdministratorUser user, String password) {
+    public void setAdminPassword(AdministratorUser user, String password) {
         try {
             SettingsManager.getInstance().saveAdminUser(user.setPassword(getPasswordEncoder().encode(password)));
         } catch (Exception ex) {
@@ -120,7 +120,7 @@ public class UserService implements AuthenticationProvider, Serializable {
         }
     }
 
-    public IAdministratorUser getAdmin(String username) throws ConfigurationException {
+    public AdministratorUser getAdmin(String username) throws ConfigurationException {
         try {
             return SettingsManager.getInstance().getAdminUser(username);
         } catch (ConnectionProviderException e) {
@@ -128,7 +128,7 @@ public class UserService implements AuthenticationProvider, Serializable {
         }
     }
 
-    public IAdministratorUser getAdmin(Principal user) throws ConfigurationException {
+    public AdministratorUser getAdmin(Principal user) throws ConfigurationException {
         try {
             return SettingsManager.getInstance().getAdminUser(user.getName());
         } catch (ConnectionProviderException e) {
@@ -167,7 +167,7 @@ public class UserService implements AuthenticationProvider, Serializable {
 
         private String username;
         
-        AdministratorUserPrinciple(IAdministratorUser user) {
+        AdministratorUserPrinciple(AdministratorUser user) {
             this.username = user.getUsername();
         }
         

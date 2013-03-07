@@ -39,7 +39,7 @@ import org.n52.sos.config.settings.UriSettingDefinition;
  * @author Christian Autermann <c.autermann@52north.org>
  * @since 4.0
  */
-public interface ISettingValueFactory {
+public interface SettingValueFactory {
 
     /**
      * Constructs a new {@code Boolean} setting value from the supplied definition and string value.
@@ -47,9 +47,9 @@ public interface ISettingValueFactory {
      * @param setting the setting definition
      * @param stringValue the value as string
      * <p/>
-     * @return the implementation specific {@code ISettingValue}
+     * @return the implementation specific {@code SettingValue}
      */
-    public ISettingValue<Boolean> newBooleanSettingValue(BooleanSettingDefinition setting, String stringValue);
+    public SettingValue<Boolean> newBooleanSettingValue(BooleanSettingDefinition setting, String stringValue);
 
     /**
      * Constructs a new {@code Integer} setting value from the supplied definition and string value.
@@ -57,9 +57,9 @@ public interface ISettingValueFactory {
      * @param setting the setting definition
      * @param stringValue the value as string
      * <p/>
-     * @return the implementation specific {@code ISettingValue}
+     * @return the implementation specific {@code SettingValue}
      */
-    public ISettingValue<Integer> newIntegerSettingValue(IntegerSettingDefinition setting, String stringValue);
+    public SettingValue<Integer> newIntegerSettingValue(IntegerSettingDefinition setting, String stringValue);
 
     /**
      * Constructs a new {@code String} setting value from the supplied definition and string value.
@@ -67,9 +67,9 @@ public interface ISettingValueFactory {
      * @param setting the setting definition
      * @param stringValue the value as string
      * <p/>
-     * @return the implementation specific {@code ISettingValue}
+     * @return the implementation specific {@code SettingValue}
      */
-    public ISettingValue<String> newStringSettingValue(StringSettingDefinition setting, String stringValue);
+    public SettingValue<String> newStringSettingValue(StringSettingDefinition setting, String stringValue);
 
     /**
      * Constructs a new {@code File} setting value from the supplied definition and string value.
@@ -77,9 +77,9 @@ public interface ISettingValueFactory {
      * @param setting the setting definition
      * @param stringValue the value as string
      * <p/>
-     * @return the implementation specific {@code ISettingValue}
+     * @return the implementation specific {@code SettingValue}
      */
-    public ISettingValue<File> newFileSettingValue(FileSettingDefinition setting, String stringValue);
+    public SettingValue<File> newFileSettingValue(FileSettingDefinition setting, String stringValue);
 
     /**
      * Constructs a new {@code URI} setting value from the supplied definition and string value.
@@ -87,9 +87,9 @@ public interface ISettingValueFactory {
      * @param setting the setting definition
      * @param stringValue the value as string
      * <p/>
-     * @return the implementation specific {@code ISettingValue}
+     * @return the implementation specific {@code SettingValue}
      */
-    public ISettingValue<URI> newUriSettingValue(UriSettingDefinition setting, String stringValue);
+    public SettingValue<URI> newUriSettingValue(UriSettingDefinition setting, String stringValue);
 
     /**
      * Constructs a new {@code Double} setting value from the supplied definition and string value.
@@ -97,9 +97,9 @@ public interface ISettingValueFactory {
      * @param setting the setting definition
      * @param stringValue the value as string
      * <p/>
-     * @return the implementation specific {@code ISettingValue}
+     * @return the implementation specific {@code SettingValue}
      */
-    public ISettingValue<Double> newNumericSettingValue(NumericSettingDefinition setting, String stringValue);
+    public SettingValue<Double> newNumericSettingValue(NumericSettingDefinition setting, String stringValue);
 
     /**
      * Constructs a new generic setting value from the supplied definition and string value.
@@ -107,7 +107,7 @@ public interface ISettingValueFactory {
      * @param setting the setting definition
      * @param stringValue the value as string
      * <p/>
-     * @return the implementation specific {@code ISettingValue}
+     * @return the implementation specific {@code SettingValue}
      */
-    public ISettingValue<?> newSettingValue(ISettingDefinition<?, ?> setting, String stringValue);
+    public SettingValue<?> newSettingValue(SettingDefinition<?, ?> setting, String stringValue);
 }

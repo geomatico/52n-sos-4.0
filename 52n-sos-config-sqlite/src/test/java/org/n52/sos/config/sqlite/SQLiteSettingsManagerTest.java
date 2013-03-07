@@ -38,9 +38,9 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.n52.sos.config.IAdministratorUser;
-import org.n52.sos.config.ISettingDefinition;
-import org.n52.sos.config.ISettingValue;
+import org.n52.sos.config.AdministratorUser;
+import org.n52.sos.config.SettingDefinition;
+import org.n52.sos.config.SettingValue;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.config.sqlite.entities.BooleanSettingValue;
 import org.n52.sos.config.sqlite.entities.FileSettingValue;
@@ -108,9 +108,9 @@ public class SQLiteSettingsManagerTest {
     @Test
     public void testBooleanSettings() throws ConfigurationException, ConnectionProviderException {
         final BooleanSettingDefinition settingDefinition = new BooleanSettingDefinition().setKey(BOOLEAN_SETTING);
-        final ISettingValue<Boolean> settingValue = new BooleanSettingValue().setKey(BOOLEAN_SETTING).setValue(
+        final SettingValue<Boolean> settingValue = new BooleanSettingValue().setKey(BOOLEAN_SETTING).setValue(
                 Boolean.TRUE);
-        final ISettingValue<Boolean> newSettingValue = new BooleanSettingValue().setKey(BOOLEAN_SETTING)
+        final SettingValue<Boolean> newSettingValue = new BooleanSettingValue().setKey(BOOLEAN_SETTING)
                 .setValue(Boolean.FALSE);
         testSaveGetAndDelete(settingDefinition, settingValue, newSettingValue);
     }
@@ -118,8 +118,8 @@ public class SQLiteSettingsManagerTest {
     @Test
     public void testStringSettings() throws ConfigurationException, ConnectionProviderException {
         final StringSettingDefinition settingDefinition = new StringSettingDefinition().setKey(STRING_SETTING);
-        final ISettingValue<String> settingValue = new StringSettingValue().setKey(STRING_SETTING).setValue("string1");
-        final ISettingValue<String> newSettingValue = new StringSettingValue().setKey(STRING_SETTING)
+        final SettingValue<String> settingValue = new StringSettingValue().setKey(STRING_SETTING).setValue("string1");
+        final SettingValue<String> newSettingValue = new StringSettingValue().setKey(STRING_SETTING)
                 .setValue("string2");
         testSaveGetAndDelete(settingDefinition, settingValue, newSettingValue);
     }
@@ -127,9 +127,9 @@ public class SQLiteSettingsManagerTest {
     @Test
     public void testFileSettings() throws ConfigurationException, ConnectionProviderException {
         final FileSettingDefinition settingDefinition = new FileSettingDefinition().setKey(FILE_SETTING);
-        final ISettingValue<File> settingValue = new FileSettingValue().setKey(FILE_SETTING).setValue(new File(
+        final SettingValue<File> settingValue = new FileSettingValue().setKey(FILE_SETTING).setValue(new File(
                 "/home/auti/sos1"));
-        final ISettingValue<File> newSettingValue = new FileSettingValue().setKey(FILE_SETTING).setValue(new File(
+        final SettingValue<File> newSettingValue = new FileSettingValue().setKey(FILE_SETTING).setValue(new File(
                 "/home/auti/sos2"));
         testSaveGetAndDelete(settingDefinition, settingValue, newSettingValue);
     }
@@ -137,16 +137,16 @@ public class SQLiteSettingsManagerTest {
     @Test
     public void testIntegerSettings() throws ConfigurationException, ConnectionProviderException {
         final IntegerSettingDefinition settingDefinition = new IntegerSettingDefinition().setKey(INTEGER_SETTING);
-        final ISettingValue<Integer> settingValue = new IntegerSettingValue().setKey(INTEGER_SETTING).setValue(12312);
-        final ISettingValue<Integer> newSettingValue = new IntegerSettingValue().setKey(INTEGER_SETTING).setValue(12311);
+        final SettingValue<Integer> settingValue = new IntegerSettingValue().setKey(INTEGER_SETTING).setValue(12312);
+        final SettingValue<Integer> newSettingValue = new IntegerSettingValue().setKey(INTEGER_SETTING).setValue(12311);
         testSaveGetAndDelete(settingDefinition, settingValue, newSettingValue);
     }
 
     @Test
     public void testNumericSettings() throws ConfigurationException, ConnectionProviderException {
         final NumericSettingDefinition settingDefinition = new NumericSettingDefinition().setKey(DOUBLE_SETTING);
-        final ISettingValue<Double> settingValue = new NumericSettingValue().setKey(DOUBLE_SETTING).setValue(212.1213);
-        final ISettingValue<Double> newSettingValue = new NumericSettingValue().setKey(DOUBLE_SETTING)
+        final SettingValue<Double> settingValue = new NumericSettingValue().setKey(DOUBLE_SETTING).setValue(212.1213);
+        final SettingValue<Double> newSettingValue = new NumericSettingValue().setKey(DOUBLE_SETTING)
                 .setValue(212.1211);
         testSaveGetAndDelete(settingDefinition, settingValue, newSettingValue);
     }
@@ -154,30 +154,30 @@ public class SQLiteSettingsManagerTest {
     @Test
     public void testUriSettings() throws ConfigurationException, ConnectionProviderException {
         final UriSettingDefinition settingDefinition = new UriSettingDefinition().setKey(URI_SETTING);
-        final ISettingValue<URI> settingValue = new UriSettingValue().setKey(URI_SETTING).setValue(URI.create(
+        final SettingValue<URI> settingValue = new UriSettingValue().setKey(URI_SETTING).setValue(URI.create(
                 "http://localhost:8080/a"));
-        final ISettingValue<URI> newSettingValue = new UriSettingValue().setKey(URI_SETTING).setValue(URI.create(
+        final SettingValue<URI> newSettingValue = new UriSettingValue().setKey(URI_SETTING).setValue(URI.create(
                 "http://localhost:8080/b"));
         testSaveGetAndDelete(settingDefinition, settingValue, newSettingValue);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testChangedSettingsTypeForKey() throws ConfigurationException, ConnectionProviderException {
-        final ISettingValue<Double> doubleValue = new NumericSettingValue().setKey(BOOLEAN_SETTING).setValue(212.1213);
+        final SettingValue<Double> doubleValue = new NumericSettingValue().setKey(BOOLEAN_SETTING).setValue(212.1213);
         settingsManager.changeSetting(doubleValue);
     }
 
     public <T> void testSaveGetAndDelete(
-            final ISettingDefinition<? extends ISettingDefinition<?, T>, T> settingDefinition,
-            final ISettingValue<T> settingValue,
-            final ISettingValue<T> newSettingValue) throws ConfigurationException, ConnectionProviderException {
+            final SettingDefinition<? extends SettingDefinition<?, T>, T> settingDefinition,
+            final SettingValue<T> settingValue,
+            final SettingValue<T> newSettingValue) throws ConfigurationException, ConnectionProviderException {
 
         assertNotEquals(settingValue, newSettingValue);
         settingsManager.changeSetting(settingValue);
         assertEquals(settingValue, settingsManager.getSetting(settingDefinition));
 
         settingsManager.changeSetting(newSettingValue);
-        final ISettingValue<T> value = settingsManager.getSetting(settingDefinition);
+        final SettingValue<T> value = settingsManager.getSetting(settingDefinition);
         assertEquals(newSettingValue, value);
         assertNotEquals(settingValue, value);
 
@@ -187,12 +187,12 @@ public class SQLiteSettingsManagerTest {
 
     @Test
     public void createAdminUserTest() throws ConnectionProviderException {
-        IAdministratorUser au = settingsManager.createAdminUser(USERNAME, PASSWORD);
+        AdministratorUser au = settingsManager.createAdminUser(USERNAME, PASSWORD);
         assertNotNull(au);
         assertEquals(USERNAME, au.getUsername());
         assertEquals(PASSWORD, au.getPassword());
 
-        IAdministratorUser au2 = settingsManager.getAdminUser(USERNAME);
+        AdministratorUser au2 = settingsManager.getAdminUser(USERNAME);
         assertNotNull(au2);
         assertEquals(au, au2);
     }
@@ -205,7 +205,7 @@ public class SQLiteSettingsManagerTest {
 
     @Test
     public void deleteAdminUserTest() throws ConnectionProviderException {
-        IAdministratorUser au = settingsManager.getAdminUser(USERNAME);
+        AdministratorUser au = settingsManager.getAdminUser(USERNAME);
         if (au == null) {
             au = settingsManager.createAdminUser(USERNAME, PASSWORD);
 

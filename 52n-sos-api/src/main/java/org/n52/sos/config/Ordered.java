@@ -24,41 +24,24 @@
 package org.n52.sos.config;
 
 /**
- * Holder for generic settings. Implementations are {@link SettingsManager} specific.
- * <p/>
- * @param <T> the value type
+ * Generic class to implement a Order based on floating point numbers.
+ *
+ * @param <T> the type of the extending class
  * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
  * @since 4.0
  */
-public interface ISettingValue<T> {
+public interface Ordered<T extends Ordered<T>> extends Comparable<Ordered<?>> {
 
     /**
-     * @return the key of this setting
+     * @return the order of this clas represented as a <code>float</code>
      */
-    public String getKey();
+    public float getOrder();
 
     /**
-     * @return the value
-     */
-    public T getValue();
-
-    /**
-     * @param key the key of this setting
+     * @param order the order
      * <p/>
      * @return <code>this</code>
      */
-    public ISettingValue<T> setKey(String key);
-
-    /**
-     * @param value the value of this setting
-     * <p/>
-     * @return <code>this</code>
-     */
-    public ISettingValue<T> setValue(T value);
-
-    /**
-     * @return the {@code SettingType} of this value
-     */
-    public SettingType getType();
+    public T setOrder(float order);
 }

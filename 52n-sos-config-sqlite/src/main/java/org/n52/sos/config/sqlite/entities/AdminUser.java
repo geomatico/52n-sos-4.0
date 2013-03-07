@@ -30,20 +30,20 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.n52.sos.config.IAdministratorUser;
+import org.n52.sos.config.AdministratorUser;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
 @Entity(name = "administrator_user")
-public class AdministratorUser implements Serializable, IAdministratorUser {
+public class AdminUser implements Serializable, AdministratorUser {
 
     private static final long serialVersionUID = 1L;
     public static final String USERNAME_PROPERTY = "username";
     @Id
     @GeneratedValue
     private Long id;
-    @Column(name = AdministratorUser.USERNAME_PROPERTY, unique = true)
+    @Column(name = AdminUser.USERNAME_PROPERTY, unique = true)
     private String username;
     private String password;
 
@@ -61,7 +61,7 @@ public class AdministratorUser implements Serializable, IAdministratorUser {
     }
 
     @Override
-    public AdministratorUser setUsername(String username) {
+    public AdminUser setUsername(String username) {
         this.username = username;
         return this;
     }
@@ -72,7 +72,7 @@ public class AdministratorUser implements Serializable, IAdministratorUser {
     }
 
     @Override
-    public AdministratorUser setPassword(String password) {
+    public AdminUser setPassword(String password) {
         this.password = password;
         return this;
     }
@@ -88,8 +88,8 @@ public class AdministratorUser implements Serializable, IAdministratorUser {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof AdministratorUser) {
-            final AdministratorUser other = (AdministratorUser) obj;
+        if (obj != null && obj instanceof AdminUser) {
+            final AdminUser other = (AdminUser) obj;
             return (getId() == null ? other.getId() == null : getId().equals(other.getId()))
                    && (getUsername() == null ? other.getUsername() == null : getUsername().equals(other.getUsername()));
         }

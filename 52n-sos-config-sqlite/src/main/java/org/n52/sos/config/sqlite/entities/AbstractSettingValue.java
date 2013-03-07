@@ -30,7 +30,7 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 
-import org.n52.sos.config.ISettingValue;
+import org.n52.sos.config.SettingValue;
 
 /**
  * @param <T> settings type
@@ -39,7 +39,7 @@ import org.n52.sos.config.ISettingValue;
  */
 @Entity(name = "settings")
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class AbstractSettingValue<T> implements ISettingValue<T>, Serializable {
+public abstract class AbstractSettingValue<T> implements SettingValue<T>, Serializable {
     private static final long serialVersionUID = 1L;
     
     @Id
@@ -51,7 +51,7 @@ public abstract class AbstractSettingValue<T> implements ISettingValue<T>, Seria
     }
 
     @Override
-    public ISettingValue<T> setKey(String key) {
+    public SettingValue<T> setKey(String key) {
         this.identifier = key;
         return this;
     }
@@ -72,8 +72,8 @@ public abstract class AbstractSettingValue<T> implements ISettingValue<T>, Seria
 
     @Override
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof ISettingValue) {
-            final ISettingValue<?> other = (ISettingValue<?>) obj;
+        if (obj != null && obj instanceof SettingValue) {
+            final SettingValue<?> other = (SettingValue<?>) obj;
             return (getKey() == null ? other.getKey() == null : getKey().equals(other.getKey()))
                    && (getValue() == null ? other.getValue() == null : getValue().equals(other.getValue()));
         }

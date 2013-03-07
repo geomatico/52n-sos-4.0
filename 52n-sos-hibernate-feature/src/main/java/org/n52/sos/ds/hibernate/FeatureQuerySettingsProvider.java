@@ -26,8 +26,8 @@ package org.n52.sos.ds.hibernate;
 import java.util.Collections;
 import java.util.Set;
 
-import org.n52.sos.config.ISettingDefinition;
-import org.n52.sos.config.ISettingDefinitionProvider;
+import org.n52.sos.config.SettingDefinition;
+import org.n52.sos.config.SettingDefinitionProvider;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
 import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.service.MiscSettings;
@@ -39,7 +39,7 @@ import org.n52.sos.util.CollectionHelper;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class FeatureQuerySettingsProvider implements ISettingDefinitionProvider {
+public class FeatureQuerySettingsProvider implements SettingDefinitionProvider {
     
     public static final String EPSG_CODES_WITH_REVERSED_AXIS_ORDER = "misc.switchCoordinatesForEpsgCodes";
     public static final String DEFAULT_EPSG = "service.defaultEpsg";
@@ -69,11 +69,11 @@ public class FeatureQuerySettingsProvider implements ISettingDefinitionProvider 
             .setDescription("The EPSG code in which the geometries are stored.");
     
     
-    private static final Set<ISettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<ISettingDefinition<?, ?>>set(
+    private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?, ?>>set(
             EPSG_CODES_WITH_REVERSED_AXIS_ORDER_DEFINITION, DEFAULT_EPSG_DEFINITION);
     
     @Override
-    public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
+    public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
         return Collections.unmodifiableSet(DEFINITIONS);
     }
 }

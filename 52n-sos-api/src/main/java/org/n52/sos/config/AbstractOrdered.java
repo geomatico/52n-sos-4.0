@@ -24,13 +24,13 @@
 package org.n52.sos.config;
 
 /**
- * Abstract, generic implementation of {@code IOrdered}.
+ * Abstract, generic implementation of {@code Ordered}.
  * <p/>
  * @param <T> the type of the class extending this class
  * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class AbstractOrdered<T extends IOrdered<T>> implements IOrdered<T> {
+public abstract class AbstractOrdered<T extends Ordered<T>> implements Ordered<T> {
 
     private float order;
 
@@ -47,7 +47,7 @@ public abstract class AbstractOrdered<T extends IOrdered<T>> implements IOrdered
     }
 
     @Override
-    public int compareTo(IOrdered<?> t) {
+    public int compareTo(Ordered<?> t) {
         return Float.compare(getOrder(), t.getOrder());
     }
 }

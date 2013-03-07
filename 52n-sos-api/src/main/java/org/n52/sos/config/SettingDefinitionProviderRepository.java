@@ -36,17 +36,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Repository for {@code ISettingDefinitionProvider} implementations.
+ * Repository for {@code SettingDefinitionProvider} implementations.
  * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
  * @since 4.0
  */
-public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRepository<ISettingDefinitionProvider> {
+public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRepository<SettingDefinitionProvider> {
 
     private static final Logger log = LoggerFactory.getLogger(SettingDefinitionProviderRepository.class);
-    private Map<String, ISettingDefinition<?, ?>> definitionsByKey = Collections.emptyMap();
-    private Set<ISettingDefinition<?, ?>> settingDefinitions = Collections.emptySet();
-    private Map<ISettingDefinition<?, ?>, Set<ISettingDefinitionProvider>> providersByDefinition = Collections
+    private Map<String, SettingDefinition<?, ?>> definitionsByKey = Collections.emptyMap();
+    private Set<SettingDefinition<?, ?>> settingDefinitions = Collections.emptySet();
+    private Map<SettingDefinition<?, ?>, Set<SettingDefinitionProvider>> providersByDefinition = Collections
             .emptyMap();
 
     /**
@@ -55,14 +55,14 @@ public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRe
      * @throws ConfigurationException if there is a problem while loading implementations
      */
     public SettingDefinitionProviderRepository() throws ConfigurationException {
-        super(ISettingDefinitionProvider.class, false);
+        super(SettingDefinitionProvider.class, false);
         super.load(false);
     }
 
     /**
      * @return all setting definitions
      */
-    public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
+    public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
         return Collections.unmodifiableSet(this.settingDefinitions);
     }
 
@@ -73,8 +73,8 @@ public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRe
      * <p/>
      * @return the providers
      */
-    public Set<ISettingDefinitionProvider> getProviders(ISettingDefinition<?, ?> setting) {
-        Set<ISettingDefinitionProvider> set = this.providersByDefinition.get(setting);
+    public Set<SettingDefinitionProvider> getProviders(SettingDefinition<?, ?> setting) {
+        Set<SettingDefinitionProvider> set = this.providersByDefinition.get(setting);
         if (set == null) {
             return Collections.emptySet();
         } else {
@@ -89,21 +89,21 @@ public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRe
      * <p/>
      * @return the definition or {@code null} if none is known
      */
-    public ISettingDefinition<?, ?> getDefinition(String key) {
+    public SettingDefinition<?, ?> getDefinition(String key) {
         return this.definitionsByKey.get(key);
     }
 
     @Override
-    protected void processImplementations(Set<ISettingDefinitionProvider> implementations) throws ConfigurationException {
-        this.settingDefinitions = new HashSet<ISettingDefinition<?, ?>>();
-        this.providersByDefinition = new HashMap<ISettingDefinition<?, ?>, Set<ISettingDefinitionProvider>>();
-        this.definitionsByKey = new HashMap<String, ISettingDefinition<?, ?>>();
+    protected void processImplementations(Set<SettingDefinitionProvider> implementations) throws ConfigurationException {
+        this.settingDefinitions = new HashSet<SettingDefinition<?, ?>>();
+        this.providersByDefinition = new HashMap<SettingDefinition<?, ?>, Set<SettingDefinitionProvider>>();
+        this.definitionsByKey = new HashMap<String, SettingDefinition<?, ?>>();
 
-        for (ISettingDefinitionProvider provider : implementations) {
+        for (SettingDefinitionProvider provider : implementations) {
             log.debug("Processing IDefinitionProvider {}", provider);
-            Set<ISettingDefinition<?, ?>> requiredSettings = provider.getSettingDefinitions();
-            for (ISettingDefinition<?, ?> definition : requiredSettings) {
-                ISettingDefinition<?, ?> prev = definitionsByKey.put(definition.getKey(), definition);
+            Set<SettingDefinition<?, ?>> requiredSettings = provider.getSettingDefinitions();
+            for (SettingDefinition<?, ?> definition : requiredSettings) {
+                SettingDefinition<?, ?> prev = definitionsByKey.put(definition.getKey(), definition);
                 if (prev != null && !prev.equals(definition)) {
                     log.warn("{} overwrites {} requested by [{}]", definition, prev,
                              StringHelper.join(", ", this.providersByDefinition.get(prev)));
@@ -112,10 +112,10 @@ public class SettingDefinitionProviderRepository extends AbstractServiceLoaderRe
                 log.debug("Found Setting definition for key '{}'", definition.getKey());
             }
             this.settingDefinitions.addAll(requiredSettings);
-            for (ISettingDefinition<?, ?> setting : requiredSettings) {
-                Set<ISettingDefinitionProvider> wanters = this.providersByDefinition.get(setting);
+            for (SettingDefinition<?, ?> setting : requiredSettings) {
+                Set<SettingDefinitionProvider> wanters = this.providersByDefinition.get(setting);
                 if (wanters == null) {
-                    this.providersByDefinition.put(setting, wanters = new HashSet<ISettingDefinitionProvider>());
+                    this.providersByDefinition.put(setting, wanters = new HashSet<SettingDefinitionProvider>());
                 }
                 wanters.add(provider);
             }

@@ -26,8 +26,8 @@ package org.n52.sos.cache.ctrl;
 import java.util.Collections;
 import java.util.Set;
 
-import org.n52.sos.config.ISettingDefinition;
-import org.n52.sos.config.ISettingDefinitionProvider;
+import org.n52.sos.config.SettingDefinition;
+import org.n52.sos.config.SettingDefinitionProvider;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
 import org.n52.sos.service.ServiceSettings;
 
@@ -36,7 +36,7 @@ import org.n52.sos.service.ServiceSettings;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class ScheduledContentCacheControllerSettings implements ISettingDefinitionProvider {
+public class ScheduledContentCacheControllerSettings implements SettingDefinitionProvider {
     public static final String CAPABILITIES_CACHE_UPDATE_INTERVAL = "service.capabilitiesCacheUpdateInterval";
     public static final IntegerSettingDefinition CACHE_UPDATE_INTERVAL_DEFINITION = new IntegerSettingDefinition()
             .setGroup(ServiceSettings.GROUP)
@@ -48,7 +48,7 @@ public class ScheduledContentCacheControllerSettings implements ISettingDefiniti
             .setDescription("The update interval of the capabilities cache in minutes.");
 
     @Override
-    public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
-        return Collections.<ISettingDefinition<?, ?>>singleton(CACHE_UPDATE_INTERVAL_DEFINITION);
+    public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
+        return Collections.<SettingDefinition<?, ?>>singleton(CACHE_UPDATE_INTERVAL_DEFINITION);
     }
 }

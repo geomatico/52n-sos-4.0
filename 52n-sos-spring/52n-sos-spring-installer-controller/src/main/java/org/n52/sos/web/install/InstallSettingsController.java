@@ -27,8 +27,8 @@ import java.io.File;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.n52.sos.config.ISettingDefinition;
-import org.n52.sos.config.ISettingValue;
+import org.n52.sos.config.SettingDefinition;
+import org.n52.sos.config.SettingValue;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.web.ControllerConstants;
@@ -75,16 +75,16 @@ public class InstallSettingsController extends AbstractProcessingInstallationCon
             throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_INSTANTIATE_SETTINGS_MANAGER,
                                                                  ex.getMessage()), ex);
         }
-        ISettingDefinition<?, ?> def = sm.getDefinitionByKey(key);
+        SettingDefinition<?, ?> def = sm.getDefinitionByKey(key);
         if (def == null) {
             throw new InstallationSettingsError(c, String.format(ErrorMessages.NO_DEFINITON_FOUND, key));
         }
-        ISettingValue<?> val = createSettingValue(sm, def, stringValue, c);
+        SettingValue<?> val = createSettingValue(sm, def, stringValue, c);
         checkFileSetting(def, val, c);
         c.setSetting(def, val);
     }
 
-    protected ISettingValue<?> createSettingValue(SettingsManager sm, ISettingDefinition<?, ?> def, String stringValue,
+    protected SettingValue<?> createSettingValue(SettingsManager sm, SettingDefinition<?, ?> def, String stringValue,
                                                 InstallationConfiguration c) throws InstallationSettingsError {
         try {
             return sm.getSettingFactory().newSettingValue(def, stringValue);
@@ -95,10 +95,10 @@ public class InstallSettingsController extends AbstractProcessingInstallationCon
     }
 
     @SuppressWarnings("unchecked")
-    protected void checkFileSetting(ISettingDefinition<?, ?> def, ISettingValue<?> val, InstallationConfiguration c)
+    protected void checkFileSetting(SettingDefinition<?, ?> def, SettingValue<?> val, InstallationConfiguration c)
             throws InstallationSettingsError {
         if (val.getValue() instanceof File) {
-            ISettingValue<File> fileSetting = (ISettingValue<File>) val;
+            SettingValue<File> fileSetting = (SettingValue<File>) val;
             File f = fileSetting.getValue();
             if (!f.exists() && !def.isOptional()) {
                 throw new InstallationSettingsError(c, String

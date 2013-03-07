@@ -30,13 +30,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.n52.sos.config.ISettingDefinition;
-import org.n52.sos.config.ISettingDefinitionProvider;
+import org.n52.sos.config.SettingDefinition;
+import org.n52.sos.config.SettingDefinitionProvider;
 import org.n52.sos.config.SettingsManager;
 
 /**
  * Annotation that should be applied to a method that takes a single Setting as a parameter. The parameter of
- * this method should be of the same type as the {@link ISettingDefinition} declared with the same {@code key} in a
+ * this method should be of the same type as the {@link SettingDefinition} declared with the same {@code key} in a
  * {@code ISettingDefnitionProvider}.
  * <p/>
  * It is needed to apply the {@code Configurable} annotation to a class with a mehtod annotated with this annotations
@@ -51,8 +51,8 @@ import org.n52.sos.config.SettingsManager;
  * </pre>
  * <p/>
  * @see Configurable
- * @see ISettingDefinition
- * @see ISettingDefinitionProvider
+ * @see SettingDefinition
+ * @see SettingDefinitionProvider
  * @see SettingsManager
  * <p/>
  * @author Christian Autermann <c.autermann@52north.org>

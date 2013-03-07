@@ -25,8 +25,8 @@ package org.n52.sos.config.sqlite;
 
 import java.util.Set;
 
-import org.n52.sos.config.ISettingDefinition;
-import org.n52.sos.config.ISettingDefinitionProvider;
+import org.n52.sos.config.SettingDefinition;
+import org.n52.sos.config.SettingDefinitionProvider;
 import org.n52.sos.config.settings.BooleanSettingDefinition;
 import org.n52.sos.config.settings.FileSettingDefinition;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
@@ -40,7 +40,7 @@ import org.n52.sos.util.CollectionHelper;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class TestSettingDefinitionProvider implements ISettingDefinitionProvider {
+public class TestSettingDefinitionProvider implements SettingDefinitionProvider {
 
     public static final String URI_SETTING = "uri_setting";
     public static final String DOUBLE_SETTING = "double_setting";
@@ -50,8 +50,8 @@ public class TestSettingDefinitionProvider implements ISettingDefinitionProvider
     public static final String BOOLEAN_SETTING = "boolean_setting";
 
     @Override
-    public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
-        return CollectionHelper.<ISettingDefinition<?, ?>>set(
+    public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
+        return CollectionHelper.<SettingDefinition<?, ?>>set(
                 new BooleanSettingDefinition().setKey(BOOLEAN_SETTING),
                 new NumericSettingDefinition().setKey(DOUBLE_SETTING),
                 new IntegerSettingDefinition().setKey(INTEGER_SETTING),

@@ -25,7 +25,7 @@ package org.n52.sos.web;
 
 import java.net.URI;
 
-import org.n52.sos.config.ISettingValue;
+import org.n52.sos.config.SettingValue;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.service.ConfigurationException;
@@ -45,7 +45,7 @@ public class GetInvolvedController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView view() {
-        ISettingValue<URI> setting = null;
+        SettingValue<URI> setting = null;
         try {
             setting = SettingsManager.getInstance().getSetting(ServiceSettings.SERVICE_URL_DEFINITION);
         } catch (ConfigurationException ex) {

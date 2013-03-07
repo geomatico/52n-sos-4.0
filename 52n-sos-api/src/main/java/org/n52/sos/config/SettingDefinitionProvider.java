@@ -23,43 +23,25 @@
  */
 package org.n52.sos.config;
 
+import java.util.ServiceLoader;
+import java.util.Set;
+
+import org.n52.sos.config.annotation.Configurable;
+
 /**
- * Interface for users that are allowed to administer the SOS. Implementations are {@link SettingsManager} specific.
+ * Interface to declare dependencies to specific settings. This class should not be implemented by classes that are
+ * loaded by the Service (e.g {@link Binding}s), as the will be instantiated before the Configurator is present.
+ * {@code IDefinitionProviders} will be loaded with the {@link ServiceLoader} interface. The setting will be injected in
+ * the classes loaded by the service, that are annotated with the <code>&#064;Configurable</code> annotation.
  * <p/>
+ * @see Configurable
  * @author Christian Autermann <c.autermann@52north.org>
  * @since 4.0
  */
-public interface IAdministratorUser {
+public interface SettingDefinitionProvider {
 
     /**
-     * Get the value of password
-     * <p/>
-     * @return the value of password
+     * @return the declared setting definitons of this provider
      */
-    public String getPassword();
-
-    /**
-     * Get the value of username
-     * <p/>
-     * @return the value of username
-     */
-    public String getUsername();
-
-    /**
-     * Set the value of password
-     * <p/>
-     * @param password new value of password
-     * <p/>
-     * @return this
-     */
-    public IAdministratorUser setPassword(String password);
-
-    /**
-     * Set the value of username
-     * <p/>
-     * @param username new value of username
-     * <p/>
-     * @return this
-     */
-    public IAdministratorUser setUsername(String username);
+    public Set<SettingDefinition<?, ?>> getSettingDefinitions();
 }

@@ -45,7 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Abstract {@code SettingsManaeger} implementation that handles the loading of {@link ISettingDefinition}s and the
+ * Abstract {@code SettingsManaeger} implementation that handles the loading of {@link SettingDefinition}s and the
  * configuration of objects.
  * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
@@ -75,7 +75,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     }
 
     @Override
-    public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
+    public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
         return getSettingDefinitionRepository().getSettingDefinitions();
     }
 
@@ -83,30 +83,30 @@ public abstract class AbstractSettingsManager extends SettingsManager {
      * @return the keys for all definiions
      */
     public Set<String> getKeys() {
-        Set<ISettingDefinition<?, ?>> settings = getSettingDefinitions();
+        Set<SettingDefinition<?, ?>> settings = getSettingDefinitions();
         HashSet<String> keys = new HashSet<String>(settings.size());
-        for (ISettingDefinition<?, ?> setting : settings) {
+        for (SettingDefinition<?, ?> setting : settings) {
             keys.add(setting.getKey());
         }
         return keys;
     }
 
     @Override
-    public void changeSetting(ISettingValue<?> newValue) throws ConfigurationException, ConnectionProviderException {
+    public void changeSetting(SettingValue<?> newValue) throws ConfigurationException, ConnectionProviderException {
         if (newValue == null) {
             throw new NullPointerException("newValue can not be null");
         }
         if (newValue.getKey() == null) {
             throw new NullPointerException("key can not be null");
         }
-        ISettingDefinition<?, ?> def = getDefinitionByKey(newValue.getKey());
+        SettingDefinition<?, ?> def = getDefinitionByKey(newValue.getKey());
 
         if (def.getType() != newValue.getType()) {
             throw new IllegalArgumentException(String.format("Invalid type for definition (%s vs. %s)", def.getType(),
                                                              newValue.getType()));
         }
 
-        ISettingValue<?> oldValue = getSettingValue(newValue.getKey());
+        SettingValue<?> oldValue = getSettingValue(newValue.getKey());
         if (oldValue == null || !oldValue.equals(newValue)) {
             applySetting(def, oldValue, newValue);
             saveSettingValue(newValue);
@@ -116,8 +116,8 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     }
 
     @Override
-    public void deleteSetting(ISettingDefinition<?, ?> setting) throws ConfigurationException, ConnectionProviderException {
-        ISettingValue<?> oldValue = getSettingValue(setting.getKey());
+    public void deleteSetting(SettingDefinition<?, ?> setting) throws ConfigurationException, ConnectionProviderException {
+        SettingValue<?> oldValue = getSettingValue(setting.getKey());
         if (oldValue != null) {
             applySetting(setting, oldValue, null);
             deleteSettingValue(setting.getKey());
@@ -135,9 +135,9 @@ public abstract class AbstractSettingsManager extends SettingsManager {
      * <p/>
      * @throws ConfigurationException if there is a error configuring the objects
      */
-    private void applySetting(ISettingDefinition<?, ?> setting,
-                              ISettingValue<?> oldValue,
-                              ISettingValue<?> newValue) throws ConfigurationException {
+    private void applySetting(SettingDefinition<?, ?> setting,
+                              SettingValue<?> oldValue,
+                              SettingValue<?> newValue) throws ConfigurationException {
         LinkedList<ConfigurableObject> changed = new LinkedList<ConfigurableObject>();
         ConfigurationException e = null;
         configurableObjectsLock.readLock().lock();
@@ -175,33 +175,33 @@ public abstract class AbstractSettingsManager extends SettingsManager {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> ISettingValue<T> getSetting(ISettingDefinition<?, T> key) throws ConnectionProviderException {
-        return (ISettingValue<T>) getSettingValue(key.getKey());
+    public <T> SettingValue<T> getSetting(SettingDefinition<?, T> key) throws ConnectionProviderException {
+        return (SettingValue<T>) getSettingValue(key.getKey());
     }
 
     @Override
-    public Map<ISettingDefinition<?, ?>, ISettingValue<?>> getSettings() throws ConnectionProviderException {
-        Set<ISettingValue<?>> values = getSettingValues();
-        Map<ISettingDefinition<?, ?>, ISettingValue<?>> settingsByDefinition = new HashMap<ISettingDefinition<?, ?>, ISettingValue<?>>(values
+    public Map<SettingDefinition<?, ?>, SettingValue<?>> getSettings() throws ConnectionProviderException {
+        Set<SettingValue<?>> values = getSettingValues();
+        Map<SettingDefinition<?, ?>, SettingValue<?>> settingsByDefinition = new HashMap<SettingDefinition<?, ?>, SettingValue<?>>(values
                 .size());
-        for (ISettingValue<?> value : values) {
-            final ISettingDefinition<?, ?> definition = getSettingDefinitionRepository().getDefinition(value.getKey());
+        for (SettingValue<?> value : values) {
+            final SettingDefinition<?, ?> definition = getSettingDefinitionRepository().getDefinition(value.getKey());
             if (definition == null) {
                 log.warn("No definition for '{}' found.", value.getKey());
             } else {
                 settingsByDefinition.put(definition, value);
             }
         }
-        HashSet<ISettingDefinition<?, ?>> nullValues = new HashSet<ISettingDefinition<?, ?>>(getSettingDefinitions());
+        HashSet<SettingDefinition<?, ?>> nullValues = new HashSet<SettingDefinition<?, ?>>(getSettingDefinitions());
         nullValues.removeAll(settingsByDefinition.keySet());
-        for (ISettingDefinition<?, ?> s : nullValues) {
+        for (SettingDefinition<?, ?> s : nullValues) {
             settingsByDefinition.put(s, null);
         }
         return settingsByDefinition;
     }
 
     @Override
-    public void deleteAdminUser(IAdministratorUser user) throws ConnectionProviderException {
+    public void deleteAdminUser(AdministratorUser user) throws ConnectionProviderException {
         deleteAdminUser(user.getUsername());
     }
 
@@ -256,19 +256,19 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     }
 
     @Override
-    public ISettingDefinition<?, ?> getDefinitionByKey(String key) {
+    public SettingDefinition<?, ?> getDefinitionByKey(String key) {
         return getSettingDefinitionRepository().getDefinition(key);
     }
 
     @SuppressWarnings("unchecked")
-    private ISettingValue<Object> getNotNullSettingValue(ConfigurableObject co) throws ConnectionProviderException, ConfigurationException {
-        ISettingValue<Object> val = (ISettingValue<Object>) getSettingValue(co.getKey());
+    private SettingValue<Object> getNotNullSettingValue(ConfigurableObject co) throws ConnectionProviderException, ConfigurationException {
+        SettingValue<Object> val = (SettingValue<Object>) getSettingValue(co.getKey());
         if (val == null) {
-            ISettingDefinition<?,?> def = getDefinitionByKey(co.getKey());
+            SettingDefinition<?,?> def = getDefinitionByKey(co.getKey());
             if (def == null) {
                 throw new ConfigurationException(String.format("No SettingDefinition found for key %s", co.getKey()));
             }
-            val =(ISettingValue<Object>) getSettingFactory().newSettingValue(def, null);
+            val =(SettingValue<Object>) getSettingFactory().newSettingValue(def, null);
             if (def.isOptional()) {
                 log.debug("No value found for optional setting {}", co.getKey());
                 saveSettingValue(val);
@@ -288,7 +288,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
      * @throws ConnectionProviderException
      * @throws HibernateException
      */
-    protected abstract Set<ISettingValue<?>> getSettingValues() throws ConnectionProviderException;
+    protected abstract Set<SettingValue<?>> getSettingValues() throws ConnectionProviderException;
 
     /**
      * Returns the value of the specified setting or {@code null} if it does not exist.
@@ -299,7 +299,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
      *
      * @throws ConnectionProviderException
      */
-    protected abstract ISettingValue<?> getSettingValue(String key) throws ConnectionProviderException;
+    protected abstract SettingValue<?> getSettingValue(String key) throws ConnectionProviderException;
 
     /**
      * Deletes the setting with the specified key.
@@ -317,7 +317,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
      *
      * @throws ConnectionProviderException
      */
-    protected abstract void saveSettingValue(ISettingValue<?> setting) throws ConnectionProviderException;
+    protected abstract void saveSettingValue(SettingValue<?> setting) throws ConnectionProviderException;
 
     /*
      * TODO handle the references as WeakReferences
@@ -400,7 +400,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
          * <p/>
          * @throws ConfigurationException if an error occurs
          */
-        public void configure(ISettingValue<?> val) throws ConfigurationException {
+        public void configure(SettingValue<?> val) throws ConfigurationException {
             configure(val.getValue());
         }
 

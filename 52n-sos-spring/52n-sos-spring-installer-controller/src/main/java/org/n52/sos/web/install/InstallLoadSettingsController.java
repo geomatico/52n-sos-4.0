@@ -30,7 +30,7 @@ import javax.servlet.http.HttpSession;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.n52.sos.config.ISettingDefinition;
+import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.service.ConfigurationException;
 import org.n52.sos.web.ControllerConstants;
@@ -63,7 +63,7 @@ public class InstallLoadSettingsController {
         while (i.hasNext()) {
             String key = (String) i.next();
             String value = settings.getString(key);
-            ISettingDefinition<?, ?> def = sm.getDefinitionByKey(key);
+            SettingDefinition<?, ?> def = sm.getDefinitionByKey(key);
             if (def == null) {
                 log.warn("No definition for setting with key {}", key);
                 continue;

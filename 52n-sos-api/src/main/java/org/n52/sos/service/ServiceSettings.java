@@ -26,8 +26,8 @@ package org.n52.sos.service;
 import java.util.Collections;
 import java.util.Set;
 
-import org.n52.sos.config.ISettingDefinition;
-import org.n52.sos.config.ISettingDefinitionProvider;
+import org.n52.sos.config.SettingDefinition;
+import org.n52.sos.config.SettingDefinitionProvider;
 import org.n52.sos.config.SettingDefinitionGroup;
 import org.n52.sos.config.settings.BooleanSettingDefinition;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
@@ -40,7 +40,7 @@ import org.n52.sos.util.CollectionHelper;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class ServiceSettings implements ISettingDefinitionProvider {
+public class ServiceSettings implements SettingDefinitionProvider {
 
     public static final String SERVICE_URL = "service.sosUrl";
     public static final String MINIMUM_GZIP_SIZE = "service.minimumGzipSize";
@@ -148,7 +148,7 @@ public class ServiceSettings implements ISettingDefinitionProvider {
             "Configuration files and their file identifier (List: IDENTIFIER FILENAME;IDENTIFIER2 FILENAME2; ...).");
 
     
-    private static final Set<ISettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<ISettingDefinition<?,?>>set(
+    private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
             ServiceSettings.SERVICE_URL_DEFINITION,
             ServiceSettings.LEASE_DEFINITION,
             ServiceSettings.MINIMUM_GZIP_SIZE_DEFINITION,
@@ -159,7 +159,7 @@ public class ServiceSettings implements ISettingDefinitionProvider {
             ServiceSettings.CONFIGURATION_FILES_DEFINITION);
 
     @Override
-    public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
+    public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
         return Collections.unmodifiableSet(DEFINITIONS);
     }
 }

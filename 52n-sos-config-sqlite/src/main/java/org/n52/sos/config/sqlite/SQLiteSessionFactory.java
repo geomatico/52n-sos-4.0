@@ -34,7 +34,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
-import org.n52.sos.config.sqlite.entities.AdministratorUser;
+import org.n52.sos.config.sqlite.entities.AdminUser;
 import org.n52.sos.config.sqlite.entities.BooleanSettingValue;
 import org.n52.sos.config.sqlite.entities.FileSettingValue;
 import org.n52.sos.config.sqlite.entities.IntegerSettingValue;
@@ -136,7 +136,7 @@ public class SQLiteSessionFactory implements IConnectionProvider {
                 .addAnnotatedClass(NumericSettingValue.class)
                 .addAnnotatedClass(StringSettingValue.class)
                 .addAnnotatedClass(UriSettingValue.class)
-                .addAnnotatedClass(AdministratorUser.class)
+                .addAnnotatedClass(AdminUser.class)
                 .addAnnotatedClass(Operation.class);
         
         cfg.registerTypeOverride(new HibernateFileType(), new String[] { "file", File.class.getName() });

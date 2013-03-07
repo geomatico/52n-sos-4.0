@@ -38,7 +38,7 @@ import javax.servlet.http.HttpSession;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.n52.sos.config.ISettingValue;
+import org.n52.sos.config.SettingValue;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.hibernate.util.DefaultHibernateConstants;
@@ -197,7 +197,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
     protected void insertSettings(InstallationConfiguration c, Connection con) throws InstallationSettingsError {
         try {
             
-            for (ISettingValue<?> e : c.getSettings().values()) {
+            for (SettingValue<?> e : c.getSettings().values()) {
                 SettingsManager.getInstance().changeSetting(e);
             }
             

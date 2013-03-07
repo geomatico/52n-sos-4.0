@@ -23,11 +23,11 @@
  */
 package org.n52.sos.config.settings;
 
-import org.n52.sos.config.ISettingDefinition;
+import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingType;
 
 /**
- * {@link ISettingDefinition} for {@code Boolean}s
+ * {@link SettingDefinition} for {@code Boolean}s
  * <p/>
  * @since 4.0
  * @author Christian Autermann <c.autermann@52north.org>

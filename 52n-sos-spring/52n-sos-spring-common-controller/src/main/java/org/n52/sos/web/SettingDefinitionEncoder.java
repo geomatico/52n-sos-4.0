@@ -32,7 +32,7 @@ import java.util.Set;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.n52.sos.config.ISettingDefinition;
+import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingDefinitionGroup;
 import org.n52.sos.config.SettingType;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
@@ -60,7 +60,7 @@ public class SettingDefinitionEncoder {
     private static final String SECTIONS_KEY = "sections";
     private static final String SETTINGS_KEY = "settings";
 
-    public JSONObject encode(Map<SettingDefinitionGroup, Set<ISettingDefinition<?, ?>>> grouped) throws JSONException {
+    public JSONObject encode(Map<SettingDefinitionGroup, Set<SettingDefinition<?, ?>>> grouped) throws JSONException {
         JSONArray sections = new JSONArray();
         List<SettingDefinitionGroup> sortedGroups = new ArrayList<SettingDefinitionGroup>(grouped.keySet());
         Collections.sort(sortedGroups);
@@ -73,17 +73,17 @@ public class SettingDefinitionEncoder {
         return new JSONObject().put(SECTIONS_KEY, sections);
     }
 
-    public JSONObject encode(Set<ISettingDefinition<?, ?>> settings) throws JSONException {
+    public JSONObject encode(Set<SettingDefinition<?, ?>> settings) throws JSONException {
         JSONObject j = new JSONObject();
-        List<ISettingDefinition<?,?>> sorted = new ArrayList<ISettingDefinition<?, ?>>(settings);
+        List<SettingDefinition<?,?>> sorted = new ArrayList<SettingDefinition<?, ?>>(settings);
         Collections.sort(sorted);
-        for (ISettingDefinition<?, ?> def : sorted) {
+        for (SettingDefinition<?, ?> def : sorted) {
             j.put(def.getKey(), encode(def));
         }
         return j;
     }
 
-    public JSONObject encode(ISettingDefinition<?, ?> def) throws JSONException {
+    public JSONObject encode(SettingDefinition<?, ?> def) throws JSONException {
         JSONObject j = new JSONObject()
                 .put(TITLE_KEY, def.getTitle())
                 .put(DESCRIPTION_KEY, def.getDescription())
@@ -106,7 +106,7 @@ public class SettingDefinitionEncoder {
         return j;
     }
 
-    private String getType(ISettingDefinition<?, ?> def) {
+    private String getType(SettingDefinition<?, ?> def) {
         switch (def.getType()) {
         case INTEGER:
             return INTEGER_TYPE;
@@ -123,7 +123,7 @@ public class SettingDefinitionEncoder {
         }
     }
 
-    private Object encodeValue(ISettingDefinition<?, ?> def) {
+    private Object encodeValue(SettingDefinition<?, ?> def) {
         switch (def.getType()) {
         case FILE:
         case URI:

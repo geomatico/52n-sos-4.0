@@ -23,25 +23,42 @@
  */
 package org.n52.sos.config;
 
-import java.util.ServiceLoader;
-import java.util.Set;
-
-import org.n52.sos.config.annotation.Configurable;
-
 /**
- * Interface to declare dependencies to specific settings. This class should not be implemented by classes that are
- * loaded by the Service (e.g {@link Binding}s), as the will be instantiated before the Configurator is present.
- * {@code IDefinitionProviders} will be loaded with the {@link ServiceLoader} interface. The setting will be injected in
- * the classes loaded by the service, that are annotated with the <code>&#064;Configurable</code> annotation.
+ * Holder for generic settings. Implementations are {@link SettingsManager} specific.
  * <p/>
- * @see Configurable
+ * @param <T> the value type
+ * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
  * @since 4.0
  */
-public interface ISettingDefinitionProvider {
+public interface SettingValue<T> {
 
     /**
-     * @return the declared setting definitons of this provider
+     * @return the key of this setting
      */
-    public Set<ISettingDefinition<?, ?>> getSettingDefinitions();
+    public String getKey();
+
+    /**
+     * @return the value
+     */
+    public T getValue();
+
+    /**
+     * @param key the key of this setting
+     * <p/>
+     * @return <code>this</code>
+     */
+    public SettingValue<T> setKey(String key);
+
+    /**
+     * @param value the value of this setting
+     * <p/>
+     * @return <code>this</code>
+     */
+    public SettingValue<T> setValue(T value);
+
+    /**
+     * @return the {@code SettingType} of this value
+     */
+    public SettingType getType();
 }

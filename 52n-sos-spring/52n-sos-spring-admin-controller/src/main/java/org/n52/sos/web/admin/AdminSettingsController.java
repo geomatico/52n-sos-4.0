@@ -38,9 +38,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.jettison.json.JSONObject;
-import org.n52.sos.config.IAdministratorUser;
-import org.n52.sos.config.ISettingDefinition;
-import org.n52.sos.config.ISettingValue;
+import org.n52.sos.config.AdministratorUser;
+import org.n52.sos.config.SettingDefinition;
+import org.n52.sos.config.SettingValue;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.service.ConfigurationException;
@@ -128,16 +128,16 @@ public class AdminSettingsController extends AbstractController {
         }
     }
 
-    private Map<String, Object> toSimpleMap(Map<ISettingDefinition<?, ?>, ISettingValue<?>> settings) throws
+    private Map<String, Object> toSimpleMap(Map<SettingDefinition<?, ?>, SettingValue<?>> settings) throws
             ConfigurationException {
         Map<String, Object> simpleMap = new HashMap<String, Object>(settings.size());
-        for (Entry<ISettingDefinition<?, ?>, ISettingValue<?>> e : settings.entrySet()) {
+        for (Entry<SettingDefinition<?, ?>, SettingValue<?>> e : settings.entrySet()) {
             simpleMap.put(e.getKey().getKey(), encodeValue(e.getValue()));
         }
         return simpleMap;
     }
 
-    private Object encodeValue(ISettingValue<?> v) {
+    private Object encodeValue(SettingValue<?> v) {
         if (v == null || v.getValue() == null) {
             return null;
         }
@@ -156,9 +156,9 @@ public class AdminSettingsController extends AbstractController {
         }
     }
 
-    private void logSettings(Collection<ISettingValue<?>> values) {
+    private void logSettings(Collection<SettingValue<?>> values) {
         if (log.isDebugEnabled()) {
-            for (ISettingValue<?> value : values) {
+            for (SettingValue<?> value : values) {
                 log.info("Saving Setting: ('{}'({}) => '{}')", value.getKey(), value.getType(), value.getValue());
             }
         }
@@ -169,14 +169,14 @@ public class AdminSettingsController extends AbstractController {
     }
     
     private void updateSettings(HttpServletRequest request) throws RuntimeException, SQLException, ConfigurationException, ConnectionProviderException {
-        Map<ISettingDefinition<?, ?>, ISettingValue<?>> changedSettings = new HashMap<ISettingDefinition<?, ?>, ISettingValue<?>>();
-        for (ISettingDefinition<?, ?> def : getSettingsManager().getSettingDefinitions()) {
-            ISettingValue<?> newValue = getSettingsManager().getSettingFactory()
+        Map<SettingDefinition<?, ?>, SettingValue<?>> changedSettings = new HashMap<SettingDefinition<?, ?>, SettingValue<?>>();
+        for (SettingDefinition<?, ?> def : getSettingsManager().getSettingDefinitions()) {
+            SettingValue<?> newValue = getSettingsManager().getSettingFactory()
                     .newSettingValue(def, request.getParameter(def.getKey()));
             changedSettings.put(def, newValue);
         }
         logSettings(changedSettings.values());
-        for (ISettingValue<?> e : changedSettings.values()) {
+        for (SettingValue<?> e : changedSettings.values()) {
             getSettingsManager().changeSetting(e);
         }
     }
@@ -196,7 +196,7 @@ public class AdminSettingsController extends AbstractController {
             if (currentPassword == null) {
                 throw new BadCredentialsException("You have to submit your current password.");
             }
-            IAdministratorUser loggedInAdmin = getUserService().authenticate(currentUsername, currentPassword);
+            AdministratorUser loggedInAdmin = getUserService().authenticate(currentUsername, currentPassword);
             if (newPassword != null && !newPassword.isEmpty() && !newPassword.equals(currentPassword)) {
                 getUserService().setAdminPassword(loggedInAdmin, newPassword);
             }

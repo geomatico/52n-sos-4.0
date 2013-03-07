@@ -23,8 +23,8 @@
  */
 package org.n52.sos.event.events;
 
-import org.n52.sos.config.ISettingDefinition;
-import org.n52.sos.config.ISettingValue;
+import org.n52.sos.config.SettingDefinition;
+import org.n52.sos.config.SettingValue;
 import org.n52.sos.event.SosEvent;
 
 /**
@@ -32,25 +32,25 @@ import org.n52.sos.event.SosEvent;
  */
 public class SettingsChangeEvent implements SosEvent {
 
-    private ISettingDefinition<?, ?> setting;
-    private ISettingValue<?> oldValue;
-    private ISettingValue<?> newValue;
+    private SettingDefinition<?, ?> setting;
+    private SettingValue<?> oldValue;
+    private SettingValue<?> newValue;
 
-    public SettingsChangeEvent(ISettingDefinition<?, ?> setting, ISettingValue<?> oldValue, ISettingValue<?> newValue) {
+    public SettingsChangeEvent(SettingDefinition<?, ?> setting, SettingValue<?> oldValue, SettingValue<?> newValue) {
         this.setting = setting;
         this.oldValue = oldValue;
         this.newValue = newValue;
     }
 
-    public ISettingDefinition<?, ?> getSetting() {
+    public SettingDefinition<?, ?> getSetting() {
         return setting;
     }
 
-    public ISettingValue<?> getOldValue() {
+    public SettingValue<?> getOldValue() {
         return oldValue;
     }
 
-    public ISettingValue<?> getNewValue() {
+    public SettingValue<?> getNewValue() {
         return newValue;
     }
 

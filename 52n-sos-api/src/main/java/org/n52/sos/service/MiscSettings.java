@@ -26,8 +26,8 @@ package org.n52.sos.service;
 import java.util.Collections;
 import java.util.Set;
 
-import org.n52.sos.config.ISettingDefinition;
-import org.n52.sos.config.ISettingDefinitionProvider;
+import org.n52.sos.config.SettingDefinition;
+import org.n52.sos.config.SettingDefinitionProvider;
 import org.n52.sos.config.SettingDefinitionGroup;
 import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.util.CollectionHelper;
@@ -37,7 +37,7 @@ import org.n52.sos.util.CollectionHelper;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class MiscSettings implements ISettingDefinitionProvider {
+public class MiscSettings implements SettingDefinitionProvider {
 
     public static final String TOKEN_SEPARATOR = "misc.tokenSeparator";
     public static final String TUPLE_SEPARATOR = "misc.tupleSeparator";
@@ -124,7 +124,7 @@ public class MiscSettings implements ISettingDefinitionProvider {
             .setDescription("The character encoding used for responses.");
 
     
-    private static final Set<ISettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<ISettingDefinition<?,?>>set(
+    private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
             MiscSettings.TOKEN_SEPERATOR_DEFINITION,
             MiscSettings.TUPLE_SEPERATOR_DEFINITION,
             MiscSettings.DECIMAL_SEPARATOR_DEFINITION,
@@ -135,7 +135,7 @@ public class MiscSettings implements ISettingDefinitionProvider {
             MiscSettings.CHARACTER_ENCODING_DEFINITION);
 
     @Override
-    public Set<ISettingDefinition<?, ?>> getSettingDefinitions() {
+    public Set<SettingDefinition<?, ?>> getSettingDefinitions() {
         return Collections.unmodifiableSet(DEFINITIONS);
     }
 }
