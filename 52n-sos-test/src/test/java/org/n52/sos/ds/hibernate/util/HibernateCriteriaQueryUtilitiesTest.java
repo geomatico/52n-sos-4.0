@@ -96,8 +96,8 @@ public class HibernateCriteriaQueryUtilitiesTest extends AbstractSosTestCase {
 		long startOldWay, startNewWay, endOldWay, endNewWay;
 		Session session = (Session)Configurator.getInstance().getDataConnectionProvider().getConnection();
 		startOldWay = System.currentTimeMillis();
-		HibernateCriteriaQueryUtilities.getMinObservationTime(session);
-		HibernateCriteriaQueryUtilities.getMaxObservationTime(session);
+        HibernateCriteriaQueryUtilities.getMinPhenomenonTime(session);
+        HibernateCriteriaQueryUtilities.getMaxPhenomenonTime(session);
 		endOldWay = System.currentTimeMillis();
 		startNewWay = System.currentTimeMillis();
 		HibernateCriteriaQueryUtilities.getGlobalTemporalBoundingBox(session);

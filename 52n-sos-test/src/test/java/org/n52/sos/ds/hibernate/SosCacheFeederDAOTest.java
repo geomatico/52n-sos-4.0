@@ -23,8 +23,12 @@
  */
 package org.n52.sos.ds.hibernate;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.n52.sos.cache.WritableCache;
+import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.test.AbstractSosTestCase;
 
@@ -54,7 +58,7 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 	@Test public void 
 	updateCacheFillsCapabilitiesCache() 
 			throws OwsExceptionReport {
-        WritableCapabilitiesCache cache = new CacheImpl();
+        WritableContentCache cache = new WritableCache();
 		instance.updateCache(cache);
 		testCacheResult(cache);
 	}
@@ -67,18 +71,16 @@ public class SosCacheFeederDAOTest extends AbstractSosTestCase {
 	
 	/* HELPER */
 	
-    private void testCacheResult(WritableCapabilitiesCache cache)	{
+    private void testCacheResult(WritableContentCache cache) {
 		assertNotNull("cache is null", cache);
 		assertNotNull("envelope of features is null",cache.getGlobalEnvelope());
-		assertNotNull("feature types is null",cache.getFeatureOfInterestTypes());
-		assertFalse("feature types is empty",cache.getFeatureOfInterestTypes().isEmpty());
-		assertNotNull("offering envelopes map is null",cache.getEnvelopeForOfferings());
-		assertNotNull("offering max times map is null",cache.getMaxTimeForOfferings());
-		assertNotNull("offering min times map is null",cache.getMinTimeForOfferings());
-		assertNotNull("max event time is null",cache.getMaxEventTime());
-		assertNotNull("min event time is null",cache.getMinEventTime());
+        assertNotNull("feature types is null", cache.getFeatureOfInterestTypes());
+        assertNotNull("offerings is null", cache.getOfferings());
+        assertNotNull("max phenomenon time is null", cache.getMaxPhenomenonTime());
+        assertNotNull("min phenomenon time is null", cache.getMinPhenomenonTime());
+        assertNotNull("max result time is null", cache.getMaxResultTime());
+        assertNotNull("min result time is null", cache.getMinResultTime());
 		assertNotNull("observation types is null",cache.getObservationTypes());
-		assertFalse("observation types is emtpy",cache.getObservationTypes().isEmpty());
 		assertNotNull("result templates is null",cache.getResultTemplates());
 	}
 	
