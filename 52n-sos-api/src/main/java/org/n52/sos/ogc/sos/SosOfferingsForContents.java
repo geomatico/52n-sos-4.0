@@ -24,6 +24,8 @@
 package org.n52.sos.ogc.sos;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,12 +55,12 @@ public class SosOfferingsForContents {
     /**
      * All observableProperties contained in the offering
      */
-    private Collection<String> observableProperties;
+    private Collection<String> observableProperties = new HashSet<String>(0);
 
     /**
      * All compositePhenomenon contained in the offering
      */
-    private Collection<String> compositePhenomena;
+    private Collection<String> compositePhenomena = new HashSet<String>(0);
 
     /**
      * All phenomenon for compositePhenomenon contained in the offering
@@ -74,46 +76,46 @@ public class SosOfferingsForContents {
     /**
      * All featuresOfinterest contained in the offering
      */
-    private Set<String> featureOfInterest;
+    private Set<String> featureOfInterest = new HashSet<String>(0);
 
     /**
      * All related features contained in the offering
      */
-    private Map<String, Set<String>> relatedFeatures;
+    private Map<String, Set<String>> relatedFeatures = new HashMap<String, Set<String>>(0);
 
     /**
      * All procedures contained in the offering
      */
-    private Collection<String> procedures;
+    private Collection<String> procedures = new HashSet<String>(0);
 
     /**
      * All resultModels contained in the offering
      */
-    private Collection<QName> resultModels;
+    private Collection<QName> resultModels = new HashSet<QName>(0);
 
     /**
      * All observation types contained in the offering
      */
-    private Collection<String> observationTypes;
+    private Collection<String> observationTypes = new HashSet<String>(0);
     
-    private Collection<String> featureOfInterestTypes;
+    private Collection<String> featureOfInterestTypes = new HashSet<String>(0);
 
     /**
      * All observation result types contained in the offering
      */
-    private Map<String, Collection<String>> observationResultTypes;
+    private Map<String, Collection<String>> observationResultTypes = new HashMap<String, Collection<String>>(0);
 
     /**
      * All response formats contained in the offering
      */
-    private Collection<String> responseFormats;
+    private Collection<String> responseFormats = new HashSet<String>(0);
 
     /**
      * All response modes contained in the offering
      */
-    private Collection<String> responseModes;
+    private Collection<String> responseModes = new HashSet<String>(0);
 
-    private Collection<String> procedureDescriptionFormats;
+    private Collection<String> procedureDescriptionFormats = new HashSet<String>(0);
 
     /**
      * @return
