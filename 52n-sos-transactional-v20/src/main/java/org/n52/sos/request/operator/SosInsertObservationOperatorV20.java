@@ -33,7 +33,7 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.cache.ContentCache;
-import org.n52.sos.ds.IInsertObservationDAO;
+import org.n52.sos.ds.AbstractInsertObservationDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.ObservationInsertion;
@@ -57,7 +57,7 @@ import org.n52.sos.wsdl.WSDLOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<IInsertObservationDAO, InsertObservationRequest> {
+public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<AbstractInsertObservationDAO, InsertObservationRequest> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SosInsertObservationOperatorV20.class);
     private static final String OPERATION_NAME = SosConstants.Operations.InsertObservation.name();
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_OBSERVATION_INSERTION);

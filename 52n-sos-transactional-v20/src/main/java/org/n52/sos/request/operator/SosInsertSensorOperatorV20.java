@@ -35,7 +35,7 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
-import org.n52.sos.ds.IInsertSensorDAO;
+import org.n52.sos.ds.AbstractInsertSensorDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.SensorInsertion;
@@ -63,7 +63,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Configurable
-public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<IInsertSensorDAO, InsertSensorRequest> {
+public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<AbstractInsertSensorDAO, InsertSensorRequest> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SosInsertSensorOperatorV20.class);
 
     private static final String OPERATION_NAME = Sos2Constants.Operations.InsertSensor.name();

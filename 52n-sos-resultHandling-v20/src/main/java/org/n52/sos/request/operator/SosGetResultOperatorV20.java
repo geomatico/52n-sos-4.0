@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ds.IGetResultDAO;
+import org.n52.sos.ds.AbstractGetResultDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
@@ -49,7 +49,7 @@ import org.n52.sos.wsdl.WSDLOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosGetResultOperatorV20 extends AbstractV2RequestOperator<IGetResultDAO, GetResultRequest> {
+public class SosGetResultOperatorV20 extends AbstractV2RequestOperator<AbstractGetResultDAO, GetResultRequest> {
 
     private static final String OPERATION_NAME = SosConstants.Operations.GetResult.name();
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_RESULT_RETRIEVAL);

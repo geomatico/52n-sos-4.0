@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ds.IInsertResultTemplateDAO;
+import org.n52.sos.ds.AbstractInsertResultTemplateDAO;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.ResultTemplateInsertion;
@@ -50,12 +50,12 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
-import org.n52.sos.wsdl.WSDLOperation;
 import org.n52.sos.wsdl.WSDLConstants;
+import org.n52.sos.wsdl.WSDLOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperator<IInsertResultTemplateDAO, InsertResultTemplateRequest> {
+public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperator<AbstractInsertResultTemplateDAO, InsertResultTemplateRequest> {
 
     private static final String OPERATION_NAME = Sos2Constants.Operations.InsertResultTemplate.name();
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_RESULT_INSERTION);
