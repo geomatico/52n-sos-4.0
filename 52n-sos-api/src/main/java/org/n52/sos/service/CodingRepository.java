@@ -26,6 +26,8 @@ package org.n52.sos.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +39,7 @@ import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.IDecoder;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.IEncoder;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;
@@ -47,187 +50,44 @@ import org.slf4j.LoggerFactory;
  */
 public class CodingRepository {
 
-    private static abstract class SimilarityComparator<T> implements Comparator<T> {
-
-        @Override
-        public int compare(T o1, T o2) {
-            int s1 = getSimilarity(o1);
-            int s2 = getSimilarity(o2);
-            return (s1 == s2) ?  0 : (s1 ==  0) ? -1 : (s2 ==  0) ?  1 : (s1  <  0)
-                ? ((s2 < 0) ? 0 : 1) : (s2 <  0) ? -1 : ((s1 < s2) ? -1 : 1);
-        }
-
-        protected abstract int getSimilarity(T t);
-    }
-
-    private static class DecoderComparator extends SimilarityComparator<IDecoder<?,?>> {
-        private DecoderKey key;
-
-        DecoderComparator(DecoderKey key) {
-            this.key = key;
-        }
-
-        @Override
-        protected int getSimilarity(IDecoder<?,?> d) {
-            int similarity = -1;
-            for (DecoderKey dk : d.getDecoderKeyTypes()) {
-                int s = dk.getSimilarity(this.key);
-                if (similarity < 0) {
-                    similarity = s;
-                } else if (s >= 0) {
-                    similarity = Math.min(similarity, s);
-                }
-                if (similarity == 0) {
-                    break;
-                }
-            }
-            return similarity;
-        }
-    }
-
-    private static class EncoderComparator extends SimilarityComparator<IEncoder<?,?>> {
-        private EncoderKey key;
-
-        EncoderComparator(EncoderKey key) {
-            this.key = key;
-        }
-
-        @Override
-        protected int getSimilarity(IEncoder<?,?> d) {
-            int similarity = -1;
-            for (EncoderKey dk : d.getEncoderKeyType()) {
-                int s = dk.getSimilarity(this.key);
-                if (similarity < 0) {
-                    similarity = s;
-                } else if (s >= 0) {
-                    similarity = Math.min(similarity, s);
-                }
-                if (similarity == 0) {
-                    break;
-                }
-            }
-            return similarity;
-        }
-    }
-
-    private static class CompositeEncoderKey extends EncoderKey {
-
-        private final Set<EncoderKey> keys;
-
-        CompositeEncoderKey(Iterable<EncoderKey> keys) {
-            this.keys = CollectionHelper.asSet(keys);
-        }
-
-        private Set<EncoderKey> getKeys() {
-            return Collections.unmodifiableSet(this.keys);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj != null && obj.getClass() == getClass()) {
-                CompositeEncoderKey key = (CompositeEncoderKey) obj;
-                return keys.size() == key.getKeys().size()
-                        && keys.containsAll(key.getKeys())
-                        && key.getKeys().containsAll(keys);
-            }
-            return false;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%s[%s]", getClass().getSimpleName(),
-                    StringHelper.join(", ", keys));
-        }
-
-        @Override
-        public int hashCode() {
-            return hash(11, 13, keys.toArray());
-        }
-
-        public boolean matches(Set<EncoderKey> toTest) {
-            return toTest == null ? keys.isEmpty() : toTest.containsAll(keys);
-        }
-
-        @Override
-        public int getSimilarity(EncoderKey key) {
-            if (key != null && key.getClass() == getClass()) {
-                CompositeEncoderKey cek = (CompositeEncoderKey) key;
-                if (cek.getKeys().size() != keys.size()) { return -1; }
-                int similarity = 0;
-                for (EncoderKey k1 : keys) {
-                    int s = -1;
-                    for (EncoderKey k2 : cek.getKeys()) {
-                        int ks = k1.getSimilarity(k2);
-                        if ((s = (s < 0) ? ks : Math.min(s, ks)) == 0) { break; }
-                    }
-                    if (s < 0) { return -1; }
-                    else { similarity += s; }
-                }
-                return similarity;
-            }
-            return -1;
-        }
-    }
-
-    private static class CompositeDecoderKey extends DecoderKey {
-
-        private final Set<DecoderKey> keys;
-
-        CompositeDecoderKey(Iterable<DecoderKey> keys) {
-            this.keys = CollectionHelper.asSet(keys);
-        }
-
-        private Set<DecoderKey> getKeys() {
-            return Collections.unmodifiableSet(this.keys);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj != null && obj.getClass() == getClass()) {
-                CompositeDecoderKey key = (CompositeDecoderKey) obj;
-                return keys.containsAll(key.getKeys())
-                        && key.getKeys().containsAll(keys);
-            }
-            return false;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%s[%s]", getClass().getSimpleName(),
-                    StringHelper.join(", ", keys));
-        }
-
-        @Override
-        public int hashCode() {
-            return hash(11, 13, keys.toArray());
-        }
-
-        public boolean matches(Set<DecoderKey> toTest) {
-            return toTest == null ? keys.isEmpty() : toTest.containsAll(keys);
-        }
-
-        @Override
-        public int getSimilarity(DecoderKey key) {
-            if (key != null && key.getClass() == getClass()) {
-                CompositeDecoderKey cek = (CompositeDecoderKey) key;
-                if (cek.getKeys().size() != keys.size()) { return -1; }
-                int similarity = 0;
-                for (DecoderKey k1 : keys) {
-                    int s = -1;
-                    for (DecoderKey k2 : cek.getKeys()) {
-                        int ks = k1.getSimilarity(k2);
-                        if ((s = (s < 0) ? ks : Math.min(s, ks)) == 0) { break; }
-                    }
-                    if (s < 0) { return -1; }
-                    else { similarity += s; }
-                }
-                return similarity;
-            }
-            return -1;
-        }
-    }
-
     private static final Logger log = LoggerFactory.getLogger(CodingRepository.class);
+
+    @SuppressWarnings("unchecked")
+    private static <T> T unsafeCast(Object o) {
+        return (T) o;
+    }
+
+    private static <F, T> IDecoder<F, T> processDecoderMatches(Set<IDecoder<?, ?>> matches, DecoderKey key) {
+        if (matches == null || matches.isEmpty()) {
+            log.debug("No Decoder implementation for {}", key);
+            return null;
+        } else if (matches.size() > 1) {
+            List<IDecoder<?, ?>> list = new ArrayList<IDecoder<?, ?>>(matches);
+            Collections.sort(list, new DecoderComparator(key));
+            IDecoder<?, ?> dec = list.iterator().next();
+            log.warn("Requested ambiguous Decoder implementations for {}: Found {}; Choosing {}.",
+                     key, StringHelper.join(", ", matches), dec);
+            return unsafeCast(dec);
+        } else {
+            return unsafeCast(matches.iterator().next());
+        }
+    }
+
+    private static <F, T> IEncoder<F, T> processEncoderMatches(Set<IEncoder<?, ?>> matches, EncoderKey key) {
+        if (matches.isEmpty()) {
+            log.debug("No Encoder for {}", key);
+            return null;
+        } else if (matches.size() > 1) {
+            List<IEncoder<?, ?>> list = new ArrayList<IEncoder<?, ?>>(matches);
+            Collections.sort(list, new EncoderComparator(key));
+            IEncoder<?, ?> enc = list.iterator().next();
+            log.warn("Requested ambiguous Encoder implementations for {}: Found {}; Choosing {}.",
+                     key, StringHelper.join(", ", matches), enc);
+            return unsafeCast(enc);
+        } else {
+            return unsafeCast(matches.iterator().next());
+        }
+    }
     @SuppressWarnings("rawtypes")
     private final ServiceLoader<IDecoder> serviceLoaderDecoder;
     @SuppressWarnings("rawtypes")
@@ -236,6 +96,7 @@ public class CodingRepository {
     private final Set<IEncoder<?, ?>> encoders;
     private final Map<DecoderKey, Set<IDecoder<?, ?>>> decoderByKey = CollectionHelper.map();
     private final Map<EncoderKey, Set<IEncoder<?, ?>>> encoderByKey = CollectionHelper.map();
+    private Map<SupportedTypeKey, Set<String>> typeMap = Collections.emptyMap();
 
     public CodingRepository() throws ConfigurationException {
 		this.serviceLoaderDecoder = ServiceLoader.load(IDecoder.class);
@@ -244,13 +105,15 @@ public class CodingRepository {
         this.encoders = CollectionHelper.asSet(loadEncoders());
         initDecoderMap();
         initEncoderMap();
+        generateTypeMap();
     }
 
 	public void updateDecoders() throws ConfigurationException {
 		log.debug("Reloading Decoder implementations");
 		this.decoders.clear();
 		this.decoders.addAll(loadDecoders());
-		initDecoderMap();
+        initDecoderMap();
+        generateTypeMap();
 		log.debug("Reloaded Decoder implementations");
 	}
 
@@ -258,7 +121,8 @@ public class CodingRepository {
 		log.debug("Reloading Encoder implementations");
 		this.encoders.clear();
 		this.encoders.addAll(loadEncoders());
-		initEncoderMap();
+        initEncoderMap();
+        generateTypeMap();
 		log.debug("Reloaded Encoder implementations");
 	}
 
@@ -314,6 +178,56 @@ public class CodingRepository {
 
     public Map<EncoderKey, Set<IEncoder<?, ?>>> getEncoderByKey() {
         return CollectionHelper.unmodifiableMap(encoderByKey);
+    }
+
+    public Set<String> getFeatureOfInterestTypes() {
+        return typesFor(SupportedTypeKey.FeatureType);
+    }
+
+    public Set<String> getObservationTypes() {
+        return typesFor(SupportedTypeKey.ObservationType);
+    }
+
+    public Set<String> getProcedureDescriptionFormats() {
+        return typesFor(SupportedTypeKey.ProcedureDescriptionFormat);
+    }
+
+    public Set<String> getSweTypes() {
+        return typesFor(SupportedTypeKey.SweType);
+    }
+
+    private Set<String> typesFor(SupportedTypeKey key) {
+        if (typeMap == null || !typeMap.containsKey(key) || typeMap.get(key) == null) {
+            return Collections.emptySet();
+        }
+        return Collections.unmodifiableSet(new HashSet<String>(typeMap.get(key)));
+    }
+
+    private void generateTypeMap() {
+        List<Map<SupportedTypeKey, Set<String>>> list = new LinkedList<Map<SupportedTypeKey, Set<String>>>();
+        for (IDecoder<?, ?> decoder : getDecoders()) {
+            list.add(decoder.getSupportedTypes());
+        }
+        for (IEncoder<?, ?> encoder : getEncoders()) {
+            list.add(encoder.getSupportedTypes());
+        }
+
+        Map<SupportedTypeKey, Set<String>> resultMap =
+                                           new EnumMap<SupportedTypeKey, Set<String>>(SupportedTypeKey.class);
+        for (Map<SupportedTypeKey, Set<String>> map : list) {
+            if (map != null && !map.isEmpty()) {
+                for (SupportedTypeKey type : map.keySet()) {
+                    if (map.get(type) != null && !map.get(type).isEmpty()) {
+                        Set<String> values = resultMap.get(type);
+                        if (values == null) {
+                            resultMap.put(type, values = new HashSet<String>());
+                        }
+                        values.addAll(map.get(type));
+                    }
+                }
+            }
+        }
+        this.typeMap = resultMap;
     }
 
     private void initEncoderMap() {
@@ -372,12 +286,6 @@ public class CodingRepository {
 
     private <F, T> IEncoder<F, T> getEncoderCompositeKey(CompositeEncoderKey key) {
         return processEncoderMatches(findEncodersForCompositeKey(key), key);
-    }
-
-
-    @SuppressWarnings("unchecked")
-    private static <T> T unsafeCast(Object o) {
-        return (T) o;
     }
 
     private Set<IEncoder<?, ?>> findEncodersForSingleKey(EncoderKey key) {
@@ -442,35 +350,195 @@ public class CodingRepository {
         return matches;
     }
 
-    private static <F, T> IDecoder<F, T> processDecoderMatches(Set<IDecoder<?, ?>> matches, DecoderKey key) {
-        if (matches == null || matches.isEmpty()) {
-            log.debug("No Decoder implementation for {}", key);
-            return null;
-        } else if (matches.size() > 1) {
-            List<IDecoder<?, ?>> list = new ArrayList<IDecoder<?, ?>>(matches);
-            Collections.sort(list, new DecoderComparator(key));
-            IDecoder<?, ?> dec = list.iterator().next();
-            log.warn("Requested ambiguous Decoder implementations for {}: Found {}; Choosing {}.",
-                    key, StringHelper.join(", ", matches), dec);
-            return unsafeCast(dec);
-        } else {
-            return unsafeCast(matches.iterator().next());
+    private static abstract class SimilarityComparator<T> implements Comparator<T> {
+        @Override
+        public int compare(T o1, T o2) {
+            int s1 = getSimilarity(o1);
+            int s2 = getSimilarity(o2);
+            return (s1 == s2) ? 0 : (s1 == 0) ? -1 : (s2 == 0) ? 1 : (s1 < 0)
+                                                                     ? ((s2 < 0) ? 0 : 1) : (s2 < 0) ? -1 : ((s1 < s2)
+                                                                                                             ? -1 : 1);
+        }
+
+        protected abstract int getSimilarity(T t);
+    }
+
+    private static class DecoderComparator extends SimilarityComparator<IDecoder<?, ?>> {
+        private DecoderKey key;
+
+        DecoderComparator(DecoderKey key) {
+            this.key = key;
+        }
+
+        @Override
+        protected int getSimilarity(IDecoder<?, ?> d) {
+            int similarity = -1;
+            for (DecoderKey dk : d.getDecoderKeyTypes()) {
+                int s = dk.getSimilarity(this.key);
+                if (similarity < 0) {
+                    similarity = s;
+                } else if (s >= 0) {
+                    similarity = Math.min(similarity, s);
+                }
+                if (similarity == 0) {
+                    break;
+                }
+            }
+            return similarity;
         }
     }
 
-    private static <F, T> IEncoder<F, T> processEncoderMatches(Set<IEncoder<?, ?>> matches, EncoderKey key) {
-        if (matches.isEmpty()) {
-            log.debug("No Encoder for {}", key);
-            return null;
-        } else if (matches.size() > 1) {
-            List<IEncoder<?, ?>> list = new ArrayList<IEncoder<?, ?>>(matches);
-            Collections.sort(list, new EncoderComparator(key));
-            IEncoder<?, ?> enc = list.iterator().next();
-            log.warn("Requested ambiguous Encoder implementations for {}: Found {}; Choosing {}.",
-                    key, StringHelper.join(", ", matches), enc);
-            return unsafeCast(enc);
-        } else {
-            return unsafeCast(matches.iterator().next());
+    private static class EncoderComparator extends SimilarityComparator<IEncoder<?, ?>> {
+        private EncoderKey key;
+
+        EncoderComparator(EncoderKey key) {
+            this.key = key;
+        }
+
+        @Override
+        protected int getSimilarity(IEncoder<?, ?> d) {
+            int similarity = -1;
+            for (EncoderKey dk : d.getEncoderKeyType()) {
+                int s = dk.getSimilarity(this.key);
+                if (similarity < 0) {
+                    similarity = s;
+                } else if (s >= 0) {
+                    similarity = Math.min(similarity, s);
+                }
+                if (similarity == 0) {
+                    break;
+                }
+            }
+            return similarity;
+        }
+    }
+
+    private static class CompositeEncoderKey extends EncoderKey {
+        private final Set<EncoderKey> keys;
+
+        CompositeEncoderKey(Iterable<EncoderKey> keys) {
+            this.keys = CollectionHelper.asSet(keys);
+        }
+
+        private Set<EncoderKey> getKeys() {
+            return Collections.unmodifiableSet(this.keys);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj != null && obj.getClass() == getClass()) {
+                CompositeEncoderKey key = (CompositeEncoderKey) obj;
+                return keys.size() == key.getKeys().size()
+                       && keys.containsAll(key.getKeys())
+                       && key.getKeys().containsAll(keys);
+            }
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s[%s]", getClass().getSimpleName(),
+                                 StringHelper.join(", ", keys));
+        }
+
+        @Override
+        public int hashCode() {
+            return hash(11, 13, keys.toArray());
+        }
+
+        public boolean matches(Set<EncoderKey> toTest) {
+            return toTest == null ? keys.isEmpty() : toTest.containsAll(keys);
+        }
+
+        @Override
+        public int getSimilarity(EncoderKey key) {
+            if (key != null && key.getClass() == getClass()) {
+                CompositeEncoderKey cek = (CompositeEncoderKey) key;
+                if (cek.getKeys().size() != keys.size()) {
+                    return -1;
+                }
+                int similarity = 0;
+                for (EncoderKey k1 : keys) {
+                    int s = -1;
+                    for (EncoderKey k2 : cek.getKeys()) {
+                        int ks = k1.getSimilarity(k2);
+                        if ((s = (s < 0) ? ks : Math.min(s, ks)) == 0) {
+                            break;
+                        }
+                    }
+                    if (s < 0) {
+                        return -1;
+                    } else {
+                        similarity += s;
+                    }
+                }
+                return similarity;
+            }
+            return -1;
+        }
+    }
+
+    private static class CompositeDecoderKey extends DecoderKey {
+        private final Set<DecoderKey> keys;
+
+        CompositeDecoderKey(Iterable<DecoderKey> keys) {
+            this.keys = CollectionHelper.asSet(keys);
+        }
+
+        private Set<DecoderKey> getKeys() {
+            return Collections.unmodifiableSet(this.keys);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj != null && obj.getClass() == getClass()) {
+                CompositeDecoderKey key = (CompositeDecoderKey) obj;
+                return keys.containsAll(key.getKeys())
+                       && key.getKeys().containsAll(keys);
+            }
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s[%s]", getClass().getSimpleName(),
+                                 StringHelper.join(", ", keys));
+        }
+
+        @Override
+        public int hashCode() {
+            return hash(11, 13, keys.toArray());
+        }
+
+        public boolean matches(Set<DecoderKey> toTest) {
+            return toTest == null ? keys.isEmpty() : toTest.containsAll(keys);
+        }
+
+        @Override
+        public int getSimilarity(DecoderKey key) {
+            if (key != null && key.getClass() == getClass()) {
+                CompositeDecoderKey cek = (CompositeDecoderKey) key;
+                if (cek.getKeys().size() != keys.size()) {
+                    return -1;
+                }
+                int similarity = 0;
+                for (DecoderKey k1 : keys) {
+                    int s = -1;
+                    for (DecoderKey k2 : cek.getKeys()) {
+                        int ks = k1.getSimilarity(k2);
+                        if ((s = (s < 0) ? ks : Math.min(s, ks)) == 0) {
+                            break;
+                        }
+                    }
+                    if (s < 0) {
+                        return -1;
+                    } else {
+                        similarity += s;
+                    }
+                }
+                return similarity;
+            }
+            return -1;
         }
     }
 }
