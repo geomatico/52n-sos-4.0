@@ -9,7 +9,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>52n-sos-coding-ows-v110</artifactId>
 	<packaging>jar</packaging>
-	<name>52North OWS XML Request Coding</name>
+	<name>52North SOS OWS XML Request Coding</name>
 	<description>52North Sensor Observation Service XML request Coding</description>
 	<url>http://maven.apache.org</url>
 	<dependencies>
