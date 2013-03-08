@@ -31,37 +31,43 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public interface IGeneralQueryDAO extends IInitializableDAO {
+import org.n52.sos.ds.GeneralQueryDAO.QueryResult;
 
+public interface GeneralQueryDAO {
     public static class QueryResult {
-
         private boolean error;
         private String message;
         private List<String> columnNames = new ArrayList<String>(0);
         private List<Row> columns = new LinkedList<Row>();
 
-        public QueryResult(){
-            
+        public QueryResult() {
         }
-        public QueryResult(String message, boolean isError){
+
+        public QueryResult(String message) {
+            this(message, false);
+        }
+
+        public QueryResult(String message, boolean isError) {
             this.message = message;
             this.error = isError;
         }
-        
+
         public List<String> getColumnNames() {
             return Collections.unmodifiableList(this.columnNames);
         }
 
-        public void setColumnNames(List<String> columnNames) {
+        public QueryResult setColumnNames(List<String> columnNames) {
             this.columnNames = new ArrayList<String>(columnNames);
+            return this;
         }
 
         public List<Row> getRows() {
             return Collections.unmodifiableList(this.columns);
         }
 
-        public void addRow(Row column) {
+        public QueryResult addRow(Row column) {
             this.columns.add(column);
+            return this;
         }
 
         public boolean isError() {
@@ -74,15 +80,20 @@ public interface IGeneralQueryDAO extends IInitializableDAO {
     }
 
     public static class Row {
-
         private List<String> values = new LinkedList<String>();
 
         public List<String> getValues() {
             return Collections.unmodifiableList(this.values);
         }
 
-        public void addValue(String value) {
+        public Row addValue(String value) {
             this.values.add(value);
+            return this;
+        }
+
+        public Row setValues(List<String> values) {
+            this.values = values == null ? new LinkedList<String>() : values;
+            return this;
         }
     }
 
