@@ -93,7 +93,7 @@ import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SweCommonDecoderV101 implements IDecoder<Object, Object> {
+public class SweCommonDecoderV101 implements Decoder<Object, Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SweCommonDecoderV101.class);
 

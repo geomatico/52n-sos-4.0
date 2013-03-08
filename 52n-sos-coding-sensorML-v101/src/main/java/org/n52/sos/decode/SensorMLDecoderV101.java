@@ -94,7 +94,7 @@ import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SensorMLDecoderV101 implements IDecoder<AbstractSensorML, XmlObject> {
+public class SensorMLDecoderV101 implements Decoder<AbstractSensorML, XmlObject> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SensorMLDecoderV101.class);
     

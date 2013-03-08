@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.soap.SOAPConstants;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.decode.IDecoder;
+import org.n52.sos.decode.Decoder;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
@@ -89,7 +89,7 @@ public class SoapBinding extends Binding {
             String soapAction = SoapHelper.checkSoapHeader(request);
             XmlObject doc = XmlHelper.parseXmlSosRequest(request);
             LOGGER.debug("SOAP-REQUEST: {}", doc.xmlText());
-            IDecoder<?,XmlObject> decoder = Configurator.getInstance().getCodingRepository()
+            Decoder<?,XmlObject> decoder = Configurator.getInstance().getCodingRepository()
                     .getDecoder(CodingHelper.getDecoderKey(doc));
             // decode SOAP message
             Object abstractRequest = decoder.decode(doc);
@@ -105,7 +105,7 @@ public class SoapBinding extends Binding {
                 soapResponse.setHeader(soapRequest.getSoapHeader());
                 if (soapRequest.getSoapFault() == null) {
                     XmlObject xmlObject = soapRequest.getSoapBodyContent();
-                    IDecoder<?, XmlObject> bodyDecoder = Configurator.getInstance().getCodingRepository()
+                    Decoder<?, XmlObject> bodyDecoder = Configurator.getInstance().getCodingRepository()
                             .getDecoder(CodingHelper.getDecoderKey(xmlObject));
                     // Decode SOAPBody content
                     Object aBodyRequest = bodyDecoder.decode(xmlObject);

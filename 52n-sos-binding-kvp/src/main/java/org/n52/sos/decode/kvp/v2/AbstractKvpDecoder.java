@@ -35,7 +35,7 @@ import java.util.Set;
 
 import org.joda.time.DateTime;
 import org.n52.sos.decode.DecoderException;
-import org.n52.sos.decode.IDecoder;
+import org.n52.sos.decode.Decoder;
 import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.filter.SpatialFilter;
@@ -55,7 +55,7 @@ import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractKvpDecoder implements IDecoder<AbstractServiceRequest, Map<String, String>> {
+public abstract class AbstractKvpDecoder implements Decoder<AbstractServiceRequest, Map<String, String>> {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(GetCapabilitiesKvpDecoder.class);
 

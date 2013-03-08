@@ -39,7 +39,7 @@ import org.n52.sos.wsa.WsaHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WsaDecoder implements IDecoder<WsaHeader, List<SOAPHeaderElement>> {
+public class WsaDecoder implements Decoder<WsaHeader, List<SOAPHeaderElement>> {
 
     private static Logger LOGGER = LoggerFactory.getLogger(WsaDecoder.class);
 

@@ -70,7 +70,7 @@ import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObject, XmlObject> {
+public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObject, XmlObject> {
 
     /**
      * logger, used for logging while initializing the constants from config
@@ -553,9 +553,9 @@ public class SosDecoderv100 implements IDecoder<AbstractServiceCommunicationObje
 //    }
 //
 //    private Object decodeXmlToObject(XmlObject xmlObject) throws OwsExceptionReport {
-//        List<IDecoder> decoderList = Configurator.getInstance().getDecoder(XmlHelper.getNamespace(xmlObject));
+//        List<Decoder> decoderList = Configurator.getInstance().getDecoder(XmlHelper.getNamespace(xmlObject));
 //        if (decoderList != null) {
-//            for (IDecoder decoder : decoderList) {
+//            for (Decoder decoder : decoderList) {
 //                // TODO: check if decoding returns null or throws exception: in
 //                // both cases try next decoder in list
 //                return decoder.decode(xmlObject);

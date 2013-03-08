@@ -30,7 +30,7 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.decode.DecoderKey;
-import org.n52.sos.decode.IDecoder;
+import org.n52.sos.decode.Decoder;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.decode.XmlNamespaceDecoderKey;
 import org.n52.sos.decode.XmlOperationDecoderKey;
@@ -131,7 +131,7 @@ public class CodingHelper {
 
     public static Object decodeXmlObject(XmlObject xbObject) throws OwsExceptionReport {
         DecoderKey key = getDecoderKey(xbObject);
-        IDecoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository().getDecoder(key);
+        Decoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository().getDecoder(key);
         if (decoder == null) {
             String errorMsg = String.format("No decoder found for key \"%s\".", key);
             LOGGER.error(errorMsg);

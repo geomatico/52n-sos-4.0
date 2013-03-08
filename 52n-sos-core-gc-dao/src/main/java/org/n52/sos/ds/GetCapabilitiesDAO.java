@@ -38,7 +38,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.n52.sos.binding.Binding;
-import org.n52.sos.decode.IDecoder;
+import org.n52.sos.decode.Decoder;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.filter.FilterCapabilities;
@@ -245,7 +245,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         for (IRequestOperator requestOperator : getConfigurator().getRequestOperatorRepository().getRequestOperator().values()) {
             profiles.addAll(requestOperator.getConformanceClasses());
         }
-        for (IDecoder<?,?> decoder : getConfigurator().getCodingRepository().getDecoders()) {
+        for (Decoder<?,?> decoder : getConfigurator().getCodingRepository().getDecoders()) {
             profiles.addAll(decoder.getConformanceClasses());
         }
         for (IEncoder<?,?> encoder : getConfigurator().getCodingRepository().getEncoders()) {

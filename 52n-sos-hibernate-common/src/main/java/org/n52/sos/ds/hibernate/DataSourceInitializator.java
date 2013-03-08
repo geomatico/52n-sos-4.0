@@ -35,7 +35,7 @@ import java.util.Set;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.n52.sos.decode.IDecoder;
+import org.n52.sos.decode.Decoder;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IDataSourceInitializator;
@@ -95,7 +95,7 @@ public class DataSourceInitializator implements IDataSourceInitializator {
 
     private Map<SupportedTypeKey, Set<String>> getTypeMap() {
         List<Map<SupportedTypeKey, Set<String>>> list = new LinkedList<Map<SupportedTypeKey, Set<String>>>();
-        for (IDecoder<?,?> decoder : Configurator.getInstance().getCodingRepository().getDecoders()) {
+        for (Decoder<?,?> decoder : Configurator.getInstance().getCodingRepository().getDecoders()) {
             list.add(decoder.getSupportedTypes());
         }
         for (IEncoder<?,?> encoder : Configurator.getInstance().getCodingRepository().getEncoders()) {

@@ -103,7 +103,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class SosDecoderv20 implements IDecoder<AbstractServiceCommunicationObject, XmlObject> {
+public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject, XmlObject> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SosDecoderv20.class);
     @SuppressWarnings("unchecked")

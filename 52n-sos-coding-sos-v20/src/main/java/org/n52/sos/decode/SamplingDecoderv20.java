@@ -61,7 +61,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class SamplingDecoderv20 implements IDecoder<SosAbstractFeature, XmlObject> {
+public class SamplingDecoderv20 implements Decoder<SosAbstractFeature, XmlObject> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SamplingDecoderv20.class);
 

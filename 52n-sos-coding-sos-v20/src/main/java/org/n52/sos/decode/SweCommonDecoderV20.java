@@ -91,7 +91,7 @@ import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SweCommonDecoderV20 implements IDecoder<Object, Object> {
+public class SweCommonDecoderV20 implements Decoder<Object, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SweCommonDecoderV20.class);
 
     private Set<DecoderKey> DECODER_KEYS = CodingHelper.decoderKeysForElements(

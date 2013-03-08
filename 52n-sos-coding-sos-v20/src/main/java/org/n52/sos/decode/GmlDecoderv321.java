@@ -87,7 +87,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class GmlDecoderv321 implements IDecoder<Object, XmlObject> {
+public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GmlDecoderv321.class);
     @SuppressWarnings("unchecked")

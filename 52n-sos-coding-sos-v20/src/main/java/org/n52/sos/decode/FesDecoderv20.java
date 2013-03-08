@@ -58,7 +58,7 @@ import org.w3c.dom.NodeList;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class FesDecoderv20 implements IDecoder<Object, XmlObject> {
+public class FesDecoderv20 implements Decoder<Object, XmlObject> {
 
     /**
      * logger, used for logging while initializing the constants from config

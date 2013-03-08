@@ -71,7 +71,7 @@ import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OmDecoderv20 implements IDecoder<SosObservation, OMObservationType> {
+public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OmDecoderv20.class);
     

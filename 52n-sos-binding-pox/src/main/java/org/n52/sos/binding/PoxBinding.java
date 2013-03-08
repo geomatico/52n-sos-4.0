@@ -31,7 +31,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.decode.IDecoder;
+import org.n52.sos.decode.Decoder;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -80,7 +80,7 @@ public class PoxBinding extends Binding {
         try {
             XmlObject doc = XmlHelper.parseXmlSosRequest(request);
             LOGGER.debug("XML-REQUEST: {}", doc.xmlText());
-            IDecoder<AbstractServiceRequest, XmlObject> decoder = Configurator.getInstance()
+            Decoder<AbstractServiceRequest, XmlObject> decoder = Configurator.getInstance()
                     .getCodingRepository().getDecoder(CodingHelper.getDecoderKey(doc));
             // decode XML message
             Object abstractRequest = decoder.decode(doc);

@@ -39,7 +39,7 @@ import net.opengis.gml.TimePositionType;
 
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
-import org.n52.sos.decode.IDecoder;
+import org.n52.sos.decode.Decoder;
 
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class GmlDecoderv311 implements IDecoder<Object, XmlObject> {
+public class GmlDecoderv311 implements Decoder<Object, XmlObject> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GmlDecoderv311.class);
 

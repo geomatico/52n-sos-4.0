@@ -64,7 +64,7 @@ import org.w3c.dom.NodeList;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class OgcDecoderv100 implements IDecoder<Object, XmlObject> {
+public class OgcDecoderv100 implements Decoder<Object, XmlObject> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(OgcDecoderv100.class);
 

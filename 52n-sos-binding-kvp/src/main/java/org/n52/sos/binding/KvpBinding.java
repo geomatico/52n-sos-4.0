@@ -30,7 +30,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.n52.sos.decode.DecoderKey;
 
-import org.n52.sos.decode.IDecoder;
+import org.n52.sos.decode.Decoder;
 import org.n52.sos.decode.KvpOperationDecoderKey;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.ogc.ows.OWSConstants;
@@ -97,7 +97,7 @@ public class KvpBinding extends Binding {
                         RequestParams.version.name(), "The requested version is not supported!");
             }
             DecoderKey k = new KvpOperationDecoderKey(service, version, operation);
-            IDecoder<AbstractServiceRequest, Map<String, String>> decoder = Configurator.getInstance()
+            Decoder<AbstractServiceRequest, Map<String, String>> decoder = Configurator.getInstance()
                     .getCodingRepository().getDecoder(k);
 
             if (decoder != null) {

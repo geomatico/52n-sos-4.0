@@ -75,7 +75,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class SwesDecoderv20 implements IDecoder<AbstractServiceCommunicationObject, XmlObject> {
+public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObject, XmlObject> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SwesDecoderv20.class);
     
@@ -188,7 +188,7 @@ public class SwesDecoderv20 implements IDecoder<AbstractServiceCommunicationObje
                     XmlObject.Factory.parse(getNodeFromNodeList(xbInsertSensor.getProcedureDescription()
                             .getDomNode().getChildNodes()));
             
-            IDecoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository()
+            Decoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository()
                     .getDecoder(CodingHelper.getDecoderKey(xmlObject));
             if (decoder == null) {
                  String exceptionText = "The requested procedureDescritpionFormat is not supported!";
@@ -240,7 +240,7 @@ public class SwesDecoderv20 implements IDecoder<AbstractServiceCommunicationObje
                 XmlObject xmlObject =
                         XmlObject.Factory.parse(getNodeFromNodeList(description.getSensorDescription()
                                 .getData().getDomNode().getChildNodes()));
-                IDecoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository()
+                Decoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository()
                         .getDecoder(CodingHelper.getDecoderKey(xmlObject));
                 if (decoder == null) {
                     String exceptionText = "The requested procedureDescritpionFormat is not supported!";

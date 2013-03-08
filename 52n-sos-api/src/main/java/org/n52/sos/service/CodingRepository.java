@@ -37,7 +37,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.n52.sos.decode.DecoderKey;
-import org.n52.sos.decode.IDecoder;
+import org.n52.sos.decode.Decoder;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.IEncoder;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
@@ -58,14 +58,14 @@ public class CodingRepository {
         return (T) o;
     }
 
-    private static <F, T> IDecoder<F, T> processDecoderMatches(Set<IDecoder<?, ?>> matches, DecoderKey key) {
+    private static <F, T> Decoder<F, T> processDecoderMatches(Set<Decoder<?, ?>> matches, DecoderKey key) {
         if (matches == null || matches.isEmpty()) {
             log.debug("No Decoder implementation for {}", key);
             return null;
         } else if (matches.size() > 1) {
-            List<IDecoder<?, ?>> list = new ArrayList<IDecoder<?, ?>>(matches);
+            List<Decoder<?, ?>> list = new ArrayList<Decoder<?, ?>>(matches);
             Collections.sort(list, new DecoderComparator(key));
-            IDecoder<?, ?> dec = list.iterator().next();
+            Decoder<?, ?> dec = list.iterator().next();
             log.warn("Requested ambiguous Decoder implementations for {}: Found {}; Choosing {}.",
                      key, StringHelper.join(", ", matches), dec);
             return unsafeCast(dec);
@@ -90,17 +90,17 @@ public class CodingRepository {
         }
     }
     @SuppressWarnings("rawtypes")
-    private final ServiceLoader<IDecoder> serviceLoaderDecoder;
+    private final ServiceLoader<Decoder> serviceLoaderDecoder;
     @SuppressWarnings("rawtypes")
     private final ServiceLoader<IEncoder> serviceLoaderEncoder;
-    private final Set<IDecoder<?, ?>> decoders;
+    private final Set<Decoder<?, ?>> decoders;
     private final Set<IEncoder<?, ?>> encoders;
-    private final Map<DecoderKey, Set<IDecoder<?, ?>>> decoderByKey = CollectionHelper.map();
+    private final Map<DecoderKey, Set<Decoder<?, ?>>> decoderByKey = CollectionHelper.map();
     private final Map<EncoderKey, Set<IEncoder<?, ?>>> encoderByKey = CollectionHelper.map();
     private Map<SupportedTypeKey, Set<String>> typeMap = Collections.emptyMap();
 
     public CodingRepository() throws ConfigurationException {
-		this.serviceLoaderDecoder = ServiceLoader.load(IDecoder.class);
+		this.serviceLoaderDecoder = ServiceLoader.load(Decoder.class);
 		this.serviceLoaderEncoder = ServiceLoader.load(IEncoder.class);
         this.decoders = CollectionHelper.asSet(loadDecoders());
         this.encoders = CollectionHelper.asSet(loadEncoders());
@@ -127,19 +127,19 @@ public class CodingRepository {
 		log.debug("Reloaded Encoder implementations");
 	}
 
-	private List<IDecoder<?,?>> loadDecoders() throws ConfigurationException {
-		List<IDecoder<?,?>> loadedDecoders = new LinkedList<IDecoder<?, ?>>();
+	private List<Decoder<?,?>> loadDecoders() throws ConfigurationException {
+		List<Decoder<?,?>> loadedDecoders = new LinkedList<Decoder<?, ?>>();
         try {
-            for (IDecoder<?,?> decoder : serviceLoaderDecoder) {
+            for (Decoder<?,?> decoder : serviceLoaderDecoder) {
                 loadedDecoders.add(decoder);
             }
         } catch (ServiceConfigurationError sce) {
-            String text = "An IDecoder implementation could not be loaded!";
+            String text = "An Decoder implementation could not be loaded!";
             log.warn(text, sce);
             throw new ConfigurationException(text, sce);
         }
 		if (loadedDecoders.isEmpty()) {
-            String exceptionText = "No IDecoder implementations is loaded!";
+            String exceptionText = "No Decoder implementations is loaded!";
             log.error(exceptionText);
             throw new ConfigurationException(exceptionText);
         }
@@ -165,7 +165,7 @@ public class CodingRepository {
 		return loadedEncoders;
 	}
 
-    public Set<IDecoder<?, ?>> getDecoders() {
+    public Set<Decoder<?, ?>> getDecoders() {
         return CollectionHelper.unmodifiableSet(decoders);
     }
 
@@ -173,7 +173,7 @@ public class CodingRepository {
         return CollectionHelper.unmodifiableSet(encoders);
     }
 
-    public Map<DecoderKey, Set<IDecoder<?, ?>>> getDecoderByKey() {
+    public Map<DecoderKey, Set<Decoder<?, ?>>> getDecoderByKey() {
         return CollectionHelper.unmodifiableMap(decoderByKey);
     }
 
@@ -206,7 +206,7 @@ public class CodingRepository {
 
     private void generateTypeMap() {
         List<Map<SupportedTypeKey, Set<String>>> list = new LinkedList<Map<SupportedTypeKey, Set<String>>>();
-        for (IDecoder<?, ?> decoder : getDecoders()) {
+        for (Decoder<?, ?> decoder : getDecoders()) {
             list.add(decoder.getSupportedTypes());
         }
         for (IEncoder<?, ?> encoder : getEncoders()) {
@@ -246,9 +246,9 @@ public class CodingRepository {
 
     private void initDecoderMap() {
 		this.decoderByKey.clear();
-        for (IDecoder<?, ?> decoder : getDecoders()) {
+        for (Decoder<?, ?> decoder : getDecoders()) {
             for (DecoderKey key : decoder.getDecoderKeyTypes()) {
-                Set<IDecoder<?, ?>> decodersForKey = decoderByKey.get(key);
+                Set<Decoder<?, ?>> decodersForKey = decoderByKey.get(key);
                 if (decodersForKey == null) {
                     decoderByKey.put(key, decodersForKey = CollectionHelper.set());
                 }
@@ -257,7 +257,7 @@ public class CodingRepository {
         }
     }
     
-    public <F, T> IDecoder<F, T> getDecoder(DecoderKey key, DecoderKey... keys) {
+    public <F, T> Decoder<F, T> getDecoder(DecoderKey key, DecoderKey... keys) {
         if (keys.length == 0) {
             return getDecoderSingleKey(key);
         } else {
@@ -273,11 +273,11 @@ public class CodingRepository {
         }
     }
 
-    private <F, T> IDecoder<F, T> getDecoderSingleKey(DecoderKey key) {
+    private <F, T> Decoder<F, T> getDecoderSingleKey(DecoderKey key) {
         return processDecoderMatches(findDecodersForSingleKey(key), key);
     }
 
-    private <F, T> IDecoder<F, T> getDecoderCompositeKey(CompositeDecoderKey key) {
+    private <F, T> Decoder<F, T> getDecoderCompositeKey(CompositeDecoderKey key) {
         return processDecoderMatches(findDecodersForCompositeKey(key), key);
     }
 
@@ -304,11 +304,11 @@ public class CodingRepository {
         return matches;
     }
 
-    private Set<IDecoder<?, ?>> findDecodersForSingleKey(DecoderKey key) {
-        Set<IDecoder<?, ?>> matches = decoderByKey.get(key);
+    private Set<Decoder<?, ?>> findDecodersForSingleKey(DecoderKey key) {
+        Set<Decoder<?, ?>> matches = decoderByKey.get(key);
         if (matches == null) {
             decoderByKey.put(key, matches = CollectionHelper.set());
-            for (IDecoder<?,?> decoder : getDecoders()) {
+            for (Decoder<?,?> decoder : getDecoders()) {
                 for (DecoderKey dk : decoder.getDecoderKeyTypes()) {
                     if (dk.getSimilarity(key) > 0) {
                         matches.add(decoder);
@@ -335,12 +335,12 @@ public class CodingRepository {
         return matches;
     }
 
-    private Set<IDecoder<?, ?>> findDecodersForCompositeKey(CompositeDecoderKey ck) {
-        Set<IDecoder<?, ?>> matches = decoderByKey.get(ck);
+    private Set<Decoder<?, ?>> findDecodersForCompositeKey(CompositeDecoderKey ck) {
+        Set<Decoder<?, ?>> matches = decoderByKey.get(ck);
         if (matches == null) {
             // first request; search for matching decoders and save result for later queries
             decoderByKey.put(ck, matches = CollectionHelper.set());
-            for (IDecoder<?, ?> decoder : decoders) {
+            for (Decoder<?, ?> decoder : decoders) {
                 if (ck.matches(decoder.getDecoderKeyTypes())) {
                     matches.add(decoder);
                 }
@@ -364,7 +364,7 @@ public class CodingRepository {
         protected abstract int getSimilarity(T t);
     }
 
-    private static class DecoderComparator extends SimilarityComparator<IDecoder<?, ?>> {
+    private static class DecoderComparator extends SimilarityComparator<Decoder<?, ?>> {
         private DecoderKey key;
 
         DecoderComparator(DecoderKey key) {
@@ -372,7 +372,7 @@ public class CodingRepository {
         }
 
         @Override
-        protected int getSimilarity(IDecoder<?, ?> d) {
+        protected int getSimilarity(Decoder<?, ?> d) {
             int similarity = -1;
             for (DecoderKey dk : d.getDecoderKeyTypes()) {
                 int s = dk.getSimilarity(this.key);

@@ -36,7 +36,7 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
  * @param <S>
  *            the input which is decoded, the "Source"
  */
-public interface IDecoder<T, S> extends IConformanceClass {
+public interface Decoder<T, S> extends IConformanceClass {
 
 	/**
 	 * @return List encodings this implementation (identified by

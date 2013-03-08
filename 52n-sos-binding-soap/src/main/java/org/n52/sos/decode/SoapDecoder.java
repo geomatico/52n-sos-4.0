@@ -67,7 +67,7 @@ import org.w3c.dom.Document;
  * 
  * @author Carsten Hollmann
  */
-public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
+public class SoapDecoder implements Decoder<SoapRequest, XmlObject> {
 
     private static Logger LOGGER = LoggerFactory.getLogger(SoapDecoder.class);
     @SuppressWarnings("unchecked")
@@ -306,7 +306,7 @@ public class SoapDecoder implements IDecoder<SoapRequest, XmlObject> {
         Map<String, SoapHeader> soapHeaders = new HashMap<String, SoapHeader>();
         for (String headerElementsNamespace : headerElementsMap.keySet()) {
             try {
-                IDecoder<?, List<SOAPHeaderElement>> decoder = Configurator.getInstance().getCodingRepository()
+                Decoder<?, List<SOAPHeaderElement>> decoder = Configurator.getInstance().getCodingRepository()
                         .getDecoder(new NamespaceDecoderKey(headerElementsNamespace, SOAPHeaderElement.class));
                 if (decoder != null) {
                     Object headerElement = decoder.decode(headerElementsMap.get(headerElementsNamespace));
