@@ -4,7 +4,7 @@ RELEASE NOTES
  sensor archives. The service provides an interface to get the pure data (encoded 
  in Observation&Measurement), information about the sensor itself (encoded in a 
  SensorML instance document), and information about the sensor mounting platform 
- (SensorML as well).
+ (SensorML as well). 
 
 Changes since last release
 ===========================
