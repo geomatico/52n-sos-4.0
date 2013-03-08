@@ -130,9 +130,12 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
             exceptions.add(owse);
         }
         try {
-            checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
-                    .getCache().getFeaturesOfInterest(),
+            checkFeatureOfInterestAndRelatedFeatureIdentifier(sosRequest.getFeatureIdentifiers(), 
+                    getCache().getFeaturesOfInterest(), getCache().getRelatedFeatures(),
                                               Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name());
+//            checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), Configurator.getInstance()
+//                    .getCache().getFeaturesOfInterest(),
+//                                              Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -144,6 +147,23 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
         }
 
         Util4Exceptions.mergeAndThrowExceptions(exceptions);
+    }
+
+    private void checkFeatureOfInterestAndRelatedFeatureIdentifier(List<String> featureIdentifiers,
+            Set<String> validFeaturesOfInterest, Set<String> validRelatedFeatures, String parameterName) throws OwsExceptionReport {
+        if (featureIdentifiers != null) {
+            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+            for (String featureOfInterest : featureIdentifiers) {
+                try {
+                    if (!isRelatedFetureIdentifier(featureOfInterest, validRelatedFeatures)) {
+                        checkFeatureOfInterestIdentifier(featureOfInterest, validFeaturesOfInterest, parameterName);
+                    }
+                } catch (OwsExceptionReport e) {
+                        exceptions.add(e);
+                }
+            }
+            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        }
     }
 
     @Override

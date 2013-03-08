@@ -368,7 +368,7 @@ public abstract class AbstractRequestOperator<D extends IOperationDAO, R extends
             List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             for (String featureOfInterest : featuresOfInterest) {
                 try {
-                    checkFeatureOfInterstIdentifier(featureOfInterest, validFeatureOfInterest, parameterName);
+                    checkFeatureOfInterestIdentifier(featureOfInterest, validFeatureOfInterest, parameterName);
                 } catch (OwsExceptionReport e) {
                     exceptions.add(e);
                 }
@@ -377,7 +377,7 @@ public abstract class AbstractRequestOperator<D extends IOperationDAO, R extends
         }
     }
 
-    protected void checkFeatureOfInterstIdentifier(String featureOfInterest,
+    protected void checkFeatureOfInterestIdentifier(String featureOfInterest,
             Collection<String> validFeatureOfInterest, String parameterName) throws OwsExceptionReport {
         if (featureOfInterest == null || featureOfInterest.isEmpty()) {
             String exceptionText = String.format(
@@ -388,6 +388,30 @@ public abstract class AbstractRequestOperator<D extends IOperationDAO, R extends
         if (!validFeatureOfInterest.contains(featureOfInterest)) {
             String exceptionText = String.format(
                     "The value '%s' of the parameter '%s' is invalid", featureOfInterest, parameterName);
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+        }
+    }
+    
+    protected boolean isRelatedFetureIdentifier(String relatedFeature,
+            Collection<String> validRelatedFeatures) throws OwsExceptionReport {
+        if (relatedFeature == null || relatedFeature.isEmpty()) {
+           return false;
+        }
+        return validRelatedFeatures.contains(relatedFeature);
+    }
+    
+    protected void checkRelatedFeatureIdentifier(String relatedFeature,
+            Collection<String> validRelatedFeatures, String parameterName) throws OwsExceptionReport {
+        if (relatedFeature == null || relatedFeature.isEmpty()) {
+            String exceptionText = String.format(
+                    "The value of the parameter '%s' was not found in the request or is incorrect!", parameterName);
+            LOGGER.debug(exceptionText);
+            throw Util4Exceptions.createMissingParameterValueException(parameterName);
+        }
+        if (!validRelatedFeatures.contains(relatedFeature)) {
+            String exceptionText = String.format(
+                    "The value '%s' of the parameter '%s' is invalid", relatedFeature, parameterName);
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
         }

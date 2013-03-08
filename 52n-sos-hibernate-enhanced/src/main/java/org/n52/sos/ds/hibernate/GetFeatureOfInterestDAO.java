@@ -124,10 +124,11 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
         String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
         // featureOfInterest identifiers
         if (sosRequest.isSetFeatureOfInterestIdentifiers()) {
+            Set<String> featureIdentifiers = checkFeatureIdentifiersForRelatedFeatures(sosRequest.getFeatureIdentifiers());
             String foiAlias = HibernateCriteriaQueryUtilities.addFeatureOfInterestAliasToMap(aliases, null);
             queryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
                     HibernateCriteriaQueryUtilities.getIdentifierParameter(foiAlias),
-                    sosRequest.getFeatureIdentifiers()));
+                    featureIdentifiers));
         }
         // observableProperties
         if (sosRequest.isSetObservableProperties()) {
@@ -151,4 +152,5 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
         queryObject.setAliases(aliases);
         return HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifier(queryObject, session);
     }
+
 }

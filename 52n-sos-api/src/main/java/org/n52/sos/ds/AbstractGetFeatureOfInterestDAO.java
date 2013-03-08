@@ -24,6 +24,9 @@
 package org.n52.sos.ds;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -77,4 +80,33 @@ public abstract class AbstractGetFeatureOfInterestDAO extends AbstractOperationD
     
     public abstract GetFeatureOfInterestResponse getFeatureOfInterest(GetFeatureOfInterestRequest request)
             throws OwsExceptionReport;
+    
+    protected boolean isRelatedFeature(String featureIdentifier) {
+        Set<String> relatedFeatures = getCache().getRelatedFeatures();
+        return relatedFeatures.contains(featureIdentifier);
+    }
+    
+    protected Set<String> checkFeatureIdentifiersForRelatedFeatures(List<String> featureIdentifiers) {
+        Set<String> allFeatureIdentifiers = new HashSet<String>();
+        for (String featureIdentifier : featureIdentifiers) {
+            if (isRelatedFeature(featureIdentifier)) {
+                allFeatureIdentifiers.addAll(getFeatureIdentifierForRelatedFeature(featureIdentifier));
+            } else {
+                allFeatureIdentifiers.add(featureIdentifier);
+            }
+        }
+        return allFeatureIdentifiers;
+    }
+
+    protected Collection<? extends String> getFeatureIdentifierForRelatedFeature(String featureIdentifier) {
+        Set<String> featureIdentifiers = new HashSet<String>();
+        // TODO change to get only the features related to related feature, e.g. feature hierarchy
+//        Set<String> offerings = getCache().getOfferings();
+//        for (String offering : offerings) {
+//            if (getCache().getRelatedFeaturesForOffering(offering).contains(featureIdentifier)) {
+//                featureIdentifiers.addAll(getCache().getFeaturesOfInterestForOffering(offering));
+//            }
+//        }
+        return featureIdentifiers;
+    }
 }
