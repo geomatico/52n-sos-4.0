@@ -27,8 +27,8 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.n52.sos.config.SettingDefinition;
-import org.n52.sos.config.SettingDefinitionProvider;
 import org.n52.sos.config.SettingDefinitionGroup;
+import org.n52.sos.config.SettingDefinitionProvider;
 import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.util.CollectionHelper;
 
@@ -38,7 +38,6 @@ import org.n52.sos.util.CollectionHelper;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class MiscSettings implements SettingDefinitionProvider {
-
     public static final String TOKEN_SEPARATOR = "misc.tokenSeparator";
     public static final String TUPLE_SEPARATOR = "misc.tupleSeparator";
     public static final String CHARACTER_ENCODING = "misc.characterEncoding";
@@ -69,6 +68,10 @@ public class MiscSettings implements SettingDefinitionProvider {
             .setDefaultValue("OFFERING_")
             .setTitle("Default Offering Prefix")
             .setDescription("The default prefix for generated offerings (if not defined in RegisterSensor requests).");
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
+    @Deprecated
     public static final StringSettingDefinition TOKEN_SEPERATOR_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(0)
@@ -76,6 +79,10 @@ public class MiscSettings implements SettingDefinitionProvider {
             .setDefaultValue(",")
             .setTitle("Token separator")
             .setDescription("Token separator in result element (a character)");
+    /**
+     * @deprecated not used by any code, check for external use or remove
+     */
+    @Deprecated
     public static final StringSettingDefinition TUPLE_SEPERATOR_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(0)
