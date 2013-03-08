@@ -25,17 +25,17 @@ package org.n52.sos.request.operator;
 
 import java.util.Map;
 
-import org.n52.sos.ds.IOperationDAO;
+import org.n52.sos.ds.OperationDAO;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 
 /**
- * @param <D> The IOperationDAO implementation class
+ * @param <D> The OperationDAO implementation class
  * @param <R> The request type
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class AbstractV2RequestOperator<D extends IOperationDAO, R extends AbstractServiceRequest> 
+public abstract class AbstractV2RequestOperator<D extends OperationDAO, R extends AbstractServiceRequest> 
                     extends AbstractRequestOperator<D, R> implements IWSDLAwareRequestOperator {
 
     public AbstractV2RequestOperator(String operationName, Class<R> requestType) {

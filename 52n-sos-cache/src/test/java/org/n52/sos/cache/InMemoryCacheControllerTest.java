@@ -54,7 +54,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.n52.sos.cache.ctrl.InMemoryCacheController;
-import org.n52.sos.ds.ICacheFeederDAO;
+import org.n52.sos.ds.CacheFeederDAO;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
@@ -1124,7 +1124,7 @@ public class InMemoryCacheControllerTest {
         }
 
         @Override
-        protected ICacheFeederDAO getCacheDAO() {
+        protected CacheFeederDAO getCacheDAO() {
             return null;
         }
     }

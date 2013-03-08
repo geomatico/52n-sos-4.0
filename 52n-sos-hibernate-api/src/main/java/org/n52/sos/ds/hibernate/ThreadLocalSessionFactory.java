@@ -29,7 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.Session;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.ds.IConnectionProvider;
+import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.util.CollectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 public class ThreadLocalSessionFactory {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(ThreadLocalSessionFactory.class);
-    private final IConnectionProvider connectionProvider;
+    private final ConnectionProvider connectionProvider;
     private final Lock lock = new ReentrantLock();
     private final Set<Session> createdSessions = CollectionHelper.synchronizedSet();
     private boolean closed = false;
@@ -58,7 +58,7 @@ public class ThreadLocalSessionFactory {
         }
     };
 
-    public ThreadLocalSessionFactory(IConnectionProvider connectionProvider) {
+    public ThreadLocalSessionFactory(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
     }
 
@@ -81,7 +81,7 @@ public class ThreadLocalSessionFactory {
         returnSessions();
     }
 
-    public IConnectionProvider getConnectionProvider() {
+    public ConnectionProvider getConnectionProvider() {
         return connectionProvider;
     }
 

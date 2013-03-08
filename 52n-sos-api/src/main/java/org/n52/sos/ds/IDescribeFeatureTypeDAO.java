@@ -32,7 +32,7 @@ import org.n52.sos.request.AbstractServiceRequest;
  * DescribeFeatureType request from the data source
  * 
  */
-public interface IDescribeFeatureTypeDAO extends IOperationDAO {
+public interface IDescribeFeatureTypeDAO extends OperationDAO {
 
     /**
      * Get the feature type description

@@ -36,12 +36,12 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class OperationDAORepository extends AbstractConfiguringServiceLoaderRepository<IOperationDAO> {
+public class OperationDAORepository extends AbstractConfiguringServiceLoaderRepository<OperationDAO> {
 
 	private static final Logger log = LoggerFactory.getLogger(OperationDAORepository.class);
 
 	/** Implemented ISosOperationDAO */
-    private final Map<String, IOperationDAO> operationDaos = new HashMap<String, IOperationDAO>(0);
+    private final Map<String, OperationDAO> operationDaos = new HashMap<String, OperationDAO>(0);
 
     /**
      * Load implemented operation dao
@@ -50,7 +50,7 @@ public class OperationDAORepository extends AbstractConfiguringServiceLoaderRepo
      *             If no operation dao is implemented
      */
     public OperationDAORepository() throws ConfigurationException {
-		super(IOperationDAO.class, true);
+		super(OperationDAO.class, true);
 		load(false);
     }
 
@@ -62,9 +62,9 @@ public class OperationDAORepository extends AbstractConfiguringServiceLoaderRepo
      *             If no operation dao is implemented
      */
 	@Override
-    protected void processConfiguredImplementations(Set<IOperationDAO> daos) throws ConfigurationException {
+    protected void processConfiguredImplementations(Set<OperationDAO> daos) throws ConfigurationException {
 		this.operationDaos.clear();
-		for (IOperationDAO dao : daos) {
+		for (OperationDAO dao : daos) {
 			this.operationDaos.put(dao.getOperationName(), dao);
 		}
     }
@@ -72,7 +72,7 @@ public class OperationDAORepository extends AbstractConfiguringServiceLoaderRepo
     /**
      * @return the implemented operation DAOs
      */
-    public Map<String, IOperationDAO> getOperationDAOs() {
+    public Map<String, OperationDAO> getOperationDAOs() {
         return Collections.unmodifiableMap(this.operationDaos);
     }
 
@@ -80,7 +80,7 @@ public class OperationDAORepository extends AbstractConfiguringServiceLoaderRepo
 	  * @param operationName the operation name
 	  * @return the implemented operation DAO
      */
-    public IOperationDAO getOperationDAO(String operationName) {
+    public OperationDAO getOperationDAO(String operationName) {
         return this.operationDaos.get(operationName);
     }
 }

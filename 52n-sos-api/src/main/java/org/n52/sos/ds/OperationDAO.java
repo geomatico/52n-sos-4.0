@@ -31,7 +31,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
  * Interface for all SOS operation DAOs
  * 
  */
-public interface IOperationDAO {
+public interface OperationDAO {
 
     /**
      * Get the SOS operation name this DAO supports

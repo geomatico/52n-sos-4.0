@@ -34,7 +34,7 @@ import org.n52.sos.response.GetObservationResponse;
  * Use {@link AbstractGetObservationDAO}
  */
 @Deprecated
-public interface IGetObservationDAO extends IOperationDAO {
+public interface IGetObservationDAO extends OperationDAO {
 
     /**
      * process the GetObservation query

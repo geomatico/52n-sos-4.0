@@ -24,16 +24,9 @@
 package org.n52.sos.ds;
 
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.request.DeleteSensorRequest;
-import org.n52.sos.response.DeleteSensorResponse;
 
-/**
- * 
- * Use {@link AbstractDeleteSensorDAO}
- */
-@Deprecated
-public interface IDeleteSensorDAO extends IOperationDAO {
+public interface DataSourceInitializer {
 
-    DeleteSensorResponse deleteSensor(DeleteSensorRequest request) throws OwsExceptionReport;
+   public void initializeDataSource() throws OwsExceptionReport;
 
 }

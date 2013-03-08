@@ -31,7 +31,7 @@ import org.n52.sos.request.AbstractServiceRequest;
  * 
  * 
  */
-public interface IRegisterSensorDAO extends IOperationDAO {
+public interface IRegisterSensorDAO extends OperationDAO {
 
     /**
      * inserts new Sensor into SOS DB

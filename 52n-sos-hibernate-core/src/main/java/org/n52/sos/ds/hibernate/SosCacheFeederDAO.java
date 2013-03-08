@@ -34,7 +34,7 @@ import org.hibernate.Session;
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
-import org.n52.sos.ds.ICacheFeederDAO;
+import org.n52.sos.ds.CacheFeederDAO;
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.cache.InitialCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.ObservationDeletionCacheUpdate;
@@ -49,11 +49,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of the interface ICacheFeederDAO
+ * Implementation of the interface CacheFeederDAO
  *
  */
 @Configurable
-public class SosCacheFeederDAO extends HibernateSessionHolder implements ICacheFeederDAO {
+public class SosCacheFeederDAO extends HibernateSessionHolder implements CacheFeederDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SosCacheFeederDAO.class);
     

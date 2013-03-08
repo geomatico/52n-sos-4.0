@@ -43,10 +43,10 @@ import org.n52.sos.config.SettingsManager;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.convert.ConverterRepository;
-import org.n52.sos.ds.ICacheFeederDAO;
-import org.n52.sos.ds.IConnectionProvider;
-import org.n52.sos.ds.IDataConnectionProvider;
-import org.n52.sos.ds.IDataSourceInitializator;
+import org.n52.sos.ds.CacheFeederDAO;
+import org.n52.sos.ds.ConnectionProvider;
+import org.n52.sos.ds.DataConnectionProvider;
+import org.n52.sos.ds.DataSourceInitializer;
 import org.n52.sos.ds.IFeatureConnectionProvider;
 import org.n52.sos.ds.IFeatureQueryHandler;
 import org.n52.sos.ds.OperationDAORepository;
@@ -176,28 +176,28 @@ public class Configurator implements Cleanupable {
     private IFeatureQueryHandler featureQueryHandler;
     
     /**
-     * Implementation of IDataConnectionProvider.
+     * Implementation of DataConnectionProvider.
      */
-    private IConnectionProvider dataConnectionProvider;
+    private ConnectionProvider dataConnectionProvider;
     
     /**
      * Implementation of IFeatureConnectionProvider.
      */
-    private IConnectionProvider featureConnectionProvider;
+    private ConnectionProvider featureConnectionProvider;
     
     /**
      * Implementation of
-     * <code>IDataSourceInitializator</code>.
+     * <code>DataSourceInitializer</code>.
      */
-    private IDataSourceInitializator dataSourceInitializator;
+    private DataSourceInitializer dataSourceInitializator;
     /**
      * Content Cache Controller.
      */
     private ContentCacheController capabilitiesCacheController;
     /**
-     * Implementation of ICacheFeederDAO.
+     * Implementation of CacheFeederDAO.
      */
-    private ICacheFeederDAO cacheFeederDAO;
+    private CacheFeederDAO cacheFeederDAO;
     /**
      * Implementation of
      * <code>IProfileHandler</code>.
@@ -676,7 +676,7 @@ public class Configurator implements Cleanupable {
      * @throws ConfigurationException If no cache feeder dao is implemented
      */
     private void initalizeCacheFeederDAO() throws ConfigurationException {
-        cacheFeederDAO = new ConfiguringSingletonServiceLoader<ICacheFeederDAO>(ICacheFeederDAO.class, true).get();
+        cacheFeederDAO = new ConfiguringSingletonServiceLoader<CacheFeederDAO>(CacheFeederDAO.class, true).get();
     }
 
     /**
@@ -695,7 +695,7 @@ public class Configurator implements Cleanupable {
      * @throws ConfigurationException If no connection provider is implemented
      */
     private void initializeDataConnectionProvider() throws ConfigurationException {
-        dataConnectionProvider = new ConfiguringSingletonServiceLoader<IDataConnectionProvider>(IDataConnectionProvider.class,
+        dataConnectionProvider = new ConfiguringSingletonServiceLoader<DataConnectionProvider>(DataConnectionProvider.class,
                                                                                              true).get();
         dataConnectionProvider.initialize(this.dataConnectionProviderProperties);
     }
@@ -717,8 +717,8 @@ public class Configurator implements Cleanupable {
 
     @Deprecated
     private void initializeDataSource() throws ConfigurationException {
-        dataSourceInitializator = new ConfiguringSingletonServiceLoader<IDataSourceInitializator>(
-                IDataSourceInitializator.class, true).get();
+        dataSourceInitializator = new ConfiguringSingletonServiceLoader<DataSourceInitializer>(
+                DataSourceInitializer.class, true).get();
         try {
             dataSourceInitializator.initializeDataSource();
         } catch (OwsExceptionReport owse) {
@@ -821,21 +821,21 @@ public class Configurator implements Cleanupable {
     /**
      * @return the implemented cache feeder DAO
      */
-    public ICacheFeederDAO getCacheFeederDAO() {
+    public CacheFeederDAO getCacheFeederDAO() {
         return cacheFeederDAO;
     }
 
     /**
      * @return the implemented data connection provider
      */
-    public IConnectionProvider getDataConnectionProvider() {
+    public ConnectionProvider getDataConnectionProvider() {
         return dataConnectionProvider;
     }
     
     /**
      * @return the implemented feature connection provider
      */
-    public IConnectionProvider getFeatureConnectionProvider() {
+    public ConnectionProvider getFeatureConnectionProvider() {
         return featureConnectionProvider;
     }
 

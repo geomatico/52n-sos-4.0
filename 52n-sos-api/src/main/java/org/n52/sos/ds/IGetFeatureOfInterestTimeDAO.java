@@ -32,7 +32,7 @@ import org.n52.sos.request.AbstractServiceRequest;
  * the data source
  * 
  */
-public interface IGetFeatureOfInterestTimeDAO extends IOperationDAO {
+public interface IGetFeatureOfInterestTimeDAO extends OperationDAO {
 
     /**
      * Get the times period of observations for a specific FOI contained in data

@@ -35,7 +35,7 @@ import org.hibernate.service.ServiceRegistryBuilder;
 import org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider;
 import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.ds.IDataConnectionProvider;
+import org.n52.sos.ds.DataConnectionProvider;
 import org.n52.sos.config.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * Implementation of the SessionFactory.
  *
  */
-public class SessionFactoryProvider implements IDataConnectionProvider {
+public class SessionFactoryProvider implements DataConnectionProvider {
 
     /**
      * logger
@@ -68,7 +68,7 @@ public class SessionFactoryProvider implements IDataConnectionProvider {
     /*
      * (non-Javadoc)
      *
-     * @see org.n52.sos.ds.IConnectionProvider#getConnection()
+     * @see org.n52.sos.ds.ConnectionProvider#getConnection()
      */
     @Override
     public Session getConnection() throws ConnectionProviderException {
@@ -90,7 +90,7 @@ public class SessionFactoryProvider implements IDataConnectionProvider {
      * (non-Javadoc)
      *
      * @see
-     * org.n52.sos.ds.IConnectionProvider#returnConnection(java.lang.Object)
+     * org.n52.sos.ds.ConnectionProvider#returnConnection(java.lang.Object)
      */
     @Override
     public void returnConnection(Object connection) {
@@ -113,7 +113,7 @@ public class SessionFactoryProvider implements IDataConnectionProvider {
     /*
      * (non-Javadoc)
      *
-     * @see org.n52.sos.ds.IConnectionProvider#cleanup()
+     * @see org.n52.sos.ds.ConnectionProvider#cleanup()
      */
     @Override
     public void cleanup() {

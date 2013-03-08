@@ -34,7 +34,7 @@ import org.n52.sos.response.DescribeSensorResponse;
  * Use {@link AbstractDescribeSensorDAO}
  */
 @Deprecated
-public interface IDescribeSensorDAO extends IOperationDAO {
+public interface IDescribeSensorDAO extends OperationDAO {
 
     /**
      * Get the procedure description for a procedure

@@ -23,17 +23,17 @@
  */
 package org.n52.sos.request.operator;
 
-import org.n52.sos.ds.IOperationDAO;
+import org.n52.sos.ds.OperationDAO;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 
 /**
- * @param <T> The IOperationDAO implementation class
+ * @param <T> The OperationDAO implementation class
  * @param <R> The request type
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class AbstractV1RequestOperator<T extends IOperationDAO, R extends AbstractServiceRequest> 
+public abstract class AbstractV1RequestOperator<T extends OperationDAO, R extends AbstractServiceRequest> 
                                                             extends AbstractRequestOperator<T, R> {
     
     public AbstractV1RequestOperator(String operationName, Class<R> requestType) {

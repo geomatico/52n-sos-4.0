@@ -39,7 +39,7 @@ import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractOperationDAO implements IOperationDAO {
+public abstract class AbstractOperationDAO implements OperationDAO {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOperationDAO.class);
     private final String operationName;

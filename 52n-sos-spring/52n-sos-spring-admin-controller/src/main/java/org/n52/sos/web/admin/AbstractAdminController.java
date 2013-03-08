@@ -36,7 +36,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.jdbc.Work;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.ds.IConnectionProvider;
+import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.SqlUtils;
@@ -48,7 +48,7 @@ public abstract class AbstractAdminController extends AbstractController {
         if (!f.exists()) {
             throw new FileNotFoundException(f.getAbsolutePath() + " not found.");
         }
-        IConnectionProvider p = Configurator.getInstance().getDataConnectionProvider();
+        ConnectionProvider p = Configurator.getInstance().getDataConnectionProvider();
         Object con = null;
         try {
             con = p.getConnection();

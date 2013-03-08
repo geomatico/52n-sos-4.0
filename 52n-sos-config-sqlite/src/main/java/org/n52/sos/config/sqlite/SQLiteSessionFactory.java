@@ -43,7 +43,7 @@ import org.n52.sos.config.sqlite.entities.Operation;
 import org.n52.sos.config.sqlite.entities.StringSettingValue;
 import org.n52.sos.config.sqlite.entities.UriSettingValue;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.ds.IConnectionProvider;
+import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.service.SosContextListener;
 import org.slf4j.Logger;
@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class SQLiteSessionFactory implements IConnectionProvider {
+public class SQLiteSessionFactory implements ConnectionProvider {
 
     private static final Logger log = LoggerFactory.getLogger(SQLiteSessionFactory.class);
     

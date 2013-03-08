@@ -55,7 +55,7 @@ import org.n52.sos.config.settings.NumericSettingDefinition;
 import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.config.settings.UriSettingDefinition;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.ds.IConnectionProvider;
+import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
@@ -73,7 +73,7 @@ public class SQLiteSettingsManagerTest {
     private static final Logger log = LoggerFactory.getLogger(SQLiteSettingsManagerTest.class);
     private static final String USERNAME = "admin";
     private static final String PASSWORD = "password";
-    private static IConnectionProvider connectionProvider;
+    private static ConnectionProvider connectionProvider;
     private static File databaseFile;
     private SettingsManager settingsManager;
 

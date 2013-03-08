@@ -32,7 +32,7 @@ import org.n52.sos.response.InsertObservationResponse;
  *
  */
 @Deprecated
-public interface IInsertObservationDAO extends IOperationDAO {
+public interface IInsertObservationDAO extends OperationDAO {
 
     public InsertObservationResponse insertObservation(InsertObservationRequest request) throws OwsExceptionReport;
 

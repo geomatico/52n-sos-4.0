@@ -34,7 +34,7 @@ import org.n52.sos.response.GetResultResponse;
  * Use {@link AbstractGetResultDAO}
  */
 @Deprecated
-public interface IGetResultDAO extends IOperationDAO {
+public interface IGetResultDAO extends OperationDAO {
 
     /**
      * method queries data for the getResult response and generates an

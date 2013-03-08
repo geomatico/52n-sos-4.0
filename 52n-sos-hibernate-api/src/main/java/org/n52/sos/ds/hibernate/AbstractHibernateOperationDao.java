@@ -31,7 +31,7 @@ import java.util.Map;
 import org.n52.sos.binding.Binding;
 import org.n52.sos.cache.ContentCache;
 import org.n52.sos.decode.OperationDecoderKey;
-import org.n52.sos.ds.IOperationDAO;
+import org.n52.sos.ds.OperationDAO;
 import org.n52.sos.ogc.ows.IExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 @Deprecated
-public abstract class AbstractHibernateOperationDao implements IOperationDAO {
+public abstract class AbstractHibernateOperationDao implements OperationDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractHibernateOperationDao.class);
 

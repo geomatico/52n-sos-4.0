@@ -50,7 +50,7 @@ import org.n52.sos.config.sqlite.entities.OperationKey;
 import org.n52.sos.config.sqlite.entities.StringSettingValue;
 import org.n52.sos.config.sqlite.entities.UriSettingValue;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.ds.IConnectionProvider;
+import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.config.ConfigurationException;
 import org.slf4j.Logger;
@@ -61,21 +61,21 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     private static final Pattern SETTINGS_TYPE_CHANGED = Pattern.compile(
             ".*Abort due to constraint violation \\(column .* is not unique\\)");
     public static final SettingValueFactory SQLITE_SETTING_FACTORY = new SqliteSettingFactory();
-    private IConnectionProvider connectionProvider;
+    private ConnectionProvider connectionProvider;
     private final ReentrantLock lock = new ReentrantLock();
 
     public SQLiteSettingsManager() throws ConfigurationException {
         super();
     }
 
-    protected IConnectionProvider getConnectionProvider() {
+    protected ConnectionProvider getConnectionProvider() {
         if (this.connectionProvider == null) {
             createDefaultConnectionProvider();
         }
         return connectionProvider;
     }
 
-    public void setConnectionProvider(IConnectionProvider connectionProvider) {
+    public void setConnectionProvider(ConnectionProvider connectionProvider) {
         lock.lock();
         try {
             this.connectionProvider = connectionProvider;

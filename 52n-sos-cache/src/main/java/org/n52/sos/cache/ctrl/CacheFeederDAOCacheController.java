@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.n52.sos.cache.WritableCache;
 import org.n52.sos.cache.WritableContentCache;
-import org.n52.sos.ds.ICacheFeederDAO;
+import org.n52.sos.ds.CacheFeederDAO;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.Configurator;
@@ -41,14 +41,14 @@ import org.slf4j.LoggerFactory;
 public abstract class CacheFeederDAOCacheController extends ScheduledContentCacheController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheFeederDAOCacheController.class);
     private WritableContentCache cache;
-    private ICacheFeederDAO cacheFeederDAO;
+    private CacheFeederDAO cacheFeederDAO;
 
     public CacheFeederDAOCacheController() {
         cache = new WritableCache();
         cacheFeederDAO = getCacheDAO();
     }
 
-    protected ICacheFeederDAO getCacheDAO() {
+    protected CacheFeederDAO getCacheDAO() {
         return Configurator.getInstance().getCacheFeederDAO();
     }
 

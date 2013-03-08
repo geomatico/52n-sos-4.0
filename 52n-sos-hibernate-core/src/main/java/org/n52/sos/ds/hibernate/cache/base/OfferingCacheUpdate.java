@@ -33,7 +33,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.ds.IConnectionProvider;
+import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.ds.hibernate.ThreadLocalSessionFactory;
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
@@ -53,7 +53,7 @@ public class OfferingCacheUpdate extends CacheUpdate {
     private static final Logger LOGGER = LoggerFactory.getLogger(OfferingCacheUpdate.class);
     private static final String THREAD_GROUP_NAME = "offering-cache-update";
     private final ThreadFactory threadFactory = new GroupedAndNamedThreadFactory(THREAD_GROUP_NAME);
-    private final IConnectionProvider connectionProvider = Configurator.getInstance().getDataConnectionProvider();
+    private final ConnectionProvider connectionProvider = Configurator.getInstance().getDataConnectionProvider();
     private final ThreadLocalSessionFactory sessionFactory = new ThreadLocalSessionFactory(connectionProvider);
     private final ExecutorService executor;
     private List<OwsExceptionReport> errors;

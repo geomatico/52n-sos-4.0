@@ -32,7 +32,7 @@ import org.n52.sos.response.InsertResultTemplateResponse;
  *
  */
 @Deprecated
-public interface IInsertResultTemplateDAO extends IOperationDAO {
+public interface IInsertResultTemplateDAO extends OperationDAO {
     
     public InsertResultTemplateResponse insertResultTemplate(InsertResultTemplateRequest request) throws OwsExceptionReport;
 

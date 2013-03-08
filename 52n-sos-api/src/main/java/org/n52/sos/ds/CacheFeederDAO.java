@@ -31,7 +31,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
  * CapabilitiesCache with data from the data source.
  * 
  */
-public interface ICacheFeederDAO {
+public interface CacheFeederDAO {
 
     public void updateCache(WritableContentCache capabilitiesCache) throws OwsExceptionReport;
 

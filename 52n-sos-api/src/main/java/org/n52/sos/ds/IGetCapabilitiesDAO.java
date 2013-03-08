@@ -34,7 +34,7 @@ import org.n52.sos.response.GetCapabilitiesResponse;
  * Use {@link AbstractGetCapabilitiesDAO}
  */
 @Deprecated
-public interface IGetCapabilitiesDAO extends IOperationDAO {
+public interface IGetCapabilitiesDAO extends OperationDAO {
 
     /**
      * Get the SOS capabilities

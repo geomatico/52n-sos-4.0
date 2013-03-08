@@ -31,7 +31,7 @@ import org.n52.sos.response.ServiceResponse;
  * 
  * 
  */
-public interface IDescribeObservationTypeDAO extends IOperationDAO {
+public interface IDescribeObservationTypeDAO extends OperationDAO {
 
     /**
      * @return Returns the DescirbeObservationType response

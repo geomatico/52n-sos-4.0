@@ -34,7 +34,7 @@ import org.n52.sos.response.GetFeatureOfInterestResponse;
  * Use {@link AbstractGetFeatureOfInterestDAO}
  */
 @Deprecated
-public interface IGetFeatureOfInterestDAO extends IOperationDAO {
+public interface IGetFeatureOfInterestDAO extends OperationDAO {
 
     /**
      * Get the featureOfInterest from data source.

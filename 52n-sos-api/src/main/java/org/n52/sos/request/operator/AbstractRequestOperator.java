@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.n52.sos.cache.ContentCache;
-import org.n52.sos.ds.IOperationDAO;
+import org.n52.sos.ds.OperationDAO;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.RequestEvent;
 import org.n52.sos.ogc.filter.SpatialFilter;
@@ -49,11 +49,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @param <D> the IOperationDAO of this operator
+ * @param <D> the OperationDAO of this operator
  * @param <R> The AbstractServiceRequest to handle
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class AbstractRequestOperator<D extends IOperationDAO, R extends AbstractServiceRequest> implements IRequestOperator {
+public abstract class AbstractRequestOperator<D extends OperationDAO, R extends AbstractServiceRequest> implements IRequestOperator {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractRequestOperator.class);
     private final D dao;
     private final String operationName;

@@ -30,6 +30,6 @@ package org.n52.sos.ds;
  * @since 4.0.0
  *
  */
-public interface IFeatureConnectionProvider extends IConnectionProvider {
+public interface IFeatureConnectionProvider extends ConnectionProvider {
 
 }

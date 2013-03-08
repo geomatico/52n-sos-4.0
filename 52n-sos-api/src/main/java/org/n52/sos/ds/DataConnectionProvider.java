@@ -23,42 +23,14 @@
  */
 package org.n52.sos.ds;
 
-import java.util.Properties;
-
-import org.n52.sos.config.ConfigurationException;
-import org.n52.sos.util.Cleanupable;
 
 /**
- * Interface for a connection provider that handles the connection to the
- * underlying data source (e.g. database, web service). Implementation can
- * contain a ConnectionPool.
+ * Interface for data connection provider
  * 
+ * @author Carsten Hollmann <c.hollmann@62north.org>
+ * @since 4.0.0
+ *
  */
-public interface IConnectionProvider extends Cleanupable{
-
-    /**
-     * Get a data source connection
-     * 
-     * @return Connection to the data source
-     * @throws ConnectionProviderException  
-     */
-    public Object getConnection() throws ConnectionProviderException;
-
-    /**
-     * Return the connection to the provider
-     * 
-     * @param connection
-     *            Connection
-     */
-    public void returnConnection(Object connection);
-
-	/**
-	 * Initializes the connection provider.
-	 * 
-	 * @param properties the properties
-	 * 
-	 * @throws ConfigurationException if the initialization failed 
-	 */
-	public void initialize(Properties properties) throws ConfigurationException;
+public interface DataConnectionProvider extends ConnectionProvider {
 
 }

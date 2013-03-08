@@ -31,7 +31,7 @@ import org.n52.sos.response.GetResultTemplateResponse;
  * Use {@link AbstractGetResultTemplateDAO}
  */
 @Deprecated
-public interface IGetResultTemplateDAO extends IOperationDAO {
+public interface IGetResultTemplateDAO extends OperationDAO {
     
     public GetResultTemplateResponse getResultTemplate(GetResultTemplateRequest request) throws OwsExceptionReport;
 

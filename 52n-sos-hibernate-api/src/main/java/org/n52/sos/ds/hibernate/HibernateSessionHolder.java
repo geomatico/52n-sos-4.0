@@ -25,7 +25,7 @@ package org.n52.sos.ds.hibernate;
 
 import org.hibernate.Session;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.ds.IConnectionProvider;
+import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.Util4Exceptions;
@@ -36,7 +36,7 @@ public class HibernateSessionHolder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateSessionHolder.class);
     
-    private final IConnectionProvider connectionProvider;
+    private final ConnectionProvider connectionProvider;
 
     public HibernateSessionHolder() {
         this.connectionProvider = Configurator.getInstance().getDataConnectionProvider();

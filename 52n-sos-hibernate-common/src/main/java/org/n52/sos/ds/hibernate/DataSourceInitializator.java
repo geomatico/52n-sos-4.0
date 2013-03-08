@@ -37,8 +37,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.n52.sos.decode.Decoder;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.ds.IConnectionProvider;
-import org.n52.sos.ds.IDataSourceInitializator;
+import org.n52.sos.ds.ConnectionProvider;
+import org.n52.sos.ds.DataSourceInitializer;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -49,10 +49,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Deprecated
-public class DataSourceInitializator implements IDataSourceInitializator {
+public class DataSourceInitializator implements DataSourceInitializer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataSourceInitializator.class);
-    private IConnectionProvider connectionProvider;
+    private ConnectionProvider connectionProvider;
 
     public DataSourceInitializator() {
         this.connectionProvider = Configurator.getInstance().getDataConnectionProvider();
