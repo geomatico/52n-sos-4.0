@@ -78,7 +78,7 @@ import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.SosFeatureCollection;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
-import org.n52.sos.ogc.ows.IExtension;
+import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
@@ -253,7 +253,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         }
 
         if (sosCapabilities.getExtensions() != null && !sosCapabilities.getExtensions().isEmpty()) {
-            for (IExtension extension : sosCapabilities.getExtensions()) {
+            for (SwesExtension extension : sosCapabilities.getExtensions()) {
                 setExensions(xbCaps.addNewExtension(), extension);
             }
         }
@@ -588,7 +588,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         }
     }
 
-    private void setExensions(XmlObject addNewExtension, IExtension extension) {
+    private void setExensions(XmlObject addNewExtension, SwesExtension extension) {
         if (extension instanceof SosInsertionCapabilities) {
             addNewExtension.set(createInsertionCapabilities((SosInsertionCapabilities) extension));
         } else {

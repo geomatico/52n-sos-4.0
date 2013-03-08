@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.ows;
 
-public interface IMergableExtension<T extends IMergableExtension<T>> extends ICapabilitiesExtension {
+public interface MergableExtension<T extends MergableExtension<T>> extends CapabilitiesExtension {
     
     public void merge(T t);
 }

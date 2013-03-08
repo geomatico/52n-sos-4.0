@@ -23,7 +23,7 @@
  */
 package org.n52.sos.request.operator;
 
-import org.n52.sos.ogc.ows.IExtension;
+import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.AbstractServiceRequest;
@@ -44,5 +44,5 @@ public interface IRequestOperator extends ConformanceClass {
     public OWSOperation getOperationMetadata(String service, String version)
             throws OwsExceptionReport;
     
-    public IExtension getExtension() throws OwsExceptionReport;
+    public SwesExtension getExtension() throws OwsExceptionReport;
 }

@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.ows;
 
-public interface ICapabilitiesExtension extends IExtension {
+public interface CapabilitiesExtension extends SwesExtension {
 
     public String getSectionName();
 }

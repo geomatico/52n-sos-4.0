@@ -32,7 +32,7 @@ import org.n52.sos.binding.Binding;
 import org.n52.sos.cache.ContentCache;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.ds.OperationDAO;
-import org.n52.sos.ogc.ows.IExtension;
+import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -69,7 +69,7 @@ public abstract class AbstractHibernateOperationDao implements OperationDAO {
 
     @Override
     /* provide a default implementation for extension-less DAO's */
-    public IExtension getExtension() throws OwsExceptionReport {
+    public SwesExtension getExtension() throws OwsExceptionReport {
         return null;
     }
 

@@ -48,9 +48,9 @@ import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.ows.ICapabilitiesExtension;
-import org.n52.sos.ogc.ows.IExtension;
-import org.n52.sos.ogc.ows.IMergableExtension;
+import org.n52.sos.ogc.ows.CapabilitiesExtension;
+import org.n52.sos.ogc.ows.SwesExtension;
+import org.n52.sos.ogc.ows.MergableExtension;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSOperationsMetadata;
@@ -652,34 +652,34 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
     
     @Override
     protected Set<String> getExtensionSections() throws OwsExceptionReport {
-        Collection<IExtension> extensions = getAndMergeExtensions();
+        Collection<SwesExtension> extensions = getAndMergeExtensions();
         HashSet<String> sections = new HashSet<String>(extensions.size());
-        for (IExtension e : extensions) {
-            if (e instanceof ICapabilitiesExtension) {
-                sections.add(((ICapabilitiesExtension) e).getSectionName());
+        for (SwesExtension e : extensions) {
+            if (e instanceof CapabilitiesExtension) {
+                sections.add(((CapabilitiesExtension) e).getSectionName());
             }
         }
         return sections;
     }
 
     /**
-     * Get extensions and merge IMergableExtension of the same class.
+     * Get extensions and merge MergableExtension of the same class.
      *
      * @return Extensions
      * @throws OwsExceptionReport
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private List<IExtension> getAndMergeExtensions() throws OwsExceptionReport {
+    private List<SwesExtension> getAndMergeExtensions() throws OwsExceptionReport {
         Map<RequestOperatorKeyType, IRequestOperator> requestOperators = getConfigurator()
 				.getRequestOperatorRepository().getRequestOperator();
-        List<IExtension> extensions = new ArrayList<IExtension>(requestOperators.size());
-        HashMap<String, IMergableExtension> map = new HashMap<String, IMergableExtension>(requestOperators.size());
+        List<SwesExtension> extensions = new ArrayList<SwesExtension>(requestOperators.size());
+        HashMap<String, MergableExtension> map = new HashMap<String, MergableExtension>(requestOperators.size());
         for (IRequestOperator requestOperator : requestOperators.values()) {
-            IExtension extension = requestOperator.getExtension();
+            SwesExtension extension = requestOperator.getExtension();
             if (extension != null) {
-                if (extension instanceof IMergableExtension) {
-                    IMergableExtension me = (IMergableExtension) extension;
-                    IMergableExtension previous = map.get(me.getSectionName());
+                if (extension instanceof MergableExtension) {
+                    MergableExtension me = (MergableExtension) extension;
+                    MergableExtension previous = map.get(me.getSectionName());
                     if (previous == null) {
                         map.put(me.getSectionName(), me);
                     } else {
@@ -694,13 +694,13 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         return extensions;
     }
 
-    private Collection<IExtension> getExtensions(Set<String> requestedExtensionSections)
+    private Collection<SwesExtension> getExtensions(Set<String> requestedExtensionSections)
             throws OwsExceptionReport {
-        List<IExtension> extensions = getAndMergeExtensions();
-        List<IExtension> filtered = new ArrayList<IExtension>(requestedExtensionSections.size());
-        for (IExtension e : extensions) {
-            if (e instanceof ICapabilitiesExtension) {
-                if (requestedExtensionSections.contains(((ICapabilitiesExtension) e).getSectionName())) {
+        List<SwesExtension> extensions = getAndMergeExtensions();
+        List<SwesExtension> filtered = new ArrayList<SwesExtension>(requestedExtensionSections.size());
+        for (SwesExtension e : extensions) {
+            if (e instanceof CapabilitiesExtension) {
+                if (requestedExtensionSections.contains(((CapabilitiesExtension) e).getSectionName())) {
                     filtered.add(e);
                 }
             }

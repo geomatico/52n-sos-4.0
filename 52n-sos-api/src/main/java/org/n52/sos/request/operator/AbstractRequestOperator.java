@@ -35,7 +35,7 @@ import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.RequestEvent;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
-import org.n52.sos.ogc.ows.IExtension;
+import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -78,7 +78,7 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
     }
 
     @Override
-    public IExtension getExtension() throws OwsExceptionReport {
+    public SwesExtension getExtension() throws OwsExceptionReport {
     	if (hasImplementedDAO()) {
     		return getDao().getExtension();
     	}

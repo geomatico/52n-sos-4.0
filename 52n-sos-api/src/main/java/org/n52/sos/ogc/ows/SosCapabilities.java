@@ -62,7 +62,7 @@ public class SosCapabilities {
     /**
      * extensions
      */
-    private Collection<IExtension> extensions;
+    private Collection<SwesExtension> extensions;
 
     /**
      * Set service identification
@@ -167,7 +167,7 @@ public class SosCapabilities {
      * @param extensions
      *            extension data
      */
-    public void setExensions(Collection<IExtension> extensions) {
+    public void setExensions(Collection<SwesExtension> extensions) {
         this.extensions = extensions;
     }
 
@@ -176,7 +176,7 @@ public class SosCapabilities {
      * 
      * @return extension data
      */
-    public Collection<IExtension> getExtensions() {
+    public Collection<SwesExtension> getExtensions() {
         return this.extensions;
     }
 }

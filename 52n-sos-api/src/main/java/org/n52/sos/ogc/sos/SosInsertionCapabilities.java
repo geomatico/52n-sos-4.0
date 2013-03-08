@@ -27,11 +27,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.n52.sos.ogc.ows.ICapabilitiesExtension;
-import org.n52.sos.ogc.ows.IExtension;
-import org.n52.sos.ogc.ows.IMergableExtension;
+import org.n52.sos.ogc.ows.CapabilitiesExtension;
+import org.n52.sos.ogc.ows.SwesExtension;
+import org.n52.sos.ogc.ows.MergableExtension;
 
-public class SosInsertionCapabilities implements IExtension, ICapabilitiesExtension, IMergableExtension<SosInsertionCapabilities> {
+public class SosInsertionCapabilities implements SwesExtension, CapabilitiesExtension, MergableExtension<SosInsertionCapabilities> {
     
     private static final String SECTION_NAME = Sos2Constants.CapabilitiesSections.InsertionCapabilities.name();
 

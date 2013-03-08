@@ -23,6 +23,6 @@
  */
 package org.n52.sos.ogc.ows;
 
-public interface IExtension {
+public interface SwesExtension {
 
 }

@@ -44,7 +44,7 @@ import org.n52.sos.ds.hibernate.entities.RelatedFeatureRole;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.om.SosOffering;
-import org.n52.sos.ogc.ows.IExtension;
+import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sos.SosInsertionCapabilities;
@@ -183,7 +183,7 @@ public class InsertSensorDAO extends AbstractInsertSensorDAO {
     }
 
     @Override
-    public IExtension getExtension() throws OwsExceptionReport {
+    public SwesExtension getExtension() throws OwsExceptionReport {
         SosInsertionCapabilities insertionCapabilities = new SosInsertionCapabilities();
         insertionCapabilities.addFeatureOfInterestTypes(getCache().getFeatureOfInterestTypes());
         insertionCapabilities.addObservationTypes(getCache().getObservationTypes());

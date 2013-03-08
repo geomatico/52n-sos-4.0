@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ds;
 
-import org.n52.sos.ogc.ows.IExtension;
+import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
@@ -59,5 +59,5 @@ public interface OperationDAO {
      * @return the operation specific extension information (&larr; should be available from cache or from code)
      * @throws OwsExceptionReport
      */
-    public IExtension getExtension() throws OwsExceptionReport;
+    public SwesExtension getExtension() throws OwsExceptionReport;
 }
