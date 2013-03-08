@@ -37,13 +37,13 @@ import org.n52.sos.request.operator.IWSDLAwareRequestOperator;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.util.IFactory;
+import org.n52.sos.util.Producer;
 
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class WSDLFactory implements IFactory<String> {
+public class WSDLFactory implements Producer<String> {
 
     private static final String SOAP_BINDING_ENDPOINT = "/soap";
     private static final String POX_BINDING_ENDPOINT = "/pox";

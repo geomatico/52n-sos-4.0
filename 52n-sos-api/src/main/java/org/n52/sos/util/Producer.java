@@ -23,14 +23,14 @@
  */
 package org.n52.sos.util;
 
-import org.n52.sos.config.ConfigurationException;
-
 /**
  * Generic Factory interface.
  *
+ * @param <T> the type to produce
+ *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public interface IFactory<T> {
+public interface Producer<T> {
 
-    public T get() throws ConfigurationException;
+    public T get();
 }

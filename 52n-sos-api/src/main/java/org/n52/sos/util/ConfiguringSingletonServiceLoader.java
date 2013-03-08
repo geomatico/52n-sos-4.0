@@ -23,13 +23,17 @@
  */
 package org.n52.sos.util;
 
-import org.n52.sos.config.SettingsManager;
 import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.config.SettingsManager;
 
 public class ConfiguringSingletonServiceLoader<T> extends SingletonServiceLoader<T> {
 
-    public ConfiguringSingletonServiceLoader(Class<T> c, boolean failIfNotFound) {
+    public ConfiguringSingletonServiceLoader(Class<? extends T> c, boolean failIfNotFound) {
         super(c, failIfNotFound);
+    }
+
+    public ConfiguringSingletonServiceLoader(Class<? extends T> c, boolean failIfNotFound, T defaultImplementation) {
+        super(c, failIfNotFound, defaultImplementation);
     }
 
     @Override

@@ -23,7 +23,7 @@
  */
 package org.n52.sos.config;
 
-public class ConfigurationException extends Exception {
+public class ConfigurationException extends Error {
     private static final long serialVersionUID = -7249708070675332849L;
 
     public ConfigurationException() {

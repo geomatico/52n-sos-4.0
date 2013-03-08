@@ -36,7 +36,7 @@ import org.n52.sos.config.ConfigurationException;
  * @since 4.0
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class LazyThreadSafeFactory<T> implements IFactory<T> {
+public abstract class LazyThreadSafeFactory<T> implements Producer<T> {
 
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 	private T object;

@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * IFactory that loads a single instance of
+ * Producer that loads a single instance of
  * <code>T</code> with a {@link ServiceLoader}.
  *
  * @param <T> the type to produce
@@ -40,30 +40,39 @@ import org.slf4j.LoggerFactory;
  * @author Christian Autermann <c.autermann@52north.org>
  * @since 4.0
  */
-public class SingletonServiceLoader<T> implements IFactory<T> {
+public class SingletonServiceLoader<T> implements Producer<T> {
 
     private static final Logger log = LoggerFactory.getLogger(SingletonServiceLoader.class);
-    private final Class<T> clazz;
+    private final Class<? extends T> clazz;
     private final boolean failIfNotFound;
-    private final ServiceLoader<T> serviceLoader;
+    private final ServiceLoader<? extends T> serviceLoader;
     private T implementation;
+    private T defaultImplementation;
 
-    public SingletonServiceLoader(Class<T> c, boolean failIfNotFound) {
+    public SingletonServiceLoader(Class<? extends T> c, boolean failIfNotFound) {
+        this(c, failIfNotFound, null);
+    }
+
+    public SingletonServiceLoader(Class<? extends T> c, boolean failIfNotFound, T defaultImplementation) {
         this.clazz = c;
         this.failIfNotFound = failIfNotFound;
         this.serviceLoader = ServiceLoader.load(c);
+        this.defaultImplementation = defaultImplementation;
     }
 
     @Override
     public final T get() throws ConfigurationException {
         if (implementation == null) {
-            Iterator<T> iter = serviceLoader.iterator();
+            Iterator<? extends T> iter = serviceLoader.iterator();
             while (iter.hasNext() && implementation == null) {
                 try {
                     implementation = iter.next();
                 } catch (ServiceConfigurationError sce) {
                     log.warn(String.format("Implementation for %s could be loaded!", clazz), sce);
                 }
+            }
+            if (implementation == null && defaultImplementation != null) {
+                implementation = defaultImplementation;
             }
             if (implementation == null) {
                 String message = String.format("No implementation for %s could be loaded!", clazz);
