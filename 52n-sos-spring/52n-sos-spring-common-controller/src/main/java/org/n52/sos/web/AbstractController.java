@@ -28,15 +28,11 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 
 import org.n52.sos.service.DatabaseSettingsHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 @Controller
 public class AbstractController {
-
-    protected static final Logger log = LoggerFactory.getLogger(AbstractController.class);
 
     @Autowired
     private ServletContext context;

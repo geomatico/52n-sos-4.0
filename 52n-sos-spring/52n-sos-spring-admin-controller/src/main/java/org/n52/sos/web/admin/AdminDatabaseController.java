@@ -37,6 +37,8 @@ import org.n52.sos.ds.GeneralQueryDAO;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.ControllerConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,11 +50,12 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class AdminDatabaseController extends AbstractAdminController {
-
-    public static final String TEST_OFFERING_PREFIX = "test_offering";
+    private static final Logger log = LoggerFactory.getLogger(AdminDatabaseController.class);
+    private static final String TEST_OFFERING_PREFIX = "test_offering";
     private static final String ROWS = "rows";
     private static final String NAMES = "names";
-    private static final String IS_TEST_DATA_SET_INSTALLED_MODEL_ATTRIBUTE = "IS_TEST_DATA_SET_INSTALLED_MODEL_ATTRIBUTE";
+    private static final String IS_TEST_DATA_SET_INSTALLED_MODEL_ATTRIBUTE =
+                                "IS_TEST_DATA_SET_INSTALLED_MODEL_ATTRIBUTE";
     private ServiceLoader<GeneralQueryDAO> daoServiceLoader = ServiceLoader.load(GeneralQueryDAO.class);
 
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE)
@@ -105,7 +108,8 @@ public class AdminDatabaseController extends AbstractAdminController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE_REMOVE_TEST_DATA, method = RequestMethod.POST)
-    public void removeTestData() throws SQLException, OwsExceptionReport, FileNotFoundException, ConnectionProviderException {
+    public void removeTestData() throws SQLException, OwsExceptionReport, FileNotFoundException,
+                                        ConnectionProviderException {
         log.info("Removing test data set.");
         executeSqlFile(ControllerConstants.REMOVE_TEST_DATA_SQL_FILE);
         Configurator.getInstance().getCacheController().updateCacheFromDatasource();
@@ -113,7 +117,8 @@ public class AdminDatabaseController extends AbstractAdminController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_DATABASE_CREATE_TEST_DATA, method = RequestMethod.POST)
-    public void createTestData() throws SQLException, OwsExceptionReport, FileNotFoundException, ConnectionProviderException {
+    public void createTestData() throws SQLException, OwsExceptionReport, FileNotFoundException,
+                                        ConnectionProviderException {
         log.info("Inserting test data set.");
         executeSqlFile(ControllerConstants.INSERT_TEST_DATA_SQL_FILE);
         Configurator.getInstance().getCacheController().updateCacheFromDatasource();

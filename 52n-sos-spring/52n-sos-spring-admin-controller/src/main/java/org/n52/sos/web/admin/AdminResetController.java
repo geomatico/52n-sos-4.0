@@ -23,12 +23,14 @@
  */
 package org.n52.sos.web.admin;
 
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,6 +40,7 @@ import org.springframework.web.servlet.view.RedirectView;
 @Controller
 @RequestMapping(ControllerConstants.Paths.ADMIN_RESET)
 public class AdminResetController extends AbstractController {
+    private static final Logger log = LoggerFactory.getLogger(AdminResetController.class);
 
     @RequestMapping(method = RequestMethod.GET)
     public String get() {
