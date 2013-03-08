@@ -862,11 +862,32 @@
 				<module>52n-sos-resultHandling-v20</module>
 				<module>52n-sos-transactional-v20</module>
 				<module>52n-sos-webapp</module>
+				<module>52n-sos-ext-do</module>
 				<!--<module>52n-sos-test</module> -->
 			</modules>
 			<properties>
 				<config.logger.level>TRACE</config.logger.level>
+				<do.version>0.1.0-SNAPSHOT</do.version>
 			</properties>
+			<dependencyManagement>
+				<dependencies>
+					<dependency>
+						<groupId>${project.groupId}</groupId>
+						<artifactId>52n-sos-ext-do-xml</artifactId>
+						<version>${do.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>${project.groupId}</groupId>
+						<artifactId>52n-sos-ext-do-code</artifactId>
+						<version>${do.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>${project.groupId}</groupId>
+						<artifactId>52n-sos-ext-do-code-kvp</artifactId>
+						<version>${do.version}</version>
+					</dependency>
+				</dependencies>
+			</dependencyManagement>
 		</profile>
 		<profile>
 			<id>sosV100</id>
@@ -1013,22 +1034,22 @@
 				<module>52n-sos-ext-do</module>
 			</modules>
 			<dependencyManagement>
-			<dependencies>
-				<dependency>
-					<groupId>${project.groupId}</groupId>
-					<artifactId>52n-sos-ext-do-xml</artifactId>
-					<version>${do.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>${project.groupId}</groupId>
-					<artifactId>52n-sos-ext-do-code</artifactId>
-					<version>${do.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>${project.groupId}</groupId>
-					<artifactId>52n-sos-ext-do-code-kvp</artifactId>
-					<version>${do.version}</version>
-				</dependency>
+				<dependencies>
+					<dependency>
+						<groupId>${project.groupId}</groupId>
+						<artifactId>52n-sos-ext-do-xml</artifactId>
+						<version>${do.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>${project.groupId}</groupId>
+						<artifactId>52n-sos-ext-do-code</artifactId>
+						<version>${do.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>${project.groupId}</groupId>
+						<artifactId>52n-sos-ext-do-code-kvp</artifactId>
+						<version>${do.version}</version>
+					</dependency>
 				</dependencies>
 			</dependencyManagement>
 		</profile>
