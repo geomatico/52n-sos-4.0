@@ -35,19 +35,19 @@ import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 @SuppressWarnings("rawtypes")
-public class ConverterRepository extends AbstractConfiguringServiceLoaderRepository<IConverter> {
-	private final Map<ConverterKeyType, IConverter<?, ?>> converter = new HashMap<ConverterKeyType, IConverter<?, ?>>(0);
+public class ConverterRepository extends AbstractConfiguringServiceLoaderRepository<Converter> {
+	private final Map<ConverterKeyType, Converter<?, ?>> converter = new HashMap<ConverterKeyType, Converter<?, ?>>(0);
 
 	public ConverterRepository() throws ConfigurationException {
-		super(IConverter.class, false);
+		super(Converter.class, false);
 		load(false);
 	}
 
     @Override
     @SuppressWarnings("rawtypes")
-	protected void processConfiguredImplementations(Set<IConverter> converter) throws ConfigurationException {
+	protected void processConfiguredImplementations(Set<Converter> converter) throws ConfigurationException {
 		this.converter.clear();
-		for (IConverter<?, ?> aConverter : converter) {
+		for (Converter<?, ?> aConverter : converter) {
 			for (ConverterKeyType converterKeyType : aConverter.getConverterKeyTypes()) {
                 this.converter.put(converterKeyType, aConverter);
             }
@@ -55,12 +55,12 @@ public class ConverterRepository extends AbstractConfiguringServiceLoaderReposit
 		// TODO check for encoder/decoder used by converter
 	}
 
-    public <T,F> IConverter<T,F> getConverter(String fromNamespace, String toNamespace) {
+    public <T,F> Converter<T,F> getConverter(String fromNamespace, String toNamespace) {
         return getConverter(new ConverterKeyType(fromNamespace, toNamespace));
     }
 
     @SuppressWarnings("unchecked")
-    public <T,F> IConverter<T,F> getConverter(ConverterKeyType key) {
-        return (IConverter<T,F>) converter.get(key);
+    public <T,F> Converter<T,F> getConverter(ConverterKeyType key) {
+        return (Converter<T,F>) converter.get(key);
     }
 }
