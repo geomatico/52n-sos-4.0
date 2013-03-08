@@ -42,7 +42,7 @@ public class HibernateSessionHolder {
         this.connectionProvider = Configurator.getInstance().getDataConnectionProvider();
     }
 
-    protected Session getSession() throws OwsExceptionReport {
+    public Session getSession() throws OwsExceptionReport {
         try {
             return getSession(connectionProvider.getConnection());
         } catch (ConnectionProviderException cpe) {
@@ -51,11 +51,11 @@ public class HibernateSessionHolder {
         }
     }
 
-    protected void returnSession(Session session) {
+    public void returnSession(Session session) {
         this.connectionProvider.returnConnection(session);
     }
 
-    protected Session getSession(Object connection) throws OwsExceptionReport {
+    public Session getSession(Object connection) throws OwsExceptionReport {
         if (!(connection instanceof Session)) {
             String exceptionText = "The parameter connection is not an Hibernate Session!";
             LOGGER.error(exceptionText);
