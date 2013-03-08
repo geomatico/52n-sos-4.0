@@ -1,25 +1,18 @@
 /**
- * Copyright (C) 2013
- * by 52 North Initiative for Geospatial Open Source Software GmbH
+ * Copyright (C) 2013 by 52 North Initiative for Geospatial Open Source Software GmbH
  *
- * Contact: Andreas Wytzisk
- * 52 North Initiative for Geospatial Open Source Software GmbH
- * Martin-Luther-King-Weg 24
- * 48155 Muenster, Germany
- * info@52north.org
+ * Contact: Andreas Wytzisk 52 North Initiative for Geospatial Open Source Software GmbH Martin-Luther-King-Weg 24 48155
+ * Muenster, Germany info@52north.org
  *
- * This program is free software; you can redistribute and/or modify it under
- * the terms of the GNU General Public License version 2 as published by the
- * Free Software Foundation.
+ * This program is free software; you can redistribute and/or modify it under the terms of the GNU General Public
+ * License version 2 as published by the Free Software Foundation.
  *
- * This program is distributed WITHOUT ANY WARRANTY; even without the implied
- * WARRANTY OF MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
+ * This program is distributed WITHOUT ANY WARRANTY; even without the implied WARRANTY OF MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with
- * this program (see gnu-gpl v2.txt). If not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
- * visit the Free Software Foundation web page, http://www.fsf.org.
+ * You should have received a copy of the GNU General Public License along with this program (see gnu-gpl v2.txt). If
+ * not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or visit
+ * the Free Software Foundation web page, http://www.fsf.org.
  */
 package org.n52.sos.web.install;
 
@@ -38,11 +31,11 @@ import javax.servlet.http.HttpSession;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.config.SettingValue;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.hibernate.util.DefaultHibernateConstants;
-import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.JdbcUrl;
@@ -50,6 +43,8 @@ import org.n52.sos.web.MetaDataHandler;
 import org.n52.sos.web.SqlUtils;
 import org.n52.sos.web.auth.UserService;
 import org.n52.sos.web.install.InstallConstants.Step;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,7 +54,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @RequestMapping(ControllerConstants.Paths.INSTALL_FINISH)
 public class InstallFinishController extends AbstractProcessingInstallationController {
-    
+    private static final Logger log = LoggerFactory.getLogger(InstallFinishController.class);
     @Autowired
     private UserService userService;
 
@@ -70,27 +65,28 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
 
     @Override
     @RequestMapping(method = RequestMethod.POST)
-    public ModelAndView post(HttpServletRequest req, HttpServletResponse resp) throws InstallationRedirectError, InstallationSettingsError {
+    public ModelAndView post(HttpServletRequest req, HttpServletResponse resp) throws InstallationRedirectError,
+                                                                                      InstallationSettingsError {
         HttpSession session = checkPrevious(req);
         process(getParameters(req), getSettings(session));
         session.invalidate();
         return redirect(ControllerConstants.Paths.GET_INVOLVED + "?install=finished");
     }
-    
+
     @Override
     protected void process(Map<String, String> param, InstallationConfiguration c) throws InstallationSettingsError {
         checkUsername(param, c);
         checkPassword(param, c);
         Properties properties = createHibernateProperties(c);
         loadDriver(properties, c);
-        
+
         try {
             SettingsManager.getInstance().deleteAll();
         } catch (Throwable e) {
             throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_DELETE_PREVIOUS_SETTINGS, e
                     .getMessage()));
         }
-        
+
         Connection con = null;
         try {
             con = createConnection(properties);
@@ -99,7 +95,8 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
             insertSettings(c, con);
             saveAdmin(c, properties);
         } catch (Throwable e) {
-            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_CONNECT_TO_THE_DATABASE, e.getMessage()));
+            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_CONNECT_TO_THE_DATABASE, e
+                    .getMessage()));
         } finally {
             SqlUtils.close(con);
         }
@@ -107,16 +104,20 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         saveDatabaseProperties(properties, c);
         saveInstallationDate();
     }
-    
+
     protected Properties createHibernateProperties(InstallationConfiguration c) throws InstallationSettingsError {
         Properties p = checkJdbcUrl(c).toProperties();
-        p.put(DefaultHibernateConstants.DRIVER_PROPERTY, (String) c.getDatabaseSetting(InstallConstants.DRIVER_PARAMETER));
-        p.put(DefaultHibernateConstants.CONNECTION_POOL_PROPERTY, (String) c.getDatabaseSetting(InstallConstants.CONNECTION_POOL_PARAMETER));
-        p.put(DefaultHibernateConstants.DIALECT_PROPERTY, (String) c.getDatabaseSetting(InstallConstants.JDBC_DIALECT_PARAMETER));
+        p.put(DefaultHibernateConstants.DRIVER_PROPERTY, (String) c
+                .getDatabaseSetting(InstallConstants.DRIVER_PARAMETER));
+        p.put(DefaultHibernateConstants.CONNECTION_POOL_PROPERTY, (String) c
+                .getDatabaseSetting(InstallConstants.CONNECTION_POOL_PARAMETER));
+        p.put(DefaultHibernateConstants.DIALECT_PROPERTY, (String) c
+                .getDatabaseSetting(InstallConstants.JDBC_DIALECT_PARAMETER));
         return p;
     }
-    
-    protected void checkUsername(Map<String, String> param, InstallationConfiguration c) throws InstallationSettingsError {
+
+    protected void checkUsername(Map<String, String> param, InstallationConfiguration c) throws
+            InstallationSettingsError {
         String username = param.get(ControllerConstants.ADMIN_USERNAME_REQUEST_PARAMETER);
         if (username == null || username.trim().isEmpty()) {
             throw new InstallationSettingsError(c, ErrorMessages.USERNAME_IS_INVALID);
@@ -124,7 +125,8 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         c.setUsername(username);
     }
 
-    protected void checkPassword(Map<String, String> param, InstallationConfiguration c) throws InstallationSettingsError {
+    protected void checkPassword(Map<String, String> param, InstallationConfiguration c) throws
+            InstallationSettingsError {
         String password = param.get(ControllerConstants.ADMIN_PASSWORD_REQUEST_PARAMETER);
         if (password == null || password.trim().isEmpty()) {
             throw new InstallationSettingsError(c, ErrorMessages.PASSWORD_IS_INVALID);
@@ -132,7 +134,8 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         c.setPassword(password);
     }
 
-    protected void instantiateConfigurator(Properties properties, InstallationConfiguration c) throws InstallationSettingsError {
+    protected void instantiateConfigurator(Properties properties, InstallationConfiguration c) throws
+            InstallationSettingsError {
         if (Configurator.getInstance() == null) {
             log.info("Instantiating Configurator...");
             try {
@@ -146,12 +149,14 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         }
     }
 
-    protected void saveDatabaseProperties(Properties properties, InstallationConfiguration c) throws InstallationSettingsError {
+    protected void saveDatabaseProperties(Properties properties, InstallationConfiguration c) throws
+            InstallationSettingsError {
         try {
             getDatabaseSettingsHandler().saveAll(properties);
         } catch (ConfigurationException e) {
             /* TODO desctruct configurator? */
-            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_WRITE_DATASOURCE_CONFIG, e.getMessage()));
+            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_WRITE_DATASOURCE_CONFIG, e
+                    .getMessage()));
         }
     }
 
@@ -175,7 +180,8 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
                 SqlUtils.executeSQLFile(con, new File(getContext().getRealPath(
                         ControllerConstants.CREATE_DATAMODEL_SQL_FILE)));
             } catch (Exception e) {
-                throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_CREATE_SOS_TABLES, e.getMessage()));
+                throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_CREATE_SOS_TABLES, e
+                        .getMessage()));
             }
         }
     }
@@ -189,18 +195,19 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
                                         new File(getContext().getRealPath(
                         ControllerConstants.INSERT_TEST_DATA_SQL_FILE)));
             } catch (Exception e) {
-                throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_INSERT_TEST_DATA, e.getMessage()));
+                throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_INSERT_TEST_DATA, e
+                        .getMessage()));
             }
         }
     }
 
     protected void insertSettings(InstallationConfiguration c, Connection con) throws InstallationSettingsError {
         try {
-            
+
             for (SettingValue<?> e : c.getSettings().values()) {
                 SettingsManager.getInstance().changeSetting(e);
             }
-            
+
 //            try {
 //                s.put(MetaDataHandler.Metadata.VERSION.name(),
 //                      getMetaDataHandler().get(MetaDataHandler.Metadata.VERSION));
@@ -210,9 +217,11 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
 //            }
 
         } catch (ConfigurationException e) {
-            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_INSERT_SETTINGS, e.getMessage()), e);
+            throw new InstallationSettingsError(c, String
+                    .format(ErrorMessages.COULD_NOT_INSERT_SETTINGS, e.getMessage()), e);
         } catch (ConnectionProviderException e1) {
-            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_INSERT_SETTINGS, e1.getMessage()), e1);
+            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_INSERT_SETTINGS, e1
+                    .getMessage()), e1);
         }
     }
 
@@ -221,7 +230,8 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         try {
             userService.createAdmin(c.getUsername(), c.getPassword());
         } catch (Throwable e) {
-            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_SAVE_ADMIN_CREDENTIALS, e.getMessage()));
+            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_SAVE_ADMIN_CREDENTIALS, e
+                    .getMessage()));
         }
     }
 
@@ -244,14 +254,15 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         try {
             Class.forName(properties.getProperty(DefaultHibernateConstants.DRIVER_PROPERTY));
         } catch (ClassNotFoundException e) {
-            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_CONNECT_TO_THE_DATABASE, e.getMessage()));
+            throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_CONNECT_TO_THE_DATABASE, e
+                    .getMessage()));
         }
     }
 
     private Connection createConnection(Properties properties) throws SQLException {
         return DriverManager.getConnection(
-             properties.getProperty(DefaultHibernateConstants.CONNECTION_STRING_PROPERTY),
-             properties.getProperty(DefaultHibernateConstants.USER_PROPERTY),
-             properties.getProperty(DefaultHibernateConstants.PASS_PROPERTY));
+                properties.getProperty(DefaultHibernateConstants.CONNECTION_STRING_PROPERTY),
+                properties.getProperty(DefaultHibernateConstants.USER_PROPERTY),
+                properties.getProperty(DefaultHibernateConstants.PASS_PROPERTY));
     }
 }

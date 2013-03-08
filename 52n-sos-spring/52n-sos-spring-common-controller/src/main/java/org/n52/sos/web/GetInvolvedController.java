@@ -25,11 +25,13 @@ package org.n52.sos.web;
 
 import java.net.URI;
 
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.config.SettingValue;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
-import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.service.ServiceSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,6 +43,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 @RequestMapping(ControllerConstants.Paths.GET_INVOLVED)
 public class GetInvolvedController extends AbstractController {
+    private static final Logger log = LoggerFactory.getLogger(GetInvolvedController.class);
     public static final String SERVICE_URL_MODEL_ATTRIBUTE = "serviceUrl";
 
     @RequestMapping(method = RequestMethod.GET)
