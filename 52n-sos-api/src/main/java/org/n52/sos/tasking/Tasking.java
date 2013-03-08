@@ -26,7 +26,7 @@ package org.n52.sos.tasking;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.Timer;
-import org.n52.sos.tasking.ASosTasking;
+
 import org.n52.sos.util.Cleanupable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
