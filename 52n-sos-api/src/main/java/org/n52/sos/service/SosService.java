@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.binding.Binding;
 import org.n52.sos.encode.EncoderKey;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.XmlEncoderKey;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.OwsExceptionReportEvent;
@@ -180,7 +180,7 @@ public class SosService extends ConfiguratedHttpServlet {
         try {
 			SosEventBus.fire(new OwsExceptionReportEvent(owsExceptionReport));
             EncoderKey key = new XmlEncoderKey(owsExceptionReport.getNamespace(), owsExceptionReport.getClass());
-            IEncoder<?, OwsExceptionReport> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
+            Encoder<?, OwsExceptionReport> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
             if (encoder != null) {
                 Object encodedObject = encoder.encode(owsExceptionReport);
                 if (encodedObject instanceof XmlObject) {

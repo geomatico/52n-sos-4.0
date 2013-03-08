@@ -41,7 +41,7 @@ import org.n52.sos.wsa.WsaHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class WsaEncoder implements IEncoder<Map<QName, String>, WsaHeader> {
+public class WsaEncoder implements Encoder<Map<QName, String>, WsaHeader> {
 
     /** the logger, used to log exceptions and additonaly information */
     private static Logger LOGGER = LoggerFactory.getLogger(WsaEncoder.class);

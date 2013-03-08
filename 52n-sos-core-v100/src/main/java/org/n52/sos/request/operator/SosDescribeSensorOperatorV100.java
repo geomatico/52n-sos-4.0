@@ -32,7 +32,7 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractDescribeSensorDAO;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
@@ -101,7 +101,7 @@ public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<Abs
                         OWSConstants.RequestParams.version.name(), exceptionText);
             }
 
-            IEncoder<XmlObject, DescribeSensorResponse> encoder = CodingHelper.getEncoder(namespace, response);
+            Encoder<XmlObject, DescribeSensorResponse> encoder = CodingHelper.getEncoder(namespace, response);
             if (encoder != null) {
                 encoder.encode(response).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
                 return new ServiceResponse(baos, contentType, applyZIPcomp, true);

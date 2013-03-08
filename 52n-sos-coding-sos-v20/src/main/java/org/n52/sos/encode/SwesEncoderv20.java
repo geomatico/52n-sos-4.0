@@ -55,7 +55,7 @@ import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SwesEncoderv20 implements IEncoder<XmlObject, AbstractServiceResponse> {
+public class SwesEncoderv20 implements Encoder<XmlObject, AbstractServiceResponse> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SwesEncoderv20.class);
     private static final Set<EncoderKey> ENCODER_KEYS = CodingHelper

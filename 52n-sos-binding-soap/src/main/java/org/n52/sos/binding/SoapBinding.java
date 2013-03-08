@@ -34,7 +34,7 @@ import javax.xml.soap.SOAPConstants;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.decode.Decoder;
 import org.n52.sos.decode.OperationDecoderKey;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -134,7 +134,7 @@ public class SoapBinding extends Binding {
                     soapResponse.setSoapFault(soapRequest.getSoapFault());
                 }
                 // Encode SOAP response
-                IEncoder<?, SoapResponse> encoder = Configurator.getInstance().getCodingRepository()
+                Encoder<?, SoapResponse> encoder = Configurator.getInstance().getCodingRepository()
                         .getEncoder(CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse));
                 if (encoder != null) {
                     return (ServiceResponse) encoder.encode(soapResponse);
@@ -171,7 +171,7 @@ public class SoapBinding extends Binding {
             } else {
                 soapResponse.setSoapNamespace(soapNamespace);
             }
-            IEncoder<?, SoapResponse> encoder = Configurator.getInstance().getCodingRepository().getEncoder(
+            Encoder<?, SoapResponse> encoder = Configurator.getInstance().getCodingRepository().getEncoder(
                     CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse));
             if (encoder != null) {
                 return (ServiceResponse) encoder.encode(soapResponse);

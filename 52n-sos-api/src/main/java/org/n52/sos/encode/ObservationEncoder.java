@@ -25,14 +25,14 @@ package org.n52.sos.encode;
 
 import java.util.Set;
 
-public interface IObservationEncoder<S, T> extends IEncoder<S, T> {
+public interface ObservationEncoder<S, T> extends Encoder<S, T> {
     
     public boolean isObservationAndMeasurmentV20Type();
     
     public boolean shouldObservationsWithSameXBeMerged();
     
     /**
-     * Indicates, if this {@link IObservationEncoder} is currently activated in the SOS
+     * Indicates, if this {@link ObservationEncoder} is currently activated in the SOS
      * @return
      */
     public boolean isSupported();

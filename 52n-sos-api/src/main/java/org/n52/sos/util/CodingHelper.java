@@ -35,7 +35,7 @@ import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.decode.XmlNamespaceDecoderKey;
 import org.n52.sos.decode.XmlOperationDecoderKey;
 import org.n52.sos.encode.EncoderKey;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.XmlEncoderKey;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -56,7 +56,7 @@ public class CodingHelper {
     }
 
     public static <T> XmlObject encodeObjectToXml(String namespace, T o, Map<SosConstants.HelperValues, String> helperValues) throws OwsExceptionReport {
-        IEncoder<XmlObject, T> encoder = getEncoder(namespace, o);
+        Encoder<XmlObject, T> encoder = getEncoder(namespace, o);
         XmlObject encodedObject = encoder.encode(o, helperValues);
         if (encodedObject == null) {
             String errorMsg = String.format("Encoding of type \"%s\" using namespace key \"%s\" failed", o.getClass(), namespace);
@@ -66,9 +66,9 @@ public class CodingHelper {
         return encodedObject;
     }
     
-    public static <T> IEncoder<XmlObject, T> getEncoder(String namespace, T o) throws OwsExceptionReport {
+    public static <T> Encoder<XmlObject, T> getEncoder(String namespace, T o) throws OwsExceptionReport {
         EncoderKey key = getEncoderKey(namespace, o);
-        IEncoder<XmlObject, T> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
+        Encoder<XmlObject, T> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
         if (encoder == null) {
             String errorMsg = String.format("No encoder found for key \"%s\".", key);
             LOGGER.error(errorMsg);

@@ -85,7 +85,7 @@ import org.omg.CosNaming.IstringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SweCommonEncoderv20 implements IEncoder<XmlObject, Object> {
+public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SweCommonEncoderv20.class);
 

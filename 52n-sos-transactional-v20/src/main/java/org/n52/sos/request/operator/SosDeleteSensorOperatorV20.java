@@ -32,7 +32,7 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractDeleteSensorDAO;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.SensorDeletion;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -75,7 +75,7 @@ public class SosDeleteSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            IEncoder<?, DeleteSensorResponse> encoder = Configurator.getInstance().getCodingRepository()
+            Encoder<?, DeleteSensorResponse> encoder = Configurator.getInstance().getCodingRepository()
                     .getEncoder(CodingHelper.getEncoderKey(SWEConstants.NS_SWES_20, response));
             if (encoder != null) {
                 // TODO valid response object

@@ -33,7 +33,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IGetObservationByIdDAO;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
@@ -121,7 +121,7 @@ public class SosGetObservationByIdOperatorV100 extends
             }
             
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            IEncoder<XmlObject, GetObservationByIdResponse> encoder = CodingHelper.getEncoder(namespace, response);
+            Encoder<XmlObject, GetObservationByIdResponse> encoder = CodingHelper.getEncoder(namespace, response);
             
             if (encoder != null) {
                 encoder.encode(response).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());

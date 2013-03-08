@@ -32,7 +32,7 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractInsertResultDAO;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.ResultInsertion;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -74,7 +74,7 @@ public class SosInsertResultOperatorV20 extends AbstractV2RequestOperator<Abstra
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            IEncoder<?, InsertResultResponse> encoder = Configurator.getInstance().getCodingRepository()
+            Encoder<?, InsertResultResponse> encoder = Configurator.getInstance().getCodingRepository()
                     .getEncoder(CodingHelper.getEncoderKey(Sos2Constants.NS_SOS_20, response));
             if (encoder != null) {
                 Object encodedObject = encoder.encode(response);

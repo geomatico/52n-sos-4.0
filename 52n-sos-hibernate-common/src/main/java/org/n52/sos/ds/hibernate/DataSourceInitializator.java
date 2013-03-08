@@ -40,7 +40,7 @@ import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.IConnectionProvider;
 import org.n52.sos.ds.IDataSourceInitializator;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
@@ -98,7 +98,7 @@ public class DataSourceInitializator implements IDataSourceInitializator {
         for (Decoder<?,?> decoder : Configurator.getInstance().getCodingRepository().getDecoders()) {
             list.add(decoder.getSupportedTypes());
         }
-        for (IEncoder<?,?> encoder : Configurator.getInstance().getCodingRepository().getEncoders()) {
+        for (Encoder<?,?> encoder : Configurator.getInstance().getCodingRepository().getEncoders()) {
             list.add(encoder.getSupportedTypes());
         }
         

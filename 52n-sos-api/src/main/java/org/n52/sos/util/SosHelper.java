@@ -43,8 +43,8 @@ import java.util.Stack;
 
 import org.n52.sos.binding.Binding;
 import org.n52.sos.decode.OperationDecoderKey;
-import org.n52.sos.encode.IEncoder;
-import org.n52.sos.encode.IObservationEncoder;
+import org.n52.sos.encode.Encoder;
+import org.n52.sos.encode.ObservationEncoder;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -95,7 +95,7 @@ public class SosHelper {
             return Configurator.getInstance().getSrsNamePrefixSosV2();
         }
 
-        protected Set<IEncoder<?, ?>> getEncoders() {
+        protected Set<Encoder<?, ?>> getEncoders() {
             return Configurator.getInstance().getCodingRepository().getEncoders();
         }
 
@@ -740,9 +740,9 @@ public class SosHelper {
     @SuppressWarnings("unchecked")
     public static Collection<String> getSupportedResponseFormats(String service, String version) {
         Set<String> responseFormats = new HashSet<String>();
-        for (IEncoder<?, ?> iEncoder : getConfiguration().getEncoders()) {
-            if (iEncoder instanceof IObservationEncoder) {
-                responseFormats.addAll(((IObservationEncoder) iEncoder).getSupportedResponseFormats(service, version));
+        for (Encoder<?, ?> iEncoder : getConfiguration().getEncoders()) {
+            if (iEncoder instanceof ObservationEncoder) {
+                responseFormats.addAll(((ObservationEncoder) iEncoder).getSupportedResponseFormats(service, version));
             }
         }
         return responseFormats;

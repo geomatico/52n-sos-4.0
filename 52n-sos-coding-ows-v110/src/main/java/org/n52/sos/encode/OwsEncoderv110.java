@@ -73,7 +73,7 @@ import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OwsEncoderv110 implements IEncoder<XmlObject, Object> {
+public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OwsEncoderv110.class);
 

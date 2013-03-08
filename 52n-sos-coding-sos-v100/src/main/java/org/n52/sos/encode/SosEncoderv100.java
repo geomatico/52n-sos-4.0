@@ -123,7 +123,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommunicationObject> {
+public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommunicationObject> {
 
     /**
      * logger, used for logging while initializing the constants from config
@@ -296,14 +296,14 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
 
         Collection<SosObservation> observationCollection = null;
 
-        IEncoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
-        if (!(encoder instanceof IObservationEncoder)) {
-            String exceptionText = "Error while encoding GetObservation response, encoder is not of type IObservationEncoder!";
+        Encoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
+        if (!(encoder instanceof ObservationEncoder)) {
+            String exceptionText = "Error while encoding GetObservation response, encoder is not of type ObservationEncoder!";
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
-        IObservationEncoder<XmlObject, SosObservation> iObservationEncoder
-                = (IObservationEncoder<XmlObject, SosObservation>) encoder;
+        ObservationEncoder<XmlObject, SosObservation> iObservationEncoder
+                = (ObservationEncoder<XmlObject, SosObservation>) encoder;
         /* here separate by resultModel either not set then implicit SWE
          * if set only om:Measurement
          * also om:Observation valid? or take observationType from DB as given
@@ -473,14 +473,14 @@ public class SosEncoderv100 implements IEncoder<XmlObject, AbstractServiceCommun
 
         Collection<SosObservation> observationCollection = null;
 
-        IEncoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
-        if (!(encoder instanceof IObservationEncoder)) {
-            String exceptionText = "Error while encoding GetObservation response, encoder is not of type IObservationEncoder!";
+        Encoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
+        if (!(encoder instanceof ObservationEncoder)) {
+            String exceptionText = "Error while encoding GetObservation response, encoder is not of type ObservationEncoder!";
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
-        IObservationEncoder<XmlObject, SosObservation> iObservationEncoder
-                = (IObservationEncoder<XmlObject, SosObservation>) encoder;
+        ObservationEncoder<XmlObject, SosObservation> iObservationEncoder
+                = (ObservationEncoder<XmlObject, SosObservation>) encoder;
 //        if (iObservationEncoder.shouldObservationsWithSameXBeMerged()) {
 //            response.mergeObservationsWithSameX();
 //        }

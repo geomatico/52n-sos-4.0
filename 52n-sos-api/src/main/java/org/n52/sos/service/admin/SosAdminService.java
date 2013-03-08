@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.encode.EncoderKey;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.XmlEncoderKey;
 import org.n52.sos.exception.AdministratorException;
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
@@ -169,7 +169,7 @@ public class SosAdminService extends ConfiguratedHttpServlet {
         try {
             
             EncoderKey key = new XmlEncoderKey(owsExceptionReport.getNamespace(), owsExceptionReport.getClass());
-            IEncoder<?, OwsExceptionReport> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
+            Encoder<?, OwsExceptionReport> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
             if (encoder != null) {
                 Object encodedObject = encoder.encode(owsExceptionReport);
                 if (encodedObject instanceof XmlObject) {

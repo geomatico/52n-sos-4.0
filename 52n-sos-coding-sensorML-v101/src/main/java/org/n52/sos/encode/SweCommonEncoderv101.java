@@ -96,7 +96,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Encoder class for SWE Common 1.0.1
  */
-public class SweCommonEncoderv101 implements IEncoder<XmlObject, Object> {
+public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
 
     /**
      * logger, used for logging while initializing the constants from config

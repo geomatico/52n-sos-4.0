@@ -67,7 +67,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeature> {
+public class SamplingEncoderv20 implements Encoder<XmlObject, SosAbstractFeature> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SamplingEncoderv20.class);
 
@@ -190,7 +190,7 @@ public class SamplingEncoderv20 implements IEncoder<XmlObject, SosAbstractFeatur
 
             // set position
             ShapeType xbShape = xbSampFeature.addNewShape();
-            IEncoder<XmlObject, Geometry> encoder =
+            Encoder<XmlObject, Geometry> encoder =
                     Configurator.getInstance().getCodingRepository()
                             .getEncoder(CodingHelper.getEncoderKey(GMLConstants.NS_GML_32, sampFeat.getGeometry()));
             if (encoder != null) {

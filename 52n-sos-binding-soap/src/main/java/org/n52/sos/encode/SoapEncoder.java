@@ -84,7 +84,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
+public class SoapEncoder implements Encoder<ServiceResponse, SoapResponse> {
 
     private static Logger LOGGER = LoggerFactory.getLogger(SoapEncoder.class);
     @SuppressWarnings("unchecked")
@@ -169,7 +169,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
                         wsa.setActionValue(action);
                     }
                     try {
-                        IEncoder<Map<QName, String>, SoapHeader> encoder =
+                        Encoder<Map<QName, String>, SoapHeader> encoder =
                                 Configurator.getInstance().getCodingRepository()
                                         .getEncoder(CodingHelper.getEncoderKey(namespace, header));
                         if (encoder != null) {
@@ -418,7 +418,7 @@ public class SoapEncoder implements IEncoder<ServiceResponse, SoapResponse> {
         // wsa.setActionValue(action);
         // }
         // try {
-        // IEncoder encoder = Configurator.getInstance().getEncoder(namespace);
+        // Encoder encoder = Configurator.getInstance().getEncoder(namespace);
         // if (encoder != null) {
         // Map<QName, String> headerElements = (Map<QName, String>)
         // encoder.encode(header);

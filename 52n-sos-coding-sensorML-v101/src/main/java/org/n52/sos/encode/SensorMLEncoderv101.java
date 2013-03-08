@@ -122,7 +122,7 @@ import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
+public class SensorMLEncoderv101 implements Encoder<XmlObject, Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SensorMLEncoderv101.class);
     
@@ -779,7 +779,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextQuantityRange);
             case Text:
                 // FIXME: SWE Common NS
-                IEncoder<?, SosSweAbstractDataComponent> encoder = Configurator.getInstance().getCodingRepository()
+                Encoder<?, SosSweAbstractDataComponent> encoder = Configurator.getInstance().getCodingRepository()
                         .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE, sosSweData.getClass()));
                 if (encoder != null) {
                     xbField.setText((Text) encoder.encode(sosSweData));
@@ -811,7 +811,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextDefault);
             }
         } else if (sosSweData instanceof SosSweDataArray) {
-            IEncoder<?, SosSweAbstractDataComponent>  encoder = Configurator.getInstance().getCodingRepository()
+            Encoder<?, SosSweAbstractDataComponent>  encoder = Configurator.getInstance().getCodingRepository()
                     .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE, SosSweDataArray.class));
             if (encoder != null) {
                 xbField.set((XmlObject) encoder.encode(sosSweData));
@@ -821,7 +821,7 @@ public class SensorMLEncoderv101 implements IEncoder<XmlObject, Object> {
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionTextText);
             }
         } else if (sosSweData instanceof SosSweDataRecord) {
-            IEncoder<?, SosSweAbstractDataComponent> encoder = Configurator.getInstance().getCodingRepository()
+            Encoder<?, SosSweAbstractDataComponent> encoder = Configurator.getInstance().getCodingRepository()
                     .getEncoder(new XmlEncoderKey(SWEConstants.NS_SWE, SosSweDataRecord.class));
             if (encoder != null) {
                 xbField.set((XmlObject) encoder.encode(sosSweData));

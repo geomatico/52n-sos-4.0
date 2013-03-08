@@ -89,7 +89,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
-public class GmlEncoderv321 implements IEncoder<XmlObject, Object> {
+public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GmlEncoderv321.class);
 

@@ -45,7 +45,7 @@ import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateUtilities;
 import org.n52.sos.encode.EncoderKey;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosMultiObservationValues;
 import org.n52.sos.ogc.om.SosObservation;
@@ -179,7 +179,7 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
 
         if (dataArray.getElementType().getXml() == null) {
             EncoderKey key = CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, dataArray.getElementType());
-            IEncoder<XmlObject, SosSweAbstractDataComponent> encoder =
+            Encoder<XmlObject, SosSweAbstractDataComponent> encoder =
                     getConfigurator().getCodingRepository().getEncoder(key);
             if (encoder == null) {
                 String errorMsg = String.format("Could not find encoder for key \"%s\".", key.toString());
@@ -199,7 +199,7 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
         }
         if (dataArray.getEncoding().getXml() == null) {
             EncoderKey key = CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, dataArray.getEncoding());
-            IEncoder<XmlObject, SosSweAbstractEncoding> encoder =
+            Encoder<XmlObject, SosSweAbstractEncoding> encoder =
                     getConfigurator().getCodingRepository().getEncoder(key);
             if (encoder == null) {
                 String errorMsg = String.format("Could not find encoder for key \"%s\".", key.toString());

@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.xmlbeans.XmlOptions;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.features.SFConstants;
@@ -69,7 +69,7 @@ public class XmlOptionsHelper {
         prefixMap.put(W3CConstants.NS_XSI, W3CConstants.NS_XSI_PREFIX);
         prefixMap.put(W3CConstants.NS_XS, W3CConstants.NS_XS_PREFIX);
         if (Configurator.getInstance() != null) {
-            for (IEncoder<?, ?> encoder : Configurator.getInstance().getCodingRepository().getEncoders()) {
+            for (Encoder<?, ?> encoder : Configurator.getInstance().getCodingRepository().getEncoders()) {
                 encoder.addNamespacePrefixToMap(prefixMap);
             }
         } else {

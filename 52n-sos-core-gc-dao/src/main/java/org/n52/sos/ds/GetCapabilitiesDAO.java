@@ -39,7 +39,7 @@ import javax.xml.namespace.QName;
 
 import org.n52.sos.binding.Binding;
 import org.n52.sos.decode.Decoder;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.filter.FilterCapabilities;
 import org.n52.sos.ogc.filter.FilterConstants.ComparisonOperator;
@@ -248,7 +248,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         for (Decoder<?,?> decoder : getConfigurator().getCodingRepository().getDecoders()) {
             profiles.addAll(decoder.getConformanceClasses());
         }
-        for (IEncoder<?,?> encoder : getConfigurator().getCodingRepository().getEncoders()) {
+        for (Encoder<?,?> encoder : getConfigurator().getCodingRepository().getEncoders()) {
             profiles.addAll(encoder.getConformanceClasses());
         }
         return new ArrayList<String>(profiles);

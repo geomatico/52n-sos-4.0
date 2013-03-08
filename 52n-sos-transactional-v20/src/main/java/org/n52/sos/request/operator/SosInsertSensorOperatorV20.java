@@ -36,7 +36,7 @@ import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.AbstractInsertSensorDAO;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.SensorInsertion;
 import org.n52.sos.ogc.om.SosOffering;
@@ -105,7 +105,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            IEncoder<?, InsertSensorResponse> encoder =
+            Encoder<?, InsertSensorResponse> encoder =
                     Configurator.getInstance().getCodingRepository()
                             .getEncoder(CodingHelper.getEncoderKey(SWEConstants.NS_SWES_20, response));
             if (encoder != null) {

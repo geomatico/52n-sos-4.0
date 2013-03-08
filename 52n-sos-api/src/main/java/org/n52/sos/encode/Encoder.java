@@ -37,7 +37,7 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
  * @param <S>
  *            the input type, the "Source"
  */
-public interface IEncoder<T, S> extends IConformanceClass {
+public interface Encoder<T, S> extends IConformanceClass {
 
     /**
      * @return List of supported encodings of this implementation (identified by
@@ -52,7 +52,7 @@ public interface IEncoder<T, S> extends IConformanceClass {
     public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
 
     /**
-     * Add the namespace prefix of this {@linkplain IEncoder} instance to the given {@linkplain Map}.
+     * Add the namespace prefix of this {@linkplain Encoder} instance to the given {@linkplain Map}.
      * 
      * @param nameSpacePrefixMap
      */

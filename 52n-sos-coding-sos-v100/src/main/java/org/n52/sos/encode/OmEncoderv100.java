@@ -82,7 +82,7 @@ import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OmEncoderv100 implements IObservationEncoder<XmlObject, Object> {
+public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OmEncoderv100.class);
 

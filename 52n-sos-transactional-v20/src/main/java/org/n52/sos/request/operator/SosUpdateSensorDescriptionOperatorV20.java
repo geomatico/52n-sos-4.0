@@ -32,7 +32,7 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractUpdateSensorDescriptionDAO;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.ConformanceClasses;
@@ -72,7 +72,7 @@ public class SosUpdateSensorDescriptionOperatorV20 extends AbstractV2RequestOper
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            IEncoder<?, UpdateSensorResponse> encoder = Configurator.getInstance().getCodingRepository()
+            Encoder<?, UpdateSensorResponse> encoder = Configurator.getInstance().getCodingRepository()
                     .getEncoder(CodingHelper.getEncoderKey(SWEConstants.NS_SWES_20, response));
             if (encoder != null) {
                 // TODO valid response object

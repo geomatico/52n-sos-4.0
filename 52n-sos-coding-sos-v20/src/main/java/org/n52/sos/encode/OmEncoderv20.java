@@ -88,7 +88,7 @@ import org.slf4j.LoggerFactory;
 
 //import net.opengis.gml.x32.FeaturePropertyType;
 
-public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
+public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
 
     /**
      * logger, used for logging while initializing the constants from config
@@ -206,7 +206,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
             observationID = xbObs.getId().replace("o_", "");
         }
         if (sosObservation.getIdentifier() != null && sosObservation.getIdentifier().isSetValue()) {
-            IEncoder<?, CodeWithAuthority> encoder =
+            Encoder<?, CodeWithAuthority> encoder =
                     Configurator
                             .getInstance()
                             .getCodingRepository()
@@ -332,7 +332,7 @@ public class OmEncoderv20 implements IObservationEncoder<XmlObject, Object> {
 
     private void addPhenomenonTime(TimeObjectPropertyType timeObjectPropertyType, ITime iTime)
             throws OwsExceptionReport {
-        IEncoder<?, ITime> encoder =
+        Encoder<?, ITime> encoder =
                 Configurator.getInstance().getCodingRepository()
                         .getEncoder(CodingHelper.getEncoderKey(GMLConstants.NS_GML_32, iTime));
         if (encoder != null) {

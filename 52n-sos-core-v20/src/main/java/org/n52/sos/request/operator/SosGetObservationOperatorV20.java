@@ -34,8 +34,8 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetObservationDAO;
-import org.n52.sos.encode.IEncoder;
-import org.n52.sos.encode.IObservationEncoder;
+import org.n52.sos.encode.Encoder;
+import org.n52.sos.encode.ObservationEncoder;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -127,7 +127,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
                 response.mergeObservationsWithSameX();
             }
 
-            IEncoder<XmlObject, GetObservationResponse> encoder;
+            Encoder<XmlObject, GetObservationResponse> encoder;
             try {
                 encoder = CodingHelper.getEncoder(namespace, response);
             } catch (OwsExceptionReport e) {
@@ -315,9 +315,9 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
     }
 
     private boolean checkForObservationAndMeasurementV20Type(String responseFormat) throws OwsExceptionReport {
-        IEncoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(responseFormat, new SosObservation());
-        if (encoder != null && encoder instanceof IObservationEncoder) {
-            return ((IObservationEncoder) encoder).isObservationAndMeasurmentV20Type();
+        Encoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(responseFormat, new SosObservation());
+        if (encoder != null && encoder instanceof ObservationEncoder) {
+            return ((ObservationEncoder) encoder).isObservationAndMeasurmentV20Type();
         }
         return false;
     }

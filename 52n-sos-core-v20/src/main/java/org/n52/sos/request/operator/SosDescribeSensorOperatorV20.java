@@ -32,7 +32,7 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractDescribeSensorDAO;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
@@ -103,7 +103,7 @@ public class SosDescribeSensorOperatorV20 extends AbstractV2RequestOperator<Abst
                 throw Util4Exceptions.createInvalidParameterValueException(
                         OWSConstants.RequestParams.version.name(), exceptionText);
             }
-            IEncoder<?, DescribeSensorResponse> encoder = Configurator.getInstance().getCodingRepository()
+            Encoder<?, DescribeSensorResponse> encoder = Configurator.getInstance().getCodingRepository()
                     .getEncoder(CodingHelper.getEncoderKey(namespace, response));
             if (encoder != null) {
                 Object encodedObject = encoder.encode(response);

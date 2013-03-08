@@ -34,7 +34,7 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.cache.ContentCache;
 import org.n52.sos.ds.AbstractInsertObservationDAO;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.ObservationInsertion;
 import org.n52.sos.ogc.om.SosObservation;
@@ -79,7 +79,7 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<A
         String contentType = SosConstants.CONTENT_TYPE_XML;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            IEncoder<?, InsertObservationResponse> encoder = Configurator.getInstance().getCodingRepository()
+            Encoder<?, InsertObservationResponse> encoder = Configurator.getInstance().getCodingRepository()
                     .getEncoder(CodingHelper.getEncoderKey(Sos2Constants.NS_SOS_20, response));
             if (encoder != null) {
                 // TODO valid response object

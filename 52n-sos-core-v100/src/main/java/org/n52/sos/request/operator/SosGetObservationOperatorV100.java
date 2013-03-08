@@ -33,8 +33,8 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetObservationDAO;
-import org.n52.sos.encode.IEncoder;
-import org.n52.sos.encode.IObservationEncoder;
+import org.n52.sos.encode.Encoder;
+import org.n52.sos.encode.ObservationEncoder;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -120,7 +120,7 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<Abs
             // namespace.append(responseFormat);
             // }
             GetObservationResponse response = getDao().getObservation(sosRequest);
-            IEncoder<XmlObject, GetObservationResponse> encoder = CodingHelper.getEncoder(namespace, response);
+            Encoder<XmlObject, GetObservationResponse> encoder = CodingHelper.getEncoder(namespace, response);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             if (encoder != null) {
                 Object encodedObject = encoder.encode(response);
@@ -322,9 +322,9 @@ public class SosGetObservationOperatorV100 extends AbstractV1RequestOperator<Abs
 
     // TODO check for SOS 1.0.0
     private boolean checkForObservationAndMeasurementV20Type(String responseFormat) throws OwsExceptionReport {
-        IEncoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(responseFormat, new SosObservation());
-        if (encoder != null && encoder instanceof IObservationEncoder) {
-            return ((IObservationEncoder) encoder).isObservationAndMeasurmentV20Type();
+        Encoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(responseFormat, new SosObservation());
+        if (encoder != null && encoder instanceof ObservationEncoder) {
+            return ((ObservationEncoder) encoder).isObservationAndMeasurmentV20Type();
         }
         return false;
     }

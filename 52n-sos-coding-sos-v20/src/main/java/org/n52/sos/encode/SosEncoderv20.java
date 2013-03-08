@@ -119,7 +119,7 @@ import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommunicationObject> {
+public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunicationObject> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SosEncoderv20.class);
 
@@ -267,14 +267,14 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
         GetObservationResponseDocument xbGetObsRespDoc =
                 GetObservationResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         GetObservationResponseType xbGetObsResp = xbGetObsRespDoc.addNewGetObservationResponse();
-        IEncoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
-        if (!(encoder instanceof IObservationEncoder)) {
-            String exceptionText = "Error while encoding GetObservation response, encoder is not of type IObservationEncoder!";
+        Encoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
+        if (!(encoder instanceof ObservationEncoder)) {
+            String exceptionText = "Error while encoding GetObservation response, encoder is not of type ObservationEncoder!";
             LOGGER.debug(exceptionText);
             throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
-        IObservationEncoder<XmlObject, SosObservation> iObservationEncoder
-                = (IObservationEncoder<XmlObject, SosObservation>) encoder;
+        ObservationEncoder<XmlObject, SosObservation> iObservationEncoder
+                = (ObservationEncoder<XmlObject, SosObservation>) encoder;
         if (iObservationEncoder.shouldObservationsWithSameXBeMerged()) {
             response.mergeObservationsWithSameX();
         }
@@ -328,7 +328,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                 GetObservationByIdResponseDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         GetObservationByIdResponseType xbGetObsByIdResp = xbGetObsByIdRespDoc.addNewGetObservationByIdResponse();
         List<SosObservation> observationCollection = response.getObservationCollection();
-        IEncoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
+        Encoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
         HashMap<String, String> gmlID4sfIdentifier = new HashMap<String, String>(observationCollection.size());
         int sfIdCounter = 1;
         for (SosObservation sosObservation : observationCollection) {
@@ -694,7 +694,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
 
     private void createTemporalFilter(net.opengis.sos.x20.GetResultType.TemporalFilter temporalFilter,
             TemporalFilter sosTemporalFilter) throws OwsExceptionReport {
-        IEncoder<XmlObject, TemporalFilter> encoder = Configurator.getInstance().getCodingRepository()
+        Encoder<XmlObject, TemporalFilter> encoder = Configurator.getInstance().getCodingRepository()
                 .getEncoder(CodingHelper.getEncoderKey(FilterConstants.NS_FES_2, sosTemporalFilter));
         XmlObject encodedObject = encoder.encode(sosTemporalFilter);
         temporalFilter.set(encodedObject);
@@ -702,7 +702,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
 
     private void createSpatialFilter(SpatialFilter spatialFilter, org.n52.sos.ogc.filter.SpatialFilter sosSpatialFilter)
             throws OwsExceptionReport {
-        IEncoder<XmlObject, org.n52.sos.ogc.filter.SpatialFilter> encoder = Configurator.getInstance().getCodingRepository()
+        Encoder<XmlObject, org.n52.sos.ogc.filter.SpatialFilter> encoder = Configurator.getInstance().getCodingRepository()
                 .getEncoder(CodingHelper.getEncoderKey(FilterConstants.NS_FES_2, sosSpatialFilter));
         XmlObject encodedObject = encoder.encode(sosSpatialFilter);
         spatialFilter.set(encodedObject);
@@ -722,7 +722,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
             }
         } else {
-            IEncoder<XmlObject, Object> encoder = Configurator.getInstance().getCodingRepository()
+            Encoder<XmlObject, Object> encoder = Configurator.getInstance().getCodingRepository()
                     .getEncoder(CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, sosResultEncoding.getEncoding()));
             if (encoder == null) {
                 String exceptionText = "Missing encoder for ResultEncoding!";
@@ -755,7 +755,7 @@ public class SosEncoderv20 implements IEncoder<XmlObject, AbstractServiceCommuni
                throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
             }
         } else {
-            IEncoder<XmlObject, Object> encoder = Configurator.getInstance().getCodingRepository().getEncoder(CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, sosResultStructure.getResultStructure()));
+            Encoder<XmlObject, Object> encoder = Configurator.getInstance().getCodingRepository().getEncoder(CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, sosResultStructure.getResultStructure()));
             if (encoder == null) {
                 String exceptionText = "Missing encoder for ResultStructure!";
                 throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);

@@ -32,7 +32,7 @@ import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.encode.EncoderKey;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.XmlEncoderKey;
 import org.n52.sos.exception.AdministratorException;
 import org.n52.sos.ogc.ows.OWSConstants;
@@ -209,7 +209,7 @@ public class SosAdminRequestOperator implements IAdminRequestOperator {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             EncoderKey key = new XmlEncoderKey(Sos2Constants.NS_SOS_20, GetCapabilitiesResponse.class);
-            IEncoder<?, GetCapabilitiesResponse>  encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
+            Encoder<?, GetCapabilitiesResponse>  encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
             if (encoder != null) {
                 Object encodedObject = encoder.encode(response);
                 if (encodedObject instanceof XmlObject) {

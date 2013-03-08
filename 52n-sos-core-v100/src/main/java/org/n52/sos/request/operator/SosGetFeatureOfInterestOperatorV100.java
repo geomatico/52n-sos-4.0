@@ -33,7 +33,7 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.IGetFeatureOfInterestDAO;
-import org.n52.sos.encode.IEncoder;
+import org.n52.sos.encode.Encoder;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
@@ -101,7 +101,7 @@ public class SosGetFeatureOfInterestOperatorV100 extends
             }
             
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            IEncoder<XmlObject, GetFeatureOfInterestResponse> encoder = CodingHelper.getEncoder(namespace, response);
+            Encoder<XmlObject, GetFeatureOfInterestResponse> encoder = CodingHelper.getEncoder(namespace, response);
             
             if (encoder != null) {
                 encoder.encode(response).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
