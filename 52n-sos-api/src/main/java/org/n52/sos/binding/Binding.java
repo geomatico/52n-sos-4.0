@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.IConformanceClass;
+import org.n52.sos.service.ConformanceClass;
 
 /**
  * Abstract Super class for binding implementations<br />
@@ -41,7 +41,7 @@ import org.n52.sos.service.IConformanceClass;
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @author <a href="mailto:c.hollmann@52north.org">Carsten Hollmann</a> 
  */
-public abstract class Binding implements IConformanceClass {
+public abstract class Binding implements ConformanceClass {
 
     /**
      * The default response for each binding not overriding one of the doHTTP-Method methods.

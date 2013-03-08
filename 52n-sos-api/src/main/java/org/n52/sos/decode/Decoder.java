@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.service.IConformanceClass;
+import org.n52.sos.service.ConformanceClass;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 
 /**
@@ -36,7 +36,7 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
  * @param <S>
  *            the input which is decoded, the "Source"
  */
-public interface Decoder<T, S> extends IConformanceClass {
+public interface Decoder<T, S> extends ConformanceClass {
 
 	/**
 	 * @return List encodings this implementation (identified by

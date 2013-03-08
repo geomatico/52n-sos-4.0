@@ -25,7 +25,7 @@ package org.n52.sos.service;
 
 import java.util.Set;
 
-public interface IConformanceClass {
+public interface ConformanceClass {
     
     public Set<String> getConformanceClasses();
 

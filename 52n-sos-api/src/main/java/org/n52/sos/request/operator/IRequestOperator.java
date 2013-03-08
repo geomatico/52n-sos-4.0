@@ -28,12 +28,12 @@ import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.IConformanceClass;
+import org.n52.sos.service.ConformanceClass;
 
 /**
  * Interface for SOS request operator implementations
  */
-public interface IRequestOperator extends IConformanceClass {
+public interface IRequestOperator extends ConformanceClass {
 
     public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
 

@@ -28,7 +28,7 @@ import java.util.Set;
 
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
-import org.n52.sos.service.IConformanceClass;
+import org.n52.sos.service.ConformanceClass;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 
 /**
@@ -37,7 +37,7 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
  * @param <S>
  *            the input type, the "Source"
  */
-public interface Encoder<T, S> extends IConformanceClass {
+public interface Encoder<T, S> extends ConformanceClass {
 
     /**
      * @return List of supported encodings of this implementation (identified by
