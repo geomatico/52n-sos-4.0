@@ -37,7 +37,7 @@ import org.n52.sos.ogc.sos.SosEnvelope;
  * Interface for querying featurefInterest data from a data source
  * 
  */
-public interface IFeatureQueryHandler {
+public interface FeatureQueryHandler {
     
     /**
      * Query feature data from data source for an identifier

@@ -30,7 +30,7 @@ import java.util.Set;
 
 import org.n52.sos.ogc.om.OMConstants;
 
-public class DefaultProfile implements IProfile {
+public class DefaultProfile implements Profile {
     
     
     private static final String DEFAULT_IDENTIFIER = "SOS_20_PROFILE";

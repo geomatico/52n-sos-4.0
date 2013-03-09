@@ -21,17 +21,31 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.service.admin.request.operator;
+package org.n52.sos.service.operator;
 
-import org.n52.sos.exception.AdministratorException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.admin.request.AdminRequest;
 
-public interface IAdminRequestOperator {
-    
-    public ServiceResponse receiveRequest(AdminRequest request) throws AdministratorException, OwsExceptionReport;
+/**
+ * interface for the request listeners
+ * 
+ */
+public interface ServiceOperator {
 
-    public String getKey();
-    
+    /**
+     * method handles the incoming operation request and returns a matching
+     * response or an ServiceExceptionReport if the SOS was not able to build a
+     * response
+     * 
+     * @param request
+     *            the operation request
+     * 
+     * @return Returns the response of the request (e.g. CapabilitiesResponse
+     * @throws OwsExceptionReport  
+     */
+    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
+
+    public ServiceOperatorKeyType getServiceOperatorKeyType();
+
 }

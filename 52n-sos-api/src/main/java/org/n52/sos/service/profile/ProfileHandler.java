@@ -21,31 +21,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.service.operator;
+package org.n52.sos.service.profile;
 
-import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.response.ServiceResponse;
+import java.util.Map;
 
-/**
- * interface for the request listeners
- * 
- */
-public interface IServiceOperator {
+public interface ProfileHandler {
 
-    /**
-     * method handles the incoming operation request and returns a matching
-     * response or an ServiceExceptionReport if the SOS was not able to build a
-     * response
-     * 
-     * @param request
-     *            the operation request
-     * 
-     * @return Returns the response of the request (e.g. CapabilitiesResponse
-     * @throws OwsExceptionReport  
-     */
-    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
-
-    public ServiceOperatorKeyType getServiceOperatorKeyType();
-
+    
+    public Profile getActiveProfile();
+    
+    public Map<String, Profile> getAvailableProfiles();
+    
+    public boolean isSetActiveProfile();
+    
+    
 }

@@ -23,12 +23,12 @@
  */
 package org.n52.sos.ogc.ows;
 
-import org.n52.sos.exception.IExceptionCode;
+import org.n52.sos.exception.ExceptionCode;
 
 
 public class OwsException {
     
-    private IExceptionCode code;
+    private ExceptionCode code;
     
     private String locator;
     
@@ -37,26 +37,26 @@ public class OwsException {
     private Exception exception;
     
 
-    public OwsException(IExceptionCode code, String locator, String[] messages) {
+    public OwsException(ExceptionCode code, String locator, String[] messages) {
        this.code = code;
        this.locator = locator;
        this.messages = messages;
     }
 
-    public OwsException(IExceptionCode code, String locator, Exception exception) {
+    public OwsException(ExceptionCode code, String locator, Exception exception) {
         this.code = code;
         this.locator = locator;
         this.exception = exception;
     }
 
-    public OwsException(IExceptionCode code, String locator, String[] messages, Exception exception) {
+    public OwsException(ExceptionCode code, String locator, String[] messages, Exception exception) {
         this.code = code;
         this.locator = locator;
         this.messages = messages;
         this.exception = exception;
     }
 
-    public IExceptionCode getCode() {
+    public ExceptionCode getCode() {
         return code;
     }
 

@@ -73,7 +73,7 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
         opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.responseFormat,
                 SosHelper.getSupportedResponseFormats(SosConstants.SOS, version));
 
-        if (getConfigurator().getActiveProfile().isShowFullOperationsMetadataForObservations()) {
+        if (getConfigurator().getProfileHandler().getActiveProfile().isShowFullOperationsMetadataForObservations()) {
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCache()
                     .getObservableProperties());
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.featureOfInterest, featureIDs);

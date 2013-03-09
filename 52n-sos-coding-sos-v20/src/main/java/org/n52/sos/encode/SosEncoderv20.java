@@ -107,7 +107,7 @@ import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.service.profile.IProfile;
+import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
@@ -315,7 +315,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
     
     private void addFeatureOfInterestGetFeatureOfInterestResponse(SosAbstractFeature feature, GetFeatureOfInterestResponseType getFoiResponse) throws OwsExceptionReport {
         Map<HelperValues, String> additionalValues = new HashMap<SosConstants.HelperValues, String>(1);
-        IProfile activeProfile = Configurator.getInstance().getActiveProfile();
+        Profile activeProfile = Configurator.getInstance().getProfileHandler().getActiveProfile();
         if (activeProfile.isSetEncodeFeatureOfInterestNamespace()) {
             additionalValues.put(HelperValues.ENCODE_NAMESPACE, activeProfile.getEncodingNamespaceForFeatureOfInterest());
         }

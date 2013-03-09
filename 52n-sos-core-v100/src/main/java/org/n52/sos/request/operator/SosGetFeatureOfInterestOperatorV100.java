@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ds.IGetFeatureOfInterestDAO;
+import org.n52.sos.ds.AbstractGetFeatureOfInterestDAO;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -49,7 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SosGetFeatureOfInterestOperatorV100 extends
-		AbstractV1RequestOperator <IGetFeatureOfInterestDAO, GetFeatureOfInterestRequest> {
+ AbstractV1RequestOperator<AbstractGetFeatureOfInterestDAO, GetFeatureOfInterestRequest> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SosGetFeatureOfInterestOperatorV100.class.getName());
     private static final String OPERATION_NAME = SosConstants.Operations.GetFeatureOfInterest.name();

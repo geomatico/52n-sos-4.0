@@ -24,13 +24,14 @@
 package org.n52.sos.request.operator;
 
 import java.util.Map;
+
 import org.n52.sos.wsdl.WSDLOperation;
 
 /**
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public interface IWSDLAwareRequestOperator extends IRequestOperator {
+public interface WSDLAwareRequestOperator extends RequestOperator {
     public WSDLOperation getSosOperationDefinition();
     public Map<String, String> getAdditionalSchemaImports();
     public Map<String, String> getAdditionalPrefixes();

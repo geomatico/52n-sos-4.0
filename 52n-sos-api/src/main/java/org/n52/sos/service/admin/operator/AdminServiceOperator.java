@@ -33,7 +33,7 @@ import org.n52.sos.response.ServiceResponse;
  * Abstract operator class for the administration interface
  * 
  */
-public abstract class IAdminServiceOperator {
+public abstract class AdminServiceOperator {
 
     /**
      * URL pattern for the administration interface

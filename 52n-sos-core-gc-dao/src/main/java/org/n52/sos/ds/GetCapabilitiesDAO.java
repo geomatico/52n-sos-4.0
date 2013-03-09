@@ -64,7 +64,7 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.ogc.sos.SosOfferingsForContents;
 import org.n52.sos.request.GetCapabilitiesRequest;
-import org.n52.sos.request.operator.IRequestOperator;
+import org.n52.sos.request.operator.RequestOperator;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.util.SosHelper;
@@ -242,7 +242,8 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         for (Binding bindig : getConfigurator().getBindingRepository().getBindings().values()) {
             profiles.addAll(bindig.getConformanceClasses());
         }
-        for (IRequestOperator requestOperator : getConfigurator().getRequestOperatorRepository().getRequestOperator().values()) {
+        for (RequestOperator requestOperator : getConfigurator().getRequestOperatorRepository().getRequestOperator()
+                .values()) {
             profiles.addAll(requestOperator.getConformanceClasses());
         }
         for (Decoder<?,?> decoder : getConfigurator().getCodingRepository().getDecoders()) {
@@ -270,12 +271,14 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
 
         OWSOperationsMetadata operationsMetadata = new OWSOperationsMetadata();
         operationsMetadata.addCommonValue(OWSConstants.RequestParams.service.name(),
-                new OWSParameterValuePossibleValues(SosConstants.SOS));
+                                          new OWSParameterValuePossibleValues(SosConstants.SOS));
         operationsMetadata.addCommonValue(OWSConstants.RequestParams.version.name(),
-                new OWSParameterValuePossibleValues(getConfigurator().getServiceOperatorRepository().getSupportedVersions()));
+                                          new OWSParameterValuePossibleValues(getConfigurator()
+                .getServiceOperatorRepository().getSupportedVersions()));
 
         // FIXME: OpsMetadata for InsertSensor, InsertObservation SOS 2.0
-        Map<RequestOperatorKeyType, IRequestOperator> requestOperators = getConfigurator().getRequestOperatorRepository().getRequestOperator();
+        Map<RequestOperatorKeyType, RequestOperator> requestOperators = getConfigurator().getRequestOperatorRepository()
+                .getRequestOperator();
         List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>(requestOperators.size());
         for (RequestOperatorKeyType requestOperatorKeyType : requestOperators.keySet()) {
             if (requestOperatorKeyType.getServiceOperatorKeyType().getVersion().equals(version)) {
@@ -369,7 +372,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
                                                          getCache().getMaxResultTimeForOffering(offering)));
 
                 // add feature of interests
-                if (getConfigurator().getActiveProfile().isListFeatureOfInterestsInOfferings()) {
+                if (getConfigurator().getProfileHandler().getActiveProfile().isListFeatureOfInterestsInOfferings()) {
                     sosOffering.setFeatureOfInterest(getFOI4offering(offering));
                 }
 
@@ -590,7 +593,8 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
     private Set<String> getFOI4offering(String offering) throws OwsExceptionReport {
         Set<String> featureIDs = new HashSet<String>(0);
         Set<String> features = getConfigurator().getCache().getFeaturesOfInterestForOffering(offering);
-        if (!getConfigurator().getActiveProfile().isListFeatureOfInterestsInOfferings() || features == null) {
+        if (!getConfigurator().getProfileHandler().getActiveProfile().isListFeatureOfInterestsInOfferings() || features
+                                                                                                               == null) {
             featureIDs.add(OGCConstants.UNKNOWN);
         } else {
             featureIDs.addAll(features);
@@ -670,11 +674,11 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private List<SwesExtension> getAndMergeExtensions() throws OwsExceptionReport {
-        Map<RequestOperatorKeyType, IRequestOperator> requestOperators = getConfigurator()
-				.getRequestOperatorRepository().getRequestOperator();
+        Map<RequestOperatorKeyType, RequestOperator> requestOperators = getConfigurator()
+            				.getRequestOperatorRepository().getRequestOperator();
         List<SwesExtension> extensions = new ArrayList<SwesExtension>(requestOperators.size());
         HashMap<String, MergableExtension> map = new HashMap<String, MergableExtension>(requestOperators.size());
-        for (IRequestOperator requestOperator : requestOperators.values()) {
+        for (RequestOperator requestOperator : requestOperators.values()) {
             SwesExtension extension = requestOperator.getExtension();
             if (extension != null) {
                 if (extension instanceof MergableExtension) {

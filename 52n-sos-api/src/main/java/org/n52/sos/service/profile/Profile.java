@@ -26,7 +26,7 @@ package org.n52.sos.service.profile;
 import java.util.Map;
 import java.util.Set;
 
-public interface IProfile {
+public interface Profile {
 
     public String getIdentifier();
 

@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  * @param <R> The AbstractServiceRequest to handle
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public abstract class AbstractRequestOperator<D extends OperationDAO, R extends AbstractServiceRequest> implements IRequestOperator {
+public abstract class AbstractRequestOperator<D extends OperationDAO, R extends AbstractServiceRequest> implements RequestOperator {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractRequestOperator.class);
     private final D dao;
     private final String operationName;

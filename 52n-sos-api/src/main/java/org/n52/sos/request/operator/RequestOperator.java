@@ -21,18 +21,28 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.service.profile;
+package org.n52.sos.request.operator;
 
-import java.util.Map;
+import org.n52.sos.ogc.ows.OWSOperation;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.SwesExtension;
+import org.n52.sos.request.AbstractServiceRequest;
+import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.ConformanceClass;
 
-public interface IProfileHandler {
+/**
+ * Interface for SOS request operator implementations
+ */
+public interface RequestOperator extends ConformanceClass {
 
+    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
+
+    public boolean hasImplementedDAO();
+
+    public RequestOperatorKeyType getRequestOperatorKeyType();
+
+    public OWSOperation getOperationMetadata(String service, String version)
+            throws OwsExceptionReport;
     
-    public IProfile getActiveProfile();
-    
-    public Map<String, IProfile> getAvailableProfiles();
-    
-    public boolean isSetActiveProfile();
-    
-    
+    public SwesExtension getExtension() throws OwsExceptionReport;
 }

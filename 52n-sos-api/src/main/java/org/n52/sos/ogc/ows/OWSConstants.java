@@ -24,7 +24,8 @@
 package org.n52.sos.ogc.ows;
 
 import javax.xml.namespace.QName;
-import org.n52.sos.exception.IExceptionCode;
+
+import org.n52.sos.exception.ExceptionCode;
 
 /**
  * Constants for OWS.
@@ -120,7 +121,7 @@ public class OWSConstants {
      * ExceptionCodes as defined in the OWS Common Implementation Specification
      * 1.1.0
      */
-    public enum OwsExceptionCode implements IExceptionCode {
+    public enum OwsExceptionCode implements ExceptionCode {
         OperationNotSupported(SOAP_REASON_OPTION_NOT_SUPPORTED),
         MissingParameterValue(SOAP_REASON_MISSING_PARAMETER_VALUE),
         InvalidParameterValue(SOAP_REASON_INVALID_PARAMETER_VALUE),

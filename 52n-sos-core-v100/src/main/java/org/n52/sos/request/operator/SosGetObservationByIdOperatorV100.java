@@ -32,7 +32,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ds.IGetObservationByIdDAO;
+import org.n52.sos.ds.AbstractGetObservationByIdDAO;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -49,7 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SosGetObservationByIdOperatorV100 extends
-		AbstractV1RequestOperator <IGetObservationByIdDAO, GetObservationByIdRequest> {
+ AbstractV1RequestOperator<AbstractGetObservationByIdDAO, GetObservationByIdRequest> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SosGetFeatureOfInterestOperatorV100.class.getName());
     private static final String OPERATION_NAME = SosConstants.Operations.GetObservationById.name();

@@ -71,11 +71,13 @@ public class SosGetObservationByIdOperatorV20 extends AbstractV2RequestOperator<
         checkRequestedParameter(sosRequest);
         boolean zipCompression;
         if (sosRequest.getResponseFormat() == null || sosRequest.getResponseFormat().isEmpty()) {
-            sosRequest.setResponseFormat(Configurator.getInstance().getActiveProfile().getObservationResponseFormat());
+            sosRequest.setResponseFormat(Configurator.getInstance().getProfileHandler().getActiveProfile()
+                    .getObservationResponseFormat());
         } else {
             zipCompression = SosHelper.checkResponseFormatForZipCompression(sosRequest.getResponseFormat());
             if (zipCompression) {
-                sosRequest.setResponseFormat(Configurator.getInstance().getActiveProfile().getObservationResponseFormat());
+                sosRequest.setResponseFormat(Configurator.getInstance().getProfileHandler().getActiveProfile()
+                        .getObservationResponseFormat());
             }
         }
 

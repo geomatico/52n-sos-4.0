@@ -37,7 +37,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.joda.time.DateTime;
 import org.n52.sos.ds.AbstractInsertResultDAO;
-import org.n52.sos.ds.IFeatureQueryHandler;
+import org.n52.sos.ds.FeatureQueryHandler;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
@@ -154,7 +154,7 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
 
     protected SosAbstractFeature getSosAbstractFeature(FeatureOfInterest featureOfInterest, String version,
                                                        Session session) throws OwsExceptionReport {
-        final IFeatureQueryHandler featureQueryHandler = Configurator.getInstance().getFeatureQueryHandler();
+        final FeatureQueryHandler featureQueryHandler = Configurator.getInstance().getFeatureQueryHandler();
         return featureQueryHandler.getFeatureByID(featureOfInterest.getIdentifier(), session, version, -1);
     }
     

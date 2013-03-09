@@ -40,22 +40,22 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class RequestOperatorRepository extends AbstractConfiguringServiceLoaderRepository<IRequestOperator> {
+public class RequestOperatorRepository extends AbstractConfiguringServiceLoaderRepository<RequestOperator> {
     private static final Logger log = LoggerFactory.getLogger(RequestOperatorRepository.class);
-    private final Map<RequestOperatorKeyType, IRequestOperator> requestOperators =
-                                                                new HashMap<RequestOperatorKeyType, IRequestOperator>(0);
+    private final Map<RequestOperatorKeyType, RequestOperator> requestOperators =
+                                                                new HashMap<RequestOperatorKeyType, RequestOperator>(0);
 
     public RequestOperatorRepository() throws ConfigurationException {
-        super(IRequestOperator.class, true);
+        super(RequestOperator.class, true);
         load(false);
     }
 
     @Override
-    protected void processConfiguredImplementations(Set<IRequestOperator> requestOperators) throws
+    protected void processConfiguredImplementations(Set<RequestOperator> requestOperators) throws
             ConfigurationException {
         this.requestOperators.clear();
         SettingsManager sm = SettingsManager.getInstance();
-        for (IRequestOperator aRequestOperator : requestOperators) {
+        for (RequestOperator aRequestOperator : requestOperators) {
             try {
                 if (sm.isActive(aRequestOperator.getRequestOperatorKeyType())) {
                     log.info("Registered IRequestOperator for {}", aRequestOperator.getRequestOperatorKeyType());
@@ -75,15 +75,15 @@ public class RequestOperatorRepository extends AbstractConfiguringServiceLoaderR
         super.update();
     }
 
-    public IRequestOperator getRequestOperator(RequestOperatorKeyType key) {
+    public RequestOperator getRequestOperator(RequestOperatorKeyType key) {
         return this.requestOperators.get(key);
     }
 
-    public IRequestOperator getRequestOperator(ServiceOperatorKeyType serviceOperatorKeyType, String operationName) {
+    public RequestOperator getRequestOperator(ServiceOperatorKeyType serviceOperatorKeyType, String operationName) {
         return getRequestOperator(new RequestOperatorKeyType(serviceOperatorKeyType, operationName));
     }
 
-    public Map<RequestOperatorKeyType, IRequestOperator> getRequestOperator() {
+    public Map<RequestOperatorKeyType, RequestOperator> getRequestOperator() {
         return Collections.unmodifiableMap(this.requestOperators);
     }
 }

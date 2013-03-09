@@ -33,28 +33,28 @@ import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.profile.DefaultProfile;
-import org.n52.sos.service.profile.IProfile;
-import org.n52.sos.service.profile.IProfileHandler;
+import org.n52.sos.service.profile.Profile;
+import org.n52.sos.service.profile.ProfileHandler;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.x52North.sensorweb.sos.profile.SosProfileDocument;
 
-public class ProfileHandler implements IProfileHandler {
+public class ProfileHandlerImpl implements ProfileHandler {
 
     /**
      * logger
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProfileHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProfileHandlerImpl.class);
 
-    private IProfile activeProfile;
+    private Profile activeProfile;
 
-    private Map<String, IProfile> availableProfiles = new HashMap<String, IProfile>(1);
+    private Map<String, Profile> availableProfiles = new HashMap<String, Profile>(1);
 
-    public ProfileHandler() throws ConfigurationException {
+    public ProfileHandlerImpl() throws ConfigurationException {
         setActiveProfile(new DefaultProfile());
         addAvailableProvile(getActiveProfile());
         try {
@@ -67,16 +67,16 @@ public class ProfileHandler implements IProfileHandler {
     }
 
     @Override
-    public IProfile getActiveProfile() {
+    public Profile getActiveProfile() {
         return activeProfile;
     }
 
-    private void setActiveProfile(IProfile profile) {
+    private void setActiveProfile(Profile profile) {
         this.activeProfile = profile;
         addAvailableProvile(profile);
     }
 
-    private void addAvailableProvile(IProfile profile) {
+    private void addAvailableProvile(Profile profile) {
         if (availableProfiles.containsKey(profile.getIdentifier())) {
             LOGGER.warn("Profile with the identifier {} still exist! Existing profile is overwritten!",
                     profile.getIdentifier());
@@ -86,18 +86,18 @@ public class ProfileHandler implements IProfileHandler {
 
     private void loadProfiles() throws OwsExceptionReport {
         IOFileFilter fileFilter = new WildcardFileFilter("*-profile.xml");
-        File folder = FileUtils.toFile(ProfileHandler.class.getResource("/"));
+        File folder = FileUtils.toFile(ProfileHandlerImpl.class.getResource("/"));
         Collection<File> listFiles = FileUtils.listFiles(folder, fileFilter, DirectoryFileFilter.DIRECTORY);
         for (File file : listFiles) {
             XmlObject xmlDocument = XmlHelper.loadXmlDocumentFromFile(file);
             if (xmlDocument instanceof SosProfileDocument) {
-                IProfile profile = ProfileParser.parseSosProfile((SosProfileDocument)xmlDocument);
+                Profile profile = ProfileParser.parseSosProfile((SosProfileDocument) xmlDocument);
                 addProfile(profile);
             }
         }
     }
 
-    private void addProfile(IProfile profile) {
+    private void addProfile(Profile profile) {
         if (profile != null) {
             if (profile.isActiveProfile()) {
                 setActiveProfile(profile);
@@ -108,7 +108,7 @@ public class ProfileHandler implements IProfileHandler {
     }
 
     @Override
-    public Map<String, IProfile> getAvailableProfiles() {
+    public Map<String, Profile> getAvailableProfiles() {
         return availableProfiles;
     }
 

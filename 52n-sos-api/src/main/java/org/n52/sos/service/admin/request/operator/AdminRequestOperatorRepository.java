@@ -36,28 +36,28 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class AdminRequestOperatorRepository extends AbstractConfiguringServiceLoaderRepository<IAdminRequestOperator> {
+public class AdminRequestOperatorRepository extends AbstractConfiguringServiceLoaderRepository<AdminRequestOperator> {
 
 	private static final Logger log = LoggerFactory.getLogger(AdminRequestOperatorRepository.class);
-	private Map<String, IAdminRequestOperator> operators = new HashMap<String, IAdminRequestOperator>(0);
+	private Map<String, AdminRequestOperator> operators = new HashMap<String, AdminRequestOperator>(0);
 
 	public AdminRequestOperatorRepository() throws ConfigurationException {
-		super(IAdminRequestOperator.class, false);
+		super(AdminRequestOperator.class, false);
 		load(false);
 	}
 
-	public IAdminRequestOperator getAdminRequestOperator(String key) {
+	public AdminRequestOperator getAdminRequestOperator(String key) {
 		return this.operators.get(key);
 	}
 
-	public Map<String, IAdminRequestOperator> getAdminRequestOperators() {
+	public Map<String, AdminRequestOperator> getAdminRequestOperators() {
 		return Collections.unmodifiableMap(this.operators);
 	}
 
 	@Override
-	protected void processConfiguredImplementations(Set<IAdminRequestOperator> requestOperators) {
+	protected void processConfiguredImplementations(Set<AdminRequestOperator> requestOperators) {
 		this.operators.clear();
-		for (IAdminRequestOperator operator : requestOperators) {
+		for (AdminRequestOperator operator : requestOperators) {
 				this.operators.put(operator.getKey(), operator);
 		}
 		if (this.operators.isEmpty()) {

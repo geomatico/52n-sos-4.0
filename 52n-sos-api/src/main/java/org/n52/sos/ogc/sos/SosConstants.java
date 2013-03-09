@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.sos;
 
-import org.n52.sos.exception.IExceptionCode;
+import org.n52.sos.exception.ExceptionCode;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.ows.OWSConstants;
 
@@ -405,7 +405,7 @@ public final class SosConstants {
         GMLID, EXIST_FOI_IN_DOC, VERSION, TYPE, DOCUMENT, FOR_OBSERVATION, ENCODE, ENCODE_NAMESPACE
     }
 
-    public enum SosExceptionCode implements IExceptionCode {
+    public enum SosExceptionCode implements ExceptionCode {
         ResponseExceedsSizeLimit(SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT), 
         InvalidPropertyOfferingCombination(SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION);
         

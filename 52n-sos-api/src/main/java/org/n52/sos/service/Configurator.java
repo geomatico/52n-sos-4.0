@@ -39,7 +39,7 @@ import org.n52.sos.ds.CacheFeederDAO;
 import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.ds.DataConnectionProvider;
 import org.n52.sos.ds.IFeatureConnectionProvider;
-import org.n52.sos.ds.IFeatureQueryHandler;
+import org.n52.sos.ds.FeatureQueryHandler;
 import org.n52.sos.ds.OperationDAORepository;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
@@ -47,12 +47,12 @@ import org.n52.sos.ogc.ows.SosServiceIdentificationFactory;
 import org.n52.sos.ogc.ows.SosServiceProvider;
 import org.n52.sos.ogc.ows.SosServiceProviderFactory;
 import org.n52.sos.request.operator.RequestOperatorRepository;
-import org.n52.sos.service.admin.operator.IAdminServiceOperator;
+import org.n52.sos.service.admin.operator.AdminServiceOperator;
 import org.n52.sos.service.admin.request.operator.AdminRequestOperatorRepository;
 import org.n52.sos.service.operator.ServiceOperatorRepository;
 import org.n52.sos.service.profile.DefaultProfileHandler;
-import org.n52.sos.service.profile.IProfile;
-import org.n52.sos.service.profile.IProfileHandler;
+import org.n52.sos.service.profile.Profile;
+import org.n52.sos.service.profile.ProfileHandler;
 import org.n52.sos.tasking.Tasking;
 import org.n52.sos.util.Cleanupable;
 import org.n52.sos.util.ConfiguringSingletonServiceLoader;
@@ -187,13 +187,13 @@ public class Configurator implements Cleanupable {
     private ServiceConfiguration configuration;
     private Properties dataConnectionProviderProperties;
     private Properties featureConnectionProviderProperties;
-    private IFeatureQueryHandler featureQueryHandler;
+    private FeatureQueryHandler featureQueryHandler;
     private ConnectionProvider dataConnectionProvider;
     private ConnectionProvider featureConnectionProvider;
     private ContentCacheController contentCacheController;
     private CacheFeederDAO cacheFeederDAO;
-    private IProfileHandler profileHandler;
-    private IAdminServiceOperator adminServiceOperator;
+    private ProfileHandler profileHandler;
+    private AdminServiceOperator adminServiceOperator;
     private Producer<SosServiceIdentification> serviceIdentificationFactory;
     private Producer<SosServiceProvider> serviceProviderFactory;
     private CodingRepository codingRepository;
@@ -250,16 +250,16 @@ public class Configurator implements Cleanupable {
         serviceProviderFactory = new SosServiceProviderFactory();
         operationDaoRepository = new OperationDAORepository();
         serviceOperatorRepository = new ServiceOperatorRepository();
-        featureQueryHandler = loadAndConfigure(IFeatureQueryHandler.class, true);
+        featureQueryHandler = loadAndConfigure(FeatureQueryHandler.class, true);
         cacheFeederDAO = loadAndConfigure(CacheFeederDAO.class, true);
         converterRepository = new ConverterRepository();
         requestOperatorRepository = new RequestOperatorRepository();
         bindingRepository = new BindingRepository();
-        adminServiceOperator = loadAndConfigure(IAdminServiceOperator.class, true);
+        adminServiceOperator = loadAndConfigure(AdminServiceOperator.class, true);
         adminRequestOperatorRepository = new AdminRequestOperatorRepository();
         contentCacheController = loadAndConfigure(ContentCacheController.class, true);
         tasking = new Tasking();
-        profileHandler = loadAndConfigure(IProfileHandler.class, false, new DefaultProfileHandler());
+        profileHandler = loadAndConfigure(ProfileHandler.class, false, new DefaultProfileHandler());
 
         LOGGER.info("\n******\n Configurator initialization finished\n******\n");
     }
@@ -346,14 +346,14 @@ public class Configurator implements Cleanupable {
     /**
      * @return the implemented feature query handler
      */
-    public IFeatureQueryHandler getFeatureQueryHandler() {
+    public FeatureQueryHandler getFeatureQueryHandler() {
         return featureQueryHandler;
     }
 
     /**
      * @return the implemented SOS administration request operator
      */
-    public IAdminServiceOperator getAdminServiceOperator() {
+    public AdminServiceOperator getAdminServiceOperator() {
         return adminServiceOperator;
     }
 
@@ -451,7 +451,7 @@ public class Configurator implements Cleanupable {
         getRequestOperatorRepository().update();
     }
 
-    public IProfileHandler getProfileHandler() {
+    public ProfileHandler getProfileHandler() {
         return profileHandler;
     }
 
@@ -459,7 +459,7 @@ public class Configurator implements Cleanupable {
      * @deprecated use getProfileHandler().getActiveProfile()
      */
     @Deprecated
-    public IProfile getActiveProfile() {
+    public Profile getActiveProfile() {
         return getProfileHandler().getActiveProfile();
     }
 

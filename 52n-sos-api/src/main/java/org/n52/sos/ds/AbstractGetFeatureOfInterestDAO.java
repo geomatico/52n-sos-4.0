@@ -48,7 +48,7 @@ public abstract class AbstractGetFeatureOfInterestDAO extends AbstractOperationD
 
         Collection<String> featureIDs = SosHelper.getFeatureIDs(getCache().getFeaturesOfInterest(), version);
 
-        if (getConfigurator().getActiveProfile().isShowFullOperationsMetadataForObservations()) {
+        if (getConfigurator().getProfileHandler().getActiveProfile().isShowFullOperationsMetadataForObservations()) {
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache()
                     .getProcedures());
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty,

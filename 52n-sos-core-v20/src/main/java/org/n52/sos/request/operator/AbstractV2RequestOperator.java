@@ -36,7 +36,7 @@ import org.n52.sos.request.AbstractServiceRequest;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public abstract class AbstractV2RequestOperator<D extends OperationDAO, R extends AbstractServiceRequest> 
-                    extends AbstractRequestOperator<D, R> implements IWSDLAwareRequestOperator {
+                    extends AbstractRequestOperator<D, R> implements WSDLAwareRequestOperator {
 
     public AbstractV2RequestOperator(String operationName, Class<R> requestType) {
         super(SosConstants.SOS, Sos2Constants.SERVICEVERSION, operationName, requestType);

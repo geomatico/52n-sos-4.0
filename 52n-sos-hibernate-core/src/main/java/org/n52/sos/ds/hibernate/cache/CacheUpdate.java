@@ -29,7 +29,7 @@ import java.util.Set;
 
 import org.hibernate.Session;
 import org.n52.sos.cache.WritableContentCache;
-import org.n52.sos.ds.IFeatureQueryHandler;
+import org.n52.sos.ds.FeatureQueryHandler;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -81,7 +81,7 @@ public abstract class CacheUpdate implements Action {
         return offerings;
     }
     
-    protected IFeatureQueryHandler getFeatureQueryHandler() {
+    protected FeatureQueryHandler getFeatureQueryHandler() {
         return Configurator.getInstance().getFeatureQueryHandler();
     }
 

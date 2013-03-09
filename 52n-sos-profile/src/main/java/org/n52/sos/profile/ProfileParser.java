@@ -26,7 +26,7 @@ package org.n52.sos.profile;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import org.n52.sos.service.profile.IProfile;
+import org.n52.sos.service.profile.Profile;
 import org.x52North.sensorweb.sos.profile.DefaultObservationTypesForEncodingDocument.DefaultObservationTypesForEncoding;
 import org.x52North.sensorweb.sos.profile.EncodeProcedureDocument.EncodeProcedure;
 import org.x52North.sensorweb.sos.profile.NoDataPlaceholderDocument.NoDataPlaceholder;
@@ -35,8 +35,8 @@ import org.x52North.sensorweb.sos.profile.SosProfileType;
 
 public class ProfileParser {
 
-    public static IProfile parseSosProfile(SosProfileDocument sosProfileDoc) {
-        Profile profile = new Profile();
+    public static Profile parseSosProfile(SosProfileDocument sosProfileDoc) {
+        ProfileImpl profile = new ProfileImpl();
         SosProfileType sosProfile = sosProfileDoc.getSosProfile();
         profile.setIdentifier(sosProfile.getIdentifier());
         profile.setActiveProfile(sosProfile.getActiveProfile());
@@ -67,7 +67,7 @@ public class ProfileParser {
         return profile;
     }
 
-    private static void parseNoDataPlaceholder(Profile profile, NoDataPlaceholder noDataPlaceholder) {
+    private static void parseNoDataPlaceholder(ProfileImpl profile, NoDataPlaceholder noDataPlaceholder) {
         if (noDataPlaceholder.getResponsePlaceholder() != null
                 && !noDataPlaceholder.getResponsePlaceholder().isEmpty()) {
             profile.setResponseNoDataPlaceholder(noDataPlaceholder.getResponsePlaceholder());
@@ -78,15 +78,15 @@ public class ProfileParser {
 
     }
 
-    private static void parseEncodeProcedure(Profile profile, EncodeProcedure[] encodeProcedureArray) {
+    private static void parseEncodeProcedure(ProfileImpl profile, EncodeProcedure[] encodeProcedureArray) {
         for (EncodeProcedure encodeProcedure : encodeProcedureArray) {
             profile.addEncodeProcedureInObservation(encodeProcedure.getNamespace(), encodeProcedure.getEncode());
         }
 
     }
 
-    private static void parseDefaultObservationTypesForEncoding(Profile profile,
-            DefaultObservationTypesForEncoding[] defaultObservationTypesForEncodingArray) {
+    private static void parseDefaultObservationTypesForEncoding(ProfileImpl profile,
+                                                                DefaultObservationTypesForEncoding[] defaultObservationTypesForEncodingArray) {
         for (DefaultObservationTypesForEncoding defaultObservationTypesForEncoding : defaultObservationTypesForEncodingArray) {
             profile.addDefaultObservationTypesForEncoding(defaultObservationTypesForEncoding.getNamespace(),
                     defaultObservationTypesForEncoding.getObservationType());

@@ -37,7 +37,7 @@ import java.util.Set;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
 import org.n52.sos.cache.ContentCache;
-import org.n52.sos.ds.IFeatureQueryHandler;
+import org.n52.sos.ds.FeatureQueryHandler;
 import org.n52.sos.ds.hibernate.entities.BlobObservation;
 import org.n52.sos.ds.hibernate.entities.BlobValue;
 import org.n52.sos.ds.hibernate.entities.BooleanObservation;
@@ -96,7 +96,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.profile.IProfile;
+import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -130,7 +130,7 @@ public class HibernateObservationUtilities {
         return getConfiguration().getCache();
     }
 
-    public static IProfile getActiveProfile() {
+    public static Profile getActiveProfile() {
         return getConfiguration().getActiveProfile();
     }
 
@@ -152,7 +152,7 @@ public class HibernateObservationUtilities {
         return getConfiguration().getTupleSeparator();
     }
 
-    public static IFeatureQueryHandler getFeatureQueryHandler() {
+    public static FeatureQueryHandler getFeatureQueryHandler() {
         return getConfiguration().getFeatureQueryHandler();
     }
 
@@ -760,14 +760,14 @@ public class HibernateObservationUtilities {
         /**
          * @see Configurator#getActiveProfile()
          */
-        protected IProfile getActiveProfile() {
-            return Configurator.getInstance().getActiveProfile();
+        protected Profile getActiveProfile() {
+            return Configurator.getInstance().getProfileHandler().getActiveProfile();
         }
 
         /**
          * @see Configurator#getFeatureQueryHandler()
          */
-        protected IFeatureQueryHandler getFeatureQueryHandler() {
+        protected FeatureQueryHandler getFeatureQueryHandler() {
             return Configurator.getInstance().getFeatureQueryHandler();
         }
 

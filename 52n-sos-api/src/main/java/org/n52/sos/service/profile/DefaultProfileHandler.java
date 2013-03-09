@@ -26,11 +26,11 @@ package org.n52.sos.service.profile;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DefaultProfileHandler implements IProfileHandler {
+public class DefaultProfileHandler implements ProfileHandler {
     
-    private IProfile activeProfile;
+    private Profile activeProfile;
 
-    private Map<String, IProfile> availableProfiles = new HashMap<String, IProfile>(1);
+    private Map<String, Profile> availableProfiles = new HashMap<String, Profile>(1);
     
     public DefaultProfileHandler() {
         activeProfile = new DefaultProfile();
@@ -38,12 +38,12 @@ public class DefaultProfileHandler implements IProfileHandler {
     }
 
     @Override
-    public IProfile getActiveProfile() {
+    public Profile getActiveProfile() {
         return activeProfile;
     }
 
     @Override
-    public Map<String, IProfile> getAvailableProfiles() {
+    public Map<String, Profile> getAvailableProfiles() {
         return availableProfiles;
     }
 

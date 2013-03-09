@@ -211,7 +211,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
             } else {
                 // TODO Hydro-Profile add empty observation metadata as
                 // SosObservation (add FOI)
-                if (getConfigurator().getActiveProfile().isShowMetadataOfEmptyObservations()) {
+                if (getConfigurator().getProfileHandler().getActiveProfile().isShowMetadataOfEmptyObservations()) {
                     List<String> featureOfInterestIdentifiers =
                             getAndCheckFeatureOfInterest(observationConstellation, featureIdentifier, session);
                     sosObservations.addAll(HibernateObservationUtilities

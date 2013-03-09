@@ -25,7 +25,7 @@ package org.n52.sos.service.operator;
 
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.operator.IRequestOperator;
+import org.n52.sos.request.operator.RequestOperator;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.Util4Exceptions;
@@ -33,7 +33,7 @@ import org.n52.sos.util.Util4Exceptions;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class AbstractServiceOperator implements IServiceOperator {
+public class AbstractServiceOperator implements ServiceOperator {
 
     private final ServiceOperatorKeyType key;
 
@@ -49,7 +49,7 @@ public class AbstractServiceOperator implements IServiceOperator {
     @Override
     public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport {
         ServiceResponse response = null;
-        IRequestOperator requestOperator =
+        RequestOperator requestOperator =
                 Configurator.getInstance().getRequestOperatorRepository()
 				.getRequestOperator(getServiceOperatorKeyType(), request.getOperationName());
         if (requestOperator != null) {

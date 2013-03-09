@@ -44,7 +44,7 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlValidationError;
-import org.n52.sos.exception.IExceptionCode;
+import org.n52.sos.exception.ExceptionCode;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -182,7 +182,7 @@ public class XmlHelper {
             for (XmlError error : errors) {
 
                 // ExceptionCode for Exception
-                IExceptionCode exCode = null;
+                ExceptionCode exCode = null;
 
                 // get name of the missing or invalid parameter
                 message = error.getMessage();

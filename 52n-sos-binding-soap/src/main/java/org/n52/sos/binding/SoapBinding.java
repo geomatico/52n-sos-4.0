@@ -45,7 +45,7 @@ import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.operator.IServiceOperator;
+import org.n52.sos.service.operator.ServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.soap.SoapHelper;
 import org.n52.sos.soap.SoapRequest;
@@ -113,7 +113,7 @@ public class SoapBinding extends Binding {
                         AbstractServiceRequest bodyRequest = (AbstractServiceRequest) aBodyRequest;
                         checkServiceOperatorKeyTypes(bodyRequest);
                         for (ServiceOperatorKeyType serviceVersionIdentifier : bodyRequest.getServiceOperatorKeyType()) {
-                            IServiceOperator serviceOperator = Configurator.getInstance().getServiceOperatorRepository()
+                            ServiceOperator serviceOperator = Configurator.getInstance().getServiceOperatorRepository()
 									.getServiceOperator(serviceVersionIdentifier);
                             if (serviceOperator != null) {
                                 ServiceResponse bodyResponse = serviceOperator.receiveRequest(bodyRequest);

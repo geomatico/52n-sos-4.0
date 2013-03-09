@@ -26,7 +26,7 @@ package org.n52.sos.ogc.ows;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.n52.sos.exception.IExceptionCode;
+import org.n52.sos.exception.ExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +110,7 @@ public class OwsExceptionReport extends Exception {
      * @param message
      *            String message of the exception to add
      */
-    public void addCodedException(IExceptionCode code, String locator, String message) {
+    public void addCodedException(ExceptionCode code, String locator, String message) {
         String[] messages = { message };
         owsExceptions.add(new OwsException(code, locator, messages));
     }
@@ -126,7 +126,7 @@ public class OwsExceptionReport extends Exception {
      * @param messages
      *            String[] messages of this exception
      */
-    public void addCodedException(IExceptionCode code, String locator, String[] messages) {
+    public void addCodedException(ExceptionCode code, String locator, String[] messages) {
         owsExceptions.add(new OwsException(code, locator, messages));
     }
 
@@ -141,11 +141,11 @@ public class OwsExceptionReport extends Exception {
      * @param e
      *            Exception which should be added
      */
-    public void addCodedException(IExceptionCode code, String locator, String[] messages, Exception exception) {
+    public void addCodedException(ExceptionCode code, String locator, String[] messages, Exception exception) {
         owsExceptions.add(new OwsException(code, locator, messages, exception));
     }
 
-    public void addCodedException(IExceptionCode code, String locator, String message,
+    public void addCodedException(ExceptionCode code, String locator, String message,
             Exception exception) {
         String[] messages = { message };
         owsExceptions.add(new OwsException(code, locator, messages, exception));

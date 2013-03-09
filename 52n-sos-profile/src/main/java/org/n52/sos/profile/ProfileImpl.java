@@ -28,14 +28,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.n52.sos.service.profile.IProfile;
+import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.JavaHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Profile implements IProfile {
+public class ProfileImpl implements Profile {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Profile.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProfileImpl.class.getName());
 
     private String identifier;
 
@@ -75,7 +75,7 @@ public class Profile implements IProfile {
 
     private Map<String, String> defaultObservationTypesForEncoding = new HashMap<String, String>(0);
 
-    public Profile() {
+    public ProfileImpl() {
 
     }
 

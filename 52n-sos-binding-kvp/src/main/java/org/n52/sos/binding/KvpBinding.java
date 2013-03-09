@@ -44,7 +44,7 @@ import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.operator.IServiceOperator;
+import org.n52.sos.service.operator.ServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.KvpHelper;
 import org.n52.sos.util.StringHelper;
@@ -109,7 +109,7 @@ public class KvpBinding extends Binding {
             }
 
             for (ServiceOperatorKeyType serviceVersionIdentifier : request.getServiceOperatorKeyType()) {
-                IServiceOperator serviceOperator = Configurator.getInstance().getServiceOperatorRepository()
+                ServiceOperator serviceOperator = Configurator.getInstance().getServiceOperatorRepository()
 						.getServiceOperator(serviceVersionIdentifier);
                 if (serviceOperator != null) {
                     response = serviceOperator.receiveRequest(request);

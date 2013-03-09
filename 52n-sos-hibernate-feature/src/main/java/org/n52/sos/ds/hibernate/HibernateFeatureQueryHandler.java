@@ -39,7 +39,7 @@ import org.hibernate.spatial.criterion.SpatialProjections;
 import org.hibernate.spatial.criterion.SpatialRestrictions;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
-import org.n52.sos.ds.IFeatureQueryHandler;
+import org.n52.sos.ds.FeatureQueryHandler;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
@@ -67,9 +67,9 @@ import com.vividsolutions.jts.geom.Geometry;
  * Feature handler class for features stored in the database
  */
 @Configurable
-public class DBFeatureQueryHandler implements IFeatureQueryHandler {
+public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DBFeatureQueryHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateFeatureQueryHandler.class);
     private List<Range> epsgsWithReversedAxisOrder;
     private int defaultEPSG;
 

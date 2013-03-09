@@ -104,7 +104,7 @@ public class ResultHandlingHelper {
         if (resultTime != null) {
             return DateTimeHelper.formatDateTime2IsoString(new DateTime(resultTime));
         }
-        return Configurator.getInstance().getActiveProfile().getResponseNoDataPlaceholder();
+        return Configurator.getInstance().getProfileHandler().getActiveProfile().getResponseNoDataPlaceholder();
     }
 
     private static Object getTimeStringForPhenomenonTime(Date phenomenonTimeStart, Date phenomenonTimeEnd) {
@@ -116,7 +116,8 @@ public class ResultHandlingHelper {
         } else if (phenomenonTimeStart != null && phenomenonTimeEnd == null) {
             builder.append(DateTimeHelper.formatDateTime2IsoString(new DateTime(phenomenonTimeStart)));
         } else {
-            builder.append(Configurator.getInstance().getActiveProfile().getResponseNoDataPlaceholder());
+            builder.append(Configurator.getInstance().getProfileHandler().getActiveProfile()
+                    .getResponseNoDataPlaceholder());
         }
         return builder.toString();
     }
@@ -205,7 +206,7 @@ public class ResultHandlingHelper {
 //                return builder.toString();
 //            }
         }
-        return Configurator.getInstance().getActiveProfile().getResponseNoDataPlaceholder();
+        return Configurator.getInstance().getProfileHandler().getActiveProfile().getResponseNoDataPlaceholder();
     }
 
     public static String getTokenSeparator(SosSweAbstractEncoding encoding) {

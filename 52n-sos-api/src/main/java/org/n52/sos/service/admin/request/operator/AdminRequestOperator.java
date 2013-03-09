@@ -21,28 +21,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.request.operator;
+package org.n52.sos.service.admin.request.operator;
 
-import org.n52.sos.ogc.ows.SwesExtension;
-import org.n52.sos.ogc.ows.OWSOperation;
+import org.n52.sos.exception.AdministratorException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.ConformanceClass;
+import org.n52.sos.service.admin.request.AdminRequest;
 
-/**
- * Interface for SOS request operator implementations
- */
-public interface IRequestOperator extends ConformanceClass {
-
-    public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
-
-    public boolean hasImplementedDAO();
-
-    public RequestOperatorKeyType getRequestOperatorKeyType();
-
-    public OWSOperation getOperationMetadata(String service, String version)
-            throws OwsExceptionReport;
+public interface AdminRequestOperator {
     
-    public SwesExtension getExtension() throws OwsExceptionReport;
+    public ServiceResponse receiveRequest(AdminRequest request) throws AdministratorException, OwsExceptionReport;
+
+    public String getKey();
+    
 }

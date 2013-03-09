@@ -29,6 +29,7 @@ import static org.n52.sos.util.ReverseOf.reverseOf;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
 import org.n52.sos.ogc.om.features.SFConstants;
@@ -36,7 +37,6 @@ import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.JTSHelperTest;
 import org.n52.sos.util.builder.SamplingFeatureBuilder;
@@ -49,7 +49,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class DBFeatureQueryHandlerTest extends DBFeatureQueryHandler {
+public class HibernateFeatureQueryHandlerTest extends HibernateFeatureQueryHandler {
 
     @Before
     public void setUp() throws ConfigurationException {

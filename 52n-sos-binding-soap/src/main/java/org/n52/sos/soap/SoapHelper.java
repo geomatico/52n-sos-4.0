@@ -34,7 +34,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 
-import org.n52.sos.exception.IExceptionCode;
+import org.n52.sos.exception.ExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -130,7 +130,7 @@ public class SoapHelper {
      *            Exception code
      * @return SOAP action URI
      */
-    public static String getExceptionActionURI(IExceptionCode exceptionCode) {
+    public static String getExceptionActionURI(ExceptionCode exceptionCode) {
         if (exceptionCode instanceof OwsExceptionCode) {
             return SosSoapConstants.RESP_ACTION_OWS;
         } else if (exceptionCode instanceof SwesExceptionCode) {
@@ -149,7 +149,7 @@ public class SoapHelper {
      *            OWS exception code to get reason for.
      * @return Text for SOAP fault reason
      */
-    public static String getSoapFaultReasonText(IExceptionCode exceptionCode) {
+    public static String getSoapFaultReasonText(ExceptionCode exceptionCode) {
         if (exceptionCode != null && exceptionCode.getSoapFaultReason() != null) {
             return exceptionCode.getSoapFaultReason();
         } else {

@@ -25,7 +25,7 @@ package org.n52.sos.ogc.swe;
 
 import javax.xml.namespace.QName;
 
-import org.n52.sos.exception.IExceptionCode;
+import org.n52.sos.exception.ExceptionCode;
 
 /**
  * Constants class for SWE
@@ -199,7 +199,7 @@ public class SWEConstants {
         XmlStringDescription, SosDescription
     }
 
-    public enum SwesExceptionCode implements IExceptionCode {
+    public enum SwesExceptionCode implements ExceptionCode {
         InvalidRequest(SOAP_REASON_INVALID_REQUEST), 
         RequestExtensionNotSupported(SOAP_REASON_REQUEST_EXTENSION_NOT_SUPPORTED);
 

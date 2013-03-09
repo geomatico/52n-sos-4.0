@@ -55,7 +55,7 @@ import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SosAdminRequestOperator implements IAdminRequestOperator {
+public class SosAdminRequestOperator implements AdminRequestOperator {
 
     /*
      * To support full dynamic loading of a new JAR, the Tomcat context.xml file has to be modified.
@@ -121,22 +121,22 @@ public class SosAdminRequestOperator implements IAdminRequestOperator {
             List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
             for (String parameter : parameters) {
                 if (parameter.equalsIgnoreCase(UPDATE_BINDINGS)) {
-                    Configurator.getInstance().updateBindings();
+                    Configurator.getInstance().getBindingRepository().update();
                     builder.append("Bindings");
                 } else if (parameter.equalsIgnoreCase(UPDATE_CONFIGURATION)) {
                     Configurator.getInstance().updateConfiguration();
                     builder.append("Configuration");
                 } else if (parameter.equalsIgnoreCase(UPDATE_DECODER)) {
-                    Configurator.getInstance().updateDecoder();
+                    Configurator.getInstance().getCodingRepository().updateDecoders();
                     builder.append("Decoder");
                 } else if (parameter.equalsIgnoreCase(UPDATE_ENCODER)) {
-                    Configurator.getInstance().updateEncoder();
+                    Configurator.getInstance().getCodingRepository().updateEncoders();
                     builder.append("Encoder");
                 } else if (parameter.equalsIgnoreCase(UPDATE_OPERATIONS)) {
-                    Configurator.getInstance().updateRequestOperator();
+                    Configurator.getInstance().getRequestOperatorRepository().update();
                     builder.append("Supported Operations");
                 } else if (parameter.equalsIgnoreCase(UPDATE_SERVICES)) {
-                    Configurator.getInstance().updateServiceOperators();
+                    Configurator.getInstance().getServiceOperatorRepository().update();
                     builder.append("Supported Services");
                 } else {
                     String exceptionTex = "";

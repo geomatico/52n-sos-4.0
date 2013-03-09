@@ -44,7 +44,7 @@ import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.operator.IServiceOperator;
+import org.n52.sos.service.operator.ServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.Util4Exceptions;
@@ -88,7 +88,7 @@ public class PoxBinding extends Binding {
                 AbstractServiceRequest sosRequest = (AbstractServiceRequest) abstractRequest;
                 checkServiceOperatorKeyTypes(sosRequest);
                 for (ServiceOperatorKeyType serviceVersionIdentifier : sosRequest.getServiceOperatorKeyType()) {
-                    IServiceOperator serviceOperator = Configurator.getInstance().getServiceOperatorRepository()
+                    ServiceOperator serviceOperator = Configurator.getInstance().getServiceOperatorRepository()
 							.getServiceOperator(serviceVersionIdentifier);
                     if (serviceOperator != null) {
                         serviceResponse = serviceOperator.receiveRequest(sosRequest);

@@ -117,13 +117,13 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
             // TODO check for correct merging
             if (responseFormat.equals(OMConstants.RESPONSE_FORMAT_OM_2)) {
                 if (!isSubsettingExtensionSet(sosRequest.getExtensions())
-                        || Configurator.getInstance().getActiveProfile().isAllowSubsettingForSOS20OM20()) {
+                    || Configurator.getInstance().getProfileHandler().getActiveProfile().isAllowSubsettingForSOS20OM20()) {
                     response.mergeObservationsWithSameAntiSubsettingIdentifier();
                 } else {
                     response.mergeObservationsWithSameX();
                 }
             }
-            if (Configurator.getInstance().getActiveProfile().isMergeValues()) {
+            if (Configurator.getInstance().getProfileHandler().getActiveProfile().isMergeValues()) {
                 response.mergeObservationsWithSameX();
             }
 
@@ -325,14 +325,16 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
     private boolean checkResponseFormat(GetObservationRequest request) throws OwsExceptionReport {
         boolean zipCompression = false;
         if (request.getResponseFormat() == null) {
-            request.setResponseFormat(Configurator.getInstance().getActiveProfile().getObservationResponseFormat());
+            request.setResponseFormat(Configurator.getInstance().getProfileHandler().getActiveProfile()
+                    .getObservationResponseFormat());
         } else if (request.getResponseFormat() != null && request.getResponseFormat().isEmpty()) {
             throw Util4Exceptions
                     .createMissingParameterValueException(SosConstants.GetObservationParams.responseFormat.name());
         } else {
             zipCompression = SosHelper.checkResponseFormatForZipCompression(request.getResponseFormat());
             if (zipCompression) {
-                request.setResponseFormat(Configurator.getInstance().getActiveProfile().getObservationResponseFormat());
+                request.setResponseFormat(Configurator.getInstance().getProfileHandler().getActiveProfile()
+                        .getObservationResponseFormat());
             } else {
                 Collection<String> supportedResponseFormats =
                         SosHelper.getSupportedResponseFormats(request.getService(), request.getVersion());

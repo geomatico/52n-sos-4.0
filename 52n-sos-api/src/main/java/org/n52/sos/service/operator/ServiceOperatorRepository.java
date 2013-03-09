@@ -39,12 +39,14 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class ServiceOperatorRepository extends AbstractConfiguringServiceLoaderRepository<IServiceOperator> {
+public class ServiceOperatorRepository extends AbstractConfiguringServiceLoaderRepository<ServiceOperator> {
 	private static final Logger log = LoggerFactory.getLogger(ServiceOperatorRepository.class);
 
-	/** Implemented IServiceOperator */
-    private final Map<ServiceOperatorKeyType, IServiceOperator> serviceOperators =
-            new HashMap<ServiceOperatorKeyType, IServiceOperator>(0);
+    /**
+     * Implemented ServiceOperator
+     */
+    private final Map<ServiceOperatorKeyType, ServiceOperator> serviceOperators =
+                                                               new HashMap<ServiceOperatorKeyType, ServiceOperator>(0);
 
 	 /** supported SOS versions */
     private final Set<String> supportedVersions = new HashSet<String>(0);
@@ -59,7 +61,7 @@ public class ServiceOperatorRepository extends AbstractConfiguringServiceLoaderR
      *             If no request listener is implemented
      */
     public ServiceOperatorRepository() throws ConfigurationException {
-		super(IServiceOperator.class, true);
+        super(ServiceOperator.class, true);
 		load(false);
     }
 
@@ -71,11 +73,11 @@ public class ServiceOperatorRepository extends AbstractConfiguringServiceLoaderR
      *             If no request listener is implemented
      */
     @Override
-    protected void processConfiguredImplementations(Set<IServiceOperator> implementations) throws ConfigurationException {
+    protected void processConfiguredImplementations(Set<ServiceOperator> implementations) throws ConfigurationException {
 		this.serviceOperators.clear();
 		this.supportedServices.clear();
 		this.supportedVersions.clear();
-        for (IServiceOperator iServiceOperator : implementations) {
+        for (ServiceOperator iServiceOperator : implementations) {
 			this.serviceOperators.put(iServiceOperator.getServiceOperatorKeyType(), iServiceOperator);
 			this.supportedVersions.add(iServiceOperator.getServiceOperatorKeyType().getVersion());
 			this.supportedServices.add(iServiceOperator.getServiceOperatorKeyType().getService());
@@ -90,7 +92,7 @@ public class ServiceOperatorRepository extends AbstractConfiguringServiceLoaderR
      */
 	@Override
     public void update() throws ConfigurationException {
-		Configurator.getInstance().updateRequestOperator();
+        Configurator.getInstance().getRequestOperatorRepository().update();
 		super.update();
     }
 
@@ -98,11 +100,11 @@ public class ServiceOperatorRepository extends AbstractConfiguringServiceLoaderR
      * @return the implemented request listener
      * @throws OwsExceptionReport
      */
-    public Map<ServiceOperatorKeyType, IServiceOperator> getServiceOperators() throws OwsExceptionReport {
+    public Map<ServiceOperatorKeyType, ServiceOperator> getServiceOperators() throws OwsExceptionReport {
         return Collections.unmodifiableMap(serviceOperators);
     }
 
-	public IServiceOperator getServiceOperator(ServiceOperatorKeyType serviceOperatorIdentifier)
+    public ServiceOperator getServiceOperator(ServiceOperatorKeyType serviceOperatorIdentifier)
             throws OwsExceptionReport {
         return serviceOperators.get(serviceOperatorIdentifier);
     }
@@ -113,7 +115,7 @@ public class ServiceOperatorRepository extends AbstractConfiguringServiceLoaderR
      * @return the implemented request listener
      * @throws OwsExceptionReport
      */
-    public IServiceOperator getServiceOperator(String service, String version) throws OwsExceptionReport {
+    public ServiceOperator getServiceOperator(String service, String version) throws OwsExceptionReport {
         return getServiceOperator(new ServiceOperatorKeyType(service, version));
     }
 

@@ -74,7 +74,7 @@ import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.service.profile.IProfile;
+import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.GmlHelper;
@@ -317,7 +317,8 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
 
     private void addProcedure(OMProcessPropertyType procedure, SosProcedureDescription procedureDescription,
             String observationID) throws OwsExceptionReport {
-        if (Configurator.getInstance().getActiveProfile().isEncodeProcedureInObservation(OMConstants.NS_OM_2)) {
+        if (Configurator.getInstance().getProfileHandler().getActiveProfile()
+                .isEncodeProcedureInObservation(OMConstants.NS_OM_2)) {
             XmlObject encodeProcedure =
                     CodingHelper.encodeObjectToXml(procedureDescription.getDescriptionFormat(), procedureDescription);
             if (encodeProcedure != null) {
@@ -333,7 +334,7 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
     private void addPhenomenonTime(TimeObjectPropertyType timeObjectPropertyType, ITime iTime)
             throws OwsExceptionReport {
         Encoder<?, ITime> encoder =
-                Configurator.getInstance().getCodingRepository()
+                          Configurator.getInstance().getCodingRepository()
                         .getEncoder(CodingHelper.getEncoderKey(GMLConstants.NS_GML_32, iTime));
         if (encoder != null) {
             XmlObject xmlObject = (XmlObject) encoder.encode(iTime);
@@ -519,7 +520,7 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
     private void addFeatureOfInterest(OMObservationType observation, SosAbstractFeature feature)
             throws OwsExceptionReport {
         Map<HelperValues, String> additionalValues = new HashMap<SosConstants.HelperValues, String>(1);
-        IProfile activeProfile = Configurator.getInstance().getActiveProfile();
+        Profile activeProfile = Configurator.getInstance().getProfileHandler().getActiveProfile();
         additionalValues.put(HelperValues.ENCODE,
                 Boolean.toString(activeProfile.isEncodeFeatureOfInterestInObservations()));
         XmlObject encodeObjectToXml =
