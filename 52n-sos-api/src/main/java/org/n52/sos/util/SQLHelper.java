@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.web;
+package org.n52.sos.util;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -38,13 +38,9 @@ import java.sql.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SqlUtils {
+public class SQLHelper {
 
-    private static final Logger log = LoggerFactory.getLogger(SqlUtils.class);
-
-    private SqlUtils() {
-        // private constructor to enforce static access
-    }
+    private static final Logger log = LoggerFactory.getLogger(SQLHelper.class);
 
     /*
      * TODO find a working library function that can parse and execute a SQL file...
@@ -119,5 +115,9 @@ public class SqlUtils {
                 log.error("Error closing Connection!", ex);
             }
         }
+    }
+
+    private SQLHelper() {
+        // private constructor to enforce static access
     }
 }

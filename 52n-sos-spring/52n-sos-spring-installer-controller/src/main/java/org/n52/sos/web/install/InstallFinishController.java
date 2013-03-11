@@ -44,10 +44,10 @@ import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.hibernate.util.DefaultHibernateConstants;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.SQLHelper;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.JdbcUrl;
 import org.n52.sos.web.MetaDataHandler;
-import org.n52.sos.web.SqlUtils;
 import org.n52.sos.web.auth.UserService;
 import org.n52.sos.web.install.InstallConstants.Step;
 import org.slf4j.Logger;
@@ -97,6 +97,9 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         Connection con = null;
         try {
             con = createConnection(properties);
+            setSchema(c, con, true);
+            dropTables(c, con);
+            setSchema(c, con, false);
             createTables(c, con);
             insertTestData(c, con);
             insertSettings(c, con);
@@ -105,7 +108,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
             throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_CONNECT_TO_THE_DATABASE, e
                     .getMessage()));
         } finally {
-            SqlUtils.close(con);
+            SQLHelper.close(con);
         }
         instantiateConfigurator(properties, c);
         saveDatabaseProperties(properties, c);
@@ -114,13 +117,17 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
 
     protected Properties createHibernateProperties(InstallationConfiguration c) throws InstallationSettingsError {
         Properties p = checkJdbcUrl(c).toProperties();
-        p.put(DefaultHibernateConstants.DRIVER_PROPERTY, (String) c
-                .getDatabaseSetting(InstallConstants.DRIVER_PARAMETER));
-        p.put(DefaultHibernateConstants.CONNECTION_POOL_PROPERTY, (String) c
-                .getDatabaseSetting(InstallConstants.CONNECTION_POOL_PARAMETER));
-        p.put(DefaultHibernateConstants.DIALECT_PROPERTY, (String) c
-                .getDatabaseSetting(InstallConstants.JDBC_DIALECT_PARAMETER));
+        addProperty(c, p, InstallConstants.DRIVER_PARAMETER, DefaultHibernateConstants.DRIVER_PROPERTY);
+        addProperty(c, p, InstallConstants.CONNECTION_POOL_PARAMETER, DefaultHibernateConstants.CONNECTION_POOL_PROPERTY);
+        addProperty(c, p, InstallConstants.DIALECT_PARAMETER, DefaultHibernateConstants.DIALECT_PROPERTY);
+        addProperty(c, p, InstallConstants.SCHEMA_PARAMETER, DefaultHibernateConstants.CATALOG_PROPERTY);
         return p;
+    }
+
+    protected void addProperty(InstallationConfiguration c, Properties p, String parameter, String property) {
+        if (c.hasDatabaseSetting(parameter)) {
+            p.put(property, c.getDatabaseSetting(parameter));
+        }
     }
 
     protected void checkUsername(Map<String, String> param, InstallationConfiguration c) throws
@@ -148,7 +155,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
             try {
                 Configurator.createInstance(properties, getBasePath());
             } catch (ConfigurationException ex) {
-                throw new InstallationSettingsError(c, String.format(ErrorMessages.CANNOT_INSTANTIATE_CONFIGURATOR, ex
+                throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_INSTANTIATE_CONFIGURATOR, ex
                         .getMessage()), ex);
             }
         } else {
@@ -180,12 +187,12 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
     }
 
     protected void createTables(InstallationConfiguration c, Connection con) throws InstallationSettingsError {
-        /* create tables */
-        Boolean createTables = (Boolean) c.getDatabaseSetting(InstallConstants.CREATE_TABLES_PARAMETER);
-        if (createTables.booleanValue()) {
+        boolean createTables = c.getBooleanDatabaseSetting(InstallConstants.CREATE_TABLES_PARAMETER);
+        if (createTables) {
             try {
-                SqlUtils.executeSQLFile(con, new File(getContext().getRealPath(
-                        ControllerConstants.CREATE_DATAMODEL_SQL_FILE)));
+                log.debug("Creating tables");
+                SQLHelper.executeSQLFile(con, new File(getContext()
+                        .getRealPath(ControllerConstants.CREATE_DATAMODEL_SQL_FILE)));
             } catch (Exception e) {
                 throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_CREATE_SOS_TABLES, e
                         .getMessage()));
@@ -198,11 +205,12 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         Boolean createTestData = (Boolean) c.getDatabaseSetting(InstallConstants.CREATE_TEST_DATA_PARAMETER);
         if (createTestData.booleanValue()) {
             try {
-                SqlUtils.executeSQLFile(con,
+                log.debug("Inserting test data");
+                SQLHelper.executeSQLFile(con,
                                         new File(getContext().getRealPath(
                         ControllerConstants.INSERT_TEST_DATA_SQL_FILE)));
             } catch (Exception e) {
-                throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_INSERT_TEST_DATA, e
+                throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_INSERT_TEST_DATA, e
                         .getMessage()));
             }
         }
@@ -271,5 +279,19 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
                 properties.getProperty(DefaultHibernateConstants.CONNECTION_STRING_PROPERTY),
                 properties.getProperty(DefaultHibernateConstants.USER_PROPERTY),
                 properties.getProperty(DefaultHibernateConstants.PASS_PROPERTY));
+    }
+
+    protected void dropTables(InstallationConfiguration c, Connection con) throws InstallationSettingsError {
+        boolean overwriteTables = c.getBooleanDatabaseSetting(InstallConstants.OVERWRITE_TABLES_PARAMETER);
+        if (overwriteTables) {
+            try {
+                log.debug("Dropping tables");
+                SQLHelper.executeSQLFile(con, new File(getContext()
+                        .getRealPath(ControllerConstants.DROP_DATAMODEL_SQL_FILE)));
+            } catch (Exception e) {
+                throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_DROP_SOS_TABLES, e
+                        .getMessage()));
+            }
+        }
     }
 }

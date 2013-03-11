@@ -39,7 +39,7 @@ import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.AbstractController;
-import org.n52.sos.web.SqlUtils;
+import org.n52.sos.util.SQLHelper;
 
 public abstract class AbstractAdminController extends AbstractController {
 
@@ -54,7 +54,7 @@ public abstract class AbstractAdminController extends AbstractController {
             con = p.getConnection();
             if (con instanceof Connection) {
                 try {
-                    SqlUtils.executeSQLFile((Connection) con, f);
+                    SQLHelper.executeSQLFile((Connection) con, f);
                 } catch (IOException ex) {
                     throw new SQLException(ex);
                 }
@@ -66,7 +66,7 @@ public abstract class AbstractAdminController extends AbstractController {
                         @Override
                         public void execute(Connection connection) throws SQLException {
                             try {
-                                SqlUtils.executeSQLFile(connection, f);
+                                SQLHelper.executeSQLFile(connection, f);
                             } catch (IOException ex) {
                                 throw new SQLException(ex);
                             }

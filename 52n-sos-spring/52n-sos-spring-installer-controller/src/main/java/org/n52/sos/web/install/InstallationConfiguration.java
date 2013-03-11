@@ -84,6 +84,14 @@ public class InstallationConfiguration {
         return databaseSettings.get(k);
     }
 
+    public boolean getBooleanDatabaseSetting(String k) {
+        return ((Boolean) getDatabaseSetting(k)).booleanValue();
+    }
+
+    public boolean hasDatabaseSetting(String k) {
+        return databaseSettings.containsKey(k);
+    }
+
     public InstallationConfiguration setDatabaseSetting(String k, Object v) {
         databaseSettings.put(k, v);
         return this;

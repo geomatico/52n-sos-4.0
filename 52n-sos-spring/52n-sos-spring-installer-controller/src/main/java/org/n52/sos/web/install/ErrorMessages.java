@@ -30,19 +30,20 @@ package org.n52.sos.web.install;
  */
 public interface ErrorMessages {
     static final String POST_GIS_IS_NOT_INSTALLED_IN_THE_DATABASE = "PostGIS is not installed in the database.";
-    static final String COULD_INSERT_TEST_DATA = "Could insert test data: %s";
+    static final String COULD_NOT_INSERT_TEST_DATA = "Could not insert test data: %s";
     static final String NO_DRIVER_SPECIFIED = "no driver specified";
+    static final String NO_SCHEMA_SPECIFIED = "No schema specified";
     static final String NO_JDBC_URL_SPECIFIED = "No JDBC URL specified.";
     static final String COULD_NOT_WRITE_DATASOURCE_CONFIG = "Could not write datasource config: %s";
     static final String PASSWORD_IS_INVALID = "Password is invalid.";
-    static final String CANNOT_READ_SPATIAL_REF_SYS_TABLE = "Cannot read 'spatial_ref_sys' table of PostGIS. "
-                                                            + "Please revise your database configuration.";
+    static final String COULD_NOT_READ_SPATIAL_REF_SYS_TABLE = "Could not read 'spatial_ref_sys' table of PostGIS. "
+                                                               + "Please revise your database configuration.";
     static final String COULD_NOT_LOAD_DIALECT = "Could not load dialect: %s";
     static final String COULD_NOT_LOAD_CONNECTION_POOL = "Could not load connection pool: %s";
     static final String COULD_NOT_VALIDATE_PARAMETER = "Could not validate '%s' parameter: %s";
-    static final String CANNOT_INSTANTIATE_CONFIGURATOR = "Cannot instantiate Configurator: %s";
+    static final String COULD_NOT_INSTANTIATE_CONFIGURATOR = "Could not instantiate Configurator: %s";
     static final String INVALID_JDBC_URL_WITH_ERROR_MESSAGE = "Invalid JDBC URL: %s";
-    static final String CANNOT_CREATE_STATEMENT = "Cannot create Statement: %s";
+    static final String CAN_NOT_CREATE_STATEMENT = "Cannot create Statement: %s";
     static final String COULD_NOT_CONNECT_TO_THE_DATABASE = "Could not connect to the database: %s";
     static final String COULD_NOT_SAVE_ADMIN_CREDENTIALS = "Could not save admin credentials into the database: %s";
     static final String INVALID_JDBC_URL = "Invalid JDBC URL.";
@@ -54,13 +55,18 @@ public interface ErrorMessages {
                         + "Please take a look at the 'Actions' section.";
     static final String COULD_NOT_INSERT_SETTINGS = "Could not insert settings into the database: %s";
     static final String NO_CONNECTION_POOL_SPECIFIED = "no connection pool specified";
-    static final String COULD_NOT_CREATE_SOS_TABLES = "Could not create sos tables: %s";
-    static final String CANNOT_FIND_FILE = "Cannot find file '%s'!";
-    static final String COULD_NOT_CONNECT_TO_DB_SERVER = "Could not connect to DB server: %s";
-    static final String CANNOT_CREATE_TABLES = "Cannot create tables: %s";
+    static final String COULD_NOT_CREATE_SOS_TABLES = "Could not create SOS tables: %s";
+    static final String COULD_NOT_DROP_SOS_TABLES = "Could not drop SOS tables: %s";
+    static final String COULD_NOT_FIND_FILE = "Could not find file '%s'!";
+    static final String COULD_NOT_CONNECT_TO_DATABASE_SERVER = "Could not connect to DB server: %s";
+    static final String COULD_NOT_CREATE_TABLES = "Could not create tables: %s";
     static final String NO_TABLES_AND_SHOULD_NOT_CREATE = "No tables are present in the database "
                                                           + "and no tables should be created.";
     static final String COULD_NOT_INSTANTIATE_SETTINGS_MANAGER = "Could not instantiate Settings Manager: %s";
     static final String NO_DEFINITON_FOUND = "No definiton found for setting with key '%s'";
     static final String COULD_NOT_DELETE_PREVIOUS_SETTINGS = "Could not delete previous settings: %s";
+    static final String COULD_NOT_SET_CATALOG = "Could not set catalog search path";
+    static final String COULD_NOT_CHECK_IF_TABLE_EXISTS = "Could not check if table '%s' exists: %s";
+    static final String COULD_NOT_CHECK_IF_SCHEMA_EXISTS = "Could not check if schema '%s' exists: %s";
+    static final String SCHEMA_DOES_NOT_EXIST = "Schema %s does not exist";
 }

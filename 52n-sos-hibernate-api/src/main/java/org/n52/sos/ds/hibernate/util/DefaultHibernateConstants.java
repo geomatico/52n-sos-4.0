@@ -50,5 +50,6 @@ public class DefaultHibernateConstants {
     public static final String DIALECT_PROPERTY = "hibernate.dialect";
 
     public static final String CLAZZ = "clazz";
+    public static final String CATALOG_PROPERTY = "hibernate.default_catalog";
 
 }

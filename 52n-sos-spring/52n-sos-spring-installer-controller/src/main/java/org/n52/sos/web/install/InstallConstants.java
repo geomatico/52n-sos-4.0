@@ -25,23 +25,15 @@ package org.n52.sos.web.install;
 
 import org.n52.sos.web.ControllerConstants;
 
-public class InstallConstants {
-
-    /* SQL queries */
-    public static final String CAN_CREATE_TABLES = "BEGIN; "
-                                                   + "DROP TABLE IF EXISTS sos_installer_test_table; "
-                                                   + "CREATE TABLE sos_installer_test_table (id integer NOT NULL); "
-                                                   + "DROP TABLE sos_installer_test_table; "
-                                                   + "END;";
+public interface InstallConstants {
     public static final String IS_POSTGIS_INSTALLED = "SELECT version(), postgis_version()";
-    public static final String TABLES_ALREADY_EXISTENT = "SELECT observation_id FROM observation LIMIT 0;";
-    public static final String CAN_READ_SPATIAL_REF_SYS = "SELECT * FROM spatial_ref_sys LIMIT 0;";
     public static final String GET_VERSION_OF_DATABASE_INSTALLATION = "SELECT value FROM global_settings WHERE key = 'VERSION';";
 
     /* request parameters */
     public static final String DRIVER_PARAMETER = "driver";
     public static final String CONNECTION_POOL_PARAMETER = "connection_pool";
-    public static final String JDBC_DIALECT_PARAMETER = "jdbc_dialect";
+    public static final String DIALECT_PARAMETER = "dialect";
+    public static final String SCHEMA_PARAMETER = "schema";
     public static final String OVERWRITE_TABLES_PARAMETER = "overwrite_tables";
     public static final String CREATE_TEST_DATA_PARAMETER = "create_test_data";
     public static final String CREATE_TABLES_PARAMETER = "create_tables";

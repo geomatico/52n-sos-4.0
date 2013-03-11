@@ -21,10 +21,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.n52.sos.web.install;
 
 import java.net.URISyntaxException;
@@ -36,10 +32,10 @@ import java.sql.Statement;
 import java.util.Map;
 
 import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.util.SQLHelper;
 import org.n52.sos.web.ControllerConstants;
 import org.n52.sos.web.JdbcUrl;
 import org.n52.sos.web.MetaDataHandler;
-import org.n52.sos.web.SqlUtils;
 import org.n52.sos.web.install.InstallConstants.Step;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +59,7 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
         checkDriver(parameters, settings);
         checkConnectionPool(parameters, settings);
         checkDialect(parameters, settings);
+        checkSchema(parameters, settings);
         String jdbc = checkJdbcUrl(parameters, settings);
         boolean overwriteTables = checkOverwrite(parameters, settings);
         boolean createTables = checkCreate(parameters, overwriteTables, settings);
@@ -72,18 +69,19 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
         try {
             con = DriverManager.getConnection(jdbc);
             st = createStatement(con, settings);
+            checkIfSchemaExists(st, settings);
             if (createTables || createTestData) {
                 checkTableCreation(st, settings);
             }
-            boolean alreadyExistent = checkAlreadyExistent(st);
+            boolean alreadyExistent = checkAlreadyExistent(st, settings);
             checkTableConfiguration(createTables, overwriteTables, alreadyExistent, settings, st);
-            checkPostGis(st, settings);
+            checkPostGIS(st, settings);
         } catch (SQLException ex) {
-            throw new InstallationSettingsError(settings, String.format(ErrorMessages.COULD_NOT_CONNECT_TO_DB_SERVER, ex
-                    .getMessage()), ex);
+            throw new InstallationSettingsError(settings, String
+                    .format(ErrorMessages.COULD_NOT_CONNECT_TO_DATABASE_SERVER, ex.getMessage()), ex);
         } finally {
-            SqlUtils.close(st);
-            SqlUtils.close(con);
+            SQLHelper.close(st);
+            SQLHelper.close(con);
         }
     }
 
@@ -119,11 +117,11 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
 
     protected void checkDialect(Map<String, String> parameters,
                                 InstallationConfiguration settings) throws InstallationSettingsError {
-        String dialect = parameters.get(InstallConstants.JDBC_DIALECT_PARAMETER);
+        String dialect = parameters.get(InstallConstants.DIALECT_PARAMETER);
         if (dialect == null) {
             throw new InstallationSettingsError(settings, ErrorMessages.NO_DIALECT_SPECIFIED);
         }
-        settings.setDatabaseSetting(InstallConstants.JDBC_DIALECT_PARAMETER, dialect);
+        settings.setDatabaseSetting(InstallConstants.DIALECT_PARAMETER, dialect);
         try {
             Class.forName(dialect);
         } catch (Throwable ex) {
@@ -188,34 +186,27 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
         return createTestData;
     }
 
-    protected Statement createStatement(Connection con,
-                                        InstallationConfiguration settings) throws InstallationSettingsError {
-        try {
-            return con.createStatement();
-        } catch (SQLException e) {
-            throw new InstallationSettingsError(settings, String.format(ErrorMessages.CANNOT_CREATE_STATEMENT, e
-                    .getMessage()), e);
-        }
-    }
-
     protected void checkTableCreation(Statement st,
                                       InstallationConfiguration settings) throws InstallationSettingsError {
         try {
-            st.execute(InstallConstants.CAN_CREATE_TABLES);
+            String schema = getSchema(settings);
+            schema = schema == null ? "" : "." + schema;
+            final String command = String.format(
+                    "BEGIN; "
+                    + "DROP TABLE IF EXISTS \"%1$ssos_installer_test_table\"; "
+                    + "CREATE TABLE \"%1$ssos_installer_test_table\" (id integer NOT NULL); "
+                    + "DROP TABLE \"%1$ssos_installer_test_table\"; "
+                    + "END;", schema);
+            st.execute(command);
         } catch (SQLException e) {
-            throw new InstallationSettingsError(settings, String.format(ErrorMessages.CANNOT_CREATE_TABLES, e
+            throw new InstallationSettingsError(settings, String.format(ErrorMessages.COULD_NOT_CREATE_TABLES, e
                     .getMessage()), e);
         }
     }
 
-    protected boolean checkAlreadyExistent(Statement st) {
-        boolean alreadyExistent = true;
-        try {
-            st.execute(InstallConstants.TABLES_ALREADY_EXISTENT);
-        } catch (SQLException e) {
-            alreadyExistent = false;
-        }
-        return alreadyExistent;
+    protected boolean checkAlreadyExistent(Statement st, InstallationConfiguration settings) throws
+            InstallationSettingsError {
+        return checkTable(getSchema(settings), "observation", st, settings);
     }
 
     protected void checkVersion(Statement st) throws SQLException {
@@ -231,7 +222,7 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
         } catch (SQLException e) {
             log.error("Could not determine version of installed database schema.", e);
         } finally {
-            SqlUtils.close(rs);
+            SQLHelper.close(rs);
         }
 
         try {
@@ -246,13 +237,13 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
         }
     }
 
-    protected void checkPostGis(Statement st,
+    protected void checkPostGIS(Statement st,
                                 InstallationConfiguration settings) throws InstallationSettingsError {
-        checkPostGisInstallation(st, settings);
-        checkSpatialRefSys(st, settings);
+        checkPostGISInstallation(st, settings);
+        checkSpatialRefSysTable(st, settings);
     }
 
-    protected void checkPostGisInstallation(Statement st,
+    protected void checkPostGISInstallation(Statement st,
                                             InstallationConfiguration settings) throws InstallationSettingsError {
         try {
             st.execute(InstallConstants.IS_POSTGIS_INSTALLED);
@@ -261,12 +252,11 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
         }
     }
 
-    protected void checkSpatialRefSys(Statement st,
-                                      InstallationConfiguration settings) throws InstallationSettingsError {
-        try {
-            st.execute(InstallConstants.CAN_READ_SPATIAL_REF_SYS);
-        } catch (SQLException e) {
-            throw new InstallationSettingsError(settings, ErrorMessages.CANNOT_READ_SPATIAL_REF_SYS_TABLE, e);
+    protected void checkSpatialRefSysTable(Statement st,
+                                           InstallationConfiguration settings) throws InstallationSettingsError {
+
+        if (!checkTable(null, "spatial_ref_sys", st, settings)) {
+            throw new InstallationSettingsError(settings, ErrorMessages.COULD_NOT_READ_SPATIAL_REF_SYS_TABLE);
         }
     }
 
@@ -274,13 +264,70 @@ public class InstallDatabaseController extends AbstractProcessingInstallationCon
                                            InstallationConfiguration settings, Statement st) throws
             InstallationSettingsError, SQLException {
         if (createTables) {
-            if (!overwriteTables && alreadyExistent) {
+            if (alreadyExistent && !overwriteTables) {
                 throw new InstallationSettingsError(settings, ErrorMessages.TABLES_ALREADY_CREATED_BUT_SHOULD_NOT_OVERWRITE);
             }
         } else if (!alreadyExistent) {
             throw new InstallationSettingsError(settings, ErrorMessages.NO_TABLES_AND_SHOULD_NOT_CREATE);
         } else {
             checkVersion(st);
+        }
+    }
+
+    protected void checkSchema(Map<String, String> parameters, InstallationConfiguration settings) throws
+            InstallationSettingsError {
+        final String schema = parameters.get(InstallConstants.SCHEMA_PARAMETER);
+        if (schema != null && !schema.trim().isEmpty()) {
+            settings.setDatabaseSetting(InstallConstants.SCHEMA_PARAMETER, schema);
+        } else {
+            throw new InstallationSettingsError(settings, ErrorMessages.NO_SCHEMA_SPECIFIED);
+        }
+    }
+
+    protected boolean checkTable(String schema, String table, Statement st, InstallationConfiguration settings) throws
+            InstallationSettingsError {
+        ResultSet rs = null;
+        try {
+            String command;
+            if (schema != null) {
+                command = String
+                        .format("SELECT true FROM pg_tables WHERE tablename = '%s' AND schemaname = '%s';", table, schema);
+            } else {
+                command = String.format("SELECT true FROM pg_tables WHERE tablename = '%s';", table);
+            }
+
+            log.debug("Testing table existence: {}", command);
+            rs = st.executeQuery(command);
+            return rs.next();
+        } catch (SQLException e) {
+            throw new InstallationSettingsError(settings, String
+                    .format(ErrorMessages.COULD_NOT_CHECK_IF_TABLE_EXISTS, table, e
+                    .getMessage()), e);
+        } finally {
+            SQLHelper.close(rs);
+        }
+    }
+
+    protected void checkIfSchemaExists(Statement st, InstallationConfiguration settings) throws
+            InstallationSettingsError {
+        String schema = getSchema(settings);
+        if (schema != null) {
+            ResultSet rs = null;
+            try {
+                String command = String
+                        .format("SELECT true FROM information_schema.schemata WHERE schema_name = '%s';", schema);
+                rs = st.executeQuery(command);
+                if (!rs.next()) {
+                    throw new InstallationSettingsError(settings, String
+                            .format(ErrorMessages.SCHEMA_DOES_NOT_EXIST, schema));
+                }
+            } catch (SQLException e) {
+                throw new InstallationSettingsError(settings, String
+                        .format(ErrorMessages.COULD_NOT_CHECK_IF_SCHEMA_EXISTS, schema, e
+                        .getMessage()), e);
+            } finally {
+                SQLHelper.close(rs);
+            }
         }
     }
 }

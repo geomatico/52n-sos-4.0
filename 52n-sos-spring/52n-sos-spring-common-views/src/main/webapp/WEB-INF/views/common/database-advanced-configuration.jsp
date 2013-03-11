@@ -26,6 +26,14 @@
 <fieldset id="database-advanced-configuration">
     <legend>Advanced database server configuration</legend>
     <div class="control-group">
+        <label class="control-label" for="schema">Schema</label>
+        <div class="controls">
+            <input type="text" class="span8" id="schema" name="schema">
+                <span class="help-block"><span class="label label-info">optional</span> Qualifies unqualified table names with the given schema in generated SQL.</span>
+            </input>
+        </div>
+    </div>
+    <div class="control-group">
         <label class="control-label" for="driver">Database Driver</label>
         <div class="controls">
             <input type="text" class="span8" id="driver" name="driver">
@@ -42,9 +50,9 @@
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label" for="jdbc_dialect">Database Dialect</label>
+        <label class="control-label" for="dialect">Database Dialect</label>
         <div class="controls">
-            <input type="text" class="span8" id="driver" name="jdbc_dialect">
+            <input type="text" class="span8" id="driver" name="dialect">
                 <span class="help-block"><span class="label label-warning">required</span> Set this to the class of the JDBC dialect. The default value for PostgreSQL is the custom 52&deg;North dialect.</span>
             </input>
         </div>

@@ -105,7 +105,7 @@ public class InstallSettingsController extends AbstractProcessingInstallationCon
             File f = fileSetting.getValue();
             if (!f.exists() && !def.isOptional()) {
                 throw new InstallationSettingsError(c, String
-                        .format(ErrorMessages.CANNOT_FIND_FILE, f.getAbsolutePath()));
+                        .format(ErrorMessages.COULD_NOT_FIND_FILE, f.getAbsolutePath()));
             }
         }
     }

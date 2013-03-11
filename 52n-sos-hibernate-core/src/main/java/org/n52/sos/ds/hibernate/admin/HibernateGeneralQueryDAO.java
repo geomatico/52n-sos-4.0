@@ -36,6 +36,7 @@ import org.hibernate.Transaction;
 import org.hibernate.jdbc.ReturningWork;
 import org.n52.sos.ds.GeneralQueryDAO;
 import org.n52.sos.ds.hibernate.HibernateSessionHolder;
+import org.n52.sos.util.SQLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,24 +51,6 @@ public class HibernateGeneralQueryDAO implements GeneralQueryDAO {
     private static final Logger log = LoggerFactory.getLogger(HibernateGeneralQueryDAO.class);
     private static final String[] MODIFY_COMMANDS = { "alter ", "create ", "drop ", "truncate ", "rename " };
     private static final String[] UPDATE_COMMANDS = { "update ", "insert ", "delete " };
-
-    private static void close(ResultSet rs) {
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (Exception e) {
-            }
-        }
-    }
-
-    private static void close(Statement stmt) {
-        if (stmt != null) {
-            try {
-                stmt.close();
-            } catch (Exception e) {
-            }
-        }
-    }
 
     private static boolean contains(String[] commands, String query) {
         for (String command : commands) {
@@ -170,8 +153,8 @@ public class HibernateGeneralQueryDAO implements GeneralQueryDAO {
             } catch (Exception ex) {
                 return new ErrorResult(ex);
             } finally {
-                close(rset);
-                close(stmt);
+                SQLHelper.close(rset);
+                SQLHelper.close(stmt);
             }
         }
 
@@ -203,7 +186,7 @@ public class HibernateGeneralQueryDAO implements GeneralQueryDAO {
             } catch (Exception ex) {
                 return new ErrorResult(ex);
             } finally {
-                close(stmt);
+                SQLHelper.close(stmt);
             }
         }
     }
@@ -219,7 +202,7 @@ public class HibernateGeneralQueryDAO implements GeneralQueryDAO {
             } catch (Exception ex) {
                 return new ErrorResult(ex);
             } finally {
-                close(stmt);
+                SQLHelper.close(stmt);
             }
         }
     }

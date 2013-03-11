@@ -78,10 +78,12 @@
 <script type="text/javascript">
     warnIfNotHttps();
     $.getJSON("<c:url value="/static/conf/default-database-values.json" />", function(settings) {
-        var jdbc_uri = settings["jdbc_uri"];
-        var driver = settings["driver"];
-        var dialect = settings["jdbc_dialect"];
-        var connectionPool = settings["connection_pool"];
+        var jdbc_uri = settings["jdbc_uri"],
+            driver = settings["driver"],
+            dialect = settings["dialect"],
+            connectionPool = settings["connection_pool"],
+            schema = settings["schema"];
+
         
         <c:if test="${not empty databaseSettings}">
             <c:if test="${not empty databaseSettings['driver']}">
@@ -91,16 +93,20 @@
                 jdbc_uri = "${databaseSettings['jdbc_uri']}";
             </c:if>
             
-            <c:if test="${not empty databaseSettings['jdbc_dialect']}">
-                dialect = "${databaseSettings['jdbc_dialect']}";
+            <c:if test="${not empty databaseSettings['dialect']}">
+                dialect = "${databaseSettings['dialect']}";
             </c:if>
             <c:if test="${not empty databaseSettings['connection_pool']}">
                 connectionPool = "${databaseSettings['connection_pool']}";
             </c:if>
+            <c:if test="${not empty databaseSettings['schema']}">
+                schema = "${databaseSettings['schema']}";
+            </c:if>
         </c:if>
             
         $("input[name=connection_pool]").val(connectionPool);
-        $("input[name=jdbc_dialect]").val(dialect);
+        $("input[name=dialect]").val(dialect);
+        $("input[name=schema]").val(schema);
                 
         jdbc_uri = jdbc_uri.replace("jdbc:postgresql://","");
         $("#driver").val(driver);

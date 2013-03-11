@@ -4,3 +4,4 @@ hibernate.connection.url=jdbc:postgresql://localhost:5432/sos
 hibernate.connection.driver_class=org.postgresql.Driver
 hibernate.dialect=org.hibernate.spatial.dialect.postgis.PostgisDialect52N
 hibernate.connection.provider_class=org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider
+hibernate.default_catalog=public

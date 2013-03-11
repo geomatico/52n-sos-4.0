@@ -86,6 +86,7 @@ public interface ControllerConstants {
     /* SQL file paths */
     public static final String INSERT_TEST_DATA_SQL_FILE = "/sql/insert_test_data.sql";
     public static final String REMOVE_TEST_DATA_SQL_FILE = "/sql/remove_test_data.sql";
+    public static final String DROP_DATAMODEL_SQL_FILE = "/sql/script_20_drop.sql";
     public static final String CREATE_DATAMODEL_SQL_FILE = "/sql/script_20_create.sql";
     public static final String CLEAR_DATABASE_SQL_FILE = "/sql/clear_database.sql";
     
