@@ -871,4 +871,6 @@ DROP FUNCTION insert_observation_constellation_offering_observation_type(text,te
 DROP FUNCTION get_observation_constellation_offering_observation_type(bigint,bigint,bigint,bigint);
 DROP FUNCTION get_observation_constellation_offering_observation_type(text,text,text,text);
 DROP FUNCTION insert_observation_observation_constellation_offering_observation_type(bigint,bigint);
-
+DROP FUNCTION insert_allowed_feature_of_interest_types_for_offering(bigint,bigint)
+DROP FUNCTION get_observation(bigint,text,text,timestamp)
+DROP FUNCTION create_sensor_description(text,text,numeric,numeric,numeric)
