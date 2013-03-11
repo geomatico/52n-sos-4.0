@@ -3,7 +3,7 @@
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 28.01.2013 14:55:03 by Hibernate Tools 4.0.0 -->
 <hibernate-mapping>
-    <class name="org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType" table="observation_constellation_offering_observation_type" schema="public">
+    <class name="org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType" table="observation_constellation_offering_observation_type">
         <id name="observationConstellationOfferingObservationTypeId" type="long">
             <column name="observation_constellation_offering_observation_type_id" />
             <generator class="sequence">
