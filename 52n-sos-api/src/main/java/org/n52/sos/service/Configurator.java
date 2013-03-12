@@ -541,12 +541,20 @@ public class Configurator implements Cleanupable {
         return getServiceConfiguration().getMaxGetObsResults();
     }
 
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
     public String getDefaultOfferingPrefix() {
         return getServiceConfiguration().getDefaultOfferingPrefix();
+    }
+    
+    public String getDefaultProcedurePrefix() {
+        return getServiceConfiguration().getDefaultProcedurePrefix();
+    }
+    
+    public String getDefaultFeaturePrefix() {
+        return getServiceConfiguration().getDefaultFeaturePrefix();
+    }
+    
+    public boolean isUseDefaultPrefixes() {
+        return getServiceConfiguration().isUseDefaultPrefixes();
     }
 
     /**

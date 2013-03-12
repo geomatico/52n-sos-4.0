@@ -56,11 +56,14 @@ public class ServiceConfiguration {
      */
     @Deprecated
     private Map<String, String> configFileMap = new HashMap<String, String>(0);
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
+
     private String defaultOfferingPrefix;
+    
+    private String defaultProcedurePrefix;
+    
+    private String defaultFeaturePrefix;
+    
+    private boolean useDefaultPrefixes;
     /**
      * date format of gml.
      */
@@ -248,23 +251,45 @@ public class ServiceConfiguration {
         this.maxGetObsResults = maxResults;
     }
 
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
+
     public String getDefaultOfferingPrefix() {
         return this.defaultOfferingPrefix;
     }
 
-    /**
-     * @param prefix
-     *
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
+
     @Setting(DEFAULT_OFFERING_PREFIX)
     public void setDefaultOfferingPrefix(String prefix) {
         this.defaultOfferingPrefix = prefix;
+    }
+    
+    public String getDefaultProcedurePrefix() {
+        return this.defaultProcedurePrefix;
+    }
+
+
+    @Setting(DEFAULT_PROCEDURE_PREFIX)
+    public void setDefaultProcedurePrefix(String prefix) {
+        this.defaultProcedurePrefix = prefix;
+    }
+    
+    public String getDefaultFeaturePrefix() {
+        return this.defaultFeaturePrefix;
+    }
+
+
+    @Setting(DEFAULT_FEATURE_PREFIX)
+    public void setDefaultFeaturePrefix(String prefix) {
+        this.defaultFeaturePrefix = prefix;
+    }
+    
+    public boolean isUseDefaultPrefixes() {
+        return this.useDefaultPrefixes;
+    }
+
+
+    @Setting(USE_DEFAULT_PREFIXES)
+    public void setUseDefaultPrefixes(boolean prefix) {
+        this.useDefaultPrefixes = prefix;
     }
 
     /**
