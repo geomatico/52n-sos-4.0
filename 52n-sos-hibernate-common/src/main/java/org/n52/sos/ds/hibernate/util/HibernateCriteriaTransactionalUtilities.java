@@ -25,12 +25,10 @@ package org.n52.sos.ds.hibernate.util;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -81,21 +79,7 @@ public class HibernateCriteriaTransactionalUtilities {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateCriteriaTransactionalUtilities.class);
 
-    public static synchronized void setDeleteSensorFlag(String identifier, boolean deleteFlag, Session session)
-            throws OwsExceptionReport {
-        Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(identifier, session);
-        if (procedure != null) {
-            procedure.setDeleted(deleteFlag);
-            session.saveOrUpdate(procedure);
-            session.flush();
-            setObservationConstellationOfferingObservationTypeAsDeletedForProcedure(identifier, session);
-            setObservationsAsDeletedForProcedure(identifier, session);
-        } else {
-            String exceptionText = "The requested identifier is not contained in database";
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
-        }
-    }
-
+    
     public static Procedure getOrInsertProcedure(String identifier, ProcedureDescriptionFormat pdf, Session session) {
         Procedure result = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(identifier, session);
         if (result == null) {
@@ -652,41 +636,6 @@ public class HibernateCriteriaTransactionalUtilities {
                 validProcedureTime.setEndTime(new DateTime().toDate());
                 HibernateCriteriaTransactionalUtilities.updateValidProcedureTime(validProcedureTime, session);
             }
-        }
-    }
-
-    private static void setObservationConstellationOfferingObservationTypeAsDeletedForProcedure(
-            String procedureIdentifier, Session session) {
-        HibernateQueryObject queryObject = new HibernateQueryObject();
-        Map<String, String> aliases = new HashMap<String, String>(0);
-        String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
-        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, obsConstAlias);
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), procedureIdentifier));
-        queryObject.setAliases(aliases);
-        List<ObservationConstellationOfferingObservationType> obsConstOffObsTypes =
-                HibernateCriteriaQueryUtilities.getObservationConstellationOfferingObservationType(queryObject,
-                        session);
-        for (ObservationConstellationOfferingObservationType obsConstOffObsType : obsConstOffObsTypes) {
-            obsConstOffObsType.setDeleted(true);
-            session.saveOrUpdate(obsConstOffObsType);
-            session.flush();
-        }
-    }
-
-    private static void setObservationsAsDeletedForProcedure(String procedureIdentifier, Session session) {
-        HibernateQueryObject queryObject = new HibernateQueryObject();
-        Map<String, String> aliases = new HashMap<String, String>(0);
-        String obsConstAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
-        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, obsConstAlias);
-        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(
-                HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), procedureIdentifier));
-        queryObject.setAliases(aliases);
-        List<Observation> observations = HibernateCriteriaQueryUtilities.getObservations(queryObject, session);
-        for (Observation observation : observations) {
-            observation.setDeleted(true);
-            session.saveOrUpdate(observation);
-            session.flush();
         }
     }
 
