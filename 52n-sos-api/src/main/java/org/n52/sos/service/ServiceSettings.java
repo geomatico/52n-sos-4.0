@@ -46,6 +46,7 @@ public class ServiceSettings implements SettingDefinitionProvider {
     public static final String MINIMUM_GZIP_SIZE = "service.minimumGzipSize";
     public static final String SUPPORTS_QUALITY = "service.supportsQuality";
     public static final String SENSOR_DIRECTORY = "service.sensorDirectory";
+    public static final String USE_DEFAULT_PREFIXES = "service.useDefaultPrefixes";
     /**
      * @deprecated not used by any code, check for external use or remove
      */
@@ -147,6 +148,13 @@ public class ServiceSettings implements SettingDefinitionProvider {
             .setDescription(
             "Configuration files and their file identifier (List: IDENTIFIER FILENAME;IDENTIFIER2 FILENAME2; ...).");
 
+    public static final BooleanSettingDefinition USE_DEFAULT_PREFIXES_DEFINITION = new BooleanSettingDefinition()
+    .setGroup(GROUP)
+    .setOrder(11)
+    .setKey(USE_DEFAULT_PREFIXES)
+    .setDefaultValue(true)
+    .setTitle("Use default prefixes for offering, procedure, features")
+    .setDescription("Use default prefixes for offering, procedure, features.");
     
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
             ServiceSettings.SERVICE_URL_DEFINITION,
@@ -156,7 +164,8 @@ public class ServiceSettings implements SettingDefinitionProvider {
             ServiceSettings.SUPPORTS_QUALITY_DEFINITION,
             ServiceSettings.SENSOR_DIRECTORY_DEFINITION,
             ServiceSettings.SKIP_DUPLICATE_OBSERVATIONS_DEFINITION,
-            ServiceSettings.CONFIGURATION_FILES_DEFINITION);
+            ServiceSettings.CONFIGURATION_FILES_DEFINITION,
+            ServiceSettings.USE_DEFAULT_PREFIXES_DEFINITION);
 
     @Override
     public Set<SettingDefinition<?, ?>> getSettingDefinitions() {

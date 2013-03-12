@@ -51,6 +51,7 @@ import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.InsertSensorResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.MiscSettings;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.JavaHelper;
@@ -71,6 +72,8 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
     private static final Set<String> CONFORMANCE_CLASSES = CollectionHelper.set(
             ConformanceClasses.SOS_V2_INSERTION_CAPABILITIES, ConformanceClasses.SOS_V2_SENSOR_INSERTION);
 
+    private String defaultOfferingPrefix;
+    
     private String defaultProcedurePrefix;
     
     
@@ -78,11 +81,20 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
         super(OPERATION_NAME, InsertSensorRequest.class);
     }
     
+    public String getDefaultOfferingPrefix() {
+        return this.defaultOfferingPrefix;
+    }
+
+    @Setting(MiscSettings.DEFAULT_OFFERING_PREFIX)
+    public void setDefaultOfferingPrefix(String prefix) {
+        this.defaultOfferingPrefix = prefix;
+    }
+    
     public String getDefaultProcedurePrefix() {
         return this.defaultProcedurePrefix;
     }
 
-    @Setting(TransactionalOperatorSettings.DEFAULT_PROCEDURE_PREFIX)
+    @Setting(MiscSettings.DEFAULT_PROCEDURE_PREFIX)
     public void setDefaultProcedurePrefix(String prefix) {
         this.defaultProcedurePrefix = prefix;
     }
@@ -237,7 +249,6 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
 
     private void checkAndSetAssignedProcedureID(InsertSensorRequest request) {
         String procedureIdentifier = null;
-        String procedurePrefix = getDefaultProcedurePrefix();
         // if procedureDescription is SensorML
         if (request.getProcedureDescription() instanceof SensorML) {
             SensorML sensorML = (SensorML) request.getProcedureDescription();
@@ -256,7 +267,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
                 }
             } else {
                 procedureIdentifier =
-                        procedurePrefix + JavaHelper.generateID(sensorML.getSensorDescriptionXmlString());
+                        getDefaultProcedurePrefix() + JavaHelper.generateID(sensorML.getSensorDescriptionXmlString());
             }
         }
         // if procedureDescription not SensorML
@@ -266,7 +277,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
                 procedureIdentifier = request.getProcedureDescription().getProcedureIdentifier();
             } else {
                 procedureIdentifier =
-                        procedurePrefix + JavaHelper.generateID(request.getProcedureDescription().toString());
+                        getDefaultProcedurePrefix() + JavaHelper.generateID(request.getProcedureDescription().toString());
             }
         }
         request.setAssignedProcedureIdentifier(procedureIdentifier);
@@ -300,7 +311,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
         // check if offering is valid
         if (sosOfferings == null || (sosOfferings != null && sosOfferings.isEmpty())) {
             sosOfferings = new ArrayList<SosOffering>(0);
-            sosOfferings.add(new SosOffering(request.getAssignedProcedureIdentifier()));
+            sosOfferings.add(new SosOffering(getDefaultProcedurePrefix() + request.getAssignedProcedureIdentifier()));
         }
         request.setAssignedOfferings(sosOfferings);
     }

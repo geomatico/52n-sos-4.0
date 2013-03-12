@@ -44,11 +44,10 @@ public class MiscSettings implements SettingDefinitionProvider {
     public static final String GML_DATE_FORMAT = "misc.gmlDateFormat";
     public static final String SRS_NAME_PREFIX_SOS_V1 = "misc.srsNamePrefixSosV1";
     public static final String SRS_NAME_PREFIX_SOS_V2 = "misc.srsNamePrefixSosV2";
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
     public static final String DEFAULT_OFFERING_PREFIX = "misc.defaultOfferingPrefix";
+    public static final String DEFAULT_PROCEDURE_PREFIX = "misc.defaultProcedurePrefix";
+    public static final String DEFAULT_FEATURE_PREFIX = "misc.defaultFeaturePrefix";
+    
     /**
      * @deprecated not used by any code, check for external use or remove
      */
@@ -57,17 +56,7 @@ public class MiscSettings implements SettingDefinitionProvider {
     
     public static final SettingDefinitionGroup GROUP = new SettingDefinitionGroup()
             .setTitle("Miscellaneous Settings").setOrder(3);
-    /**
-     * @deprecated not used by any code, check for external use or remove
-     */
-    @Deprecated
-    public static final StringSettingDefinition DEFAULT_OFFERING_PREFIX_DEFINITION = new StringSettingDefinition()
-            .setGroup(MiscSettings.GROUP)
-            .setOrder(4)
-            .setKey(DEFAULT_OFFERING_PREFIX)
-            .setDefaultValue("OFFERING_")
-            .setTitle("Default Offering Prefix")
-            .setDescription("The default prefix for generated offerings (if not defined in RegisterSensor requests).");
+
     /**
      * @deprecated not used by any code, check for external use or remove
      */
@@ -129,7 +118,30 @@ public class MiscSettings implements SettingDefinitionProvider {
             .setDefaultValue("UTF-8")
             .setTitle("Character Encoding")
             .setDescription("The character encoding used for responses.");
-
+    
+    public static final StringSettingDefinition DEFAULT_OFFERING_PREFIX_DEFINITION = new StringSettingDefinition()
+            .setGroup(MiscSettings.GROUP)
+            .setOrder(4)
+            .setKey(DEFAULT_OFFERING_PREFIX)
+            .setDefaultValue("http://www.example.org/offering/")
+            .setTitle("Default Offering Prefix")
+            .setDescription("The default prefix for offerings (generated if not defined in Register-/InsertSensor requests or values from custom db).");
+    
+    public static final StringSettingDefinition DEFAULT_PROCEDURE_PREFIX_DEFINITION = new StringSettingDefinition()
+            .setGroup(MiscSettings.GROUP)
+            .setOrder(4)
+            .setKey(DEFAULT_PROCEDURE_PREFIX)
+            .setDefaultValue("http://www.example.org/procedure/")
+            .setTitle("Default Procedure Prefix")
+            .setDescription("The default prefix for procedures (generated if not defined in Register-/InsertSensor requests or values from custom db).");
+    
+    public static final StringSettingDefinition DEFAULT_FEATURE_PREFIX_DEFINITION = new StringSettingDefinition()
+            .setGroup(MiscSettings.GROUP)
+            .setOrder(4)
+            .setKey(DEFAULT_FEATURE_PREFIX)
+            .setDefaultValue("http://www.example.org/feature/")
+            .setTitle("Default Feature Prefix")
+            .setDescription("The default prefix for features (values from custom db).");
     
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
             MiscSettings.TOKEN_SEPERATOR_DEFINITION,
