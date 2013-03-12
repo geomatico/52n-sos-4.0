@@ -23,8 +23,8 @@
  */
 package org.n52.sos.ogc.swe;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
@@ -136,7 +136,7 @@ public class SosSweDataArray extends SosSweAbstractDataComponent{
     {
         if (values == null)
         {
-            values = new ArrayList<List<String>>();
+            values = new LinkedList<List<String>>();
         }
         return values.add(blockOfTokensToAddAtTheEnd);
     }
