@@ -44,21 +44,21 @@ public class RelatedFeature implements java.io.Serializable {
 
     private Set<RelatedFeatureRole> relatedFeatureRoles = new HashSet<RelatedFeatureRole>(0);
 
-    private Set<Offering> offerings = new HashSet<Offering>(0);
+//    private Set<Offering> offerings = new HashSet<Offering>(0);
 
     public RelatedFeature() {
     }
 
-    public RelatedFeature(long relatedFeatureId) {
-        this.relatedFeatureId = relatedFeatureId;
-    }
-
-    public RelatedFeature(long relatedFeatureId, FeatureOfInterest featureOfInterest, Set<RelatedFeatureRole> relatedFeatureRoles, Set<Offering> offerings) {
-        this.relatedFeatureId = relatedFeatureId;
-        this.featureOfInterest = featureOfInterest;
-        this.relatedFeatureRoles = relatedFeatureRoles;
-        this.offerings = offerings;
-    }
+//    public RelatedFeature(long relatedFeatureId) {
+//        this.relatedFeatureId = relatedFeatureId;
+//    }
+//
+//    public RelatedFeature(long relatedFeatureId, FeatureOfInterest featureOfInterest, Set<RelatedFeatureRole> relatedFeatureRoles, Set<Offering> offerings) {
+//        this.relatedFeatureId = relatedFeatureId;
+//        this.featureOfInterest = featureOfInterest;
+//        this.relatedFeatureRoles = relatedFeatureRoles;
+//        this.offerings = offerings;
+//    }
 
     public long getRelatedFeatureId() {
         return this.relatedFeatureId;
@@ -84,12 +84,12 @@ public class RelatedFeature implements java.io.Serializable {
         this.relatedFeatureRoles = relatedFeatureRoles;
     }
 
-    public Set<Offering> getOfferings() {
-        return this.offerings;
-    }
-
-    public void setOfferings(Set<Offering> offerings) {
-        this.offerings = offerings;
-    }
+//    public Set<Offering> getOfferings() {
+//        return this.offerings;
+//    }
+//
+//    public void setOfferings(Set<Offering> offerings) {
+//        this.offerings = offerings;
+//    }
 
 }

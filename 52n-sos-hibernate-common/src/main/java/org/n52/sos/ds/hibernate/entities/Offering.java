@@ -41,8 +41,8 @@ public class Offering implements java.io.Serializable {
 
     private String name;
 
-    private Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes = new HashSet<ObservationConstellationOfferingObservationType>(0);
-
+//    private Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes = new HashSet<ObservationConstellationOfferingObservationType>(0);
+//
 //    private Set<Request> requests = new HashSet<Request>(0);
 
     private Set<ObservationType> observationTypes = new HashSet<ObservationType>(0);
@@ -95,15 +95,15 @@ public class Offering implements java.io.Serializable {
         this.name = name;
     }
 
-    public Set<ObservationConstellationOfferingObservationType> getObservationConstellationOfferingObservationTypes() {
-        return this.observationConstellationOfferingObservationTypes;
-    }
-
-    public void setObservationConstellationOfferingObservationTypes(
-            Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes) {
-        this.observationConstellationOfferingObservationTypes = observationConstellationOfferingObservationTypes;
-    }
-
+//    public Set<ObservationConstellationOfferingObservationType> getObservationConstellationOfferingObservationTypes() {
+//        return this.observationConstellationOfferingObservationTypes;
+//    }
+//
+//    public void setObservationConstellationOfferingObservationTypes(
+//            Set<ObservationConstellationOfferingObservationType> observationConstellationOfferingObservationTypes) {
+//        this.observationConstellationOfferingObservationTypes = observationConstellationOfferingObservationTypes;
+//    }
+//
 //    public Set<Request> getRequests() {
 //        return this.requests;
 //    }

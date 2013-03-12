@@ -21,13 +21,13 @@
                 <column name="related_feature_role_id" not-null="true" />
             </many-to-many>
         </set>
-        <set name="offerings" table="offering_has_related_feature" inverse="true" lazy="true" fetch="select">
+        <!-- <set name="offerings" table="offering_has_related_feature" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="related_feature_id" not-null="true" />
             </key>
             <many-to-many entity-name="org.n52.sos.ds.hibernate.entities.Offering">
                 <column name="offering_id" not-null="true" />
             </many-to-many>
-        </set>
+        </set> -->
     </class>
 </hibernate-mapping>

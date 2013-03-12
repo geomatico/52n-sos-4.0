@@ -16,13 +16,13 @@
         <property name="name" type="string">
             <column name="name" />
         </property>
-        <set name="observationConstellationOfferingObservationTypes" table="observation_constellation_offering_observation_type" inverse="true" lazy="true" fetch="select">
+        <!-- <set name="observationConstellationOfferingObservationTypes" table="observation_constellation_offering_observation_type" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="offering_id" not-null="true" />
             </key>
             <one-to-many class="org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType" />
         </set>
-        <!-- <set name="requests" table="request" inverse="true" lazy="true" fetch="select">
+        <set name="requests" table="request" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="offering_id" not-null="true" />
             </key>
