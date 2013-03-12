@@ -28,6 +28,7 @@ import org.n52.sos.request.AbstractServiceRequest;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
+ * FIXME add since
  */
 public class RequestEvent implements SosEvent {
 
