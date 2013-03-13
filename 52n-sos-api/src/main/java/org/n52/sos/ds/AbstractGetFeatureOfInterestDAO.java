@@ -100,13 +100,13 @@ public abstract class AbstractGetFeatureOfInterestDAO extends AbstractOperationD
 
     protected Collection<? extends String> getFeatureIdentifierForRelatedFeature(String featureIdentifier) {
         Set<String> featureIdentifiers = new HashSet<String>();
-        // TODO change to get only the features related to related feature, e.g. feature hierarchy
-//        Set<String> offerings = getCache().getOfferings();
-//        for (String offering : offerings) {
-//            if (getCache().getRelatedFeaturesForOffering(offering).contains(featureIdentifier)) {
-//                featureIdentifiers.addAll(getCache().getFeaturesOfInterestForOffering(offering));
-//            }
-//        }
+        // FIXME change to get only the features related to related feature, e.g. feature hierarchy
+        Set<String> offerings = getCache().getOfferings();
+        for (String offering : offerings) {
+            if (getCache().getRelatedFeaturesForOffering(offering).contains(featureIdentifier)) {
+                featureIdentifiers.addAll(getCache().getFeaturesOfInterestForOffering(offering));
+            }
+        }
         return featureIdentifiers;
     }
 }
