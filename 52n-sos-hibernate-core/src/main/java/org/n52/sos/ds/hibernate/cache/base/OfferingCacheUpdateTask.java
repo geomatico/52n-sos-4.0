@@ -45,6 +45,7 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.util.CacheHelper;
 import org.n52.sos.util.RunnableAction;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
@@ -97,7 +98,8 @@ class OfferingCacheUpdateTask extends RunnableAction {
     }
 
     protected void getOfferingInformationFromDbAndAddItToCacheMaps(Session session) throws OwsExceptionReport {
-        String offeringId = getOffering().getIdentifier();
+        String dsOfferingId = getOffering().getIdentifier();
+        String offeringId = CacheHelper.addPrefixOrGetOfferingIdentifier(dsOfferingId);
         getCache().setNameForOffering(offeringId, getOffering().getName());
         // Procedures
         HibernateQueryObject queryObject = new HibernateQueryObject();
@@ -115,26 +117,26 @@ class OfferingCacheUpdateTask extends RunnableAction {
                 .setAllowedObservationTypeForOffering(offeringId, getObservationTypesFromObservationType(getOffering()
                 .getObservationTypes()));
         // Spatial Envelope
-        getCache().setEnvelopeForOffering(offeringId, getEnvelopeForOffering(offeringId, session));
+        getCache().setEnvelopeForOffering(offeringId, getEnvelopeForOffering(dsOfferingId, session));
         // Features of Interest
-        List<String> featureOfInterestIdentifiers = HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(getOffering().getIdentifier(), session);
+        List<String> featureOfInterestIdentifiers = HibernateCriteriaQueryUtilities.getFeatureOfInterestIdentifiersForOffering(dsOfferingId, session);
         getCache()
-                .setFeaturesOfInterestForOffering(getOffering().getIdentifier(), new HashSet<String>(featureOfInterestIdentifiers));
+                .setFeaturesOfInterestForOffering(offeringId, getValidFeaturesOfInterestFrom(featureOfInterestIdentifiers));
         // Temporal Envelope
         getCache().setMinPhenomenonTimeForOffering(offeringId, HibernateCriteriaQueryUtilities
-                .getMinDate4Offering(offeringId, session));
+                .getMinDate4Offering(dsOfferingId, session));
         getCache().setMaxPhenomenonTimeForOffering(offeringId, HibernateCriteriaQueryUtilities
-                .getMaxDate4Offering(offeringId, session));
+                .getMaxDate4Offering(dsOfferingId, session));
         getCache().setMinResultTimeForOffering(offeringId, HibernateCriteriaQueryUtilities
-                .getMinResultTime4Offering(offeringId, session));
+                .getMinResultTime4Offering(dsOfferingId, session));
         getCache().setMaxResultTimeForOffering(offeringId, HibernateCriteriaQueryUtilities
-                .getMaxResultTime4Offering(offeringId, session));
+                .getMaxResultTime4Offering(dsOfferingId, session));
     }
 
     protected Set<String> getProcedureIdentifierFrom(Collection<ObservationConstellationOfferingObservationType> set) {
         Set<String> procedures = new HashSet<String>(set.size());
         for (ObservationConstellationOfferingObservationType ocoot : set) {
-            procedures.add(ocoot.getObservationConstellation().getProcedure().getIdentifier());
+            procedures.add(CacheHelper.addPrefixOrGetProcedureIdentifier(ocoot.getObservationConstellation().getProcedure().getIdentifier()));
         }
         return procedures;
     }
@@ -147,11 +149,19 @@ class OfferingCacheUpdateTask extends RunnableAction {
         return relatedFeatureList;
     }
 
+    protected Collection<String> getValidFeaturesOfInterestFrom(List<String> featureOfInterestIdentifiers) {
+       Set<String> features = new HashSet<String>(featureOfInterestIdentifiers.size());
+       for (String featureIdentifier : featureOfInterestIdentifiers) {
+           features.add(CacheHelper.addPrefixOrGetFeatureIdentifier(featureIdentifier));
+       }
+       return features;
+    }
+
     protected Set<String> getObservablePropertyIdentifierFrom(Collection<ObservationConstellationOfferingObservationType> set) {
         Set<String> observableProperties = new HashSet<String>(set.size());
         for (ObservationConstellationOfferingObservationType ocoot : set) {
             if (ocoot.getObservationConstellation().getObservableProperty() != null) {
-                observableProperties.add(ocoot.getObservationConstellation().getObservableProperty().getIdentifier());
+                observableProperties.add(CacheHelper.addPrefixOrGetObservablePropertyIdentifier(ocoot.getObservationConstellation().getObservableProperty().getIdentifier()));
             }
         }
         return observableProperties;

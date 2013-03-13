@@ -46,6 +46,7 @@ public class MiscSettings implements SettingDefinitionProvider {
     public static final String SRS_NAME_PREFIX_SOS_V2 = "misc.srsNamePrefixSosV2";
     public static final String DEFAULT_OFFERING_PREFIX = "misc.defaultOfferingPrefix";
     public static final String DEFAULT_PROCEDURE_PREFIX = "misc.defaultProcedurePrefix";
+    public static final String DEFAULT_OBSERVABLEPROPERTY_PREFIX = "misc.defaultObservablePropertyPrefix";
     public static final String DEFAULT_FEATURE_PREFIX = "misc.defaultFeaturePrefix";
     
     /**
@@ -121,7 +122,7 @@ public class MiscSettings implements SettingDefinitionProvider {
     
     public static final StringSettingDefinition DEFAULT_OFFERING_PREFIX_DEFINITION = new StringSettingDefinition()
             .setGroup(MiscSettings.GROUP)
-            .setOrder(4)
+            .setOrder(6)
             .setKey(DEFAULT_OFFERING_PREFIX)
             .setDefaultValue("http://www.example.org/offering/")
             .setTitle("Default Offering Prefix")
@@ -129,11 +130,19 @@ public class MiscSettings implements SettingDefinitionProvider {
     
     public static final StringSettingDefinition DEFAULT_PROCEDURE_PREFIX_DEFINITION = new StringSettingDefinition()
             .setGroup(MiscSettings.GROUP)
-            .setOrder(4)
+            .setOrder(7)
             .setKey(DEFAULT_PROCEDURE_PREFIX)
             .setDefaultValue("http://www.example.org/procedure/")
             .setTitle("Default Procedure Prefix")
             .setDescription("The default prefix for procedures (generated if not defined in Register-/InsertSensor requests or values from custom db).");
+    
+    public static final StringSettingDefinition DEFAULT_OBSERVABLEPROPERTY_PREFIX_DEFINITION = new StringSettingDefinition()
+            .setGroup(MiscSettings.GROUP)
+            .setOrder(8)
+            .setKey(DEFAULT_OBSERVABLEPROPERTY_PREFIX)
+            .setDefaultValue("http://www.example.org/observableProperty/")
+            .setTitle("Default ObservableProptery Prefix")
+            .setDescription("The default prefix for observableProperty (values from custom db).");
     
     public static final StringSettingDefinition DEFAULT_FEATURE_PREFIX_DEFINITION = new StringSettingDefinition()
             .setGroup(MiscSettings.GROUP)
@@ -151,6 +160,9 @@ public class MiscSettings implements SettingDefinitionProvider {
             MiscSettings.SRS_NAME_PREFIX_SOS_V1_DEFINITION,
             MiscSettings.SRS_NAME_PREFIX_SOS_V2_DEFINITION,
             MiscSettings.DEFAULT_OFFERING_PREFIX_DEFINITION,
+            MiscSettings.DEFAULT_PROCEDURE_PREFIX_DEFINITION,
+            MiscSettings.DEFAULT_OBSERVABLEPROPERTY_PREFIX_DEFINITION,
+            MiscSettings.DEFAULT_FEATURE_PREFIX_DEFINITION,
             MiscSettings.CHARACTER_ENCODING_DEFINITION);
 
     @Override

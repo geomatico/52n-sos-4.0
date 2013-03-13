@@ -61,6 +61,8 @@ public class ServiceConfiguration {
     
     private String defaultProcedurePrefix;
     
+    private String defaultObservablePropertyPrefix;
+    
     private String defaultFeaturePrefix;
     
     private boolean useDefaultPrefixes;
@@ -264,6 +266,15 @@ public class ServiceConfiguration {
     
     public String getDefaultProcedurePrefix() {
         return this.defaultProcedurePrefix;
+    }
+    
+    @Setting(DEFAULT_OBSERVABLEPROPERTY_PREFIX)
+    public void setDefaultObservablePropertyPrefix(String prefix) {
+        this.defaultObservablePropertyPrefix = prefix;
+    }
+    
+    public String getDefaultObservablePropertyPrefix() {
+        return this.defaultObservablePropertyPrefix;
     }
 
 

@@ -149,12 +149,13 @@ public class ServiceSettings implements SettingDefinitionProvider {
             "Configuration files and their file identifier (List: IDENTIFIER FILENAME;IDENTIFIER2 FILENAME2; ...).");
 
     public static final BooleanSettingDefinition USE_DEFAULT_PREFIXES_DEFINITION = new BooleanSettingDefinition()
-    .setGroup(GROUP)
-    .setOrder(11)
-    .setKey(USE_DEFAULT_PREFIXES)
-    .setDefaultValue(true)
-    .setTitle("Use default prefixes for offering, procedure, features")
-    .setDescription("Use default prefixes for offering, procedure, features.");
+            .setGroup(GROUP)
+            .setOrder(11)
+            .setKey(USE_DEFAULT_PREFIXES)
+            .setDefaultValue(false)
+            .setOptional(true)
+            .setTitle("Use default prefixes for offering, procedure, features")
+            .setDescription("Use default prefixes for offering, procedure, features.");
     
     private static final Set<SettingDefinition<?, ?>> DEFINITIONS = CollectionHelper.<SettingDefinition<?,?>>set(
             ServiceSettings.SERVICE_URL_DEFINITION,

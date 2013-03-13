@@ -553,6 +553,10 @@ public class Configurator implements Cleanupable {
         return getServiceConfiguration().getDefaultFeaturePrefix();
     }
     
+    public String getDefaultObservablePropertyPrefix() {
+        return getServiceConfiguration().getDefaultObservablePropertyPrefix();
+    }
+    
     public boolean isUseDefaultPrefixes() {
         return getServiceConfiguration().isUseDefaultPrefixes();
     }
