@@ -115,10 +115,12 @@ public class ServiceSettings implements SettingDefinitionProvider {
             .setDefaultValue(true)
             .setTitle("Supports quality")
             .setDescription("Support quality information in observations.");
+    
     public static final StringSettingDefinition SENSOR_DIRECTORY_DEFINITION = new StringSettingDefinition()
             .setGroup(GROUP)
             .setOrder(7)
             .setKey(SENSOR_DIRECTORY)
+            .setDefaultValue("/sensors")
             .setOptional(true)
             .setTitle("Sensor Directory")
             .setDescription("The path to a directory with the sensor descriptions in SensorML format. "

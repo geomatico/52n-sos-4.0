@@ -23,9 +23,9 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlException;
@@ -44,18 +44,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HibernateProcedureUtilities {
-    
+
     /**
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateProcedureUtilities.class);
 
-    
-    public static SosProcedureDescription createSosProcedureDescription(Procedure procedure, String procedureIdentifier, String outputFormat) throws OwsExceptionReport {
+    public static SosProcedureDescription createSosProcedureDescription(Procedure procedure,
+            String procedureIdentifier, String outputFormat) throws OwsExceptionReport {
         String filename = null;
         String smlFile = null;
         String descriptionFormat;
-        
+
         // TODO: check and query for validTime parameter
         Set<ValidProcedureTime> validProcedureTimes = procedure.getValidProcedureTimes();
         for (ValidProcedureTime validProcedureTime : validProcedureTimes) {
@@ -87,29 +87,28 @@ public class HibernateProcedureUtilities {
                         throw Util4Exceptions.createInvalidParameterValueException(
                                 SosConstants.DescribeSensorParams.procedure.toString(), exceptionText);
                     }
-                    File sensorFile;
-                    LOGGER.info(filename);
-                    // read in the description file
-                    if (filename.startsWith("standard/")) {
-                        filename = filename.replace("standard/", "");
-                        sensorFile = new File(Configurator.getInstance().getSensorDir(), filename);
-                    } else {
-                        sensorFile = new File(filename);
-                    }
-                    XmlObject procedureDescription = XmlObject.Factory.parse(sensorFile);
+
+                    // check if filename contains placeholder for configured
+                    // sensor directory
+                    XmlObject procedureDescription =
+                            XmlObject.Factory.parse(getDescribeSensorDocumentAsStream(filename));
                     try {
-                        sosProcedureDescription = (SosProcedureDescription) CodingHelper.decodeXmlElement(procedureDescription);
+                        sosProcedureDescription =
+                                (SosProcedureDescription) CodingHelper.decodeXmlElement(procedureDescription);
                     } catch (OwsExceptionReport owse) {
-                        sosProcedureDescription = new SosProcedureDescriptionUnknowType(procedureIdentifier, outputFormat,
-                                procedureDescription.xmlText());
+                        sosProcedureDescription =
+                                new SosProcedureDescriptionUnknowType(procedureIdentifier, outputFormat,
+                                        procedureDescription.xmlText());
                     }
                 } else {
                     XmlObject procedureDescription = XmlObject.Factory.parse(smlFile);
                     try {
-                        sosProcedureDescription = (SosProcedureDescription) CodingHelper.decodeXmlElement(procedureDescription);
+                        sosProcedureDescription =
+                                (SosProcedureDescription) CodingHelper.decodeXmlElement(procedureDescription);
                     } catch (OwsExceptionReport owse) {
-                        sosProcedureDescription = new SosProcedureDescriptionUnknowType(procedureIdentifier, outputFormat,
-                                procedureDescription.xmlText());
+                        sosProcedureDescription =
+                                new SosProcedureDescriptionUnknowType(procedureIdentifier, outputFormat,
+                                        procedureDescription.xmlText());
                     }
                 }
                 if (sosProcedureDescription != null) {
@@ -131,6 +130,18 @@ public class HibernateProcedureUtilities {
                 throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
             }
         }
+    }
+
+    public static InputStream getDescribeSensorDocumentAsStream(String filename) throws OwsExceptionReport {
+        StringBuilder builder = new StringBuilder();
+        if (filename.startsWith("standard")) {
+            filename = filename.replace("standard", "");
+            builder.append(Configurator.getInstance().getSensorDir());
+            builder.append("/");
+        }
+        builder.append(filename);
+        LOGGER.debug("Procedure description file name '{}'!", filename);
+        return Configurator.getInstance().getClass().getResourceAsStream(builder.toString());
     }
 
 }
