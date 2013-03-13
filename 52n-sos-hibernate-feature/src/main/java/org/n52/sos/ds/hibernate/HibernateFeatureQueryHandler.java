@@ -96,7 +96,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
         try {
             if (filter != null) {
                 queryObject.addCriterion(HibernateCriteriaQueryUtilities
-                        .getCriterionForSpatialFilter(HibernateConstants.PARAMETER_GEOMETRY, filter));
+                        .getCriterionForSpatialFilter(HibernateConstants.PARAMETER_GEOMETRY, filter.getOperator(), switchCoordinateAxisOrderIfNeeded(filter.getGeometry())));
             }
             return getFeatureOfInterestIdentifier(queryObject, session);
         } catch (HibernateException he) {
@@ -126,7 +126,7 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
                 Disjunction disjunction = Restrictions.disjunction();
                 for (SpatialFilter filter : spatialFilters) {
                     disjunction.add(HibernateCriteriaQueryUtilities.getCriterionForSpatialFilter(
-                            HibernateConstants.PARAMETER_GEOMETRY, filter));
+                            HibernateConstants.PARAMETER_GEOMETRY, filter.getOperator(), switchCoordinateAxisOrderIfNeeded(filter.getGeometry())));
                 }
                 queryObject.addCriterion(disjunction);
             }

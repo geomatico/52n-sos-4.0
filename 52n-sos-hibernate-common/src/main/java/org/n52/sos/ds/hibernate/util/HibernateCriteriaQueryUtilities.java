@@ -77,6 +77,7 @@ import org.n52.sos.ds.hibernate.entities.SweType;
 import org.n52.sos.ds.hibernate.entities.TextValue;
 import org.n52.sos.ds.hibernate.entities.Unit;
 import org.n52.sos.ogc.OGCConstants;
+import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -581,11 +582,12 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
      * @throws OwsExceptionReport
      *             If the spatial filter is not supported
      */
-    public static Criterion getCriterionForSpatialFilter(String propertyName, SpatialFilter resultSpatialFilter)
+    public static Criterion getCriterionForSpatialFilter(String propertyName, SpatialOperator operator,
+            Geometry geometry)
             throws OwsExceptionReport {
-        switch (resultSpatialFilter.getOperator()) {
+        switch (operator) {
         case BBOX:
-            return SpatialRestrictions.within(propertyName, resultSpatialFilter.getGeometry());
+            return SpatialRestrictions.within(propertyName, geometry);
             // case Beyond:
             // throw new OwsExceptionReport();
             // case Contains:
