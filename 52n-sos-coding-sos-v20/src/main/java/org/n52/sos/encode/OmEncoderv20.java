@@ -164,8 +164,8 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
     }
 
     @Override
-    public void setSupported(boolean supportted) {
-        this.supported = supportted;
+    public void setSupported(boolean supported) {
+        this.supported = supported;
     }
 
     @Override
