@@ -39,6 +39,7 @@ import org.n52.sos.util.CollectionHelper;
  * @since 4.0.0
  */
 public class ReadableCache extends AbstractContentCache {
+    private static final long serialVersionUID = 1L;
     @Override
     public DateTime getMaxPhenomenonTime() {
         return getGlobalPhenomenonTimeEnvelope().getEnd();

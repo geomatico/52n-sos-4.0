@@ -23,13 +23,16 @@
  */
 package org.n52.sos.ogc.sos;
 
+import java.io.Serializable;
+
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Class for internal Envelope representation
  * TODO should this class offer merging capabilities like SosEnvelope.expandTo(SosEnvelope) considering coordinate transformations?
  */
-public class SosEnvelope {
+public class SosEnvelope implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     /**
      * JTS envelope object

@@ -284,10 +284,7 @@ public class Configurator implements Cleanupable {
 
     /**
      * @return the base path for configuration files
-     *
-     * @deprecated not used by any code, check for external use or remove
      */
-    @Deprecated
     public String getBasePath() {
         return basepath;
     }

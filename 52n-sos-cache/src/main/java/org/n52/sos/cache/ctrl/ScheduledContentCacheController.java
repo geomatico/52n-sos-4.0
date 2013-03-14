@@ -30,10 +30,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.joda.time.DateTime;
 import org.n52.sos.cache.ContentCacheController;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.util.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,9 +64,9 @@ public abstract class ScheduledContentCacheController implements ContentCacheCon
 		 */
 		current = new UpdateTimerTask();
 		long delay = getUpdateInterval();
-		if (!initialized) {
+		if (!isInitialized()) {
 			delay = 1;
-			initialized = true;
+			setInitialized(true);
 		}
 		if (delay > 0) {
 			LOGGER.info("Next CapabilitiesCacheUpdate in {}m: {}", delay/60000, new DateTime(System.currentTimeMillis()+delay));
@@ -122,7 +122,7 @@ public abstract class ScheduledContentCacheController implements ContentCacheCon
 			cleanup();
             super.finalize();
         } catch (Throwable e) {
-            LOGGER.error("Could not finalize CapabilitiesCacheController! " + e.getMessage());
+            LOGGER.error("Could not finalize CapabilitiesCacheController! " + e.getMessage(), e);
         }
     }
 
@@ -157,6 +157,20 @@ public abstract class ScheduledContentCacheController implements ContentCacheCon
     protected Condition getUpdateFree() {
 	    return updateFree;
 	}
+
+    /**
+     * @return the initialized
+     */
+    protected boolean isInitialized() {
+        return initialized;
+    }
+
+    /**
+     * @param initialized the initialized to set
+     */
+    protected void setInitialized(boolean initialized) {
+        this.initialized = initialized;
+    }
 
     private class UpdateTimerTask extends TimerTask {
         @Override

@@ -51,6 +51,7 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class WritableCache extends ReadableCache implements WritableContentCache {
     private static final Logger log = LoggerFactory.getLogger(WritableCache.class);
+    private static final long serialVersionUID = 1L;
 
     /**
      * Creates a {@code TimePeriod} for the specified {@code ITime}.

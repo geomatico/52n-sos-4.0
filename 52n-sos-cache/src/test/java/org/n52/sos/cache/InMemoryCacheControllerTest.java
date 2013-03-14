@@ -45,6 +45,8 @@ import static org.n52.sos.util.builder.SweDataArrayBuilder.aSweDataArray;
 import static org.n52.sos.util.builder.SweDataArrayValueBuilder.aSweDataArrayValue;
 import static org.n52.sos.util.builder.SweTimeBuilder.aSweTime;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Set;
@@ -52,6 +54,7 @@ import java.util.Set;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.n52.sos.cache.ctrl.InMemoryCacheController;
 import org.n52.sos.ds.CacheFeederDAO;
@@ -97,7 +100,17 @@ public class InMemoryCacheControllerTest {
     private static final String PROCEDURE = "test-procedure";
     private static final String PROCEDURE_2 = "test-procedure-2";
     private static final String RESULT_TEMPLATE_IDENTIFIER = "test-result-template";
-    public static final String OFFERING = PROCEDURE + OFFERING_IDENTIFIER_EXTENSION;
+    private static final String OFFERING = PROCEDURE + OFFERING_IDENTIFIER_EXTENSION;
+    private static File tempFile;
+
+    @BeforeClass
+    public static void setUp() {
+        try {
+            tempFile = File.createTempFile("TestableInMemoryCacheController", "");
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
     private AbstractServiceRequest request;
     private InMemoryCacheController controller;
     private AbstractServiceResponse response;
@@ -107,6 +120,12 @@ public class InMemoryCacheControllerTest {
     public void initControllerAndStopTimer() {
         controller = new TestableInMemoryCacheController();
         controller.cleanup(); // <-- we don't want no timer to run!
+    }
+
+    @Before
+    @After
+    public void deleteTempFile() {
+        tempFile.delete();
     }
 
     @After
@@ -1119,6 +1138,7 @@ public class InMemoryCacheControllerTest {
     }
 
     private class TestableInMemoryCacheController extends InMemoryCacheController {
+
         protected long getUpdateInterval() {
             return 60000;
         }
@@ -1126,6 +1146,11 @@ public class InMemoryCacheControllerTest {
         @Override
         protected CacheFeederDAO getCacheDAO() {
             return null;
+        }
+
+        @Override
+        protected File getCacheFile() {
+            return tempFile;
         }
     }
 }

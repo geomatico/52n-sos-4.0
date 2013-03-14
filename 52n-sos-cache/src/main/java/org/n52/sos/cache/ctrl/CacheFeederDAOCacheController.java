@@ -23,8 +23,14 @@
  */
 package org.n52.sos.cache.ctrl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.IOUtils;
 import org.n52.sos.cache.WritableCache;
 import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ds.CacheFeederDAO;
@@ -35,17 +41,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * CacheControllerImpl implements all methods to request all objects and relationships from a standard datasource
- *
+ * CacheControllerImpl implements all methods to request all objects and relationships from a standard datasource.
  */
 public abstract class CacheFeederDAOCacheController extends ScheduledContentCacheController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheFeederDAOCacheController.class);
+    private static final String CACHE_FILE = "cache.tmp";
     private WritableContentCache cache;
     private CacheFeederDAO cacheFeederDAO;
 
     public CacheFeederDAOCacheController() {
-        cache = new WritableCache();
-        cacheFeederDAO = getCacheDAO();
+        this.cacheFeederDAO = getCacheDAO();
+        loadOrCreateCache();
     }
 
     protected CacheFeederDAO getCacheDAO() {
@@ -69,13 +75,11 @@ public abstract class CacheFeederDAOCacheController extends ScheduledContentCach
             }
 
             while (!isUpdateIsFree()) {
-
                 getUpdateFree().await();
             }
             setUpdateIsFree(false);
             cache = new WritableCache();
             cacheFeederDAO.updateCache(cache);
-
         } catch (InterruptedException ie) {
             LOGGER.error("Problem while threadsafe capabilities cache update", ie);
             return false;
@@ -108,7 +112,6 @@ public abstract class CacheFeederDAOCacheController extends ScheduledContentCach
             setUpdateIsFree(false);
             cache = new WritableCache();
             cacheFeederDAO.updateAfterObservationDeletion(cache);
-
         } catch (InterruptedException e) {
             LOGGER.error("Problem while threadsafe capabilities cache update", e);
         } finally {
@@ -122,5 +125,69 @@ public abstract class CacheFeederDAOCacheController extends ScheduledContentCach
     @Override
     public WritableContentCache getCache() {
         return cache;
+    }
+
+    protected String getBasePath() {
+        return Configurator.getInstance().getBasePath();
+    }
+
+    protected File getCacheFile() {
+        return new File(getBasePath() + File.separator + CACHE_FILE);
+    }
+
+    private void loadOrCreateCache() {
+        File f = getCacheFile();
+        if (f.exists() && f.canRead()) {
+            LOGGER.debug("Reading cache from temp file '{}'", f.getAbsolutePath());
+            ObjectInputStream in = null;
+            try {
+                in = new ObjectInputStream(new FileInputStream(f));
+                this.cache = (WritableCache) in.readObject();
+            } catch (Throwable t) {
+                LOGGER.error(String.format("Error reading cache file '%s'", f.getAbsolutePath()), t);
+            } finally {
+                IOUtils.closeQuietly(in);
+            }
+            try {
+                f.delete();
+            } catch (Throwable t) {
+                LOGGER.error(String.format("Error deleting cache file '%s'", f.getAbsolutePath()), t);
+            }
+        } else {
+            LOGGER.debug("No cache temp file found at '{}'", f.getAbsolutePath());
+        }
+        if (this.cache == null) {
+            this.cache = new WritableCache();
+        } else {
+            setInitialized(true);
+        }
+    }
+
+    private void writeCache() {
+        File f = getCacheFile();
+        if (!f.exists() || f.delete()) {
+            ObjectOutputStream out = null;
+            if (this.cache != null) {
+                LOGGER.debug("Serializing cache to {}", f.getAbsolutePath());
+                try {
+                    if (f.createNewFile() && f.canWrite()) {
+                        out = new ObjectOutputStream(new FileOutputStream(f));
+                        out.writeObject(this.cache);
+                    } else {
+                        LOGGER.error("Can not create writable file {}", f.getAbsolutePath());
+                    }
+                } catch (Throwable t) {
+                    LOGGER.error(String.format("Error serializing cache to '%s'", f.getAbsolutePath()), t);
+                } finally {
+                    IOUtils.closeQuietly(out);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void cleanup() {
+        super.cleanup();
+        writeCache();
     }
 }

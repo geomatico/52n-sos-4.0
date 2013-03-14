@@ -23,6 +23,7 @@
  */
 package org.n52.sos.cache;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import org.joda.time.DateTime;
@@ -36,7 +37,7 @@ import org.n52.sos.ogc.sos.SosEnvelope;
  * @author <a href="mailto:e.h.juerrens@52north.org">Eike Hinderk J&uuml;rrens</a>
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public interface ContentCache {
+public interface ContentCache extends Serializable {
     /**
      * @return the maximal phenomenon time for all observations
      */
