@@ -25,7 +25,6 @@ package org.n52.sos.ds.hibernate.cache.base;
 
 import static java.util.Collections.singletonList;
 import static org.hibernate.criterion.Restrictions.in;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_OBSERVATION_CONSTELLATION;
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities.*;
 
 import java.util.HashMap;
@@ -36,11 +35,16 @@ import java.util.Set;
 
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Projections;
 import org.n52.sos.ds.hibernate.HibernateQueryObject;
 import org.n52.sos.ds.hibernate.cache.CacheUpdate;
 import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
+import org.n52.sos.ds.hibernate.util.HibernateConstants;
+import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
+import org.n52.sos.util.CollectionHelper;
+
 
 /**
  *
@@ -64,46 +68,15 @@ public class ProcedureCacheUpdate extends CacheUpdate {
     }
 
     protected Set<String> getObservationIdentifiers(Session session, String procedureIdentifier) {
-        Map<String, String> observationConstellationAliases = new HashMap<String, String>();
-        HibernateQueryObject ocQuery = new HibernateQueryObject();
-
-        Map<String, String> observationAliases = new HashMap<String, String>();
-        HibernateQueryObject oQuery = new HibernateQueryObject();
-        String obsConstAlias = addObservationConstallationAliasToMap(observationAliases, null);
-
-        ocQuery.addCriterion(getCriterionForProcedures(observationConstellationAliases, null, procedureIdentifier));
-        oQuery.addCriterion(getCriterionForProcedures(observationAliases, obsConstAlias, procedureIdentifier));
-
-        ocQuery.setAliases(observationConstellationAliases);
-        List<ObservationConstellation> observationConstellations =
-                                       getObservationConstellations(ocQuery, session);
-
-        oQuery.setAliases(observationAliases);
-
-        Set<Observation> allObservations = new HashSet<Observation>(0);
-        for (ObservationConstellation observationConstellation : observationConstellations) {
-            HibernateQueryObject defaultQueryObject = oQuery.clone();
-
-            String id = getParameterWithPrefix(PARAMETER_OBSERVATION_CONSTELLATION, null);
-            defaultQueryObject.addCriterion(getEqualRestriction(id, observationConstellation));
-
-            allObservations.addAll(getObservations(defaultQueryObject, session));
-        }
-
-        Set<String> observationIdentifier = new HashSet<String>();
-        for (Observation observation : allObservations) {
-            if (observation.getIdentifier() != null
-                && !observation.getIdentifier().isEmpty()
-                && !observationIdentifier.contains(observation.getIdentifier())) {
-                observationIdentifier.add(observation.getIdentifier());
-            }
-            if (observation.getSetId() != null
-                && !observation.getSetId().isEmpty()
-                && !observationIdentifier.contains(observation.getSetId())) {
-                observationIdentifier.add(observation.getSetId());
-            }
-        }
-        return observationIdentifier;
+        Map<String, String> aliases = new HashMap<String, String>();
+        HibernateQueryObject queryObject = new HibernateQueryObject();
+        String ocAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
+        String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, ocAlias);
+        queryObject.setAliases(aliases);
+        queryObject.addCriterion(HibernateCriteriaQueryUtilities.getEqualRestriction(HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), procedureIdentifier));
+        queryObject.addProjection(Projections.distinct(Projections.property(HibernateConstants.PARAMETER_IDENTIFIER)));
+        List<String> objectList = (List<String>)HibernateCriteriaQueryUtilities.getObjectList(queryObject, session, Observation.class);
+        return CollectionHelper.asSet(objectList);
     }
 
     protected Criterion getCriterionForProcedures(Map<String, String> aliasMap, String prefix, String procedure) {
