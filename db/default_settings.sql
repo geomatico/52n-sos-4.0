@@ -131,6 +131,7 @@ INSERT INTO "administrator_user" VALUES(1,'$2a$10$y1TfEacanLJHkC0mqtkpy.KSt7r6Dj
 
 INSERT INTO "boolean_settings" VALUES(1,'service.supportsQuality');
 INSERT INTO "boolean_settings" VALUES(1,'service.skipDuplicateObservations');
+INSERT INTO "boolean_settings" VALUES(0,'service.blockGetObservationRequestsWithoutRestriction');
 
 INSERT INTO "file_settings" VALUES(NULL,'serviceIdentification.file');
 INSERT INTO "file_settings" VALUES(NULL,'serviceProvider.file');

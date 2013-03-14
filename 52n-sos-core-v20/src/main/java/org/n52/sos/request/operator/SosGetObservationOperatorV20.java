@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.config.annotation.Configurable;
+import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.AbstractGetObservationDAO;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.ObservationEncoder;
@@ -64,6 +66,7 @@ import org.slf4j.LoggerFactory;
  * Database, class encodes the ObservationResponse (thru using the IOMEncoder)
  * 
  */
+@Configurable
 public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<AbstractGetObservationDAO, GetObservationRequest> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SosGetObservationOperatorV20.class.getName());
@@ -72,6 +75,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
 
     private static final Set<String> CONFORMANCE_CLASSES = Collections
             .singleton(ConformanceClasses.SOS_V2_CORE_PROFILE);
+    private boolean blockRequestsWithoutRestriction;
 
     public SosGetObservationOperatorV20() {
         super(OPERATION_NAME, GetObservationRequest.class);
@@ -223,10 +227,19 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
         // check if parameters are set, if not throw ResponseExceedsSizeLimit
         // exception
         // TODO remove after finishing CITE tests
-        if (sosRequest.isEmpty()) {
+        if (sosRequest.isEmpty() && isBlockRequestsWithoutRestriction()) {
             String exceptionText = "The response exceeds the size limit! Please define some filtering parameters.";
             throw Util4Exceptions.createResponseExceedsSizeLimitException(exceptionText);
         }
+    }
+
+    private boolean isBlockRequestsWithoutRestriction() {
+        return blockRequestsWithoutRestriction;
+    }
+
+    @Setting(CoreProfileOperatorSettings.BLOCK_GET_OBSERVATION_REQUESTS_WITHOUT_RESTRICTION)
+    public void setBlockRequestsWithoutRestriction(boolean blockRequestsWithoutRestriction) {
+        this.blockRequestsWithoutRestriction = blockRequestsWithoutRestriction;
     }
 
     /**
@@ -368,5 +381,4 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
     public WSDLOperation getSosOperationDefinition() {
         return WSDLConstants.Operations.GET_OBSERVATION;
     }
-    
 }
