@@ -78,10 +78,10 @@ import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.SosFeatureCollection;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
-import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
+import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
@@ -334,6 +334,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         for (SosObservation sosObservation : observationCollection) {
             Map<HelperValues, String> foiHelper = new EnumMap<SosConstants.HelperValues, String>(SosConstants.HelperValues.class);
             String gmlId;
+            //FIXME CodeWithAuthority in Map<String,String>
             if (gmlID4sfIdentifier.containsKey(sosObservation.getObservationConstellation().getFeatureOfInterest().getIdentifier())) {
                 gmlId = gmlID4sfIdentifier.get(sosObservation.getObservationConstellation().getFeatureOfInterest().getIdentifier());
                 foiHelper.put(HelperValues.EXIST_FOI_IN_DOC, Boolean.toString(true));
