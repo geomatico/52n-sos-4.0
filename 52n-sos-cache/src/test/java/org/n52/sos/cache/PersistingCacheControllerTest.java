@@ -34,23 +34,20 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.n52.sos.cache.ctrl.CacheFeederDAOCacheController;
-import org.n52.sos.config.ConfigurationException;
-import org.n52.sos.ds.CacheFeederDAO;
+import org.n52.sos.cache.ctrl.PersistingCacheController;
 import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.request.InsertSensorRequest;
 import org.n52.sos.response.InsertResultTemplateResponse;
 import org.n52.sos.response.InsertSensorResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class CacheFeederDAOCacheControllerTest {
+public class PersistingCacheControllerTest {
     public static final String IDENTIFIER = "identifier";
     private static File tempFile;
 
@@ -73,7 +70,7 @@ public class CacheFeederDAOCacheControllerTest {
     public void testSerialization() {
         tempFile.delete();
         assertThat(tempFile, is(not(existing())));
-        CacheFeederDAOCacheController cc = new TestableController();
+        PersistingCacheController cc = new TestableController();
         assertThat(cc.getCache().getObservationIdentifiers(), is(empty()));
         cc.getCache().addObservationIdentifier(IDENTIFIER);
         assertThat(cc.getCache().getObservationIdentifiers(), contains(IDENTIFIER));
@@ -84,36 +81,40 @@ public class CacheFeederDAOCacheControllerTest {
         assertThat(cc.getCache().getObservationIdentifiers(), contains(IDENTIFIER));
     }
 
-    private class TestableController extends CacheFeederDAOCacheController {
+    private class TestableController extends PersistingCacheController {
         @Override
-        public void updateAfterObservationInsertion(InsertObservationRequest sosRequest) {
+        public void updateAfterObservationInsertion1(InsertObservationRequest sosRequest) {
         }
 
         @Override
-        public void updateAfterResultInsertion(String templateIdentifier, SosObservation sosObservation) {
+        public void updateAfterResultInsertion1(String templateIdentifier, SosObservation sosObservation) {
         }
 
         @Override
-        public void updateAfterResultTemplateInsertion(InsertResultTemplateRequest sosRequest,
-                                                       InsertResultTemplateResponse sosResponse) {
+        public void updateAfterResultTemplateInsertion1(InsertResultTemplateRequest sosRequest,
+                                                        InsertResultTemplateResponse sosResponse) {
         }
 
         @Override
-        public void updateAfterSensorDeletion(DeleteSensorRequest sosRequest) {
+        public void updateAfterSensorDeletion1(DeleteSensorRequest sosRequest) {
         }
 
         @Override
-        public void updateAfterSensorInsertion(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse) {
+        public void updateAfterSensorInsertion1(InsertSensorRequest sosRequest, InsertSensorResponse sosResponse) {
+        }
+
+        @Override
+        protected void updateAfterObservationDeletion1() throws OwsExceptionReport {
+        }
+
+        @Override
+        protected boolean updateCacheFromDatasource1() throws OwsExceptionReport {
+            return true;
         }
 
         @Override
         protected File getCacheFile() {
             return tempFile;
-        }
-
-        @Override
-        protected CacheFeederDAO getCacheDAO() {
-            return null;
         }
     }
 }

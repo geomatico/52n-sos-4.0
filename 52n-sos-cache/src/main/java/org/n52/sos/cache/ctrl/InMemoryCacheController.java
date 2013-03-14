@@ -53,8 +53,8 @@ public class InMemoryCacheController extends CacheFeederDAOCacheController {
      * @see SensorInsertionInMemoryCacheUpdate
      */
     @Override
-    public void updateAfterSensorInsertion(InsertSensorRequest sosRequest,
-                                           InsertSensorResponse sosResponse) {
+    protected void updateAfterSensorInsertion1(InsertSensorRequest sosRequest,
+                                               InsertSensorResponse sosResponse) {
         update(new SensorInsertionInMemoryCacheUpdate(sosRequest, sosResponse));
     }
 
@@ -62,7 +62,7 @@ public class InMemoryCacheController extends CacheFeederDAOCacheController {
      * @see ObservationInsertionInMemoryCacheUpdate
      */
     @Override
-    public void updateAfterObservationInsertion(InsertObservationRequest sosRequest) {
+    protected void updateAfterObservationInsertion1(InsertObservationRequest sosRequest) {
         update(new ObservationInsertionInMemoryCacheUpdate(sosRequest));
     }
 
@@ -70,7 +70,7 @@ public class InMemoryCacheController extends CacheFeederDAOCacheController {
      * @see SensorDeletionInMemoryCacheUpdate
      */
     @Override
-    public void updateAfterSensorDeletion(DeleteSensorRequest sosRequest) {
+    protected void updateAfterSensorDeletion1(DeleteSensorRequest sosRequest) {
         update(new SensorDeletionInMemoryCacheUpdate(sosRequest));
     }
 
@@ -78,13 +78,13 @@ public class InMemoryCacheController extends CacheFeederDAOCacheController {
      * @see ResultTemplateInsertionInMemoryCacheUpdate
      */
     @Override
-    public void updateAfterResultTemplateInsertion(InsertResultTemplateRequest sosRequest,
-                                                   InsertResultTemplateResponse sosResponse) {
+    protected void updateAfterResultTemplateInsertion1(InsertResultTemplateRequest sosRequest,
+                                                       InsertResultTemplateResponse sosResponse) {
         update(new ResultTemplateInsertionInMemoryCacheUpdate(sosRequest, sosResponse));
     }
 
     @Override
-    public void updateAfterResultInsertion(String templateIdentifier, SosObservation sosObservation) {
+    protected void updateAfterResultInsertion1(String templateIdentifier, SosObservation sosObservation) {
         update(new ResultInsertionInMemoryCacheUpdate(templateIdentifier, sosObservation));
     }
 
