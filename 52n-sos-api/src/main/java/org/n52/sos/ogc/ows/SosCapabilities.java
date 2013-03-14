@@ -23,8 +23,11 @@
  */
 package org.n52.sos.ogc.ows;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -60,12 +63,12 @@ public class SosCapabilities {
     /**
      * All ObservationOfferings provided by this SOS.
      */
-    private SortedSet<SosOfferingsForContents> contents;
+    private SortedSet<SosOfferingsForContents> contents = new TreeSet<SosOfferingsForContents>();
 
     /**
      * extensions
      */
-    private Collection<SwesExtension> extensions;
+    private List<SwesExtension> extensions = new LinkedList<SwesExtension>();
 
     /**
      * Set service identification
@@ -171,7 +174,8 @@ public class SosCapabilities {
      *            extension data
      */
     public void setExensions(Collection<SwesExtension> extensions) {
-        this.extensions = extensions;
+        this.extensions = extensions == null ? new LinkedList<SwesExtension>()
+                          : new ArrayList<SwesExtension>(extensions);
     }
 
     /**
@@ -179,7 +183,7 @@ public class SosCapabilities {
      * 
      * @return extension data
      */
-    public Collection<SwesExtension> getExtensions() {
-        return Collections.unmodifiableCollection(this.extensions);
+    public List<SwesExtension> getExtensions() {
+        return Collections.unmodifiableList(this.extensions);
     }
 }
