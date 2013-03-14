@@ -62,4 +62,9 @@ public class SettingsChangeEvent implements SosEvent {
         return getOldValue() != null;
     }
 
+    @Override
+    public String toString() {
+        return String
+                .format("SettingsChangeEvent[setting=%s, oldValue=%s, newValue=%s", getSetting(), getOldValue(), getNewValue());
+    }
 }
