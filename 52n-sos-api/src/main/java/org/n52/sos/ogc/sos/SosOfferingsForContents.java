@@ -24,98 +24,124 @@
 package org.n52.sos.ogc.sos;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.xml.namespace.QName;
 
 import org.n52.sos.ogc.gml.time.ITime;
-import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.QNameComparator;
 
 /**
  * Class which represents a ObservationOffering. Used in the SosCapabilities.
- * 
+ *
  */
-public class SosOfferingsForContents {
+public class SosOfferingsForContents implements Comparable<SosOfferingsForContents> {
+    private static <T> void set(SortedSet<T> set, Collection<? extends T> coll) {
+        if (set != null) {
+            set.clear();
+            if (coll != null) {
+                set.addAll(coll);
+            }
+        }
+    }
 
+    private static <K, V> void addToMap(SortedMap<K, SortedSet<V>> map, K key, V value) {
+        if (map != null && key != null && value != null) {
+            SortedSet<V> set = map.get(key);
+            if (set == null) {
+                map.put(key, set = new TreeSet<V>());
+            }
+            set.add(value);
+        }
+    }
+
+    private static <K, V> void addToMap(SortedMap<K, SortedSet<V>> map, K key, Collection<V> value) {
+        if (map != null && key != null && value != null) {
+            SortedSet<V> set = map.get(key);
+            if (set == null) {
+                map.put(key, set = new TreeSet<V>());
+            }
+            set.addAll(value);
+        }
+    }
+
+    private static <K, V> void set(SortedMap<K, SortedSet<V>> sortedMap, Map<K, ? extends Collection<V>> map) {
+        if (sortedMap != null) {
+            sortedMap.clear();
+            if (map != null) {
+                for (Entry<K, ? extends Collection<V>> e : map.entrySet()) {
+                    sortedMap.put(e.getKey(), e.getValue() != null ? new TreeSet<V>(e.getValue()) : new TreeSet<V>());
+                }
+            }
+        }
+    }
     /**
      * offering identifier for this contents sub section
      */
     private String offering;
-
     /**
      * name of the offering
      */
     private String offeringName;
-
     private SosEnvelope observedArea;
-    
     /**
      * All observableProperties contained in the offering
      */
-    private Collection<String> observableProperties = new HashSet<String>(0);
-
+    private SortedSet<String> observableProperties = new TreeSet<String>();
     /**
      * All compositePhenomenon contained in the offering
      */
-    private Collection<String> compositePhenomena = new HashSet<String>(0);
-
+    private SortedSet<String> compositePhenomena = new TreeSet<String>();
     /**
      * All phenomenon for compositePhenomenon contained in the offering
      */
-    private Map<String, Collection<String>> phens4CompPhens;
-
+    private SortedMap<String, SortedSet<String>> phens4CompPhens = new TreeMap<String, SortedSet<String>>();
     /**
      * TimePeriod of data in the offering
      */
     private ITime phenomenonTime;
     private ITime resultTime;
-
     /**
      * All featuresOfinterest contained in the offering
      */
-    private Set<String> featureOfInterest = new HashSet<String>(0);
-
+    private SortedSet<String> featureOfInterest = new TreeSet<String>();
     /**
      * All related features contained in the offering
      */
-    private Map<String, Set<String>> relatedFeatures = new HashMap<String, Set<String>>(0);
-
+    private SortedMap<String, SortedSet<String>> relatedFeatures = new TreeMap<String, SortedSet<String>>();
     /**
      * All procedures contained in the offering
      */
-    private Collection<String> procedures = new HashSet<String>(0);
-
+    private SortedSet<String> procedures = new TreeSet<String>();
     /**
      * All resultModels contained in the offering
      */
-    private Collection<QName> resultModels = new HashSet<QName>(0);
-
+    private SortedSet<QName> resultModels = new TreeSet<QName>(new QNameComparator());
     /**
      * All observation types contained in the offering
      */
-    private Collection<String> observationTypes = new HashSet<String>(0);
-    
-    private Collection<String> featureOfInterestTypes = new HashSet<String>(0);
-
+    private SortedSet<String> observationTypes = new TreeSet<String>();
+    private SortedSet<String> featureOfInterestTypes = new TreeSet<String>();
     /**
      * All observation result types contained in the offering
      */
-    private Map<String, Collection<String>> observationResultTypes = new HashMap<String, Collection<String>>(0);
-
+    private SortedMap<String, SortedSet<String>> observationResultTypes = new TreeMap<String, SortedSet<String>>();
     /**
      * All response formats contained in the offering
      */
-    private Collection<String> responseFormats = new HashSet<String>(0);
-
+    private SortedSet<String> responseFormats = new TreeSet<String>();
     /**
      * All response modes contained in the offering
      */
-    private Collection<String> responseModes = new HashSet<String>(0);
-
-    private Collection<String> procedureDescriptionFormats = new HashSet<String>(0);
+    private SortedSet<String> responseModes = new TreeSet<String>();
+    private SortedSet<String> procedureDescriptionFormats = new TreeSet<String>();
 
     /**
      * @return
@@ -125,7 +151,7 @@ public class SosOfferingsForContents {
     }
 
     /**
-     * @param offeringId
+     * @param offering
      */
     public void setOffering(String offering) {
         this.offering = offering;
@@ -148,43 +174,43 @@ public class SosOfferingsForContents {
     /**
      * @return
      */
-    public Collection<String> getObservableProperties() {
-        return observableProperties;
+    public SortedSet<String> getObservableProperties() {
+        return Collections.unmodifiableSortedSet(observableProperties);
     }
 
     /**
-     * @param phenomenons
+     * @param observableProperties
      */
-    public void setObservableProperties(Collection<String> ObservableProperties) {
-        this.observableProperties = ObservableProperties;
+    public void setObservableProperties(Collection<String> observableProperties) {
+        set(this.observableProperties, observableProperties);
     }
 
     /**
      * @return
      */
-    public Collection<String> getCompositePhenomena() {
-        return compositePhenomena;
+    public SortedSet<String> getCompositePhenomena() {
+        return Collections.unmodifiableSortedSet(compositePhenomena);
     }
 
     /**
      * @param compositePhenomena
      */
     public void setCompositePhenomena(Collection<String> compositePhenomena) {
-        this.compositePhenomena = compositePhenomena;
+        set(this.compositePhenomena, compositePhenomena);
     }
 
     /**
      * @return
      */
-    public Map<String, Collection<String>> getPhens4CompPhens() {
-        return phens4CompPhens;
+    public SortedMap<String, SortedSet<String>> getPhens4CompPhens() {
+        return Collections.unmodifiableSortedMap(phens4CompPhens);
     }
 
     /**
      * @param phens4CompPhens
      */
     public void setPhens4CompPhens(Map<String, Collection<String>> phens4CompPhens) {
-        this.phens4CompPhens = phens4CompPhens;
+        set(this.phens4CompPhens, phens4CompPhens);
     }
 
     /**
@@ -218,131 +244,121 @@ public class SosOfferingsForContents {
     /**
      * @param featureOfInterest
      */
-    public void setFeatureOfInterest(Set<String> featureOfInterest) {
-        this.featureOfInterest = featureOfInterest;
+    public void setFeatureOfInterest(Collection<String> featureOfInterest) {
+        set(this.featureOfInterest, featureOfInterest);
     }
 
     /**
      * @return
      */
-    public Collection<String> getFeatureOfInterest() {
-        return featureOfInterest;
+    public SortedSet<String> getFeatureOfInterest() {
+        return Collections.unmodifiableSortedSet(featureOfInterest);
     }
 
     /**
      * @param relatedFeatures
      */
     public void setRelatedFeatures(Map<String, Set<String>> relatedFeatures) {
-        this.relatedFeatures.putAll(relatedFeatures);
+        set(this.relatedFeatures, relatedFeatures);
     }
-    
+
     public void addRelatedFeature(String identifier, String role) {
-        if (this.relatedFeatures.containsKey(identifier)) {
-            this.relatedFeatures.get(identifier).add(role);
-        } else {
-            this.relatedFeatures.put(identifier, CollectionHelper.asSet(role));
-        }
+        addToMap(this.relatedFeatures, identifier, role);
     }
-    
+
     public void addRelatedFeature(String identifier, Set<String> roles) {
-        if (this.relatedFeatures.containsKey(identifier)) {
-            this.relatedFeatures.get(identifier).addAll(roles);
-        } else {
-            this.relatedFeatures.put(identifier, roles);
-        }
+        addToMap(this.relatedFeatures, identifier, roles);
     }
 
     /**
      * @return
      */
-    public Map<String, Set<String>> getRelatedFeatures() {
-        return relatedFeatures;
+    public SortedMap<String, SortedSet<String>> getRelatedFeatures() {
+        return Collections.unmodifiableSortedMap(relatedFeatures);
     }
 
     /**
      * @return
      */
-    public Collection<String> getProcedures() {
-        return procedures;
+    public SortedSet<String> getProcedures() {
+        return Collections.unmodifiableSortedSet(procedures);
     }
 
     /**
      * @param procedures
      */
     public void setProcedures(Collection<String> procedures) {
-        this.procedures = procedures;
+        set(this.procedures, procedures);
     }
 
     /**
      * @return
      */
-    public Collection<QName> getResultModels() {
-        return resultModels;
+    public SortedSet<QName> getResultModels() {
+        return Collections.unmodifiableSortedSet(resultModels);
     }
 
     /**
      * @param resultModels
      */
     public void setResultModels(Collection<QName> resultModels) {
-        this.resultModels = resultModels;
+        set(this.resultModels, resultModels);
     }
 
     /**
      * @return
      */
-    public Collection<String> getObservationTypes() {
-        return observationTypes;
+    public SortedSet<String> getObservationTypes() {
+        return Collections.unmodifiableSortedSet(observationTypes);
     }
 
     /**
-     * @param observationTypes
-     *            the observationTypes to set
+     * @param observationTypes the observationTypes to set
      */
     public void setObservationTypes(Collection<String> observationTypes) {
-        this.observationTypes = observationTypes;
+        set(this.observationTypes, observationTypes);
     }
 
     /**
      * @return the observationResultTypes
      */
-    public Map<String, Collection<String>> getObservationResultTypes() {
-        return observationResultTypes;
+    public SortedMap<String, SortedSet<String>> getObservationResultTypes() {
+        return Collections.unmodifiableSortedMap(observationResultTypes);
     }
 
     /**
-     * @param observationResultTypes
-     *            the observationResultTypes to set
+     * @param observationResultTypes the observationResultTypes to set
      */
     public void setObservationResultTypes(Map<String, Collection<String>> observationResultTypes) {
-        this.observationResultTypes = observationResultTypes;
+        set(this.observationResultTypes, observationResultTypes);
     }
 
     /**
      * @return
      */
-    public Collection<String> getResponseFormats() {
-        return responseFormats;
+    public SortedSet<String> getResponseFormats() {
+        return Collections.unmodifiableSortedSet(responseFormats);
     }
 
     /**
      * @param responseFormats
      */
     public void setResponseFormats(Collection<String> responseFormats) {
-        this.responseFormats = responseFormats;
+        set(this.responseFormats, responseFormats);
     }
 
     /**
      * @return
      */
-    public Collection<String> getResponseModes() {
-        return responseModes;
+    public SortedSet<String> getResponseModes() {
+        return Collections.unmodifiableSortedSet(responseModes);
     }
 
     /**
      * @param responseModes
      */
     public void setResponseModes(Collection<String> responseModes) {
-        this.responseModes = responseModes;
+        set(this.responseModes, responseModes);
     }
 
     public SosEnvelope getObservedArea() {
@@ -353,19 +369,24 @@ public class SosOfferingsForContents {
         this.observedArea = observedArea;
     }
 
-    public Collection<String> getFeatureOfInterestTypes() {
-        return featureOfInterestTypes;
+    public void setFeatureOfInterestTypes(Collection<String> featureOfInterestTypes) {
+        set(this.featureOfInterestTypes, featureOfInterestTypes);
     }
 
-    public void setFeatureOfInterestTypes(Collection<String> featureOfInterestTypes) {
-        this.featureOfInterestTypes = featureOfInterestTypes;
+    public SortedSet<String> getFeatureOfInterestTypes() {
+        return Collections.unmodifiableSortedSet(featureOfInterestTypes);
     }
 
     public void setProcedureDescriptionFormat(Collection<String> procedureDescriptionFormats) {
-       this.procedureDescriptionFormats = procedureDescriptionFormats;
+        set(this.procedureDescriptionFormats, procedureDescriptionFormats);
     }
-    
-    public Collection<String> getProcedureDescriptionFormat() {
-        return this.procedureDescriptionFormats;
+
+    public SortedSet<String> getProcedureDescriptionFormat() {
+        return Collections.unmodifiableSortedSet(this.procedureDescriptionFormats);
+    }
+
+    @Override
+    public int compareTo(SosOfferingsForContents o) {
+        return getOffering().compareTo(o.getOffering());
     }
 }

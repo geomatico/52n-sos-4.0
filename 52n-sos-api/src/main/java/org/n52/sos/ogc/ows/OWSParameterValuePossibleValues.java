@@ -24,34 +24,35 @@
 package org.n52.sos.ogc.ows;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class OWSParameterValuePossibleValues implements IOWSParameterValue {
     
-    private Collection<String> values;
+    private SortedSet<String> values;
 
     public OWSParameterValuePossibleValues(Collection<String> values) {
-        super();
-        this.values = values;
+        this.values = new TreeSet<String>(values);
     }
 
-    public OWSParameterValuePossibleValues(String valueString) {
-        if (values == null) {
-            values = new HashSet<String>();
-        }
-        values.add(valueString);
+    public OWSParameterValuePossibleValues(String value) {
+        this(Collections.singleton(value));
     }
     
     public OWSParameterValuePossibleValues(Enum<?> value) {
         this(value.name());
     }
 
-    public Collection<String> getValues() {
-        return values;
+    public SortedSet<String> getValues() {
+        return Collections.unmodifiableSortedSet(values);
     }
 
     public void setValues(Collection<String> values) {
-        this.values = values;
+        this.values.clear();
+        if (values != null) {
+            this.values.addAll(values);
+        }
     }
 
 }

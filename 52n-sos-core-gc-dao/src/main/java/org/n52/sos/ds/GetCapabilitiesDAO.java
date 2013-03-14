@@ -49,7 +49,6 @@ import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.CapabilitiesExtension;
-import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.ows.MergableExtension;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
@@ -58,6 +57,7 @@ import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
+import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -424,8 +424,6 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
      */
     private List<SosOfferingsForContents> getContentsForSosV2(String version)
             throws OwsExceptionReport {
-        // TODO shouldn't this be part of the encoder?
-        int phenTimeCounter = 0;
         Collection<String> offerings = getCache().getOfferings();
         List<SosOfferingsForContents> sosOfferings = new ArrayList<SosOfferingsForContents>(offerings.size());
 
@@ -451,7 +449,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
                     sosOffering.setOfferingName(getCache().getNameForOffering(offering));
 
                     setUpPhenomenaForOffering(offering, procedure, sosOffering);
-                    setUpTimeForOffering(offering, ++phenTimeCounter, sosOffering);
+                    setUpTimeForOffering(offering, sosOffering);
                     setUpRelatedFeaturesForOffering(offering, version, procedure, sosOffering);
                     setUpFeatureOfInterestTypesForOffering(offering, sosOffering);
                     setUpProcedureDescriptionFormatForOffering(sosOffering);
@@ -762,13 +760,11 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         sosOffering.setRelatedFeatures(relatedFeatures);
     }
 
-    protected void setUpTimeForOffering(String offering, int id, SosOfferingsForContents sosOffering) {
+    protected void setUpTimeForOffering(String offering, SosOfferingsForContents sosOffering) {
         sosOffering.setPhenomenonTime(new TimePeriod(getCache().getMinPhenomenonTimeForOffering(offering),
-                                                     getCache().getMaxPhenomenonTimeForOffering(offering),
-                                                     Sos2Constants.EN_PHENOMENON_TIME + "_" + id));
+                                                     getCache().getMaxPhenomenonTimeForOffering(offering)));
         sosOffering.setResultTime(new TimePeriod(getCache().getMinResultTimeForOffering(offering),
-                                                 getCache().getMaxResultTimeForOffering(offering),
-                                                 Sos2Constants.EN_RESULT_TIME + "_" + id));
+                                                 getCache().getMaxResultTimeForOffering(offering)));
 
     }
 

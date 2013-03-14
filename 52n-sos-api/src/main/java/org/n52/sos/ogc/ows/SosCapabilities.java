@@ -24,6 +24,9 @@
 package org.n52.sos.ogc.ows;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.n52.sos.ogc.filter.FilterCapabilities;
 import org.n52.sos.ogc.sos.SosOfferingsForContents;
@@ -57,7 +60,7 @@ public class SosCapabilities {
     /**
      * All ObservationOfferings provided by this SOS.
      */
-    private Collection<SosOfferingsForContents> contents;
+    private SortedSet<SosOfferingsForContents> contents;
 
     /**
      * extensions
@@ -147,8 +150,8 @@ public class SosCapabilities {
      * 
      * @return contents data
      */
-    public Collection<SosOfferingsForContents> getContents() {
-        return contents;
+    public SortedSet<SosOfferingsForContents> getContents() {
+        return Collections.unmodifiableSortedSet(contents);
     }
 
     /**
@@ -158,7 +161,7 @@ public class SosCapabilities {
      *            contents data
      */
     public void setContents(Collection<SosOfferingsForContents> contents) {
-        this.contents = contents;
+        this.contents = new TreeSet<SosOfferingsForContents>(contents);
     }
 
     /**
@@ -177,6 +180,6 @@ public class SosCapabilities {
      * @return extension data
      */
     public Collection<SwesExtension> getExtensions() {
-        return this.extensions;
+        return Collections.unmodifiableCollection(this.extensions);
     }
 }

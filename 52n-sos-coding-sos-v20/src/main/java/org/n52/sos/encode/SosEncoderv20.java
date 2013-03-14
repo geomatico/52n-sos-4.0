@@ -26,6 +26,7 @@ package org.n52.sos.encode;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -475,7 +476,11 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
     private void setContents(Contents xbContents, Collection<SosOfferingsForContents> offerings, String version)
             throws OwsExceptionReport {
         ContentsType xbContType = xbContents.addNewContents();
+
+        int offeringCounter = 0; // for gml:id generation
         for (SosOfferingsForContents offering : offerings) {
+            ++offeringCounter;
+
             ObservationOfferingType xbObsOff =
                     ObservationOfferingType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
             xbObsOff.setIdentifier(offering.getOffering());
@@ -510,6 +515,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
             // set up phenomenon time [0..1]
             if (offering.getPhenomenonTime() instanceof TimePeriod) {
                 TimePeriod tp = (TimePeriod) offering.getPhenomenonTime();
+                tp.setGmlId(String.format("%s_%d", Sos2Constants.EN_PHENOMENON_TIME, offeringCounter));
                 if (!tp.isEmpty()) {
                     XmlObject xmlObject = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, tp);
                         xbObsOff.addNewPhenomenonTime().addNewTimePeriod().set(xmlObject);
@@ -522,6 +528,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
             // set resultTime [0..1]
             if (offering.getResultTime() instanceof TimePeriod) {
                 TimePeriod tp = (TimePeriod) offering.getResultTime();
+                tp.setGmlId(String.format("%s_%d", Sos2Constants.EN_RESULT_TIME, offeringCounter));
                 if (!tp.isEmpty()) {
                     XmlObject xmlObject = CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, offering
                             .getResultTime());

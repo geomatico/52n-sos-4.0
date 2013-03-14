@@ -24,7 +24,9 @@
 package org.n52.sos.ogc.ows;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.xmlbeans.XmlObject;
 
@@ -38,9 +40,9 @@ public class SosServiceIdentification {
 	private String fees;
 	private String accessConstraints;
 
-    private Collection<String> versions;
-    private List<String> profiles;
-    private List<String> keywords;
+    private SortedSet<String> versions = new TreeSet<String>();
+    private SortedSet<String> profiles = new TreeSet<String>();
+    private SortedSet<String> keywords = new TreeSet<String>();
 
     public XmlObject getServiceIdentification() {
         return serviceIdentification;
@@ -50,28 +52,37 @@ public class SosServiceIdentification {
         this.serviceIdentification = serviceIdentification;
     }
 
-    public Collection<String> getVersions() {
-        return versions;
+    public SortedSet<String> getVersions() {
+        return Collections.unmodifiableSortedSet(versions);
     }
 
     public void setVersions(Collection<String> versions) {
-        this.versions = versions;
+        this.versions.clear();
+        if (versions != null) {
+            this.versions.addAll(versions);
+        }
     }
 
-    public List<String> getProfiles() {
-        return profiles;
+    public SortedSet<String> getProfiles() {
+        return Collections.unmodifiableSortedSet(profiles);
     }
 
-    public void setProfiles(List<String> profiles) {
-        this.profiles = profiles;
+    public void setProfiles(Collection<String> profiles) {
+        this.profiles.clear();
+        if (profiles != null) {
+            this.profiles.addAll(profiles);
+        }
     }
 
-    public List<String> getKeywords() {
-        return keywords;
+    public SortedSet<String> getKeywords() {
+        return Collections.unmodifiableSortedSet(keywords);
     }
 
-    public void setKeywords(List<String> keywords) {
-        this.keywords = keywords;
+    public void setKeywords(Collection<String> keywords) {
+        this.keywords.clear();
+        if (keywords != null) {
+            this.keywords.addAll(keywords);
+        }
     }
 	
 	public String getTitle() {

@@ -23,51 +23,48 @@
  */
 package org.n52.sos.ogc.ows;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 public class OWSOperationsMetadata {
 
-    private Collection<OWSOperation> operations;
+    private SortedSet<OWSOperation> operations;
 
-    private Map<String, List<IOWSParameterValue>> commonValues;
+    private SortedMap<String, List<IOWSParameterValue>> commonValues;
 
-    public Collection<OWSOperation> getOperations() {
-        return operations;
+    public SortedSet<OWSOperation> getOperations() {
+        return Collections.unmodifiableSortedSet(operations);
     }
 
     public void setOperations(Collection<OWSOperation> operations) {
-        this.operations = operations;
+        this.operations = operations == null ? null : new TreeSet<OWSOperation>(operations);
     }
 
-    public Map<String, List<IOWSParameterValue>> getCommonValues() {
-        return commonValues;
-    }
-
-    public void setCommonValues(Map<String, List<IOWSParameterValue>> commonValues) {
-        this.commonValues = commonValues;
+    public SortedMap<String, List<IOWSParameterValue>> getCommonValues() {
+        return Collections.unmodifiableSortedMap(commonValues);
     }
 
     public void addOperation(OWSOperation operation) {
         if (operations == null) {
-            operations = new ArrayList<OWSOperation>();
+            operations = new TreeSet<OWSOperation>();
         }
         operations.add(operation);
     }
 
     public void addCommonValue(String parameterName, IOWSParameterValue value) {
         if (commonValues == null) {
-            commonValues = new HashMap<String, List<IOWSParameterValue>>();
+            commonValues = new TreeMap<String, List<IOWSParameterValue>>();
         }
-        if (!commonValues.containsKey(parameterName)) {
-            List<IOWSParameterValue> list = new ArrayList<IOWSParameterValue>(1);
-            list.add(value);
-            commonValues.put(parameterName, list);
-        } else {
-            commonValues.get(parameterName).add(value);
+        List<IOWSParameterValue> values = commonValues.get(parameterName);
+        if (values == null) {
+            commonValues.put(parameterName, values = new LinkedList<IOWSParameterValue>());
         }
+        values.add(value);
     }
 }

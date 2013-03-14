@@ -28,7 +28,6 @@ public class OWSParameterDataType implements IOWSParameterValue {
     private String reference;
 
     public OWSParameterDataType(String reference) {
-        super();
         this.reference = reference;
     }
 

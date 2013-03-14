@@ -25,10 +25,14 @@ package org.n52.sos.ogc.ows;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.n52.sos.util.MinMax;
 
@@ -37,7 +41,7 @@ import org.n52.sos.util.MinMax;
  * 
  * 
  */
-public class OWSOperation {
+public class OWSOperation implements Comparable<OWSOperation> {
 
     /**
      * Name of the operation which metadata are represented.
@@ -47,12 +51,13 @@ public class OWSOperation {
     /**
      * Supported DCPs
      */
-    private Map<String, List<String>> dcp;
+    private SortedMap<String, SortedSet<String>> dcp = new TreeMap<String, SortedSet<String>>();
 
     /**
      * Map with names and allowed values for the parameter.
      */
-    private Map<String, List<IOWSParameterValue>> parameterValues;
+    private SortedMap<String, List<IOWSParameterValue>> parameterValues =
+                                                        new TreeMap<String, List<IOWSParameterValue>>();
 
     /**
      * Get operation name
@@ -77,8 +82,8 @@ public class OWSOperation {
      * 
      * @return DCP map
      */
-    public Map<String, List<String>> getDcp() {
-        return dcp;
+    public SortedMap<String, SortedSet<String>> getDcp() {
+        return Collections.unmodifiableSortedMap(this.dcp);
     }
 
     /**
@@ -88,7 +93,10 @@ public class OWSOperation {
      *            DCP map
      */
     public void setDcp(Map<String, List<String>> dcp) {
-        this.dcp = dcp;
+        this.dcp.clear();
+        for (Entry<String, List<String>> e : dcp.entrySet()) {
+            addDcp(e.getKey(), e.getValue());
+        }
     }
 
     /**
@@ -99,11 +107,8 @@ public class OWSOperation {
      * @param values
      *            DCP values
      */
-    public void addDcp(String operation, List<String> values) {
-        if (dcp == null) {
-            dcp = new HashMap<String, List<String>>(1);
-        }
-        dcp.put(operation, values);
+    public void addDcp(String operation, Collection<String> values) {
+        this.dcp.put(operation, new TreeSet<String>(values));
     }
 
     /**
@@ -111,8 +116,8 @@ public class OWSOperation {
      * 
      * @return Parameter value map
      */
-    public Map<String, List<IOWSParameterValue>> getParameterValues() {
-        return parameterValues;
+    public SortedMap<String, List<IOWSParameterValue>> getParameterValues() {
+        return Collections.unmodifiableSortedMap(this.parameterValues);
     }
 
     /**
@@ -122,7 +127,12 @@ public class OWSOperation {
      *            Parameter value map
      */
     public void setParameterValues(Map<String, List<IOWSParameterValue>> parameterValues) {
-        this.parameterValues = parameterValues;
+        this.parameterValues.clear();
+        for (String parameterName : parameterValues.keySet()) {
+            for (IOWSParameterValue value : parameterValues.get(parameterName)) {
+                addParameterValue(parameterName, value);
+            }
+        }
     }
 
     /**
@@ -134,14 +144,11 @@ public class OWSOperation {
      *            values to add
      */
     public void addParameterValue(String parameterName, IOWSParameterValue value) {
-        if (parameterValues == null) {
-            parameterValues = new HashMap<String, List<IOWSParameterValue>>();
+        List<IOWSParameterValue> values = parameterValues.get(parameterName);
+        if (values == null) {
+            parameterValues.put(parameterName, values = new LinkedList<IOWSParameterValue>());
         }
-        List<IOWSParameterValue> list = parameterValues.get(parameterName);
-        if (list == null) {
-            parameterValues.put(parameterName, list = new LinkedList<IOWSParameterValue>());
-        }
-        list.add(value);
+        values.add(value);
     }
 
     public <E extends Enum<E>> void addParameterValue(E parameterName, IOWSParameterValue value) {
@@ -198,5 +205,10 @@ public class OWSOperation {
 
     public <E extends Enum<E>> void addRangeParameterValue(E parameterName, OWSParameterValueRange value) {
         addParameterValue(parameterName.name(), value);
+    }
+
+    @Override
+    public int compareTo(OWSOperation o) {
+        return getOperationName().compareTo(o.getOperationName());
     }
 }

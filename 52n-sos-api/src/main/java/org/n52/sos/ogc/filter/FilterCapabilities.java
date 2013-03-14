@@ -23,139 +23,162 @@
  */
 package org.n52.sos.ogc.filter;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.xml.namespace.QName;
 
 import org.n52.sos.ogc.filter.FilterConstants.ComparisonOperator;
 import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
+import org.n52.sos.util.QNameComparator;
 
 /**
  * SOS filter capabilities
- * 
+ *
  */
 public class FilterCapabilities {
-
     /**
      * Spatial operands list
      */
-    private List<QName> spatialOperands;
-
+    private SortedSet<QName> spatialOperands = new TreeSet<QName>(QNameComparator.INSTANCE);
     /**
      * Spatial operators map
      */
-    private Map<SpatialOperator, List<QName>> spatialOperators;
-
+    private SortedMap<SpatialOperator, SortedSet<QName>> spatialOperators =
+                                                         new TreeMap<SpatialOperator, SortedSet<QName>>();
     /**
      * Temporal operands list
      */
-    private List<QName> temporalOperands;
-
+    private SortedSet<QName> temporalOperands = new TreeSet<QName>(QNameComparator.INSTANCE);
     /**
      * Temporal operators map
      */
-    private Map<TimeOperator, List<QName>> tempporalOperators;
-
+    private SortedMap<TimeOperator, SortedSet<QName>> temporalOperators = new TreeMap<TimeOperator, SortedSet<QName>>();
     /**
      * Comparison operators list
      */
-    private List<ComparisonOperator> comparisonOperators;
+    private SortedSet<ComparisonOperator> comparisonOperators = new TreeSet<ComparisonOperator>();
 
     /**
      * Get spatial operands
-     * 
+     *
      * @return spatial operands
      */
-    public List<QName> getSpatialOperands() {
-        return spatialOperands;
+    public SortedSet<QName> getSpatialOperands() {
+        return Collections.unmodifiableSortedSet(spatialOperands);
     }
 
     /**
      * Set spatial operands
-     * 
-     * @param spatialOperands
-     *            spatial operands
+     *
+     * @param spatialOperands spatial operands
      */
-    public void setSpatialOperands(List<QName> spatialOperands) {
-        this.spatialOperands = spatialOperands;
+    public void setSpatialOperands(Collection<QName> spatialOperands) {
+        this.spatialOperands.clear();
+        if (spatialOperands != null) {
+            this.spatialOperands.addAll(spatialOperands);
+        }
     }
 
     /**
      * Get spatial operators
-     * 
+     *
      * @return spatial operators
      */
-    public Map<SpatialOperator, List<QName>> getSpatialOperators() {
-        return spatialOperators;
+    public SortedMap<SpatialOperator, SortedSet<QName>> getSpatialOperators() {
+        return Collections.unmodifiableSortedMap(spatialOperators);
     }
 
     /**
      * Set spatial operators
-     * 
-     * @param spatialOperators
-     *            spatial operators
+     *
+     * @param spatialOperators spatial operators
      */
-    public void setSpatialOperators(Map<SpatialOperator, List<QName>> spatialOperators) {
-        this.spatialOperators = spatialOperators;
+    public void setSpatialOperators(Map<SpatialOperator, ? extends Collection<QName>> spatialOperators) {
+        this.spatialOperators.clear();
+        if (spatialOperators != null) {
+            for (SpatialOperator spatialOperator : spatialOperators.keySet()) {
+                final TreeSet<QName> set = new TreeSet<QName>(QNameComparator.INSTANCE);
+                if (spatialOperators.get(spatialOperator) != null) {
+                    set.addAll(spatialOperators.get(spatialOperator));
+                }
+                this.spatialOperators.put(spatialOperator, set);
+            }
+        }
     }
 
     /**
      * Get temporal operands
-     * 
+     *
      * @return temporal operands
      */
-    public List<QName> getTemporalOperands() {
-        return temporalOperands;
+    public SortedSet<QName> getTemporalOperands() {
+        return Collections.unmodifiableSortedSet(temporalOperands);
     }
 
     /**
      * Set temporal operands
-     * 
-     * @param temporalOperands
-     *            temporal operands
+     *
+     * @param temporalOperands temporal operands
      */
-    public void setTemporalOperands(List<QName> temporalOperands) {
-        this.temporalOperands = temporalOperands;
+    public void setTemporalOperands(Collection<QName> temporalOperands) {
+        this.temporalOperands.clear();
+        if (temporalOperands != null) {
+            this.temporalOperands.addAll(temporalOperands);
+        }
     }
 
     /**
      * Get temporal operators
-     * 
+     *
      * @return temporal operators
      */
-    public Map<TimeOperator, List<QName>> getTempporalOperators() {
-        return tempporalOperators;
+    public SortedMap<TimeOperator, SortedSet<QName>> getTempporalOperators() {
+        return Collections.unmodifiableSortedMap(temporalOperators);
     }
 
     /**
      * Set temporal operators
-     * 
-     * @param tempporalOperators
-     *            temporal operators
+     *
+     * @param temporalOperators temporal operators
      */
-    public void setTempporalOperators(Map<TimeOperator, List<QName>> tempporalOperators) {
-        this.tempporalOperators = tempporalOperators;
+    public void setTempporalOperators(Map<TimeOperator, ? extends Collection<QName>> temporalOperators) {
+        this.temporalOperators.clear();
+        if (temporalOperators != null) {
+            for (TimeOperator timeOperator : temporalOperators.keySet()) {
+                final TreeSet<QName> set = new TreeSet<QName>(QNameComparator.INSTANCE);
+                if (temporalOperators.get(timeOperator) != null) {
+                    set.addAll(temporalOperators.get(timeOperator));
+                }
+                this.temporalOperators.put(timeOperator, set);
+            }
+        }
     }
 
     /**
      * Get comparison operators
-     * 
+     *
      * @return comparison operators
      */
-    public List<ComparisonOperator> getComparisonOperators() {
-        return comparisonOperators;
+    public SortedSet<ComparisonOperator> getComparisonOperators() {
+        return Collections.unmodifiableSortedSet(comparisonOperators);
     }
 
     /**
      * Set comparison operators
-     * 
-     * @param comparisonOperators
-     *            comparison operators
+     *
+     * @param comparisonOperators comparison operators
      */
-    public void setComparisonOperators(List<ComparisonOperator> comparisonOperators) {
-        this.comparisonOperators = comparisonOperators;
+    public void setComparisonOperators(Collection<ComparisonOperator> comparisonOperators) {
+        this.comparisonOperators.clear();
+        if (comparisonOperators != null) {
+            this.comparisonOperators.addAll(comparisonOperators);
+        }
     }
-
 }
