@@ -34,17 +34,18 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.config.sqlite.entities.AdminUser;
 import org.n52.sos.config.sqlite.entities.BooleanSettingValue;
 import org.n52.sos.config.sqlite.entities.FileSettingValue;
 import org.n52.sos.config.sqlite.entities.IntegerSettingValue;
 import org.n52.sos.config.sqlite.entities.NumericSettingValue;
 import org.n52.sos.config.sqlite.entities.Operation;
+import org.n52.sos.config.sqlite.entities.ResponseFormat;
 import org.n52.sos.config.sqlite.entities.StringSettingValue;
 import org.n52.sos.config.sqlite.entities.UriSettingValue;
-import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.ConnectionProvider;
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.service.SosContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,7 +138,8 @@ public class SQLiteSessionFactory implements ConnectionProvider {
                 .addAnnotatedClass(StringSettingValue.class)
                 .addAnnotatedClass(UriSettingValue.class)
                 .addAnnotatedClass(AdminUser.class)
-                .addAnnotatedClass(Operation.class);
+                .addAnnotatedClass(Operation.class)
+                .addAnnotatedClass(ResponseFormat.class);
         
         cfg.registerTypeOverride(new HibernateFileType(), new String[] { "file", File.class.getName() });
         cfg.registerTypeOverride(new HibernateUriType(), new String[] { "uri", URI.class.getName() });

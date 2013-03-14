@@ -23,8 +23,8 @@
  */
 package org.n52.sos.config.sqlite;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertNull;
 import static org.n52.sos.config.sqlite.TestSettingDefinitionProvider.*;
 
 import java.io.File;
@@ -32,34 +32,33 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
 
-import static org.hamcrest.core.Is.*;
 import org.hibernate.HibernateException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.n52.sos.config.AdministratorUser;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingValue;
 import org.n52.sos.config.SettingsManager;
-import org.n52.sos.config.sqlite.entities.BooleanSettingValue;
-import org.n52.sos.config.sqlite.entities.FileSettingValue;
-import org.n52.sos.config.sqlite.entities.IntegerSettingValue;
-import org.n52.sos.config.sqlite.entities.NumericSettingValue;
-import org.n52.sos.config.sqlite.entities.StringSettingValue;
-import org.n52.sos.config.sqlite.entities.UriSettingValue;
 import org.n52.sos.config.settings.BooleanSettingDefinition;
 import org.n52.sos.config.settings.FileSettingDefinition;
 import org.n52.sos.config.settings.IntegerSettingDefinition;
 import org.n52.sos.config.settings.NumericSettingDefinition;
 import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.config.settings.UriSettingDefinition;
-import org.n52.sos.ds.ConnectionProviderException;
+import org.n52.sos.config.sqlite.entities.BooleanSettingValue;
+import org.n52.sos.config.sqlite.entities.FileSettingValue;
+import org.n52.sos.config.sqlite.entities.IntegerSettingValue;
+import org.n52.sos.config.sqlite.entities.NumericSettingValue;
+import org.n52.sos.config.sqlite.entities.StringSettingValue;
+import org.n52.sos.config.sqlite.entities.UriSettingValue;
 import org.n52.sos.ds.ConnectionProvider;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
-import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,13 +68,16 @@ import org.slf4j.LoggerFactory;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class SQLiteSettingsManagerTest {
-
     private static final Logger log = LoggerFactory.getLogger(SQLiteSettingsManagerTest.class);
+    private static final String OPERATION_NAME = SosConstants.Operations.GetCapabilities.name();
     private static final String USERNAME = "admin";
     private static final String PASSWORD = "password";
+    private static final String VERSION = Sos2Constants.SERVICEVERSION;
+    private static final String SERVICE = SosConstants.SOS;
+    private static final String RESPONSE_FORMAT = "responseFormat";
     private static ConnectionProvider connectionProvider;
     private static File databaseFile;
-    private SettingsManager settingsManager;
+    
 
     @BeforeClass
     public static void setUpClass() throws ConfigurationException, IOException {
@@ -97,6 +99,7 @@ public class SQLiteSettingsManagerTest {
             databaseFile.delete();
         }
     }
+    private SettingsManager settingsManager;
 
     @Before
     public void setUp() throws ConfigurationException {
@@ -167,10 +170,9 @@ public class SQLiteSettingsManagerTest {
         settingsManager.changeSetting(doubleValue);
     }
 
-    public <T> void testSaveGetAndDelete(
-            final SettingDefinition<? extends SettingDefinition<?, T>, T> settingDefinition,
-            final SettingValue<T> settingValue,
-            final SettingValue<T> newSettingValue) throws ConfigurationException, ConnectionProviderException {
+    public <T> void testSaveGetAndDelete(final SettingDefinition<? extends SettingDefinition<?, T>, T> settingDefinition,
+                                         final SettingValue<T> settingValue, final SettingValue<T> newSettingValue)
+            throws ConfigurationException, ConnectionProviderException {
 
         assertNotEquals(settingValue, newSettingValue);
         settingsManager.changeSetting(settingValue);
@@ -219,19 +221,28 @@ public class SQLiteSettingsManagerTest {
         settingsManager.deleteAdminUser(USERNAME);
         assertNull(settingsManager.getAdminUser(USERNAME));
     }
-    
+
     @Test
     public void testActiveOperations() throws ConnectionProviderException {
-        RequestOperatorKeyType key = new RequestOperatorKeyType(new ServiceOperatorKeyType(SosConstants.SOS,
-                                                                                           Sos2Constants.SERVICEVERSION),
-                                                                SosConstants.Operations.GetCapabilities.name());
-        
-        
+        RequestOperatorKeyType key =
+                               new RequestOperatorKeyType(new ServiceOperatorKeyType(SERVICE, VERSION), OPERATION_NAME);
+
+
         assertThat(settingsManager.isActive(key), is(true));
         settingsManager.setActive(key, true);
         assertThat(settingsManager.isActive(key), is(true));
         settingsManager.setActive(key, false);
         assertThat(settingsManager.isActive(key), is(false));
-        
+
+    }
+
+    @Test
+    public void testActiveResponseFormats() throws ConnectionProviderException {
+        assertThat(settingsManager.isActive(SERVICE, VERSION, RESPONSE_FORMAT), is(true));
+        settingsManager.setActive(SERVICE, VERSION, RESPONSE_FORMAT, true);
+        assertThat(settingsManager.isActive(SERVICE, VERSION, RESPONSE_FORMAT), is(true));
+        settingsManager.setActive(SERVICE, VERSION, RESPONSE_FORMAT, false);
+        assertThat(settingsManager.isActive(SERVICE, VERSION, RESPONSE_FORMAT), is(false));
+
     }
 }

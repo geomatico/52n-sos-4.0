@@ -23,35 +23,27 @@
  */
 package org.n52.sos.config.sqlite.entities;
 
-import java.io.File;
-
 import javax.persistence.Entity;
 
-import org.n52.sos.config.SettingType;
-
 /**
- *
  * @author Christian Autermann <c.autermann@52north.org>
  */
-@Entity(name = "file_settings")
-public class FileSettingValue extends AbstractSettingValue<File> {
+@Entity(name = "encodings")
+public class ResponseFormat extends Activatable<ReponseFormatKey, ResponseFormat> {
     private static final long serialVersionUID = 1L;
 
-    private File value;
-    
-    @Override
-    public File getValue() {
-        return this.value;
+    public ResponseFormat(ReponseFormatKey key) {
+        super(key);
     }
 
-    @Override
-    public FileSettingValue setValue(File value) {
-        this.value = value;
-        return this;
+    public ResponseFormat(String service, String version, String responseFormat) {
+        this(new ReponseFormatKey()
+                .setService(service)
+                .setVersion(version)
+                .setResponseFormat(responseFormat));
     }
 
-    @Override
-    public SettingType getType() {
-        return SettingType.FILE;
+    public ResponseFormat() {
+        this(null);
     }
 }

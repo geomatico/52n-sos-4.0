@@ -259,4 +259,31 @@ public abstract class SettingsManager {
      */
     public abstract void setActive(RequestOperatorKeyType requestOperatorKeyType, boolean active) throws
             ConnectionProviderException;
+
+    /**
+     * Checks if the response format is active for the specified service and version.
+     *
+     * @param service        the service
+     * @param version        the version
+     * @param responseFormat the responseFormat
+     *
+     * @return if the format is active
+     *
+     * @throws ConnectionProviderException
+     */
+    public abstract boolean isActive(String service, String version, String responseFormat) throws
+            ConnectionProviderException;
+
+    /**
+     * Sets the status of a response format for the specified service and version.
+     *
+     * @param service        the service
+     * @param version        the version
+     * @param responseFormat the responseFormat
+     * @param active         the status
+     *
+     * @throws ConnectionProviderException
+     */
+    public abstract void setActive(String service, String version, String responseFormat, boolean active) throws
+            ConnectionProviderException;
 }

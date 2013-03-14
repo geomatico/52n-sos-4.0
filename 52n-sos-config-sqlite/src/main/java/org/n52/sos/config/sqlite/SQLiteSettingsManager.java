@@ -23,6 +23,7 @@
  */
 package org.n52.sos.config.sqlite;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,9 +38,11 @@ import org.hibernate.criterion.Restrictions;
 import org.n52.sos.config.AbstractSettingValueFactory;
 import org.n52.sos.config.AbstractSettingsManager;
 import org.n52.sos.config.AdministratorUser;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.config.SettingValue;
 import org.n52.sos.config.SettingValueFactory;
 import org.n52.sos.config.sqlite.entities.AbstractSettingValue;
+import org.n52.sos.config.sqlite.entities.Activatable;
 import org.n52.sos.config.sqlite.entities.AdminUser;
 import org.n52.sos.config.sqlite.entities.BooleanSettingValue;
 import org.n52.sos.config.sqlite.entities.FileSettingValue;
@@ -47,12 +50,13 @@ import org.n52.sos.config.sqlite.entities.IntegerSettingValue;
 import org.n52.sos.config.sqlite.entities.NumericSettingValue;
 import org.n52.sos.config.sqlite.entities.Operation;
 import org.n52.sos.config.sqlite.entities.OperationKey;
+import org.n52.sos.config.sqlite.entities.ReponseFormatKey;
+import org.n52.sos.config.sqlite.entities.ResponseFormat;
 import org.n52.sos.config.sqlite.entities.StringSettingValue;
 import org.n52.sos.config.sqlite.entities.UriSettingValue;
-import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.ConnectionProvider;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
-import org.n52.sos.config.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -196,14 +200,36 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
 
     @Override
     public boolean isActive(final RequestOperatorKeyType requestOperatorKeyType) throws ConnectionProviderException {
-        return execute(new IsActiveAction(requestOperatorKeyType)).booleanValue();
+        return isActive(Operation.class, new OperationKey(requestOperatorKeyType));
     }
 
     @Override
-    public void setActive(final RequestOperatorKeyType requestOperatorKeyType, final boolean active) throws
-            ConnectionProviderException {
-        execute(new SetActiveAction(requestOperatorKeyType, active));
+    public void setActive(final RequestOperatorKeyType key, final boolean active) throws ConnectionProviderException {
+        setActive(Operation.class, new Operation(key), active);
     }
+
+    @Override
+    public boolean isActive(String service, String version, String responseFormat) throws ConnectionProviderException {
+        return isActive(ResponseFormat.class, new ReponseFormatKey(service, version, responseFormat));
+    }
+
+    @Override
+    public void setActive(String service, String version, String responseFormat, boolean active) throws
+            ConnectionProviderException {
+        setActive(ResponseFormat.class, new ResponseFormat(service, version, responseFormat), active);
+    }
+
+    protected <K extends Serializable, T extends Activatable<K, T>> void setActive(Class<T> type, T activatable,
+                                                                                   boolean active) throws
+            ConnectionProviderException {
+        execute(new SetActiveAction<K, T>(type, activatable, active));
+    }
+
+    protected <K extends Serializable, T extends Activatable<K, T>> boolean isActive(Class<T> c, K key) throws
+            ConnectionProviderException {
+        return execute(new IsActiveAction<K, T>(c, key)).booleanValue();
+    }
+
 
     private static class SqliteSettingFactory extends AbstractSettingValueFactory {
         @Override
@@ -251,38 +277,43 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
         protected abstract void run(Session session);
     }
 
-    private class SetActiveAction extends VoidHibernateAction {
-        private final RequestOperatorKeyType requestOperatorKeyType;
+    private class SetActiveAction<K extends Serializable, T extends Activatable<K, T>> extends VoidHibernateAction {
+        private final Activatable<K, T> activatable;
+        private final Class<T> type;
         private final boolean active;
 
-        SetActiveAction(RequestOperatorKeyType requestOperatorKeyType, boolean active) {
-            this.requestOperatorKeyType = requestOperatorKeyType;
+        SetActiveAction(Class<T> type, T activatable, boolean active) {
+            this.activatable = activatable;
+            this.type = type;
             this.active = active;
         }
 
         @Override
         protected void run(Session session) {
-            Operation o = (Operation) session.get(Operation.class, new OperationKey(requestOperatorKeyType));
+            @SuppressWarnings("unchecked")
+            T o = (T) session.get(type, activatable.getKey());
             if (o != null) {
                 if (active != o.isActive()) {
                     session.update(o.setActive(active));
                 }
             } else {
-                session.save(new Operation(requestOperatorKeyType).setActive(active));
+                session.save(activatable.setActive(active));
             }
         }
     }
 
-    private class IsActiveAction extends HibernateAction<Boolean> {
-        private final RequestOperatorKeyType requestOperatorKeyType;
+    private class IsActiveAction<K extends Serializable, T extends Activatable<K, T>> extends HibernateAction<Boolean> {
+        private final K key;
+        private Class<T> type;
 
-        IsActiveAction(RequestOperatorKeyType requestOperatorKeyType) {
-            this.requestOperatorKeyType = requestOperatorKeyType;
+        IsActiveAction(Class<T> type, K key) {
+            this.type = type;
+            this.key = key;
         }
 
         @Override
         protected Boolean call(Session session) {
-            Operation o = (Operation) session.get(Operation.class, new OperationKey(requestOperatorKeyType));
+            Activatable<K, T> o = (Activatable<K, T>) session.get(type, key);
             return (o == null) ? true : o.isActive();
         }
     }

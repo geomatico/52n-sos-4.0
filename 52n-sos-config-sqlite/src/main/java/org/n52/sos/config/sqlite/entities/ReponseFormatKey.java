@@ -27,49 +27,31 @@ import java.io.Serializable;
 
 import javax.persistence.Embeddable;
 
-import org.n52.sos.request.operator.RequestOperatorKeyType;
-
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
 @Embeddable
-public class OperationKey implements Serializable {
+public class ReponseFormatKey implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    private String operation;
     private String service;
     private String version;
+    private String responseFormat;
 
-    public OperationKey() {
-        this(null, null, null);
-    }
-
-    public OperationKey(RequestOperatorKeyType key) {
-        this(key.getOperationName(),
-             key.getServiceOperatorKeyType().getService(),
-             key.getServiceOperatorKeyType().getVersion());
-    }
-
-    public OperationKey(String operation, String service, String version) {
-        this.operation = operation;
+    public ReponseFormatKey(String service, String version, String responseFormat) {
         this.service = service;
         this.version = version;
+        this.responseFormat = responseFormat;
     }
 
-    public String getOperationName() {
-        return operation;
-    }
-
-    public OperationKey setOperationName(String operationName) {
-        this.operation = operationName;
-        return this;
+    public ReponseFormatKey() {
+        this(null, null, null);
     }
 
     public String getService() {
         return service;
     }
 
-    public OperationKey setService(String service) {
+    public ReponseFormatKey setService(String service) {
         this.service = service;
         return this;
     }
@@ -78,8 +60,17 @@ public class OperationKey implements Serializable {
         return version;
     }
 
-    public OperationKey setVersion(String version) {
+    public ReponseFormatKey setVersion(String version) {
         this.version = version;
+        return this;
+    }
+
+    public String getEncoding() {
+        return responseFormat;
+    }
+
+    public ReponseFormatKey setResponseFormat(String responseFormat) {
+        this.responseFormat = responseFormat;
         return this;
     }
 }
