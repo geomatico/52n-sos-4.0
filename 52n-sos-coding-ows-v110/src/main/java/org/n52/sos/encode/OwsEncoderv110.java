@@ -24,6 +24,7 @@
 package org.n52.sos.encode;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -283,7 +284,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
         ExceptionDocument exceptionDoc =
                 ExceptionDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         ExceptionType exceptionType = exceptionDoc.addNewException();
-        String exceptionCode = null;
+        String exceptionCode;
         if (owsException.getCode() == null) {
             exceptionCode = OWSConstants.OwsExceptionCode.NoApplicableCode.toString();
         } else {
@@ -346,7 +347,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
      * @param get
      *            Add GET.
      */
-    private void encodeDCP(DCP dcp, Map<String, List<String>> supportedDcp) {
+    private void encodeDCP(DCP dcp, Map<String, ? extends Collection<String>> supportedDcp) {
         HTTP http = dcp.addNewHTTP();
         if (supportedDcp.containsKey(SosConstants.HTTP_GET)) {
             for (String dcpGet : supportedDcp.get(SosConstants.HTTP_GET)) {
@@ -370,7 +371,7 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
     }
 
     private void setParameterValue(DomainType domainType, String parameterName,
-            List<IOWSParameterValue> parameterValues) throws OwsExceptionReport {
+                                   Collection<IOWSParameterValue> parameterValues) throws OwsExceptionReport {
         if (parameterValues != null && !parameterValues.isEmpty()) {
             domainType.setName(parameterName);
             for (IOWSParameterValue parameterValue : parameterValues) {
