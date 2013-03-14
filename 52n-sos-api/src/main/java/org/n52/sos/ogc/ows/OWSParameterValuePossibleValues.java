@@ -33,7 +33,7 @@ public class OWSParameterValuePossibleValues implements IOWSParameterValue {
     private SortedSet<String> values;
 
     public OWSParameterValuePossibleValues(Collection<String> values) {
-        this.values = new TreeSet<String>(values);
+        this.values = values == null ? new TreeSet<String>() : new TreeSet<String>(values);
     }
 
     public OWSParameterValuePossibleValues(String value) {
