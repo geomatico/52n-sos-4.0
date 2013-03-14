@@ -76,7 +76,7 @@ public abstract class ScheduledContentCacheController implements ContentCacheCon
 
     @Setting(ScheduledContentCacheControllerSettings.CAPABILITIES_CACHE_UPDATE_INTERVAL)
     public void setUpdateInterval(int interval) throws ConfigurationException {
-        Validation.greaterZero("Cache update interval", interval);
+        Validation.greaterEqualZero("Cache update interval", interval);
         if (this.updateInterval != interval) {
             this.updateInterval = interval;
             reschedule();

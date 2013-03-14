@@ -43,6 +43,12 @@ public class Validation {
         }
     }
 
+    public static void greaterEqualZero(String name, int i) throws ConfigurationException {
+        if (i < 0) {
+            throw new ConfigurationException(String.format("%s can not be smaller than zero (was %d)!", name, i));
+        }
+    }
+
     public static void notNullOrEmpty(String name, String val) throws ConfigurationException {
         notNull(name, val);
         if (val.isEmpty()) {
