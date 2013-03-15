@@ -56,6 +56,7 @@ import org.n52.sos.config.sqlite.entities.StringSettingValue;
 import org.n52.sos.config.sqlite.entities.UriSettingValue;
 import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.ds.ConnectionProviderException;
+import org.n52.sos.encode.ResponseFormatKeyType;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.slf4j.Logger;
@@ -205,7 +206,8 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    public void setActive(final RequestOperatorKeyType key, final boolean active) throws ConnectionProviderException {
+    protected void setOperationStatus(final RequestOperatorKeyType key, final boolean active) throws
+            ConnectionProviderException {
         setActive(Operation.class, new Operation(key), active);
     }
 
@@ -215,9 +217,11 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    public void setActive(ServiceOperatorKeyType sokt, String responseFormat, boolean active) throws
+    protected void setResponseFormatStatus(ResponseFormatKeyType rfkt, boolean active) throws
             ConnectionProviderException {
-        setActive(ResponseFormat.class, new ResponseFormat(sokt.getService(), sokt.getVersion(), responseFormat), active);
+        setActive(ResponseFormat.class, new ResponseFormat(rfkt.getService(),
+                                                           rfkt.getVersion(),
+                                                           rfkt.getResponseFormat()), active);
     }
 
     protected <K extends Serializable, T extends Activatable<K, T>> void setActive(Class<T> type, T activatable,

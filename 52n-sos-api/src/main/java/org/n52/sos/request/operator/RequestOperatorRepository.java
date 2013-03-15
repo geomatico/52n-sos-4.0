@@ -25,6 +25,7 @@ package org.n52.sos.request.operator;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,6 +35,7 @@ import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
+import org.n52.sos.util.Activatable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +44,8 @@ import org.slf4j.LoggerFactory;
  */
 public class RequestOperatorRepository extends AbstractConfiguringServiceLoaderRepository<RequestOperator> {
     private static final Logger log = LoggerFactory.getLogger(RequestOperatorRepository.class);
-    private final Map<RequestOperatorKeyType, RequestOperator> requestOperators =
-                                                                new HashMap<RequestOperatorKeyType, RequestOperator>(0);
+    private final Map<RequestOperatorKeyType, Activatable<RequestOperator>> requestOperators =
+                                                                            new HashMap<RequestOperatorKeyType, Activatable<RequestOperator>>(0);
 
     public RequestOperatorRepository() throws ConfigurationException {
         super(RequestOperator.class, true);
@@ -54,17 +56,13 @@ public class RequestOperatorRepository extends AbstractConfiguringServiceLoaderR
     protected void processConfiguredImplementations(Set<RequestOperator> requestOperators) throws
             ConfigurationException {
         this.requestOperators.clear();
-        SettingsManager sm = SettingsManager.getInstance();
-        for (RequestOperator aRequestOperator : requestOperators) {
+        for (RequestOperator op : requestOperators) {
             try {
-                if (sm.isActive(aRequestOperator.getRequestOperatorKeyType())) {
-                    log.info("Registered IRequestOperator for {}", aRequestOperator.getRequestOperatorKeyType());
-                    this.requestOperators.put(aRequestOperator.getRequestOperatorKeyType(), aRequestOperator);
-                } else {
-                    log.info("{} is inactive", aRequestOperator.getRequestOperatorKeyType());
-                }
+                log.info("Registered IRequestOperator for {}", op.getRequestOperatorKeyType());
+                boolean active = SettingsManager.getInstance().isActive(op.getRequestOperatorKeyType());
+                this.requestOperators.put(op.getRequestOperatorKeyType(), new Activatable<RequestOperator>(op, active));
             } catch (ConnectionProviderException cpe) {
-               throw new ConfigurationException("Error while checking RequestOperators", cpe);
+                throw new ConfigurationException("Error while checking RequestOperator", cpe);
             }
         }
     }
@@ -76,18 +74,35 @@ public class RequestOperatorRepository extends AbstractConfiguringServiceLoaderR
     }
 
     public RequestOperator getRequestOperator(RequestOperatorKeyType key) {
-        return this.requestOperators.get(key);
+        return this.requestOperators.get(key).get();
     }
 
     public RequestOperator getRequestOperator(ServiceOperatorKeyType serviceOperatorKeyType, String operationName) {
         return getRequestOperator(new RequestOperatorKeyType(serviceOperatorKeyType, operationName));
     }
 
-    public Map<RequestOperatorKeyType, RequestOperator> getRequestOperator() {
-        return Collections.unmodifiableMap(this.requestOperators);
+    public void setActive(RequestOperatorKeyType rokt, boolean active) {
+        if (this.requestOperators.get(rokt) != null) {
+            this.requestOperators.get(rokt).setActive(active);
+        }
     }
 
-    public Set<RequestOperatorKeyType> getRequestOperatorKeyTypes() {
-        return getRequestOperator().keySet();
+    /**
+     * @return null
+     *
+     * @deprecated use {@link #getActiveRequestOperatorKeyTypes()} and
+     * {@link #getRequestOperator(org.n52.sos.request.operator.RequestOperatorKeyType)}
+     */
+    @Deprecated
+    public Map<RequestOperatorKeyType, RequestOperator> getRequestOperator() {
+        return Collections.emptyMap();
+    }
+
+    public Set<RequestOperatorKeyType> getActiveRequestOperatorKeyTypes() {
+        return Activatable.filter(this.requestOperators).keySet();
+    }
+
+    public Set<RequestOperatorKeyType> getAllRequestOperatorKeyTypes() {
+        return Collections.unmodifiableSet(this.requestOperators.keySet());
     }
 }

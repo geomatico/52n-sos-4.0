@@ -23,6 +23,9 @@
  */
 package org.n52.sos.service;
 
+import static org.n52.sos.util.CollectionHelper.map;
+import static org.n52.sos.util.CollectionHelper.set;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,11 +40,14 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.config.SettingsManager;
 import org.n52.sos.decode.Decoder;
 import org.n52.sos.decode.DecoderKey;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.ObservationEncoder;
+import org.n52.sos.encode.ResponseFormatKeyType;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.CollectionHelper;
@@ -53,7 +59,6 @@ import org.slf4j.LoggerFactory;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class CodingRepository {
-
     private static final Logger log = LoggerFactory.getLogger(CodingRepository.class);
 
     @SuppressWarnings("unchecked")
@@ -98,44 +103,84 @@ public class CodingRepository {
     private final ServiceLoader<Encoder> serviceLoaderEncoder;
     private final Set<Decoder<?, ?>> decoders;
     private final Set<Encoder<?, ?>> encoders;
-    private final Map<DecoderKey, Set<Decoder<?, ?>>> decoderByKey = CollectionHelper.map();
-    private final Map<EncoderKey, Set<Encoder<?, ?>>> encoderByKey = CollectionHelper.map();
+    private final Map<DecoderKey, Set<Decoder<?, ?>>> decoderByKey = map();
+    private final Map<EncoderKey, Set<Encoder<?, ?>>> encoderByKey = map();
     private Map<SupportedTypeKey, Set<String>> typeMap = Collections.emptyMap();
-    private final Set<ObservationEncoder<?, ?>> observationEncoders = CollectionHelper.set();
-
+    private final Set<ObservationEncoder<?, ?>> observationEncoders = set();
+    private final Map<String, Map<String, Set<String>>> responseFormats = map();
+    private final Map<ResponseFormatKeyType, Boolean> responseFormatStatus = map();
 
     public CodingRepository() throws ConfigurationException {
-		this.serviceLoaderDecoder = ServiceLoader.load(Decoder.class);
-		this.serviceLoaderEncoder = ServiceLoader.load(Encoder.class);
+        this.serviceLoaderDecoder = ServiceLoader.load(Decoder.class);
+        this.serviceLoaderEncoder = ServiceLoader.load(Encoder.class);
         this.decoders = CollectionHelper.asSet(loadDecoders());
         this.encoders = CollectionHelper.asSet(loadEncoders());
         initDecoderMap();
         initEncoderMap();
         generateTypeMap();
+        generateResponseFormatMaps();
     }
 
-	public void updateDecoders() throws ConfigurationException {
-		log.debug("Reloading Decoder implementations");
-		this.decoders.clear();
-		this.decoders.addAll(loadDecoders());
+    public void updateDecoders() throws ConfigurationException {
+        log.debug("Reloading Decoder implementations");
+        this.decoders.clear();
+        this.decoders.addAll(loadDecoders());
         initDecoderMap();
         generateTypeMap();
-		log.debug("Reloaded Decoder implementations");
-	}
+        log.debug("Reloaded Decoder implementations");
+    }
 
-	public void updateEncoders() throws ConfigurationException {
-		log.debug("Reloading Encoder implementations");
-		this.encoders.clear();
-		this.encoders.addAll(loadEncoders());
+    public void updateEncoders() throws ConfigurationException {
+        log.debug("Reloading Encoder implementations");
+        this.encoders.clear();
+        this.encoders.addAll(loadEncoders());
         initEncoderMap();
         generateTypeMap();
-		log.debug("Reloaded Encoder implementations");
-	}
+        generateResponseFormatMaps();
+        log.debug("Reloaded Encoder implementations");
+    }
 
-	private List<Decoder<?,?>> loadDecoders() throws ConfigurationException {
-		List<Decoder<?,?>> loadedDecoders = new LinkedList<Decoder<?, ?>>();
+    private void generateResponseFormatMaps() throws ConfigurationException {
+        this.responseFormatStatus.clear();
+        this.responseFormats.clear();
+        final Set<ServiceOperatorKeyType> serviceOperatorKeyTypes = Configurator.getInstance()
+                .getServiceOperatorRepository().getServiceOperatorKeyTypes();
+        for (Encoder<?, ?> e : getEncoders()) {
+            if (e instanceof ObservationEncoder) {
+                final ObservationEncoder<?, ?> oe = (ObservationEncoder<?, ?>) e;
+                for (ServiceOperatorKeyType sokt : serviceOperatorKeyTypes) {
+                    Set<String> rfs = oe.getSupportedResponseFormats(sokt.getService(), sokt.getVersion());
+                    if (rfs != null) {
+                        for (String rf : rfs) {
+                            addResponseFormat(new ResponseFormatKeyType(sokt, rf));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected void addResponseFormat(ResponseFormatKeyType rfkt) throws ConfigurationException {
         try {
-            for (Decoder<?,?> decoder : serviceLoaderDecoder) {
+            this.responseFormatStatus.put(rfkt, SettingsManager.getInstance().isActive(rfkt));
+        } catch (ConnectionProviderException ex) {
+            throw new ConfigurationException(ex);
+        }
+        Map<String, Set<String>> byService = this.responseFormats.get(rfkt.getService());
+        if (byService == null) {
+            this.responseFormats.put(rfkt.getService(), byService = map());
+        }
+        Set<String> byVersion = byService.get(rfkt.getVersion());
+        if (byVersion == null) {
+            byService.put(rfkt.getVersion(), byVersion = set());
+        }
+        byVersion.add(rfkt.getResponseFormat());
+    }
+
+    private List<Decoder<?, ?>> loadDecoders() throws ConfigurationException {
+        List<Decoder<?, ?>> loadedDecoders = new LinkedList<Decoder<?, ?>>();
+        try {
+            for (Decoder<?, ?> decoder : serviceLoaderDecoder) {
                 loadedDecoders.add(decoder);
             }
         } catch (ServiceConfigurationError sce) {
@@ -143,18 +188,18 @@ public class CodingRepository {
             log.warn(text, sce);
             throw new ConfigurationException(text, sce);
         }
-		if (loadedDecoders.isEmpty()) {
+        if (loadedDecoders.isEmpty()) {
             String exceptionText = "No Decoder implementations is loaded!";
             log.error(exceptionText);
             throw new ConfigurationException(exceptionText);
         }
-		return loadedDecoders;
-	}
+        return loadedDecoders;
+    }
 
-	private List<Encoder<?,?>> loadEncoders() throws ConfigurationException {
-		List<Encoder<?,?>> loadedEncoders = new LinkedList<Encoder<?, ?>>();
+    private List<Encoder<?, ?>> loadEncoders() throws ConfigurationException {
+        List<Encoder<?, ?>> loadedEncoders = new LinkedList<Encoder<?, ?>>();
         try {
-            for (Encoder<?,?> encoder : serviceLoaderEncoder) {
+            for (Encoder<?, ?> encoder : serviceLoaderEncoder) {
                 loadedEncoders.add(encoder);
             }
         } catch (ServiceConfigurationError sce) {
@@ -162,13 +207,13 @@ public class CodingRepository {
             log.warn(text, sce);
             throw new ConfigurationException(text, sce);
         }
-		if (loadedEncoders.isEmpty()) {
+        if (loadedEncoders.isEmpty()) {
             String exceptionText = "No Encoder implementations is loaded!";
             log.error(exceptionText);
             throw new ConfigurationException(exceptionText);
         }
-		return loadedEncoders;
-	}
+        return loadedEncoders;
+    }
 
     public Set<Decoder<?, ?>> getDecoders() {
         return CollectionHelper.unmodifiableSet(decoders);
@@ -237,12 +282,12 @@ public class CodingRepository {
     }
 
     private void initEncoderMap() {
-		this.encoderByKey.clear();
+        this.encoderByKey.clear();
         for (Encoder<?, ?> encoder : getEncoders()) {
             for (EncoderKey key : encoder.getEncoderKeyType()) {
                 Set<Encoder<?, ?>> encodersForKey = encoderByKey.get(key);
                 if (encodersForKey == null) {
-                    encoderByKey.put(key, encodersForKey = CollectionHelper.set());
+                    encoderByKey.put(key, encodersForKey = set());
                 }
                 encodersForKey.add(encoder);
             }
@@ -253,18 +298,18 @@ public class CodingRepository {
     }
 
     private void initDecoderMap() {
-		this.decoderByKey.clear();
+        this.decoderByKey.clear();
         for (Decoder<?, ?> decoder : getDecoders()) {
             for (DecoderKey key : decoder.getDecoderKeyTypes()) {
                 Set<Decoder<?, ?>> decodersForKey = decoderByKey.get(key);
                 if (decodersForKey == null) {
-                    decoderByKey.put(key, decodersForKey = CollectionHelper.set());
+                    decoderByKey.put(key, decodersForKey = set());
                 }
                 decodersForKey.add(decoder);
             }
         }
     }
-    
+
     public <F, T> Decoder<F, T> getDecoder(DecoderKey key, DecoderKey... keys) {
         if (keys.length == 0) {
             return getDecoderSingleKey(key);
@@ -300,8 +345,8 @@ public class CodingRepository {
     private Set<Encoder<?, ?>> findEncodersForSingleKey(EncoderKey key) {
         Set<Encoder<?, ?>> matches = encoderByKey.get(key);
         if (matches == null) {
-            encoderByKey.put(key, matches = CollectionHelper.set());
-            for (Encoder<?,?> encoder : getEncoders()) {
+            encoderByKey.put(key, matches = set());
+            for (Encoder<?, ?> encoder : getEncoders()) {
                 for (EncoderKey ek : encoder.getEncoderKeyType()) {
                     if (ek.getSimilarity(key) > 0) {
                         matches.add(encoder);
@@ -315,8 +360,8 @@ public class CodingRepository {
     private Set<Decoder<?, ?>> findDecodersForSingleKey(DecoderKey key) {
         Set<Decoder<?, ?>> matches = decoderByKey.get(key);
         if (matches == null) {
-            decoderByKey.put(key, matches = CollectionHelper.set());
-            for (Decoder<?,?> decoder : getDecoders()) {
+            decoderByKey.put(key, matches = set());
+            for (Decoder<?, ?> decoder : getDecoders()) {
                 for (DecoderKey dk : decoder.getDecoderKeyTypes()) {
                     if (dk.getSimilarity(key) > 0) {
                         matches.add(decoder);
@@ -331,14 +376,14 @@ public class CodingRepository {
         Set<Encoder<?, ?>> matches = encoderByKey.get(ck);
         if (matches == null) {
             // first request; search for matching encoders and save result for later quries
-            encoderByKey.put(ck, matches = CollectionHelper.set());
+            encoderByKey.put(ck, matches = set());
             for (Encoder<?, ?> encoder : encoders) {
                 if (ck.matches(encoder.getEncoderKeyType())) {
                     matches.add(encoder);
                 }
             }
             log.debug("Found {} Encoders for CompositeKey: {}", matches.size(),
-                    StringHelper.join(", ", matches));
+                      StringHelper.join(", ", matches));
         }
         return matches;
     }
@@ -347,33 +392,83 @@ public class CodingRepository {
         Set<Decoder<?, ?>> matches = decoderByKey.get(ck);
         if (matches == null) {
             // first request; search for matching decoders and save result for later queries
-            decoderByKey.put(ck, matches = CollectionHelper.set());
+            decoderByKey.put(ck, matches = set());
             for (Decoder<?, ?> decoder : decoders) {
                 if (ck.matches(decoder.getDecoderKeyTypes())) {
                     matches.add(decoder);
                 }
             }
             log.debug("Found {} Decoders for CompositeKey: {}", matches.size(),
-                    StringHelper.join(", ", matches));
+                      StringHelper.join(", ", matches));
         }
         return matches;
     }
 
     public Set<String> getSupportedResponseFormats(String service, String version) {
-        Set<String> responseFormats = new HashSet<String>(observationEncoders.size());
-        for (ObservationEncoder<?, ?> encoder : observationEncoders) {
-            responseFormats.addAll(encoder.getSupportedResponseFormats(service, version));
+        Map<String, Set<String>> byService = this.responseFormats.get(service);
+        if (byService == null) {
+            return Collections.emptySet();
         }
-        return responseFormats;
+        Set<String> rfs = byService.get(version);
+        if (rfs == null) {
+            return Collections.emptySet();
+        }
+
+        ServiceOperatorKeyType sokt = new ServiceOperatorKeyType(service, version);
+        Set<String> result = new HashSet<String>(rfs.size());
+        for (String a : rfs) {
+            ResponseFormatKeyType rfkt = new ResponseFormatKeyType(sokt, a);
+            final Boolean status = responseFormatStatus.get(rfkt);
+            if (status != null && status.booleanValue()) {
+                result.add(a);
+            }
+        }
+        return result;
+    }
+
+    public Set<String> getAllSupportedResponseFormats(String service, String version) {
+        Map<String, Set<String>> byService = this.responseFormats.get(service);
+        if (byService == null) {
+            return Collections.emptySet();
+        }
+        Set<String> rfs = byService.get(version);
+        if (rfs == null) {
+            return Collections.emptySet();
+        }
+        return Collections.unmodifiableSet(rfs);
+    }
+
+    public Set<String> getSupportedResponseFormats(ServiceOperatorKeyType sokt) {
+        return getSupportedResponseFormats(sokt.getService(), sokt.getVersion());
+    }
+
+    public Set<String> getAllSupportedResponseFormats(ServiceOperatorKeyType sokt) {
+        return getAllSupportedResponseFormats(sokt.getService(), sokt.getVersion());
     }
 
     public Map<ServiceOperatorKeyType, Set<String>> getSupportedResponseFormats() {
-        Set<ServiceOperatorKeyType> keys = Configurator.getInstance().getServiceOperatorRepository().getServiceOperatorKeyTypes();
-        Map<ServiceOperatorKeyType, Set<String>> responseFormats = new HashMap<ServiceOperatorKeyType, Set<String>>(keys.size());
-        for (ServiceOperatorKeyType key : keys) {
-            responseFormats.put(key, getSupportedResponseFormats(key.getService(), key.getVersion()));
+        Map<ServiceOperatorKeyType, Set<String>> map = new HashMap<ServiceOperatorKeyType, Set<String>>(2);
+        for (ServiceOperatorKeyType sokt : Configurator.getInstance().getServiceOperatorRepository()
+                .getServiceOperatorKeyTypes()) {
+            map.put(sokt, getSupportedResponseFormats(sokt));
         }
-        return responseFormats;
+        return map;
+    }
+
+    public Map<ServiceOperatorKeyType, Set<String>> getAllSupportedResponseFormats() {
+        Map<ServiceOperatorKeyType, Set<String>> map = new HashMap<ServiceOperatorKeyType, Set<String>>(2);
+        for (ServiceOperatorKeyType sokt : Configurator.getInstance().getServiceOperatorRepository()
+                .getServiceOperatorKeyTypes()) {
+            map.put(sokt, getAllSupportedResponseFormats(sokt));
+        }
+        return map;
+
+    }
+
+    public void setActive(ResponseFormatKeyType rfkt, boolean active) {
+        if (this.responseFormatStatus.containsKey(rfkt)) {
+            this.responseFormatStatus.put(rfkt, active);
+        }
     }
 
     private static abstract class SimilarityComparator<T> implements Comparator<T> {

@@ -38,8 +38,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.ConnectionProviderException;
+import org.n52.sos.encode.ResponseFormatKeyType;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.SettingsChangeEvent;
+import org.n52.sos.request.operator.RequestOperatorKeyType;
+import org.n52.sos.service.Configurator;
+import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,10 +55,10 @@ import org.slf4j.LoggerFactory;
  * @since 4.0
  */
 public abstract class AbstractSettingsManager extends SettingsManager {
-
     private static final Logger log = LoggerFactory.getLogger(AbstractSettingsManager.class);
     private final SettingDefinitionProviderRepository settingDefinitionRepository;
-    private final Map<String, Set<ConfigurableObject>> configurableObjects = new HashMap<String, Set<ConfigurableObject>>();
+    private final Map<String, Set<ConfigurableObject>> configurableObjects =
+                                                       new HashMap<String, Set<ConfigurableObject>>();
     private final ReadWriteLock configurableObjectsLock = new ReentrantReadWriteLock();
 
     /**
@@ -115,7 +119,8 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     }
 
     @Override
-    public void deleteSetting(SettingDefinition<?, ?> setting) throws ConfigurationException, ConnectionProviderException {
+    public void deleteSetting(SettingDefinition<?, ?> setting) throws ConfigurationException,
+                                                                      ConnectionProviderException {
         SettingValue<?> oldValue = getSettingValue(setting.getKey());
         if (oldValue != null) {
             applySetting(setting, oldValue, null);
@@ -128,7 +133,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     /**
      * Applies the a new setting to all {@code ConfiguredObject}s. If an error occurs the the old value is reapplied.
      * <p/>
-     * @param setting the definition
+     * @param setting  the definition
      * @param oldValue the old value (or {@code null} if there is none)
      * @param newValue the new value (or {@code null} if there is none)
      * <p/>
@@ -181,7 +186,8 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     @Override
     public Map<SettingDefinition<?, ?>, SettingValue<?>> getSettings() throws ConnectionProviderException {
         Set<SettingValue<?>> values = getSettingValues();
-        Map<SettingDefinition<?, ?>, SettingValue<?>> settingsByDefinition = new HashMap<SettingDefinition<?, ?>, SettingValue<?>>(values
+        Map<SettingDefinition<?, ?>, SettingValue<?>> settingsByDefinition =
+                                                      new HashMap<SettingDefinition<?, ?>, SettingValue<?>>(values
                 .size());
         for (SettingValue<?> value : values) {
             final SettingDefinition<?, ?> definition = getSettingDefinitionRepository().getDefinition(value.getKey());
@@ -260,14 +266,15 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     }
 
     @SuppressWarnings("unchecked")
-    private SettingValue<Object> getNotNullSettingValue(ConfigurableObject co) throws ConnectionProviderException, ConfigurationException {
+    private SettingValue<Object> getNotNullSettingValue(ConfigurableObject co) throws ConnectionProviderException,
+                                                                                      ConfigurationException {
         SettingValue<Object> val = (SettingValue<Object>) getSettingValue(co.getKey());
         if (val == null) {
-            SettingDefinition<?,?> def = getDefinitionByKey(co.getKey());
+            SettingDefinition<?, ?> def = getDefinitionByKey(co.getKey());
             if (def == null) {
                 throw new ConfigurationException(String.format("No SettingDefinition found for key %s", co.getKey()));
             }
-            val =(SettingValue<Object>) getSettingFactory().newSettingValue(def, null);
+            val = (SettingValue<Object>) getSettingFactory().newSettingValue(def, null);
             if (def.isOptional()) {
                 log.debug("No value found for optional setting {}", co.getKey());
                 saveSettingValue(val);
@@ -275,17 +282,44 @@ public abstract class AbstractSettingsManager extends SettingsManager {
                 log.debug("Using default value '{}' for required setting {}", def.getDefaultValue(), co.getKey());
                 saveSettingValue(val.setValue(def.getDefaultValue()));
             } else {
-                throw new ConfigurationException(String.format("No value found for required Setting '%s' with no default value.", co.getKey()));
+                throw new ConfigurationException(String
+                        .format("No value found for required Setting '%s' with no default value.", co.getKey()));
             }
         }
         return val;
     }
 
+    @Override
+    public void setActive(ServiceOperatorKeyType sokt, String rf, boolean active) throws ConnectionProviderException {
+        setActive(new ResponseFormatKeyType(sokt, rf), active);
+    }
+
+    @Override
+    public void setActive(RequestOperatorKeyType rokt, boolean active) throws ConnectionProviderException {
+        log.debug("Setting activation of {} to {}", rokt, active);
+        setOperationStatus(rokt, active);
+        if (Configurator.getInstance() != null) {
+            Configurator.getInstance().getRequestOperatorRepository().setActive(rokt, active);
+        }
+    }
+
+    @Override
+    public void setActive(ResponseFormatKeyType rfkt, boolean active) throws ConnectionProviderException {
+        log.debug("Setting activation of {} to {}", rfkt, active);
+        setResponseFormatStatus(rfkt, active);
+        if (Configurator.getInstance() != null) {
+            Configurator.getInstance().getCodingRepository().setActive(rfkt, active);
+        }
+    }
+
+    @Override
+    public boolean isActive(ResponseFormatKeyType rokt) throws ConnectionProviderException {
+        return isActive(rokt.getServiceOperatorKeyType(), rokt.getResponseFormat());
+    }
     /**
      * @return all saved setting values
      *
      * @throws ConnectionProviderException
-     * @throws HibernateException
      */
     protected abstract Set<SettingValue<?>> getSettingValues() throws ConnectionProviderException;
 
@@ -318,11 +352,34 @@ public abstract class AbstractSettingsManager extends SettingsManager {
      */
     protected abstract void saveSettingValue(SettingValue<?> setting) throws ConnectionProviderException;
 
+    /**
+     * Sets the status of an operation.
+     * <p/>
+     * @param requestOperatorKeyType the key identifying the operation
+     * @param active                 whether the operation is active or not
+     * <p/>
+     * @throws ConnectionProviderException
+     * @see #setActive(org.n52.sos.request.operator.RequestOperatorKeyType, boolean)
+     */
+    protected abstract void setOperationStatus(RequestOperatorKeyType requestOperatorKeyType, boolean active) throws
+            ConnectionProviderException;
+
+    /**
+     * Sets the status of a response format for the specified service and version.
+     *
+     * @param rfkt   the service/version/responseFormat combination
+     * @param active the status
+     *
+     * @throws ConnectionProviderException
+     * @see #setActive(org.n52.sos.service.operator.ServiceOperatorKeyType, java.lang.String, boolean)
+     */
+    protected abstract void setResponseFormatStatus(ResponseFormatKeyType rfkt, boolean active) throws
+            ConnectionProviderException;
+
     /*
      * TODO handle the references as WeakReferences
      */
     private class ConfigurableObject {
-
         private final Method method;
         private final WeakReference<Object> target;
         private final String key;
@@ -332,7 +389,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
          * <p/>
          * @param method the method of the target
          * @param target the target object
-         * @param key the settings key
+         * @param key    the settings key
          */
         ConfigurableObject(Method method, Object target, String key) {
             this.method = method;

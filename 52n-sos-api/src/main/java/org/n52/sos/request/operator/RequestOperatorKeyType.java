@@ -98,4 +98,10 @@ public class RequestOperatorKeyType implements Comparable<RequestOperatorKeyType
         return hash;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s[serviceOperatorKeyType=%s, operationName=%s]",
+                             getClass().getSimpleName(), getServiceOperatorKeyType(), getOperationName());
+    }
+
 }

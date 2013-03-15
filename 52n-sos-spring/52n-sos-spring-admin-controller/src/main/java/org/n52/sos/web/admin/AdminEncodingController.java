@@ -74,8 +74,7 @@ public class AdminEncodingController extends AbstractAdminController {
     public String getAll() throws JSONException, ConnectionProviderException {
         JSONArray array = new JSONArray();
         final Map<ServiceOperatorKeyType, Set<String>> formats = Configurator.getInstance()
-                .getCodingRepository().getSupportedResponseFormats();
-
+                .getCodingRepository().getAllSupportedResponseFormats();
         for (ServiceOperatorKeyType key : formats.keySet()) {
             for (String responseFormat : formats.get(key)) {
                 array.put(new JSONObject()

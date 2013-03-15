@@ -74,7 +74,7 @@ public class AdminOperationController extends AbstractAdminController {
     public String getAll() throws JSONException, ConnectionProviderException {
         JSONArray array = new JSONArray();
         for (RequestOperatorKeyType key : Configurator.getInstance()
-                .getRequestOperatorRepository().getRequestOperatorKeyTypes()) {
+                .getRequestOperatorRepository().getAllRequestOperatorKeyTypes()) {
             array.put(new JSONObject()
                     .put(JSONConstants.SERVICE_KEY, key.getServiceOperatorKeyType().getService())
                     .put(JSONConstants.VERSION_KEY, key.getServiceOperatorKeyType().getVersion())

@@ -277,13 +277,13 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
                 .getServiceOperatorRepository().getSupportedVersions()));
 
         // FIXME: OpsMetadata for InsertSensor, InsertObservation SOS 2.0
-        Map<RequestOperatorKeyType, RequestOperator> requestOperators = getConfigurator().getRequestOperatorRepository()
-                .getRequestOperator();
-        List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>(requestOperators.size());
-        for (RequestOperatorKeyType requestOperatorKeyType : requestOperators.keySet()) {
+        Set<RequestOperatorKeyType> requestOperatorKeyTypes = getConfigurator()
+                .getRequestOperatorRepository().getActiveRequestOperatorKeyTypes();
+        List<OWSOperation> opsMetadata = new ArrayList<OWSOperation>(requestOperatorKeyTypes.size());
+        for (RequestOperatorKeyType requestOperatorKeyType : requestOperatorKeyTypes) {
             if (requestOperatorKeyType.getServiceOperatorKeyType().getVersion().equals(version)) {
-                OWSOperation operationMetadata =
-                        requestOperators.get(requestOperatorKeyType).getOperationMetadata(service, version);
+                OWSOperation operationMetadata = getConfigurator().getRequestOperatorRepository()
+                        .getRequestOperator(requestOperatorKeyType).getOperationMetadata(service, version);
                 if (operationMetadata != null) {
                     opsMetadata.add(operationMetadata);
                 }

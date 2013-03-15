@@ -33,6 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.ConnectionProviderException;
+import org.n52.sos.encode.ResponseFormatKeyType;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
@@ -254,7 +255,7 @@ public abstract class SettingsManager {
      * Sets the status of an operation.
      * <p/>
      * @param requestOperatorKeyType the key identifying the operation
-     * @param active whether the operation is active or not
+     * @param active                 whether the operation is active or not
      * <p/>
      * @throws ConnectionProviderException
      */
@@ -275,6 +276,18 @@ public abstract class SettingsManager {
             ConnectionProviderException;
 
     /**
+     * Checks if the response format is active for the specified service and version.
+     *
+     * @param responseFormatKeyType the service/version/responseFormat combination
+     *
+     * @return if the format is active
+     *
+     * @throws ConnectionProviderException
+     */
+    public abstract boolean isActive(ResponseFormatKeyType responseFormatKeyType) throws
+            ConnectionProviderException;
+
+    /**
      * Sets the status of a response format for the specified service and version.
      *
      * @param serviceOperatorKeyType the service/version combination
@@ -285,4 +298,14 @@ public abstract class SettingsManager {
      */
     public abstract void setActive(ServiceOperatorKeyType serviceOperatorKeyType, String responseFormat, boolean active)
             throws ConnectionProviderException;
+
+    /**
+     * Sets the status of a response format for the specified service and version.
+     *
+     * @param rfkt   the service/version/responseFormat combination
+     * @param active                 the status
+     *
+     * @throws ConnectionProviderException
+     */
+    public abstract void setActive(ResponseFormatKeyType rfkt, boolean active) throws ConnectionProviderException;
 }

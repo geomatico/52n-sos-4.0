@@ -245,11 +245,12 @@ public class Configurator implements Cleanupable {
         SettingsManager.getInstance().configure(configuration = new ServiceConfiguration());
 
         initializeConnectionProviders();
-        codingRepository = new CodingRepository();
+        
         serviceIdentificationFactory = new SosServiceIdentificationFactory();
         serviceProviderFactory = new SosServiceProviderFactory();
         operationDaoRepository = new OperationDAORepository();
         serviceOperatorRepository = new ServiceOperatorRepository();
+        codingRepository = new CodingRepository();
         featureQueryHandler = loadAndConfigure(FeatureQueryHandler.class, true);
         cacheFeederDAO = loadAndConfigure(CacheFeederDAO.class, true);
         converterRepository = new ConverterRepository();
