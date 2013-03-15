@@ -23,7 +23,6 @@
  */
 package org.n52.sos.config.sqlite.entities;
 
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 
 import org.n52.sos.request.operator.RequestOperatorKeyType;
@@ -35,6 +34,7 @@ import org.n52.sos.request.operator.RequestOperatorKeyType;
  */
 @Entity(name = "operations")
 public class Operation extends Activatable<OperationKey, Operation> {
+    private static final long serialVersionUID = 1L;
     public Operation() {
         this(null, null, null);
     }

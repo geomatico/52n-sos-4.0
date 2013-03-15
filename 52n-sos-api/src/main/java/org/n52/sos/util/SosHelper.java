@@ -259,8 +259,6 @@ public class SosHelper {
      * 
      * @param srsName
      *            Requested SRS name
-     * @param srsNamePrefix
-     *            SRS name prefix, request version addicted
      * @return SRID
      * @throws OwsExceptionReport
      *             If an error occurs
@@ -732,7 +730,7 @@ public class SosHelper {
         default:
             break;
         }
-        if (unit == null || (unit != null && unit.isEmpty())) {
+        if (unit == null || unit.isEmpty()) {
             unit = SosConstants.NOT_DEFINED;
         }
         return new SosObservableProperty(identifier, description, unit, valueType);

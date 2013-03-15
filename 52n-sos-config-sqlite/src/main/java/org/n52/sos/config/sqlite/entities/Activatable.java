@@ -59,7 +59,8 @@ public class Activatable<K extends Serializable, T extends Activatable<K, T>> im
         return key;
     }
 
-    public T setEncodingKey(K encodingKey) {
+    @SuppressWarnings("unchecked")
+    public T setKey(K encodingKey) {
         this.key = encodingKey;
         return (T) this;
     }

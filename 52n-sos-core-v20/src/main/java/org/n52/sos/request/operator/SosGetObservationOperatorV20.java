@@ -207,7 +207,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
                 if (Configurator.getInstance().getProfileHandler().getActiveProfile()
                         .isReturnLatestValueIfTemporalFilterIsMissingInGetObservation()) {
                     // TODO check this for pofile
-                    List<TemporalFilter> filters = new ArrayList<TemporalFilter>();
+                    List<TemporalFilter> filters = new ArrayList<TemporalFilter>(1);
                     TemporalFilter filter = new TemporalFilter();
                     filter.setOperator(TimeOperator.TM_Equals);
                     filter.setValueReference("phenomenonTime");
@@ -295,11 +295,10 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
             Collection<String> offerings = Configurator.getInstance().getCache().getOfferings();
             List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
             for (String offeringId : offeringIds) {
-                if (offeringId == null || (offeringId != null && offeringId.isEmpty())) {
+                if (offeringId == null || offeringId.isEmpty()) {
                     exceptions.add(Util4Exceptions
                             .createMissingParameterValueException(SosConstants.GetObservationParams.offering.name()));
-                }
-                if (offeringId.contains(SosConstants.SEPARATOR_4_OFFERINGS)) {
+                } else if (offeringId.contains(SosConstants.SEPARATOR_4_OFFERINGS)) {
                     String[] offArray = offeringId.split(SosConstants.SEPARATOR_4_OFFERINGS);
                     if (!offerings.contains(offArray[0])
                         || !Configurator.getInstance().getCache()

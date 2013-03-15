@@ -67,8 +67,9 @@ public class ProcedureCacheUpdate extends CacheUpdate {
         return identifiers;
     }
 
+    @SuppressWarnings("unchecked")
     protected Set<String> getObservationIdentifiers(Session session, String procedureIdentifier) {
-        Map<String, String> aliases = new HashMap<String, String>();
+        Map<String, String> aliases = new HashMap<String, String>(2);
         HibernateQueryObject queryObject = new HibernateQueryObject();
         String ocAlias = HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(aliases, null);
         String procAlias = HibernateCriteriaQueryUtilities.addProcedureAliasToMap(aliases, ocAlias);
