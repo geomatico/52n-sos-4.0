@@ -96,6 +96,16 @@
                                                                 </a>
                                                             </li>
                                                             <li>
+                                                                <a href="<c:url value="/admin/operations" />">
+                                                                    <span class="menu-title">Operations</span>
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="<c:url value="/admin/encodings" />">
+                                                                    <span class="menu-title">Encodings</span>
+                                                                </a>
+                                                            </li>
+                                                            <li>
                                                                 <a href="<c:url value="/admin/database/settings" />">
                                                                     <span class="menu-title">Database</span>
                                                                 </a>
