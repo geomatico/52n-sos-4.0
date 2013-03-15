@@ -43,7 +43,7 @@
             <th>Service</th>
             <th>Version</th>
             <th>Encoding</th>
-            <th>Active</th>
+            <th>Status</th>
         </tr>
     </thead>
     <tbody></tbody>
@@ -92,7 +92,7 @@ jQuery(document).ready(function($) {
                 $button.addClass("btn-danger").text("inactive"); 
                 
             }
-            $("<td>").addClass("active").append($button).appendTo($row);
+            $("<td>").addClass("status").append($button).appendTo($row);
             
             $tbody.append($row);    
         }
