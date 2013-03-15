@@ -57,6 +57,7 @@ import org.n52.sos.config.sqlite.entities.UriSettingValue;
 import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
+import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -209,14 +210,14 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    public boolean isActive(String service, String version, String responseFormat) throws ConnectionProviderException {
-        return isActive(ResponseFormat.class, new ReponseFormatKey(service, version, responseFormat));
+    public boolean isActive(ServiceOperatorKeyType sokt, String responseFormat) throws ConnectionProviderException {
+        return isActive(ResponseFormat.class, new ReponseFormatKey(sokt.getService(), sokt.getVersion(), responseFormat));
     }
 
     @Override
-    public void setActive(String service, String version, String responseFormat, boolean active) throws
+    public void setActive(ServiceOperatorKeyType sokt, String responseFormat, boolean active) throws
             ConnectionProviderException {
-        setActive(ResponseFormat.class, new ResponseFormat(service, version, responseFormat), active);
+        setActive(ResponseFormat.class, new ResponseFormat(sokt.getService(), sokt.getVersion(), responseFormat), active);
     }
 
     protected <K extends Serializable, T extends Activatable<K, T>> void setActive(Class<T> type, T activatable,
@@ -313,7 +314,8 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
 
         @Override
         protected Boolean call(Session session) {
-            Activatable<K, T> o = (Activatable<K, T>) session.get(type, key);
+            @SuppressWarnings("unchecked")
+            T o = (T) session.get(type, key);
             return (o == null) ? true : o.isActive();
         }
     }

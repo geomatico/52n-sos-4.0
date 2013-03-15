@@ -77,7 +77,9 @@ public class SQLiteSettingsManagerTest {
     private static final String RESPONSE_FORMAT = "responseFormat";
     private static ConnectionProvider connectionProvider;
     private static File databaseFile;
-    
+    public static final ServiceOperatorKeyType SOKT = new ServiceOperatorKeyType(SERVICE, VERSION);
+    public static final RequestOperatorKeyType ROKT = new RequestOperatorKeyType(SOKT, OPERATION_NAME);
+
 
     @BeforeClass
     public static void setUpClass() throws ConfigurationException, IOException {
@@ -224,25 +226,23 @@ public class SQLiteSettingsManagerTest {
 
     @Test
     public void testActiveOperations() throws ConnectionProviderException {
-        RequestOperatorKeyType key =
-                               new RequestOperatorKeyType(new ServiceOperatorKeyType(SERVICE, VERSION), OPERATION_NAME);
 
 
-        assertThat(settingsManager.isActive(key), is(true));
-        settingsManager.setActive(key, true);
-        assertThat(settingsManager.isActive(key), is(true));
-        settingsManager.setActive(key, false);
-        assertThat(settingsManager.isActive(key), is(false));
+        assertThat(settingsManager.isActive(ROKT), is(true));
+        settingsManager.setActive(ROKT, true);
+        assertThat(settingsManager.isActive(ROKT), is(true));
+        settingsManager.setActive(ROKT, false);
+        assertThat(settingsManager.isActive(ROKT), is(false));
 
     }
 
     @Test
     public void testActiveResponseFormats() throws ConnectionProviderException {
-        assertThat(settingsManager.isActive(SERVICE, VERSION, RESPONSE_FORMAT), is(true));
-        settingsManager.setActive(SERVICE, VERSION, RESPONSE_FORMAT, true);
-        assertThat(settingsManager.isActive(SERVICE, VERSION, RESPONSE_FORMAT), is(true));
-        settingsManager.setActive(SERVICE, VERSION, RESPONSE_FORMAT, false);
-        assertThat(settingsManager.isActive(SERVICE, VERSION, RESPONSE_FORMAT), is(false));
+        assertThat(settingsManager.isActive(SOKT, RESPONSE_FORMAT), is(true));
+        settingsManager.setActive(SOKT, RESPONSE_FORMAT, true);
+        assertThat(settingsManager.isActive(SOKT, RESPONSE_FORMAT), is(true));
+        settingsManager.setActive(SOKT, RESPONSE_FORMAT, false);
+        assertThat(settingsManager.isActive(SOKT, RESPONSE_FORMAT), is(false));
 
     }
 }

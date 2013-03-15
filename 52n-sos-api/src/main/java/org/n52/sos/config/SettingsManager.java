@@ -35,6 +35,7 @@ import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.Configurator;
+import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
 import org.n52.sos.util.ConfiguringSingletonServiceLoader;
 import org.slf4j.Logger;
@@ -263,27 +264,25 @@ public abstract class SettingsManager {
     /**
      * Checks if the response format is active for the specified service and version.
      *
-     * @param service        the service
-     * @param version        the version
-     * @param responseFormat the responseFormat
+     * @param serviceOperatorKeyType the service/version combination
+     * @param responseFormat         the responseFormat
      *
      * @return if the format is active
      *
      * @throws ConnectionProviderException
      */
-    public abstract boolean isActive(String service, String version, String responseFormat) throws
+    public abstract boolean isActive(ServiceOperatorKeyType serviceOperatorKeyType, String responseFormat) throws
             ConnectionProviderException;
 
     /**
      * Sets the status of a response format for the specified service and version.
      *
-     * @param service        the service
-     * @param version        the version
-     * @param responseFormat the responseFormat
-     * @param active         the status
+     * @param serviceOperatorKeyType the service/version combination
+     * @param responseFormat         the responseFormat
+     * @param active                 the status
      *
      * @throws ConnectionProviderException
      */
-    public abstract void setActive(String service, String version, String responseFormat, boolean active) throws
-            ConnectionProviderException;
+    public abstract void setActive(ServiceOperatorKeyType serviceOperatorKeyType, String responseFormat, boolean active)
+            throws ConnectionProviderException;
 }
