@@ -96,12 +96,15 @@ public class ServiceOperatorRepository extends AbstractConfiguringServiceLoaderR
 		super.update();
     }
 
-	  /**
+    /**
      * @return the implemented request listener
-     * @throws OwsExceptionReport
      */
-    public Map<ServiceOperatorKeyType, ServiceOperator> getServiceOperators() throws OwsExceptionReport {
+    public Map<ServiceOperatorKeyType, ServiceOperator> getServiceOperators() {
         return Collections.unmodifiableMap(serviceOperators);
+    }
+
+    public Set<ServiceOperatorKeyType> getServiceOperatorKeyTypes() {
+        return getServiceOperators().keySet();
     }
 
     public ServiceOperator getServiceOperator(ServiceOperatorKeyType serviceOperatorIdentifier)

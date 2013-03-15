@@ -23,11 +23,11 @@
  */
 package org.n52.sos.service;
 
-import org.n52.sos.config.ConfigurationException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,11 +36,14 @@ import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import org.n52.sos.decode.DecoderKey;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.decode.Decoder;
-import org.n52.sos.encode.EncoderKey;
+import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.encode.Encoder;
+import org.n52.sos.encode.EncoderKey;
+import org.n52.sos.encode.ObservationEncoder;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;
@@ -98,6 +101,8 @@ public class CodingRepository {
     private final Map<DecoderKey, Set<Decoder<?, ?>>> decoderByKey = CollectionHelper.map();
     private final Map<EncoderKey, Set<Encoder<?, ?>>> encoderByKey = CollectionHelper.map();
     private Map<SupportedTypeKey, Set<String>> typeMap = Collections.emptyMap();
+    private final Set<ObservationEncoder<?, ?>> observationEncoders = CollectionHelper.set();
+
 
     public CodingRepository() throws ConfigurationException {
 		this.serviceLoaderDecoder = ServiceLoader.load(Decoder.class);
@@ -241,6 +246,9 @@ public class CodingRepository {
                 }
                 encodersForKey.add(encoder);
             }
+            if (encoder instanceof ObservationEncoder) {
+                observationEncoders.add((ObservationEncoder<?, ?>) encoder);
+            }
         }
     }
 
@@ -349,6 +357,23 @@ public class CodingRepository {
                     StringHelper.join(", ", matches));
         }
         return matches;
+    }
+
+    public Set<String> getSupportedResponseFormats(String service, String version) {
+        Set<String> responseFormats = new HashSet<String>(observationEncoders.size());
+        for (ObservationEncoder<?, ?> encoder : observationEncoders) {
+            responseFormats.addAll(encoder.getSupportedResponseFormats(service, version));
+        }
+        return responseFormats;
+    }
+
+    public Map<ServiceOperatorKeyType, Set<String>> getSupportedResponseFormats() {
+        Set<ServiceOperatorKeyType> keys = Configurator.getInstance().getServiceOperatorRepository().getServiceOperatorKeyTypes();
+        Map<ServiceOperatorKeyType, Set<String>> responseFormats = new HashMap<ServiceOperatorKeyType, Set<String>>(keys.size());
+        for (ServiceOperatorKeyType key : keys) {
+            responseFormats.put(key, getSupportedResponseFormats(key.getService(), key.getVersion()));
+        }
+        return responseFormats;
     }
 
     private static abstract class SimilarityComparator<T> implements Comparator<T> {

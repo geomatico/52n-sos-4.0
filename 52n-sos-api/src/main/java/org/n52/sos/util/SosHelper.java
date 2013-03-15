@@ -64,6 +64,7 @@ import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -737,15 +738,12 @@ public class SosHelper {
         return new SosObservableProperty(identifier, description, unit, valueType);
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * @deprecated use {@link CodingRepository#getSupportedResponseFormats(java.lang.String, java.lang.String) }
+     */
+    @Deprecated
     public static Collection<String> getSupportedResponseFormats(String service, String version) {
-        Set<String> responseFormats = new HashSet<String>();
-        for (Encoder<?, ?> iEncoder : getConfiguration().getEncoders()) {
-            if (iEncoder instanceof ObservationEncoder) {
-                responseFormats.addAll(((ObservationEncoder) iEncoder).getSupportedResponseFormats(service, version));
-            }
-        }
-        return responseFormats;
+        return Configurator.getInstance().getCodingRepository().getSupportedResponseFormats(service, version);
     }
     
     public static Object duplicateObject(Object objectToDuplicate) throws OwsExceptionReport {
