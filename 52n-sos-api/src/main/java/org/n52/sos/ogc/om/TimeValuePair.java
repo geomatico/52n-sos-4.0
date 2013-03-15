@@ -26,7 +26,7 @@ package org.n52.sos.ogc.om;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.om.values.IValue;
 
-public class TimeValuePair {
+public class TimeValuePair implements Comparable<TimeValuePair> {
     
     private ITime time;
     
@@ -51,6 +51,11 @@ public class TimeValuePair {
 
     public void setValue(IValue<?> value) {
         this.value = value;
+    }
+
+    @Override
+    public int compareTo(TimeValuePair o) {
+        return time.compareTo(o.time);
     }
 
 }
