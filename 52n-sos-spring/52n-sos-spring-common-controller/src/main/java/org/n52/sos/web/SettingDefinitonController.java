@@ -29,10 +29,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.jettison.json.JSONException;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingDefinitionGroup;
-import org.n52.sos.config.SettingsManager;
-import org.n52.sos.config.ConfigurationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -51,9 +50,9 @@ public class SettingDefinitonController extends AbstractController {
 
     @ResponseBody
     @RequestMapping(value = ControllerConstants.Paths.SETTING_DEFINITIONS, method = RequestMethod.GET,
-                    produces = "application/json; charset=UTF-8")
+                    produces = ControllerConstants.MEDIA_TYPE_APPLICATION_JSON)
     public String get() throws ConfigurationException, JSONException {
-        Set<SettingDefinition<?, ?>> defs = SettingsManager.getInstance().getSettingDefinitions();
+        Set<SettingDefinition<?, ?>> defs = getSettingsManager().getSettingDefinitions();
         Map<SettingDefinitionGroup, Set<SettingDefinition<?, ?>>> grouped = sortByGroup(defs);
         return getEncoder().encode(grouped).toString(4);
     }

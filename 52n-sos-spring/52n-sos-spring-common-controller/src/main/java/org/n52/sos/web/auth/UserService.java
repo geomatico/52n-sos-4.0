@@ -71,7 +71,7 @@ public class UserService implements AuthenticationProvider, Serializable {
         }
 
         try {
-            user = SettingsManager.getInstance().getAdminUser(username);
+            user = getSettingsManager().getAdminUser(username);
         } catch (Exception ex) {
             log.error("Error querying admin", ex);
             throw new BadCredentialsException("Bad Credentials");
@@ -95,7 +95,7 @@ public class UserService implements AuthenticationProvider, Serializable {
 
     public AdministratorUser createAdmin(String username, String password) {
         try {
-            return SettingsManager.getInstance().createAdminUser(username, getPasswordEncoder().encode(password));
+            return getSettingsManager().createAdminUser(username, getPasswordEncoder().encode(password));
         } catch (Exception ex) {
             log.error("Error saving admin", ex);
             throw new RuntimeException(ex);
@@ -104,7 +104,7 @@ public class UserService implements AuthenticationProvider, Serializable {
 
     public void setAdminUserName(AdministratorUser user, String name) {
         try {
-            SettingsManager.getInstance().saveAdminUser(user.setUsername(name));
+            getSettingsManager().saveAdminUser(user.setUsername(name));
         } catch (Exception ex) {
             log.error("Error saving admin", ex);
             throw new RuntimeException(ex);
@@ -113,7 +113,7 @@ public class UserService implements AuthenticationProvider, Serializable {
 
     public void setAdminPassword(AdministratorUser user, String password) {
         try {
-            SettingsManager.getInstance().saveAdminUser(user.setPassword(getPasswordEncoder().encode(password)));
+            getSettingsManager().saveAdminUser(user.setPassword(getPasswordEncoder().encode(password)));
         } catch (Exception ex) {
             log.error("Error saving admin", ex);
             throw new RuntimeException(ex);
@@ -122,7 +122,7 @@ public class UserService implements AuthenticationProvider, Serializable {
 
     public AdministratorUser getAdmin(String username) throws ConfigurationException {
         try {
-            return SettingsManager.getInstance().getAdminUser(username);
+            return getSettingsManager().getAdminUser(username);
         } catch (ConnectionProviderException e) {
            throw new ConfigurationException(e);
         }
@@ -130,7 +130,7 @@ public class UserService implements AuthenticationProvider, Serializable {
 
     public AdministratorUser getAdmin(Principal user) throws ConfigurationException {
         try {
-            return SettingsManager.getInstance().getAdminUser(user.getName());
+            return getSettingsManager().getAdminUser(user.getName());
         } catch (ConnectionProviderException e) {
             throw new ConfigurationException(e);
         }
@@ -150,6 +150,10 @@ public class UserService implements AuthenticationProvider, Serializable {
 
     public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
+    }
+
+    protected SettingsManager getSettingsManager() throws ConfigurationException {
+        return SettingsManager.getInstance();
     }
 
     private static class AdministratorAuthority implements GrantedAuthority {

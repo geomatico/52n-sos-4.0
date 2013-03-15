@@ -30,9 +30,10 @@ import javax.servlet.http.HttpSession;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingsManager;
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
 @RequestMapping(ControllerConstants.Paths.INSTALL_LOAD_CONFIGURATION)
-public class InstallLoadSettingsController {
+public class InstallLoadSettingsController extends AbstractController {
 
     private static final Logger log = LoggerFactory.getLogger(InstallLoadSettingsController.class);
 
@@ -57,18 +58,17 @@ public class InstallLoadSettingsController {
     public void post(@RequestBody String config, HttpServletRequest req) throws JSONException, ConfigurationException {
         final HttpSession session = req.getSession();
         InstallationConfiguration c = AbstractInstallController.getSettings(session);
-        SettingsManager sm = SettingsManager.getInstance();
         JSONObject settings = new JSONObject(config);
         Iterator< ?> i = settings.keys();
         while (i.hasNext()) {
             String key = (String) i.next();
             String value = settings.getString(key);
-            SettingDefinition<?, ?> def = sm.getDefinitionByKey(key);
+            SettingDefinition<?, ?> def = getSettingsManager().getDefinitionByKey(key);
             if (def == null) {
                 log.warn("No definition for setting with key {}", key);
                 continue;
             }
-            c.setSetting(def, sm.getSettingFactory().newSettingValue(def, value));
+            c.setSetting(def, getSettingsManager().getSettingFactory().newSettingValue(def, value));
         }
         AbstractInstallController.setSettings(session, c);
     }

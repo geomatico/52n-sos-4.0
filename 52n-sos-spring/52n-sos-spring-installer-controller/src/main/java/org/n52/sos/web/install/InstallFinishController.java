@@ -88,7 +88,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         loadDriver(properties, c);
 
         try {
-            SettingsManager.getInstance().deleteAll();
+            getSettingsManager().deleteAll();
         } catch (Throwable e) {
             throw new InstallationSettingsError(c, String.format(ErrorMessages.COULD_NOT_DELETE_PREVIOUS_SETTINGS, e
                     .getMessage()));
@@ -220,7 +220,7 @@ public class InstallFinishController extends AbstractProcessingInstallationContr
         try {
 
             for (SettingValue<?> e : c.getSettings().values()) {
-                SettingsManager.getInstance().changeSetting(e);
+                getSettingsManager().changeSetting(e);
             }
 
 //            try {

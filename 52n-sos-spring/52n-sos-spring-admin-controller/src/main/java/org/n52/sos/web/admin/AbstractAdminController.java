@@ -37,6 +37,7 @@ import org.hibernate.Transaction;
 import org.hibernate.jdbc.Work;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.ConnectionProvider;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.util.SQLHelper;
@@ -82,5 +83,9 @@ public abstract class AbstractAdminController extends AbstractController {
         } finally {
             p.returnConnection(con);
         }
+    }
+
+    protected boolean updateCache() throws OwsExceptionReport {
+        return Configurator.getInstance().getCacheController().updateCacheFromDatasource();
     }
 }

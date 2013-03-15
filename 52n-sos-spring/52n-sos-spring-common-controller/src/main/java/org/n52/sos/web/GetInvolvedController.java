@@ -27,7 +27,6 @@ import java.net.URI;
 
 import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.config.SettingValue;
-import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.service.ServiceSettings;
 import org.slf4j.Logger;
@@ -50,7 +49,7 @@ public class GetInvolvedController extends AbstractController {
     public ModelAndView view() {
         SettingValue<URI> setting = null;
         try {
-            setting = SettingsManager.getInstance().getSetting(ServiceSettings.SERVICE_URL_DEFINITION);
+            setting = getSettingsManager().getSetting(ServiceSettings.SERVICE_URL_DEFINITION);
         } catch (ConfigurationException ex) {
             log.error("Could not load service url", ex);
         } catch (ConnectionProviderException ex) {

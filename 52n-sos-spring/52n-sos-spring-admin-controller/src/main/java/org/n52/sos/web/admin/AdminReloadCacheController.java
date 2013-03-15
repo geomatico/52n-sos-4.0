@@ -57,7 +57,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
 @RequestMapping(ControllerConstants.Paths.ADMIN_RELOAD_CAPABILITIES_CACHE)
-public class AdminReloadCacheController extends AbstractController {
+public class AdminReloadCacheController extends AbstractAdminController {
     private static final Logger log = LoggerFactory.getLogger(AdminReloadCacheController.class);
 
     @RequestMapping(method = RequestMethod.POST)
@@ -65,7 +65,7 @@ public class AdminReloadCacheController extends AbstractController {
     public void reload() throws OwsExceptionReport, UnavailableException {
         log.debug("Reloading Capabilitities Cache");
         if (Configurator.getInstance() != null) {
-            Configurator.getInstance().getCacheController().updateCacheFromDatasource();
+            updateCache();
         } else {
             throw new UnavailableException("configurator is not available");
         }

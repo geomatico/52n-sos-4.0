@@ -27,6 +27,8 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.config.SettingsManager;
 import org.n52.sos.service.DatabaseSettingsHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -36,6 +38,7 @@ public class AbstractController {
 
     @Autowired
     private ServletContext context;
+    private SettingsManager sm;
 
     public ServletContext getContext() {
         return this.context;
@@ -71,5 +74,9 @@ public class AbstractController {
             }
         }
         return Boolean.FALSE;
+    }
+
+    protected SettingsManager getSettingsManager() throws ConfigurationException {
+        return (sm == null) ? sm = SettingsManager.getInstance() : sm;
     }
 }

@@ -24,10 +24,8 @@
 package org.n52.sos.web.admin;
 
 import org.n52.sos.config.ConfigurationException;
-import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +37,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
 @RequestMapping(ControllerConstants.Paths.ADMIN_RESET)
-public class AdminResetController extends AbstractController {
+public class AdminResetController extends AbstractAdminController {
     private static final Logger log = LoggerFactory.getLogger(AdminResetController.class);
 
     @RequestMapping(method = RequestMethod.GET)
@@ -55,7 +53,7 @@ public class AdminResetController extends AbstractController {
             Configurator.getInstance().cleanup();
         }
         getDatabaseSettingsHandler().delete();
-        SettingsManager.getInstance().deleteAll();
+        getSettingsManager().deleteAll();
         return new RedirectView(ControllerConstants.Paths.LOGOUT, true);
     }
 }

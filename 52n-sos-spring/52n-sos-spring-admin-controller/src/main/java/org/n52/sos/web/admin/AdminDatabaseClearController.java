@@ -65,6 +65,6 @@ public class AdminDatabaseClearController extends AbstractAdminController {
                                         ConnectionProviderException {
         log.info("Clearing database contents.");
         executeSqlFile(ControllerConstants.CLEAR_DATABASE_SQL_FILE);
-        Configurator.getInstance().getCacheController().updateCacheFromDatasource();
+        updateCache();
     }
 }

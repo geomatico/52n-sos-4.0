@@ -112,7 +112,7 @@ public class AdminDatabaseController extends AbstractAdminController {
                                         ConnectionProviderException {
         log.info("Removing test data set.");
         executeSqlFile(ControllerConstants.REMOVE_TEST_DATA_SQL_FILE);
-        Configurator.getInstance().getCacheController().updateCacheFromDatasource();
+        updateCache();
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -121,6 +121,6 @@ public class AdminDatabaseController extends AbstractAdminController {
                                         ConnectionProviderException {
         log.info("Inserting test data set.");
         executeSqlFile(ControllerConstants.INSERT_TEST_DATA_SQL_FILE);
-        Configurator.getInstance().getCacheController().updateCacheFromDatasource();
+        updateCache();
     }
 }

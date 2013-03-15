@@ -56,7 +56,6 @@ import org.n52.sos.config.AdministratorUser;
 import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingValue;
-import org.n52.sos.config.SettingsManager;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.web.AbstractController;
 import org.n52.sos.web.ControllerConstants;
@@ -80,7 +79,6 @@ public class AdminSettingsController extends AbstractController {
     private static final Logger log = LoggerFactory.getLogger(AdminSettingsController.class);
     @Autowired
     private UserService userService;
-    private SettingsManager sm;
 
     public UserService getUserService() {
         return userService;
@@ -176,10 +174,6 @@ public class AdminSettingsController extends AbstractController {
                 log.info("Saving Setting: ('{}'({}) => '{}')", value.getKey(), value.getType(), value.getValue());
             }
         }
-    }
-
-    private SettingsManager getSettingsManager() throws ConfigurationException {
-        return (sm == null) ? sm = SettingsManager.getInstance() : sm;
     }
 
     private void updateSettings(HttpServletRequest request) throws RuntimeException, SQLException,
