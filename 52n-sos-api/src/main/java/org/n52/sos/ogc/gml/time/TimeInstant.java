@@ -174,7 +174,7 @@ public class TimeInstant extends ITime {
     }
     
     public boolean isSetIndeterminateValue() {
-        return indeterminateValue != null && !indeterminateValue.isEmpty();
+        return getIndeterminateValue() != null && !getIndeterminateValue().isEmpty();
     }
     
     /**
