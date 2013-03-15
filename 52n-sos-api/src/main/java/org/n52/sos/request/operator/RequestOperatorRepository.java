@@ -86,4 +86,8 @@ public class RequestOperatorRepository extends AbstractConfiguringServiceLoaderR
     public Map<RequestOperatorKeyType, RequestOperator> getRequestOperator() {
         return Collections.unmodifiableMap(this.requestOperators);
     }
+
+    public Set<RequestOperatorKeyType> getRequestOperatorKeyTypes() {
+        return getRequestOperator().keySet();
+    }
 }
