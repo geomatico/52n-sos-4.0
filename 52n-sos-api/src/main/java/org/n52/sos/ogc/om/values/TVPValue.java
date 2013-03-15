@@ -24,6 +24,7 @@
 package org.n52.sos.ogc.om.values;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.n52.sos.ogc.gml.time.ITime;
@@ -45,6 +46,7 @@ public class TVPValue implements IMultiValue<List<TimeValuePair>> {
 
     @Override
     public List<TimeValuePair> getValue() {
+        Collections.sort(value);
         return value;
     }
     
