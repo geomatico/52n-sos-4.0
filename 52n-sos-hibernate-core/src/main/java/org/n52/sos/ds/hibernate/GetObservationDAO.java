@@ -80,7 +80,12 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
                 sosResponse.setService(sosRequest.getService());
                 sosResponse.setVersion(sosRequest.getVersion());
                 sosResponse.setResponseFormat(sosRequest.getResponseFormat());
-                sosResponse.setObservationCollection(queryObservation(sosRequest, session));
+                if (getConfigurator().getProfileHandler().getActiveProfile().isShowMetadataOfEmptyObservations()) {
+                    // TODO Hydro-Profile adds empty observation metadata to response
+                    sosResponse.setObservationCollection(queryObservationHydro(sosRequest, session));
+                } else {
+                    sosResponse.setObservationCollection(queryObservation(sosRequest, session));
+                }
                 return sosResponse;
             }
         } catch (HibernateException he) {
@@ -91,7 +96,97 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
             sessionHolder.returnSession(session);
         }
     }
+    
+    protected List<SosObservation> queryObservation(GetObservationRequest request, Session session)
+            throws OwsExceptionReport {
+        long start = System.currentTimeMillis();
+        Map<String, String> observationAliases = new HashMap<String, String>();
+        HibernateQueryObject observationQueryObject = new HibernateQueryObject();
+        String obsConstAlias =
+                HibernateCriteriaQueryUtilities.addObservationConstallationAliasToMap(observationAliases, null);
+        String obsConstOffObsTypeAlias = HibernateCriteriaQueryUtilities.addObservationConstellationOfferingObservationTypesAliasToMap(
+                observationAliases, obsConstAlias);
 
+        // offering
+        if (request.isSetOffering()) {
+            observationQueryObject.addCriterion(getCriterionForOffering(observationAliases,
+                    obsConstOffObsTypeAlias, request.getOfferings()));
+        }
+        // observableProperties
+        if (request.isSetObservableProperty()) {
+            observationQueryObject.addCriterion(getCriterionForObservableProperties(observationAliases, obsConstAlias,
+                    request.getObservedProperties()));
+        }
+        // procedures
+        if (request.isSetProcedure()) {
+            observationQueryObject.addCriterion(getCriterionForProcedures(observationAliases, obsConstAlias,
+                    request.getProcedures()));
+        }
+        observationQueryObject.addCriterion(Restrictions.isNotNull(HibernateCriteriaQueryUtilities
+                .getParameterWithPrefix(HibernateConstants.PARAMETER_OBSERVATION_TYPE, obsConstOffObsTypeAlias)));
+
+        // feature identifier
+        Set<String> featureIdentifier =
+                QueryHelper.getFeatureIdentifier(request.getSpatialFilter(), request.getFeatureIdentifiers(), session);
+        if (featureIdentifier != null && featureIdentifier.isEmpty()) {
+            return null;
+        } else if (featureIdentifier != null && !featureIdentifier.isEmpty()) {
+            String foiAlias = HibernateCriteriaQueryUtilities.addFeatureOfInterestAliasToMap(observationAliases, null);
+            observationQueryObject.addCriterion(HibernateCriteriaQueryUtilities.getDisjunctionCriterionForStringList(
+                    HibernateCriteriaQueryUtilities.getIdentifierParameter(foiAlias), new ArrayList<String>(
+                            featureIdentifier)));
+        }
+
+        observationQueryObject.setAliases(observationAliases);
+        List<SosObservation> sosObservations = new LinkedList<SosObservation>();
+
+        // temporal filters
+        List<FirstLatest> firstLatestTemporalFilter = null;
+        Criterion criterionForTemporalFilters = null;
+        if (request.hasTemporalFilters()) {
+            firstLatestTemporalFilter = SosHelper.getFirstLatestTemporalFilter(request.getTemporalFilters());
+            List<TemporalFilter> nonFirstLatestTemporalFilter =
+                    SosHelper.getNonFirstLatestTemporalFilter(request.getTemporalFilters());
+            if (nonFirstLatestTemporalFilter != null && !nonFirstLatestTemporalFilter.isEmpty()) {
+                criterionForTemporalFilters =
+                        HibernateCriteriaQueryUtilities.getCriterionForTemporalFilters(nonFirstLatestTemporalFilter);
+            }
+        }
+        // query observations
+        // TODO Threadable !?!
+        // TODO How to ensure no duplicated observations ?!
+        // TODO How to ensure that anti subsetting observation are also
+        // included ?!
+        Set<Observation> observations = new HashSet<Observation>(0);
+            if (request.hasTemporalFilters()) {
+                if (firstLatestTemporalFilter != null && !firstLatestTemporalFilter.isEmpty()) {
+                    for (FirstLatest firstLatest : firstLatestTemporalFilter) {
+                        HibernateQueryObject firstLatestQueryObject = observationQueryObject.clone();
+                        firstLatestQueryObject.addOrder(HibernateCriteriaQueryUtilities.getOrderForEnum(firstLatest));
+                        firstLatestQueryObject.setMaxResult(1);
+                        observations.addAll(HibernateCriteriaQueryUtilities.getObservations(firstLatestQueryObject,
+                                session));
+                    }
+                } else if (criterionForTemporalFilters != null) {
+                    observationQueryObject.addCriterion(criterionForTemporalFilters);
+                    observations.addAll(HibernateCriteriaQueryUtilities.getObservations(observationQueryObject, session));
+                }
+            } else {
+                observations.addAll(HibernateCriteriaQueryUtilities.getObservations(observationQueryObject, session));
+            }
+        LOGGER.debug("Time to query observations needs {} ms!", (System.currentTimeMillis()-start));
+        if (observations != null && !observations.isEmpty()) {
+            long startProcess = System.currentTimeMillis();
+            sosObservations.addAll(HibernateObservationUtilities.createSosObservationsFromObservations(
+                    observations, request.getVersion(), session));
+            LOGGER.debug("Time to process observations needs {} ms!", (System.currentTimeMillis()-startProcess));
+        }
+        LOGGER.debug("Time to query and process observations needs {} ms!", (System.currentTimeMillis()-start));
+        return sosObservations;
+        
+    }
+
+        
     /**
      * Query observations from database depending on requested filters
      * 
@@ -103,9 +198,9 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
      * @throws OwsExceptionReport
      *             If an error occurs.
      */
-    protected List<SosObservation> queryObservation(GetObservationRequest request, Session session)
+    protected List<SosObservation> queryObservationHydro(GetObservationRequest request, Session session)
             throws OwsExceptionReport {
-
+        long start = System.currentTimeMillis();
         Map<String, String> observationConstellationAliases = new HashMap<String, String>();
         HibernateQueryObject observationConstellationQueryObject = new HibernateQueryObject();
         String obsConstOffObsTypeAlias =
@@ -209,25 +304,23 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
             if (observations != null && !observations.isEmpty()) {
                 allObservations.addAll(observations);
             } else {
-                // TODO Hydro-Profile add empty observation metadata as
-                // SosObservation (add FOI)
-                if (getConfigurator().getProfileHandler().getActiveProfile().isShowMetadataOfEmptyObservations()) {
                     List<String> featureOfInterestIdentifiers =
                             getAndCheckFeatureOfInterest(observationConstellation, featureIdentifier, session);
                     sosObservations.addAll(HibernateObservationUtilities
                             .createSosObservationFromObservationConstellation(observationConstellation,
                                     featureOfInterestIdentifiers, request.getVersion(), session));
-                }
             }
         }
-
+        LOGGER.debug("Time to query observations needs {} ms!", (System.currentTimeMillis()-start));
         if (allObservations != null && !allObservations.isEmpty()) {
+            long startProcess = System.currentTimeMillis();
             sosObservations.addAll(HibernateObservationUtilities.createSosObservationsFromObservations(
                     allObservations, request.getVersion(), session));
+            LOGGER.debug("Time to process observations needs {} ms!", (System.currentTimeMillis()-startProcess));
         }
+        LOGGER.debug("Time to query and process observations needs {} ms!", (System.currentTimeMillis()-start));
         return sosObservations;
     }
-
 
     private List<String> getAndCheckFeatureOfInterest(ObservationConstellation observationConstellation,
             Set<String> featureIdentifier, Session session) {
