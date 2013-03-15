@@ -38,12 +38,18 @@ public abstract class ITime implements Comparable<ITime>, Serializable {
     private String indeterminateValue;
     
     private TimeFormat timeFormat = TimeFormat.NOT_SET;
-    
+
     public ITime() {
+        this(null, null);
     }
 
     public ITime(String gmlId) {
+        this(gmlId, null);
+    }
+
+    public ITime(String gmlId, String indeterminateValue) {
         this.gmlId = gmlId;
+        this.indeterminateValue = indeterminateValue;
     }
 
     public void setGmlId(String gmlId) {
@@ -51,7 +57,7 @@ public abstract class ITime implements Comparable<ITime>, Serializable {
     }
 
     public String getGmlId() {
-        if (isSetGmlId()) {
+        if (this.gmlId != null) {
             return this.gmlId.replaceFirst("#", "");
         }
         return this.gmlId;
@@ -77,15 +83,15 @@ public abstract class ITime implements Comparable<ITime>, Serializable {
     }
     
     public boolean isSetGmlId() {
-        return gmlId != null && !gmlId.isEmpty();
+        return getGmlId() != null && !getGmlId().isEmpty();
     }
     
     public boolean isSetIndeterminateValue(){
-        return indeterminateValue != null && !indeterminateValue.isEmpty();
+        return getIndeterminateValue() != null && !getIndeterminateValue().isEmpty();
     }
     
     public boolean isReferenced() {
-        return isSetGmlId() && gmlId.startsWith("#");
+        return isSetGmlId() && this.gmlId.startsWith("#");
     }
     
     public TimeFormat getTimeFormat() {

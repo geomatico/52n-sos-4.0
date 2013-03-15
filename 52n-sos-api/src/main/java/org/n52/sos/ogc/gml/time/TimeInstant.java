@@ -36,33 +36,30 @@ public class TimeInstant extends ITime {
     /** date for this timeInstant */
     private DateTime value;
 
-    /** indeterminate position of timeInstant */
-    private String indeterminateValue;
-
     /** length of timeInstant date */
     private int requestedTimeLength;
 
     /**
      * default constructor
-     * 
      */
     public TimeInstant() {
+        super();
     }
 
     public TimeInstant(DateTime dateTime) {
+        super();
         this.value = dateTime;
     }
 
     /**
      * constructor with date and indeterminateValue
      * 
-     * @param value
-     *            date of the timeInstante
+     * @param dateValue     *            date of the timeInstante
      * @param indeterminateValue
      */
     public TimeInstant(DateTime dateValue, String indeterminateValue) {
+        super(null, indeterminateValue);
         this.value = dateValue;
-        this.indeterminateValue = indeterminateValue;
     }
 
     /**
@@ -113,9 +110,9 @@ public class TimeInstant extends ITime {
         if (value != null) {
             String dateString;
             dateString = value.toString();
-            return "Time instant: " + dateString + "," + indeterminateValue;
+            return "Time instant: " + dateString + "," + getIndeterminateValue();
         } else {
-            return "Time instant: " + indeterminateValue;
+            return "Time instant: " + getIndeterminateValue();
         }
     }
 
@@ -171,10 +168,6 @@ public class TimeInstant extends ITime {
     
     public boolean isSetValue() {
         return value != null;
-    }
-    
-    public boolean isSetIndeterminateValue() {
-        return getIndeterminateValue() != null && !getIndeterminateValue().isEmpty();
     }
     
     /**
