@@ -52,6 +52,11 @@
 			<td><a href='http://opensource.org/licenses/mit-license.php'>MIT</a></td>
 		</tr>
 		<tr>
+			<td><a href='https://github.com/Mottie/tablesorter'>JQuery Tablesorter Plugin</a></td>
+			<td>2.7.12</td>
+			<td><a href='http://www.opensource.org/licenses/mit-license.php'>MIT</a></td>
+		</tr>
+		<tr>
 			<td><a href='http://jquery.com/'>JQuery</a></td>
 			<td>2.34</td>
 			<td><a href='http://jquery.org/license/'>MIT</a></td>
