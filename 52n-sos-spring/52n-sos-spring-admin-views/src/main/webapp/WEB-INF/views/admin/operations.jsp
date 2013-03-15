@@ -60,7 +60,8 @@ jQuery(document).ready(function($) {
             $("<td>").addClass("service").text(o.service).appendTo($row);
             $("<td>").addClass("version").text(o.version).appendTo($row);
             $("<td>").addClass("operation").text(o.operation).appendTo($row);
-            $button = $("<button>").attr("type", "button").addClass("btn").on("click", function() {
+            $button = $("<button>").attr("type", "button")
+                    .addClass("btn btn-small btn-block").on("click", function() {
                 var $b = $(this),
                     $tr = $b.parents("tr"),
                     active = !$b.hasClass("btn-success"),
