@@ -36,10 +36,15 @@ import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.hibernate.HibernateQueryObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultHibernateCriteriaQueryUtilities {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultHibernateCriteriaQueryUtilities.class);
 
     public static List<?> getObjectList(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
+        long start = System.currentTimeMillis();
         Criteria criteria = session.createCriteria(objectClass);
         if (queryObject.isSetAliases()) {
             addAliasesToCriteria(criteria, queryObject.getAliases());
@@ -71,10 +76,13 @@ public class DefaultHibernateCriteriaQueryUtilities {
         } else {
             criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         }
-        return criteria.list();
+         List<?> list = criteria.list();
+         LOGGER.debug("Time to query database entity {} in {} ms!", objectClass.getSimpleName(), (System.currentTimeMillis()-start));
+         return list;
     }
     
     protected static Object getObject(HibernateQueryObject queryObject, Session session, Class<?> objectClass) {
+        long start = System.currentTimeMillis();
         Criteria criteria = session.createCriteria(objectClass);
         if (queryObject.isSetAliases()) {
             addAliasesToCriteria(criteria, queryObject.getAliases());
@@ -102,7 +110,9 @@ public class DefaultHibernateCriteriaQueryUtilities {
             criteria.setMaxResults(queryObject.getMaxResult());
         }
         criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        return criteria.uniqueResult();
+        Object uniqueResult = criteria.uniqueResult();
+        LOGGER.debug("Time to query database entity {} in {} ms!", objectClass.getSimpleName(), (System.currentTimeMillis()-start));
+        return uniqueResult;
     }
     
     /**
