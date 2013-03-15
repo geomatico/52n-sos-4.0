@@ -330,7 +330,8 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
 
             SosEnvelope envelopeForOffering = getCache().getEnvelopeForOffering(offering);
             Set<String> featuresForoffering = getFOI4offering(offering);
-            Collection<String> responseFormats = SosHelper.getSupportedResponseFormats(SosConstants.SOS, "1.0.0");
+            Collection<String> responseFormats = SosHelper
+                    .getSupportedResponseFormats(SosConstants.SOS, Sos1Constants.SERVICEVERSION);
             if (checkOfferingValues(envelopeForOffering, featuresForoffering, responseFormats)) {
                 SosOfferingsForContents sosOffering = new SosOfferingsForContents();
                 sosOffering.setOffering(offering);
