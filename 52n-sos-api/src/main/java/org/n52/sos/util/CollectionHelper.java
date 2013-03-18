@@ -86,8 +86,10 @@ public class CollectionHelper {
                : new HashSet<T>() {
             private static final long serialVersionUID = 1L;
             {
-                for (T t : iterable) {
-                    add(t);
+                if (iterable != null) {
+                    for (T t : iterable) {
+                        add(t);
+                    }
                 }
             }
         };

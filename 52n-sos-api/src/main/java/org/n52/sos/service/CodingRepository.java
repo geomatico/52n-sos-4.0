@@ -30,8 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +48,7 @@ import org.n52.sos.encode.ObservationEncoder;
 import org.n52.sos.encode.ResponseFormatKeyType;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.util.Activatable;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;
@@ -60,13 +59,36 @@ import org.slf4j.LoggerFactory;
  */
 public class CodingRepository {
     private static final Logger log = LoggerFactory.getLogger(CodingRepository.class);
+    @SuppressWarnings("rawtypes")
+    private final ServiceLoader<Decoder> serviceLoaderDecoder;
+    @SuppressWarnings("rawtypes")
+    private final ServiceLoader<Encoder> serviceLoaderEncoder;
+    private final Set<Decoder<?, ?>> decoders;
+    private final Set<Encoder<?, ?>> encoders;
+    private final Map<DecoderKey, Set<Decoder<?, ?>>> decoderByKey = map();
+    private final Map<EncoderKey, Set<Encoder<?, ?>>> encoderByKey = map();
+    private Map<SupportedTypeKey, Set<Activatable<String>>> typeMap = Collections.emptyMap();
+    private final Set<ObservationEncoder<?, ?>> observationEncoders = set();
+    private final Map<String, Map<String, Set<String>>> responseFormats = map();
+    private final Map<ResponseFormatKeyType, Boolean> responseFormatStatus = map();
+
+    public CodingRepository() throws ConfigurationException {
+        this.serviceLoaderDecoder = ServiceLoader.load(Decoder.class);
+        this.serviceLoaderEncoder = ServiceLoader.load(Encoder.class);
+        this.decoders = CollectionHelper.asSet(loadDecoders());
+        this.encoders = CollectionHelper.asSet(loadEncoders());
+        initDecoderMap();
+        initEncoderMap();
+        generateTypeMap();
+        generateResponseFormatMaps();
+    }
 
     @SuppressWarnings("unchecked")
-    private static <T> T unsafeCast(Object o) {
+    private <T> T unsafeCast(Object o) {
         return (T) o;
     }
 
-    private static <F, T> Decoder<F, T> processDecoderMatches(Set<Decoder<?, ?>> matches, DecoderKey key) {
+    private <F, T> Decoder<F, T> processDecoderMatches(Set<Decoder<?, ?>> matches, DecoderKey key) {
         if (matches == null || matches.isEmpty()) {
             log.debug("No Decoder implementation for {}", key);
             return null;
@@ -82,7 +104,7 @@ public class CodingRepository {
         }
     }
 
-    private static <F, T> Encoder<F, T> processEncoderMatches(Set<Encoder<?, ?>> matches, EncoderKey key) {
+    private <F, T> Encoder<F, T> processEncoderMatches(Set<Encoder<?, ?>> matches, EncoderKey key) {
         if (matches.isEmpty()) {
             log.debug("No Encoder for {}", key);
             return null;
@@ -96,29 +118,6 @@ public class CodingRepository {
         } else {
             return unsafeCast(matches.iterator().next());
         }
-    }
-    @SuppressWarnings("rawtypes")
-    private final ServiceLoader<Decoder> serviceLoaderDecoder;
-    @SuppressWarnings("rawtypes")
-    private final ServiceLoader<Encoder> serviceLoaderEncoder;
-    private final Set<Decoder<?, ?>> decoders;
-    private final Set<Encoder<?, ?>> encoders;
-    private final Map<DecoderKey, Set<Decoder<?, ?>>> decoderByKey = map();
-    private final Map<EncoderKey, Set<Encoder<?, ?>>> encoderByKey = map();
-    private Map<SupportedTypeKey, Set<String>> typeMap = Collections.emptyMap();
-    private final Set<ObservationEncoder<?, ?>> observationEncoders = set();
-    private final Map<String, Map<String, Set<String>>> responseFormats = map();
-    private final Map<ResponseFormatKeyType, Boolean> responseFormatStatus = map();
-
-    public CodingRepository() throws ConfigurationException {
-        this.serviceLoaderDecoder = ServiceLoader.load(Decoder.class);
-        this.serviceLoaderEncoder = ServiceLoader.load(Encoder.class);
-        this.decoders = CollectionHelper.asSet(loadDecoders());
-        this.encoders = CollectionHelper.asSet(loadEncoders());
-        initDecoderMap();
-        initEncoderMap();
-        generateTypeMap();
-        generateResponseFormatMaps();
     }
 
     public void updateDecoders() throws ConfigurationException {
@@ -251,7 +250,7 @@ public class CodingRepository {
         if (typeMap == null || !typeMap.containsKey(key) || typeMap.get(key) == null) {
             return Collections.emptySet();
         }
-        return Collections.unmodifiableSet(new HashSet<String>(typeMap.get(key)));
+        return Collections.unmodifiableSet(Activatable.filter(typeMap.get(key)));
     }
 
     private void generateTypeMap() {
@@ -263,21 +262,23 @@ public class CodingRepository {
             list.add(encoder.getSupportedTypes());
         }
 
-        Map<SupportedTypeKey, Set<String>> resultMap =
-                                           new EnumMap<SupportedTypeKey, Set<String>>(SupportedTypeKey.class);
+        Map<SupportedTypeKey, Set<Activatable<String>>> resultMap =
+                                                        new EnumMap<SupportedTypeKey, Set<Activatable<String>>>(SupportedTypeKey.class);
         for (Map<SupportedTypeKey, Set<String>> map : list) {
             if (map != null && !map.isEmpty()) {
                 for (SupportedTypeKey type : map.keySet()) {
                     if (map.get(type) != null && !map.get(type).isEmpty()) {
-                        Set<String> values = resultMap.get(type);
+                        Set<Activatable<String>> values = resultMap.get(type);
                         if (values == null) {
-                            resultMap.put(type, values = new HashSet<String>());
+                            resultMap.put(type, values = set());
                         }
-                        values.addAll(map.get(type));
+                        values.addAll(Activatable.from(map.get(type)));
                     }
                 }
             }
         }
+
+        setStateForTypes(resultMap);
         this.typeMap = resultMap;
     }
 
@@ -415,7 +416,7 @@ public class CodingRepository {
         }
 
         ServiceOperatorKeyType sokt = new ServiceOperatorKeyType(service, version);
-        Set<String> result = new HashSet<String>(rfs.size());
+        Set<String> result = set();
         for (String a : rfs) {
             ResponseFormatKeyType rfkt = new ResponseFormatKeyType(sokt, a);
             final Boolean status = responseFormatStatus.get(rfkt);
@@ -447,7 +448,7 @@ public class CodingRepository {
     }
 
     public Map<ServiceOperatorKeyType, Set<String>> getSupportedResponseFormats() {
-        Map<ServiceOperatorKeyType, Set<String>> map = new HashMap<ServiceOperatorKeyType, Set<String>>(2);
+        Map<ServiceOperatorKeyType, Set<String>> map = map();
         for (ServiceOperatorKeyType sokt : Configurator.getInstance().getServiceOperatorRepository()
                 .getServiceOperatorKeyTypes()) {
             map.put(sokt, getSupportedResponseFormats(sokt));
@@ -456,18 +457,46 @@ public class CodingRepository {
     }
 
     public Map<ServiceOperatorKeyType, Set<String>> getAllSupportedResponseFormats() {
-        Map<ServiceOperatorKeyType, Set<String>> map = new HashMap<ServiceOperatorKeyType, Set<String>>(2);
+        Map<ServiceOperatorKeyType, Set<String>> map = map();
         for (ServiceOperatorKeyType sokt : Configurator.getInstance().getServiceOperatorRepository()
                 .getServiceOperatorKeyTypes()) {
             map.put(sokt, getAllSupportedResponseFormats(sokt));
         }
         return map;
-
     }
+
+    public Set<String> getAllProcedureDescriptionFormats() {
+        return Activatable.unfiltered(this.typeMap.get(SupportedTypeKey.ProcedureDescriptionFormat));
+    }
+
 
     public void setActive(ResponseFormatKeyType rfkt, boolean active) {
         if (this.responseFormatStatus.containsKey(rfkt)) {
             this.responseFormatStatus.put(rfkt, active);
+        }
+    }
+
+    public void setActive(String procedureDescriptionFormat, boolean active) {
+        final Set<Activatable<String>> pdfs = typeMap.get(SupportedTypeKey.ProcedureDescriptionFormat);
+        if (pdfs != null && procedureDescriptionFormat != null) {
+            for (Activatable<String> a : pdfs) {
+                if (procedureDescriptionFormat.equals(a.getInternal())) {
+                    a.setActive(active);
+                }
+            }
+        }
+    }
+
+    private void setStateForTypes(Map<SupportedTypeKey, Set<Activatable<String>>> map) {
+        if (map.get(SupportedTypeKey.ProcedureDescriptionFormat) != null) {
+            SettingsManager sm = SettingsManager.getInstance();
+            for (Activatable<String> pdf : map.get(SupportedTypeKey.ProcedureDescriptionFormat)) {
+                try {
+                    pdf.setActive(sm.isActive(pdf.getInternal()));
+                } catch (ConnectionProviderException ex) {
+                    throw new ConfigurationException(ex);
+                }
+            }
         }
     }
 

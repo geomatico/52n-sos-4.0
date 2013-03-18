@@ -33,6 +33,9 @@ import java.util.Set;
  */
 public class Activatable<T> {
     public static <K, V> Map<K, V> filter(Map<K, Activatable<V>> map) {
+        if (map == null) {
+            return CollectionHelper.map();
+        }
         Map<K, V> filtered = new HashMap<K, V>(map.size());
         for (K k : map.keySet()) {
             if (map.get(k) != null && map.get(k).get() != null) {
@@ -43,6 +46,9 @@ public class Activatable<T> {
     }
 
     public static <E> Set<E> filter(Set<Activatable<E>> set) {
+        if (set == null) {
+            return CollectionHelper.set();
+        }
         Set<E> filtered = new HashSet<E>(set.size());
         for (Activatable<E> a : set) {
             if (a.isActive()) {
@@ -50,6 +56,33 @@ public class Activatable<T> {
             }
         }
         return filtered;
+    }
+
+    public static <E> Set<E> unfiltered(Set<Activatable<E>> set) {
+        if (set == null) {
+            return CollectionHelper.set();
+        }
+        Set<E> unfiltered = new HashSet<E>(set.size());
+        for (Activatable<E> a : set) {
+            unfiltered.add(a.getInternal());
+        }
+        return unfiltered;
+    }
+
+    public static <E> Set<Activatable<E>> from(Set<E> set) {
+        Set<Activatable<E>> a = new HashSet<Activatable<E>>(set.size());
+        for (E t : set) {
+            a.add(from(t));
+        }
+        return a;
+    }
+
+    public static <T> Activatable<T> from(T t) {
+        return from(t, true);
+    }
+
+    public static <T> Activatable<T> from(T t, boolean active) {
+        return new Activatable<T>(t, active);
     }
     private T object;
     private boolean active;
@@ -64,10 +97,14 @@ public class Activatable<T> {
     }
 
     /**
-     * @return isActive() ? object : null
+     * @return isActive() ? getInternal() : null
      */
     public T get() {
-        return isActive() ? object : null;
+        return isActive() ? getInternal() : null;
+    }
+
+    public T getInternal() {
+        return object;
     }
 
     public boolean isActive() {

@@ -50,8 +50,9 @@ import org.n52.sos.config.sqlite.entities.IntegerSettingValue;
 import org.n52.sos.config.sqlite.entities.NumericSettingValue;
 import org.n52.sos.config.sqlite.entities.Operation;
 import org.n52.sos.config.sqlite.entities.OperationKey;
-import org.n52.sos.config.sqlite.entities.ReponseFormatKey;
-import org.n52.sos.config.sqlite.entities.ResponseFormat;
+import org.n52.sos.config.sqlite.entities.ProcedureEncoding;
+import org.n52.sos.config.sqlite.entities.ObservationEncodingKey;
+import org.n52.sos.config.sqlite.entities.ObservationEncoding;
 import org.n52.sos.config.sqlite.entities.StringSettingValue;
 import org.n52.sos.config.sqlite.entities.UriSettingValue;
 import org.n52.sos.ds.ConnectionProvider;
@@ -201,27 +202,20 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
     }
 
     @Override
-    public boolean isActive(final RequestOperatorKeyType requestOperatorKeyType) throws ConnectionProviderException {
+    public boolean isActive(RequestOperatorKeyType requestOperatorKeyType) throws ConnectionProviderException {
         return isActive(Operation.class, new OperationKey(requestOperatorKeyType));
     }
 
     @Override
-    protected void setOperationStatus(final RequestOperatorKeyType key, final boolean active) throws
+    protected void setOperationStatus(RequestOperatorKeyType key, final boolean active) throws
             ConnectionProviderException {
         setActive(Operation.class, new Operation(key), active);
     }
 
     @Override
-    public boolean isActive(ServiceOperatorKeyType sokt, String responseFormat) throws ConnectionProviderException {
-        return isActive(ResponseFormat.class, new ReponseFormatKey(sokt.getService(), sokt.getVersion(), responseFormat));
-    }
-
-    @Override
     protected void setResponseFormatStatus(ResponseFormatKeyType rfkt, boolean active) throws
             ConnectionProviderException {
-        setActive(ResponseFormat.class, new ResponseFormat(rfkt.getService(),
-                                                           rfkt.getVersion(),
-                                                           rfkt.getResponseFormat()), active);
+        setActive(ObservationEncoding.class, new ObservationEncoding(rfkt), active);
     }
 
     protected <K extends Serializable, T extends Activatable<K, T>> void setActive(Class<T> type, T activatable,
@@ -235,6 +229,20 @@ public class SQLiteSettingsManager extends AbstractSettingsManager {
         return execute(new IsActiveAction<K, T>(c, key)).booleanValue();
     }
 
+    @Override
+    protected void setProcedureDescriptionFormatStatus(String pdf, boolean active) throws ConnectionProviderException {
+        setActive(ProcedureEncoding.class, new ProcedureEncoding(pdf), active);
+    }
+
+    @Override
+    public boolean isActive(ResponseFormatKeyType rfkt) throws ConnectionProviderException {
+        return isActive(ObservationEncoding.class, new ObservationEncodingKey(rfkt));
+    }
+
+    @Override
+    public boolean isActive(String pdf) throws ConnectionProviderException {
+        return isActive(ProcedureEncoding.class, pdf);
+    }
 
     private static class SqliteSettingFactory extends AbstractSettingValueFactory {
         @Override

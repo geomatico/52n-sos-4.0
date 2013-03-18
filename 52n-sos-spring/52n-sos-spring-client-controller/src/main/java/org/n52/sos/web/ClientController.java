@@ -47,7 +47,8 @@ public class ClientController extends AbstractController {
     public ModelAndView get() {
         if (Configurator.getInstance() != null) {
             Map<String, Object> map = new HashMap<String, Object>(2);
-            Set<RequestOperatorKeyType> ops = Configurator.getInstance().getRequestOperatorRepository().getRequestOperator().keySet();
+            Set<RequestOperatorKeyType> ops = Configurator.getInstance().getRequestOperatorRepository()
+                    .getActiveRequestOperatorKeyTypes();
             Set<String> operations = new HashSet<String>(ops.size());
             for (RequestOperatorKeyType op : ops) {
                 operations.add(op.getOperationName());

@@ -25,7 +25,7 @@ package org.n52.sos.config.sqlite.entities;
 
 import java.io.Serializable;
 
-import javax.persistence.EmbeddedId;
+import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
 /**
@@ -37,7 +37,7 @@ import javax.persistence.MappedSuperclass;
 @MappedSuperclass
 public class Activatable<K extends Serializable, T extends Activatable<K, T>> implements Serializable {
     private static final long serialVersionUID = 1L;
-    @EmbeddedId
+    @Id
     private K key;
     private boolean active;
 
@@ -75,8 +75,8 @@ public class Activatable<K extends Serializable, T extends Activatable<K, T>> im
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ResponseFormat) {
-            ResponseFormat o = (ResponseFormat) obj;
+        if (obj instanceof ObservationEncoding) {
+            ObservationEncoding o = (ObservationEncoding) obj;
             return (getKey() == null ? o.getKey() == null : getKey().equals(o.getKey())) && isActive() == o.isActive();
         }
         return false;

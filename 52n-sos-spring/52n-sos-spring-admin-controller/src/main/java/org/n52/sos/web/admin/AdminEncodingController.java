@@ -30,7 +30,9 @@ import java.util.Set;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.ds.ConnectionProviderException;
+import org.n52.sos.encode.ResponseFormatKeyType;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.web.ControllerConstants;
@@ -72,19 +74,10 @@ public class AdminEncodingController extends AbstractAdminController {
     @RequestMapping(value = ControllerConstants.Paths.ADMIN_ENCODINGS_JSON_ENDPOINT, method = RequestMethod.GET,
                     produces = ControllerConstants.MEDIA_TYPE_APPLICATION_JSON)
     public String getAll() throws JSONException, ConnectionProviderException {
-        JSONArray array = new JSONArray();
-        final Map<ServiceOperatorKeyType, Set<String>> formats = Configurator.getInstance()
-                .getCodingRepository().getAllSupportedResponseFormats();
-        for (ServiceOperatorKeyType key : formats.keySet()) {
-            for (String responseFormat : formats.get(key)) {
-                array.put(new JSONObject()
-                        .put(JSONConstants.SERVICE_KEY, key.getService())
-                        .put(JSONConstants.VERSION_KEY, key.getVersion())
-                        .put(JSONConstants.RESPONSE_FORMAT_KEY, responseFormat)
-                        .put(JSONConstants.ACTIVE_KEY, getSettingsManager().isActive(key, responseFormat)));
-            }
-        }
-        return new JSONObject().put(JSONConstants.ENCODINGS_KEY, array).toString();
+        return new JSONObject()
+                .put(JSONConstants.OBSERVATION_ENCODINGS_KEY, getObservationEncodings())
+                .put(JSONConstants.PROCEDURE_ENCODINGS_KEY, getProcedureEncodings())
+                .toString();
     }
 
     @ResponseBody
@@ -92,10 +85,49 @@ public class AdminEncodingController extends AbstractAdminController {
                     consumes = ControllerConstants.MEDIA_TYPE_APPLICATION_JSON)
     public void change(@RequestBody String request) throws JSONException, ConnectionProviderException {
         JSONObject json = new JSONObject(request);
-        ServiceOperatorKeyType sokt = new ServiceOperatorKeyType(json.getString(JSONConstants.SERVICE_KEY),
-                                                                 json.getString(JSONConstants.VERSION_KEY));
-        getSettingsManager().setActive(sokt,
-                                       json.getString(JSONConstants.RESPONSE_FORMAT_KEY),
-                                       json.getBoolean(JSONConstants.ACTIVE_KEY));
+
+        if (json.has(JSONConstants.RESPONSE_FORMAT_KEY)) {
+            ServiceOperatorKeyType sokt = new ServiceOperatorKeyType(json.getString(JSONConstants.SERVICE_KEY),
+                                                                     json.getString(JSONConstants.VERSION_KEY));
+            ResponseFormatKeyType rfkt = new ResponseFormatKeyType(sokt, json
+                    .getString(JSONConstants.RESPONSE_FORMAT_KEY));
+            getSettingsManager().setActive(rfkt, json.getBoolean(JSONConstants.ACTIVE_KEY));
+        } else if (json.has(JSONConstants.PROCEDURE_DESCRIPTION_FORMAT_KEY)) {
+            getSettingsManager().setActive(json.getString(JSONConstants.PROCEDURE_DESCRIPTION_FORMAT_KEY),
+                                           json.getBoolean(JSONConstants.ACTIVE_KEY));
+
+        } else {
+            throw new JSONException("Invalid JSON");
+        }
+    }
+
+    protected JSONArray getObservationEncodings() throws ConnectionProviderException, ConfigurationException,
+                                                         JSONException {
+        JSONArray joes = new JSONArray();
+        final Map<ServiceOperatorKeyType, Set<String>> oes = Configurator.getInstance().getCodingRepository()
+                .getAllSupportedResponseFormats();
+        for (ServiceOperatorKeyType sokt : oes.keySet()) {
+            for (String responseFormat : oes.get(sokt)) {
+                ResponseFormatKeyType rfkt = new ResponseFormatKeyType(sokt, responseFormat);
+                joes.put(new JSONObject()
+                        .put(JSONConstants.SERVICE_KEY, rfkt.getService())
+                        .put(JSONConstants.VERSION_KEY, rfkt.getVersion())
+                        .put(JSONConstants.RESPONSE_FORMAT_KEY, rfkt.getResponseFormat())
+                        .put(JSONConstants.ACTIVE_KEY, getSettingsManager().isActive(rfkt)));
+            }
+        }
+        return joes;
+    }
+
+    protected JSONArray getProcedureEncodings() throws JSONException, ConnectionProviderException,
+                                                       ConfigurationException {
+        JSONArray jpes = new JSONArray();
+        final Set<String> pes = Configurator.getInstance().getCodingRepository().getAllProcedureDescriptionFormats();
+        for (String pe : pes) {
+            jpes.put(new JSONObject()
+                    .put(JSONConstants.PROCEDURE_DESCRIPTION_FORMAT_KEY, pe)
+                    .put(JSONConstants.ACTIVE_KEY, getSettingsManager().isActive(pe)));
+        }
+        return jpes;
     }
 }

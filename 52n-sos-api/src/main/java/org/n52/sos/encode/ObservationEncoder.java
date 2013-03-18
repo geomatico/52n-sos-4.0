@@ -25,6 +25,8 @@ package org.n52.sos.encode;
 
 import java.util.Set;
 
+import org.n52.sos.config.SettingsManager;
+
 public interface ObservationEncoder<S, T> extends Encoder<S, T> {
     
     public boolean isObservationAndMeasurmentV20Type();
@@ -33,10 +35,17 @@ public interface ObservationEncoder<S, T> extends Encoder<S, T> {
     
     /**
      * Indicates, if this {@link ObservationEncoder} is currently activated in the SOS
+
+     *
      * @return
+     *
+     * @deprecated see {@link SettingsManager#isActive(org.n52.sos.encode.ResponseFormatKeyType)} and
+     * {@link SettingsManager#setActive(org.n52.sos.encode.ResponseFormatKeyType, boolean)}.
      */
+    @Deprecated
     public boolean isSupported();
-    
+
+    @Deprecated
     public void setSupported(boolean supported);
     
     // TODO add javadoc

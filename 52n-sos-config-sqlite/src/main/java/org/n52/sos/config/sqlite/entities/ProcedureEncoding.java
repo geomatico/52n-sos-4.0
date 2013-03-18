@@ -21,6 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
+
 package org.n52.sos.config.sqlite.entities;
 
 import javax.persistence.Entity;
@@ -28,22 +29,15 @@ import javax.persistence.Entity;
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-@Entity(name = "encodings")
-public class ResponseFormat extends Activatable<ReponseFormatKey, ResponseFormat> {
+@Entity(name = "procedure_encodings")
+public class ProcedureEncoding extends Activatable<String, ProcedureEncoding> {
     private static final long serialVersionUID = 1L;
 
-    public ResponseFormat(ReponseFormatKey key) {
+    public ProcedureEncoding(String key) {
         super(key);
     }
 
-    public ResponseFormat(String service, String version, String responseFormat) {
-        this(new ReponseFormatKey()
-                .setService(service)
-                .setVersion(version)
-                .setResponseFormat(responseFormat));
-    }
-
-    public ResponseFormat() {
-        this(null);
+    public ProcedureEncoding() {
+        super(null);
     }
 }

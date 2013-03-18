@@ -37,7 +37,7 @@
 <script type="text/javascript" src="<c:url value='/static/lib/jquery.tablesorter-2.7.12.min.js'/>"></script>
 <script type="text/javascript" src="<c:url value='/static/lib/jquery.tablesorter.widgets-2.7.12.min.js'/>"></script>
 
-<table id="encodingsTable" class="table table-striped table-bordered">
+<table id="observationEncodings" class="table table-striped table-bordered">
     <thead>
         <tr>
             <th>Service</th>
@@ -49,11 +49,29 @@
     <tbody></tbody>
 </table>
 
+<table id="procedureEncodings" class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Procedure Description Format</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
 <script type="text/javascript">
 jQuery(document).ready(function($) {
-    $.getJSON("<c:url value='/admin/encodings/json'/>", function(j) {
-        var $tbody = $("#encodingsTable tbody"),
-        encodings = j.encodings, i, o, $row, $button;
+
+    $.extend($.tablesorter.themes.bootstrap, {
+        table: "table table-bordered",
+        header: "bootstrap-header",
+        sortNone: "bootstrap-icon-unsorted",
+        sortAsc: "icon-chevron-up",
+        sortDesc: "icon-chevron-down",
+    });
+
+    function observationEncodings(encodings) {
+        var $tbody = $("#observationEncodings tbody"), i, o, $row, $button;
         for (i = 0; i < encodings.length; ++i) {
             o = encodings[i];
             $row = $("<tr>");
@@ -77,7 +95,8 @@ jQuery(document).ready(function($) {
                     contentType: "application/json",
                     data: JSON.stringify(j)
                 }).fail(function(e) {
-                    showError("Failed to save settings: " + e.status + " " + e.statusText);
+                    showError("Failed to save observation encoding: " 
+                        + e.status + " " + e.statusText);
                     $b.prop("disabled", false);
                 }).done(function() {
                     $b.toggleClass("btn-danger btn-success")
@@ -96,14 +115,8 @@ jQuery(document).ready(function($) {
             
             $tbody.append($row);    
         }
-        $.extend($.tablesorter.themes.bootstrap, {
-            table: "table table-bordered",
-            header: "bootstrap-header",
-            sortNone: "bootstrap-icon-unsorted",
-            sortAsc: "icon-chevron-up",
-            sortDesc: "icon-chevron-down",
-        });
-        $("#encodingsTable").tablesorter({
+        
+        $("#observationEncodings").tablesorter({
             theme : "bootstrap",
             widgets : [ "uitheme", "zebra" ],
             headerTemplate: "{content} {icon}",
@@ -116,11 +129,68 @@ jQuery(document).ready(function($) {
             },
             sortList: [ [0,0], [1,1], [2,0] ]
         });
+    }
+
+    function procedureEncodings(encodings) {
+        var $tbody = $("#procedureEncodings tbody"), i, o, $row, $button;
+        for (i = 0; i < encodings.length; ++i) {
+            o = encodings[i];
+            $row = $("<tr>");
+            $("<td>").addClass("encoding").text(o.procedureDescriptionFormat).appendTo($row);
+            $button = $("<button>").attr("type", "button")
+                    .addClass("btn btn-small btn-block").on("click", function() {
+                var $b = $(this),
+                    $tr = $b.parents("tr"),
+                    active = !$b.hasClass("btn-success"),
+                    j = {
+                        procedureDescriptionFormat: $tr.find(".encoding").text(),
+                        active: active
+                    };
+                $b.prop("disabled", true);
+                $.ajax("<c:url value='/admin/encodings/json'/>", {
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(j)
+                }).fail(function(e) {
+                    showError("Failed to save procedure encoding: " 
+                        + e.status + " " + e.statusText);
+                    $b.prop("disabled", false);
+                }).done(function() {
+                    $b.toggleClass("btn-danger btn-success")
+                      .text(active ? "active" : "inactive")
+                      .prop("disabled", false);
+                    
+                });
+            });
+            if (o.active) { 
+                $button.addClass("btn-success").text("active"); 
+            } else {
+                $button.addClass("btn-danger").text("inactive"); 
+                
+            }
+            $("<td>").addClass("status").append($button).appendTo($row);
+            
+            $tbody.append($row);    
+        }
+        
+        $("#procedureEncodings").tablesorter({
+            theme : "bootstrap",
+            widgets : [ "uitheme", "zebra" ],
+            headerTemplate: "{content} {icon}",
+            widthFixed: true,
+            headers: { 
+                0: { sorter: "text" },
+                1: { sorter: false } 
+            },
+            sortList: [ [0,0] ]
+        });
+    }
+
+    $.getJSON("<c:url value='/admin/encodings/json'/>", function(j) {
+        observationEncodings(j.observationEncodings);
+        procedureEncodings(j.procedureEncodings);
     });
 });
 </script>
-
-
-
 
 <jsp:include page="../common/footer.jsp" />

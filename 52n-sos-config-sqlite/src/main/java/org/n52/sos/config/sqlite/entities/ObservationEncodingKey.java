@@ -27,23 +27,29 @@ import java.io.Serializable;
 
 import javax.persistence.Embeddable;
 
+import org.n52.sos.encode.ResponseFormatKeyType;
+
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
 @Embeddable
-public class ReponseFormatKey implements Serializable {
+public class ObservationEncodingKey implements Serializable {
     private static final long serialVersionUID = 1L;
     private String service;
     private String version;
     private String responseFormat;
 
-    public ReponseFormatKey(String service, String version, String responseFormat) {
+    public ObservationEncodingKey(String service, String version, String responseFormat) {
         this.service = service;
         this.version = version;
         this.responseFormat = responseFormat;
     }
 
-    public ReponseFormatKey() {
+    public ObservationEncodingKey(ResponseFormatKeyType key) {
+        this(key.getService(), key.getVersion(), key.getResponseFormat());
+    }
+
+    public ObservationEncodingKey() {
         this(null, null, null);
     }
 
@@ -51,7 +57,7 @@ public class ReponseFormatKey implements Serializable {
         return service;
     }
 
-    public ReponseFormatKey setService(String service) {
+    public ObservationEncodingKey setService(String service) {
         this.service = service;
         return this;
     }
@@ -60,7 +66,7 @@ public class ReponseFormatKey implements Serializable {
         return version;
     }
 
-    public ReponseFormatKey setVersion(String version) {
+    public ObservationEncodingKey setVersion(String version) {
         this.version = version;
         return this;
     }
@@ -69,7 +75,7 @@ public class ReponseFormatKey implements Serializable {
         return responseFormat;
     }
 
-    public ReponseFormatKey setResponseFormat(String responseFormat) {
+    public ObservationEncodingKey setResponseFormat(String responseFormat) {
         this.responseFormat = responseFormat;
         return this;
     }

@@ -41,7 +41,8 @@ import org.n52.sos.config.sqlite.entities.FileSettingValue;
 import org.n52.sos.config.sqlite.entities.IntegerSettingValue;
 import org.n52.sos.config.sqlite.entities.NumericSettingValue;
 import org.n52.sos.config.sqlite.entities.Operation;
-import org.n52.sos.config.sqlite.entities.ResponseFormat;
+import org.n52.sos.config.sqlite.entities.ObservationEncoding;
+import org.n52.sos.config.sqlite.entities.ProcedureEncoding;
 import org.n52.sos.config.sqlite.entities.StringSettingValue;
 import org.n52.sos.config.sqlite.entities.UriSettingValue;
 import org.n52.sos.ds.ConnectionProvider;
@@ -139,7 +140,8 @@ public class SQLiteSessionFactory implements ConnectionProvider {
                 .addAnnotatedClass(UriSettingValue.class)
                 .addAnnotatedClass(AdminUser.class)
                 .addAnnotatedClass(Operation.class)
-                .addAnnotatedClass(ResponseFormat.class);
+                .addAnnotatedClass(ProcedureEncoding.class)
+                .addAnnotatedClass(ObservationEncoding.class);
         
         cfg.registerTypeOverride(new HibernateFileType(), new String[] { "file", File.class.getName() });
         cfg.registerTypeOverride(new HibernateUriType(), new String[] { "uri", URI.class.getName() });

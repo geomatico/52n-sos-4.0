@@ -28,7 +28,9 @@ package org.n52.sos.web;
  */
 public interface JSONConstants {
     String RESPONSE_FORMAT_KEY = "responseFormat";
-    String ENCODINGS_KEY = "encodings";
+    String PROCEDURE_DESCRIPTION_FORMAT_KEY = "procedureDescriptionFormat";
+    String OBSERVATION_ENCODINGS_KEY = "observationEncodings";
+    String PROCEDURE_ENCODINGS_KEY = "procedureEncodings";
     String SECTIONS_KEY = "sections";
     String MINIMUM_KEY = "minimum";
     String BOOLEAN_TYPE = "boolean";

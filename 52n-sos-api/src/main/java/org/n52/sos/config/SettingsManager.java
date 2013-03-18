@@ -36,7 +36,6 @@ import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.encode.ResponseFormatKeyType;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
 import org.n52.sos.util.ConfiguringSingletonServiceLoader;
 import org.slf4j.Logger;
@@ -243,69 +242,66 @@ public abstract class SettingsManager {
     /**
      * Returns if a operation is active and should be offered by this SOS.
      * <p/>
-     * @param requestOperatorKeyType the key identifying the operation
+     * @param rokt the key identifying the operation
      * <p/>
      * @return {@code true} if the operation is active in this SOS
      * <p/>
      * @throws ConnectionProviderException
      */
-    public abstract boolean isActive(RequestOperatorKeyType requestOperatorKeyType) throws ConnectionProviderException;
+    public abstract boolean isActive(RequestOperatorKeyType rokt) throws ConnectionProviderException;
+
+    /**
+     * Checks if the response format is active for the specified service and version.
+     *
+     * @param rfkt the service/version/responseFormat combination
+     *
+     * @return if the format is active
+     *
+     * @throws ConnectionProviderException
+     */
+    public abstract boolean isActive(ResponseFormatKeyType rfkt) throws
+            ConnectionProviderException;
+
+    /**
+     * Checks if the procedure description format is active.
+     *
+     * @param pdf the pdf
+     *
+     * @return if the format is active
+     *
+     * @throws ConnectionProviderException
+     */
+    public abstract boolean isActive(String pdf) throws
+            ConnectionProviderException;
 
     /**
      * Sets the status of an operation.
      * <p/>
-     * @param requestOperatorKeyType the key identifying the operation
-     * @param active                 whether the operation is active or not
+     * @param rokt   the key identifying the operation
+     * @param active whether the operation is active or not
      * <p/>
      * @throws ConnectionProviderException
      */
-    public abstract void setActive(RequestOperatorKeyType requestOperatorKeyType, boolean active) throws
+    public abstract void setActive(RequestOperatorKeyType rokt, boolean active) throws
             ConnectionProviderException;
-
-    /**
-     * Checks if the response format is active for the specified service and version.
-     *
-     * @param serviceOperatorKeyType the service/version combination
-     * @param responseFormat         the responseFormat
-     *
-     * @return if the format is active
-     *
-     * @throws ConnectionProviderException
-     */
-    public abstract boolean isActive(ServiceOperatorKeyType serviceOperatorKeyType, String responseFormat) throws
-            ConnectionProviderException;
-
-    /**
-     * Checks if the response format is active for the specified service and version.
-     *
-     * @param responseFormatKeyType the service/version/responseFormat combination
-     *
-     * @return if the format is active
-     *
-     * @throws ConnectionProviderException
-     */
-    public abstract boolean isActive(ResponseFormatKeyType responseFormatKeyType) throws
-            ConnectionProviderException;
-
-    /**
-     * Sets the status of a response format for the specified service and version.
-     *
-     * @param serviceOperatorKeyType the service/version combination
-     * @param responseFormat         the responseFormat
-     * @param active                 the status
-     *
-     * @throws ConnectionProviderException
-     */
-    public abstract void setActive(ServiceOperatorKeyType serviceOperatorKeyType, String responseFormat, boolean active)
-            throws ConnectionProviderException;
 
     /**
      * Sets the status of a response format for the specified service and version.
      *
      * @param rfkt   the service/version/responseFormat combination
-     * @param active                 the status
+     * @param active the status
      *
      * @throws ConnectionProviderException
      */
     public abstract void setActive(ResponseFormatKeyType rfkt, boolean active) throws ConnectionProviderException;
+
+    /**
+     * Sets the status of a procedure description format.
+     *
+     * @param pdf    the procedure description format
+     * @param active the status
+     *
+     * @throws ConnectionProviderException
+     */
+    public abstract void setActive(String pdf, boolean active) throws ConnectionProviderException;
 }

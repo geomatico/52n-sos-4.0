@@ -56,6 +56,7 @@ import org.n52.sos.config.sqlite.entities.StringSettingValue;
 import org.n52.sos.config.sqlite.entities.UriSettingValue;
 import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.ds.ConnectionProviderException;
+import org.n52.sos.encode.ResponseFormatKeyType;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
@@ -75,10 +76,12 @@ public class SQLiteSettingsManagerTest {
     private static final String VERSION = Sos2Constants.SERVICEVERSION;
     private static final String SERVICE = SosConstants.SOS;
     private static final String RESPONSE_FORMAT = "responseFormat";
+    private static final String PROCEDURE_DESCRIPTION_FORMAT = "procedureDescriptionFormat";
     private static ConnectionProvider connectionProvider;
     private static File databaseFile;
-    public static final ServiceOperatorKeyType SOKT = new ServiceOperatorKeyType(SERVICE, VERSION);
-    public static final RequestOperatorKeyType ROKT = new RequestOperatorKeyType(SOKT, OPERATION_NAME);
+    private static final ServiceOperatorKeyType SOKT = new ServiceOperatorKeyType(SERVICE, VERSION);
+    private static final RequestOperatorKeyType ROKT = new RequestOperatorKeyType(SOKT, OPERATION_NAME);
+    private static final ResponseFormatKeyType RFKT = new ResponseFormatKeyType(SOKT, RESPONSE_FORMAT);
 
 
     @BeforeClass
@@ -238,11 +241,20 @@ public class SQLiteSettingsManagerTest {
 
     @Test
     public void testActiveResponseFormats() throws ConnectionProviderException {
-        assertThat(settingsManager.isActive(SOKT, RESPONSE_FORMAT), is(true));
-        settingsManager.setActive(SOKT, RESPONSE_FORMAT, true);
-        assertThat(settingsManager.isActive(SOKT, RESPONSE_FORMAT), is(true));
-        settingsManager.setActive(SOKT, RESPONSE_FORMAT, false);
-        assertThat(settingsManager.isActive(SOKT, RESPONSE_FORMAT), is(false));
+        assertThat(settingsManager.isActive(RFKT), is(true));
+        settingsManager.setActive(RFKT, true);
+        assertThat(settingsManager.isActive(RFKT), is(true));
+        settingsManager.setActive(RFKT, false);
+        assertThat(settingsManager.isActive(RFKT), is(false));
+    }
+
+    @Test
+    public void testActiveProcedureDescriptionFormats() throws ConnectionProviderException {
+        assertThat(settingsManager.isActive(PROCEDURE_DESCRIPTION_FORMAT), is(true));
+        settingsManager.setActive(PROCEDURE_DESCRIPTION_FORMAT, true);
+        assertThat(settingsManager.isActive(PROCEDURE_DESCRIPTION_FORMAT), is(true));
+        settingsManager.setActive(PROCEDURE_DESCRIPTION_FORMAT, false);
+        assertThat(settingsManager.isActive(PROCEDURE_DESCRIPTION_FORMAT), is(false));
 
     }
 }

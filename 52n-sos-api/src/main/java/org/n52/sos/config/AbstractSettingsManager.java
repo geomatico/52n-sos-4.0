@@ -44,6 +44,7 @@ import org.n52.sos.event.events.SettingsChangeEvent;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
+import org.n52.sos.util.CollectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +58,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractSettingsManager extends SettingsManager {
     private static final Logger log = LoggerFactory.getLogger(AbstractSettingsManager.class);
     private final SettingDefinitionProviderRepository settingDefinitionRepository;
-    private final Map<String, Set<ConfigurableObject>> configurableObjects =
-                                                       new HashMap<String, Set<ConfigurableObject>>();
+    private final Map<String, Set<ConfigurableObject>> configurableObjects = CollectionHelper.map();
     private final ReadWriteLock configurableObjectsLock = new ReentrantReadWriteLock();
 
     /**
@@ -247,7 +247,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         try {
             Set<ConfigurableObject> cos = configurableObjects.get(co.getKey());
             if (cos == null) {
-                configurableObjects.put(co.getKey(), cos = new HashSet<ConfigurableObject>());
+                configurableObjects.put(co.getKey(), cos = CollectionHelper.set());
             }
             cos.add(co);
         } finally {
@@ -290,11 +290,6 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     }
 
     @Override
-    public void setActive(ServiceOperatorKeyType sokt, String rf, boolean active) throws ConnectionProviderException {
-        setActive(new ResponseFormatKeyType(sokt, rf), active);
-    }
-
-    @Override
     public void setActive(RequestOperatorKeyType rokt, boolean active) throws ConnectionProviderException {
         log.debug("Setting activation of {} to {}", rokt, active);
         setOperationStatus(rokt, active);
@@ -313,9 +308,15 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     }
 
     @Override
-    public boolean isActive(ResponseFormatKeyType rokt) throws ConnectionProviderException {
-        return isActive(rokt.getServiceOperatorKeyType(), rokt.getResponseFormat());
+    public void setActive(String pdf, boolean active) throws ConnectionProviderException {
+        log.debug("Setting activation of {} to {}", pdf, active);
+        setProcedureDescriptionFormatStatus(pdf, active);
+        if (Configurator.getInstance() != null) {
+            Configurator.getInstance().getCodingRepository().setActive(pdf, active);
+        }
     }
+
+
     /**
      * @return all saved setting values
      *
@@ -376,9 +377,18 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     protected abstract void setResponseFormatStatus(ResponseFormatKeyType rfkt, boolean active) throws
             ConnectionProviderException;
 
-    /*
-     * TODO handle the references as WeakReferences
+    /**
+     * Sets the status of a procedure description format for the specified service and version.
+     *
+     * @param pdf    the procedure description format
+     * @param active the status
+     *
+     * @throws ConnectionProviderException
+     * @see #setActive(java.lang.String, boolean)
      */
+    protected abstract void setProcedureDescriptionFormatStatus(String pdf, boolean active) throws
+            ConnectionProviderException;
+
     private class ConfigurableObject {
         private final Method method;
         private final WeakReference<Object> target;
