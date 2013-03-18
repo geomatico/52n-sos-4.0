@@ -35,6 +35,7 @@ public interface ControllerConstants {
         String ADMIN_DATABASE_SETTINGS = "admin/database-settings";
         String ADMIN_LOGIN = "admin/login";
         String ADMIN_RESET = "admin/reset";
+        String ADMIN_LIBRARY_LIST = "admin/libs";
         String ADMIN_SETTINGS = "admin/settings";
         String ADMIN_OPERATIONS = "admin/operations";
         String ADMIN_ENCODINGS = "admin/encodings";
@@ -60,6 +61,7 @@ public interface ControllerConstants {
         String ADMIN_SETTINGS_DUMP = "/admin/settings.json";
         String ADMIN_SETTINGS_UPDATE = "/admin/settings";
         String ADMIN_DATABASE = "/admin/database";
+        String ADMIN_LIBRARY_LIST = "/admin/libs";
         String ADMIN_OPERATIONS = "/admin/operations";
         String ADMIN_OPERATIONS_JSON_ENDPOINT = "/admin/operations/json";
         String ADMIN_ENCODINGS = "/admin/encodings";
@@ -86,6 +88,7 @@ public interface ControllerConstants {
     String DATABASE_SETTINGS_MODEL_ATTRIBUTE = "databaseSettings";
     String ERROR_MODEL_ATTRIBUTE = "error";
     String JDBC_PARAMETER = "jdbc_uri";
+    String LIBRARIES_MODEL_ATTRIBUTE = "libs";
     String ROLE_ADMIN = "ROLE_ADMIN";
     /* SQL file paths */
     String INSERT_TEST_DATA_SQL_FILE = "/sql/insert_test_data.sql";
