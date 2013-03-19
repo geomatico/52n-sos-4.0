@@ -135,15 +135,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-coding-sos-v100</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>52n-sos-coding-sos-v20</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>52n-sos-core-v100</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -210,10 +202,10 @@
             <groupId>org.n52.sensorweb</groupId>
             <artifactId>52n-xml-sos-v20</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.n52.sensorweb</groupId>
-            <artifactId>52n-xml-sos-v100</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.n52.sensorweb</groupId>
+			<artifactId>52n-xml-sos-v100</artifactId>
+		</dependency>
         <!-- #### Spring dependencies #### -->
         <dependency>
             <groupId>com.thetransactioncompany</groupId>
@@ -320,14 +312,14 @@
                     <groupId>${project.groupId}</groupId>
                     <artifactId>52n-sos-hibernate-resultHandling</artifactId>
                 </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-core-v100</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-coding-sos-v100</artifactId>
-                </dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-coding-sos-v100</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-core-v100</artifactId>
+				</dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>52n-sos-coding-wml-v20</artifactId>
@@ -485,14 +477,14 @@
         <profile>
             <id>sosV100</id>
             <dependencies>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-coding-sos-v100</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>52n-sos-core-v100</artifactId>
-                </dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-coding-sos-v100</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-core-v100</artifactId>
+				</dependency>
             </dependencies>
         </profile>
         <profile>
