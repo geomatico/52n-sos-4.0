@@ -965,35 +965,25 @@
 				<rest-binding.version>0.1.0-SNAPSHOT</rest-binding.version>
 			</properties>
 			<dependencies>
-			        <dependency>
-                        <groupId>${project.groupId}</groupId>
-                        <artifactId>52n-sos-ext-do-xml</artifactId>
-                        <version>${do.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>${project.groupId}</groupId>
-                        <artifactId>52n-sos-ext-do-code</artifactId>
-                        <version>${do.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>${project.groupId}</groupId>
-                        <artifactId>52n-sos-ext-do-code-hibernate</artifactId>
-                        <version>${do.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>${project.groupId}</groupId>
-                        <artifactId>52n-sos-ext-do-code-kvp</artifactId>
-                        <version>${do.version}</version>
-                    </dependency>
-				<dependency>
-					<groupId>${project.groupId}</groupId>
-					<artifactId>52n-sos-ext-do-code</artifactId>
-					<version>${sos-ext-do.version}</version>
-				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-ext-do-xml</artifactId>
-					<version>${sos-ext-do.version}</version>
+					<version>${do.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-ext-do-code</artifactId>
+					<version>${do.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-ext-do-code-hibernate</artifactId>
+					<version>${do.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>52n-sos-ext-do-code-kvp</artifactId>
+					<version>${do.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
