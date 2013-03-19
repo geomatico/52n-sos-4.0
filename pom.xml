@@ -956,10 +956,30 @@
 		<profile>
 			<id>restful</id>
 			<properties>
-				<sos-ext-do.version>0.1.0-SNAPSHOT</sos-ext-do.version>
+				<do.version>0.1.0-SNAPSHOT</do.version>
 				<rest-binding.version>0.1.0-SNAPSHOT</rest-binding.version>
 			</properties>
 			<dependencies>
+			        <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-ext-do-xml</artifactId>
+                        <version>${do.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-ext-do-code</artifactId>
+                        <version>${do.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-ext-do-code-hibernate</artifactId>
+                        <version>${do.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-ext-do-code-kvp</artifactId>
+                        <version>${do.version}</version>
+                    </dependency>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>52n-sos-ext-do-code</artifactId>
@@ -1051,6 +1071,11 @@
 						<artifactId>52n-sos-ext-do-code</artifactId>
 						<version>${do.version}</version>
 					</dependency>
+					<dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-ext-do-code-hibernate</artifactId>
+                        <version>${do.version}</version>
+                    </dependency>
 					<dependency>
 						<groupId>${project.groupId}</groupId>
 						<artifactId>52n-sos-ext-do-code-kvp</artifactId>
