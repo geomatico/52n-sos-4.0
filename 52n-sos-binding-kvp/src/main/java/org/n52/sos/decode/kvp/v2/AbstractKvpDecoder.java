@@ -34,8 +34,8 @@ import java.util.RandomAccess;
 import java.util.Set;
 
 import org.joda.time.DateTime;
-import org.n52.sos.decode.DecoderException;
 import org.n52.sos.decode.Decoder;
+import org.n52.sos.decode.DecoderException;
 import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.filter.SpatialFilter;
@@ -120,9 +120,6 @@ public abstract class AbstractKvpDecoder implements Decoder<AbstractServiceReque
         List<TemporalFilter> filterList = new ArrayList<TemporalFilter>(1);
         if (parameterValues.size() != 2) {
             throw new DecoderException("The parameter value is not valid!");
-            // throw
-            // Util4Exceptions.createInvalidParameterValueException(parameterName,
-            // "The parameter value is not valid!");
         }
         filterList.add(createTemporalFilterFromValue(parameterValues.get(1), parameterValues.get(0)));
         return filterList;
