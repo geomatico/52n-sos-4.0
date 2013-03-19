@@ -32,7 +32,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,14 +43,17 @@ import java.util.Stack;
 import org.n52.sos.binding.Binding;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.encode.Encoder;
-import org.n52.sos.encode.ObservationEncoder;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.MissingParameterValueException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingProcedureDescriptionFormatException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.sos.ResponseExceedsSizeLimitException;
+import org.n52.sos.exception.swes.InvalidRequestException;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.om.SosObservableProperty;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
@@ -60,7 +62,6 @@ import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
-import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
 import org.n52.sos.ogc.swe.simpleType.SosSweAbstractSimpleType;
 import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
@@ -78,51 +79,18 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class SosHelper {
    
-    /**
-     * Class to encapsulate all calls to the {@link Configurator}. Can be overwritten by tests.
-     * @see SosHelper#setConfiguration(org.n52.sos.util.SosHelper.Configuration) 
-     */
-    protected static class Configuration {
-
-        protected Collection<String> getObservationTypes() {
-            return Configurator.getInstance().getCache().getObservationTypes();
-        }
-
-        protected String getSrsNamePrefix() {
-            return Configurator.getInstance().getSrsNamePrefix();
-        }
-
-        protected String getSrsNamePrefixSosV2() {
-            return Configurator.getInstance().getSrsNamePrefixSosV2();
-        }
-
-        protected Set<Encoder<?, ?>> getEncoders() {
-            return Configurator.getInstance().getCodingRepository().getEncoders();
-        }
-
-        protected Collection<Binding> getBindings() {
-            return Configurator.getInstance().getBindingRepository().getBindings().values();
-        }
-    }
-    
     private static Configuration config = new Configuration();
-    
-    protected static Configuration getConfiguration() {
-        return config;
-    }
-    protected static void setConfiguration(Configuration config) {
-        SosHelper.config = config;
-    }
-
     /**
      * logger
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosHelper.class);
 
-    /**
-     * Hide utility constructor
-     */
-    protected SosHelper() {
+    protected static Configuration getConfiguration() {
+        return config;
+    }
+
+    protected static void setConfiguration(Configuration config) {
+        SosHelper.config = config;
     }
 
     /**
@@ -181,88 +149,8 @@ public class SosHelper {
     }
 
     // /**
-    // * Creates a SosAbstractFeature from values
-    // *
-    // * @param id
-    // * FOI identifier
-    // * @param desc
-    // * FOI description
-    // * @param name
-    // * FOI name
-    // * @param geometry
-    // * FOI geometry
-    // * @param srid
-    // * SRID for FOI
-    // * @param featureType
-    // * FOI type
-    // * @param schemaLink
-    // * SchemaLink for type
-    // * @return SOS abstract representation of FOI
-    // * @throws OwsExceptionReport
-    // * If FOI type is not supported or type and geometry are invalid
-    // */
-    // public static SosAbstractFeature getAbstractFeatureFromValues(String id,
-    // String desc, String name, Geometry geometry, int srid,
-    // String featureType, String schemaLink) throws OwsExceptionReport {
-    //
-    // SosAbstractFeature absFeat = null;
-    //
-    // // add new AbstractFeature to Collection
-    // // TODO: implement further AbstractFeatures
-    // if (featureType.equalsIgnoreCase(SFConstants.FT_SAMPLINGPOINT)
-    // || featureType
-    // .equalsIgnoreCase(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_POINT)) {
-    // if (geometry instanceof Point) {
-    // absFeat = new SosSamplingPoint(id, name, desc,
-    // (Point) geometry, featureType, schemaLink);
-    // } else {
-    // String exceptionText = "The geometry of feature type '"
-    // + featureType + "' has to be Point!";
-    // LOGGER.error(exceptionText);
-    // OwsExceptionReport owse = new OwsExceptionReport(
-    // ExceptionLevel.DetailedExceptions);
-    // owse.addCodedException(ExceptionCode.NoApplicableCode, null,
-    // exceptionText);
-    // throw owse;
-    // }
-    // } else if (featureType.equalsIgnoreCase(SFConstants.FT_SAMPLINGSURFACE)
-    // || featureType
-    // .equalsIgnoreCase(SFConstants.SAMPLING_FEAT_TYPE_SF_SAMPLING_SURFACE)) {
-    // if (geometry instanceof Polygon || geometry instanceof MultiPolygon) {
-    // absFeat = new SosSamplingSurface(id, name, desc, geometry,
-    // featureType, schemaLink);
-    // } else {
-    // String exceptionText = "The geometry of feature type '"
-    // + featureType + "' has to be Polygon!";
-    // LOGGER.error(exceptionText);
-    // OwsExceptionReport owse = new OwsExceptionReport(
-    // ExceptionLevel.DetailedExceptions);
-    // owse.addCodedException(ExceptionCode.NoApplicableCode, null,
-    // exceptionText);
-    // throw owse;
-    // }
-    // } else {
-    // String exceptionText = "The feature type '" + featureType
-    // + "' is not supported!";
-    // LOGGER.error(exceptionText);
-    // OwsExceptionReport owse = new OwsExceptionReport(
-    // ExceptionLevel.DetailedExceptions);
-    // owse.addCodedException(ExceptionCode.NoApplicableCode, null,
-    // exceptionText);
-    // throw owse;
-    // }
-    // return absFeat;
-    // }
 
-    /**
-     * Parses the SRS name from a request and returns the SRID
-     * 
-     * @param srsName
-     *            Requested SRS name
-     * @return SRID
-     * @throws OwsExceptionReport
-     *             If an error occurs
-     */
+    // * Creates a SosAbstractFeature from values
     public static int parseSrsName(String srsName) throws OwsExceptionReport {
         int srid = -1;
         if (srsName != null && !srsName.isEmpty() && !srsName.equalsIgnoreCase("NOT_SET")) {
@@ -271,18 +159,9 @@ public class SosHelper {
             try {
                 srid = Integer.valueOf(srsName.replace(urnSrsPrefix, "").replace(urlSrsPrefix, ""));
             } catch (NumberFormatException nfe) {
-                StringBuilder builder = new StringBuilder();
-                builder.append("Error while parsing srsName parameter!");
-                builder.append("Parameter has to match pattern '");
-                builder.append(urnSrsPrefix);
-                builder.append("' or '");
-                builder.append(urlSrsPrefix);
-                builder.append("' with appended EPSGcode number");
-                LOGGER.error(builder.toString(), nfe);
-                OwsExceptionReport owse = new OwsExceptionReport();
-                owse.addCodedException(OwsExceptionCode.NoApplicableCode,
-                        SosConstants.GetObservationParams.srsName.name(), builder.toString(), nfe);
-                throw owse;
+                throw new NoApplicableCodeException().causedBy(nfe).at(SosConstants.GetObservationParams.srsName)
+                        .withMessage("Error while parsing srsName parameter! Parameter has to match "
+                                     + "pattern '%s' or '%s' with appended EPSGcode number", urnSrsPrefix, urlSrsPrefix);
             }
         }
         return srid;
@@ -291,8 +170,7 @@ public class SosHelper {
     /**
      * Checks the free memory size.
      * 
-     * @throws OwsExceptionReport
-     *             If no free memory size.
+     * @throws OwsExceptionReport If no free memory size.
      */
     public static void checkFreeMemory() throws OwsExceptionReport {
         long freeMem;
@@ -302,12 +180,12 @@ public class SosHelper {
         LOGGER.debug("Remaining Heap Size: " + (freeMem / 1024) + "KB");
         if (Runtime.getRuntime().totalMemory() == Runtime.getRuntime().maxMemory() && freeMem < 256000) { // 256000
             // accords to 256 kB create service exception
-            String exceptionText =
-                    String.format(
-                            "The observation response is to big for the maximal heap size of %d Byte of the virtual machine! Please either refine your getObservation request to reduce the number of observations in the response or ask the administrator of this SOS to increase the maximum heap size of the virtual machine!",
-                            Runtime.getRuntime().maxMemory());
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createResponseExceedsSizeLimitException(exceptionText);
+            throw new ResponseExceedsSizeLimitException()
+                    .withMessage("The observation response is to big for the maximal heap size of %d Byte of the "
+                                 + "virtual machine! Please either refine your getObservation request to reduce the "
+                                 + "number of observations in the response or ask the administrator of this SOS to "
+                                 + "increase the maximum heap size of the virtual machine!",
+                                 Runtime.getRuntime().maxMemory());
         }
     }
 
@@ -338,11 +216,11 @@ public class SosHelper {
      * @param parameterMap
      *            Parameter map
      * @return Value of the parameter
-     * @throws OwsExceptionReport
-     *             If the parameter is not supported by this SOS.
+     *
+     * @throws OwsExceptionReport * If the parameter is not supported by this SOS.
      */
-    public static String parseHttpPostBodyWithParameter(Enumeration<?> paramNames, Map<?, ?> parameterMap)
-            throws OwsExceptionReport {
+    public static String parseHttpPostBodyWithParameter(Enumeration<?> paramNames, Map<?, ?> parameterMap) throws
+            OwsExceptionReport {
         while (paramNames.hasMoreElements()) {
             String paramName = (String) paramNames.nextElement();
             if (paramName.equalsIgnoreCase(RequestParams.request.name())) {
@@ -350,28 +228,17 @@ public class SosHelper {
                 if (paramValues.length == 1) {
                     return paramValues[0];
                 } else {
-                    String exceptionText =
-                            String.format(
-                                    "The parameter '%s' has more than one value or is empty for HTTP-Post requests by this SOS!",
-                                    paramName);
-                    LOGGER.error(exceptionText);
-                    OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-                    owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText);
-                    throw owse;
-                }
-            } else {
-                String exceptionText =
-                        String.format("The parameter '%s' is not supportted for HTTP-Post requests by this SOS!",
-                                paramName);
-                LOGGER.error(exceptionText);
-                OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-                owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText);
-                throw owse;
-            }
+                    throw new NoApplicableCodeException()
+                            .withMessage("The parameter '%s' has more than one value or is empty for HTTP-Post requests by this SOS!",
+                                         paramName);
         }
-        // FIXME: valid exception
-        OwsExceptionReport se = new OwsExceptionReport();
-        throw se;
+    } else {
+        throw new NoApplicableCodeException()
+                .withMessage("The parameter '%s' is not supportted for HTTP-Post requests by this SOS!", paramName);
+    }
+        }
+// FIXME: valid exception
+        throw new NoApplicableCodeException();
     }
 
     /**
@@ -380,17 +247,14 @@ public class SosHelper {
      * 
      * @param requestString
      *            Request as String
-     * @throws OwsExceptionReport
-     *             If the request contains critical characters
+
+     *
+     * @throws OwsExceptionReport If the request contains critical characters
      */
     public static void checkRequestString(String requestString) throws OwsExceptionReport {
         if (requestString.contains("');")) {
-            String exceptionText =
-                    "Request contains critical character sequence '\');'! If ProstgreSQL database is used, critical code can be excecuted via the request!";
-            LOGGER.error(exceptionText);
-            OwsExceptionReport owse = new OwsExceptionReport();
-            owse.addCodedException(SwesExceptionCode.InvalidRequest, null, exceptionText);
-            throw owse;
+            throw new InvalidRequestException()
+                    .withMessage("Request contains critical character sequence '\');'! If ProstgreSQL database is used, critical code can be excecuted via the request!");
         }
     }
 
@@ -424,10 +288,7 @@ public class SosHelper {
                 throw (OwsExceptionReport) e;
             }
             // FIXME valid exception
-            OwsExceptionReport owse = new OwsExceptionReport();
-            // owse.addCodedException(invalidparametervalue, locator, message,
-            // e);
-            throw owse;
+            throw new NoApplicableCodeException();
         }
         return null;
     }
@@ -465,15 +326,15 @@ public class SosHelper {
      *            whether to include the passed key in the result collection
      * @return collection of the full hierarchy
      */
-    public static Set<String> getHierarchy(Map<String, Set<String>> hierarchy, String key,
-                                           boolean fullHierarchy, boolean includeStartKey) {
+    public static Set<String> getHierarchy(Map<String, Set<String>> hierarchy, String key, boolean fullHierarchy,
+                                           boolean includeStartKey) {
         Set<String> hierarchyValues = new HashSet<String>();
         if (includeStartKey) {
             hierarchyValues.add(key);
-        }
+}
 
         Stack<String> keysToCheck = new Stack<String>();
-        keysToCheck.push(key);
+keysToCheck.push(key);
 
         while (!keysToCheck.isEmpty()) {
             Collection<String> keyValues = hierarchy.get(keysToCheck.pop());
@@ -484,10 +345,10 @@ public class SosHelper {
                     }
                 }
             }
-        }
+}
 
         return hierarchyValues;
-    }
+}
 
     /**
      * get collection of hierarchy values for a set of keys
@@ -499,14 +360,14 @@ public class SosHelper {
      *
      * @return collection of the full hierarchy
      */
-    public static Set<String> getHierarchy(Map<String, Set<String>> hierarchy, Set<String> keys,
-                                           boolean fullHierarchy, boolean includeStartKeys) {
+    public static Set<String> getHierarchy(Map<String, Set<String>> hierarchy, Set<String> keys, boolean fullHierarchy,
+                                           boolean includeStartKeys) {
         Set<String> parents = new HashSet<String>();
         for (String key : keys) {
             parents.addAll(getHierarchy(hierarchy, key, fullHierarchy, includeStartKeys));
         }
         return parents;
-    }
+}
 
     /**
      * creates a HTTP-GET string for DescribeSensor.
@@ -526,31 +387,31 @@ public class SosHelper {
     public static String getDescribeSensorUrl(String version, String serviceURL, String procedureId, String urlPattern)
             throws UnsupportedEncodingException {
         StringBuilder url = new StringBuilder();
-        // service URL
+// service URL
         url.append(serviceURL);
-        // URL pattern
+// URL pattern
         url.append(urlPattern);
-        // ?
+// ?
         url.append("?");
-        // request
+// request
         url.append(RequestParams.request.name()).append("=").append(SosConstants.Operations.DescribeSensor.name());
-        // service
+// service
         url.append("&").append(OWSConstants.RequestParams.service.name()).append("=").append(SosConstants.SOS);
-        // version
+// version
         url.append("&").append(OWSConstants.RequestParams.version.name()).append("=").append(version);
-        // procedure
+// procedure
         url.append("&").append(SosConstants.DescribeSensorParams.procedure.name()).append("=").append(procedureId);
-        // outputFormat
+// outputFormat
         if (version.equalsIgnoreCase(Sos1Constants.SERVICEVERSION)) {
             url.append("&").append(Sos1Constants.DescribeSensorParams.outputFormat).append("=")
                     .append(URLEncoder.encode(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE, "UTF-8"));
         } else {
             url.append("&").append(Sos2Constants.DescribeSensorParams.procedureDescriptionFormat).append("=")
                     .append(URLEncoder.encode(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL, "UTF-8"));
-        }
+}
 
         return url.toString();
-    }
+}
 
     /**
      * help method to check the result format parameter. If the application/zip
@@ -563,8 +424,9 @@ public class SosHelper {
      * @param version
      * @return boolean true if application/zip is the resultFormat value, false
      *         if its value is text/xml;subtype="OM"
-     * @throws OwsExceptionReport
-     *             if the parameter value is incorrect
+
+     *
+     * @throws OwsExceptionReport * if the parameter value is incorrect
      */
     public static boolean checkResponseFormat(String responseFormat, String version) throws OwsExceptionReport {
         if (OMHelper.checkOMResponseFormat(responseFormat)) {
@@ -572,15 +434,9 @@ public class SosHelper {
         } else if (responseFormat.equalsIgnoreCase(SosConstants.CONTENT_TYPE_ZIP)) {
             return true;
         } else {
-            String exceptionText =
-                    "The value of the parameter '" + SosConstants.GetObservationParams.responseFormat.toString() + "'"
-                            + "is invalid. Please check the capabilities for valid values. Delivered value was: "
-                            + responseFormat;
-            LOGGER.debug(exceptionText);
-            OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-            owse.addCodedException(OwsExceptionCode.InvalidParameterValue,
-                    SosConstants.GetObservationParams.responseFormat.toString(), exceptionText);
-            throw owse;
+            throw new InvalidParameterValueException().at(SosConstants.GetObservationParams.responseFormat)
+                    .withMessage("The value of the parameter '%s' is invalid. Please check the capabilities for valid values. Delivered value was: %s",
+                                 SosConstants.GetObservationParams.responseFormat, responseFormat);
         }
     }
 
@@ -602,37 +458,27 @@ public class SosHelper {
      *            the outputFormat parameter which should be checked
      * @param parameterName
      *            the parameter name
-     * @throws OwsExceptionReport
-     *             if the value of the outputFormat parameter is incorrect
+
+     *
+     * @throws OwsExceptionReport if the value of the outputFormat parameter is incorrect
      */
-    public static void checkProcedureDescriptionFormat(String procedureDecriptionFormat, String parameterName)
-            throws OwsExceptionReport {
+    public static void checkProcedureDescriptionFormat(String procedureDecriptionFormat, String parameterName) throws
+            OwsExceptionReport {
         if (procedureDecriptionFormat == null || procedureDecriptionFormat.isEmpty()
-                || procedureDecriptionFormat.equals(SosConstants.PARAMETER_NOT_SET)) {
-            String exceptionText =
-                    String.format(
-                            "The value of the mandatory parameter '%s' was not found in the request or is incorrect!",
-                            parameterName);
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createMissingParameterValueException(parameterName);
+            || procedureDecriptionFormat.equals(SosConstants.PARAMETER_NOT_SET)) {
+            throw new MissingProcedureDescriptionFormatException();
         }
         if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
             if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
-                String exceptionText =
-                        String.format(
-                                "The value '%s' of the %s parameter is incorrect and has to be '%s' for the requested sensor!",
-                                procedureDecriptionFormat, parameterName,
-                                SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE);
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+                throw new InvalidParameterValueException().at(parameterName).withMessage(
+                        "The value '%s' of the %s parameter is incorrect and has to be '%s' for the requested sensor!",
+                        procedureDecriptionFormat, parameterName,
+                        SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE);
             } else if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
-                String exceptionText =
-                        String.format(
-                                "The value '%s' of the %s parameter is incorrect and has to be '%s' for the requested sensor!",
-                                procedureDecriptionFormat, parameterName, SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
-            }
+                throw new InvalidParameterValueException().at(parameterName).withMessage(
+                        "The value '%s' of the %s parameter is incorrect and has to be '%s' for the requested sensor!",
+                        procedureDecriptionFormat, parameterName, SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
+    }
         }
     }
 
@@ -645,9 +491,8 @@ public class SosHelper {
             validSos2 = Sos2Constants.Operations.contains(requestValue);
         }
         if (!validSos1 && !validSos2) {
-            String exceptionText = "The requested request value is invalid. Delivered value: " + requestValue;
-            throw Util4Exceptions.createInvalidParameterValueException(OWSConstants.RequestParams.request.name(),
-                    exceptionText);
+            throw new InvalidParameterValueException().at(OWSConstants.RequestParams.request)
+                    .withMessage("The requested request value is invalid. Delivered value: %s", requestValue);
         }
     }
 
@@ -687,7 +532,7 @@ public class SosHelper {
                 .setMaximum(envelope.getMaxX() + " " + envelope.getMaxY())
                 .setMinimum(envelope.getMinX() + " " + envelope.getMinY());
     }
-    
+
     public static SosObservableProperty createSosOberavablePropertyFromSosSMLIo(SosSMLIo<?> output) {
         SosSweAbstractSimpleType<?> ioValue = output.getIoValue();
         String identifier = ioValue.getDefinition();
@@ -740,7 +585,7 @@ public class SosHelper {
      * @deprecated use {@link CodingRepository#getSupportedResponseFormats(java.lang.String, java.lang.String) }
      */
     @Deprecated
-    public static Collection<String> getSupportedResponseFormats(String service, String version) {
+public static Collection<String> getSupportedResponseFormats(String service, String version) {
         return Configurator.getInstance().getCodingRepository().getSupportedResponseFormats(service, version);
     }
     
@@ -753,21 +598,17 @@ public class SosHelper {
             ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayIntputStream);
             Object duplicatedObject = objectInputStream.readObject();
             return duplicatedObject;
-        } catch (IOException ioe) {
-            String exceptionText = "Error while duplicating object!";
-            LOGGER.error(exceptionText, ioe);
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
-        } catch (ClassNotFoundException cnfe) {
-            String exceptionText = "Error while duplicating object!";
-            LOGGER.error(exceptionText, cnfe);
-            throw Util4Exceptions.createNoApplicableCodeException(cnfe, exceptionText);
+        } catch (IOException e) {
+            throw new NoApplicableCodeException().causedBy(e).withMessage("Error while duplicating object!");
+        } catch (ClassNotFoundException e) {
+            throw new NoApplicableCodeException().causedBy(e).withMessage("Error while duplicating object!");
         }
     }
 
     public static void checkHref(String href, String parameterName) throws OwsExceptionReport {
         if (!href.startsWith("http") && !href.startsWith("urn")) {
-            String exceptionText = "The referance (href) has an invalid style!";
-            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+            throw new InvalidParameterValueException().at(parameterName)
+                    .withMessage("The reference (href) has an invalid style!");
         }
     }
 
@@ -796,15 +637,9 @@ public class SosHelper {
     public static void checkObservationType(String observationType, String parameterName) throws OwsExceptionReport {
         Collection<String> validObservationTypes = getConfiguration().getObservationTypes();
         if (observationType.isEmpty()) {
-            throw Util4Exceptions.createMissingParameterValueException(parameterName);
-        } else {
-            if (!validObservationTypes.contains(observationType)) {
-                String exceptionText =
-                        "The value (" + observationType + ") of the parameter '"
-                                + Sos2Constants.InsertSensorParams.observationType.name() + "' is invalid";
-                LOGGER.error(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
-            }
+            throw new MissingParameterValueException(parameterName);
+        } else if (!validObservationTypes.contains(observationType)) {
+            throw new InvalidParameterValueException(parameterName, observationType);
         }
 
     }
@@ -854,5 +689,38 @@ public class SosHelper {
             }
         }
         return filters;
+    }
+
+    /**
+     * Hide utility constructor
+     */
+    protected SosHelper() {
+    }
+
+    /**
+     * Class to encapsulate all calls to the {@link Configurator}. Can be overwritten by tests.
+     *
+     * @see SosHelper#setConfiguration(org.n52.sos.util.SosHelper.Configuration)
+     */
+    protected static class Configuration {
+        protected Collection<String> getObservationTypes() {
+            return Configurator.getInstance().getCache().getObservationTypes();
+        }
+
+        protected String getSrsNamePrefix() {
+            return Configurator.getInstance().getSrsNamePrefix();
+        }
+
+        protected String getSrsNamePrefixSosV2() {
+            return Configurator.getInstance().getSrsNamePrefixSosV2();
+        }
+
+        protected Set<Encoder<?, ?>> getEncoders() {
+            return Configurator.getInstance().getCodingRepository().getEncoders();
+        }
+
+        protected Collection<Binding> getBindings() {
+            return Configurator.getInstance().getBindingRepository().getBindings().values();
+        }
     }
 }

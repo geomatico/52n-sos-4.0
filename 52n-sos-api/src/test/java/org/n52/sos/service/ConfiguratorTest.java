@@ -23,7 +23,7 @@
  */
 package org.n52.sos.service;
 
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.exception.ConfigurationException;
 import static org.junit.Assert.*;
 
 import java.io.FileInputStream;

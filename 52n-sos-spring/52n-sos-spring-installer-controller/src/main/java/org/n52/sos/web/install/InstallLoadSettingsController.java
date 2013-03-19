@@ -30,7 +30,7 @@ import javax.servlet.http.HttpSession;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.web.AbstractController;

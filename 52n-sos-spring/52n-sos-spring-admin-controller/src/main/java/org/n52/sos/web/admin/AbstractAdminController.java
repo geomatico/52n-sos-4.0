@@ -1,5 +1,3 @@
-package org.n52.sos.web.admin;
-
 /**
  * Copyright (C) 2013
  * by 52 North Initiative for Geospatial Open Source Software GmbH
@@ -23,7 +21,7 @@ package org.n52.sos.web.admin;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-
+package org.n52.sos.web.admin;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,12 +33,12 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.jdbc.Work;
-import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.ConnectionProvider;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.web.AbstractController;
 import org.n52.sos.util.SQLHelper;
+import org.n52.sos.web.AbstractController;
 
 public abstract class AbstractAdminController extends AbstractController {
 

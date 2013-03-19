@@ -40,11 +40,11 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.SosResultEncoding;
 import org.n52.sos.ogc.sos.SosResultStructure;
 import org.n52.sos.request.GetResultRequest;
 import org.n52.sos.response.GetResultResponse;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,9 +80,8 @@ public class GetResultDAO extends AbstractGetResultDAO {
             }
             return response;
         } catch (HibernateException he) {
-            String exceptionText = "Error while querying result data!";
-            LOGGER.error(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+            throw new NoApplicableCodeException().causedBy(he)
+                    .withMessage("Error while querying result data!");
         } finally {
             sessionHolder.returnSession(session);
         }
@@ -105,11 +104,12 @@ public class GetResultDAO extends AbstractGetResultDAO {
      * @param session
      *            Hibernate session
      * @return List of Observation objects
-     * @throws OwsExceptionReport
-     *             If an error occurs.
+
+     *
+     * @throws OwsExceptionReport     *             If an error occurs.
      */
     protected List<Observation> queryObservation(GetResultRequest request, Set<String> featureIdentifier,
-            Session session) throws OwsExceptionReport {
+                                                 Session session) throws OwsExceptionReport {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>();
         String obsConstOffObsTypeAlias = HibernateCriteriaQueryUtilities.addObservationConstellationOfferingObservationTypesAliasToMap(aliases, null);

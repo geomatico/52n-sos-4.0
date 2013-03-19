@@ -32,9 +32,10 @@ import org.n52.sos.binding.Binding;
 import org.n52.sos.cache.ContentCache;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.ds.OperationDAO;
-import org.n52.sos.ogc.ows.SwesExtension;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
@@ -86,6 +87,8 @@ public abstract class AbstractHibernateOperationDao implements OperationDAO {
      *
      * @param decoderKey the decoderKey
      * @return Map with DCPs for the SOS operation
+
+     *
      * @throws OwsExceptionReport
      */
     protected Map<String, List<String>> getDCP(OperationDecoderKey decoderKey) throws OwsExceptionReport {
@@ -119,10 +122,7 @@ public abstract class AbstractHibernateOperationDao implements OperationDAO {
                 throw (OwsExceptionReport) e;
             }
             // FIXME valid exception
-            OwsExceptionReport owse = new OwsExceptionReport();
-            // owse.addCodedException(invalidparametervalue, locator, message,
-            // e);
-            throw owse;
+            throw new NoApplicableCodeException();
         }
 
         Map<String, List<String>> dcp = new HashMap<String, List<String>>(4);
@@ -141,5 +141,6 @@ public abstract class AbstractHibernateOperationDao implements OperationDAO {
         return dcp;
     }
 
-    protected abstract void setOperationsMetadata(OWSOperation operation, String service, String version) throws OwsExceptionReport;
+    protected abstract void setOperationsMetadata(OWSOperation operation, String service, String version) throws
+            OwsExceptionReport;
 }

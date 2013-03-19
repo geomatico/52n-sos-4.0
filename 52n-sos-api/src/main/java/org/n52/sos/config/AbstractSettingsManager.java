@@ -23,6 +23,7 @@
  */
 package org.n52.sos.config;
 
+import org.n52.sos.exception.ConfigurationException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

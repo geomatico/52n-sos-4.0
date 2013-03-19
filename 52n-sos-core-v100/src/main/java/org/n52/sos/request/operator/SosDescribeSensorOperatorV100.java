@@ -25,14 +25,18 @@ package org.n52.sos.request.operator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractDescribeSensorDAO;
 import org.n52.sos.encode.Encoder;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidOutputFormatException;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidProcedureDescriptionFormatException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingProcedureDescriptionFormatException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
@@ -45,10 +49,7 @@ import org.n52.sos.response.DescribeSensorResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * class handles the DescribeSensor request
@@ -57,12 +58,30 @@ import org.slf4j.LoggerFactory;
 public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<AbstractDescribeSensorDAO, DescribeSensorRequest> {
 
     private static final String OPERATION_NAME = SosConstants.Operations.DescribeSensor.name();
-    private static final Logger LOGGER = LoggerFactory.getLogger(SosDescribeSensorOperatorV100.class);
     // TODO necessary in SOS 1.0.0, different value?
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton("http://www.opengis.net/spec/SOS/1.0/conf/core");
+
     public SosDescribeSensorOperatorV100() {
         super(OPERATION_NAME, DescribeSensorRequest.class);
     }
+
+    /**
+     * from SosHelper, I think there was a bug, checks whether the value of outputFormat parameter is valid
+     *
+     * @param procedureDecriptionFormat the outputFormat parameter which should be checked
+     *
+     * @throws OwsExceptionReport if the value of the outputFormat parameter is incorrect
+     */
+    private void checkProcedureDescriptionFormat(String procedureDecriptionFormat, String parameterName) throws
+            OwsExceptionReport {
+        if (procedureDecriptionFormat == null || procedureDecriptionFormat.isEmpty() || procedureDecriptionFormat
+                .equals(SosConstants.PARAMETER_NOT_SET)) {
+            throw new MissingProcedureDescriptionFormatException();
+        }
+        if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
+            throw new InvalidParameterValueException(parameterName, procedureDecriptionFormat);
+        }
+}
 
     @Override
     public Set<String> getConformanceClasses() {
@@ -95,10 +114,9 @@ public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<Abs
                     contentType = SensorMLConstants.SENSORML_CONTENT_TYPE;
                 }
             } else {
-                String exceptionText = "Received version in request is not supported!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        OWSConstants.RequestParams.version.name(), exceptionText);
+                throw new InvalidParameterValueException()
+                        .at(OWSConstants.RequestParams.version)
+                        .withMessage("Received version in request is not supported!");
             }
 
             Encoder<XmlObject, DescribeSensorResponse> encoder = CodingHelper.getEncoder(namespace, response);
@@ -106,25 +124,21 @@ public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<Abs
                 encoder.encode(response).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
                 return new ServiceResponse(baos, contentType, applyZIPcomp, true);
             } else {
-                String parameterName = null;
                 if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
-                    parameterName = Sos1Constants.DescribeSensorParams.outputFormat.name();
-                } else if (sosRequest.getVersion().equals(Sos2Constants.SERVICEVERSION)) {
-                    parameterName = Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name();
+                    throw new InvalidOutputFormatException(sosRequest.getProcedureDescriptionFormat());
+                } else {
+                    throw new InvalidProcedureDescriptionFormatException(sosRequest.getProcedureDescriptionFormat());
                 }
-                throw Util4Exceptions.createInvalidParameterValueException(parameterName, String.format(
-                        "The value '%s' of the outputFormat parameter is incorrect and has to be '%s' for the requested sensor!",
-                        sosRequest.getProcedureDescriptionFormat(), SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL));
             }
         } catch (IOException ioe) {
-            String exceptionText = "Error occurs while saving response to output stream!";
-            LOGGER.error(exceptionText, ioe);
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            throw new NoApplicableCodeException().causedBy(ioe)
+                    .withMessage("Error occurs while saving response to output stream!");
         }
     }
 
-    private void checkRequestedParameters(DescribeSensorRequest sosRequest) throws OwsExceptionReport {
-        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
+    private void checkRequestedParameters(DescribeSensorRequest sosRequest) throws
+            OwsExceptionReport {
+        CompositeOwsException exceptions = new CompositeOwsException();
         try {
             checkServiceParameter(sosRequest.getService());
         } catch (OwsExceptionReport owse) {
@@ -153,31 +167,7 @@ public class SosDescribeSensorOperatorV100 extends AbstractV1RequestOperator<Abs
 //            String exceptionText = "The requested parameter is not supported by this server!";
 //            exceptions.add(Util4Exceptions.createOptionNotSupportedException(Sos2Constants.DescribeSensorParams.validTime.name(), exceptionText));
 //        }
-        Util4Exceptions.mergeAndThrowExceptions(exceptions);
-    }
-
-    /**
-     * from SosHelper, I think there was a bug,
-     * checks whether the value of outputFormat parameter is valid
-     *
-     * @param procedureDecriptionFormat
-     *            the outputFormat parameter which should be checked
-     * @throws OwsExceptionReport
-     *             if the value of the outputFormat parameter is incorrect
-     */
-    private static void checkProcedureDescriptionFormat(String procedureDecriptionFormat, String parameterName) throws OwsExceptionReport {
-        if (procedureDecriptionFormat == null || procedureDecriptionFormat.isEmpty() || procedureDecriptionFormat.equals(SosConstants.PARAMETER_NOT_SET)) {
-            String exceptionText = String.format("The value of the mandatory parameter '%s' was not found in the request or is incorrect!", parameterName);
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createMissingParameterValueException(parameterName);
-        }
-        if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
-            String exceptionText = String.format(
-                    "The value '%s' of the %s parameter is incorrect and has to be '%s' for the requested sensor!",
-                    procedureDecriptionFormat, parameterName, SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE);
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
-        }
+        exceptions.throwIfNotEmpty();
     }
 
 }

@@ -27,9 +27,9 @@ package org.n52.sos.ogc.sos;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject.Factory;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,16 +81,10 @@ public class SosResultEncoding {
                 SosSweAbstractEncoding sosSweEncoding = (SosSweAbstractEncoding) decodedObject;
                 return sosSweEncoding;
             } else {
-                StringBuilder exceptionText = new StringBuilder();
-                exceptionText.append("Error while parsing result encoding!");
-                LOGGER.debug(exceptionText.toString());
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+                throw new NoApplicableCodeException().withMessage("Error while parsing result encoding!");
             }
         } catch (XmlException xmle) {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("Error while parsing result encoding!");
-            LOGGER.debug(exceptionText.toString());
-            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText.toString());
+            throw new NoApplicableCodeException().causedBy(xmle).withMessage("Error while parsing result encoding!");
         }
     }
     

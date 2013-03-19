@@ -58,17 +58,17 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.ows.SwesExtension;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.VersionNegotiationFailedException;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.ogc.sos.SosOfferingsForContents;
 import org.n52.sos.request.GetCapabilitiesRequest;
-import org.n52.sos.request.operator.RequestOperator;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.response.GetCapabilitiesResponse;
-import org.n52.sos.util.SosHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,8 +115,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
 	private void addSectionSpecificContent(GetCapabilitiesResponse response,
 			Set<String> requestedExtensionSections,
 			int sections,
-			SosCapabilities sosCapabilities) throws OwsExceptionReport
-	{
+                                           SosCapabilities sosCapabilities) throws OwsExceptionReport	{
 		if (isServiceIdentificationSectionRequested(sections)) 
     	{
     		sosCapabilities.setServiceIdentification(getServiceIdentification(response.getVersion()));
@@ -158,8 +157,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
 	private int identifyRequestedSections(GetCapabilitiesRequest request,
 			GetCapabilitiesResponse response,
 			Set<String> availableExtensionSections,
-			Set<String> requestedExtensionSections) throws OwsExceptionReport
-    {
+                                          Set<String> requestedExtensionSections) throws OwsExceptionReport    {
         int sections = 0;
 		// handle sections array and set requested sections flag
     	if (request.getSections() == null) {
@@ -188,21 +186,16 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
     			} else if (availableExtensionSections.contains(section)
     					&& isVersionSos2(response)) {
     				requestedExtensionSections.add(section);
-    			} else {
-    				String exceptionText =
-    						String.format("The requested section '%s' does not exist or is not supported!",
-    								section);
-    				LOGGER.debug(exceptionText);
-    				throw Util4Exceptions.createInvalidParameterValueException(
-    						SosConstants.GetCapabilitiesParams.Section.name(), exceptionText);
-    			}
+                } else {
+                    throw new InvalidParameterValueException().at(SosConstants.GetCapabilitiesParams.Section)
+                            .withMessage("The requested section '%s' does not exist or is not supported!", section);
+                }
     		}
     	}
 		return sections;
 	}
 
-	private String getVersionParameter(GetCapabilitiesRequest request) throws OwsExceptionReport
-	{
+    private String getVersionParameter(GetCapabilitiesRequest request) throws OwsExceptionReport	{
 		if (request.getVersion() == null) {
     		if (request.getAcceptVersions() != null) {
     			String[] acceptedVersion = request.getAcceptVersions();
@@ -222,11 +215,9 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
     		return request.getVersion();
     	}
 
-		String exceptionText =
-				String.format("The requested '%s' values are not supported by this service!",
-						SosConstants.GetCapabilitiesParams.AcceptVersions.name());
-		LOGGER.error(exceptionText);
-		throw Util4Exceptions.createVersionNegotiationFailedException(exceptionText);
+        throw new VersionNegotiationFailedException()
+                .withMessage("The requested '%s' values are not supported by this service!",
+                             SosConstants.GetCapabilitiesParams.AcceptVersions);
 	}
 
     private SosServiceIdentification getServiceIdentification(String version) throws OwsExceptionReport {
@@ -242,9 +233,10 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
         for (Binding bindig : getConfigurator().getBindingRepository().getBindings().values()) {
             profiles.addAll(bindig.getConformanceClasses());
         }
-        for (RequestOperator requestOperator : getConfigurator().getRequestOperatorRepository().getRequestOperator()
-                .values()) {
-            profiles.addAll(requestOperator.getConformanceClasses());
+        for (RequestOperatorKeyType k : getConfigurator().getRequestOperatorRepository()
+                .getActiveRequestOperatorKeyTypes()) {
+            profiles.addAll(getConfigurator().getRequestOperatorRepository().getRequestOperator(k)
+                    .getConformanceClasses());
         }
         for (Decoder<?,?> decoder : getConfigurator().getCodingRepository().getDecoders()) {
             profiles.addAll(decoder.getConformanceClasses());
@@ -263,8 +255,9 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
      * @param session
      *            Hibernate session Hibernate session
      * @return List of OperationsMetadata
-     * @throws OwsExceptionReport
-     *             If an error occurs
+
+     *
+     * @throws OwsExceptionReport     *             If an error occurs
      */
     private OWSOperationsMetadata getOperationsMetadataForOperations(String service, String version)
             throws OwsExceptionReport {
@@ -320,8 +313,9 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
      * @param sosCapabilities
      *            SOS internal capabilities
      * @return Offerings for contents
-     * @throws OwsExceptionReport
-     *             If an error occurs
+
+     *
+     * @throws OwsExceptionReport     *             If an error occurs
      */
     private List<SosOfferingsForContents> getContents() throws OwsExceptionReport {
         Collection<String> offerings = getCache().getOfferings();
@@ -330,7 +324,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
 
             SosEnvelope envelopeForOffering = getCache().getEnvelopeForOffering(offering);
             Set<String> featuresForoffering = getFOI4offering(offering);
-            Collection<String> responseFormats = SosHelper
+            Collection<String> responseFormats = getConfigurator().getCodingRepository()
                     .getSupportedResponseFormats(SosConstants.SOS, Sos1Constants.SERVICEVERSION);
             if (checkOfferingValues(envelopeForOffering, featuresForoffering, responseFormats)) {
                 SosOfferingsForContents sosOffering = new SosOfferingsForContents();
@@ -380,10 +374,8 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
                 // set procedures
                 Collection<String> procedures = getCache().getProceduresForOffering(offering);
                 if (procedures == null || procedures.isEmpty()) {
-                    String exceptionText = String.format(
-                            "No procedures are contained in the database for the offering: %s! Please contact the admin of this SOS.", offering);
-                    LOGGER.error(exceptionText);
-                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                    throw new NoApplicableCodeException()
+                            .withMessage("No procedures are contained in the database for the offering: %s! Please contact the admin of this SOS.", offering);
                 }
                 sosOffering.setProcedures(procedures);
 
@@ -420,8 +412,9 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
      * @param session
      *            Hibernate session
      * @return Offerings for contents
-     * @throws OwsExceptionReport
-     *             If an error occurs
+
+     *
+     * @throws OwsExceptionReport     *             If an error occurs
      */
     private List<SosOfferingsForContents> getContentsForSosV2(String version)
             throws OwsExceptionReport {
@@ -586,8 +579,9 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
      * @param offering
      *            Offering identifier
      * @return FOI identifiers
-     * @throws OwsExceptionReport
-     *             If an error occurs
+
+     *
+     * @throws OwsExceptionReport     *             If an error occurs
      */
     private Set<String> getFOI4offering(String offering) throws OwsExceptionReport {
         Set<String> featureIDs = new HashSet<String>(0);
@@ -669,16 +663,19 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
      * Get extensions and merge MergableExtension of the same class.
      *
      * @return Extensions
+
+     *
      * @throws OwsExceptionReport
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private List<SwesExtension> getAndMergeExtensions() throws OwsExceptionReport {
-        Map<RequestOperatorKeyType, RequestOperator> requestOperators = getConfigurator()
-            				.getRequestOperatorRepository().getRequestOperator();
+        Set<RequestOperatorKeyType> requestOperators = getConfigurator()
+                .getRequestOperatorRepository().getActiveRequestOperatorKeyTypes();
         List<SwesExtension> extensions = new ArrayList<SwesExtension>(requestOperators.size());
         HashMap<String, MergableExtension> map = new HashMap<String, MergableExtension>(requestOperators.size());
-        for (RequestOperator requestOperator : requestOperators.values()) {
-            SwesExtension extension = requestOperator.getExtension();
+        for (RequestOperatorKeyType k : requestOperators) {
+            SwesExtension extension = getConfigurator().getRequestOperatorRepository()
+                    .getRequestOperator(k).getExtension();
             if (extension != null) {
                 if (extension instanceof MergableExtension) {
                     MergableExtension me = (MergableExtension) extension;
@@ -782,7 +779,8 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
     }
 
     protected void setUpResponseFormatForOffering(String version, SosOfferingsForContents sosOffering) {
-        Collection<String> responseFormats = SosHelper.getSupportedResponseFormats(SosConstants.SOS, version);
+        Collection<String> responseFormats = getConfigurator().getCodingRepository()
+                .getSupportedResponseFormats(SosConstants.SOS, version);
         sosOffering.setResponseFormats(responseFormats);
         // TODO set as property
         responseFormats.add(SosConstants.CONTENT_TYPE_ZIP);
@@ -796,12 +794,8 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
     private Collection<String> getProceduresForOffering(String offering) throws OwsExceptionReport {
         Collection<String> procedures = getCache().getProceduresForOffering(offering);
         if (procedures.isEmpty()) {
-            String exceptionText =
-                    String.format(
-                            "No procedures are contained in the database for the offering '%s'! Please contact the admin of this SOS.",
-                            offering);
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            throw new NoApplicableCodeException()
+                    .withMessage("No procedures are contained in the database for the offering '%s'! Please contact the admin of this SOS.", offering);
         }
         return procedures;
     }

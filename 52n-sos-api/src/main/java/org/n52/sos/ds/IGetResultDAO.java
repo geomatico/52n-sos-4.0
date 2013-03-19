@@ -44,8 +44,9 @@ public interface IGetResultDAO extends OperationDAO {
      * @param request
      *            GetResult request for the getResult operation
      * @return Returns GetResult response
-     * @throws OwsExceptionReport
-     *             If an error occurs.
+
+     *
+     * @throws OwsExceptionReport     *             If an error occurs.
      */
     public GetResultResponse getResult(GetResultRequest request) throws OwsExceptionReport;
 

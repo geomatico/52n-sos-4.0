@@ -34,15 +34,15 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 
-import org.n52.sos.exception.ExceptionCode;
+import org.n52.sos.exception.ows.OwsExceptionCode;
+import org.n52.sos.exception.sos.SosExceptionCode;
+import org.n52.sos.exception.swes.SwesExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.ows.ExceptionCode;
 import org.n52.sos.ogc.sos.SosConstants.Operations;
-import org.n52.sos.ogc.sos.SosConstants.SosExceptionCode;
 import org.n52.sos.ogc.sos.SosSoapConstants;
-import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.NodeList;
@@ -173,8 +173,9 @@ public class SoapHelper {
                 LOGGER.debug("ActionURI and SOAPBody content are valid!");
                 return SosSoapConstants.RESP_ACTION_GET_OBSERVATION;
             } else {
-                throw Util4Exceptions.createNoApplicableCodeException(null, "Error while actionURI (" + soapAction
-                        + ") is not compatible with the SOAPBody content (" + operationName + " request)!");
+                throw new NoApplicableCodeException()
+                        .withMessage("Error while actionURI (%s) is not compatible with the SOAPBody content (%s request)!",
+                                     soapAction, operationName);
             }
         }
         return null;

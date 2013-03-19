@@ -44,13 +44,14 @@ import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -193,9 +194,8 @@ public class SamplingDecoderv20 implements Decoder<SosAbstractFeature, XmlObject
                                 XmlObject.Factory.parse(XmlHelper.getNodeFromNodeList(sampledFeature.getDomNode()
                                         .getChildNodes()));
                     } catch (XmlException xmle) {
-                        String exceptionText = "Error while parsing feature request!";
-                        LOGGER.error(exceptionText, xmle);
-                        throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+                        throw new NoApplicableCodeException().causedBy(xmle)
+                                .withMessage("Error while parsing feature request!");
                     }
                 }
                 if (abstractFeature != null) {
@@ -204,10 +204,8 @@ public class SamplingDecoderv20 implements Decoder<SosAbstractFeature, XmlObject
                         sampledFeatures.add((SosAbstractFeature) decodedObject);
                     }
                 }
-                String exceptionText = "The requested sampledFeature type is not supported by this service!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        Sos2Constants.InsertObservationParams.observation.name(), exceptionText);
+                throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
+                        .withMessage("The requested sampledFeature type is not supported by this service!");
             }
         }
         return sampledFeatures;
@@ -218,10 +216,8 @@ public class SamplingDecoderv20 implements Decoder<SosAbstractFeature, XmlObject
         if (decodedObject != null && decodedObject instanceof Geometry) {
             return (Geometry) decodedObject;
         }
-        String exceptionText = "The requested geometry type of featureOfInterest is not supported by this service!";
-        LOGGER.debug(exceptionText);
-        throw Util4Exceptions.createInvalidParameterValueException(
-                Sos2Constants.InsertObservationParams.observation.name(), exceptionText);
+        throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
+                .withMessage("The requested geometry type of featureOfInterest is not supported by this service!");
     }
 
     private void checkTypeAndGeometry(SosSamplingFeature sosFeat) throws OwsExceptionReport {
@@ -230,13 +226,10 @@ public class SamplingDecoderv20 implements Decoder<SosAbstractFeature, XmlObject
             sosFeat.setFeatureType(featTypeForGeometry);
         } else {
             if (!featTypeForGeometry.equals(sosFeat.getFeatureType())) {
-                StringBuilder exceptionText = new StringBuilder();
-                exceptionText.append("The requested observation is invalid!");
-                exceptionText.append("The featureOfInterest type does not comply with the defined type (");
-                exceptionText.append(sosFeat.getFeatureType());
-                exceptionText.append(")!");
-                LOGGER.debug(exceptionText.toString());
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+
+                throw new NoApplicableCodeException()
+                        .withMessage("The requested observation is invalid! The featureOfInterest type "
+                                     + "does not comply with the defined type (%s)!", sosFeat.getFeatureType());
             }
         }
 

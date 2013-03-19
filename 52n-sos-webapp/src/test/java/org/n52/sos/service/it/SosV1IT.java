@@ -23,9 +23,7 @@
  */
 package org.n52.sos.service.it;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -200,7 +198,7 @@ public class SosV1IT extends SosITBase {
             IllegalStateException,
             XmlException,
             SAXException,
-            OwsExceptionReport {
+                                                        OwsExceptionReport {
         // create request document
         GetObservationDocument xb_getObsDoc = GetObservationDocument.Factory.newInstance();
         GetObservation xb_getObs = xb_getObsDoc.addNewGetObservation();
@@ -253,6 +251,8 @@ public class SosV1IT extends SosITBase {
      * 
      * @param templateId
      *        Observation template id for the request
+
+     *
      * @throws OwsExceptionReport
      * @throws URISyntaxException
      * @throws IOException
@@ -260,7 +260,7 @@ public class SosV1IT extends SosITBase {
      * @throws XmlException
      */
     private void getLatestResultV1(String templateId) throws OwsExceptionReport,
-            URISyntaxException,
+                                                             URISyntaxException,
             IOException,
             IllegalStateException,
             XmlException {

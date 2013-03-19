@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
 import org.slf4j.Logger;
@@ -116,6 +116,8 @@ public class ServiceOperatorRepository extends AbstractConfiguringServiceLoaderR
      * @param service
      * @param version
      * @return the implemented request listener
+
+     *
      * @throws OwsExceptionReport
      */
     public ServiceOperator getServiceOperator(String service, String version) throws OwsExceptionReport {

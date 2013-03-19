@@ -25,15 +25,16 @@ package org.n52.sos.request.operator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetFeatureOfInterestDAO;
 import org.n52.sos.encode.Encoder;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
@@ -43,7 +44,6 @@ import org.n52.sos.response.GetFeatureOfInterestResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,13 +63,14 @@ public class SosGetFeatureOfInterestOperatorV100 extends
         super(OPERATION_NAME, GetFeatureOfInterestRequest.class);
     }
     
-	private void checkRequestedParameters(GetFeatureOfInterestRequest sosRequest) throws OwsExceptionReport {
-        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
+    private void checkRequestedParameters(GetFeatureOfInterestRequest sosRequest) throws OwsExceptionReport {
+        CompositeOwsException exceptions = new CompositeOwsException();
         try {
             checkServiceParameter(sosRequest.getService());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
+        exceptions.throwIfNotEmpty();
 	}
 
 	@Override
@@ -79,7 +80,7 @@ public class SosGetFeatureOfInterestOperatorV100 extends
 
 	@Override
 	protected ServiceResponse receive(GetFeatureOfInterestRequest sosRequest)
-			throws OwsExceptionReport {
+            throws OwsExceptionReport {
 		boolean applyZIPcomp = false;
 
         checkRequestedParameters(sosRequest);
@@ -94,10 +95,8 @@ public class SosGetFeatureOfInterestOperatorV100 extends
             if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION) ) {
                 namespace = Sos1Constants.NS_SOS;
             } else {
-                String exceptionText = "Received version in request is not supported!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        OWSConstants.RequestParams.version.name(), exceptionText);
+                throw new InvalidParameterValueException().at(OWSConstants.RequestParams.version)
+                        .withMessage("Received version in request is not supported!");
             }
             
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -108,16 +107,10 @@ public class SosGetFeatureOfInterestOperatorV100 extends
                 return new ServiceResponse(baos, contentType, applyZIPcomp, true);
                 
             } else {
-                // complain check missing params throw exception
-            	OwsExceptionReport owse = new OwsExceptionReport();
-            	String exceptionText = "No encoder for operation found!";
-                LOGGER.error(exceptionText, owse);
-                throw Util4Exceptions.createNoApplicableCodeException(owse, exceptionText);
+                throw new NoApplicableCodeException().withMessage("No encoder for operation found!");
             }
         } catch (IOException ioe) {
-            String exceptionText = "Error occurs while saving response to output stream!";
-            LOGGER.error(exceptionText, ioe);
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            throw new NoApplicableCodeException().withMessage("Error occurs while saving response to output stream!");
         }
     }
 }

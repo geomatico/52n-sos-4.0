@@ -33,8 +33,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -53,8 +53,8 @@ public class W3cHelper {
      *            Node to parse.
      * 
      * @return Node as String.
-     * @throws OwsExceptionReport
-     *             if an error occurs.
+     *
+     * @throws OwsExceptionReport if an error occurs.
      */
     public static String nodeToXmlString(Node node) throws OwsExceptionReport {
         String xmlString = "";
@@ -67,11 +67,8 @@ public class W3cHelper {
             t.transform(new DOMSource(node), new StreamResult(sw));
             xmlString = sw.toString();
         } catch (TransformerException te) {
-            OwsExceptionReport se = new OwsExceptionReport();
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null,
-                    "The request was sent in an unknown format or is invalid!!");
-            LOGGER.error("nodeToString Transformer Exception", te);
-            throw se;
+            throw new NoApplicableCodeException().causedBy(te)
+                    .withMessage("The request was sent in an unknown format or is invalid!");
         } finally {
             try {
                 if (sw != null) {
@@ -86,13 +83,11 @@ public class W3cHelper {
 
     /**
      * Get text content from element by namespace.
-     * 
-     * @param soapHeader
-     *            SOAPHeader element
-     * @param namespaceURI
-     *            Namespace URI
-     * @param localName
-     *            local name
+     *
+     * @param element      element
+     * @param namespaceURI Namespace URI
+     * @param localName    local name
+     *
      * @return Text content.
      */
     public static String getContentFromElement(Element element, String namespaceURI, String localName) {

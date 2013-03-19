@@ -24,7 +24,7 @@
 package org.n52.sos.encode;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,7 +52,6 @@ import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +73,7 @@ import net.opengis.gml.TimePeriodDocument;
 import net.opengis.gml.TimePeriodType;
 import net.opengis.gml.TimePositionType;
 
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -126,7 +126,7 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
 
     @Override
     public XmlObject encode(Object element) throws OwsExceptionReport {
-        return encode(element, new HashMap<HelperValues, String>());
+        return encode(element, new EnumMap<HelperValues, String>(HelperValues.class));
     }
 
     @Override
@@ -188,8 +188,9 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
      *            SOS time object
      * @param timePeriodType
      * @return XML TimePeriod
-     * @throws OwsExceptionReport
-     *             if an error occurs.
+
+     *
+     * @throws OwsExceptionReport     *             if an error occurs.
      */
     private TimePeriodType createTimePeriodType(TimePeriod timePeriod, TimePeriodType timePeriodType)
             throws OwsExceptionReport {
@@ -224,19 +225,12 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
             timePeriodType.setEndPosition(xbTimePositionEnd);
 
             return timePeriodType;
-        } catch (DateTimeException dte) {
-            String exceptionText = "Error while creating TimePeriod!";
-            LOGGER.error(exceptionText, dte);
-            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
-        } catch (XmlRuntimeException xre) {
-        	String exceptionText = "Error while creating TimePeriod!";
-            LOGGER.error(exceptionText, xre);
-            throw Util4Exceptions.createNoApplicableCodeException(xre, exceptionText);
-        } catch (XmlValueDisconnectedException xvde) {
-        	String exceptionText = "Error while creating TimePeriod!";
-        	xvde.printStackTrace();
-            LOGGER.error(exceptionText, xvde);
-            throw Util4Exceptions.createNoApplicableCodeException(xvde, exceptionText);
+        } catch (DateTimeException x) {
+            throw new NoApplicableCodeException().causedBy(x).withMessage("Error while creating TimePeriod!");
+        } catch (XmlRuntimeException x) {
+            throw new NoApplicableCodeException().causedBy(x).withMessage("Error while creating TimePeriod!");
+        } catch (XmlValueDisconnectedException x) {
+            throw new NoApplicableCodeException().causedBy(x).withMessage("Error while creating TimePeriod!");
         }
     }
 
@@ -255,8 +249,9 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
      * @param timeInstantType
      * @param xbTime
      * @return XML TimeInstant
-     * @throws OwsExceptionReport
-     *             if an error occurs.
+
+     *
+     * @throws OwsExceptionReport     *             if an error occurs.
      */
     private TimeInstantType createTimeInstantType(TimeInstant timeInstant, TimeInstantType timeInstantType)
             throws OwsExceptionReport {
@@ -286,9 +281,7 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
             xb_posType.setStringValue(timeString);
             return timeInstantType;
         } catch (DateTimeException dte) {
-            String exceptionText = "Error while creating TimeInstant!";
-            LOGGER.error(exceptionText, dte);
-            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+            throw new NoApplicableCodeException().causedBy(dte).withMessage("Error while creating TimeInstant!");
         }
     }
 

@@ -27,8 +27,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
@@ -36,8 +34,14 @@ import org.n52.sos.ds.AbstractInsertResultTemplateDAO;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.ResultTemplateInsertion;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.MissingParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.EncoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.ErrorWhileSavingResponseToOutputStreamException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.NoEncoderForResponseException;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosObservationConstellation;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -48,7 +52,6 @@ import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.SosHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
@@ -88,22 +91,18 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
                 } else if (encodedObject instanceof ServiceResponse) {
                     return (ServiceResponse) encodedObject;
                 } else {
-                    String exceptionText = "The encoder response is not supported!";
-                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                    throw new EncoderResponseUnsupportedException();
                 }
             } else {
-                String exceptionText = "Error while getting encoder for response!";
-                throw Util4Exceptions.createInvalidParameterValueException("", exceptionText);
+                throw new NoEncoderForResponseException();
             }
         } catch (IOException ioe) {
-            String exceptionText = "Error occurs while saving response to output stream!";
-            LOGGER.error(exceptionText, ioe);
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
     }
 
     private void checkRequestedParameter(InsertResultTemplateRequest request) throws OwsExceptionReport {
-        List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+        CompositeOwsException exceptions = new CompositeOwsException();
         try {
             checkServiceParameter(request.getService());
         } catch (OwsExceptionReport owse) {
@@ -139,25 +138,19 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
-        try {
-            String identifier = request.getObservationTemplate().getFeatureOfInterest().getIdentifier().getValue();
-            if (identifier.isEmpty()) {
-                throw Util4Exceptions
-                        .createMissingParameterValueException(Sos2Constants.InsertResultTemplateParams.proposedTemplate
-                                .name());
-            }
-
-        } catch (OwsExceptionReport owse) {
-            exceptions.add(owse);
+        String identifier = request.getObservationTemplate().getFeatureOfInterest().getIdentifier().getValue();
+        if (identifier.isEmpty()) {
+            exceptions
+                    .add(new MissingParameterValueException(Sos2Constants.InsertResultTemplateParams.proposedTemplate));
         }
+
         // check identifier
         try {
             checkResultTemplateIdentifier(request.getIdentifier());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
-
-        Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        exceptions.throwIfNotEmpty();
         // TODO check parameter as defined in SOS 2.0 spec
 
         /*
@@ -210,9 +203,8 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
     private void checkResultTemplateIdentifier(String identifier) throws OwsExceptionReport {
         if (Configurator.getInstance().getCache().getResultTemplates().contains(identifier)) {
             //TODO correct rerror message
-            String exceptionText = String.format("The requested template identifier (%s) still contains in this service!", identifier);
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    Sos2Constants.InsertResultTemplateParams.identifier.name(), exceptionText.toString());
+            throw new InvalidParameterValueException().at(Sos2Constants.InsertResultTemplateParams.identifier)
+                    .withMessage("The requested template identifier (%s) still contains in this service!", identifier);
         }
 
     }
@@ -232,10 +224,8 @@ public class SosInsertResultTemplateOperatorV20 extends AbstractV2RequestOperato
         }
         // check if observation type is valid for offering
         if (!validObservationTypesForOffering.contains(observationConstellation.getObservationType())) {
-            String exceptionText = "The requested observation type is not valid for the offering!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    Sos2Constants.InsertResultTemplateParams.observationType.name(), exceptionText);
+            throw new InvalidParameterValueException().at(Sos2Constants.InsertResultTemplateParams.observationType)
+                    .withMessage("The requested observation type is not valid for the offering!");
         }
     }
 

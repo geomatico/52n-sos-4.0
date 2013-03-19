@@ -24,7 +24,6 @@
 package org.n52.sos.ds.hibernate;
 
 import static org.n52.sos.ds.hibernate.CacheFeederSettingDefinitionProvider.CACHE_THREAD_COUNT;
-import static org.n52.sos.util.Util4Exceptions.createNoApplicableCodeException;
 import static org.n52.sos.util.Util4Exceptions.mergeAndThrowExceptions;
 
 import java.util.LinkedList;
@@ -32,6 +31,7 @@ import java.util.LinkedList;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.n52.sos.cache.WritableContentCache;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.CacheFeederDAO;
@@ -43,7 +43,8 @@ import org.n52.sos.ds.hibernate.cache.ResultTemplateInsertionCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.SensorDeletionCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.SensorInsertionCacheUpdate;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.util.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,13 +110,9 @@ public class SosCacheFeederDAO extends HibernateSessionHolder implements CacheFe
 
     protected void update(WritableContentCache cache, CacheUpdate action) throws OwsExceptionReport {
         if (cache == null) {
-            String errorMsg = "CapabilitiesCache object is null";
-            IllegalArgumentException e = new IllegalArgumentException(errorMsg);
-            LOGGER.debug("Exception thrown:", e);
-            LOGGER.error(errorMsg);
-            throw createNoApplicableCodeException(e, errorMsg);
+            throw new NoApplicableCodeException().withMessage("CapabilitiesCache object is null");
         }
-        LinkedList<OwsExceptionReport> errors = new LinkedList<OwsExceptionReport>();
+        CompositeOwsException errors = new CompositeOwsException();
         Session session = null;
         try {
             session = getSession();
@@ -129,6 +126,6 @@ public class SosCacheFeederDAO extends HibernateSessionHolder implements CacheFe
         } finally {
             returnSession(session);
         }
-        mergeAndThrowExceptions(errors);
+        errors.throwIfNotEmpty();
     }
 }

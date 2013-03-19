@@ -32,16 +32,12 @@ import org.n52.sos.service.ConformanceClass;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 
 /**
- * @param <T>
- *            the resulting type, the "Target"
- * @param <S>
- *            the input type, the "Source"
+ * @param <T> the resulting type, the "Target"
+ * @param <S> the input type, the "Source"
  */
 public interface Encoder<T, S> extends ConformanceClass {
-
     /**
-     * @return List of supported encodings of this implementation (identified by
-     *         {@link EncoderKeyType})
+     * @return List of supported encodings of this implementation (identified by {@link EncoderKeyType})
      */
     public Set<EncoderKey> getEncoderKeyType();
 
@@ -53,7 +49,7 @@ public interface Encoder<T, S> extends ConformanceClass {
 
     /**
      * Add the namespace prefix of this {@linkplain Encoder} instance to the given {@linkplain Map}.
-     * 
+     *
      * @param nameSpacePrefixMap
      */
     public void addNamespacePrefixToMap(Map<String, String> nameSpacePrefixMap);
@@ -62,5 +58,4 @@ public interface Encoder<T, S> extends ConformanceClass {
      * @return the content type of the encoded response.
      */
     public String getContentType();
-
 }

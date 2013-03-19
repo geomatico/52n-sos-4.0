@@ -45,6 +45,7 @@ import org.n52.sos.ogc.om.features.SFConstants;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -56,7 +57,6 @@ import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -196,9 +196,8 @@ public class SamplingEncoderv100 implements Encoder<XmlObject, SosAbstractFeatur
             	XmlHelper.substituteElement(xbShape.getGeometry(), xmlObject);
             	//                    encoder.substitute(xbShape.getAbstractGeometry(), xmlObject);
             } else {
-            	String exceptionText = "Error while encoding geometry for feature, needed encoder is missing!";
-            	LOGGER.debug(exceptionText);
-            	throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoApplicableCodeException()
+                        .withMessage("Error while encoding geometry for feature, needed encoder is missing!");
             }
             return xbSampFeatDoc;
         }

@@ -29,7 +29,7 @@ import static org.n52.sos.util.ReverseOf.reverseOf;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
 import org.n52.sos.ogc.om.features.SFConstants;

@@ -28,13 +28,11 @@ import static org.n52.sos.ogc.ows.SosServiceIdentificationFactorySettings.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
-import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.LazyThreadSafeFactory;
 import org.n52.sos.util.Validation;

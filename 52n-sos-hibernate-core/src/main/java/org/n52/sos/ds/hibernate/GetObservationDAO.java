@@ -42,17 +42,17 @@ import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
 import org.n52.sos.ds.hibernate.util.QueryHelper;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingObservedPropertyParameterException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
-import org.n52.sos.ogc.sos.SosConstants.GetObservationParams;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.SosHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,9 +72,8 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
         try {
             session = sessionHolder.getSession();
             if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION)
-                    && sosRequest.getObservedProperties().isEmpty()) {
-                throw Util4Exceptions.createMissingParameterValueException(GetObservationParams.observedProperty
-                        .name());
+                && sosRequest.getObservedProperties().isEmpty()) {
+                throw new MissingObservedPropertyParameterException();
             } else {
                 GetObservationResponse sosResponse = new GetObservationResponse();
                 sosResponse.setService(sosRequest.getService());
@@ -89,9 +88,8 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
                 return sosResponse;
             }
         } catch (HibernateException he) {
-            String exceptionText = "Error while querying data observation data!";
-            LOGGER.error(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+            throw new NoApplicableCodeException().causedBy(he)
+                    .withMessage("Error while querying data observation data!");
         } finally {
             sessionHolder.returnSession(session);
         }
@@ -175,7 +173,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
                 observations.addAll(HibernateCriteriaQueryUtilities.getObservations(observationQueryObject, session));
             }
         LOGGER.debug("Time to query observations needs {} ms!", (System.currentTimeMillis()-start));
-        if (observations != null && !observations.isEmpty()) {
+        if (!observations.isEmpty()) {
             long startProcess = System.currentTimeMillis();
             sosObservations.addAll(HibernateObservationUtilities.createSosObservationsFromObservations(
                     observations, request.getVersion(), session));
@@ -195,8 +193,9 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
      * @param session
      *            Hibernate session
      * @return List of Observation objects
-     * @throws OwsExceptionReport
-     *             If an error occurs.
+
+     *
+     * @throws OwsExceptionReport * If an error occurs.
      */
     protected List<SosObservation> queryObservationHydro(GetObservationRequest request, Session session)
             throws OwsExceptionReport {
@@ -301,7 +300,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
                 observations.addAll(HibernateCriteriaQueryUtilities.getObservations(defaultQueryObject, session));
             }
             // create SosObservations
-            if (observations != null && !observations.isEmpty()) {
+            if (!observations.isEmpty()) {
                 allObservations.addAll(observations);
             } else {
                     List<String> featureOfInterestIdentifiers =
@@ -312,7 +311,7 @@ public class GetObservationDAO extends AbstractGetObservationDAO {
             }
         }
         LOGGER.debug("Time to query observations needs {} ms!", (System.currentTimeMillis()-start));
-        if (allObservations != null && !allObservations.isEmpty()) {
+        if (!allObservations.isEmpty()) {
             long startProcess = System.currentTimeMillis();
             sosObservations.addAll(HibernateObservationUtilities.createSosObservationsFromObservations(
                     allObservations, request.getVersion(), session));

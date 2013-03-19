@@ -30,7 +30,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.joda.time.DateTime;
 import org.n52.sos.cache.ContentCacheController;
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ogc.ows.OwsExceptionReport;

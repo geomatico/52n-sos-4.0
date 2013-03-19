@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.jettison.json.JSONException;
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingDefinitionGroup;
 import org.springframework.stereotype.Controller;

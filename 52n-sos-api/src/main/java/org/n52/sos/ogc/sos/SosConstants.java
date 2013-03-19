@@ -23,7 +23,6 @@
  */
 package org.n52.sos.ogc.sos;
 
-import org.n52.sos.exception.ExceptionCode;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.ows.OWSConstants;
 
@@ -177,11 +176,11 @@ public final class SosConstants {
 	 */
 	public static final String PROPERTY_NAME_SPATIAL_VALUE = OGCConstants.URN_PROPERTY_NAME_SPATIAL_VALUE;
 
-    private static final String SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT =
-            "The requested result set exceeds the response size limit of this service and thus cannot be delivered.";
+    public static final String SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT =
+                               "The requested result set exceeds the response size limit of this service and thus cannot be delivered.";
 
-    private static final String SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION =
-            "Observations for the requested combination of observedProperty and offering do not use SWE Common encoded results.";
+    public static final String SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION =
+                               "Observations for the requested combination of observedProperty and offering do not use SWE Common encoded results.";
 
     public static final String GENERATED_IDENTIFIER_PREFIX = "generated_";
 
@@ -405,19 +404,4 @@ public final class SosConstants {
         GMLID, EXIST_FOI_IN_DOC, VERSION, TYPE, DOCUMENT, FOR_OBSERVATION, ENCODE, ENCODE_NAMESPACE
     }
 
-    public enum SosExceptionCode implements ExceptionCode {
-        ResponseExceedsSizeLimit(SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT), 
-        InvalidPropertyOfferingCombination(SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION);
-        
-        private final String soapFaultReason;
-        
-        private SosExceptionCode(String soapFaultReason) {
-            this.soapFaultReason = soapFaultReason;
-        }
-
-        @Override
-        public String getSoapFaultReason() {
-            return this.soapFaultReason;
-        }
-    }
 }

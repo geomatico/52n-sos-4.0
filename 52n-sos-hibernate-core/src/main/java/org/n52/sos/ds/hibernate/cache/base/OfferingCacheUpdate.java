@@ -91,9 +91,7 @@ public class OfferingCacheUpdate extends CacheUpdate {
             queueTasks(offerings);
             waitForTaskCompletion();
             LOGGER.debug("Finished waiting for other threads");
-            if (!errors.isEmpty()) {
-                getErrors().addAll(errors);
-            }
+            getErrors().add(errors);
         } finally {
             try {
                 getSessionFactory().close();

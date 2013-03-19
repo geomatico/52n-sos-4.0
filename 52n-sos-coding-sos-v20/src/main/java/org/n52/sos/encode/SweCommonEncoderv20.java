@@ -26,7 +26,7 @@ package org.n52.sos.encode;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,6 +55,7 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
@@ -79,9 +80,7 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
-import org.omg.CosNaming.IstringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -206,9 +205,8 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
             } else if (sosSweAbstractDataComponent.getXml() != null && !sosSweAbstractDataComponent.getXml().isEmpty()) {
                 return XmlObject.Factory.parse(sosSweAbstractDataComponent.getXml());
             } else {
-                String exceptionText = "AbstractDataComponent can not be encoded!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoApplicableCodeException()
+                        .withMessage("AbstractDataComponent can not be encoded!");
             }
             // add AbstractDataComponentType information
             if (abstractDataComponentType != null) {
@@ -232,14 +230,12 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
                 }
             return abstractDataComponentType;
         } catch (XmlException e) {
-            String exceptionText = "Error while encoding AbstractDataComponent!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+            throw new NoApplicableCodeException().causedBy(e)
+                    .withMessage("Error while encoding AbstractDataComponent!");
         }
     }
 
-    private DataRecordType createDataRecord(SosSweDataRecord sosDataRecord) throws OwsExceptionReport
-    {
+    private DataRecordType createDataRecord(SosSweDataRecord sosDataRecord) throws OwsExceptionReport    {
         List<SosSweField> sosFields = sosDataRecord.getFields();
         DataRecordType xbDataRecord = DataRecordType.Factory.newInstance();
         if (sosFields != null) {
@@ -344,7 +340,7 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
             xbField.setName(sweField.getName());
         }
         AbstractDataComponentType xbDCD = xbField.addNewAbstractDataComponent();
-        xbDCD.set(createAbstractDataComponent(sosElement, new HashMap<SosConstants.HelperValues, String>(0)));
+        xbDCD.set(createAbstractDataComponent(sosElement, new EnumMap<SosConstants.HelperValues, String>(HelperValues.class)));
         if (sosElement instanceof SosSweBoolean)
         {
             xbField.getAbstractDataComponent().substitute(SWEConstants.QN_BOOLEAN_SWE_200, BooleanType.type);
@@ -381,14 +377,11 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
         }
         else
         {
-            String errorMsg =
-                    String.format(
-                            "The type '%s' of the received %s is not supported by this encoder '%s'.",
-                            sosElement != null ? sosElement.getClass().getName() : null,
-							sweField != null ? sweField.getClass().getName() : null,
-							getClass().getName());
-            LOGGER.error(errorMsg);
-            throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+            throw new NoApplicableCodeException()
+                    .withMessage("The type '%s' of the received %s is not supported by this encoder '%s'.",
+                                 sosElement != null ? sosElement.getClass().getName() : null,
+                                 sweField != null ? sweField.getClass().getName() : null,
+                                 getClass().getName());
         }
         return xbField;
     }
@@ -416,9 +409,9 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
         } else if (sosSimpleType instanceof SosSweTime) {
             return createTime((SosSweTime) sosSimpleType);
         }
-        
+
         // TODO: NOT SUPPORTED EXCEPTION
-        throw new OwsExceptionReport();
+        throw new NoApplicableCodeException();
     }
 
     private BooleanType createBoolean(SosSweBoolean sosElement) {
@@ -529,13 +522,9 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
                     return (AbstractEncodingType) xmlObject;
                 }
             }
-            String exceptionText = "AbstractEncoding can not be encoded!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            throw new NoApplicableCodeException().withMessage("AbstractEncoding can not be encoded!");
         } catch (XmlException e) {
-            String exceptionText = "Error while encoding AbstractEncoding!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+            throw new NoApplicableCodeException().withMessage("Error while encoding AbstractEncoding!");
         }
     }
 
@@ -563,7 +552,7 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
      *
      * private String createResultString(List<SosObservableProperty>
      * phenComponents, SosObservation sosObservation, Map<ITime, Map<String,
-     * IValue>> valueMap) throws OwsExceptionReport {
+ IValue>> valueMap) throws OwsExceptionReport {
      *
      * if (!(phenComponents instanceof ArrayList)) { phenComponents = new
      * ArrayList<SosObservableProperty>(phenComponents); } String noDataValue =
@@ -599,7 +588,7 @@ public class SweCommonEncoderv20 implements Encoder<XmlObject, Object> {
      *
      * private String getValue(int i, int j, ITime[] times, String[] phens, int
      * phenTimeIndex, String noDataValue, Map<ITime, Map<String, IValue>>
-     * valueMap) throws OwsExceptionReport { if (j == phenTimeIndex) { return
+ valueMap) throws OwsExceptionReport { if (j == phenTimeIndex) { return
      * DateTimeHelper.format(times[i]); } else { Map<String, IValue> value =
      * valueMap.get(times[i]); return (value == null) ? noDataValue :
      * getStringValue(value.get(phens[j]), noDataValue); } }

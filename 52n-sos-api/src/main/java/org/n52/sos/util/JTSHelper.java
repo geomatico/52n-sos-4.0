@@ -23,8 +23,9 @@
  */
 package org.n52.sos.util;
 
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,17 +72,14 @@ public class JTSHelper {
             LOGGER.debug("FOI Geometry: {}", wkt);
             return wktReader.read(wkt);
         } catch (ParseException pe) {
-            String exceptionText = "Error while parsing the geometry of featureOfInterest parameter";
-            LOGGER.error(exceptionText, pe);
-            OwsExceptionReport se = new OwsExceptionReport();
-            se.addCodedException(OwsExceptionCode.InvalidParameterValue, null, exceptionText, pe);
-            throw se;
+            throw new InvalidParameterValueException().causedBy(pe)
+                    .withMessage("Error while parsing the geometry of featureOfInterest parameter");
         }
     }
 
     public static WKTReader getWKTReaderForSRID(int srid) throws OwsExceptionReport {
         if (srid <= 0) {
-            throw Util4Exceptions.createNoApplicableCodeException(null, "SRID may not be <= 0");
+            throw new NoApplicableCodeException().withMessage("SRID may not be <= 0. Was %d", srid);
         }
         return new WKTReader(getGeometryFactoryForSRID(srid));
     }
@@ -154,8 +152,7 @@ public class JTSHelper {
      * <p/>
      * @return Geometry with switched coordinates
      * <p/>
-     * @throws OwsExceptionReport
-     * <p/>
+     * @throws OwsExceptionReport     * <p/>
      */
     public static <G extends Geometry> G switchCoordinateAxisOrder(G geometry) throws OwsExceptionReport {
         if (geometry == null) {

@@ -44,12 +44,13 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlValidationError;
-import org.n52.sos.exception.ExceptionCode;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.swes.InvalidRequestException;
 import org.n52.sos.ogc.gml.GMLConstants;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.swe.SWEConstants;
-import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
@@ -76,8 +77,9 @@ public class XmlHelper {
      * @param request
      *            HTTP-Post request
      * @return XML document
-     * @throws OwsExceptionReport
-     *             If an error occurs
+
+     *
+     * @throws OwsExceptionReport If an error occurs
      */
     public static XmlObject parseXmlSosRequest(HttpServletRequest request) throws OwsExceptionReport {
         XmlObject doc;
@@ -87,15 +89,15 @@ public class XmlHelper {
                 doc = XmlObject.Factory.parse(requestContent);
             } else {
                 doc =
-                        XmlObject.Factory.parse(SosHelper.parseHttpPostBodyWithParameter(request.getParameterNames(),
-                                request.getParameterMap()));
+                XmlObject.Factory.parse(SosHelper.parseHttpPostBodyWithParameter(request.getParameterNames(),
+                                                                                 request.getParameterMap()));
             }
         } catch (XmlException xmle) {
-            throw Util4Exceptions.createNoApplicableCodeException(xmle,
-                    "An xml error occured when parsing the request! Message: " + xmle.getMessage());
+            throw new NoApplicableCodeException().causedBy(xmle)
+                    .withMessage("An xml error occured when parsing the request! Message: %s", xmle.getMessage());
         } catch (IOException ioe) {
-            throw Util4Exceptions.createNoApplicableCodeException(ioe,
-                    "Error while reading request! Message: " + ioe.getMessage());
+            throw new NoApplicableCodeException().causedBy(ioe)
+                    .withMessage("Error while reading request! Message: %s", ioe.getMessage());
         }
         // validateDocument(doc);
         return doc;
@@ -107,10 +109,9 @@ public class XmlHelper {
             if (scanner.hasNext()) {
                 return scanner.next();
             }
-        } catch (NoSuchElementException nSEE) {
-            String msg = String.format("Error while reading content of HTTP request: %s", nSEE.getMessage());
-            LOGGER.debug(msg, nSEE);
-            throw Util4Exceptions.createNoApplicableCodeException(nSEE, msg);
+        } catch (NoSuchElementException nsee) {
+            throw new NoApplicableCodeException().causedBy(nsee)
+                    .withMessage("Error while reading content of HTTP request: %s", nsee.getMessage());
         }
         return "";
     }
@@ -139,8 +140,7 @@ public class XmlHelper {
      * @param xb_doc
      *            the document which should be checked
      * 
-     * @throws OwsExceptionReport
-     *             if the Document is not valid
+     * @throws OwsExceptionReport * if the Document is not valid
      */
     public static void validateDocument(XmlObject xb_doc) throws OwsExceptionReport {
         // Create an XmlOptions instance and set the error listener.
@@ -178,21 +178,16 @@ public class XmlHelper {
                     errors.add(error);
                 }
             }
-            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+            CompositeOwsException exceptions = new CompositeOwsException();
             for (XmlError error : errors) {
 
-                // ExceptionCode for Exception
-                ExceptionCode exCode = null;
 
                 // get name of the missing or invalid parameter
                 message = error.getMessage();
                 if (message != null) {
 
-                    OwsExceptionReport se = new OwsExceptionReport();
-                    se.addCodedException(SwesExceptionCode.InvalidRequest, message, "[XmlBeans validation error:] "
-                            + message);
-                    LOGGER.error("The request is invalid!", se);
-                    exceptions.add(se);
+                    exceptions.add(new InvalidRequestException().at(message)
+                            .withMessage("[XmlBeans validation error:] %s", message));
 
                     // TODO check if code can be used for validation of SOS
                     // 1.0.0 requests
@@ -301,7 +296,7 @@ public class XmlHelper {
                     // throw se;
                 }
             }
-            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+            exceptions.throwIfNotEmpty();
         }
     }
 
@@ -364,8 +359,9 @@ public class XmlHelper {
      * @param file
      *            File
      * @return XML document
-     * @throws OwsExceptionReport
-     *             If an error occurs
+
+     *
+     * @throws OwsExceptionReport If an error occurs
      */
     public static XmlObject loadXmlDocumentFromFile(File file) throws OwsExceptionReport {
         InputStream is = null;
@@ -373,11 +369,11 @@ public class XmlHelper {
             is = FileIOHelper.loadInputStreamFromFile(file);
             return XmlObject.Factory.parse(is);
         } catch (XmlException xmle) {
-            throw Util4Exceptions.createNoApplicableCodeException(xmle, "Error while parsing file " + file.getName()
-                    + "!");
+            throw new NoApplicableCodeException().causedBy(xmle)
+                    .withMessage("Error while parsing file %s!", file.getName());
         } catch (IOException ioe) {
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, "Error while parsing file " + file.getName()
-                    + "!");
+            throw new NoApplicableCodeException().causedBy(ioe)
+                    .withMessage("Error while parsing file %s!", file.getName());
         } finally {
             if (is != null) {
                 try {
@@ -544,7 +540,7 @@ public class XmlHelper {
     }
     
     public static String getLocalName(XmlObject element) {
-        return element.getDomNode().getLocalName();
+        return (element == null) ? null : element.getDomNode().getLocalName();
     }
     
 }

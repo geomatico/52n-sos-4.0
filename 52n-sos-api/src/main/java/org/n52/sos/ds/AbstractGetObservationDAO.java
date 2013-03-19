@@ -35,17 +35,18 @@ import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSParameterValueRange;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
+import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.MinMax;
 import org.n52.sos.util.SosHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +72,8 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
         opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.offering, getCache().getOfferings());
         opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.procedure, getCache().getProcedures());
         opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.responseFormat,
-                SosHelper.getSupportedResponseFormats(SosConstants.SOS, version));
+                                           Configurator.getInstance().getCodingRepository()
+                .getSupportedResponseFormats(SosConstants.SOS, version));
 
         if (getConfigurator().getProfileHandler().getActiveProfile().isShowFullOperationsMetadataForObservations()) {
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.observedProperty, getCache()
@@ -109,8 +111,9 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
      * Get the min/max phenomenon time of contained observations
      * 
      * @return min/max phenomenon time
-     * @throws OwsExceptionReport
-     *             If an error occurs.
+
+     *
+     * @throws OwsExceptionReport     *             If an error occurs.
      */
     private MinMax<String> getPhenomenonTime() throws OwsExceptionReport {
         try {
@@ -120,9 +123,8 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
                     .setMinimum(minDate != null ? DateTimeHelper.formatDateTime2ResponseString(minDate) : null)
                     .setMaximum(maxDate != null ? DateTimeHelper.formatDateTime2ResponseString(maxDate) : null);
         } catch (DateTimeException dte) {
-            String exceptionText = "Error while getting min/max phenomenon time for OwsMetadata!";
-            LOGGER.error(exceptionText, dte);
-            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+            throw new NoApplicableCodeException().causedBy(dte)
+                    .withMessage("Error while getting min/max phenomenon time for OwsMetadata!");
         }
     }
     
@@ -130,8 +132,9 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
      * Get the min/max result time of contained observations
      * 
      * @return min/max result time
-     * @throws OwsExceptionReport
-     *             If an error occurs.
+
+     *
+     * @throws OwsExceptionReport     *             If an error occurs.
      */
     private MinMax<String> getResultTime() throws OwsExceptionReport {
         try {
@@ -141,9 +144,8 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
                     .setMinimum(minDate != null ? DateTimeHelper.formatDateTime2ResponseString(minDate) : null)
                     .setMaximum(maxDate != null ? DateTimeHelper.formatDateTime2ResponseString(maxDate) : null);
         } catch (DateTimeException dte) {
-            String exceptionText = "Error while getting min/max result time for OwsMetadata!";
-            LOGGER.error(exceptionText, dte);
-            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+            throw new NoApplicableCodeException().causedBy(dte)
+                    .withMessage("Error while getting min/max result time for OwsMetadata!");
         }
     }
     
@@ -166,8 +168,7 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
      * @return ObservationDocument representing the requested values in an OGC
      *         conform O&M observation document
      * 
-     * @throws OwsExceptionReport
-     *             if query of the database or creating the O&M document failed
+     * @throws OwsExceptionReport     *             if query of the database or creating the O&M document failed
      */
     public abstract GetObservationResponse getObservation(GetObservationRequest request) throws OwsExceptionReport;
 

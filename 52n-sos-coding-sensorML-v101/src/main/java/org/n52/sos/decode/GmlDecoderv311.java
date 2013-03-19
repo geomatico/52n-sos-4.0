@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.opengis.gml.CodeType;
-import net.opengis.gml.DirectPositionType;
 import net.opengis.gml.EnvelopeDocument;
 import net.opengis.gml.EnvelopeType;
 import net.opengis.gml.TimeInstantDocument;
@@ -39,14 +38,12 @@ import net.opengis.gml.TimePositionType;
 
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
-import org.n52.sos.decode.Decoder;
-
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.DateTimeException;
@@ -54,7 +51,6 @@ import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,9 +123,8 @@ public class GmlDecoderv311 implements Decoder<Object, XmlObject> {
                 String beginString = xbBeginTPT.getStringValue();
                 begin = DateTimeHelper.parseIsoString2DateTime(beginString);
             } else {
-                String exceptionText = "gml:TimePeriod! must contain beginPos Element with valid ISO:8601 String!!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoApplicableCodeException()
+                        .withMessage("gml:TimePeriod! must contain beginPos Element with valid ISO:8601 String!");
             }
 
             // end position
@@ -141,17 +136,14 @@ public class GmlDecoderv311 implements Decoder<Object, XmlObject> {
                         DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
                                 DateTimeHelper.parseIsoString2DateTime(endString), endString.length());
             } else {
-                String exceptionText = "gml:TimePeriod! must contain endPos Element with valid ISO:8601 String!!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoApplicableCodeException()
+                        .withMessage("gml:TimePeriod! must contain endPos Element with valid ISO:8601 String!");
             }
             TimePeriod timePeriod = new TimePeriod(begin, end);
             timePeriod.setGmlId(xbTimePeriod.getId());
             return timePeriod;
         } catch (DateTimeException dte) {
-            String exceptionText = "Error while parsing TimePeriod!";
-            LOGGER.error(exceptionText, dte);
-            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+            throw new NoApplicableCodeException().causedBy(dte).withMessage("Error while parsing TimePeriod!");
         }
     }
 
@@ -168,9 +160,7 @@ public class GmlDecoderv311 implements Decoder<Object, XmlObject> {
                     ti.setValue(DateTimeHelper.parseIsoString2DateTime(timeString));
 
                 } catch (DateTimeException dte) {
-                    String exceptionText = "Error while parsing TimeInstant!";
-                    LOGGER.error(exceptionText, dte);
-                    throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+                    throw new NoApplicableCodeException().causedBy(dte).withMessage("Error while parsing TimeInstant!");
                 }
                 ti.setRequestedTimeLength(timeString.length());
             }

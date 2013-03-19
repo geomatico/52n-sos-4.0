@@ -34,22 +34,17 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.n52.sos.ds.AbstractGetFeatureOfInterestDAO;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
+import org.n52.sos.exception.ows.MissingParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.om.features.SosFeatureCollection;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.request.GetFeatureOfInterestRequest;
 import org.n52.sos.response.GetFeatureOfInterestResponse;
-import org.n52.sos.util.Util4Exceptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
 
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(GetFeatureOfInterestDAO.class);
-    
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
     @Override
@@ -61,11 +56,9 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
             if (request.getVersion().equals(Sos1Constants.SERVICEVERSION)) {
                 // sos 1.0.0 either or
                 if ((request.getFeatureIdentifiers() != null && !request.getFeatureIdentifiers().isEmpty())
-                        && (request.getSpatialFilters() != null && !request.getSpatialFilters().isEmpty())) {
-                    String exceptionText = "Only one out of featureofinterestid or location possible";
-                    OwsExceptionReport owse = new OwsExceptionReport();
-                    Util4Exceptions.createNoApplicableCodeException(owse, exceptionText);
-                    throw owse;
+                    && (request.getSpatialFilters() != null && !request.getSpatialFilters().isEmpty())) {
+                    throw new NoApplicableCodeException()
+                            .withMessage("Only one out of featureofinterestid or location possible");
                 } else if ((request.getFeatureIdentifiers() != null && !request.getFeatureIdentifiers().isEmpty())
                         || (request.getSpatialFilters() != null && !request.getSpatialFilters().isEmpty())) {
                     // good
@@ -81,14 +74,9 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
                     response.setAbstractFeature(featureCollection);
                     return response;
                 } else {
-                    OwsExceptionReport owse =
-                            Util4Exceptions
-                                    .createMissingParameterValueException(Sos1Constants.GetFeatureOfInterestParams.featureOfInterestID
-                                            .name());
-                    owse.addOwsExceptionReport(Util4Exceptions
-                            .createMissingParameterValueException(Sos1Constants.GetFeatureOfInterestParams.location
-                                    .name()));
-                    throw owse;
+                    throw new CompositeOwsException(
+                            new MissingParameterValueException(Sos1Constants.GetFeatureOfInterestParams.featureOfInterestID),
+                            new MissingParameterValueException(Sos1Constants.GetFeatureOfInterestParams.location));
                 }
             } else {
                 Set<String> foiIDs = new HashSet<String>(queryFeatureIdentifiersForParameter(request, session));
@@ -104,9 +92,8 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO {
                 return response;
             }
         } catch (HibernateException he) {
-            String exceptionText = "Error while querying feature of interest data!";
-            LOGGER.error(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+            throw new NoApplicableCodeException().causedBy(he)
+                    .withMessage("Error while querying feature of interest data!");
         } finally {
             sessionHolder.returnSession(session);
         }

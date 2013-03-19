@@ -27,7 +27,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingValue;
 import org.n52.sos.config.SettingsManager;

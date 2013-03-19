@@ -73,7 +73,8 @@ public class ResultHandlingHelper {
     }
 
     public static String createResultValuesFromObservations(List<Observation> observations,
-            SosResultEncoding sosResultEncoding, SosResultStructure sosResultStructure) throws OwsExceptionReport {
+                                                            SosResultEncoding sosResultEncoding,
+                                                            SosResultStructure sosResultStructure) throws OwsExceptionReport {
         StringBuilder builder = new StringBuilder();
         String tokenSeparator = getTokenSeparator(sosResultEncoding.getEncoding());
         String blockSeparator = getBlockSeparator(sosResultEncoding.getEncoding());

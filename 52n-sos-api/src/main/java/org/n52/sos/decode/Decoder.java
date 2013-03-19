@@ -44,7 +44,7 @@ public interface Decoder<T, S> extends ConformanceClass {
 	 */
 	public Set<DecoderKey> getDecoderKeyTypes();
 
-	public T decode(S objectToDecode) throws OwsExceptionReport;
+    public T decode(S objectToDecode) throws OwsExceptionReport;
 
 	public Map<SupportedTypeKey, Set<String>> getSupportedTypes();
 }

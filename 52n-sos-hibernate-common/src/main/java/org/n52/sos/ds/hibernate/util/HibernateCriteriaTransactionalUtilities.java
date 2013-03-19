@@ -64,12 +64,12 @@ import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosResultEncoding;
 import org.n52.sos.ogc.sos.SosResultStructure;
 import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,7 +140,8 @@ public class HibernateCriteriaTransactionalUtilities {
     }
 
     public static List<RelatedFeature> getOrInsertRelatedFeature(SosAbstractFeature feature,
-            List<RelatedFeatureRole> roles, Session session) throws OwsExceptionReport {
+                                                                 List<RelatedFeatureRole> roles, Session session) throws
+            OwsExceptionReport {
         // TODO: create featureOfInterest and link to relatedFeature
         List<RelatedFeature> relFeats =
                 HibernateCriteriaQueryUtilities.getRelatedFeatures(feature.getIdentifier().getValue(), session);
@@ -477,7 +478,7 @@ public class HibernateCriteriaTransactionalUtilities {
 
     public static void checkOrInsertResultTemplate(InsertResultTemplateRequest request,
             ObservationConstellationOfferingObservationType obsConstOffObsType, FeatureOfInterest featureOfInterest,
-            Session session) throws OwsExceptionReport {
+                                                   Session session) throws OwsExceptionReport {
         ObservationConstellation observationConstellation = obsConstOffObsType.getObservationConstellation();
         List<ResultTemplate> resultTemplates =
                 HibernateCriteriaQueryUtilities.getResultTemplateObject(obsConstOffObsType.getOffering()
@@ -493,30 +494,24 @@ public class HibernateCriteriaTransactionalUtilities {
                 SosResultStructure newStructure = new SosResultStructure(request.getResultStructure().getXml());
 
                 if (!storedStructure.equals(newStructure)) {
-                    String exceptionText =
-                            String.format(
-                                    "The requested resultStructure is different from already inserted result template "
+                    throw new InvalidParameterValueException()
+                            .at(Sos2Constants.InsertResultTemplateParams.proposedTemplate)
+                            .withMessage("The requested resultStructure is different from already inserted result template "
                                             + "for procedure (%s) observedProperty (%s) and offering (%s)!",
-                                    observationConstellation.getProcedure().getIdentifier(), observationConstellation
-                                            .getObservableProperty().getIdentifier(), obsConstOffObsType.getOffering()
-                                            .getIdentifier());
-                    LOGGER.error(exceptionText);
-                    throw Util4Exceptions.createInvalidParameterValueException(
-                            Sos2Constants.InsertResultTemplateParams.proposedTemplate.name(), exceptionText);
+                                         observationConstellation.getProcedure().getIdentifier(),
+                                         observationConstellation.getObservableProperty().getIdentifier(),
+                                         obsConstOffObsType.getOffering().getIdentifier());
                 }
                 SosResultEncoding storedEncoding = new SosResultEncoding(storedResultTemplate.getResultEncoding());
                 SosResultEncoding newEndoding = new SosResultEncoding(request.getResultEncoding().getXml());
                 if (!storedEncoding.equals(newEndoding)) {
-                    String exceptionText =
-                            String.format(
-                                    "The requested resultEncoding is different from already inserted result template "
+                    throw new InvalidParameterValueException()
+                            .at(Sos2Constants.InsertResultTemplateParams.proposedTemplate)
+                            .withMessage("The requested resultEncoding is different from already inserted result template "
                                             + "for procedure (%s) observedProperty (%s) and offering (%s)!",
-                                    observationConstellation.getProcedure().getIdentifier(), observationConstellation
-                                            .getObservableProperty().getIdentifier(), obsConstOffObsType.getOffering()
-                                            .getIdentifier());
-                    LOGGER.error(exceptionText);
-                    throw Util4Exceptions.createInvalidParameterValueException(
-                            Sos2Constants.InsertResultTemplateParams.proposedTemplate.name(), exceptionText);
+                                         observationConstellation.getProcedure().getIdentifier(),
+                                         observationConstellation.getObservableProperty().getIdentifier(),
+                                         obsConstOffObsType.getOffering().getIdentifier());
                 }
             }
             if (request.getIdentifier() != null && !storedIdentifiers.contains(request.getIdentifier())) {

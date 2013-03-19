@@ -31,12 +31,13 @@ import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateUtilities;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidObservationTypeException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.request.InsertResultTemplateRequest;
 import org.n52.sos.response.InsertResultTemplateResponse;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,10 +88,7 @@ public class InsertResultTemplateDAO extends AbstractInsertResultTemplateDAO {
                     HibernateCriteriaTransactionalUtilities.checkOrInsertResultTemplate(request, obsConstOffObsType, feature, session);
                 } else {
                     // TODO make better exception.
-                    StringBuilder exceptionText = new StringBuilder();
-                    exceptionText.append("The observationType is not supported!");
-                    throw Util4Exceptions.createInvalidParameterValueException("observationType",
-                            exceptionText.toString());
+                    throw new InvalidObservationTypeException(request.getObservationTemplate().getObservationType());
                 }
             }
             transaction.commit();
@@ -98,9 +96,8 @@ public class InsertResultTemplateDAO extends AbstractInsertResultTemplateDAO {
             if (transaction != null) {
                 transaction.rollback();
             }
-            String exceptionText = "Insert result template into database failed!";
-            LOGGER.error(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+            throw new NoApplicableCodeException().causedBy(he)
+                    .withMessage("Insert result template into database failed!");
         } finally {
             sessionHolder.returnSession(session);
         }

@@ -30,12 +30,13 @@ import java.util.Set;
 import org.hibernate.Session;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.util.Util4Exceptions;
 
 public class QueryHelper {
     
-    public static Set<String> getFeatureIdentifier(SpatialFilter spatialFilter, List<String> featureIdentifier, Session session) throws OwsExceptionReport {
+    public static Set<String> getFeatureIdentifier(SpatialFilter spatialFilter, List<String> featureIdentifier,
+                                                   Session session) throws OwsExceptionReport {
         Set<String> foiIDs = null;
         // spatial filter
         if (spatialFilter != null) {
@@ -45,8 +46,8 @@ public class QueryHelper {
                         new HashSet<String>(Configurator.getInstance().getFeatureQueryHandler()
                                 .getFeatureIDs(spatialFilter, session));
             } else {
-                throw Util4Exceptions.createNoApplicableCodeException(null,
-                        "The requested valueReference for spatial filters is not supported by this server!");
+                throw new NoApplicableCodeException()
+                        .withMessage("The requested valueReference for spatial filters is not supported by this server!");
             }
         }
         // feature of interest

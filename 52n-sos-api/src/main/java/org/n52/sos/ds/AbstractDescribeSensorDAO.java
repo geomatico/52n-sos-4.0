@@ -60,8 +60,9 @@ public abstract class AbstractDescribeSensorDAO extends AbstractOperationDAO {
      * Get the procedure description for a procedure
      * 
      * @return Returns the DescribeSensor response
-     * @throws OwsExceptionReport
-     *             If an error occurs
+
+     *
+     * @throws OwsExceptionReport If an error occurs
      */
     public abstract DescribeSensorResponse getSensorDescription(DescribeSensorRequest request) throws OwsExceptionReport;
 

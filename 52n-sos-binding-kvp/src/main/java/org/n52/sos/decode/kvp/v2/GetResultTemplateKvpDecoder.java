@@ -24,21 +24,23 @@
 package org.n52.sos.decode.kvp.v2;
 
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.KvpOperationDecoderKey;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingObservedPropertyParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingOfferingParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingServiceParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingVersionParameterException;
+import org.n52.sos.exception.ows.OptionNotSupportedException.ParameterNotSupportedException;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.Sos2Constants.GetResultTemplateParams;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetResultTemplateRequest;
 import org.n52.sos.util.KvpHelper;
-import org.n52.sos.util.Util4Exceptions;
 
 public class GetResultTemplateKvpDecoder extends AbstractKvpDecoder {
 
@@ -53,7 +55,7 @@ public class GetResultTemplateKvpDecoder extends AbstractKvpDecoder {
     @Override
     public GetResultTemplateRequest decode(Map<String, String> element) throws OwsExceptionReport {
         GetResultTemplateRequest request = new GetResultTemplateRequest();
-        List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+        CompositeOwsException exceptions = new CompositeOwsException();
 
         boolean foundService = false;
         boolean foundVersion = false;
@@ -83,9 +85,7 @@ public class GetResultTemplateKvpDecoder extends AbstractKvpDecoder {
                     request.setObservedProperty(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
                     foundObservedProperty = true;
                 } else {
-                    String exceptionText = String.format("The parameter '%s' is invalid for the GetResultTemplate request!", parameterName);
-                    LOGGER.debug(exceptionText);
-                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
+                    exceptions.add(new ParameterNotSupportedException(parameterName));
                 }
             } catch (OwsExceptionReport owse) {
                 exceptions.add(owse);
@@ -93,21 +93,21 @@ public class GetResultTemplateKvpDecoder extends AbstractKvpDecoder {
         }
 
         if (!foundService) {
-            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(RequestParams.service.name()));
+            exceptions.add(new MissingServiceParameterException());
         }
 
         if (!foundVersion) {
-            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(RequestParams.version.name()));
+            exceptions.add(new MissingVersionParameterException());
         }
 
         if (!foundOffering) {
-            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(GetResultTemplateParams.offering.name()));
+            exceptions.add(new MissingOfferingParameterException());
         }
 
         if (!foundObservedProperty) {
-            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(GetResultTemplateParams.observedProperty.name()));
+            exceptions.add(new MissingObservedPropertyParameterException());
         }
-        Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        exceptions.throwIfNotEmpty();
 
         return request;
     }

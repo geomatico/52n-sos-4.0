@@ -24,21 +24,21 @@
 package org.n52.sos.decode.kvp.v2;
 
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.KvpOperationDecoderKey;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.OptionNotSupportedException.ParameterNotSupportedException;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.KvpHelper;
-import org.n52.sos.util.Util4Exceptions;
 
 public class GetCapabilitiesKvpDecoder extends AbstractKvpDecoder {
 
@@ -69,7 +69,7 @@ public class GetCapabilitiesKvpDecoder extends AbstractKvpDecoder {
     public GetCapabilitiesRequest decode(Map<String, String> element) throws OwsExceptionReport {
 
         GetCapabilitiesRequest request = new GetCapabilitiesRequest();
-        List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+        CompositeOwsException exceptions = new CompositeOwsException();
 
         for (String parameterName : element.keySet()) {
             String parameterValues = element.get(parameterName);
@@ -85,10 +85,7 @@ public class GetCapabilitiesKvpDecoder extends AbstractKvpDecoder {
                     if (!parameterValues.isEmpty()) {
                         request.setAcceptVersions(parameterValues.split(","));
                     } else {
-                        OwsExceptionReport owse = new OwsExceptionReport();
-                        owse.addCodedException(OwsExceptionCode.InvalidParameterValue, parameterName, 
-                                String.format("The value of parameter %s (%s) is invalid.", parameterName, parameterValues));
-                        throw owse;
+                        exceptions.add(new InvalidParameterValueException(parameterName, parameterValues));
                     }
                 } // acceptFormats (optional)
                 else if (parameterName.equalsIgnoreCase(SosConstants.GetCapabilitiesParams.AcceptFormats.name())) {
@@ -96,21 +93,17 @@ public class GetCapabilitiesKvpDecoder extends AbstractKvpDecoder {
                 } // updateSequence (optional)
                 else if (parameterName.equalsIgnoreCase(SosConstants.GetCapabilitiesParams.updateSequence.name())) {
                     request.setUpdateSequence(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
-
                 } // sections (optional)
                 else if (parameterName.equalsIgnoreCase(SosConstants.GetCapabilitiesParams.Sections.name())) {
                     request.setSections(KvpHelper.checkParameterMultipleValues(parameterValues, parameterName));
                 } else {
-                    String exceptionText = String.format(
-                            "The parameter '%s' is invalid for the GetCapabilities request!", parameterName);
-                    LOGGER.debug(exceptionText);
-                    throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+                    exceptions.add(new ParameterNotSupportedException(parameterName));
                 }
             } catch (OwsExceptionReport owse) {
                 exceptions.add(owse);
             }
         }
-        Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        exceptions.throwIfNotEmpty();
 
         return request;
 

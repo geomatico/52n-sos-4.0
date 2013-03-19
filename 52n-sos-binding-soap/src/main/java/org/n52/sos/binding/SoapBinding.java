@@ -23,9 +23,7 @@
  */
 package org.n52.sos.binding;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,14 +33,15 @@ import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.decode.Decoder;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.encode.Encoder;
-import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
-import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
+import org.n52.sos.encode.EncoderKey;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.MethodNotSupportedException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.NoEncoderForKeyException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.request.AbstractServiceRequest;
-import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperator;
@@ -51,7 +50,6 @@ import org.n52.sos.soap.SoapHelper;
 import org.n52.sos.soap.SoapRequest;
 import org.n52.sos.soap.SoapResponse;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,13 +63,7 @@ public class SoapBinding extends Binding {
     @Override
     public ServiceResponse doGetOperation(HttpServletRequest request) throws OwsExceptionReport {
         SoapResponse soapResponse = new SoapResponse();
-        String message = "HTTP GET is no supported for SOAP binding!";
-        OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, message);
-        if (Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
-            owse.setVersion(Sos1Constants.SERVICEVERSION);
-        } else {
-            owse.setVersion(Sos2Constants.SERVICEVERSION);
-        }
+        OwsExceptionReport owse = new MethodNotSupportedException("SOAP", "GET");
         soapResponse.setException(owse);
         soapResponse.setSoapVersion(SOAPConstants.SOAP_1_2_PROTOCOL);
         soapResponse.setSoapNamespace(SOAPConstants.URI_NS_SOAP_1_2_ENVELOPE);
@@ -127,41 +119,28 @@ public class SoapBinding extends Binding {
                             }
                         }
                     } else {
-                        throw Util4Exceptions.createNoApplicableCodeException(null,
-                                "The returned object is not an AbstractServiceRequest implementation");
+                        throw new NoApplicableCodeException()
+                                .withMessage("The returned object is not an AbstractServiceRequest implementation");
                     }
                 } else {
                     soapResponse.setSoapFault(soapRequest.getSoapFault());
                 }
                 // Encode SOAP response
-                Encoder<?, SoapResponse> encoder = Configurator.getInstance().getCodingRepository()
-                        .getEncoder(CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse));
+                EncoderKey key = CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse);
+                Encoder<?, SoapResponse> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
                 if (encoder != null) {
                     return (ServiceResponse) encoder.encode(soapResponse);
                 } else {
-                    // FIXME: valid exception
-                    OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-                    throw owse;
+                    throw new NoEncoderForKeyException(key);
                 }
             } else {
                 // FIXME: valid exception
-                OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-                throw owse;
+                throw new NoApplicableCodeException();
             }
         } catch (OwsExceptionReport owse) {
-            // FIXME: valid debug text
-            LOGGER.debug("", owse);
-            if (version != null) {
-                owse.setVersion(version);
-            } else {
-                if (Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(Sos1Constants.SERVICEVERSION)) {
-                    owse.setVersion(Sos1Constants.SERVICEVERSION);
-                } else {
-                    owse.setVersion(Sos2Constants.SERVICEVERSION);
-                }
-            }
-            soapResponse.setException(owse);
-            if (soapVersion == null || (soapVersion != null && !soapVersion.isEmpty())) {
+            LOGGER.warn("Error processing request", owse);
+            soapResponse.setException(owse.setVersion(version));
+            if (soapVersion == null || !soapVersion.isEmpty()) {
                 soapResponse.setSoapVersion(SOAPConstants.SOAP_1_2_PROTOCOL);
             } else {
                 soapResponse.setSoapVersion(soapVersion);
@@ -171,73 +150,29 @@ public class SoapBinding extends Binding {
             } else {
                 soapResponse.setSoapNamespace(soapNamespace);
             }
-            Encoder<?, SoapResponse> encoder = Configurator.getInstance().getCodingRepository().getEncoder(
-                    CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse));
+            EncoderKey key = CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse);
+            Encoder<?, SoapResponse> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
             if (encoder != null) {
                 return (ServiceResponse) encoder.encode(soapResponse);
             } else {
-                throw Util4Exceptions.createNoApplicableCodeException(null,
-                        "Error while encoding exception with SOAP envelope!");
+                throw new NoEncoderForKeyException(key);
             }
         }
     }
 
+    protected void setVersionForOwsExceptionReport() {
+        //FIXME shouldn't version 2.0.0 be delivered by default?
+    }
+
     private OwsExceptionReport createOperationNotSupportedException() {
-        String exceptionText = "The requested service URL only supports HTTP-Post SOAP requests!";
-        OwsExceptionReport owse = Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        OwsExceptionReport owse = new NoApplicableCodeException()
+                .withMessage("The requested service URL only supports HTTP-Post SOAP requests!");
         if (Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
             owse.setVersion(Sos2Constants.SERVICEVERSION);
         } else {
             owse.setVersion(Sos1Constants.SERVICEVERSION);
         }
         return owse;
-    }
-
-    private void checkServiceOperatorKeyTypes(AbstractServiceRequest request) throws OwsExceptionReport {
-        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
-        for (ServiceOperatorKeyType serviceVersionIdentifier : request.getServiceOperatorKeyType()) {
-            if (serviceVersionIdentifier.getService() != null) {
-                if (serviceVersionIdentifier.getService().isEmpty()) {
-                    exceptions.add(Util4Exceptions.createMissingParameterValueException(RequestParams.service.name()));
-                } else {
-                    if (!Configurator.getInstance().getServiceOperatorRepository().isServiceSupported(serviceVersionIdentifier.getService())) {
-                        String exceptionText = "The requested service is not supported!";
-                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(
-                                RequestParams.service.name(), exceptionText));
-                    }
-                }
-            }
-            if (request instanceof GetCapabilitiesRequest) {
-                GetCapabilitiesRequest getCapsRequest = (GetCapabilitiesRequest)request;
-                if (getCapsRequest.isSetAcceptVersions()) {
-                    boolean hasSupportedVersion = false;
-                    for (String accaptVersion : getCapsRequest.getAcceptVersions()) {
-                        if (Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(accaptVersion)) {
-                            hasSupportedVersion = true;
-                        }
-                    }
-                    if (!hasSupportedVersion) {
-                        String exceptionText = "The requested acceptedVersions are not supported by this service!";
-                        exceptions.add(Util4Exceptions.createVersionNegotiationFailedException(exceptionText));
-                    }
-                }
-            } else {
-                if (serviceVersionIdentifier.getVersion() != null) {
-                    if (serviceVersionIdentifier.getVersion().isEmpty()) {
-                        exceptions.add(Util4Exceptions.createMissingParameterValueException(RequestParams.version
-                                .name()));
-                    } else {
-                        if (!Configurator.getInstance().getServiceOperatorRepository()
-								.isVersionSupported(serviceVersionIdentifier.getVersion())) {
-                            String exceptionText = "The requested version is not supported!";
-                            exceptions.add(Util4Exceptions.createInvalidParameterValueException(
-                                    RequestParams.version.name(), exceptionText));
-                        }
-                    }
-                }
-            }
-        }
-        Util4Exceptions.mergeAndThrowExceptions(exceptions);
     }
 
     @Override

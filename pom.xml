@@ -891,7 +891,12 @@
 						<groupId>${project.groupId}</groupId>
 						<artifactId>52n-sos-ext-do-code-kvp</artifactId>
 						<version>${do.version}</version>
-					</dependency>
+                    </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>52n-sos-ext-do-code-hibernate</artifactId>
+                        <version>${do.version}</version>
+                    </dependency>
 				</dependencies>
 			</dependencyManagement>
 		</profile>

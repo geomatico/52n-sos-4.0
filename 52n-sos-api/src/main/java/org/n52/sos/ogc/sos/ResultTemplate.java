@@ -25,12 +25,12 @@ package org.n52.sos.ogc.sos;
 
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.ogc.swe.encoding.SosSweTextEncoding;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.Util4Exceptions;
 
 public class ResultTemplate {
 
@@ -95,10 +95,9 @@ public class ResultTemplate {
         if (decodedObject instanceof SosSweDataRecord) {
             return (SosSweDataRecord) decodedObject;
         }
-        String errorMsg =
-                String.format("Decoding of string \"%s\" failed. Returned type is \"%s\".", resultStructure,
-                        decodedObject.getClass().getName());
-        throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+        throw new NoApplicableCodeException()
+                .withMessage("Decoding of string \"%s\" failed. Returned type is \"%s\".", resultStructure,
+                             decodedObject.getClass().getName());
     }
 
     private SosSweAbstractEncoding parseResultEncoding() throws OwsExceptionReport {
@@ -106,9 +105,8 @@ public class ResultTemplate {
         if (decodedObject instanceof SosSweTextEncoding) {
             return (SosSweTextEncoding) decodedObject;
         }
-        String errorMsg =
-                String.format("Decoding of string \"%s\" failed. Returned type is \"%s\".", resultEncoding,
-                        decodedObject.getClass().getName());
-        throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+        throw new NoApplicableCodeException()
+                .withMessage("Decoding of string \"%s\" failed. Returned type is \"%s\".", resultEncoding,
+                             decodedObject.getClass().getName());
     }
 }

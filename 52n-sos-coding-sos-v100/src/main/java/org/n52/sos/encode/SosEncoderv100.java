@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,11 +56,9 @@ import net.opengis.ogc.TemporalOperandsType;
 import net.opengis.ogc.TemporalOperatorNameType;
 import net.opengis.ogc.TemporalOperatorType;
 import net.opengis.ogc.TemporalOperatorsType;
-import net.opengis.om.x10.MeasurementType;
 import net.opengis.om.x10.ObservationCollectionDocument;
 import net.opengis.om.x10.ObservationCollectionType;
 import net.opengis.om.x10.ObservationPropertyType;
-import net.opengis.om.x10.ObservationType;
 import net.opengis.ows.x11.MimeType;
 import net.opengis.ows.x11.OperationsMetadataDocument.OperationsMetadata;
 import net.opengis.ows.x11.ServiceIdentificationDocument.ServiceIdentification;
@@ -93,6 +90,8 @@ import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -115,7 +114,6 @@ import org.n52.sos.util.MinMax;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -180,7 +178,7 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
 
     @Override
     public XmlObject encode(AbstractServiceCommunicationObject communicationObject,
-            Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+                            Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         if (communicationObject instanceof AbstractServiceRequest) {
             return encodeRequests((AbstractServiceRequest) communicationObject);
         } else if (communicationObject instanceof AbstractServiceResponse) {
@@ -294,13 +292,12 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
         ObservationCollectionType xb_obsCol = xb_obsColDoc.addNewObservationCollection();
         xb_obsCol.setId(SosConstants.OBS_COL_ID_PREFIX + new DateTime().getMillis());
 
-        Collection<SosObservation> observationCollection = null;
+        Collection<SosObservation> observationCollection;
 
         Encoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
         if (!(encoder instanceof ObservationEncoder)) {
-            String exceptionText = "Error while encoding GetObservation response, encoder is not of type ObservationEncoder!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            throw new NoApplicableCodeException()
+                    .withMessage("Error while encoding GetObservation response, encoder is not of type ObservationEncoder!");
         }
         ObservationEncoder<XmlObject, SosObservation> iObservationEncoder
                 = (ObservationEncoder<XmlObject, SosObservation>) encoder;
@@ -342,7 +339,7 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
 
         // set schema location
         XmlHelper.makeGmlIdsUnique(xb_obsColDoc.getDomNode());
-        List<String> schemaLocations = new ArrayList<String>();
+        List<String> schemaLocations = new ArrayList<String>(3);
         schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS100());
         schemaLocations.add(N52XmlHelper.getSchemaLocationForOM100());
         schemaLocations.add(N52XmlHelper.getSchemaLocationForSA100());
@@ -382,7 +379,7 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
     	// sa:SamplingXXX
     	// gml:descr/name
     	// sa:position
-    	SosSamplingFeature samplingFeature = null;
+    	SosSamplingFeature samplingFeature;
     	FeatureCollectionDocument xbFeatColDoc = FeatureCollectionDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
     	AbstractFeatureCollectionType xbFeatCol = xbFeatColDoc.addNewFeatureCollection();
     	StringBuilder builder = new StringBuilder();
@@ -423,11 +420,8 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
                         featureType = SFConstants.FT_SAMPLINGCURVE;
                         featureNamespace = SFConstants.NS_SA;
                     } else {
-                        OwsExceptionReport owse = new OwsExceptionReport();
-                        String exceptionText = "Error while encoding featureOfInterest in om:Observation!";
-                        LOGGER.error(exceptionText, owse);
-                        throw Util4Exceptions
-                                .createInvalidParameterValueException("sa:SamplingFeature", exceptionText);
+                        throw new InvalidParameterValueException().at("sa:SamplingFeature")
+                                .withMessage("Error while encoding featureOfInterest in om:Observation!");
                     }
 
                     XmlObject xmlObject = CodingHelper.encodeObjectToXml(featureNamespace, samplingFeature);
@@ -435,19 +429,12 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
 		            xbFeatCol.addNewFeatureMember().set(xmlObject);
 		            
 		        // SosFeatureCollection
-		        } else {
-		        	OwsExceptionReport owse = new OwsExceptionReport();
-		        	String message = "No encoder found for featuretype";
-		        	Util4Exceptions.createNoApplicableCodeException(owse, message);
-		        	throw owse;
+                } else {
+                    throw new NoApplicableCodeException().withMessage("No encoder found for featuretype");
 		        }
     		}
     	} else {
-    		
-    		OwsExceptionReport owse = new OwsExceptionReport();
-        	String message = "Unknown featuretype";
-        	Util4Exceptions.createNoApplicableCodeException(owse, message);
-        	throw owse;
+            throw new NoApplicableCodeException().withMessage("Unknown featuretype");
     	}
     	XmlCursor cursor = xbFeatColDoc.newCursor();
     	boolean isAFC = cursor.toChild(new QName(GMLConstants.NS_GML, GMLConstants.EN_ABSTRACT_FEATURE_COLLECTION));
@@ -456,7 +443,7 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
         }
     	cursor.dispose();
 	    // set schema location
-        List<String> schemaLocations = new ArrayList<String>();
+        List<String> schemaLocations = new ArrayList<String>(3);
         schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS100());
         schemaLocations.add(N52XmlHelper.getSchemaLocationForGML311());
         schemaLocations.add(N52XmlHelper.getSchemaLocationForSA100());
@@ -475,9 +462,8 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
 
         Encoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
         if (!(encoder instanceof ObservationEncoder)) {
-            String exceptionText = "Error while encoding GetObservation response, encoder is not of type ObservationEncoder!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            throw new NoApplicableCodeException()
+                    .withMessage("Error while encoding GetObservation response, encoder is not of type ObservationEncoder!");
         }
         ObservationEncoder<XmlObject, SosObservation> iObservationEncoder
                 = (ObservationEncoder<XmlObject, SosObservation>) encoder;
@@ -506,7 +492,7 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
 
         // set schema location
         XmlHelper.makeGmlIdsUnique(xb_obsColDoc.getDomNode());
-        List<String> schemaLocations = new ArrayList<String>();
+        List<String> schemaLocations = new ArrayList<String>(4);
         schemaLocations.add(N52XmlHelper.getSchemaLocationForSOS100());
         schemaLocations.add(N52XmlHelper.getSchemaLocationForOM100());
         schemaLocations.add(N52XmlHelper.getSchemaLocationForSA100());
@@ -541,8 +527,9 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
      *            SOS offerings for contents
      * @param version
      *            SOS response version
-     * @throws OwsExceptionReport
-     *             if an error occurs.
+
+     *
+     * @throws OwsExceptionReport     *             if an error occurs.
      */
     private void setContents(Contents xbContents, Collection<SosOfferingsForContents> offerings, String version)
             throws OwsExceptionReport {
@@ -640,10 +627,8 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
             Collection<QName> resultModels = offering.getResultModels();
 
             if (resultModels == null || resultModels.isEmpty()) {
-
-                String exceptionText = "No result models are contained in the database for the offering: " + offering
-                        + "! Please contact the admin of this SOS.";
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoApplicableCodeException()
+                        .withMessage("No result models are contained in the database for the offering: %s! Please contact the admin of this SOS.", offering);
             }
 
 //            for (QName resultModelQName : resultModels) {
@@ -905,8 +890,9 @@ public class SosEncoderv100 implements Encoder<XmlObject, AbstractServiceCommuni
      *            interests for which the BBOX should be returned
      * @return Returns EnvelopeType XmlBean which represents the BBOX of the
      *         requested feature of interests
-     * @throws OwsExceptionReport
-     *             if query of the BBOX failed
+
+     *
+     * @throws OwsExceptionReport     *             if query of the BBOX failed
      */
     private EnvelopeType getBBOX4Offering(Envelope envelope, int srsID) throws OwsExceptionReport {
         EnvelopeType envelopeType = EnvelopeType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());

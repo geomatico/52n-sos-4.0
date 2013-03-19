@@ -36,15 +36,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.binding.Binding;
-import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.Encoder;
+import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.XmlEncoderKey;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.OwsExceptionReportEvent;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +84,7 @@ public class SosService extends ConfiguratedHttpServlet {
         try {
             sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doDeleteperation(req);
         } catch (OwsExceptionReport owse) {
-            sosResp = handleOwsExceptionReport(owse);
+            sosResp = handleOwsException(owse);
         }
         doResponse(resp, sosResp, clientSupportsGzip);
     }
@@ -109,7 +109,7 @@ public class SosService extends ConfiguratedHttpServlet {
         try {
             sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doGetOperation(req);
         } catch (OwsExceptionReport owse) {
-            sosResp = handleOwsExceptionReport(owse);
+            sosResp = handleOwsException(owse);
         }
         doResponse(resp, sosResp, clientSupportsGzip);
     }
@@ -132,7 +132,7 @@ public class SosService extends ConfiguratedHttpServlet {
         try {
             sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doPostOperation(req);
         } catch (OwsExceptionReport owse) {
-            sosResp = handleOwsExceptionReport(owse);
+            sosResp = handleOwsException(owse);
         }
         doResponse(resp, sosResp, clientSupportsGzip);
     }
@@ -145,7 +145,7 @@ public class SosService extends ConfiguratedHttpServlet {
         try {
             sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doPutOperation(req);
         } catch (OwsExceptionReport owse) {
-            sosResp = handleOwsExceptionReport(owse);
+            sosResp = handleOwsException(owse);
         }
         doResponse(resp, sosResp, clientSupportsGzip);
 
@@ -168,7 +168,7 @@ public class SosService extends ConfiguratedHttpServlet {
         try {
             sosResp = getBindingOperatorForRequestURI(req.getRequestURI()).doOptionsOperation(req);
         } catch (OwsExceptionReport owse) {
-            sosResp = handleOwsExceptionReport(owse);
+            sosResp = handleOwsException(owse);
         }
         if (sosResp.getHttpResponseCode() == HttpServletResponse.SC_NOT_IMPLEMENTED) {
             super.doOptions(req, resp);
@@ -176,9 +176,9 @@ public class SosService extends ConfiguratedHttpServlet {
         doResponse(resp, sosResp, clientSupportsGzip);
     }
 
-    private ServiceResponse handleOwsExceptionReport(OwsExceptionReport owsExceptionReport) throws ServletException {
+    private ServiceResponse handleOwsException(OwsExceptionReport owsExceptionReport) throws ServletException {
         try {
-			SosEventBus.fire(new OwsExceptionReportEvent(owsExceptionReport));
+            SosEventBus.fire(new OwsExceptionReportEvent(owsExceptionReport));
             EncoderKey key = new XmlEncoderKey(owsExceptionReport.getNamespace(), owsExceptionReport.getClass());
             Encoder<?, OwsExceptionReport> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
             if (encoder != null) {
@@ -323,8 +323,9 @@ public class SosService extends ConfiguratedHttpServlet {
      *            URL pattern from request URL
      * @return The implementation of {@link Binding} that is registered for the
      *         given <code>urlPattern</code>.
-     * @throws OwsExceptionReport
-     *             If the URL pattern is not supported by this SOS.
+
+     *
+     * @throws OwsExceptionReport * If the URL pattern is not supported by this SOS.
      */
     private Binding getBindingOperatorForRequestURI(String requestURI) throws OwsExceptionReport {
         Binding bindingOperator = null;
@@ -336,10 +337,8 @@ public class SosService extends ConfiguratedHttpServlet {
             }
         }
         if (bindingOperator == null) {
-            String exceptionText = String.format(
+            throw new NoApplicableCodeException().withMessage(
                     "The requested servlet path with pattern '%s' is not supported by this SOS!", requestURI);
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
         }
         return bindingOperator;
     }

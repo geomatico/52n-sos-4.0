@@ -32,13 +32,14 @@ import java.util.Set;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetCapabilitiesDAO;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,9 +84,8 @@ public class SosGetCapabilitiesOperatorV100 extends AbstractV1RequestOperator<Ab
             return new ServiceResponse(baos, contentType, zipCompr, true);
 
         } catch (IOException ioe) {
-            String exceptionText = "Error occurs while saving response to output stream!";
-            LOGGER.error(exceptionText, ioe);
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            throw new NoApplicableCodeException().causedBy(ioe)
+                    .withMessage("Error occurs while saving response to output stream!");
         }
     }
 
@@ -103,12 +103,10 @@ public class SosGetCapabilitiesOperatorV100 extends AbstractV1RequestOperator<Ab
             }
         }
         if (zip == -1 && xml == -1) {
-            String exceptionText = String.format("The parameter '%s' is invalid. The following values are supported: %s, %s",
-                    SosConstants.GetCapabilitiesParams.AcceptFormats.name(), 
-                    SosConstants.CONTENT_TYPE_XML, SosConstants.CONTENT_TYPE_ZIP);
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    SosConstants.GetCapabilitiesParams.AcceptFormats.name(), exceptionText);
+            throw new InvalidParameterValueException().at(SosConstants.GetCapabilitiesParams.AcceptFormats)
+                    .withMessage("The parameter '%s' is invalid. The following values are supported: %s, %s",
+                                 SosConstants.GetCapabilitiesParams.AcceptFormats.name(), 
+                                 SosConstants.CONTENT_TYPE_XML, SosConstants.CONTENT_TYPE_ZIP);
         }
 
         // if zip is requested testing, whether the priority is bigger than xml

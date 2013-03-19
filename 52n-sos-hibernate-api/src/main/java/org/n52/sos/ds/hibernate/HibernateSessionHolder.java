@@ -24,11 +24,11 @@
 package org.n52.sos.ds.hibernate;
 
 import org.hibernate.Session;
-import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ds.ConnectionProvider;
+import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +46,7 @@ public class HibernateSessionHolder {
         try {
             return getSession(connectionProvider.getConnection());
         } catch (ConnectionProviderException cpe) {
-           String exceptionText = "Error while getting new Session!";
-           throw Util4Exceptions.createNoApplicableCodeException(cpe, exceptionText);
+            throw new NoApplicableCodeException().causedBy(cpe).withMessage("Error while getting new Session!");
         }
     }
 
@@ -57,9 +56,7 @@ public class HibernateSessionHolder {
 
     public Session getSession(Object connection) throws OwsExceptionReport {
         if (!(connection instanceof Session)) {
-            String exceptionText = "The parameter connection is not an Hibernate Session!";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            throw new NoApplicableCodeException().withMessage("The parameter connection is not an Hibernate Session!");
         }
         return (Session) connection;
     }

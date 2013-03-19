@@ -59,6 +59,8 @@ import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -79,7 +81,6 @@ import org.n52.sos.response.InsertResultResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,9 +130,7 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
                 transaction.rollback();
             }
             // XXX exception text
-            String exceptionText = "";
-            LOGGER.error(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+            throw new NoApplicableCodeException().causedBy(he);
         } finally {
             sessionHolder.returnSession(session);
         }
@@ -140,7 +139,7 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
 
     private SosObservation getSingleObservationFromResultValues(String version, ResultTemplate resultTemplate,
                                                                 String resultValues, Session session) 
-                                                                throws OwsExceptionReport {
+            throws OwsExceptionReport {
         SosResultEncoding resultEncoding = new SosResultEncoding(resultTemplate.getResultEncoding());
         SosResultStructure resultStructure = new SosResultStructure(resultTemplate.getResultStructure());
         String[] blockValues = getBlockValues(resultValues, resultEncoding.getEncoding());
@@ -163,10 +162,8 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
         try {
             return HibernateObservationUtilities.unfoldObservation(observation);
         } catch (Exception e) {
-            String exceptionText = "The resultValues format does not comply to the resultStructure of the resultTemplate!";
-            LOGGER.debug(exceptionText, e);
-            throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.InsertResultParams.resultValues
-                                                                       .name(), exceptionText);
+            throw new InvalidParameterValueException().at(Sos2Constants.InsertResultParams.resultValues).causedBy(e)
+                    .withMessage("The resultValues format does not comply to the resultStructure of the resultTemplate!");
         }
     }
 
@@ -235,7 +232,8 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
     private SosMultiObservationValues<SosSweDataArray> createObservationValueFrom(String[] blockValues,
             SosSweAbstractDataComponent recordFromResultStructure, SosSweAbstractEncoding encoding,
             int resultTimeIndex, int phenomenonTimeIndex, Map<Integer, SWEConstants.SweSimpleType> types,
-            Map<Integer, String> units) throws OwsExceptionReport {
+                                                                                  Map<Integer, String> units) throws
+            OwsExceptionReport {
         SosSweDataArray dataArray = new SosSweDataArray();
         dataArray.setElementType(recordFromResultStructure);
         dataArray.setEncoding(encoding);
@@ -263,9 +261,7 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
         } else if (resultStructure instanceof SosSweDataRecord) {
             record = (SosSweDataRecord) resultStructure;
         } else {
-            String exceptionText = "Unsupported ResultStructure!";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            throw new NoApplicableCodeException().withMessage("Unsupported ResultStructure!");
         }
         return record;
     }
@@ -285,9 +281,8 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
             }
             return phenomenonTime;
         } catch (DateTimeException dte) {
-            String exceptionText = "Error while parsing phenomenonTime!";
-            LOGGER.error(exceptionText, dte);
-            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+            throw new NoApplicableCodeException().causedBy(dte)
+                    .withMessage("Error while parsing phenomenonTime '%s'!", timeString);
         }
     }
 

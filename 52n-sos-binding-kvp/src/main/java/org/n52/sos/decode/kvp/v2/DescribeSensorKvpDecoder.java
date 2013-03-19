@@ -24,28 +24,31 @@
 package org.n52.sos.decode.kvp.v2;
 
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.n52.sos.decode.DecoderException;
 import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.KvpOperationDecoderKey;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingProcedureDescriptionFormatException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingProcedureParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingServiceParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingVersionParameterException;
+import org.n52.sos.exception.ows.OptionNotSupportedException.ParameterNotSupportedException;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
-import org.n52.sos.ogc.sos.SosConstants.DescribeSensorParams;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.KvpHelper;
-import org.n52.sos.util.Util4Exceptions;
 
 public class DescribeSensorKvpDecoder extends AbstractKvpDecoder {
-
-    private static final DecoderKey KVP_DECODER_KEY_TYPE 
-            = new KvpOperationDecoderKey(SosConstants.SOS, Sos2Constants.SERVICEVERSION, SosConstants.Operations.DescribeSensor.name());
+    private static final DecoderKey KVP_DECODER_KEY_TYPE =
+                                    new KvpOperationDecoderKey(SosConstants.SOS, Sos2Constants.SERVICEVERSION, SosConstants.Operations.DescribeSensor
+            .name());
 
     @Override
     public Set<DecoderKey> getDecoderKeyTypes() {
@@ -56,7 +59,7 @@ public class DescribeSensorKvpDecoder extends AbstractKvpDecoder {
     public DescribeSensorRequest decode(Map<String, String> element) throws OwsExceptionReport {
 
         DescribeSensorRequest request = new DescribeSensorRequest();
-        List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+        CompositeOwsException exceptions = new CompositeOwsException();
 
         boolean foundProcedure = false;
         boolean foundProcedureDescriptionFormat = false;
@@ -70,49 +73,34 @@ public class DescribeSensorKvpDecoder extends AbstractKvpDecoder {
                 if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.service.name())) {
                     request.setService(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
                     foundService = true;
-                }
-                // version (mandatory)
+                } // version (mandatory)
                 else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.version.name())) {
                     request.setVersion(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
                     foundVersion = true;
-                }
-                // request (mandatory)
+                } // request (mandatory)
                 else if (parameterName.equalsIgnoreCase(OWSConstants.RequestParams.request.name())) {
                     KvpHelper.checkParameterSingleValue(parameterValues, parameterName);
-                }
-                // procedure
+                } // procedure
                 else if (parameterName.equalsIgnoreCase(SosConstants.DescribeSensorParams.procedure.name())) {
                     request.setProcedures(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
                     foundProcedure = true;
-                }
-                // procedureDescriptionFormat
+                } // procedureDescriptionFormat
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.DescribeSensorParams.procedureDescriptionFormat
                         .name())) {
-                    request.setProcedureDescriptionFormat(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
+                    request.setProcedureDescriptionFormat(KvpHelper
+                            .checkParameterSingleValue(parameterValues, parameterName));
                     foundProcedureDescriptionFormat = true;
-                }
-                // valid time (optional)
+                } // valid time (optional)
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.DescribeSensorParams.validTime.name())) {
                     try {
                         request.setTime(parseValidTime(parameterValues, parameterName));
                     } catch (DecoderException e) {
-                        String exceptionText = String.format(
-                                "The optional parameter '%s' is not supported by this service!", parameterName);
-                        LOGGER.debug(exceptionText, e);
-                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(
-                                parameterName, exceptionText));
+                        exceptions.add(new InvalidParameterValueException(parameterName, parameterValues).causedBy(e));
                     } catch (DateTimeException e) {
-                        String exceptionText = String.format(
-                                "The optional parameter '%s' is not supported by this service!", parameterName);
-                        LOGGER.debug(exceptionText, e);
-                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(
-                                parameterName, exceptionText));
+                        exceptions.add(new InvalidParameterValueException(parameterName, parameterValues).causedBy(e));
                     }
                 } else {
-                    String exceptionText = String.format(
-                            "The optional parameter '%s' is not supported by this service!", parameterName);
-                    LOGGER.debug(exceptionText);
-                    exceptions.add(Util4Exceptions.createOptionNotSupportedException(parameterName, exceptionText));
+                    exceptions.add(new ParameterNotSupportedException(parameterName));
                 }
             } catch (OwsExceptionReport owse) {
                 exceptions.add(owse);
@@ -120,22 +108,22 @@ public class DescribeSensorKvpDecoder extends AbstractKvpDecoder {
         }
 
         if (!foundProcedure) {
-            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(DescribeSensorParams.procedure.name()));
+            exceptions.add(new MissingProcedureParameterException());
         }
 
         if (!foundProcedureDescriptionFormat) {
-            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(Sos2Constants.DescribeSensorParams.procedureDescriptionFormat.name()));
+            exceptions.add(new MissingProcedureDescriptionFormatException());
         }
 
         if (!foundService) {
-            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(RequestParams.service.name()));
+            exceptions.add(new MissingServiceParameterException());
         }
 
         if (!foundVersion) {
-            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(RequestParams.version.name()));
+            exceptions.add(new MissingVersionParameterException());
         }
 
-        Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        exceptions.throwIfNotEmpty();
 
         return request;
     }

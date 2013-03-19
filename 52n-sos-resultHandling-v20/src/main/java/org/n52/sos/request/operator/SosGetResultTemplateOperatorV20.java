@@ -26,13 +26,19 @@ package org.n52.sos.request.operator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetResultTemplateDAO;
 import org.n52.sos.encode.Encoder;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidObservedPropertyParameterException;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidOfferingParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingObservedPropertyParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingOfferingParameterException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.EncoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.ErrorWhileSavingResponseToOutputStreamException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.NoEncoderForResponseException;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -42,18 +48,14 @@ import org.n52.sos.response.GetResultTemplateResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SosGetResultTemplateOperatorV20 extends AbstractV2RequestOperator<AbstractGetResultTemplateDAO, GetResultTemplateRequest> {
-
-    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_RESULT_RETRIEVAL);
+    private static final Set<String> CONFORMANCE_CLASSES = Collections
+            .singleton(ConformanceClasses.SOS_V2_RESULT_RETRIEVAL);
     private static final String OPERATION_NAME = Sos2Constants.Operations.GetResultTemplate.name();
-    private static final Logger LOGGER = LoggerFactory.getLogger(SosInsertResultOperatorV20.class);
 
     public SosGetResultTemplateOperatorV20() {
         super(OPERATION_NAME, GetResultTemplateRequest.class);
@@ -81,22 +83,18 @@ public class SosGetResultTemplateOperatorV20 extends AbstractV2RequestOperator<A
                 } else if (encodedObject instanceof ServiceResponse) {
                     return (ServiceResponse) encodedObject;
                 } else {
-                    String exceptionText = "The encoder response is not supported!";
-                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                    throw new EncoderResponseUnsupportedException();
                 }
             } else {
-                String exceptionText = "Error while getting encoder for response!";
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoEncoderForResponseException();
             }
         } catch (IOException ioe) {
-            String exceptionText = "Error occurs while saving response to output stream!";
-            LOGGER.error(exceptionText, ioe);
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
     }
 
     private void checkRequestedParameter(GetResultTemplateRequest request) throws OwsExceptionReport {
-        List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+        CompositeOwsException exceptions = new CompositeOwsException();
         try {
             checkServiceParameter(request.getService());
         } catch (OwsExceptionReport owse) {
@@ -117,32 +115,27 @@ public class SosGetResultTemplateOperatorV20 extends AbstractV2RequestOperator<A
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
-        Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        exceptions.throwIfNotEmpty();
     }
-
 
     private void checkOffering(String offering) throws OwsExceptionReport {
         if (offering == null || offering.isEmpty()) {
-            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.GetResultTemplateParams.offering.name());
+            throw new MissingOfferingParameterException();
         } else if (!Configurator.getInstance().getCache().getOfferings().contains(offering)) {
-            String exceptionText = String.format("The requested offering (%s) is not supported by this server!", offering);
-            throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.GetResultTemplateParams.offering.name(), exceptionText);
+            throw new InvalidOfferingParameterException(offering);
         }
     }
-
 
     private void checkObservedProperty(String observedProperty) throws OwsExceptionReport {
         if (observedProperty == null || observedProperty.isEmpty()) {
-            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.GetResultTemplateParams.observedProperty.name());
+            throw new MissingObservedPropertyParameterException();
         } else if (!Configurator.getInstance().getCache().getObservableProperties().contains(observedProperty)) {
-            String exceptionText = String.format("The requested observedProperty (%s) is not supported by this server!", observedProperty);
-            throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.GetResultTemplateParams.observedProperty.name(), exceptionText);
+            throw new InvalidObservedPropertyParameterException(observedProperty);
         }
     }
-    
+
     @Override
     public WSDLOperation getSosOperationDefinition() {
         return WSDLConstants.Operations.GET_RESULT_TEMPLATE;
     }
-
 }

@@ -38,34 +38,19 @@ import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateProcedureUtilities;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.request.DescribeSensorRequest;
 import org.n52.sos.response.DescribeSensorResponse;
 import org.n52.sos.util.SosHelper;
-import org.n52.sos.util.Util4Exceptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of the interface IDescribeSensorDAO
  * 
  */
 public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
-
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DescribeSensorDAO.class);
-    
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.n52.sos.ds.IDescribeSensorDAO#getSensorMLDescription(org.n52.sos.
-     * request.AbstractSosRequest)
-     */
     @Override
     public DescribeSensorResponse getSensorDescription(DescribeSensorRequest request) throws OwsExceptionReport {
         // sensorDocument which should be returned
@@ -99,9 +84,8 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
             response.setSensorDescription(result);
             return response;
         } catch (HibernateException he) {
-            String exceptionText = "Error while querying data for DescribeSensor document!";
-            LOGGER.error(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+            throw new NoApplicableCodeException().causedBy(he)
+                    .withMessage("Error while querying data for DescribeSensor document!");
         } finally {
             sessionHolder.returnSession(session);
         }
@@ -116,7 +100,7 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
     }
 
     private Collection<String> getFeatureOfInterestIDsForProcedure(String procedureIdentifier, String version,
-            Session session) throws OwsExceptionReport {
+                                                                   Session session) throws OwsExceptionReport {
         HibernateQueryObject queryObject = new HibernateQueryObject();
         Map<String, String> aliases = new HashMap<String, String>(3);
         String obsConstAlias =
@@ -141,6 +125,8 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
      *            System document to add parent procedures to
      * @param parentProcedureIds
      *            The parent procedures to add
+
+     *
      * @throws OwsExceptionReport
      */
     private Set<String> getParentProcedures(String procID, String version) throws OwsExceptionReport {
@@ -180,10 +166,12 @@ public class DescribeSensorDAO extends AbstractDescribeSensorDAO {
      *            System document to add child procedures to
      * @param childProcedures
      *            The child procedures to add
+
+     *
      * @throws OwsExceptionReport
      */
     private Set<SosProcedureDescription> getChildProcedures(String procID, String outputFormat, String version,
-            Session session) throws OwsExceptionReport {
+                                                            Session session) throws OwsExceptionReport {
         Set<SosProcedureDescription> childProcedures = new HashSet<SosProcedureDescription>(0);
         Collection<String> childProcedureIds = getCache().getChildProcedures(procID, false, false);
 

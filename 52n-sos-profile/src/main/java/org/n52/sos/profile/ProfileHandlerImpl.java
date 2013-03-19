@@ -25,6 +25,7 @@ package org.n52.sos.profile;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +34,7 @@ import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.profile.DefaultProfile;
 import org.n52.sos.service.profile.Profile;
@@ -60,9 +61,7 @@ public class ProfileHandlerImpl implements ProfileHandler {
         try {
             loadProfiles();
         } catch (OwsExceptionReport e) {
-            String exceptionText = "Error while loading profiles";
-            LOGGER.error(exceptionText, e);
-            throw new ConfigurationException(exceptionText, e);
+            throw new ConfigurationException("Error while loading profiles", e);
         }
     }
 
@@ -109,7 +108,7 @@ public class ProfileHandlerImpl implements ProfileHandler {
 
     @Override
     public Map<String, Profile> getAvailableProfiles() {
-        return availableProfiles;
+        return Collections.unmodifiableMap(availableProfiles);
     }
 
     @Override

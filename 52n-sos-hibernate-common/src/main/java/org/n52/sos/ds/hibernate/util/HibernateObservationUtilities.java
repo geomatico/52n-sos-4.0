@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -79,9 +80,8 @@ import org.n52.sos.ogc.om.values.NilTemplateValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.om.values.UnknownValue;
-import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -134,16 +134,6 @@ public class HibernateObservationUtilities {
         return getConfiguration().getActiveProfile();
     }
 
-    @Deprecated
-    public static String getTokenSeperator() {
-        return getConfiguration().getTokenSeperator();
-    }
-
-    @Deprecated
-    public static String getTupleSeperator() {
-        return getConfiguration().getTupleSeperator();
-    }
-    
     public static String getTokenSeparator() {
         return getConfiguration().getTokenSeparator();
     }
@@ -172,12 +162,14 @@ public class HibernateObservationUtilities {
      * @param session
      *            Hibernate session
      * @return SOS internal observation
-     * @throws OwsExceptionReport
-     *             If an error occurs
+
+     *
+     * @throws OwsExceptionReport     *             If an error occurs
      */
     @SuppressWarnings("unchecked")
     public static List<SosObservation> createSosObservationsFromObservations(Collection<Observation> observations,
-                                                                             String version, Session session) throws OwsExceptionReport {
+                                                                             String version, Session session) throws
+            OwsExceptionReport {
         List<SosObservation> observationCollection = new ArrayList<SosObservation>(0);
 
         Map<String, SosAbstractFeature> features = new HashMap<String, SosAbstractFeature>(0);
@@ -586,17 +578,15 @@ public class HibernateObservationUtilities {
                     && arrayValue.getValue().getElementType() instanceof SosSweDataRecord) {
                 elementType = (SosSweDataRecord) arrayValue.getValue().getElementType();
             } else {
-                String exceptionMsg =
-                        String.format("sweElementType type \"%s\" not supported", elementType != null ? elementType
-                                .getClass().getName() : "null");
-                LOGGER.debug(exceptionMsg);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
+                throw new NoApplicableCodeException()
+                        .withMessage("sweElementType type \"%s\" not supported",
+                                     elementType != null ? elementType.getClass().getName() : "null");
             }
 
             for (List<String> block : values) {
                 int tokenIndex = 0;
                 ITime phenomenonTime = null;
-                List<IValue<?>> observedValues = new ArrayList<IValue<?>>();
+                List<IValue<?>> observedValues = new LinkedList<IValue<?>>();
                 // map to store the observed properties
                 Map<IValue<?>, String> definitionsForObservedValues = new HashMap<IValue<?>, String>();
                 IValue<?> observedValue = null;
@@ -614,16 +604,12 @@ public class HibernateObservationUtilities {
                             if (e instanceof OwsExceptionReport) {
                                 throw (OwsExceptionReport) e;
                             } else {
-                                OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-                                String exceptionMsg = "Error while parse time String to DateTime!";
-                                LOGGER.error(exceptionMsg, e);
                                 /*
                                  * FIXME what is the valid exception code if the
                                  * result is not correct?
                                  */
-                                owse.addCodedException(OWSConstants.OwsExceptionCode.NoApplicableCode, null,
-                                        exceptionMsg);
-                                throw owse;
+                                throw new NoApplicableCodeException().causedBy(e)
+                                        .withMessage("Error while parse time String to DateTime!");
                             }
                         }
                     } else if (fieldForToken instanceof SosSweTimeRange) {
@@ -636,16 +622,12 @@ public class HibernateObservationUtilities {
                             if (e instanceof OwsExceptionReport) {
                                 throw (OwsExceptionReport) e;
                             } else {
-                                OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-                                String exceptionMsg = "Error while parse time String to DateTime!";
-                                LOGGER.error(exceptionMsg, e);
                                 /*
                                  * FIXME what is the valid exception code if the
                                  * result is not correct?
                                  */
-                                owse.addCodedException(OWSConstants.OwsExceptionCode.NoApplicableCode, null,
-                                        exceptionMsg);
-                                throw owse;
+                                throw new NoApplicableCodeException().causedBy(e)
+                                        .withMessage("Error while parse time String to DateTime!");
                             }
                         }
                     }
@@ -665,11 +647,9 @@ public class HibernateObservationUtilities {
                     } else if (fieldForToken instanceof SosSweCount) {
                         observedValue = new org.n52.sos.ogc.om.values.CountValue(Integer.parseInt(token));
                     } else {
-                        String exceptionMsg =
-                                String.format("sweField type \"%s\" not supported",
-                                        fieldForToken != null ? fieldForToken.getClass().getName() : "null");
-                        LOGGER.debug(exceptionMsg);
-                        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
+                        throw new NoApplicableCodeException()
+                                .withMessage("sweField type '%s' not supported",
+                                             fieldForToken != null ? fieldForToken.getClass().getName() : "null");
                     }
                     if (observedValue != null) {
                         definitionsForObservedValues.put(observedValue, fieldForToken.getDefinition());
@@ -719,22 +699,6 @@ public class HibernateObservationUtilities {
      * Configurator.
      */
     protected static class Configuration {
-        /**
-         * @see Configurator#getTupleSeperator()
-         */
-        @Deprecated
-        protected String getTupleSeperator() {
-            return Configurator.getInstance().getTupleSeperator();
-        }
-
-        /**
-         * @see Configurator#getTokenSeperator()
-         */
-        @Deprecated
-        protected String getTokenSeperator() {
-            return Configurator.getInstance().getTokenSeperator();
-        }
-        
         
         /**
          * @see Configurator#getTupleSeparator()

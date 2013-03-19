@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.config;
+package org.n52.sos.exception;
 
 public class ConfigurationException extends Error {
     private static final long serialVersionUID = -7249708070675332849L;

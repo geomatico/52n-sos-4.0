@@ -23,7 +23,8 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
-import static org.hibernate.criterion.Projections.*;
+import static org.hibernate.criterion.Projections.distinct;
+import static org.hibernate.criterion.Projections.property;
 import static org.hibernate.criterion.Restrictions.*;
 import static org.n52.sos.ds.hibernate.util.HibernateConstants.*;
 
@@ -78,14 +79,13 @@ import org.n52.sos.ds.hibernate.entities.TextValue;
 import org.n52.sos.ds.hibernate.entities.Unit;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
-import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.util.DateTimeHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -481,8 +481,9 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
      *            Temporal filters
      * @param criterions
      * @return filter restrictions
-     * @throws OwsExceptionReport
-     *             If the temporal filter is not supported
+
+     *
+     * @throws OwsExceptionReport     *             If the temporal filter is not supported
      */
     public static Criterion getCriterionForTemporalFilters(List<TemporalFilter> eventTime) throws OwsExceptionReport {
         Disjunction disjunction = Restrictions.disjunction();
@@ -499,8 +500,9 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
      *            Temporal filer
      * @param criterions
      * @return filter restriction
-     * @throws OwsExceptionReport
-     *             If the temporal filter is not supported
+
+     *
+     * @throws OwsExceptionReport     *             If the temporal filter is not supported
      */
     private static Criterion getCriterionForTemporalFilter(TemporalFilter temporalFilter) throws OwsExceptionReport {
         String valueReference = temporalFilter.getValueReference();
@@ -527,8 +529,8 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
                                 .toDate(), tp.getEnd().toDate());
                 return Restrictions.or(gele, btw);
             } else {
-                throw Util4Exceptions.createNoApplicableCodeException(null,
-                        "The requested valueReference for temporal filter is not supported by this server!");
+                throw new NoApplicableCodeException()
+                        .withMessage("The requested valueReference for temporal filter is not supported by this server!");
             }
             // case TM_EndedBy:
             // return null;
@@ -555,8 +557,8 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
                     return Restrictions.or(gele, btw);
                 }
             } else {
-                throw Util4Exceptions.createNoApplicableCodeException(null,
-                        "The requested valueReference for temporal filter is not supported by this server!");
+                throw new NoApplicableCodeException()
+                        .withMessage("The requested valueReference for temporal filter is not supported by this server!");
             }
             // case TM_Meets:
             // return null;
@@ -566,8 +568,8 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
             // return null;
             // case TM_Overlaps:
             // return null;
-        default:
-            throw new OwsExceptionReport();
+            default:
+                throw new NoApplicableCodeException();
         }
     }
 
@@ -579,8 +581,9 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
      * @param resultSpatialFilter
      *            Spatial filter
      * @return filter restriction
-     * @throws OwsExceptionReport
-     *             If the spatial filter is not supported
+
+     *
+     * @throws OwsExceptionReport     *             If the spatial filter is not supported
      */
     public static Criterion getCriterionForSpatialFilter(String propertyName, SpatialOperator operator,
             Geometry geometry)
@@ -618,7 +621,7 @@ public class HibernateCriteriaQueryUtilities extends DefaultHibernateCriteriaQue
             // return SpatialRestrictions.within(propertyName,
             // resultSpatialFilter.getGeometry());
         default:
-            throw new OwsExceptionReport();
+                throw new NoApplicableCodeException();
         }
     }
 

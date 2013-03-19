@@ -39,8 +39,9 @@ public interface IRegisterSensorDAO extends OperationDAO {
      * @param request
      *            request containing the sensor which should be inserted
      * @return Returns String containing message for RegisterSensorResponse
-     * @throws OwsExceptionReport
-     *             If an error occurs.
+
+     *
+     * @throws OwsExceptionReport     *             If an error occurs.
      */
     public String insertSensor(AbstractServiceRequest request) throws OwsExceptionReport;
 }

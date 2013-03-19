@@ -28,13 +28,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.opengis.om.x20.NamedValuePropertyType;
 import net.opengis.om.x20.NamedValueType;
 import net.opengis.om.x20.OMObservationType;
 import net.opengis.om.x20.OMProcessPropertyType;
@@ -65,6 +63,7 @@ import org.n52.sos.ogc.om.values.IValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -80,8 +79,6 @@ import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.GmlHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.SweHelper;
-import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,6 +113,7 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
             SosConstants.SOS,
             Collections.singletonMap(Sos2Constants.SERVICEVERSION, Collections.singleton(OMConstants.NS_OM_2)));
 
+    @Deprecated
     private boolean supported = true;
 
     public OmEncoderv20() {
@@ -159,11 +157,13 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
     }
 
     @Override
+    @Deprecated
     public boolean isSupported() {
         return supported;
     }
 
     @Override
+    @Deprecated
     public void setSupported(boolean supported) {
         this.supported = supported;
     }
@@ -216,8 +216,8 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
                 XmlObject xmlObject = (XmlObject) encoder.encode(sosObservation.getIdentifier());
                 xbObs.addNewIdentifier().set(xmlObject);
             } else {
-                String exceptionText = "Error while encoding geometry value, needed encoder is missing!";
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoApplicableCodeException()
+                        .withMessage("Error while encoding geometry value, needed encoder is missing!");
             }
         }
 
@@ -316,7 +316,7 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
     }
 
     private void addProcedure(OMProcessPropertyType procedure, SosProcedureDescription procedureDescription,
-            String observationID) throws OwsExceptionReport {
+                              String observationID) throws OwsExceptionReport {
         if (Configurator.getInstance().getProfileHandler().getActiveProfile()
                 .isEncodeProcedureInObservation(OMConstants.NS_OM_2)) {
             XmlObject encodeProcedure =
@@ -343,8 +343,8 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
                             xmlObject.schemaType());
             substitution.set(xmlObject);
         } else {
-            String exceptionText = "Error while encoding phenomenon time, needed encoder is missing!";
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            throw new NoApplicableCodeException()
+                    .withMessage("Error while encoding phenomenon time, needed encoder is missing!");
         }
     }
 
@@ -382,7 +382,8 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
     }
 
     private void addResultToObservation(XmlObject xbResult, SosObservation sosObservation,
-            List<SosObservableProperty> phenComponents, String observationID) throws OwsExceptionReport {
+                                        List<SosObservableProperty> phenComponents, String observationID) throws
+            OwsExceptionReport {
         // TODO if OM_SWEArrayObservation and get ResultEncoding and
         // ResultStructure exists,
         String observationType = sosObservation.getObservationConstellation().getObservationType();
@@ -476,12 +477,11 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
             if (encodedObj != null && encodedObj instanceof XmlObject) {
                 xbResult.set((XmlObject) encodedObj);
             } else {
-                String exceptionMsg =
-                        String.format("Encoding of observation value of type \"%s\" failed. Result: %s",
-                                observationValue.getValue() != null ? observationValue.getValue().getClass().getName()
+                throw new NoApplicableCodeException()
+                        .withMessage("Encoding of observation value of type \"%s\" failed. Result: %s",
+                                     observationValue.getValue() != null ? observationValue.getValue().getClass().getName()
                                         : observationValue.getValue(), encodedObj != null ? encodedObj.getClass()
                                         .getName() : encodedObj);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
             }
         }
     }
@@ -498,12 +498,11 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
         if (encodedObj != null && encodedObj instanceof XmlObject) {
             xbResult.set((XmlObject) encodedObj);
         } else {
-            String exceptionMsg =
-                    String.format("Encoding of observation value of type \"%s\" failed. Result: %s",
-                            observationValue.getValue() != null ? observationValue.getValue().getClass().getName()
+            throw new NoApplicableCodeException()
+                    .withMessage("Encoding of observation value of type \"%s\" failed. Result: %s",
+                                 observationValue.getValue() != null ? observationValue.getValue().getClass().getName()
                                     : observationValue.getValue(), encodedObj != null ? encodedObj.getClass()
                                     .getName() : encodedObj);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
         }
     }
 
@@ -515,11 +514,13 @@ public class OmEncoderv20 implements ObservationEncoder<XmlObject, Object> {
      *            XmlObject O&M observation
      * @param absObs
      *            SOS observation
+
+     *
      * @throws OwsExceptionReport
      */
     private void addFeatureOfInterest(OMObservationType observation, SosAbstractFeature feature)
             throws OwsExceptionReport {
-        Map<HelperValues, String> additionalValues = new HashMap<SosConstants.HelperValues, String>(1);
+        Map<HelperValues, String> additionalValues = new EnumMap<SosConstants.HelperValues, String>(HelperValues.class);
         Profile activeProfile = Configurator.getInstance().getProfileHandler().getActiveProfile();
         additionalValues.put(HelperValues.ENCODE,
                 Boolean.toString(activeProfile.isEncodeFeatureOfInterestInObservations()));

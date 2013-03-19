@@ -23,7 +23,7 @@
  */
 package org.n52.sos.request;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.n52.sos.ogc.om.SosObservation;
@@ -96,7 +96,7 @@ public class InsertObservationRequest extends AbstractServiceRequest {
 
     public void addObservation(SosObservation observation) {
        if (observations == null) {
-           observations = new ArrayList<SosObservation>();
+           observations = new LinkedList<SosObservation>();
        }
         observations.add(observation);
     }

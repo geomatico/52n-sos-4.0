@@ -47,10 +47,11 @@ import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,8 +113,9 @@ public class FesDecoderv20 implements Decoder<Object, XmlObject> {
      *            request
      * @return Returns SpatialFilter created from the passed foi request
      *         parameter
-     * @throws OwsExceptionReport
-     *             if creation of the SpatialFilter failed
+
+     *
+     * @throws OwsExceptionReport     *             if creation of the SpatialFilter failed
      */
     private SpatialFilter parseSpatialFilterType(SpatialOpsType xbSpatialOpsType) throws OwsExceptionReport {
         SpatialFilter spatialFilter = new SpatialFilter();
@@ -136,22 +138,16 @@ public class FesDecoderv20 implements Decoder<Object, XmlObject> {
                     }
                     
                 } else {
-                    String exceptionText = "The requested spatial filter operand is not supported by this SOS!";
-                    LOGGER.debug(exceptionText);
-                    throw Util4Exceptions.createInvalidParameterValueException(
-                            Sos2Constants.GetObservationParams.spatialFilter.name(), exceptionText);
+                    throw new InvalidParameterValueException().at(Sos2Constants.GetObservationParams.spatialFilter)
+                            .withMessage("The requested spatial filter operand is not supported by this SOS!");
                 }
                 geometryCursor.dispose();
             } else {
-                String exceptionText = "The requested spatial filter is not supported by this SOS!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        Sos2Constants.GetObservationParams.spatialFilter.name(), exceptionText);
+                throw new InvalidParameterValueException().at(Sos2Constants.GetObservationParams.spatialFilter)
+                        .withMessage("The requested spatial filter is not supported by this SOS!");
             }
         } catch (XmlException xmle) {
-            String exceptionText = "Error while parsing spatial filter!";
-            LOGGER.error(exceptionText, xmle);
-            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+            throw new NoApplicableCodeException().causedBy(xmle).withMessage("Error while parsing spatial filter!");
         }
         return spatialFilter;
     }
@@ -163,8 +159,9 @@ public class FesDecoderv20 implements Decoder<Object, XmlObject> {
      * @param xbTemporalOpsType
      *            XmlObject representing the temporal filter
      * @return Returns SOS representation of temporal filter
-     * @throws OwsExceptionReport
-     *             if parsing of the element failed
+
+     *
+     * @throws OwsExceptionReport     *             if parsing of the element failed
      */
     private TemporalFilter parseTemporalFilterType(TemporalOpsType xbTemporalOpsType) throws OwsExceptionReport {
         TemporalFilter temporalFilter = new TemporalFilter();
@@ -187,11 +184,9 @@ public class FesDecoderv20 implements Decoder<Object, XmlObject> {
                             } else if (localName.equals(TimeOperator2.TEquals.name()) && time instanceof TimeInstant) {
                                 operator = TimeOperator.TM_Equals;
                             } else {
-                                String exceptionText =
-                                        "The requested temporal filter operand is not supported by this SOS!";
-                                LOGGER.debug(exceptionText);
-                                throw Util4Exceptions.createInvalidParameterValueException(
-                                        Sos2Constants.GetObservationParams.temporalFilter.name(), exceptionText);
+                                throw new InvalidParameterValueException()
+                                        .at(Sos2Constants.GetObservationParams.temporalFilter)
+                                        .withMessage("The requested temporal filter operand is not supported by this SOS!");
                             }
                             temporalFilter.setOperator(operator);
                             temporalFilter.setTime(time);
@@ -202,15 +197,11 @@ public class FesDecoderv20 implements Decoder<Object, XmlObject> {
                     }
                 }
             } else {
-                String exceptionText = "The requested temporal filter operand is not supported by this SOS!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        Sos2Constants.GetObservationParams.temporalFilter.name(), exceptionText);
+                throw new InvalidParameterValueException().at(Sos2Constants.GetObservationParams.temporalFilter)
+                        .withMessage("The requested temporal filter operand is not supported by this SOS!");
             }
         } catch (XmlException xmle) {
-            String exceptionText = "Error while parsing temporal filter!";
-            LOGGER.error(exceptionText, xmle);
-            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+            throw new NoApplicableCodeException().withMessage("Error while parsing temporal filter!").causedBy(xmle);
         }
         return temporalFilter;
     }

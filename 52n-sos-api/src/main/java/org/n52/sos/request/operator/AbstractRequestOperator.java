@@ -33,18 +33,27 @@ import org.n52.sos.cache.ContentCache;
 import org.n52.sos.ds.OperationDAO;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.RequestEvent;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidValueReferenceException;
+import org.n52.sos.exception.ows.MissingParameterValueException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingProcedureParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingServiceParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingValueReferenceException;
+import org.n52.sos.exception.ows.OperationNotSupportedException;
+import org.n52.sos.exception.ows.VersionNegotiationFailedException;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
-import org.n52.sos.ogc.ows.SwesExtension;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.SwesExtension;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
-import org.n52.sos.util.Util4Exceptions;
+import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +77,7 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
         this.dao = (D) Configurator.getInstance().getOperationDaoRepository().getOperationDAO(operationName);
         if (this.dao == null) {
             throw new NullPointerException(String
-                    .format("IOperationDao for Operation %s has no implementation!", operationName));
+                    .format("OperationDAO for Operation %s has no implementation!", operationName));
         }
         LOGGER.info("{} initialized successfully!", getClass().getSimpleName());
     }
@@ -115,9 +124,8 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
         if (requestType.isAssignableFrom(request.getClass())) {
             return receive(requestType.cast(request));
         } else {
-            String exceptionText = String.format("Received request is not a %s!", requestType.getSimpleName());
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
+            throw new OperationNotSupportedException()
+                    .withMessage("Received request is not a %s!", requestType.getSimpleName());
         }
     }
     
@@ -131,8 +139,7 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
      * @param versions
      *            the requested versions of the SOS
      *
-     * @throws OwsExceptionReport
-     *             if this SOS does not support the requested versions
+     * @throws OwsExceptionReport * if this SOS does not support the requested versions
      */
     protected List<String> checkAcceptedVersionsParameter(List<String> versions, Set<String> supportedVersions)
             throws OwsExceptionReport {
@@ -146,23 +153,13 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
                 }
             }
             if (validVersions.isEmpty()) {
-                String exceptionText =
-                        "The parameter '" + SosConstants.GetCapabilitiesParams.AcceptVersions.name() + "'"
-                                + " does not contain a supported Service version!";
-                LOGGER.error(exceptionText);
-                OwsExceptionReport se = new OwsExceptionReport();
-                se.addCodedException(OWSConstants.OwsExceptionCode.VersionNegotiationFailed,
-                        SosConstants.GetCapabilitiesParams.AcceptVersions.name(), exceptionText);
-                throw se;
+                throw new VersionNegotiationFailedException().at(SosConstants.GetCapabilitiesParams.AcceptVersions)
+                        .withMessage("The parameter '%s' does not contain a supported Service version!",
+                                     SosConstants.GetCapabilitiesParams.AcceptVersions.name());
             }
             return validVersions;
         } else {
-            OwsExceptionReport owse =
-                    Util4Exceptions
-                            .createMissingParameterValueException(SosConstants.GetCapabilitiesParams.AcceptVersions
-                                    .name());
-            LOGGER.error("checkAcceptedVersionsParameters", owse);
-            throw owse;
+            throw new MissingParameterValueException(SosConstants.GetCapabilitiesParams.AcceptVersions);
         }
     }
 
@@ -172,8 +169,7 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
      * @param versions
      *            the requested versions of the SOS
      *
-     * @throws OwsExceptionReport
-     *             if this SOS does not support the requested versions
+     * @throws OwsExceptionReport * if this SOS does not support the requested versions
      */
     protected List<String> checkAcceptedVersionsParameter(List<String> versions)
             throws OwsExceptionReport {
@@ -186,31 +182,19 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
      *
      * @param request
      *            the request
-     * @throws OwsExceptionReport
-     *             if this SOS does not support the requested versions
+
+     *
+     * @throws OwsExceptionReport * if this SOS does not support the requested versions
      */
     protected void checkSingleVersionParameter(AbstractServiceRequest request)
             throws OwsExceptionReport {
 
         // if version is incorrect, throw exception
         if (request.getVersion() == null || !Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(request.getVersion())) {
-
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The parameter '");
-            exceptionText.append(OWSConstants.RequestParams.version.name());
-            exceptionText.append("'  does not contain version(s) supported by this Service: '");
-            for (String supportedVersion : Configurator.getInstance().getServiceOperatorRepository().getSupportedVersions()) {
-                exceptionText.append(supportedVersion);
-                exceptionText.append("', '");
-            }
-            exceptionText.delete(exceptionText.lastIndexOf("', '"), exceptionText.length());
-            exceptionText.append("'!");
-            LOGGER.error("The accepted versions parameter is incorrect.");
-            OwsExceptionReport owse = new OwsExceptionReport();
-            owse.addCodedException(OWSConstants.OwsExceptionCode.InvalidParameterValue, OWSConstants.RequestParams.version.name(),
-                    exceptionText.toString());
-
-            throw owse;
+            throw new InvalidParameterValueException().at(OWSConstants.RequestParams.version)
+                    .withMessage("The parameter '%s' does not contain version(s) supported by this Service: '%s'!",
+                                 OWSConstants.RequestParams.version.name(),
+                                 StringHelper.join("', '", Configurator.getInstance().getServiceOperatorRepository().getSupportedVersions()));
         }
     }
 
@@ -220,9 +204,9 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
      *
      * @param versionsString
      *            comma seperated list of requested service versions
-     * @throws OwsExceptionReport
-     *             if the versions list is empty or no matching version is
-     *             contained
+
+     *
+     * @throws OwsExceptionReport * if the versions list is empty or no matching version is     *             contained
      */
     protected void checkAcceptedVersionsParameter(String versionsString, Set<String> supportedVersions)
             throws OwsExceptionReport {
@@ -231,12 +215,7 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
             String[] versionsArray = versionsString.split(",");
             checkAcceptedVersionsParameter(Arrays.asList(versionsArray), supportedVersions);
         } else {
-            OwsExceptionReport se =
-                    Util4Exceptions
-                            .createMissingParameterValueException(SosConstants.GetCapabilitiesParams.AcceptVersions
-                                    .name());
-            LOGGER.error("checkAcceptedVersionsParameter", se);
-            throw se;
+            throw new MissingParameterValueException(SosConstants.GetCapabilitiesParams.AcceptVersions);
         }
     }
 
@@ -246,9 +225,9 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
      *
      * @param versionsString
      *            comma seperated list of requested service versions
-     * @throws OwsExceptionReport
-     *             if the versions list is empty or no matching version is
-     *             contained
+
+     *
+     * @throws OwsExceptionReport * if the versions list is empty or no matching version is     *             contained
      */
     protected void checkAcceptedVersionsParameter(String versionsString)
             throws OwsExceptionReport {
@@ -262,29 +241,18 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
      *
      * @param service
      *            service parameter of the request
-     * @throws OwsExceptionReport
-     *             if service parameter is incorrect
+
+     *
+     * @throws OwsExceptionReport if service parameter is incorrect
      */
     protected static void checkServiceParameter(String service) throws OwsExceptionReport {
 
-        // if service==null, throw exception with missing parameter value code
         if (service == null || service.equalsIgnoreCase("NOT_SET")) {
-            OwsExceptionReport se =
-                    Util4Exceptions.createMissingParameterValueException(SosConstants.GetCapabilitiesParams.service
-                            .name());
-            LOGGER.debug("checkServiceParameter", se);
-            throw se;
-        }
-        // if not null, but incorrect, throw also exception
-        else if (!service.equals(SosConstants.SOS)) {
-            String exceptionText = String.format(
-                    "The value of the mandatory parameter '%s' must be '%s'. Delivered value was: %s",
-                    SosConstants.GetCapabilitiesParams.service.toString(),  SosConstants.SOS, service);
-            LOGGER.error(exceptionText);
-            OwsExceptionReport se = new OwsExceptionReport();
-            se.addCodedException(OWSConstants.OwsExceptionCode.InvalidParameterValue,
-                    SosConstants.GetCapabilitiesParams.service.toString(), exceptionText);
-            throw se;
+            throw new MissingServiceParameterException();
+        } else if (!service.equals(SosConstants.SOS)) {
+            throw new InvalidParameterValueException().at(SosConstants.GetCapabilitiesParams.service)
+                    .withMessage("The value of the mandatory parameter '%s' must be '%s'. Delivered value was: %s",
+                                 SosConstants.GetCapabilitiesParams.service.toString(), SosConstants.SOS, service);
         }
     }
 
@@ -295,34 +263,28 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
      *            the sensor ID which should be checked
      * @param validProcedures the valid procedure identifiers
      * @param parameterName the parameter name
-     * @throws OwsExceptionReport
-     *             if the value of the sensor ID parameter is incorrect
+
+     *
+     * @throws OwsExceptionReport * if the value of the sensor ID parameter is incorrect
      */
     protected void checkProcedureID(String procedureID, Collection<String> validProcedures, String parameterName)
             throws OwsExceptionReport {
-        // null or an empty String
         if (procedureID == null || procedureID.isEmpty()) {
-            String exceptionText = String.format(
-                    "The value of the mandatory parameter '%s' was not found in the request or is incorrect!", parameterName);
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createMissingParameterValueException(parameterName);
-        }
-        if (!validProcedures.contains(procedureID)) {
-            String exceptionText = String.format(
-                    "The value of the '%s' parameter is incorrect. Please check the capabilities response document for valid values!", parameterName);
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+            throw new MissingProcedureParameterException();
+        } else if (!validProcedures.contains(procedureID)) {
+            throw new InvalidParameterValueException(parameterName, procedureID);
         }
     }
 
-	protected void checkProcedureIDs(Collection<String> procedureIDs, String parameterName) throws OwsExceptionReport {
+    protected void checkProcedureIDs(Collection<String> procedureIDs, String parameterName) throws OwsExceptionReport {
 		checkProcedureIDs(procedureIDs, parameterName, Configurator.getInstance()
                 .getCache().getProcedures());
 	}
 
-    protected void checkProcedureIDs(Collection<String> procedureIDs, String parameterName, Collection<String> validProcedures) throws OwsExceptionReport {
+    protected void checkProcedureIDs(Collection<String> procedureIDs, String parameterName,
+                                     Collection<String> validProcedures) throws OwsExceptionReport {
         if (procedureIDs != null) {
-            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+            CompositeOwsException exceptions = new CompositeOwsException();
             for (String procedureID : procedureIDs) {
                 try {
                     checkProcedureID(procedureID, validProcedures, parameterName);
@@ -330,27 +292,23 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
                     exceptions.add(owse);
                 }
             }
-            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+            exceptions.throwIfNotEmpty();
         }
     }
 
-	 protected void checkObservationID(String observationID, Collection<String> validObservations, String parameterName) throws OwsExceptionReport {
+    protected void checkObservationID(String observationID, Collection<String> validObservations, String parameterName)
+            throws OwsExceptionReport {
         if (observationID == null || observationID.isEmpty()) {
-            String exceptionText = String.format("The value of the mandatory parameter '%s' was not found in the request or is incorrect!",parameterName);
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createMissingParameterValueException(parameterName);
-        }
-        if (!validObservations.contains(observationID)) {
-            String exceptionText = String.format("The value of the '%s' parameter is incorrect. Please check the capabilities response document for valid values!", parameterName);
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+            throw new MissingParameterValueException(parameterName);
+        } else if (!validObservations.contains(observationID)) {
+            throw new InvalidParameterValueException(parameterName, observationID);
         }
     }
 
     protected void checkObservationIDs(Collection<String> observationIDs, Collection<String> validObservations,
-            String parameterName) throws OwsExceptionReport {
+                                       String parameterName) throws OwsExceptionReport {
         if (observationIDs != null) {
-            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+            CompositeOwsException exceptions = new CompositeOwsException();
             for (String procedureID : observationIDs) {
                 try {
                     checkObservationID(procedureID, validObservations, parameterName);
@@ -358,14 +316,15 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
                     exceptions.add(owse);
                 }
             }
-            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+            exceptions.throwIfNotEmpty();
         }
     }
 
     protected void checkFeatureOfInterestIdentifiers(List<String> featuresOfInterest,
-            Collection<String> validFeatureOfInterest, String parameterName) throws OwsExceptionReport {
+                                                     Collection<String> validFeatureOfInterest, String parameterName)
+            throws OwsExceptionReport {
         if (featuresOfInterest != null) {
-            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+            CompositeOwsException exceptions = new CompositeOwsException();
             for (String featureOfInterest : featuresOfInterest) {
                 try {
                     checkFeatureOfInterestIdentifier(featureOfInterest, validFeatureOfInterest, parameterName);
@@ -373,28 +332,23 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
                     exceptions.add(e);
                 }
             }
-            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+            exceptions.throwIfNotEmpty();
         }
     }
 
     protected void checkFeatureOfInterestIdentifier(String featureOfInterest,
-            Collection<String> validFeatureOfInterest, String parameterName) throws OwsExceptionReport {
+                                                    Collection<String> validFeatureOfInterest, String parameterName)
+            throws OwsExceptionReport {
         if (featureOfInterest == null || featureOfInterest.isEmpty()) {
-            String exceptionText = String.format(
-                    "The value of the parameter '%s' was not found in the request or is incorrect!", parameterName);
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createMissingParameterValueException(parameterName);
+            throw new MissingParameterValueException(parameterName);
         }
         if (!validFeatureOfInterest.contains(featureOfInterest)) {
-            String exceptionText = String.format(
-                    "The value '%s' of the parameter '%s' is invalid", featureOfInterest, parameterName);
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+            throw new InvalidParameterValueException(parameterName, featureOfInterest);
         }
     }
     
     protected boolean isRelatedFetureIdentifier(String relatedFeature,
-            Collection<String> validRelatedFeatures) throws OwsExceptionReport {
+                                                Collection<String> validRelatedFeatures) throws OwsExceptionReport {
         if (relatedFeature == null || relatedFeature.isEmpty()) {
            return false;
         }
@@ -402,25 +356,21 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
     }
     
     protected void checkRelatedFeatureIdentifier(String relatedFeature,
-            Collection<String> validRelatedFeatures, String parameterName) throws OwsExceptionReport {
+                                                 Collection<String> validRelatedFeatures, String parameterName) throws
+            OwsExceptionReport {
         if (relatedFeature == null || relatedFeature.isEmpty()) {
-            String exceptionText = String.format(
-                    "The value of the parameter '%s' was not found in the request or is incorrect!", parameterName);
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createMissingParameterValueException(parameterName);
+            throw new MissingParameterValueException(parameterName);
         }
         if (!validRelatedFeatures.contains(relatedFeature)) {
-            String exceptionText = String.format(
-                    "The value '%s' of the parameter '%s' is invalid", relatedFeature, parameterName);
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+            throw new InvalidParameterValueException(parameterName, relatedFeature);
         }
     }
 
     protected void checkObservedProperties(List<String> observedProperties,
-            Collection<String> validObservedProperties, String parameterName) throws OwsExceptionReport {
+                                           Collection<String> validObservedProperties, String parameterName) throws
+            OwsExceptionReport {
         if (observedProperties != null) {
-            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+            CompositeOwsException exceptions = new CompositeOwsException();
             for (String observedProperty : observedProperties) {
                 try {
                     checkObservedProperty(observedProperty, validObservedProperties, parameterName);
@@ -428,30 +378,24 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
                     exceptions.add(e);
                 }
             }
-            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+            exceptions.throwIfNotEmpty();
         }
     }
 
     protected void checkObservedProperty(String observedProperty, Collection<String> validObservedProperties,
-            String parameterName) throws OwsExceptionReport {
+                                         String parameterName) throws OwsExceptionReport {
         if (observedProperty == null || observedProperty.isEmpty()) {
-            String exceptionText =
-                    "The value of the parameter '" + parameterName + "' was not found in the request or is not set!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createMissingParameterValueException(parameterName);
+            throw new MissingParameterValueException(parameterName);
         }
         if (!validObservedProperties.contains(observedProperty)) {
-            String exceptionText =
-                    "The value '" + observedProperty + "' of the parameter '" + parameterName + "' is invalid";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+            throw new InvalidParameterValueException(parameterName, observedProperty);
         }
     }
 
     protected void checkOfferings(Set<String> offerings, Collection<String> validOfferings, String parameterName)
             throws OwsExceptionReport {
         if (offerings != null) {
-            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+            CompositeOwsException exceptions = new CompositeOwsException();
             for (String offering : offerings) {
                 try {
                     checkObservedProperty(offering, validOfferings, parameterName);
@@ -459,26 +403,21 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
                     exceptions.add(e);
                 }
             }
-            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+            exceptions.throwIfNotEmpty();
         }
     }
 
     protected void checkOffering(String offering, Collection<String> validOfferings, String parameterName)
             throws OwsExceptionReport {
         if (offering == null || offering.isEmpty()) {
-            String exceptionText =
-                    "The value of the parameter '" + parameterName + "' was not found in the request or is not set!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createMissingParameterValueException(parameterName);
+            throw new MissingParameterValueException(parameterName);
         }
         if (!validOfferings.contains(offering)) {
-            String exceptionText = "The value '" + offering + "' of the parameter '" + parameterName + "' is invalid";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText);
+            throw new InvalidParameterValueException(parameterName, offering);
         }
     }
 
-	 protected void checkSpatialFilters(List<SpatialFilter> spatialFilters, String name) throws OwsExceptionReport {
+    protected void checkSpatialFilters(List<SpatialFilter> spatialFilters, String name) throws OwsExceptionReport {
         // TODO make supported ValueReferences dynamic
         if (spatialFilters != null) {
             for (SpatialFilter spatialFilter : spatialFilters) {
@@ -492,21 +431,13 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
         // TODO make supported ValueReferences dynamic
         if (spatialFilter != null) {
             if (spatialFilter.getValueReference() == null
-                    || (spatialFilter.getValueReference() != null && spatialFilter.getValueReference().isEmpty())) {
-                String exceptionText =
-                        "The value of the parameter '" + SosConstants.Filter.ValueReference.name()
-                                + "' was not found in the request or is not set!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createMissingParameterValueException(SosConstants.Filter.ValueReference.name());
+                || (spatialFilter.getValueReference() != null && spatialFilter.getValueReference().isEmpty())) {
+                throw new MissingValueReferenceException();
             } else if (!spatialFilter.getValueReference().equals("sams:shape")
                     && !spatialFilter.getValueReference().equals(
                             "om:featureOfInterest/sams:SF_SpatialSamplingFeature/sams:shape")
-                    && !spatialFilter.getValueReference().equals("om:featureOfInterest/*/sams:shape")) {
-                String exceptionText =
-                        "The value of the parameter '" + SosConstants.Filter.ValueReference.name() + "' is invalid!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(SosConstants.Filter.ValueReference.name(),
-                        exceptionText);
+                       && !spatialFilter.getValueReference().equals("om:featureOfInterest/*/sams:shape")) {
+                throw new InvalidValueReferenceException(spatialFilter.getValueReference());
             }
         }
     }
@@ -517,40 +448,26 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, R extends 
         if (temporalFilters != null) {
             for (TemporalFilter temporalFilter : temporalFilters) {
                 if (temporalFilter.getValueReference() == null
-                        || (temporalFilter.getValueReference() != null && temporalFilter.getValueReference().isEmpty())) {
-                    String exceptionText =
-                            "The value of the parameter '" + SosConstants.Filter.ValueReference.name()
-                                    + "' was not found in the request or is not set!";
-                    LOGGER.debug(exceptionText);
-                    throw Util4Exceptions.createMissingParameterValueException(SosConstants.Filter.ValueReference
-                            .name());
+                    || (temporalFilter.getValueReference() != null && temporalFilter.getValueReference().isEmpty())) {
+                    throw new MissingValueReferenceException();
                 } else if (!temporalFilter.getValueReference().equals("phenomenonTime")
                         && !temporalFilter.getValueReference().equals("om:phenomenonTime")
                         && !temporalFilter.getValueReference().equals("resultTime")
                         && !temporalFilter.getValueReference().equals("om:resultTime")
                         && !temporalFilter.getValueReference().equals("validTime")
-                        && !temporalFilter.getValueReference().equals("om:validTime")) {
-                    String exceptionText =
-                            "The value of the parameter '" + SosConstants.Filter.ValueReference.name()
-                                    + "' was not found in the request or is not set!";
-                    LOGGER.debug(exceptionText);
-                    throw Util4Exceptions.createInvalidParameterValueException(
-                            SosConstants.Filter.ValueReference.name(), exceptionText);
+                           && !temporalFilter.getValueReference().equals("om:validTime")) {
+
+                    throw new InvalidValueReferenceException(temporalFilter.getValueReference());
                 }
             }
         }
     }
 
     protected void checkResultTemplate(String resultTemplate, String parameterName) throws OwsExceptionReport {
-        if (resultTemplate == null || (resultTemplate != null && resultTemplate.isEmpty())) {
-            throw Util4Exceptions.createMissingParameterValueException(parameterName);
-        } else if (resultTemplate != null
-            && !Configurator.getInstance().getCache().getResultTemplates()                        .contains(resultTemplate)) {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The requested template identifier (");
-            exceptionText.append(resultTemplate);
-            exceptionText.append(") is not supported by this server!");
-            throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText.toString());
+        if (resultTemplate == null || resultTemplate.isEmpty()) {
+            throw new MissingParameterValueException(parameterName);
+        } else if (!Configurator.getInstance().getCache().getResultTemplates().contains(resultTemplate)) {
+            throw new InvalidParameterValueException(parameterName, resultTemplate);
         }
     }
 

@@ -25,9 +25,9 @@ package org.n52.sos.decode;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,6 +51,7 @@ import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
@@ -65,7 +66,6 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -189,9 +189,7 @@ public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObjec
 //        }
 
         else {
-            String exceptionText = "The request is not supported by this server!";
-            LOGGER.debug(exceptionText);
-            Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            throw new NoApplicableCodeException().withMessage("The request is not supported by this server!");
         }
         return response;
     }
@@ -205,8 +203,9 @@ public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObjec
      * @param getCapsDoc
      *            XmlBean created from the incoming request stream
      * @return Returns SosGetCapabilitiesRequest representing the request
-     * @throws OwsExceptionReport
-     *             If parsing the XmlBean failed
+
+     *
+     * @throws OwsExceptionReport     *             If parsing the XmlBean failed
      */
     private AbstractServiceRequest parseGetCapabilities(GetCapabilitiesDocument getCapsDoc) throws OwsExceptionReport {
     	GetCapabilitiesRequest request = new GetCapabilitiesRequest();
@@ -241,8 +240,9 @@ public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObjec
      * @param descSensorDoc
      *            XmlBean created from the incoming request stream
      * @return Returns SosDescribeSensorRequest representing the request
-     * @throws OwsExceptionReport
-     *             If parsing the XmlBean failed
+
+     *
+     * @throws OwsExceptionReport     *             If parsing the XmlBean failed
      */
     private AbstractServiceCommunicationObject parseDescribeSensor(
 			DescribeSensorDocument descSensorDoc) {
@@ -272,8 +272,9 @@ public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObjec
      * @param getObsDoc
      *            XmlBean created from the incoming request stream
      * @return Returns SosGetObservationRequest representing the request
-     * @throws OwsExceptionReport
-     *             If parsing the XmlBean failed
+
+     *
+     * @throws OwsExceptionReport     *             If parsing the XmlBean failed
      */
     private AbstractServiceRequest parseGetObservation(GetObservationDocument getObsDoc) throws OwsExceptionReport {
         GetObservationRequest getObsRequest = new GetObservationRequest();
@@ -298,8 +299,8 @@ public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObjec
                 String responseFormat = URLDecoder.decode(getObs.getResponseFormat(), "UTF-8");
                 getObsRequest.setResponseFormat(responseFormat);
             } catch (UnsupportedEncodingException e) {
-                String exceptionText = "Error while decoding response format!";
-                throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+                throw new NoApplicableCodeException().causedBy(e)
+                        .withMessage("Error while decoding response format!");
             }
 
         } else {
@@ -317,8 +318,9 @@ public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObjec
      *            XmlBeans document representing the getFeatureOfInterest
      *            request
      * @return Returns SOS getFeatureOfInterest request
-     * @throws OwsExceptionReport
-     *             if validation of the request failed
+
+     *
+     * @throws OwsExceptionReport     *             if validation of the request failed
      */
     private AbstractServiceRequest parseGetFeatureOfInterest(GetFeatureOfInterestDocument getFoiDoc)
             throws OwsExceptionReport {
@@ -409,8 +411,9 @@ public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObjec
      *            request
      * @return Returns SpatialFilter created from the passed foi request
      *         parameter
-     * @throws OwsExceptionReport
-     *             if creation of the SpatialFilter failed
+
+     *
+     * @throws OwsExceptionReport     *             if creation of the SpatialFilter failed
      */
     private SpatialFilter parseSpatialFilter4GetObservation(
             GetObservation.FeatureOfInterest spatialFilter) throws OwsExceptionReport {
@@ -431,13 +434,14 @@ public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObjec
      *            request
      * @return Returns SpatialFilter created from the passed foi request
      *         parameter
-     * @throws OwsExceptionReport
-     *             if creation of the SpatialFilter failed
+
+     *
+     * @throws OwsExceptionReport     *             if creation of the SpatialFilter failed
      */
     private List<SpatialFilter> parseSpatialFilters4GetFeatureOfInterest(
             Location location) throws OwsExceptionReport {
     	
-    	List<SpatialFilter> sosSpatialFilters = new ArrayList<SpatialFilter>();
+        List<SpatialFilter> sosSpatialFilters = new LinkedList<SpatialFilter>();
         if (location != null && location.getSpatialOps() != null) {
             Object filter = CodingHelper.decodeXmlElement(location.getSpatialOps());
             if (filter != null && filter instanceof SpatialFilter) {
@@ -456,13 +460,14 @@ public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObjec
      *            array of XmlObjects representing the Time element in the
      *            request
      * @return Returns array representing the temporal filters
-     * @throws OwsExceptionReport
-     *             if parsing of the element failed
+
+     *
+     * @throws OwsExceptionReport     *             if parsing of the element failed
      */
     private List<TemporalFilter> parseTemporalFilters4GetObservation(
             GetObservation.EventTime[] temporalFilters) throws OwsExceptionReport {
 
-        List<TemporalFilter> sosTemporalFilters = new ArrayList<TemporalFilter>();
+        List<TemporalFilter> sosTemporalFilters = new LinkedList<TemporalFilter>();
         
         for (GetObservation.EventTime temporalFilter : temporalFilters) {
             Object filter = CodingHelper.decodeXmlElement(temporalFilter.getTemporalOps());
@@ -568,7 +573,7 @@ public class SosDecoderv100 implements Decoder<AbstractServiceCommunicationObjec
 	private List<String> parseFeatureofInterestV100(FeatureOfInterest featureOfInterest)
             throws OwsExceptionReport {
 
-		List<String> features = new ArrayList<String>();
+        List<String> features = new LinkedList<String>();
 
 		// TODO we need a featureDecoderV100 or in the GmlDecoderv311
 

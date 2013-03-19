@@ -83,8 +83,8 @@ public abstract class AbstractGetCapabilitiesDAO extends AbstractOperationDAO {
      * @param request
      *            GetCapabilities request
      * @return internal SOS capabilities representation
-     * @throws OwsExceptionReport
-     *             If an error occurs.
+     *
+     * @throws OwsExceptionReport If an error occurs.
      */
     public abstract GetCapabilitiesResponse getCapabilities(GetCapabilitiesRequest request) throws OwsExceptionReport;
 

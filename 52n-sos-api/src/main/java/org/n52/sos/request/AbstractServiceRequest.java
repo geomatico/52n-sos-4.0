@@ -23,26 +23,20 @@
  */
 package org.n52.sos.request;
 
-import static org.n52.sos.util.Util4Exceptions.createMissingParameterValueException;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.n52.sos.ogc.ows.OWSConstants;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingServiceParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingVersionParameterException;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.swes.SwesExtensions;
 import org.n52.sos.service.AbstractServiceCommunicationObject;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
-import org.n52.sos.util.Util4Exceptions;
 
 /**
  * abstract super class for all service request classes
  *
  */
 public abstract class AbstractServiceRequest extends AbstractServiceCommunicationObject {
-
     protected ServiceOperatorKeyType[] serviceOperatorKeyTypes;
-
     protected SwesExtensions extensions;
 
     /**
@@ -61,17 +55,17 @@ public abstract class AbstractServiceRequest extends AbstractServiceCommunicatio
     }
 
     private void checkServiceAndVersionParameter() throws OwsExceptionReport {
-        List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>();
+        CompositeOwsException exceptions = new CompositeOwsException();
         if (getService() == null) {
-            exceptions.add(createMissingParameterValueException(OWSConstants.RequestParams.service.name()));
-        } else if ( (getService() != null && getService().isEmpty())) {
-            exceptions.add(createMissingParameterValueException(OWSConstants.RequestParams.service.name()));
+            exceptions.add(new MissingServiceParameterException());
+        } else if (getService().isEmpty()) {
+            exceptions.add(new MissingServiceParameterException());
         } else if (getVersion() == null) {
-            exceptions.add(createMissingParameterValueException(OWSConstants.RequestParams.version.name()));
-        } else if ( (getVersion() != null && getVersion().isEmpty())) {
-            exceptions.add(createMissingParameterValueException(OWSConstants.RequestParams.version.name()));
+            exceptions.add(new MissingVersionParameterException());
+        } else if (getVersion().isEmpty()) {
+            exceptions.add(new MissingVersionParameterException());
         }
-        Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        exceptions.throwIfNotEmpty();
     }
 
     public SwesExtensions getExtensions() {

@@ -65,6 +65,8 @@ import org.n52.sos.ogc.om.values.GeometryValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
@@ -111,6 +113,7 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
             CodingHelper.encoderKeysForElements(OMConstants.NS_OM, SosObservation.class),
             CodingHelper.encoderKeysForElements(OMConstants.CONTENT_TYPE_OM, SosObservation.class));
 
+    @Deprecated
     private boolean supported = true;
 
     public OmEncoderv100() {
@@ -150,15 +153,17 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
                 return supportedResponseFormats.get(service).get(version);
             }
         }
-        return new HashSet<String>(0);
+        return Collections.emptySet();
     }
 
     @Override
+    @Deprecated
     public boolean isSupported() {
         return supported;
     }
 
     @Override
+    @Deprecated
     public void setSupported(boolean supported) {
         this.supported = supported;
     }
@@ -340,7 +345,8 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
     }
 
     private void addResultToObservation(XmlObject xbResult, SosObservation sosObservation,
-            List<SosObservableProperty> phenComponents, String observationID) throws OwsExceptionReport {
+                                        List<SosObservableProperty> phenComponents, String observationID) throws
+            OwsExceptionReport {
         // TODO if OM_SWEArrayObservation and get ResultEncoding and
         // ResultStructure exists,
         String observationType = sosObservation.getObservationConstellation().getObservationType();
@@ -457,6 +463,8 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
      *            XmlObject O&M observation
      * @param absObs
      *            SOS observation
+
+     *
      * @throws OwsExceptionReport
      */
     private void encodeFeatureOfInterest(ObservationType observation, SosAbstractFeature feature)
@@ -511,11 +519,8 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
                         featureType = SFConstants.FT_SAMPLINGCURVE;
                         featureNamespace = SFConstants.NS_SA;
                     } else {
-                        OwsExceptionReport owse = new OwsExceptionReport();
-                        String exceptionText = "Error while encoding featureOfInterest in om:Observation!";
-                        LOGGER.error(exceptionText, owse);
-                        throw Util4Exceptions
-                                .createInvalidParameterValueException("sa:SamplingFeature", exceptionText);
+                        throw new InvalidParameterValueException().at("sa:SamplingFeature")
+                                .withMessage("Error while encoding featureOfInterest in om:Observation!");
                     }
 
                     featureProperty.set(CodingHelper.encodeObjectToXml(featureNamespace, samplingFeature));
@@ -526,9 +531,8 @@ public class OmEncoderv100 implements ObservationEncoder<XmlObject, Object> {
                             // XmlDescription?
                             featureProperty.set(XmlObject.Factory.parse(samplingFeature.getXmlDescription()));
                         } catch (XmlException xmle) {
-                            String exceptionText = "Error while encoding featureOfInterest in om:Observation!";
-                            LOGGER.error(exceptionText, xmle);
-                            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+                            throw new NoApplicableCodeException().causedBy(xmle)
+                                    .withMessage("Error while encoding featureOfInterest in om:Observation!");
                         }
                     } else {
                         featureProperty.setHref(samplingFeature.getIdentifier().getValue());

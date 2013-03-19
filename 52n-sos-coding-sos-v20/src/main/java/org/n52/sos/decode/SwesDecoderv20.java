@@ -50,7 +50,10 @@ import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.Sos2Constants.UpdateSensorDescriptionParams;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.swe.SWEConstants;
@@ -68,7 +71,6 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -144,8 +146,9 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
      * @param xbDescSenDoc
      *            XmlBeans document representing the describeSensor request
      * @return Returns SOS describeSensor request
-     * @throws OwsExceptionReport
-     *             if validation of the request failed
+
+     *
+     * @throws OwsExceptionReport     *             if validation of the request failed
      */
     private AbstractServiceRequest parseDescribeSensor(DescribeSensorDocument xbDescSenDoc) throws OwsExceptionReport {
         DescribeSensorRequest descSensorRequest = new DescribeSensorRequest();
@@ -191,19 +194,17 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
             Decoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository()
                     .getDecoder(CodingHelper.getDecoderKey(xmlObject));
             if (decoder == null) {
-                 String exceptionText = "The requested procedureDescritpionFormat is not supported!";
-                LOGGER.error(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        Sos2Constants.InsertSensorParams.procedureDescriptionFormat.name(), exceptionText);
+                throw new InvalidParameterValueException()
+                        .at(Sos2Constants.InsertSensorParams.procedureDescriptionFormat)
+                        .withMessage("The requested procedureDescritpionFormat is not supported!");
             }
             Object decodedObject = decoder.decode(xmlObject);
             if (decodedObject != null && decodedObject instanceof SosProcedureDescription) {
                 request.setProcedureDescription((SosProcedureDescription) decodedObject);
             }
         } catch (XmlException xmle) {
-            String exceptionText = "Error while parsing procedure description of InsertSensor request!";
-            LOGGER.error(exceptionText, xmle);
-            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+            throw new NoApplicableCodeException().causedBy(xmle)
+                    .withMessage("Error while parsing procedure description of InsertSensor request!");
         }
         return request;
     }
@@ -222,8 +223,9 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
      * @param xbUpSenDoc
      *            UpdateSensorDescription document
      * @return SOS UpdateSensor request
-     * @throws OwsExceptionReport
-     *             if an error occurs.
+
+     *
+     * @throws OwsExceptionReport     *             if an error occurs.
      */
     private AbstractServiceRequest parseUpdateSensorDescription(UpdateSensorDescriptionDocument xbUpSenDoc)
             throws OwsExceptionReport {
@@ -243,10 +245,8 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
                 Decoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository()
                         .getDecoder(CodingHelper.getDecoderKey(xmlObject));
                 if (decoder == null) {
-                    String exceptionText = "The requested procedureDescritpionFormat is not supported!";
-                    LOGGER.error(exceptionText);
-                    throw Util4Exceptions.createInvalidParameterValueException(
-                            Sos2Constants.UpdateSensorDescriptionParams.procedureDescriptionFormat.name(), exceptionText);
+                    throw new InvalidParameterValueException().at(UpdateSensorDescriptionParams.procedureDescriptionFormat)
+                            .withMessage("The requested procedureDescritpionFormat is not supported!");
                 }
                 
                 Object decodedObject = decoder.decode(xmlObject);
@@ -254,9 +254,8 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
                     request.addProcedureDescriptionString((SosProcedureDescription) decodedObject);
                 }
             } catch (XmlException xmle) {
-                String exceptionText = "Error while parsing procedure description of UpdateSensor request!";
-                LOGGER.error(exceptionText, xmle);
-                throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+                throw new NoApplicableCodeException().causedBy(xmle)
+                        .withMessage("Error while parsing procedure description of UpdateSensor request!");
             }
         }
         return request;
@@ -293,9 +292,8 @@ public class SwesDecoderv20 implements Decoder<AbstractServiceCommunicationObjec
                 }
             }
         } catch (XmlException xmle) {
-            String exceptionText = "An error occurred while parsing the metadata in the http post request";
-            LOGGER.error(exceptionText, xmle);
-            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+            throw new NoApplicableCodeException().causedBy(xmle)
+                    .withMessage("An error occurred while parsing the metadata in the http post request");
         }
         return sosMetadata;
     }

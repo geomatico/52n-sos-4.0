@@ -42,7 +42,9 @@ public interface ServiceOperator {
      *            the operation request
      * 
      * @return Returns the response of the request (e.g. CapabilitiesResponse
-     * @throws OwsExceptionReport  
+
+     *
+     * @throws OwsExceptionReport
      */
     public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
 

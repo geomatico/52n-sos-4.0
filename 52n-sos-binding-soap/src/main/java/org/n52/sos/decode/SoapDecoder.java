@@ -42,8 +42,10 @@ import javax.xml.soap.SOAPMessage;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.ogc.ows.OwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.swes.InvalidRequestException;
+import org.n52.sos.ogc.ows.CodedException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.soap.SoapFault;
@@ -53,7 +55,6 @@ import org.n52.sos.soap.SoapRequest;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3cHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsa.WsaConstants;
@@ -136,14 +137,7 @@ public class SoapDecoder implements Decoder<SoapRequest, XmlObject> {
                     fault.setFaultCode(SOAPConstants.SOAP_SENDER_FAULT);
                 }
                 fault.setLocale(Locale.ENGLISH);
-                StringBuilder faultString = new StringBuilder();
-                for (OwsException owsException : owse.getExceptions()) {
-                    for (String exceptionText : owsException.getMessages()) {
-                        faultString.append(exceptionText).append("\n");
-                    }
-                    faultString.append("\n");
-                }
-                fault.setFaultReason(faultString.toString());
+                fault.setFaultReason(owse.getMessage());
                 soapRequest.setSoapFault(fault);
             } else {
                 throw owse;
@@ -160,8 +154,9 @@ public class SoapDecoder implements Decoder<SoapRequest, XmlObject> {
      * @param requestString
      *            Request as text representation
      * @return SOS internal SOAP request
-     * @throws OwsExceptionReport
-     *             if an error occurs.
+
+     *
+     * @throws OwsExceptionReport * if an error occurs.
      */
     private SoapRequest checkSOAP12Envelope(XmlObject doc) throws OwsExceptionReport {
         String soapVersion = SOAPConstants.SOAP_1_2_PROTOCOL;
@@ -174,13 +169,11 @@ public class SoapDecoder implements Decoder<SoapRequest, XmlObject> {
                 soapMessageRequest =
                         SoapHelper.getSoapMessageForProtocol(SOAPConstants.SOAP_1_2_PROTOCOL, doc.newInputStream());
             } catch (IOException ioe) {
-                String exceptionText = "Error while parsing SOAPMessage from request string!";
-                LOGGER.debug(exceptionText, ioe);
-                throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+                throw new NoApplicableCodeException().causedBy(ioe)
+                        .withMessage("Error while parsing SOAPMessage from request string!");
             } catch (SOAPException soape) {
-                String exceptionText = "Error while parsing SOAPMessage from request string!";
-                LOGGER.debug(exceptionText, soape);
-                throw Util4Exceptions.createNoApplicableCodeException(soape, exceptionText);
+                throw new NoApplicableCodeException().causedBy(soape)
+                        .withMessage("Error while parsing SOAPMessage from request string!");
             }
             try {
                 if (soapMessageRequest.getSOAPHeader() != null) {
@@ -189,9 +182,7 @@ public class SoapDecoder implements Decoder<SoapRequest, XmlObject> {
                 soapRequest.setAction(checkSoapAction(soapAction, soapRequest.getSoapHeader()));
                 soapRequest.setSoapBodyContent(getSOAPBodyContent(soapMessageRequest));
             } catch (SOAPException soape) {
-                String exceptionText = "Error while parsing SOAPMessage!";
-                LOGGER.debug(exceptionText, soape);
-                throw Util4Exceptions.createNoApplicableCodeException(soape, exceptionText);
+                throw new NoApplicableCodeException().causedBy(soape).withMessage("Error while parsing SOAPMessage!");
             }
         } catch (OwsExceptionReport owse) {
             throw owse;
@@ -207,8 +198,9 @@ public class SoapDecoder implements Decoder<SoapRequest, XmlObject> {
      * @param requestString
      *            Request as text representation
      * @return SOS internal SOAP request
-     * @throws OwsExceptionReport
-     *             if an error occurs.
+
+     *
+     * @throws OwsExceptionReport * if an error occurs.
      */
     private SoapRequest checkSOAP11Envelope(XmlObject doc) throws OwsExceptionReport {
         String soapVersion = SOAPConstants.SOAP_1_1_PROTOCOL;
@@ -222,13 +214,11 @@ public class SoapDecoder implements Decoder<SoapRequest, XmlObject> {
                 soapMessageRequest =
                         SoapHelper.getSoapMessageForProtocol(SOAPConstants.SOAP_1_1_PROTOCOL, doc.newInputStream());
             } catch (IOException ioe) {
-                String exceptionText = "Error while parsing SOAPMessage from request string!";
-                LOGGER.debug(exceptionText, ioe);
-                throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+                throw new NoApplicableCodeException().causedBy(ioe)
+                        .withMessage("Error while parsing SOAPMessage from request string!");
             } catch (SOAPException soape) {
-                String exceptionText = "Error while parsing SOAPMessage from request string!";
-                LOGGER.debug(exceptionText, soape);
-                throw Util4Exceptions.createNoApplicableCodeException(soape, exceptionText);
+                throw new NoApplicableCodeException().causedBy(soape)
+                        .withMessage("Error while parsing SOAPMessage from request string!");
             }
             // if SOAPAction is not spec conform, create SOAPFault
             if (soapAction.isEmpty() || !soapAction.startsWith("SOAPAction:")) {
@@ -253,9 +243,8 @@ public class SoapDecoder implements Decoder<SoapRequest, XmlObject> {
                 soapRequest.setAction(checkSoapAction(soapAction, soapRequest.getSoapHeader()));
                 soapRequest.setSoapBodyContent(getSOAPBodyContent(soapMessageRequest));
             } catch (SOAPException soape) {
-                String exceptionText = "Error while parsing SOAPMessage!";
-                LOGGER.debug(exceptionText, soape);
-                throw Util4Exceptions.createNoApplicableCodeException(soape, exceptionText);
+                throw new NoApplicableCodeException().causedBy(soape)
+                        .withMessage("Error while parsing SOAPMessage!");
             }
         } catch (OwsExceptionReport owse) {
             throw owse;
@@ -269,8 +258,9 @@ public class SoapDecoder implements Decoder<SoapRequest, XmlObject> {
      * @param soapMessageRequest
      *            SOAP message
      * @return SOAPBody content as text
-     * @throws OwsExceptionReport
-     *             if an error occurs.
+
+     *
+     * @throws OwsExceptionReport * if an error occurs.
      */
     private XmlObject getSOAPBodyContent(SOAPMessage soapMessageRequest) throws OwsExceptionReport {
         try {
@@ -280,13 +270,11 @@ public class SoapDecoder implements Decoder<SoapRequest, XmlObject> {
             return XmlObject.Factory.parse(W3cHelper.nodeToXmlString(bodyRequestDoc.getDocumentElement()), XmlOptionsHelper.getInstance().getXmlOptions());
 //            return XmlObject.Factory.parse(bodyRequestDoc.getFirstChild(), XmlOptionsHelper.getInstance().getXmlOptions());
         } catch (SOAPException soape) {
-            String exceptionText = "Error while parsing SOAPMessage body content!";
-            LOGGER.debug(exceptionText, soape);
-            throw Util4Exceptions.createInvalidRequestException(exceptionText, soape);
+            throw new InvalidRequestException().causedBy(soape)
+                    .withMessage("Error while parsing SOAPMessage body content!");
         } catch (XmlException xmle) {
-            String exceptionText = "Error while parsing SOAPMessage body content!";
-            LOGGER.debug(exceptionText, xmle);
-            throw Util4Exceptions.createInvalidRequestException(exceptionText, xmle);
+            throw new InvalidRequestException().causedBy(xmle)
+                    .withMessage("Error while parsing SOAPMessage body content!");
         }
     }
 

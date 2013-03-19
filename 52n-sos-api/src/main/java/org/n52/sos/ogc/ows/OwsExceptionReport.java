@@ -23,176 +23,52 @@
  */
 package org.n52.sos.ogc.ows;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.n52.sos.exception.ExceptionCode;
-import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.n52.sos.ogc.sos.Sos1Constants;
+import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.service.Configurator;
 
 /**
- * Implementation of the ows service exception. The exception codes are defined
- * according the ows common spec. version 1.1.0
- * 
+ * Implementation of the ows service exception. The exception codes are defined according the ows common spec. version
+ * 1.1.0
+ *
+ * @author Christian Autermann <c.autermann@52north.org>
  */
-public class OwsExceptionReport extends Exception {
-
-    private static final long serialVersionUID = 9069373009339881302L;
-
-    /** logger */
-    private static final Logger LOGGER = LoggerFactory.getLogger(OwsExceptionReport.class.getName());
-
-    /** Exception types */
-    private List<OwsException> owsExceptions = new ArrayList<OwsException>();
-
-    /** exception level */
-    private ExceptionLevel excLevel = null;
-    
-    private final String namespace = OWSConstants.NS_OWS;
-
-    /**
-     * SOS version
-     */
+public abstract class OwsExceptionReport extends Exception {
+    private static final String namespace = OWSConstants.NS_OWS;
     private String version;
-
+    
     /**
-     * standard constructor without parameters, sets the ExceptionLevel on
-     * PlainExceptions
-     * 
-     */
-    public OwsExceptionReport() {
-        this.excLevel = ExceptionLevel.DetailedExceptions;
-    }
-
-//    /**
-//     * constructor with message and cause as parameters
-//     * 
-//     * @param message
-//     *            String containing the message of this exception
-//     * @param cause
-//     *            Throwable cause of this exception
-//     */
-//    public OwsExceptionReport(String message, Throwable cause) {
-//        super(message, cause);
-//        
-//        this.excLevel = ExceptionLevel.DetailedExceptions;
-//    }
-//
-//    /**
-//     * constructor with cause as parameter
-//     * 
-//     * @param cause
-//     *            Throwable cause of this exception
-//     */
-//    public OwsExceptionReport(Throwable cause) {
-//        super(cause);
-//        this.excLevel = ExceptionLevel.DetailedExceptions;
-//    }
-
-    /**
-     * constructor with exceptionLevel as parameter
-     * 
-     * @param excLevelIn
-     */
-    public OwsExceptionReport(ExceptionLevel excLevelIn) {
-        this.excLevel = excLevelIn;
-    }
-
-    /**
-     * adds a coded Exception with ExceptionCode,locator and a single String
-     * message to this exception
-     * 
-     * @param code
-     *            Exception code of the exception to add
-     * @param locator
-     *            String locator of the exception to add
-     * @param message
-     *            String message of the exception to add
-     */
-    public void addCodedException(ExceptionCode code, String locator, String message) {
-        String[] messages = { message };
-        owsExceptions.add(new OwsException(code, locator, messages));
-    }
-
-    /**
-     * adds a coded exception to this exception with code, locator and messages
-     * as parameters
-     * 
-     * @param code
-     *            ExceptionCode of the added exception
-     * @param locator
-     *            String locator of this exception
-     * @param messages
-     *            String[] messages of this exception
-     */
-    public void addCodedException(ExceptionCode code, String locator, String[] messages) {
-        owsExceptions.add(new OwsException(code, locator, messages));
-    }
-
-    /**
-     * adds a coded Exception to this service exception with code, locator and
-     * the exception itself as parameters
-     * 
-     * @param code
-     *            ExceptionCode of the added exception
-     * @param locator
-     *            String locator of the added exception
-     * @param e
-     *            Exception which should be added
-     */
-    public void addCodedException(ExceptionCode code, String locator, String[] messages, Exception exception) {
-        owsExceptions.add(new OwsException(code, locator, messages, exception));
-    }
-
-    public void addCodedException(ExceptionCode code, String locator, String message,
-            Exception exception) {
-        String[] messages = { message };
-        owsExceptions.add(new OwsException(code, locator, messages, exception));
-    }
-
-    /**
-     * adds a ServiceException to this exception
-     * 
-     * @param seIn
-     *            ServiceException which should be added
-     */
-    public void addOwsExceptionReport(OwsExceptionReport owsExceptionReport) {
-        this.owsExceptions.addAll(owsExceptionReport.getExceptions());
-    }
-
-    /**
-     * 
      * @return Returns the ExceptionTypes of this exception
      */
-    public List<OwsException> getExceptions() {
-        return owsExceptions;
-    }
-
-    public ExceptionLevel getExcLevel() {
-        return excLevel;
-    }
-
-    public void setExcLevel(ExceptionLevel excLevel) {
-        this.excLevel = excLevel;
-    }
+    public abstract List<? extends CodedException> getExceptions();
 
     /**
      * Set SOS version
-     * 
-     * @param version
-     *            the version to set
+     *
+     * @param version the version to set
+     *
+     * @return this
      */
-    public void setVersion(String version) {
+    public OwsExceptionReport setVersion(String version) {
         this.version = version;
+        return this;
     }
 
     /**
      * Get SOS version
-     * 
+     *
      * @return SOS version
      */
     public String getVersion() {
+        if (this.version == null) {
+            /* FIXME shouldn't this be the other way around? defaulting to the newest version? */
+            this.version = Configurator.getInstance().getServiceOperatorRepository()
+                    .isVersionSupported(Sos1Constants.SERVICEVERSION)
+                           ? Sos1Constants.SERVICEVERSION
+                           : Sos2Constants.SERVICEVERSION;
+        }
         return this.version;
     }
 
@@ -200,4 +76,13 @@ public class OwsExceptionReport extends Exception {
         return namespace;
     }
 
+    @Override
+    public String getMessage() {
+        StringBuilder faultString = new StringBuilder();
+        for (CodedException owsException : getExceptions()) {
+            faultString.append(owsException.getMessage()).append("\n");
+            faultString.append("\n");
+        }
+        return faultString.toString();
+    }
 }

@@ -23,9 +23,7 @@
  */
 package org.n52.sos.ds.hibernate;
 
-
 import static org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities.setValidProcedureDescriptionEndTime;
-import static org.n52.sos.util.Util4Exceptions.createNoApplicableCodeException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,17 +38,15 @@ import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObserva
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.response.DeleteSensorResponse;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DeleteSensorDAO extends AbstractDeleteSensorDAO {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(DeleteSensorDAO.class);
-
-   private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
+    private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
 
     @Override
     public synchronized DeleteSensorResponse deleteSensor(DeleteSensorRequest request) throws OwsExceptionReport {
@@ -71,15 +67,14 @@ public class DeleteSensorDAO extends AbstractDeleteSensorDAO {
             if (transaction != null) {
                 transaction.rollback();
             }
-            String exceptionText = "Error while updateing deleted sensor flag data!";
-            LOGGER.error(exceptionText, he);
-            throw createNoApplicableCodeException(he, exceptionText);
+            throw new NoApplicableCodeException().causedBy(he)
+                    .withMessage("Error while updateing deleted sensor flag data!");
         } finally {
             sessionHolder.returnSession(session);
         }
         return response;
     }
-    
+
     private void setDeleteSensorFlag(String identifier, boolean deleteFlag, Session session)
             throws OwsExceptionReport {
         Procedure procedure = HibernateCriteriaQueryUtilities.getProcedureForIdentifier(identifier, session);
@@ -90,11 +85,10 @@ public class DeleteSensorDAO extends AbstractDeleteSensorDAO {
             setObservationConstellationOfferingObservationTypeAsDeletedForProcedure(identifier, session);
             setObservationsAsDeletedForProcedure(identifier, session);
         } else {
-            String exceptionText = "The requested identifier is not contained in database";
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            throw new NoApplicableCodeException().withMessage("The requested identifier is not contained in database");
         }
     }
-    
+
     private void setObservationConstellationOfferingObservationTypeAsDeletedForProcedure(
             String procedureIdentifier, Session session) {
         HibernateQueryObject queryObject = new HibernateQueryObject();
@@ -105,8 +99,9 @@ public class DeleteSensorDAO extends AbstractDeleteSensorDAO {
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias), procedureIdentifier));
         queryObject.setAliases(aliases);
         List<ObservationConstellationOfferingObservationType> obsConstOffObsTypes =
-                HibernateCriteriaQueryUtilities.getObservationConstellationOfferingObservationType(queryObject,
-                        session);
+                                                              HibernateCriteriaQueryUtilities
+                .getObservationConstellationOfferingObservationType(queryObject,
+                                                                    session);
         for (ObservationConstellationOfferingObservationType obsConstOffObsType : obsConstOffObsTypes) {
             obsConstOffObsType.setDeleted(true);
             session.saveOrUpdate(obsConstOffObsType);

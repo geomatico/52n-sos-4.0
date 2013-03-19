@@ -23,10 +23,14 @@
  */
 package org.n52.sos.decode.kvp.v2;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -44,10 +48,15 @@ public class DeleteSensorKvpDecoderTest extends DeleteSensorKvpDecoder {
     private static final String VERSION = Sos2Constants.SERVICEVERSION;
     private static final String ADDITIONAL_PARAMETER = "additionalParameter";
     private static final String EMPTY_STRING = "";
+    private DeleteSensorKvpDecoder decoder;
+
+    @Before
+    public void setUp() {
+        this.decoder = new DeleteSensorKvpDecoder();
+    }
 
     @Test
     public void correctMap() throws OwsExceptionReport {
-        DeleteSensorKvpDecoder decoder = new DeleteSensorKvpDecoder();
         DeleteSensorRequest req = decoder.decode(createMap(SERVICE, VERSION, PROCEDURE));
         assertThat(req, is(notNullValue()));
         assertThat(req.getOperationName(), is(Sos2Constants.Operations.DeleteSensor.name()));
@@ -58,7 +67,6 @@ public class DeleteSensorKvpDecoderTest extends DeleteSensorKvpDecoder {
 
     @Test(expected = OwsExceptionReport.class)
     public void additionalParameter() throws OwsExceptionReport {
-        DeleteSensorKvpDecoder decoder = new DeleteSensorKvpDecoder();
         final Map<String, String> map = createMap(SERVICE, VERSION, PROCEDURE);
         map.put(ADDITIONAL_PARAMETER, ADDITIONAL_PARAMETER);
         decoder.decode(map);
@@ -66,37 +74,31 @@ public class DeleteSensorKvpDecoderTest extends DeleteSensorKvpDecoder {
 
     @Test(expected = OwsExceptionReport.class)
     public void missingService() throws OwsExceptionReport {
-        DeleteSensorKvpDecoder decoder = new DeleteSensorKvpDecoder();
         decoder.decode(createMap(null, VERSION, PROCEDURE));
     }
 
     @Test(expected = OwsExceptionReport.class)
     public void missingVersion() throws OwsExceptionReport {
-        DeleteSensorKvpDecoder decoder = new DeleteSensorKvpDecoder();
         decoder.decode(createMap(SERVICE, null, PROCEDURE));
     }
 
     @Test(expected = OwsExceptionReport.class)
     public void missingProcedure() throws OwsExceptionReport {
-        DeleteSensorKvpDecoder decoder = new DeleteSensorKvpDecoder();
         decoder.decode(createMap(SERVICE, VERSION, null));
     }
 
     @Test(expected = OwsExceptionReport.class)
     public void emptyService() throws OwsExceptionReport {
-        DeleteSensorKvpDecoder decoder = new DeleteSensorKvpDecoder();
         decoder.decode(createMap(EMPTY_STRING, VERSION, PROCEDURE));
     }
 
     @Test(expected = OwsExceptionReport.class)
     public void emptyVersion() throws OwsExceptionReport {
-        DeleteSensorKvpDecoder decoder = new DeleteSensorKvpDecoder();
         decoder.decode(createMap(SERVICE, EMPTY_STRING, PROCEDURE));
     }
 
     @Test(expected = OwsExceptionReport.class)
     public void emptyProcedure() throws OwsExceptionReport {
-        DeleteSensorKvpDecoder decoder = new DeleteSensorKvpDecoder();
         decoder.decode(createMap(SERVICE, VERSION, EMPTY_STRING));
     }
 

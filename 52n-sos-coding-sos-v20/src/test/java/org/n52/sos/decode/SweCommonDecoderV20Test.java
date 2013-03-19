@@ -25,6 +25,7 @@ package org.n52.sos.decode;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+
 import net.opengis.swe.x20.BooleanType;
 import net.opengis.swe.x20.CategoryType;
 
@@ -59,7 +60,7 @@ public class SweCommonDecoderV20Test {
 
 	@Test public void 
 	should_encode_xbBoolean_into_SosSweBoolean_with_correct_value_and_definition()
-			throws OwsExceptionReport {
+            throws OwsExceptionReport {
 		BooleanType xbBoolean = BooleanType.Factory.newInstance();
 		final boolean value = true;
 		xbBoolean.setValue(value);
@@ -77,7 +78,7 @@ public class SweCommonDecoderV20Test {
 	
 	@Test public void
 	should_encode_xbCategory_into_SosSweCategory_with_correct_value_definition_and_codespace()
-			throws OwsExceptionReport, XmlException {
+            throws OwsExceptionReport, XmlException {
 		final String codeSpace = "test-codespace";
 		final String value = "test-category-value";
 		

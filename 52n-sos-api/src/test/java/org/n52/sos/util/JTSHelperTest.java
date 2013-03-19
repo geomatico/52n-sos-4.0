@@ -57,6 +57,28 @@ public class JTSHelperTest extends JTSHelper {
 
     private static final Random RANDOM = new Random();
 
+    public static Coordinate randomCoordinate() {
+        return new Coordinate(RANDOM.nextDouble(),
+                              RANDOM.nextDouble(),
+                              RANDOM.nextDouble());
+    }
+
+    public static Coordinate[] randomCoordinates(int size) {
+        Coordinate[] coordinates = new Coordinate[size];
+        for (int i = 0; i < size; ++i) {
+            coordinates[i] = randomCoordinate();
+        }
+        return coordinates;
+    }
+
+    public static Coordinate[] randomCoordinateRing(int size) {
+        Coordinate[] coordinates = randomCoordinates(size);
+        if (size > 0) {
+            coordinates[size - 1] = coordinates[0];
+        }
+        return coordinates;
+    }
+
     @Test
     public void factoryFromSridShouldSetSrid() {
         GeometryFactory factory = getGeometryFactoryForSRID(4326);
@@ -202,28 +224,6 @@ public class JTSHelperTest extends JTSHelper {
         assertThat(reversed, is(not(sameInstance(geometry))));
         assertThat(reversed, is(notNullValue()));
         assertThat(reversed, is(reverseOf(geometry)));
-    }
-
-    public static Coordinate randomCoordinate() {
-        return new Coordinate(RANDOM.nextDouble(),
-                              RANDOM.nextDouble(),
-                              RANDOM.nextDouble());
-    }
-
-    public static Coordinate[] randomCoordinates(int size) {
-        Coordinate[] coordinates = new Coordinate[size];
-        for (int i = 0; i < size; ++i) {
-            coordinates[i] = randomCoordinate();
-        }
-        return coordinates;
-    }
-
-    public static Coordinate[] randomCoordinateRing(int size) {
-        Coordinate[] coordinates = randomCoordinates(size);
-        if (size > 0) {
-            coordinates[size - 1] = coordinates[0];
-        }
-        return coordinates;
     }
 
     private class UnknownGeometry extends Geometry {

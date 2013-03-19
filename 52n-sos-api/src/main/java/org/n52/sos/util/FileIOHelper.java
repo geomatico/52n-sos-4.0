@@ -33,8 +33,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,24 +50,23 @@ public class FileIOHelper {
 
     /**
      * Loads a file and returns an InputStream
-     * 
-     * @param file
-     *            File to load
+
+     *
+     *
+     * @param file File to load
+     *
      * @return InputStream of the file
-     * @throws OwsExceptionReport
-     *             If and error occurs;
+     *
+     * @throws OwsExceptionReport If and error occurs;
      */
     public static InputStream loadInputStreamFromFile(File file) throws OwsExceptionReport {
-        InputStream is = null;
+        InputStream is;
         try {
             is = new FileInputStream(file);
             return is;
         } catch (FileNotFoundException fnfe) {
-            String exceptionText = "Error while loading file " + file.getName() + "!";
-            LOGGER.error(exceptionText, fnfe);
-            OwsExceptionReport se = new OwsExceptionReport();
-            se.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText, fnfe);
-            throw se;
+            throw new NoApplicableCodeException().causedBy(fnfe)
+                    .withMessage("Error while loading file %s!", file.getName());
         }
     }
 

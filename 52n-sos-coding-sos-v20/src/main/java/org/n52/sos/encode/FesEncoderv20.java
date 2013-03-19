@@ -66,12 +66,12 @@ import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,9 +137,8 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
         } else if (temporalFilter.getOperator().equals(TimeOperator.TM_Equals)) {
             return encodeTemporalFilterEquals(temporalFilter);
         } else {
-            String exceptionText = String.format("The temporal filter operand '%s' is not supported!",
-                    temporalFilter.getOperator().name());
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            throw new NoApplicableCodeException().withMessage("The temporal filter operand '%s' is not supported!",
+                                                              temporalFilter.getOperator().name());
         }
     }
 
@@ -151,9 +150,7 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
             additionalValues.put(HelperValues.DOCUMENT, "");
             during.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, temporalFilter.getTime(), additionalValues));
         } else {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The temporal filter value is not a TimePeriod!");
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            throw new NoApplicableCodeException().withMessage("The temporal filter value is not a TimePeriod!");
         }
         checkAndAddValueReference(during, temporalFilter);
         return duringDoc;
@@ -169,8 +166,7 @@ public class FesEncoderv20 implements Encoder<XmlObject, Object> {
             equals.set(CodingHelper.encodeObjectToXml(GMLConstants.NS_GML_32, temporalFilter.getTime(), additionalValues));
         } else {
             StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The temporal filter value is not a TimeInstant!");
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            throw new NoApplicableCodeException().withMessage("The temporal filter value is not a TimeInstant!");
         }
         checkAndAddValueReference(equals, temporalFilter);
         return equalsDoc;

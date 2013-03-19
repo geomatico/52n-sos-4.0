@@ -24,7 +24,6 @@
 package org.n52.sos.ds.hibernate.cache;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Session;
@@ -32,7 +31,7 @@ import org.n52.sos.cache.WritableContentCache;
 import org.n52.sos.ds.FeatureQueryHandler;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObservationType;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.Action;
 
@@ -44,13 +43,13 @@ public abstract class CacheUpdate implements Action {
     
     private Session session;
     private WritableContentCache cache;
-    private List<OwsExceptionReport> errors;
+    private CompositeOwsException errors;
 
-    public List<OwsExceptionReport> getErrors() {
+    public CompositeOwsException getErrors() {
         return errors;
     }
 
-    public void setErrors(List<OwsExceptionReport> errors) {
+    public void setErrors(CompositeOwsException errors) {
         this.errors = errors;
     }
     

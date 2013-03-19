@@ -34,6 +34,8 @@ import org.n52.sos.ds.AbstractGetCapabilitiesDAO;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -91,20 +93,16 @@ public class SosGetCapabilitiesOperatorV20 extends AbstractV2RequestOperator<Abs
                 } else if (encodedObject instanceof ServiceResponse) {
                     return (ServiceResponse) encodedObject;
                 } else {
-                    String exceptionText = "The encoder response is not supported!";
-                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                    throw new NoApplicableCodeException().withMessage("The encoder response is not supported!");
                 }
             } else {
-                String exceptionText = "Received version in request is not supported!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        OWSConstants.RequestParams.version.name(), exceptionText);
+                throw new InvalidParameterValueException().at(OWSConstants.RequestParams.version)
+                        .withMessage("Received version in request is not supported!");
             }
 
         } catch (IOException ioe) {
-            String exceptionText = "Error occurs while saving response to output stream!";
-            LOGGER.error(exceptionText, ioe);
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            throw new NoApplicableCodeException().causedBy(ioe)
+                    .withMessage("Error occurs while saving response to output stream!");
         }
     }
 
@@ -122,13 +120,10 @@ public class SosGetCapabilitiesOperatorV20 extends AbstractV2RequestOperator<Abs
             }
         }
         if (zip == -1 && xml == -1) {
-            String exceptionText =
-                    "The parameter '" + SosConstants.GetCapabilitiesParams.AcceptFormats.name() + "'"
-                            + " is invalid. The following values are supported: " + SosConstants.CONTENT_TYPE_XML
-                            + ", " + SosConstants.CONTENT_TYPE_ZIP;
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    SosConstants.GetCapabilitiesParams.AcceptFormats.name(), exceptionText);
+            throw new InvalidParameterValueException().at(SosConstants.GetCapabilitiesParams.AcceptFormats)
+                    .withMessage("The parameter '%s' is invalid. The following values are supported: %s, %s",
+                                 SosConstants.GetCapabilitiesParams.AcceptFormats, SosConstants.CONTENT_TYPE_XML,
+                                 SosConstants.CONTENT_TYPE_ZIP);
         }
 
         // if zip is requested testing, whether the priority is bigger than xml

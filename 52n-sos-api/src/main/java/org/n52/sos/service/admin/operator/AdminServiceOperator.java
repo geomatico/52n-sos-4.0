@@ -46,9 +46,12 @@ public abstract class AdminServiceOperator {
      * @param request
      *            HTTP-Get request
      * @return SOS response
-     * @throws OwsExceptionReport 
+
+     *
+     * @throws OwsExceptionReport
      */
-    public abstract ServiceResponse doGetOperation(HttpServletRequest request) throws AdministratorException, OwsExceptionReport;
+    public abstract ServiceResponse doGetOperation(HttpServletRequest request) throws AdministratorException,
+                                                                                      OwsExceptionReport;
 
     /**
      * Get URL pattern for the administration interface

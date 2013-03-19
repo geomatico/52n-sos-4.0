@@ -63,6 +63,8 @@ import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.ows.CodedException;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.sos.SosEnvelope;
@@ -142,34 +144,33 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
 
     @Override
     public XmlObject encode(Object element, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
-        if (element != null) {
-            if (element instanceof ITime) {
-                return createTime((ITime) element, additionalValues);
-            } else if (element instanceof Geometry) {
-                return createPosition((Geometry) element, additionalValues.get(HelperValues.GMLID));
-            } else if (element instanceof CategoryValue) {
-                return createReferenceTypeForCategroyValue((CategoryValue) element);
-            } else if (element instanceof org.n52.sos.ogc.gml.ReferenceType) {
-                return createReferencType((org.n52.sos.ogc.gml.ReferenceType) element);
-            } else if (element instanceof CodeWithAuthority) {
-                return createCodeWithAuthorityType((CodeWithAuthority) element);
-            } else if (element instanceof QuantityValue) {
-                return createMeasureType((QuantityValue)element);
-            } else if (element instanceof org.n52.sos.ogc.gml.CodeType) {
-                return createCodeType((org.n52.sos.ogc.gml.CodeType) element);
-            } else if (element instanceof SosAbstractFeature) {
-                return createFeaturePropertyType((SosAbstractFeature)element, additionalValues);
-            } else if (element instanceof SosEnvelope) {
-                return createEnvelope((SosEnvelope)element);
-            }
-            return null;
+        if (element == null) {
+            throw new NoApplicableCodeException().withMessage("The element to encode is null!");
         }
-        String exceptionText = "The element to encode is null!";
-        LOGGER.error(exceptionText);
-        throw new IllegalArgumentException(exceptionText);
+        if (element instanceof ITime) {
+            return createTime((ITime) element, additionalValues);
+        } else if (element instanceof Geometry) {
+            return createPosition((Geometry) element, additionalValues.get(HelperValues.GMLID));
+        } else if (element instanceof CategoryValue) {
+            return createReferenceTypeForCategroyValue((CategoryValue) element);
+        } else if (element instanceof org.n52.sos.ogc.gml.ReferenceType) {
+            return createReferencType((org.n52.sos.ogc.gml.ReferenceType) element);
+        } else if (element instanceof CodeWithAuthority) {
+            return createCodeWithAuthorityType((CodeWithAuthority) element);
+        } else if (element instanceof QuantityValue) {
+            return createMeasureType((QuantityValue)element);
+        } else if (element instanceof org.n52.sos.ogc.gml.CodeType) {
+            return createCodeType((org.n52.sos.ogc.gml.CodeType) element);
+        } else if (element instanceof SosAbstractFeature) {
+            return createFeaturePropertyType((SosAbstractFeature)element, additionalValues);
+        } else if (element instanceof SosEnvelope) {
+            return createEnvelope((SosEnvelope)element);
+        }
+        return null;
     }
 
-    private XmlObject createFeaturePropertyType(SosAbstractFeature feature, Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+    private XmlObject createFeaturePropertyType(SosAbstractFeature feature, Map<HelperValues, String> additionalValues)
+            throws OwsExceptionReport {
         FeaturePropertyType featurePropertyType = FeaturePropertyType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         if (!(feature instanceof SosSamplingFeature)) {
             featurePropertyType.setHref(feature.getIdentifier().getValue());
@@ -202,7 +203,7 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
                     }
                     return featurePropertyType;
                 } else {
-                    String namespace = null;
+                    String namespace;
                     if (additionalValues.containsKey(HelperValues.ENCODE_NAMESPACE)) {
                         namespace = additionalValues.get(HelperValues.ENCODE_NAMESPACE);
                     } else {
@@ -219,9 +220,8 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
                                 // XmlDescription?
                                 return XmlObject.Factory.parse(samplingFeature.getXmlDescription());
                             } catch (XmlException xmle) {
-                                String exceptionText = "Error while encoding featurePropertyType!";
-                                LOGGER.error(exceptionText, xmle);
-                                throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+                                throw new NoApplicableCodeException().causedBy(xmle)
+                                        .withMessage("Error while encoding featurePropertyType!");
                             }
                         } else {
                             featurePropertyType.setHref(samplingFeature.getIdentifier().getValue());
@@ -280,8 +280,9 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
      *            SOS time object
      * @param timePeriodType
      * @return XML TimePeriod
-     * @throws OwsExceptionReport
-     *             if an error occurs.
+
+     *
+     * @throws OwsExceptionReport * if an error occurs.
      */
     private TimePeriodType createTimePeriodType(TimePeriod timePeriod, TimePeriodType timePeriodType)
             throws OwsExceptionReport {
@@ -319,9 +320,7 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
 
             return timePeriodType;
         } catch (DateTimeException dte) {
-            String exceptionText = "Error while creating TimePeriod!";
-            LOGGER.error(exceptionText, dte);
-            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+            throw new NoApplicableCodeException().causedBy(dte).withMessage("Error while creating TimePeriod!");
         }
     }
 
@@ -340,8 +339,9 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
      * @param timeInstantType
      * @param xbTime
      * @return XML TimeInstant
-     * @throws OwsExceptionReport
-     *             if an error occurs.
+
+     *
+     * @throws OwsExceptionReport * if an error occurs.
      */
     private TimeInstantType createTimeInstantType(TimeInstant timeInstant, TimeInstantType timeInstantType)
             throws OwsExceptionReport {
@@ -372,9 +372,8 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
             xb_posType.setStringValue(timeString);
             return timeInstantType;
         } catch (DateTimeException dte) {
-            String exceptionText = "Error while creating TimeInstant!";
-            LOGGER.error(exceptionText, dte);
-            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+            throw new NoApplicableCodeException().causedBy(dte)
+                    .withMessage("Error while creating TimeInstant!");
         }
     }
 
@@ -426,7 +425,8 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
      * @param xbLst
      *            XML LinetSring
      */
-    private void createLineStringFromJtsGeometry(LineString jtsLineString, LineStringType xbLst) throws OwsExceptionReport {
+    private void createLineStringFromJtsGeometry(LineString jtsLineString, LineStringType xbLst) throws
+            OwsExceptionReport {
         final String srsName = getSrsName(jtsLineString);
         xbLst.setSrsName(srsName);
         DirectPositionListType xbPosList = xbLst.addNewPosList();
@@ -557,11 +557,10 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
         return codeType;
     }
 
-    private MeasureType createMeasureType(QuantityValue quantityValue) {
+    private MeasureType createMeasureType(QuantityValue quantityValue) throws OwsExceptionReport {
         if (!quantityValue.isSetValue()) {
-            String exceptionText = String.format("The required 'value' parameter is empty for encoding %s!", MeasureType.class.getName());
-            LOGGER.error(exceptionText);
-            throw new IllegalArgumentException(exceptionText);
+            throw new NoApplicableCodeException()
+                    .withMessage("The required 'value' parameter is empty for encoding %s!", MeasureType.class.getName());
         }
         MeasureType measureType =
                 MeasureType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());

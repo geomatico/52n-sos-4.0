@@ -36,6 +36,7 @@ import java.util.Set;
 import org.joda.time.DateTime;
 import org.n52.sos.decode.Decoder;
 import org.n52.sos.decode.DecoderException;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.ogc.filter.FilterConstants.SpatialOperator;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.filter.SpatialFilter;
@@ -51,7 +52,6 @@ import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.SosHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,8 +103,8 @@ public abstract class AbstractKvpDecoder implements Decoder<AbstractServiceReque
             }
 
             if (coordinates.size() != 4) {
-                throw Util4Exceptions.createInvalidParameterValueException(parameterName,
-                        "The parameter value is not valid!");
+                throw new InvalidParameterValueException().at(parameterName)
+                        .withMessage("The parameter value is not valid!");
             }
             String lowerCorner = String.format(Locale.US, "%f %f", new Float(coordinates.get(0)), new Float(coordinates.get(1)));
             String upperCorner = String.format(Locale.US, "%f %f", new Float(coordinates.get(2)), new Float(coordinates.get(3)));

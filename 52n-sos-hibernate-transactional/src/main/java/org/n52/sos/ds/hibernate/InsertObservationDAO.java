@@ -23,9 +23,7 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -44,14 +42,17 @@ import org.n52.sos.ds.hibernate.entities.ObservationConstellationOfferingObserva
 import org.n52.sos.ds.hibernate.entities.ResultTemplate;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateUtilities;
-import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.Encoder;
+import org.n52.sos.encode.EncoderKey;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.NoEncoderForKeyException;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosMultiObservationValues;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.om.SosSingleObservationValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.swe.SWEConstants;
@@ -61,20 +62,11 @@ import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
 import org.n52.sos.request.InsertObservationRequest;
 import org.n52.sos.response.InsertObservationResponse;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class InsertObservationDAO extends AbstractInsertObservationDAO {
-
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(InsertObservationDAO.class);
-
     private HibernateSessionHolder sessionHolder = new HibernateSessionHolder();
-    
+
     @Override
     public synchronized InsertObservationResponse insertObservation(InsertObservationRequest request)
             throws OwsExceptionReport {
@@ -87,34 +79,35 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
         try {
             session = sessionHolder.getSession();
             transaction = session.beginTransaction();
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
+            CompositeOwsException exceptions = new CompositeOwsException();
             for (SosObservation sosObservation : request.getObservations()) {
                 SosObservationConstellation sosObsConst = sosObservation.getObservationConstellation();
                 Set<ObservationConstellationOfferingObservationType> hObsConstOffObsTypes =
-                        new HashSet<ObservationConstellationOfferingObservationType>(0);
+                                                                     new HashSet<ObservationConstellationOfferingObservationType>(0);
                 FeatureOfInterest hFeature = null;
                 for (String offeringID : sosObsConst.getOfferings()) {
                     ObservationConstellationOfferingObservationType hObsConstOffObsType = null;
                     try {
                         hObsConstOffObsType =
-                                // HibernateUtilities.checkObservationConstellationForObservation(sosObsConst,
-                                // offeringID, session,
-                                // Sos2Constants.InsertObservationParams.observationType.name());
-                                HibernateUtilities.checkObservationConstellationOfferingObservationTypeForObservation(
-                                        sosObsConst, offeringID, session,
-                                        Sos2Constants.InsertObservationParams.observationType.name());
+                        // HibernateUtilities.checkObservationConstellationForObservation(sosObsConst,
+                        // offeringID, session,
+                        // Sos2Constants.InsertObservationParams.observationType.name());
+                        HibernateUtilities.checkObservationConstellationOfferingObservationTypeForObservation(
+                                sosObsConst, offeringID, session,
+                                Sos2Constants.InsertObservationParams.observationType.name());
                     } catch (OwsExceptionReport owse) {
                         exceptions.add(owse);
                     }
                     if (hObsConstOffObsType != null) {
                         hFeature =
-                                HibernateUtilities.checkOrInsertFeatureOfInterest(sosObservation
-                                        .getObservationConstellation().getFeatureOfInterest(), session);
+                        HibernateUtilities.checkOrInsertFeatureOfInterest(sosObservation
+                                .getObservationConstellation().getFeatureOfInterest(), session);
                         HibernateUtilities.checkOrInsertFeatureOfInterestRelatedFeatureRelation(hFeature,
-                                hObsConstOffObsType.getOffering(), session);
+                                                                                                hObsConstOffObsType
+                                .getOffering(), session);
                         if (isSweArrayObservation(hObsConstOffObsType)) {
                             ResultTemplate resultTemplate =
-                                    createResultTemplate(sosObservation, hObsConstOffObsType, hFeature);
+                                           createResultTemplate(sosObservation, hObsConstOffObsType, hFeature);
                             session.save(resultTemplate);
                             session.flush();
                         }
@@ -125,16 +118,16 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
                 if (!hObsConstOffObsTypes.isEmpty()) {
                     if (sosObservation.getValue() instanceof SosSingleObservationValue) {
                         HibernateCriteriaTransactionalUtilities.insertObservationSingleValue(hObsConstOffObsTypes,
-                                hFeature, sosObservation, session);
+                                                                                             hFeature, sosObservation, session);
                     } else if (sosObservation.getValue() instanceof SosMultiObservationValues) {
                         HibernateCriteriaTransactionalUtilities.insertObservationMutliValue(hObsConstOffObsTypes,
-                                hFeature, sosObservation, session);
+                                                                                            hFeature, sosObservation, session);
                     }
                 }
             }
             // if no observationConstellation is valid, throw exception
             if (exceptions.size() == request.getObservations().size()) {
-                Util4Exceptions.mergeAndThrowExceptions(exceptions);
+                throw exceptions;
             }
             session.flush();
             transaction.commit();
@@ -142,9 +135,8 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
             if (transaction != null) {
                 transaction.rollback();
             }
-            String exceptionText = "Error while inserting new observation!";
-            LOGGER.error(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+            throw new NoApplicableCodeException().causedBy(he)
+                    .withMessage("Error while inserting new observation!");
         } finally {
             sessionHolder.returnSession(session);
         }
@@ -161,13 +153,14 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
     }
 
     private ResultTemplate createResultTemplate(SosObservation observation,
-            ObservationConstellationOfferingObservationType hObsConstOffObsType, FeatureOfInterest feature)
+                                                ObservationConstellationOfferingObservationType hObsConstOffObsType,
+                                                FeatureOfInterest feature)
             throws OwsExceptionReport {
         ResultTemplate resultTemplate = new ResultTemplate();
         // TODO identifier handling: ignoring code space now
         String identifier;
         if (observation.getIdentifier() != null && observation.getIdentifier().getValue() != null
-                && !observation.getIdentifier().getValue().isEmpty()) {
+            && !observation.getIdentifier().getValue().isEmpty()) {
             identifier = observation.getIdentifier().getValue();
         } else {
             identifier = UUID.randomUUID().toString();
@@ -180,11 +173,9 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
         if (dataArray.getElementType().getXml() == null) {
             EncoderKey key = CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, dataArray.getElementType());
             Encoder<XmlObject, SosSweAbstractDataComponent> encoder =
-                    getConfigurator().getCodingRepository().getEncoder(key);
+                                                            getConfigurator().getCodingRepository().getEncoder(key);
             if (encoder == null) {
-                String errorMsg = String.format("Could not find encoder for key \"%s\".", key.toString());
-                LOGGER.error(errorMsg);
-                throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+                throw new NoEncoderForKeyException(key);
             }
             XmlObject encodedXMLObject = encoder.encode(dataArray.getElementType());
             if (encodedXMLObject instanceof DataRecordType) {
@@ -200,11 +191,9 @@ public class InsertObservationDAO extends AbstractInsertObservationDAO {
         if (dataArray.getEncoding().getXml() == null) {
             EncoderKey key = CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, dataArray.getEncoding());
             Encoder<XmlObject, SosSweAbstractEncoding> encoder =
-                    getConfigurator().getCodingRepository().getEncoder(key);
+                                                       getConfigurator().getCodingRepository().getEncoder(key);
             if (encoder == null) {
-                String errorMsg = String.format("Could not find encoder for key \"%s\".", key.toString());
-                LOGGER.error(errorMsg);
-                throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+                throw new NoEncoderForKeyException(key);
             }
             XmlObject encodedXmlObject = encoder.encode(dataArray.getEncoding());
             if (encodedXmlObject instanceof TextEncodingType) {

@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -39,7 +38,16 @@ import org.n52.sos.ds.AbstractInsertSensorDAO;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.SensorInsertion;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidFeatureOfInterestTypeException;
+import org.n52.sos.exception.ows.MissingParameterValueException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingFeatureOfInterestTypeParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingObservedPropertyParameterException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.EncoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.ErrorWhileSavingResponseToOutputStreamException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.NoEncoderForResponseException;
 import org.n52.sos.ogc.om.SosOffering;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.AbstractProcess;
 import org.n52.sos.ogc.sensorML.SensorML;
@@ -56,7 +64,6 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.SosHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
@@ -129,22 +136,18 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
                 } else if (encodedObject instanceof ServiceResponse) {
                     return (ServiceResponse) encodedObject;
                 } else {
-                    String exceptionText = "The encoder response is not supported!";
-                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                    throw new EncoderResponseUnsupportedException();
                 }
             } else {
-                String exceptionText = "Error while getting encoder for response!";
-                throw Util4Exceptions.createInvalidParameterValueException("", exceptionText);
+                throw new NoEncoderForResponseException();
             }
         } catch (IOException ioe) {
-            String exceptionText = "Error occurs while saving response to output stream!";
-            LOGGER.error(exceptionText, ioe);
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
     }
 
     private void checkRequestedParameter(InsertSensorRequest request) throws OwsExceptionReport {
-        List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+        CompositeOwsException exceptions = new CompositeOwsException();
         // check parameters with variable content
         try {
             checkServiceParameter(request.getService());
@@ -187,19 +190,15 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
                 exceptions.add(owse);
             }
         } else {
-            exceptions.add(Util4Exceptions
-                    .createMissingParameterValueException(Sos2Constants.InsertSensorParams.observationType.name()));
-            exceptions.add(Util4Exceptions
-                    .createMissingParameterValueException(Sos2Constants.InsertSensorParams.featureOfInterestType
-                            .name()));
+            exceptions.add(new MissingParameterValueException(Sos2Constants.InsertSensorParams.observationType));
+            exceptions.add(new MissingParameterValueException(Sos2Constants.InsertSensorParams.featureOfInterestType));
         }
-        Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        exceptions.throwIfNotEmpty();
     }
 
     private void checkObservablePropterty(List<String> observableProperty) throws OwsExceptionReport {
-        if (observableProperty == null || (observableProperty != null && observableProperty.isEmpty())) {
-            throw Util4Exceptions
-                    .createMissingParameterValueException(Sos2Constants.InsertSensorParams.observableProperty.name());
+        if (observableProperty == null || observableProperty.isEmpty()) {
+            throw new MissingObservedPropertyParameterException();
         } else {
             // TODO: check with existing and/or defined in outputs
         }
@@ -207,34 +206,25 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
 
     private void checkFeatureOfInterestTypes(Set<String> featureOfInterestTypes) throws OwsExceptionReport {
         if (featureOfInterestTypes != null) {
-            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+            CompositeOwsException exceptions = new CompositeOwsException();
             Collection<String> validFeatureOfInterestTypes =
                     Configurator.getInstance().getCache().getFeatureOfInterestTypes();
             for (String featureOfInterestType : featureOfInterestTypes) {
                 if (featureOfInterestType.isEmpty()) {
-                    exceptions
-                            .add(Util4Exceptions
-                                    .createMissingParameterValueException(Sos2Constants.InsertSensorParams.featureOfInterestType
-                                            .name()));
+                    exceptions.add(new MissingFeatureOfInterestTypeParameterException());
                 } else {
                     if (!validFeatureOfInterestTypes.contains(featureOfInterestType)) {
-                        String exceptionText =
-                                "The value (" + featureOfInterestType + ") of the parameter '"
-                                        + Sos2Constants.InsertSensorParams.featureOfInterestType.name()
-                                        + "' is invalid";
-                        LOGGER.error(exceptionText);
-                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(
-                                Sos2Constants.InsertSensorParams.featureOfInterestType.name(), exceptionText));
+                        exceptions.add(new InvalidFeatureOfInterestTypeException(featureOfInterestType));
                     }
                 }
             }
-            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+            exceptions.throwIfNotEmpty();
         }
     }
 
     private void checkObservationTypes(Set<String> observationTypes) throws OwsExceptionReport {
         if (observationTypes != null) {
-            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+            CompositeOwsException exceptions = new CompositeOwsException();
             for (String observationType : observationTypes) {
                 try {
                     SosHelper.checkObservationType(observationType,
@@ -243,7 +233,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
                     exceptions.add(e);
                 }
             }
-            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+            exceptions.throwIfNotEmpty();
         }
     }
 
@@ -309,7 +299,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
             }
         }
         // check if offering is valid
-        if (sosOfferings == null || (sosOfferings != null && sosOfferings.isEmpty())) {
+        if (sosOfferings == null || sosOfferings.isEmpty()) {
             sosOfferings = new ArrayList<SosOffering>(0);
             sosOfferings.add(new SosOffering(getDefaultProcedurePrefix() + request.getAssignedProcedureIdentifier()));
         }
@@ -319,13 +309,9 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
     private void checkProcedureAndOfferingCombination(InsertSensorRequest request) throws OwsExceptionReport {
         for (SosOffering offering : request.getAssignedOfferings()) {
             if (getCache().getOfferings().contains(offering.getOfferingIdentifier())) {
-                String message =
-                        String.format(
-                                "The offering with the identifier '%s' still exists in this service and it is not allowed to insert more than one procedure to an offering!",
-                                offering.getOfferingIdentifier());
-                LOGGER.debug(message);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        Sos2Constants.InsertSensorParams.offeringIdentifier.name(), message);
+                throw new InvalidParameterValueException().at(Sos2Constants.InsertSensorParams.offeringIdentifier)
+                        .withMessage("The offering with the identifier '%s' still exists in this service and it is not allowed to insert more than one procedure to an offering!",
+                                     offering.getOfferingIdentifier());
             }
         }
     }

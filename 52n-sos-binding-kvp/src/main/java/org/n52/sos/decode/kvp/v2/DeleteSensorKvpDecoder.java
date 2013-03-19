@@ -23,16 +23,17 @@
  */
 package org.n52.sos.decode.kvp.v2;
 
-import static org.n52.sos.decode.kvp.v2.AbstractKvpDecoder.LOGGER;
-
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.KvpOperationDecoderKey;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingProcedureParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingServiceParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingVersionParameterException;
+import org.n52.sos.exception.ows.OptionNotSupportedException.ParameterNotSupportedException;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -40,7 +41,6 @@ import org.n52.sos.ogc.sos.Sos2Constants.DeleteSensorParams;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.DeleteSensorRequest;
 import org.n52.sos.util.KvpHelper;
-import org.n52.sos.util.Util4Exceptions;
 
 public class DeleteSensorKvpDecoder extends AbstractKvpDecoder {
     private static final DecoderKey KVP_DECODER_KEY_TYPE = new KvpOperationDecoderKey(SosConstants.SOS,
@@ -56,7 +56,7 @@ public class DeleteSensorKvpDecoder extends AbstractKvpDecoder {
     public DeleteSensorRequest decode(Map<String, String> element) throws OwsExceptionReport {
 
         DeleteSensorRequest request = new DeleteSensorRequest();
-        List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+        CompositeOwsException exceptions = new CompositeOwsException();
 
         boolean foundProcedure = false;
         boolean foundService = false;
@@ -81,30 +81,25 @@ public class DeleteSensorKvpDecoder extends AbstractKvpDecoder {
                     request.setProcedureIdentifier(KvpHelper.checkParameterSingleValue(parameterValues, parameterName));
                     foundProcedure = true;
                 } else {
-                    String exceptionText = String.format(
-                            "The optional parameter '%s' is not supported by this service!", parameterName);
-                    LOGGER.debug(exceptionText);
-                    exceptions.add(Util4Exceptions.createOptionNotSupportedException(parameterName, exceptionText));
+                    exceptions.add(new ParameterNotSupportedException(parameterName));
                 }
             } catch (OwsExceptionReport owse) {
                 exceptions.add(owse);
             }
         }
 
+
         if (!foundProcedure) {
-            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(DeleteSensorParams.procedure
-                    .name()));
+            exceptions.add(new MissingProcedureParameterException());
         }
-
         if (!foundService) {
-            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(RequestParams.service.name()));
+            exceptions.add(new MissingServiceParameterException());
         }
-
         if (!foundVersion) {
-            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(RequestParams.version.name()));
+            exceptions.add(new MissingVersionParameterException());
         }
 
-        Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        exceptions.throwIfNotEmpty();
 
         return request;
     }

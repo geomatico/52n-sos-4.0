@@ -56,8 +56,9 @@ public interface ContentCacheController extends Cleanupable {
 
     /**
      * @return true, if updated successfully
-     * @throws OwsExceptionReport
-     *             if the query of one of the values described upside failed
+
+     *
+     * @throws OwsExceptionReport     *             if the query of one of the values described upside failed
      */
     boolean updateCacheFromDatasource() throws OwsExceptionReport;
 }

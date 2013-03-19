@@ -24,12 +24,12 @@
 package org.n52.sos.web;
 
 import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.wsdl.WSDLException;
+
 import org.apache.commons.io.IOUtils;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.wsdl.WSDLFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;

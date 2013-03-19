@@ -26,7 +26,7 @@ package org.n52.sos.util;
 import java.util.Set;
 
 import org.n52.sos.config.SettingsManager;
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.exception.ConfigurationException;
 
 /**
  * TODO JavaDoc

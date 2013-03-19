@@ -62,6 +62,9 @@ import net.opengis.sos.x20.ResultTemplateType.ObservationTemplate;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingResultValuesException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.time.ITime;
@@ -70,6 +73,7 @@ import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -95,7 +99,6 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3CConstants;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
@@ -223,9 +226,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
         }
 
         else {
-            String exceptionText = "The request is not supported by this server!";
-            LOGGER.debug(exceptionText);
-            Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            throw new NoApplicableCodeException().withMessage("The request is not supported by this server!");
         }
         return response;
     }
@@ -237,8 +238,9 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
      * @param getCapsDoc
      *            XmlBean created from the incoming request stream
      * @return Returns SosGetCapabilitiesRequest representing the request
-     * @throws OwsExceptionReport
-     *             If parsing the XmlBean failed
+
+     *
+     * @throws OwsExceptionReport * If parsing the XmlBean failed
      */
     private AbstractServiceRequest parseGetCapabilities(GetCapabilitiesDocument getCapsDoc) throws OwsExceptionReport {
         GetCapabilitiesRequest request = new GetCapabilitiesRequest();
@@ -273,8 +275,9 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
      * @param getObsDoc
      *            XmlBean created from the incoming request stream
      * @return Returns SosGetObservationRequest representing the request
-     * @throws OwsExceptionReport
-     *             If parsing the XmlBean failed
+
+     *
+     * @throws OwsExceptionReport * If parsing the XmlBean failed
      */
     private AbstractServiceRequest parseGetObservation(GetObservationDocument getObsDoc) throws OwsExceptionReport {
         GetObservationRequest getObsRequest = new GetObservationRequest();
@@ -295,8 +298,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
                 String responseFormat = URLDecoder.decode(getObsType.getResponseFormat(), "UTF-8");
                 getObsRequest.setResponseFormat(responseFormat);
             } catch (UnsupportedEncodingException e) {
-                String exceptionText = "Error while encoding response format!";
-                throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+                throw new NoApplicableCodeException().causedBy(e).withMessage("Error while encoding response format!");
             }
         }
 
@@ -311,8 +313,9 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
      *            XmlBeans document representing the getFeatureOfInterest
      *            request
      * @return Returns SOS getFeatureOfInterest request
-     * @throws OwsExceptionReport
-     *             if validation of the request failed
+
+     *
+     * @throws OwsExceptionReport * if validation of the request failed
      */
     private AbstractServiceRequest parseGetFeatureOfInterest(GetFeatureOfInterestDocument getFoiDoc)
             throws OwsExceptionReport {
@@ -365,7 +368,7 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
             Map<String, ITime> phenomenonTimes = new HashMap<String, ITime>(length);
             Map<String, TimeInstant> resultTimes = new HashMap<String, TimeInstant>(length);
             Map<String, SosAbstractFeature> features = new HashMap<String, SosAbstractFeature>(length);
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(insertObservationType.getObservationArray().length);
+            CompositeOwsException exceptions = new CompositeOwsException();
             for (Observation observation : insertObservationType.getObservationArray()) {
                 Object decodedObject = CodingHelper.decodeXmlElement(observation.getOMObservation());
                 if (decodedObject != null && decodedObject instanceof SosObservation) {
@@ -375,22 +378,18 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
                     checkAndAddFeatures(sosObservation.getObservationConstellation().getFeatureOfInterest(), features);
                     insertObservationRequest.addObservation(sosObservation);
                 } else {
-                    StringBuilder exceptionText = new StringBuilder();
-                    exceptionText.append("The requested observation type (");
-                    exceptionText.append(observation.getOMObservation().getDomNode().getNodeName());
-                    exceptionText.append(") is not supported by this server!");
-                    LOGGER.debug(exceptionText.toString());
-                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(
-                            Sos2Constants.InsertObservationParams.observation.name(), exceptionText.toString()));
+                    throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
+                            .withMessage("The requested observation type (%s) is not supported by this server!",
+                                         observation.getOMObservation().getDomNode().getNodeName());
                 }
             }
             checkReferencedElements(insertObservationRequest.getObservations(), phenomenonTimes, resultTimes, features);
-            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+            exceptions.throwIfNotEmpty();
         } else {
-            String exceptionText = "The request does not contain an observation";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    Sos2Constants.InsertObservationParams.observation.name(), exceptionText);
+            //TODO MissingMandatoryParameterException?
+            throw new InvalidParameterValueException()
+                    .at(Sos2Constants.InsertObservationParams.observation)
+                    .withMessage("The request does not contain an observation");
         }
         return insertObservationRequest;
 
@@ -482,8 +481,9 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
      *            request
      * @return Returns SpatialFilter created from the passed foi request
      *         parameter
-     * @throws OwsExceptionReport
-     *             if creation of the SpatialFilter failed
+
+     *
+     * @throws OwsExceptionReport * if creation of the SpatialFilter failed
      */
     private SpatialFilter parseSpatialFilter4GetObservation(
             net.opengis.sos.x20.GetObservationType.SpatialFilter spatialFilter) throws OwsExceptionReport {
@@ -504,8 +504,9 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
      *            request
      * @return Returns SpatialFilter created from the passed foi request
      *         parameter
-     * @throws OwsExceptionReport
-     *             if creation of the SpatialFilter failed
+
+     *
+     * @throws OwsExceptionReport * if creation of the SpatialFilter failed
      */
     private List<SpatialFilter> parseSpatialFilters4GetFeatureOfInterest(
             net.opengis.sos.x20.GetFeatureOfInterestType.SpatialFilter[] spatialFilters) throws OwsExceptionReport {
@@ -538,8 +539,9 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
      *            array of XmlObjects representing the Time element in the
      *            request
      * @return Returns array representing the temporal filters
-     * @throws OwsExceptionReport
-     *             if parsing of the element failed
+
+     *
+     * @throws OwsExceptionReport * if parsing of the element failed
      */
     private List<TemporalFilter> parseTemporalFilters4GetObservation(
             net.opengis.sos.x20.GetObservationType.TemporalFilter[] temporalFilters) throws OwsExceptionReport {
@@ -583,13 +585,9 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
             sosResultStructure.setResultStructure(sosSweData);
             return sosResultStructure;
         } else {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The requested result structure (");
-            exceptionText.append(resultStructure.getDomNode().getNodeName());
-            exceptionText.append(") is not supported by this server!");
-            LOGGER.debug(exceptionText.toString());
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    Sos2Constants.InsertObservationParams.observation.name(), exceptionText.toString());
+            throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
+                    .withMessage("The requested result structure (%s) is not supported by this server!",
+                                 resultStructure.getDomNode().getNodeName());
         }
     }
 
@@ -601,13 +599,9 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
             encoding.setEncoding(sosSweEncoding);
             return encoding;
         } else {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The requested result structure (");
-            exceptionText.append(resultEncoding.getDomNode().getNodeName());
-            exceptionText.append(") is not supported by this server!");
-            LOGGER.debug(exceptionText.toString());
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    Sos2Constants.InsertObservationParams.observation.name(), exceptionText.toString());
+            throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
+                    .withMessage("The requested result encoding (%s) is not supported by this server!",
+                                 resultEncoding.getDomNode().getNodeName());
         }
     }
 
@@ -625,10 +619,9 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
                     }
                 }
             }
-            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertResultParams.resultValues.name());
+            throw new MissingResultValuesException();
         } else {
-            throw Util4Exceptions.createNoApplicableCodeException(null,
-                    "The requested resultValue type is not supported");
+            throw new NoApplicableCodeException().withMessage("The requested resultValue type is not supported");
         }
     }
 
@@ -651,7 +644,8 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
     }
 
     private void checkReferencedElements(List<SosObservation> observations, Map<String, ITime> phenomenonTimes,
-            Map<String, TimeInstant> resultTimes, Map<String, SosAbstractFeature> features) throws OwsExceptionReport {
+                                         Map<String, TimeInstant> resultTimes, Map<String, SosAbstractFeature> features)
+            throws OwsExceptionReport {
         for (SosObservation observation : observations) {
             // phenomenonTime
             ITime phenomenonTime = observation.getPhenomenonTime();
@@ -671,9 +665,8 @@ public class SosDecoderv20 implements Decoder<AbstractServiceCommunicationObject
                         TimePeriod timePeriod = (TimePeriod) iTime;
                         observation.setResultTime(new TimeInstant(timePeriod.getEnd()));
                     } else {
-                        String exceptionText = "The time value type is not supported";
-                        LOGGER.error(exceptionText);
-                        throw Util4Exceptions.createInvalidParameterValueException("observation.resultTime", exceptionText);
+                        throw new InvalidParameterValueException().at("observation.resultTime")
+                                .withMessage("The time value type is not supported");
                     }
                         
                 }

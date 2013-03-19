@@ -24,23 +24,24 @@
 package org.n52.sos.decode.kvp.v2;
 
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.n52.sos.decode.DecoderException;
 import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.KvpOperationDecoderKey;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingServiceParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingVersionParameterException;
+import org.n52.sos.exception.ows.OptionNotSupportedException.ParameterNotSupportedException;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
-import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.KvpHelper;
-import org.n52.sos.util.Util4Exceptions;
 
 public class GetObservationKvpDecoder extends AbstractKvpDecoder {
 
@@ -55,8 +56,8 @@ public class GetObservationKvpDecoder extends AbstractKvpDecoder {
     @Override
     public GetObservationRequest decode(Map<String, String> element) throws OwsExceptionReport {
 
-        GetObservationRequest request = new GetObservationRequest();
-        List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+        final GetObservationRequest request = new GetObservationRequest();
+        final CompositeOwsException exceptions = new CompositeOwsException();
         boolean foundService = false;
         boolean foundVersion = false;
 
@@ -105,15 +106,9 @@ public class GetObservationKvpDecoder extends AbstractKvpDecoder {
                         request.setTemporalFilters(parseTemporalFilter(KvpHelper.checkParameterMultipleValues(
                                 parameterValues, parameterName), parameterName));
                     } catch (DecoderException e) {
-                        OwsExceptionReport owse = new OwsExceptionReport();
-                        owse.addCodedException(OwsExceptionCode.InvalidParameterValue, parameterName, String.format(
-                                "The value of parameter %s is invalid.", parameterName));
-                        exceptions.add(owse);
+                        exceptions.add(new InvalidParameterValueException(parameterName, parameterValues).causedBy(e));
                     } catch (DateTimeException e) {
-                        OwsExceptionReport owse = new OwsExceptionReport();
-                        owse.addCodedException(OwsExceptionCode.InvalidParameterValue, parameterName, String.format(
-                                "The value of parameter %s is invalid.", parameterName));
-                        exceptions.add(owse);
+                        exceptions.add(new InvalidParameterValueException(parameterName, parameterValues).causedBy(e));
                     }
                 }
 
@@ -131,10 +126,7 @@ public class GetObservationKvpDecoder extends AbstractKvpDecoder {
                 else if (parameterName.equalsIgnoreCase(Sos2Constants.GetObservationParams.namespaces.name())) {
                     request.setNamespaces(parseNamespaces(parameterValues));
                 } else {
-                    String exceptionText = String.format(
-                            "The parameter '%s' is invalid for the GetObservation request!", parameterName);
-                    LOGGER.debug(exceptionText);
-                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText));
+                    exceptions.add(new ParameterNotSupportedException(parameterName));
                 }
 
             } catch (OwsExceptionReport owse) {
@@ -143,14 +135,14 @@ public class GetObservationKvpDecoder extends AbstractKvpDecoder {
         }
 
         if (!foundService) {
-            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(RequestParams.service.name()));
+            exceptions.add(new MissingServiceParameterException());
         }
 
         if (!foundVersion) {
-            exceptions.add(Util4Exceptions.createMissingMandatoryParameterException(RequestParams.version.name()));
+            exceptions.add(new MissingVersionParameterException());
         }
 
-        Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        exceptions.throwIfNotEmpty();
 
         return request;
     }

@@ -59,6 +59,9 @@ import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.NotYetSupportedException;
 import org.n52.sos.ogc.swe.RangeValue;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName;
@@ -85,7 +88,6 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
@@ -158,16 +160,9 @@ public class SweCommonDecoderV20 implements Decoder<Object, Object> {
             sosTextEncoding.setXml(textEncodingDoc.xmlText(XmlOptionsHelper.getInstance().getXmlOptions()));
             return sosTextEncoding;
         } else {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The requested element");
-            if (element instanceof XmlObject) {
-                exceptionText.append(" '");
-                exceptionText.append(XmlHelper.getLocalName(((XmlObject) element)));
-                exceptionText.append("' ");
-            }
-            exceptionText.append("is not supported by this server!");
-            LOGGER.debug(exceptionText.toString());
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            throw new NoApplicableCodeException()
+                    .withMessage("The requested element '%s' is not supported by this server",
+                                 XmlHelper.getLocalName(((XmlObject) element)));
         }
     }
 
@@ -253,7 +248,7 @@ public class SweCommonDecoderV20 implements Decoder<Object, Object> {
         SosSweDataArray sosSweDataArray = new SosSweDataArray();
         
         CountPropertyType elementCount = xbDataArray.getElementCount();
-        if (elementCount != null && elementCount != null) { 
+        if (elementCount != null) { 
             sosSweDataArray.setElementCount(parseElementCount(elementCount));
         }
         
@@ -320,18 +315,14 @@ public class SweCommonDecoderV20 implements Decoder<Object, Object> {
     private boolean checkParameterTypes(SosSweAbstractDataComponent elementType, SosSweAbstractEncoding encoding)
             throws OwsExceptionReport {
         if (!(encoding instanceof SosSweTextEncoding)) {
-            String exceptionMsg =
-                    String.format("Received encoding type \"%s\" of swe:values is not supported.",
-                            encoding != null ? encoding.getClass().getName() : encoding);
-            LOGGER.debug(exceptionMsg);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
+            throw new NoApplicableCodeException()
+                    .withMessage("Received encoding type \"%s\" of swe:values is not supported.",
+                                 encoding != null ? encoding.getClass().getName() : encoding);
         }
         if (!(elementType instanceof SosSweDataRecord)) {
-            String exceptionMsg =
-                    String.format("Received elementType \"%s\" in combination with swe:values is not supported.",
-                            elementType != null ? elementType.getClass().getName() : elementType);
-            LOGGER.debug(exceptionMsg);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
+            throw new NoApplicableCodeException()
+                    .withMessage("Received elementType \"%s\" in combination with swe:values is not supported.",
+                                 elementType != null ? elementType.getClass().getName() : elementType);
         }
         return true;
     }
@@ -341,12 +332,10 @@ public class SweCommonDecoderV20 implements Decoder<Object, Object> {
         if (abstractEncodingType instanceof TextEncodingType) {
             return parseTextEncoding((TextEncodingType) abstractEncodingType);
         }
-        String exceptionMsg =
-                String.format("Encoding type not supported: %s. Currently supported: %s",
-                        abstractEncodingType != null ? abstractEncodingType.getClass().getName()
-                                : abstractEncodingType, TextEncodingType.type.getName());
-        LOGGER.debug(exceptionMsg);
-        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionMsg);
+        throw new NoApplicableCodeException().withMessage("Encoding type not supported: %s. Currently supported: %s",
+                                                          abstractEncodingType != null
+                                                          ? abstractEncodingType.getClass().getName()
+                                                          : abstractEncodingType, TextEncodingType.type.getName());
     }
 
     private SosSweDataRecord parseDataRecord(DataRecordType dataRecord) throws OwsExceptionReport {
@@ -392,9 +381,7 @@ public class SweCommonDecoderV20 implements Decoder<Object, Object> {
     }
 
     private SosSweCountRange parseCountRange(CountRangeType countRange) throws OwsExceptionReport {
-        String exceptionText = "The CountRange is not supported";
-        LOGGER.debug(exceptionText);
-        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        throw new NotYetSupportedException().forFeature("CountRange");
     }
 
     // private SosSweAbstractSimpleType
@@ -424,9 +411,7 @@ public class SweCommonDecoderV20 implements Decoder<Object, Object> {
     }
 
     private SosSweQuantityRange parseQuantityRange(QuantityRangeType quantityRange) throws OwsExceptionReport {
-        String exceptionText = "The QuantityRange is not supported";
-        LOGGER.debug(exceptionText);
-        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        throw new NotYetSupportedException().forFeature("QuantityRange");
     }
 
     private SosSweText parseText(TextType xbText) {
@@ -443,9 +428,7 @@ public class SweCommonDecoderV20 implements Decoder<Object, Object> {
             try {
                 sosTime.setValue(DateTimeHelper.parseIsoString2DateTime(xbTime.getValue().toString()));
             } catch (DateTimeException e) {
-                String exceptionText = "Error while parsing Time!";
-                LOGGER.debug(exceptionText, e);
-                throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+                throw new NoApplicableCodeException().withMessage("Error while parsing Time!").causedBy(e);
             }
         }
         if (xbTime.getUom() != null) {
@@ -474,9 +457,7 @@ public class SweCommonDecoderV20 implements Decoder<Object, Object> {
                 }
 
             } catch (DateTimeException e) {
-                String exceptionText = "Error while parsing TimeRange!";
-                LOGGER.debug(exceptionText, e);
-                throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+                throw new NoApplicableCodeException().withMessage("Error while parsing TimeRange!").causedBy(e);
             }
         }
         if (xbTime.getUom() != null) {
@@ -489,9 +470,7 @@ public class SweCommonDecoderV20 implements Decoder<Object, Object> {
         if (qualityArray == null || qualityArray.length == 0) {
             return null;
         }
-        String exceptionText = "The Quality is not supported";
-        LOGGER.debug(exceptionText);
-        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        throw new NotYetSupportedException().forFeature("Quality");
     }
 
     // private SosSMLPosition parsePosition(PositionType position) throws
@@ -516,9 +495,8 @@ public class SweCommonDecoderV20 implements Decoder<Object, Object> {
                 sosCoordinates.add(new SosSweCoordinate(checkCoordinateName(xbCoordinate.getName()),
                         (SosSweAbstractSimpleType)parseAbstractDataComponent(xbCoordinate.getQuantity())));
             } else {
-                String exceptionText = "Error when parsing the Coordinates of Position: It must be of type Quantity!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException("Position", exceptionText);
+                throw new InvalidParameterValueException().at("Position")
+                        .withMessage("Error when parsing the Coordinates of Position: It must be of type Quantity!");
             }
             return sosCoordinates;
         }
@@ -533,9 +511,8 @@ public class SweCommonDecoderV20 implements Decoder<Object, Object> {
         } else if (name.equals(SweCoordinateName.altitude.name())) {
             return SweCoordinateName.altitude;
         } else {
-            String exceptionText = "The coordinate name is neighter 'easting' nor 'northing' nor 'altitude'!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException("Position", exceptionText);
+            throw new InvalidParameterValueException().at("Position")
+                    .withMessage("The coordinate name is neighter 'easting' nor 'northing' nor 'altitude'!");
         }
     }
 

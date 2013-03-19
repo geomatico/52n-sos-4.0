@@ -33,11 +33,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.Encoder;
+import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.XmlEncoderKey;
 import org.n52.sos.exception.AdministratorException;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.response.ServiceResponse;
@@ -87,13 +87,11 @@ public class SosAdminService extends ConfiguratedHttpServlet {
 
         this.setCorsHeaders(resp);
 
-        ServiceResponse sosResp;
+        ServiceResponse sosResp = null;
         try {
             sosResp = Configurator.getInstance().getAdminServiceOperator().doGetOperation(req);
         } catch (AdministratorException e) {
-            OwsExceptionReport owsExceptionReport = new OwsExceptionReport();
-            owsExceptionReport.addCodedException(OwsExceptionCode.NoApplicableCode, null, "Error", e);
-            sosResp = handleException(owsExceptionReport);
+            handleException(new NoApplicableCodeException().withMessage("Error").causedBy(e));
         } catch (OwsExceptionReport e) {
             sosResp = handleException(e);
         } 

@@ -439,6 +439,10 @@
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
+                    <artifactId>52n-sos-ext-do-code-hibernate</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
                     <artifactId>52n-sos-ext-do-code-kvp</artifactId>
                 </dependency>
             </dependencies>

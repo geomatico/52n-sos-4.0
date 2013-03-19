@@ -24,7 +24,6 @@
 package org.n52.sos.decode;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -51,6 +50,8 @@ import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
@@ -92,16 +93,14 @@ public class OgcDecoderv100 implements Decoder<Object, XmlObject> {
 	}
 
 	@Override
-	public Object decode(XmlObject xmlObject) throws OwsExceptionReport {
+    public Object decode(XmlObject xmlObject) throws OwsExceptionReport {
 
 		if (xmlObject instanceof BinaryTemporalOpType) {
             return parseTemporalOperatorType((BinaryTemporalOpType) xmlObject);
         } 
-		if (xmlObject instanceof TemporalOperatorType) {
-			String exceptionText = "The requested temporal filter operand is not supported by this SOS!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    Sos1Constants.GetObservationParams.eventTime.name(), exceptionText);
+        if (xmlObject instanceof TemporalOperatorType) {
+            throw new InvalidParameterValueException().at(Sos1Constants.GetObservationParams.eventTime)
+                    .withMessage("The requested temporal filter operand is not supported by this SOS!");
 		}
 		// add propertyNameDoc here 
 		if (xmlObject instanceof PropertyNameDocument) {
@@ -125,7 +124,7 @@ public class OgcDecoderv100 implements Decoder<Object, XmlObject> {
 
 	@Override
 	public Map<SupportedTypeKey, Set<String>> getSupportedTypes() {
-		return new HashMap<SupportedTypeKey, Set<String>>(0);
+        return Collections.emptyMap();
 	}
 	
 	/**
@@ -135,10 +134,11 @@ public class OgcDecoderv100 implements Decoder<Object, XmlObject> {
      * @param xbTemporalOpsType
      *            XmlObject representing the temporal filter
      * @return Returns SOS representation of temporal filter
-     * @throws OwsExceptionReport
-     *             if parsing of the element failed
+
+     *
+     * @throws OwsExceptionReport     *             if parsing of the element failed
      */
-	private Object parseTemporalOperatorType(BinaryTemporalOpType xb_btot) throws OwsExceptionReport {
+    private Object parseTemporalOperatorType(BinaryTemporalOpType xb_btot) throws OwsExceptionReport {
 
 		TemporalFilter temporalFilter = new TemporalFilter();
 		// FIXME local workaround against SOSHelper check value reference
@@ -174,12 +174,9 @@ public class OgcDecoderv100 implements Decoder<Object, XmlObject> {
 	                        operator = TimeOperator.TM_After;
 	                    } else if (localName.equals(TimeOperator.TM_Before.name()) && time instanceof TimeInstant) {
 	                        operator = TimeOperator.TM_Before;
-	                    } else {
-	                        String exceptionText =
-	                                "The requested temporal filter operand is not supported by this SOS!";
-	                        LOGGER.debug(exceptionText);
-	                        throw Util4Exceptions.createInvalidParameterValueException(
-	                                Sos1Constants.GetObservationParams.eventTime.name(), exceptionText);
+                        } else {
+                            throw new InvalidParameterValueException().at(Sos1Constants.GetObservationParams.eventTime)
+                                    .withMessage("The requested temporal filter operand is not supported by this SOS!");
 	                    }
 	                    temporalFilter.setOperator(operator);
 	                    temporalFilter.setTime(time);
@@ -191,9 +188,8 @@ public class OgcDecoderv100 implements Decoder<Object, XmlObject> {
 	        }
             
         } catch (XmlException xmle) {
-            String exceptionText = "Error while parsing temporal filter!";
-            LOGGER.error(exceptionText, xmle);
-            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+            throw new NoApplicableCodeException().causedBy(xmle)
+                    .withMessage("Error while parsing temporal filter!");
         }
         return temporalFilter;
         
@@ -207,8 +203,9 @@ public class OgcDecoderv100 implements Decoder<Object, XmlObject> {
      *            request
      * @return Returns SpatialFilter created from the passed foi request
      *         parameter
-     * @throws OwsExceptionReport
-     *             if creation of the SpatialFilter failed
+
+     *
+     * @throws OwsExceptionReport     *             if creation of the SpatialFilter failed
      */
     private SpatialFilter parseBBOXFilterType(BBOXTypeImpl xbBBOX) throws OwsExceptionReport {
         
@@ -236,17 +233,14 @@ public class OgcDecoderv100 implements Decoder<Object, XmlObject> {
                 }
 
             } else {
-                String exceptionText = "The requested spatial filter operand is not supported by this SOS!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        "FeatureOfInterest Filter", exceptionText);
+                throw new InvalidParameterValueException().at("FeatureOfInterest Filter")
+                        .withMessage("The requested spatial filter operand is not supported by this SOS!");
             }
             geometryCursor.dispose();
             
         } catch (XmlException xmle) {
-            String exceptionText = "Error while parsing spatial filter!";
-            LOGGER.error(exceptionText, xmle);
-            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+            throw new NoApplicableCodeException().causedBy(xmle)
+                    .withMessage("Error while parsing spatial filter!");
         }
         return spatialFilter;
     }
@@ -265,23 +259,18 @@ public class OgcDecoderv100 implements Decoder<Object, XmlObject> {
 	                    spatialFilter.setGeometry((Geometry) sosGeometry);
 	                }
 	
-	            } else {
-	                String exceptionText = "The requested spatial filter operand is not supported by this SOS!";
-	                LOGGER.debug(exceptionText);
-	                throw Util4Exceptions.createInvalidParameterValueException(
-	                        Sos2Constants.GetObservationParams.spatialFilter.name(), exceptionText);
+                } else {
+                    throw new InvalidParameterValueException().at(Sos2Constants.GetObservationParams.spatialFilter)
+                            .withMessage("The requested spatial filter operand is not supported by this SOS!");
 	            }
 	            geometryCursor.dispose();
-			} else {
-                String exceptionText = "The requested spatial filter is not supported by this SOS!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        "GetFeatureOfInterest Filter", exceptionText);           
+            } else {
+                throw new InvalidParameterValueException().at("GetFeatureOfInterest Filter")
+                        .withMessage("The requested spatial filter is not supported by this SOS!");
 			}
         } catch (XmlException xmle) {
-            String exceptionText = "Error while parsing spatial filter!";
-            LOGGER.error(exceptionText, xmle);
-            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+            throw new NoApplicableCodeException().causedBy(xmle)
+                    .withMessage("Error while parsing spatial filter!");
         }
         return spatialFilter;
 	}

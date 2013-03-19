@@ -29,27 +29,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 import net.opengis.swe.x101.AbstractDataComponentType;
-import net.opengis.swe.x101.AbstractDataRecordType;
 import net.opengis.swe.x101.AbstractEncodingType;
 import net.opengis.swe.x101.BlockEncodingPropertyType;
-import net.opengis.swe.x101.BooleanPropertyType;
-import net.opengis.swe.x101.CategoryPropertyType;
-import net.opengis.swe.x101.CountPropertyType;
+import net.opengis.swe.x101.CategoryDocument.Category;
+import net.opengis.swe.x101.CountDocument.Count;
 import net.opengis.swe.x101.DataArrayDocument;
 import net.opengis.swe.x101.DataArrayType;
 import net.opengis.swe.x101.DataComponentPropertyType;
 import net.opengis.swe.x101.DataRecordDocument;
 import net.opengis.swe.x101.DataRecordType;
 import net.opengis.swe.x101.DataValuePropertyType;
-import net.opengis.swe.x101.QuantityPropertyType;
-import net.opengis.swe.x101.TextPropertyType;
-import net.opengis.swe.x101.TimePropertyType;
-import net.opengis.swe.x101.TimeRangePropertyType;
-import net.opengis.swe.x101.CategoryDocument.Category;
-import net.opengis.swe.x101.CountDocument.Count;
 import net.opengis.swe.x101.ObservablePropertyDocument.ObservableProperty;
 import net.opengis.swe.x101.QuantityDocument.Quantity;
 import net.opengis.swe.x101.QuantityRangeDocument.QuantityRange;
@@ -63,8 +53,8 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.apache.xmlbeans.impl.values.XmlValueDisconnectedException;
-import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.swe.SWEConstants;
@@ -84,11 +74,9 @@ import org.n52.sos.ogc.swe.simpleType.SosSweQuantityRange;
 import org.n52.sos.ogc.swe.simpleType.SosSweText;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -210,13 +198,10 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
             xbDCD.set(createTime((SosSweTime) sosElement));
             xbField.getAbstractDataArray1().substitute(SWEConstants.QN_TIME_SWE_101, Time.type);
         } else {
-            String errorMsg =
-                    String.format(
-                            "The element type '%s' of the received %s is not supported by this encoder '%s'.",
-                            sosElement != null ? sosElement.getClass().getName() : null, sweField != null ? sweField
-                                    .getClass().getName() : null, getClass().getName());
-            LOGGER.error(errorMsg);
-            throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+            throw new NoApplicableCodeException()
+                    .withMessage("The element type '%s' of the received %s is not supported by this encoder '%s'.",
+                                 sosElement != null ? sosElement.getClass().getName() : null,
+                                 sweField.getClass().getName(), getClass().getName());
         }
         return xbField;
     }
@@ -485,23 +470,18 @@ public class SweCommonEncoderv101 implements Encoder<XmlObject, Object> {
                 if (xmlObject instanceof AbstractEncodingType) {
                     return (BlockEncodingPropertyType) xmlObject;
                 }
-                String exceptionText = "AbstractEncoding can not be encoded!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoApplicableCodeException().withMessage("AbstractEncoding can not be encoded!");
             }
             
         } catch (XmlException e) {
-        	e.printStackTrace();
-            String exceptionText = "Error while encoding AbstractEncoding!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+            throw new NoApplicableCodeException().causedBy(e)
+                    .withMessage("Error while encoding AbstractEncoding!");
         } catch (XmlValueDisconnectedException xvde) {
-        	xvde.printStackTrace();
-            String exceptionText = "Error while encoding AbstractEncoding!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(xvde, exceptionText);
+            throw new NoApplicableCodeException().causedBy(xvde)
+                    .withMessage("Error while encoding AbstractEncoding!");
         } catch (Exception ge) {
-        	ge.printStackTrace();
+            throw new NoApplicableCodeException().causedBy(ge)
+                    .withMessage("Error while encoding AbstractEncoding!");
         }
     	return null;
     }

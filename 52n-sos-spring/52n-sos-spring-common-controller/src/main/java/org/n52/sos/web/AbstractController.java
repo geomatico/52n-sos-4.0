@@ -27,7 +27,7 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.service.DatabaseSettingsHandler;
 import org.springframework.beans.factory.annotation.Autowired;

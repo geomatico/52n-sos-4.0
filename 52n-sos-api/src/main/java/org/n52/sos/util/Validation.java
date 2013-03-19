@@ -23,7 +23,7 @@
  */
 package org.n52.sos.util;
 
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.exception.ConfigurationException;
 
 
 /**

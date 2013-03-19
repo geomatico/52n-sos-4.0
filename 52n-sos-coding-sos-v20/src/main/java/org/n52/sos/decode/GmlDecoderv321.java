@@ -30,34 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlObject;
-import org.joda.time.DateTime;
-import org.n52.sos.ogc.gml.CodeWithAuthority;
-import org.n52.sos.ogc.gml.GMLConstants;
-import org.n52.sos.ogc.gml.time.TimeInstant;
-import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.ogc.om.SosSingleObservationValue;
-import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
-import org.n52.sos.ogc.om.values.CategoryValue;
-import org.n52.sos.ogc.om.values.QuantityValue;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.Sos2Constants;
-import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
-import org.n52.sos.service.Configurator;
-import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
-import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.CollectionHelper;
-import org.n52.sos.util.DateTimeException;
-import org.n52.sos.util.DateTimeHelper;
-import org.n52.sos.util.JTSHelper;
-import org.n52.sos.util.SosHelper;
-import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
-import org.n52.sos.util.XmlHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.opengis.gml.x32.AbstractRingPropertyType;
 import net.opengis.gml.x32.AbstractRingType;
 import net.opengis.gml.x32.AbstractSurfaceType;
@@ -82,6 +54,34 @@ import net.opengis.gml.x32.TimeInstantType;
 import net.opengis.gml.x32.TimePeriodDocument;
 import net.opengis.gml.x32.TimePeriodType;
 import net.opengis.gml.x32.TimePositionType;
+
+import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
+import org.joda.time.DateTime;
+import org.n52.sos.ogc.gml.CodeWithAuthority;
+import org.n52.sos.ogc.gml.GMLConstants;
+import org.n52.sos.ogc.gml.time.TimeInstant;
+import org.n52.sos.ogc.gml.time.TimePeriod;
+import org.n52.sos.ogc.om.SosSingleObservationValue;
+import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
+import org.n52.sos.ogc.om.values.CategoryValue;
+import org.n52.sos.ogc.om.values.QuantityValue;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.ogc.sos.Sos2Constants;
+import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
+import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
+import org.n52.sos.util.CodingHelper;
+import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.DateTimeException;
+import org.n52.sos.util.DateTimeHelper;
+import org.n52.sos.util.JTSHelper;
+import org.n52.sos.util.SosHelper;
+import org.n52.sos.util.StringHelper;
+import org.n52.sos.util.XmlHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -194,9 +194,8 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
                             XmlObject.Factory.parse(XmlHelper.getNodeFromNodeList(featurePropertyType.getDomNode()
                                     .getChildNodes()));
                 } catch (XmlException xmle) {
-                    String exceptionText = "Error while parsing feature request!";
-                    LOGGER.error(exceptionText, xmle);
-                    throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+                    throw new NoApplicableCodeException().causedBy(xmle)
+                            .withMessage("Error while parsing feature request!");
                 }
             }
             if (abstractFeature != null) {
@@ -204,18 +203,14 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
                 if (decodedObject != null && decodedObject instanceof SosSamplingFeature) {
                     feature = (SosSamplingFeature) decodedObject;
                 } else {
-                    String exceptionText = "The requested featurePropertyType type is not supported by this service!";
-                    LOGGER.debug(exceptionText);
-                    throw Util4Exceptions.createInvalidParameterValueException(
-                            Sos2Constants.InsertObservationParams.observation.name(), exceptionText);
+                    throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
+                            .withMessage("The requested featurePropertyType type is not supported by this service!");
                 }
             }
         }
         if (feature == null) {
-            String exceptionText = "The requested featurePropertyType type is not supported by this service!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    Sos2Constants.InsertObservationParams.observation.name(), exceptionText);
+            throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
+                    .withMessage("The requested featurePropertyType type is not supported by this service!");
         }
         return feature;
     }
@@ -229,8 +224,9 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
      *            XmlBean representing the BBOX-element in the request
      * @return Returns WKT-String representing the BBOX as Multipoint with two
      *         elements
-     * @throws OwsExceptionReport
-     *             if parsing the BBOX element failed
+
+     *
+     * @throws OwsExceptionReport     *             if parsing the BBOX element failed
      */
     private Geometry getGeometry4BBOX(EnvelopeDocument envelopeDocument) throws OwsExceptionReport {
         EnvelopeType envelopeType = envelopeDocument.getEnvelope();
@@ -287,16 +283,16 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
      * @param coordsString
      *            contains coordinates, which should be switched
      * @return Returns String contained coordinates in switched order
+
+     *
      * @throws OwsExceptionReport
      */
     private String switchCoordinatesInString(String coordsString) throws OwsExceptionReport {
         String switchedCoordString = null;
         String[] coordsArray = coordsString.split(" ");
         if (coordsArray.length != 2) {
-            String exceptionText =
-                    "An error occurred, while switching coordinates. Only a pair with two coordinates are supported!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            throw new NoApplicableCodeException()
+                    .withMessage("An error occurred, while switching coordinates. Only a pair with two coordinates are supported!");
         } else {
             switchedCoordString = coordsArray[1] + " " + coordsArray[0];
         }
@@ -328,9 +324,8 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
                         ti.setValue(DateTimeHelper.parseIsoString2DateTime(timeString));
                         
                     } catch (DateTimeException dte) {
-                        String exceptionText = "Error while parsing TimeInstant!";
-                        LOGGER.error(exceptionText, dte);
-                        throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+                        throw new NoApplicableCodeException().causedBy(dte)
+                                .withMessage("Error while parsing TimeInstant!");
                     }
                     ti.setRequestedTimeLength(timeString.length());
                 }
@@ -349,6 +344,8 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
      * @param xb_timePeriod
      *            XMLBeans representation of time period
      * @return Returns SOS representation of time period
+
+     *
      * @throws OwsExceptionReport
      */
     private TimePeriod parseTimePeriod(TimePeriodType xbTimePeriod) throws OwsExceptionReport {
@@ -360,9 +357,8 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
                 String beginString = xbBeginTPT.getStringValue();
                 begin = DateTimeHelper.parseIsoString2DateTime(beginString);
             } else {
-                String exceptionText = "gml:TimePeriod! must contain beginPos Element with valid ISO:8601 String!!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoApplicableCodeException()
+                        .withMessage("gml:TimePeriod! must contain beginPos Element with valid ISO:8601 String!!");
             }
 
             // end position
@@ -374,17 +370,14 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
                         DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
                                 DateTimeHelper.parseIsoString2DateTime(endString), endString.length());
             } else {
-                String exceptionText = "gml:TimePeriod! must contain endPos Element with valid ISO:8601 String!!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoApplicableCodeException()
+                        .withMessage("gml:TimePeriod! must contain endPos Element with valid ISO:8601 String!!");
             }
             TimePeriod timePeriod = new TimePeriod(begin, end);
             timePeriod.setGmlId(xbTimePeriod.getId());
             return timePeriod;
         } catch (DateTimeException dte) {
-            String exceptionText = "Error while parsing TimePeriod!";
-            LOGGER.error(exceptionText, dte);
-            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+            throw new NoApplicableCodeException().causedBy(dte).withMessage("Error while parsing TimePeriod!");
         }
     }
 
@@ -423,19 +416,15 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
             String directPosition = getString4Coordinates(xbCoords);
             geomWKT = "POINT" + directPosition;
         } else {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("For geometry type 'gml:Point' only element ");
-            exceptionText.append("'gml:pos' and 'gml:coordinates' are allowed ");
-            exceptionText.append("in the feature of interest parameter!");
-            LOGGER.debug(exceptionText.toString());
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            throw new NoApplicableCodeException().withMessage("For geometry type 'gml:Point' only element "
+                                                              + "'gml:pos' and 'gml:coordinates' are allowed "
+                                                              + "in the feature of interest parameter!");
         }
 
         checkSrid(srid);
         if (srid == -1) {
-            StringBuilder exceptionText = new StringBuilder("No SrsName ist specified for geometry!");
-            LOGGER.debug(exceptionText.toString());
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            throw new NoApplicableCodeException()
+                    .withMessage("No SrsName ist specified for geometry!");
         }
         
         return JTSHelper.createGeometryFromWKT(geomWKT, srid);
@@ -480,11 +469,8 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
                 LinearRingType xbLinearRing = (LinearRingType) xbExteriorRing;
                 exteriorCoordString = getCoordString4LinearRing(xbLinearRing);
             } else {
-                StringBuilder exceptionText = new StringBuilder();
-                exceptionText.append("The Polygon must contain the following elements ");
-                exceptionText.append("<gml:exterior><gml:LinearRing><gml:posList>!");
-                LOGGER.debug(exceptionText.toString());
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+                throw new NoApplicableCodeException().withMessage("The Polygon must contain the following elements "
+                                                                  + "<gml:exterior><gml:LinearRing><gml:posList>!");
             }
         }
 
@@ -527,21 +513,13 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
             if (xbAbstractSurface instanceof PolygonType) {
                 polygons.add((Polygon) parsePolygonType((PolygonType) xbAbstractSurface));
             } else {
-                StringBuilder exceptionText = new StringBuilder();
-                exceptionText.append("The FeatureType ");
-                exceptionText.append(xbAbstractSurface);
-                exceptionText.append(" is not supportted! Only PolygonType");
-                LOGGER.debug(exceptionText.toString());
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+                throw new NoApplicableCodeException()
+                        .withMessage("The FeatureType %s is not supportted! Only PolygonType", xbAbstractSurface);
             }
         }
         if (polygons.isEmpty()) {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The FeatureType: ");
-            exceptionText.append(xbCompositeSurface);
-            exceptionText.append(" does not contain any member!");
-            LOGGER.debug(exceptionText.toString());
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            throw new NoApplicableCodeException()
+                    .withMessage("The FeatureType: %s does not contain any member!", xbCompositeSurface);
         }
         checkSrid(srid);
         GeometryFactory factory = new GeometryFactory();
@@ -575,8 +553,9 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
      *            linearRing(generated thru XmlBEans)
      * @return Returns a string containing the coordinate values of the passed
      *         ring
-     * @throws OwsExceptionReport
-     *             if parsing the linear Ring failed
+
+     *
+     * @throws OwsExceptionReport     *             if parsing the linear Ring failed
      */
     private String getCoordString4LinearRing(LinearRingType xbLinearRing) throws OwsExceptionReport {
 
@@ -591,13 +570,10 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
         } else if (xbPosArray != null && xbPosArray.length > 0) {
             result = getString4PosArray(xbPosArray);
         } else {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The Polygon must contain the following elements ");
-            exceptionText.append("<gml:exterior><gml:LinearRing><gml:posList>, ");
-            exceptionText.append("<gml:exterior><gml:LinearRing><gml:coordinates> ");
-            exceptionText.append("or <gml:exterior><gml:LinearRing><gml:pos>{<gml:pos>}!");
-            LOGGER.debug(exceptionText.toString());
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            throw new NoApplicableCodeException().withMessage("The Polygon must contain the following elements "
+                                                              + "<gml:exterior><gml:LinearRing><gml:posList>, "
+                                                              + "<gml:exterior><gml:LinearRing><gml:coordinates> "
+                                                              + "or <gml:exterior><gml:LinearRing><gml:pos>{<gml:pos>}!");
         }
 
         return result;
@@ -640,15 +616,15 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
      * @param xbPosList
      *            XmlBeans generated DirectPositionList.
      * @return Returns String with coordinates for WKT.
+
+     *
      * @throws OwsExceptionReport
      */
     private String getString4PosList(DirectPositionListType xbPosList) throws OwsExceptionReport {
         StringBuilder coordinateString = new StringBuilder("(");
         List<?> values = xbPosList.getListValue();
         if ((values.size() % 2) != 0) {
-            String exceptionText = "The Polygons posList must contain pairs of coordinates!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            throw new NoApplicableCodeException().withMessage("The Polygons posList must contain pairs of coordinates!");
         } else {
             for (int i = 0; i < values.size(); i++) {
                 coordinateString.append(values.get(i));
@@ -693,9 +669,7 @@ public class GmlDecoderv321 implements Decoder<Object, XmlObject> {
 
     private void checkSrid(int srid) throws OwsExceptionReport {
         if (srid == 0 || srid == -1) {
-            StringBuilder exceptionText = new StringBuilder("No SrsName ist specified for geometry!");
-            LOGGER.debug(exceptionText.toString());
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            throw new NoApplicableCodeException().withMessage("No SrsName ist specified for geometry!");
         }
     }
 

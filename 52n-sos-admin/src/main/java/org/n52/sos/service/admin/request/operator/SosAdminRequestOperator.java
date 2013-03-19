@@ -31,11 +31,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.encode.EncoderKey;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.encode.Encoder;
+import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.XmlEncoderKey;
 import org.n52.sos.exception.AdministratorException;
-import org.n52.sos.ogc.ows.OWSConstants;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.MissingParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.EncoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.ErrorWhileSavingResponseToOutputStreamException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.NoEncoderForResponseException;
+import org.n52.sos.exception.ows.OperationNotSupportedException;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSOperationsMetadata;
 import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
@@ -45,15 +52,11 @@ import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.response.GetCapabilitiesResponse;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.admin.AdministratorConstants.AdministratorParams;
 import org.n52.sos.service.admin.request.AdminRequest;
 import org.n52.sos.util.CollectionHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SosAdminRequestOperator implements AdminRequestOperator {
 
@@ -63,34 +66,22 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
      * Or you have to reload the Webapp.
      * Maybe there are other solution: CLassLoader, ...
      */
-
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SosAdminRequestOperator.class);
-
     private static final String KEY = "SOS";
-
     private static final String CONTENT_TYPE_PLAIN = "text/plain";
-
     public static final String REQUEST_GET_CAPABILITIES = "GetCapabilities";
-
     public static final String REQUEST_UPDATE = "Update";
-
     public static final String UPDATE_ENCODER = "Encoder";
-
     public static final String UPDATE_DECODER = "Decoder";
-
     public static final String UPDATE_OPERATIONS = "Operations";
-
     public static final String UPDATE_SERVICES = "Services";
-
     public static final String UPDATE_BINDINGS = "Bindings";
-
     public static final String UPDATE_CONFIGURATION = "Configuration";
-
     private static final List<String> PARAMETERS = CollectionHelper.list(UPDATE_BINDINGS,
-        UPDATE_CONFIGURATION, UPDATE_DECODER, UPDATE_ENCODER, UPDATE_OPERATIONS, UPDATE_SERVICES);
+                                                                         UPDATE_CONFIGURATION,
+                                                                         UPDATE_DECODER,
+                                                                         UPDATE_ENCODER,
+                                                                         UPDATE_OPERATIONS,
+                                                                         UPDATE_SERVICES);
 
     @Override
     public String getKey() {
@@ -105,7 +96,7 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
             } else if (request.getRequest().equalsIgnoreCase(REQUEST_UPDATE)) {
                 return handleUpdateRequest(request);
             } else {
-                throw Util4Exceptions.createOperationNotSupportedException(request.getRequest());
+                throw new OperationNotSupportedException(request.getRequest());
             }
         } catch (ConfigurationException e) {
             throw new AdministratorException(e);
@@ -113,12 +104,12 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
     }
 
     private ServiceResponse handleUpdateRequest(AdminRequest request) throws ConfigurationException,
-            OwsExceptionReport {
+                                                                             OwsExceptionReport {
         String[] parameters = request.getParameters();
         if (parameters != null && parameters.length > 0) {
             StringBuilder builder = new StringBuilder();
             builder.append("The following resources are successful updated: ");
-            List<OwsExceptionReport> exceptions = new ArrayList<OwsExceptionReport>(0);
+            CompositeOwsException exceptions = new CompositeOwsException();
             for (String parameter : parameters) {
                 if (parameter.equalsIgnoreCase(UPDATE_BINDINGS)) {
                     Configurator.getInstance().getBindingRepository().update();
@@ -139,19 +130,15 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
                     Configurator.getInstance().getServiceOperatorRepository().update();
                     builder.append("Supported Services");
                 } else {
-                    String exceptionTex = "";
-                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(
-                            AdministratorParams.parameter.name(), exceptionTex));
+                    exceptions.add(new InvalidParameterValueException(AdministratorParams.parameter, parameter));
                 }
                 builder.append(", ");
             }
-            if (!exceptions.isEmpty()) {
-                Util4Exceptions.mergeAndThrowExceptions(exceptions);
-            }
+            exceptions.throwIfNotEmpty();
             builder.delete(builder.lastIndexOf(", "), builder.length());
             return createServiceResponse(builder.toString());
         } else {
-            throw Util4Exceptions.createMissingParameterValueException(AdministratorParams.parameter.name());
+            throw new MissingParameterValueException(AdministratorParams.parameter);
         }
     }
 
@@ -188,7 +175,8 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
 
     private Map<String, List<String>> getDCP() {
         return Collections.singletonMap(SosConstants.HTTP_GET,
-                Collections.singletonList(Configurator.getInstance().getServiceURL() + "/admin?"));
+                                        Collections
+                .singletonList(Configurator.getInstance().getServiceURL() + "/admin?"));
     }
 
     private ServiceResponse createServiceResponse(String string) throws OwsExceptionReport {
@@ -198,9 +186,7 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
             baos.write(string.getBytes());
             return new ServiceResponse(baos, contentType, false, true);
         } catch (IOException e) {
-            String exceptionText = "Error occurs while saving response to output stream!";
-            LOGGER.error(exceptionText, e);
-            throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+            throw new ErrorWhileSavingResponseToOutputStreamException(e);
         }
     }
 
@@ -209,7 +195,8 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             EncoderKey key = new XmlEncoderKey(Sos2Constants.NS_SOS_20, GetCapabilitiesResponse.class);
-            Encoder<?, GetCapabilitiesResponse>  encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
+            Encoder<?, GetCapabilitiesResponse> encoder = Configurator.getInstance().getCodingRepository()
+                    .getEncoder(key);
             if (encoder != null) {
                 Object encodedObject = encoder.encode(response);
                 if (encodedObject instanceof XmlObject) {
@@ -218,21 +205,14 @@ public class SosAdminRequestOperator implements AdminRequestOperator {
                 } else if (encodedObject instanceof ServiceResponse) {
                     return (ServiceResponse) encodedObject;
                 } else {
-                    String exceptionText = "The encoder response is not supported!";
-                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                    throw new EncoderResponseUnsupportedException();
                 }
             } else {
-                String exceptionText = "Received version in request is not supported!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(OWSConstants.RequestParams.version.name(),
-                        exceptionText);
+                throw new NoEncoderForResponseException();
             }
 
         } catch (IOException ioe) {
-            String exceptionText = "Error occurs while saving response to output stream!";
-            LOGGER.error(exceptionText, ioe);
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
     }
-
 }

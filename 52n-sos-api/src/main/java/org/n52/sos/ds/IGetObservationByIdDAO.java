@@ -44,8 +44,9 @@ public interface IGetObservationByIdDAO extends OperationDAO {
      *            observations for
      * @return Returns observation collection (also if single observations are
      *         returned)
-     * @throws OwsExceptionReport
-     *             if getting observation(s) from data source failed
+
+     *
+     * @throws OwsExceptionReport     *             if getting observation(s) from data source failed
      */
     public GetObservationByIdResponse getObservationById(GetObservationByIdRequest request) throws OwsExceptionReport;
 }

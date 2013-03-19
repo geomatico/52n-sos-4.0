@@ -47,6 +47,9 @@ import net.opengis.sos.x10.GetObservationDocument.GetObservation.EventTime;
 import net.opengis.sos.x10.GetObservationDocument.GetObservation.FeatureOfInterest;
 import net.opengis.sos.x10.ResponseModeType;
 
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidResponseModeParameterException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.filter.ComparisonFilter;
 import org.n52.sos.ogc.filter.FilterConstants;
@@ -66,7 +69,6 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,6 +128,8 @@ public class ITRequestEncoder {
      * @param assignedSensorID
      *        id of new registered sensor
      * @return Returns XMLBeans representation of RegisterSensorResponse
+
+     *
      * @throws OwsExceptionReport
      */
     public GetObservationDocument createGetObservationRequest(AbstractServiceRequest request) throws OwsExceptionReport {
@@ -219,9 +223,12 @@ public class ITRequestEncoder {
      * @param xb_compOpsType
      *        The pre-created ComparisonOpsType XML bean to populate
      * @return Populated ComparisonOpsType XML bean (for convenience)
+
+     *
      * @throws OwsExceptionReport
      */
-    public static ComparisonOpsType encodeComparisonFilter(ComparisonFilter filter, ComparisonOpsType xb_compOpsType) throws OwsExceptionReport {
+    public static ComparisonOpsType encodeComparisonFilter(ComparisonFilter filter, ComparisonOpsType xb_compOpsType)
+            throws OwsExceptionReport {
         switch (filter.getOperator()) {
         case PropertyIsBetween:
             PropertyIsBetweenType xb_propBetween = (PropertyIsBetweenType) xb_compOpsType.changeType(PropertyIsBetweenType.type);
@@ -278,9 +285,8 @@ public class ITRequestEncoder {
             xb_propNE.setExpressionArray(createExpressionArray(filter.getPropertyName(), filter.getValue()));
             break;
         default:
-            String error = "Could not encode unknown comparison operator " + filter.getOperator().toString();
-            throw Util4Exceptions.createInvalidParameterValueException(SosConstants.GetObservationParams.result.name(),
-                                                                       error);
+                throw new InvalidParameterValueException().at(SosConstants.GetObservationParams.result)
+                        .withMessage("Could not encode unknown comparison operator %s", filter.getOperator().toString());
         }
 
         return xb_compOpsType;
@@ -315,14 +321,14 @@ public class ITRequestEncoder {
      * @param responseMode
      *        The responseMode string to look up
      * @return The matching ResponseModeType.Enum
+
+     *
      * @throws OwsExceptionReport
      */
     public static ResponseModeType.Enum getResponseModeEnum(String responseMode) throws OwsExceptionReport {
         ResponseModeType.Enum responseModeEnum = (ResponseModeType.Enum) ResponseModeType.Enum.table.forString(responseMode);
         if (responseModeEnum == null) {
-            String error = "Invalid ResponseMode.Enum " + responseMode;
-            throw Util4Exceptions.createInvalidParameterValueException(SosConstants.GetObservationParams.responseMode.name(),
-                                                                       error);
+            throw new InvalidResponseModeParameterException(responseMode);
         }
 
         return responseModeEnum;
@@ -336,6 +342,8 @@ public class ITRequestEncoder {
      * @param xb_eventTime
      *        EventTime xmlbean to add encoded temporal filter to
      * @return EventTime arguments (for convenience)
+
+     *
      * @throws OwsExceptionReport
      */
     public static EventTime encodeTemporalFilter(TemporalFilter tf, EventTime xb_eventTime) throws OwsExceptionReport {
@@ -346,10 +354,8 @@ public class ITRequestEncoder {
         case TM_During:
             QName timeOpQName = timeOpQNameMap.get(tf.getOperator());
             if (timeOpQName == null) {
-                // OwsExceptionReport se = new OwsExceptionReport();
-                String error = "No QName found for temporal operator " + tf.getOperator().name();
-                throw Util4Exceptions.createInvalidParameterValueException(Sos1Constants.GetObservationParams.eventTime.name(),
-                                                                           error);
+                throw new InvalidParameterValueException().at(Sos1Constants.GetObservationParams.eventTime)
+                        .withMessage("No QName found for temporal operator %s", tf.getOperator().name());
             }
             BinaryTemporalOpType xb_binaryTempOp = (BinaryTemporalOpType) xb_eventTime.addNewTemporalOps().substitute(timeOpQName,
                                                                                                                       BinaryTemporalOpType.type);
@@ -357,10 +363,9 @@ public class ITRequestEncoder {
             addTimeObject(tf.getTime(), xb_binaryTempOp);
             break;
         default:
-            // operator not implemented, throw error
-            String error = "Temporal filter " + tf.getOperator().name() + " not implemented in " + "SosRequestEncoder";
-            throw Util4Exceptions.createInvalidParameterValueException(Sos1Constants.GetObservationParams.eventTime.name(),
-                                                                       error);
+                // operator not implemented, throw error
+                throw new InvalidParameterValueException().at(Sos1Constants.GetObservationParams.eventTime)
+                        .withMessage("Temporal filter %s not implemented in SosRequestEncoder", tf.getOperator());
         }
         return xb_eventTime;
     }
@@ -372,54 +377,51 @@ public class ITRequestEncoder {
      *        ISosTime to convert (TimeInstant or TimePeriod)
      * @param xb_binaryTempOps
      *        BinaryTemporalOpType to add TimeInstant or TimePeriod to
+
+     *
      * @throws OwsExceptionReport
      */
     public static void addTimeObject(ITime sosTime, BinaryTemporalOpType xb_binaryTempOps) throws OwsExceptionReport {
         try {
             if (sosTime == null) {
                 return;
-            }
-            else if (sosTime instanceof TimeInstant) {
+            } else if (sosTime instanceof TimeInstant) {
                 TimeInstant ti = (TimeInstant) sosTime;
-                TimeInstantType xb_timeInstant = (TimeInstantType) xb_binaryTempOps.addNewTimeObject().substitute(QN_TIME_INSTANT,
-                                                                                                                  TimeInstantType.type);
+                TimeInstantType xb_timeInstant = (TimeInstantType) xb_binaryTempOps.addNewTimeObject()
+                        .substitute(QN_TIME_INSTANT,
+                                    TimeInstantType.type);
                 String timeStr;
                 if (ti.getIndeterminateValue() != null) {
                     timeStr = ti.getIndeterminateValue();
-                }
-                else {
+                } else {
                     timeStr = DateTimeHelper.formatDateTime2ResponseString(ti.getValue());
                 }
                 xb_timeInstant.addNewTimePosition().setStringValue(timeStr);
-            }
-            else if (sosTime instanceof TimePeriod) {
+            } else if (sosTime instanceof TimePeriod) {
                 TimePeriod tp = (TimePeriod) sosTime;
-                TimePeriodType xb_timePeriod = (TimePeriodType) xb_binaryTempOps.addNewTimeObject().substitute(QN_TIME_PERIOD,
-                                                                                                               TimePeriodType.type);
+                TimePeriodType xb_timePeriod = (TimePeriodType) xb_binaryTempOps.addNewTimeObject()
+                        .substitute(QN_TIME_PERIOD,
+                                    TimePeriodType.type);
                 String beginTimeStr;
                 if (tp.getStartIndet() != null) {
                     beginTimeStr = tp.getStartIndet();
-                }
-                else {
+                } else {
                     beginTimeStr = DateTimeHelper.formatDateTime2ResponseString(tp.getStart());
                 }
 
                 String endTimeStr;
                 if (tp.getEndIndet() != null) {
                     endTimeStr = tp.getEndIndet();
-                }
-                else {
+                } else {
                     endTimeStr = DateTimeHelper.formatDateTime2ResponseString(tp.getEnd());
                 }
 
                 xb_timePeriod.addNewBeginPosition().setStringValue(beginTimeStr);
                 xb_timePeriod.addNewEndPosition().setStringValue(endTimeStr);
             }
-        }
-        catch (DateTimeException dte) {
-            String exceptionText = "Error while creating time objects!";
-            LOGGER.error(exceptionText, dte);
-            throw Util4Exceptions.createNoApplicableCodeException(dte, exceptionText);
+        } catch (DateTimeException dte) {
+            throw new NoApplicableCodeException().causedBy(dte)
+                    .withMessage("Error while creating time objects!");
         }
     }
 
@@ -433,15 +435,13 @@ public class ITRequestEncoder {
             mp = (MultiPoint) geom;
         }
         catch (ClassCastException e) {
-            String error = "BBOX geometry argument not a MultiPoint";
-            throw Util4Exceptions.createInvalidParameterValueException(SosConstants.GetObservationParams.featureOfInterest.name(),
-                                                                       error);
+            throw new InvalidParameterValueException().at(SosConstants.GetObservationParams.featureOfInterest)
+                    .causedBy(e).withMessage("BBOX geometry argument not a MultiPoint");
         }
 
         if (mp.getNumPoints() != 2) {
-            String error = "BBOX geometry argument does not have two points";
-            throw Util4Exceptions.createInvalidParameterValueException(SosConstants.GetObservationParams.featureOfInterest.name(),
-                                                                       error);
+            throw new InvalidParameterValueException().at(SosConstants.GetObservationParams.featureOfInterest)
+                    .withMessage("BBOX geometry argument does not have two points");
         }
 
         int srid = mp.getSRID();

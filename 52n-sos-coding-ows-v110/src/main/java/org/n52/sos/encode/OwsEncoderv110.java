@@ -51,6 +51,10 @@ import net.opengis.ows.x11.ServiceProviderDocument;
 import net.opengis.ows.x11.ServiceProviderDocument.ServiceProvider;
 
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.OwsExceptionCode;
+import org.n52.sos.ogc.ows.CodedException;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.IOWSParameterValue;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
@@ -58,7 +62,6 @@ import org.n52.sos.ogc.ows.OWSOperationsMetadata;
 import org.n52.sos.ogc.ows.OWSParameterDataType;
 import org.n52.sos.ogc.ows.OWSParameterValuePossibleValues;
 import org.n52.sos.ogc.ows.OWSParameterValueRange;
-import org.n52.sos.ogc.ows.OwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.ows.SosServiceProvider;
@@ -69,22 +72,21 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(OwsEncoderv110.class);
-
     private Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(OWSConstants.NS_OWS,
-            SosServiceIdentification.class, SosServiceProvider.class, OWSOperationsMetadata.class,
-            OwsExceptionReport.class, OwsException.class);
+                                                                               SosServiceIdentification.class,
+                                                                               SosServiceProvider.class,
+                                                                               OWSOperationsMetadata.class,
+                                                                               OwsExceptionReport.class);
 
     public OwsEncoderv110() {
         LOGGER.debug("Encoder for the following keys initialized successfully: {}!",
-                StringHelper.join(", ", ENCODER_KEYS));
+                     StringHelper.join(", ", ENCODER_KEYS));
     }
 
     @Override
@@ -127,21 +129,18 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
             return encodeOperationsMetadata((OWSOperationsMetadata) element);
         } else if (element instanceof OwsExceptionReport) {
             return encodeOwsExceptionReport((OwsExceptionReport) element);
-        } else if (element instanceof OwsException) {
-            return encodeOwsException((OwsException)element);
         }
         return null;
     }
 
     /**
      * Set the service identification information
-     * 
-     * @param serviceIdentification
-     *            XML object loaded from file.
-     * @param xbCaps
-     *            XML capabilities document.
-     * @throws OwsExceptionReport
-     *             if the file is invalid.
+     *
+     * @param serviceIdentification XML object loaded from file.
+     * @param xbCaps                XML capabilities document.
+     *
+     *
+     * @throws OwsExceptionReport * if the file is invalid.
      */
     private XmlObject encodeServiceIdentification(SosServiceIdentification sosServiceIdentification)
             throws OwsExceptionReport {
@@ -150,15 +149,13 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
 
             if (sosServiceIdentification.getServiceIdentification() instanceof ServiceIdentificationDocument) {
                 serviceIdent =
-                        ((ServiceIdentificationDocument) sosServiceIdentification.getServiceIdentification())
-                                .getServiceIdentification();
+                ((ServiceIdentificationDocument) sosServiceIdentification.getServiceIdentification())
+                        .getServiceIdentification();
             } else if (sosServiceIdentification.getServiceIdentification() instanceof ServiceIdentification) {
                 serviceIdent = (ServiceIdentification) sosServiceIdentification.getServiceIdentification();
             } else {
-                String exceptionText =
-                        "The service identification file is not a ServiceIdentificationDocument, ServiceIdentification or invalid! Check the file in the Tomcat webapps: /SOS_webapp/WEB-INF/conf/capabilities/.";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoApplicableCodeException()
+                        .withMessage("The service identification file is not a ServiceIdentificationDocument, ServiceIdentification or invalid! Check the file in the Tomcat webapps: /SOS_webapp/WEB-INF/conf/capabilities/.");
             }
         } else {
             /* TODO check for required fields and fail on missing ones */
@@ -196,13 +193,12 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
 
     /**
      * Set the service provider information
-     * 
-     * @param serviceProvider
-     *            XML object loaded from file.
-     * @param xbCaps
-     *            XML capabilities document.
-     * @throws OwsExceptionReport
-     *             if the file is invalid.
+     *
+     * @param serviceProvider XML object loaded from file.
+     * @param xbCaps          XML capabilities document.
+     *
+     *
+     * @throws OwsExceptionReport * if the file is invalid.
      */
     private XmlObject encodeServiceProvider(SosServiceProvider sosServiceProvider) throws OwsExceptionReport {
         if (sosServiceProvider.getServiceProvider() != null) {
@@ -211,10 +207,10 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
             } else if (sosServiceProvider.getServiceProvider() instanceof ServiceProvider) {
                 return sosServiceProvider.getServiceProvider();
             } else {
-                String exceptionText =
-                        "The service identification file is not a ServiceProviderDocument, ServiceProvider or invalid! Check the file in the Tomcat webapps: /SOS_webapp/WEB-INF/conf/capabilities/.";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoApplicableCodeException()
+                        .withMessage("The service identification file is not a ServiceProviderDocument, "
+                                     + "ServiceProvider or invalid! Check the file in the Tomcat webapps: "
+                                     + "/SOS_webapp/WEB-INF/conf/capabilities/.");
             }
         } else {
             /* TODO check for required fields and fail on missing ones */
@@ -240,16 +236,16 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
 
     /**
      * Sets the OperationsMetadata section to the capabilities document.
-     * 
-     * @param operationsMetadata
-     *            SOS metadatas for the operations
-     * @throws OwsExceptionReport
-     *             if an error occurs
+     *
+     * @param operationsMetadata SOS metadatas for the operations
+     *
+     *
+     * @throws CompositeOwsException * if an error occurs
      */
     private OperationsMetadata encodeOperationsMetadata(OWSOperationsMetadata operationsMetadata)
             throws OwsExceptionReport {
         OperationsMetadata xbMeta =
-                OperationsMetadata.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                           OperationsMetadata.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         for (OWSOperation operationMetadata : operationsMetadata.getOperations()) {
             Operation operation = xbMeta.addNewOperation();
             // name
@@ -280,13 +276,13 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
         return xbMeta;
     }
 
-    private ExceptionDocument encodeOwsException(OwsException owsException) {
+    private ExceptionDocument encodeOwsException(CodedException owsException) {
         ExceptionDocument exceptionDoc =
-                ExceptionDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                          ExceptionDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         ExceptionType exceptionType = exceptionDoc.addNewException();
         String exceptionCode;
         if (owsException.getCode() == null) {
-            exceptionCode = OWSConstants.OwsExceptionCode.NoApplicableCode.toString();
+            exceptionCode = OwsExceptionCode.NoApplicableCode.toString();
         } else {
             exceptionCode = owsException.getCode().toString();
         }
@@ -295,18 +291,16 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
             exceptionType.setLocator(owsException.getLocator());
         }
         StringBuilder exceptionText = new StringBuilder();
-        if (owsException.getMessages() != null) {
-            for (String message : owsException.getMessages()) {
-                exceptionText.append(message);
-                exceptionText.append("\n");
-            }
+        if (owsException.getMessage() != null) {
+            exceptionText.append(owsException.getMessage());
+            exceptionText.append("\n");
         }
-        if (owsException.getException() != null) {
+        if (owsException.getCause() != null) {
             exceptionText.append("[EXEPTION]: \n");
-            String localizedMessage = owsException.getException().getLocalizedMessage();
-            String message = owsException.getException().getMessage();
+            String localizedMessage = owsException.getCause().getLocalizedMessage();
+            String message = owsException.getCause().getMessage();
             if (localizedMessage != null && message != null) {
-                if(!message.equals(localizedMessage)) {
+                if (!message.equals(localizedMessage)) {
                     JavaHelper.appendTextToStringBuilderWithLineBreak(exceptionText, message);
                 }
                 JavaHelper.appendTextToStringBuilderWithLineBreak(exceptionText, localizedMessage);
@@ -321,31 +315,25 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
 
     private ExceptionReportDocument encodeOwsExceptionReport(OwsExceptionReport owsExceptionReport)
             throws OwsExceptionReport {
-        ExceptionReportDocument erd =
-                ExceptionReportDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+        ExceptionReportDocument erd = ExceptionReportDocument.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         ExceptionReport er = erd.addNewExceptionReport();
         // er.setLanguage("en");
         er.setVersion(owsExceptionReport.getVersion());
-        if (owsExceptionReport.getExceptions() != null) {
-            List<ExceptionType> exceptionTypes =
-                    new ArrayList<ExceptionType>(owsExceptionReport.getExceptions().size());
-            for (OwsException owsException : owsExceptionReport.getExceptions()) {
-                ExceptionDocument exceptionDoc = (ExceptionDocument) encode(owsException);
-                exceptionTypes.add(exceptionDoc.getException());
-            }
-            er.setExceptionArray(exceptionTypes.toArray(new ExceptionType[exceptionTypes.size()]));
+        List<ExceptionType> exceptionTypes =
+                            new ArrayList<ExceptionType>(owsExceptionReport.getExceptions().size());
+        for (CodedException e : owsExceptionReport.getExceptions()) {
+            exceptionTypes.add(encodeOwsException(e).getException());
         }
+        er.setExceptionArray(exceptionTypes.toArray(new ExceptionType[exceptionTypes.size()]));
         N52XmlHelper.setSchemaLocationToDocument(erd, N52XmlHelper.getSchemaLocationForOWS110());
         return erd;
     }
 
     /**
      * Sets the DCP operation.
-     * 
-     * @param dcp
-     *            The operation.
-     * @param get
-     *            Add GET.
+     *
+     * @param dcp The operation.
+     * @param get Add GET.
      */
     private void encodeDCP(DCP dcp, Map<String, ? extends Collection<String>> supportedDcp) {
         HTTP http = dcp.addNewHTTP();
@@ -391,13 +379,10 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
 
     /**
      * Sets operation parameters to AnyValue, NoValues or AllowedValues.
-     * 
-     * @param domainType
-     *            Paramter.
-     * @param name
-     *            Parameter name.
-     * @param parameterValue
-     *            .getValues() List of values.
+     *
+     * @param domainType     Paramter.
+     * @param name           Parameter name.
+     * @param parameterValue .getValues() List of values.
      */
     private void setParamList(DomainType domainType, OWSParameterValuePossibleValues parameterValue) {
         if (parameterValue.getValues() != null) {
@@ -433,11 +418,12 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
 
     /**
      * Sets the EventTime parameter.
-     * 
-     * @param domainType
-     *            Parameter.
+     *
+     * @param domainType     Parameter.
      * @param parameterValue
-     * @throws OwsExceptionReport
+     *
+     *
+     * @throws CompositeOwsException
      */
     private void setParamRange(DomainType domainType, OWSParameterValueRange parameterValue) throws OwsExceptionReport {
         if (parameterValue.getMinValue() != null && parameterValue.getMaxValue() != null) {
@@ -455,5 +441,4 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
             domainType.addNewValuesReference().setReference(parameterValue.getValueReference());
         }
     }
-
 }

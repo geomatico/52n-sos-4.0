@@ -25,129 +25,87 @@ package org.n52.sos.util;
 
 import java.util.List;
 
-import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OWSConstants.ExceptionLevel;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.MissingParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.OperationNotSupportedException;
+import org.n52.sos.exception.ows.OptionNotSupportedException;
+import org.n52.sos.exception.ows.VersionNegotiationFailedException;
+import org.n52.sos.exception.sos.InvalidPropertyOfferingCombinationException;
+import org.n52.sos.exception.sos.ResponseExceedsSizeLimitException;
+import org.n52.sos.exception.swes.InvalidRequestException;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.ogc.sos.SosConstants.SosExceptionCode;
-import org.n52.sos.ogc.swe.SWEConstants.SwesExceptionCode;
 
 /**
  * class offers util methods for Exceptions used in this SOS
- * 
- * 
  */
 public class Util4Exceptions {
-
+    @Deprecated
     public static OwsExceptionReport createMissingMandatoryParameterException(String parameterName) {
-        OwsExceptionReport owse = new OwsExceptionReport(OWSConstants.ExceptionLevel.DetailedExceptions);
-        owse.addCodedException(OWSConstants.OwsExceptionCode.MissingParameterValue, parameterName, 
-            String.format("Your request was invalid! The mandatory parameter %s must be contained in your request!", parameterName));
-        return owse;
+        return createMissingParameterValueException(parameterName);
     }
 
-    /**
-     * Hide utility constructor
-     */
-    private Util4Exceptions() {
-        super();
-    }
-
-    /**
-     * creates a ServiceException, if a request parameter is missing
-     * 
-     * @param parameterName
-     *            name of the parameter, which is missing in the request
-     * @return Returns ServiceException with ExceptionCode =
-     *         MissingParameterValue and corresponding message
-     * 
-     */
+    @Deprecated
     public static OwsExceptionReport createMissingParameterValueException(String parameterName) {
-        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-        owse.addCodedException(OwsExceptionCode.MissingParameterValue, parameterName,
-                String.format("The value for the parameter '%s' is missing in the request!", parameterName));
-        return owse;
+        return new MissingParameterValueException(parameterName);
     }
 
-    /**
-     * creates a ServiceException for GetObservation requests that are too large
-     * 
-     * @param responseSize
-     *            Number of observations matching request
-     * @param responseLimit 
-     * @return Returns ServiceException with ExceptionCode =
-     *         ResponseExceedsSizeLimit and corresponding message
-     * 
-     */
+    @Deprecated
     public static OwsExceptionReport createResponseExceedsSizeLimitException(int responseSize, int responseLimit) {
-        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-        owse.addCodedException(SosExceptionCode.ResponseExceedsSizeLimit, null, String.format(
-                "The request matched %d observations, which exceeds this server's limit of %d", 
-                responseSize, responseLimit));
-        return owse;
+        return new ResponseExceedsSizeLimitException().forLimit(responseSize, responseLimit);
     }
-    
+
+    @Deprecated
     public static OwsExceptionReport createResponseExceedsSizeLimitException(String message) {
-        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-        owse.addCodedException(SosExceptionCode.ResponseExceedsSizeLimit, null, message);
-        return owse;
+        return new ResponseExceedsSizeLimitException().withMessage(message);
     }
 
+    @Deprecated
     public static OwsExceptionReport createOperationNotSupportedException(String operationName) {
-        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-        owse.addCodedException(OwsExceptionCode.OperationNotSupported, operationName,
-                String.format("The requested operation '%s' is not supported by this service!", operationName));
-        return owse;
+        return new OperationNotSupportedException().forOperation(operationName);
     }
 
+    @Deprecated
     public static OwsExceptionReport createNoApplicableCodeException(Exception exception, String message) {
-        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-        owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, message, exception);
-        return owse;
+        return new NoApplicableCodeException().withMessage(message).causedBy(exception);
     }
 
+    @Deprecated
     public static OwsExceptionReport createInvalidParameterValueException(String parameterName, String message) {
-        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-        owse.addCodedException(OwsExceptionCode.InvalidParameterValue, parameterName, message);
-        return owse;
+        return new InvalidParameterValueException().at(parameterName).withMessage(message);
     }
 
+    @Deprecated
     public static OwsExceptionReport createVersionNegotiationFailedException(String message) {
-        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-        owse.addCodedException(OwsExceptionCode.VersionNegotiationFailed, null, message);
-        return owse;
+        return new VersionNegotiationFailedException().withMessage(message);
     }
 
+    @Deprecated
     public static void mergeAndThrowExceptions(List<OwsExceptionReport> exceptions) throws OwsExceptionReport {
-        if (!exceptions.isEmpty()) {
-            OwsExceptionReport owse = null;
-            for (OwsExceptionReport owsExceptionReport : exceptions) {
-                if (owse == null) {
-                    owse = owsExceptionReport;
-                } else {
-                    owse.addOwsExceptionReport(owsExceptionReport);
-                }
-            }
-            throw owse;
-        }
+        new CompositeOwsException().add(exceptions).throwIfNotEmpty();
     }
 
+    @Deprecated
+    public static OwsExceptionReport merge(OwsExceptionReport... exceptions) {
+        return new CompositeOwsException().add(exceptions);
+    }
+
+    @Deprecated
     public static OwsExceptionReport createOptionNotSupportedException(String parameterName, String message) {
-        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-        owse.addCodedException(OwsExceptionCode.OptionNotSupported, parameterName, message);
-        return owse;
+        return new OptionNotSupportedException().at(parameterName).withMessage(message);
     }
 
+    @Deprecated
     public static OwsExceptionReport createInvalidRequestException(String message, Exception exception) {
-        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-        owse.addCodedException(SwesExceptionCode.InvalidRequest, null, message, exception);
-        return owse;
+        return new InvalidRequestException().withMessage(message).causedBy(exception);
     }
 
+    @Deprecated
     public static OwsExceptionReport createInvalidPropertyOfferingCombination(String message) {
-        OwsExceptionReport owse = new OwsExceptionReport(ExceptionLevel.DetailedExceptions);
-        owse.addCodedException(SosExceptionCode.InvalidPropertyOfferingCombination, null, message);
-        return owse;
+        return new InvalidPropertyOfferingCombinationException().withMessage(message);
     }
 
+    private Util4Exceptions() {
+    }
 }

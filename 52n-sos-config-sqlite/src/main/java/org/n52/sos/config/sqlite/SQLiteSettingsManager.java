@@ -38,7 +38,7 @@ import org.hibernate.criterion.Restrictions;
 import org.n52.sos.config.AbstractSettingValueFactory;
 import org.n52.sos.config.AbstractSettingsManager;
 import org.n52.sos.config.AdministratorUser;
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingValue;
 import org.n52.sos.config.SettingValueFactory;
 import org.n52.sos.config.sqlite.entities.AbstractSettingValue;

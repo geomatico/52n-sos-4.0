@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -38,11 +37,20 @@ import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.AbstractGetObservationDAO;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.ObservationEncoder;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidObservedPropertyParameterException;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidOfferingParameterException;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidResponseFormatParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingObservedPropertyParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingOfferingParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingResponseFormatParameterException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.ErrorWhileSavingResponseToOutputStreamException;
+import org.n52.sos.exception.sos.ResponseExceedsSizeLimitException;
 import org.n52.sos.ogc.filter.FilterConstants.TimeOperator;
 import org.n52.sos.ogc.filter.TemporalFilter;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.om.SosObservation;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -54,12 +62,9 @@ import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.SosHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * class and forwards requests to the GetObservationDAO; after query of
@@ -68,13 +73,8 @@ import org.slf4j.LoggerFactory;
  */
 @Configurable
 public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<AbstractGetObservationDAO, GetObservationRequest> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SosGetObservationOperatorV20.class.getName());
-
     private static final String OPERATION_NAME = SosConstants.Operations.GetObservation.name();
-
-    private static final Set<String> CONFORMANCE_CLASSES = Collections
-            .singleton(ConformanceClasses.SOS_V2_CORE_PROFILE);
+    private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_CORE_PROFILE);
     private boolean blockRequestsWithoutRestriction;
 
     public SosGetObservationOperatorV20() {
@@ -135,13 +135,7 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
             try {
                 encoder = CodingHelper.getEncoder(namespace, response);
             } catch (OwsExceptionReport e) {
-                String exceptionText =
-                        String.format(
-                                "The value '%s' of the responseFormat parameter is not supported by this server!",
-                                responseFormat);
-                LOGGER.error(exceptionText, e);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        SosConstants.GetObservationParams.responseFormat.name(), exceptionText);
+                throw new InvalidResponseFormatParameterException(responseFormat).causedBy(e);
             }
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -150,15 +144,13 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
             encodedObject.save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
             return new ServiceResponse(baos, contentType, zipCompression, true);
         } catch (IOException ioe) {
-            String exceptionText = "Error occurs while saving response to output stream!";
-            LOGGER.error(exceptionText, ioe);
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
 
     }
 
     private void checkRequestedParameters(GetObservationRequest sosRequest) throws OwsExceptionReport {
-        List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+        CompositeOwsException exceptions = new CompositeOwsException();
         try {
             checkServiceParameter(sosRequest.getService());
         } catch (OwsExceptionReport owse) {
@@ -222,14 +214,14 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
             exceptions.add(owse);
         }
 
-        Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        exceptions.throwIfNotEmpty();
 
         // check if parameters are set, if not throw ResponseExceedsSizeLimit
         // exception
         // TODO remove after finishing CITE tests
         if (sosRequest.isEmpty() && isBlockRequestsWithoutRestriction()) {
-            String exceptionText = "The response exceeds the size limit! Please define some filtering parameters.";
-            throw Util4Exceptions.createResponseExceedsSizeLimitException(exceptionText);
+            throw new ResponseExceedsSizeLimitException()
+                    .withMessage("The response exceeds the size limit! Please define some filtering parameters.");
         }
     }
 
@@ -251,32 +243,25 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
      * @param strings
      * @param offering
      *            the requested offeringID
-     * @throws OwsExceptionReport
-     *             if the parameter does not containing any matching
-     *             observedProperty for the requested offering
+
+     *
+     * @throws OwsExceptionReport * if the parameter does not containing any matching     *             observedProperty for the requested offering
      */
     private void checkObservedProperties(List<String> observedProperties) throws OwsExceptionReport {
         if (observedProperties != null) {
-            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+            CompositeOwsException exceptions = new CompositeOwsException();
             Collection<String> validObservedProperties =
                                Configurator.getInstance().getCache().getObservableProperties();
             for (String obsProp : observedProperties) {
                 if (obsProp.isEmpty()) {
-                    exceptions.add(Util4Exceptions
-                            .createMissingParameterValueException(SosConstants.GetObservationParams.observedProperty
-                                    .name()));
+                    exceptions.add(new MissingObservedPropertyParameterException());
                 } else {
                     if (!validObservedProperties.contains(obsProp)) {
-                        String exceptionText =
-                                String.format("The value (%s) of the parameter '%s' is invalid", obsProp,
-                                        SosConstants.GetObservationParams.observedProperty.toString());
-                        LOGGER.error(exceptionText);
-                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(
-                                SosConstants.GetObservationParams.observedProperty.name(), exceptionText));
+                        exceptions.add(new InvalidObservedPropertyParameterException(obsProp));
                     }
                 }
             }
-            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+            exceptions.throwIfNotEmpty();
         }
     }
 
@@ -287,42 +272,32 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
      * 
      * @param offeringId
      *            the offeringId to be checked
-     * @throws OwsExceptionReport
-     *             if the passed offeringId is not supported
+
+     *
+     * @throws OwsExceptionReport * if the passed offeringId is not supported
      */
     private void checkOfferingId(List<String> offeringIds) throws OwsExceptionReport {
         if (offeringIds != null) {
             Collection<String> offerings = Configurator.getInstance().getCache().getOfferings();
-            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+            CompositeOwsException exceptions = new CompositeOwsException();
             for (String offeringId : offeringIds) {
                 if (offeringId == null || offeringId.isEmpty()) {
-                    exceptions.add(Util4Exceptions
-                            .createMissingParameterValueException(SosConstants.GetObservationParams.offering.name()));
+                    exceptions.add(new MissingOfferingParameterException());
                 } else if (offeringId.contains(SosConstants.SEPARATOR_4_OFFERINGS)) {
                     String[] offArray = offeringId.split(SosConstants.SEPARATOR_4_OFFERINGS);
                     if (!offerings.contains(offArray[0])
                         || !Configurator.getInstance().getCache()
                             .getProceduresForOffering(offArray[0]).contains(offArray[1])) {
-                        String exceptionText =
-                                String.format("The value (%s) of the parameter '%s' is invalid", offeringId,
-                                        SosConstants.GetObservationParams.offering.toString());
-                        LOGGER.error(exceptionText);
-                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(
-                                SosConstants.GetObservationParams.offering.name(), exceptionText));
+                        exceptions.add(new InvalidOfferingParameterException(offeringId));
                     }
 
                 } else {
                     if (!offerings.contains(offeringId)) {
-                        String exceptionText =
-                                String.format("The value (%s) of the parameter '%s' is invalid", offeringId,
-                                        SosConstants.GetObservationParams.offering.toString());
-                        LOGGER.error(exceptionText);
-                        exceptions.add(Util4Exceptions.createInvalidParameterValueException(
-                                SosConstants.GetObservationParams.offering.name(), exceptionText));
+                        exceptions.add(new InvalidOfferingParameterException(offeringId));
                     }
                 }
             }
-            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+            exceptions.throwIfNotEmpty();
         }
     }
 
@@ -340,39 +315,25 @@ public class SosGetObservationOperatorV20 extends AbstractV2RequestOperator<Abst
             request.setResponseFormat(Configurator.getInstance().getProfileHandler().getActiveProfile()
                     .getObservationResponseFormat());
         } else if (request.getResponseFormat() != null && request.getResponseFormat().isEmpty()) {
-            throw Util4Exceptions
-                    .createMissingParameterValueException(SosConstants.GetObservationParams.responseFormat.name());
+            throw new MissingResponseFormatParameterException();
         } else {
             zipCompression = SosHelper.checkResponseFormatForZipCompression(request.getResponseFormat());
             if (zipCompression) {
                 request.setResponseFormat(Configurator.getInstance().getProfileHandler().getActiveProfile()
                         .getObservationResponseFormat());
             } else {
-                Collection<String> supportedResponseFormats =
-                        SosHelper.getSupportedResponseFormats(request.getService(), request.getVersion());
+                Collection<String> supportedResponseFormats = Configurator.getInstance().getCodingRepository()
+                        .getSupportedResponseFormats(request.getService(), request.getVersion());
                 if (!supportedResponseFormats.contains(request.getResponseFormat())) {
-                    String exceptionText =
-                            String.format("The requested responseFormat (%s) is not supported by this server!",
-                                    request.getResponseFormat());
-                    LOGGER.debug(exceptionText);
-                    throw Util4Exceptions.createInvalidParameterValueException(
-                            SosConstants.GetObservationParams.responseFormat.name(), exceptionText);
+                    throw new InvalidResponseFormatParameterException(request.getResponseFormat());
                 }
             }
         }
         return zipCompression;
     }
 
-//    private String getResponseFormat() {
-//        if (Configurator.getInstance().isSetActiveProfile()) {
-//            return Configurator.getInstance().getActiveProfile().getObservationResponseFormat();
-//        } else {
-//            return OMConstants.NS_OM_2;
-//        }
-//    }
-
     private boolean isSubsettingExtensionSet(SwesExtensions extensions) {
-        return extensions != null ? extensions.isBooleanExentsionSet(Sos2Constants.Extensions.Subsetting.name())
+        return extensions != null ? extensions.isBooleanExtensionSet(Sos2Constants.Extensions.Subsetting.name())
                 : false;
     }
     

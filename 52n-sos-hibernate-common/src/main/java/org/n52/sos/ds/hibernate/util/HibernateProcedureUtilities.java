@@ -33,25 +33,23 @@ import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sensorML.SensorMLConstants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosProcedureDescription;
 import org.n52.sos.ogc.sos.SosProcedureDescriptionUnknowType;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HibernateProcedureUtilities {
-
-    /**
-     * logger
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateProcedureUtilities.class);
 
     public static SosProcedureDescription createSosProcedureDescription(Procedure procedure,
-            String procedureIdentifier, String outputFormat) throws OwsExceptionReport {
+                                                                        String procedureIdentifier, String outputFormat)
+            throws OwsExceptionReport {
         String filename = null;
         String smlFile = null;
         String descriptionFormat;
@@ -65,27 +63,21 @@ public class HibernateProcedureUtilities {
             }
         }
         descriptionFormat = procedure.getProcedureDescriptionFormat().getProcedureDescriptionFormat();
-        SosProcedureDescription sosProcedureDescription = null;
+        SosProcedureDescription sosProcedureDescription;
         // check whether SMLFile or Url is set
         if (filename == null && smlFile == null) {
-            String exceptionText = "No sensorML file was found for the requested procedure " + procedureIdentifier;
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    SosConstants.DescribeSensorParams.procedure.toString(), exceptionText);
-
+            throw new InvalidParameterValueException().at(SosConstants.DescribeSensorParams.procedure)
+                    .withMessage("No sensorML file was found for the requested procedure %s", procedureIdentifier);
         } else {
             try {
                 if (filename != null && descriptionFormat != null && smlFile == null) {
                     // return sensorML from folder
 
                     if (!descriptionFormat.equalsIgnoreCase(outputFormat)
-                            && !descriptionFormat.equalsIgnoreCase(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
-                        String exceptionText =
-                                "The value of the output format is wrong and has to be " + descriptionFormat
-                                        + " for procedure " + procedureIdentifier;
-                        LOGGER.error(exceptionText);
-                        throw Util4Exceptions.createInvalidParameterValueException(
-                                SosConstants.DescribeSensorParams.procedure.toString(), exceptionText);
+                        && !descriptionFormat.equalsIgnoreCase(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
+                        throw new InvalidParameterValueException().at(SosConstants.DescribeSensorParams.procedure)
+                                .withMessage("The value of the output format is wrong and has to be %s for procedure %s",
+                                             descriptionFormat, procedureIdentifier);
                     }
 
                     // check if filename contains placeholder for configured
@@ -116,18 +108,15 @@ public class HibernateProcedureUtilities {
                 }
                 return sosProcedureDescription;
             } catch (FileNotFoundException fnfe) {
-                String exceptionText = "No sensorML file was found for the requested procedure " + procedureIdentifier;
-                LOGGER.error(exceptionText, fnfe);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        SosConstants.DescribeSensorParams.procedure.toString(), exceptionText);
+                throw new InvalidParameterValueException().causedBy(fnfe)
+                        .at(SosConstants.DescribeSensorParams.procedure)
+                        .withMessage("No sensorML file was found for the requested procedure %s", procedureIdentifier);
             } catch (IOException ioe) {
-                String exceptionText = "An error occured while parsing the sensor description document!";
-                LOGGER.error(exceptionText, ioe);
-                throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+                throw new NoApplicableCodeException().causedBy(ioe)
+                        .withMessage("An error occured while parsing the sensor description document!");
             } catch (XmlException xmle) {
-                String exceptionText = "An error occured while parsing the sensor description document!";
-                LOGGER.error(exceptionText, xmle);
-                throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+                throw new NoApplicableCodeException().causedBy(xmle)
+                        .withMessage("An error occured while parsing the sensor description document!");
             }
         }
     }
@@ -144,4 +133,6 @@ public class HibernateProcedureUtilities {
         return Configurator.getInstance().getClass().getResourceAsStream(builder.toString());
     }
 
+    private HibernateProcedureUtilities() {
+    }
 }

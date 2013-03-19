@@ -30,13 +30,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.n52.sos.exception.AdministratorException;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.admin.AdministratorConstants.AdministratorParams;
 import org.n52.sos.service.admin.request.AdminRequest;
 import org.n52.sos.service.admin.request.operator.AdminRequestOperator;
 import org.n52.sos.util.KvpHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,8 +59,7 @@ public class AdminServiceOperatorImpl extends AdminServiceOperator {
 
         AdminRequest request = null;
         if (req.getParameterMap() == null || (req.getParameterMap() != null && req.getParameterMap().isEmpty())) {
-            LOGGER.debug("The mandatory parameter '" + OWSConstants.RequestParams.request.name() + "' is missing!");
-            throw Util4Exceptions.createMissingParameterValueException(OWSConstants.RequestParams.request.name());
+            throw new MissingParameterValueException(OWSConstants.RequestParams.request);
         }
         Map<String, String> parameterValueMap = KvpHelper.getKvpParameterValueMap(req);
         request = getRequestFromValues(parameterValueMap);

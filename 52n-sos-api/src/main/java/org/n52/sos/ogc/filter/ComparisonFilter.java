@@ -24,8 +24,8 @@
 package org.n52.sos.ogc.filter;
 
 import org.n52.sos.ogc.filter.FilterConstants.ComparisonOperator;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,20 +92,6 @@ public class ComparisonFilter {
         this.propertyName = propertyName;
     }
 
-    /**
-     * constructor
-     * 
-     * @param operator
-     *            Filter operator
-     * @param propertyName
-     *            property name
-     * @param value
-     *            value
-     * @param valueUpper
-     *            upper value for between filter
-     * @throws OwsExceptionReport
-     *             If the constructor is not valid for operator
-     */
     public ComparisonFilter(ComparisonOperator operator, String propertyName, String value, String valueUpper)
             throws OwsExceptionReport {
         if (operator == ComparisonOperator.PropertyIsBetween) {
@@ -114,13 +100,9 @@ public class ComparisonFilter {
             this.valueUpper = valueUpper;
             this.propertyName = propertyName;
         } else {
-            String exceptionText =
-                    "Use other constructor for ComparisonFilter! This constructor could only"
-                            + "be used for operator 'PropertyIsBetween'";
-            LOGGER.error(exceptionText);
-            OwsExceptionReport owse = new OwsExceptionReport();
-            owse.addCodedException(OwsExceptionCode.NoApplicableCode, null, exceptionText);
-            throw owse;
+            throw new NoApplicableCodeException()
+                    .withMessage("Use other constructor for ComparisonFilter! This constructor could only"
+                                 + "be used for operator 'PropertyIsBetween'");
         }
     }
 
@@ -141,7 +123,7 @@ public class ComparisonFilter {
      *             If the constructor is not valid for operator
      */
     public ComparisonFilter(ComparisonOperator operator, String propertyName, String value, String valueUpper,
-            String escapeString) throws OwsExceptionReport {
+                            String escapeString) throws OwsExceptionReport {
         if (operator == ComparisonOperator.PropertyIsLike) {
             this.operator = operator;
             this.value = value;
@@ -149,11 +131,8 @@ public class ComparisonFilter {
             this.propertyName = propertyName;
             this.escapeString = escapeString;
         } else {
-            String exceptionText =
-                    "Use other constructor for ComparisonFilter! This constructor could only"
-                            + "be used for operator 'PropertyIsLike'";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            throw new NoApplicableCodeException()
+                    .withMessage("Use other constructor for ComparisonFilter! This constructor could only be used for operator 'PropertyIsLike'");
         }
     }
 
@@ -201,11 +180,7 @@ public class ComparisonFilter {
         this.valueUpper = valueUpper;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
+    @Override
     public String toString() {
         String result = "ComparisonFilter: ";
         if (valueUpper != null) {

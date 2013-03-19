@@ -24,18 +24,19 @@
 package org.n52.sos.wsdl;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import javax.wsdl.WSDLException;
 
 import org.n52.sos.binding.Binding;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.operator.RequestOperator;
-import org.n52.sos.request.operator.WSDLAwareRequestOperator;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.request.operator.RequestOperatorRepository;
+import org.n52.sos.request.operator.WSDLAwareRequestOperator;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.Producer;
 
@@ -66,23 +67,25 @@ public class WSDLFactory implements Producer<String> {
         if (Configurator.getInstance() != null) {
             Map<String, Binding> bindings = Configurator.getInstance()
                     .getBindingRepository().getBindings();
+            final RequestOperatorRepository repo = Configurator.getInstance().getRequestOperatorRepository();
 
-            Collection<RequestOperator> requestOperators = Configurator.getInstance()
-                    .getRequestOperatorRepository().getRequestOperator().values();
+            Set<RequestOperatorKeyType> requestOperators = repo.getActiveRequestOperatorKeyTypes();
+
             String serviceUrl = Configurator.getInstance().getServiceURL();
             
             if (bindings.containsKey(SOAP_BINDING_ENDPOINT)) {
                 builder.setSoapEndpoint(URI.create(serviceUrl + SOAP_BINDING_ENDPOINT));
                 Binding b = bindings.get(SOAP_BINDING_ENDPOINT);
-                for (RequestOperator o : requestOperators) {
-                    if (o instanceof WSDLAwareRequestOperator) {
-                        WSDLAwareRequestOperator op = (WSDLAwareRequestOperator) o;
-                        if (op.getSosOperationDefinition() != null) {
-                            if (isHttpPostSupported(b, o)) {
-                                builder.addSoapOperation(op.getSosOperationDefinition());
+                for (RequestOperatorKeyType o : requestOperators) {
+                    RequestOperator op = repo.getRequestOperator(o);
+                    if (op instanceof WSDLAwareRequestOperator) {
+                        WSDLAwareRequestOperator wop = (WSDLAwareRequestOperator) op;
+                        if (wop.getSosOperationDefinition() != null) {
+                            if (isHttpPostSupported(b, wop)) {
+                                builder.addSoapOperation(wop.getSosOperationDefinition());
                             }
-                            addAdditionalPrefixes(op, builder);
-                            addAdditionalSchemaImports(op, builder);
+                            addAdditionalPrefixes(wop, builder);
+                            addAdditionalSchemaImports(wop, builder);
                         }
                     }
                 }
@@ -90,15 +93,16 @@ public class WSDLFactory implements Producer<String> {
             if (bindings.containsKey(POX_BINDING_ENDPOINT)) {
                 builder.setPoxEndpoint(URI.create(serviceUrl + POX_BINDING_ENDPOINT));
                 Binding b = bindings.get(POX_BINDING_ENDPOINT);
-                for (RequestOperator o : requestOperators) {
-                    if (o instanceof WSDLAwareRequestOperator) {
-                        WSDLAwareRequestOperator op = (WSDLAwareRequestOperator) o;
-                        if (op.getSosOperationDefinition() != null) {
-                            if (isHttpPostSupported(b, o)) {
-                                builder.addPoxOperation(op.getSosOperationDefinition());
+                for (RequestOperatorKeyType o : requestOperators) {
+                    RequestOperator op = repo.getRequestOperator(o);
+                    if (op instanceof WSDLAwareRequestOperator) {
+                        WSDLAwareRequestOperator wop = (WSDLAwareRequestOperator) op;
+                        if (wop.getSosOperationDefinition() != null) {
+                            if (isHttpPostSupported(b, wop)) {
+                                builder.addPoxOperation(wop.getSosOperationDefinition());
                             }
-                            addAdditionalPrefixes(op, builder);
-                            addAdditionalSchemaImports(op, builder);
+                            addAdditionalPrefixes(wop, builder);
+                            addAdditionalSchemaImports(wop, builder);
                         }
                     }
                 }
@@ -106,15 +110,16 @@ public class WSDLFactory implements Producer<String> {
             if (bindings.containsKey(KVP_BINDING_ENDPOINT)) {
                 builder.setKvpEndpoint(URI.create(serviceUrl + KVP_BINDING_ENDPOINT + "?"));
                 Binding b = bindings.get(KVP_BINDING_ENDPOINT);
-                for (RequestOperator o : requestOperators) {
+                for (RequestOperatorKeyType o : requestOperators) {
                     if (o instanceof WSDLAwareRequestOperator) {
-                        WSDLAwareRequestOperator op = (WSDLAwareRequestOperator) o;
-                        if (op.getSosOperationDefinition() != null) {
-                            if (isHttpGetSupported(b, o)) {
-                                builder.addKvpOperation(op.getSosOperationDefinition());
+                        RequestOperator op = repo.getRequestOperator(o);
+                        WSDLAwareRequestOperator wop = (WSDLAwareRequestOperator) o;
+                        if (wop.getSosOperationDefinition() != null) {
+                            if (isHttpGetSupported(b, wop)) {
+                                builder.addKvpOperation(wop.getSosOperationDefinition());
                             }
-                            addAdditionalPrefixes(op, builder);
-                            addAdditionalSchemaImports(op, builder);
+                            addAdditionalPrefixes(wop, builder);
+                            addAdditionalSchemaImports(wop, builder);
                         }
                     }
                 }

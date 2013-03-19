@@ -64,6 +64,9 @@ import net.opengis.swe.x101.VectorType.Coordinate;
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.NotYetSupportedException;
 import org.n52.sos.ogc.sensorML.elements.SosSMLPosition;
 import org.n52.sos.ogc.swe.RangeValue;
 import org.n52.sos.ogc.swe.SWEConstants;
@@ -88,7 +91,6 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,20 +174,14 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         } else if (element instanceof AbstractDataRecordDocument) {
             return parseAbstractDataComponentType(((AbstractDataRecordDocument) element).getAbstractDataRecord());
         } else {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The requested element");
-            if (element instanceof XmlObject) {
-                exceptionText.append(" '");
-                exceptionText.append(XmlHelper.getLocalName(((XmlObject) element)));
-                exceptionText.append("' ");
-            }
-            exceptionText.append("is not supported by this server!");
-            LOGGER.debug(exceptionText.toString());
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+            throw new NoApplicableCodeException()
+                    .withMessage("The requested element '%s' is not supported by this server!",
+                                 element instanceof XmlObject ? XmlHelper.getLocalName(((XmlObject) element)) : element);
         }
     }
     
-    private SosSweAbstractDataComponent parseAbstractDataComponentType(AbstractDataComponentType abstractDataComponent) throws OwsExceptionReport {
+    private SosSweAbstractDataComponent parseAbstractDataComponentType(AbstractDataComponentType abstractDataComponent)
+            throws OwsExceptionReport {
         SosSweAbstractDataComponent sosAbstractDataComponent = null;
         if (abstractDataComponent instanceof net.opengis.swe.x101.BooleanDocument.Boolean) {
             sosAbstractDataComponent = parseBoolean((net.opengis.swe.x101.BooleanDocument.Boolean)abstractDataComponent);
@@ -238,7 +234,8 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
 //        return null;
 //    }
 
-    private SosSweDataRecord parseDataRecordProperty(DataRecordPropertyType dataRecordProperty) throws OwsExceptionReport {
+    private SosSweDataRecord parseDataRecordProperty(DataRecordPropertyType dataRecordProperty) throws
+            OwsExceptionReport {
         DataRecordType dataRecord = dataRecordProperty.getDataRecord();
         return parseDataRecord(dataRecord);
     }
@@ -251,7 +248,8 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         return sosDataRecord;
     }
 
-    private SosSweSimpleDataRecord parseSimpleDataRecord(SimpleDataRecordType simpleDataRecord) throws OwsExceptionReport {
+    private SosSweSimpleDataRecord parseSimpleDataRecord(SimpleDataRecordType simpleDataRecord) throws
+            OwsExceptionReport {
         SosSweSimpleDataRecord sosSimpleDataRecord = new SosSweSimpleDataRecord();
         if (simpleDataRecord.getFieldArray() != null) {
             sosSimpleDataRecord.setFields(parseAnyScalarPropertyArray(simpleDataRecord.getFieldArray()));
@@ -296,7 +294,8 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         return sosFields;
     }
 
-    private SosSweAbstractSimpleType<Boolean> parseBoolean(net.opengis.swe.x101.BooleanDocument.Boolean xbBoolean) throws OwsExceptionReport {
+    private SosSweAbstractSimpleType<Boolean> parseBoolean(net.opengis.swe.x101.BooleanDocument.Boolean xbBoolean)
+            throws OwsExceptionReport {
         SosSweBoolean sosBoolean = new SosSweBoolean();
         if (xbBoolean.isSetValue()) {
             sosBoolean.setValue(xbBoolean.getValue());
@@ -326,10 +325,9 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         return sosCount;
     }
 
-    private SosSweAbstractSimpleType<RangeValue<Integer>> parseCountRange(CountRange countRange) throws OwsExceptionReport {
-        String exceptionText = "The CountRange is not supported";
-        LOGGER.debug(exceptionText);
-        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+    private SosSweAbstractSimpleType<RangeValue<Integer>> parseCountRange(CountRange countRange) throws
+            OwsExceptionReport {
+        throw new NotYetSupportedException().forFeature("CountRange");
     }
 
     private SosSweAbstractSimpleType<String> parseObservableProperty(ObservableProperty observableProperty) {
@@ -354,10 +352,9 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         return sosQuantity;
     }
 
-    private SosSweAbstractSimpleType<RangeValue<Double>> parseQuantityRange(QuantityRange quantityRange) throws OwsExceptionReport {
-        String exceptionText = "The QuantityRange is not supported";
-        LOGGER.debug(exceptionText);
-        throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+    private SosSweAbstractSimpleType<RangeValue<Double>> parseQuantityRange(QuantityRange quantityRange) throws
+            OwsExceptionReport {
+        throw new NotYetSupportedException().forFeature("QuantityRange");
     }
 
     private SosSweAbstractSimpleType<?> parseText(Text xbText) {
@@ -374,9 +371,7 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
             try {
                 sosTime.setValue(DateTimeHelper.parseIsoString2DateTime(time.getValue().toString()));
             } catch (DateTimeException e) {
-                String exceptionText = "Error while parsing Time!";
-                LOGGER.debug(exceptionText, e);
-                throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+                throw new NoApplicableCodeException().causedBy(e).withMessage("Error while parsing Time!");
             }
         }
         if (time.getUom() != null) {
@@ -405,9 +400,7 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
                 }
 
             } catch (DateTimeException e) {
-                String exceptionText = "Error while parsing TimeRange!";
-                LOGGER.debug(exceptionText, e);
-                throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+                throw new NoApplicableCodeException().causedBy(e).withMessage("Error while parsing TimeRange!");
             }
         }
         if (timeRange.getUom() != null) {
@@ -444,9 +437,8 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
                 sosCoordinates.add(new SosSweCoordinate<Double>(checkCoordinateName(xbCoordinate.getName()),
                         (SosSweAbstractSimpleType)parseAbstractDataComponentType(xbCoordinate.getQuantity())));
             } else {
-                String exceptionText = "Error when parsing the Coordinates of Position: It must be of type Quantity!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException("Position", exceptionText);
+                throw new InvalidParameterValueException().at("Position")
+                        .withMessage("Error when parsing the Coordinates of Position: It must be of type Quantity!");
             }
         }
         return sosCoordinates;
@@ -460,9 +452,8 @@ public class SweCommonDecoderV101 implements Decoder<Object, Object> {
         } else if (name.equals(SweCoordinateName.altitude.name())) {
             return SweCoordinateName.altitude;
         } else {
-            String exceptionText = "The coordinate name is neighter 'easting' nor 'northing' nor 'altitude'!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException("Position", exceptionText);
+            throw new InvalidParameterValueException().at("Position")
+                    .withMessage("The coordinate name is neighter 'easting' nor 'northing' nor 'altitude'!");
         }
     }
 

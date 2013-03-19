@@ -58,21 +58,15 @@ import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.om.values.TextValue;
 import org.n52.sos.ogc.om.values.UnknownValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.util.Util4Exceptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class HibernateUtilities {
-    
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(HibernateUtilities.class);
-
     public static ObservationConstellationOfferingObservationType checkObservationConstellationOfferingObservationTypeForObservation(
-            SosObservationConstellation sosObservationConstellation, String offeringIdentifier, Session session, String parameterName)
+            SosObservationConstellation sosObservationConstellation, String offeringIdentifier, Session session,
+            String parameterName)
             throws OwsExceptionReport, HibernateException {
         // FIXME parameterName should not be part of the parameters
         // check if multiple offerings.
@@ -91,52 +85,40 @@ public class HibernateUtilities {
                 HibernateCriteriaQueryUtilities.getIdentifierParameter(procAlias),
                 sosObservationConstellation.getProcedure().getProcedureIdentifier()));
         queryObject.setAliases(aliases);
-        List<ObservationConstellationOfferingObservationType> obsConstsOffObsTypes = HibernateCriteriaQueryUtilities.getObservationConstellationOfferingObservationType(queryObject, session);
+        List<ObservationConstellationOfferingObservationType> obsConstsOffObsTypes = HibernateCriteriaQueryUtilities
+                .getObservationConstellationOfferingObservationType(queryObject, session);
         if (obsConstsOffObsTypes != null && !obsConstsOffObsTypes.isEmpty()) {
             for (ObservationConstellationOfferingObservationType obsConstsOffObsType : obsConstsOffObsTypes) {
                 if (obsConstsOffObsType.getObservationType() == null
-                        || (obsConstsOffObsType.getObservationType() != null && (obsConstsOffObsType.getObservationType().getObservationType()
-                                .equals("NOT_DEFINED") || obsConstsOffObsType.getObservationType().getObservationType().isEmpty()))) {
-                    return HibernateCriteriaTransactionalUtilities.updateObservationConstellationOfferingObservationType(obsConstsOffObsType,
-                            sosObservationConstellation.getObservationType(), session);
+                    || (obsConstsOffObsType.getObservationType() != null && (obsConstsOffObsType.getObservationType()
+                        .getObservationType()
+                        .equals("NOT_DEFINED") || obsConstsOffObsType.getObservationType().getObservationType()
+                        .isEmpty()))) {
+                    return HibernateCriteriaTransactionalUtilities
+                            .updateObservationConstellationOfferingObservationType(obsConstsOffObsType,
+                                                                                   sosObservationConstellation
+                            .getObservationType(), session);
                 } else {
                     if (obsConstsOffObsType.getObservationType().getObservationType()
                             .equals(sosObservationConstellation.getObservationType())) {
                         return obsConstsOffObsType;
                     } else {
-                        StringBuilder exceptionText = new StringBuilder();
-                        exceptionText.append("The requested observationType (");
-                        exceptionText.append(sosObservationConstellation.getObservationType());
-                        exceptionText.append(") is invalid for ");
-                        exceptionText.append("procedure = ");
-                        exceptionText.append(sosObservationConstellation.getProcedure());
-                        exceptionText.append(", observedProperty = ");
-                        exceptionText.append(sosObservationConstellation.getObservableProperty().getIdentifier());
-                        exceptionText.append("and offering = ");
-                        exceptionText.append(sosObservationConstellation.getOfferings());
-                        exceptionText.append("!");
-                        exceptionText.append("The valid observationType is '");
-                        exceptionText.append(obsConstsOffObsType.getObservationType().getObservationType());
-                        exceptionText.append("'!");
-                        LOGGER.debug(exceptionText.toString());
-                        throw Util4Exceptions.createInvalidParameterValueException(parameterName, exceptionText.toString());
+                        throw new InvalidParameterValueException().at(parameterName)
+                                .withMessage("The requested observationType (%s) is invalid for procedure = %s, observedProperty = %s and offering = %s! The valid observationType is '%s'!",
+                                             sosObservationConstellation.getObservationType(),
+                                             sosObservationConstellation.getProcedure(),
+                                             sosObservationConstellation.getObservableProperty().getIdentifier(),
+                                             sosObservationConstellation.getOfferings(),
+                                             obsConstsOffObsType.getObservationType().getObservationType());
                     }
                 }
             }
         } else {
-            StringBuilder exceptionText = new StringBuilder();
-            exceptionText.append("The requested observation constellation (");
-            exceptionText.append("procedure=");
-            exceptionText.append(sosObservationConstellation.getProcedure());
-            exceptionText.append(", observedProperty=");
-            exceptionText.append(sosObservationConstellation.getObservableProperty().getIdentifier());
-            exceptionText.append(" and offering=");
-            exceptionText.append(sosObservationConstellation.getOfferings());
-            exceptionText.append(")");
-            exceptionText.append(" is invalid!");
-            LOGGER.debug(exceptionText.toString());
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    Sos2Constants.InsertObservationParams.observation.name(), exceptionText.toString());
+            throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
+                    .withMessage("The requested observation constellation (procedure=%s, observedProperty=%s and offering=%s) is invalid!",
+                                 sosObservationConstellation.getProcedure(),
+                                 sosObservationConstellation.getObservableProperty().getIdentifier(),
+                                 sosObservationConstellation.getOfferings());
         }
         return null;
     }
@@ -145,20 +127,22 @@ public class HibernateUtilities {
             throws OwsExceptionReport {
         if (featureOfInterest instanceof SosSamplingFeature) {
             String featureIdentifier =
-                    Configurator.getInstance().getFeatureQueryHandler()
-                            .insertFeature((SosSamplingFeature) featureOfInterest, session);
+                   Configurator.getInstance().getFeatureQueryHandler()
+                    .insertFeature((SosSamplingFeature) featureOfInterest, session);
             return HibernateCriteriaTransactionalUtilities.getOrInsertFeatureOfInterest(featureIdentifier,
-                    ((SosSamplingFeature) featureOfInterest).getUrl(), session);
+                                                                                        ((SosSamplingFeature) featureOfInterest)
+                    .getUrl(), session);
         } else {
             // TODO: throw exception
-            throw new OwsExceptionReport();
+            throw new NoApplicableCodeException();
         }
     }
-    
+
     public static void checkOrInsertFeatureOfInterestRelatedFeatureRelation(FeatureOfInterest featureOfInterest,
-            Offering offering, Session session) {
+                                                                            Offering offering, Session session) {
         List<RelatedFeature> relatedFeatures =
-                HibernateCriteriaQueryUtilities.getRelatedFeatureForOffering(offering.getIdentifier(), session);
+                             HibernateCriteriaQueryUtilities
+                .getRelatedFeatureForOffering(offering.getIdentifier(), session);
         if (relatedFeatures != null) {
             for (RelatedFeature relatedFeature : relatedFeatures) {
                 HibernateCriteriaTransactionalUtilities.insertFeatureOfInterestRelationShip(
@@ -166,9 +150,9 @@ public class HibernateUtilities {
             }
         }
     }
-    
+
     public static void addPhenomeonTimeAndResultTimeToObservation(Observation hObservation, ITime phenomenonTime,
-            TimeInstant resultTime) {
+                                                                  TimeInstant resultTime) {
         addPhenomenonTimeToObservation(hObservation, phenomenonTime);
         addResultTimeToObservation(hObservation, resultTime, phenomenonTime);
     }
@@ -190,7 +174,7 @@ public class HibernateUtilities {
             if (resultTime.getValue() != null) {
                 hObservation.setResultTime(resultTime.getValue().toDate());
             } else if (resultTime.getIndeterminateValue().contains(Sos2Constants.EN_PHENOMENON_TIME)
-                    && phenomenonTime instanceof TimeInstant) {
+                       && phenomenonTime instanceof TimeInstant) {
                 hObservation.setResultTime(((TimeInstant) phenomenonTime).getValue().toDate());
             } else {
                 // TODO: exception not valid resultTime
@@ -214,7 +198,8 @@ public class HibernateUtilities {
     public static Observation createObservationFromValue(IValue<?> value, Session session) {
         if (value instanceof BooleanValue) {
             BooleanObservation observation = new BooleanObservation();
-            org.n52.sos.ds.hibernate.entities.BooleanValue booleanValue = new org.n52.sos.ds.hibernate.entities.BooleanValue();
+            org.n52.sos.ds.hibernate.entities.BooleanValue booleanValue =
+                                                           new org.n52.sos.ds.hibernate.entities.BooleanValue();
             booleanValue.setValue(((BooleanValue) value).getValue());
             observation.setValue(booleanValue);
             return observation;
@@ -253,4 +238,6 @@ public class HibernateUtilities {
         return new Observation();
     }
 
+    private HibernateUtilities() {
+    }
 }

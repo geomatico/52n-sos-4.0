@@ -34,6 +34,9 @@ import javax.xml.namespace.QName;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetObservationByIdDAO;
 import org.n52.sos.encode.Encoder;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingResponseFormatParameterException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos1Constants;
@@ -43,7 +46,6 @@ import org.n52.sos.response.GetObservationByIdResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,34 +65,29 @@ public class SosGetObservationByIdOperatorV100 extends
         super(OPERATION_NAME, GetObservationByIdRequest.class);
     }
     
-	private void checkRequestedParameters(GetObservationByIdRequest sosRequest) throws OwsExceptionReport {
+    private void checkRequestedParameters(GetObservationByIdRequest sosRequest) throws OwsExceptionReport {
         
         checkServiceParameter(sosRequest.getService());
         // check valid obs ids
         Collection<String> validObservations = Configurator.getInstance().getCache().getObservationIdentifiers();
-		checkObservationIDs(sosRequest.getObservationIdentifier(), validObservations, "ObservationId");
+        checkObservationIDs(sosRequest.getObservationIdentifier(), validObservations, Sos1Constants.GetObservationByIdParams.ObservationId
+                .name());
         // check responseFormat!
 		String responseFormat = sosRequest.getResponseFormat();
-		if ((responseFormat == null) || !(responseFormat.length() > 0)) {
-			OwsExceptionReport owse = new OwsExceptionReport();
-        	String exceptionText = "No encoder for operation found!";
-            LOGGER.error(exceptionText, owse);
-            throw Util4Exceptions.createMissingMandatoryParameterException("responseFormat");
+        if ((responseFormat == null) || !(responseFormat.length() > 0)) {
+            throw new MissingResponseFormatParameterException();
 		}
         // srsName and resultModel (omObs, om:Meas, Swe:?, responseMode (inline only)
 		String responseMode = sosRequest.getResponseMode();
-		if (responseMode != null && !responseMode.equalsIgnoreCase("inline")) {
-			OwsExceptionReport owse = new OwsExceptionReport();
-        	String exceptionText = "Only responseMode inline is currently supported by this SOS 1.0.0 implementation";
-            LOGGER.error(exceptionText, owse);
-            throw Util4Exceptions.createNoApplicableCodeException(owse, exceptionText);
+        if (responseMode != null && !responseMode.equalsIgnoreCase("inline")) {
+            throw new NoApplicableCodeException()
+                    .withMessage("Only responseMode inline is currently supported by this SOS 1.0.0 implementation")
+                    .at(SosConstants.GetObservationParams.responseMode);
 		}
 		QName resultModel = sosRequest.getResultModel();
-		if (resultModel != null ) {
-			OwsExceptionReport owse = new OwsExceptionReport();
-        	String exceptionText = "resultModel is currently not supported by this SOS 1.0.0 implementation";
-            LOGGER.error(exceptionText, owse);
-            throw Util4Exceptions.createNoApplicableCodeException(owse, exceptionText);
+        if (resultModel != null) {
+            throw new NoApplicableCodeException().at(SosConstants.GetObservationParams.resultModel)
+                    .withMessage("resultModel is currently not supported by this SOS 1.0.0 implementation");
 		}
 	}
 
@@ -101,7 +98,7 @@ public class SosGetObservationByIdOperatorV100 extends
 
 	@Override
 	protected ServiceResponse receive(GetObservationByIdRequest sosRequest)
-			throws OwsExceptionReport {
+            throws OwsExceptionReport {
 		boolean applyZIPcomp = false;
 
         checkRequestedParameters(sosRequest);
@@ -114,10 +111,8 @@ public class SosGetObservationByIdOperatorV100 extends
             if (sosRequest.getVersion().equals(Sos1Constants.SERVICEVERSION) ) {
                 namespace = Sos1Constants.NS_SOS;
             } else {
-                String exceptionText = "Received version in request is not supported!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        OWSConstants.RequestParams.version.name(), exceptionText);
+                throw new InvalidParameterValueException().at(OWSConstants.RequestParams.version)
+                        .withMessage("Received version in request is not supported!");
             }
             
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -129,15 +124,11 @@ public class SosGetObservationByIdOperatorV100 extends
                 
             } else {
                 // complain check missing params throw exception
-            	OwsExceptionReport owse = new OwsExceptionReport();
-            	String exceptionText = "No encoder for operation found!";
-                LOGGER.error(exceptionText, owse);
-                throw Util4Exceptions.createNoApplicableCodeException(owse, exceptionText);
+                throw new NoApplicableCodeException().withMessage("No encoder for operation found!");
             }
         } catch (IOException ioe) {
-            String exceptionText = "Error occurs while saving response to output stream!";
-            LOGGER.error(exceptionText, ioe);
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            throw new NoApplicableCodeException().causedBy(ioe)
+                    .withMessage("Error occurs while saving response to output stream!");
         }
     }
 }

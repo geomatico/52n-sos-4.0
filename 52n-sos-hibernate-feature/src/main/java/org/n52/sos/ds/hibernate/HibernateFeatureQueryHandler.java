@@ -37,6 +37,7 @@ import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.spatial.criterion.SpatialProjections;
 import org.hibernate.spatial.criterion.SpatialRestrictions;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.FeatureQueryHandler;
@@ -49,14 +50,13 @@ import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.Range;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosEnvelope;
-import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.SosHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.Validation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +68,6 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 @Configurable
 public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(HibernateFeatureQueryHandler.class);
     private List<Range> epsgsWithReversedAxisOrder;
     private int defaultEPSG;
@@ -82,9 +81,8 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
                     .add(Restrictions.eq(HibernateConstants.PARAMETER_IDENTIFIER, featureID));
             return createSosAbstractFeature((FeatureOfInterest) q.uniqueResult(), version);
         } catch (HibernateException he) {
-            String exceptionText = "An error occurs while querying feature data for a featureOfInterest identifier!";
-            LOGGER.error(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+            throw new NoApplicableCodeException().causedBy(he)
+                    .withMessage("An error occurs while querying feature data for a featureOfInterest identifier!");
         }
 
     }
@@ -96,14 +94,13 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
         try {
             if (filter != null) {
                 queryObject.addCriterion(HibernateCriteriaQueryUtilities
-                        .getCriterionForSpatialFilter(HibernateConstants.PARAMETER_GEOMETRY, filter.getOperator(), switchCoordinateAxisOrderIfNeeded(filter.getGeometry())));
+                        .getCriterionForSpatialFilter(HibernateConstants.PARAMETER_GEOMETRY, filter.getOperator(), switchCoordinateAxisOrderIfNeeded(filter
+                        .getGeometry())));
             }
             return getFeatureOfInterestIdentifier(queryObject, session);
         } catch (HibernateException he) {
-            String exceptionText =
-                   "An error occurs while querying feature identifiers for a featureOfInterest identifier!";
-            LOGGER.error(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+            throw new NoApplicableCodeException().causedBy(he)
+                    .withMessage("An error occurs while querying feature identifiers for a featureOfInterest identifier!");
         }
     }
 
@@ -126,7 +123,8 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
                 Disjunction disjunction = Restrictions.disjunction();
                 for (SpatialFilter filter : spatialFilters) {
                     disjunction.add(HibernateCriteriaQueryUtilities.getCriterionForSpatialFilter(
-                            HibernateConstants.PARAMETER_GEOMETRY, filter.getOperator(), switchCoordinateAxisOrderIfNeeded(filter.getGeometry())));
+                            HibernateConstants.PARAMETER_GEOMETRY, filter.getOperator(), switchCoordinateAxisOrderIfNeeded(filter
+                            .getGeometry())));
                 }
                 queryObject.addCriterion(disjunction);
             }
@@ -137,9 +135,8 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
             }
 
         } catch (HibernateException he) {
-            String exceptionText = "Error while querying features from data source!";
-            LOGGER.error(exceptionText, he);
-            throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+            throw new NoApplicableCodeException().causedBy(he)
+                    .withMessage("Error while querying features from data source!");
         }
     }
 
@@ -158,9 +155,8 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
                     return new SosEnvelope(geom.getEnvelopeInternal(), getDefaultEPSG());
                 }
             } catch (HibernateException he) {
-                String exceptionText = "Exception thrown while requesting global feature envelope";
-                LOGGER.error(exceptionText, he);
-                throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
+                throw new NoApplicableCodeException().causedBy(he)
+                        .withMessage("Exception thrown while requesting global feature envelope");
             }
         }
         return null;
@@ -188,15 +184,12 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     /**
      * Creates a map with FOI identifier and SOS feature
      * <p/>
-     * @param features
-     * FeatureOfInterest objects
-     * @param version
-     * SOS version
+     * @param features FeatureOfInterest objects
+     * @param version  SOS version
      * <p/>
      * @return Map with FOI identifier and SOS feature
      * <p/>
-     * @throws OwsExceptionReport
-     * If feature type is not supported
+     * @throws OwsExceptionReport * If feature type is not supported
      */
     protected Map<String, SosAbstractFeature> createSosFeatures(List<FeatureOfInterest> features,
                                                                 String version) throws OwsExceptionReport {
@@ -212,35 +205,28 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     /**
      * Checks if connection is a Hibernate Session and casts the connection
      * <p/>
-     * @param connection
-     * connection
+     * @param connection connection
      * <p/>
      * @return Hibernate Session
      * <p/>
-     * @throws OwsExceptionReport
-     * If connection is not a Hibentat Sessrion
+     * @throws OwsExceptionReport * If connection is not a Hibentat Sessrion
      */
     protected Session getSessionFromConnection(Object connection) throws OwsExceptionReport {
         if (connection instanceof Session) {
             return (Session) connection;
         } else {
-            String exceptionText = "The connection is not a Hibernate Session!";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            throw new NoApplicableCodeException()
+                    .withMessage("The connection is not a Hibernate Session!");
         }
     }
 
     /**
      * Get FeatureOfInterest objects for the defined restrictions
      * <p/>
-     * @param aliases
-     * Aliases for query between tables
-     * @param criterions
-     * Restriction for the query
-     * @param projections
-     * Projections for the query
-     * @param session
-     * Hibernate session
+     * @param aliases     Aliases for query between tables
+     * @param criterions  Restriction for the query
+     * @param projections Projections for the query
+     * @param session     Hibernate session
      * <p/>
      * @return FeatureOfInterest objects
      */
@@ -250,11 +236,13 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
                                                                                        FeatureOfInterest.class);
     }
 
-    protected FeatureOfInterest getFeatureOfInterest(String identifier, Geometry geometry, Session session) throws OwsExceptionReport {
+    protected FeatureOfInterest getFeatureOfInterest(String identifier, Geometry geometry, Session session) throws
+            OwsExceptionReport {
         Criteria q = session.createCriteria(FeatureOfInterest.class)
                 .add(Restrictions.disjunction()
-                    .add(Restrictions.eq(HibernateConstants.PARAMETER_IDENTIFIER, identifier))
-                    .add(SpatialRestrictions.eq(HibernateConstants.PARAMETER_GEOMETRY, switchCoordinateAxisOrderIfNeeded(geometry))));
+                .add(Restrictions.eq(HibernateConstants.PARAMETER_IDENTIFIER, identifier))
+                .add(SpatialRestrictions
+                .eq(HibernateConstants.PARAMETER_GEOMETRY, switchCoordinateAxisOrderIfNeeded(geometry))));
         return (FeatureOfInterest) q.uniqueResult();
     }
 
@@ -266,17 +254,15 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
                                                                             FeatureOfInterest.class);
     }
 
-     /**
+    /**
      * Creates a SOS feature from the FeatureOfInterest object
      *
-     * @param feature
-     * FeatureOfInterest object
-     * @param version
-     * SOS version
+     * @param feature FeatureOfInterest object
+     * @param version SOS version
      * <p/>
      * @return SOS feature
      * <p/>
-     * @throws OwsExceptionReport  
+     * @throws OwsExceptionReport
      */
     protected SosAbstractFeature createSosAbstractFeature(FeatureOfInterest feature, String version) throws OwsExceptionReport {
         if (feature == null) {
@@ -305,9 +291,9 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
         }
         return sampFeat;
     }
-    
+
     protected void insertFeatureOfInterest(SosSamplingFeature samplingFeature, Session session) throws OwsExceptionReport {
-        FeatureOfInterest feature = getFeatureOfInterest(samplingFeature.getIdentifier().getValue(), 
+        FeatureOfInterest feature = getFeatureOfInterest(samplingFeature.getIdentifier().getValue(),
                                                          samplingFeature.getGeometry(), session);
         if (feature == null) {
             feature = new FeatureOfInterest();
@@ -317,9 +303,9 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
             if (samplingFeature.isSetNames()) {
                 feature.setName(SosHelper.createCSVFromCodeTypeList(samplingFeature.getName()));
             }
-            
+
             processGeometryPreSave(samplingFeature, feature);
-            
+
             if (samplingFeature.isSetXmlDescription()) {
                 feature.setDescriptionXml(samplingFeature.getXmlDescription());
             }
@@ -350,10 +336,9 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
             return geom;
         }
     }
-    
-     /**
-     * @param epsgCode
-     * <p/>
+
+    /**
+     * @param epsgCode <p/>
      * @return boolean indicating if coordinates have to be switched
      */
     protected boolean isAxisOrderSwitchRequired(int epsgCode) {

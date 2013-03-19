@@ -28,12 +28,11 @@ import static org.n52.sos.ogc.ows.SosServiceProviderFactorySettings.*;
 import java.io.File;
 import java.net.URI;
 
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
-import org.n52.sos.config.ConfigurationException;
 import org.n52.sos.util.LazyThreadSafeFactory;
-import org.n52.sos.util.Validation;
 import org.n52.sos.util.XmlHelper;
 
 /**

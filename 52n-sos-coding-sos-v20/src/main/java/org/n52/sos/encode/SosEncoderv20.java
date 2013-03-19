@@ -26,7 +26,6 @@ package org.n52.sos.encode;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +82,7 @@ import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosCapabilities;
 import org.n52.sos.ogc.ows.SwesExtension;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
@@ -113,7 +113,6 @@ import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3CConstants;
 import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -179,7 +178,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
 
     @Override
     public XmlObject encode(AbstractServiceCommunicationObject communicationObject,
-            Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
+                            Map<HelperValues, String> additionalValues) throws OwsExceptionReport {
         if (communicationObject instanceof AbstractServiceRequest) {
             return encodeRequests((AbstractServiceRequest) communicationObject);
         } else if (communicationObject instanceof AbstractServiceResponse) {
@@ -270,9 +269,8 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         GetObservationResponseType xbGetObsResp = xbGetObsRespDoc.addNewGetObservationResponse();
         Encoder<XmlObject, SosObservation> encoder = CodingHelper.getEncoder(response.getResponseFormat(), new SosObservation());
         if (!(encoder instanceof ObservationEncoder)) {
-            String exceptionText = "Error while encoding GetObservation response, encoder is not of type ObservationEncoder!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+            throw new NoApplicableCodeException()
+                    .withMessage("Error while encoding GetObservation response, encoder is not of type ObservationEncoder!");
         }
         ObservationEncoder<XmlObject, SosObservation> iObservationEncoder
                 = (ObservationEncoder<XmlObject, SosObservation>) encoder;
@@ -314,8 +312,10 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
         return xbGetFoiResponseDoc;
     }
     
-    private void addFeatureOfInterestGetFeatureOfInterestResponse(SosAbstractFeature feature, GetFeatureOfInterestResponseType getFoiResponse) throws OwsExceptionReport {
-        Map<HelperValues, String> additionalValues = new HashMap<SosConstants.HelperValues, String>(1);
+    private void addFeatureOfInterestGetFeatureOfInterestResponse(SosAbstractFeature feature,
+                                                                  GetFeatureOfInterestResponseType getFoiResponse)
+            throws OwsExceptionReport {
+        Map<HelperValues, String> additionalValues = new EnumMap<SosConstants.HelperValues, String>(HelperValues.class);
         Profile activeProfile = Configurator.getInstance().getProfileHandler().getActiveProfile();
         if (activeProfile.isSetEncodeFeatureOfInterestNamespace()) {
             additionalValues.put(HelperValues.ENCODE_NAMESPACE, activeProfile.getEncodingNamespaceForFeatureOfInterest());
@@ -470,8 +470,9 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
      *            SOS offerings for contents
      * @param version
      *            SOS response version
-     * @throws OwsExceptionReport
-     *             if an error occurs.
+
+     *
+     * @throws OwsExceptionReport     *             if an error occurs.
      */
     private void setContents(Contents xbContents, Collection<SosOfferingsForContents> offerings, String version)
             throws OwsExceptionReport {
@@ -701,7 +702,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
     }
 
     private void createTemporalFilter(net.opengis.sos.x20.GetResultType.TemporalFilter temporalFilter,
-            TemporalFilter sosTemporalFilter) throws OwsExceptionReport {
+                                      TemporalFilter sosTemporalFilter) throws OwsExceptionReport {
         Encoder<XmlObject, TemporalFilter> encoder = Configurator.getInstance().getCodingRepository()
                 .getEncoder(CodingHelper.getEncoderKey(FilterConstants.NS_FES_2, sosTemporalFilter));
         XmlObject encodedObject = encoder.encode(sosTemporalFilter);
@@ -718,23 +719,23 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
 
     private ResultEncoding createResultEncoding(SosResultEncoding sosResultEncoding) throws OwsExceptionReport {
         ResultEncoding resultEncoding =
-                ResultEncoding.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
+                       ResultEncoding.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         // TODO move encoding to SWECommonEncoder
         if (sosResultEncoding.getXml() != null && !sosResultEncoding.getXml().isEmpty()) {
             try {
-                TextEncodingDocument textEncodingDoc = (TextEncodingDocument) XmlObject.Factory.parse(sosResultEncoding.getXml());
+                TextEncodingDocument textEncodingDoc = (TextEncodingDocument) XmlObject.Factory.parse(sosResultEncoding
+                        .getXml());
                 resultEncoding.addNewAbstractEncoding().set(textEncodingDoc.getTextEncoding());
                 XmlHelper.substituteElement(resultEncoding.getAbstractEncoding(), textEncodingDoc.getTextEncoding());
             } catch (XmlException e) {
-                String exceptionText = "ResultEncoding element encoding is not supported!";
-               throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+                throw new NoApplicableCodeException().causedBy(e)
+                        .withMessage("ResultEncoding element encoding is not supported!");
             }
         } else {
             Encoder<XmlObject, Object> encoder = Configurator.getInstance().getCodingRepository()
                     .getEncoder(CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, sosResultEncoding.getEncoding()));
             if (encoder == null) {
-                String exceptionText = "Missing encoder for ResultEncoding!";
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoApplicableCodeException().withMessage("Missing encoder for ResultEncoding!");
             }
             Object encodedObject = encoder.encode(sosResultEncoding.getEncoding());
             if (encodedObject instanceof XmlObject) {
@@ -742,8 +743,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
                 resultEncoding.addNewAbstractEncoding().set(textEncodingDoc.getTextEncoding());
                 XmlHelper.substituteElement(resultEncoding.getAbstractEncoding(), textEncodingDoc.getTextEncoding());
             } else {
-                String exceptionText = "ResultEncoding element encoding is not supported!";
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoApplicableCodeException().withMessage("ResultEncoding element encoding is not supported!");
             }
         }
         return resultEncoding;
@@ -759,14 +759,14 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
                 resultStructure.addNewAbstractDataComponent().set(dataRecordDoc.getDataRecord());
                 XmlHelper.substituteElement(resultStructure.getAbstractDataComponent(), dataRecordDoc.getDataRecord());
             } catch (XmlException e) {
-                String exceptionText = "ResultStructure element encoding is not supported!";
-               throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+                throw new NoApplicableCodeException().withMessage("ResultStructure element encoding is not supported!");
             }
         } else {
-            Encoder<XmlObject, Object> encoder = Configurator.getInstance().getCodingRepository().getEncoder(CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, sosResultStructure.getResultStructure()));
+            Encoder<XmlObject, Object> encoder = Configurator.getInstance().getCodingRepository()
+                    .getEncoder(CodingHelper.getEncoderKey(SWEConstants.NS_SWE_20, sosResultStructure
+                    .getResultStructure()));
             if (encoder == null) {
-                String exceptionText = "Missing encoder for ResultStructure!";
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoApplicableCodeException().withMessage("Missing encoder for ResultStructure!");
             }
             Object encodedObject = encoder.encode(sosResultStructure.getResultStructure());
             if (encodedObject instanceof XmlObject) {
@@ -774,8 +774,7 @@ public class SosEncoderv20 implements Encoder<XmlObject, AbstractServiceCommunic
                 resultStructure.addNewAbstractDataComponent().set(dataRecordDoc.getDataRecord());
                 XmlHelper.substituteElement(resultStructure.getAbstractDataComponent(), dataRecordDoc.getDataRecord());
             } else {
-                String exceptionText = "ResultStructure element encoding is not supported!";
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoApplicableCodeException().withMessage("ResultStructure element encoding is not supported!");
             }
         }
         return resultStructure;

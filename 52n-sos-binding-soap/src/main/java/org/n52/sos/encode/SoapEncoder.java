@@ -44,9 +44,10 @@ import javax.xml.soap.SOAPMessage;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.OwsExceptionCode;
+import org.n52.sos.ogc.ows.CodedException;
 import org.n52.sos.ogc.ows.OWSConstants;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
-import org.n52.sos.ogc.ows.OwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
@@ -64,7 +65,6 @@ import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.N52XmlHelper;
 import org.n52.sos.util.OwsHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.W3CConstants;
 import org.n52.sos.util.XmlHelper;
 import org.n52.sos.util.XmlOptionsHelper;
@@ -196,13 +196,11 @@ public class SoapEncoder implements Encoder<ServiceResponse, SoapResponse> {
             }
             return new ServiceResponse(baos, SosConstants.CONTENT_TYPE_XML, applicationZip, true);
         } catch (SOAPException soape) {
-            String exceptionText = "Error while encoding SOAPMessage!";
-            LOGGER.debug(exceptionText, soape);
-            throw Util4Exceptions.createNoApplicableCodeException(soape, exceptionText);
+            throw new NoApplicableCodeException().causedBy(soape)
+                    .withMessage("Error while encoding SOAPMessage!");
         } catch (IOException ioe) {
-            String exceptionText = "Error while encoding SOAPMessage!";
-            LOGGER.debug(exceptionText, ioe);
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            throw new NoApplicableCodeException().causedBy(ioe)
+                    .withMessage("Error while encoding SOAPMessage!");
         }
     }
 
@@ -275,8 +273,8 @@ public class SoapEncoder implements Encoder<ServiceResponse, SoapResponse> {
             throws SOAPException {
         // FIXME: check and fix support for ExceptionReport with multiple
         // exceptions!
-        if (owsExceptionReport.getExceptions() != null && !owsExceptionReport.getExceptions().isEmpty()) {
-            OwsException firstException = owsExceptionReport.getExceptions().get(0);
+        if (!owsExceptionReport.getExceptions().isEmpty()) {
+            CodedException firstException = owsExceptionReport.getExceptions().iterator().next();
             if (soapFault.getNamespaceURI().equalsIgnoreCase(SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE)) {
                 QName qname = new QName(soapFault.getNamespaceURI(), "Client", soapFault.getPrefix());
                 soapFault.setFaultCode(qname);
@@ -291,12 +289,8 @@ public class SoapEncoder implements Encoder<ServiceResponse, SoapResponse> {
                 }
             }
             soapFault.addFaultReasonText(SoapHelper.getSoapFaultReasonText(firstException.getCode()), Locale.ENGLISH);
-            Detail detail = null;
-            for (OwsException exception : owsExceptionReport.getExceptions()) {
-                // set fault detail
-                if (detail == null) {
-                    detail = soapFault.addDetail();
-                }
+            Detail detail = soapFault.addDetail();
+            for (CodedException exception : owsExceptionReport.getExceptions()) {
                 createSOAPFaultDetail(detail, exception);
             }
             return SoapHelper.getExceptionActionURI(firstException.getCode());
@@ -322,7 +316,7 @@ public class SoapEncoder implements Encoder<ServiceResponse, SoapResponse> {
      * @throws SOAPException
      *             if an error occurs.
      */
-    private void createSOAPFaultDetail(Detail detail, OwsException exception) throws SOAPException {
+    private void createSOAPFaultDetail(Detail detail, CodedException exception) throws SOAPException {
         SOAPElement exRep =
                 detail.addChildElement(new QName(OWSConstants.NS_OWS, OWSConstants.EN_EXCEPTION,
                         OWSConstants.NS_OWS_PREFIX));
@@ -330,19 +324,17 @@ public class SoapEncoder implements Encoder<ServiceResponse, SoapResponse> {
         String code = exception.getCode().toString();
         String locator = exception.getLocator();
         StringBuilder exceptionText = new StringBuilder();
-        for (String text : exception.getMessages()) {
-            exceptionText.append(text);
-            exceptionText.append("\n");
-        }
-        if (exception.getException() != null) {
-            exceptionText.append("\n[EXEPTION]: \n");
-            if (exception.getException().getLocalizedMessage() != null
-                    && !exception.getException().getLocalizedMessage().isEmpty()) {
-                exceptionText.append(exception.getException().getLocalizedMessage());
+        exceptionText.append(exception.getMessage());
+        exceptionText.append("\n");
+        if (exception.getCause() != null) {
+            exceptionText.append("\n[EXCEPTION]: \n");
+            if (exception.getCause().getLocalizedMessage() != null
+                && !exception.getCause().getLocalizedMessage().isEmpty()) {
+                exceptionText.append(exception.getCause().getLocalizedMessage());
                 exceptionText.append("\n");
             }
-            if (exception.getException().getMessage() != null && !exception.getException().getMessage().isEmpty()) {
-                exceptionText.append(exception.getException().getMessage());
+            if (exception.getCause().getMessage() != null && !exception.getCause().getMessage().isEmpty()) {
+                exceptionText.append(exception.getCause().getMessage());
                 exceptionText.append("\n");
             }
         }
@@ -373,9 +365,8 @@ public class SoapEncoder implements Encoder<ServiceResponse, SoapResponse> {
             body.set(createSOAP12Fault(response.getSoapFault()));
         } else {
             if (response.getException() != null) {
-                if (response.getException().getExceptions() != null
-                        && !response.getException().getExceptions().isEmpty()) {
-                    OwsException firstException = response.getException().getExceptions().get(0);
+                if (!response.getException().getExceptions().isEmpty()) {
+                    CodedException firstException = response.getException().getExceptions().get(0);
                     action = SoapHelper.getExceptionActionURI(firstException.getCode());
                 }
                 body.set(createSOAP12FaultFromExceptionResponse(response.getException()));
@@ -449,9 +440,8 @@ public class SoapEncoder implements Encoder<ServiceResponse, SoapResponse> {
             }
             return new ServiceResponse(baos, SosConstants.CONTENT_TYPE_XML, applicationZip, true);
         } catch (IOException e) {
-            String exceptionText = "Error while encoding SOAPMessage!";
-            LOGGER.debug(exceptionText, e);
-            throw Util4Exceptions.createNoApplicableCodeException(e, exceptionText);
+            throw new NoApplicableCodeException().causedBy(e)
+                    .withMessage("Error while encoding SOAPMessage!");
         }
     }
 
@@ -460,9 +450,8 @@ public class SoapEncoder implements Encoder<ServiceResponse, SoapResponse> {
             return XmlObject.Factory.parse(new String(response.getByteArray()), XmlOptionsHelper.getInstance()
                     .getXmlOptions());
         } catch (XmlException xmle) {
-            String exceptionText = "Error while creating SOAP body!";
-            LOGGER.error(exceptionText, xmle);
-            throw Util4Exceptions.createNoApplicableCodeException(xmle, exceptionText);
+            throw new NoApplicableCodeException().causedBy(xmle)
+                    .withMessage("Error while creating SOAP body!");
         }
     }
 
@@ -481,14 +470,15 @@ public class SoapEncoder implements Encoder<ServiceResponse, SoapResponse> {
         return faultDoc;
     }
 
-    private XmlObject createSOAP12FaultFromExceptionResponse(OwsExceptionReport owsExceptionReport) throws OwsExceptionReport {
+    private XmlObject createSOAP12FaultFromExceptionResponse(OwsExceptionReport owsExceptionReport) throws
+            OwsExceptionReport {
         FaultDocument faultDoc = FaultDocument.Factory.newInstance();
         Fault fault = faultDoc.addNewFault();
         Faultcode code = fault.addNewCode();
         code.setValue(SOAPConstants.SOAP_SENDER_FAULT);
 
-        if (owsExceptionReport.getExceptions() != null && !owsExceptionReport.getExceptions().isEmpty()) {
-            OwsException firstException = owsExceptionReport.getExceptions().get(0);
+        if (!owsExceptionReport.getExceptions().isEmpty()) {
+            CodedException firstException = owsExceptionReport.getExceptions().get(0);
             Subcode subcode = code.addNewSubcode();
             QName qName;
             if (firstException.getCode() != null) {
@@ -501,7 +491,7 @@ public class SoapEncoder implements Encoder<ServiceResponse, SoapResponse> {
             addNewText.setLang(Locale.ENGLISH.getLanguage());
             addNewText.setStringValue(SoapHelper.getSoapFaultReasonText(firstException.getCode()));
 
-            for (OwsException owsException : owsExceptionReport.getExceptions()) {
+            for (OwsExceptionReport owsException : owsExceptionReport.getExceptions()) {
                 fault.addNewDetail().set(CodingHelper.encodeObjectToXml(OWSConstants.NS_OWS, owsException));
                 break;
             }

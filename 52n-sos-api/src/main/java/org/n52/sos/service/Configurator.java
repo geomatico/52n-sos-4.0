@@ -32,7 +32,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.n52.sos.binding.BindingRepository;
 import org.n52.sos.cache.ContentCache;
 import org.n52.sos.cache.ContentCacheController;
-import org.n52.sos.config.ConfigurationException;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.convert.ConverterRepository;
 import org.n52.sos.ds.CacheFeederDAO;
@@ -42,10 +42,12 @@ import org.n52.sos.ds.IFeatureConnectionProvider;
 import org.n52.sos.ds.FeatureQueryHandler;
 import org.n52.sos.ds.OperationDAORepository;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.ows.SosServiceIdentification;
 import org.n52.sos.ogc.ows.SosServiceIdentificationFactory;
 import org.n52.sos.ogc.ows.SosServiceProvider;
 import org.n52.sos.ogc.ows.SosServiceProviderFactory;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.request.operator.RequestOperatorRepository;
 import org.n52.sos.service.admin.operator.AdminServiceOperator;
 import org.n52.sos.service.admin.request.operator.AdminRequestOperatorRepository;
@@ -166,8 +168,7 @@ public class Configurator implements Cleanupable {
             } else if (e.getCause() != null && e.getCause() instanceof OwsExceptionReport) {
                 throw (OwsExceptionReport) e.getCause();
             } else {
-                throw Util4Exceptions.createNoApplicableCodeException(e, String
-                        .format("Could not request object from %s", factory));
+                throw new NoApplicableCodeException().withMessage("Could not request object from %s", factory);
             }
         }
     }

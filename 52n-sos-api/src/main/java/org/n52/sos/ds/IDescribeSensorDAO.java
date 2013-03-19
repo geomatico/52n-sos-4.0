@@ -40,8 +40,9 @@ public interface IDescribeSensorDAO extends OperationDAO {
      * Get the procedure description for a procedure
      * 
      * @return Returns the DescribeSensor response
-     * @throws OwsExceptionReport
-     *             If an error occurs
+
+     *
+     * @throws OwsExceptionReport     *             If an error occurs
      */
     public DescribeSensorResponse getSensorDescription(DescribeSensorRequest request) throws OwsExceptionReport;
 

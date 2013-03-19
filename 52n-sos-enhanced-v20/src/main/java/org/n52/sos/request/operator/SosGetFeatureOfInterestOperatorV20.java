@@ -26,12 +26,15 @@ package org.n52.sos.request.operator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetFeatureOfInterestDAO;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.EncoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.ErrorWhileSavingResponseToOutputStreamException;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
@@ -43,7 +46,6 @@ import org.n52.sos.response.GetFeatureOfInterestResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
@@ -81,10 +83,7 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
             } else if (sosRequest.getVersion().equalsIgnoreCase(Sos2Constants.SERVICEVERSION)) {
                 namespace = Sos2Constants.NS_SOS_20;
             } else {
-                String exceptionText = "Received version in request is not supported!";
-                LOGGER.debug(exceptionText);
-                throw Util4Exceptions.createInvalidParameterValueException(
-                        OWSConstants.RequestParams.version.name(), exceptionText);
+                throw new InvalidParameterValueException(OWSConstants.RequestParams.version, sosRequest.getVersion());
             }
 
             XmlObject encodedObject = CodingHelper.encodeObjectToXml(namespace, response);
@@ -94,18 +93,15 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
             } else if (encodedObject instanceof ServiceResponse) {
                 return (ServiceResponse) encodedObject;
             } else {
-                String exceptionText = "The encoder response is not supported!";
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new EncoderResponseUnsupportedException();
             }
         } catch (IOException ioe) {
-            String exceptionText = "Error occurs while saving response to output stream!";
-            LOGGER.error(exceptionText, ioe);
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
     }
 
     private void checkRequestedParameter(GetFeatureOfInterestRequest sosRequest) throws OwsExceptionReport {
-        List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+        CompositeOwsException exceptions = new CompositeOwsException();
         try {
             checkServiceParameter(sosRequest.getService());
         } catch (OwsExceptionReport owse) {
@@ -146,13 +142,15 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
             exceptions.add(owse);
         }
 
-        Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        exceptions.throwIfNotEmpty();
     }
 
     private void checkFeatureOfInterestAndRelatedFeatureIdentifier(List<String> featureIdentifiers,
-            Set<String> validFeaturesOfInterest, Set<String> validRelatedFeatures, String parameterName) throws OwsExceptionReport {
+                                                                   Set<String> validFeaturesOfInterest,
+                                                                   Set<String> validRelatedFeatures,
+                                                                   String parameterName) throws OwsExceptionReport {
         if (featureIdentifiers != null) {
-            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+            CompositeOwsException exceptions = new CompositeOwsException();
             for (String featureOfInterest : featureIdentifiers) {
                 try {
                     if (!isRelatedFetureIdentifier(featureOfInterest, validRelatedFeatures)) {
@@ -162,7 +160,7 @@ public class SosGetFeatureOfInterestOperatorV20 extends AbstractV2RequestOperato
                         exceptions.add(e);
                 }
             }
-            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+            exceptions.throwIfNotEmpty();
         }
     }
 

@@ -37,11 +37,11 @@ public class SwesExtensions {
 
     /**
      * 
-     * @param extensionId
+     * @param extensionName
+     *
      * @return
      */
-    public boolean isBooleanExentsionSet(String extensionName)
-    {
+    public boolean isBooleanExtensionSet(String extensionName)    {
         for (SwesExtension<?> swesExtension : extensions) {
             if (swesExtension.getDefinition().equals(extensionName)) {
                 Object value = swesExtension.getValue();

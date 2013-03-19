@@ -34,15 +34,13 @@ import org.n52.sos.service.ConformanceClass;
  * Interface for SOS request operator implementations
  */
 public interface RequestOperator extends ConformanceClass {
-
     public ServiceResponse receiveRequest(AbstractServiceRequest request) throws OwsExceptionReport;
 
     public boolean hasImplementedDAO();
 
     public RequestOperatorKeyType getRequestOperatorKeyType();
 
-    public OWSOperation getOperationMetadata(String service, String version)
-            throws OwsExceptionReport;
-    
+    public OWSOperation getOperationMetadata(String service, String version) throws OwsExceptionReport;
+
     public SwesExtension getExtension() throws OwsExceptionReport;
 }

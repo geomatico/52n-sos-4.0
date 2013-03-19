@@ -23,9 +23,7 @@
  */
 package org.n52.sos.ds.hibernate;
 
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.DELETED;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_IDENTIFIER;
-import static org.n52.sos.ds.hibernate.util.HibernateConstants.PARAMETER_SET_ID;
+import static org.n52.sos.ds.hibernate.util.HibernateConstants.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -39,9 +37,9 @@ import org.n52.sos.ds.hibernate.entities.Observation;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.request.GetObservationByIdRequest;
 import org.n52.sos.response.GetObservationByIdResponse;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,31 +54,24 @@ public class GetObservationByIdDAO extends AbstractGetObservationByIdDAO {
 
     @Override
     public GetObservationByIdResponse getObservationById(GetObservationByIdRequest request) throws OwsExceptionReport {
-        if (request instanceof GetObservationByIdRequest) {
-            Session session = null;
-            try {
-                session = sessionHolder.getSession();
-                
-                List<Observation> observations = queryObservation(request, session);
-                GetObservationByIdResponse response = new GetObservationByIdResponse();
-                response.setService(request.getService());
-                response.setVersion(request.getVersion());
-                response.setResponseFormat(request.getResponseFormat());
-                response.setObservationCollection(HibernateObservationUtilities.
-                        createSosObservationsFromObservations(observations, request.getVersion(), session));
-                return response;
-                
-            } catch (HibernateException he) {
-                String exceptionText = "Error while querying observation data!";
-                LOGGER.error(exceptionText, he);
-                throw Util4Exceptions.createNoApplicableCodeException(he, exceptionText);
-            } finally {
-                sessionHolder.returnSession(session);
-            }
-        } else {
-            String exceptionText = "The SOS request is not a SosGetObservationByIdRequest!";
-            LOGGER.error(exceptionText);
-            throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+        Session session = null;
+        try {
+            session = sessionHolder.getSession();
+
+            List<Observation> observations = queryObservation(request, session);
+            GetObservationByIdResponse response = new GetObservationByIdResponse();
+            response.setService(request.getService());
+            response.setVersion(request.getVersion());
+            response.setResponseFormat(request.getResponseFormat());
+            response.setObservationCollection(HibernateObservationUtilities.
+                    createSosObservationsFromObservations(observations, request.getVersion(), session));
+            return response;
+
+        } catch (HibernateException he) {
+            throw new NoApplicableCodeException().causedBy(he)
+                    .withMessage("Error while querying observation data!");
+        } finally {
+            sessionHolder.returnSession(session);
         }
     }
 

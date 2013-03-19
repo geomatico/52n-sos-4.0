@@ -24,11 +24,11 @@
 package org.n52.sos.service.operator;
 
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.OperationNotSupportedException;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.operator.RequestOperator;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.util.Util4Exceptions;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
@@ -58,6 +58,6 @@ public class AbstractServiceOperator implements ServiceOperator {
         if (response != null) {
             return response;
         }
-        throw Util4Exceptions.createOperationNotSupportedException(request.getOperationName());
+        throw new OperationNotSupportedException().forOperation(request.getOperationName());
     }
 }

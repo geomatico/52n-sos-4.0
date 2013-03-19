@@ -29,15 +29,16 @@ import java.util.Set;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
-import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.Decoder;
+import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.decode.XmlNamespaceDecoderKey;
 import org.n52.sos.decode.XmlOperationDecoderKey;
-import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.Encoder;
+import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.XmlEncoderKey;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
@@ -55,13 +56,14 @@ public class CodingHelper {
         return decodeXmlObject(x);
     }
 
-    public static <T> XmlObject encodeObjectToXml(String namespace, T o, Map<SosConstants.HelperValues, String> helperValues) throws OwsExceptionReport {
+    public static <T> XmlObject encodeObjectToXml(String namespace, T o,
+                                                  Map<SosConstants.HelperValues, String> helperValues) throws
+            OwsExceptionReport {
         Encoder<XmlObject, T> encoder = getEncoder(namespace, o);
         XmlObject encodedObject = encoder.encode(o, helperValues);
         if (encodedObject == null) {
-            String errorMsg = String.format("Encoding of type \"%s\" using namespace key \"%s\" failed", o.getClass(), namespace);
-            LOGGER.error(errorMsg);
-            throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+            throw new NoApplicableCodeException()
+                    .withMessage("Encoding of type \"%s\" using namespace key \"%s\" failed", o.getClass(), namespace);
         }
         return encodedObject;
     }
@@ -70,9 +72,8 @@ public class CodingHelper {
         EncoderKey key = getEncoderKey(namespace, o);
         Encoder<XmlObject, T> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
         if (encoder == null) {
-            String errorMsg = String.format("No encoder found for key \"%s\".", key);
-            LOGGER.error(errorMsg);
-            throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+            throw new NoApplicableCodeException()
+                    .withMessage("No encoder found for key \"%s\".", key);
         }
         return encoder;
     }
@@ -133,15 +134,13 @@ public class CodingHelper {
         DecoderKey key = getDecoderKey(xbObject);
         Decoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository().getDecoder(key);
         if (decoder == null) {
-            String errorMsg = String.format("No decoder found for key \"%s\".", key);
-            LOGGER.error(errorMsg);
-            throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+            throw new NoApplicableCodeException().withMessage("No decoder found for key \"%s\".", key);
         }
         Object decodedObject = decoder.decode(xbObject);
         if (decodedObject == null) {
-            String errorMsg = String.format("Decoding of type \"%s\" using key \"%s\" failed", xbObject.getClass().getCanonicalName(), key);
-            LOGGER.error(errorMsg);
-            throw Util4Exceptions.createNoApplicableCodeException(null, errorMsg);
+            throw new NoApplicableCodeException()
+                    .withMessage("Decoding of type \"%s\" using key \"%s\" failed",
+                                 xbObject.getClass().getCanonicalName(), key);
         }
         return decodedObject;
     }
@@ -150,9 +149,8 @@ public class CodingHelper {
         try {
             return decodeXmlObject(XmlObject.Factory.parse(xmlString));
         } catch (XmlException e) {
-            String errorMsg = String.format("Exception thrown while parsing XML string from database: %s", e.getMessage());
-            LOGGER.error(errorMsg, e);
-            throw Util4Exceptions.createNoApplicableCodeException(e, errorMsg);
+            throw new NoApplicableCodeException().causedBy(e)
+                    .withMessage("Exception thrown while parsing XML string from database: %s", e.getMessage());
         }
     }
 

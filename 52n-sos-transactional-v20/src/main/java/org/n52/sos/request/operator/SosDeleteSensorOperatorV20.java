@@ -26,8 +26,6 @@ package org.n52.sos.request.operator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
@@ -35,6 +33,12 @@ import org.n52.sos.ds.AbstractDeleteSensorDAO;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.SensorDeletion;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidProcedureParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingProcedureParameterException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.EncoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.ErrorWhileSavingResponseToOutputStreamException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.NoEncoderForResponseException;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -45,7 +49,6 @@ import org.n52.sos.response.DeleteSensorResponse;
 import org.n52.sos.response.ServiceResponse;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
@@ -86,23 +89,18 @@ public class SosDeleteSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
                 } else if (encodedObject instanceof ServiceResponse) {
                     return (ServiceResponse) encodedObject;
                 } else {
-                    String exceptionText = "The encoder response is not supported!";
-                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                    throw new EncoderResponseUnsupportedException();
                 }
             } else {
-                String exceptionText =
-                        "The DeleteSensor operation is not supported!";
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                throw new NoEncoderForResponseException();
             }
         } catch (IOException ioe) {
-            String exceptionText = "Error occurs while saving response to output stream!";
-            LOGGER.error(exceptionText, ioe);
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
     }
 
     private void checkRequestedParameter(DeleteSensorRequest request) throws OwsExceptionReport {
-        List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+        CompositeOwsException exceptions = new CompositeOwsException();
         try {
             checkServiceParameter(request.getService());
         } catch (OwsExceptionReport owse) {
@@ -118,17 +116,16 @@ public class SosDeleteSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
-        Util4Exceptions.mergeAndThrowExceptions(exceptions);
+        exceptions.throwIfNotEmpty();
     }
 
     private void checkProcedureIdentifier(String procedureIdentifier) throws OwsExceptionReport {
         if (procedureIdentifier != null && !procedureIdentifier.isEmpty()) {
-            if (!Configurator.getInstance().getCache().getProcedures().contains(procedureIdentifier)){
-                String exceptionText = "The requested procedure identifier (" + procedureIdentifier + ") is not provided by this service!";
-                throw Util4Exceptions.createInvalidParameterValueException(Sos2Constants.DeleteSensorParams.procedure.name(), exceptionText);
+            if (!Configurator.getInstance().getCache().getProcedures().contains(procedureIdentifier)) {
+                throw new InvalidProcedureParameterException(procedureIdentifier);
             }
         } else {
-            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.DeleteSensorParams.procedure.name());
+            throw new MissingProcedureParameterException();
         }
     }
     

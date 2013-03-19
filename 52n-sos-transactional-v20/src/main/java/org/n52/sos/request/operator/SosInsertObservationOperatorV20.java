@@ -27,7 +27,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -37,8 +36,18 @@ import org.n52.sos.ds.AbstractInsertObservationDAO;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.ObservationInsertion;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidObservationTypeException;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidObservationTypeForOfferingException;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidOfferingParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingObservationParameterException;
+import org.n52.sos.exception.ows.MissingParameterValueException.MissingOfferingParameterException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.EncoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.ErrorWhileSavingResponseToOutputStreamException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.NoEncoderForResponseException;
 import org.n52.sos.ogc.om.SosObservation;
 import org.n52.sos.ogc.om.SosObservationConstellation;
+import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -50,15 +59,11 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.SosHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<AbstractInsertObservationDAO, InsertObservationRequest> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SosInsertObservationOperatorV20.class);
     private static final String OPERATION_NAME = SosConstants.Operations.InsertObservation.name();
     private static final Set<String> CONFORMANCE_CLASSES = Collections.singleton(ConformanceClasses.SOS_V2_OBSERVATION_INSERTION);
 
@@ -90,22 +95,18 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<A
                 } else if (encodedObject instanceof ServiceResponse) {
                     return (ServiceResponse) encodedObject;
                 } else {
-                    String exceptionText = "The encoder response is not supported!";
-                    throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText);
+                    throw new EncoderResponseUnsupportedException();
                 }
             } else {
-                String exceptionText = "Error while getting encoder for response!";
-                throw Util4Exceptions.createInvalidParameterValueException("", exceptionText);
+                throw new NoEncoderForResponseException();
             }
         } catch (IOException ioe) {
-            String exceptionText = "Error occurs while saving response to output stream!";
-            LOGGER.error(exceptionText, ioe);
-            throw Util4Exceptions.createNoApplicableCodeException(ioe, exceptionText);
+            throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
     }
 
     private void checkRequestedParameter(InsertObservationRequest request) throws OwsExceptionReport {
-        List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+        CompositeOwsException exceptions = new CompositeOwsException();
         try {
             checkServiceParameter(request.getService());
         } catch (OwsExceptionReport owse) {
@@ -128,82 +129,63 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<A
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
-        Util4Exceptions.mergeAndThrowExceptions(exceptions);
-
+        exceptions.throwIfNotEmpty();
     }
 
     private void checkAndAddOfferingToObservationConstallation(InsertObservationRequest request)
             throws OwsExceptionReport {
         // TODO: Check requirement for this case in SOS 2.0 specification
         if (request.getOfferings() == null || (request.getOfferings() != null && request.getOfferings().isEmpty())) {
-            throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertObservationParams.offering
-                    .name());
+            throw new MissingOfferingParameterException();
         } else {
-            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+            CompositeOwsException exceptions = new CompositeOwsException();
             for (String offering : request.getOfferings()) {
-                if (offering == null || (offering != null && offering.isEmpty())) {
-                    throw Util4Exceptions.createMissingParameterValueException(Sos2Constants.InsertObservationParams.offering
-                            .name());
-                }
-                if (!Configurator.getInstance().getCache().getOfferings().contains(offering)) {
-                    StringBuilder exceptionText = new StringBuilder();
-                    exceptionText.append("The requested offering (");
-                    exceptionText.append(offering);
-                    exceptionText.append(") is not supported by this server!");
-                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(
-                            Sos2Constants.InsertObservationParams.offering.name(), exceptionText.toString()));
+                if (offering == null || offering.isEmpty()) {
+                    exceptions.add(new MissingOfferingParameterException());
+                } else if (!Configurator.getInstance().getCache().getOfferings().contains(offering)) {
+                    exceptions.add(new InvalidOfferingParameterException(offering));
                 } else {
                     for (SosObservation observation : request.getObservations()) {
                         observation.getObservationConstellation().addOffering(offering);
                     }
                 }
             }
-            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+            exceptions.throwIfNotEmpty();
         }
     }
 
     private void checkObservations(List<SosObservation> observations) throws OwsExceptionReport {
         ContentCache cache = Configurator.getInstance().getCache();
         if (observations == null || observations.isEmpty()) {
-            throw Util4Exceptions
-                    .createMissingParameterValueException(Sos2Constants.InsertObservationParams.observation.name());
+            throw new MissingObservationParameterException();
         } else {
-            List<OwsExceptionReport> exceptions = new LinkedList<OwsExceptionReport>();
+            CompositeOwsException exceptions = new CompositeOwsException();
             for (SosObservation observation : observations) {
                 SosObservationConstellation obsConstallation = observation.getObservationConstellation();
                 checkObservationConstellationParameter(obsConstallation);
                 // Requirement 67
                 checkOrSetObservationType(observation);
                 if (!cache.getObservationTypes().contains(obsConstallation.getObservationType())) {
-                    StringBuilder exceptionText = new StringBuilder();
-                    exceptionText.append("The requested observationType (");
-                    exceptionText.append(observation.getObservationConstellation().getObservationType());
-                    exceptionText.append(") is not supported by this server!");
-                    exceptions.add(Util4Exceptions.createInvalidParameterValueException(
-                            Sos2Constants.InsertObservationParams.observationType.name(), exceptionText.toString()));
+                    exceptions.add(new InvalidObservationTypeException(obsConstallation.getObservationType()));
                 } else if (obsConstallation.isSetOfferings()) {
                     for (String offeringID : obsConstallation.getOfferings()) {
                         Collection<String> allowedObservationTypes =
                                            cache.getAllowedObservationTypesForOffering(offeringID);
-                        if (allowedObservationTypes == null || !allowedObservationTypes.contains(obsConstallation.getObservationType())) {
-                            StringBuilder exceptionText = new StringBuilder();
-                            exceptionText.append("The requested observationType (");
-                            exceptionText.append(obsConstallation.getObservationType());
-                            exceptionText.append(") is not allowed for the requested offering (");
-                            exceptionText.append(obsConstallation.getOfferings());
-                            exceptionText.append(")!");
-                            exceptions.add(Util4Exceptions.createInvalidParameterValueException(
-                                    Sos2Constants.InsertObservationParams.observationType.name(),
-                                    exceptionText.toString()));
+                        if (allowedObservationTypes == null || !allowedObservationTypes.contains(obsConstallation
+                                .getObservationType())) {
+                            exceptions
+                                    .add(new InvalidObservationTypeForOfferingException(obsConstallation
+                                    .getObservationType(), offeringID));
                         }
                     }
                 }
             }
-            Util4Exceptions.mergeAndThrowExceptions(exceptions);
+            exceptions.throwIfNotEmpty();
         }
     }
 
-    private void checkObservationConstellationParameter(SosObservationConstellation obsConstallation) throws OwsExceptionReport {
+    private void checkObservationConstellationParameter(SosObservationConstellation obsConstallation) throws
+            OwsExceptionReport {
         ContentCache cache = Configurator.getInstance().getCache();
         checkProcedureID(obsConstallation.getProcedure().getProcedureIdentifier(), cache.getProcedures(), Sos2Constants.InsertObservationParams.procedure
                 .name());
@@ -220,13 +202,9 @@ public class SosInsertObservationOperatorV20 extends AbstractV2RequestOperator<A
                     .name());
             if (obsTypeFromValue != null
                     && !sosObservation.getObservationConstellation().getObservationType().equals(obsTypeFromValue)) {
-                StringBuilder exceptionText = new StringBuilder();
-                exceptionText.append("The requested observation is invalid!");
-                exceptionText.append(" The result element does not comply with the defined type (");
-                exceptionText.append(sosObservation.getObservationConstellation().getObservationType());
-                exceptionText.append(")!");
-                LOGGER.debug(exceptionText.toString());
-                throw Util4Exceptions.createNoApplicableCodeException(null, exceptionText.toString());
+                throw new NoApplicableCodeException()
+                        .withMessage("The requested observation is invalid! The result element does not comply with the defined type (%s)!",
+                                     sosObservation.getObservationConstellation().getObservationType());
             }
         } else {
             sosObservation.getObservationConstellation().setObservationType(obsTypeFromValue);

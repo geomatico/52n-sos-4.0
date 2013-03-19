@@ -23,6 +23,7 @@
  */
 package org.n52.sos.config;
 
+import org.n52.sos.exception.ConfigurationException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceConfigurationError;

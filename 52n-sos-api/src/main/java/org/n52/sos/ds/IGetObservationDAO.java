@@ -46,8 +46,7 @@ public interface IGetObservationDAO extends OperationDAO {
      * @return ObservationDocument representing the requested values in an OGC
      *         conform O&M observation document
      * 
-     * @throws OwsExceptionReport
-     *             if query of the database or creating the O&M document failed
+     * @throws OwsExceptionReport     *             if query of the database or creating the O&M document failed
      */
     public GetObservationResponse getObservation(GetObservationRequest request) throws OwsExceptionReport;
 

@@ -23,13 +23,13 @@
  */
 package org.n52.sos.encode;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
 import org.apache.xmlbeans.XmlObject;
 import org.junit.Test;
-
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 
@@ -37,7 +37,7 @@ public class GmlEncoderTest {
     
     GmlEncoderv321 encoder = new GmlEncoderv321();
     
-    @Test (expected=IllegalArgumentException.class)
+    @Test(expected = OwsExceptionReport.class)
     public void throwIAEForEncodeNullTest() throws OwsExceptionReport {
         encoder.encode(null);
     }
@@ -47,7 +47,7 @@ public class GmlEncoderTest {
         assertNull("Encoded object is NOT null", encoder.encode(5));
     }
     
-    @Test (expected=IllegalArgumentException.class)
+    @Test(expected = OwsExceptionReport.class)
     public void throwsIllegalArgumentExceptionWhenConstructorValueNullTest() throws OwsExceptionReport {
         QuantityValue quantity = new QuantityValue(null);
         encoder.encode(quantity);

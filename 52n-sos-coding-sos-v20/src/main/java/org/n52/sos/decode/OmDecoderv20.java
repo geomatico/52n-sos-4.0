@@ -36,6 +36,9 @@ import net.opengis.om.x20.TimeObjectPropertyType;
 import org.apache.xmlbeans.XmlBoolean;
 import org.apache.xmlbeans.XmlInteger;
 import org.apache.xmlbeans.XmlString;
+import org.n52.sos.exception.ows.OwsExceptionCode;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
@@ -54,8 +57,7 @@ import org.n52.sos.ogc.om.values.CountValue;
 import org.n52.sos.ogc.om.values.NilTemplateValue;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.om.values.TextValue;
-import org.n52.sos.ogc.ows.OWSConstants.OwsExceptionCode;
-import org.n52.sos.ogc.ows.OwsException;
+import org.n52.sos.ogc.ows.CodedException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
@@ -67,7 +69,6 @@ import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,11 +135,12 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
             }
         } catch (OwsExceptionReport e) {
             if (sosObservation.getValue().getPhenomenonTime().getIndeterminateValue().equals("template")) {
-                for (OwsException exception : e.getExceptions()) {
+                for (CodedException exception : e.getExceptions()) {
                     if (exception.getCode().equals(OwsExceptionCode.InvalidParameterValue)) {
-                       throw Util4Exceptions.createInvalidParameterValueException(exception.getLocator(), exception.getMessages()[0]);
+                        throw new InvalidParameterValueException().at(exception.getLocator())
+                                .withMessage(exception.getMessage());
                     } else if (exception.getCode().equals(OwsExceptionCode.MissingParameterValue)) {
-                        throw Util4Exceptions.createMissingParameterValueException(exception.getLocator());
+                        throw new MissingParameterValueException(exception.getLocator());
                     }
                 }
             } 
@@ -208,10 +210,8 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
                 return (ITime) decodedObject;
             }
         }
-        String exceptionText = "The requested phenomenonTime type is not supported by this service!";
-        LOGGER.debug(exceptionText);
-        throw Util4Exceptions.createInvalidParameterValueException(
-                Sos2Constants.InsertObservationParams.observation.name(), exceptionText);
+        throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
+                .withMessage("The requested phenomenonTime type is not supported by this service!");
     }
 
     private TimeInstant getResultTime(OMObservationType omObservation) throws OwsExceptionReport {
@@ -238,10 +238,8 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
             if (decodedObject != null && decodedObject instanceof TimeInstant) {
                 return (TimeInstant) decodedObject;
             }
-            String exceptionText = "The requested resultTime type is not supported by this service!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    Sos2Constants.InsertObservationParams.observation.name(), exceptionText);
+            throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
+                    .withMessage("The requested resultTime type is not supported by this service!");
         }
     }
 
@@ -251,10 +249,8 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
             if (decodedObject != null && decodedObject instanceof TimePeriod) {
                 return (TimePeriod) decodedObject;
             }
-            String exceptionText = "The requested validTime type is not supported by this service!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    Sos2Constants.InsertObservationParams.observation.name(), exceptionText);
+            throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
+                    .withMessage("The requested validTime type is not supported by this service!");
         }
         return null;
     }
@@ -309,10 +305,8 @@ public class OmDecoderv20 implements Decoder<SosObservation, OMObservationType> 
                 result.setValue(value);
                 return result;
             }
-            String exceptionText = "The requested result type is not supported by this service!";
-            LOGGER.debug(exceptionText);
-            throw Util4Exceptions.createInvalidParameterValueException(
-                    Sos2Constants.InsertObservationParams.observation.name(), exceptionText);
+            throw new InvalidParameterValueException().at(Sos2Constants.InsertObservationParams.observation)
+                    .withMessage("The requested result type is not supported by this service!");
         }
     }
 
