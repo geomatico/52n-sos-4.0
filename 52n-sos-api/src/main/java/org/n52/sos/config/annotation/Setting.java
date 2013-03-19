@@ -39,14 +39,14 @@ import org.n52.sos.config.SettingsManager;
  * this method should be of the same type as the {@link SettingDefinition} declared with the same {@code key} in a
  * {@code ISettingDefnitionProvider}.
  * <p/>
- * It is needed to apply the {@code Configurable} annotation to a class with a mehtod annotated with this annotations
+ * It is needed to apply the {@code Configurable} annotation to a class with a method annotated with this annotations
  * for the {@code SettingsManager} to recognize it.
  * <p/>
  * <b>Example usage:</b>
  * <pre>
  * &#064;Setting(MiscellaneousSettingDefinitions.TOKEN_SEPERATOR_KEY)
- * public void setTokenSeperator(String seperator) {
- *     this.seperator = seperator;
+ * public void setTokenSeperator(String separator) {
+ *     this.separator = separator;
  * }
  * </pre>
  * <p/>
