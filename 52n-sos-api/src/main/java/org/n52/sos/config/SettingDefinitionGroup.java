@@ -103,4 +103,9 @@ public class SettingDefinitionGroup extends AbstractOrdered<SettingDefinitionGro
         return String.format("%s[title=%s, description=%s]", getClass()
                 .getSimpleName(), getTitle(), getDescription());
     }
+
+    @Override
+    protected String getSuborder() {
+        return getTitle();
+    }
 }

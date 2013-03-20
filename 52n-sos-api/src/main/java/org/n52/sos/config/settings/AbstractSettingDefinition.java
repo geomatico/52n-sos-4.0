@@ -176,4 +176,9 @@ abstract class AbstractSettingDefinition<S extends AbstractSettingDefinition<S, 
     public SettingType getType() {
         return this.type;
     }
+
+    @Override
+    protected String getSuborder() {
+        return getTitle();
+    }
 }

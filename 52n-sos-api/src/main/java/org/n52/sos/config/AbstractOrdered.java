@@ -47,8 +47,22 @@ public abstract class AbstractOrdered<T extends Ordered<T>> implements Ordered<T
     }
 
     @Override
-    //TODO get the title and compare that if order is equal
     public int compareTo(Ordered<?> t) {
-        return Float.compare(getOrder(), t.getOrder());
+        int compare = Float.compare(getOrder(), t.getOrder());
+        if (compare == 0) {
+            if (t instanceof AbstractOrdered) {
+                AbstractOrdered<?> ao = (AbstractOrdered) t;
+                if (getSuborder() == null) {
+                    return 1;
+                } else if (ao.getSuborder() == null) {
+                    return -1;
+                } else {
+                    return getSuborder().compareTo(ao.getSuborder());
+                }
+            }
+        }
+        return compare;
     }
+
+    protected abstract String getSuborder();
 }
