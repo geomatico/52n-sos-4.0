@@ -31,7 +31,7 @@ import javax.persistence.Entity;
  */
 @Entity(name = "procedure_encodings")
 public class ProcedureEncoding extends Activatable<String, ProcedureEncoding> {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 5044027451211700269L;
 
     public ProcedureEncoding(String key) {
         super(key);

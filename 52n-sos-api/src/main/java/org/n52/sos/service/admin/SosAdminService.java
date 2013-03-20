@@ -53,9 +53,7 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class SosAdminService extends ConfiguratedHttpServlet {
-
-    private static final long serialVersionUID = 1L;
-
+    private static final long serialVersionUID = -3279981432309569992L;
     /** the logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(SosAdminService.class);
 
@@ -196,5 +194,4 @@ public class SosAdminService extends ConfiguratedHttpServlet {
         }
         return new ServletException(exceptionText);
     }
-
 }

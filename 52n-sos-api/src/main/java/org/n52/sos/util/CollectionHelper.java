@@ -71,7 +71,7 @@ public class CollectionHelper {
     public static <T> Set<T> union(final Set<T>... elements) {
         return ((elements.length == 0) ? Collections.<T>emptySet()
                 : new HashSet<T>(elements.length * elements[0].size()) {
-            private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = -3161916411604210423L;
             {
                 for (Set<T> s : elements) {
                     addAll(s);
@@ -84,7 +84,7 @@ public class CollectionHelper {
         return (iterable instanceof Collection)
                ? new HashSet<T>((Collection<? extends T>) iterable)
                : new HashSet<T>() {
-            private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 3109256773218160485L;
             {
                 if (iterable != null) {
                     for (T t : iterable) {

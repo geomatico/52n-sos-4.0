@@ -27,7 +27,7 @@ package org.n52.sos.exception.ows;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class InvalidUpdateSequenceException extends CodedOwsException {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -2764825556277141124L;
 
     public InvalidUpdateSequenceException() {
         super(OwsExceptionCode.InvalidUpdateSequence);

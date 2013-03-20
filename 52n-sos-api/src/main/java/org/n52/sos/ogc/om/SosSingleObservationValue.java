@@ -30,8 +30,7 @@ import org.n52.sos.ogc.om.quality.SosQuality;
 import org.n52.sos.ogc.om.values.IValue;
 
 public class SosSingleObservationValue<T> implements IObservationValue<IValue<T>> {
-
-    private static final long serialVersionUID = 52L;
+    private static final long serialVersionUID = -8162038672393523937L;
 
     private ITime phenomenonTime;
 

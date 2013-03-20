@@ -24,7 +24,7 @@
 package org.n52.sos.ogc.om.values;
 
 public class TextValue implements IValue<String> {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 7540851661208136333L;
     
     private String value;
     
@@ -69,5 +69,4 @@ public class TextValue implements IValue<String> {
     public boolean isSetUnit() {
         return unit != null && !unit.isEmpty();
     }
-
 }

@@ -32,7 +32,7 @@ import org.n52.sos.encode.ResponseFormatKeyType;
  */
 @Entity(name = "observation_encodings")
 public class ObservationEncoding extends Activatable<ObservationEncodingKey, ObservationEncoding> {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1170517643847304183L;
 
     public ObservationEncoding(ObservationEncodingKey key) {
         super(key);

@@ -55,10 +55,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class SosService extends ConfiguratedHttpServlet {
-
-    private static final long serialVersionUID = 1L;
-
-    /** the logger */
+    private static final long serialVersionUID = -2103692310137045855L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SosService.class);
 
     private static final String ACCEPT_ENCODING = "Accept-Encoding";
@@ -342,5 +339,4 @@ public class SosService extends ConfiguratedHttpServlet {
         }
         return bindingOperator;
     }
-
 }

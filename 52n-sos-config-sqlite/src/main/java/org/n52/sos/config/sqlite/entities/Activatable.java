@@ -36,7 +36,7 @@ import javax.persistence.MappedSuperclass;
  */
 @MappedSuperclass
 public class Activatable<K extends Serializable, T extends Activatable<K, T>> implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -1470828735015412115L;
     @Id
     private K key;
     private boolean active;

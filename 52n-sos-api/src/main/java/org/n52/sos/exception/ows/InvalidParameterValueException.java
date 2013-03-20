@@ -32,7 +32,7 @@ import org.n52.sos.ogc.sos.SosConstants;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class InvalidParameterValueException extends CodedOwsException {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 7664405001972222761L;
 
     public InvalidParameterValueException() {
         super(OwsExceptionCode.InvalidParameterValue);
@@ -48,7 +48,7 @@ public class InvalidParameterValueException extends CodedOwsException {
     }
 
     public static class VersionNotSupportedException extends InvalidParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 7013609926378578859L;
 
         public VersionNotSupportedException() {
             withMessage("The requested version is not supported!").at(RequestParams.version);
@@ -56,7 +56,7 @@ public class InvalidParameterValueException extends CodedOwsException {
     }
 
     public static class ServiceNotSupportedException extends InvalidParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -4185556617598192292L;
 
         public ServiceNotSupportedException() {
             super(RequestParams.service, "The requested service is not supported!");
@@ -64,7 +64,7 @@ public class InvalidParameterValueException extends CodedOwsException {
     }
 
     public static class InvalidServiceOrVersionException extends InvalidParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 6678340028297145825L;
 
         public InvalidServiceOrVersionException(String service, String version) {
             at(RequestParams.service);
@@ -73,7 +73,7 @@ public class InvalidParameterValueException extends CodedOwsException {
     }
 
     public static class InvalidOfferingParameterException extends InvalidParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 3382928908282530867L;
 
         public InvalidOfferingParameterException(String value) {
             super(SosConstants.GetObservationParams.offering, value);
@@ -81,7 +81,7 @@ public class InvalidParameterValueException extends CodedOwsException {
     }
 
     public static class InvalidObservedPropertyParameterException extends InvalidParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -4272023297121839387L;
 
         public InvalidObservedPropertyParameterException(String value) {
             super(SosConstants.GetObservationParams.observedProperty, value);
@@ -89,7 +89,7 @@ public class InvalidParameterValueException extends CodedOwsException {
     }
 
     public static class InvalidFeatureOfInterestTypeException extends InvalidParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 4225597475733453751L;
 
         public InvalidFeatureOfInterestTypeException(String value) {
             super(Sos2Constants.InsertSensorParams.featureOfInterestType, value);
@@ -97,7 +97,7 @@ public class InvalidParameterValueException extends CodedOwsException {
     }
 
     public static class InvalidValueReferenceException extends InvalidParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 4751250325590494752L;
 
         public InvalidValueReferenceException(String value) {
             super(SosConstants.Filter.ValueReference, value);
@@ -105,7 +105,7 @@ public class InvalidParameterValueException extends CodedOwsException {
     }
 
     public static class InvalidObservationTypeException extends InvalidParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 7783723530983520961L;
 
         public InvalidObservationTypeException(String value) {
             super(Sos2Constants.InsertObservationParams.observationType, value);
@@ -113,10 +113,9 @@ public class InvalidParameterValueException extends CodedOwsException {
     }
 
     public static class InvalidObservationTypeForOfferingException extends InvalidParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -1598937401956045205L;
 
         public InvalidObservationTypeForOfferingException(String observationType, String offering) {
-            super();
             at(Sos2Constants.InsertObservationParams.observationType);
             withMessage("The requested observationType (%s) is not allowed for the requested offering (%s)!",
                         observationType, offering);
@@ -125,7 +124,7 @@ public class InvalidParameterValueException extends CodedOwsException {
     }
 
     public static class InvalidResponseFormatParameterException extends InvalidParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1740331674439130975L;
 
         public InvalidResponseFormatParameterException(String value) {
             super(SosConstants.GetObservationParams.responseFormat, value);
@@ -133,7 +132,7 @@ public class InvalidParameterValueException extends CodedOwsException {
     }
 
     public static class InvalidResponseModeParameterException extends InvalidParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -4370825833122909637L;
 
         public InvalidResponseModeParameterException(String value) {
             super(SosConstants.GetObservationParams.responseMode, value);
@@ -141,7 +140,7 @@ public class InvalidParameterValueException extends CodedOwsException {
     }
 
     public static class InvalidTemporalFilterParameterException extends InvalidParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 4454244754129206013L;
 
         public InvalidTemporalFilterParameterException(String value) {
             super(Sos2Constants.GetObservationParams.temporalFilter, value);
@@ -149,7 +148,7 @@ public class InvalidParameterValueException extends CodedOwsException {
     }
 
     public static class InvalidProcedureParameterException extends InvalidParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2578703817081517533L;
 
         public InvalidProcedureParameterException(String value) {
             super(SosConstants.DescribeSensorParams.procedure, value);
@@ -157,7 +156,7 @@ public class InvalidParameterValueException extends CodedOwsException {
     }
 
     public static class InvalidProcedureDescriptionFormatException extends InvalidParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -6138488504467961928L;
 
         public InvalidProcedureDescriptionFormatException(String value) {
             super(Sos2Constants.DescribeSensorParams.procedureDescriptionFormat, value);
@@ -165,7 +164,7 @@ public class InvalidParameterValueException extends CodedOwsException {
     }
 
     public static class InvalidOutputFormatException extends InvalidParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 6425942384678159423L;
 
         public InvalidOutputFormatException(String value) {
             super(Sos1Constants.DescribeSensorParams.outputFormat, value);

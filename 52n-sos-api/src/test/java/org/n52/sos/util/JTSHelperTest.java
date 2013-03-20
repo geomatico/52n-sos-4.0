@@ -227,8 +227,8 @@ public class JTSHelperTest extends JTSHelper {
     }
 
     private class UnknownGeometry extends Geometry {
+        private static final long serialVersionUID = -1032955252468856386L;
 
-        private static final long serialVersionUID = 1L;
         private Geometry geom;
 
         UnknownGeometry(Geometry geom) {

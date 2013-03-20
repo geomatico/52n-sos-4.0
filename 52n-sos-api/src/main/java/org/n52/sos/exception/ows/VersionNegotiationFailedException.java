@@ -30,17 +30,16 @@ import org.n52.sos.util.StringHelper;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class VersionNegotiationFailedException extends CodedOwsException {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 3626112515127914596L;
 
     public VersionNegotiationFailedException() {
         super(OwsExceptionCode.VersionNegotiationFailed);
     }
 
     public static class InvalidAcceptVersionsParameterException extends VersionNegotiationFailedException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -4208117985311582007L;
 
         public InvalidAcceptVersionsParameterException(String... acceptVersions) {
-            super();
             withMessage("The requested %s values (%s) are not supported by this service!",
                         SosConstants.GetCapabilitiesParams.AcceptVersions,
                         StringHelper.join(", ", (Object[]) acceptVersions));

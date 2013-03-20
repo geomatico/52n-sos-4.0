@@ -24,8 +24,7 @@
 package org.n52.sos.ds.hibernate.entities;
 
 public class CategoryObservation extends Observation {
-    private static final long serialVersionUID = 1L;
-    
+    private static final long serialVersionUID = 3454843143125726200L;
     private CategoryValue value;
 
     public CategoryValue getValue() {
@@ -35,5 +34,4 @@ public class CategoryObservation extends Observation {
     public void setValue(CategoryValue value) {
         this.value = value;
     }
-
 }

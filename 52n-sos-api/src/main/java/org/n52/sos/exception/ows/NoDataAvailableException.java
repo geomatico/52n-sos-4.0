@@ -27,7 +27,7 @@ package org.n52.sos.exception.ows;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class NoDataAvailableException extends CodedOwsException {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -6036422401648477861L;
 
     public NoDataAvailableException() {
         super(OwsExceptionCode.NoDataAvailable);

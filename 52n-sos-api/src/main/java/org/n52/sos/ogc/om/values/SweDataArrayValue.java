@@ -41,9 +41,8 @@ import org.slf4j.LoggerFactory;
 public class SweDataArrayValue implements IMultiValue<SosSweDataArray> {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(SweDataArrayValue.class);
+    private static final long serialVersionUID = 3022136042762771037L;
     
-    private static final long serialVersionUID = 52L;
-
     private SosSweDataArray value;
     
     @Override
@@ -152,6 +151,5 @@ public class SweDataArrayValue implements IMultiValue<SosSweDataArray> {
     public boolean isSetUnit() {
         return false;
     }
-
 
 }

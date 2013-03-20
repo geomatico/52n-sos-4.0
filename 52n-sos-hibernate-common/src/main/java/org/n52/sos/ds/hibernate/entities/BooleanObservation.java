@@ -24,8 +24,7 @@
 package org.n52.sos.ds.hibernate.entities;
 
 public class BooleanObservation extends Observation {
-    private static final long serialVersionUID = 1L;
-    
+    private static final long serialVersionUID = -1839724413208580516L;
     private BooleanValue value;
 
     public BooleanValue getValue() {
@@ -35,5 +34,4 @@ public class BooleanObservation extends Observation {
     public void setValue(BooleanValue value) {
         this.value = value;
     }
-
 }

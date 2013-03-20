@@ -39,8 +39,7 @@ import org.slf4j.LoggerFactory;
 public class TimePeriod extends ITime {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TimePeriod.class);
-
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -1784577421975774171L;
 
     /** start Date of timePeriod */
     private DateTime start;
@@ -431,5 +430,4 @@ public class TimePeriod extends ITime {
             return false;
         return true;
     }
-
 }

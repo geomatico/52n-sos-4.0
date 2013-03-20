@@ -24,7 +24,7 @@
 package org.n52.sos.ogc.om.values;
 
 public class CountValue implements IValue<Integer> {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 6995364149748171024L;
 
     private Integer value;
     
@@ -69,5 +69,4 @@ public class CountValue implements IValue<Integer> {
     public boolean isSetUnit() {
         return unit != null && !unit.isEmpty();
     }
-
 }

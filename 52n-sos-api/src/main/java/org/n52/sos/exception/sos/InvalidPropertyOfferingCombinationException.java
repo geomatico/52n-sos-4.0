@@ -27,14 +27,14 @@ package org.n52.sos.exception.sos;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class InvalidPropertyOfferingCombinationException extends CodedSosException {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 7758576540177872103L;
 
     public InvalidPropertyOfferingCombinationException() {
         super(SosExceptionCode.InvalidPropertyOfferingCombination);
     }
 
     public static class NoSweCommonEncodingForOfferingObservablePropertyCombination extends InvalidPropertyOfferingCombinationException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 6023259175582467602L;
 
         public NoSweCommonEncodingForOfferingObservablePropertyCombination(String offering, String observableProperty) {
             withMessage("For the requested combination offering (%s) and observedProperty (%s) no SWE Common 2.0 encoded result values are available!", offering, observableProperty);

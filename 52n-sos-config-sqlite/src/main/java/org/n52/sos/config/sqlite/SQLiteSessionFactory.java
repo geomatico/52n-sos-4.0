@@ -34,26 +34,25 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.sqlite.entities.AdminUser;
 import org.n52.sos.config.sqlite.entities.BooleanSettingValue;
 import org.n52.sos.config.sqlite.entities.FileSettingValue;
 import org.n52.sos.config.sqlite.entities.IntegerSettingValue;
 import org.n52.sos.config.sqlite.entities.NumericSettingValue;
-import org.n52.sos.config.sqlite.entities.Operation;
 import org.n52.sos.config.sqlite.entities.ObservationEncoding;
+import org.n52.sos.config.sqlite.entities.Operation;
 import org.n52.sos.config.sqlite.entities.ProcedureEncoding;
 import org.n52.sos.config.sqlite.entities.StringSettingValue;
 import org.n52.sos.config.sqlite.entities.UriSettingValue;
 import org.n52.sos.ds.ConnectionProvider;
 import org.n52.sos.ds.ConnectionProviderException;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.service.SosContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 /**
- *
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class SQLiteSessionFactory implements ConnectionProvider {
@@ -85,8 +84,7 @@ public class SQLiteSessionFactory implements ConnectionProvider {
     public static final String EMPTY = "";
     
     private static final Properties DEFAULT_PROPERTIES = new Properties() {
-        private static final long serialVersionUID = 1L;
-        
+        private static final long serialVersionUID = 3109256773218160485L;
         {
             String path = null;
             try {

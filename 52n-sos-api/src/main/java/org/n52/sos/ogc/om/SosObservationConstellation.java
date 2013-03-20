@@ -37,8 +37,7 @@ import org.n52.sos.ogc.sos.SosProcedureDescription;
  * 
  */
 public class SosObservationConstellation implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 8758412729768944974L;
 
     /** Identifier of the procedure by which the observation is made */
     private SosProcedureDescription procedure;

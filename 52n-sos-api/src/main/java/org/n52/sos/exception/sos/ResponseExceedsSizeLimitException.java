@@ -27,7 +27,7 @@ package org.n52.sos.exception.sos;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class ResponseExceedsSizeLimitException extends CodedSosException {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 192859897753197663L;
 
     public ResponseExceedsSizeLimitException() {
         super(SosExceptionCode.ResponseExceedsSizeLimit);

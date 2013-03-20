@@ -33,7 +33,7 @@ import java.util.List;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class CompositeOwsException extends OwsExceptionReport {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -4876354677532448922L;
     private List<CodedException> exceptions = new LinkedList<CodedException>();
 
     public CompositeOwsException(OwsExceptionReport... exceptions) {

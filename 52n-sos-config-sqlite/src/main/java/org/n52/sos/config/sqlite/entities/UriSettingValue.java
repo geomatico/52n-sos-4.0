@@ -35,7 +35,7 @@ import org.n52.sos.config.SettingValue;
  */
 @Entity(name = "uri_settings")
 public class UriSettingValue extends AbstractSettingValue<URI> {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -8771649328574485594L;
 
     private URI value;
     

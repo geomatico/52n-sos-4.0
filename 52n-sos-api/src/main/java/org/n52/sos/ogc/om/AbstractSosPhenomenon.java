@@ -30,8 +30,7 @@ import java.io.Serializable;
  * 
  */
 public class AbstractSosPhenomenon implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 8730485367220080360L;
 
     /** phenomenon identifier */
     private String identifier;

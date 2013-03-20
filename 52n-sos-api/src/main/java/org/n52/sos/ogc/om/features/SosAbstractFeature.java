@@ -36,8 +36,6 @@ import org.n52.sos.ogc.gml.CodeWithAuthority;
  */
 public abstract class SosAbstractFeature implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     /** identifier */
     private CodeWithAuthority identifier;
 

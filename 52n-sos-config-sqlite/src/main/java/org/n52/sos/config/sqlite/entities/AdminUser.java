@@ -37,8 +37,7 @@ import org.n52.sos.config.AdministratorUser;
  */
 @Entity(name = "administrator_user")
 public class AdminUser implements Serializable, AdministratorUser {
-
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -6073682567042001348L;
     public static final String USERNAME_PROPERTY = "username";
     @Id
     @GeneratedValue

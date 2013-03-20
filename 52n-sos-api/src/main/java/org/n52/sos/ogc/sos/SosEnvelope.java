@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * TODO should this class offer merging capabilities like SosEnvelope.expandTo(SosEnvelope) considering coordinate transformations?
  */
 public class SosEnvelope implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 6525679408878064331L;
 
     /**
      * JTS envelope object
@@ -135,5 +135,4 @@ public class SosEnvelope implements Serializable {
 	{
 		return String.format("SosEnvelope[envelope=%s, srid=%s]", getEnvelope(), getSrid());
 	}
-	
 }

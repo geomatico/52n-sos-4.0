@@ -43,7 +43,7 @@ import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
  */
 //TODO review super class: PostgreSQL82Dialect instead of PostgreSQLDialect?
 public class PostgisDialect52N extends PostgreSQLDialect implements SpatialDialect {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 5071705897622517771L;
 
     public PostgisDialect52N() {
         super();

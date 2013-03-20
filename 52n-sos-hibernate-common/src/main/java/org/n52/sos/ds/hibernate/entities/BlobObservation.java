@@ -24,9 +24,7 @@
 package org.n52.sos.ds.hibernate.entities;
 
 public class BlobObservation extends Observation {
-    
     private static final long serialVersionUID = -3712110463000862218L;
-    
     private BlobValue value;
 
     public BlobValue getValue() {
@@ -36,5 +34,4 @@ public class BlobObservation extends Observation {
     public void setValue(BlobValue value) {
         this.value = value;
     }
-
 }

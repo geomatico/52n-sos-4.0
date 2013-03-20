@@ -40,7 +40,6 @@ import org.n52.sos.config.SettingValue;
 @Entity(name = "settings")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class AbstractSettingValue<T> implements SettingValue<T>, Serializable {
-    private static final long serialVersionUID = 1L;
     
     @Id
     private String identifier;

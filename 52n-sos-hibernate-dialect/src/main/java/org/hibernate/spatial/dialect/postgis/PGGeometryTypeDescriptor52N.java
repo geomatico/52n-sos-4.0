@@ -33,7 +33,7 @@ import org.hibernate.type.descriptor.sql.SqlTypeDescriptor;
 public class PGGeometryTypeDescriptor52N implements SqlTypeDescriptor {
 
     public static final SqlTypeDescriptor INSTANCE = new PGGeometryTypeDescriptor52N();
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1259846599170907138L;
 
     @Override
     public int getSqlType() {

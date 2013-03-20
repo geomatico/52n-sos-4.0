@@ -24,8 +24,7 @@
 package org.n52.sos.ds.hibernate.entities;
 
 public class TextObservation extends Observation {
-    private static final long serialVersionUID = 1L;
-    
+    private static final long serialVersionUID = 1139695332890175636L;
     private TextValue value;
 
     public TextValue getValue() {
@@ -35,5 +34,4 @@ public class TextObservation extends Observation {
     public void setValue(TextValue value) {
         this.value = value;
     }
-
 }

@@ -29,8 +29,8 @@ package org.n52.sos.web.install;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class InstallationSettingsError extends Exception {
+    private static final long serialVersionUID = -7245722915117312457L;
 
-    private static final long serialVersionUID = 1L;
     private final InstallationConfiguration settings;
 
     public InstallationSettingsError(InstallationConfiguration c, String message) {

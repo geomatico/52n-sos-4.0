@@ -23,16 +23,10 @@
  */
 package org.n52.sos.tasking;
 
-
 public class TaskingException extends Exception {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -8172007426557569165L;
 
     public TaskingException(String message, Exception throwable) {
         super(message, throwable);
     }
-
 }

@@ -24,8 +24,7 @@
 package org.n52.sos.ds.hibernate.entities;
 
 public class GeometryObservation extends Observation {
-    private static final long serialVersionUID = 1L;
-    
+    private static final long serialVersionUID = 3211318745222417959L;
     private GeometryValue value;
 
     public GeometryValue getValue() {
@@ -35,5 +34,4 @@ public class GeometryObservation extends Observation {
     public void setValue(GeometryValue value) {
         this.value = value;
     }
-
 }

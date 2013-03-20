@@ -32,14 +32,14 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class NoApplicableCodeException extends CodedOwsException {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -2872459106299660578L;
 
     public NoApplicableCodeException() {
         super(OwsExceptionCode.NoApplicableCode);
     }
 
     public static class NotYetSupportedException extends NoApplicableCodeException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 8214490617892996058L;
 
         public OwsExceptionReport forFeature(String feature) {
             return withMessage("%s is not yet supported", feature);
@@ -47,7 +47,7 @@ public class NoApplicableCodeException extends CodedOwsException {
     }
 
     public static class NoEncoderForResponseException extends NoApplicableCodeException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -6155794217269036717L;
 
         public NoEncoderForResponseException() {
             withMessage("Error while getting encoder for response!");
@@ -55,7 +55,7 @@ public class NoApplicableCodeException extends CodedOwsException {
     }
 
     public static class NoEncoderForKeyException extends NoApplicableCodeException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -5532147003138146625L;
 
         public NoEncoderForKeyException(EncoderKey key) {
             withMessage("Could not find encoder for key '%s'.", key.toString());
@@ -63,7 +63,7 @@ public class NoApplicableCodeException extends CodedOwsException {
     }
 
     public static class NoDecoderForKeyException extends NoApplicableCodeException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2130152587752891589L;
 
         public NoDecoderForKeyException(DecoderKey k) {
             withMessage("No decoder implementation is available for KvpBinding (%s)!", k);
@@ -71,7 +71,7 @@ public class NoApplicableCodeException extends CodedOwsException {
     }
 
     public static class MethodNotSupportedException extends NoApplicableCodeException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 5636725554502040487L;
 
         public MethodNotSupportedException(String binding, String method) {
             withMessage("HTTP %s is no supported for %s binding!", method, binding);
@@ -79,7 +79,7 @@ public class NoApplicableCodeException extends CodedOwsException {
     }
 
     public static class EncoderResponseUnsupportedException extends NoApplicableCodeException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 7222883731485291699L;
 
         public EncoderResponseUnsupportedException() {
             withMessage("The encoder response is not supported!");
@@ -87,7 +87,7 @@ public class NoApplicableCodeException extends CodedOwsException {
     }
 
     public static class ErrorWhileSavingResponseToOutputStreamException extends NoApplicableCodeException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -5999201023324478127L;
 
         public ErrorWhileSavingResponseToOutputStreamException(IOException ioe) {
             withMessage("Error occurs while saving response to output stream!").causedBy(ioe);

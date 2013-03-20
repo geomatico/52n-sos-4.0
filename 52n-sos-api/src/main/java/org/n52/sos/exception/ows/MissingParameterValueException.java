@@ -23,7 +23,7 @@
  */
 package org.n52.sos.exception.ows;
 
-import org.n52.sos.ogc.ows.OWSConstants.RequestParams;
+import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 
@@ -31,11 +31,10 @@ import org.n52.sos.ogc.sos.SosConstants;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class MissingParameterValueException extends CodedOwsException {
-    private static final long serialVersionUID = 1L;
-    public static final OwsExceptionCode EXCEPTION_CODE = OwsExceptionCode.MissingParameterValue;
+    private static final long serialVersionUID = 236478803986562631L;
 
     public MissingParameterValueException(String parameter) {
-        super(EXCEPTION_CODE);
+        super(OwsExceptionCode.MissingParameterValue);
         at(parameter).withMessage("The value for the parameter '%s' is missing in the request!", parameter);
     }
 
@@ -44,7 +43,7 @@ public class MissingParameterValueException extends CodedOwsException {
     }
 
     public static class MissingObservedPropertyParameterException extends MissingParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2583948076925210591L;
 
         public MissingObservedPropertyParameterException() {
             super(SosConstants.GetObservationParams.observedProperty);
@@ -52,15 +51,15 @@ public class MissingParameterValueException extends CodedOwsException {
     }
 
     public static class MissingRequestParameterException extends MissingParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -8897872076017250022L;
 
         public MissingRequestParameterException() {
-            super(RequestParams.request);
+            super(OWSConstants.RequestParams.request);
         }
     }
 
     public static class MissingFeatureOfInterestTypeParameterException extends MissingParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -7256457003519176098L;
 
         public MissingFeatureOfInterestTypeParameterException() {
             super(Sos2Constants.InsertSensorParams.featureOfInterestType);
@@ -68,7 +67,7 @@ public class MissingParameterValueException extends CodedOwsException {
     }
 
     public static class MissingOfferingParameterException extends MissingParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 5664712544498144359L;
 
         public MissingOfferingParameterException() {
             super(SosConstants.GetObservationParams.offering);
@@ -76,7 +75,7 @@ public class MissingParameterValueException extends CodedOwsException {
     }
 
     public static class MissingProcedureDescriptionFormatException extends MissingParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -6918117488213110713L;
 
         public MissingProcedureDescriptionFormatException() {
             super(Sos2Constants.DescribeSensorParams.procedureDescriptionFormat);
@@ -84,7 +83,7 @@ public class MissingParameterValueException extends CodedOwsException {
     }
 
     public static class MissingProcedureParameterException extends MissingParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -8518264618221276704L;
 
         public MissingProcedureParameterException() {
             super(SosConstants.DescribeSensorParams.procedure);
@@ -92,7 +91,7 @@ public class MissingParameterValueException extends CodedOwsException {
     }
 
     public static class MissingResponseFormatParameterException extends MissingParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -8563326213851630597L;
 
         public MissingResponseFormatParameterException() {
             super(SosConstants.GetObservationParams.responseFormat);
@@ -100,7 +99,7 @@ public class MissingParameterValueException extends CodedOwsException {
     }
 
     public static class MissingResultValuesException extends MissingParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -1499782879560921078L;
 
         public MissingResultValuesException() {
             super(Sos2Constants.InsertResultParams.resultValues);
@@ -108,23 +107,23 @@ public class MissingParameterValueException extends CodedOwsException {
     }
 
     public static class MissingServiceParameterException extends MissingParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = -3822276903836147432L;
 
         public MissingServiceParameterException() {
-            super(RequestParams.service);
+            super(OWSConstants.RequestParams.service);
         }
     }
 
     public static class MissingVersionParameterException extends MissingParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2689961871576299539L;
 
         public MissingVersionParameterException() {
-            super(RequestParams.version);
+            super(OWSConstants.RequestParams.version);
         }
     }
 
     public static class MissingValueReferenceException extends MissingParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 2958391391259123546L;
 
         public MissingValueReferenceException() {
             super(SosConstants.Filter.ValueReference);
@@ -132,10 +131,18 @@ public class MissingParameterValueException extends CodedOwsException {
     }
 
     public static class MissingObservationParameterException extends MissingParameterValueException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 5819915445639045249L;
 
         public MissingObservationParameterException() {
             super(Sos2Constants.InsertObservationParams.observation);
+        }
+    }
+
+    public class MissingResultValuesParameterException extends MissingParameterValueException {
+        private static final long serialVersionUID = -1427286098612596147L;
+
+        public MissingResultValuesParameterException() {
+            super(Sos2Constants.InsertResultParams.resultValues);
         }
     }
 }

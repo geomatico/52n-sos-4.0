@@ -34,7 +34,7 @@ import org.n52.sos.request.operator.RequestOperatorKeyType;
  */
 @Embeddable
 public class OperationKey implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 6880719913150275598L;
 
     private String operation;
     private String service;

@@ -27,7 +27,7 @@ package org.n52.sos.exception.ows;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class OperationNotSupportedException extends CodedOwsException {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -5985965676110111858L;
 
     public OperationNotSupportedException() {
         super(OwsExceptionCode.OperationNotSupported);

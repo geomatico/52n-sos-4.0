@@ -45,10 +45,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-/* TODO make this serializable */
 public class UserService implements AuthenticationProvider, Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -3207103212342510378L;
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
+    
     @Autowired
     private ServletContext context;
     @Autowired
@@ -167,7 +167,7 @@ public class UserService implements AuthenticationProvider, Serializable {
     }
     
     private class AdministratorUserPrinciple implements Principal, Serializable {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 8178359938656526381L;
 
         private String username;
         
@@ -179,6 +179,5 @@ public class UserService implements AuthenticationProvider, Serializable {
         public String getName() {
             return this.username;
         }
-        
     }
 }

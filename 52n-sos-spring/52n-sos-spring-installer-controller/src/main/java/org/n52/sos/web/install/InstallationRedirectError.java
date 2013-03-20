@@ -24,12 +24,10 @@
 package org.n52.sos.web.install;
 
 /**
- * TODO JavaDoc
- *
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class InstallationRedirectError extends Exception {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -3268501649427618242L;
     private String path;
 
     public InstallationRedirectError(String path) {

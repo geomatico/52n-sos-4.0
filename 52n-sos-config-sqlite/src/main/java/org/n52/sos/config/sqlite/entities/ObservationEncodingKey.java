@@ -34,7 +34,7 @@ import org.n52.sos.encode.ResponseFormatKeyType;
  */
 @Embeddable
 public class ObservationEncodingKey implements Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1746777293931177130L;
     private String service;
     private String version;
     private String responseFormat;

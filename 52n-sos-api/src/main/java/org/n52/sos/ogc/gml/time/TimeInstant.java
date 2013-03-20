@@ -30,8 +30,7 @@ import org.joda.time.DateTime;
  * 
  */
 public class TimeInstant extends ITime {
-    
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -1426561343329882331L;
 
     /** date for this timeInstant */
     private DateTime value;
@@ -179,6 +178,5 @@ public class TimeInstant extends ITime {
     {
         return !isSetValue() && !isSetIndeterminateValue();
     }
-    
 
 }

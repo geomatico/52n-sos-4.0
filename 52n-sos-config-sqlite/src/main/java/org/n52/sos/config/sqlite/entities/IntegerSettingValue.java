@@ -33,7 +33,7 @@ import org.n52.sos.config.SettingType;
  */
 @Entity(name = "integer_settings")
 public class IntegerSettingValue extends AbstractSettingValue<Integer> {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -4010604057961878469L;
     
     private Integer value;
     

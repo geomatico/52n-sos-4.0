@@ -27,7 +27,7 @@ package org.n52.sos.exception.swes;
  * @author Christian Autermann <c.autermann@52north.org>
  */
 public class RequestExtensionNotSupportedException extends CodedSwesException {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -8667723076809166063L;
 
     public RequestExtensionNotSupportedException() {
         super(SwesExceptionCode.RequestExtensionNotSupported);

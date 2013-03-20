@@ -33,8 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet to block all requests while the {@link Configurator} is not available.
  */
-public class ConfiguratedHttpServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+public abstract class ConfiguratedHttpServlet extends HttpServlet {
 
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp)

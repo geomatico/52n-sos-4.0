@@ -32,9 +32,10 @@ import org.n52.sos.ogc.gml.CodeWithAuthority;
  * 
  */
 public class SosFeatureCollection extends SosAbstractFeature {
-    private static final long serialVersionUID = 1L;
-
-    /** members of this feature collection */
+    private static final long serialVersionUID = -6527441724827160710L;
+    /**
+     * members of this feature collection
+     */
     private Map<String, SosAbstractFeature> members;
 
     /**
@@ -66,5 +67,4 @@ public class SosFeatureCollection extends SosAbstractFeature {
     public void setMembers(Map<String, SosAbstractFeature> members) {
         this.members = members;
     }
-
 }
