@@ -27,7 +27,7 @@ import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingType;
 
 /**
- * {@link SettingDefinition} for {@code Boolean}s
+ * {@link SettingDefinition} for {@code Boolean}s.
  * <p/>
  * @since 4.0
  * @author Christian Autermann <c.autermann@52north.org>
@@ -35,7 +35,7 @@ import org.n52.sos.config.SettingType;
 public class BooleanSettingDefinition extends AbstractSettingDefinition<BooleanSettingDefinition, Boolean> {
 
     /**
-     * Constructs a new {@code BooleanSettingDefinition}
+     * Constructs a new {@code BooleanSettingDefinition}.
      */
     public BooleanSettingDefinition() {
         super(SettingType.BOOLEAN);

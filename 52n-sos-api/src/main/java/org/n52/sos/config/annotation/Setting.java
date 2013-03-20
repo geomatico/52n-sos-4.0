@@ -37,7 +37,7 @@ import org.n52.sos.config.SettingsManager;
 /**
  * Annotation that should be applied to a method that takes a single Setting as a parameter. The parameter of
  * this method should be of the same type as the {@link SettingDefinition} declared with the same {@code key} in a
- * {@code ISettingDefnitionProvider}.
+ * {@link SettingDefnitionProvider}.
  * <p/>
  * It is needed to apply the {@code Configurable} annotation to a class with a method annotated with this annotations
  * for the {@code SettingsManager} to recognize it.

@@ -43,32 +43,65 @@ public class SettingDefinitionGroup extends AbstractOrdered<SettingDefinitionGro
     private String title;
     private String description;
 
+    /**
+     * @return the title of this group
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * @return if this group has a non empty title
+     */
     public boolean hasTitle() {
         return hasStringProperty(getTitle());
     }
 
+    /**
+     * Sets the title of this group.
+     *
+     * @param title the title
+     *
+     * @return this
+     */
     public SettingDefinitionGroup setTitle(String title) {
         this.title = title;
         return this;
     }
 
+    /**
+     * @return the description for this group
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * @return if this group has a non empty description
+     */
     public boolean hasDescription() {
         return hasStringProperty(getDescription());
     }
 
+    /**
+     * Sets the description for this group.
+     *
+     * @param description the description
+     *
+     * @return this
+     */
     public SettingDefinitionGroup setDescription(String description) {
         this.description = description;
         return this;
     }
 
+    /**
+     * Checks if the parameter is not null and not empty.
+     *
+     * @param s the string to test
+     *
+     * @return if it is not null and not empty
+     */
     protected boolean hasStringProperty(String s) {
         return s != null && !s.isEmpty();
     }

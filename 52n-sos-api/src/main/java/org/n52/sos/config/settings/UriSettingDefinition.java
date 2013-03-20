@@ -28,7 +28,7 @@ import java.net.URI;
 import org.n52.sos.config.SettingType;
 
 /**
- * {@link ISettingDefinition} for {@code URI}s
+ * {@link SettingDefinition} for {@code URI}s.
  * <p/>
  * @since 4.0
  * @author Christian Autermann <c.autermann@52north.org>
@@ -36,7 +36,7 @@ import org.n52.sos.config.SettingType;
 public class UriSettingDefinition extends AbstractSettingDefinition<UriSettingDefinition, URI> {
 
     /**
-     * Constructs a new {@code UriSettingDefinition}
+     * Constructs a new {@code UriSettingDefinition}.
      */
     public UriSettingDefinition() {
         super(SettingType.URI);

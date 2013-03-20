@@ -23,13 +23,13 @@
  */
 package org.n52.sos.config;
 
-import org.n52.sos.exception.ConfigurationException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.util.AbstractServiceLoaderRepository;
 import org.n52.sos.util.StringHelper;
 import org.slf4j.Logger;

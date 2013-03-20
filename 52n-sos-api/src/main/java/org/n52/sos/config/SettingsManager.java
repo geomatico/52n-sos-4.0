@@ -23,7 +23,6 @@
  */
 package org.n52.sos.config;
 
-import org.n52.sos.exception.ConfigurationException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
@@ -35,6 +34,7 @@ import org.n52.sos.config.annotation.Configurable;
 import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.encode.ResponseFormatKeyType;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.AbstractConfiguringServiceLoaderRepository;
@@ -182,10 +182,24 @@ public abstract class SettingsManager {
     /* TODO JavaDoc */
     public abstract SettingValueFactory getSettingFactory();
 
-    /* TODO JavaDoc */
+    /**
+     * Gets all registered administrator users.
+     *
+     * @return the users
+     *
+     * @throws ConnectionProviderException
+     */
     public abstract Set<AdministratorUser> getAdminUsers() throws ConnectionProviderException;
 
-    /* TODO JavaDoc */
+    /**
+     * Gets the administrator user with the specified user name.
+     *
+     * @param username the username
+     *
+     * @return the administrator user or {@code null} if no user with the specified name exists
+     *
+     * @throws ConnectionProviderException
+     */
     public abstract AdministratorUser getAdminUser(String username) throws ConnectionProviderException;
 
     /**

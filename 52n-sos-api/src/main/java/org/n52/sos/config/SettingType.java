@@ -23,6 +23,9 @@
  */
 package org.n52.sos.config;
 
+import java.io.File;
+import java.net.URI;
+
 /**
  * Enum to describe the type of a {@code ISettingDefinition} and {@code ISettingValue}.
  *
@@ -32,10 +35,28 @@ package org.n52.sos.config;
  * @since 4.0
  */
 public enum SettingType {
+    /**
+     * Type for {@link Boolean} and {@code boolean}.
+     */
     BOOLEAN,
+    /**
+     * Type for {@link Integer} and {@code int}.
+     */
     INTEGER,
+    /**
+     * Type for {@link File}.
+     */
     FILE,
+    /**
+     * Type for {@link Double} and {@code double}.
+     */
     NUMERIC,
+    /**
+     * Type for {@link String}.
+     */
     STRING,
+    /**
+     * Type for {@link URI}.
+     */
     URI;
 }

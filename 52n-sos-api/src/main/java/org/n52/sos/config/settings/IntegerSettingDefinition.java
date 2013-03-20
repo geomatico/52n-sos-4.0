@@ -26,7 +26,7 @@ package org.n52.sos.config.settings;
 import org.n52.sos.config.SettingType;
 
 /**
- * {@link ISettingDefinition} for {@code Integer}s
+ * {@link SettingDefinition} for {@code Integer}s.
  * <p/>
  * @since 4.0
  * @author Christian Autermann <c.autermann@52north.org>
@@ -39,14 +39,14 @@ public class IntegerSettingDefinition extends AbstractSettingDefinition<IntegerS
     private boolean exclusiveMinimum = false;
 
     /**
-     * Constructs a new {@code IntegerSettingDefinition}
+     * Constructs a new {@code IntegerSettingDefinition}.
      */
     public IntegerSettingDefinition() {
         super(SettingType.INTEGER);
     }
 
     /**
-     * Get the value of minimum
+     * Get the value of minimum.
      * <p/>
      * @return the value of minimum
      */
@@ -62,7 +62,7 @@ public class IntegerSettingDefinition extends AbstractSettingDefinition<IntegerS
     }
 
     /**
-     * Set the value of minimum
+     * Set the value of minimum.
      * <p/>
      * @param minimum new value of minimum
      * <p/>
@@ -74,7 +74,7 @@ public class IntegerSettingDefinition extends AbstractSettingDefinition<IntegerS
     }
 
     /**
-     * Get the value of maximum
+     * Get the value of maximum.
      * <p/>
      * @return the value of maximum
      */
@@ -90,7 +90,7 @@ public class IntegerSettingDefinition extends AbstractSettingDefinition<IntegerS
     }
 
     /**
-     * Set the value of maximum
+     * Set the value of maximum.
      * <p/>
      * @param maximum new value of maximum
      * <p/>
@@ -102,7 +102,7 @@ public class IntegerSettingDefinition extends AbstractSettingDefinition<IntegerS
     }
 
     /**
-     * Get the value of exclusiveMaximum
+     * Get the value of exclusiveMaximum.
      * <p/>
      * @return the value of exclusiveMaximum
      */
@@ -111,7 +111,7 @@ public class IntegerSettingDefinition extends AbstractSettingDefinition<IntegerS
     }
 
     /**
-     * Set the value of exclusiveMaximum
+     * Set the value of exclusiveMaximum.
      * <p/>
      * @param exclusiveMaximum new value of exclusiveMaximum
      * <p/>
@@ -123,7 +123,7 @@ public class IntegerSettingDefinition extends AbstractSettingDefinition<IntegerS
     }
 
     /**
-     * Get the value of exclusiveMinimum
+     * Get the value of exclusiveMinimum.
      * <p/>
      * @return the value of exclusiveMinimum
      */
@@ -132,7 +132,7 @@ public class IntegerSettingDefinition extends AbstractSettingDefinition<IntegerS
     }
 
     /**
-     * Set the value of exclusiveMinimum
+     * Set the value of exclusiveMinimum.
      * <p/>
      * @param exclusiveMinimum new value of exclusiveMinimum
      * <p/>

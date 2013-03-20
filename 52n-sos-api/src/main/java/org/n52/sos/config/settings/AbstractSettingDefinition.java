@@ -31,10 +31,10 @@ import org.n52.sos.config.SettingType;
 /**
  * Generic implementation of
  * <code>SettingDefinition</code>.
- * <p/>
+ *
  * @param <S> the type of the class extending this class
  * @param <T> the type of the value
- * <p/>
+ *
  * @author Christian Autermann <c.autermann@52north.org>
  * @since 4.0
  */

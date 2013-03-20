@@ -34,7 +34,7 @@ import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.config.settings.UriSettingDefinition;
 
 /**
- * Factory to construct implementation specific {@link ISettingvalue}s.
+ * Factory to construct implementation specific {@link SettingValue}s.
  * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
  * @since 4.0
