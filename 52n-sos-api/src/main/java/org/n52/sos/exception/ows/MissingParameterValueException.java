@@ -138,7 +138,7 @@ public class MissingParameterValueException extends CodedOwsException {
         }
     }
 
-    public class MissingResultValuesParameterException extends MissingParameterValueException {
+    public static class MissingResultValuesParameterException extends MissingParameterValueException {
         private static final long serialVersionUID = -1427286098612596147L;
 
         public MissingResultValuesParameterException() {
