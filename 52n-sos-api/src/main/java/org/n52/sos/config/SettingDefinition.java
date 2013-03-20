@@ -50,6 +50,7 @@ import org.n52.sos.config.settings.UriSettingDefinition;
  * <p/>
  * @author Christian Autermann <c.autermann@52north.org>
  * @since 4.0
+ * TODO Christian: add javadoc
  */
 public interface SettingDefinition<S extends SettingDefinition<S, T>, T> extends Ordered<S> {
 
