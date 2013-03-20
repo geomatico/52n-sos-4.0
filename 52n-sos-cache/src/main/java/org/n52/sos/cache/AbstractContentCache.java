@@ -35,6 +35,8 @@ import org.joda.time.DateTime;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.SetMultiMap;
+import org.n52.sos.util.SynchonizedHashSetMultiMap;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -139,50 +141,6 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
      */
     protected static <T> Set<T> synchronizedSet() {
         return synchronizedSet(null);
-    }
-
-    /**
-     * Gets or creates the set for the specfied key in the map.
-     *
-     * @param <K> the key type
-     * @param <V> the value type
-     * @param map the map
-     * @param key the key
-     *
-     * @return the set
-     */
-    protected static <K, V> Set<V> getSet(Map<K, Set<V>> map, K key) {
-        Set<V> set = map.get(key);
-        if (set == null) {
-            map.put(key, set = synchronizedSet());
-        }
-        return set;
-    }
-
-    /**
-     * Adds the value to the set with the specified key in the map.
-     *
-     * @param <K>   the key type
-     * @param <V>   the value type
-     * @param map   the map
-     * @param key   the key
-     * @param value the value to add
-     */
-    protected static <K, V> void addToMap(Map<K, Set<V>> map, K key, V value) {
-        getSet(map, key).add(value);
-    }
-
-    /**
-     * Adds the values to the set with the specified key in the map.
-     *
-     * @param <K>    the key type
-     * @param <V>    the value type
-     * @param map    the map
-     * @param key    the key
-     * @param values the values to add
-     */
-    protected static <K, V> void addToMap(Map<K, Set<V>> map, K key, Collection<V> values) {
-        getSet(map, key).addAll(values);
     }
 
     /**
@@ -321,64 +279,34 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
         }
     }
 
-    /**
-     * Removes the specified value from the map. Also removes the set if it is empty.
-     *
-     * @param <K> the key type
-     * @param <V> the value type
-     * @param map the map to remove elements from
-     * @param k   the key of the map
-     * @param v   the value to remove
-     */
-    protected static <K, V> void removeElementFromMap(Map<K, Set<V>> map, K k, V v) {
-        removeElementsFromMap(map, k, Collections.singleton(v));
-    }
-
-    /**
-     * Removes the specified values from the map. Also removes the set if it is empty.
-     *
-     * @param <K> the key type
-     * @param <V> the value type
-     * @param map the map to remove elements from
-     * @param k   the key of the map
-     * @param v   the values to remove
-     */
-    protected static <K, V> void removeElementsFromMap(Map<K, Set<V>> map, K k, Collection<V> v) {
-        Set<V> set = map.get(k);
-        if (set != null) {
-            set.removeAll(v);
-            if (set.isEmpty()) {
-                map.remove(k);
-            }
-        }
-    }
     private int defaultEpsgCode = 4326;
     private Map<String, DateTime> maxPhenomenonTimeForOfferings = synchronizedMap();
     private Map<String, DateTime> minPhenomenonTimeForOfferings = synchronizedMap();
     private Map<String, DateTime> maxResultTimeForOfferings = synchronizedMap();
     private Map<String, DateTime> minResultTimeForOfferings = synchronizedMap();
-    private Map<String, Set<String>> allowedObservationTypeForOfferings = synchronizedMap();
-    private Map<String, Set<String>> childFeaturesForFeatureOfInterest = synchronizedMap();
-    private Map<String, Set<String>> childProceduresForProcedures = synchronizedMap();
-    private Map<String, Set<String>> compositePhenomenonForOfferings = synchronizedMap();
-    private Map<String, Set<String>> featuresOfInterestForOfferings = synchronizedMap();
-    private Map<String, Set<String>> featuresOfInterestForResultTemplates = synchronizedMap();
-    private Map<String, Set<String>> observablePropertiesForCompositePhenomenons = synchronizedMap();
-    private Map<String, Set<String>> observablePropertiesForOfferings = synchronizedMap();
-    private Map<String, Set<String>> observablePropertiesForProcedures = synchronizedMap();
-    private Map<String, Set<String>> observationIdentifiersForProcedures = synchronizedMap();
-    private Map<String, Set<String>> observationTypesForOfferings = synchronizedMap();
-    private Map<String, Set<String>> observedPropertiesForResultTemplates = synchronizedMap();
-    private Map<String, Set<String>> offeringsForObservableProperties = synchronizedMap();
-    private Map<String, Set<String>> offeringsForProcedures = synchronizedMap();
-    private Map<String, Set<String>> parentFeaturesForFeaturesOfInterest = synchronizedMap();
-    private Map<String, Set<String>> parentProceduresForProcedures = synchronizedMap();
-    private Map<String, Set<String>> proceduresForFeaturesOfInterest = synchronizedMap();
-    private Map<String, Set<String>> proceduresForObservableProperties = synchronizedMap();
-    private Map<String, Set<String>> proceduresForOfferings = synchronizedMap();
-    private Map<String, Set<String>> relatedFeaturesForOfferings = synchronizedMap();
-    private Map<String, Set<String>> resultTemplatesForOfferings = synchronizedMap();
-    private Map<String, Set<String>> rolesForRelatedFeatures = synchronizedMap();
+    private SetMultiMap<String, String> allowedObservationTypeForOfferings = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> childFeaturesForFeatureOfInterest = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> childProceduresForProcedures = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> compositePhenomenonForOfferings = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> featuresOfInterestForOfferings = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> featuresOfInterestForResultTemplates = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> observablePropertiesForCompositePhenomenons =
+                                   new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> observablePropertiesForOfferings = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> observablePropertiesForProcedures = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> observationIdentifiersForProcedures = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> observationTypesForOfferings = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> observedPropertiesForResultTemplates = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> offeringsForObservableProperties = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> offeringsForProcedures = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> parentFeaturesForFeaturesOfInterest = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> parentProceduresForProcedures = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> proceduresForFeaturesOfInterest = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> proceduresForObservableProperties = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> proceduresForOfferings = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> relatedFeaturesForOfferings = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> resultTemplatesForOfferings = new SynchonizedHashSetMultiMap<String, String>();
+    private SetMultiMap<String, String> rolesForRelatedFeatures = new SynchonizedHashSetMultiMap<String, String>();
     private Map<String, SosEnvelope> envelopeForOfferings = synchronizedMap();
     private Map<String, String> nameForOfferings = synchronizedMap();
     private Set<Integer> epsgCodes = synchronizedSet();
@@ -421,133 +349,133 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
     /**
      * @return the relating offering -> allowed observation type
      */
-    protected Map<String, Set<String>> getAllowedObservationTypesForOfferingsMap() {
+    protected SetMultiMap<String, String> getAllowedObservationTypesForOfferingsMap() {
         return this.allowedObservationTypeForOfferings;
     }
 
     /**
      * @return the relating feature -> child feature
      */
-    protected Map<String, Set<String>> getChildFeaturesForFeaturesOfInterestMap() {
+    protected SetMultiMap<String, String> getChildFeaturesForFeaturesOfInterestMap() {
         return this.childFeaturesForFeatureOfInterest;
     }
 
     /**
      * @return the relating offering -> composite phenomenons
      */
-    protected Map<String, Set<String>> getCompositePhenomenonsForOfferingsMap() {
+    protected SetMultiMap<String, String> getCompositePhenomenonsForOfferingsMap() {
         return this.compositePhenomenonForOfferings;
     }
 
     /**
      * @return the relating offering -> feature
      */
-    protected Map<String, Set<String>> getFeaturesOfInterestForOfferingMap() {
+    protected SetMultiMap<String, String> getFeaturesOfInterestForOfferingMap() {
         return this.featuresOfInterestForOfferings;
     }
 
     /**
      * @return the relating result template -> feature
      */
-    protected Map<String, Set<String>> getFeaturesOfInterestForResultTemplatesMap() {
+    protected SetMultiMap<String, String> getFeaturesOfInterestForResultTemplatesMap() {
         return this.featuresOfInterestForResultTemplates;
     }
 
     /**
      * @return the relating composite phenomenon -> observable property
      */
-    protected Map<String, Set<String>> getObservablePropertiesForCompositePhenomenonsMap() {
+    protected SetMultiMap<String, String> getObservablePropertiesForCompositePhenomenonsMap() {
         return this.observablePropertiesForCompositePhenomenons;
     }
 
     /**
      * @return the relating offering -> observable property
      */
-    protected Map<String, Set<String>> getObservablePropertiesForOfferingsMap() {
+    protected SetMultiMap<String, String> getObservablePropertiesForOfferingsMap() {
         return this.observablePropertiesForOfferings;
     }
 
     /**
      * @return the relating procedure -> observation identifier
      */
-    protected Map<String, Set<String>> getObservationIdentifiersForProceduresMap() {
+    protected SetMultiMap<String, String> getObservationIdentifiersForProceduresMap() {
         return this.observationIdentifiersForProcedures;
     }
 
     /**
      * @return the relating offering -> observation types
      */
-    protected Map<String, Set<String>> getObservationTypesForOfferingsMap() {
+    protected SetMultiMap<String, String> getObservationTypesForOfferingsMap() {
         return this.observationTypesForOfferings;
     }
 
     /**
      * @return the relating result template -> obsevable properties
      */
-    protected Map<String, Set<String>> getObservablePropertiesForResultTemplatesMap() {
+    protected SetMultiMap<String, String> getObservablePropertiesForResultTemplatesMap() {
         return this.observedPropertiesForResultTemplates;
     }
 
     /**
      * @return the relating observable property -> offerings
      */
-    protected Map<String, Set<String>> getOfferingsForObservablePropertiesMap() {
+    protected SetMultiMap<String, String> getOfferingsForObservablePropertiesMap() {
         return this.offeringsForObservableProperties;
     }
 
     /**
      * @return the relating procedure -> offerings
      */
-    protected Map<String, Set<String>> getOfferingsForProceduresMap() {
+    protected SetMultiMap<String, String> getOfferingsForProceduresMap() {
         return this.offeringsForProcedures;
     }
 
     /**
      * @return the relating feature -> parent feature
      */
-    protected Map<String, Set<String>> getParentFeaturesForFeaturesOfInterestMap() {
+    protected SetMultiMap<String, String> getParentFeaturesForFeaturesOfInterestMap() {
         return this.parentFeaturesForFeaturesOfInterest;
     }
 
     /**
      * @return the relating feature -> procedure
      */
-    protected Map<String, Set<String>> getProceduresForFeaturesOfInterestMap() {
+    protected SetMultiMap<String, String> getProceduresForFeaturesOfInterestMap() {
         return this.proceduresForFeaturesOfInterest;
     }
 
     /**
      * @return the relating observable property -> procedure
      */
-    protected Map<String, Set<String>> getProceduresForObservablePropertiesMap() {
+    protected SetMultiMap<String, String> getProceduresForObservablePropertiesMap() {
         return this.proceduresForObservableProperties;
     }
 
     /**
      * @return the relating offering -> procedure
      */
-    protected Map<String, Set<String>> getProceduresForOfferingsMap() {
+    protected SetMultiMap<String, String> getProceduresForOfferingsMap() {
         return this.proceduresForOfferings;
     }
 
     /**
      * @return the relating offering -> related features
      */
-    protected Map<String, Set<String>> getRelatedFeaturesForOfferingsMap() {
+    protected SetMultiMap<String, String> getRelatedFeaturesForOfferingsMap() {
         return this.relatedFeaturesForOfferings;
     }
 
     /**
      * @return the relating offering -> resulte templates
      */
-    protected Map<String, Set<String>> getResultTemplatesForOfferingsMap() {
+    protected SetMultiMap<String, String> getResultTemplatesForOfferingsMap() {
         return this.resultTemplatesForOfferings;
     }
 
     /**
      * @return the relating related feature -> roles
      */
-    protected Map<String, Set<String>> getRolesForRelatedFeaturesMap() {
+    protected SetMultiMap<String, String> getRolesForRelatedFeaturesMap() {
         return this.rolesForRelatedFeatures;
     }
 
@@ -568,21 +496,21 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
     /**
      * @return the relating procedure -> observable properties
      */
-    protected Map<String, Set<String>> getObservablePropertiesForProceduresMap() {
+    protected SetMultiMap<String, String> getObservablePropertiesForProceduresMap() {
         return this.observablePropertiesForProcedures;
     }
 
     /**
      * @return the relating procedure -> parent procedure
      */
-    protected Map<String, Set<String>> getParentProceduresForProceduresMap() {
+    protected SetMultiMap<String, String> getParentProceduresForProceduresMap() {
         return this.parentProceduresForProcedures;
     }
 
     /**
      * @return the relating procedure -> child procedure
      */
-    protected Map<String, Set<String>> getChildProceduresForProceduresMap() {
+    protected SetMultiMap<String, String> getChildProceduresForProceduresMap() {
         return this.childProceduresForProcedures;
     }
 

@@ -37,6 +37,7 @@ import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.util.CollectionHelper;
+import org.n52.sos.util.SetMultiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -356,7 +357,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("allowedObservationType", allowedObservationType);
         log.trace("Adding AllowedObservationType {} to Offering {}", allowedObservationType, offering);
-        addToMap(getAllowedObservationTypesForOfferingsMap(), offering, allowedObservationType);
+        getAllowedObservationTypesForOfferingsMap().add(offering, allowedObservationType);
     }
 
     @Override
@@ -364,7 +365,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         noNullValues("allowedObservationTypes", allowedObservationTypes);
         log.trace("Adding AllowedObservationTypes {} to Offering {}", allowedObservationTypes, offering);
-        addToMap(getAllowedObservationTypesForOfferingsMap(), offering, allowedObservationTypes);
+        getAllowedObservationTypesForOfferingsMap().addAll(offering, allowedObservationTypes);
     }
 
     @Override
@@ -372,7 +373,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("compositePhenomenon", compositePhenomenon);
         log.trace("Adding compositePhenomenon {} to Offering {}", compositePhenomenon, offering);
-        addToMap(getCompositePhenomenonsForOfferingsMap(), offering, compositePhenomenon);
+        getCompositePhenomenonsForOfferingsMap().add(offering, compositePhenomenon);
     }
 
     @Override
@@ -380,7 +381,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("featureOfInterest", featureOfInterest);
         log.trace("Adding featureOfInterest {} to Offering {}", featureOfInterest, offering);
-        addToMap(getFeaturesOfInterestForOfferingMap(), offering, featureOfInterest);
+        getFeaturesOfInterestForOfferingMap().add(offering, featureOfInterest);
     }
 
     @Override
@@ -388,7 +389,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("resultTemplate", resultTemplate);
         notNullOrEmpty("featureOfInterest", featureOfInterest);
         log.trace("Adding FeatureOfInterest {} to ResultTemplate {}", featureOfInterest, resultTemplate);
-        addToMap(getFeaturesOfInterestForResultTemplatesMap(), resultTemplate, featureOfInterest);
+        getFeaturesOfInterestForResultTemplatesMap().add(resultTemplate, featureOfInterest);
     }
 
     @Override
@@ -396,7 +397,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("resultTemplate", resultTemplate);
         noNullValues("featuresOfInterest", featuresOfInterest);
         log.trace("Adding FeatureOfInterest {} to ResultTemplate {}", featuresOfInterest, resultTemplate);
-        addToMap(getFeaturesOfInterestForResultTemplatesMap(), resultTemplate, featuresOfInterest);
+        getFeaturesOfInterestForResultTemplatesMap().addAll(resultTemplate, featuresOfInterest);
     }
 
     @Override
@@ -404,7 +405,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("compositePhenomenon", compositePhenomenon);
         notNullOrEmpty("observableProperty", observableProperty);
         log.trace("Adding ObservableProperty {} to CompositePhenomenon {}", observableProperty, compositePhenomenon);
-        addToMap(getObservablePropertiesForCompositePhenomenonsMap(), compositePhenomenon, observableProperty);
+        getObservablePropertiesForCompositePhenomenonsMap().add(compositePhenomenon, observableProperty);
     }
 
     @Override
@@ -412,7 +413,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("observableProperty", observableProperty);
         log.trace("Adding observableProperty {} to offering {}", observableProperty, offering);
-        addToMap(getObservablePropertiesForOfferingsMap(), offering, observableProperty);
+        getObservablePropertiesForOfferingsMap().add(offering, observableProperty);
     }
 
     @Override
@@ -420,7 +421,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("procedure", procedure);
         notNullOrEmpty("observableProperty", observableProperty);
         log.trace("Adding observableProperty {} to procedure {}", observableProperty, procedure);
-        addToMap(getObservablePropertiesForProceduresMap(), procedure, observableProperty);
+        getObservablePropertiesForProceduresMap().add(procedure, observableProperty);
     }
 
     @Override
@@ -428,7 +429,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("resultTemplate", resultTemplate);
         notNullOrEmpty("observableProperty", observableProperty);
         log.trace("Adding observableProperty {} to resultTemplate {}", observableProperty, resultTemplate);
-        addToMap(getObservablePropertiesForResultTemplatesMap(), resultTemplate, observableProperty);
+        getObservablePropertiesForResultTemplatesMap().add(resultTemplate, observableProperty);
     }
 
     @Override
@@ -436,7 +437,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("procedure", procedure);
         notNullOrEmpty("observableProperty", observationIdentifier);
         log.trace("Adding observationIdentifier {} to procedure {}", observationIdentifier, procedure);
-        addToMap(getObservationIdentifiersForProceduresMap(), procedure, observationIdentifier);
+        getObservationIdentifiersForProceduresMap().add(procedure, observationIdentifier);
     }
 
     @Override
@@ -444,7 +445,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("observableProperty", observationType);
         log.trace("Adding observationType {} to offering {}", observationType, offering);
-        addToMap(getObservationTypesForOfferingsMap(), offering, observationType);
+        getObservationTypesForOfferingsMap().add(offering, observationType);
     }
 
     @Override
@@ -452,7 +453,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("observableProperty", observableProperty);
         notNullOrEmpty("offering", offering);
         log.trace("Adding offering {} to observableProperty {}", offering, observableProperty);
-        addToMap(getOfferingsForObservablePropertiesMap(), observableProperty, offering);
+        getOfferingsForObservablePropertiesMap().add(observableProperty, offering);
     }
 
     @Override
@@ -460,7 +461,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("procedure", procedure);
         notNullOrEmpty("offering", offering);
         log.trace("Adding offering {} to procedure {}", offering, procedure);
-        addToMap(getOfferingsForProceduresMap(), procedure, offering);
+        getOfferingsForProceduresMap().add(procedure, offering);
     }
 
     @Override
@@ -468,7 +469,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("featureOfInterest", featureOfInterest);
         notNullOrEmpty("procedure", procedure);
         log.trace("Adding procedure {} to featureOfInterest {}", procedure, featureOfInterest);
-        addToMap(getProceduresForFeaturesOfInterestMap(), featureOfInterest, procedure);
+        getProceduresForFeaturesOfInterestMap().add(featureOfInterest, procedure);
     }
 
     @Override
@@ -476,7 +477,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("featureOfInterest", observableProperty);
         notNullOrEmpty("procedure", procedure);
         log.trace("Adding procedure {} to observableProperty {}", procedure, observableProperty);
-        addToMap(getProceduresForObservablePropertiesMap(), observableProperty, procedure);
+        getProceduresForObservablePropertiesMap().add(observableProperty, procedure);
     }
 
     @Override
@@ -484,7 +485,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("procedure", procedure);
         log.trace("Adding procedure {} to offering {}", procedure, offering);
-        addToMap(getProceduresForOfferingsMap(), offering, procedure);
+        getProceduresForOfferingsMap().add(offering, procedure);
     }
 
     @Override
@@ -492,7 +493,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("relatedFeature", relatedFeature);
         log.trace("Adding relatedFeature {} to offering {}", relatedFeature, offering);
-        addToMap(getRelatedFeaturesForOfferingsMap(), offering, relatedFeature);
+        getRelatedFeaturesForOfferingsMap().add(offering, relatedFeature);
     }
 
     @Override
@@ -500,7 +501,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         noNullValues("relatedFeature", relatedFeature);
         log.trace("Adding relatedFeatures {} to offering {}", relatedFeature, offering);
-        addToMap(getRelatedFeaturesForOfferingsMap(), offering, relatedFeature);
+        getRelatedFeaturesForOfferingsMap().addAll(offering, relatedFeature);
     }
 
     @Override
@@ -508,7 +509,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("resultTemplate", resultTemplate);
         log.trace("Adding resultTemplate {} to offering {}", resultTemplate, offering);
-        addToMap(getResultTemplatesForOfferingsMap(), offering, resultTemplate);
+        getResultTemplatesForOfferingsMap().add(offering, resultTemplate);
     }
 
     @Override
@@ -516,7 +517,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("relatedFeature", relatedFeature);
         notNullOrEmpty("role", role);
         log.trace("Adding role {} to relatedFeature {}", role, relatedFeature);
-        addToMap(getRolesForRelatedFeaturesMap(), relatedFeature, role);
+        getRolesForRelatedFeaturesMap().add(relatedFeature, role);
     }
 
     @Override
@@ -524,7 +525,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("allowedObservationType", allowedObservationType);
         log.trace("Removing allowedObservationType {} from offering {}", allowedObservationType, offering);
-        removeElementFromMap(getAllowedObservationTypesForOfferingsMap(), offering, allowedObservationType);
+        getAllowedObservationTypesForOfferingsMap().removeWithKey(offering, allowedObservationType);
     }
 
     @Override
@@ -539,7 +540,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("compositePhenomenon", compositePhenomenon);
         log.trace("Removing compositePhenomenon {} from offering {}", compositePhenomenon, offering);
-        removeElementFromMap(getCompositePhenomenonsForOfferingsMap(), offering, compositePhenomenon);
+        getCompositePhenomenonsForOfferingsMap().removeWithKey(offering, compositePhenomenon);
     }
 
     @Override
@@ -576,7 +577,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("featureOfInterest", featureOfInterest);
         log.trace("Removing featureOfInterest {} from offering {}", featureOfInterest, offering);
-        removeElementFromMap(getFeaturesOfInterestForOfferingMap(), offering, featureOfInterest);
+        getFeaturesOfInterestForOfferingMap().removeWithKey(offering, featureOfInterest);
     }
 
     @Override
@@ -584,7 +585,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("resultTemplate", resultTemplate);
         notNullOrEmpty("featureOfInterest", featureOfInterest);
         log.trace("Removing featureOfInterest {} from resultTemplate {}", featureOfInterest, resultTemplate);
-        removeElementFromMap(getFeaturesOfInterestForResultTemplatesMap(), resultTemplate, featureOfInterest);
+        getFeaturesOfInterestForResultTemplatesMap().removeWithKey(resultTemplate, featureOfInterest);
     }
 
     @Override
@@ -655,7 +656,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("compositePhenomenon", compositePhenomenon);
         notNullOrEmpty("observableProperty", observableProperty);
         log.trace("Removing observableProperty {} from compositePhenomenon {}", observableProperty, compositePhenomenon);
-        removeElementFromMap(getObservablePropertiesForCompositePhenomenonsMap(), compositePhenomenon, observableProperty);
+        getObservablePropertiesForCompositePhenomenonsMap().removeWithKey(compositePhenomenon, observableProperty);
     }
 
     @Override
@@ -663,7 +664,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("observableProperty", observableProperty);
         log.trace("Removing observableProperty {} from offering {}", observableProperty, offering);
-        removeElementFromMap(getObservablePropertiesForOfferingsMap(), offering, observableProperty);
+        getObservablePropertiesForOfferingsMap().removeWithKey(offering, observableProperty);
     }
 
     @Override
@@ -671,7 +672,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("procedure", procedure);
         notNullOrEmpty("observableProperty", observableProperty);
         log.trace("Removing observableProperty {} from procedure {}", observableProperty, procedure);
-        removeElementFromMap(getObservablePropertiesForProceduresMap(), procedure, observableProperty);
+        getObservablePropertiesForProceduresMap().removeWithKey(procedure, observableProperty);
     }
 
     @Override
@@ -679,7 +680,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("resultTemplate", resultTemplate);
         notNullOrEmpty("observableProperty", observableProperty);
         log.trace("Removing observableProperty {} from resultTemplate {}", observableProperty, resultTemplate);
-        removeElementFromMap(getObservablePropertiesForResultTemplatesMap(), resultTemplate, observableProperty);
+        getObservablePropertiesForResultTemplatesMap().removeWithKey(resultTemplate, observableProperty);
     }
 
     @Override
@@ -687,7 +688,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("procedure", procedure);
         notNullOrEmpty("observationIdentifier", observationIdentifier);
         log.trace("Removing observationIdentifier {} from procedure {}", observationIdentifier, procedure);
-        removeElementFromMap(getObservationIdentifiersForProceduresMap(), procedure, observationIdentifier);
+        getObservationIdentifiersForProceduresMap().removeWithKey(procedure, observationIdentifier);
     }
 
     @Override
@@ -702,7 +703,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("observationType", observationType);
         log.trace("Removing observationType {} from offering {}", observationType, offering);
-        removeElementFromMap(getObservationTypesForOfferingsMap(), offering, observationType);
+        getObservationTypesForOfferingsMap().removeWithKey(offering, observationType);
     }
 
     @Override
@@ -717,7 +718,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("observableProperty", observableProperty);
         notNullOrEmpty("offering", offering);
         log.trace("Removing offering {} from observableProperty {}", offering, observableProperty);
-        removeElementFromMap(getOfferingsForObservablePropertiesMap(), observableProperty, offering);
+        getOfferingsForObservablePropertiesMap().removeWithKey(observableProperty, offering);
     }
 
     @Override
@@ -725,7 +726,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("procedure", procedure);
         notNullOrEmpty("offering", offering);
         log.trace("Removing offering {} from procedure {}", offering, procedure);
-        removeElementFromMap(getOfferingsForProceduresMap(), procedure, offering);
+        getOfferingsForProceduresMap().removeWithKey(procedure, offering);
     }
 
     @Override
@@ -747,7 +748,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("featureOfInterest", featureOfInterest);
         notNullOrEmpty("procedure", procedure);
         log.trace("Removing procedure {} from featureOfInterest {}", procedure, featureOfInterest);
-        removeElementFromMap(getProceduresForFeaturesOfInterestMap(), featureOfInterest, procedure);
+        getProceduresForFeaturesOfInterestMap().removeWithKey(featureOfInterest, procedure);
     }
 
     @Override
@@ -755,7 +756,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("observableProperty", observableProperty);
         notNullOrEmpty("procedure", procedure);
         log.trace("Removing procedure {} from observableProperty {}", procedure, observableProperty);
-        removeElementFromMap(getProceduresForObservablePropertiesMap(), observableProperty, procedure);
+        getProceduresForObservablePropertiesMap().removeWithKey(observableProperty, procedure);
     }
 
     @Override
@@ -763,7 +764,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("procedure", procedure);
         log.trace("Removing procedure {} from offering {}", procedure, offering);
-        removeElementFromMap(getProceduresForOfferingsMap(), offering, procedure);
+        getProceduresForOfferingsMap().removeWithKey(offering, procedure);
     }
 
     @Override
@@ -792,7 +793,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("relatedFeature", relatedFeature);
         log.trace("Removing relatedFeature {} from offering {}", relatedFeature, offering);
-        removeElementFromMap(getRelatedFeaturesForOfferingsMap(), offering, relatedFeature);
+        getRelatedFeaturesForOfferingsMap().removeWithKey(offering, relatedFeature);
     }
 
     @Override
@@ -807,7 +808,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("offering", offering);
         notNullOrEmpty("resultTemplate", resultTemplate);
         log.trace("Removing resultTemplate {} from offering {}", resultTemplate, offering);
-        removeElementFromMap(getResultTemplatesForOfferingsMap(), offering, resultTemplate);
+        getResultTemplatesForOfferingsMap().removeWithKey(offering, resultTemplate);
     }
 
     @Override
@@ -822,7 +823,7 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("relatedFeature", relatedFeature);
         notNullOrEmpty("role", role);
         log.trace("Removing role {} from relatedFeature {}", role, relatedFeature);
-        removeElementFromMap(getRolesForRelatedFeaturesMap(), relatedFeature, role);
+        getRolesForRelatedFeaturesMap().removeWithKey(relatedFeature, role);
     }
 
     @Override
@@ -935,18 +936,18 @@ public class WritableCache extends ReadableCache implements WritableContentCache
      * @param parents   the parents map
      * @param childs    the childs map
      */
-    protected <T> void updateHierarchy(T parent, Collection<T> newChilds, Map<T, Set<T>> parents, Map<T, Set<T>> childs) {
+    protected <T> void updateHierarchy(T parent, Collection<T> newChilds, SetMultiMap<T, T> parents, SetMultiMap<T, T> childs) {
         Set<T> newChildSet = synchronizedSet(newChilds);
         Set<T> currentParents = parents.put(parent, newChildSet);
         if (currentParents != null) {
             for (T currentParent : currentParents) {
                 log.trace("Removing child {} from parent {}", parent, currentParent);
-                removeElementFromMap(childs, currentParent, parent);
+                childs.removeWithKey(currentParent, parent);
             }
         }
         for (T child : newChildSet) {
             log.trace("Adding parent {} to child {}", parent, child);
-            addToMap(childs, child, parent);
+            childs.add(child, parent);
         }
     }
 
@@ -955,8 +956,8 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("featureOfInterest", featureOfInterest);
         notNullOrEmpty("parentFeature", parentFeature);
         log.trace("Adding parentFeature {} to featureOfInterest {}", parentFeature, featureOfInterest);
-        addToMap(getParentFeaturesForFeaturesOfInterestMap(), featureOfInterest, parentFeature);
-        addToMap(getChildFeaturesForFeaturesOfInterestMap(), parentFeature, featureOfInterest);
+        getParentFeaturesForFeaturesOfInterestMap().add(featureOfInterest, parentFeature);
+        getChildFeaturesForFeaturesOfInterestMap().add(parentFeature, featureOfInterest);
     }
 
     @Override
@@ -964,9 +965,9 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("featureOfInterest", featureOfInterest);
         noNullOrEmptyValues("parentFeatures", parentFeatures);
         log.trace("Adding parentFeature {} to featureOfInterest {}", parentFeatures, featureOfInterest);
-        addToMap(getParentFeaturesForFeaturesOfInterestMap(), featureOfInterest, parentFeatures);
+        getParentFeaturesForFeaturesOfInterestMap().addAll(featureOfInterest, parentFeatures);
         for (String parentFeature : parentFeatures) {
-            addToMap(getChildFeaturesForFeaturesOfInterestMap(), parentFeature, featureOfInterest);
+            getChildFeaturesForFeaturesOfInterestMap().add(parentFeature, featureOfInterest);
         }
     }
 
@@ -975,8 +976,8 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("procedure", procedure);
         notNullOrEmpty("parentProcedure", parentProcedure);
         log.trace("Adding parentProcedure {} to procedure {}", parentProcedure, procedure);
-        addToMap(getParentProceduresForProceduresMap(), procedure, parentProcedure);
-        addToMap(getChildProceduresForProceduresMap(), parentProcedure, procedure);
+        getParentProceduresForProceduresMap().add(procedure, parentProcedure);
+        getChildProceduresForProceduresMap().add(parentProcedure, procedure);
     }
 
     @Override
@@ -984,9 +985,9 @@ public class WritableCache extends ReadableCache implements WritableContentCache
         notNullOrEmpty("procedure", procedure);
         noNullOrEmptyValues("parentProcedures", parentProcedures);
         log.trace("Adding parentProcedures {} to procedure {}", parentProcedures, procedure);
-        addToMap(getParentProceduresForProceduresMap(), procedure, parentProcedures);
+        getParentProceduresForProceduresMap().addAll(procedure, parentProcedures);
         for (String parentProcedure : parentProcedures) {
-            addToMap(getChildProceduresForProceduresMap(), parentProcedure, procedure);
+            getChildProceduresForProceduresMap().add(parentProcedure, procedure);
         }
     }
 
