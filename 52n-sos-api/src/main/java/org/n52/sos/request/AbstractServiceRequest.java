@@ -23,8 +23,8 @@
  */
 package org.n52.sos.request;
 
-import org.n52.sos.exception.ows.MissingParameterValueException.MissingServiceParameterException;
-import org.n52.sos.exception.ows.MissingParameterValueException.MissingVersionParameterException;
+import org.n52.sos.exception.ows.concrete.MissingServiceParameterException;
+import org.n52.sos.exception.ows.concrete.MissingVersionParameterException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.swes.SwesExtensions;

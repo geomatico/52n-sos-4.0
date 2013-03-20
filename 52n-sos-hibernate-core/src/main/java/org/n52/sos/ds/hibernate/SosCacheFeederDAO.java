@@ -44,7 +44,7 @@ import org.n52.sos.ds.hibernate.cache.SensorDeletionCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.SensorInsertionCacheUpdate;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.exception.ows.NoApplicableCodeException.GenericThrowableWrapperException;
+import org.n52.sos.exception.ows.concrete.GenericThrowableWrapperException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.util.Validation;
 import org.slf4j.Logger;

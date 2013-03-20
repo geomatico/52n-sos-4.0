@@ -35,8 +35,8 @@ import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.ITime.TimeFormat;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
-import org.n52.sos.exception.ows.DateTimeFormatException;
-import org.n52.sos.exception.ows.DateTimeParseException;
+import org.n52.sos.exception.ows.concrete.DateTimeFormatException;
+import org.n52.sos.exception.ows.concrete.DateTimeParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

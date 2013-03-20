@@ -58,6 +58,6 @@ public class AbstractServiceOperator implements ServiceOperator {
         if (response != null) {
             return response;
         }
-        throw new OperationNotSupportedException().forOperation(request.getOperationName());
+        throw new OperationNotSupportedException(request.getOperationName());
     }
 }

@@ -30,14 +30,14 @@ import org.n52.sos.ogc.ows.OWSConstants;
  * ExceptionCodes as defined in the OWS Common Implementation Specification 1.1.0.
  */
 public enum OwsExceptionCode implements ExceptionCode {
-    OperationNotSupported(OWSConstants.SOAP_REASON_OPTION_NOT_SUPPORTED),
-    MissingParameterValue(OWSConstants.SOAP_REASON_MISSING_PARAMETER_VALUE),
     InvalidParameterValue(OWSConstants.SOAP_REASON_INVALID_PARAMETER_VALUE),
-    VersionNegotiationFailed(OWSConstants.SOAP_REASON_VERSION_NEGOTIATION_FAILED),
     InvalidUpdateSequence(OWSConstants.SOAP_REASON_INVALID_UPDATE_SEQUENCES),
-    OptionNotSupported(OWSConstants.SOAP_REASON_OPERATION_NOT_SUPPORTED),
+    MissingParameterValue(OWSConstants.SOAP_REASON_MISSING_PARAMETER_VALUE),
     NoApplicableCode(OWSConstants.SOAP_REASON_NO_APPLICABLE_CODE),
-    NoDataAvailable(OWSConstants.SOAP_REASON_NO_DATA_AVAILABLE);
+    NoDataAvailable(OWSConstants.SOAP_REASON_NO_DATA_AVAILABLE),
+    OperationNotSupported(OWSConstants.SOAP_REASON_OPTION_NOT_SUPPORTED),
+    OptionNotSupported(OWSConstants.SOAP_REASON_OPERATION_NOT_SUPPORTED),
+    VersionNegotiationFailed(OWSConstants.SOAP_REASON_VERSION_NEGOTIATION_FAILED);
     final String soapFaulReason;
 
     private OwsExceptionCode(String soapFaultReason) {

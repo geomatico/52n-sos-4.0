@@ -21,25 +21,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
+package org.n52.sos.exception.ows.concrete;
 
-package org.n52.sos.exception.ows;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.ogc.sos.Sos2Constants;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class DateTimeParseException extends DateTimeException {
+public class InvalidTemporalFilterParameterException extends InvalidParameterValueException {
+    private static final long serialVersionUID = 4454244754129206013L;
 
-    private static final long serialVersionUID = 8746024085392577840L;
-
-    public DateTimeParseException(String value) {
-        this(value, null);
+    public InvalidTemporalFilterParameterException(String value) {
+        super(Sos2Constants.GetObservationParams.temporalFilter, value);
     }
-
-    public DateTimeParseException(String value, Throwable cause) {
-        withMessage("Error parsing time string '%s'", value);
-        if (cause != null) {
-            causedBy(cause);
-        }
-    }
-
 }

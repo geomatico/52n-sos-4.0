@@ -35,11 +35,6 @@ public class OperationNotSupportedException extends CodedOwsException {
 
     public OperationNotSupportedException(String operation) {
         super(OwsExceptionCode.OperationNotSupported);
-        forOperation(operation);
-    }
-
-    public OperationNotSupportedException forOperation(String operation) {
         at(operation).withMessage("The requested operation '%s' is not supported by this service!", operation);
-        return this;
     }
 }

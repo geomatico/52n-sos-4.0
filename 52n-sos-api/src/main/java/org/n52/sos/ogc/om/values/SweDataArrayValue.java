@@ -33,7 +33,7 @@ import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.SosSweField;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
-import org.n52.sos.exception.ows.DateTimeParseException;
+import org.n52.sos.exception.ows.concrete.DateTimeParseException;
 import org.n52.sos.util.DateTimeHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

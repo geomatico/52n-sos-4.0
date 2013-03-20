@@ -35,7 +35,7 @@ import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetObservationByIdDAO;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.MissingParameterValueException.MissingResponseFormatParameterException;
+import org.n52.sos.exception.ows.concrete.MissingResponseFormatParameterException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;

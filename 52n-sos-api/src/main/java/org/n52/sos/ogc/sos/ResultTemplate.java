@@ -23,7 +23,7 @@
  */
 package org.n52.sos.ogc.sos;
 
-import org.n52.sos.exception.ows.NoApplicableCodeException.DecoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.concrete.DecoderResponseUnsupportedException;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;

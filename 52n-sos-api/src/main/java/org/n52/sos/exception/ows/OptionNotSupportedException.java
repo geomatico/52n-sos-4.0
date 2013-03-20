@@ -32,12 +32,4 @@ public class OptionNotSupportedException extends CodedOwsException {
     public OptionNotSupportedException() {
         super(OwsExceptionCode.OptionNotSupported);
     }
-
-    public static class ParameterNotSupportedException extends OptionNotSupportedException {
-        private static final long serialVersionUID = -4888724617519223794L;
-
-        public ParameterNotSupportedException(String parameterName) {
-            withMessage("The optional parameter '%s' is not supported by this service!", parameterName);
-        }
-    }
 }

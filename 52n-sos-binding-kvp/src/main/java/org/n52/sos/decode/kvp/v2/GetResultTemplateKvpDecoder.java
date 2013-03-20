@@ -29,11 +29,11 @@ import java.util.Set;
 
 import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.KvpOperationDecoderKey;
-import org.n52.sos.exception.ows.MissingParameterValueException.MissingObservedPropertyParameterException;
-import org.n52.sos.exception.ows.MissingParameterValueException.MissingOfferingParameterException;
-import org.n52.sos.exception.ows.MissingParameterValueException.MissingServiceParameterException;
-import org.n52.sos.exception.ows.MissingParameterValueException.MissingVersionParameterException;
-import org.n52.sos.exception.ows.OptionNotSupportedException.ParameterNotSupportedException;
+import org.n52.sos.exception.ows.concrete.MissingObservedPropertyParameterException;
+import org.n52.sos.exception.ows.concrete.MissingOfferingParameterException;
+import org.n52.sos.exception.ows.concrete.MissingServiceParameterException;
+import org.n52.sos.exception.ows.concrete.MissingVersionParameterException;
+import org.n52.sos.exception.ows.concrete.ParameterNotSupportedException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;

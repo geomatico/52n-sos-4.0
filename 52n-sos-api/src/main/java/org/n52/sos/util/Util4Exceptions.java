@@ -63,7 +63,7 @@ public class Util4Exceptions {
 
     @Deprecated
     public static OwsExceptionReport createOperationNotSupportedException(String operationName) {
-        return new OperationNotSupportedException().forOperation(operationName);
+        return new OperationNotSupportedException(operationName);
     }
 
     @Deprecated

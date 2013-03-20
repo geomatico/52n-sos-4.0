@@ -79,7 +79,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.request.InsertResultRequest;
 import org.n52.sos.response.InsertResultResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.exception.ows.DateTimeParseException;
+import org.n52.sos.exception.ows.concrete.DateTimeParseException;
 import org.n52.sos.util.DateTimeHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

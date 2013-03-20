@@ -48,7 +48,7 @@ import net.opengis.sos.x10.GetObservationDocument.GetObservation.FeatureOfIntere
 import net.opengis.sos.x10.ResponseModeType;
 
 import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidResponseModeParameterException;
+import org.n52.sos.exception.ows.concrete.InvalidResponseModeParameterException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.filter.ComparisonFilter;
 import org.n52.sos.ogc.filter.FilterConstants;

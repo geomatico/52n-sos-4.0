@@ -39,13 +39,13 @@ import org.n52.sos.encode.Encoder;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.SensorInsertion;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidFeatureOfInterestTypeException;
 import org.n52.sos.exception.ows.MissingParameterValueException;
-import org.n52.sos.exception.ows.MissingParameterValueException.MissingFeatureOfInterestTypeParameterException;
-import org.n52.sos.exception.ows.MissingParameterValueException.MissingObservedPropertyParameterException;
-import org.n52.sos.exception.ows.NoApplicableCodeException.EncoderResponseUnsupportedException;
-import org.n52.sos.exception.ows.NoApplicableCodeException.ErrorWhileSavingResponseToOutputStreamException;
-import org.n52.sos.exception.ows.NoApplicableCodeException.NoEncoderForResponseException;
+import org.n52.sos.exception.ows.concrete.InvalidFeatureOfInterestTypeException;
+import org.n52.sos.exception.ows.concrete.MissingFeatureOfInterestTypeException;
+import org.n52.sos.exception.ows.concrete.MissingObservedPropertyParameterException;
+import org.n52.sos.exception.ows.concrete.EncoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.concrete.ErrorWhileSavingResponseToOutputStreamException;
+import org.n52.sos.exception.ows.concrete.NoEncoderForResponseException;
 import org.n52.sos.ogc.om.SosOffering;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -208,7 +208,7 @@ public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<Abstra
                     Configurator.getInstance().getCache().getFeatureOfInterestTypes();
             for (String featureOfInterestType : featureOfInterestTypes) {
                 if (featureOfInterestType.isEmpty()) {
-                    exceptions.add(new MissingFeatureOfInterestTypeParameterException());
+                    exceptions.add(new MissingFeatureOfInterestTypeException());
                 } else {
                     if (!validFeatureOfInterestTypes.contains(featureOfInterestType)) {
                         exceptions.add(new InvalidFeatureOfInterestTypeException(featureOfInterestType));

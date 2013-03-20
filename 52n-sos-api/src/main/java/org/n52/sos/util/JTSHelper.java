@@ -24,7 +24,7 @@
 package org.n52.sos.util;
 
 import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException.InvalidSridException;
+import org.n52.sos.exception.ows.concrete.InvalidSridException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

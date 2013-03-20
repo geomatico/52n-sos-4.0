@@ -21,36 +21,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.exception.ows;
+package org.n52.sos.exception.ows.concrete;
 
-import org.joda.time.DateTime;
-import org.n52.sos.ogc.gml.time.ITime;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.ogc.sos.Sos1Constants;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>
  */
-public class DateTimeFormatException extends DateTimeException {
-    private static final long serialVersionUID = 4594521785170898431L;
+public class InvalidOutputFormatException extends InvalidParameterValueException {
+    private static final long serialVersionUID = 6425942384678159423L;
 
-    public DateTimeFormatException(ITime value) {
-        this(value, null);
-    }
-
-    public DateTimeFormatException(ITime value, Throwable cause) {
-        withMessage("Error formatting ITime %s", value);
-        if (cause != null) {
-            causedBy(cause);
-        }
-    }
-
-    public DateTimeFormatException(DateTime value) {
-        this(value, null);
-    }
-
-    public DateTimeFormatException(DateTime value, Throwable cause) {
-        withMessage("Error formatting DateTime %s", value);
-        if (cause != null) {
-            causedBy(cause);
-        }
+    public InvalidOutputFormatException(String value) {
+        super(Sos1Constants.DescribeSensorParams.outputFormat, value);
     }
 }
