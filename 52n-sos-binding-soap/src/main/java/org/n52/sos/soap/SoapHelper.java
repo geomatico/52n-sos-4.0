@@ -34,9 +34,6 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 
-import org.n52.sos.exception.ows.OwsExceptionCode;
-import org.n52.sos.exception.sos.SosExceptionCode;
-import org.n52.sos.exception.swes.SwesExceptionCode;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
@@ -121,25 +118,6 @@ public class SoapHelper {
     public static SOAPMessage getSoapMessageForProtocol(String soapVersion, InputStream inputStream)
             throws SOAPException, IOException {
         return MessageFactory.newInstance(soapVersion).createMessage(new MimeHeaders(), inputStream);
-    }
-
-    /**
-     * Get SOAP action URI depending on Exception code
-     * 
-     * @param exceptionCode
-     *            Exception code
-     * @return SOAP action URI
-     */
-    public static String getExceptionActionURI(ExceptionCode exceptionCode) {
-        if (exceptionCode instanceof OwsExceptionCode) {
-            return SosSoapConstants.RESP_ACTION_OWS;
-        } else if (exceptionCode instanceof SwesExceptionCode) {
-            return SosSoapConstants.RESP_ACTION_SWES;
-        } else if (exceptionCode instanceof SosExceptionCode) {
-            return SosSoapConstants.RESP_ACTION_SOS;
-        } else {
-            return SosSoapConstants.RESP_ACTION_OWS;
-        }
     }
 
     /**
