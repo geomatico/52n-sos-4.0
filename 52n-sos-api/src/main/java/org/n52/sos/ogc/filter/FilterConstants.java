@@ -25,26 +25,23 @@ package org.n52.sos.ogc.filter;
 
 /**
  * Constants class for filter
- * <p/>
  */
-public class FilterConstants {
-
-    public static final String NS_FES_2 = "http://www.opengis.net/fes/2.0";
-    public static final String NS_FES_2_PREFIX = "fes";
+public interface FilterConstants {
+    String NS_FES_2 = "http://www.opengis.net/fes/2.0";
+    String NS_FES_2_PREFIX = "fes";
     /**
      * element name TEquals
      */
-    public static final String EN_TEQUALS = "TEquals";
+    String EN_TEQUALS = "TEquals";
     /**
      * element name ValueReference
      */
-    public static final String EN_VALUE_REFERENCE = "ValueReference";
+    String EN_VALUE_REFERENCE = "ValueReference";
 
     /**
      * Enumeration for conformance class constraint names
-     * <p/>
      */
-    public enum ConformanceClassConstraintNames {
+    enum ConformanceClassConstraintNames {
         ImplementsQuery,
         ImplementsAdHocQuery,
         ImplementsFunctions,
@@ -64,9 +61,8 @@ public class FilterConstants {
 
     /**
      * Enumeration for temporal operators
-     * <p/>
      */
-    public enum TimeOperator {
+    enum TimeOperator {
         TM_Before,
         TM_After,
         TM_Begins,
@@ -84,9 +80,8 @@ public class FilterConstants {
 
     /**
      * Enumeration for FES 2.0 temporal operators
-     * <p/>
      */
-    public enum TimeOperator2 {
+    enum TimeOperator2 {
         Before,
         After,
         Begins,
@@ -104,12 +99,12 @@ public class FilterConstants {
 
     /**
      * Enumeration for spatial operators
-     * <p/>
      */
-    public enum SpatialOperator {
+    enum SpatialOperator {
         Equals,
         Disjoint,
-        Touches, Within,
+        Touches,
+        Within,
         Overlaps,
         Crosses,
         Intersects,
@@ -121,9 +116,8 @@ public class FilterConstants {
 
     /**
      * Enumeration for comparison operators
-     * <p/>
      */
-    public enum ComparisonOperator {
+    enum ComparisonOperator {
         PropertyIsEqualTo,
         PropertyIsNotEqualTo,
         PropertyIsLessThan,
@@ -134,8 +128,5 @@ public class FilterConstants {
         PropertyIsNil,
         PropertyIsNull,
         PropertyIsBetween
-    }
-
-    private FilterConstants() {
     }
 }

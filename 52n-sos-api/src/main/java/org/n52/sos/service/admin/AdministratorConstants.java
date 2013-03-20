@@ -23,28 +23,11 @@
  */
 package org.n52.sos.service.admin;
 
-public class AdministratorConstants {
+public interface AdministratorConstants {
     
     /** enum with parameter names for getCapabilities request */
-    public enum AdministratorParams {
+    enum AdministratorParams {
         service, request, parameter;
-
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-			for (AdministratorParams p : values()) {
-				if (p.name().equals(s)) {
-					return true;
-				}
-			}
-			return false;
-        }
     }
 
 }

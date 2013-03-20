@@ -25,28 +25,20 @@ package org.n52.sos.soap;
 
 /**
  * Constants for SOAP messages
- * 
+ *
  */
-public class SoapConstants {
-    // locator
+public interface SoapConstants {
     /**
      * SOAP envelope locator
      */
-    public static final String LOCATOR_SOAP_ENVELOPE = "SOAPEnvelope";
-
+    String LOCATOR_SOAP_ENVELOPE = "SOAPEnvelope";
     /**
      * SOAP header locator
      */
-    public static final String LOCATOR_SOAP_HEADER = "SOAPHeader";
-
+    String LOCATOR_SOAP_HEADER = "SOAPHeader";
     /**
      * SOAP body locator
      */
-    public static final String LOCATOR_SOAP_BODY = "SOAPBody";
-    
-    public static final String CONTENT_TYPE = "application/soap+xml";
-
-    private SoapConstants() {
-    }
-
+    String LOCATOR_SOAP_BODY = "SOAPBody";
+    String CONTENT_TYPE = "application/soap+xml";
 }

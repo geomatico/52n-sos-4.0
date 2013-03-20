@@ -26,19 +26,19 @@ package org.n52.sos.web.install;
 import org.n52.sos.web.ControllerConstants;
 
 public interface InstallConstants {
-    public static final String IS_POSTGIS_INSTALLED = "SELECT version(), postgis_version()";
-    public static final String GET_VERSION_OF_DATABASE_INSTALLATION = "SELECT value FROM global_settings WHERE key = 'VERSION';";
+    String IS_POSTGIS_INSTALLED = "SELECT version(), postgis_version()";
+    String GET_VERSION_OF_DATABASE_INSTALLATION = "SELECT value FROM global_settings WHERE key = 'VERSION';";
 
     /* request parameters */
-    public static final String DRIVER_PARAMETER = "driver";
-    public static final String CONNECTION_POOL_PARAMETER = "connection_pool";
-    public static final String DIALECT_PARAMETER = "dialect";
-    public static final String SCHEMA_PARAMETER = "schema";
-    public static final String OVERWRITE_TABLES_PARAMETER = "overwrite_tables";
-    public static final String CREATE_TEST_DATA_PARAMETER = "create_test_data";
-    public static final String CREATE_TABLES_PARAMETER = "create_tables";
+    String DRIVER_PARAMETER = "driver";
+    String CONNECTION_POOL_PARAMETER = "connection_pool";
+    String DIALECT_PARAMETER = "dialect";
+    String SCHEMA_PARAMETER = "schema";
+    String OVERWRITE_TABLES_PARAMETER = "overwrite_tables";
+    String CREATE_TEST_DATA_PARAMETER = "create_test_data";
+    String CREATE_TABLES_PARAMETER = "create_tables";
     
-    public enum Step {
+    enum Step {
         /* DECLARATION ORDER IS IMPORTANT! */
         WELCOME(ControllerConstants.Paths.INSTALL_INDEX,
                 ControllerConstants.Views.INSTALL_INDEX),

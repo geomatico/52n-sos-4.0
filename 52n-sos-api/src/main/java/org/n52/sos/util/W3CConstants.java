@@ -27,38 +27,21 @@ import javax.xml.namespace.QName;
 
 /**
  * Constants class for W3C
- * 
+ *
  */
-public class W3CConstants {
-
+public interface W3CConstants {
     // attribute names
-	
-    public static final String AN_HREF = "href";
-	
-    public static final String AN_TITLE = "title";
-	
+    String AN_HREF = "href";
+    String AN_TITLE = "title";
+    String AN_SCHEMA_LOCATION = "schemaLocation";
     // namespaces and schema locations
-
-    public static final String NS_XLINK = "http://www.w3.org/1999/xlink";
-
-    public static final String NS_XLINK_PREFIX = "xlink";
-
-    public static final String NS_XSI = "http://www.w3.org/2001/XMLSchema-instance";
-
-    public static final String NS_XSI_PREFIX = "xsi";
-
-    public static final String SCHEMA_LOCATION_XLINK = "http://www.w3.org/1999/xlink.xsd";
-
-    public static final String AN_SCHEMA_LOCATION = "schemaLocation";
-
-    public static final String NS_XS = "http://www.w3.org/2001/XMLSchema";
-
-    public static final String NS_XS_PREFIX = "xs";
-
-    public static final QName QN_SCHEMA_LOCATION = new QName(NS_XSI, AN_SCHEMA_LOCATION);
-
-    public static final QName QN_SCHEMA_LOCATION_PREFIXED = new QName(NS_XSI, AN_SCHEMA_LOCATION, NS_XSI_PREFIX);
-
-    private W3CConstants() {
-    }
+    String NS_XLINK = "http://www.w3.org/1999/xlink";
+    String NS_XLINK_PREFIX = "xlink";
+    String NS_XSI = "http://www.w3.org/2001/XMLSchema-instance";
+    String NS_XSI_PREFIX = "xsi";
+    String SCHEMA_LOCATION_XLINK = "http://www.w3.org/1999/xlink.xsd";
+    String NS_XS = "http://www.w3.org/2001/XMLSchema";
+    String NS_XS_PREFIX = "xs";
+    QName QN_SCHEMA_LOCATION = new QName(NS_XSI, AN_SCHEMA_LOCATION);
+    QName QN_SCHEMA_LOCATION_PREFIXED = new QName(NS_XSI, AN_SCHEMA_LOCATION, NS_XSI_PREFIX);
 }

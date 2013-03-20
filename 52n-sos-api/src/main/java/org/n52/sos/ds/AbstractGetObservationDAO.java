@@ -24,18 +24,17 @@
 package org.n52.sos.ds;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
 import org.joda.time.DateTime;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSParameterValueRange;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.Sos1Constants;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
@@ -102,8 +101,8 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
             opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.srsName);
             opsMeta.addAnyParameterValue(SosConstants.GetObservationParams.result);
             opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.resultModel, getResultModels());
-            opsMeta.addPossibleValuesParameter(SosConstants.GetObservationParams.responseMode,
-                    Arrays.asList(SosConstants.getResponseModes()));
+            opsMeta
+                    .addPossibleValuesParameter(SosConstants.GetObservationParams.responseMode, SosConstants.RESPONSE_MODES);
         }
     }
     
@@ -150,9 +149,8 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
     }
     
     private List<String> getResultModels() {
-        QName[] resultModels = OMConstants.getResultModels();
-        List<String> resultModelsList = new ArrayList<String>(resultModels.length);
-        for (QName qname : resultModels) {
+        List<String> resultModelsList = new ArrayList<String>(OMConstants.RESULT_MODELS.size());
+        for (QName qname : OMConstants.RESULT_MODELS) {
             resultModelsList.add(qname.getPrefix() + ":" + qname.getLocalPart());
         }
         return resultModelsList;

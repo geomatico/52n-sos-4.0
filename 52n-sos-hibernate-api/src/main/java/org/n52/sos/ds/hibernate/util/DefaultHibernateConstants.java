@@ -23,33 +23,33 @@
  */
 package org.n52.sos.ds.hibernate.util;
 
-public class DefaultHibernateConstants {
+public interface DefaultHibernateConstants {
 
     // SQL query statements
-    public static final String SELECT = "SELECT ";
+    String SELECT = "SELECT ";
 
-    public static final String DISTINCT = " DISTINCT ";
+    String DISTINCT = " DISTINCT ";
 
-    public static final String FROM = " FROM ";
+    String FROM = " FROM ";
 
-    public static final String WHERE = " WHERE ";
+    String WHERE = " WHERE ";
 
-    public static final String AND = " AND ";
+    String AND = " AND ";
 
     /* dssos.config properties */
-    public static final String DRIVER_PROPERTY = "hibernate.connection.driver_class";
+    String DRIVER_PROPERTY = "hibernate.connection.driver_class";
 
-    public static final String PASS_PROPERTY = "hibernate.connection.password";
+    String PASS_PROPERTY = "hibernate.connection.password";
 
-    public static final String USER_PROPERTY = "hibernate.connection.username";
+    String USER_PROPERTY = "hibernate.connection.username";
 
-    public static final String CONNECTION_STRING_PROPERTY = "hibernate.connection.url";
+    String CONNECTION_STRING_PROPERTY = "hibernate.connection.url";
 
-    public static final String CONNECTION_POOL_PROPERTY = "hibernate.connection.provider_class";
+    String CONNECTION_POOL_PROPERTY = "hibernate.connection.provider_class";
 
-    public static final String DIALECT_PROPERTY = "hibernate.dialect";
+    String DIALECT_PROPERTY = "hibernate.dialect";
 
-    public static final String CLAZZ = "clazz";
-    public static final String CATALOG_PROPERTY = "hibernate.default_catalog";
+    String CLAZZ = "clazz";
+    String CATALOG_PROPERTY = "hibernate.default_catalog";
 
 }

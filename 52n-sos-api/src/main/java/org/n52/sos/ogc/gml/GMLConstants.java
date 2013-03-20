@@ -27,162 +27,155 @@ import javax.xml.namespace.QName;
 
 import org.n52.sos.ogc.om.OMConstants;
 
-public class GMLConstants {
+public interface GMLConstants {
 
     /* namespaces and schema locations */
-    public static final String NS_GML = "http://www.opengis.net/gml";
+    String NS_GML = "http://www.opengis.net/gml";
 
-    public static final String NS_GML_32 = "http://www.opengis.net/gml/3.2";
+    String NS_GML_32 = "http://www.opengis.net/gml/3.2";
 
-    public static final String NS_GML_PREFIX = "gml";
+    String NS_GML_PREFIX = "gml";
 
-    public static final String SCHEMA_LOCATION_GML = "http://schemas.opengis.net/gml/3.1.1/base/gml.xsd";
+    String SCHEMA_LOCATION_GML = "http://schemas.opengis.net/gml/3.1.1/base/gml.xsd";
 
-    public static final String SCHEMA_LOCATION_GML_32 = "http://schemas.opengis.net/gml/3.2.1/gml.xsd";
+    String SCHEMA_LOCATION_GML_32 = "http://schemas.opengis.net/gml/3.2.1/gml.xsd";
 
-    public static final String GML_ID_ATT = "id";
+    String GML_ID_ATT = "id";
 
     /* element names used in GML */
 
-    public static final String EN_TIME_INSTANT = "TimeInstant";
+    String EN_TIME_INSTANT = "TimeInstant";
 
-    public static final String EN_TIME_PERIOD = "TimePeriod";
+    String EN_TIME_PERIOD = "TimePeriod";
 
-    public static final String EN_TIME_BEGIN = "beginTime";
+    String EN_TIME_BEGIN = "beginTime";
 
-    public static final String EN_TIME_END = "endTime";
+    String EN_TIME_END = "endTime";
 
-    public static final String EN_TIME_POSITION = "timePosition";
+    String EN_TIME_POSITION = "timePosition";
 
-    public static final String EN_BEGIN_POSITION = "beginPosition";
+    String EN_BEGIN_POSITION = "beginPosition";
 
-	public static final String EN_END_POSITION = "endPosition";
+	String EN_END_POSITION = "endPosition";
 
-    public static final String GML_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+    String GML_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 
     // nil values from GML 3.2 Section 8.2.3.1
-    public static final String NIL_INAPPLICABLE = "urn:ogc:def:nil:OGC:inapplicable";
+    String NIL_INAPPLICABLE = "urn:ogc:def:nil:OGC:inapplicable";
 
-    public static final String NIL_MISSING = "urn:ogc:def:nil:OGC:missing";
+    String NIL_MISSING = "urn:ogc:def:nil:OGC:missing";
 
-    public static final String NIL_TEMPLATE = "urn:ogc:def:nil:OGC:template";
+    String NIL_TEMPLATE = "urn:ogc:def:nil:OGC:template";
 
-    public static final String NIL_UNKNOWN = "urn:ogc:def:nil:OGC:unknown";
+    String NIL_UNKNOWN = "urn:ogc:def:nil:OGC:unknown";
 
-    public static final String NIL_WITHHELD = "urn:ogc:def:nil:OGC:withheld";
+    String NIL_WITHHELD = "urn:ogc:def:nil:OGC:withheld";
 
-    public static final String EN_ENVELOPE = "Envelope";
+    String EN_ENVELOPE = "Envelope";
 
-    public static final String EN_ABSTRACT_TIME_OBJECT = "_TimeObject";
+    String EN_ABSTRACT_TIME_OBJECT = "_TimeObject";
 	
-	public static final String EN_ABSTRACT_TIME_OBJECT_32 = "AbstractTimeObject";
+	String EN_ABSTRACT_TIME_OBJECT_32 = "AbstractTimeObject";
 
-    public static final String EN_ABSTRACT_ENCODING = "_Encoding";
+    String EN_ABSTRACT_ENCODING = "_Encoding";
 
-    public static final String EN_ABSTRACT_OBSERVATION = "AbstractObservation";
+    String EN_ABSTRACT_OBSERVATION = "AbstractObservation";
 
-    public static final String EN_ABSTRACT_FEATURE = "_Feature";
+    String EN_ABSTRACT_FEATURE = "_Feature";
 	
-	public static final String EN_ABSTRACT_FEATURE_32 = "AbstractFeature";
+	String EN_ABSTRACT_FEATURE_32 = "AbstractFeature";
 
-    public static final String EN_ABSTRACT_FEATURE_COLLECTION = "_FeatureCollection";
+    String EN_ABSTRACT_FEATURE_COLLECTION = "_FeatureCollection";
     
-    public static final String EN_FEATURE_COLLECTION = "FeatureCollection";
+    String EN_FEATURE_COLLECTION = "FeatureCollection";
 
-    public static final String EN_ABSTRACT_GEOMETRY = "_Geometry";
+    String EN_ABSTRACT_GEOMETRY = "_Geometry";
 
-    public static final String EN_ABSTRACT_SURFACE = "_Surface";
+    String EN_ABSTRACT_SURFACE = "_Surface";
 
-    public static final String EN_ABSTRACT_TIME_GEOM_PRIM = "_TimeGeometricPrimitive";
+    String EN_ABSTRACT_TIME_GEOM_PRIM = "_TimeGeometricPrimitive";
 
-    public static final String EN_ABSTRACT_RING = "_Ring";
+    String EN_ABSTRACT_RING = "_Ring";
 
-    public static final String EN_LINEAR_RING = "LinearRing";
+    String EN_LINEAR_RING = "LinearRing";
 
-    public static final String EN_LINE_STRING = "LineString";
+    String EN_LINE_STRING = "LineString";
 
-    public static final String EN_POINT = "Point";
+    String EN_POINT = "Point";
 
-    public static final String EN_POLYGON = "Polygon";
+    String EN_POLYGON = "Polygon";
 
-    public static final String EN_LOWER_CORNER = "lowerCorner";
+    String EN_LOWER_CORNER = "lowerCorner";
 
-    public static final String EN_UPPER_CORNER = "upperCorner";
+    String EN_UPPER_CORNER = "upperCorner";
 
     /* attribute names in GML */
 
-    public static final String AN_ID = "id";
+    String AN_ID = "id";
 	
     /* QNames for elements */
 
-    public static final QName QN_ENVELOPE = new QName(NS_GML, EN_ENVELOPE, NS_GML_PREFIX);
+    QName QN_ENVELOPE = new QName(NS_GML, EN_ENVELOPE, NS_GML_PREFIX);
 
-    public static final QName QN_POINT = new QName(NS_GML, EN_POINT, NS_GML_PREFIX);
+    QName QN_POINT = new QName(NS_GML, EN_POINT, NS_GML_PREFIX);
 
-    public static final QName QN_LINESTRING = new QName(NS_GML, EN_LINE_STRING, NS_GML_PREFIX);
+    QName QN_LINESTRING = new QName(NS_GML, EN_LINE_STRING, NS_GML_PREFIX);
 
-    public static final QName QN_POLYGON = new QName(NS_GML, EN_POLYGON, NS_GML_PREFIX);
+    QName QN_POLYGON = new QName(NS_GML, EN_POLYGON, NS_GML_PREFIX);
 
-    public static final QName QN_ENVELOPE_32 = new QName(NS_GML_32, EN_ENVELOPE, NS_GML_PREFIX);
+    QName QN_ENVELOPE_32 = new QName(NS_GML_32, EN_ENVELOPE, NS_GML_PREFIX);
 
-    public static final QName QN_POINT_32 = new QName(NS_GML_32, EN_POINT, NS_GML_PREFIX);
+    QName QN_POINT_32 = new QName(NS_GML_32, EN_POINT, NS_GML_PREFIX);
 
-    public static final QName QN_LINESTRING_32 = new QName(NS_GML_32, EN_LINE_STRING, NS_GML_PREFIX);
+    QName QN_LINESTRING_32 = new QName(NS_GML_32, EN_LINE_STRING, NS_GML_PREFIX);
 
-    public static final QName QN_POLYGON_32 = new QName(NS_GML_32, EN_POLYGON, NS_GML_PREFIX);
+    QName QN_POLYGON_32 = new QName(NS_GML_32, EN_POLYGON, NS_GML_PREFIX);
 
-    public static final QName QN_TIME_INSTANT = new QName(NS_GML, EN_TIME_INSTANT, NS_GML_PREFIX);
+    QName QN_TIME_INSTANT = new QName(NS_GML, EN_TIME_INSTANT, NS_GML_PREFIX);
 
-    public static final QName QN_TIME_PERIOD = new QName(NS_GML, EN_TIME_PERIOD, NS_GML_PREFIX);
+    QName QN_TIME_PERIOD = new QName(NS_GML, EN_TIME_PERIOD, NS_GML_PREFIX);
 
-    public static final QName QN_TIME_INSTANT_32 = new QName(NS_GML_32, EN_TIME_INSTANT, NS_GML_PREFIX);
+    QName QN_TIME_INSTANT_32 = new QName(NS_GML_32, EN_TIME_INSTANT, NS_GML_PREFIX);
 
-    public static final QName QN_TIME_PERIOD_32 = new QName(NS_GML_32, EN_TIME_PERIOD, NS_GML_PREFIX);
+    QName QN_TIME_PERIOD_32 = new QName(NS_GML_32, EN_TIME_PERIOD, NS_GML_PREFIX);
 
-    public static final QName QN_ABSTRACT_FEATURE_COLLECTION = new QName(NS_GML, EN_ABSTRACT_FEATURE_COLLECTION,
+    QName QN_ABSTRACT_FEATURE_COLLECTION = new QName(NS_GML, EN_ABSTRACT_FEATURE_COLLECTION,
             NS_GML_PREFIX);
 
-    public static final QName QN_FEATURE_COLLECTION = new QName(GMLConstants.NS_GML,
+    QName QN_FEATURE_COLLECTION = new QName(GMLConstants.NS_GML,
             OMConstants.EN_FEATURE_COLLECTION, NS_GML_PREFIX);
 
-    public static final QName QN_ABSTRACT_RING = new QName(NS_GML, EN_ABSTRACT_RING, NS_GML_PREFIX);
+    QName QN_ABSTRACT_RING = new QName(NS_GML, EN_ABSTRACT_RING, NS_GML_PREFIX);
 
-    public static final QName QN_LINEAR_RING = new QName(NS_GML, EN_LINEAR_RING, NS_GML_PREFIX);
+    QName QN_LINEAR_RING = new QName(NS_GML, EN_LINEAR_RING, NS_GML_PREFIX);
 
-    public static final QName QN_ABSTRACT_RING_32 = new QName(NS_GML_32, EN_ABSTRACT_RING, NS_GML_PREFIX);
+    QName QN_ABSTRACT_RING_32 = new QName(NS_GML_32, EN_ABSTRACT_RING, NS_GML_PREFIX);
 
-    public static final QName QN_LINEAR_RING_32 = new QName(NS_GML_32, EN_LINEAR_RING, NS_GML_PREFIX);
+    QName QN_LINEAR_RING_32 = new QName(NS_GML_32, EN_LINEAR_RING, NS_GML_PREFIX);
 
-    public static final QName QN_ABSTRACT_TIME_OBJECT = new QName(NS_GML, EN_ABSTRACT_TIME_OBJECT, NS_GML_PREFIX);
+    QName QN_ABSTRACT_TIME_OBJECT = new QName(NS_GML, EN_ABSTRACT_TIME_OBJECT, NS_GML_PREFIX);
 
-    public static final QName QN_ABSTRACT_TIME_GEOM_PRIM =
+    QName QN_ABSTRACT_TIME_GEOM_PRIM =
             new QName(NS_GML, EN_ABSTRACT_TIME_GEOM_PRIM, NS_GML_PREFIX);
 	
-	public static final QName QN_ABSTRACT_FEATURE_GML = new QName(GMLConstants.NS_GML, GMLConstants.EN_ABSTRACT_FEATURE, NS_GML_PREFIX);
+	QName QN_ABSTRACT_FEATURE_GML = new QName(GMLConstants.NS_GML, GMLConstants.EN_ABSTRACT_FEATURE, NS_GML_PREFIX);
 	
-	public static final QName QN_ABSTRACT_FEATURE_GML_32 = new QName(GMLConstants.NS_GML_32, GMLConstants.EN_ABSTRACT_FEATURE_32, NS_GML_PREFIX);
+	QName QN_ABSTRACT_FEATURE_GML_32 = new QName(GMLConstants.NS_GML_32, GMLConstants.EN_ABSTRACT_FEATURE_32, NS_GML_PREFIX);
 	
-	public static final QName QN_ABSTRACT_TIME_32 = new QName(GMLConstants.NS_GML_32, GMLConstants.EN_ABSTRACT_TIME_OBJECT_32, NS_GML_PREFIX);
+	QName QN_ABSTRACT_TIME_32 = new QName(GMLConstants.NS_GML_32, GMLConstants.EN_ABSTRACT_TIME_OBJECT_32, NS_GML_PREFIX);
 
     /** string constant for ascending sorting order */
-    public static final String SORT_ORDER_ASC = SortingOrder.ASC.name();
+    String SORT_ORDER_ASC = SortingOrder.ASC.name();
 
     /** Constant for result model of common observations */
-    public static final String SORT_ORDER_DESC = SortingOrder.DESC.name();
-
-    /**
-     * Hide utility constructor
-     */
-    private GMLConstants() {
-        super();
-    }
+    String SORT_ORDER_DESC = SortingOrder.DESC.name();
 
     /**
      * Enumeration of the possible values for indeterminate Time attribute of
      * eventtime in GetObservation request
      * 
      */
-    public static enum IndetTimeValues {
+    enum IndetTimeValues {
         after, before, now, unknown
     }
 
@@ -190,7 +183,7 @@ public class GMLConstants {
      * enumeration of the possible sorting orders
      * 
      */
-    public static enum SortingOrder {
+    enum SortingOrder {
         ASC, DESC
     }
 

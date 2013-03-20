@@ -90,13 +90,13 @@ public class WsaEncoder implements Encoder<Map<QName, String>, WsaHeader> {
             throws OwsExceptionReport {
         Map<QName, String> wsaHeaderValues = new HashMap<QName, String>(3);
         if (response.getReplyToAddress() != null && !response.getReplyToAddress().isEmpty()) {
-            wsaHeaderValues.put(WsaConstants.getQNameTo(), response.getReplyToAddress());
+            wsaHeaderValues.put(WsaConstants.QN_TO, response.getReplyToAddress());
         }
         if (response.getMessageID() != null) {
-            wsaHeaderValues.put(WsaConstants.getQNameRelatesTo(), response.getMessageID());
+            wsaHeaderValues.put(WsaConstants.QN_RELATES_TO, response.getMessageID());
         }
         if (response.getActionValue() != null) {
-            wsaHeaderValues.put(WsaConstants.getQNameAction(), response.getActionValue());
+            wsaHeaderValues.put(WsaConstants.QN_ACTION, response.getActionValue());
         }
         return wsaHeaderValues;
     }

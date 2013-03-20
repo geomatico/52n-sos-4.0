@@ -76,7 +76,7 @@ public class WsaDecoder implements Decoder<WsaHeader, List<SOAPHeaderElement>> {
                 wsaHeaderRequest.setToValue(soapHeaderElement.getValue());
             } else if (soapHeaderElement.getLocalName().equals(WsaConstants.EN_ACTION)) {
                 wsaHeaderRequest.setActionValue(soapHeaderElement.getValue());
-            } else if (soapHeaderElement.getLocalName().equals(WsaConstants.EN_REPLYTO)) {
+            } else if (soapHeaderElement.getLocalName().equals(WsaConstants.EN_REPLY_TO)) {
                 Iterator<?> iter = soapHeaderElement.getChildElements();
                 while (iter.hasNext()) {
                     Node node = (Node) iter.next();
@@ -84,7 +84,7 @@ public class WsaDecoder implements Decoder<WsaHeader, List<SOAPHeaderElement>> {
                         wsaHeaderRequest.setReplyToAddress(node.getValue());
                     }
                 }
-            } else if (soapHeaderElement.getLocalName().equals(WsaConstants.EN_MESSAGEID)) {
+            } else if (soapHeaderElement.getLocalName().equals(WsaConstants.EN_MESSAGE_ID)) {
                 wsaHeaderRequest.setMessageID(soapHeaderElement.getValue());
             }
         }

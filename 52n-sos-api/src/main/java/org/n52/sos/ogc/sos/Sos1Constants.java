@@ -23,250 +23,106 @@
  */
 package org.n52.sos.ogc.sos;
 
+import static java.util.Collections.unmodifiableSet;
+import static org.n52.sos.util.CollectionHelper.set;
+
+import java.util.Set;
+
 import org.n52.sos.ogc.om.OMConstants;
-import org.n52.sos.ogc.ows.OWSConstants;
 
 /**
  * SosConstants holds all important and often used constants (e.g. name of the
  * getCapabilities operation) that are specific to SOS 1.0
- * 
- * 
  */
-public final class Sos1Constants {
+public interface Sos1Constants {
 
-    public static final String NS_SOS = "http://www.opengis.net/sos/1.0";
+    String NS_SOS = "http://www.opengis.net/sos/1.0";
 
     /** Constant for the schema repository of the SOS */
-    public static final String SCHEMA_LOCATION_SOS = "http://schemas.opengis.net/sos/1.0.0/sosAll.xsd";
+    String SCHEMA_LOCATION_SOS = "http://schemas.opengis.net/sos/1.0.0/sosAll.xsd";
 
     /** Constant for the content types of the response formats */
-    private static String[] RESPONSE_FORMATS = { OMConstants.CONTENT_TYPE_OM, SosConstants.CONTENT_TYPE_ZIP };
+    Set<String> RESPONSE_FORMATS = unmodifiableSet(set(OMConstants.CONTENT_TYPE_OM, SosConstants.CONTENT_TYPE_ZIP));
 
     /** Constant for actual implementing version */
-    public static final String SERVICEVERSION = "1.0.0";
+    String SERVICEVERSION = "1.0.0";
 
-    /** private constructor, to enforce use of instance instead of instantiation */
-    private Sos1Constants() {
+    /**
+     * the names of the SOS 1.0 operations that are not supported by all versions
+     */
+    enum Operations {
+        GetFeatureOfInterestTime,
+        DescribeFeatureType,
+        DescribeObservationType,
+        DescribeResultModel,
+        RegisterSensor;
     }
 
     /**
-     * the names of the SOS 1.0 operations that are not supported by all
-     * versions
+     * enum with names of SOS 1.0 Capabilities sections not supported by all versions
      */
-    public enum Operations {
-        GetFeatureOfInterestTime, DescribeFeatureType, DescribeObservationType, DescribeResultModel, RegisterSensor;
-
-        public static boolean contains(String s) {
-            for (Operations o : values()) {
-                if (o.name().equals(s)) {
-                    return true;
-                }
-            }
-            return SosConstants.Operations.contains(s);
-        }
-    }
-
-    /**
-     * enum with names of SOS 1.0 Capabilities sections not supported by all
-     * versions
-     */
-    public enum CapabilitiesSections {
+    enum CapabilitiesSections {
         Filter_Capabilities;
-
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            for (Enum<?> p : values()) {
-                if (p.name().equals(s)) {
-                    return true;
-                }
-            }
-            return SosConstants.CapabilitiesSections.contains(s);
-        }
     }
 
     /**
-     * enum with parameter names for SOS 1.0 getObservation request not
-     * supported by all versions
+     * enum with parameter names for SOS 1.0 getObservation request not supported by all versions
      */
-    public enum GetObservationParams {
+    enum GetObservationParams {
         eventTime;
-
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            for (Enum<?> p : values()) {
-                if (p.name().equals(s)) {
-                    return true;
-                }
-            }
-            return SosConstants.GetObservationParams.contains(s);
-        }
     }
 
     /**
-     * enum with parameter names for SOS 1.0 insertObservation request not
-     * supported by all versions
+     * enum with parameter names for SOS 1.0 insertObservation request not supported by all versions
      */
-    public enum InsertObservationParams {
-        AssignedSensorId, Observation;
-
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            for (Enum<?> p : values()) {
-                if (p.name().equals(s)) {
-                    return true;
-                }
-            }
-            return OWSConstants.RequestParams.contains(s);
-        }
+    enum InsertObservationParams {
+        AssignedSensorId,
+        Observation;
     }
 
     /**
-     * enum with parameter names for SOS 1.0 getObservation request not
-     * supported by all versions
+     * enum with parameter names for SOS 1.0 getObservation request not supported by all versions
      */
-    public enum DescribeSensorParams {
-        outputFormat, time;
-
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            for (Enum<?> p : values()) {
-                if (p.name().equals(s)) {
-                    return true;
-                }
-            }
-            return SosConstants.DescribeSensorParams.contains(s);
-        }
+    enum DescribeSensorParams {
+        outputFormat,
+        time;
     }
 
     /**
-     * enum with parameter names for SOS 1.0 getFeatureOfInterest request not
-     * supported by all versions
+     * enum with parameter names for SOS 1.0 getFeatureOfInterest request not supported by all versions
      */
-    public enum GetFeatureOfInterestParams {
-        featureOfInterestID, location;
-
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            for (Enum<?> p : values()) {
-                if (p.name().equals(s)) {
-                    return true;
-                }
-            }
-            return OWSConstants.RequestParams.contains(s);
-        }
-    }
-
-    /** enum with parameter names for getFeatureOfInterestTime request */
-    public enum GetFeatureOfInterestTimeParams {
-        featureOfInterestID, location, observedProperty, procedure;
-
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            for (Enum<?> p : values()) {
-                if (p.name().equals(s)) {
-                    return true;
-                }
-            }
-            return OWSConstants.RequestParams.contains(s);
-        }
-    }
-
-    /** enum with parameter names for registerSensor request */
-    public enum RegisterSensorParams {
-        SensorDescription, ObservationTemplate;
-
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            for (Enum<?> p : values()) {
-                if (p.name().equals(s)) {
-                    return true;
-                }
-            }
-            return OWSConstants.RequestParams.contains(s);
-        }
+    enum GetFeatureOfInterestParams {
+        featureOfInterestID,
+        location;
     }
 
     /**
-     * enum with parameter names for SOS 1.0 getObservationById request not
-     * supported by all versions
+     * enum with parameter names for getFeatureOfInterestTime request
      */
-    public enum GetObservationByIdParams {
-        srsName, ObservationId, responseFormat, resultModel, responseMode, SortBy;
-
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            for (Enum<?> p : values()) {
-                if (p.name().equals(s)) {
-                    return true;
-                }
-            }
-            return OWSConstants.RequestParams.contains(s);
-        }
+    enum GetFeatureOfInterestTimeParams {
+        featureOfInterestID,
+        location,
+        observedProperty,
+        procedure;
     }
 
     /**
-     * Returns the supported response formats.
-     * 
-     * @return response formats
+     * enum with parameter names for registerSensor request
      */
-    public static String[] getResponseFormats() {
-        return RESPONSE_FORMATS;
+    enum RegisterSensorParams {
+        SensorDescription,
+        ObservationTemplate;
     }
 
+    /**
+     * enum with parameter names for SOS 1.0 getObservationById request not supported by all versions
+     */
+    enum GetObservationByIdParams {
+        srsName,
+        ObservationId,
+        responseFormat,
+        resultModel,
+        responseMode,
+        SortBy;
+    }
 }

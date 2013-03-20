@@ -30,72 +30,72 @@ import javax.xml.namespace.QName;
  * Constants for OWS.
  * 
  */
-public class OWSConstants {
+public interface OWSConstants {
 
     // namespace and schema locations
-    public static final String NS_OWS = "http://www.opengis.net/ows/1.1";
+    String NS_OWS = "http://www.opengis.net/ows/1.1";
 
-    public static final String NS_OWS_PREFIX = "ows";
+    String NS_OWS_PREFIX = "ows";
 
-    public static final String SCHEMA_LOCATION_OWS = "http://schemas.opengis.net/ows/1.1.0/owsAll.xsd";
+    String SCHEMA_LOCATION_OWS = "http://schemas.opengis.net/ows/1.1.0/owsAll.xsd";
 
-    public static final String SCHEMA_LOCATION_OWS_EXCEPTIONREPORT =
+    String SCHEMA_LOCATION_OWS_EXCEPTIONREPORT =
             "http://schemas.opengis.net/ows/1.1.0/owsExceptionReport.xsd";
 
     // exception messages
-    public static final String SOAP_REASON_INVALID_PARAMETER_VALUE =
+    String SOAP_REASON_INVALID_PARAMETER_VALUE =
                                "The request contained an invalid parameter value.";
 
-    public static final String SOAP_REASON_INVALID_UPDATE_SEQUENCES =
+    String SOAP_REASON_INVALID_UPDATE_SEQUENCES =
                                "The value of the updateSequence parameter in the GetCapabilities operation request was greater than the current value of the service metadata updateSequence number.";
 
-    public static final String SOAP_REASON_MISSING_PARAMETER_VALUE =
+    String SOAP_REASON_MISSING_PARAMETER_VALUE =
                                "The request did not include a value for a required parameter and this server does not declare a default value for it.";
 
-    public static final String SOAP_REASON_NO_APPLICABLE_CODE = "A server exception was encountered.";
+    String SOAP_REASON_NO_APPLICABLE_CODE = "A server exception was encountered.";
 
-    public static final String SOAP_REASON_NO_DATA_AVAILABLE = "There are no data available.";
+    String SOAP_REASON_NO_DATA_AVAILABLE = "There are no data available.";
 
-    public static final String SOAP_REASON_OPERATION_NOT_SUPPORTED =
+    String SOAP_REASON_OPERATION_NOT_SUPPORTED =
                                "The requested operation is not supported by this server.";
 
-    public static final String SOAP_REASON_OPTION_NOT_SUPPORTED =
+    String SOAP_REASON_OPTION_NOT_SUPPORTED =
                                "The request included/targeted an option that is not supported by this server.";
 
-    public static final String SOAP_REASON_REQUEST_EXTENSION_NOT_SUPPORTED =
+    String SOAP_REASON_REQUEST_EXTENSION_NOT_SUPPORTED =
                                "The request included an extension that is not supported by this server.";
 
-    public static final String SOAP_REASON_VERSION_NEGOTIATION_FAILED =
+    String SOAP_REASON_VERSION_NEGOTIATION_FAILED =
                                "The list of versions in the ‘AcceptVersions’ parameter value of the GetCapabilities operation request did not include any version supported by this server.";
 
-    public static final String SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT =
+    String SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT =
                                "The requested result set exceeds the response size limit of this service and thus cannot be delivered.";
 
-    public static final String SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION =
+    String SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION =
                                "Observations for the requested combination of observedProperty and offering do not use SWE Common encoded results.";
 
-    public static final String SOAP_REASON_UNKNOWN = "A server exception was encountered.";
+    String SOAP_REASON_UNKNOWN = "A server exception was encountered.";
 
-    public static final String EN_EXCEPTION = "Exception";
+    String EN_EXCEPTION = "Exception";
 
-    public static final String EN_EXCEPTION_CODE = "exceptionCode";
+    String EN_EXCEPTION_CODE = "exceptionCode";
 
-    public static final String EN_LOCATOR = "locator";
+    String EN_LOCATOR = "locator";
 
-    public static final String EN_EXCEPTION_TEXT = "ExceptionText";
+    String EN_EXCEPTION_TEXT = "ExceptionText";
     
-    public static final QName QN_EXCEPTION = new QName(NS_OWS, EN_EXCEPTION, NS_OWS_PREFIX);
+    QName QN_EXCEPTION = new QName(NS_OWS, EN_EXCEPTION, NS_OWS_PREFIX);
 
     /**
      * Enumeration for related feature role
      * 
      */
-    public enum RelatedFeatureRole {
+    enum RelatedFeatureRole {
         featureOfInterestID, relatedFeatureID
     }
 
     /** enum with names of get request parameters for all requests */
-    public enum RequestParams {
+    enum RequestParams {
         request, service, version;
 
         /**
@@ -122,10 +122,8 @@ public class OWSConstants {
      * @deprecated not found in spec or used in code
      */
     @Deprecated
-    public enum ExceptionLevel {
+    enum ExceptionLevel {
         PlainExceptions, DetailedExceptions
     }
 
-    private OWSConstants() {
-    }
 }

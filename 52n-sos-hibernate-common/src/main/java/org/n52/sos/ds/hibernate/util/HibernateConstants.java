@@ -28,89 +28,89 @@ package org.n52.sos.ds.hibernate.util;
  * and column names, ...
  * 
  */
-public class HibernateConstants {
+public interface HibernateConstants {
 
     // table and column names
     // TODO: make this constants configurable
-	public static final String PARAMETER_SET_ID = "setId";
+	String PARAMETER_SET_ID = "setId";
 	
-    public static final String PARAMETER_IDENTIFIER = "identifier";
+    String PARAMETER_IDENTIFIER = "identifier";
 
-    public static final String PARAMETER_GEOMETRY = "geom";
+    String PARAMETER_GEOMETRY = "geom";
 
-    public static final String PARAMETER_FEATURE_OF_INTEREST = "featureOfInterest";
+    String PARAMETER_FEATURE_OF_INTEREST = "featureOfInterest";
 
-    public static final String PARAMETER_FEATURE_OF_INTEREST_ID = "featureOfInterestId";
+    String PARAMETER_FEATURE_OF_INTEREST_ID = "featureOfInterestId";
 
-    public static final String PARAMETER_PROCEDURE = "procedure";
+    String PARAMETER_PROCEDURE = "procedure";
 
-    public static final String PARAMETER_OBSERVABLE_PROPERTY = "observableProperty";
+    String PARAMETER_OBSERVABLE_PROPERTY = "observableProperty";
 
-    public static final String PARAMETER_OBSERVATION_CONSTELLATION = "observationConstellation";
+    String PARAMETER_OBSERVATION_CONSTELLATION = "observationConstellation";
     
-    public static final String PARAMETER_OBSERVATION_CONSTELLATIONS = "observationConstellations";
+    String PARAMETER_OBSERVATION_CONSTELLATIONS = "observationConstellations";
 
-    public static final String PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPE = "observationConstellationOfferingObservationType";
+    String PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPE = "observationConstellationOfferingObservationType";
 
-    public static final String PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPES = "observationConstellationOfferingObservationTypes";
+    String PARAMETER_OBSERVATION_CONSTELLATION_OFFERING_OBSERVATION_TYPES = "observationConstellationOfferingObservationTypes";
 
-    public static final String PARAMETER_OBSERVATION_CONSTELLATIONS_ID = "observationConstellationId";
+    String PARAMETER_OBSERVATION_CONSTELLATIONS_ID = "observationConstellationId";
 
-    public static final String PARAMETER_PHENOMENON_TIME_START = "phenomenonTimeStart";
+    String PARAMETER_PHENOMENON_TIME_START = "phenomenonTimeStart";
 
-    public static final String PARAMETER_PHENOMENON_TIME_END = "phenomenonTimeEnd";
+    String PARAMETER_PHENOMENON_TIME_END = "phenomenonTimeEnd";
     
-    public static final String PARAMETER_RESULT_TIME = "resultTime";
+    String PARAMETER_RESULT_TIME = "resultTime";
 
-    public static final String PARAMETER_OBSERVATION = "observation";
+    String PARAMETER_OBSERVATION = "observation";
 
-    public static final String PARAMETER_OBSERVATIONS = "observations";
+    String PARAMETER_OBSERVATIONS = "observations";
 
-    public static final String PARAMETER_OBSERVATION_TYPE = "observationType";
+    String PARAMETER_OBSERVATION_TYPE = "observationType";
     
-    public static final String PARAMETER_PROCEDURE_DESCRIPTION_FORMAT = "procedureDescriptionFormat";
+    String PARAMETER_PROCEDURE_DESCRIPTION_FORMAT = "procedureDescriptionFormat";
 
-    public static final String PARAMETER_UNIT = "unit";
+    String PARAMETER_UNIT = "unit";
 	
-	public static final String DELETED = "deleted";
+	String DELETED = "deleted";
 
-    public static final String PARAMETER_RELATED_FEATURE_ROLE = "relatedFeatureRole";
+    String PARAMETER_RELATED_FEATURE_ROLE = "relatedFeatureRole";
 
-    public static final String PARAMETER_RESULT_TYPE = "resultType";
+    String PARAMETER_RESULT_TYPE = "resultType";
 
-    public static final String PARAMETER_VALUE_TYPE = "valueType";
+    String PARAMETER_VALUE_TYPE = "valueType";
 
-    public static final String PARAMETER_FEATURE_OF_INTEREST_TYPE = "featureOfInterestType";
+    String PARAMETER_FEATURE_OF_INTEREST_TYPE = "featureOfInterestType";
     
-    public static final String PARAMETER_FEATURE_OF_INTEREST_TYPES = "featureOfInterestTypes";
+    String PARAMETER_FEATURE_OF_INTEREST_TYPES = "featureOfInterestTypes";
 
-    public static final String PARAMETER_VALUE = "value";
+    String PARAMETER_VALUE = "value";
 
-    public static final String PARAMETER_RELATED_FEATURES = "relatedFeatures";
+    String PARAMETER_RELATED_FEATURES = "relatedFeatures";
 
-    public static final String PARAMETER_OFFERING = "offering";
+    String PARAMETER_OFFERING = "offering";
 
-    public static final String PARAMETER_OFFERINGS = "offerings";
+    String PARAMETER_OFFERINGS = "offerings";
 
-    public static final String PARAMETER_OBSERVATION_ID = "observationId";
+    String PARAMETER_OBSERVATION_ID = "observationId";
 
-    public static final String PARAMETER_PROCEDURES = "procedures";
+    String PARAMETER_PROCEDURES = "procedures";
     
-    public static final String PARAMETER_BOOLEAN_VALUES = "booleanValues";
+    String PARAMETER_BOOLEAN_VALUES = "booleanValues";
 
-    public static final String PARAMETER_CATEGORY_VALUES = "categoryValues";
+    String PARAMETER_CATEGORY_VALUES = "categoryValues";
 
-    public static final String PARAMETER_COUNT_VALUES = "countValues";
+    String PARAMETER_COUNT_VALUES = "countValues";
 
-    public static final String PARAMETER_NUMERIC_VALUES = "numericValues";
+    String PARAMETER_NUMERIC_VALUES = "numericValues";
 
-    public static final String PARAMETER_GEOMETRY_VALUES = "geometryValues";
+    String PARAMETER_GEOMETRY_VALUES = "geometryValues";
 
-    public static final String PARAMETER_TEXT_VALUES = "textValues";
+    String PARAMETER_TEXT_VALUES = "textValues";
 
-	public static final String PARAMETER_SETTING_KEY = "key";
+	String PARAMETER_SETTING_KEY = "key";
 
-	public static final String PARAMETER_SETTING_VALUE = "value";
+	String PARAMETER_SETTING_VALUE = "value";
 	
 
 }

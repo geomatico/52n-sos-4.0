@@ -27,106 +27,49 @@ import javax.xml.namespace.QName;
 
 /**
  * Constants for WS-Addressing
- * 
+ *
  */
-public class WsaConstants {
-
+public interface WsaConstants {
     /**
      * WSA fault action URI
      */
-    public static final String WSA_FAULT_ACTION = "http://www.w3.org/2005/08/addressing/fault";
-
+    String WSA_FAULT_ACTION = "http://www.w3.org/2005/08/addressing/fault";
     /**
      * WSA namespace
      */
-    public static final String NS_WSA = "http://www.w3.org/2005/08/addressing";
-
+    String NS_WSA = "http://www.w3.org/2005/08/addressing";
     /**
      * WSA prefix
      */
-    public static final String NS_WSA_PREFIX = "wsa";
-
+    String NS_WSA_PREFIX = "wsa";
     /**
      * WSA to element
      */
-    public static final String EN_TO = "To";
-
+    String EN_TO = "To";
     /**
      * WSA action element
      */
-    public static final String EN_ACTION = "Action";
-
+    String EN_ACTION = "Action";
     /**
      * WSA replyTo element
      */
-    public static final String EN_REPLYTO = "ReplyTo";
-
+    String EN_REPLY_TO = "ReplyTo";
     /**
      * WSA address element
      */
-    public static final String EN_ADDRESS = "Address";
-
+    String EN_ADDRESS = "Address";
     /**
      * WSA messageID element
      */
-    public static final String EN_MESSAGEID = "MessageID";
-
+    String EN_MESSAGE_ID = "MessageID";
     /**
      * WSA relatesTo element
      */
-    public static final String EN_RELATESTO = "RelatesTo";
-
-    /**
-     * Get QName for To element
-     * 
-     * @return
-     */
-    public static QName getQNameTo() {
-        return new QName(NS_WSA, EN_TO, NS_WSA_PREFIX);
-    }
-
-    /**
-     * Get QName for Action element
-     * 
-     * @return
-     */
-    public static QName getQNameAction() {
-        return new QName(NS_WSA, EN_ACTION, NS_WSA_PREFIX);
-    }
-
-    /**
-     * Get QName for ReplyTo element
-     * 
-     * @return
-     */
-    public static QName getQNameReplyTo() {
-        return new QName(NS_WSA, EN_REPLYTO, NS_WSA_PREFIX);
-    }
-
-    /**
-     * Get QName for Address element
-     * 
-     * @return
-     */
-    public static QName getQNameAddress() {
-        return new QName(NS_WSA, EN_ADDRESS, NS_WSA_PREFIX);
-    }
-
-    /**
-     * Get QName for MessageID element
-     * 
-     * @return
-     */
-    public static QName getQNameMessageID() {
-        return new QName(NS_WSA, EN_MESSAGEID, NS_WSA_PREFIX);
-    }
-
-    /**
-     * Get QName for RelatesTo element
-     * 
-     * @return
-     */
-    public static QName getQNameRelatesTo() {
-        return new QName(NS_WSA, EN_RELATESTO, NS_WSA_PREFIX);
-    }
+    String EN_RELATES_TO = "RelatesTo";
+    QName QN_TO = new QName(NS_WSA, EN_TO, NS_WSA_PREFIX);
+    QName QN_ACTION = new QName(NS_WSA, EN_ACTION, NS_WSA_PREFIX);
+    QName QN_REPLY_TO = new QName(NS_WSA, EN_REPLY_TO, NS_WSA_PREFIX);
+    QName QN_ADDRESS = new QName(NS_WSA, EN_ADDRESS, NS_WSA_PREFIX);
+    QName QN_MESSAGE_ID = new QName(NS_WSA, EN_MESSAGE_ID, NS_WSA_PREFIX);
+    QName QN_RELATES_TO = new QName(NS_WSA, EN_RELATES_TO, NS_WSA_PREFIX);
 }

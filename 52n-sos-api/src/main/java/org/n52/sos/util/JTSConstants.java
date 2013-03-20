@@ -26,14 +26,8 @@ package org.n52.sos.util;
 /**
  * Constant class for the Java Topology Suite (JTS), e.g. WKT names
  */
-public class JTSConstants {
-
-    public static final String WKT_POINT = "POINT";
-
-    public static final String WKT_LINESTRING = "LINESTRING";
-
-    public static final String WKT_POLYGON = "POLYGON";
-
-    private JTSConstants() {
-    }
+public interface JTSConstants {
+    String WKT_POINT = "POINT";
+    String WKT_LINESTRING = "LINESTRING";
+    String WKT_POLYGON = "POLYGON";
 }

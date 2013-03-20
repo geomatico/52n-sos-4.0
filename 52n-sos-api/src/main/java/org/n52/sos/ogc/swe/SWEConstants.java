@@ -30,175 +30,187 @@ import javax.xml.namespace.QName;
  * Constants class for SWE
  * 
  */
-public class SWEConstants {
+public interface SWEConstants {
 
     // namespaces and schema locations
-    public static final String NS_SWE = "http://www.opengis.net/swe/1.0.1";
+    String NS_SWE = "http://www.opengis.net/swe/1.0.1";
 
-    public static final String NS_SWE_20 = "http://www.opengis.net/swe/2.0";
+    String NS_SWE_20 = "http://www.opengis.net/swe/2.0";
 
-    public static final String NS_SWE_PREFIX = "swe";
+    String NS_SWE_PREFIX = "swe";
 
-    public static final String NS_SWES_20 = "http://www.opengis.net/swes/2.0";
+    String NS_SWES_20 = "http://www.opengis.net/swes/2.0";
 
-    public static final String NS_SWES_PREFIX = "swes";
+    String NS_SWES_PREFIX = "swes";
 
-    public static final String SCHEMA_LOCATION_SWE = "http://schemas.opengis.net/sweCommon/1.0.1/swe.xsd";
+    String SCHEMA_LOCATION_SWE = "http://schemas.opengis.net/sweCommon/1.0.1/swe.xsd";
 
-    public static final String SCHEMA_LOCATION_SWE_200 = "http://schemas.opengis.net/sweCommon/2.0/swe.xsd";
+    String SCHEMA_LOCATION_SWE_200 = "http://schemas.opengis.net/sweCommon/2.0/swe.xsd";
     
-    public static final String SCHEMA_LOCATION_SWES_200 = "http://schemas.opengis.net/swes/2.0/swes.xsd";
+    String SCHEMA_LOCATION_SWES_200 = "http://schemas.opengis.net/swes/2.0/swes.xsd";
 
     // element names
-    public static final String EN_ABSTRACT_OFFERING = "AbstractOffering";
+    String EN_ABSTRACT_OFFERING = "AbstractOffering";
 
-    public static final String EN_BOOLEAN = "Boolean";
+    String EN_BOOLEAN = "Boolean";
 
-    public static final String EN_CATEGORY = "Category";
+    String EN_CATEGORY = "Category";
 
-    public static final String EN_COUNT = "Count";
+    String EN_COUNT = "Count";
 
-    public static final String EN_DATA_ARRAY = "DataArray";
+    String EN_DATA_ARRAY = "DataArray";
 
-    public static final String EN_DATA_RECORD = "DataRecord";
+    String EN_DATA_RECORD = "DataRecord";
 
-    public static final String EN_DELETE_SENSOR = "DeleteSensor";
+    String EN_DELETE_SENSOR = "DeleteSensor";
 
-    public static final String EN_DELETE_SENSOR_RESPONSE = "DeleteSensorResponse";
+    String EN_DELETE_SENSOR_RESPONSE = "DeleteSensorResponse";
 
-    public static final String EN_DESCRIBE_SENSOR = "DescribeSensor";
+    String EN_DESCRIBE_SENSOR = "DescribeSensor";
 
-    public static final String EN_DESCRIBE_SENSOR_RESPONSE = "DescribeSensorResponse";
+    String EN_DESCRIBE_SENSOR_RESPONSE = "DescribeSensorResponse";
 
-    public static final String EN_INSERT_SENSOR = "InsertSensor";
+    String EN_INSERT_SENSOR = "InsertSensor";
 
-    public static final String EN_INSERT_SENSOR_RESPONSE = "InsertSensorResponse";
+    String EN_INSERT_SENSOR_RESPONSE = "InsertSensorResponse";
 
-    public static final String EN_INSERTION_METADATA = "InsertionMetadata";
+    String EN_INSERTION_METADATA = "InsertionMetadata";
 
-    public static final String EN_METADATA = "metadata";
+    String EN_METADATA = "metadata";
 
-    public static final String EN_OFFERING = "offering";
+    String EN_OFFERING = "offering";
 
-    public static final String EN_QUANTITY = "Quantity";
+    String EN_QUANTITY = "Quantity";
 
-    public static final String EN_SIMPLEDATARECORD = "SimpleDataRecord";
+    String EN_SIMPLEDATARECORD = "SimpleDataRecord";
 
-    public static final String EN_TEXT = "Text";
+    String EN_TEXT = "Text";
 
-    public static final String EN_TEXT_ENCODING = "TextEncoding";
+    String EN_TEXT_ENCODING = "TextEncoding";
 
-    public static final String EN_TIME = "Time";
+    String EN_TIME = "Time";
 
-    public static final String EN_TIME_RANGE = "TimeRange";
+    String EN_TIME_RANGE = "TimeRange";
 
-    public static final String EN_UPDATE_SENSOR_DESCRIPTION = "UpdateSensorDescription";
+    String EN_UPDATE_SENSOR_DESCRIPTION = "UpdateSensorDescription";
 
-    public static final String EN_UPDATE_SENSOR_DESCRIPTION_RESPONSE = "UpdateSensorDescriptionResponse";
+    String EN_UPDATE_SENSOR_DESCRIPTION_RESPONSE = "UpdateSensorDescriptionResponse";
 
     // QNames for elements
-    public static final QName QN_ABSTRACT_OFFERING = new QName(NS_SWES_20, EN_ABSTRACT_OFFERING, NS_SWES_PREFIX);
+    QName QN_ABSTRACT_OFFERING = new QName(NS_SWES_20, EN_ABSTRACT_OFFERING, NS_SWES_PREFIX);
 
-    public static final QName QN_BOOLEAN_SWE_101 = new QName(NS_SWE, EN_BOOLEAN, NS_SWE_PREFIX);
+    QName QN_BOOLEAN_SWE_101 = new QName(NS_SWE, EN_BOOLEAN, NS_SWE_PREFIX);
 
-    public static final QName QN_BOOLEAN_SWE_200 = new QName(NS_SWE_20, EN_BOOLEAN, NS_SWE_PREFIX);
+    QName QN_BOOLEAN_SWE_200 = new QName(NS_SWE_20, EN_BOOLEAN, NS_SWE_PREFIX);
 
-    public static final QName QN_CATEGORY_SWE_101 = new QName(NS_SWE, EN_CATEGORY, NS_SWE_PREFIX);
+    QName QN_CATEGORY_SWE_101 = new QName(NS_SWE, EN_CATEGORY, NS_SWE_PREFIX);
 
-    public static final QName QN_CATEGORY_SWE_200 = new QName(NS_SWE_20, EN_CATEGORY, NS_SWE_PREFIX);
+    QName QN_CATEGORY_SWE_200 = new QName(NS_SWE_20, EN_CATEGORY, NS_SWE_PREFIX);
 
-    public static final QName QN_COUNT_SWE_101 = new QName(NS_SWE, EN_COUNT, NS_SWE_PREFIX);
+    QName QN_COUNT_SWE_101 = new QName(NS_SWE, EN_COUNT, NS_SWE_PREFIX);
 
-    public static final QName QN_COUNT_SWE_200 = new QName(NS_SWE_20, EN_COUNT, NS_SWE_PREFIX);
+    QName QN_COUNT_SWE_200 = new QName(NS_SWE_20, EN_COUNT, NS_SWE_PREFIX);
 
-    public static final QName QN_DATA_ARRAY_SWE_200 = new QName(NS_SWE, EN_DATA_ARRAY, NS_SWE_PREFIX);
+    QName QN_DATA_ARRAY_SWE_200 = new QName(NS_SWE, EN_DATA_ARRAY, NS_SWE_PREFIX);
 
-    public static final QName QN_DATA_RECORD_SWE_200 = new QName(NS_SWE, EN_DATA_RECORD, NS_SWE_PREFIX);
+    QName QN_DATA_RECORD_SWE_200 = new QName(NS_SWE, EN_DATA_RECORD, NS_SWE_PREFIX);
 
-    public static final QName QN_DELETE_SENSOR = new QName(NS_SWES_20, EN_DELETE_SENSOR, NS_SWES_PREFIX);
+    QName QN_DELETE_SENSOR = new QName(NS_SWES_20, EN_DELETE_SENSOR, NS_SWES_PREFIX);
 
-    public static final QName QN_DELETE_SENSOR_RESPONSE = new QName(NS_SWES_20, EN_DELETE_SENSOR_RESPONSE, NS_SWES_PREFIX);
+    QName QN_DELETE_SENSOR_RESPONSE = new QName(NS_SWES_20, EN_DELETE_SENSOR_RESPONSE, NS_SWES_PREFIX);
 
-    public static final QName QN_DESCRIBE_SENSOR = new QName(NS_SWES_20, EN_DESCRIBE_SENSOR, NS_SWES_PREFIX);
+    QName QN_DESCRIBE_SENSOR = new QName(NS_SWES_20, EN_DESCRIBE_SENSOR, NS_SWES_PREFIX);
 
-    public static final QName QN_DESCRIBE_SENSOR_RESPONSE = new QName(NS_SWES_20, EN_DESCRIBE_SENSOR_RESPONSE, NS_SWES_PREFIX);
+    QName QN_DESCRIBE_SENSOR_RESPONSE = new QName(NS_SWES_20, EN_DESCRIBE_SENSOR_RESPONSE, NS_SWES_PREFIX);
 
-    public static final QName QN_INSERT_SENSOR = new QName(NS_SWES_20, EN_INSERT_SENSOR, NS_SWES_PREFIX);
+    QName QN_INSERT_SENSOR = new QName(NS_SWES_20, EN_INSERT_SENSOR, NS_SWES_PREFIX);
 
-    public static final QName QN_INSERT_SENSOR_RESPONSE = new QName(NS_SWES_20, EN_INSERT_SENSOR_RESPONSE, NS_SWES_PREFIX);
+    QName QN_INSERT_SENSOR_RESPONSE = new QName(NS_SWES_20, EN_INSERT_SENSOR_RESPONSE, NS_SWES_PREFIX);
 
-    public static final QName QN_INSERTION_METADATA = new QName(NS_SWES_20, EN_INSERTION_METADATA, NS_SWES_PREFIX);
+    QName QN_INSERTION_METADATA = new QName(NS_SWES_20, EN_INSERTION_METADATA, NS_SWES_PREFIX);
 
-    public static final QName QN_METADATA = new QName(NS_SWES_20, EN_METADATA, NS_SWES_PREFIX);
+    QName QN_METADATA = new QName(NS_SWES_20, EN_METADATA, NS_SWES_PREFIX);
 
-    public static final QName QN_OFFERING = new QName(NS_SWES_20, EN_OFFERING, NS_SWES_PREFIX);
+    QName QN_OFFERING = new QName(NS_SWES_20, EN_OFFERING, NS_SWES_PREFIX);
 
-    public static final QName QN_QUANTITY_SWE_101 = new QName(NS_SWE, EN_QUANTITY, NS_SWE_PREFIX);
+    QName QN_QUANTITY_SWE_101 = new QName(NS_SWE, EN_QUANTITY, NS_SWE_PREFIX);
 
-    public static final QName QN_QUANTITY_SWE_200 = new QName(NS_SWE_20, EN_QUANTITY, NS_SWE_PREFIX);
+    QName QN_QUANTITY_SWE_200 = new QName(NS_SWE_20, EN_QUANTITY, NS_SWE_PREFIX);
 
-    public static final QName QN_SIMPLEDATARECORD_SWE_101 = new QName(NS_SWE, EN_SIMPLEDATARECORD, NS_SWE_PREFIX);
+    QName QN_SIMPLEDATARECORD_SWE_101 = new QName(NS_SWE, EN_SIMPLEDATARECORD, NS_SWE_PREFIX);
 
-    public static final QName QN_TEXT_ENCODING_SWE_101 = new QName(NS_SWE, EN_TEXT_ENCODING, NS_SWE_PREFIX);
+    QName QN_TEXT_ENCODING_SWE_101 = new QName(NS_SWE, EN_TEXT_ENCODING, NS_SWE_PREFIX);
 
-    public static final QName QN_TEXT_ENCODING_SWE_200 = new QName(NS_SWE_20, EN_TEXT_ENCODING, NS_SWE_PREFIX);
+    QName QN_TEXT_ENCODING_SWE_200 = new QName(NS_SWE_20, EN_TEXT_ENCODING, NS_SWE_PREFIX);
 
-    public static final QName QN_TEXT_SWE_101 = new QName(NS_SWE, EN_TEXT, NS_SWE_PREFIX);
+    QName QN_TEXT_SWE_101 = new QName(NS_SWE, EN_TEXT, NS_SWE_PREFIX);
 
-    public static final QName QN_TEXT_SWE_200 = new QName(NS_SWE_20, EN_TEXT, NS_SWE_PREFIX);
+    QName QN_TEXT_SWE_200 = new QName(NS_SWE_20, EN_TEXT, NS_SWE_PREFIX);
 
-    public static final QName QN_TIME_RANGE_SWE_101 = new QName(NS_SWE, EN_TIME_RANGE, NS_SWE_PREFIX);
+    QName QN_TIME_RANGE_SWE_101 = new QName(NS_SWE, EN_TIME_RANGE, NS_SWE_PREFIX);
 
-    public static final QName QN_TIME_RANGE_SWE_200 = new QName(NS_SWE_20, EN_TIME_RANGE, NS_SWE_PREFIX);
+    QName QN_TIME_RANGE_SWE_200 = new QName(NS_SWE_20, EN_TIME_RANGE, NS_SWE_PREFIX);
 
-    public static final QName QN_TIME_SWE_101 = new QName(NS_SWE, EN_TIME, NS_SWE_PREFIX);
+    QName QN_TIME_SWE_101 = new QName(NS_SWE, EN_TIME, NS_SWE_PREFIX);
 
-    public static final QName QN_TIME_SWE_200 = new QName(NS_SWE_20, EN_TIME, NS_SWE_PREFIX);
+    QName QN_TIME_SWE_200 = new QName(NS_SWE_20, EN_TIME, NS_SWE_PREFIX);
 
-    public static final QName QN_UPDATE_SENSOR_DESCRIPTION = new QName(NS_SWES_20, EN_UPDATE_SENSOR_DESCRIPTION, NS_SWES_PREFIX);
+    QName QN_UPDATE_SENSOR_DESCRIPTION = new QName(NS_SWES_20, EN_UPDATE_SENSOR_DESCRIPTION, NS_SWES_PREFIX);
 
-    public static final QName QN_UPDATE_SENSOR_DESCRIPTION_RESPONSE = new QName(NS_SWES_20, EN_UPDATE_SENSOR_DESCRIPTION_RESPONSE, NS_SWES_PREFIX);
+    QName QN_UPDATE_SENSOR_DESCRIPTION_RESPONSE = new QName(NS_SWES_20, EN_UPDATE_SENSOR_DESCRIPTION_RESPONSE, NS_SWES_PREFIX);
     
-    public static final String SOAP_REASON_INVALID_REQUEST = "The request did not conform to its XML Schema definition.";
+    String SOAP_REASON_INVALID_REQUEST = "The request did not conform to its XML Schema definition.";
 
-    public static final String SOAP_REASON_REQUEST_EXTENSION_NOT_SUPPORTED = ""; //FIXME emtpy constant
+    String SOAP_REASON_REQUEST_EXTENSION_NOT_SUPPORTED = ""; //FIXME emtpy constant
     
     /**
      * Enum for SensorML types
      */
-    public static enum SensorMLType {
-        System, Component, ProcessModel, ProcessChain
+    enum SensorMLType {
+        System,
+        Component,
+        ProcessModel,
+        ProcessChain
     }
 
     /**
      * Enum for SWE aggregate types
      */
-    public static enum SweAggregateType {
-        SimpleDataRecord, DataRecord
+    enum SweAggregateType {
+        SimpleDataRecord,
+        DataRecord
     }
 
     /**
      * Enum for SWE simple types
      */
-    public static enum SweSimpleType {
-        Boolean, Category, Count, CountRange, Quantity, QuantityRange, Text, Time, TimeRange, ObservableProperty
+    enum SweSimpleType {
+        Boolean,
+        Category,
+        Count,
+        CountRange,
+        Quantity,
+        QuantityRange,
+        Text,
+        Time,
+        TimeRange,
+        ObservableProperty
     }
 
     /**
      * Enum for coordinate names
      */
-    public static enum SweCoordinateName {
-        easting, northing, altitude
+    enum SweCoordinateName {
+        easting,
+        northing,
+        altitude
     }
 
     /**
      * Enum for sensor descriptions
      */
-    public static enum SosSensorDescription {
-        XmlStringDescription, SosDescription
+    enum SosSensorDescription {
+        XmlStringDescription,
+        SosDescription
     }
-
-    private SWEConstants() {
-    }
-
 }

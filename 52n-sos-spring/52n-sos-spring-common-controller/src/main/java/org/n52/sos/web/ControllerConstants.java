@@ -24,8 +24,8 @@
 package org.n52.sos.web;
 
 public interface ControllerConstants {
-    public static final String MEDIA_TYPE_APPLICATION_JSON = "application/json; charset=UTF-8";
-    public static interface Views {
+    String MEDIA_TYPE_APPLICATION_JSON = "application/json; charset=UTF-8";
+    interface Views {
         String INDEX = "index";
         String CLIENT = "client";
         String LICENSE = "license";
@@ -47,7 +47,7 @@ public interface ControllerConstants {
         String ADMIN_LOGGING = "admin/logging";
     }
 
-    public static interface Paths {
+    interface Paths {
         String ROOT = "/";
         String WSDL = "/wsdl";
         String INDEX = "/index";

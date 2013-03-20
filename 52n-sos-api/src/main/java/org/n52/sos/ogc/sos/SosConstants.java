@@ -23,385 +23,278 @@
  */
 package org.n52.sos.ogc.sos;
 
+import static java.util.Collections.unmodifiableSet;
+import static org.n52.sos.util.CollectionHelper.set;
+
+import java.util.Set;
+
 import org.n52.sos.ogc.OGCConstants;
-import org.n52.sos.ogc.ows.OWSConstants;
 
 /**
- * SosConstants holds all important and often used constants of this SOS (e.g.
- * name of the getCapabilities operation) that are global between all supported
- * versions
- * 
+ * SosConstants holds all important and often used constants of this SOS (e.g. name of the getCapabilities operation)
+ * that are global between all supported versions
+ *
  */
-public final class SosConstants {
-
-    public static final String NS_SOS_PREFIX = "sos";
-
-    /** Constant for the content type of the response */
-    public static final String CONTENT_TYPE_XML = "text/xml";
-
-    /** Constant for the content type of the response */
-    public static final String CONTENT_TYPE_ZIP = "application/zip";
-
-    /** Constant for the content types of the accept formats */
-    private static String[] ACCEPT_FORMATS = { CONTENT_TYPE_XML, CONTENT_TYPE_ZIP };
-
+public interface SosConstants {
+    String NS_SOS_PREFIX = "sos";
     /**
-     * name of System capabilities containing parent procedures for
-     * RegisterSensor and DescribeSensor
+     * Constant for the content type of the response
      */
-    public static final String SYS_CAP_PARENT_PROCEDURES_NAME = "parentProcedures";
-
-    /** Constant for prefixes of FOIs 
-	 * @deprecated Use {@link OGCConstants#URN_FOI_PREFIX} instead*/
-	public static final String FOI_PREFIX = OGCConstants.URN_FOI_PREFIX;
-
-    /** Constant for prefixes of procedures 
-	 * @deprecated Use {@link OGCConstants#URN_PROCEDURE_PREFIX} instead*/
-	public static final String PROCEDURE_PREFIX = OGCConstants.URN_PROCEDURE_PREFIX;
-
-    public static final String PROCEDURE_STANDARD_DESC_URL = "standardURL";
-
-    /** Constant for prefixes of procedures 
-	 * @deprecated Use {@link OGCConstants#URN_PHENOMENON_PREFIX} instead*/
-	public static final String PHENOMENON_PREFIX = OGCConstants.URN_PHENOMENON_PREFIX;
-
-    /** Constant for the service name of the SOS */
-    public static final String SOS = "SOS";
-
+    String CONTENT_TYPE_XML = "text/xml";
     /**
-     * String representing parameter value, if parameter is not set in an
-     * operation request
+     * Constant for the content type of the response
      */
-    public static final String PARAMETER_NOT_SET = "NOT_SET";
-
+    String CONTENT_TYPE_ZIP = "application/zip";
     /**
-     * String representing parameter value, if parameter is any in an operation
-     * request
+     * Constant for the content types of the accept formats
      */
-    public static final String PARAMETER_ANY = "ANY";
-
+    Set<String> ACCEPT_FORMATS = unmodifiableSet(set(CONTENT_TYPE_XML, CONTENT_TYPE_ZIP));
     /**
-     * String representing parameter value, if parameter is no values in an
-     * operation request
+     * name of System capabilities containing parent procedures for RegisterSensor and DescribeSensor
      */
-    public static final String PARAMETER_NO_VALUES = "NoValues";
-
-    public static final String NOT_DEFINED = "NOT_DEFINED";
-
+    String SYS_CAP_PARENT_PROCEDURES_NAME = "parentProcedures";
+    /**
+     * Constant for prefixes of FOIs
+     *
+     * @deprecated Use {@link OGCConstants#URN_FOI_PREFIX} instead
+     */
+    String FOI_PREFIX = OGCConstants.URN_FOI_PREFIX;
+    /**
+     * Constant for prefixes of procedures
+     *
+     * @deprecated Use {@link OGCConstants#URN_PROCEDURE_PREFIX} instead
+     */
+    String PROCEDURE_PREFIX = OGCConstants.URN_PROCEDURE_PREFIX;
+    String PROCEDURE_STANDARD_DESC_URL = "standardURL";
+    /**
+     * Constant for prefixes of procedures
+     *
+     * @deprecated Use {@link OGCConstants#URN_PHENOMENON_PREFIX} instead
+     */
+    String PHENOMENON_PREFIX = OGCConstants.URN_PHENOMENON_PREFIX;
+    /**
+     * Constant for the service name of the SOS
+     */
+    String SOS = "SOS";
+    /**
+     * String representing parameter value, if parameter is not set in an operation request
+     */
+    String PARAMETER_NOT_SET = "NOT_SET";
+    /**
+     * String representing parameter value, if parameter is any in an operation request
+     */
+    String PARAMETER_ANY = "ANY";
+    /**
+     * String representing parameter value, if parameter is no values in an operation request
+     */
+    String PARAMETER_NO_VALUES = "NoValues";
+    String NOT_DEFINED = "NOT_DEFINED";
     /**
      * request timeout in ms for split requests to SOS instances
      */
-    public static final long UPDATE_TIMEOUT = 10000;
-
+    long UPDATE_TIMEOUT = 10000;
     /**
      * Constant for actual implementing version Measurement
      */
-    public static final String OBS_ID_PREFIX = "o_";
-
+    String OBS_ID_PREFIX = "o_";
     /**
      * Constant for actual implementing version OvservationCollection
      */
-    public static final String OBS_GENERIC_ID_PREFIX = "go_";
-
+    String OBS_GENERIC_ID_PREFIX = "go_";
     /**
      * Constant for actual implementing version OvservationCollection
      */
-    public static final String OBS_COL_ID_PREFIX = "oc_";
-
+    String OBS_COL_ID_PREFIX = "oc_";
     /**
      * Constant for actual implementing version ObservationTemplate
      */
-    public static final String OBS_TEMP_ID_PREFIX = "ot_";
-
+    String OBS_TEMP_ID_PREFIX = "ot_";
     /**
-     * Constant 'out-of-bands' for response mode, which means that the results
-     * in an observation response appear external to the observation element
+     * Constant 'out-of-bands' for response mode, which means that the results in an observation response appear
+     * external to the observation element
      */
-    public static final String RESPONSE_MODE_OUT_OF_BANDS = "out-of-bands";
-
+    String RESPONSE_MODE_OUT_OF_BANDS = "out-of-bands";
     /**
-     * Constant 'resultTemplate' for response mode, which means that the result
-     * is an ObservationTemplate for subsequent calls to GetResult operation
+     * Constant 'resultTemplate' for response mode, which means that the result is an ObservationTemplate for subsequent
+     * calls to GetResult operation
      */
-    public static final String RESPONSE_RESULT_TEMPLATE = "resultTemplate";
-
+    String RESPONSE_RESULT_TEMPLATE = "resultTemplate";
     /**
-     * Constant 'inline' for response mode, which means that results are
-     * contained inline the Observation elements of an observation response
-     * document
+     * Constant 'inline' for response mode, which means that results are contained inline the Observation elements of an
+     * observation response document
      */
-    public static final String RESPONSE_MODE_INLINE = "inline";
-
+    String RESPONSE_MODE_INLINE = "inline";
     /**
-     * Constant 'attached' for response mode, which means that result values of
-     * an observation response are attached as MIME attachments
+     * Constant 'attached' for response mode, which means that result values of an observation response are attached as
+     * MIME attachments
      */
-    public static final String RESPONSE_MODE_ATTACHED = "attached";
-
+    String RESPONSE_MODE_ATTACHED = "attached";
     /**
      * Array of constants for response mode.
      */
-    private static final String[] RESPONSE_MODES = { RESPONSE_MODE_INLINE, RESPONSE_RESULT_TEMPLATE };
-
-    public static final String HTTP_GET = "GET";
-
-    public static final String HTTP_POST = "POST";
-    
-    public static final String HTTP_PUT = "PUT";
-    
-    public static final String HTTP_DELETE = "DELETE";
-
-    public static final String MIN_VALUE = "MinValue";
-
-    public static final String MAX_VALUE = "MaxValue";
-
-    public static final String ALL_RELATED_FEATURES = "allFeatures";
-
-    public static final String SEPARATOR_4_REL_FEAT = "_._";
-
-    public static final String SEPARATOR_4_OFFERINGS = "_._";
-
+    Set<String> RESPONSE_MODES = unmodifiableSet(set(RESPONSE_MODE_INLINE, RESPONSE_RESULT_TEMPLATE));
+    String HTTP_GET = "GET";
+    String HTTP_POST = "POST";
+    String HTTP_PUT = "PUT";
+    String HTTP_DELETE = "DELETE";
+    String MIN_VALUE = "MinValue";
+    String MAX_VALUE = "MaxValue";
+    String ALL_RELATED_FEATURES = "allFeatures";
+    String SEPARATOR_4_REL_FEAT = "_._";
+    String SEPARATOR_4_OFFERINGS = "_._";
     /**
-	 * @deprecated Use {@link OGCConstants#URN_PROPERTY_NAME_LOCATION} instead
-	 */
-	public static final String PROPERTY_NAME_LOCATION = OGCConstants.URN_PROPERTY_NAME_LOCATION;
-
-    /**
-	 * @deprecated Use {@link OGCConstants#URN_PROPERTY_NAME_SAMPLING_GEOMETRY} instead
-	 */
-	public static final String PROPERTY_NAME_SAMPLING_GEOMETRY = OGCConstants.URN_PROPERTY_NAME_SAMPLING_GEOMETRY;
-
-    /**
-	 * @deprecated Use {@link OGCConstants#URN_PROPERTY_NAME_SPATIAL_VALUE} instead
-	 */
-	public static final String PROPERTY_NAME_SPATIAL_VALUE = OGCConstants.URN_PROPERTY_NAME_SPATIAL_VALUE;
-
-    public static final String SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT =
-                               "The requested result set exceeds the response size limit of this service and thus cannot be delivered.";
-
-    public static final String SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION =
-                               "Observations for the requested combination of observedProperty and offering do not use SWE Common encoded results.";
-
-    public static final String GENERATED_IDENTIFIER_PREFIX = "generated_";
-
-    /** private constructor, to enforce use of instance instead of instantiation */
-    private SosConstants() {
-    }
-
-    /**
-     * the names of the operations supported by all versions of the SOS
-     * specification
+     * @deprecated Use {@link OGCConstants#URN_PROPERTY_NAME_LOCATION} instead
      */
-    public enum Operations {
-        GetCapabilities, GetObservation, GetObservationById, DescribeSensor, InsertObservation, GetResult, GetFeatureOfInterest;
+    String PROPERTY_NAME_LOCATION = OGCConstants.URN_PROPERTY_NAME_LOCATION;
+    /**
+     * @deprecated Use {@link OGCConstants#URN_PROPERTY_NAME_SAMPLING_GEOMETRY} instead
+     */
+    String PROPERTY_NAME_SAMPLING_GEOMETRY = OGCConstants.URN_PROPERTY_NAME_SAMPLING_GEOMETRY;
+    /**
+     * @deprecated Use {@link OGCConstants#URN_PROPERTY_NAME_SPATIAL_VALUE} instead
+     */
+    String PROPERTY_NAME_SPATIAL_VALUE = OGCConstants.URN_PROPERTY_NAME_SPATIAL_VALUE;
+    String SOAP_REASON_RESPONSE_EXCEEDS_SIZE_LIMIT =
+                               "The requested result set exceeds the response size limit of this service and thus cannot be delivered.";
+    String SOAP_REASON_INVALID_PROPERTY_OFFERING_COMBINATION =
+                               "Observations for the requested combination of observedProperty and offering do not use SWE Common encoded results.";
+    String GENERATED_IDENTIFIER_PREFIX = "generated_";
 
-        public static boolean contains(String s) {
-            for (Enum<?> p : values()) {
-                if (p.name().equals(s)) {
-                    return true;
-                }
-            }
-            return false;
-        }
+    /**
+     * the names of the operations supported by all versions of the SOS specification
+     */
+    enum Operations {
+        GetCapabilities,
+        GetObservation,
+        GetObservationById,
+        DescribeSensor,
+        InsertObservation,
+        GetResult,
+        GetFeatureOfInterest;
     }
-    
-    public enum Filter {
+
+    enum Filter {
         ValueReference;
     }
 
-    /** enum with names of Capabilities sections supported by all versions */
-    public enum CapabilitiesSections {
-        ServiceIdentification, ServiceProvider, OperationsMetadata, Contents, All;
-
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            for (Enum<?> p : values()) {
-                if (p.name().equals(s)) {
-                    return true;
-                }
-            }
-            return OWSConstants.RequestParams.contains(s);
-        }
-    }
-
-    /** enum with parameter names for getCapabilities request */
-    public enum GetCapabilitiesParams {
-        Sections, AcceptVersions, updateSequence, AcceptFormats, service, request, Section;
-
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            for (Enum<?> p : values()) {
-                if (p.name().equals(s)) {
-                    return true;
-                }
-            }
-            return OWSConstants.RequestParams.contains(s);
-        }
+    /**
+     * enum with names of Capabilities sections supported by all versions
+     */
+    enum CapabilitiesSections {
+        ServiceIdentification,
+        ServiceProvider,
+        OperationsMetadata,
+        Contents,
+        All;
     }
 
     /**
-     * enum with parameter names for getObservation request supported by all
-     * versions
+     * enum with parameter names for getCapabilities request
      */
-    public enum GetObservationParams {
-        srsName, resultType, startPosition, maxRecords, offering, procedure, observedProperty, featureOfInterest, result, responseFormat, resultModel, responseMode, SortBy, BBOX;
-
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            for (Enum<?> p : values()) {
-                if (p.name().equals(s)) {
-                    return true;
-                }
-            }
-            return OWSConstants.RequestParams.contains(s);
-        }
+    enum GetCapabilitiesParams {
+        Sections,
+        AcceptVersions,
+        updateSequence,
+        AcceptFormats,
+        service,
+        request,
+        Section;
     }
 
     /**
-     * enum with parameter names for getObservation request supported by all
-     * versions
+     * enum with parameter names for getObservation request supported by all versions
      */
-    public enum DescribeSensorParams {
+    enum GetObservationParams {
+        srsName,
+        resultType,
+        startPosition,
+        maxRecords,
+        offering,
+        procedure,
+        observedProperty,
+        featureOfInterest,
+        result,
+        responseFormat,
+        resultModel,
+        responseMode,
+        SortBy,
+        BBOX;
+    }
+
+    /**
+     * enum with parameter names for getObservation request supported by all versions
+     */
+    enum DescribeSensorParams {
         procedure;
-
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            for (Enum<?> p : values()) {
-                if (p.name().equals(s)) {
-                    return true;
-                }
-            }
-            return OWSConstants.RequestParams.contains(s);
-        }
     }
 
     /**
-     * 
+     *
      * Enumeration with values for value type
      */
-    public enum ValueTypes {
-        textType, numericType, booleanType, countType, categoryType, isoTimeType, spatialType, commonType, externalReferenceType, referenceValueTextType, referenceValueNumericType, referenceValueExternalReferenceType, uncertaintyType, notDefined;
+    @Deprecated
+    enum ValueTypes {
+        textType,
+        numericType,
+        booleanType,
+        countType,
+        categoryType,
+        isoTimeType,
+        spatialType,
+        commonType,
+        externalReferenceType,
+        referenceValueTextType,
+        referenceValueNumericType,
+        referenceValueExternalReferenceType,
+        uncertaintyType,
+        notDefined;
 
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            for (Enum<?> p : values()) {
-                if (p.name().equals(s)) {
-                    return true;
-                }
+        static ValueTypes getValueTypeForString(String valueType) {
+            try {
+                return valueOf(valueType);
+            } catch (IllegalArgumentException e) {
+                return notDefined;
             }
-            return false;
-        }
-    }
-
-    /**
-     * @param valueType
-     * @return
-     */
-    public static ValueTypes getValueTypeForString(String valueType) {
-        try {
-            return ValueTypes.valueOf(valueType);
-        } catch (IllegalArgumentException e) {
-            return ValueTypes.notDefined;
         }
     }
 
     /**
      * possible resultTypes in getObservation request
-     * 
+     *
      */
-    public static enum ResultType {
-        results, hits;
-
-        /**
-         * method checks whether the string parameter is contained in this
-         * enumeration
-         * 
-         * @param s
-         *            the name which should be checked
-         * @return true if the name is contained in the enumeration
-         */
-        public static boolean contains(String s) {
-            for (Enum<?> p : values()) {
-                if (p.name().equals(s)) {
-                    return true;
-                }
-            }
-            return false;
-        }
+    @Deprecated
+    enum ResultType {
+        results,
+        hits;
     }
 
-    public enum FirstLatest {
-        first, latest;
+    enum FirstLatest {
+        first,
+        latest;
 
         public static boolean contains(String timeString) {
-            return timeString.equalsIgnoreCase(first.name()) || timeString.equalsIgnoreCase(latest.name());
+            return timeString.equalsIgnoreCase(first.name())
+                   || timeString.equalsIgnoreCase(latest.name());
         }
 
         public static FirstLatest getEnumForString(String value) {
-           if (value.equalsIgnoreCase(first.name())){
-               return first;
-           } else if (value.equalsIgnoreCase(latest.name())){
-               return latest;
-           }
+            if (value.equalsIgnoreCase(first.name())) {
+                return first;
+            } else if (value.equalsIgnoreCase(latest.name())) {
+                return latest;
+            }
             return null;
         }
     }
 
-    /**
-     * Returns the accepted formats.
-     * 
-     * @return accepted formats
-     */
-    public static String[] getAcceptFormats() {
-        return ACCEPT_FORMATS;
+    enum HelperValues {
+        GMLID,
+        EXIST_FOI_IN_DOC,
+        VERSION,
+        TYPE,
+        DOCUMENT,
+        FOR_OBSERVATION,
+        ENCODE,
+        ENCODE_NAMESPACE
     }
-
-    /**
-     * Returns the supported response modes.
-     * 
-     * @return response modes
-     */
-    public static String[] getResponseModes() {
-        return RESPONSE_MODES;
-    }
-
-    public enum HelperValues {
-        GMLID, EXIST_FOI_IN_DOC, VERSION, TYPE, DOCUMENT, FOR_OBSERVATION, ENCODE, ENCODE_NAMESPACE
-    }
-
 }

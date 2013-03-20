@@ -389,7 +389,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesDAO {
                 sosOffering.setResponseFormats(responseFormats);
 
                 // set response Mode
-                sosOffering.setResponseModes(Arrays.asList(SosConstants.getResponseModes()));
+                sosOffering.setResponseModes(SosConstants.RESPONSE_MODES);
 
                 sosOfferings.add(sosOffering);
             }

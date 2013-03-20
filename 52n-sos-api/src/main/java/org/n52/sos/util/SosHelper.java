@@ -482,20 +482,6 @@ keysToCheck.push(key);
         }
     }
 
-    public static void checkForValidRequestValues(String requestValue, String version) throws OwsExceptionReport {
-        boolean validSos1 = false;
-        boolean validSos2 = false;
-        if (version != null && version.equals(Sos1Constants.SERVICEVERSION)) {
-            validSos1 = Sos1Constants.Operations.contains(requestValue);
-        } else if (version != null && version.equals(Sos2Constants.SERVICEVERSION)) {
-            validSos2 = Sos2Constants.Operations.contains(requestValue);
-        }
-        if (!validSos1 && !validSos2) {
-            throw new InvalidParameterValueException().at(OWSConstants.RequestParams.request)
-                    .withMessage("The requested request value is invalid. Delivered value: %s", requestValue);
-        }
-    }
-
     /**
      * Get valid FOI identifiers for SOS 2.0
      * 
