@@ -116,6 +116,7 @@ public class InvalidParameterValueException extends CodedOwsException {
         private static final long serialVersionUID = 1L;
 
         public InvalidObservationTypeForOfferingException(String observationType, String offering) {
+            super();
             at(Sos2Constants.InsertObservationParams.observationType);
             withMessage("The requested observationType (%s) is not allowed for the requested offering (%s)!",
                         observationType, offering);

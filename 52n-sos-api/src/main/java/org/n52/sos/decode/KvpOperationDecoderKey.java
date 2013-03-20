@@ -35,4 +35,8 @@ public class KvpOperationDecoderKey extends OperationDecoderKey {
     public KvpOperationDecoderKey(String service, String version, Enum<?> operation) {
         this(service, version, operation.name());
     }
+
+    public KvpOperationDecoderKey(OperationDecoderKey key) {
+        this(key.getService(), key.getVersion(), key.getOperation());
+    }
 }

@@ -106,8 +106,9 @@ public class CodingHelper {
         return set;
     }
 
+    @Deprecated
     public static boolean hasXmlEncoderForOperation(OperationDecoderKey k) {
-        return Configurator.getInstance().getCodingRepository().getDecoder(new XmlOperationDecoderKey(k.getService(), k.getVersion(), k.getOperation())) != null;
+        return Configurator.getInstance().getCodingRepository().getDecoder(new XmlOperationDecoderKey(k)) != null;
     }
 
     public static Set<EncoderKey> encoderKeysForElements(String namespace, Class<?>... elements) {

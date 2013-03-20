@@ -26,7 +26,11 @@ package org.n52.sos.binding;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.n52.sos.decode.Decoder;
+import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.decode.OperationDecoderKey;
+import org.n52.sos.encode.Encoder;
+import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.exception.ows.InvalidParameterValueException.ServiceNotSupportedException;
 import org.n52.sos.exception.ows.InvalidParameterValueException.VersionNotSupportedException;
 import org.n52.sos.exception.ows.MissingParameterValueException.MissingServiceParameterException;
@@ -37,6 +41,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.ServiceResponse;
+import org.n52.sos.service.CodingRepository;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ConformanceClass;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
@@ -255,7 +260,19 @@ public abstract class Binding implements ConformanceClass {
         return getServiceOperatorRepository().isVersionSupported(acceptVersion);
     }
 
+    protected boolean isServiceSupported(String service) {
+        return getServiceOperatorRepository().isServiceSupported(service);
+    }
+
     protected ServiceOperatorRepository getServiceOperatorRepository() {
         return Configurator.getInstance().getServiceOperatorRepository();
+    }
+
+    protected <F, T> Decoder<F, T> getDecoder(DecoderKey key) {
+        return Configurator.getInstance().getCodingRepository().getDecoder(key);
+    }
+
+    protected <F, T> Encoder<F, T> getEncoder(EncoderKey key) {
+        return Configurator.getInstance().getCodingRepository().getEncoder(key);
     }
 }

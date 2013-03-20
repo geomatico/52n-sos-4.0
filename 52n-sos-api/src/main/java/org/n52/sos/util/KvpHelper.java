@@ -72,9 +72,29 @@ public class KvpHelper {
         if (parameterValues.isEmpty()) {
             throw new MissingParameterValueException(parameterName);
         }
-        return Arrays.asList(parameterValues.split(","));
+        List<String> splittedParameterValues = Arrays.asList(parameterValues.split(","));
+        for (String parameterValue : splittedParameterValues) {
+            if (isNullOrEmpty(parameterValue)) {
+                throw new MissingParameterValueException(parameterName);
+            }
+        }
+        return splittedParameterValues;
     }
-    
+
+    public static void checkParameterValue(String parameterValue, String parameterName) throws OwsExceptionReport {
+        if (isNullOrEmpty(parameterValue)) {
+            throw new MissingParameterValueException(parameterName);
+        }
+    }
+
+    public static boolean isNullOrEmpty(String parameterValue) {
+        return parameterValue == null || parameterValue.isEmpty();
+    }
+
+    /**
+     * @deprecated moved to KvpBinding
+     */
+    @Deprecated
     public static boolean checkForGetCapabilities(Map<String, String> parameterValueMap) throws OwsExceptionReport {
         String requestValue = getRequestParameterValue(parameterValueMap);
         if (requestValue != null && requestValue.equals(SosConstants.Operations.GetCapabilities.name())) {
@@ -82,7 +102,11 @@ public class KvpHelper {
         }
         return false;
     }
-    
+
+    /**
+     * @deprecated moved to KvpBinding
+     */
+    @Deprecated
     public static String getRequestParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
         String requestParameterValue = getParameterValue(RequestParams.request.name(), parameterValueMap);
         checkParameterValue(requestParameterValue, RequestParams.request.name());
@@ -98,12 +122,6 @@ public class KvpHelper {
         return null;
     }
     
-    public static void checkParameterValue(String parameterValue, String parameterName) throws OwsExceptionReport {
-        if (parameterValue == null || parameterValue.isEmpty()) {
-            throw new MissingParameterValueException(parameterName);
-        }
-    }
-
     private KvpHelper() {
     }
 }

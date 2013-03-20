@@ -31,4 +31,8 @@ public class XmlOperationDecoderKey extends OperationDecoderKey {
     public XmlOperationDecoderKey(String service, String version, String operation) {
         super(service, version, operation);
     }
+
+    public XmlOperationDecoderKey(OperationDecoderKey key) {
+        this(key.getService(), key.getVersion(), key.getOperation());
+    }
 }

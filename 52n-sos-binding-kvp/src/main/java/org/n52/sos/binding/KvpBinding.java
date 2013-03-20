@@ -47,7 +47,6 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.KvpHelper;
@@ -85,19 +84,17 @@ public class KvpBinding extends Binding {
             }
             Map<String, String> parameterValueMap = KvpHelper.getKvpParameterValueMap(req);
             // check if request contains request parameter
-            String operation = KvpHelper.getRequestParameterValue(parameterValueMap);
+            String operation = getRequestParameterValue(parameterValueMap);
             KvpHelper.checkParameterValue(operation, RequestParams.request.name());
             String service = getServiceParameterValue(parameterValueMap);
             String version = getVersionParameterValue(parameterValueMap);
 
 
-            if (version != null && !Configurator.getInstance().getServiceOperatorRepository()
-                    .isVersionSupported(version)) {
+            if (version != null && !isVersionSupported(version)) {
                 throw new VersionNotSupportedException();
             }
             DecoderKey k = new KvpOperationDecoderKey(service, version, operation);
-            Decoder<AbstractServiceRequest, Map<String, String>> decoder = Configurator.getInstance()
-                    .getCodingRepository().getDecoder(k);
+            Decoder<AbstractServiceRequest, Map<String, String>> decoder = getDecoder(k);
 
             if (decoder != null) {
                 request = decoder.decode(parameterValueMap);
@@ -106,8 +103,8 @@ public class KvpBinding extends Binding {
             }
 
             for (ServiceOperatorKeyType serviceVersionIdentifier : request.getServiceOperatorKeyType()) {
-                ServiceOperator serviceOperator = Configurator.getInstance().getServiceOperatorRepository()
-						.getServiceOperator(serviceVersionIdentifier);
+                ServiceOperator serviceOperator = getServiceOperatorRepository()
+                        .getServiceOperator(serviceVersionIdentifier);
                 if (serviceOperator != null) {
                     response = serviceOperator.receiveRequest(request);
                     LOGGER.debug("{} operation executed successfully!", request.getOperationName());
@@ -136,13 +133,13 @@ public class KvpBinding extends Binding {
 
     private String getServiceParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
         String service = KvpHelper.getParameterValue(RequestParams.service.name(), parameterValueMap);
-        boolean isGetCapabilities = KvpHelper.checkForGetCapabilities(parameterValueMap);
+        boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
         if (isGetCapabilities && service == null) {
             return SosConstants.SOS;
         } else {
             KvpHelper.checkParameterValue(service, RequestParams.service.name());
         }
-        if (!Configurator.getInstance().getServiceOperatorRepository().isServiceSupported(service)) {
+        if (!isServiceSupported(service)) {
             throw new ServiceNotSupportedException();
         }
         return service;
@@ -150,19 +147,32 @@ public class KvpBinding extends Binding {
 
     private String getVersionParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
         String version = KvpHelper.getParameterValue(RequestParams.version.name(), parameterValueMap);
-        boolean isGetCapabilities = KvpHelper.checkForGetCapabilities(parameterValueMap);
+        boolean isGetCapabilities = checkForGetCapabilities(parameterValueMap);
         if (!isGetCapabilities) {
             KvpHelper.checkParameterValue(version, RequestParams.version.name());
-            if (!Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(version)) {
+            if (!isVersionSupported(version)) {
                 throw new VersionNotSupportedException();
             }
         }
         return version;
     }
 
+    protected boolean checkForGetCapabilities(Map<String, String> parameterValueMap) throws OwsExceptionReport {
+        String requestValue = getRequestParameterValue(parameterValueMap);
+        if (requestValue != null && requestValue.equals(SosConstants.Operations.GetCapabilities.name())) {
+            return true;
+        }
+        return false;
+    }
+
+    public String getRequestParameterValue(Map<String, String> parameterValueMap) throws OwsExceptionReport {
+        String requestParameterValue = KvpHelper.getParameterValue(RequestParams.request.name(), parameterValueMap);
+        KvpHelper.checkParameterValue(requestParameterValue, RequestParams.request.name());
+        return requestParameterValue;
+    }
+
     @Override
     public boolean checkOperationHttpGetSupported(OperationDecoderKey k) throws OwsExceptionReport {
-        return Configurator.getInstance().getCodingRepository().getDecoder(
-                new KvpOperationDecoderKey(k.getService(), k.getVersion(), k.getOperation())) != null;
+        return getDecoder(new KvpOperationDecoderKey(k)) != null;
     }
 }

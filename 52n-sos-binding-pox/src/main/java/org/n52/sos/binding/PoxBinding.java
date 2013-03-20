@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.decode.Decoder;
 import org.n52.sos.decode.OperationDecoderKey;
+import org.n52.sos.decode.XmlOperationDecoderKey;
 import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidServiceOrVersionException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.NoApplicableCodeException.MethodNotSupportedException;
@@ -40,7 +41,6 @@ import org.n52.sos.ogc.sos.ConformanceClasses;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetCapabilitiesRequest;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.CodingHelper;
@@ -66,15 +66,14 @@ public class PoxBinding extends Binding {
         try {
             XmlObject doc = XmlHelper.parseXmlSosRequest(request);
             LOGGER.debug("XML-REQUEST: {}", doc.xmlText());
-            Decoder<AbstractServiceRequest, XmlObject> decoder = Configurator.getInstance()
-                    .getCodingRepository().getDecoder(CodingHelper.getDecoderKey(doc));
+            Decoder<AbstractServiceRequest, XmlObject> decoder = getDecoder(CodingHelper.getDecoderKey(doc));
             // decode XML message
             Object abstractRequest = decoder.decode(doc);
             if (abstractRequest instanceof AbstractServiceRequest) {
                 sosRequest = (AbstractServiceRequest) abstractRequest;
                 checkServiceOperatorKeyTypes(sosRequest);
                 for (ServiceOperatorKeyType serviceVersionIdentifier : sosRequest.getServiceOperatorKeyType()) {
-                    ServiceOperator serviceOperator = Configurator.getInstance().getServiceOperatorRepository()
+                    ServiceOperator serviceOperator = getServiceOperatorRepository()
 							.getServiceOperator(serviceVersionIdentifier);
                     if (serviceOperator != null) {
                         serviceResponse = serviceOperator.receiveRequest(sosRequest);
@@ -112,6 +111,6 @@ public class PoxBinding extends Binding {
 
     @Override
     public boolean checkOperationHttpPostSupported(OperationDecoderKey k) throws OwsExceptionReport {
-        return CodingHelper.hasXmlEncoderForOperation(k);
+        return getDecoder(new XmlOperationDecoderKey(k)) != null;
     }
 }

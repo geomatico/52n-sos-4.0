@@ -32,6 +32,7 @@ import javax.xml.soap.SOAPConstants;
 import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.decode.Decoder;
 import org.n52.sos.decode.OperationDecoderKey;
+import org.n52.sos.decode.XmlOperationDecoderKey;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
@@ -39,11 +40,8 @@ import org.n52.sos.exception.ows.NoApplicableCodeException.MethodNotSupportedExc
 import org.n52.sos.exception.ows.NoApplicableCodeException.NoEncoderForKeyException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
-import org.n52.sos.ogc.sos.Sos1Constants;
-import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.response.ServiceResponse;
-import org.n52.sos.service.Configurator;
 import org.n52.sos.service.operator.ServiceOperator;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.soap.SoapHelper;
@@ -81,8 +79,7 @@ public class SoapBinding extends Binding {
             String soapAction = SoapHelper.checkSoapHeader(request);
             XmlObject doc = XmlHelper.parseXmlSosRequest(request);
             LOGGER.debug("SOAP-REQUEST: {}", doc.xmlText());
-            Decoder<?,XmlObject> decoder = Configurator.getInstance().getCodingRepository()
-                    .getDecoder(CodingHelper.getDecoderKey(doc));
+            Decoder<?,XmlObject> decoder = getDecoder(CodingHelper.getDecoderKey(doc));
             // decode SOAP message
             Object abstractRequest = decoder.decode(doc);
             if (abstractRequest instanceof SoapRequest) {
@@ -97,18 +94,16 @@ public class SoapBinding extends Binding {
                 soapResponse.setHeader(soapRequest.getSoapHeader());
                 if (soapRequest.getSoapFault() == null) {
                     XmlObject xmlObject = soapRequest.getSoapBodyContent();
-                    Decoder<?, XmlObject> bodyDecoder = Configurator.getInstance().getCodingRepository()
-                            .getDecoder(CodingHelper.getDecoderKey(xmlObject));
+                    Decoder<?, XmlObject> bodyDecoder = getDecoder(CodingHelper.getDecoderKey(xmlObject));
                     // Decode SOAPBody content
                     Object aBodyRequest = bodyDecoder.decode(xmlObject);
                     if (aBodyRequest instanceof AbstractServiceRequest) {
                         AbstractServiceRequest bodyRequest = (AbstractServiceRequest) aBodyRequest;
                         checkServiceOperatorKeyTypes(bodyRequest);
-                        for (ServiceOperatorKeyType serviceVersionIdentifier : bodyRequest.getServiceOperatorKeyType()) {
-                            ServiceOperator serviceOperator = Configurator.getInstance().getServiceOperatorRepository()
-									.getServiceOperator(serviceVersionIdentifier);
-                            if (serviceOperator != null) {
-                                ServiceResponse bodyResponse = serviceOperator.receiveRequest(bodyRequest);
+                        for (ServiceOperatorKeyType sokt : bodyRequest.getServiceOperatorKeyType()) {
+                            ServiceOperator so = getServiceOperatorRepository().getServiceOperator(sokt);
+                            if (so != null) {
+                                ServiceResponse bodyResponse = so.receiveRequest(bodyRequest);
                                 if (!bodyResponse.isXmlResponse()) {
                                     // FIXME how to encode non xml encoded data
                                     // in soap responses?
@@ -127,7 +122,7 @@ public class SoapBinding extends Binding {
                 }
                 // Encode SOAP response
                 EncoderKey key = CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse);
-                Encoder<?, SoapResponse> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
+                Encoder<?, SoapResponse> encoder = getEncoder(key);
                 if (encoder != null) {
                     return (ServiceResponse) encoder.encode(soapResponse);
                 } else {
@@ -151,7 +146,7 @@ public class SoapBinding extends Binding {
                 soapResponse.setSoapNamespace(soapNamespace);
             }
             EncoderKey key = CodingHelper.getEncoderKey(soapResponse.getSoapNamespace(), soapResponse);
-            Encoder<?, SoapResponse> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
+            Encoder<?, SoapResponse> encoder = getEncoder(key);
             if (encoder != null) {
                 return (ServiceResponse) encoder.encode(soapResponse);
             } else {
@@ -160,29 +155,14 @@ public class SoapBinding extends Binding {
         }
     }
 
-    protected void setVersionForOwsExceptionReport() {
-        //FIXME shouldn't version 2.0.0 be delivered by default?
-    }
-
-    private OwsExceptionReport createOperationNotSupportedException() {
-        OwsExceptionReport owse = new NoApplicableCodeException()
-                .withMessage("The requested service URL only supports HTTP-Post SOAP requests!");
-        if (Configurator.getInstance().getServiceOperatorRepository().isVersionSupported(Sos2Constants.SERVICEVERSION)) {
-            owse.setVersion(Sos2Constants.SERVICEVERSION);
-        } else {
-            owse.setVersion(Sos1Constants.SERVICEVERSION);
-        }
-        return owse;
-    }
-
     @Override
     public String getUrlPattern() {
         return urlPattern;
     }
 
     @Override
-    public boolean checkOperationHttpPostSupported(OperationDecoderKey decoderKey) throws OwsExceptionReport {
-        return CodingHelper.hasXmlEncoderForOperation(decoderKey);
+    public boolean checkOperationHttpPostSupported(OperationDecoderKey k) throws OwsExceptionReport {
+        return getDecoder(new XmlOperationDecoderKey(k)) != null;
     }
 
     @Override
