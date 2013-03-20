@@ -37,6 +37,7 @@ import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidServiceOr
 import org.n52.sos.exception.ows.InvalidParameterValueException.ServiceNotSupportedException;
 import org.n52.sos.exception.ows.InvalidParameterValueException.VersionNotSupportedException;
 import org.n52.sos.exception.ows.MissingParameterValueException.MissingRequestParameterException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.NoApplicableCodeException.MethodNotSupportedException;
 import org.n52.sos.exception.ows.NoApplicableCodeException.NoDecoderForKeyException;
 import org.n52.sos.exception.ows.VersionNegotiationFailedException.InvalidAcceptVersionsParameterException;
@@ -119,7 +120,13 @@ public class KvpBinding extends Binding {
                     throw new InvalidServiceOrVersionException(request.getService(), request.getVersion());
                 }
             }
-        } catch (OwsExceptionReport owse) {
+        } catch (Throwable t) {
+            OwsExceptionReport owse;
+            if (t instanceof OwsExceptionReport) {
+                owse = (OwsExceptionReport) t;
+            } else {
+                owse = new NoApplicableCodeException().causedBy(t);
+            }
             LOGGER.warn("Error processing request", owse);
             throw owse.setVersion(request != null ? request.getVersion() : null);
         }

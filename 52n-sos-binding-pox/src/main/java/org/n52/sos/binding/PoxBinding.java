@@ -92,7 +92,13 @@ public class PoxBinding extends Binding {
                 throw new NoApplicableCodeException()
                         .withMessage("The returned object is not an AbstractServiceRequest implementation");
             }
-        } catch (OwsExceptionReport owse) {
+        } catch (Throwable t) {
+            OwsExceptionReport owse;
+            if (t instanceof OwsExceptionReport) {
+                owse = (OwsExceptionReport) t;
+            } else {
+                owse = new NoApplicableCodeException().causedBy(t);
+            }
             LOGGER.warn("Error processing request", owse);
             throw owse.setVersion(sosRequest != null ? sosRequest.getVersion() : null);
         }

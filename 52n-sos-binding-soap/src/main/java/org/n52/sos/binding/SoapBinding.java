@@ -132,7 +132,13 @@ public class SoapBinding extends Binding {
                 // FIXME: valid exception
                 throw new NoApplicableCodeException();
             }
-        } catch (OwsExceptionReport owse) {
+        } catch (Throwable t) {
+            OwsExceptionReport owse;
+            if (t instanceof OwsExceptionReport) {
+                owse = (OwsExceptionReport) t;
+            } else {
+                owse = new NoApplicableCodeException().causedBy(t);
+            }
             LOGGER.warn("Error processing request", owse);
             soapResponse.setException(owse.setVersion(version));
             if (soapVersion == null || !soapVersion.isEmpty()) {
