@@ -170,4 +170,12 @@ public class InvalidParameterValueException extends CodedOwsException {
             super(Sos1Constants.DescribeSensorParams.outputFormat, value);
         }
     }
+
+    public static class DuplicateIdentifierException extends InvalidParameterValueException {
+        private static final long serialVersionUID = -5966745700953811127L;
+
+        public DuplicateIdentifierException(String name, String value) {
+            withMessage("The requested %s identifier (%s) is already registered at this service", name, value);
+        }
+    }
 }

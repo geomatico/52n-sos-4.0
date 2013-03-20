@@ -33,7 +33,7 @@ import org.n52.sos.ogc.swe.SosSweDataArray;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.SosSweField;
 import org.n52.sos.ogc.swe.simpleType.SosSweTime;
-import org.n52.sos.util.DateTimeException;
+import org.n52.sos.exception.ows.DateTimeParseException;
 import org.n52.sos.util.DateTimeHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,12 +119,8 @@ public class SweDataArrayValue implements IMultiValue<SosSweDataArray> {
                         } else {
                             time = new TimeInstant(DateTimeHelper.parseIsoString2DateTime(token));
                         }
-                    } catch (DateTimeException dte) {
-                        String exceptionMsg =
-                                String.format(
-                                        "Could not parse ISO8601 string \"%s\". Exception thrown: \"%s\"; Message: \"%s\"",
-                                        token, dte.getClass().getName(), dte.getMessage());
-                        LOGGER.error(exceptionMsg);
+                    } catch (DateTimeParseException dte) {
+                        LOGGER.error(String.format("Could not parse ISO8601 string \"%s\"", token), dte);
                         // TODO throw exception here?
                         continue; // try next block;
                     }

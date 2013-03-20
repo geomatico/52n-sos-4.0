@@ -42,13 +42,13 @@ import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.GenericThrowableWrapperException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CacheHelper;
 import org.n52.sos.util.RunnableAction;
-import org.n52.sos.util.Util4Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -201,7 +201,7 @@ class OfferingCacheUpdateTask extends RunnableAction {
         } catch (OwsExceptionReport owse) {
             getErrors().add(owse);
         } catch (Exception e) {
-            getErrors().add(new NoApplicableCodeException().causedBy(e)
+            getErrors().add(new GenericThrowableWrapperException(e)
                     .withMessage("Error while processing offering cache update task!"));
         } finally {
             LOGGER.debug("OfferingTask finished, latch.countDown().");

@@ -44,6 +44,7 @@ import org.n52.sos.ds.hibernate.cache.SensorDeletionCacheUpdate;
 import org.n52.sos.ds.hibernate.cache.SensorInsertionCacheUpdate;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.GenericThrowableWrapperException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.util.Validation;
 import org.slf4j.Logger;
@@ -110,7 +111,7 @@ public class SosCacheFeederDAO extends HibernateSessionHolder implements CacheFe
 
     protected void update(WritableContentCache cache, CacheUpdate action) throws OwsExceptionReport {
         if (cache == null) {
-            throw new NoApplicableCodeException().withMessage("CapabilitiesCache object is null");
+            throw new NullPointerException("cache is null");
         }
         CompositeOwsException errors = new CompositeOwsException();
         Session session = null;

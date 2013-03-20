@@ -58,10 +58,10 @@ import net.opengis.swe.x20.VectorType.Coordinate;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.NoApplicableCodeException.NotYetSupportedException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.swe.RangeValue;
 import org.n52.sos.ogc.swe.SWEConstants;
 import org.n52.sos.ogc.swe.SWEConstants.SweCoordinateName;
@@ -85,7 +85,6 @@ import org.n52.sos.ogc.swe.simpleType.SosSweTime;
 import org.n52.sos.ogc.swe.simpleType.SosSweTimeRange;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.StringHelper;
 import org.n52.sos.util.XmlHelper;
@@ -425,11 +424,7 @@ public class SweCommonDecoderV20 implements Decoder<Object, Object> {
     private SosSweTime parseTime(TimeType xbTime) throws OwsExceptionReport {
         SosSweTime sosTime = new SosSweTime();
         if (xbTime.isSetValue()) {
-            try {
-                sosTime.setValue(DateTimeHelper.parseIsoString2DateTime(xbTime.getValue().toString()));
-            } catch (DateTimeException e) {
-                throw new NoApplicableCodeException().withMessage("Error while parsing Time!").causedBy(e);
-            }
+            sosTime.setValue(DateTimeHelper.parseIsoString2DateTime(xbTime.getValue().toString()));
         }
         if (xbTime.getUom() != null) {
             sosTime.setUom(xbTime.getUom().getHref());
@@ -440,24 +435,19 @@ public class SweCommonDecoderV20 implements Decoder<Object, Object> {
     private SosSweTimeRange parseTimeRange(TimeRangeType xbTime) throws OwsExceptionReport {
         SosSweTimeRange sosTimeRange = new SosSweTimeRange();
         if (xbTime.isSetValue()) {
-            try {
-                // FIXME check if this parses correct
-                List<?> value = xbTime.getValue();
-                if (value != null && !value.isEmpty()) {
-                    RangeValue<DateTime> range = new RangeValue<DateTime>();
-                    boolean first = true;
-                    for (Object object : value) {
-                        if (first) {
-                            range.setRangeStart(DateTimeHelper.parseIsoString2DateTime(xbTime.getValue().toString()));
-                            first = false;
-                        }
-                        range.setRangeEnd(DateTimeHelper.parseIsoString2DateTime(xbTime.getValue().toString()));
+            // FIXME check if this parses correct
+            List<?> value = xbTime.getValue();
+            if (value != null && !value.isEmpty()) {
+                RangeValue<DateTime> range = new RangeValue<DateTime>();
+                boolean first = true;
+                for (Object object : value) {
+                    if (first) {
+                        range.setRangeStart(DateTimeHelper.parseIsoString2DateTime(xbTime.getValue().toString()));
+                        first = false;
                     }
-                    sosTimeRange.setValue(range);
+                    range.setRangeEnd(DateTimeHelper.parseIsoString2DateTime(xbTime.getValue().toString()));
                 }
-
-            } catch (DateTimeException e) {
-                throw new NoApplicableCodeException().withMessage("Error while parsing TimeRange!").causedBy(e);
+                sosTimeRange.setValue(range);
             }
         }
         if (xbTime.getUom() != null) {

@@ -23,9 +23,9 @@
  */
 package org.n52.sos.ogc.sos;
 
+import org.n52.sos.exception.ows.NoApplicableCodeException.DecoderResponseUnsupportedException;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.ogc.swe.SosSweDataRecord;
 import org.n52.sos.ogc.swe.encoding.SosSweAbstractEncoding;
@@ -95,9 +95,7 @@ public class ResultTemplate {
         if (decodedObject instanceof SosSweDataRecord) {
             return (SosSweDataRecord) decodedObject;
         }
-        throw new NoApplicableCodeException()
-                .withMessage("Decoding of string \"%s\" failed. Returned type is \"%s\".", resultStructure,
-                             decodedObject.getClass().getName());
+        throw new DecoderResponseUnsupportedException(xmlResultStructure, decodedObject);
     }
 
     private SosSweAbstractEncoding parseResultEncoding() throws OwsExceptionReport {
@@ -105,8 +103,6 @@ public class ResultTemplate {
         if (decodedObject instanceof SosSweTextEncoding) {
             return (SosSweTextEncoding) decodedObject;
         }
-        throw new NoApplicableCodeException()
-                .withMessage("Decoding of string \"%s\" failed. Returned type is \"%s\".", resultEncoding,
-                             decodedObject.getClass().getName());
+        throw new DecoderResponseUnsupportedException(xmResultEncoding, decodedObject);
     }
 }

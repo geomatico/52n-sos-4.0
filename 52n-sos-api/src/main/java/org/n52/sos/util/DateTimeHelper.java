@@ -35,6 +35,8 @@ import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.ITime.TimeFormat;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
+import org.n52.sos.exception.ows.DateTimeFormatException;
+import org.n52.sos.exception.ows.DateTimeParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,9 +46,6 @@ import org.slf4j.LoggerFactory;
  */
 public class DateTimeHelper {
 
-    /**
-     * logger
-     */
     private static final Logger LOGGER = LoggerFactory.getLogger(DateTimeHelper.class);
 
     /**
@@ -54,23 +53,16 @@ public class DateTimeHelper {
      */
     private static String responseFormat;
 
-    private static String ymdResponseFormat = "yyyy-MM-dd";
+    private static final String ymdResponseFormat = "yyyy-MM-dd";
 
-    private static String ymResponseFormat = "yyyy-MM";
+    private static final String ymResponseFormat = "yyyy-MM";
 
-    private static String yResponseFormat = "yyyy";
+    private static final String yResponseFormat = "yyyy";
 
     /**
      * lease value
      */
     private static int lease;
-
-    /**
-     * Hide utility constructor
-     */
-    private DateTimeHelper() {
-        super();
-    }
 
     /**
      * Parses a time String to a Joda Time DateTime object
@@ -81,7 +73,7 @@ public class DateTimeHelper {
      * @throws DateTimeException
      *             IF an error occurs.
      */
-    public static DateTime parseIsoString2DateTime(String timeString) throws DateTimeException {
+    public static DateTime parseIsoString2DateTime(String timeString) throws DateTimeParseException {
         checkForValidity(timeString);
         if (timeString == null || timeString.isEmpty()) {
             return null;
@@ -93,20 +85,14 @@ public class DateTimeHelper {
             } else {
                 return ISODateTimeFormat.dateOptionalTimeParser().withZone(DateTimeZone.UTC).parseDateTime(timeString);
             }
-        } catch (IllegalArgumentException iae) {
-            String exceptionText = "Error while parse time String to DateTime!";
-            LOGGER.error(exceptionText, iae);
-            throw new DateTimeException(exceptionText, iae);
-        } catch (UnsupportedOperationException uoe) {
-            String exceptionText = "Error while parse time String to DateTime!";
-            LOGGER.error(exceptionText, uoe);
-            throw new DateTimeException(exceptionText, uoe);
+        } catch (Throwable uoe) {
+            throw new DateTimeParseException(timeString, uoe);
         }
     }
 
-    private static void checkForValidity(String timeString) throws DateTimeException {
+    private static void checkForValidity(String timeString) throws DateTimeParseException {
         if (!(timeString.length() == 4 || timeString.length() == 7 || timeString.length() >= 10)) {
-            throw new DateTimeException("The requested time has no ISO 8601 format!");
+            throw new DateTimeParseException(timeString);
         }
     }
 
@@ -127,11 +113,11 @@ public class DateTimeHelper {
                 return formatDateTime2IsoString(((TimeInstant) time).getValue());
             } else if (time instanceof TimePeriod) {
                 return String.format("%s/%s", formatDateTime2IsoString(((TimePeriod) time).getStart()),
-                        formatDateTime2IsoString(((TimePeriod) time).getEnd()));
+                                     formatDateTime2IsoString(((TimePeriod) time).getEnd()));
             }
         }
         String exceptionMsg =
-                String.format("Given ITime object is not valid: %s", time != null ? time.getClass().getName() : "null");
+                String.format("Given ITime object is not valid: %s", time);
         LOGGER.debug(exceptionMsg);
         throw new IllegalArgumentException(exceptionMsg);
     }
@@ -156,14 +142,14 @@ public class DateTimeHelper {
      * @param dateTime
      *            Time object
      * @return Response formatted time String
-     * @throws DateTimeException
-     *             If an error occurs.
+     *
+     * @throws DateTimeFormatException If an error occurs.
      */
-    public static String formatDateTime2ResponseString(DateTime dateTime) throws DateTimeException {
+    public static String formatDateTime2ResponseString(DateTime dateTime) throws DateTimeFormatException {
         return formatDateTime2FormattedString(dateTime, responseFormat);
     }
 
-    public static String formatDateTime2String(DateTime dateTime, TimeFormat timeFormat) throws DateTimeException {
+    public static String formatDateTime2String(DateTime dateTime, TimeFormat timeFormat) throws DateTimeFormatException {
         switch (timeFormat) {
         case Y:
             return formatDateTime2YearDateString(dateTime);
@@ -181,11 +167,13 @@ public class DateTimeHelper {
      * 
      * @param dateTime
      *            Time object
+     * @param dateFormat the date time format
+     *
      * @return Specified formatted time String
-     * @throws DateTimeException
-     *             If an error occurs.
+     *
+     * @throws DateTimeFormatException If an error occurs.
      */
-    public static String formatDateTime2FormattedString(DateTime dateTime, String dateFormat) throws DateTimeException {
+    public static String formatDateTime2FormattedString(DateTime dateTime, String dateFormat) throws DateTimeFormatException {
         try {
             if (dateFormat == null || dateFormat.isEmpty()) {
                 return formatDateTime2IsoString(dateTime);
@@ -197,9 +185,7 @@ public class DateTimeHelper {
                 return dateTime.toString(DateTimeFormat.forPattern(dateFormat)).replace("Z", "+00:00");
             }
         } catch (IllegalArgumentException iae) {
-            String exceptionText = "Error while parse time String to DateTime!";
-            LOGGER.error(exceptionText, iae);
-            throw new DateTimeException(exceptionText, iae);
+            throw new DateTimeFormatException(dateTime, iae);
         }
     }
 
@@ -209,11 +195,12 @@ public class DateTimeHelper {
      * @param dateTime
      *            The DateTime.
      * @return Returns formatted time String.
-     * @throws DateTimeException 
+     *
+     * @throws DateTimeFormatException
      */
-    public static String formatDateTime2YearMonthDayDateStringYMD(DateTime dateTime) throws DateTimeException {
+    public static String formatDateTime2YearMonthDayDateStringYMD(DateTime dateTime) throws DateTimeFormatException {
         try {
-            DateTime result = null;
+            DateTime result;
             if (dateTime == null) {
                 result = new DateTime(0000, 01, 01, 00, 00, 00, 000, DateTimeZone.UTC);
             } else {
@@ -221,9 +208,7 @@ public class DateTimeHelper {
             }
             return result.toString(DateTimeFormat.forPattern(ymdResponseFormat));
         } catch (IllegalArgumentException iae) {
-            String exceptionText = "Error while parse time String to DateTime!";
-            LOGGER.error(exceptionText, iae);
-            throw new DateTimeException(exceptionText, iae);
+            throw new DateTimeFormatException(dateTime, iae);
         }
     }
 
@@ -233,11 +218,12 @@ public class DateTimeHelper {
      * @param dateTime
      *            The DateTime.
      * @return Returns formatted time String.
-     * @throws DateTimeException 
+     *
+     * @throws DateTimeFormatException
      */
-    public static String formatDateTime2YearMonthDateString(DateTime dateTime) throws DateTimeException {
+    public static String formatDateTime2YearMonthDateString(DateTime dateTime) throws DateTimeFormatException {
         try {
-            DateTime result = null;
+            DateTime result;
             if (dateTime == null) {
                 result = new DateTime(0000, 01, 01, 00, 00, 00, 000, DateTimeZone.UTC);
             } else {
@@ -245,9 +231,7 @@ public class DateTimeHelper {
             }
             return result.toString(DateTimeFormat.forPattern(ymResponseFormat));
         } catch (IllegalArgumentException iae) {
-            String exceptionText = "Error while parse time String to DateTime!";
-            LOGGER.error(exceptionText, iae);
-            throw new DateTimeException(exceptionText, iae);
+            throw new DateTimeFormatException(dateTime, iae);
         }
     }
 
@@ -257,11 +241,12 @@ public class DateTimeHelper {
      * @param dateTime
      *            The DateTime.
      * @return Returns formatted time String.
-     * @throws DateTimeException 
+     *
+     * @throws DateTimeFormatException
      */
-    public static String formatDateTime2YearDateString(DateTime dateTime) throws DateTimeException {
+    public static String formatDateTime2YearDateString(DateTime dateTime) throws DateTimeFormatException {
         try {
-            DateTime result = null;
+            DateTime result;
             if (dateTime == null) {
                 result = new DateTime(0000, 01, 01, 00, 00, 00, 000, DateTimeZone.UTC);
             } else {
@@ -269,9 +254,7 @@ public class DateTimeHelper {
             }
             return result.toString(DateTimeFormat.forPattern(yResponseFormat));
         } catch (IllegalArgumentException iae) {
-            String exceptionText = "Error while parse time String to DateTime!";
-            LOGGER.error(exceptionText, iae);
-            throw new DateTimeException(exceptionText, iae);
+            throw new DateTimeFormatException(dateTime, iae);
         }
     }
 
@@ -287,35 +270,27 @@ public class DateTimeHelper {
      */
     public static DateTime setDateTime2EndOfDay4RequestedEndPosition(DateTime dateTime, int isoTimeLength) {
         switch (isoTimeLength) {
-        // year
-        case 4:
-            dateTime = dateTime.plusYears(1).minusMillis(1);
-            break;
-        // year, month
-        case 7:
-            dateTime = dateTime.plusMonths(1).minusMillis(1);
-            break;
-        // year, month, day
-        case 10:
-            dateTime = dateTime.plusDays(1).minusMillis(1);
-            break;
-        // year, month, day, hour
-        case 13:
-            dateTime = dateTime.plusHours(1).minusMillis(1);
-            break;
-        // year, month, day, hour, minute
-        case 16:
-            dateTime = dateTime.plusMinutes(1).minusMillis(1);
-            break;
-        // year, month, day, hour, minute, second
-        case 19:
-            dateTime = dateTime.plusSeconds(1).minusMillis(1);
-            break;
-
-        default:
-            break;
+            // year
+            case 4:
+                return dateTime.plusYears(1).minusMillis(1);
+            // year, month
+            case 7:
+                return dateTime.plusMonths(1).minusMillis(1);
+            // year, month, day
+            case 10:
+                return dateTime.plusDays(1).minusMillis(1);
+            // year, month, day, hour
+            case 13:
+                return dateTime.plusHours(1).minusMillis(1);
+            // year, month, day, hour, minute
+            case 16:
+                return dateTime.plusMinutes(1).minusMillis(1);
+            // year, month, day, hour, minute, second
+            case 19:
+                return dateTime.plusSeconds(1).minusMillis(1);
+            default:
+                return dateTime;
         }
-        return dateTime;
     }
 
     /**
@@ -337,9 +312,7 @@ public class DateTimeHelper {
      * @return Expire time
      */
     public static DateTime calculateExpiresDateTime(DateTime start) {
-        DateTime end = null;
-        end = start.plusMinutes(lease);
-        return end;
+        return start.plusMinutes(lease);
     }
 
     /**
@@ -360,5 +333,11 @@ public class DateTimeHelper {
      */
     public static void setLease(int lease) {
         DateTimeHelper.lease = lease;
+    }
+
+    /**
+     * Hide utility constructor
+     */
+    private DateTimeHelper() {
     }
 }

@@ -44,9 +44,12 @@ import org.n52.sos.binding.Binding;
 import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidProcedureDescriptionFormatException;
+import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidResponseFormatParameterException;
 import org.n52.sos.exception.ows.MissingParameterValueException;
 import org.n52.sos.exception.ows.MissingParameterValueException.MissingProcedureDescriptionFormatException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.GenericThrowableWrapperException;
 import org.n52.sos.exception.sos.ResponseExceedsSizeLimitException;
 import org.n52.sos.exception.swes.InvalidRequestException;
 import org.n52.sos.ogc.filter.TemporalFilter;
@@ -237,7 +240,7 @@ public class SosHelper {
                 .withMessage("The parameter '%s' is not supportted for HTTP-Post requests by this SOS!", paramName);
     }
         }
-// FIXME: valid exception
+        // FIXME: valid exception
         throw new NoApplicableCodeException();
     }
 
@@ -248,9 +251,10 @@ public class SosHelper {
      * @param requestString
      *            Request as String
 
-     *
+     * @deprecated legacy code not needed with hibernate
      * @throws OwsExceptionReport If the request contains critical characters
      */
+    @Deprecated
     public static void checkRequestString(String requestString) throws OwsExceptionReport {
         if (requestString.contains("');")) {
             throw new InvalidRequestException()
@@ -387,21 +391,21 @@ keysToCheck.push(key);
     public static String getDescribeSensorUrl(String version, String serviceURL, String procedureId, String urlPattern)
             throws UnsupportedEncodingException {
         StringBuilder url = new StringBuilder();
-// service URL
+        // service URL
         url.append(serviceURL);
-// URL pattern
+        // URL pattern
         url.append(urlPattern);
-// ?
+        // ?
         url.append("?");
-// request
+        // request
         url.append(RequestParams.request.name()).append("=").append(SosConstants.Operations.DescribeSensor.name());
-// service
+        // service
         url.append("&").append(OWSConstants.RequestParams.service.name()).append("=").append(SosConstants.SOS);
-// version
+        // version
         url.append("&").append(OWSConstants.RequestParams.version.name()).append("=").append(version);
-// procedure
+        // procedure
         url.append("&").append(SosConstants.DescribeSensorParams.procedure.name()).append("=").append(procedureId);
-// outputFormat
+        // outputFormat
         if (version.equalsIgnoreCase(Sos1Constants.SERVICEVERSION)) {
             url.append("&").append(Sos1Constants.DescribeSensorParams.outputFormat).append("=")
                     .append(URLEncoder.encode(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE, "UTF-8"));
@@ -434,9 +438,7 @@ keysToCheck.push(key);
         } else if (responseFormat.equalsIgnoreCase(SosConstants.CONTENT_TYPE_ZIP)) {
             return true;
         } else {
-            throw new InvalidParameterValueException().at(SosConstants.GetObservationParams.responseFormat)
-                    .withMessage("The value of the parameter '%s' is invalid. Please check the capabilities for valid values. Delivered value was: %s",
-                                 SosConstants.GetObservationParams.responseFormat, responseFormat);
+            throw new InvalidResponseFormatParameterException(responseFormat);
         }
     }
 
@@ -470,15 +472,10 @@ keysToCheck.push(key);
         }
         if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
             if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE)) {
-                throw new InvalidParameterValueException().at(parameterName).withMessage(
-                        "The value '%s' of the %s parameter is incorrect and has to be '%s' for the requested sensor!",
-                        procedureDecriptionFormat, parameterName,
-                        SensorMLConstants.SENSORML_OUTPUT_FORMAT_MIME_TYPE);
+                throw new InvalidProcedureDescriptionFormatException(procedureDecriptionFormat);
             } else if (!procedureDecriptionFormat.equals(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL)) {
-                throw new InvalidParameterValueException().at(parameterName).withMessage(
-                        "The value '%s' of the %s parameter is incorrect and has to be '%s' for the requested sensor!",
-                        procedureDecriptionFormat, parameterName, SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL);
-    }
+                throw new InvalidProcedureDescriptionFormatException(procedureDecriptionFormat);
+            }
         }
     }
 
@@ -585,9 +582,9 @@ public static Collection<String> getSupportedResponseFormats(String service, Str
             Object duplicatedObject = objectInputStream.readObject();
             return duplicatedObject;
         } catch (IOException e) {
-            throw new NoApplicableCodeException().causedBy(e).withMessage("Error while duplicating object!");
+            throw new GenericThrowableWrapperException(e).withMessage("Error while duplicating object!");
         } catch (ClassNotFoundException e) {
-            throw new NoApplicableCodeException().causedBy(e).withMessage("Error while duplicating object!");
+            throw new GenericThrowableWrapperException(e).withMessage("Error while duplicating object!");
         }
     }
 

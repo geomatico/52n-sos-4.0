@@ -42,7 +42,7 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.Sos2Constants;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.GetResultRequest;
-import org.n52.sos.util.DateTimeException;
+import org.n52.sos.exception.ows.DateTimeParseException;
 import org.n52.sos.util.KvpHelper;
 
 public class GetResultKvpDecoder extends AbstractKvpDecoder {
@@ -97,7 +97,7 @@ public class GetResultKvpDecoder extends AbstractKvpDecoder {
                                 parameterValues, parameterName), parameterName));
                     } catch (DecoderException e) {
                         throw new InvalidTemporalFilterParameterException(parameterValues).causedBy(e);
-                    } catch (DateTimeException e) {
+                    } catch (DateTimeParseException e) {
                         throw new InvalidTemporalFilterParameterException(parameterValues).causedBy(e);
                     }
 

@@ -48,7 +48,6 @@ import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.StringHelper;
@@ -225,8 +224,6 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
             timePeriodType.setEndPosition(xbTimePositionEnd);
 
             return timePeriodType;
-        } catch (DateTimeException x) {
-            throw new NoApplicableCodeException().causedBy(x).withMessage("Error while creating TimePeriod!");
         } catch (XmlRuntimeException x) {
             throw new NoApplicableCodeException().causedBy(x).withMessage("Error while creating TimePeriod!");
         } catch (XmlValueDisconnectedException x) {
@@ -255,34 +252,30 @@ public class GmlEncoderv311 implements Encoder<XmlObject, Object> {
      */
     private TimeInstantType createTimeInstantType(TimeInstant timeInstant, TimeInstantType timeInstantType)
             throws OwsExceptionReport {
-        try {
-            // create time instant
-            if (timeInstantType == null) {
-                timeInstantType = TimeInstantType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-            }
-            if (timeInstant.isSetGmlId()) {
-                timeInstantType.setId(timeInstant.getGmlId());
-            }
-            TimePositionType xb_posType = timeInstantType.addNewTimePosition();
-
-            String timeString = OGCConstants.UNKNOWN;
-            if(timeInstant.isSetValue()) {
-                // parse db date string and format into GML format
-                DateTime date = timeInstant.getValue();
-                timeString = DateTimeHelper.formatDateTime2ResponseString(date);
-                // concat minutes for timeZone offset, because gml requires
-                // xs:dateTime,
-                // which needs minutes in
-                // timezone offset
-                // TODO enable really
-            } else if (timeInstant.isSetIndeterminateValue()) {
-                timeString = timeInstant.getIndeterminateValue();
-            }
-            xb_posType.setStringValue(timeString);
-            return timeInstantType;
-        } catch (DateTimeException dte) {
-            throw new NoApplicableCodeException().causedBy(dte).withMessage("Error while creating TimeInstant!");
+        // create time instant
+        if (timeInstantType == null) {
+            timeInstantType = TimeInstantType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         }
+        if (timeInstant.isSetGmlId()) {
+            timeInstantType.setId(timeInstant.getGmlId());
+        }
+        TimePositionType xb_posType = timeInstantType.addNewTimePosition();
+
+        String timeString = OGCConstants.UNKNOWN;
+        if(timeInstant.isSetValue()) {
+            // parse db date string and format into GML format
+            DateTime date = timeInstant.getValue();
+            timeString = DateTimeHelper.formatDateTime2ResponseString(date);
+            // concat minutes for timeZone offset, because gml requires
+            // xs:dateTime,
+            // which needs minutes in
+            // timezone offset
+            // TODO enable really
+        } else if (timeInstant.isSetIndeterminateValue()) {
+            timeString = timeInstant.getIndeterminateValue();
+        }
+        xb_posType.setStringValue(timeString);
+        return timeInstantType;
     }
 
     private XmlObject createPosition(Geometry geom, String foiId) throws OwsExceptionReport {

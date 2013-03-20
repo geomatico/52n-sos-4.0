@@ -52,6 +52,7 @@ import net.opengis.gml.x32.TimePositionType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
 import org.n52.sos.ogc.gml.GMLConstants;
@@ -63,15 +64,12 @@ import org.n52.sos.ogc.om.features.samplingFeatures.SosSamplingFeature;
 import org.n52.sos.ogc.om.values.CategoryValue;
 import org.n52.sos.ogc.om.values.QuantityValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.ogc.ows.CodedException;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.ogc.sos.SosConstants.HelperValues;
 import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.JavaHelper;
@@ -79,7 +77,6 @@ import org.n52.sos.util.MinMax;
 import org.n52.sos.util.OMHelper;
 import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.StringHelper;
-import org.n52.sos.util.Util4Exceptions;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -286,42 +283,38 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
      */
     private TimePeriodType createTimePeriodType(TimePeriod timePeriod, TimePeriodType timePeriodType)
             throws OwsExceptionReport {
-        try {
-            if (timePeriodType == null) {
-                timePeriodType = TimePeriodType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-            }
-            if (timePeriod.getGmlId() != null && !timePeriod.getGmlId().isEmpty()) {
-                timePeriodType.setId(timePeriod.getGmlId());
-            } else {
-                timePeriodType.setId("tp_" + JavaHelper.generateID(timePeriod.toString() + System.currentTimeMillis()));
-            }
-            // beginPosition
-            TimePositionType xbTimePositionBegin = TimePositionType.Factory.newInstance();
-            String beginString =  DateTimeHelper.formatDateTime2String(timePeriod.getStart(), timePeriod.getTimeFormat());
-
-            // concat minutes for timeZone offset, because gml requires
-            // xs:dateTime, which needs minutes in
-            // timezone offset
-            // TODO enable really
-            xbTimePositionBegin.setStringValue(beginString);
-
-            // endPosition
-            TimePositionType xbTimePositionEnd = TimePositionType.Factory.newInstance();
-            String endString =  DateTimeHelper.formatDateTime2String(timePeriod.getEnd(), timePeriod.getTimeFormat());
-
-            // concat minutes for timeZone offset, because gml requires
-            // xs:dateTime, which needs minutes in
-            // timezone offset
-            // TODO enable really
-            xbTimePositionEnd.setStringValue(endString);
-
-            timePeriodType.setBeginPosition(xbTimePositionBegin);
-            timePeriodType.setEndPosition(xbTimePositionEnd);
-
-            return timePeriodType;
-        } catch (DateTimeException dte) {
-            throw new NoApplicableCodeException().causedBy(dte).withMessage("Error while creating TimePeriod!");
+        if (timePeriodType == null) {
+            timePeriodType = TimePeriodType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         }
+        if (timePeriod.getGmlId() != null && !timePeriod.getGmlId().isEmpty()) {
+            timePeriodType.setId(timePeriod.getGmlId());
+        } else {
+            timePeriodType.setId("tp_" + JavaHelper.generateID(timePeriod.toString() + System.currentTimeMillis()));
+        }
+        // beginPosition
+        TimePositionType xbTimePositionBegin = TimePositionType.Factory.newInstance();
+        String beginString =  DateTimeHelper.formatDateTime2String(timePeriod.getStart(), timePeriod.getTimeFormat());
+
+        // concat minutes for timeZone offset, because gml requires
+        // xs:dateTime, which needs minutes in
+        // timezone offset
+        // TODO enable really
+        xbTimePositionBegin.setStringValue(beginString);
+
+        // endPosition
+        TimePositionType xbTimePositionEnd = TimePositionType.Factory.newInstance();
+        String endString =  DateTimeHelper.formatDateTime2String(timePeriod.getEnd(), timePeriod.getTimeFormat());
+
+        // concat minutes for timeZone offset, because gml requires
+        // xs:dateTime, which needs minutes in
+        // timezone offset
+        // TODO enable really
+        xbTimePositionEnd.setStringValue(endString);
+
+        timePeriodType.setBeginPosition(xbTimePositionBegin);
+        timePeriodType.setEndPosition(xbTimePositionEnd);
+
+        return timePeriodType;
     }
 
     private XmlObject createTimeInstantDocument(TimeInstant time) throws OwsExceptionReport {
@@ -345,36 +338,31 @@ public class GmlEncoderv321 implements Encoder<XmlObject, Object> {
      */
     private TimeInstantType createTimeInstantType(TimeInstant timeInstant, TimeInstantType timeInstantType)
             throws OwsExceptionReport {
-        try {
-            // create time instant
-            if (timeInstantType == null) {
-                timeInstantType = TimeInstantType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
-            }
-            if (timeInstant.isSetGmlId()) {
-                timeInstantType.setId(timeInstant.getGmlId());
-            } else {
-                timeInstantType.setId("ti_" + JavaHelper.generateID(timeInstantType.toString() + System.currentTimeMillis()));
-            }
-            TimePositionType xb_posType = timeInstantType.addNewTimePosition();
-
-            String timeString = OGCConstants.UNKNOWN;
-            if(timeInstant.isSetValue()) {
-                // parse db date string and format into GML format
-                timeString =  DateTimeHelper.formatDateTime2String(timeInstant.getValue(), timeInstant.getTimeFormat());
-                // concat minutes for timeZone offset, because gml requires
-                // xs:dateTime,
-                // which needs minutes in
-                // timezone offset
-                // TODO enable really
-            } else if (timeInstant.isSetIndeterminateValue()) {
-                timeString = timeInstant.getIndeterminateValue();
-            }
-            xb_posType.setStringValue(timeString);
-            return timeInstantType;
-        } catch (DateTimeException dte) {
-            throw new NoApplicableCodeException().causedBy(dte)
-                    .withMessage("Error while creating TimeInstant!");
+        // create time instant
+        if (timeInstantType == null) {
+            timeInstantType = TimeInstantType.Factory.newInstance(XmlOptionsHelper.getInstance().getXmlOptions());
         }
+        if (timeInstant.isSetGmlId()) {
+            timeInstantType.setId(timeInstant.getGmlId());
+        } else {
+            timeInstantType.setId("ti_" + JavaHelper.generateID(timeInstantType.toString() + System.currentTimeMillis()));
+        }
+        TimePositionType xb_posType = timeInstantType.addNewTimePosition();
+
+        String timeString = OGCConstants.UNKNOWN;
+        if(timeInstant.isSetValue()) {
+            // parse db date string and format into GML format
+            timeString =  DateTimeHelper.formatDateTime2String(timeInstant.getValue(), timeInstant.getTimeFormat());
+            // concat minutes for timeZone offset, because gml requires
+            // xs:dateTime,
+            // which needs minutes in
+            // timezone offset
+            // TODO enable really
+        } else if (timeInstant.isSetIndeterminateValue()) {
+            timeString = timeInstant.getIndeterminateValue();
+        }
+        xb_posType.setStringValue(timeString);
+        return timeInstantType;
     }
 
     private XmlObject createPosition(Geometry geom, String foiId) throws OwsExceptionReport {

@@ -24,6 +24,8 @@
 package org.n52.sos.exception.ows;
 
 import java.io.IOException;
+
+import org.apache.xmlbeans.XmlException;
 import org.n52.sos.decode.DecoderKey;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -91,6 +93,41 @@ public class NoApplicableCodeException extends CodedOwsException {
 
         public ErrorWhileSavingResponseToOutputStreamException(IOException ioe) {
             withMessage("Error occurs while saving response to output stream!").causedBy(ioe);
+        }
+    }
+
+    public static class GenericThrowableWrapperException extends NoApplicableCodeException {
+        private static final long serialVersionUID = -5252630016009694159L;
+
+        public GenericThrowableWrapperException(Throwable t) {
+            if (t != null) {
+                withMessage(t.getMessage()).causedBy(t);
+            }
+        }
+    }
+
+    public static class DecoderResponseUnsupportedException extends NoApplicableCodeException {
+        private static final long serialVersionUID = 7821283328920709066L;
+
+        public DecoderResponseUnsupportedException(String valueToDecode, Object decodedValue) {
+            withMessage("Decoding of string \"%s\" failed. Returned type is \"%s\".", valueToDecode,
+                        decodedValue == null ? null : decodedValue.getClass().getName());
+        }
+    }
+
+    public static class XmlDecodingException extends NoApplicableCodeException {
+        private static final long serialVersionUID = -495706406337738990L;
+
+        public XmlDecodingException(String name, String xml, XmlException e) {
+            withMessage("Error while decoding %s:\n%s", name, xml).causedBy(e);
+        }
+    }
+
+    public static class InvalidSridException extends NoApplicableCodeException {
+        private static final long serialVersionUID = -7826006594215854637L;
+
+        public InvalidSridException(int srid) {
+            withMessage("SRID may not be <= 0. Was %d", srid);
         }
     }
 }

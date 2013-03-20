@@ -32,6 +32,9 @@ import org.apache.xmlbeans.XmlObject;
 import org.n52.sos.ds.AbstractGetResultDAO;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.EncoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.ErrorWhileSavingResponseToOutputStreamException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.NoEncoderForResponseException;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.ConformanceClasses;
@@ -77,14 +80,13 @@ public class SosGetResultOperatorV20 extends AbstractV2RequestOperator<AbstractG
                 } else if (encodedObject instanceof ServiceResponse) {
                     return (ServiceResponse) encodedObject;
                 } else {
-                    throw new NoApplicableCodeException().withMessage("The encoder response is not supported!");
+                    throw new EncoderResponseUnsupportedException();
                 }
             } else {
-                throw new NoApplicableCodeException().withMessage("Error while getting encoder for response!");
+                throw new NoEncoderForResponseException();
             }
         } catch (IOException ioe) {
-            throw new NoApplicableCodeException().causedBy(ioe)
-                    .withMessage("Error occurs while saving response to output stream!");
+            throw new ErrorWhileSavingResponseToOutputStreamException(ioe);
         }
     }
 

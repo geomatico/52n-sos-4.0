@@ -34,6 +34,7 @@ import org.n52.sos.decode.OperationDecoderKey;
 import org.n52.sos.decode.XmlOperationDecoderKey;
 import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidServiceOrVersionException;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.GenericThrowableWrapperException;
 import org.n52.sos.exception.ows.NoApplicableCodeException.MethodNotSupportedException;
 import org.n52.sos.exception.ows.VersionNegotiationFailedException.InvalidAcceptVersionsParameterException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
@@ -97,7 +98,7 @@ public class PoxBinding extends Binding {
             if (t instanceof OwsExceptionReport) {
                 owse = (OwsExceptionReport) t;
             } else {
-                owse = new NoApplicableCodeException().causedBy(t);
+                owse = new GenericThrowableWrapperException(t);
             }
             LOGGER.warn("Error processing request", owse);
             throw owse.setVersion(sosRequest != null ? sosRequest.getVersion() : null);

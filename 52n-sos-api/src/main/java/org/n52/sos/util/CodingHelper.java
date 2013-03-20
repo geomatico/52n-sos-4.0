@@ -37,8 +37,12 @@ import org.n52.sos.decode.XmlOperationDecoderKey;
 import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.XmlEncoderKey;
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.DecoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.EncoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.NoDecoderForKeyException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.XmlDecodingException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.service.Configurator;
 import org.slf4j.Logger;
@@ -135,13 +139,11 @@ public class CodingHelper {
         DecoderKey key = getDecoderKey(xbObject);
         Decoder<?, XmlObject> decoder = Configurator.getInstance().getCodingRepository().getDecoder(key);
         if (decoder == null) {
-            throw new NoApplicableCodeException().withMessage("No decoder found for key \"%s\".", key);
+            throw new NoDecoderForKeyException(key);
         }
         Object decodedObject = decoder.decode(xbObject);
         if (decodedObject == null) {
-            throw new NoApplicableCodeException()
-                    .withMessage("Decoding of type \"%s\" using key \"%s\" failed",
-                                 xbObject.getClass().getCanonicalName(), key);
+            throw new DecoderResponseUnsupportedException(xbObject.xmlText(), decodedObject);
         }
         return decodedObject;
     }
@@ -150,8 +152,7 @@ public class CodingHelper {
         try {
             return decodeXmlObject(XmlObject.Factory.parse(xmlString));
         } catch (XmlException e) {
-            throw new NoApplicableCodeException().causedBy(e)
-                    .withMessage("Exception thrown while parsing XML string from database: %s", e.getMessage());
+            throw new XmlDecodingException("XML string", xmlString, e);
         }
     }
 

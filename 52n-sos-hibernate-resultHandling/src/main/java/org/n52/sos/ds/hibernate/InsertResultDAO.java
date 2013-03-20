@@ -47,6 +47,8 @@ import org.n52.sos.ds.hibernate.util.HibernateCriteriaQueryUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateCriteriaTransactionalUtilities;
 import org.n52.sos.ds.hibernate.util.HibernateObservationUtilities;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
+import org.n52.sos.exception.ows.InvalidParameterValueException;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.gml.time.ITime;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
@@ -59,8 +61,6 @@ import org.n52.sos.ogc.om.SosObservationConstellation;
 import org.n52.sos.ogc.om.features.SosAbstractFeature;
 import org.n52.sos.ogc.om.values.SweDataArrayValue;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sensorML.SensorML;
 import org.n52.sos.ogc.sensorML.elements.SosSMLIdentifier;
 import org.n52.sos.ogc.sos.Sos2Constants;
@@ -79,7 +79,7 @@ import org.n52.sos.ogc.swe.simpleType.SosSweQuantity;
 import org.n52.sos.request.InsertResultRequest;
 import org.n52.sos.response.InsertResultResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.util.DateTimeException;
+import org.n52.sos.exception.ows.DateTimeParseException;
 import org.n52.sos.util.DateTimeHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -280,9 +280,8 @@ public class InsertResultDAO extends AbstractInsertResultDAO {
                 phenomenonTime = new TimeInstant(dateTime);
             }
             return phenomenonTime;
-        } catch (DateTimeException dte) {
-            throw new NoApplicableCodeException().causedBy(dte)
-                    .withMessage("Error while parsing phenomenonTime '%s'!", timeString);
+        } catch (DateTimeParseException dte) {
+            throw dte.at("phenomenonTime");
         }
     }
 

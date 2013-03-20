@@ -23,23 +23,15 @@
  */
 package org.n52.sos.ogc.filter;
 
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.filter.FilterConstants.ComparisonOperator;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.n52.sos.util.Util4Exceptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * SOS class for result filter
  * 
  */
 public class ComparisonFilter {
-
-    /**
-     * logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(ComparisonFilter.class);
 
     /**
      * property name

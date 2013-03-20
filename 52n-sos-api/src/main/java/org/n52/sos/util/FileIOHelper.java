@@ -33,17 +33,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.n52.sos.exception.ows.NoApplicableCodeException.GenericThrowableWrapperException;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for file handling
  */
 public class FileIOHelper {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileIOHelper.class);
     private static final byte LINE_FEED = (byte) '\n';
     private static final byte CARRIAGE_RETURN = (byte) '\r';
     private static final String READ_MODE = "r";
@@ -65,8 +62,7 @@ public class FileIOHelper {
             is = new FileInputStream(file);
             return is;
         } catch (FileNotFoundException fnfe) {
-            throw new NoApplicableCodeException().causedBy(fnfe)
-                    .withMessage("Error while loading file %s!", file.getName());
+            throw new GenericThrowableWrapperException(fnfe);
         }
     }
 

@@ -38,15 +38,14 @@ import net.opengis.gml.TimePositionType;
 
 import org.apache.xmlbeans.XmlObject;
 import org.joda.time.DateTime;
+import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.gml.GMLConstants;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.util.CodingHelper;
-import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.SosHelper;
@@ -115,36 +114,32 @@ public class GmlDecoderv311 implements Decoder<Object, XmlObject> {
     }
 
     private Object parseTimePeriod(TimePeriodType xbTimePeriod) throws OwsExceptionReport {
-        try {
-            // begin position
-            TimePositionType xbBeginTPT = xbTimePeriod.getBeginPosition();
-            DateTime begin = null;
-            if (xbBeginTPT != null) {
-                String beginString = xbBeginTPT.getStringValue();
-                begin = DateTimeHelper.parseIsoString2DateTime(beginString);
-            } else {
-                throw new NoApplicableCodeException()
-                        .withMessage("gml:TimePeriod! must contain beginPos Element with valid ISO:8601 String!");
-            }
-
-            // end position
-            DateTime end = null;
-            TimePositionType xbEndTPT = xbTimePeriod.getEndPosition();
-            if (xbEndTPT != null) {
-                String endString = xbEndTPT.getStringValue();
-                end =
-                        DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
-                                DateTimeHelper.parseIsoString2DateTime(endString), endString.length());
-            } else {
-                throw new NoApplicableCodeException()
-                        .withMessage("gml:TimePeriod! must contain endPos Element with valid ISO:8601 String!");
-            }
-            TimePeriod timePeriod = new TimePeriod(begin, end);
-            timePeriod.setGmlId(xbTimePeriod.getId());
-            return timePeriod;
-        } catch (DateTimeException dte) {
-            throw new NoApplicableCodeException().causedBy(dte).withMessage("Error while parsing TimePeriod!");
+        // begin position
+        TimePositionType xbBeginTPT = xbTimePeriod.getBeginPosition();
+        DateTime begin = null;
+        if (xbBeginTPT != null) {
+            String beginString = xbBeginTPT.getStringValue();
+            begin = DateTimeHelper.parseIsoString2DateTime(beginString);
+        } else {
+            throw new NoApplicableCodeException()
+                    .withMessage("gml:TimePeriod! must contain beginPos Element with valid ISO:8601 String!");
         }
+
+        // end position
+        DateTime end = null;
+        TimePositionType xbEndTPT = xbTimePeriod.getEndPosition();
+        if (xbEndTPT != null) {
+            String endString = xbEndTPT.getStringValue();
+            end =
+                    DateTimeHelper.setDateTime2EndOfDay4RequestedEndPosition(
+                            DateTimeHelper.parseIsoString2DateTime(endString), endString.length());
+        } else {
+            throw new NoApplicableCodeException()
+                    .withMessage("gml:TimePeriod! must contain endPos Element with valid ISO:8601 String!");
+        }
+        TimePeriod timePeriod = new TimePeriod(begin, end);
+        timePeriod.setGmlId(xbTimePeriod.getId());
+        return timePeriod;
     }
 
     private Object parseTimeInstant(TimeInstantType xbTimeIntant) throws OwsExceptionReport {
@@ -156,12 +151,7 @@ public class GmlDecoderv311 implements Decoder<Object, XmlObject> {
             if ((FirstLatest.contains(timeString))) {
                 ti.setIndeterminateValue(timeString);
             } else {
-                try {
-                    ti.setValue(DateTimeHelper.parseIsoString2DateTime(timeString));
-
-                } catch (DateTimeException dte) {
-                    throw new NoApplicableCodeException().causedBy(dte).withMessage("Error while parsing TimeInstant!");
-                }
+                ti.setValue(DateTimeHelper.parseIsoString2DateTime(timeString));
                 ti.setRequestedTimeLength(timeString.length());
             }
         }

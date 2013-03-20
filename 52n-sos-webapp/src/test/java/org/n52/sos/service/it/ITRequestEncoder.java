@@ -49,7 +49,6 @@ import net.opengis.sos.x10.ResponseModeType;
 
 import org.n52.sos.exception.ows.InvalidParameterValueException;
 import org.n52.sos.exception.ows.InvalidParameterValueException.InvalidResponseModeParameterException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.filter.ComparisonFilter;
 import org.n52.sos.ogc.filter.FilterConstants;
@@ -66,7 +65,6 @@ import org.n52.sos.ogc.sos.SosConstants;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.slf4j.Logger;
@@ -382,46 +380,41 @@ public class ITRequestEncoder {
      * @throws OwsExceptionReport
      */
     public static void addTimeObject(ITime sosTime, BinaryTemporalOpType xb_binaryTempOps) throws OwsExceptionReport {
-        try {
-            if (sosTime == null) {
-                return;
-            } else if (sosTime instanceof TimeInstant) {
-                TimeInstant ti = (TimeInstant) sosTime;
-                TimeInstantType xb_timeInstant = (TimeInstantType) xb_binaryTempOps.addNewTimeObject()
-                        .substitute(QN_TIME_INSTANT,
-                                    TimeInstantType.type);
-                String timeStr;
-                if (ti.getIndeterminateValue() != null) {
-                    timeStr = ti.getIndeterminateValue();
-                } else {
-                    timeStr = DateTimeHelper.formatDateTime2ResponseString(ti.getValue());
-                }
-                xb_timeInstant.addNewTimePosition().setStringValue(timeStr);
-            } else if (sosTime instanceof TimePeriod) {
-                TimePeriod tp = (TimePeriod) sosTime;
-                TimePeriodType xb_timePeriod = (TimePeriodType) xb_binaryTempOps.addNewTimeObject()
-                        .substitute(QN_TIME_PERIOD,
-                                    TimePeriodType.type);
-                String beginTimeStr;
-                if (tp.getStartIndet() != null) {
-                    beginTimeStr = tp.getStartIndet();
-                } else {
-                    beginTimeStr = DateTimeHelper.formatDateTime2ResponseString(tp.getStart());
-                }
-
-                String endTimeStr;
-                if (tp.getEndIndet() != null) {
-                    endTimeStr = tp.getEndIndet();
-                } else {
-                    endTimeStr = DateTimeHelper.formatDateTime2ResponseString(tp.getEnd());
-                }
-
-                xb_timePeriod.addNewBeginPosition().setStringValue(beginTimeStr);
-                xb_timePeriod.addNewEndPosition().setStringValue(endTimeStr);
+        if (sosTime == null) {
+            return;
+        } else if (sosTime instanceof TimeInstant) {
+            TimeInstant ti = (TimeInstant) sosTime;
+            TimeInstantType xb_timeInstant = (TimeInstantType) xb_binaryTempOps.addNewTimeObject()
+                    .substitute(QN_TIME_INSTANT,
+                                TimeInstantType.type);
+            String timeStr;
+            if (ti.getIndeterminateValue() != null) {
+                timeStr = ti.getIndeterminateValue();
+            } else {
+                timeStr = DateTimeHelper.formatDateTime2ResponseString(ti.getValue());
             }
-        } catch (DateTimeException dte) {
-            throw new NoApplicableCodeException().causedBy(dte)
-                    .withMessage("Error while creating time objects!");
+            xb_timeInstant.addNewTimePosition().setStringValue(timeStr);
+        } else if (sosTime instanceof TimePeriod) {
+            TimePeriod tp = (TimePeriod) sosTime;
+            TimePeriodType xb_timePeriod = (TimePeriodType) xb_binaryTempOps.addNewTimeObject()
+                    .substitute(QN_TIME_PERIOD,
+                                TimePeriodType.type);
+            String beginTimeStr;
+            if (tp.getStartIndet() != null) {
+                beginTimeStr = tp.getStartIndet();
+            } else {
+                beginTimeStr = DateTimeHelper.formatDateTime2ResponseString(tp.getStart());
+            }
+
+            String endTimeStr;
+            if (tp.getEndIndet() != null) {
+                endTimeStr = tp.getEndIndet();
+            } else {
+                endTimeStr = DateTimeHelper.formatDateTime2ResponseString(tp.getEnd());
+            }
+
+            xb_timePeriod.addNewBeginPosition().setStringValue(beginTimeStr);
+            xb_timePeriod.addNewEndPosition().setStringValue(endTimeStr);
         }
     }
 

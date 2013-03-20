@@ -30,7 +30,6 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.joda.time.DateTime;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.ogc.om.OMConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
 import org.n52.sos.ogc.ows.OWSParameterValueRange;
@@ -42,7 +41,6 @@ import org.n52.sos.ogc.sos.SosEnvelope;
 import org.n52.sos.request.GetObservationRequest;
 import org.n52.sos.response.GetObservationResponse;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.util.DateTimeException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.MinMax;
 import org.n52.sos.util.SosHelper;
@@ -115,16 +113,11 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
      * @throws OwsExceptionReport     *             If an error occurs.
      */
     private MinMax<String> getPhenomenonTime() throws OwsExceptionReport {
-        try {
-            DateTime minDate = getCache().getMinPhenomenonTime();
-            DateTime maxDate = getCache().getMaxPhenomenonTime();
-            return new MinMax<String>()
-                    .setMinimum(minDate != null ? DateTimeHelper.formatDateTime2ResponseString(minDate) : null)
-                    .setMaximum(maxDate != null ? DateTimeHelper.formatDateTime2ResponseString(maxDate) : null);
-        } catch (DateTimeException dte) {
-            throw new NoApplicableCodeException().causedBy(dte)
-                    .withMessage("Error while getting min/max phenomenon time for OwsMetadata!");
-        }
+        DateTime minDate = getCache().getMinPhenomenonTime();
+        DateTime maxDate = getCache().getMaxPhenomenonTime();
+        return new MinMax<String>()
+                .setMinimum(minDate != null ? DateTimeHelper.formatDateTime2ResponseString(minDate) : null)
+                .setMaximum(maxDate != null ? DateTimeHelper.formatDateTime2ResponseString(maxDate) : null);
     }
     
     /**
@@ -136,16 +129,11 @@ public abstract class AbstractGetObservationDAO extends AbstractOperationDAO {
      * @throws OwsExceptionReport     *             If an error occurs.
      */
     private MinMax<String> getResultTime() throws OwsExceptionReport {
-        try {
-            DateTime minDate = getCache().getMinResultTime();
-            DateTime maxDate = getCache().getMaxResultTime();
-            return new MinMax<String>()
-                    .setMinimum(minDate != null ? DateTimeHelper.formatDateTime2ResponseString(minDate) : null)
-                    .setMaximum(maxDate != null ? DateTimeHelper.formatDateTime2ResponseString(maxDate) : null);
-        } catch (DateTimeException dte) {
-            throw new NoApplicableCodeException().causedBy(dte)
-                    .withMessage("Error while getting min/max result time for OwsMetadata!");
-        }
+        DateTime minDate = getCache().getMinResultTime();
+        DateTime maxDate = getCache().getMaxResultTime();
+        return new MinMax<String>()
+                .setMinimum(minDate != null ? DateTimeHelper.formatDateTime2ResponseString(minDate) : null)
+                .setMaximum(maxDate != null ? DateTimeHelper.formatDateTime2ResponseString(maxDate) : null);
     }
     
     private List<String> getResultModels() {

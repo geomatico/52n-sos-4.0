@@ -67,12 +67,9 @@ import org.n52.sos.util.SosHelper;
 import org.n52.sos.util.XmlOptionsHelper;
 import org.n52.sos.wsdl.WSDLConstants;
 import org.n52.sos.wsdl.WSDLOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Configurable
 public class SosInsertSensorOperatorV20 extends AbstractV2RequestOperator<AbstractInsertSensorDAO, InsertSensorRequest> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SosInsertSensorOperatorV20.class);
 
     private static final String OPERATION_NAME = Sos2Constants.Operations.InsertSensor.name();
 

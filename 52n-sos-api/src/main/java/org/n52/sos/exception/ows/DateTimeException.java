@@ -21,29 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA or
  * visit the Free Software Foundation web page, http://www.fsf.org.
  */
-package org.n52.sos.util;
+package org.n52.sos.exception.ows;
 
-public class DateTimeException extends Exception {
-    
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -7581405089861037253L;
-
-    public DateTimeException() {
-        super();
-    }
-    
-    public DateTimeException(String message) {
-        super(message);
-    }
-    
-    public DateTimeException(Throwable exception) {
-        super(exception);
-    }
-    
-    public DateTimeException(String message, Throwable exception) {
-        super(message, exception);
-    }
-
+public abstract class DateTimeException extends NoApplicableCodeException {
 }

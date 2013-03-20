@@ -23,9 +23,9 @@
  */
 package org.n52.sos.util;
 
-import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.InvalidParameterValueException;
-import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.InvalidSridException;
+import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +79,7 @@ public class JTSHelper {
 
     public static WKTReader getWKTReaderForSRID(int srid) throws OwsExceptionReport {
         if (srid <= 0) {
-            throw new NoApplicableCodeException().withMessage("SRID may not be <= 0. Was %d", srid);
+            throw new InvalidSridException(srid);
         }
         return new WKTReader(getGeometryFactoryForSRID(srid));
     }

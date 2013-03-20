@@ -48,7 +48,7 @@ import org.n52.sos.ogc.sos.SosConstants.FirstLatest;
 import org.n52.sos.request.AbstractServiceRequest;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConstants;
-import org.n52.sos.util.DateTimeException;
+import org.n52.sos.exception.ows.DateTimeParseException;
 import org.n52.sos.util.DateTimeHelper;
 import org.n52.sos.util.JTSHelper;
 import org.n52.sos.util.SosHelper;
@@ -70,7 +70,7 @@ public abstract class AbstractKvpDecoder implements Decoder<AbstractServiceReque
     }
 
     protected List<TemporalFilter> parseValidTime(String parameterValue, String parameterName) throws DecoderException,
-            DateTimeException {
+                                                                                                      DateTimeParseException {
         List<TemporalFilter> filterList = new ArrayList<TemporalFilter>(1);
         filterList.add(createTemporalFilterFromValue(parameterValue, null));
         return filterList;
@@ -116,7 +116,7 @@ public abstract class AbstractKvpDecoder implements Decoder<AbstractServiceReque
     }
 
     protected List<TemporalFilter> parseTemporalFilter(List<String> parameterValues, String parameterName)
-            throws DecoderException, DateTimeException {
+            throws DecoderException, DateTimeParseException {
         List<TemporalFilter> filterList = new ArrayList<TemporalFilter>(1);
         if (parameterValues.size() != 2) {
             throw new DecoderException("The parameter value is not valid!");
@@ -139,7 +139,7 @@ public abstract class AbstractKvpDecoder implements Decoder<AbstractServiceReque
     }
     
     private TemporalFilter createTemporalFilterFromValue(String value, String valueReference) throws DecoderException,
-            DateTimeException {
+                                                                                                     DateTimeParseException {
         TemporalFilter temporalFilter = new TemporalFilter();
         temporalFilter.setValueReference(valueReference);
         String[] times = value.split("/");

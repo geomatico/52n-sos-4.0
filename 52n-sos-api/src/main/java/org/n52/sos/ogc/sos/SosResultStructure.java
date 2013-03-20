@@ -28,6 +28,9 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject.Factory;
 import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.DecoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.EncoderResponseUnsupportedException;
+import org.n52.sos.exception.ows.NoApplicableCodeException.XmlDecodingException;
 import org.n52.sos.ogc.swe.SosSweAbstractDataComponent;
 import org.n52.sos.util.CodingHelper;
 import org.slf4j.Logger;
@@ -81,10 +84,10 @@ public class SosResultStructure {
                 SosSweAbstractDataComponent sosSweData = (SosSweAbstractDataComponent) decodedObject;
                 return sosSweData;
             } else {
-                throw new NoApplicableCodeException().withMessage("Error while parsing result structure!");
+                throw new DecoderResponseUnsupportedException(xml, decodedObject);
             }
         } catch (XmlException xmle) {
-            throw new NoApplicableCodeException().causedBy(xmle).withMessage("Error while parsing result structure!");
+            throw new XmlDecodingException("resultStructure", xml, xmle);
         }
     }
 
