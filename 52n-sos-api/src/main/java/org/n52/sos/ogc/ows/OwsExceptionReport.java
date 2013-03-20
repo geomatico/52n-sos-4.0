@@ -37,6 +37,7 @@ import org.n52.sos.service.Configurator;
  */
 public abstract class OwsExceptionReport extends Exception {
     private static final String namespace = OWSConstants.NS_OWS;
+    private Integer responseCode;
     private String version;
     
     /**
@@ -84,5 +85,31 @@ public abstract class OwsExceptionReport extends Exception {
             faultString.append("\n");
         }
         return faultString.toString();
+    }
+
+    /**
+     * @return the HTTP response code of this {@code OwsExceptionReport} or {@code null} if it is not set
+     */
+    public Integer getResponseCode() {
+        return responseCode;
+    }
+
+    /**
+     * @return if the HTTP response code for this {@code OwsExceptionReport} is set
+     */
+    public boolean hasResponseCode() {
+        return this.responseCode != null;
+    }
+
+    /**
+     * Sets the HTTP response code for this {@code OwsExceptionReport}.
+     *
+     * @param responseCode the code
+     *
+     * @return this (for method chaining)
+     */
+    public OwsExceptionReport setResponseCode(int responseCode) {
+        this.responseCode = responseCode;
+        return this;
     }
 }

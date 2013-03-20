@@ -175,6 +175,7 @@ public class SosService extends ConfiguratedHttpServlet {
 
     private ServiceResponse handleOwsException(OwsExceptionReport owsExceptionReport) throws ServletException {
         try {
+            ServiceResponse serviceResponse = null;
             SosEventBus.fire(new OwsExceptionReportEvent(owsExceptionReport));
             EncoderKey key = new XmlEncoderKey(owsExceptionReport.getNamespace(), owsExceptionReport.getClass());
             Encoder<?, OwsExceptionReport> encoder = Configurator.getInstance().getCodingRepository().getEncoder(key);
@@ -183,15 +184,19 @@ public class SosService extends ConfiguratedHttpServlet {
                 if (encodedObject instanceof XmlObject) {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ((XmlObject) encodedObject).save(baos, XmlOptionsHelper.getInstance().getXmlOptions());
-                    return new ServiceResponse(baos, SosConstants.CONTENT_TYPE_XML, false, true);
+                    serviceResponse = new ServiceResponse(baos, SosConstants.CONTENT_TYPE_XML, false, true);
                 } else if (encodedObject instanceof ServiceResponse) {
-                    return (ServiceResponse) encodedObject;
+                    serviceResponse = (ServiceResponse) encodedObject;
                 } else {
                     throw logExceptionAndCreateServletException(null);
                 }
             } else {
                 throw logExceptionAndCreateServletException(null);
             }
+            if (owsExceptionReport.hasResponseCode()) {
+                serviceResponse.setHttpResponseCode(owsExceptionReport.getResponseCode().intValue());
+            }
+            return serviceResponse;
         } catch (Exception owse) {
             throw logExceptionAndCreateServletException(owse);
         }
