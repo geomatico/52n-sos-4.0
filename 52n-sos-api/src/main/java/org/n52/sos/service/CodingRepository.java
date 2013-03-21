@@ -179,7 +179,9 @@ public class CodingRepository {
     private List<Decoder<?, ?>> loadDecoders() throws ConfigurationException {
         List<Decoder<?, ?>> loadedDecoders = new LinkedList<Decoder<?, ?>>();
         try {
+            SettingsManager sm = SettingsManager.getInstance();
             for (Decoder<?, ?> decoder : serviceLoaderDecoder) {
+                sm.configure(decoder);
                 loadedDecoders.add(decoder);
             }
         } catch (ServiceConfigurationError sce) {
@@ -198,7 +200,9 @@ public class CodingRepository {
     private List<Encoder<?, ?>> loadEncoders() throws ConfigurationException {
         List<Encoder<?, ?>> loadedEncoders = new LinkedList<Encoder<?, ?>>();
         try {
+            SettingsManager sm = SettingsManager.getInstance();
             for (Encoder<?, ?> encoder : serviceLoaderEncoder) {
+                sm.configure(encoder);
                 loadedEncoders.add(encoder);
             }
         } catch (ServiceConfigurationError sce) {
@@ -283,10 +287,8 @@ public class CodingRepository {
     }
 
     private void initEncoderMap() {
-        SettingsManager sm = SettingsManager.getInstance();
         this.encoderByKey.clear();
         for (Encoder<?, ?> encoder : getEncoders()) {
-            sm.configure(encoder);
             for (EncoderKey key : encoder.getEncoderKeyType()) {
                 Set<Encoder<?, ?>> encodersForKey = encoderByKey.get(key);
                 if (encodersForKey == null) {
@@ -301,10 +303,8 @@ public class CodingRepository {
     }
 
     private void initDecoderMap() {
-        SettingsManager sm = SettingsManager.getInstance();
         this.decoderByKey.clear();
         for (Decoder<?, ?> decoder : getDecoders()) {
-            sm.configure(decoder);
             for (DecoderKey key : decoder.getDecoderKeyTypes()) {
                 Set<Decoder<?, ?>> decodersForKey = decoderByKey.get(key);
                 if (decodersForKey == null) {
