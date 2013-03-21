@@ -179,7 +179,9 @@ public abstract class SettingsManager {
     public abstract void changeSetting(SettingValue<?> value) throws ConfigurationException,
                                                                       ConnectionProviderException;
 
-    /* TODO JavaDoc */
+    /**
+     * @return the {@link SettingValueFactory} to produce values
+     */
     public abstract SettingValueFactory getSettingFactory();
 
     /**
