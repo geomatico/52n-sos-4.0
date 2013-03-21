@@ -241,8 +241,8 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
         Criteria q = session.createCriteria(FeatureOfInterest.class)
                 .add(Restrictions.disjunction()
                 .add(Restrictions.eq(HibernateConstants.PARAMETER_IDENTIFIER, identifier))
-                .add(SpatialRestrictions
-                .eq(HibernateConstants.PARAMETER_GEOMETRY, switchCoordinateAxisOrderIfNeeded(geometry))));
+                .add(SpatialRestrictions.eq(HibernateConstants.PARAMETER_GEOMETRY,
+                                            switchCoordinateAxisOrderIfNeeded(geometry))));
         return (FeatureOfInterest) q.uniqueResult();
     }
 
@@ -293,12 +293,12 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
     }
 
     protected void insertFeatureOfInterest(SosSamplingFeature samplingFeature, Session session) throws OwsExceptionReport {
-        FeatureOfInterest feature = getFeatureOfInterest(samplingFeature.getIdentifier().getValue(),
-                                                         samplingFeature.getGeometry(), session);
+        String newId = samplingFeature.getIdentifier().getValue();
+        FeatureOfInterest feature = getFeatureOfInterest(newId, samplingFeature.getGeometry(), session);
         if (feature == null) {
             feature = new FeatureOfInterest();
             if (samplingFeature.isSetIdentifier()) {
-                feature.setIdentifier(samplingFeature.getIdentifier().getValue());
+                feature.setIdentifier(newId);
             }
             if (samplingFeature.isSetNames()) {
                 feature.setName(SosHelper.createCSVFromCodeTypeList(samplingFeature.getName()));
@@ -318,6 +318,13 @@ public class HibernateFeatureQueryHandler implements FeatureQueryHandler {
             }
             session.save(feature);
             session.flush();
+        } else {
+            String persistedId = feature.getIdentifier();
+            if (!(persistedId == null ? newId == null : persistedId.equals(newId))) {
+                throw new NoApplicableCodeException()
+                        .withMessage("The featureOfInterest '%s' has the same geometry as the featureOfInterest with the id '%s'",
+                                     newId, persistedId);
+            }
         }
     }
 
