@@ -23,7 +23,6 @@
  */
 package org.n52.sos.config;
 
-import org.n52.sos.exception.ConfigurationException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -42,9 +41,9 @@ import org.n52.sos.ds.ConnectionProviderException;
 import org.n52.sos.encode.ResponseFormatKeyType;
 import org.n52.sos.event.SosEventBus;
 import org.n52.sos.event.events.SettingsChangeEvent;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.request.operator.RequestOperatorKeyType;
 import org.n52.sos.service.Configurator;
-import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.CollectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,17 +105,16 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         SettingDefinition<?, ?> def = getDefinitionByKey(newValue.getKey());
 
         if (def.getType() != newValue.getType()) {
-            throw new IllegalArgumentException(String.format("Invalid type for definition (%s vs. %s)", def.getType(),
-                                                             newValue.getType()));
+            throw new IllegalArgumentException(String.format("Invalid type for definition (%s vs. %s)",
+                                                             def.getType(), newValue.getType()));
         }
 
         SettingValue<?> oldValue = getSettingValue(newValue.getKey());
         if (oldValue == null || !oldValue.equals(newValue)) {
             applySetting(def, oldValue, newValue);
             saveSettingValue(newValue);
+            SosEventBus.fire(new SettingsChangeEvent(def, oldValue, newValue));
         }
-
-        SosEventBus.fire(new SettingsChangeEvent(def, oldValue, newValue));
     }
 
     @Override
@@ -126,9 +124,8 @@ public abstract class AbstractSettingsManager extends SettingsManager {
         if (oldValue != null) {
             applySetting(setting, oldValue, null);
             deleteSettingValue(setting.getKey());
+            SosEventBus.fire(new SettingsChangeEvent(setting, oldValue, null));
         }
-
-        SosEventBus.fire(new SettingsChangeEvent(setting, oldValue, null));
     }
 
     /**
@@ -158,7 +155,6 @@ public abstract class AbstractSettingsManager extends SettingsManager {
                     } finally {
                         changed.add(co);
                     }
-                    co.configure(newValue.getValue());
                 }
                 if (e != null) {
                     log.debug("Reverting setting...");
@@ -213,6 +209,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
 
     @Override
     public void configure(Object object) throws ConfigurationException {
+        log.debug("Configuring {}", object);
         Class<?> clazz = object.getClass();
         Configurable configurable = clazz.getAnnotation(Configurable.class);
         if (configurable == null) {
@@ -244,6 +241,7 @@ public abstract class AbstractSettingsManager extends SettingsManager {
     }
 
     private void configure(ConfigurableObject co) throws ConfigurationException {
+        log.debug("Configuring {}", co);
         configurableObjectsLock.writeLock().lock();
         try {
             Set<ConfigurableObject> cos = configurableObjects.get(co.getKey());
@@ -479,8 +477,10 @@ public abstract class AbstractSettingsManager extends SettingsManager {
          * @throws ConfigurationException if an error occurs
          */
         public void configure(Object val) throws ConfigurationException {
+
             try {
                 if (getTarget().get() != null) {
+                    log.debug("Setting value '{}' for {}", val, this);
                     getMethod().invoke(getTarget().get(), val);
                 }
             } catch (IllegalAccessException ex) {
@@ -497,6 +497,12 @@ public abstract class AbstractSettingsManager extends SettingsManager {
                                            val, val.getClass(), getKey(), getMethod());
             log.error(message);
             throw new ConfigurationException(message, t);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("ConfigurableObject[key=%s, method=%s, target=%s]",
+                                 getKey(), getMethod(), getTarget().get());
         }
     }
 }
