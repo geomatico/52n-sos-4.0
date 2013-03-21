@@ -37,7 +37,6 @@ import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.config.SettingsManager;
 import org.n52.sos.decode.Decoder;
 import org.n52.sos.decode.DecoderKey;
@@ -46,6 +45,7 @@ import org.n52.sos.encode.Encoder;
 import org.n52.sos.encode.EncoderKey;
 import org.n52.sos.encode.ObservationEncoder;
 import org.n52.sos.encode.ResponseFormatKeyType;
+import org.n52.sos.exception.ConfigurationException;
 import org.n52.sos.service.ServiceConstants.SupportedTypeKey;
 import org.n52.sos.service.operator.ServiceOperatorKeyType;
 import org.n52.sos.util.Activatable;
@@ -283,8 +283,10 @@ public class CodingRepository {
     }
 
     private void initEncoderMap() {
+        SettingsManager sm = SettingsManager.getInstance();
         this.encoderByKey.clear();
         for (Encoder<?, ?> encoder : getEncoders()) {
+            sm.configure(encoder);
             for (EncoderKey key : encoder.getEncoderKeyType()) {
                 Set<Encoder<?, ?>> encodersForKey = encoderByKey.get(key);
                 if (encodersForKey == null) {
@@ -299,8 +301,10 @@ public class CodingRepository {
     }
 
     private void initDecoderMap() {
+        SettingsManager sm = SettingsManager.getInstance();
         this.decoderByKey.clear();
         for (Decoder<?, ?> decoder : getDecoders()) {
+            sm.configure(decoder);
             for (DecoderKey key : decoder.getDecoderKeyTypes()) {
                 Set<Decoder<?, ?>> decodersForKey = decoderByKey.get(key);
                 if (decodersForKey == null) {
@@ -468,7 +472,6 @@ public class CodingRepository {
     public Set<String> getAllProcedureDescriptionFormats() {
         return Activatable.unfiltered(this.typeMap.get(SupportedTypeKey.ProcedureDescriptionFormat));
     }
-
 
     public void setActive(ResponseFormatKeyType rfkt, boolean active) {
         if (this.responseFormatStatus.containsKey(rfkt)) {
