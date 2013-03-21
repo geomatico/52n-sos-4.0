@@ -159,10 +159,14 @@ abstract class AbstractSettingDefinition<S extends AbstractSettingDefinition<S, 
 
     @Override
     public boolean equals(Object obj) {
-        //FIXME include other properties
         if (obj != null && obj instanceof AbstractSettingDefinition) {
-            AbstractSettingDefinition<?, ?> other = (AbstractSettingDefinition<?, ?>) obj;
-            return getKey() == null ? other.getKey() == null : getKey().equals(other.getKey());
+            AbstractSettingDefinition<?, ?> o = (AbstractSettingDefinition<?, ?>) obj;
+            return getKey() == null ? o.getKey() == null : getKey().equals(o.getKey()) && getTitle() == null ? o
+                    .getTitle() == null : getTitle().equals(o.getTitle()) && getDescription() == null ? o
+                    .getDescription() == null : getDescription().equals(o.getDescription()) && getGroup() == null ? o
+                    .getGroup() == null : getGroup().equals(o.getGroup()) && getDefaultValue() == null ? o
+                    .getDefaultValue() == null : getDefaultValue().equals(o.getDefaultValue()) && getType() == o
+                    .getType() && isOptional() == o.isOptional();
         }
         return true;
     }
