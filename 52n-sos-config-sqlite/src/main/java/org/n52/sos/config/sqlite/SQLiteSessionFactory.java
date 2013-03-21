@@ -156,7 +156,6 @@ public class SQLiteSessionFactory implements ConnectionProvider {
     @Override
     public Session getConnection() throws ConnectionProviderException {
         try {
-            log.trace("Session requested...");
             return getSessionFactory().getCurrentSession();
         } catch (HibernateException e) {
             throw new ConnectionProviderException(e);
@@ -165,15 +164,6 @@ public class SQLiteSessionFactory implements ConnectionProvider {
 
     @Override
     public void returnConnection(Object connection) {
-        if (connection != null && connection instanceof Session) {
-            log.trace("Session returned...");
-//            Session session = (Session) connection;
-//            if (session.isOpen()) {
-//                session.close();
-//            } else {
-//                log.warn("Returned session already closed");
-//            }
-        }
     }
 
     @Override
