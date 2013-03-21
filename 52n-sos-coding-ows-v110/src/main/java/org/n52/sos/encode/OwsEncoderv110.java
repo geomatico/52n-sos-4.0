@@ -23,6 +23,7 @@
  */
 package org.n52.sos.encode;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -50,12 +51,14 @@ import net.opengis.ows.x11.ServiceIdentificationDocument.ServiceIdentification;
 import net.opengis.ows.x11.ServiceProviderDocument;
 import net.opengis.ows.x11.ServiceProviderDocument.ServiceProvider;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.xmlbeans.XmlObject;
+import org.n52.sos.config.annotation.Configurable;
+import org.n52.sos.config.annotation.Setting;
 import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.OwsExceptionCode;
 import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.ows.CodedException;
-import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.IOWSParameterValue;
 import org.n52.sos.ogc.ows.OWSConstants;
 import org.n52.sos.ogc.ows.OWSOperation;
@@ -77,6 +80,7 @@ import org.n52.sos.util.XmlOptionsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Configurable
 public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
     private static final Logger LOGGER = LoggerFactory.getLogger(OwsEncoderv110.class);
     private Set<EncoderKey> ENCODER_KEYS = CodingHelper.encoderKeysForElements(OWSConstants.NS_OWS,
@@ -84,10 +88,16 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
                                                                                SosServiceProvider.class,
                                                                                OWSOperationsMetadata.class,
                                                                                OwsExceptionReport.class);
+    private boolean includeStackTraceInExceptionReport = false;
 
     public OwsEncoderv110() {
         LOGGER.debug("Encoder for the following keys initialized successfully: {}!",
                      StringHelper.join(", ", ENCODER_KEYS));
+    }
+
+    @Setting(OwsEncoderSettings.INCLUDE_STACK_TRACE_IN_EXCEPTION_REPORT)
+    public void setIncludeStackTrace(boolean includeStackTraceInExceptionReport) {
+        this.includeStackTraceInExceptionReport = includeStackTraceInExceptionReport;
     }
 
     @Override
@@ -308,6 +318,11 @@ public class OwsEncoderv110 implements Encoder<XmlObject, Object> {
             } else {
                 JavaHelper.appendTextToStringBuilderWithLineBreak(exceptionText, localizedMessage);
                 JavaHelper.appendTextToStringBuilderWithLineBreak(exceptionText, message);
+            }
+            if (includeStackTraceInExceptionReport) {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                owsException.getCause().printStackTrace(new PrintStream(os));
+                exceptionText.append(os.toString());
             }
         }
         exceptionType.addExceptionText(exceptionText.toString());

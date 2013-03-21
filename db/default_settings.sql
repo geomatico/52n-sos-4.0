@@ -116,6 +116,7 @@ INSERT INTO "settings" VALUES('misc.defaultObservablePropertyPrefix');
 INSERT INTO "settings" VALUES('misc.defaultOfferingPrefix');
 INSERT INTO "settings" VALUES('misc.defaultProcedurePrefix');
 INSERT INTO "settings" VALUES('misc.gmlDateFormat');
+INSERT INTO "settings" VALUES('misc.includeStackTraceInExceptionReport');
 INSERT INTO "settings" VALUES('misc.srsNamePrefixSosV1');
 INSERT INTO "settings" VALUES('misc.srsNamePrefixSosV2');
 INSERT INTO "settings" VALUES('misc.switchCoordinatesForEpsgCodes');
@@ -159,6 +160,7 @@ INSERT INTO "settings" VALUES('serviceProvider.state');
 
 INSERT INTO "administrator_user" VALUES(1,'$2a$10$y1TfEacanLJHkC0mqtkpy.KSt7r6DjdebUdbTn2kpqfwbiVRgnWsa','admin');
 
+INSERT INTO "boolean_settings" VALUES(0,'misc.includeStackTraceInExceptionReport');
 INSERT INTO "boolean_settings" VALUES(1,'service.supportsQuality');
 INSERT INTO "boolean_settings" VALUES(1,'service.skipDuplicateObservations');
 INSERT INTO "boolean_settings" VALUES(0,'service.blockGetObservationRequestsWithoutRestriction');
